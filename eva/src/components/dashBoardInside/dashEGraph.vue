@@ -1,11 +1,13 @@
 <template>
-  <div class="dash-template"></div>
+  <div class="dash-template" ref="graph"></div>
 </template>
 
 
 <script>
 import * as yfile from 'yfiles'
 import licenseData from './license.json'
+
+yfile.License.value = licenseData//проверка лицензии
 
 export default {
   name: "dashEGraph",
