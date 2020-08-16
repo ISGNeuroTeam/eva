@@ -1,5 +1,7 @@
 <template>
-  <div class="dash-template" ref="graph"></div>
+  <div class="ygraph-wrapper">
+    <div ref="graph"/>
+  </div>
 </template>
 
 
@@ -10,7 +12,7 @@ import licenseData from './license.json'
 yfile.License.value = licenseData//проверка лицензии
 
 export default {
-  name: "dashEGraph",
+  name: "dashYGraph",
   props: {  // переменные полученные от родителя
     idFrom: null,  // id элемнета (table, graph-2)
     idDashFrom: null, // id дашборда 
@@ -193,12 +195,20 @@ export default {
   },  
   methods: {
     doSomething(data) {
-      console.log(data)
+      // console.log(data)
     },
 
   },
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+
+    this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
+    this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
+
+    //убираем надпись о license
+    document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
+    document.querySelector('.yfiles-svgpanel').children[2].style.opacity = 0
+
   } 
 }
 

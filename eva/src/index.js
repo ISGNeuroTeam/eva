@@ -65,7 +65,7 @@ Vue.component('dash-textarea', require('./components/dashBoardInside/dashTextAre
 Vue.component('dash-barchart', require('./components/dashBoardInside/dashBarChart.vue').default)  // элемент столбцовой диаграммы
 Vue.component('dash-tile', require('./components/dashBoardInside/dashTile.vue').default)  // элемент плиточной визуализации
 Vue.component('dash-csvg', require('./components/dashBoardInside/dashCSvg.vue').default)  // элемент  визуализации svg
-Vue.component('dash-egraph', require('./components/dashBoardInside/dashEGraph.vue').default)  // граф. новая версия
+Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vue').default)  // граф. новая версия
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
 //Vue.component('dash-search', require('./components/dashBoardInside/dashSearch.vue').default)  // элемнет поиска пока не актуален
