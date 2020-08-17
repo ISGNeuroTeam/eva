@@ -1,6 +1,6 @@
 <template>
   <div class="ygraph-wrapper">
-    <div ref="graph"/>
+    <div class="ygraph-component-container" ref="graph"/>
   </div>
 </template>
 
@@ -197,6 +197,43 @@ export default {
     doSomething(data) {
       // console.log(data)
     },
+    initializeDefaultStyles(){
+      this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
+        fill: 'orange',
+        stroke: 'orange',
+        shape: 'rectangle'
+      })
+    },
+    createGraphBuilder() {
+      const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
+
+      this.nodesSource = graphBuilder.createNodesSource({
+        data: this.nodesSource,
+        id: 'id',
+        tag: item => ({ name: item.name })
+      })
+
+      this.edgesSource = graphBuilder.createEdgesSource({
+        data: this.edgesSource,
+        sourceId: 'fromNode',
+        targetId: 'toNode'
+      })
+    
+      return graphBuilder
+  },
+  createDefaultGraph() {
+      const graph = this.$graphComponent.graph
+      graph.clear()
+      const n1 = graph.createNodeAt([150, 150])
+      const n2 = graph.createNodeAt([250, 150])
+      const n3 = graph.createNodeAt([150, 250])
+      graph.createEdge(n1, n2)
+      graph.createEdge(n1, n3)
+      graph.createEdge(n2, n3)
+      this.$graphComponent.fitGraphBounds()
+    },
+
+
 
   },
   mounted() {
@@ -204,6 +241,15 @@ export default {
 
     this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
     this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
+    this.initializeDefaultStyles()
+    this.createDefaultGraph()
+
+    // const graphBuilder = this.createGraphBuilder()
+    // this.$graphComponent.graph = graphBuilder.buildGraph()
+
+    // this.$graphComponent.fitGraphBounds()
+
+    // this.$graphComponent.morphLayout(new yfile.HierarchicLayout(), '1s')
 
     //убираем надпись о license
     document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
@@ -215,8 +261,14 @@ export default {
 
 </script>
 
-<style lang="sass" > 
-  
+<style lang="css" > 
+.ygraph-component-container {
+  position: absolute;
+  top: 100px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
 
    
 </style>
