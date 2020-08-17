@@ -185,13 +185,14 @@ export default {
     idDash: function() { 
       return this.idDashFrom
     },
-    dataRest: function() {
-      this.doSomething(this.dataRestFrom)
-      return this.dataRestFrom
-    },
     color: function() {
       return this.colorFrom
     },
+  },
+  watch: {
+    dataRestFrom() {
+      this.applyGraphBuilder()
+    }
   },  
   methods: {
     initializeDefaultStyles(){
@@ -201,7 +202,7 @@ export default {
         shape: 'rectangle'
       })
     },
-    createGraphBuilder() {
+    applyGraphBuilder() {
       const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
 
       this.nodesSource = graphBuilder.createNodesSource({
@@ -216,7 +217,9 @@ export default {
         targetId: 'toNode',
       })
     
-      return graphBuilder
+      this.$graphComponent.graph = graphBuilder.buildGraph()
+      //this.$graphComponent.fitGraphBounds() tmp
+      this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
     },
 
     creareGraph() {
@@ -228,14 +231,6 @@ export default {
       document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
       document.querySelector('.yfiles-svgpanel').children[2].style.opacity = 0
     },
-
-    applyGraphBuilder(){
-      const graphBuilder = this.createGraphBuilder()
-      this.$graphComponent.graph = graphBuilder.buildGraph()
-
-      this.$graphComponent.fitGraphBounds()
-      this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
-    }
 
   },
   mounted() {
