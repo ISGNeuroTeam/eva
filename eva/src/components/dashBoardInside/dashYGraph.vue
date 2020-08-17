@@ -194,19 +194,11 @@ export default {
     },
   },  
   methods: {
-    doSomething(data) {
-      // console.log(data)
-    },
     initializeDefaultStyles(){
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
         fill: 'orange',
         stroke: 'orange',
         shape: 'rectangle'
-      })
-      
-      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle({
-        textFill: '#fff',
-        font: new yfile.Font('serif', 14)
       })
     },
     createGraphBuilder() {
@@ -221,31 +213,34 @@ export default {
       this.edgesSource = graphBuilder.createEdgesSource({
         data: this.edgesSource,
         sourceId: 'fromNode',
-        targetId: 'toNode'
+        targetId: 'toNode',
       })
     
       return graphBuilder
-  },
+    },
+
+    creareGraph() {
+      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
+      this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
+      this.initializeDefaultStyles()
+
+      //убираем надпись о license
+      document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
+      document.querySelector('.yfiles-svgpanel').children[2].style.opacity = 0
+    },
+
+    applyGraphBuilder(){
+      const graphBuilder = this.createGraphBuilder()
+      this.$graphComponent.graph = graphBuilder.buildGraph()
+
+      this.$graphComponent.fitGraphBounds()
+      this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
+    }
 
   },
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
-
-    this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
-    this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
-    this.initializeDefaultStyles()
-
-    const graphBuilder = this.createGraphBuilder()
-    this.$graphComponent.graph = graphBuilder.buildGraph()
-
-    this.$graphComponent.fitGraphBounds()
-
-    this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
-
-    //убираем надпись о license
-    document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
-    document.querySelector('.yfiles-svgpanel').children[2].style.opacity = 0
-
+    this.creareGraph();
   } 
 }
 
