@@ -203,6 +203,11 @@ export default {
         stroke: 'orange',
         shape: 'rectangle'
       })
+      
+      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle({
+        textFill: '#fff',
+        font: new yfile.Font('serif', 14)
+      })
     },
     createGraphBuilder() {
       const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
@@ -221,19 +226,6 @@ export default {
     
       return graphBuilder
   },
-  createDefaultGraph() {
-      const graph = this.$graphComponent.graph
-      graph.clear()
-      const n1 = graph.createNodeAt([150, 150])
-      const n2 = graph.createNodeAt([250, 150])
-      const n3 = graph.createNodeAt([150, 250])
-      graph.createEdge(n1, n2)
-      graph.createEdge(n1, n3)
-      graph.createEdge(n2, n3)
-      this.$graphComponent.fitGraphBounds()
-    },
-
-
 
   },
   mounted() {
@@ -242,14 +234,13 @@ export default {
     this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
     this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
     this.initializeDefaultStyles()
-    this.createDefaultGraph()
 
-    // const graphBuilder = this.createGraphBuilder()
-    // this.$graphComponent.graph = graphBuilder.buildGraph()
+    const graphBuilder = this.createGraphBuilder()
+    this.$graphComponent.graph = graphBuilder.buildGraph()
 
-    // this.$graphComponent.fitGraphBounds()
+    this.$graphComponent.fitGraphBounds()
 
-    // this.$graphComponent.morphLayout(new yfile.HierarchicLayout(), '1s')
+    this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
 
     //убираем надпись о license
     document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
@@ -264,7 +255,7 @@ export default {
 <style lang="css" > 
 .ygraph-component-container {
   position: absolute;
-  top: 100px;
+  top: 25px;
   left: 0;
   right: 0;
   bottom: 0;
