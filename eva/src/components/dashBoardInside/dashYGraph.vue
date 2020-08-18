@@ -64,6 +64,8 @@ export default {
       })
     },
     applyGraphBuilder() {
+      this.$graphComponent.graph.clear()
+
       const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
 
       this.nodesSource = graphBuilder.createNodesSource({
