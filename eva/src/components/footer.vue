@@ -16,7 +16,7 @@ export default {
 
   data () {
     return {
-      version: '1.51.0',
+      version: '1.51.0 20200818-113800',
       color: { },
     } 
   },
