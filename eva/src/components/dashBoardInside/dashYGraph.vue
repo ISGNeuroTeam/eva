@@ -60,7 +60,16 @@ export default {
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
         fill: 'orange',
         stroke: 'orange',
-        shape: 'rectangle'
+        shape: 'ellipse',
+      })
+
+      this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
+        stroke: '1px #242265',
+        targetArrow: new yfile.Arrow({
+          fill: '#242265',
+          scale: 1,
+          type: 'circle'
+        })
       })
     },
     applyGraphBuilder() {
@@ -71,14 +80,27 @@ export default {
       this.nodesSource = graphBuilder.createNodesSource({
         data: this.nodesSource,
         id: 'id',
-        tag: item => ({ name: item.name })
+        tag: item => item.name
       })
+
+      const nodeLabelCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
+      nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
+        textSize: 8
+      })
+
 
       this.edgesSource = graphBuilder.createEdgesSource({
         data: this.edgesSource,
         sourceId: 'fromNode',
         targetId: 'toNode',
       })
+
+      const edgeLabelCreator = this.edgesSource.edgeCreator.createLabelBinding(edgeDataItem => edgeDataItem.label)
+      edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
+        textSize: 6
+      })
+
+
     
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //this.$graphComponent.fitGraphBounds() 
