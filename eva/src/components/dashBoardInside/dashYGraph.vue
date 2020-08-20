@@ -50,6 +50,7 @@ export default {
       this.generateNodesSource(val)
       this.generateEdgesSource(val)
       this.applyGraphBuilder()
+
     }
   },  
   methods: {
@@ -69,6 +70,7 @@ export default {
         })
       })
     },
+
     applyGraphBuilder() {
       this.$graphComponent.graph.clear()
 
@@ -80,26 +82,25 @@ export default {
         tag: item => item.name,
       })
       
-
+      //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 8,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
      
-
+      //label label для nodes
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
          if( nodeDataItem.label !== "-"){
            return nodeDataItem.label
          }
       })
-      
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 8
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST
 
-
+      //генерация edges
       this.$edgesSource = graphBuilder.createEdgesSource({
         data: this.edgesSource,
         sourceId: 'fromNode',
@@ -111,45 +112,24 @@ export default {
            return edgeDataItem.label
          }
       })
-      
       edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 8,
         backgroundFill: this.colorFrom.backElement,
       })
     
+
       this.$graphComponent.graph = graphBuilder.buildGraph()
-      
+      //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
         nodeHalos: yfile.NodeHalo.create(15, 75, 15, 100)
       })
 
+      //применяем layout
       this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout(), layoutData)
-
-      const nodes = this.$graphComponent.graph.nodes
-      nodes.forEach(n=>{
-        if (n.tag === 'start'){
-         this.$graphComponent.graph.setStyle(n, new  yfile.ShapeNodeStyle({
-          shape: 'ELLIPSE',
-          fill: '#ffccff',
-          })
-        )
-        }
-         if (n.tag === 'finish'){
-
-           this.$graphComponent.graph.setStyle(n, new  yfile.ShapeNodeStyle({
-          shape: 'ELLIPSE',
-          fill: '#ff00ff',
-          })
-        )
-         }
-
-
-      })
     },
 
     creareGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
-      //this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
       this.initializeDefaultStyles()
 
       //убираем надпись о license
