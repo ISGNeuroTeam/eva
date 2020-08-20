@@ -57,10 +57,11 @@ export default {
   },  
   methods: {
     initializeDefaultStyles(){
+      //this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(25, 50)
+      
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
         fill: 'orange',
         stroke: 'orange',
-        shape: 'ellipse',
       })
 
       this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
@@ -83,11 +84,18 @@ export default {
         tag: item => item.name
       })
 
-      const nodeLabelCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
+      const nodeNameCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
+      nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
+        textSize: 6,
+      })
+      nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
+     
+
+      const nodeLabelCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.label)
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 8
       })
-
+      nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.SOUTH_EAST
 
       this.edgesSource = graphBuilder.createEdgesSource({
         data: this.edgesSource,
