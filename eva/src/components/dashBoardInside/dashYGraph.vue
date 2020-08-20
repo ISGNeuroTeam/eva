@@ -50,7 +50,9 @@ export default {
       this.generateNodesSource(val)
       this.generateEdgesSource(val)
       this.applyGraphBuilder()
-
+    },
+    colorFrom(){
+      this.applyGraphBuilder()
     }
   },  
   methods: {
