@@ -44,9 +44,6 @@ export default {
     idDash: function() { 
       return this.idDashFrom
     },
-    color: function() {
-      return this.colorFrom
-    },
   },
   watch: {
     dataRestFrom(val) {
@@ -56,12 +53,11 @@ export default {
     }
   },  
   methods: {
-    initializeDefaultStyles(){
-      //this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(25, 50)
-      
+    initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
         fill: 'orange',
         stroke: 'orange',
+        shape: 'ELLIPSE',
       })
 
       this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
@@ -77,25 +73,22 @@ export default {
       this.$graphComponent.graph.clear()
 
       const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
-
-      this.nodesSource = graphBuilder.createNodesSource({
+     
+      this.$nodesSource = graphBuilder.createNodesSource({
         data: this.nodesSource,
         id: 'id',
-        tag: item => item.name
+        tag: item => item.name,
       })
+      
 
-      const nodeNameCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
-        if( nodeDataItem.name.toLowerCase() !== 'start'.toLowerCase() && nodeDataItem.name.toLowerCase() !== 'finish'.toLowerCase() ){
-          return nodeDataItem.name
-        }
-      })
+      const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 6,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
      
 
-      const nodeLabelCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
+      const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
          if( nodeDataItem.label.toLowerCase() !== '-'){
            return nodeDataItem.label
          }
@@ -105,37 +98,48 @@ export default {
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.SOUTH_EAST
 
-      const graphHeader = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
-        if( nodeDataItem.name.toLowerCase() === 'start'.toLowerCase() || nodeDataItem.name.toLowerCase() === 'finish'.toLowerCase() ){
-          return nodeDataItem.name
-        }
-      })
-      graphHeader.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 12,
-      })
 
-
-      this.edgesSource = graphBuilder.createEdgesSource({
+      this.$edgesSource = graphBuilder.createEdgesSource({
         data: this.edgesSource,
         sourceId: 'fromNode',
         targetId: 'toNode',
       })
 
-      const edgeLabelCreator = this.edgesSource.edgeCreator.createLabelBinding(edgeDataItem => edgeDataItem.label)
+      const edgeLabelCreator = this.$edgesSource.edgeCreator.createLabelBinding(edgeDataItem => edgeDataItem.label)
       edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 6
+        textSize: 6,
+        backgroundFill: this.colorFrom.backElement,
       })
-
-
     
       this.$graphComponent.graph = graphBuilder.buildGraph()
-      //this.$graphComponent.fitGraphBounds() 
+      
       this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
+
+      const nodes = this.$graphComponent.graph.nodes
+      nodes.forEach(n=>{
+        if (n.tag === 'start'){
+         this.$graphComponent.graph.setStyle(n, new  yfile.ShapeNodeStyle({
+          shape: 'ELLIPSE',
+          fill: '#ffccff',
+          })
+        )
+        }
+         if (n.tag === 'finish'){
+
+           this.$graphComponent.graph.setStyle(n, new  yfile.ShapeNodeStyle({
+          shape: 'ELLIPSE',
+          fill: '#ff00ff',
+          })
+        )
+         }
+
+
+      })
     },
 
     creareGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
-      this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
+      //this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
       this.initializeDefaultStyles()
 
       //убираем надпись о license
