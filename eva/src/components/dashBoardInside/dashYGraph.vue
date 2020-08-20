@@ -83,20 +83,21 @@ export default {
 
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 6,
+        textSize: 8,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
      
 
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
-         if( nodeDataItem.label.toLowerCase() !== '-'){
+         if( nodeDataItem.label !== "-"){
            return nodeDataItem.label
          }
       })
+      
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 8
       })
-      nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.SOUTH_EAST
+      nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST
 
 
       this.$edgesSource = graphBuilder.createEdgesSource({
@@ -105,15 +106,24 @@ export default {
         targetId: 'toNode',
       })
 
-      const edgeLabelCreator = this.$edgesSource.edgeCreator.createLabelBinding(edgeDataItem => edgeDataItem.label)
+      const edgeLabelCreator = this.$edgesSource.edgeCreator.createLabelBinding(edgeDataItem =>{
+       if( edgeDataItem.label !== "-"){
+           return edgeDataItem.label
+         }
+      })
+      
       edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 6,
+        textSize: 8,
         backgroundFill: this.colorFrom.backElement,
       })
     
       this.$graphComponent.graph = graphBuilder.buildGraph()
       
-      this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout())
+      const layoutData = new yfile.HierarchicLayoutData({
+        nodeHalos: yfile.NodeHalo.create(15, 75, 15, 100)
+      })
+
+      this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout(), layoutData)
 
       const nodes = this.$graphComponent.graph.nodes
       nodes.forEach(n=>{
