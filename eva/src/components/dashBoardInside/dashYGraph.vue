@@ -84,18 +84,36 @@ export default {
         tag: item => item.name
       })
 
-      const nodeNameCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
+      const nodeNameCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
+        if( nodeDataItem.name.toLowerCase() !== 'start'.toLowerCase() && nodeDataItem.name.toLowerCase() !== 'finish'.toLowerCase() ){
+          return nodeDataItem.name
+        }
+      })
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 6,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
      
 
-      const nodeLabelCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.label)
+      const nodeLabelCreator = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
+         if( nodeDataItem.label.toLowerCase() !== '-'){
+           return nodeDataItem.label
+         }
+      })
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
         textSize: 8
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.SOUTH_EAST
+
+      const graphHeader = this.nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
+        if( nodeDataItem.name.toLowerCase() === 'start'.toLowerCase() || nodeDataItem.name.toLowerCase() === 'finish'.toLowerCase() ){
+          return nodeDataItem.name
+        }
+      })
+      graphHeader.defaults.style = new yfile.DefaultLabelStyle({
+        textSize: 12,
+      })
+
 
       this.edgesSource = graphBuilder.createEdgesSource({
         data: this.edgesSource,
