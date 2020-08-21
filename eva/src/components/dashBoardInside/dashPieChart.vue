@@ -27,7 +27,7 @@
       <div  
         v-show="!dataLoading" 
         ref="piechartItself"
-        class="dash-piechart" 
+        :class="`dash-piechart ${this.idFrom}`" 
         :data-change="change"
       />
       <div 
@@ -83,8 +83,18 @@ export default {
       nodata: true,
       message: 'Нет данных для отображения',
       colors: {
-        neitral: ['#650075','#5F27FF','#003CFF'],
-        indicted: ['#FF7F37','#EB2F2F','#920000'],
+        neitral: [
+          '#650075','#5F27FF','#228B22','#99CC00','#8B4513',
+          '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
+          '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
+          '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
+        ],
+        indicted: [
+          '#FF7F37','#EB2F2F','#920000','#99CC00','#8B4513',
+          '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
+          '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
+          '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
+        ],
         custom: []
       },
       legends: [],
@@ -95,12 +105,6 @@ export default {
     } 
   },
   computed: {  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function() { 
-      return this.idFrom
-    },
-    idDash: function() { 
-      return this.idDashFrom
-    },
     dataRest: function() {
       return this.dataRestFrom
     },
@@ -108,7 +112,10 @@ export default {
       return this.colorFrom
     },
     metrics: function() {
-      let metrics = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).metricsRelation.relations;
+      let metrics = this.$store.getters.getOptions({
+        idDash: this.idDashFrom, 
+        id: this.idFrom
+      }).metricsRelation.relations;
       return metrics
     },
     dataLoading: function() {
@@ -121,20 +128,20 @@ export default {
       return this.heightFrom
     },
     change: function() {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0 && this.width != 0 && this.height != 0) {
-        if (this.dataReport) {
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.width && this.height ) {
+        // if (this.dataReport) {
           
-          if (this.activeElemFrom == this.id) {
-            this.createPieChartAsync();
-          } else {
-            let graphics = d3.select(this.$el.querySelector('.dash-piechart')).selectAll('svg').nodes();
-            if(graphics.length != 0){  // если график уже есть
-              graphics[0].remove(); // удаляем его
-            }
-          }
-        } else {
-          this.createPieChartAsync();
-        }
+        //   if (this.activeElemFrom == this.id) {
+        //     this.createPieChartAsync();
+        //   } else {
+        //     let graphics = d3.select(this.$el.querySelector(`.dash-${this.idFrom}`)).selectAll('svg').nodes();
+        //     if(graphics.length != 0){  // если график уже есть
+        //       graphics[0].remove(); // удаляем его
+        //     }
+        //   }
+        // } else {
+        this.createPieChartAsync();
+        // }
         
       }
       return true  
@@ -142,88 +149,76 @@ export default {
   },  
   methods: {
     createPieChartAsync: function() {
+      let sizeLine = {'width': 0,'height': 0};  // получаем размеры от родителя
+      sizeLine['width'] = this.width;
+      sizeLine['height'] = this.height;
 
-      let prom = new Promise( resolve => { // создаем promise чтобы затем отрисовать график асинхронно
+      if(this.dataRestFrom.error) {  // смотрим если с ошибкой
+        this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
+      } else {  // если нет
+        this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDashFrom, id: this.idFrom });
+        this.$store.commit('setThemePie', {
+          themes: this.colors,
+          idDash: this.idDashFrom, 
+          id: this.idFrom
+        });
+      } 
 
-     
-        let sizeLine = {'width': 0,'height': 0};  // получаем размеры от родителя
-        sizeLine['width'] = this.width;
-        sizeLine['height'] = this.height;
-
-        if(this.dataRestFrom.error) {  // смотрим если с ошибкой
-          this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
-        } else {  // если нет
-          this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDash, id: this.id });
-          this.$store.commit('setThemePie', {themes: {
-            neitral: ['#650075','#5F27FF','#003CFF'],
-            indicted: ['#FF7F37','#EB2F2F','#920000'],
-            custom: [],
-          },
-          idDash: this.idDash, id: this.id
-          });
-          resolve(sizeLine) // передаем в результат размеры графика
-        
-        } 
-
-      })
-
-      prom.then( (sizeLine) => { // как раз тут делаем асинхронность
-        let onlyNum = true;
-        let metrics = this.metrics;
-        let showlegend = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).showlegend;
-        if (showlegend == undefined) {
-          showlegend = true;
+      let onlyNum = true;
+      let metrics = this.metrics;
+      let showlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).showlegend;
+      if (showlegend == undefined) {
+        showlegend = true;
+      }
+      let positionlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).positionlegend;
+      if (positionlegend == undefined) {
+        positionlegend = 'right'
+      }
+      let colorsPie = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).colorsPie;
+      if (colorsPie == undefined) {
+        colorsPie = {
+          theme: 'neitral',
+          colors: '',
+          nametheme: '',
         }
-        let positionlegend = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).positionlegend;
-        if (positionlegend == undefined) {
-          positionlegend = 'right'
-        }
-        let colorsPie = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).colorsPie;
-        if (colorsPie == undefined) {
-          colorsPie = {
-            theme: 'neitral',
-            colors: '',
-            nametheme: '',
-          }
-        }
-        if (this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).themes)  {
-          this.colors = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).themes;
-        }
-        typeof(this.dataRestFrom[0][metrics[1]]) != 'number' ? onlyNum = false : false
-        if (onlyNum){  // если все-таки число
-          this.nodata = false; // то убираем соощение о отсутствии данных
-          if (this.dataRestFrom.length > 20) {  // если элемнетов больше 20
-            this.nodata = true;  // показываем сообщение о некорректности данных
-            this.legends = [];
-            this.message = "К сожалению данных слишком много для построения диаграммы";  // выводим сообщение
-            d3.select(this.$el.querySelector('.dash-piechart')).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
-          } else {
-            this.createLegend(this.dataRestFrom,metrics,showlegend,colorsPie);
-            let legendsSize = {};
-            if (this.legends.length > 0) {
-              let timeOut = setTimeout( function tick() {  // важно чтобы наш график построился толкьо после того когда создался блок с легендой
-                  
-                if (this.$refs.legends.getBoundingClientRect().width != 0) { 
-                  legendsSize = {width: Math.round(this.$refs.legends.getBoundingClientRect().width), height: Math.round(this.$refs.legends.getBoundingClientRect().height)};
-                  this.createPieChart(this.dataRestFrom,this,sizeLine,metrics,legendsSize,positionlegend,colorsPie); // и собственно создаем график
-                  clearTimeout(timeOut);
-                } else {
-                  timeOut = setTimeout(tick.bind(this), 100); 
-                }
-              }.bind(this), 0);
-
-            } else {
-              legendsSize = {width: 0, height: 0};
-              this.createPieChart(this.dataRestFrom,this,sizeLine,metrics,legendsSize,positionlegend,colorsPie); // и собственно создаем график
-            }
-          }
-        } else {  // если первое значение первого элемнета (подразумеваем что это time не число)
+      }
+      if (this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).themes)  {
+        this.colors = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).themes;
+      }
+      typeof(this.dataRestFrom[0][metrics[1]]) != 'number' ? onlyNum = false : false
+      if (onlyNum){  // если все-таки число
+        this.nodata = false; // то убираем соощение о отсутствии данных
+        if (this.dataRestFrom.length > 20) {  // если элемнетов больше 20
           this.nodata = true;  // показываем сообщение о некорректности данных
-          this.message = "К сожалению данные не подходят к диаграмме";  // выводим сообщение
           this.legends = [];
-          d3.select(this.$el.querySelector('.dash-piechart')).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+          this.message = "К сожалению данных слишком много для построения диаграммы";  // выводим сообщение
+          d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+        } else {
+          this.createLegend(this.dataRestFrom,metrics,showlegend,colorsPie);
+          let legendsSize = {};
+          if (this.legends.length > 0) {
+            let timeOut = setTimeout( function tick() {  // важно чтобы наш график построился толкьо после того когда создался блок с легендой
+                
+              if (this.$refs.legends.getBoundingClientRect().width != 0) { 
+                legendsSize = {width: Math.round(this.$refs.legends.getBoundingClientRect().width), height: Math.round(this.$refs.legends.getBoundingClientRect().height)};
+                this.createPieChart(this.dataRestFrom,this,sizeLine,metrics,legendsSize,positionlegend,colorsPie); // и собственно создаем график
+                clearTimeout(timeOut);
+              } else {
+                timeOut = setTimeout(tick.bind(this), 100); 
+              }
+            }.bind(this), 0);
+
+          } else {
+            legendsSize = {width: 0, height: 0};
+            this.createPieChart(this.dataRestFrom,this,sizeLine,metrics,legendsSize,positionlegend,colorsPie); // и собственно создаем график
+          }
         }
-      })
+      } else {  // если первое значение первого элемнета (подразумеваем что это time не число)
+        this.nodata = true;  // показываем сообщение о некорректности данных
+        this.message = "К сожалению данные не подходят к диаграмме";  // выводим сообщение
+        this.legends = [];
+        d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+      }
     },
     createLegend: function(data,metrics,showlegend,colorsPie) {
       this.legends = [];
@@ -233,9 +228,10 @@ export default {
         })
       }
     },
+
     createPieChart: function (dataFrom,that,sizeLine,metrics,legendsSize,positionlegend,colorsPie) {  // создает диаграмму
   
-      d3.select(this.$el.querySelector('.dash-piechart')).selectAll('svg').remove();
+      d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove();
       
       let width = sizeLine['width']-40; // отступ по бокам
       let height = sizeLine['height']-35; // минус шапка
@@ -268,7 +264,7 @@ export default {
 
       let radius = Math.min(width, height) / 2 - margin // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
 
-      let svg = d3.select(".dash-piechart")  // добовляем svg объект в нужный div
+      let svg = d3.select(`.${this.idFrom}`)  // добовляем svg объект в нужный div
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -286,7 +282,7 @@ export default {
         .domain(data)
         .range(that.colors[colorsPie.theme])
 
-      let tooltip = d3.select(this.$el.querySelector('.dash-piechart'))
+      let tooltip = d3.select(this.$el.querySelector(`.dash-${this.idFrom}`))
         .append("div")
         .attr("class", "tooltip")
         .style("color",this.colors.text)
@@ -385,24 +381,24 @@ export default {
         value = this.selectedValue[0]
       } 
 
-      let tockens = this.$store.getters.getTockens(this.idDash);
+      let tockens = this.$store.getters.getTockens(this.idDashFrom);
       let tocken = {};
 
       Object.keys(tockens).forEach( i =>{
         tocken = {
           name: tockens[i].name,
           action: tockens[i].action,
-          capture: tockens[i].capture,
+          capture: tockens[i].capture
         }
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
-          this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: value, store: this.$store });
+        if (tockens[i].elem == this.idFrom && tockens[i].action == 'click') {
+          this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDashFrom, value: value, store: this.$store });
         } 
       })
 
     }
   },
   mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
   } 
 }
 
