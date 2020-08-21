@@ -87,10 +87,9 @@ export default {
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 8,
+        textSize: 12,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
-      console.log(nodeNameCreator)
       //label label для nodes
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
          if( nodeDataItem.label !== "-"){
@@ -98,7 +97,7 @@ export default {
          }
       })
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 8
+        textSize: 12
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST
 
@@ -115,7 +114,7 @@ export default {
          }
       })
       edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 8,
+        textSize: 12,
         backgroundFill: this.colorFrom.backElement,
       })
     
@@ -123,7 +122,7 @@ export default {
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
-        nodeHalos: yfile.NodeHalo.create(15, 75, 15, 100)
+        nodeHalos: yfile.NodeHalo.create(15, 100, 15, 320)
       })
 
       //применяем layout
