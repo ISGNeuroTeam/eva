@@ -90,7 +90,7 @@ export default {
         textSize: 8,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
-     
+      console.log(nodeNameCreator)
       //label label для nodes
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
          if( nodeDataItem.label !== "-"){
@@ -128,6 +128,7 @@ export default {
 
       //применяем layout
       this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout(), layoutData)
+      this.$graphComponent.fitGraphBounds()
     },
 
     creareGraph() {
