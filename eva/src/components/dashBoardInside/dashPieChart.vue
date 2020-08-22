@@ -32,7 +32,7 @@
       />
       <div 
         ref="legends"
-        class="legend-block-pie" 
+        class="legend-block-pie"
       >
         <div 
           v-for="item in legends" 
@@ -131,16 +131,17 @@ export default {
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.width && this.height ) {
         // if (this.dataReport) {
           
-        //   if (this.activeElemFrom == this.id) {
-        //     this.createPieChartAsync();
-        //   } else {
-        //     let graphics = d3.select(this.$el.querySelector(`.dash-${this.idFrom}`)).selectAll('svg').nodes();
-        //     if(graphics.length != 0){  // если график уже есть
-        //       graphics[0].remove(); // удаляем его
-        //     }
-        //   }
+          // if (this.activeElemFrom == this.id) {
+          //   this.createPieChartAsync();
+          // } else {
+            let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
+            if(graphics.length == 0){  // если график уже есть
+              this.createPieChartAsync();
+              // graphics[0].remove(); // удаляем его
+            }
+          // }
         // } else {
-        this.createPieChartAsync();
+          // this.createPieChartAsync();
         // }
         
       }
@@ -148,14 +149,13 @@ export default {
     },
   },  
   methods: {
+
     createPieChartAsync: function() {
-      let sizeLine = {'width': 0,'height': 0};  // получаем размеры от родителя
-      sizeLine['width'] = this.width;
-      sizeLine['height'] = this.height;
+      let sizeLine = {width: this.width, height:this.height} // получаем размеры от родителя
 
       if(this.dataRestFrom.error) {  // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
-      } else {  // если нет
+      } else {  
         this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDashFrom, id: this.idFrom });
         this.$store.commit('setThemePie', {
           themes: this.colors,
@@ -165,16 +165,22 @@ export default {
       } 
 
       let onlyNum = true;
+
       let metrics = this.metrics;
+
       let showlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).showlegend;
       if (showlegend == undefined) {
         showlegend = true;
       }
+
       let positionlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).positionlegend;
+
       if (positionlegend == undefined) {
         positionlegend = 'right'
       }
+
       let colorsPie = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).colorsPie;
+
       if (colorsPie == undefined) {
         colorsPie = {
           theme: 'neitral',
@@ -182,10 +188,13 @@ export default {
           nametheme: '',
         }
       }
+
       if (this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).themes)  {
         this.colors = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).themes;
       }
+
       typeof(this.dataRestFrom[0][metrics[1]]) != 'number' ? onlyNum = false : false
+
       if (onlyNum){  // если все-таки число
         this.nodata = false; // то убираем соощение о отсутствии данных
         if (this.dataRestFrom.length > 20) {  // если элемнетов больше 20
@@ -220,6 +229,7 @@ export default {
         d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
       }
     },
+
     createLegend: function(data,metrics,showlegend,colorsPie) {
       this.legends = [];
       if (showlegend) {
@@ -230,35 +240,32 @@ export default {
     },
 
     createPieChart: function (dataFrom,that,sizeLine,metrics,legendsSize,positionlegend,colorsPie) {  // создает диаграмму
-  
       d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove();
-      
       let width = sizeLine['width']-40; // отступ по бокам
       let height = sizeLine['height']-35; // минус шапка
       let margin = 40; // отступ от контейнера
 
+      switch(positionlegend ) {
 
-      switch(positionlegend ){
+        case 'right':
+          this.positionLegends = 'row nowrap';
+          width = width - legendsSize.width;
+          break
 
-      case 'right':
-        this.positionLegends = 'row nowrap';
-        width = width - legendsSize.width;
-        break
+        case 'left':
+          this.positionLegends = 'row-reverse nowrap';
+          width = width - legendsSize.width;
+          break
 
-      case 'left':
-        this.positionLegends = 'row-reverse nowrap';
-        width = width - legendsSize.width;
-        break
+        case 'top':
+          this.positionLegends = 'column-reverse nowrap';
+          height = height - legendsSize.height - 40;  // 40 - margin у legends
+          break
 
-      case 'top':
-        this.positionLegends = 'column-reverse nowrap';
-        height = height - legendsSize.height - 40;  // 40 - margin у legends
-        break
-
-      case 'bottom':
-        this.positionLegends = 'column nowrap';
-        height = height - legendsSize.height-40;
-        break
+        case 'bottom':
+          this.positionLegends = 'column nowrap';
+          height = height - legendsSize.height - 40;
+          break
   
       }
 
@@ -272,7 +279,9 @@ export default {
         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
       let data = {};
+
       let selectedDefault = [];
+
       dataFrom.forEach( item => {
         data[item[metrics[0]]] = item[metrics[1]];
         selectedDefault.push(item[metrics[2]])
@@ -282,7 +291,7 @@ export default {
         .domain(data)
         .range(that.colors[colorsPie.theme])
 
-      let tooltip = d3.select(this.$el.querySelector(`.dash-${this.idFrom}`))
+      let tooltip = d3.select(this.$el.querySelector(`.${this.idFrom}`))
         .append("div")
         .attr("class", "tooltip")
         .style("color",this.colors.text)
@@ -292,11 +301,8 @@ export default {
         .style("opacity","0")
         .style("visibility","hidden")
         .text('');
-
-
       let pie = d3.pie()  // вычисляем позицию каждого кусочка диаграммы
         .value(function(d) {return d.value; })
-
       let data_ready = pie(d3.entries(data))
 
       svg   // строим круговую диаграмму  - по сути каждая часть это жлемент path нарисованный через arc функцию
@@ -335,11 +341,9 @@ export default {
               .style("left",(event.layerX+15)+"px");
             selected = true;
           }
-          
           tooltip
             .attr('index',d.index)
             .html(`#${d.data.key} - ${d.data.value}%`);
-          
 
           return that.setClick(d,selected)
         })
@@ -348,7 +352,6 @@ export default {
     },
     setClick: function(part,selected) {
 
-      
       if (selected) {
         this.selectedValue.push(`(${part.data.key},${part.data.value})`);
       } else {
