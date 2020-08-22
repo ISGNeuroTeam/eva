@@ -171,9 +171,9 @@ export default {
         id: this.idFrom
       }).metricsRelation.relations;
 
-      this.actions.forEach((action, i)=>{
-        this.$set(this.actions[i],'capture', metrics);
-      })
+      // this.actions.forEach((action, i)=>{
+      //   this.$set(this.actions[i],'capture',metrics);
+      // })
 
       let showlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).showlegend;
       if (showlegend == undefined) {
