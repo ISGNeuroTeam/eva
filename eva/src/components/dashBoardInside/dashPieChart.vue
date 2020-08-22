@@ -111,13 +111,13 @@ export default {
     color: function() {
       return this.colorFrom
     },
-    metrics: function() {
-      let metrics = this.$store.getters.getOptions({
-        idDash: this.idDashFrom, 
-        id: this.idFrom
-      }).metricsRelation.relations;
-      return metrics
-    },
+    // metrics: function() {
+    //   let metrics = this.$store.getters.getOptions({
+    //     idDash: this.idDashFrom, 
+    //     id: this.idFrom
+    //   }).metricsRelation.relations;
+    //   return metrics
+    // },
     dataLoading: function() {
       return this.dataLoadingFrom
     },
@@ -166,7 +166,14 @@ export default {
 
       let onlyNum = true;
 
-      let metrics = this.metrics;
+      let metrics = this.$store.getters.getOptions({
+        idDash: this.idDashFrom, 
+        id: this.idFrom
+      }).metricsRelation.relations;
+
+      this.actions.forEach((action, i)=>{
+        this.$set(this.actions[i],'capture', metrics);
+      })
 
       let showlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).showlegend;
       if (showlegend == undefined) {
