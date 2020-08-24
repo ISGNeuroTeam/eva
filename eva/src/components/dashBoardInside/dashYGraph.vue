@@ -3,7 +3,7 @@
      <v-row align="start">
        <v-icon @click="changeInputMode" :color="isEditor ? 'primary' : 'gray'">{{iconArrowAll}}</v-icon>
      </v-row>
-     <div class="ygraph-component-container" ref="graph"/>
+     <div class="ygraph-component-container" :style="{top:`${top}`}" ref="graph"/>
   </div>
 </template>
 
@@ -41,6 +41,15 @@ export default {
         },
       ],
     } 
+  },
+  computed: { 
+    top () {// для ряда управляющих иконок 
+      if(document.body.clientWidth <=1600){
+        return '50px'
+      } else {
+        return '60px'
+      }
+    },
   },
   watch: {
     dataRestFrom(val) {
@@ -197,7 +206,6 @@ export default {
 <style lang="css" > 
 .ygraph-component-container {
   position: absolute;
-  top: 50px;
   left: 0;
   right: 0;
   bottom: 0;
