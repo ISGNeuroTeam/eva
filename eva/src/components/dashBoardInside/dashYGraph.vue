@@ -72,17 +72,17 @@ export default {
     },
     initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
-        fill: 'orange',
-        stroke: 'orange',
+        fill: '#0AB3FF',
+        stroke: '#0AB3FF',
         shape: 'ELLIPSE',
       })
 
       this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(120, 120)
 
       this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
-        stroke: '3px #7100FF',
+        stroke: '6px #0AB3FF',
         targetArrow: new yfile.Arrow({
-          fill: '#7100FF',
+          fill: '#0AB3FF',
           scale: 5,
           type: 'SHORT'
         })
