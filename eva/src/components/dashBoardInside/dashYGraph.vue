@@ -1,6 +1,9 @@
 <template>
   <div class="ygraph-wrapper">
-    <div class="ygraph-component-container" ref="graph"/>
+     <v-row align="start">
+       <v-icon @click="changeInputMode" :color="isEditor ? 'primary' : 'gray'">{{iconArrowAll}}</v-icon>
+     </v-row>
+     <div class="ygraph-component-container" ref="graph"/>
   </div>
 </template>
 
@@ -8,7 +11,7 @@
 <script>
 import * as yfile from 'yfiles'
 import licenseData from './license.json'
-
+import { mdiArrowAll } from '@mdi/js'
 yfile.License.value = licenseData//проверка лицензии
 
 export default {
@@ -25,6 +28,8 @@ export default {
   },
   data () {
     return {
+      iconArrowAll: mdiArrowAll,
+      isEditor: false,
       nodesSource : null,
       edgesSource: null,
       actions: [
@@ -56,6 +61,14 @@ export default {
     }
   },  
   methods: {
+    changeInputMode(){ // меняем режим графика
+      if(this.isEditor){
+        this.$graphComponent.inputMode = null
+      } else {
+        this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
+      }
+      this.isEditor = !this.isEditor
+    },
     initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
         fill: 'orange',
@@ -68,7 +81,7 @@ export default {
         targetArrow: new yfile.Arrow({
           fill: '#242265',
           scale: 1,
-          type: 'circle'
+          type: 'SHORT'
         })
       })
     },
@@ -132,6 +145,8 @@ export default {
 
     creareGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
+      this.$graphComponent.inputMode = null
+
       this.initializeDefaultStyles()
 
       //убираем надпись о license
@@ -182,7 +197,7 @@ export default {
 <style lang="css" > 
 .ygraph-component-container {
   position: absolute;
-  top: 25px;
+  top: 50px;
   left: 0;
   right: 0;
   bottom: 0;
