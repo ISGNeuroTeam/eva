@@ -128,25 +128,24 @@ export default {
       return this.heightFrom
     },
     change: function() {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.width && this.height ) {
-        // if (this.dataReport) {
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0 && this.width != 0 && this.height != 0) {
+        if (this.dataReport) {
           
-          // if (this.activeElemFrom == this.id) {
-          //   this.createPieChartAsync();
-          // } else {
-            let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
-            if(graphics.length == 0){  // если график уже есть
-              this.createPieChartAsync();
-              // graphics[0].remove(); // удаляем его
+          if (this.activeElemFrom == this.id) {
+            this.createPieChartAsync();
+          } else {
+            let graphics = d3.select(this.$el.querySelector('.dash-piechart')).selectAll('svg').nodes();
+            if(graphics.length != 0){  
+              graphics[0].remove(); 
             }
-          // }
-        // } else {
-          // this.createPieChartAsync();
-        // }
+          }
+        } else {
+          this.createPieChartAsync();
+        }
         
       }
       return true  
-    },
+    }
   },  
   methods: {
 
@@ -287,7 +286,7 @@ export default {
 
       let data = {};
 
-      let selectedDefault = [];
+      let selectedDefault = []; // Выбранные кусочки до рендера графика
 
       dataFrom.forEach( item => {
         data[item[metrics[0]]] = item[metrics[1]];
@@ -298,19 +297,21 @@ export default {
         .domain(data)
         .range(that.colors[colorsPie.theme])
 
-      let tooltip = d3.select(this.$el.querySelector(`.${this.idFrom}`))
-        .append("div")
-        .attr("class", "tooltip")
-        .style("color",this.colors.text)
-        .style("background",this.color.backElement)
-        .style('border-color',this.colors.text)
-        .style('z-index','2')
-        .style("opacity","0")
-        .style("visibility","hidden")
-        .text('');
+      // let tooltip = d3.select(this.$el.querySelector(`.${this.idFrom}`))
+      //   .append("div")
+      //   .attr("class", "tooltip")
+      //   .style("color",this.colors.text)
+      //   .style("background",this.color.backElement)
+      //   .style('border-color',this.colors.text)
+      //   .style('z-index','2')
+      //   .style("opacity","0")
+      //   .style("visibility","hidden")
+      //   .text('');
       let pie = d3.pie()  // вычисляем позицию каждого кусочка диаграммы
         .value(function(d) {return d.value; })
       let data_ready = pie(d3.entries(data))
+
+      let selectedValue = this.selectedValue
 
       svg   // строим круговую диаграмму  - по сути каждая часть это жлемент path нарисованный через arc функцию
         .selectAll('pies')
@@ -322,7 +323,8 @@ export default {
           .outerRadius(radius)
         )
         .attr('class',function(d) {
-          if (selectedDefault[d.index] == 1) {
+          let index = selectedValue.indexOf(`(${d.data.key},${d.data.value})`);
+          if (index != -1) {
             return 'piepart piepartSelect'
           } else {
             return 'piepart'
@@ -335,22 +337,22 @@ export default {
           let selected = false;
           if (this.classList.contains('piepartSelect')) {
             this.classList.remove('piepartSelect');
-            tooltip
-              .style("opacity","0")
-              .style("visibility","hidden");
+            // tooltip
+            //   .style("opacity","0")
+            //   .style("visibility","hidden");
             selected = false;
           } else {
             this.classList.add('piepartSelect');
-            tooltip
-              .style("opacity","1")
-              .style("visibility","visible")
-              .style("top", (event.layerY-40)+"px")
-              .style("left",(event.layerX+15)+"px");
+            // tooltip
+            //   .style("opacity","1")
+            //   .style("visibility","visible")
+            //   .style("top", (event.layerY-40)+"px")
+            //   .style("left",(event.layerX+15)+"px");
             selected = true;
           }
-          tooltip
-            .attr('index',d.index)
-            .html(`#${d.data.key} - ${d.data.value}%`);
+          // tooltip
+          //   .attr('index',d.index)
+          //   .html(`#${d.data.key} - ${d.data.value}%`);
 
           return that.setClick(d,selected)
         })
