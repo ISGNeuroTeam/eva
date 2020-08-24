@@ -76,6 +76,8 @@ export default {
         shape: 'ELLIPSE',
       })
 
+      this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(120, 120)
+
       this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
         stroke: '1px #242265',
         targetArrow: new yfile.Arrow({
@@ -100,7 +102,7 @@ export default {
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 12,
+        textSize: 60,
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
       //label label для nodes
@@ -110,7 +112,7 @@ export default {
          }
       })
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 12
+        textSize: 60
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST
 
@@ -127,7 +129,7 @@ export default {
          }
       })
       edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        textSize: 12,
+        textSize: 60,
         backgroundFill: this.colorFrom.backElement,
       })
     
@@ -135,7 +137,7 @@ export default {
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
-        nodeHalos: yfile.NodeHalo.create(15, 100, 15, 320)
+        nodeHalos: yfile.NodeHalo.create(50, 300, 50, 550)
       })
 
       //применяем layout
