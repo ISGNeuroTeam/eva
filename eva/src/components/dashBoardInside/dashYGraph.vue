@@ -79,10 +79,10 @@ export default {
       this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(120, 120)
 
       this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
-        stroke: '1px #242265',
+        stroke: '3px #7100FF',
         targetArrow: new yfile.Arrow({
-          fill: '#242265',
-          scale: 1,
+          fill: '#7100FF',
+          scale: 5,
           type: 'SHORT'
         })
       })
