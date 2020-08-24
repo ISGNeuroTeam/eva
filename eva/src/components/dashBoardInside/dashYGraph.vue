@@ -152,8 +152,10 @@ export default {
       this.initializeDefaultStyles()
 
       //убираем надпись о license
-      document.querySelector('.yfiles-svgpanel').children[1].style.opacity = 0
-      document.querySelector('.yfiles-svgpanel').children[2].style.opacity = 0
+      document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
+        item.children[1].style.opacity = 0
+        item.children[2].style.opacity = 0
+      })
     },
     generateNodesSource(dataRest){
       let _allNodes = []
