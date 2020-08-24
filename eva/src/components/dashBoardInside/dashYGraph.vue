@@ -102,7 +102,8 @@ export default {
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
-        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif', fontWeight: 'bold'})
+        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif', fontWeight: 'bold'}),
+        textFill: this.colorFrom.text
       })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
       //label label для nodes
@@ -112,7 +113,8 @@ export default {
          }
       })
       nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'})
+        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
+        textFill: this.colorFrom.text
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST
 
@@ -131,6 +133,7 @@ export default {
       edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
         font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
         backgroundFill: this.colorFrom.backElement,
+        textFill: this.colorFrom.text
       })
     
 
