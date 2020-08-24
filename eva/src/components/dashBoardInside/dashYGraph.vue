@@ -42,14 +42,6 @@ export default {
       ],
     } 
   },
-  computed: {  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function() { 
-      return this.idFrom
-    },
-    idDash: function() { 
-      return this.idDashFrom
-    },
-  },
   watch: {
     dataRestFrom(val) {
       this.generateNodesSource(val)
@@ -193,8 +185,9 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
     this.creareGraph();
+
   } 
 }
 
