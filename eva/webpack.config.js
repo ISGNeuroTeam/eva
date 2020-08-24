@@ -92,7 +92,6 @@ module.exports = {
       "vue$": "vue/dist/vue.js",
     }
   },
-  // devtool:'source-map',
   plugins: [
     new VueLoaderPlugin(),
     new VuetifyLoaderPlugin(),
