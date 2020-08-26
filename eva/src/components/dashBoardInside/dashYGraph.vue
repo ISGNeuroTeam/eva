@@ -149,7 +149,7 @@ export default {
       this.$graphComponent.fitGraphBounds()
     },
 
-    creareGraph() {
+    createGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
       this.$graphComponent.inputMode = null
 
@@ -195,7 +195,7 @@ export default {
   },
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-    this.creareGraph();
+    this.createGraph();
 
   } 
 }
