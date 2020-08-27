@@ -237,9 +237,12 @@ export default {
       const layoutData = new yfile.HierarchicLayoutData({
         nodeHalos: yfile.NodeHalo.create(50, 300, 50, 550)
       })
+      //настройки для layout
+      const layout = new yfile.HierarchicLayout()
+      layout.integratedEdgeLabeling = true
 
       //применяем layout
-      this.$graphComponent.graph.applyLayout(new yfile.HierarchicLayout(), layoutData)
+      this.$graphComponent.graph.applyLayout(layout, layoutData)
       this.$graphComponent.fitGraphBounds()
     },
 
