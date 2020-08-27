@@ -1,7 +1,7 @@
 <template>
   <div class="ygraph-wrapper">
      <v-row align="start">
-       <v-icon @click="changeInputMode" :color="isEditor ? 'primary' : 'gray'">{{iconArrowAll}}</v-icon>
+       <v-icon @click="changeInputMode" :color="isEditor ? colorFrom.controlsActive : colorFrom.controls">{{iconArrowAll}}</v-icon>
      </v-row>
      <div class="ygraph-component-container" :style="{top:`${top}`}" ref="graph"/>
   </div>
