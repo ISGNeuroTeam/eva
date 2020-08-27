@@ -33,7 +33,7 @@ export default {
       nodesSource : null,
       edgesSource: null,
       errorColor: '#D34C00',//цвет ошибки
-      colors: ['#7100FF', '#003CFF', '#0AB3FF', '#AEFAFF'],
+      colors: ['#AEFAFF', '#0AB3FF', '#003CFF', '#7100FF'],
       startColor: '#C7C7C7',//цвет старт и финиш 
       actions: [
         {name: 'click',
@@ -61,10 +61,10 @@ export default {
       this.applyGraphBuilder()
       this.colorFont()
       this.colorNodes()
+      this.colorEdges()
     },
     colorFrom(){
       this.colorFont()
-      this.colorNodes()
     }
   },  
   methods: {
@@ -76,10 +76,48 @@ export default {
       }
       this.isEditor = !this.isEditor
     },
+
+    colorEdges(){
+      const edges = this.$graphComponent.graph.edges
+      edges.forEach(edge=>{
+        if(edge.tag === '-'){
+          this.$graphComponent.graph.setStyle(edge,new yfile.PolylineEdgeStyle({
+            stroke: `6px ${this.startColor}`,
+            targetArrow: new yfile.Arrow({
+              fill: this.startColor,
+              scale: 5,
+              type: 'SHORT'
+            })
+          })
+          )
+        } else if (edge.tag === '-1') {
+            this.$graphComponent.graph.setStyle(edge,new yfile.PolylineEdgeStyle({
+              stroke: `6px ${this.errorColor}`,
+              targetArrow: new yfile.Arrow({
+                fill: this.errorColor,
+                scale: 5,
+                type: 'SHORT'
+              })
+            })
+            )
+        } else {
+            this.$graphComponent.graph.setStyle(edge,new yfile.PolylineEdgeStyle({
+              stroke: `6px ${this.colors[edge.tag-1]}`,
+              targetArrow: new yfile.Arrow({
+               fill: this.colors[edge.tag-1],
+                scale: 5,
+                type: 'SHORT'
+              })
+            })
+          )
+        }
+      })
+    },
+
     colorNodes(){
       const nodes = this.$graphComponent.graph.nodes
-       nodes.forEach(node=>{
-         if(node.tag.toLowerCase() === 'start'.toLowerCase() || node.tag.toLowerCase() === 'finish'.toLowerCase()){
+      nodes.forEach(node=>{
+         if(node.tag.toLowerCase() === 'start' || node.tag.toLowerCase() === 'finish'){
            this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
             fill: this.startColor,
             shape: 'ELLIPSE',
@@ -87,8 +125,25 @@ export default {
             })
            )
          }
+         else if(node.tag === '-1'){
+            this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
+              fill: this.errorColor,
+              shape: 'ELLIPSE',
+              stroke: this.errorColor,
+              })
+            )
+         } else {
+            this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
+              fill: this.colors[node.tag-1],
+              shape: 'ELLIPSE',
+              stroke: this.colors[node.tag-1],
+              })
+            )
+           
+         }
        })
     },
+
     colorFont(){
       const nodes = this.$graphComponent.graph.nodes
       nodes.forEach(node=>{
@@ -116,6 +171,7 @@ export default {
         )
       })
     },
+
     initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
         fill: 'orange',
@@ -143,7 +199,11 @@ export default {
       this.$nodesSource = graphBuilder.createNodesSource({
         data: this.nodesSource,
         id: 'id',
-        tag: item => item.name,
+        tag: item => {
+          return item.name.toLowerCase()==='start'|| item.name.toLowerCase()==='finish' ?
+          item.name :
+          item.color
+        }
       })
       
       //label name для nodes
@@ -163,6 +223,7 @@ export default {
         data: this.edgesSource,
         sourceId: 'fromNode',
         targetId: 'toNode',
+        tag: item => item.color
       })
 
       const edgeLabelCreator = this.$edgesSource.edgeCreator.createLabelBinding(edgeDataItem =>{
@@ -194,6 +255,7 @@ export default {
         item.children[2].style.opacity = 0
       })
     },
+
     generateNodesSource(dataRest){
       let _allNodes = []
 
@@ -201,7 +263,8 @@ export default {
         _allNodes.push({
           id:dataRestItem.id,
           name:dataRestItem.node,
-          label:dataRestItem.node_description
+          label:dataRestItem.node_description,
+          color:dataRestItem.node_color
         })
       });
 
@@ -210,6 +273,7 @@ export default {
 
       this.nodesSource = Object.values(_nodesSource)
     },
+
     generateEdgesSource(dataRest){
       let _allEdges = []
 
@@ -218,7 +282,8 @@ export default {
           _allEdges.push({
             fromNode:dataRestItem.id,
             toNode:dataRestItem.relation_id,
-            label:dataRestItem.edge_description
+            label:dataRestItem.edge_description,
+            color:dataRestItem.edge_color
           })
         }
       });
