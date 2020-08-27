@@ -32,8 +32,9 @@ export default {
       isEditor: false,
       nodesSource : null,
       edgesSource: null,
-      errorColor: null,
-      colors: [],
+      errorColor: '#D34C00',//цвет ошибки
+      colors: ['#7100FF', '#003CFF', '#0AB3FF', '#AEFAFF'],
+      startColor: '#C7C7C7',//цвет старт и финиш 
       actions: [
         {name: 'click',
           capture: []
@@ -59,9 +60,11 @@ export default {
       this.generateEdgesSource(val)
       this.applyGraphBuilder()
       this.colorFont()
+      this.colorNodes()
     },
     colorFrom(){
       this.colorFont()
+      this.colorNodes()
     }
   },  
   methods: {
@@ -72,6 +75,19 @@ export default {
         this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
       }
       this.isEditor = !this.isEditor
+    },
+    colorNodes(){
+      const nodes = this.$graphComponent.graph.nodes
+       nodes.forEach(node=>{
+         if(node.tag.toLowerCase() === 'start'.toLowerCase() || node.tag.toLowerCase() === 'finish'.toLowerCase()){
+           this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
+            fill: this.startColor,
+            shape: 'ELLIPSE',
+            stroke: this.startColor,
+            })
+           )
+         }
+       })
     },
     colorFont(){
       const nodes = this.$graphComponent.graph.nodes
@@ -98,14 +114,12 @@ export default {
           textFill: this.colorFrom.text
           }) 
         )
-
       })
-
     },
     initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
-        fill: '#0AB3FF',
-        stroke: '#0AB3FF',
+        fill: 'orange',
+        stroke: 'orange',
         shape: 'ELLIPSE',
       })
 
