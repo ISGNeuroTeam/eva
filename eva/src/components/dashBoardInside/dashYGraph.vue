@@ -32,6 +32,8 @@ export default {
       isEditor: false,
       nodesSource : null,
       edgesSource: null,
+      errorColor: null,
+      colors: [],
       actions: [
         {name: 'click',
           capture: []
@@ -56,9 +58,10 @@ export default {
       this.generateNodesSource(val)
       this.generateEdgesSource(val)
       this.applyGraphBuilder()
+      this.colorFont()
     },
     colorFrom(){
-      this.applyGraphBuilder()
+      this.colorFont()
     }
   },  
   methods: {
@@ -69,6 +72,35 @@ export default {
         this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
       }
       this.isEditor = !this.isEditor
+    },
+    colorFont(){
+      const nodes = this.$graphComponent.graph.nodes
+      nodes.forEach(node=>{
+        //node.labels.elementAt(0) -- label который name
+        this.$graphComponent.graph.setStyle(node.labels.elementAt(0), new yfile.DefaultLabelStyle({
+          font: new yfile.Font({fontSize: 60, fontFamily: 'sefif', fontWeight: 'BOLD'}),
+          textFill: this.colorFrom.text
+          }) 
+        )
+        //node.labels.elementAt(1) -- label который label
+        this.$graphComponent.graph.setStyle(node.labels.elementAt(1), new yfile.DefaultLabelStyle({
+          font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
+          textFill: this.colorFrom.text
+          }) 
+        )
+      })
+
+      const edges = this.$graphComponent.graph.edges
+      edges.forEach(edge=>{
+        this.$graphComponent.graph.setStyle(edge.labels.elementAt(0), new yfile.DefaultLabelStyle({
+          font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
+          backgroundFill: this.colorFrom.backElement,
+          textFill: this.colorFrom.text
+          }) 
+        )
+
+      })
+
     },
     initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
@@ -102,20 +134,13 @@ export default {
       
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
-      nodeNameCreator.defaults.style = new yfile.DefaultLabelStyle({
-        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif', fontWeight: 'bold'}),
-        textFill: this.colorFrom.text
-      })
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
+
       //label label для nodes
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
          if( nodeDataItem.label !== "-"){
            return nodeDataItem.label
          }
-      })
-      nodeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
-        textFill: this.colorFrom.text
       })
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST
 
@@ -130,13 +155,7 @@ export default {
        if( edgeDataItem.label !== "-"){
            return edgeDataItem.label
          }
-      })
-      edgeLabelCreator.defaults.style = new yfile.DefaultLabelStyle({
-        font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
-        backgroundFill: this.colorFrom.backElement,
-        textFill: this.colorFrom.text
-      })
-    
+      })    
 
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
