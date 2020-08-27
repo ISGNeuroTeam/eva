@@ -174,8 +174,8 @@ export default {
 
     initializeDefaultStyles(){    
       this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
-        fill: 'orange',
-        stroke: 'orange',
+        fill: '#0AB3FF',
+        stroke: '#0AB3FF',
         shape: 'ELLIPSE',
       })
 
