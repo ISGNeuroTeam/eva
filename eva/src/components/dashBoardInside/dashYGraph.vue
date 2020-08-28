@@ -149,13 +149,13 @@ export default {
       nodes.forEach(node=>{
         //node.labels.elementAt(0) -- label который name
         this.$graphComponent.graph.setStyle(node.labels.elementAt(0), new yfile.DefaultLabelStyle({
-          font: new yfile.Font({fontSize: 60, fontFamily: 'sefif', fontWeight: 'BOLD'}),
+          font: new yfile.Font({fontSize: 70, fontFamily: 'sefif', fontWeight: 'BOLD'}),
           textFill: this.colorFrom.text
           }) 
         )
         //node.labels.elementAt(1) -- label который label
         this.$graphComponent.graph.setStyle(node.labels.elementAt(1), new yfile.DefaultLabelStyle({
-          font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
+          font: new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
           textFill: this.colorFrom.text
           }) 
         )
@@ -164,7 +164,7 @@ export default {
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=>{
         this.$graphComponent.graph.setStyle(edge.labels.elementAt(0), new yfile.DefaultLabelStyle({
-          font: new yfile.Font({fontSize: 60, fontFamily: 'sefif'}),
+          font: new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
           backgroundFill: this.colorFrom.backElement,
           textFill: this.colorFrom.text
           }) 
@@ -235,11 +235,12 @@ export default {
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
-        nodeHalos: yfile.NodeHalo.create(50, 300, 50, 550)
+        nodeHalos: yfile.NodeHalo.create(50, 570, 50, 650)
       })
       //настройки для layout
       const layout = new yfile.HierarchicLayout()
       layout.integratedEdgeLabeling = true
+      layout.considerNodeLabels = true
 
       //применяем layout
       this.$graphComponent.graph.applyLayout(layout, layoutData)
