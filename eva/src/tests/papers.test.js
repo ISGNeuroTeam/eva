@@ -42,7 +42,7 @@ describe('Компонент papers.vue', () => {  // тест самого ко
 
     expect(putLogMock()).toBe("add some logs"); // ставим заглушку на функцию записи логов и проверяем что она отработала корреткно
 
-    wrapper.setData({ uploadFile: 'test.xlsx' }) // заносим файл имитируя выбор файла пользователем
+    wrapper.setData({ uploadFile: 'test.csv' }) // заносим файл имитируя выбор файла пользователем
     fetch
       .once(JSON.stringify({ status: 'success' })) // имитируем fetch запрос который вернет нужный объект,  loadPaper
 
@@ -81,7 +81,7 @@ describe('Компонент papers.vue', () => {  // тест самого ко
   })
   
   it('При выборе файла и подтверждения выбора должен поменяться статус третьего кружочка', async () => {
-    wrapper.setData({ selectedFile: 'test.xlsx'}) // заносим в переменную фиктивный файл
+    wrapper.setData({ selectedFile: 'test.csv'}) // заносим в переменную фиктивный файл
     wrapper.vm.choosePaper()  // запускаем метод выбора файла
     expect(wrapper.vm.steps['3'].complete).toBe(true) 
 

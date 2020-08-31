@@ -221,7 +221,7 @@ export default {
       csvContent += encodeURIComponent(search.map( item =>  Object.values(item).join(",")).join("\n")); // добовляем все значения по ключам в файл
       let link = this.$refs.buttonEl.parentElement.appendChild(document.createElement("a")); // создаем ссылку
       link.setAttribute('href',csvContent); // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute("download", `${this.idDash}-${sid}.xlsx`); // указываем имя файла 
+      link.setAttribute("download", `${this.idDash}-${sid}.csv`); // указываем имя файла 
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку 
     }, 

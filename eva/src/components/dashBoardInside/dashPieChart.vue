@@ -128,25 +128,24 @@ export default {
       return this.heightFrom
     },
     change: function() {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.width && this.height ) {
-        // if (this.dataReport) {
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0 && this.width != 0 && this.height != 0) {
+        if (this.dataReport) {
           
-          // if (this.activeElemFrom == this.id) {
-          //   this.createPieChartAsync();
-          // } else {
-            let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
-            if(graphics.length == 0){  // если график уже есть
-              this.createPieChartAsync();
-              // graphics[0].remove(); // удаляем его
+          if (this.activeElemFrom == this.id) {
+            this.createPieChartAsync();
+          } else {
+            let graphics = d3.select(this.$el.querySelector('.dash-piechart')).selectAll('svg').nodes();
+            if(graphics.length != 0){  
+              graphics[0].remove(); 
             }
-          // }
-        // } else {
-          // this.createPieChartAsync();
-        // }
+          }
+        } else {
+          this.createPieChartAsync();
+        }
         
       }
       return true  
-    },
+    }
   },  
   methods: {
 
@@ -287,7 +286,7 @@ export default {
 
       let data = {};
 
-      let selectedDefault = [];
+      let selectedDefault = []; // Выбранные кусочки до рендера графика
 
       dataFrom.forEach( item => {
         data[item[metrics[0]]] = item[metrics[1]];
