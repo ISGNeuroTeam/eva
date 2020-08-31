@@ -85,13 +85,15 @@ module.exports = {
     contentBase: './dist',
     overlay: true,
     historyApiFallback: true,
-    host: '0.0.0.0'
+    host: '0.0.0.0',
+    // port:7070
   },
   resolve: {
     alias: {
       "vue$": "vue/dist/vue.js",
     }
   },
+  // devtool:'source-map',
   plugins: [
     new VueLoaderPlugin(),
     new VuetifyLoaderPlugin(),
