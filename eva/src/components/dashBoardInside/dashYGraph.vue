@@ -60,8 +60,8 @@ export default {
       this.generateEdgesSource(val)
       this.applyGraphBuilder()
       this.colorFont()
-      //this.colorNodes()
-      //this.colorEdges()
+      this.colorNodes()
+      this.colorEdges()
     },
     colorFrom(){
       this.colorFont()
@@ -143,7 +143,6 @@ export default {
          }
        })
     },
-
     colorFont(){
       const nodes = this.$graphComponent.graph.nodes
       nodes.forEach(node=>{
@@ -166,10 +165,10 @@ export default {
         this.$graphComponent.graph.setStyle(edge.labels.elementAt(0), new yfile.DefaultLabelStyle({
           font: new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
           backgroundFill: this.colorFrom.backElement,
-          textFill: this.colorFrom.text
+          textFill: this.colorFrom.text,
           }) 
         )
-      })
+      })      
     },
 
     initializeDefaultStyles(){    
@@ -178,7 +177,6 @@ export default {
         stroke: '#0AB3FF',
         shape: 'ELLIPSE',
       })
-
       this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(120, 120)
 
       this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
@@ -189,6 +187,7 @@ export default {
           type: 'SHORT'
         })
       })
+      this.$graphComponent.graph.edgeDefaults.labels.style.minimumSize = new yfile.Size(70*3, 0)
     },
 
     applyGraphBuilder() {
@@ -240,9 +239,11 @@ export default {
       //настройки для layout
       const layout = new yfile.HierarchicLayout({
         integratedEdgeLabeling: true,
-        separateLayers: true,
+        separateLayers: false,
         considerNodeLabels: true,
+
       })
+      layout.nodeToNodeDistance = 200
 
       //применяем layout
       this.$graphComponent.graph.applyLayout(layout, layoutData)
