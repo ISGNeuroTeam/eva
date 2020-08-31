@@ -60,8 +60,8 @@ export default {
       this.generateEdgesSource(val)
       this.applyGraphBuilder()
       this.colorFont()
-      this.colorNodes()
-      this.colorEdges()
+      //this.colorNodes()
+      //this.colorEdges()
     },
     colorFrom(){
       this.colorFont()
@@ -235,12 +235,14 @@ export default {
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
-        nodeHalos: yfile.NodeHalo.create(50, 570, 50, 650)
+        nodeHalos: yfile.NodeHalo.create(50, 700, 50, 600)
       })
       //настройки для layout
-      const layout = new yfile.HierarchicLayout()
-      layout.integratedEdgeLabeling = true
-      layout.considerNodeLabels = true
+      const layout = new yfile.HierarchicLayout({
+        integratedEdgeLabeling: true,
+        separateLayers: true,
+        considerNodeLabels: true,
+      })
 
       //применяем layout
       this.$graphComponent.graph.applyLayout(layout, layoutData)
