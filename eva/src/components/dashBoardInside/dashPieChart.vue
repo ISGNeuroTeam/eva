@@ -84,13 +84,13 @@ export default {
       message: 'Нет данных для отображения',
       colors: {
         neitral: [
-          '#650075','#5F27FF','#228B22','#99CC00','#8B4513',
-          '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
+          '#650075','#631B8F','#3A0085','#5F27FF','#6978FF',
+          '#003CFF','#0070A3','#50C9FF','#AEFAFF','#FFFFFF',
           '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
           '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
         ],
         indicted: [
-          '#FF7F37','#EB2F2F','#920000','#99CC00','#8B4513',
+          '#FF7F37','#EB2F2F','#920000','#600000','#D34C00',
           '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
           '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
           '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
@@ -298,19 +298,21 @@ export default {
         .domain(data)
         .range(that.colors[colorsPie.theme])
 
-      let tooltip = d3.select(this.$el.querySelector(`.${this.idFrom}`))
-        .append("div")
-        .attr("class", "tooltip")
-        .style("color",this.colors.text)
-        .style("background",this.color.backElement)
-        .style('border-color',this.colors.text)
-        .style('z-index','2')
-        .style("opacity","0")
-        .style("visibility","hidden")
-        .text('');
+      // let tooltip = d3.select(this.$el.querySelector(`.${this.idFrom}`))
+      //   .append("div")
+      //   .attr("class", "tooltip")
+      //   .style("color",this.colors.text)
+      //   .style("background",this.color.backElement)
+      //   .style('border-color',this.colors.text)
+      //   .style('z-index','2')
+      //   .style("opacity","0")
+      //   .style("visibility","hidden")
+      //   .text('');
       let pie = d3.pie()  // вычисляем позицию каждого кусочка диаграммы
         .value(function(d) {return d.value; })
       let data_ready = pie(d3.entries(data))
+
+      let selectedValue = this.selectedValue
 
       svg   // строим круговую диаграмму  - по сути каждая часть это жлемент path нарисованный через arc функцию
         .selectAll('pies')
@@ -322,7 +324,8 @@ export default {
           .outerRadius(radius)
         )
         .attr('class',function(d) {
-          if (selectedDefault[d.index] == 1) {
+          let index = selectedValue.indexOf(`(${d.data.key},${d.data.value})`);
+          if (index != -1) {
             return 'piepart piepartSelect'
           } else {
             return 'piepart'
@@ -335,22 +338,22 @@ export default {
           let selected = false;
           if (this.classList.contains('piepartSelect')) {
             this.classList.remove('piepartSelect');
-            tooltip
-              .style("opacity","0")
-              .style("visibility","hidden");
+            // tooltip
+            //   .style("opacity","0")
+            //   .style("visibility","hidden");
             selected = false;
           } else {
             this.classList.add('piepartSelect');
-            tooltip
-              .style("opacity","1")
-              .style("visibility","visible")
-              .style("top", (event.layerY-40)+"px")
-              .style("left",(event.layerX+15)+"px");
+            // tooltip
+            //   .style("opacity","1")
+            //   .style("visibility","visible")
+            //   .style("top", (event.layerY-40)+"px")
+            //   .style("left",(event.layerX+15)+"px");
             selected = true;
           }
-          tooltip
-            .attr('index',d.index)
-            .html(`#${d.data.key} - ${d.data.value}%`);
+          // tooltip
+          //   .attr('index',d.index)
+          //   .html(`#${d.data.key} - ${d.data.value}%`);
 
           return that.setClick(d,selected)
         })
