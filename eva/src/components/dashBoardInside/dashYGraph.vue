@@ -81,112 +81,88 @@ export default {
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=>{
         if(edge.tag === '-'){
-          this.$graphComponent.graph.setStyle(edge,new yfile.PolylineEdgeStyle({
-            stroke: `6px ${this.startColor}`,
-            targetArrow: new yfile.Arrow({
-              fill: this.startColor,
-              scale: 5,
-              type: 'SHORT'
-            })
-          })
+          this.$graphComponent.graph.setStyle(edge,
+            this.edgeStyle(this.startColor)
           )
         } else if (edge.tag === '-1') {
-            this.$graphComponent.graph.setStyle(edge,new yfile.PolylineEdgeStyle({
-              stroke: `6px ${this.errorColor}`,
-              targetArrow: new yfile.Arrow({
-                fill: this.errorColor,
-                scale: 5,
-                type: 'SHORT'
-              })
-            })
+            this.$graphComponent.graph.setStyle(edge,
+              this.edgeStyle(this.errorColor)
             )
         } else {
-            this.$graphComponent.graph.setStyle(edge,new yfile.PolylineEdgeStyle({
-              stroke: `6px ${this.colors[edge.tag-1]}`,
-              targetArrow: new yfile.Arrow({
-               fill: this.colors[edge.tag-1],
-                scale: 5,
-                type: 'SHORT'
-              })
-            })
-          )
+            this.$graphComponent.graph.setStyle(edge,
+              this.edgeStyle(this.colors[edge.tag-1])
+            )
         }
       })
     },
-
+    edgeStyle(color) {
+      return new yfile.PolylineEdgeStyle({ 
+        stroke: `6px ${color}`, 
+        targetArrow: new yfile.Arrow({
+          fill: color,
+          scale: 5,
+          type: 'SHORT'
+          })
+        })
+    },
     colorNodes(){
       const nodes = this.$graphComponent.graph.nodes
       nodes.forEach(node=>{
          if(node.tag.toLowerCase() === 'start' || node.tag.toLowerCase() === 'finish'){
-           this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
-            fill: this.startColor,
-            shape: 'ELLIPSE',
-            stroke: this.startColor,
-            })
+           this.$graphComponent.graph.setStyle(node,
+            this.nodeStyle(this.startColor)
            )
          }
          else if(node.tag === '-1'){
-            this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
-              fill: this.errorColor,
-              shape: 'ELLIPSE',
-              stroke: this.errorColor,
-              })
+            this.$graphComponent.graph.setStyle(node,
+              this.nodeStyle(this.errorColor)
             )
          } else {
-            this.$graphComponent.graph.setStyle(node, new  yfile.ShapeNodeStyle({
-              fill: this.colors[node.tag-1],
-              shape: 'ELLIPSE',
-              stroke: this.colors[node.tag-1],
-              })
+            this.$graphComponent.graph.setStyle(node, 
+              this.nodeStyle(this.colors[node.tag-1])
             )
-           
          }
        })
+    },
+    nodeStyle(color) {
+      return  new  yfile.ShapeNodeStyle({
+        fill: color,
+        shape: 'ELLIPSE',
+        stroke: color,
+      })
     },
     colorFont(){
       const nodes = this.$graphComponent.graph.nodes
       nodes.forEach(node=>{
         //node.labels.elementAt(0) -- label который name
-        this.$graphComponent.graph.setStyle(node.labels.elementAt(0), new yfile.DefaultLabelStyle({
-          font: new yfile.Font({fontSize: 70, fontFamily: 'sefif', fontWeight: 'BOLD'}),
-          textFill: this.colorFrom.text
-          }) 
+        this.$graphComponent.graph.setStyle(node.labels.elementAt(0), 
+          this.labelStyle(true) 
         )
         //node.labels.elementAt(1) -- label который label
-        this.$graphComponent.graph.setStyle(node.labels.elementAt(1), new yfile.DefaultLabelStyle({
-          font: new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
-          textFill: this.colorFrom.text
-          }) 
+        this.$graphComponent.graph.setStyle(node.labels.elementAt(1), 
+          this.labelStyle(false) 
         )
       })
 
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=>{
-        this.$graphComponent.graph.setStyle(edge.labels.elementAt(0), new yfile.DefaultLabelStyle({
-          font: new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
-          backgroundFill: this.colorFrom.backElement,
-          textFill: this.colorFrom.text,
-          }) 
+        this.$graphComponent.graph.setStyle(edge.labels.elementAt(0),
+          this.labelStyle(false, this.colorFrom.backElement)  
         )
       })      
     },
-
+    labelStyle(isBold, backgroundFill=null) {
+        return new yfile.DefaultLabelStyle({
+          font: isBold? new yfile.Font({fontSize: 70, fontFamily: 'sefif',  fontWeight: 'BOLD'}) : new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
+          textFill: this.colorFrom.text,
+          backgroundFill: backgroundFill,
+        })
+    },
     initializeDefaultStyles(){    
-      this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
-        fill: '#0AB3FF',
-        stroke: '#0AB3FF',
-        shape: 'ELLIPSE',
-      })
+      this.$graphComponent.graph.nodeDefaults.style = this.nodeStyle('#0AB3FF')
       this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(120, 120)
 
-      this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
-        stroke: '6px #0AB3FF',
-        targetArrow: new yfile.Arrow({
-          fill: '#0AB3FF',
-          scale: 5,
-          type: 'SHORT'
-        })
-      })
+      this.$graphComponent.graph.edgeDefaults.style = this.edgeStyle('#0AB3FF')
       this.$graphComponent.graph.edgeDefaults.labels.style.minimumSize = new yfile.Size(70*3, 0)
     },
 
