@@ -86,7 +86,7 @@ module.exports = {
     overlay: true,
     historyApiFallback: true,
     host: '0.0.0.0',
-    port:7070
+    //port:7070
   },
   resolve: {
     alias: {
