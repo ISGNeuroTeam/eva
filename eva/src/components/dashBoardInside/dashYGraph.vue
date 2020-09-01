@@ -277,7 +277,6 @@ export default {
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
     this.createGraph();
-
   } 
 }
 
