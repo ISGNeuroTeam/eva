@@ -105,89 +105,70 @@ export default {
     } 
   },
   computed: {  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
+    dashOptions(){
+      return this.$store.getters.getOptions({
+        idDash: this.idDashFrom, 
+        id: this.idFrom
+      })
+    },
     dataRest: function() {
       return this.dataRestFrom
     },
     color: function() {
       return this.colorFrom
     },
-    // metrics: function() {
-    //   let metrics = this.$store.getters.getOptions({
-    //     idDash: this.idDashFrom, 
-    //     id: this.idFrom
-    //   }).metricsRelation.relations;
-    //   return metrics
-    // },
     dataLoading: function() {
       return this.dataLoadingFrom
     },
-    width: function() {
-      return this.widthFrom
-    },
-    height: function() {
-      return this.heightFrom
+    dashSize() {
+      return {
+        width: this.widthFrom,
+        height: this.heightFrom
+      }
     },
     change: function() {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.width && this.height ) {
-        // if (this.dataReport) {
-          
-          // if (this.activeElemFrom == this.id) {
-          //   this.createPieChartAsync();
-          // } else {
-            let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
-            if(graphics.length == 0){  // если график уже есть
-              this.createPieChartAsync();
-              // graphics[0].remove(); // удаляем его
-            }
-          // }
-        // } else {
-          // this.createPieChartAsync();
-        // }
-        
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
+        let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
+        if(graphics.length != 0){  
+          graphics[0].remove(); 
+          this.createPieChartDash();
+        } else {
+          this.createPieChartDash()
+        }
       }
       return true  
     },
   },  
   methods: {
-
-    createPieChartAsync: function() {
-      let sizeLine = {width: this.width, height:this.height} // получаем размеры от родителя
+    setMetrics(){
+      this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDashFrom, id: this.idFrom });
+      this.$store.commit('setThemePie', {
+        themes: this.colors,
+        idDash: this.idDashFrom, 
+        id: this.idFrom
+      });
+    },
+    createPieChartDash: function() {
 
       if(this.dataRestFrom.error) {  // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
-      } else {  
-        this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDashFrom, id: this.idFrom });
-        this.$store.commit('setThemePie', {
-          themes: this.colors,
-          idDash: this.idDashFrom, 
-          id: this.idFrom
-        });
       } 
 
-      let onlyNum = true;
+      let showlegend = this.dashOptions.showlegend;
 
-      let metrics = this.$store.getters.getOptions({
-        idDash: this.idDashFrom, 
-        id: this.idFrom
-      }).metricsRelation.relations;
-
-      // this.actions.forEach((action, i)=>{
-      //   this.$set(this.actions[i],'capture',metrics);
-      // })
-
-      let showlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).showlegend;
       if (showlegend == undefined) {
         showlegend = true;
       }
 
-      let positionlegend = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).positionlegend;
+      let positionlegend = this.dashOptions.positionlegend;
 
       if (positionlegend == undefined) {
         positionlegend = 'right'
       }
 
-      let colorsPie = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).colorsPie;
+      let colorsPie = this.dashOptions.colorsPie;
 
+      // SETTING DEFAULT COLORS
       if (colorsPie == undefined) {
         colorsPie = {
           theme: 'neitral',
@@ -196,9 +177,13 @@ export default {
         }
       }
 
-      if (this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).themes)  {
-        this.colors = this.$store.getters.getOptions({idDash: this.idDashFrom, id: this.idFrom}).themes;
+      if (this.dashOptions.themes)  {
+        this.colors = this.dashOptions.themes;
       }
+
+      let onlyNum = true;
+
+      let metrics = this.dashOptions.metricsRelation.relations;
 
       typeof(this.dataRestFrom[0][metrics[1]]) != 'number' ? onlyNum = false : false
 
@@ -217,7 +202,7 @@ export default {
                 
               if (this.$refs.legends.getBoundingClientRect().width != 0) { 
                 legendsSize = {width: Math.round(this.$refs.legends.getBoundingClientRect().width), height: Math.round(this.$refs.legends.getBoundingClientRect().height)};
-                this.createPieChart(this.dataRestFrom,this,sizeLine,metrics,legendsSize,positionlegend,colorsPie); // и собственно создаем график
+                this.createPieChart(this.dataRestFrom, this, this.dashSize, metrics, legendsSize, positionlegend, colorsPie); // и собственно создаем график
                 clearTimeout(timeOut);
               } else {
                 timeOut = setTimeout(tick.bind(this), 100); 
@@ -226,7 +211,7 @@ export default {
 
           } else {
             legendsSize = {width: 0, height: 0};
-            this.createPieChart(this.dataRestFrom,this,sizeLine,metrics,legendsSize,positionlegend,colorsPie); // и собственно создаем график
+            this.createPieChart(this.dataRestFrom,this,this.dashSize, metrics, legendsSize, positionlegend, colorsPie); // и собственно создаем график
           }
         }
       } else {  // если первое значение первого элемнета (подразумеваем что это time не число)
@@ -357,11 +342,8 @@ export default {
 
           return that.setClick(d,selected)
         })
-
-
     },
     setClick: function(part,selected) {
-
       if (selected) {
         this.selectedValue.push(`(${part.data.key},${part.data.value})`);
       } else {
@@ -375,11 +357,8 @@ export default {
           this.setTocken();
         },1500)
       }
-      
-
     },
     setTocken: function() {
-
       let value = '';
       if (this.selectedValue.length > 1) {
         value = '[';
@@ -393,7 +372,6 @@ export default {
       } else if (this.selectedValue.length == 1) {
         value = this.selectedValue[0]
       } 
-
       let tockens = this.$store.getters.getTockens(this.idDashFrom);
       let tocken = {};
 
@@ -412,9 +390,11 @@ export default {
   },
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-  } 
+  },
+  beforeUpdate() {
+    this.setMetrics()
+  }
 }
-
 
 </script>
 
