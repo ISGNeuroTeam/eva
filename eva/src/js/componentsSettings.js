@@ -101,7 +101,7 @@ export default {
   }, 
   options: {
     //lineChart: ['visible','level','boxShadow','lastDot'],
-    multiLine: ['visible','level','boxShadow','united','lastDot','metrics'], 
+    multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat'], 
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes'],
     //barchart: ['visible','level','boxShadow'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor'],
