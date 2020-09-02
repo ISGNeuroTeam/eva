@@ -156,52 +156,8 @@ export default {
     sendSizeGrid: function() {
       this.$store.commit('setSizeGrid', {id: this.idDashFrom,grid: JSON.parse(JSON.stringify(this.sizeGrid))});
     },
-  //   switchBlock: function(switcher) {
-  //     Object.keys(this.switchers).forEach( item => {
-  //       if (item != switcher) {
-  //         this.switchers[item].status = false;
-  //         this.switchers[item].arrow = mdiChevronDown;
-  //       }
-  //     })
-  //     this.switchers[switcher].status = !this.switchers[switcher].status;
-  //     if (this.switchers[switcher].status) {
-  //       this.switchers[switcher].arrow = mdiChevronUp;
-  //     } else {
-  //       this.switchers[switcher].arrow = mdiChevronDown; 
-  //     }
-  //   },
-  //   setTheme: function(theme){
-  //     // let formData =  new FormData();
-  //     // formData.append('setting', {theme: theme});
-
-  //     this.$store.commit('setTheme', theme);
-  //     let settings = JSON.stringify({
-  //       theme: theme,
-  //     });
-  //     this.$store.commit('setThemeBack', JSON.stringify({setting: settings}));
-
-
-  //     // if (theme == 'light') {
-  //     //   this.color.text = '#333';
-  //     //   this.color.back = '#FFF';
-  //     //   this.color.backElement = '#FFF';
-  //     //   this.color.controls = '#008080';
-  //     //   this.color.controlsActive = '#FF6D70';
-  //     //   this.color.border = '#00000033';
-  //     //   this.color.change = !this.color.change;
-  //     // } else {
-  //     //   this.color.text = '#FFFCFCFF';
-  //     //   this.color.back = '#07070EFF';
-  //     //   this.color.backElement = '#17171BFF';
-  //     //   this.color.controls = '#0B909C';
-  //     //   this.color.controlsActive = '#F5B910';
-  //     //   this.color.border = "#F1FFFF33";
-  //     //   this.color.change = !this.color.change;
-  //     // }
-  //   },
   },
   mounted() {
-    //this.color =  this.$store.getters.getColor;
     let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
