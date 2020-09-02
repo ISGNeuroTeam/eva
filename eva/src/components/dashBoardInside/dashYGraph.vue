@@ -56,7 +56,7 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
-      this.generateNodesEdgesSource(val)
+      this.generateNodesEdges(val)
       this.applyGraphBuilder()
       this.colorFont()
       this.colorNodes()
@@ -238,7 +238,7 @@ export default {
       })
     },
 
-    generateNodesEdgesSource(dataRest){
+    generateNodesEdges(dataRest){
       let _allNodes = []
       let _allEdges = []
 
@@ -259,7 +259,7 @@ export default {
           })
         }
       });
-      
+
       let _nodesSource = {}
       _allNodes.map((item)=> _nodesSource[item.id] = item)
 
