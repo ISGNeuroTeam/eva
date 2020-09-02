@@ -22,7 +22,7 @@
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
-            <div 
+            <div
               v-if="props.edit"
               class="dash-title"  
               :style="{color:color.text}"
@@ -57,7 +57,7 @@
             />             
           </div>
         </div>
-        <div class="settings-dash-block">
+        <div class="settings-dash-block" v-show="dataMode">
           <div 
             class="settings-dash" 
             :class="{settings_move:props.open_gear}"
@@ -66,7 +66,7 @@
               bottom 
               :color="color.controlsActive"
             > 
-              <template v-slot:activator="{ on }">
+              <template v-slot:activator="{ on }"  >
                 <v-icon 
                   class=" datasource" 
                   :color="color[setColorDS]" 
@@ -78,38 +78,6 @@
               </template>
               <span>Источник данных</span>
             </v-tooltip>
-            <!-- <v-tooltip 
-              bottom 
-              :color="color.controlsActive"  
-            >
-              <template v-slot:activator="{ on }">
-                <v-icon 
-                  class=" resize" 
-                  :color="color[props.resize_arrow_coral]"  
-                  v-on="on" 
-                  @click="resizeElem(props)"
-                >
-                  {{ props.mdiArrowExpandAll }}
-                </v-icon>
-              </template>
-              <span>Изменить размер</span>
-            </v-tooltip>
-            <v-tooltip 
-              bottom 
-              :color="color.controlsActive"  
-            >
-              <template v-slot:activator="{ on }">
-                <v-icon 
-                  class=" arrow-all"  
-                  :color="color[props.arrow_coral]"  
-                  v-on="on" 
-                  @click="moveElem(props)"
-                >
-                  {{ props.mdiArrowAll }}
-                </v-icon>
-              </template>
-              <span>Переместить</span>
-            </v-tooltip> -->
             <v-tooltip 
               v-if="props.edit_icon"
               bottom  

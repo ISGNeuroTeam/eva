@@ -13,22 +13,6 @@
       <div 
         class="title-edit" 
       >
-        <!-- <v-tooltip 
-          bottom 
-          :color="color.controlsActive" 
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="edit" 
-              :style="{color:'#DADADA'}"
-              v-on="on"
-              @click="setEditMode"
-            >
-              {{ edit_layout }}
-            </v-icon> 
-          </template>
-          <span>Поменять режим отображения</span>
-        </v-tooltip> -->
         <v-tooltip 
           v-if="editPermission"
           bottom 
@@ -125,7 +109,7 @@
           <v-icon 
             class="profile" 
             :style="profileSwitch" 
-            :data-error="colorError" 
+            :data-error="colorError"
             v-on="on" 
             @click="openProfile"
           >
@@ -138,7 +122,7 @@
         bottom 
         :color="color.controlsActive"
       >
-        <template v-slot:activator="{ on }">
+        <template v-slot:activator="{ on }"  v-if="editPermission">
           <v-icon 
             class="save" 
             :style="saveSwitch" 
