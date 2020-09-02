@@ -56,8 +56,7 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
-      this.generateNodesSource(val)
-      this.generateEdgesSource(val)
+      this.generateNodesEdgesSource(val)
       this.applyGraphBuilder()
       this.colorFont()
       this.colorNodes()
@@ -239,8 +238,9 @@ export default {
       })
     },
 
-    generateNodesSource(dataRest){
+    generateNodesEdgesSource(dataRest){
       let _allNodes = []
+      let _allEdges = []
 
       dataRest.forEach(dataRestItem => {
         _allNodes.push({
@@ -249,18 +249,7 @@ export default {
           label:dataRestItem.node_description,
           color:dataRestItem.node_color
         })
-      });
 
-      let _nodesSource = {}
-      _allNodes.map((item)=> _nodesSource[item.id] = item)
-
-      this.nodesSource = Object.values(_nodesSource)
-    },
-
-    generateEdgesSource(dataRest){
-      let _allEdges = []
-
-      dataRest.forEach(dataRestItem => {
         if(dataRestItem.relation_id){
           _allEdges.push({
             fromNode:dataRestItem.id,
@@ -270,9 +259,13 @@ export default {
           })
         }
       });
+      
+      let _nodesSource = {}
+      _allNodes.map((item)=> _nodesSource[item.id] = item)
 
+      this.nodesSource = Object.values(_nodesSource)
       this.edgesSource = _allEdges
-    }
+    },
   },
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
