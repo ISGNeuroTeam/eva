@@ -161,9 +161,14 @@ export default {
     let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
-    let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
-    dragRes == 'true' ? dragRes = true : dragRes = false;
-    this.dragresable =  dragRes;
+    if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
+      this.dragresable = false;
+    } else {
+      let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
+      dragRes == 'true' ? dragRes = true : dragRes = false;
+      this.dragresable =  dragRes;
+    }
+    
   } 
 }
 
