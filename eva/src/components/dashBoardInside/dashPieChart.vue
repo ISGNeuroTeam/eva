@@ -131,6 +131,9 @@ export default {
         let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
         if(graphics.length != 0){  
           graphics[0].remove(); 
+          //если строим заново(изменились данные) - очищаем токены
+          this.selectedValue = []
+          this.setTocken()
           this.createPieChartDash();
         } else {
           this.createPieChartDash()

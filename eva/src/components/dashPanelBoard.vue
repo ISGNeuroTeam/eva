@@ -1012,6 +1012,7 @@ export default {
         prefix: parent.querySelector('.tocken-prefix').querySelector('input') ?  parent.querySelector('.tocken-prefix').querySelector('input').value :  '',
         sufix: parent.querySelector('.tocken-sufix').querySelector('input') ?  parent.querySelector('.tocken-sufix').querySelector('input').value :  '',
         delimetr: parent.querySelector('.tocken-delimetr').querySelector('input') ?  parent.querySelector('.tocken-delimetr').querySelector('input').value :  '',
+        resetData: true//сделать норм
       }
 
       let j = -1; 
