@@ -16,6 +16,7 @@
         :idDashFrom="idDash" 
         :colorFrom="color" 
         :style="{top:top, display:display}" 
+        :permissions-from="permissions"
         @changeMode="changeMode" 
         @openProfile="event => {openProfile = event}" 
         @openSettings="openSettings" 
@@ -105,20 +106,18 @@ export default {
       showSetting: false,
       rotate: '',
       color: { },
-      adminRoot: false,
       openProfile: false,
       alreadyDash: {},
       alreadyShow: false,
       letElements: false,
       prepared: false,
       colorChange: false,
-      deltaHorizontal:0,//сколько надо увеличить высоту overlay-grid,по первое знач-500,
-      startClientHeight:0,
-      startClientWidth:0,
-      verticalCell:0,
-      horizontalCell:0
-
-
+      permissions: [],
+      deltaHorizontal: 0,//сколько надо увеличить высоту overlay-grid,по первое знач-500,
+      startClientHeight: 0,
+      startClientWidth: 0,
+      verticalCell: 0,
+      horizontalCell: 0
     }
   },   
   computed: {
@@ -189,9 +188,7 @@ export default {
       this.showSetting = !this.showSetting;
     },
     setPermissions: function(event) { 
-      if (event.includes('admin_all')) {
-        this.adminRoot = true;
-      }           
+      this.permissions = event;       
     },
     checkOver: function() {
       this.letElements = true;

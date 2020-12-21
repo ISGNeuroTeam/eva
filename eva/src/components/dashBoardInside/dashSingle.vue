@@ -59,7 +59,7 @@ export default {
         },
       ],
       noMsg: true,
-      msgText: 'Нет данных для отображения'
+      msgText: 'Нет данных для отображения',
     } 
   },
   computed: {
@@ -103,7 +103,7 @@ export default {
       let color = this.colorFrom.controls;
       if(options.color){
         color = options.color;
-      }  
+      } 
       return color
     },
     changeSize: function() {
@@ -169,6 +169,29 @@ export default {
         }
         flag = -1;
       });
+
+      
+
+      events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onValueCompare', element: this.id});
+      
+
+      let treshold, color, value;
+
+      events.forEach( (item) => { 
+        treshold = item.treshold.replace('[','').replace(']','').split(',');
+        color = item.color.replace('[','').replace(']','').split(',');
+        treshold.forEach( (item,i) => {
+          if (number > Number(item)) {
+            value = color[i];
+          }
+        })
+        if (value) {
+          this.$store.commit('letEventSet', {events: [{target: item.target,prop: item.prop[0],value: value}], idDash: this.idDash,  });
+        } else {
+          this.$store.commit('letEventSet', {events: [{target: item.target,prop: item.prop[0],value: ''}], idDash: this.idDash,  });
+        }
+      });
+
             
     },
     setClick: function() {

@@ -252,6 +252,7 @@ export default {
     getDataAsynchrony: function() {
       let united = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).united;
       let lastDot = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).lastDot;
+      let timeFormat = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).timeFormat;
       let metricsOpt = [];
       if (this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).metrics) {
         metricsOpt = [...[],...this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).metrics];
@@ -307,7 +308,7 @@ export default {
               let timeOut = setTimeout( function tick() {
                 if (this.$refs && this.props.legends.length > 0 ) {    
                   clearTimeout(timeOut);
-                  this.createLineChart(this.props,this,sizeLine,time,united,lastDot,metricsOpt);
+                  this.createLineChart(this.props,this,sizeLine,time,united,lastDot,timeFormat,metricsOpt);
                 }  else {
                   timeOut = setTimeout(tick.bind(this), 100); 
                 }
@@ -319,7 +320,7 @@ export default {
             }
 
           } else {
-            this.createLineChart(this.props,this,sizeLine,time,united,lastDot,metricsOpt);
+            this.createLineChart(this.props,this,sizeLine,time,united,lastDot,timeFormat,metricsOpt);
           }
 
         } else {  // если первое значение первого элемнета (подразумеваем что это time не число)
@@ -333,7 +334,7 @@ export default {
     setMetrics: function() {
       this.$store.commit('setMetricsMulti', {metrics: this.metrics, idDash: this.idDash, id: this.id });
     },
-    createLineChart: function (props,that,sizeLine,time,united,lastDot,metricsOpt) {  // создает график
+    createLineChart: function (props,that,sizeLine,time,united,lastDot,timeFormat,metricsOpt) {  // создает график
     
       let colors = [this.color.controls,this.color.text,this.color.controlsActive,'#660099','#3366FF','#e5194a',]; // основные используемые цвета
       let colorLine = this.colorLegends;
@@ -454,15 +455,14 @@ export default {
         }
       })
 
-      
-
 
       if (time) {
+        !timeFormat ? timeFormat = '%Y-%m-%d %H:%M:%S' : false;
         xAxis = svg.append("g")
           .attr("class","xAxis")
           .attr("transform", "translate(0," + height + ")")
           .call(d3.axisBottom(x)
-            .tickFormat(d3.timeFormat('%d-%m-%Y '))
+            .tickFormat(d3.timeFormat(timeFormat))
             .tickValues(
               x.ticks().filter( (item,i) => {
                 if (i%deliter == 0) {
@@ -1367,6 +1367,8 @@ export default {
                 brushObj.selectionUp();
               })
 
+              
+
             brushObj['selectionDown'] =  () => {
               brushObj.mouseDown = true;
               brushObj.clearBrush();
@@ -1377,7 +1379,7 @@ export default {
                 .attr("x", brushObj.startX)
                 .attr("y",startY[i])
                 .attr("width", 0)
-                .attr("height", parseFloat(step*(i+1)))
+                .attr("height", parseFloat(step))
                 .style("fill",colors[2])
                 .style("opacity","0.3")
                 .on("mousemove", () => {
@@ -1391,7 +1393,6 @@ export default {
 
             brushObj['selectionMove'] = () => {
               if (brushObj.mouseDown) {
-
                 if ((event.layerX-50 - brushObj.startX) > 0) {
                   brushObj.direction = 'right';
                   brushObj.endX = event.layerX-50;

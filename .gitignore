@@ -3,3 +3,6 @@ eva/package-lock.json
 eva/dist/
 build/
 eva-*.tar.gz
+
+*-lock.*
+.vscode/

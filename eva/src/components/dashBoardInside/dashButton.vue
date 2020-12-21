@@ -38,11 +38,11 @@ export default {
   },
   data () {
     return {
-      // actions: [
-      //     {name:'click',
-      //         capture: []
-      //     },
-      // ],
+      actions: [
+        {name: 'click',
+          capture: ['inverse']
+        },
+      ],
       optionsData: {
         'name': '',
         'background': '',
@@ -127,10 +127,46 @@ export default {
       let _link =`${window.location.origin}/dashboards/${targetLink}${header==='false'|| header==='0' ?'?header=false':''}`
       window.open(_link, '', `width=${_width}, height=${_height}, top=${_top}, left=${_left}`);
     },
-    createReport: function(item) {
-      this.getData(item.sid,item.file);
+    createReport: function(item,type) {
+      this.getData(item.sid,item.file,type);
+    },
+    exportSearch: function(item,type) {
+      item.searches.forEach( sid => {
+        this.getData(sid,'',type);
+      })
+      
     },
     setClick: function() {
+
+      let tockens = this.$store.getters.getTockens(this.idDash);
+      let tocken = {};
+      let value = false;
+
+      Object.keys(tockens).forEach( i =>{
+        tocken = {
+          name: tockens[i].name,
+          action: tockens[i].action,
+          capture: tockens[i].capture,
+        }
+        if (tockens[i].elem == this.id && tockens[i].action == 'click' && tockens[i].capture == 'inverse') {
+
+          switch (tockens[i].value) {
+          case '':
+            value = true;
+            break
+          case true:
+            value = false;
+            break
+          case false:
+            value = true;
+            break
+          }
+          
+          this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: value, store: this.$store });
+        } 
+      })
+
+
       let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onclick', element: this.id, partelement: 'empty'});
       if (events.length != 0) {
         events.forEach( item => {
@@ -138,11 +174,12 @@ export default {
             this.$store.commit('letEventSet', {events: events, idDash: this.idDash,  });
           } else if (item.action == 'go') {
             this.$store.commit('letEventGo', {event: item, idDash: this.idDash, route: this.$router, store: this.$store });
-            //this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
-          } else if (item.action.toLowerCase() === 'open'.toLowerCase()){//если экшен open
+          } else if (item.action.toLowerCase() == 'open'){//если экшен open
             this.actionOpen(item.target.toLowerCase(), item.header, item.widthPersent, item.heightPersent);
-          }  else if (item.action.toLowerCase() === 'changeReport'.toLowerCase()){//если экшен open
-            this.createReport(item);
+          }  else if (item.action.toLowerCase() == 'changeReport'.toLowerCase()){//если экшен open
+            this.createReport(item,'report');
+          } else if (item.action.toLowerCase() == 'exportSearch'.toLowerCase()){//если экшен open
+            this.exportSearch(item,'search');
           }
         })
       }
@@ -176,7 +213,18 @@ export default {
       }
 
     },
-    getData: function(sid,file) {
+    getSearch: function(search,sid) {
+      let csvContent = "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"; // задаем кодировку csv файла
+      let keys = Object.keys(search[0]); // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(keys.join(',') + "\n"); // добавляем ключи в файл
+      csvContent += encodeURIComponent(search.map( item =>  Object.values(item).join(",")).join("\n")); // добовляем все значения по ключам в файл
+      let link = this.$refs.buttonEl.parentElement.appendChild(document.createElement("a")); // создаем ссылку
+      link.setAttribute('href',csvContent); // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute("download", `${this.idDash}-${sid}.csv`); // указываем имя файла 
+      link.click(); // жмем на скачку
+      link.remove(); // удаляем ссылку 
+    }, 
+    getData: function(sid,file,type) {
 
 
       let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], { type: "text/javascript" }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
@@ -185,11 +233,16 @@ export default {
 
       let worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
 
-      worker.onmessage = function(event) { // при успешном выполнении функции что передали в blob изначально сработает этот код
 
+      worker.onmessage = function(event) { // при успешном выполнении функции что передали в blob изначально сработает этот код
         if (event.data.length != 0) { 
           //this.data = event.data;
-          this.getPaper(file,event.data);
+          if (type == 'report') {
+            this.getPaper(file,event.data);
+          } else {
+            this.getSearch(event.data,sid)
+          }
+          
         } else {
           // this.errorMsg = "Получить данные для отчета не удалось.";
           // this.showError = true;
@@ -263,6 +316,7 @@ export default {
   mounted() {
     this.$emit('hideDS',this.id);
     this.$emit('hideLoading');
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
   } 
 }
 

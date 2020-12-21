@@ -22,7 +22,7 @@
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
-            <div 
+            <div
               v-if="props.edit"
               class="dash-title"  
               :style="{color:color.text}"
@@ -57,7 +57,7 @@
             />             
           </div>
         </div>
-        <div class="settings-dash-block">
+        <div class="settings-dash-block" v-show="dataMode">
           <div 
             class="settings-dash" 
             :class="{settings_move:props.open_gear}"
@@ -66,7 +66,7 @@
               bottom 
               :color="color.controlsActive"
             > 
-              <template v-slot:activator="{ on }">
+              <template v-slot:activator="{ on }"  >
                 <v-icon 
                   class=" datasource" 
                   :color="color[setColorDS]" 
@@ -78,38 +78,6 @@
               </template>
               <span>Источник данных</span>
             </v-tooltip>
-            <!-- <v-tooltip 
-              bottom 
-              :color="color.controlsActive"  
-            >
-              <template v-slot:activator="{ on }">
-                <v-icon 
-                  class=" resize" 
-                  :color="color[props.resize_arrow_coral]"  
-                  v-on="on" 
-                  @click="resizeElem(props)"
-                >
-                  {{ props.mdiArrowExpandAll }}
-                </v-icon>
-              </template>
-              <span>Изменить размер</span>
-            </v-tooltip>
-            <v-tooltip 
-              bottom 
-              :color="color.controlsActive"  
-            >
-              <template v-slot:activator="{ on }">
-                <v-icon 
-                  class=" arrow-all"  
-                  :color="color[props.arrow_coral]"  
-                  v-on="on" 
-                  @click="moveElem(props)"
-                >
-                  {{ props.mdiArrowAll }}
-                </v-icon>
-              </template>
-              <span>Переместить</span>
-            </v-tooltip> -->
             <v-tooltip 
               v-if="props.edit_icon"
               bottom  
@@ -312,15 +280,20 @@ export default {
   asyncComputed: {
     async prepareData() {  // подготавливаем данные для отображения
       if (this.shouldGet) {
+        
         let searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
         let searchName = `${this.idDash}-${searchId}`;
+        let search = this.$store.getters.getSearch({idDash: this.idDash, id: this.element});
         searchId == -1 ? this.props.sid = '': this.props.sid = searchId;
 
         if (searchId != -1){
           let result = await this.getData(searchName);
+          if (result.length == 0) {
+            result = await this.startSearch(search);
+          }
           this.props.dataRest = result;
           this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});
-            
+          
           return result
         } else {        
           this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false}); 
@@ -776,7 +749,30 @@ export default {
         this.props.dataRestFilter = JSON.parse(JSON.stringify(this.props.dataRest));
       }
              
-    }
+    },
+    startSearch: async function(event) {
+
+      // this.$set(this.loadings,event.sid,true);
+
+      this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false }); 
+    
+      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
+      let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными 
+      // вызывая метод в хранилище 
+      if ( response.length == 0) {  // если что-то пошло не так 
+        this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });  
+      } else {  // если все нормально
+
+        let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash);
+        responseDB
+          .then(
+            result => {
+              this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  }); 
+            },
+          );
+      }
+      return response
+    },
   },
   mounted() {
     this.props.icons = settings.icons;

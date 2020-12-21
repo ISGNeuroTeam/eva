@@ -191,7 +191,9 @@ export default {  // приблизительный объект хранили�
         let response = {};
 
         searches.forEach( async item => {  // также при обновлении токена нужно заново запускать серч и обновлять информацию
-          if (item.original_otl.indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1  ) {  // если в тексте запроса есть наш токен
+          if (item.original_otl.indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||  
+            String(item.parametrs.tws).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||
+            String(item.parametrs.twf).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ) {  // если в тексте запроса есть наш токен
                 
 
             tocken.store.commit('setLoading', {search: item.sid, idDash: tocken.idDash, should: true, error: false});  
@@ -248,10 +250,11 @@ export default {  // приблизительный объект хранили�
     },
     setDash: (state, dash) => {  // обновляем порядок layout на странице
       let dashboard = dash.data;
+      //console.log(dashboard)
       if (!state[dashboard.id]) {
-        
         Vue.set(state, dashboard.id , {});
         Vue.set(state[dashboard.id], 'name' , dashboard.name);
+        Vue.set(state[dashboard.id], 'idgroup' , dashboard.idgroup);
         Vue.set(state[dashboard.id], 'modified' , dashboard.modified);
         dash.getters(dashboard.id,true)
       }
@@ -359,7 +362,6 @@ export default {  // приблизительный объект хранили�
       state[layout.name] = state[layout.old_name];  // делаем копию дашборда
       state[layout.name].name = layout.name[0].toUpperCase() + layout.name.substring(1); // но меняем в нем имя с большой буквы для красоты
       delete state[layout.old_name];  // удаляем старый дашборд с которого скопировали
-
       let layouts = state.layouts.map( item => {  // пробегаем массив дашбордов и в нем заменяем имя старого дашборда на новый
         if (item == layout.old_name) {
           return layout.name
@@ -476,7 +478,7 @@ export default {  // приблизительный объект хранили�
         Vue.set( state[events.idDash][item.target].options, item.prop , item.value);
       })
     },
-    letEventGo: (state,event) => {  // при переходе на другой дашборд нам нужно обновить определенный токен
+    letEventGo: async (state,event) => {  // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({},event.event);
       if (item.prop[0] != '') {
         let tockens = state[event.idDash].tockens;
@@ -485,7 +487,6 @@ export default {  // приблизительный объект хранили�
         Object.keys(state).forEach( key => {
           if (state[key].name) {
             if( state[key].name.toLowerCase() == item.target.toLowerCase()) {
-              tockensTarget = state[key].tockens;
               id = key;
             } 
           }
@@ -512,6 +513,33 @@ export default {  // приблизительный объект хранили�
           }
         })
 
+
+        if (id == -1) {
+
+          
+          let response = await rest.getDashByName({name: item.target,idgroup: state[event.idDash].idgroup},restAuth);
+          if(response) {
+
+            id =  response.id;
+            Vue.set(state, response.id, {});
+            
+            if (response.body != '') {
+              Vue.set(state, id, JSON.parse(response.body));
+            }
+            Vue.set(state[response.id], 'name', response.name);
+            Vue.set(state[response.id], 'idgroup', response.idgroup);
+            Vue.set(state[response.id], 'modified', response.modified);
+            
+          }
+
+
+        }
+
+        if (state[id].tockens) {
+          tockensTarget = state[id].tockens;
+        }
+
+
         item.prop.forEach( (itemProp,j) => {
           tockensTarget.forEach( (itemTock,i) => {
             if (itemProp == itemTock.name) {
@@ -524,17 +552,15 @@ export default {  // приблизительный объект хранили�
           })
         })
 
-       
+        
 
-
-        if (id != -1) {
-
-          
-          event.route.push(`/dashboards/${id}`);
+        event.route.push(`/dashboards/${id}`);
     
-          let searches = state[id].searches;
+        let searches = state[id].searches;
 
-          let response = {};
+        let response = {};
+
+        if (searches){
 
           searches.forEach(async item => {  // также при обновлении токена нужно заново запускать серч и обновлять информацию
             
@@ -560,10 +586,10 @@ export default {  // приблизительный объект хранили�
             })
                 
           });
-
-        } else {
-          console.log('it is')
         }
+
+
+
   
       }
                 
@@ -646,6 +672,23 @@ export default {  // приблизительный объект хранили�
       }
       //Vue.set(state[dash.idDash][dash.id], 'metrics',[]);
       state[dash.idDash][dash.id].metrics = metrics;
+    },
+    setMetricsPie: (state,dash) => {
+      let metrics = [...[],...dash.metrics];
+      if (!state[dash.idDash][dash.id].options.metricsRelation) {
+        state[dash.idDash][dash.id].options.metricsRelation = {};
+        state[dash.idDash][dash.id].options.metricsRelation['relations'] = metrics;
+        state[dash.idDash][dash.id].options.metricsRelation['namesMetric'] = ['Категория','Процентное соотношение','Выбрано'];
+      }
+      state[dash.idDash][dash.id].options.metricsRelation['metrics'] = metrics;
+     
+    },
+    setThemePie: (state,dash) => {
+      let themes = {...{},...dash.themes};
+      if (!state[dash.idDash][dash.id].options.themes) {
+        state[dash.idDash][dash.id].options.themes  = themes;
+      }
+      
     },
     setSizeGrid: (state,sizeGrid) => {
       if (!state[sizeGrid.id].grid) {
@@ -834,7 +877,6 @@ export default {  // приблизительный объект хранили�
         let reg = null;
 
 
-
         if (state[idDash].tockens){
 
           Object.keys(state[idDash].tockens).forEach( item => {  // если есть токены в запросе то меняем временные метки в зависимости от значения токена
@@ -852,8 +894,8 @@ export default {  // приблизительный объект хранили�
             if (typeof twf == 'string' && twf.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
               twf = state[idDash].tockens[item].value
             }
-                    
-                        
+
+           
             if(state[idDash].tockens[item].elem == 'picker' && state[idDash].tockens[item].capture == 'start') {
               if (typeof search.parametrs.tws != 'number'){
                 if (search.parametrs.tws.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
@@ -1115,6 +1157,7 @@ export default {  // приблизительный объект хранили�
       }
     },
     getEventFull(state) {  // получаем скриншот страницы
+     
       return (id) => {
         if (state[id].eventFull) {
           return state[id].eventFull
@@ -1233,10 +1276,13 @@ export default {  // приблизительный объект хранили�
                     
               if (!state[id]) { 
                 Vue.set(state, id, {});
+               
                 if (stateFrom.body != '') {
+                  
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                 }
                 Vue.set(state[id], 'name', stateFrom.name);
+                Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                 Vue.set(state[id], 'modified', stateFrom.modified);
               } 
               if (stateFrom.modified > state[id].modified) {
@@ -1245,6 +1291,7 @@ export default {  // приблизительный объект хранили�
               if (first) {
                 if (stateFrom.body != '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
+                  Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                   Vue.set(state[id], 'name', stateFrom.name);
                   Vue.set(state[id], 'modified', stateFrom.modified);
                 }

@@ -637,6 +637,154 @@
               />
             </div>
           </div>
+          <div 
+            v-if="checkOptions('showlegend')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              showlegend
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Показывать ли легенду
+            </div>
+            <div class="status-option item">
+              <v-switch  
+                v-model="options.showlegend" 
+                class="switch" 
+                :color="color.controls" 
+                :style="{color:color.text,}" 
+                :label="String(options.showlegend)" 
+              />
+            </div>
+          </div>
+          <div 
+            v-if="checkOptions('positionlegend')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              positionlegend
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Позиция легенды
+            </div>
+            <div class="status-option item">
+              <v-select  
+                v-model="options.positionlegend"
+                :items="['top','left','right','bottom']" 
+                :color="color.controls" 
+                :style="{color:color.text, fill: color.text}"  
+                hide-details  
+                outlined  
+                class="subnumber" 
+                label="Позиция легенды"
+                @click="changeColor"
+              /> 
+            </div>
+          </div>
+          <v-card-text 
+            class="headline " 
+          >
+            <div 
+              class="settings-title" 
+              :style="{color:color.text,borderColor:color.text}"
+            >
+              Настройки круговой диаграммы 
+            </div>
+          </v-card-text>
+
+          <div 
+            ref="options" 
+            class="options-block"  
+          >
+            <div 
+              class="divider-tooltip-setting" 
+              :style="{color:color.text}" 
+            >
+              <p>Соотношение метрик</p>
+              <div 
+                :style="{backgroundColor:color.text}" 
+                class="divider-line"
+              />
+            </div>  
+            <div 
+              class="options-item-tooltip"  
+            >
+              <v-select  
+                v-for="i in metricsRelation.metrics.length" 
+                :key="i+'metric'"
+                v-model="metricsRelation.relations[i-1]"
+                :items="metricsRelation.metrics" 
+                :color="color.controls" 
+                :style="{color:color.text, fill: color.text}"  
+                hide-details  
+                outlined  
+                class="item-metric" 
+                :label="metricsRelation.namesMetric[i-1]"
+                @click="changeColor"
+              /> 
+            </div>
+            <div 
+              class="divider-tooltip-setting" 
+              :style="{color:color.text}" 
+            >
+              <p>Цветовая схема</p>
+              <div 
+                :style="{backgroundColor:color.text}" 
+                class="divider-line"
+              />
+            </div> 
+            <div 
+              class="options-item-tooltip"  
+            >
+              <v-select  
+                v-model="colorsPie.theme"
+                :items="themesArr" 
+                :color="color.controls" 
+                :style="{color:color.text, fill: color.text}"  
+                hide-details  
+                outlined  
+                class="item-metric" 
+                label="Выберите схему"
+                @click="changeColor"
+              /> 
+              <v-text-field 
+                v-show="colorsPie.theme == 'custom'"
+                v-model="colorsPie.nametheme" 
+                clearable  
+                placeholder="green"  
+                label="Имя новой схема"
+                :color="color.text" 
+                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                outlined 
+                class="item-metric"  
+                hide-details
+              />
+              <v-text-field 
+                v-show="colorsPie.theme == 'custom'"
+                v-model="colorsPie.colors" 
+                clearable  
+                placeholder="red,#5F27FF,rgb(95, 39, 255)"  
+                label="Новая схема"
+                :color="color.text" 
+                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                outlined 
+                class="item-metric"  
+                hide-details
+              />
+            </div>
+          </div>
         </div>
         <v-card-text 
           v-if="tooltipSettingShow"
@@ -867,6 +1015,18 @@ export default {
         links: [],
         buttons: [],
       },
+      metricsRelation: {
+        metrics: [],
+        relations: [],
+        namesMetric: ['Категория','Процентное соотношение','Выбрано']
+      },
+      colorsPie: {
+        theme: 'neitral',
+        colors: '',
+        nametheme: ''
+      },
+      themesArr: [],
+      themes: {},
       metrics: [],
       types: ['Line chart', 'Bar chart'],
       metricsName: [],
@@ -915,13 +1075,21 @@ export default {
       if (this.element.indexOf('csvg') != -1) {
         this.options.tooltip = this.tooltip;
       }
+      if (this.element.indexOf('piechart') != -1) {
+        this.options.metricsRelation = JSON.parse(JSON.stringify(this.metricsRelation));
+        this.options.colorsPie = this.colorsPie;
+        if (this.colorsPie.theme == 'custom') {
+          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
+          this.colorsPie.theme = this.colorsPie.nametheme;
+        }
+        this.options.themes = this.themes;
+      }
       if (this.element.indexOf('multiLine') != -1) {
         let updateMetrics = this.metrics.map( item => {
           return JSON.parse(JSON.stringify(item))
         })
         this.$set(this.options,'metrics',updateMetrics);
       }
-
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options });
       this.cancelModal();
     },
@@ -976,10 +1144,8 @@ export default {
     prepareOptions: function() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции 
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
-
       this.options = {}; 
       this.optionsItems = settings.options[elem];
-
       this.optionsItems.forEach( item => {
         if (Object.keys(options).includes(item)) {
           if (item == 'tooltip') {
@@ -990,11 +1156,23 @@ export default {
           } else if (item == 'metrics') {
             //this.$set(this,'metrics',options[item]);
             this.metrics = options[item];
+          } else if (item == 'metricsRelation') {
+            this.metricsRelation = {};
+            this.$set(this.metricsRelation,'metrics', [...[],...options[item].metrics]);
+            this.$set(this.metricsRelation,'relations', [...[],...options[item].relations]);
+            this.$set(this.metricsRelation,'namesMetric', ['Категория','Процентное соотношение','Выбрано']);
+          } else if (item == 'colorsPie') {
+            this.colorsPie = {};
+            this.$set(this.colorsPie,'theme', options[item].theme);
+            this.$set(this.colorsPie,'colors', options[item].colors);
+            this.$set(this.colorsPie,'nametheme', options[item].nametheme);
+          } else if (item == 'themes') {
+            this.themesArr = Object.keys(options[item]);
+            this.themes = options[item];
           } else {
             this.$set(this.options,item,options[item]);
           }
         } else {
-          
           this.$set(this.options,item,null);
           if (item == 'united') {
             this.$set(this.options,item,false);
@@ -1002,6 +1180,18 @@ export default {
           if (item == 'lastDot') {
             this.$set(this.options,item,false);
           }
+          if (item == 'showlegend') {
+            this.$set(this.options,item,true);
+          }
+          if (item == 'positionlegend') {
+            this.$set(this.options,item,'right');
+          }
+          // if (item == 'colorsPie') {
+          //   this.colorsPie = {};
+          //   this.$set(this.colorsPie,'theme', 'neitral');
+          //   this.$set(this.colorsPie,'colors', '');
+          //   this.$set(this.colorsPie,'nametheme', '');
+          // }
           if (item == 'metrics') {
             this.metrics = [];
           } 

@@ -54,7 +54,7 @@ export default {
   },
   async setEssence(data) {
 
-
+    
     let response = await fetch(`/api/${data.essence}`, {  // сперва нужно подать post запрос
       method: data.method,
       // headers: {

@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
+## [1.52.0]
+### Added
+- add graph yfiles component
 ## [1.51.0]
 ### Fixed
 - set asynchrony all create components. Then draw only one component per time. Then get data from rest throw web worker.
@@ -29,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - new plugin, whom create papers (reports) from template and give link on download and preview
 
 - add set token in single
+
+- new component pie chart
+
 ## [1.44.26] [newSetting]
 ### Adde
 
