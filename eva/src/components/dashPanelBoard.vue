@@ -13,23 +13,8 @@
       <div 
         class="title-edit" 
       >
-        <!-- <v-tooltip 
-          bottom 
-          :color="color.controlsActive" 
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="edit" 
-              :style="{color:'#DADADA'}"
-              v-on="on"
-              @click="setEditMode"
-            >
-              {{ edit_layout }}
-            </v-icon> 
-          </template>
-          <span>Поменять режим отображения</span>
-        </v-tooltip> -->
         <v-tooltip 
+          v-if="editPermission"
           bottom 
           :color="color.controlsActive" 
         >
@@ -124,7 +109,7 @@
           <v-icon 
             class="profile" 
             :style="profileSwitch" 
-            :data-error="colorError" 
+            :data-error="colorError"
             v-on="on" 
             @click="openProfile"
           >
@@ -137,7 +122,7 @@
         bottom 
         :color="color.controlsActive"
       >
-        <template v-slot:activator="{ on }">
+        <template v-slot:activator="{ on }"  v-if="editPermission">
           <v-icon 
             class="save" 
             :style="saveSwitch" 
@@ -635,6 +620,7 @@
     <dash-settings 
       :color-from="color" 
       :gear-from="gearShow"
+      :permissions-from="permissionsFrom"
       :idDashFrom="idDashFrom"
       @changeMode="setEditMode"
     />
@@ -660,6 +646,7 @@ export default {
   props: {
     idDashFrom: null,
     colorFrom: null,
+    permissionsFrom: null,
   },
   data () {
     return {
@@ -819,6 +806,12 @@ export default {
       } else {
         return `fill:#DADADA`;
       }
+    },
+    editPermission: function() {
+      if (this.permissionsFrom.includes('admin_all') || this.permissionsFrom.includes('editdash')) {
+        return true
+      }
+      return false
     },
     // editSwitch: function() {
     //   if (this.edit_elem) {
@@ -1019,6 +1012,7 @@ export default {
         prefix: parent.querySelector('.tocken-prefix').querySelector('input') ?  parent.querySelector('.tocken-prefix').querySelector('input').value :  '',
         sufix: parent.querySelector('.tocken-sufix').querySelector('input') ?  parent.querySelector('.tocken-sufix').querySelector('input').value :  '',
         delimetr: parent.querySelector('.tocken-delimetr').querySelector('input') ?  parent.querySelector('.tocken-delimetr').querySelector('input').value :  '',
+        resetData: true//сделать норм
       }
 
       let j = -1; 
@@ -1077,8 +1071,7 @@ export default {
 
     
       this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
-      //   let response = await this.$store.getters.getDataAPI({search: event, idDash: this.idDash});  // собственно проводим все операции с данными 
-      let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash});
+      let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными 
       // вызывая метод в хранилище 
       if ( response.length == 0) {  // если что-то пошло не так 
         this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });  
@@ -1182,7 +1175,7 @@ export default {
         csvContent += encodeURIComponent(res.map( item =>  Object.values(item).join(",")).join("\n")); // добовляем все значения по ключам в файл
         let link = this.$refs.blockCode.appendChild(document.createElement("a")); // создаем ссылку
         link.setAttribute('href',csvContent); // указываем ссылке что надо скачать наш файл csv
-        link.setAttribute("download", `${this.idDash}-${sid}.xlsx`); // указываем имя файла 
+        link.setAttribute("download", `${this.idDash}-${sid}.csv`); // указываем имя файла 
         link.click(); // жмем на скачку
         link.remove(); // удаляем ссылку 
       })
@@ -1340,10 +1333,8 @@ export default {
               this.$set(this.event,'event',reg.exec(item)[0].replace('(',''));
               reg = new RegExp( /\(.+\)/, "g");               
               body = reg.exec(item)[0];
-              
               body = body.slice(1, body.length-1);      
               bodyArray = body.split(',');
-              
               bodyArray.forEach( (elem,i) => {
                 if(elem.indexOf('(') != -1) {
                   element = bodyArray.splice(0, i);
@@ -1365,6 +1356,19 @@ export default {
                 this.$set(this.event,'compare',element[0]);
                 this.$set(this.event,'token',element[1]);
                 this.$set(this.event,'tokenval',element.splice(2, element.length-1).join(','));
+              } else if(this.event.event == 'onValueCompare') {
+                if (element.length == 2) {
+                  this.$set(this.event,'treshold',element[0]);
+                  this.$set(this.event,'color',element[1]);
+                } else {
+                  for (let i = 0; i< element.length; i++) {
+                    if (element[i].indexOf(']') != -1) {
+                      this.$set(this.event,'treshold',element.slice(0, i+1).join(','))
+                      this.$set(this.event,'color',element.slice(i+1, element.length).join(','))
+                      break
+                    }
+                  }
+                }
               } else {
                 this.$set(this.event,'element',element[0]);//click
                 if (element[1]){
@@ -1389,13 +1393,14 @@ export default {
                 }
 
               }
-            
               reg = new RegExp( /\w+\(.+\)/, "g");
               doing = reg.exec(body)[0];
               doing = doing.split('(');
               this.$set(this.event,'action',doing[0]);
               if (doing[0].toLowerCase() == 'set'.toLowerCase()) {
+                
                 doing = doing[1].slice(0, doing[1].length-1).split(',');
+               
                 this.$set(this.event,'target',doing[0]);
                 doing.splice(0,1);
                 doing = doing.join(',');
@@ -1410,7 +1415,11 @@ export default {
                   this.$set(this.event,'value',['']);
                 } else {
                   this.$set(this.event,'prop',doing[0].split(','));
-                  this.$set(this.event,'value',doing[1].split(','));
+                  if (doing[1]) {
+                    this.$set(this.event,'value',doing[1].split(','));
+                  } else {
+                    this.$set(this.event,'value',['']);
+                  }
                 } 
               
               } else if(doing[0].toLowerCase() == 'go'.toLowerCase()) {///go
@@ -1441,7 +1450,7 @@ export default {
 
                 this.$set(this.event,'header',doing[5]);
 
-              } else if (doing[0].toLowerCase() == 'changeReport'.toLowerCase()) {
+              } else if (doing[0].toLowerCase() == 'changeReport'.toLowerCase()) { // changeReport
                 
                 doing = originItem.split(doing[0])[1];
                 doing =  doing.replace(/\(/g, '').replace(/\)/g, '').split(','); 
@@ -1456,7 +1465,12 @@ export default {
                   this.$set(this.event,'file',[doing[1]]);
                 }
                 
-              }
+              } else if (doing[0].toLowerCase() == 'exportSearch'.toLowerCase()) { // changeReport
+
+                doing =  doing[1].replace(/\)/g, '').replace(/\[/g, '').replace(/\]/g, '').split(',');
+                this.$set(this.event,'searches',doing);
+                
+              } 
               this.events.push(this.event);
               this.event ={};
             }
@@ -1554,7 +1568,10 @@ export default {
     if (eventFull != '') {
       this.textarea_event = eventFull;
     }
-    document.querySelector('.block-code').style.maxHeight = `${document.querySelector('#content').clientHeight-100}px`;
+    if (document.querySelector('.block-code')) {
+      document.querySelector('.block-code').style.maxHeight = `${document.querySelector('#content').clientHeight-100}px`;
+    }
+
     this.colorGear = 'controls';
     this.colorExim = 'controls';
     // this.fieldsets = document.querySelectorAll('fieldset');

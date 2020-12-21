@@ -50,7 +50,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
-                            v-if="adminRool" 
+                            v-if="editGroupPermission" 
                             class="edit control-group" 
                             :color="color.controls"  
                             v-on="on" 
@@ -67,7 +67,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
-                            v-if="adminRool"
+                            v-if="editGroupPermission"
                             class="delete control-group"
                             :color="color.controls"
                             v-on="on" 
@@ -90,7 +90,7 @@
                   </v-card-text>
                 </v-card>
                 <v-btn
-                  v-if="adminRool"
+                  v-if="editGroupPermission"
                   :color="color.controls"
                   fab
                   dark
@@ -106,6 +106,7 @@
                   </v-icon>
                 </v-btn>
                 <v-btn
+                  v-if="editGroupPermission"
                   :color="color.controls"
                   fab 
                   dark  
@@ -143,7 +144,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
-                            v-if="adminRool" 
+                            v-if="editDashPermission" 
                             class="edit control-group" 
                             :color="color.controls" 
                             v-on="on" 
@@ -160,7 +161,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
-                            v-if="adminRool" 
+                            v-if="editDashPermission" 
                             class="delete control-group"
                             :color="color.controls" 
                             v-on="on" 
@@ -183,7 +184,7 @@
                   </v-card-text>
                 </v-card>
                 <v-btn
-                  v-if="adminRool"
+                  v-if="editDashPermission"
                   :color="color.controls"
                   fab 
                   dark  
@@ -192,13 +193,14 @@
                   absolute
                   top
                   right
-                  @click="() => {modalCreateGroup=true; createGroupFlag=false; actionBtn='create'; curGroup=-1}"
+                  @click="() => {modalCreateGroup=true; createGroupFlag=false; actionBtn='create'; curGroup=curGroup}"
                 >
                   <v-icon>
                     {{ plus }}
                   </v-icon>
                 </v-btn>
                 <v-btn
+                  v-if="editDashPermission"
                   :color="color.controls"
                   fab 
                   dark  
@@ -230,7 +232,6 @@
     />
     <modal-create 
       :modalFrom="modalCreateGroup" 
-      :permissionsFrom="adminRoot" 
       :actionFrom="actionBtn" 
       :groupFrom="allGroups" 
       :nameGroupFrom="cookieName" 
@@ -274,7 +275,8 @@ export default {
       curDash: null,
       allGroups: [],
       allDashs: [],
-      adminRoot: true,
+      editGroupPermission: false,
+      editDashPermission: false,
       modalExim: false,
       modalCreateGroup: false,
       element: 'dash',
@@ -289,9 +291,9 @@ export default {
     }
   },   
   computed: {
-    adminRool: function() {
-      return this.adminRoot
-    },
+    // adminRool: function() {
+    //   return this.adminRoot
+    // },
     theme: function() {
       return this.$store.getters.getTheme
     }
@@ -326,9 +328,14 @@ export default {
       document.cookie = `eva-dashPage=${JSON.stringify(group)}; max-age=3600; path=/`;
       this.getDashs(this.curGroup)
     },
-    setPermissions: function(event) { 
-      if (event.includes('admin_all')) {
-        this.adminRoot = true;
+    setPermissions: function(event) {
+      this.editDashPermission = false; 
+      this.editGroupPermission = false;
+      if (event.includes('admin_all') || event.includes('managedash')) {
+        this.editDashPermission = true;
+      }   
+      if (event.includes('admin_all') || event.includes('managegroup')) {
+        this.editGroupPermission = true;
       }   
     },
     closeModal: function() {
@@ -341,7 +348,7 @@ export default {
       }
     },
     goToDash: function(i) {
-      this.$store.commit('setDash',{data: this.allDashs[i],getters: this.$store.getters.checkAlreadyDash});
+      this.$store.commit('setDash',{data: this.allDashs[i], getters: this.$store.getters.checkAlreadyDash});
       this.$router.push(`/dashboards/${this.allDashs[i].id}`);
     },
     deleteElem: function() {

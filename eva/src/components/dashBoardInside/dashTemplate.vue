@@ -49,8 +49,8 @@ export default {
     }
   },
   mounted() {
-    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
-    //  this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+    
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
   } 
 }
 

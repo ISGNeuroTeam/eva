@@ -62,14 +62,9 @@ Anton Khromov
 
 Andrey Starchenkov
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/otdeveloper/EVA/tags). 
-
 ## Authors
 
-* **Fedor Metelkin** - *web-developer* 
-<!-- [PurpleBooth](https://github.com/PurpleBooth) -->
+ISG-neuro
 
 See also the list of contributing  a little higher, who participated in this project.
 

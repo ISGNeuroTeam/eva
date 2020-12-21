@@ -75,7 +75,7 @@
           hide-details  
           class="select"
           label="Значение"  
-          @blur="setTocken"
+          @change="setTocken"
           @click="changeColor" 
         >
           <template 
@@ -318,7 +318,6 @@ export default {
       return data
     },
     setTocken: function() {
-      
       this.$store.commit('setSelected', {element: 'elemDeep',value: this.elemDeep[String(this.multiple)], idDash: this.idDash, id: this.id });
       let tockens = this.$store.getters.getTockens(this.idDash);
       let name = '';

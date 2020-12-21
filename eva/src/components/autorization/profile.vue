@@ -310,7 +310,7 @@ export default {
           table = document.querySelector(`[data-id="${i}"]`);
           table.addEventListener('mouseover', event => {
             if(event.target.tagName.toLowerCase() == 'td') {
-              event.target.parentElement.style =`background: ${this.color.controls} !important;color:${this.color.back}`;
+              event.target.parentElement.style =`background: ${this.color.controlsActive} !important;color:${this.color.back}`;
             }
           })
           table.addEventListener('mouseout', event => {

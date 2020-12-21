@@ -169,7 +169,6 @@ export default {
     dashFrom: null,
     curGroupFrom: null,
     nameGroupFrom: null,
-    permissionsFrom: null,
   },
   data () {
     return {
@@ -292,6 +291,7 @@ export default {
           if (this.newDash.id != '') {
             dataObj.id = this.newDash.id; 
           }
+          dataObj.idgroup = this.curGroupFrom;
 
           if (Object.keys(this.changedData).length != 0) {
             let keys = this.changedData.dash;
@@ -346,13 +346,13 @@ export default {
     noDashBoards: function() {  // если нажали на отмену
       this.create_warning = false;  // просто убираем предупреждение
     },
-    createEssence:  function(group,method,essence) {
+    createEssence: function(group,method,essence) {
       let response =  this.$store.auth.getters.setEssence({formData: JSON.stringify(group), essence: essence,method: method});
       response.then( res => {
         if (res.status == 200){
           if (essence == 'dash') {
             res.json().then (data => {
-              this.createDash({id: data.id, name: group.name, modified: data.modified});
+              this.createDash({id: data.id, name: group.name, idgroup: group.idgroup, modified: data.modified});
             }) 
           }
           this.$emit('closeModal');  // передаем в родителя чтобы выключили модалку

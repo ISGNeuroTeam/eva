@@ -7,6 +7,7 @@
     class="left-dash-setting"
     :color="colorFrom.text"
     :style="{background: colorFrom.backElement, borderTop:`2px solid ${colorFrom.panel}`,borderBottom:`2px solid ${colorFrom.panel}`}"
+    :permissions="permissions"
   >
     <div
       class="line-setting"
@@ -104,6 +105,7 @@ export default {
     colorFrom: null,
     gearFrom: null,
     idDashFrom: null,
+    permissionsFrom: null
   },
   data () {
     return {
@@ -121,7 +123,19 @@ export default {
   computed: {
     active: function() {  
       return this.showFrom 
-    }, 
+    },
+    permissions: function() {
+      if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
+        this.mode = false;
+        this.dragresable = false;
+        this.gridShow = false;   
+      } else {
+        this.mode = true;
+        this.dragresable = true;
+        this.gridShow = true;  
+      }
+      return true
+    } 
   },  
   watch: {
     gearFrom: function (gear) {
@@ -136,64 +150,25 @@ export default {
     },
     gridShow: function() {
       this.$store.commit('setGridShow', {id: this.idDashFrom,item: String(this.gridShow)});
-    }
+    },
   },
   methods: {
     sendSizeGrid: function() {
       this.$store.commit('setSizeGrid', {id: this.idDashFrom,grid: JSON.parse(JSON.stringify(this.sizeGrid))});
     },
-  //   switchBlock: function(switcher) {
-  //     Object.keys(this.switchers).forEach( item => {
-  //       if (item != switcher) {
-  //         this.switchers[item].status = false;
-  //         this.switchers[item].arrow = mdiChevronDown;
-  //       }
-  //     })
-  //     this.switchers[switcher].status = !this.switchers[switcher].status;
-  //     if (this.switchers[switcher].status) {
-  //       this.switchers[switcher].arrow = mdiChevronUp;
-  //     } else {
-  //       this.switchers[switcher].arrow = mdiChevronDown; 
-  //     }
-  //   },
-  //   setTheme: function(theme){
-  //     // let formData =  new FormData();
-  //     // formData.append('setting', {theme: theme});
-
-  //     this.$store.commit('setTheme', theme);
-  //     let settings = JSON.stringify({
-  //       theme: theme,
-  //     });
-  //     this.$store.commit('setThemeBack', JSON.stringify({setting: settings}));
-
-
-  //     // if (theme == 'light') {
-  //     //   this.color.text = '#333';
-  //     //   this.color.back = '#FFF';
-  //     //   this.color.backElement = '#FFF';
-  //     //   this.color.controls = '#008080';
-  //     //   this.color.controlsActive = '#FF6D70';
-  //     //   this.color.border = '#00000033';
-  //     //   this.color.change = !this.color.change;
-  //     // } else {
-  //     //   this.color.text = '#FFFCFCFF';
-  //     //   this.color.back = '#07070EFF';
-  //     //   this.color.backElement = '#17171BFF';
-  //     //   this.color.controls = '#0B909C';
-  //     //   this.color.controlsActive = '#F5B910';
-  //     //   this.color.border = "#F1FFFF33";
-  //     //   this.color.change = !this.color.change;
-  //     // }
-  //   },
   },
   mounted() {
-    //this.color =  this.$store.getters.getColor;
     let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
-    let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
-    dragRes == 'true' ? dragRes = true : dragRes = false;
-    this.dragresable =  dragRes;
+    if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
+      this.dragresable = false;
+    } else {
+      let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
+      dragRes == 'true' ? dragRes = true : dragRes = false;
+      this.dragresable =  dragRes;
+    }
+    
   } 
 }
 

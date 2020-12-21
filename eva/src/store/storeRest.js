@@ -126,7 +126,6 @@ export default {
                           restAuth.putLog(`Данные из запроса ${searchFrom.sid}:&nbsp;&nbsp;${res.data_urls.join(' ; ')}`);
 
                           let shema = null;
-
                           let promise = res.data_urls.map(  (item,i) => {
                             if (item.indexOf('SCHEMA') != -1) {
                               shema = i;
@@ -138,12 +137,11 @@ export default {
         
                           let resultProm = await Promise.all(promise);
 
-                        
+                          
 
                           let dataProm = resultProm.map((prom,i) => {
                             return new Promise(function(resolve, reject) {
                               let allData = []
-
 
                               prom.text().then(dataitself => {
                                 if (shema == i) {
@@ -173,8 +171,8 @@ export default {
                               resolveData = [...item];
                             }
                           })
-                          if(shema != null) {
-
+                          
+                          if(shema != null && shema != '') {
                             let keys = shema.match(/\`[^\`.]+\`/g).map( item => {
                               return item.replace(/\`/g,'')
                             })
@@ -282,7 +280,9 @@ export default {
         restAuth.putLog(`Состояние приложения получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`);
         return response
       }) 
+     
     if (response.status == 200) {  // если получилось
+     
       await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
         data = res.data; 
         restAuth.putLog(`Состояние приложения успешно получено.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`);
@@ -547,6 +547,26 @@ export default {
       return response
     }
 
+    return data
+  },
+  async getDashByName(param,restAuth) { 
+    let data = [];
+    let response = await fetch(`/api/dashByName?name="${param.name}"&idgroup=${param.idgroup}`)
+      .catch (error => {
+        restAuth.putLog(`Получить дашборд ${param.name} не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`);
+        return []
+      }) 
+    if (response.status == 200) {  // если получилось
+      await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
+        data = res.data; 
+        restAuth.putLog(`Дашборд ${param.name} получен.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`);
+      }).catch( error => {
+        restAuth.putLog(`Получить дашборд ${param.name} не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`);
+      }) 
+    }  else {
+      restAuth.putLog(`Получить дашборд ${param.name} не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`);
+      return response
+    }
     return data
   },
   
