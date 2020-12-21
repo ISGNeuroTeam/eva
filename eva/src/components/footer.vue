@@ -16,7 +16,7 @@ export default {
 
   data () {
     return {
-      version: '1.52.0 with-graph',
+      version: '1.53.0',
       color: { },
     } 
   },

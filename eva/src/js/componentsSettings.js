@@ -11,7 +11,6 @@ export default {
     {name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart'},
     {name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select'},
     {name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker'},
-    {name: 'Граф', img: mdiGraphql , type: 'ygraph'},
     {name: 'Диаграмма Гантта', img: mdiChartGantt, type: 'guntt'},
     {name: 'Плитка', img: mdiViewGrid , type: 'tile'},
     {name: 'Изображение', img: mdiBrush , type: 'csvg'},
@@ -76,11 +75,7 @@ export default {
     csvg: {
       width: 500,
       height: 400
-    },
-    ygraph: {
-      width: 930,
-      height: 850
-    },  
+    }, 
   },
   icons: {
     table: mdiTableLarge,
@@ -97,7 +92,6 @@ export default {
   //  barchart: mdiPoll,
     tile: mdiViewGrid,
     csvg: mdiBrush,
-    ygraph: mdiGraphql
   }, 
   options: {
     //lineChart: ['visible','level','boxShadow','lastDot'],
@@ -114,7 +108,6 @@ export default {
     guntt: ['visible','level','timeFormat'],
     tile: ['visible','level','widthTile','heightTile'],
     csvg: ['visible','level','tooltip'],
-    ygraph: ['visible','level']
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
   reports: {
@@ -153,10 +146,6 @@ export default {
     csvg: {
       tooltip: 'Изображение',
       icon: mdiBrush
-    },
-    ygraph: {
-      tooltip: 'Граф',
-      icon: mdiGraphql
-    },
+    }
   }
 }
