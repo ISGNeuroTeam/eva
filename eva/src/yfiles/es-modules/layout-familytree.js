@@ -1,6 +1,6 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.3.0.2.
+ ** This file is part of yFiles for HTML 2.3.0.3.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **

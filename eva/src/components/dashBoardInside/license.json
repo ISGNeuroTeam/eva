@@ -1,19 +1,21 @@
 {
-  "comment": "a22633ee-de76-4f6f-b9d2-fcd4b1420422",
-  "date": "08/12/2020",
-  "distribution": false,
+  "company": "ISG Neuro",
+  "contact": "Andrey Starchenkov",
+  "date": "10/27/2020",
+  "distribution": true,
   "domains": [
     "*"
   ],
-  "expires": "10/12/2020",
+  "email": "astarchenkov@isgneuro.com",
   "fileSystemAllowed": true,
   "licensefileversion": "1.1",
   "localhost": true,
   "oobAllowed": true,
   "package": "complete",
   "product": "yFiles for HTML",
-  "type": "eval",
+  "projectname": "EVA",
+  "subscription": "10/26/2021",
+  "type": "project",
   "version": "2.3",
-  "watermark": "yFiles HTML Evaluation License (expires in ${license-days-remaining} days)",
-  "key": "fd6f71f27c5238a84153889f6c93896a4da8999c"
+  "key": "624c634061da3c9286e6d7372606ef4ff9a23ae8"
 }
