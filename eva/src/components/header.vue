@@ -43,6 +43,23 @@
           </template>
           <span>Назад</span>
         </v-tooltip>
+        <v-tooltip 
+          bottom 
+          :color="color.controlsActive" 
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="palete"  
+              color="white" 
+              :data-theme="theme"
+              v-on="on"
+              @click="paleteShow = !paleteShow"
+            >
+              {{ palete }}
+            </v-icon>
+          </template>
+          <span>Настройки темы</span>
+        </v-tooltip>
       </div>
       <div class="manage-btn">
         <div 
@@ -53,6 +70,7 @@
           | 
         </div>
         <v-tooltip 
+          v-if="isAdmin"
           bottom 
           :color="color.controlsActive" 
         >
@@ -142,7 +160,18 @@ export default {
       undo: mdiUndoVariant,
       palete: mdiPalette,
       paleteShow: false,
-      color: { },
+      color: { 
+        back: "#060606",
+        backElement: "#191919",
+        border: "#FFFFFF33",
+        controls: "#6e96c5",
+        controlsActive: "#41C4FF",
+        controlsInsideDash: "#DADADA",
+        controlsSystem: "#004799",
+        panel: "#191919",
+        text: "#DADADA"
+      },
+      userPermissions: null
     } 
   },
   computed: { 
@@ -162,13 +191,28 @@ export default {
       }
     },
     theme: function() {
-      this.getTheme();
+      this.color = themes[this.$store.getters.getTheme];
+      this.getTheme(this.$store.getters.getTheme);
+      return this.$store.getters.getTheme
+    },
+    isAdmin(){
+       if (this.userPermissions && this.userPermissions.includes('admin_all') ){
+          return true
+       } else{ 
+         return false
+       }
     }
   },  
   methods: {
-    getTheme: async function() {
-      this.$store.commit('setTheme', 'dark');
+    getTheme: async function(theme) {
       
+      let themeBack = await this.$store.getters.getThemeBack();
+      if (themeBack.setting && themeBack.setting != '') {
+        let settings = JSON.parse(themeBack.setting);
+        if (settings.theme != theme) {
+          this.$store.commit('setTheme', settings.theme);
+        }
+      }
     },
     getCookie: async function() {
       //console.log(this.$jwt.hasToken())
@@ -186,6 +230,7 @@ export default {
         if (response.status == 200) {  // если получилось
           await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
             permissions = res.data;
+            this.userPermissions = permissions
             this.$emit('permissions',permissions);
             this.$emit('setUsername',this.login);
             this.$emit('checkOver');
