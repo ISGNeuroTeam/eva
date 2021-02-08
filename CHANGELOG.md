@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fix color icons in dashboard header(color - white)
+- font for application (proxima nova)
 
 ## [1.53.0]
 ### Deleted
