@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [UNRELEASED]
 ### Added
-- Custom scrollbar for dashTitle component
+- Custom scrollbar for Application (google Chrome)
 ## [1.53.0]
 ### Deleted
 - graph yfiles component

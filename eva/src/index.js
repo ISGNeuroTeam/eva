@@ -85,6 +85,7 @@ Vue.component('data-profile', require('./components/autorization/dataForProfile.
 store.form = storeForm;
 store.auth = storeAuth;
 
+import "./scroll.css"
 
 // создаем экземпляр vue где подключаем самое главное переадрасицию, визуализацию элемнетов и хранилище
 new Vue({

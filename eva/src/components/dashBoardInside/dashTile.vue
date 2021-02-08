@@ -235,17 +235,3 @@ export default {
 <style lang="sass" >
 @import '../../sass/dashTile.sass'
 </style>
-<style scoped>
-.dash-tile::-webkit-scrollbar {
-  width: 5px;              
-}
-
-.dash-tile::-webkit-scrollbar-track {
-  background: #333333;       
-}
-
-.dash-tile::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;    
-  border-radius: 15px;      
-}
-</style>
