@@ -856,7 +856,10 @@ export default {
     colorError: function() {
       if (this.$store.getters.getColorError ) {
         this.profile_elem = true;
-        this.$emit('openProfile',true);
+        if (this.permissionsFrom.includes('admin_all')){
+          this.$emit('openProfile',true);
+        }
+        
       } 
       return true
     }
