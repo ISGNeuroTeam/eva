@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - no visible arrow in look view mode in csv components
+- Custom scrollbar for Application (google Chrome)
 
 ### Deleted
 - light theme
