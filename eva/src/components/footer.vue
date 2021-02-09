@@ -16,7 +16,7 @@ export default {
 
   data () {
     return {
-      version: '1.53.0 08012021 local/merge-test',
+      version: '1.53.0 09012021 local/merge-test',
       color: { },
     } 
   },
