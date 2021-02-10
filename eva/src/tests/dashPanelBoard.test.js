@@ -69,7 +69,7 @@ describe('Компонент dashPanelBoard.vue', () => {  // тест само�
 
   it('Меняется отображение в зависимости от permission ([])', () => {
     wrapper.setProps({ permissionsFrom: [] })
-    expect(wrapper.vm.editPermission).toBe(false)
+    expect(wrapper.vm.editPermission).toBe(true)
   })
 
 
