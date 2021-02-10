@@ -123,29 +123,29 @@
             </div>
           </div>
           <!-- start lastResult-->
-                    <div 
-            v-if="checkOptions('visible1')"
+          <div 
+            v-if="checkOptions('lastResult')"
             class="option-item" 
           >
             <div 
               class="name-option item" 
               :style="{color:color.text, borderColor:color.text}" 
             >
-              visible1
+              lastResult
             </div>
             <div 
               class="discribe-option item" 
               :style="{color:color.text, borderColor:color.text}"
             >
-              Показывает / скрывает элемент
+              Вывод предыдущих результатов
             </div>
             <div class="status-option item">
               <v-switch   
-                v-model="options.visible1"  
+                v-model="options.lastResult"  
                 class="switch" 
                 :color="color.controls" 
                 :style="{color:color.text}" 
-                :label="String(options.visible1)" 
+                :label="String(options.lastResult)" 
               />
             </div>
           </div>
