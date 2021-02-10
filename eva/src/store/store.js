@@ -4,6 +4,7 @@ import  settings  from '../js/componentsSettings.js';
 
 export default {  // приблизительный объект хранилища, может отличаться от реального
   state: {
+    theme: "dark",
     // color: {
     //     back: '#fafafa',
     //     backElement: '#FFF',
@@ -1205,7 +1206,7 @@ export default {  // приблизительный объект хранили�
     },
     getTheme(state) {
       if (!state.theme) {
-        Vue.set(state, 'theme', 'light');
+        Vue.set(state, 'theme', 'dark');
       }
       return state.theme
       

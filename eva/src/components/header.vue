@@ -70,6 +70,7 @@
           | 
         </div>
         <v-tooltip 
+          v-if="isAdmin"
           bottom 
           :color="color.controlsActive" 
         >
@@ -159,7 +160,18 @@ export default {
       undo: mdiUndoVariant,
       palete: mdiPalette,
       paleteShow: false,
-      color: { },
+      color: { 
+        back: "#060606",
+        backElement: "#191919",
+        border: "#FFFFFF33",
+        controls: "#6e96c5",
+        controlsActive: "#41C4FF",
+        controlsInsideDash: "#DADADA",
+        controlsSystem: "#004799",
+        panel: "#191919",
+        text: "#DADADA"
+      },
+      userPermissions: null
     } 
   },
   computed: { 
@@ -182,6 +194,13 @@ export default {
       this.color = themes[this.$store.getters.getTheme];
       this.getTheme(this.$store.getters.getTheme);
       return this.$store.getters.getTheme
+    },
+    isAdmin(){
+       if (this.userPermissions && this.userPermissions.includes('admin_all') ){
+          return true
+       } else{ 
+         return false
+       }
     }
   },  
   methods: {
@@ -211,6 +230,7 @@ export default {
         if (response.status == 200) {  // если получилось
           await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
             permissions = res.data;
+            this.userPermissions = permissions
             this.$emit('permissions',permissions);
             this.$emit('setUsername',this.login);
             this.$emit('checkOver');

@@ -47,7 +47,8 @@
     >
       {{ msgText }}
     </div>
-    <v-icon 
+    <v-icon
+      v-if="dataModeFrom" 
       v-show="noMsg!=2" 
       class="icon file" 
       :color="colorMsg" 

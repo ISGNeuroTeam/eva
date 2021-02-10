@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.54.0]
+
+### Added
+- no visible arrow in look view mode in csv components
+- custom scrollbar for Application (google Chrome)
+- hide logs for not admin_all Permissions
+
+### Deleted
+- light theme
+
+### Fixed
+- fix color icons in dashboard header(color - white)
+- font for application (proxima nova)
+
 ## [1.53.0]
 ### Removed
 - graph yfiles component

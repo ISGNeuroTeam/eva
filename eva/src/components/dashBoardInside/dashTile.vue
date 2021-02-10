@@ -1,29 +1,28 @@
 <template>
   <div class="tile-template">
-    <div 
+    <div
       v-show="!noMsg"
-      class="dash-tile" 
-      :style="{height:`${height-otstupBottom}px`}"
+      class="dash-tile"
+      :style="{ height: `${height - otstupBottom}px` }"
     >
-      <div 
-        class="tile-block"
-        :data-status="change"
-      >
-        <div 
-          v-for="i in dataTile.length" 
+      <div class="tile-block" :data-status="change">
+        <div
+          v-for="i in dataTile.length"
           :key="i"
-          class="tile" 
-          :style="{backgroundColor:dataTile[i-1].color,border: `3px inset ${borderColor(dataTile[i-1].border)}`,width:widthTile,height:heightTile}"
-          @click="setClick(dataTile[i-1])"
+          class="tile"
+          :style="{
+            backgroundColor: dataTile[i - 1].color,
+            border: `3px inset ${borderColor(dataTile[i - 1].border)}`,
+            width: widthTile,
+            height: heightTile,
+          }"
+          @click="setClick(dataTile[i - 1])"
         >
-          <p v-html="checkName(dataTile[i-1].caption)" />
+          <p v-html="checkName(dataTile[i - 1].caption)" />
         </div>
       </div>
     </div>
-    <div 
-      v-show="noMsg"
-      class="errormsg"
-    >
+    <div v-show="noMsg" class="errormsg">
       {{ msgText }}
     </div>
   </div>
@@ -31,40 +30,40 @@
 
  
 <script>
-
-
 export default {
-  props: {  // переменные полученные от родителя
-    idFrom: null,  // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда 
+  props: {
+    // переменные полученные от родителя
+    idFrom: null, // id элемнета (table, graph-2)
+    idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null,  // цветовые переменные
-    sizeTileFrom: null,  // размер плиток 
-    heightFrom: null,  // высота родительского элемента
-    dataModeFrom: null,  // включена ли шапка
+    colorFrom: null, // цветовые переменные
+    sizeTileFrom: null, // размер плиток
+    heightFrom: null, // высота родительского элемента
+    dataModeFrom: null, // включена ли шапка
     activeElemFrom: null,
     dataReport: null,
   },
-  data () {
+  data() {
     return {
       actions: [
         {
-          name: 'click',
-          capture: []
+          name: "click",
+          capture: [],
         },
       ],
       captures: {},
       noMsg: false,
-      msgText: '',
+      msgText: "",
       dataTile: [],
-    } 
+    };
   },
-  computed: {  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function() { 
-      return this.idFrom
+  computed: {
+    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
+    id: function () {
+      return this.idFrom;
     },
-    idDash: function() { 
-      return this.idDashFrom
+    idDash: function () {
+      return this.idDashFrom;
     },
     // dataRest: function() {
     //   if (!this.dataRestFrom.length || this.dataRestFrom.length == 0) {
@@ -75,11 +74,11 @@ export default {
     //     this.msgText = "Ожидается поле caption и color";
     //   } else {
     //     this.pushDataAsynchrony();
-        
+
     //   }
     //   return 'done'
     // },
-    change: function() {
+    change: function () {
       if (!this.dataRestFrom.length || this.dataRestFrom.length == 0) {
         this.noMsg = true;
         this.msgText = "Нет данных для отображения";
@@ -88,7 +87,6 @@ export default {
         this.msgText = "Ожидается поле caption и color";
       } else {
         if (this.dataReport) {
-          
           if (this.activeElemFrom == this.id) {
             this.pushDataAsynchrony();
           } else {
@@ -97,12 +95,10 @@ export default {
         } else {
           this.pushDataAsynchrony();
         }
-        
-        
       }
-      return true
+      return true;
     },
-    otstupBottom: function() {
+    otstupBottom: function () {
       let otstup = null;
       if (this.dataModeFrom) {
         otstup = 50;
@@ -112,115 +108,130 @@ export default {
       } else {
         otstup = 10;
       }
-      return otstup
+      return otstup;
     },
-    color: function() {
-      return this.colorFrom
+    color: function () {
+      return this.colorFrom;
     },
-    height: function() {
-      return this.heightFrom
+    height: function () {
+      return this.heightFrom;
     },
-    widthTile: function() {
-      return this.setSize('width')
+    widthTile: function () {
+      return this.setSize("width");
     },
-    heightTile: function() {
-      return this.setSize('height')
+    heightTile: function () {
+      return this.setSize("height");
     },
-  }, 
+  },
   watch: {
     captures: function (captures) {
-      this.actions[0].capture =  captures;
-      this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+      this.actions[0].capture = captures;
+      this.$store.commit("setActions", {
+        actions: this.actions,
+        idDash: this.idDash,
+        id: this.id,
+      });
     },
   },
   methods: {
-    pushDataAsynchrony: function () { 
-
-      let prom = new Promise( resolve => { // создаем promise чтобы затем отрисовать график асинхронно
+    pushDataAsynchrony: function () {
+      let prom = new Promise((resolve) => {
+        // создаем promise чтобы затем отрисовать график асинхронно
         resolve();
       });
 
-      prom.then( () => { // как раз тут делаем асинхронность
+      prom.then(() => {
+        // как раз тут делаем асинхронность
         this.dataTile = [];
         this.noMsg = false;
-        this.dataRestFrom.forEach( (item) => {
-          this.dataTile.push({...{},...item})
-        })
+        this.dataRestFrom.forEach((item) => {
+          this.dataTile.push({ ...{}, ...item });
+        });
         this.captures = Object.keys(this.dataRestFrom[0]);
-      })
-
-     
-
+      });
     },
-    setClick: function(item) {
-
+    setClick: function (item) {
       let tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
-      Object.keys(tockens).forEach( i =>{
+      Object.keys(tockens).forEach((i) => {
         tocken = {
           name: tockens[i].name,
           action: tockens[i].action,
           capture: tockens[i].capture,
+        };
+        if (tockens[i].elem == this.id && tockens[i].action == "click") {
+          this.$store.commit("setTocken", {
+            tocken: tocken,
+            idDash: this.idDash,
+            value: item[tockens[i].capture],
+            store: this.$store,
+          });
         }
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
-          this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: item[tockens[i].capture], store: this.$store });
-        } 
-      })
+      });
 
-                 
-      let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onclick', element: this.id, partelement: 'empty'});
-  
+      let events = this.$store.getters.getEvents({
+        idDash: this.idDash,
+        event: "onclick",
+        element: this.id,
+        partelement: "empty",
+      });
+
       if (events.length != 0) {
-        events.forEach( item => {
-          if(item.action == 'set'){
-            this.$store.commit('letEventSet', {events: events, idDash: this.idDash,  });
-          } else if (item.action == 'go') {
-            this.$store.commit('letEventGo', {event: item, idDash: this.idDash, route: this.$router, store: this.$store  });
+        events.forEach((item) => {
+          if (item.action == "set") {
+            this.$store.commit("letEventSet", {
+              events: events,
+              idDash: this.idDash,
+            });
+          } else if (item.action == "go") {
+            this.$store.commit("letEventGo", {
+              event: item,
+              idDash: this.idDash,
+              route: this.$router,
+              store: this.$store,
+            });
           }
-        })
+        });
       }
-
     },
-    checkName: function(name) {
-      return name.replace('\\n','<br>');
+    checkName: function (name) {
+      return name.replace("\\n", "<br>");
     },
-    setSize: function(sizeFrom) {
-      let size = '';
-      if (this.sizeTileFrom[sizeFrom] == '') {
-        size = '100px';
+    setSize: function (sizeFrom) {
+      let size = "";
+      if (this.sizeTileFrom[sizeFrom] == "") {
+        size = "100px";
       } else {
-        if (this.sizeTileFrom[sizeFrom].indexOf('px') != -1) {
+        if (this.sizeTileFrom[sizeFrom].indexOf("px") != -1) {
           size = this.sizeTileFrom[sizeFrom];
         } else {
-          size = `${this.sizeTileFrom[sizeFrom]}px`
+          size = `${this.sizeTileFrom[sizeFrom]}px`;
         }
       }
-      return size
+      return size;
     },
-    borderColor: function(border) {
-      if (border == '1') {
-        return this.colorFrom.controlsSystem 
-      } else if (border == '0' || border == null) { 
-        return 'transparent'
+    borderColor: function (border) {
+      if (border == "1") {
+        return this.colorFrom.controlsSystem;
+      } else if (border == "0" || border == null) {
+        return "transparent";
       } else {
-        return border
+        return border;
       }
-    }
-        
+    },
   },
   mounted() {
     //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
-  } 
-}
-
-
+    this.$store.commit("setActions", {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
+  },
+};
 </script>
 
-<style lang="sass" > 
-  
-    @import '../../sass/dashTile.sass'
-
-   
+<style lang="sass" >
+@import '../../sass/dashTile.sass'
 </style>

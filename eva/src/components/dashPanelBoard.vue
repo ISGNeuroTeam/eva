@@ -20,7 +20,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-icon 
-              class="edit" 
+              class="edit theme--dark" 
               :style="{color:'#DADADA'}"
               v-on="on"
               @click="gearShow = !gearShow"
@@ -39,7 +39,7 @@
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="code" 
+            class="code theme--dark" 
             :style="codeSwitch" 
             :class="{hide_control:!edit_elem}"  
             v-on="on" 
@@ -56,7 +56,7 @@
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="tocken" 
+            class="tocken theme--dark" 
             :style="tockenSwitch" 
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
@@ -73,7 +73,7 @@
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="search" 
+            class="search theme--dark" 
             :style="searchSwitch" 
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
@@ -90,7 +90,7 @@
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="tools" 
+            class="tools theme--dark" 
             :style="toolSwitch" 
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
@@ -107,7 +107,7 @@
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="profile" 
+            class="profile theme--dark" 
             :style="profileSwitch" 
             :data-error="colorError"
             v-on="on" 
@@ -124,7 +124,7 @@
       >
         <template v-slot:activator="{ on }"  v-if="editPermission">
           <v-icon 
-            class="save" 
+            class="save theme--dark" 
             :style="saveSwitch" 
             v-on="on" 
             @click="openSave"
@@ -856,7 +856,10 @@ export default {
     colorError: function() {
       if (this.$store.getters.getColorError ) {
         this.profile_elem = true;
-        this.$emit('openProfile',true);
+        if (this.permissionsFrom.includes('admin_all')){
+          this.$emit('openProfile',true);
+        }
+        
       } 
       return true
     }
