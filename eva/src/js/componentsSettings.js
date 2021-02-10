@@ -98,7 +98,7 @@ export default {
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat'], 
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes'],
     //barchart: ['visible','level','boxShadow'],
-    table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor'],
+    table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'visible1'],
     select: ['visible','level','boxShadow','multiple'],
     picker: ['visible','level'],
     graph: ['visible','level','boxShadow'],

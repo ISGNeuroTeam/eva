@@ -122,6 +122,34 @@
               />
             </div>
           </div>
+          <!-- start lastResult-->
+                    <div 
+            v-if="checkOptions('visible1')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              visible1
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Показывает / скрывает элемент
+            </div>
+            <div class="status-option item">
+              <v-switch   
+                v-model="options.visible1"  
+                class="switch" 
+                :color="color.controls" 
+                :style="{color:color.text}" 
+                :label="String(options.visible1)" 
+              />
+            </div>
+          </div>
+          <!-- end lastResult-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 
