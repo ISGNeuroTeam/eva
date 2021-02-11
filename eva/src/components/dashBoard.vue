@@ -309,7 +309,7 @@ export default {
             let searchName = `${this.idDash}-${searchId}`;
             result = await this.getData(searchName);
 
-            this.props.dataRest = result;
+            this.props.dataRestFilter = result;
             this.$store.commit("setShould", {
               idDash: this.idDash,
               id: this.element,
