@@ -81,8 +81,7 @@ export default {
       return this.idDashFrom
     },
     change: function() {
-      
-      /*if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
+    if (this.lastResult && this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
         if (this.dataReport) {
           
           if (this.activeElemFrom == this.id) {
@@ -95,7 +94,7 @@ export default {
         }
         
       }
-      return true*/
+      return true
     },
     color: function() {
       return this.colorFrom
