@@ -774,6 +774,11 @@ export default {  // приблизительный объект хранили�
         return state[ids.idDash][ids.id].should
       }
     },
+    getLastResult(state){//показать результ прошлого счета
+      return (ids) => {
+        return state[ids.idDash][ids.id].lastResult
+      }
+    },
     getSearchID(state) {  // получаем статус должен ли элемнет запрашивать данные
       return (ids) => {
         return state[ids.idDash][ids.id].search

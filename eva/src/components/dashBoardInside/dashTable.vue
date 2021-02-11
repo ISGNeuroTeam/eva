@@ -80,14 +80,9 @@ export default {
     idDash: function() { 
       return this.idDashFrom
     },
-    // dataRest: function() {
-    //   if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) { 
-    //     this.getDataAsynchrony(this.dataRestFrom);
-    //   }
-    //   return true
-    // },
     change: function() {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
+      
+      /*if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
         if (this.dataReport) {
           
           if (this.activeElemFrom == this.id) {
@@ -95,12 +90,12 @@ export default {
           } else {
             this.props.itemsForTable = [];
           }
-        } else {
+        } else { //если данные есть!
           this.getDataAsynchrony(this.dataRestFrom);
         }
         
       }
-      return true
+      return true*/
     },
     color: function() {
       return this.colorFrom
@@ -122,6 +117,10 @@ export default {
       let height = this.heightFrom-otstup; // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
       return height
     },
+    lastResult: function() {
+      let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.id});
+      return options.lastResult
+    },
  
 
   },
@@ -130,23 +129,11 @@ export default {
       this.$refs.tableBlock.style.color = color.text;
       this.$refs.tableBlock.style.backgroundColor = color.backElement;
     },
-    // activeElemFrom: function() {
-    //   if (this.dataReport && this.activeElemFrom == this.id && this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
-    //     console.log('start')
-    //   }
-    // },
-    // dataRestFrom: function() {
-    //   if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) { 
-    //       console.log('startdata')
-    //    // this.getDataAsynchrony(this.dataRestFrom);
-    //   }
-    // }
   },
   methods: {
 
     getDataAsynchrony: function (data) {
-      
-      let prom = new Promise( resolve => {
+      let prom = new Promise( (resolve) => {
         if(data.error) {
           this.props.message = data.error;
           this.props.nodata = true;
