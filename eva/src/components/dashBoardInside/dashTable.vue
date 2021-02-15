@@ -66,18 +66,23 @@ export default {
     idDash: function () {
       return this.idDashFrom;
     },
-    change: function () {
-      if(this.dataRestFrom && this.dataRestFrom.length > 0){//данные есть
-        this.getDataAsynchrony(this.dataRestFrom)
-      } else {//данные не пришли
-        if (this.lastResult) { //показать старые данные данные
-          this.getDataAsynchrony(this.dataRestFrom);
+    change: function() {
+      //console.log(this.dataRestFrom)
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
+        if (this.dataReport) {
+          
+          if (this.activeElemFrom == this.id) {
+            this.getDataAsynchrony(this.dataRestFrom);
+          } else {
+            this.props.itemsForTable = [];
+          }
         } else {
-          this.props.nodata = true;
+          this.getDataAsynchrony(this.dataRestFrom);
         }
+        
       }
-      return true;
-    },
+      return true
+    },  
     color: function () {
       return this.colorFrom;
     },
