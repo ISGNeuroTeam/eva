@@ -195,7 +195,7 @@ export default {  // приблизительный объект хранили�
           if (item.original_otl.indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||  
             String(item.parametrs.tws).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||
             String(item.parametrs.twf).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ) {  // если в тексте запроса есть наш токен
-                
+
 
             tocken.store.commit('setLoading', {search: item.sid, idDash: tocken.idDash, should: true, error: false});  
 
@@ -213,8 +213,14 @@ export default {  // приблизительный объект хранили�
               tocken.store.commit('setLoading', {search: item.sid, idDash: tocken.idDash, should: false, error: true });  
             }
           }
+          
+          
         });
-
+        Object.keys(state[tocken.idDash]).forEach(dashElement=>{
+          if(dashElement.includes('table')){
+            tocken.store.commit('setShould', { idDash: tocken.idDash,  id: dashElement, status: true}); 
+          }
+        })
 
       } 
     },

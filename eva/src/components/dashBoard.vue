@@ -302,27 +302,27 @@ export default {
         this.dataFromDB = true
         this.getDataFromDB(searchName).then(result=>{
           fromDB = result
-          this.props.dataRest = fromDB;
+          this.props.dataRestFilter = fromDB;
         })
 
-        this.getDataFromRest(search).then(result=>{
-          this.dataFromDB = false
-          if(result.length>0){
-            this.props.dataRest = result
-          } else {
-            if(this.lastResult){
-              this.props.dataRest = fromDB
-            } else {
-              this.props.dataRest = result
+        this.getDataFromRest(search)
+          .then(result=>{
+            this.props.dataRestFilter = result
+            this.dataFromDB = false
+            if(result.length===0 && this.lastResult){
+              this.props.dataRestFilter = fromDB
             }
-          }  
-        })
-
-        this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false}); 
-       
+          },
+          () => {
+            if(this.lastResult){
+              this.props.dataRestFilter = fromDB
+            } else {
+              this.props.dataRestFilter = []
+            }
+          }
+          )
       }
-      console.log(this.element)
-      console.log(this.props.dataRest)        
+      this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});         
       // if (this.props.dataRest.length > 0) {
       //   this.checkFilter();
       // }

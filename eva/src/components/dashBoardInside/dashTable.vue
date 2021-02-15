@@ -67,20 +67,25 @@ export default {
       return this.idDashFrom;
     },
     change: function() {
-      //console.log(this.dataRestFrom)
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
-        if (this.dataReport) {
-          
-          if (this.activeElemFrom == this.id) {
-            this.getDataAsynchrony(this.dataRestFrom);
-          } else {
-            this.props.itemsForTable = [];
-          }
-        } else {
-          this.getDataAsynchrony(this.dataRestFrom);
-        }
-        
+      if(!this.dataRestFrom || this.dataRestFrom.length === 0){
+        this.props.itemsForTable = [];
+        this.props.nodata = true
+      } else {
+         this.getDataAsynchrony(this.dataRestFrom);
       }
+      // if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
+      //   if (this.dataReport) {
+          
+      //     if (this.activeElemFrom == this.id) {
+      //       this.getDataAsynchrony(this.dataRestFrom);
+      //     } else {
+      //       this.props.itemsForTable = [];
+      //     }
+      //   } else {
+      //     this.getDataAsynchrony(this.dataRestFrom);
+      //   }
+        
+      // }
       return true
     },  
     color: function () {
