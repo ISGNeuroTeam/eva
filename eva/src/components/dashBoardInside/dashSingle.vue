@@ -76,6 +76,7 @@ export default {
       return this.dataLoadingFrom
     },
     number: function() {
+      console.log(this.dataRestFrom)
       if (Object.keys(this.dataRest).length != 0) {
         let number =  Object.values(this.dataRest[0])[0];
         this.setEventColor(number);

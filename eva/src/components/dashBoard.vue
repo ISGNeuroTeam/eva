@@ -301,6 +301,8 @@ export default {
         let fromDB
         this.dataFromDB = true
         this.getDataFromDB(searchName).then(result=>{
+          console.log('111:')
+          console.log(result)
           fromDB = result
           this.props.dataRestFilter = fromDB;
         })
@@ -583,6 +585,7 @@ export default {
              
 
       events.forEach( item => {
+
         event = {...{},...item};
           
         if(event.prop == 'filter' && event.value == 'true') {

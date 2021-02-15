@@ -198,7 +198,7 @@ export default {  // приблизительный объект хранили�
 
 
             tocken.store.commit('setLoading', {search: item.sid, idDash: tocken.idDash, should: true, error: false});  
-
+      
             response = await tocken.store.getters.getDataApi({search: item, idDash: tocken.idDash});
             if ( response.length != 0) {
               let responseDB = tocken.store.getters.putIntoDB(response, item.sid, tocken.idDash);
@@ -216,8 +216,9 @@ export default {  // приблизительный объект хранили�
           
           
         });
+        //для компонента table и single
         Object.keys(state[tocken.idDash]).forEach(dashElement=>{
-          if(dashElement.includes('table')){
+          if(dashElement.includes('table') || dashElement.includes('single')){
             tocken.store.commit('setShould', { idDash: tocken.idDash,  id: dashElement, status: true}); 
           }
         })

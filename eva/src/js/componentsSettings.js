@@ -102,7 +102,7 @@ export default {
     select: ['visible','level','boxShadow','multiple'],
     picker: ['visible','level'],
     graph: ['visible','level','boxShadow'],
-    single: ['visible','level','subnumber','color','boxShadow','fontSize'],
+    single: ['visible','level','subnumber','color','boxShadow','fontSize', 'lastResult'],
     button: ['visible','level','color','backgroundcolor','name','fontSize','underline'],
     textarea: ['visible','level'],
     guntt: ['visible','level','timeFormat'],
