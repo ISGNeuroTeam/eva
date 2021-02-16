@@ -75,16 +75,21 @@ export default {
     dataLoading: function() {
       return this.dataLoadingFrom
     },
+    numberValue(){
+      if(this.dataRestFrom && this.dataRestFrom.length > 0){
+        return Number( Object.values(this.dataRestFrom[0])[0] )
+      } else {
+        return false
+      }
+    },
     number: function() {
-      console.log(this.dataRestFrom)
-      if (Object.keys(this.dataRest).length != 0) {
-        let number =  Object.values(this.dataRest[0])[0];
-        this.setEventColor(number);
-        this.noMsg = false;
-        return number 
+      if(this.dataRestFrom && this.dataRestFrom.length > 0){
+        this.setEventColor(this.numberValue)
+        this.noMsg = false
+        return this.numberValue
       } else {
         this.noMsg = true;
-        return ''
+        return null
       }
     },
     subnumber: function() {
