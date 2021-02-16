@@ -216,9 +216,12 @@ export default {  // приблизительный объект хранили�
           
           
         });
-        //для компонента table и single
+        //для компонента table и single и multiLine -- сделать Should в true 
+        //чтобы dashBoard еще раз сделал запрос
         Object.keys(state[tocken.idDash]).forEach(dashElement=>{
-          if(dashElement.includes('table') || dashElement.includes('single')){
+          if(dashElement.includes('table')  || 
+             dashElement.includes('single') ||  
+             dashElement.includes('multiLine') ){
             tocken.store.commit('setShould', { idDash: tocken.idDash,  id: dashElement, status: true}); 
           }
         })

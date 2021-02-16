@@ -301,8 +301,6 @@ export default {
         let fromDB
         this.dataFromDB = true
         this.getDataFromDB(searchName).then(result=>{
-          console.log('111:')
-          console.log(result)
           fromDB = result
           this.props.dataRestFilter = fromDB;
         })
