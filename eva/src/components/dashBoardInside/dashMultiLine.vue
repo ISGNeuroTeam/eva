@@ -99,10 +99,6 @@ export default {
     idDash: function() { 
       return this.idDashFrom
     },
-    // dataRest: function() {
-    //   this.props.legends = [];
-    //   return this.dataRestFrom
-    // },
     color: function() {
       return this.colorFrom
     },
@@ -121,20 +117,10 @@ export default {
     height: function() {
       return this.heightFrom
     },
-    // metrics: function() {
-    //   if (this.props.metrics) {
-    //     let metrics = this.props.metrics.filter( (item,i) => {
-    //       if (i != 0) {
-    //         return item
-    //       }
-    //     })
-    //     this.setMetrics(metrics);
-    //   }
-    //   return true
-    // },
     change: function() {
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0 && this.width != 0 && this.height != 0) {
         this.props.legends = [];
+        this.props.nodata = true
         if (this.dataReport) {
           
           if (this.activeElemFrom == this.id) {
