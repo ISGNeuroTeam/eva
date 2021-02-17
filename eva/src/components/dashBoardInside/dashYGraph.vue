@@ -16,7 +16,7 @@ yfile.License.value = licenseData//проверка лицензии
 
 export default {
   name: "dashYGraph",
-  props: {  // переменные полученные от родителя
+  props: {  // переменные полученные от родител
     idFrom: null,  // id элемнета (table, graph-2)
     idDashFrom: null, // id дашборда 
     dataRestFrom: null, // данные полученые после выполнения запроса
