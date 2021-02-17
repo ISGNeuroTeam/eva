@@ -602,13 +602,15 @@ export default {
     },
     exportDataCSV(){
       let csvContent = "data:text/csv;charset=utf-8,"; // задаем кодировку csv файла
-      let keys = Object.keys([]); // получаем ключи для заголовков столбцов
+      let keys = Object.keys(this.props.dataRestFilter[0]); // получаем ключи для заголовков столбцов
+      console.log(keys)
       csvContent += encodeURIComponent(keys.join(',') + "\n"); // добавляем ключи в файл
-      //csvContent += encodeURIComponent(res.map( item =>  Object.values(item).join(",")).join("\n"));
+      csvContent += encodeURIComponent(this.props.dataRestFilter.map( item =>  Object.values(item).join(",")).join("\n"));
       
       const link = document.createElement("a"); // создаем ссылку
       link.setAttribute('href',csvContent); // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute("download", `${this.idDash}-sid.csv`); // указываем имя файла 
+      const searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
+      link.setAttribute("download", `${this.idDash}-${searchId}.csv`); // указываем имя файла 
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку 
     }
