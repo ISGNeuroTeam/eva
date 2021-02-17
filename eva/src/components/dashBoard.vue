@@ -21,7 +21,7 @@
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
-          <v-icon 
+          <v-icon
             class="icon"
             :color="color[setColorDS]"
             @click="exportDataCSV"
@@ -603,7 +603,6 @@ export default {
     exportDataCSV(){
       let csvContent = "data:text/csv;charset=utf-8,"; // задаем кодировку csv файла
       let keys = Object.keys(this.props.dataRestFilter[0]); // получаем ключи для заголовков столбцов
-      console.log(keys)
       csvContent += encodeURIComponent(keys.join(',') + "\n"); // добавляем ключи в файл
       csvContent += encodeURIComponent(this.props.dataRestFilter.map( item =>  Object.values(item).join(",")).join("\n"));
       
