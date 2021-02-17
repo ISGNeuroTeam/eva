@@ -22,6 +22,7 @@
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-icon
+            v-if="props.dataRestFilter.length>0"
             class="icon"
             :color="color[setColorDS]"
             @click="exportDataCSV"
@@ -445,6 +446,9 @@ export default {
       this.setShadow();
 
       return options.change
+    },
+    searсhID(){
+      return this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
     }
   },
   methods: {
