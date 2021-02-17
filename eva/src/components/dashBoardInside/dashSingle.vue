@@ -119,68 +119,7 @@ export default {
   },  
   methods: {
     setEventColor: function(number) {
-
-      
-      let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'OnDataCompare', element: this.id});
-      
-      let flag = -1,frontier;
-
-      events.forEach( (item) => {
-
-
-        switch(item['compare']) {
-                                        
-        case 'equals':  
-          if (Number(item.sense) == Number(number)) {
-            flag = 0;
-          }
-          break
-
-        case 'over':  
-          if (Number(item.sense) > Number(number))  {
-            flag = 0;
-          }
-          break
-
-        case 'less':  
-          if (Number(item.sense) < Number(number))  {
-            flag = 0;
-          }
-          break
-
-        case 'in':  
-          frontier = item.sense.replace(/\[|\]/g, '').split(',');
-          frontier.forEach( itemFron => {
-            if (Number(number) == Number(itemFron))  {
-              flag = 0; 
-            }
-          })
-
-          break
-
-        case 'between': 
-          frontier = item.sense.replace(/\[|\]/g, '').split(',');
-          if ( Number(number) < Number(frontier[1]) && Number(number) > Number(frontier[0]))  {
-            flag = 0;
-          }
-            
-          break
-
-        }
-
-        if (flag != -1) {
-          this.$store.commit('letEventSet', {events: [{target: item.target,prop: item.prop[0],value: item.value[0]}], idDash: this.idDash,  });
-        } else {
-          this.$store.commit('letEventSet', {events: [{target: item.target,prop: item.prop[0],value: ''}], idDash: this.idDash,  });
-        }
-        flag = -1;
-      });
-
-      
-
-      events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onValueCompare', element: this.id});
-      
-
+      let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onValueCompare', element: this.id});
       let treshold, color, value;
 
       events.forEach( (item) => { 
