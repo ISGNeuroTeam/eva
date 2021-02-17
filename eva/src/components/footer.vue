@@ -16,7 +16,7 @@ export default {
 
   data () {
     return {
-      version: '1.54.0',
+      version: '1.55.0',
       color: { },
     } 
   },
