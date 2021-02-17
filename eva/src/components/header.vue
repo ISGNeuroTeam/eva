@@ -43,23 +43,6 @@
           </template>
           <span>Назад</span>
         </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="color.controlsActive" 
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="palete"  
-              color="white" 
-              :data-theme="theme"
-              v-on="on"
-              @click="paleteShow = !paleteShow"
-            >
-              {{ palete }}
-            </v-icon>
-          </template>
-          <span>Настройки темы</span>
-        </v-tooltip>
       </div>
       <div class="manage-btn">
         <div 
@@ -191,8 +174,6 @@ export default {
       }
     },
     theme: function() {
-      this.color = themes[this.$store.getters.getTheme];
-      this.getTheme(this.$store.getters.getTheme);
       return this.$store.getters.getTheme
     },
     isAdmin(){
@@ -204,15 +185,8 @@ export default {
     }
   },  
   methods: {
-    getTheme: async function(theme) {
-      
-      let themeBack = await this.$store.getters.getThemeBack();
-      if (themeBack.setting && themeBack.setting != '') {
-        let settings = JSON.parse(themeBack.setting);
-        if (settings.theme != theme) {
-          this.$store.commit('setTheme', settings.theme);
-        }
-      }
+    getTheme: async function() {
+      this.$store.commit('setTheme', 'dark');
     },
     getCookie: async function() {
       //console.log(this.$jwt.hasToken())

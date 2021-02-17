@@ -1228,21 +1228,6 @@ export default {  // приблизительный объект хранили�
       }
       
     },
-    // getColor(state) {  // получаем объект с цветовыми настройками
-        
-    //     if (!state.color) {  // если его нет то создаем шаблонный
-    //         let color = {
-    //             back: '#fafafa',
-    //             backElement: 'white',
-    //             text: 'rgba(0,0,0,1)',
-    //             controls: 'teal',
-    //             controlsActive: '#FF6D70',
-    //             border: 'rgba(0,0,0,0.2)',
-    //         }
-    //         return color
-    //     }
-    //     return state.color
-    // },
     getModalSettings(state) {  // получаем объект с настройками моадлки натсроек
       return (idDash) => {
         if (!state[idDash].modalSettings) {
