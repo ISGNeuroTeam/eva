@@ -177,9 +177,6 @@ export default {
                               return item.replace(/\`/g,'')
                             })
                             let values = shema.replace(/\`[^\`.]+\`/g,'').replace(/\s*/g,'').split(',');
-                            // shema = shema.match(/\`[^\`.]+\`/g).map( item => {
-                            //     return item.replace(/\`/g,'')
-                            // })
                             shema = {};
                             keys.forEach( (item,i) => {
                               shema[item] = values[i];

@@ -195,10 +195,10 @@ export default {  // приблизительный объект хранили�
           if (item.original_otl.indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||  
             String(item.parametrs.tws).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||
             String(item.parametrs.twf).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ) {  // если в тексте запроса есть наш токен
-                
+
 
             tocken.store.commit('setLoading', {search: item.sid, idDash: tocken.idDash, should: true, error: false});  
-
+      
             response = await tocken.store.getters.getDataApi({search: item, idDash: tocken.idDash});
             if ( response.length != 0) {
               let responseDB = tocken.store.getters.putIntoDB(response, item.sid, tocken.idDash);
@@ -213,8 +213,18 @@ export default {  // приблизительный объект хранили�
               tocken.store.commit('setLoading', {search: item.sid, idDash: tocken.idDash, should: false, error: true });  
             }
           }
+          
+          
         });
-
+        //для компонента table и single и multiLine -- сделать Should в true 
+        //чтобы dashBoard еще раз сделал запрос
+        Object.keys(state[tocken.idDash]).forEach(dashElement=>{
+          if(dashElement.includes('table')  || 
+             dashElement.includes('single') ||  
+             dashElement.includes('multiLine') ){
+            tocken.store.commit('setShould', { idDash: tocken.idDash,  id: dashElement, status: true}); 
+          }
+        })
 
       } 
     },
@@ -1153,6 +1163,7 @@ export default {  // приблизительный объект хранили�
           Vue.set(state[id.idDash][id.id].options, 'visible',true);
           Vue.set(state[id.idDash][id.id].options, 'level',1);
           Vue.set(state[id.idDash][id.id].options, 'boxShadow',false);
+          Vue.set(state[id.idDash][id.id].options, 'lastResult',false);
         }
         return state[id.idDash][id.id].options
       }

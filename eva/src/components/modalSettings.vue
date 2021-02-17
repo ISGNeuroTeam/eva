@@ -122,6 +122,34 @@
               />
             </div>
           </div>
+          <!-- start lastResult-->
+          <div 
+            v-if="checkOptions('lastResult')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              lastResult
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Вывод предыдущих результатов
+            </div>
+            <div class="status-option item">
+              <v-switch   
+                v-model="options.lastResult"  
+                class="switch" 
+                :color="color.controls" 
+                :style="{color:color.text}" 
+                :label="String(options.lastResult)" 
+              />
+            </div>
+          </div>
+          <!-- end lastResult-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 
