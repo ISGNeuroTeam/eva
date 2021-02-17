@@ -127,7 +127,6 @@ export default {
         this.createTockens(data);
         this.setColors();
         this.clearColor();
-        this.setEventColor();
         if (this.props.justCreate) {
           this.selectRow();
           this.props.justCreate = false;
@@ -261,139 +260,9 @@ export default {
         itemRow.classList.remove("event");
       });
     },
-    setEventColor: function () {
-      let events = this.$store.getters.getEvents({
-        idDash: this.idDash,
-        event: "OnDataCompare",
-        element: this.id,
-      });
-      let table, column;
-      let eventObj = {};
-
-      events.forEach((item, j) => {
-        eventObj[j] = {};
-        eventObj[j]["compare"] = item.compare;
-        eventObj[j]["column"] = item.column;
-        eventObj[j]["row"] = item.row;
-        eventObj[j]["color"] = item.value[0];
-        eventObj[j]["prop"] = item.prop[0];
-        table = this.$refs[this.id].$el;
-
-        if (
-          eventObj[j]["prop"] == "rowcolor" ||
-          eventObj[j]["prop"] == "columncolor" ||
-          eventObj[j]["prop"] == "cellcolor"
-        ) {
-          let readyTh = setTimeout(
-            function tick() {
-              if (table.querySelectorAll("thead th").length != 0) {
-                clearTimeout(readyTh);
-                let sp = 0;
-                table.querySelectorAll("thead span").forEach((itemSpan) => {
-                  if (itemSpan.innerText != 0) {
-                    if (itemSpan.innerText == eventObj[j]["column"]) {
-                      column = sp;
-                    }
-                    sp++;
-                  }
-                });
-
-                table.querySelectorAll("tbody tr").forEach((itemRow) => {
-                  itemRow.querySelectorAll("td").forEach((itemTd, i) => {
-                    if (i == column) {
-                      let needItem = null,
-                        row,
-                        k = -1;
-
-                      switch (eventObj[j]["compare"]) {
-                        case "equals":
-                          if (itemTd.innerText == eventObj[j]["row"]) {
-                            needItem = itemRow;
-                          }
-
-                          break;
-
-                        case "over":
-                          if (itemTd.innerText > eventObj[j]["row"]) {
-                            needItem = itemRow;
-                          }
-                          break;
-
-                        case "less":
-                          if (itemTd.innerText < eventObj[j]["row"]) {
-                            needItem = itemRow;
-                          }
-                          break;
-
-                        case "in":
-                          row = eventObj[j]["row"]
-                            .replace(/\[|\]/g, "")
-                            .split(",");
-                          k = -1;
-                          row.forEach((rowValue) => {
-                            if (itemTd.innerText == rowValue) {
-                              k = 0;
-                            }
-                          });
-                          if (k != -1) {
-                            needItem = itemRow;
-                          }
-
-                          break;
-
-                        case "between":
-                          row = eventObj[j]["row"]
-                            .replace(/\[|\]/g, "")
-                            .split(",");
-                          if (
-                            itemTd.innerText > row[0] &&
-                            itemTd.innerText < row[1]
-                          ) {
-                            needItem = itemRow;
-                          }
-                          break;
-                      }
-
-                      if (needItem != null) {
-                        needItem.classList.add("event");
-                      }
-                    }
-                  });
-                });
-
-                if (table.querySelectorAll(".event").length > 0) {
-                  if (item.prop[0] == "rowcolor") {
-                    table.querySelectorAll(".event").forEach((res) => {
-                      res.style.background = eventObj[j]["color"];
-                      res.style.color = this.color.back;
-                    });
-                  } else if (item.prop[0] == "cellcolor") {
-                    table.querySelectorAll(".event").forEach((res) => {
-                      res.children[column].style.background =
-                        eventObj[j]["color"];
-                      res.children[column].style.color = this.color.back;
-                    });
-                  } else if (item.prop[0] == "columncolor") {
-                    table.querySelectorAll("tbody tr").forEach((itemRow) => {
-                      itemRow.children[column].style.background =
-                        eventObj[j]["color"];
-                      itemRow.children[column].style.color = this.color.back;
-                    });
-                  }
-                }
-              } else {
-                readyTh = setTimeout(tick, 100);
-              }
-            }.bind(this),
-            0
-          );
-        }
-      });
-    },
     updatePage: function () {
       if (this.$refs[this.id]) {
         this.clearColor();
-        this.setEventColor();
       }
     },
   },
