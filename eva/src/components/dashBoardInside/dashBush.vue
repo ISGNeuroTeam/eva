@@ -27,6 +27,19 @@ export default {
       edgesSource: null, //связи
     } 
   },
+  computed: {
+    dragRes () {
+      let dragRes = this.$store.getters.getDragRes({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if(dragRes === 'true'){
+        return true
+      } else {
+        return false
+      }
+    },
+  },
   watch: {
     dataRestFrom() {
     },

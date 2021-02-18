@@ -1178,6 +1178,12 @@ export default {  // приблизительный объект хранили�
         }
       }
     },
+    getDragRes(state){
+      return (id) => {
+        return state[id.idDash].dragRes
+      }
+    },
+
     getEvents(state) {  // получаем скриншот страницы
       return (event) => {
         let result = [];
