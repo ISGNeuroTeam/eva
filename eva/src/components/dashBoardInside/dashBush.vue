@@ -20,6 +20,11 @@ export default {
   },
   data () {
     return {
+      propertiesBlock: false, //блок свойств
+      elementBlock: false, //блок палитры элементов
+      elementConfig: null, //конфиг палитры элементов
+      nodesSource: null, //ноды
+      edgesSource: null, //связи
     } 
   },
   watch: {
