@@ -1,6 +1,6 @@
 
 import {  mdiGraph, mdiGestureTap, mdiBrush, mdiViewGrid, 
-  mdiCardTextOutline, mdiChartGantt, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql } from '@mdi/js'
+  mdiCardTextOutline, mdiChartGantt, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql,mdiChartScatterPlot } from '@mdi/js'
 
 export default {  
   tools: [
@@ -12,6 +12,7 @@ export default {
     {name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select'},
     {name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker'},
     {name: 'Граф', img: mdiGraphql , type: 'ygraph'},
+    {name: 'Кустовая схема', img: mdiChartScatterPlot, type: 'bush'},
     {name: 'Диаграмма Гантта', img: mdiChartGantt, type: 'guntt'},
     {name: 'Плитка', img: mdiViewGrid , type: 'tile'},
     {name: 'Изображение', img: mdiBrush , type: 'csvg'},
@@ -80,7 +81,11 @@ export default {
     ygraph: {
       width: 930,
       height: 850
-    },  
+    },
+    bush: {
+      width: 930,
+      height: 850
+    }  
   },
   icons: {
     table: mdiTableLarge,
@@ -97,7 +102,8 @@ export default {
   //  barchart: mdiPoll,
     tile: mdiViewGrid,
     csvg: mdiBrush,
-    ygraph: mdiGraphql
+    ygraph: mdiGraphql,
+    bush: mdiChartScatterPlot
   }, 
   options: {
     //lineChart: ['visible','level','boxShadow','lastDot'],
@@ -114,7 +120,8 @@ export default {
     guntt: ['visible','level','timeFormat'],
     tile: ['visible','level','widthTile','heightTile'],
     csvg: ['visible','level','tooltip'],
-    ygraph: ['visible','level']
+    ygraph: ['visible','level'],
+    bush: ['visible','level']
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
   reports: {
@@ -158,5 +165,9 @@ export default {
       tooltip: 'Граф',
       icon: mdiGraphql
     },
+    bush: {
+      tooltip: 'Кустовая схема',
+      icon: mdiChartScatterPlot
+    }
   }
 }
