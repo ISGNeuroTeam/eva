@@ -87,6 +87,7 @@ store.auth = storeAuth;
 
 import "./fonts.css"
 import "./scroll.css"
+import "./yfiles/es-modules/yfiles.css"
 
 // создаем экземпляр vue где подключаем самое главное переадрасицию, визуализацию элемнетов и хранилище
 new Vue({
