@@ -1,5 +1,9 @@
 <template>
   <div class="bush-wrapper">
+    <div align="start">
+      <v-icon :color="'white'">{{icon.iconArrowAll}}</v-icon>
+      <v-icon :color="'white'">{{icon.iconArrowAll}}</v-icon>
+    </div>
     <div class="bush-ygraph-container" :style="{top:`${top}`}" ref="graph"/>
   </div>
 </template>
@@ -8,7 +12,7 @@
 <script>
 import * as yfile from 'yfiles'
 import licenseData from './license.json'
-
+import { mdiArrowAll } from '@mdi/js'
 yfile.License.value = licenseData//проверка лицензии
 
 export default {
@@ -21,6 +25,9 @@ export default {
   },
   data () {
     return {
+      icon: {
+        iconArrowAll: mdiArrowAll,
+      },
       propertiesBlock: false, //блок свойств
       elementBlock: false, //блок палитры элементов
       elementConfig: null, //конфиг палитры элементов
@@ -53,10 +60,7 @@ export default {
     },
   },
   mounted() {
-    this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
-    this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
-    this.initializeDefaultStyles()
-    this.createDefaultGraph()
+    this.createGraph()
   },
   methods: {
     initializeDefaultStyles() {
@@ -66,16 +70,11 @@ export default {
         shape: 'rectangle'
       })
     },
-    createDefaultGraph() {
-      const graph = this.$graphComponent.graph
-      graph.clear()
+    createGraph() {
+      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
+      this.$graphComponent.inputMode = new yfile.GraphEditorInputMode()
 
-      const n1 = graph.createNode()
-      const n2 = graph.createNodeAt([250, 150])
-      const n3 = graph.createNodeAt([150, 250])
-      graph.createEdge(n1, n2)
-      graph.createEdge(n1, n3)
-      graph.createEdge(n2, n3)
+      this.initializeDefaultStyles()
     },
   }
 }
