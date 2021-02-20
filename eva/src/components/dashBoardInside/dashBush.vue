@@ -56,25 +56,52 @@ export default {
     },
   },
   watch: {
-    dataRestFrom() {
+    dataRestFrom(val) {
+      this.generateNodesEdgesConfig(val)
     },
   },
   mounted() {
     this.createGraph()
   },
   methods: {
-    initializeDefaultStyles() {
-      this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
-        fill: 'orange',
-        stroke: 'orange',
-        shape: 'rectangle'
-      })
+    generateNodesEdgesConfig(dataRest){
+      let _allNodes = []
+      let _allEdges = []
+      //в последней строке доступы
+      for(let i=0; i<dataRest.length-1; i++){
+        _allNodes.push({
+          id: dataRest[i].ID,
+          point: new yfile.Point(dataRest[i].object_coordinate_X, dataRest[i].object_coordinate_Y),
+          label: dataRest[i].object_label,
+          type: dataRest[i].object,
+          status: dataRest[i].status
+        })
+        if(dataRest[i].edges){
+          dataRest[i].edges.split(',').forEach(edge => {
+            _allEdges.push({
+              fromNode: dataRest[i].ID,
+              toNode: Number(edge)
+            })
+          });
+        }
+      }
+      this.nodesSource = _allNodes
+      this.edgesSource = _allEdges
+      //конфиг в элементе
+      this.elementConfig = dataRest[dataRest.length-1]
     },
     createGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
       this.$graphComponent.inputMode = new yfile.GraphEditorInputMode()
 
       this.initializeDefaultStyles()
+    },
+    initializeDefaultStyles() {
+      this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
+        fill: 'orange',
+        stroke: 'orange',
+        shape: 'rectangle'
+      })
     },
   }
 }
