@@ -67,10 +67,10 @@ export default {
       }
     },
     containerWidth() {
-      return this.$refs.graph.clientWidth;
+      return  Math.floor(this.$refs.graph.clientWidth);
     },
     containerHeight() {
-      return this.$refs.graph.clientHeight;
+      return  Math.floor(this.$refs.graph.clientHeight);
     },
   },
   watch: {
@@ -136,7 +136,6 @@ export default {
       this.$graphComponent.graph.clear();
       const _kX = this.containerWidth / this.coordX.delta;
       const _kY = this.containerHeight / this.coordY.delta;
-
       this.nodesSource.forEach((node) => {
         this.$graphComponent.graph.createNodeAt([
           node.point.x * _kX,
@@ -144,33 +143,6 @@ export default {
         ]);
       });
     },
-    minmaxcoord(dataRest) {
-      //начальные значения для мин и макс расстояний
-      this.coordX.min = dataRest[0].object_coordinate_X;
-      this.coordX.max = dataRest[0].object_coordinate_X;
-      this.coordY.min = dataRest[0].object_coordinate_Y;
-      this.coordY.max = dataRest[0].object_coordinate_Y;
-
-      for (let i = 0; i < dataRest.length - 1; i++) {
-        if (dataRest[i].object_coordinate_X > this.coordX.max) {
-          this.coordX.max = dataRest[i].object_coordinate_X;
-        }
-        if (dataRest[i].object_coordinate_X < this.coordX.min) {
-          this.coordX.min = dataRest[i].object_coordinate_X;
-        }
-
-        if (dataRest[i].object_coordinate_Y > this.coordY.max) {
-          this.coordY.max = dataRest[i].object_coordinate_Y;
-        }
-        if (dataRest[i].object_coordinate_Y < this.coordY.min) {
-          this.coordY.min = dataRest[i].object_coordinate_Y;
-        }
-      }
-
-      this.coordX.delta = Number(this.coordX.max) - Number(this.coordX.min);
-      this.coordY.delta = Number(this.coordY.max) - Number(this.coordY.min);
-    },
-
     generateNodesEdges(dataRest) {
       let _allNodes = [];
       let _allEdges = [];
@@ -194,14 +166,14 @@ export default {
           status: dataRest[i].status,
         });
 
-        // if (dataRest[i].edges) {
-        //   dataRest[i].edges.split(",").forEach((edge) => {
-        //     _allEdges.push({
-        //       fromNode: dataRest[i].ID,
-        //       toNode: Number(edge),
-        //     });
-        //   });
-        // }
+        if (dataRest[i].edges) {
+          dataRest[i].edges.split(",").forEach((edge) => {
+            _allEdges.push({
+              fromNode: dataRest[i].ID,
+              toNode: Number(edge),
+            });
+          });
+        }
       }
       this.nodesSource = _allNodes;
       this.edgesSource = _allEdges;
