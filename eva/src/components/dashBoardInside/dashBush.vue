@@ -141,8 +141,16 @@ export default {
 
         const _alphac = Math.acos(_xc/Math.sqrt(_xc**2+_yc**2))
 
-        const _xn = Math.sqrt(_xc**2+_yc**2)*Math.cos(_alpha+_alphac)
-        const _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha+ _alphac)
+        let _xn = null
+        let _yn = null 
+        if (_alphac>=Math.PI/2){
+          _xn = Math.sqrt(_xc**2+_yc**2)*Math.cos(_alpha+ _alphac)
+          _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha+ _alphac)
+        } else{
+          _xn = Math.sqrt(_xc**2+_yc**2)*Math.cos(_alpha-_alphac)
+          _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha- _alphac)
+        }
+        
 
         const _x = _xn+this.containerWidth/2
         const _y = _yn+ this.containerHeight/2
