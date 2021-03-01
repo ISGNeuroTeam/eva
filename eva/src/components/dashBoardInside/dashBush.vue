@@ -134,31 +134,43 @@ export default {
 
     drawGraph() {
       this.$graphComponent.graph.clear();
-      const _kX = this.containerWidth / this.coordX.delta;
-      const _kY = this.containerHeight / this.coordY.delta;
+      const _alpha =Math.acos(this.containerWidth/Math.sqrt(this.containerWidth**2+this.containerHeight**2))
       this.nodesSource.forEach((node) => {
+        const _xc = node.point.x - this.containerWidth/2
+        const _yc = node.point.y - this.containerHeight/2
+
+        const _alphac = Math.acos(_xc/Math.sqrt(_xc**2+_yc**2))
+
+        const _xn = Math.sqrt(_xc**2+_yc**2)*Math.cos(_alpha+_alphac)
+        const _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha+ _alphac)
+
+        const _x = _xn+this.containerWidth/2
+        const _y = _yn+ this.containerHeight/2
+
         this.$graphComponent.graph.createNodeAt([
-          node.point.x * _kX,
-          node.point.y * _kY,
+          _x,
+          _y,
         ]);
       });
     },
     generateNodesEdges(dataRest) {
       let _allNodes = [];
       let _allEdges = [];
+      const _kX = this.containerWidth / this.coordX.delta;
+      const _kY = this.containerHeight / this.coordY.delta;
       //в последней строке доступы
       for (let i = 0; i < dataRest.length - 1; i++) {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
             dataRest[i].object_coordinate_X > 0
-              ? Number(dataRest[i].object_coordinate_X) -
-                Number(this.coordX.min)
+              ? (Number(dataRest[i].object_coordinate_X) -
+                Number(this.coordX.min))*_kX
               : dataRest[i].object_coordinate_X,
 
             dataRest[i].object_coordinate_Y > 0
-              ? Number(dataRest[i].object_coordinate_Y) -
-                Number(this.coordY.min)
+              ? (Number(dataRest[i].object_coordinate_Y) -
+                Number(this.coordY.min))*_kY
               : dataRest[i].object_coordinate_Y
           ),
           label: dataRest[i].object_label,
@@ -169,7 +181,7 @@ export default {
         if (dataRest[i].edges) {
           dataRest[i].edges.split(",").forEach((edge) => {
             _allEdges.push({
-              fromNode: dataRest[i].ID,
+              fromNode: Number(dataRest[i].ID),
               toNode: Number(edge),
             });
           });
