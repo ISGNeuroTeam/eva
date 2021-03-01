@@ -80,6 +80,8 @@ export default {
       this.maxdeltacoord(val);
       this.generateNodesEdges(val);
       this.drawGraph();
+      this.drawEdges()
+
     },
   },
   mounted() {
@@ -134,7 +136,10 @@ export default {
 
     drawGraph() {
       this.$graphComponent.graph.clear();
+      //обнулили переменную за ноды на графе
+      this.$graphNodes = null
       const _alpha =Math.acos(this.containerWidth/Math.sqrt(this.containerWidth**2+this.containerHeight**2))
+      
       this.nodesSource.forEach((node) => {
         const _xc = node.point.x - this.containerWidth/2
         const _yc = node.point.y - this.containerHeight/2
@@ -154,12 +159,26 @@ export default {
 
         const _x = _xn+this.containerWidth/2
         const _y = _yn+ this.containerHeight/2
-
-        this.$graphComponent.graph.createNodeAt([
+        //Нода которую рисуем
+        const _node = this.$graphComponent.graph.createNodeAt([
           _x,
           _y,
         ]);
+        //для связи по надам
+        _node.tag = node.id
+
+        if(this.$graphNodes){
+          this.$graphNodes.push(_node)
+        }else{
+          this.$graphNodes = []
+          this.$graphNodes.push(_node)
+        }
+        //label для ноды
+        this.$graphComponent.graph.addLabel(_node, node.label)
       });
+    },
+    drawEdges(){
+      console.log(this.$graphNodes)
     },
     generateNodesEdges(dataRest) {
       let _allNodes = [];
