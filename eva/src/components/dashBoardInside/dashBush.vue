@@ -112,12 +112,6 @@ export default {
         ) {
           dataRest[i].object_coordinate_X = dataRest[i].object_coordinate_X - Math.trunc(dataRest[i].object_coordinate_X);
           dataRest[i].object_coordinate_Y = dataRest[i].object_coordinate_Y - Math.trunc(dataRest[i].object_coordinate_Y);
-          // dataRest[i].object_coordinate_X = 0
-          // dataRest[i].object_coordinate_Y = 0
-          console.log(dataRest[i].object_coordinate_X, dataRest[i].object_coordinate_Y )
-        } else {
-          console.log('good:')
-          console.log(dataRest[i].object_coordinate_X, dataRest[i].object_coordinate_Y )
         }
       }
     },
