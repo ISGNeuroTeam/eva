@@ -44,6 +44,9 @@ export default {
       elementConfig: null, //конфиг палитры элементов
       nodesSource: null, //ноды
       edgesSource: null, //связи
+      nodesCoords: null, // подготовленные ноды
+      Kproportion: null,
+      Xmin: null
     };
   },
   computed: {
@@ -79,8 +82,10 @@ export default {
       this.nullcoord(val);
       this.maxdeltacoord(val);
       this.generateNodesEdges(val);
-      this.drawGraph();
-      this.drawEdges()
+      this.accumulationCoords();
+      this.generateKproportion()
+      this.drawNodes()
+      //this.drawEdges()
 
     },
   },
@@ -134,10 +139,9 @@ export default {
       this.coordY.delta = Number(this.coordY.max) - Number(this.coordY.min);
     },
 
-    drawGraph() {
+    accumulationCoords() {
       this.$graphComponent.graph.clear();
-      //обнулили переменную за ноды на графе
-      this.$graphNodes = null
+      this.nodesCoords= null
       const _alpha =Math.acos(this.containerWidth/Math.sqrt(this.containerWidth**2+this.containerHeight**2))
       
       this.nodesSource.forEach((node) => {
@@ -156,26 +160,39 @@ export default {
           _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha- _alphac)
         }
         
-
         const _x = _xn+this.containerWidth/2
         const _y = _yn+ this.containerHeight/2
-        //Нода которую рисуем
-        const _node = this.$graphComponent.graph.createNodeAt([
-          _x,
-          _y,
-        ]);
-        //для связи по надам
-        _node.tag = node.id
-
-        if(this.$graphNodes){
-          this.$graphNodes.push(_node)
-        }else{
-          this.$graphNodes = []
-          this.$graphNodes.push(_node)
+        
+        if(this.nodesCoords){
+          this.nodesCoords.push({x: _x,y: _y})
+        } else {
+          this.nodesCoords = []
+          this.nodesCoords.push({x: _x,y: _y})
         }
-        //label для ноды
-        this.$graphComponent.graph.addLabel(_node, node.label)
+       
       });
+    },
+    generateKproportion(){
+      this.Xmin = this.nodesCoords[0].x
+      let Xmax = this.nodesCoords[0].x
+      this.nodesCoords.forEach(node=>{
+        if(node.x>Xmax){
+          Xmax = node.x
+        }
+        if(node.x<this.Xmin){
+          this.Xmin= node.x
+        }
+      })
+      this.Kproportion = (Xmax-this.Xmin)/this.containerWidth
+
+    },
+    drawNodes(){
+      this.nodesCoords.forEach((node) => {
+        this.$graphComponent.graph.createNodeAt([
+          (-1*this.Xmin+node.x)/this.Kproportion,
+          node.y/this.Kproportion,
+        ]);
+      })
     },
     drawEdges(){
       this.edgesSource.forEach(edge=>{
