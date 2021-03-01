@@ -110,8 +110,14 @@ export default {
           dataRest[i].object_coordinate_Y - this.coordY.min >
             170 * dataRest.length
         ) {
-          dataRest[i].object_coordinate_X = 0;
-          dataRest[i].object_coordinate_Y = 0;
+          dataRest[i].object_coordinate_X = dataRest[i].object_coordinate_X - Math.trunc(dataRest[i].object_coordinate_X);
+          dataRest[i].object_coordinate_Y = dataRest[i].object_coordinate_Y - Math.trunc(dataRest[i].object_coordinate_Y);
+          // dataRest[i].object_coordinate_X = 0
+          // dataRest[i].object_coordinate_Y = 0
+          console.log(dataRest[i].object_coordinate_X, dataRest[i].object_coordinate_Y )
+        } else {
+          console.log('good:')
+          console.log(dataRest[i].object_coordinate_X, dataRest[i].object_coordinate_Y )
         }
       }
     },
@@ -178,7 +184,19 @@ export default {
       });
     },
     drawEdges(){
-      console.log(this.$graphNodes)
+      this.edgesSource.forEach(edge=>{
+        let _fNode = null
+        let _tNode = null
+        this.$graphNodes.forEach(gNode=>{
+          if(gNode.tag === edge.fromNode) {
+            _fNode = gNode
+          }
+          if(gNode.tag === edge.toNode){
+            _tNode = gNode
+          }
+        })
+        this.$graphComponent.graph.createEdge(_fNode,_tNode)
+      })
     },
     generateNodesEdges(dataRest) {
       let _allNodes = [];
@@ -190,15 +208,15 @@ export default {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
-            dataRest[i].object_coordinate_X > 0
+            dataRest[i].object_coordinate_X >= 1
               ? (Number(dataRest[i].object_coordinate_X) -
                 Number(this.coordX.min))*_kX
-              : dataRest[i].object_coordinate_X,
+              : dataRest[i].object_coordinate_X*this.containerWidth,
 
-            dataRest[i].object_coordinate_Y > 0
+            dataRest[i].object_coordinate_Y >= 1
               ? (Number(dataRest[i].object_coordinate_Y) -
                 Number(this.coordY.min))*_kY
-              : dataRest[i].object_coordinate_Y
+              : dataRest[i].object_coordinate_Y*this.containerHeight
           ),
           label: dataRest[i].object_label,
           type: dataRest[i].object,
