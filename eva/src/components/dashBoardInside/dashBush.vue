@@ -82,13 +82,16 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
+      //генерируем и рисуем ноды
       this.mincoord(val);
       this.nullcoord(val);
       this.maxdeltacoord(val);
-      this.generateNodesEdges(val);
+      this.generateNodes(val);
       this.accumulationCoords();
       this.generateKproportion()
       this.drawNodes()
+      //генерируем связи
+      this.generateEdges(val)
       //this.drawEdges()
 
     },
@@ -213,9 +216,18 @@ export default {
         this.$graphComponent.graph.createEdge(_fNode,_tNode)
       })
     },
-    generateNodesEdges(dataRest) {
-      let _allNodes = [];
+    generateEdges(dataRest) {
       let _allEdges = [];
+      //в последней строке доступы
+      for (let i = 0; i < dataRest.length - 1; i++) {
+        if(dataRest[i].edges){
+          console.log(JSON.parse(dataRest[i].edges.replaceAll("'", '"')))
+          
+        }
+      }
+    },
+    generateNodes(dataRest) {
+      let _allNodes = [];
       const _kX = this.containerWidth / this.coordX.delta;
       const _kY = this.containerHeight / this.coordY.delta;
       //в последней строке доступы
@@ -237,18 +249,8 @@ export default {
           type: dataRest[i].object,
           status: dataRest[i].status,
         });
-
-        if (dataRest[i].edges) {
-          dataRest[i].edges.split(",").forEach((edge) => {
-            _allEdges.push({
-              fromNode: Number(dataRest[i].ID),
-              toNode: Number(edge),
-            });
-          });
-        }
       }
       this.nodesSource = _allNodes;
-      this.edgesSource = _allEdges;
     },
 
     createGraph() {

@@ -364,7 +364,7 @@
             v-model="tocken.sufix"  
             class="tocken-sufix " 
             :color="color.text" 
-            label="Суфикс"  
+            label="Суффикс"  
             outlined 
             hide-details 
           />
@@ -462,7 +462,7 @@
           v-model="newTockenDop.sufix"
           class="tocken-sufix" 
           :color="color.text" 
-          label="Суфикс"  
+          label="Суффикс"  
           outlined 
           hide-details 
         />
