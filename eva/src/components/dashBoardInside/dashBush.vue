@@ -282,7 +282,7 @@ export default {
 
     createGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
-      this.$graphComponent.inputMode = new yfile.GraphEditorInputMode();
+      this.$graphComponent.inputMode = null;
 
       this.initializeDefaultStyles();
     },
@@ -292,6 +292,8 @@ export default {
         stroke: "orange",
         shape: "rectangle",
       });
+      //положение label относительно ноды
+      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = yfile.ExteriorLabelModel.SOUTH
     },
   },
 };
