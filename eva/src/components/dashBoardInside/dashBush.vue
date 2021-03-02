@@ -43,7 +43,7 @@ export default {
       edgesSource: null, //связи
       nodesCoords: null, // подготовленные ноды
       Kproportion: null,
-      Xmin: null
+      Xmin: null,
     };
   },
   computed: {
@@ -67,18 +67,23 @@ export default {
       }
     },
     containerWidth() {
-      return  Math.floor(this.$refs.graph.clientWidth);
+      return Math.floor(this.$refs.graph.clientWidth);
     },
     containerHeight() {
-      return  Math.floor(this.$refs.graph.clientHeight);
+      return Math.floor(this.$refs.graph.clientHeight);
     },
     elementConfig() {
-      if(this.dataRestFrom) {
-        return JSON.parse(this.dataRestFrom[this.dataRestFrom.length - 1].ID.replaceAll("'", '"'))
+      if (this.dataRestFrom) {
+        return JSON.parse(
+          this.dataRestFrom[this.dataRestFrom.length - 1].ID.replaceAll(
+            "'",
+            '"'
+          )
+        );
       } else {
-        return null
+        return null;
       }
-    }
+    },
   },
   watch: {
     dataRestFrom(val) {
@@ -88,12 +93,11 @@ export default {
       this.maxdeltacoord(val);
       this.generateNodes(val);
       this.accumulationCoords();
-      this.generateKproportion()
-      this.drawNodes()
+      this.generateKproportion();
+      this.drawNodes();
       //генерируем связи
-      this.generateEdges(val)
+      this.generateEdges(val);
       //this.drawEdges()
-
     },
   },
   mounted() {
@@ -101,17 +105,21 @@ export default {
   },
   methods: {
     mincoord(dataRest) {
-      let _min = dataRest[0].object_coordinate_X**2+ dataRest[0].object_coordinate_Y**2
-      let _minIndex = 0
-      for(let i = 0; i < dataRest.length - 1; i++){
-        let _tmpmin =  dataRest[i].object_coordinate_X**2+ dataRest[i].object_coordinate_Y**2
-        if(_tmpmin<_min){
-          _min=_tmpmin
-          _minIndex = i
+      let _min =
+        dataRest[0].object_coordinate_X ** 2 +
+        dataRest[0].object_coordinate_Y ** 2;
+      let _minIndex = 0;
+      for (let i = 0; i < dataRest.length - 1; i++) {
+        let _tmpmin =
+          dataRest[i].object_coordinate_X ** 2 +
+          dataRest[i].object_coordinate_Y ** 2;
+        if (_tmpmin < _min) {
+          _min = _tmpmin;
+          _minIndex = i;
         }
       }
-      this.coordX.min = dataRest[_minIndex].object_coordinate_X
-      this.coordY.min = dataRest[_minIndex].object_coordinate_Y
+      this.coordX.min = dataRest[_minIndex].object_coordinate_X;
+      this.coordY.min = dataRest[_minIndex].object_coordinate_Y;
     },
     nullcoord(dataRest) {
       //в последней строке доступы + JSON
@@ -122,8 +130,12 @@ export default {
           dataRest[i].object_coordinate_Y - this.coordY.min >
             this.elementConfig.extra.max_Y * dataRest.length
         ) {
-          dataRest[i].object_coordinate_X = dataRest[i].object_coordinate_X - Math.trunc(dataRest[i].object_coordinate_X);
-          dataRest[i].object_coordinate_Y = dataRest[i].object_coordinate_Y - Math.trunc(dataRest[i].object_coordinate_Y);
+          dataRest[i].object_coordinate_X =
+            dataRest[i].object_coordinate_X -
+            Math.trunc(dataRest[i].object_coordinate_X);
+          dataRest[i].object_coordinate_Y =
+            dataRest[i].object_coordinate_Y -
+            Math.trunc(dataRest[i].object_coordinate_Y);
         }
       }
     },
@@ -148,81 +160,86 @@ export default {
 
     accumulationCoords() {
       this.$graphComponent.graph.clear();
-      this.nodesCoords= null
-      const _alpha =Math.acos(this.containerWidth/Math.sqrt(this.containerWidth**2+this.containerHeight**2))
-      
+      this.nodesCoords = null;
+      const _alpha = Math.acos(
+        this.containerWidth /
+          Math.sqrt(this.containerWidth ** 2 + this.containerHeight ** 2)
+      );
+
       this.nodesSource.forEach((node) => {
-        const _xc = node.point.x - this.containerWidth/2
-        const _yc = node.point.y - this.containerHeight/2
+        const _xc = node.point.x - this.containerWidth / 2;
+        const _yc = node.point.y - this.containerHeight / 2;
 
-        const _alphac = Math.acos(_xc/Math.sqrt(_xc**2+_yc**2))
+        const _alphac = Math.acos(_xc / Math.sqrt(_xc ** 2 + _yc ** 2));
 
-        let _xn = null
-        let _yn = null 
-        if (_alphac>=Math.PI/2){
-          _xn = Math.sqrt(_xc**2+_yc**2)*Math.cos(_alpha+ _alphac)
-          _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha+ _alphac)
-        } else{
-          _xn = Math.sqrt(_xc**2+_yc**2)*Math.cos(_alpha-_alphac)
-          _yn = Math.sqrt(_xc**2+_yc**2)*Math.sin(_alpha- _alphac)
-        }
-        
-        const _x = _xn+this.containerWidth/2
-        const _y = _yn+ this.containerHeight/2
-        
-        if(this.nodesCoords){
-          this.nodesCoords.push({x: _x,y: _y})
+        let _xn = null;
+        let _yn = null;
+        if (_alphac >= Math.PI / 2) {
+          _xn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.cos(_alpha + _alphac);
+          _yn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.sin(_alpha + _alphac);
         } else {
-          this.nodesCoords = []
-          this.nodesCoords.push({x: _x,y: _y})
+          _xn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.cos(_alpha - _alphac);
+          _yn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.sin(_alpha - _alphac);
         }
-       
+
+        const _x = _xn + this.containerWidth / 2;
+        const _y = _yn + this.containerHeight / 2;
+
+        if (this.nodesCoords) {
+          this.nodesCoords.push({ x: _x, y: _y });
+        } else {
+          this.nodesCoords = [];
+          this.nodesCoords.push({ x: _x, y: _y });
+        }
       });
     },
-    generateKproportion(){
-      this.Xmin = this.nodesCoords[0].x
-      let Xmax = this.nodesCoords[0].x
-      this.nodesCoords.forEach(node=>{
-        if(node.x>Xmax){
-          Xmax = node.x
+    generateKproportion() {
+      this.Xmin = this.nodesCoords[0].x;
+      let Xmax = this.nodesCoords[0].x;
+      this.nodesCoords.forEach((node) => {
+        if (node.x > Xmax) {
+          Xmax = node.x;
         }
-        if(node.x<this.Xmin){
-          this.Xmin= node.x
+        if (node.x < this.Xmin) {
+          this.Xmin = node.x;
         }
-      })
-      this.Kproportion = (Xmax-this.Xmin)/this.containerWidth
-
+      });
+      this.Kproportion = (Xmax - this.Xmin) / this.containerWidth;
     },
-    drawNodes(){
+    drawNodes() {
       this.nodesCoords.forEach((node) => {
         this.$graphComponent.graph.createNodeAt([
-          (-1*this.Xmin+node.x)/this.Kproportion,
-          node.y/this.Kproportion,
+          (-1 * this.Xmin + node.x) / this.Kproportion,
+          node.y / this.Kproportion,
         ]);
-      })
+      });
     },
-    drawEdges(){
-      this.edgesSource.forEach(edge=>{
-        let _fNode = null
-        let _tNode = null
-        this.$graphNodes.forEach(gNode=>{
-          if(gNode.tag === edge.fromNode) {
-            _fNode = gNode
+    drawEdges() {
+      this.edgesSource.forEach((edge) => {
+        let _fNode = null;
+        let _tNode = null;
+        this.$graphNodes.forEach((gNode) => {
+          if (gNode.tag === edge.fromNode) {
+            _fNode = gNode;
           }
-          if(gNode.tag === edge.toNode){
-            _tNode = gNode
+          if (gNode.tag === edge.toNode) {
+            _tNode = gNode;
           }
-        })
-        this.$graphComponent.graph.createEdge(_fNode,_tNode)
-      })
+        });
+        this.$graphComponent.graph.createEdge(_fNode, _tNode);
+      });
     },
     generateEdges(dataRest) {
       let _allEdges = [];
       //в последней строке доступы
       for (let i = 0; i < dataRest.length - 1; i++) {
-        if(dataRest[i].edges){
-          console.log(JSON.parse(dataRest[i].edges.replaceAll("'", '"')))
-          
+        if (dataRest[i].edges) {
+          Object.keys(
+            JSON.parse(dataRest[i].edges.replaceAll("'", '"'))
+          ).forEach((key) => {
+            //прохожу по всем ключам
+            console.log(key);
+          });
         }
       }
     },
@@ -237,13 +254,15 @@ export default {
           point: new yfile.Point(
             dataRest[i].object_coordinate_X >= 1
               ? (Number(dataRest[i].object_coordinate_X) -
-                Number(this.coordX.min))*_kX
-              : dataRest[i].object_coordinate_X*this.containerWidth,
+                  Number(this.coordX.min)) *
+                _kX
+              : dataRest[i].object_coordinate_X * this.containerWidth,
 
             dataRest[i].object_coordinate_Y >= 1
               ? (Number(dataRest[i].object_coordinate_Y) -
-                Number(this.coordY.min))*_kY
-              : dataRest[i].object_coordinate_Y*this.containerHeight
+                  Number(this.coordY.min)) *
+                _kY
+              : dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
           type: dataRest[i].object,
