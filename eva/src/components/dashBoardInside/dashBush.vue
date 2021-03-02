@@ -234,14 +234,20 @@ export default {
       //в последней строке доступы
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].edges) {
-          Object.keys(
-            JSON.parse(dataRest[i].edges.replaceAll("'", '"'))
-          ).forEach((key) => {
+          const _tmpEdge = JSON.parse(dataRest[i].edges.replaceAll("'", '"'));
+          Object.keys(_tmpEdge).forEach((key) => {
             //прохожу по всем ключам
-            console.log(key);
+            _tmpEdge[key].forEach((edge) => {
+              _allEdges.push({
+                fromNode: Number(dataRest[i].ID),
+                toNode: Number(edge),
+                style: key // стиль 
+              });
+            });
           });
         }
       }
+      this.edgesSource = _allEdges
     },
     generateNodes(dataRest) {
       let _allNodes = [];
