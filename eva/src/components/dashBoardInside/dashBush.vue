@@ -95,7 +95,7 @@ export default {
       this.accumulationCoords();
       this.generateKproportion();
       this.drawNodes();
-      //генерируем связи
+      //генерируем и рисуем связи
       this.generateEdges(val);
       //this.drawEdges()
     },
@@ -207,11 +207,13 @@ export default {
       this.Kproportion = (Xmax - this.Xmin) / this.containerWidth;
     },
     drawNodes() {
-      this.nodesCoords.forEach((node) => {
-        this.$graphComponent.graph.createNodeAt([
+      this.nodesCoords.forEach((node,index) => {
+        const _node = this.$graphComponent.graph.createNodeAt([
           (-1 * this.Xmin + node.x) / this.Kproportion,
           node.y / this.Kproportion,
         ]);
+        //добавляем label для ноды
+        this.$graphComponent.graph.addLabel(_node, this.nodesSource[index].label)
       });
     },
     drawEdges() {
@@ -236,7 +238,7 @@ export default {
         if (dataRest[i].edges) {
           const _tmpEdge = JSON.parse(dataRest[i].edges.replaceAll("'", '"'));
           Object.keys(_tmpEdge).forEach((key) => {
-            //прохожу по всем ключам
+            //прохожу по всем ключам-разного типа
             _tmpEdge[key].forEach((edge) => {
               _allEdges.push({
                 fromNode: Number(dataRest[i].ID),
