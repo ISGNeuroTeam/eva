@@ -115,9 +115,9 @@ export default {
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (
           dataRest[i].object_coordinate_X - this.coordX.min >
-            80 * dataRest.length ||
+            this.elementConfig.extra.max_X * dataRest.length ||
           dataRest[i].object_coordinate_Y - this.coordY.min >
-            170 * dataRest.length
+            this.elementConfig.extra.max_Y * dataRest.length
         ) {
           dataRest[i].object_coordinate_X = dataRest[i].object_coordinate_X - Math.trunc(dataRest[i].object_coordinate_X);
           dataRest[i].object_coordinate_Y = dataRest[i].object_coordinate_Y - Math.trunc(dataRest[i].object_coordinate_Y);
