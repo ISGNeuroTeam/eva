@@ -39,9 +39,6 @@ export default {
         max: null,
         delta: null,
       },
-      propertiesBlock: false, //блок свойств
-      elementBlock: false, //блок палитры элементов
-      elementConfig: null, //конфиг палитры элементов
       nodesSource: null, //ноды
       edgesSource: null, //связи
       nodesCoords: null, // подготовленные ноды
@@ -75,6 +72,13 @@ export default {
     containerHeight() {
       return  Math.floor(this.$refs.graph.clientHeight);
     },
+    elementConfig() {
+      if(this.dataRestFrom) {
+        return JSON.parse(this.dataRestFrom[this.dataRestFrom.length - 1].ID.replaceAll("'", '"'))
+      } else {
+        return null
+      }
+    }
   },
   watch: {
     dataRestFrom(val) {
