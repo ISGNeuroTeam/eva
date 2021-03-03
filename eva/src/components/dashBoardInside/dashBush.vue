@@ -97,7 +97,7 @@ export default {
       this.drawNodes();
       //генерируем и рисуем связи
       this.generateEdges(val);
-      //this.drawEdges()
+      this.drawEdges()
     },
   },
   mounted() {
@@ -207,11 +207,25 @@ export default {
       this.Kproportion = (Xmax - this.Xmin) / this.containerWidth;
     },
     drawNodes() {
+      //для нод на графе, скрытая переменная yfile
+      this.$graphNodes = null 
+
       this.nodesCoords.forEach((node,index) => {
         const _node = this.$graphComponent.graph.createNodeAt([
           (-1 * this.Xmin + node.x) / this.Kproportion,
           node.y / this.Kproportion,
         ]);
+       
+        //для дальнейшего рисования edges
+        //через tag передаётся id
+        _node.tag = this.nodesSource[index].id
+        if(this.$graphNodes){
+          this.$graphNodes.push(_node)
+        }else{
+          this.$graphNodes = []
+          this.$graphNodes.push(_node)
+        }
+
         //добавляем label для ноды
         this.$graphComponent.graph.addLabel(_node, this.nodesSource[index].label)
       });
@@ -228,7 +242,10 @@ export default {
             _tNode = gNode;
           }
         });
-        this.$graphComponent.graph.createEdge(_fNode, _tNode);
+        const _edge = this.$graphComponent.graph.createEdge(_fNode, _tNode);
+        
+        //стилизуем нарисованный edge
+
       });
     },
     generateEdges(dataRest) {
@@ -292,6 +309,11 @@ export default {
         stroke: "orange",
         shape: "rectangle",
       });
+      //стиль для label
+      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle({
+        textFill: '#b8b8b8',
+        backgroundFill: '#0a0a0a',
+      })
       //положение label относительно ноды
       this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = yfile.ExteriorLabelModel.SOUTH
     },
