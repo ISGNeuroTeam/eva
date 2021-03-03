@@ -97,7 +97,7 @@ export default {
       this.drawNodes();
       //генерируем и рисуем связи
       this.generateEdges(val);
-      this.drawEdges()
+      this.drawEdges();
     },
   },
   mounted() {
@@ -208,26 +208,29 @@ export default {
     },
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
-      this.$graphNodes = null 
+      this.$graphNodes = null;
 
-      this.nodesCoords.forEach((node,index) => {
+      this.nodesCoords.forEach((node, index) => {
         const _node = this.$graphComponent.graph.createNodeAt([
           (-1 * this.Xmin + node.x) / this.Kproportion,
           node.y / this.Kproportion,
         ]);
-       
+
         //для дальнейшего рисования edges
         //через tag передаётся id
-        _node.tag = this.nodesSource[index].id
-        if(this.$graphNodes){
-          this.$graphNodes.push(_node)
-        }else{
-          this.$graphNodes = []
-          this.$graphNodes.push(_node)
+        _node.tag = this.nodesSource[index].id;
+        if (this.$graphNodes) {
+          this.$graphNodes.push(_node);
+        } else {
+          this.$graphNodes = [];
+          this.$graphNodes.push(_node);
         }
 
         //добавляем label для ноды
-        this.$graphComponent.graph.addLabel(_node, this.nodesSource[index].label)
+        this.$graphComponent.graph.addLabel(
+          _node,
+          this.nodesSource[index].label
+        );
       });
     },
     drawEdges() {
@@ -243,9 +246,16 @@ export default {
           }
         });
         const _edge = this.$graphComponent.graph.createEdge(_fNode, _tNode);
-        
+        //применяем этот стиль -- this.elementConfig.library.egdes[edge.style]
         //стилизуем нарисованный edge
-
+        this.$graphComponent.graph.setStyle(
+          _edge,
+          new yfile.PolylineEdgeStyle({
+            stroke: `${this.elementConfig.library.egdes[edge.style].width}px ${
+              this.elementConfig.library.egdes[edge.style].color
+            }`,
+          })
+        );
       });
     },
     generateEdges(dataRest) {
@@ -260,13 +270,13 @@ export default {
               _allEdges.push({
                 fromNode: Number(dataRest[i].ID),
                 toNode: Number(edge),
-                style: key // стиль 
+                style: key, // стиль
               });
             });
           });
         }
       }
-      this.edgesSource = _allEdges
+      this.edgesSource = _allEdges;
     },
     generateNodes(dataRest) {
       let _allNodes = [];
@@ -310,12 +320,15 @@ export default {
         shape: "rectangle",
       });
       //стиль для label
-      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle({
-        textFill: '#b8b8b8',
-        backgroundFill: '#0a0a0a',
-      })
+      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle(
+        {
+          textFill: "#b8b8b8",
+          backgroundFill: "#0a0a0a",
+        }
+      );
       //положение label относительно ноды
-      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = yfile.ExteriorLabelModel.SOUTH
+      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter =
+        yfile.ExteriorLabelModel.SOUTH;
     },
   },
 };
