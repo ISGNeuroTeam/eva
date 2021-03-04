@@ -327,8 +327,8 @@ export default {
         }
       );
       //положение label относительно ноды
-      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter =
-        yfile.ExteriorLabelModel.SOUTH;
+      const labelModel = new yfile.ExteriorLabelModel({ insets: 4 })
+      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH)
     },
   },
 };
