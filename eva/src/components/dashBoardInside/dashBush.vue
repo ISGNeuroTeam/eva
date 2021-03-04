@@ -209,12 +209,15 @@ export default {
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
-
+      
       this.nodesCoords.forEach((node, index) => {
-        const _node = this.$graphComponent.graph.createNodeAt([
-          (-1 * this.Xmin + node.x) / this.Kproportion,
-          node.y / this.Kproportion,
-        ]);
+        const _node = this.$graphComponent.graph.createNodeAt({
+          location: new yfile.Point(
+            (-1 * this.Xmin + node.x) / this.Kproportion,
+            node.y / this.Kproportion
+          ),
+          style: new yfile.ImageNodeStyle('/svg/test.svg')
+        });
 
         //для дальнейшего рисования edges
         //через tag передаётся id
@@ -225,6 +228,8 @@ export default {
           this.$graphNodes = [];
           this.$graphNodes.push(_node);
         }
+        //стилизуем ноду под svg
+        this.svgNode(_node);
 
         //добавляем label для ноды
         this.$graphComponent.graph.addLabel(
@@ -232,6 +237,13 @@ export default {
           this.nodesSource[index].label
         );
       });
+    },
+    svgNode(node) {
+      console.log(node);
+      //функция стилизации ноды под svg
+      // fetch(`/svg/test.svg`).then(result => result.text()).then(svg => {
+      //   node.style = new yfile.ImageNodeStyle(svg)
+      // })
     },
     drawEdges() {
       this.edgesSource.forEach((edge) => {
@@ -327,8 +339,10 @@ export default {
         }
       );
       //положение label относительно ноды
-      const labelModel = new yfile.ExteriorLabelModel({ insets: 4 })
-      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH)
+      const labelModel = new yfile.ExteriorLabelModel({ insets: 4 });
+      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(
+        yfile.ExteriorLabelModelPosition.SOUTH
+      );
     },
   },
 };
