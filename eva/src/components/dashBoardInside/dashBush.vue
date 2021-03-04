@@ -216,7 +216,8 @@ export default {
             (-1 * this.Xmin + node.x) / this.Kproportion,
             node.y / this.Kproportion
           ),
-          style: new yfile.ImageNodeStyle('/svg/test.svg')
+          style: new yfile.ImageNodeStyle('/svg/test.svg'),
+          labels: [this.nodesSource[index].label]
         });
 
         //для дальнейшего рисования edges
@@ -228,22 +229,7 @@ export default {
           this.$graphNodes = [];
           this.$graphNodes.push(_node);
         }
-        //стилизуем ноду под svg
-        this.svgNode(_node);
-
-        //добавляем label для ноды
-        this.$graphComponent.graph.addLabel(
-          _node,
-          this.nodesSource[index].label
-        );
       });
-    },
-    svgNode(node) {
-      console.log(node);
-      //функция стилизации ноды под svg
-      // fetch(`/svg/test.svg`).then(result => result.text()).then(svg => {
-      //   node.style = new yfile.ImageNodeStyle(svg)
-      // })
     },
     drawEdges() {
       this.edgesSource.forEach((edge) => {
