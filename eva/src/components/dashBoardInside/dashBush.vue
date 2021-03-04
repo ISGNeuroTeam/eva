@@ -195,13 +195,15 @@ export default {
       this.$graphNodes = null;
       
       this.nodesCoords.forEach((node, index) => {
+        const _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type].image_on
         const _node = this.$graphComponent.graph.createNodeAt({
           location: new yfile.Point(
             (-1 * this.Xmin + node.x) / this.Kproportion,
             node.y / this.Kproportion
           ),
-          style: new yfile.ImageNodeStyle('/svg/test.svg'),
-          labels: [this.nodesSource[index].label]
+          style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
+          labels: [this.nodesSource[index].label],
+
         });
 
         //для дальнейшего рисования edges
@@ -282,7 +284,7 @@ export default {
               : dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
-          type: dataRest[i].object,
+          type: dataRest[i].object_type,
           status: dataRest[i].status,
         });
       }
