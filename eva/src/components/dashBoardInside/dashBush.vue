@@ -1,10 +1,6 @@
 <template>
   <div class="bush-wrapper">
-    <div align="start">
-      <v-icon :color="'white'">{{ icon.iconArrowAll }}</v-icon>
-      <v-icon :color="'white'">{{ icon.iconArrowAll }}</v-icon>
-    </div>
-    <div class="bush-ygraph-container" :style="{ top: `${top}` }" ref="graph" />
+    <div class="bush-ygraph-container" ref="graph" />
   </div>
 </template>
 
@@ -12,7 +8,6 @@
 <script>
 import * as yfile from "yfiles";
 import licenseData from "./license.json";
-import { mdiArrowAll } from "@mdi/js";
 yfile.License.value = licenseData; //проверка лицензии
 
 export default {
@@ -26,9 +21,6 @@ export default {
   },
   data() {
     return {
-      icon: {
-        iconArrowAll: mdiArrowAll,
-      },
       coordX: {
         min: null,
         max: null,
@@ -47,14 +39,6 @@ export default {
     };
   },
   computed: {
-    top() {
-      // для ряда управляющих иконок
-      if (document.body.clientWidth <= 1600) {
-        return "50px";
-      } else {
-        return "60px";
-      }
-    },
     dragRes() {
       let dragRes = this.$store.getters.getDragRes({
         idDash: this.idDashFrom,
@@ -312,11 +296,6 @@ export default {
       this.initializeDefaultStyles();
     },
     initializeDefaultStyles() {
-      this.$graphComponent.graph.nodeDefaults.style = new yfile.ShapeNodeStyle({
-        fill: "orange",
-        stroke: "orange",
-        shape: "rectangle",
-      });
       //стиль для label
       this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle(
         {
@@ -340,6 +319,6 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  top: 50px;
+  top: 0px;
 }
 </style>
