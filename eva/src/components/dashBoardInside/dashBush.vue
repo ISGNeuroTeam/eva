@@ -36,6 +36,7 @@ export default {
       nodesCoords: null, // подготовленные ноды
       Kproportion: null,
       Xmin: null,
+      isUniqEdges: true,
     };
   },
   computed: {
@@ -71,7 +72,6 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
-      console.log(val)
       //генерируем и рисуем ноды
       this.mincoord(val);
       this.nullcoord(val);
@@ -194,15 +194,19 @@ export default {
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
-      
+
       this.nodesCoords.forEach((node, index) => {
-        let _imgSource = null
-        if (this.nodesSource[index].status === true){
-          _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type].image_on
+        let _imgSource = null;
+        if (this.nodesSource[index].status === true) {
+          _imgSource = this.elementConfig.library.primitives[
+            this.nodesSource[index].type
+          ].image_on;
         } else {
-          _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type].image_off
+          _imgSource = this.elementConfig.library.primitives[
+            this.nodesSource[index].type
+          ].image_off;
         }
-        
+
         const _node = this.$graphComponent.graph.createNodeAt({
           location: new yfile.Point(
             (-1 * this.Xmin + node.x) / this.Kproportion,
@@ -210,9 +214,8 @@ export default {
           ),
           style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
           labels: [this.nodesSource[index].label],
-
         });
-        this.setNodeSize(_node, this.nodesSource[index].type)
+        this.setNodeSize(_node, this.nodesSource[index].type);
         //для дальнейшего рисования edges
         //через tag передаётся id
         _node.tag = this.nodesSource[index].id;
@@ -224,9 +227,13 @@ export default {
         }
       });
     },
-    setNodeSize(node, type){
+    setNodeSize(node, type) {
       node.layout.width = this.elementConfig.library.primitives[type].width
+        ? this.elementConfig.library.primitives[type].width
+        : 30;
       node.layout.height = this.elementConfig.library.primitives[type].height
+        ? this.elementConfig.library.primitives[type].height
+        : 30;
     },
     drawEdges() {
       this.edgesSource.forEach((edge) => {
@@ -271,7 +278,33 @@ export default {
           });
         }
       }
-      this.edgesSource = _allEdges;
+
+      //уникальная связь
+      if (this.isUniqEdges) {
+        this.edgesSource = this.uniqEdges(_allEdges);
+      } else {
+        this.edgesSource = _allEdges;
+      }
+    },
+    uniqEdges(allEdges) {
+      let _acc = [];
+
+      for (let i = 0; i < allEdges.length; i++) {
+        let _isUniq = true;
+        for (let j = 0; j < _acc.length; j++) {
+          if (
+            _acc[j].style === allEdges[i].style &&
+            _acc[j].fromNode === allEdges[i].toNode &&
+            _acc[j].toNode === allEdges[i].fromNode
+          ) {
+            _isUniq = false;
+          }
+        }
+        if (_isUniq) {
+          _acc.push(allEdges[i]);
+        }
+      }
+      return _acc;
     },
     generateNodes(dataRest) {
       let _allNodes = [];
