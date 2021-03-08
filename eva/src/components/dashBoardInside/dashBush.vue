@@ -71,6 +71,7 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
+      console.log(val)
       //генерируем и рисуем ноды
       this.mincoord(val);
       this.nullcoord(val);
@@ -195,7 +196,13 @@ export default {
       this.$graphNodes = null;
       
       this.nodesCoords.forEach((node, index) => {
-        const _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type].image_on
+        let _imgSource = null
+        if (this.nodesSource[index].status === true){
+          _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type].image_on
+        } else {
+          _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type].image_off
+        }
+        
         const _node = this.$graphComponent.graph.createNodeAt({
           location: new yfile.Point(
             (-1 * this.Xmin + node.x) / this.Kproportion,
@@ -205,7 +212,7 @@ export default {
           labels: [this.nodesSource[index].label],
 
         });
-
+        this.setNodeSize(_node, this.nodesSource[index].type)
         //для дальнейшего рисования edges
         //через tag передаётся id
         _node.tag = this.nodesSource[index].id;
@@ -216,6 +223,10 @@ export default {
           this.$graphNodes.push(_node);
         }
       });
+    },
+    setNodeSize(node, type){
+      node.layout.width = this.elementConfig.library.primitives[type].width
+      node.layout.height = this.elementConfig.library.primitives[type].height
     },
     drawEdges() {
       this.edgesSource.forEach((edge) => {
