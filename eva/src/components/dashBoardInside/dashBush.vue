@@ -83,6 +83,7 @@ export default {
       //генерируем и рисуем связи
       this.generateEdges(val);
       this.drawEdges();
+      this.applyLayout();
     },
   },
   mounted() {
@@ -259,6 +260,13 @@ export default {
           })
         );
       });
+    },
+    applyLayout() {
+      const layoutData = new yfile.PolylineEdgeRouterData()
+      const edgeRouter = new yfile.EdgeRouter()
+      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES
+      this.$graphComponent.graph.applyLayout(edgeRouter, layoutData)
+
     },
     generateEdges(dataRest) {
       let _allEdges = [];
