@@ -8,6 +8,8 @@
 <script>
 import * as yfile from "yfiles";
 import licenseData from "./license.json";
+import NodeStyleDecorator from "./NodeStyleDecorator.js";
+
 yfile.License.value = licenseData; //проверка лицензии
 
 export default {
@@ -94,12 +96,23 @@ export default {
             this.nodesSource[index].type
           ].image_off;
         }
+        let _node;
+        if (this.nodesSource[index].anomaly === true) {
+          _node = this.$graphComponent.graph.createNodeAt({
+            location: node.point,
+            style: new NodeStyleDecorator(
+              new yfile.ImageNodeStyle(`/svg/${_imgSource}`), `/svg/warnind.svg`
+            ),
+            labels: [this.nodesSource[index].label],
+          });
+        } else {
+          _node = this.$graphComponent.graph.createNodeAt({
+            location: node.point,
+            style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
+            labels: [this.nodesSource[index].label],
+          });
+        }
 
-        const _node = this.$graphComponent.graph.createNodeAt({
-          location: node.point,
-          style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
-          labels: [this.nodesSource[index].label],
-        });
         this.setNodeSize(_node, this.nodesSource[index].type);
         //для дальнейшего рисования edges
         //через tag передаётся id
@@ -200,12 +213,14 @@ export default {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
-            dataRest[i].object_coordinate_X * this.containerWidth+this.maxWidthLibrary/2,
+            dataRest[i].object_coordinate_X * this.containerWidth +
+              this.maxWidthLibrary / 2,
             dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
           type: dataRest[i].object_type,
           status: dataRest[i].status,
+          anomaly: dataRest[i].anomaly,
         });
       }
       this.nodesSource = _allNodes;
