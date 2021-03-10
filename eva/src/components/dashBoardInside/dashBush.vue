@@ -23,7 +23,7 @@ export default {
     return {
       nodesSource: null, //ноды
       edgesSource: null, //связи
-      maxWidthLibrary: 0,
+      maxWidthLibrary: 30,
     };
   },
   computed: {
@@ -66,7 +66,6 @@ export default {
   watch: {
     dataRestFrom(_dataRest) {
       //генерируем и рисуем ноды
-      this.maxWidthPrimitives();
       this.generateNodes(_dataRest);
       this.drawNodes();
       //генерируем и рисуем связи
@@ -80,19 +79,6 @@ export default {
     this.createGraph();
   },
   methods: {
-    maxWidthPrimitives() {
-      //максимальная ширина в библиотеке примитивов
-      const _index = Object.keys(this.elementConfig.library.primitives)[0];
-      let _max = this.elementConfig.library.primitives[_index].width;
-
-      Object.values(this.elementConfig.library.primitives).forEach((pr) => {
-        if (pr.width > _max) {
-          _max = pr.width;
-        }
-      });
-
-      this.maxWidthLibrary = _max;
-    },
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
@@ -214,8 +200,7 @@ export default {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
-            dataRest[i].object_coordinate_X * this.containerWidth +
-              this.maxWidthLibrary / 2,
+            dataRest[i].object_coordinate_X * this.containerWidth+this.maxWidthLibrary/2,
             dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
