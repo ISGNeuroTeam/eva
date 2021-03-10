@@ -1,6 +1,6 @@
 <template>
   <div class="bush-wrapper">
-    <div class="bush-ygraph-container" ref="graph" />
+    <div class="bush-ygraph-container" :style="{top:`${top}`}" ref="graph" />
   </div>
 </template>
 
@@ -27,6 +27,13 @@ export default {
     };
   },
   computed: {
+    top () {// для ряда управляющих иконок 
+      if(document.body.clientWidth <=1600){
+        return '50px'
+      } else {
+        return '60px'
+      }
+    },
     dragRes() {
       let dragRes = this.$store.getters.getDragRes({
         idDash: this.idDashFrom,
@@ -46,28 +53,24 @@ export default {
     },
     elementConfig() {
       if (this.dataRestFrom) {
-        return JSON.parse(
-          this.dataRestFrom[this.dataRestFrom.length - 1].ID.replaceAll(
-            "'",
-            '"'
-          )
-        );
+        const _tmp =  this.dataRestFrom[this.dataRestFrom.length - 1].ID.replaceAll("'",'"') 
+        console.log(_tmp+'}')
+        return JSON.parse(_tmp+'}')
       } else {
         return null;
       }
     },
   },
   watch: {
-    dataRestFrom(val) {
-      const _dataRest = val
+    dataRestFrom(_dataRest) {
       //генерируем и рисуем ноды
       this.generateNodes(_dataRest);
       this.drawNodes();
-      //генерируем и рисуем связи
-      this.generateEdges(_dataRest);
-      this.drawEdges();
-      //применяем layot
-      this.applyLayout();
+      // //генерируем и рисуем связи
+      // this.generateEdges(_dataRest);
+      // this.drawEdges();
+      // //применяем layot
+      // this.applyLayout();
     },
   },
   mounted() {
@@ -78,7 +81,7 @@ export default {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
 
-      this.nodesCoords.forEach((node, index) => {
+      this.nodesSource.forEach((node, index) => {
         let _imgSource = null;
         if (this.nodesSource[index].status === true) {
           _imgSource = this.elementConfig.library.primitives[
@@ -89,12 +92,11 @@ export default {
             this.nodesSource[index].type
           ].image_off;
         }
+        
+        console.log(_imgSource)
 
         const _node = this.$graphComponent.graph.createNodeAt({
-          location: new yfile.Point(
-            (-1 * this.Xmin + node.x) / this.Kproportion,
-            node.y / this.Kproportion
-          ),
+          location: node.point,
           style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
           labels: [this.nodesSource[index].label],
         });
@@ -175,24 +177,13 @@ export default {
 
     generateNodes(dataRest) {
       let _allNodes = [];
-      const _kX = this.containerWidth / this.coordX.delta;
-      const _kY = this.containerHeight / this.coordY.delta;
       //в последней строке доступы
       for (let i = 0; i < dataRest.length - 1; i++) {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
-            dataRest[i].object_coordinate_X >= 1
-              ? (Number(dataRest[i].object_coordinate_X) -
-                  Number(this.coordX.min)) *
-                _kX
-              : dataRest[i].object_coordinate_X * this.containerWidth,
-
-            dataRest[i].object_coordinate_Y >= 1
-              ? (Number(dataRest[i].object_coordinate_Y) -
-                  Number(this.coordY.min)) *
-                _kY
-              : dataRest[i].object_coordinate_Y * this.containerHeight
+            dataRest[i].object_coordinate_X * this.containerWidth,
+            dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
           type: dataRest[i].object_type,
