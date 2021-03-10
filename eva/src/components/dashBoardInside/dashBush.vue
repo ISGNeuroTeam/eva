@@ -1,6 +1,6 @@
 <template>
   <div class="bush-wrapper">
-    <div class="bush-ygraph-container" :style="{top:`${top}`}" ref="graph" />
+    <div class="bush-ygraph-container" :style="{ top: `${top}` }" ref="graph" />
   </div>
 </template>
 
@@ -23,15 +23,16 @@ export default {
     return {
       nodesSource: null, //ноды
       edgesSource: null, //связи
-      isUniqEdges: true,
+      maxWidthLibrary: 0,
     };
   },
   computed: {
-    top () {// для ряда управляющих иконок 
-      if(document.body.clientWidth <=1600){
-        return '50px'
+    top() {
+      // для ряда управляющих иконок
+      if (document.body.clientWidth <= 1600) {
+        return "50px";
       } else {
-        return '60px'
+        return "60px";
       }
     },
     dragRes() {
@@ -46,16 +47,17 @@ export default {
       }
     },
     containerWidth() {
-      return Math.floor(this.$refs.graph.clientWidth);
+      return Math.floor(this.$refs.graph.clientWidth) - this.maxWidthLibrary;
     },
     containerHeight() {
       return Math.floor(this.$refs.graph.clientHeight);
     },
     elementConfig() {
       if (this.dataRestFrom) {
-        const _tmp =  this.dataRestFrom[this.dataRestFrom.length - 1].ID.replaceAll("'",'"') 
-        console.log(_tmp+'}')
-        return JSON.parse(_tmp+'}')
+        const _tmp = this.dataRestFrom[
+          this.dataRestFrom.length - 1
+        ].ID.replaceAll("'", '"');
+        return JSON.parse(_tmp + "}");
       } else {
         return null;
       }
@@ -64,19 +66,33 @@ export default {
   watch: {
     dataRestFrom(_dataRest) {
       //генерируем и рисуем ноды
+      this.maxWidthPrimitives();
       this.generateNodes(_dataRest);
       this.drawNodes();
-      // //генерируем и рисуем связи
-      // this.generateEdges(_dataRest);
-      // this.drawEdges();
-      // //применяем layot
-      // this.applyLayout();
+      //генерируем и рисуем связи
+      this.generateEdges(_dataRest);
+      this.drawEdges();
+      //применяем layot
+      this.applyLayout();
     },
   },
   mounted() {
     this.createGraph();
   },
   methods: {
+    maxWidthPrimitives() {
+      //максимальная ширина в библиотеке примитивов
+      const _index = Object.keys(this.elementConfig.library.primitives)[0];
+      let _max = this.elementConfig.library.primitives[_index].width;
+
+      Object.values(this.elementConfig.library.primitives).forEach((pr) => {
+        if (pr.width > _max) {
+          _max = pr.width;
+        }
+      });
+
+      this.maxWidthLibrary = _max;
+    },
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
@@ -92,8 +108,6 @@ export default {
             this.nodesSource[index].type
           ].image_off;
         }
-        
-        console.log(_imgSource)
 
         const _node = this.$graphComponent.graph.createNodeAt({
           location: node.point,
@@ -146,11 +160,10 @@ export default {
       });
     },
     applyLayout() {
-      const layoutData = new yfile.PolylineEdgeRouterData()
-      const edgeRouter = new yfile.EdgeRouter()
-      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES
-      this.$graphComponent.graph.applyLayout(edgeRouter, layoutData)
-
+      const layoutData = new yfile.PolylineEdgeRouterData();
+      const edgeRouter = new yfile.EdgeRouter();
+      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
+      this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
     },
     generateEdges(dataRest) {
       let _allEdges = [];
@@ -175,6 +188,25 @@ export default {
       this.edgesSource = this.uniqEdges(_allEdges);
     },
 
+    uniqEdges(allEdges) {
+      let _acc = [];
+      for (let i = 0; i < allEdges.length; i++) {
+        let _isUniq = true;
+        for (let j = 0; j < _acc.length; j++) {
+          if (
+            _acc[j].style === allEdges[i].style &&
+            _acc[j].fromNode === allEdges[i].toNode &&
+            _acc[j].toNode === allEdges[i].fromNode
+          ) {
+            _isUniq = false;
+          }
+        }
+        if (_isUniq) {
+          _acc.push(allEdges[i]);
+        }
+      }
+      return _acc;
+    },
     generateNodes(dataRest) {
       let _allNodes = [];
       //в последней строке доступы
@@ -182,7 +214,8 @@ export default {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
-            dataRest[i].object_coordinate_X * this.containerWidth,
+            dataRest[i].object_coordinate_X * this.containerWidth +
+              this.maxWidthLibrary / 2,
             dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
