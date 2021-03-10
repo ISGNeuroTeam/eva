@@ -21,21 +21,8 @@ export default {
   },
   data() {
     return {
-      coordX: {
-        min: null,
-        max: null,
-        delta: null,
-      },
-      coordY: {
-        min: null,
-        max: null,
-        delta: null,
-      },
       nodesSource: null, //ноды
       edgesSource: null, //связи
-      nodesCoords: null, // подготовленные ноды
-      Kproportion: null,
-      Xmin: null,
       isUniqEdges: true,
     };
   },
@@ -72,17 +59,14 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
+      const _dataRest = val
       //генерируем и рисуем ноды
-      this.mincoord(val);
-      this.nullcoord(val);
-      this.maxdeltacoord(val);
-      this.generateNodes(val);
-      this.accumulationCoords();
-      this.generateKproportion();
+      this.generateNodes(_dataRest);
       this.drawNodes();
       //генерируем и рисуем связи
-      this.generateEdges(val);
+      this.generateEdges(_dataRest);
       this.drawEdges();
+      //применяем layot
       this.applyLayout();
     },
   },
@@ -90,108 +74,6 @@ export default {
     this.createGraph();
   },
   methods: {
-    mincoord(dataRest) {
-      let _min =
-        dataRest[0].object_coordinate_X ** 2 +
-        dataRest[0].object_coordinate_Y ** 2;
-      let _minIndex = 0;
-      for (let i = 0; i < dataRest.length - 1; i++) {
-        let _tmpmin =
-          dataRest[i].object_coordinate_X ** 2 +
-          dataRest[i].object_coordinate_Y ** 2;
-        if (_tmpmin < _min) {
-          _min = _tmpmin;
-          _minIndex = i;
-        }
-      }
-      this.coordX.min = dataRest[_minIndex].object_coordinate_X;
-      this.coordY.min = dataRest[_minIndex].object_coordinate_Y;
-    },
-    nullcoord(dataRest) {
-      //в последней строке доступы + JSON
-      for (let i = 0; i < dataRest.length - 1; i++) {
-        if (
-          dataRest[i].object_coordinate_X - this.coordX.min >
-            this.elementConfig.extra.max_X * dataRest.length ||
-          dataRest[i].object_coordinate_Y - this.coordY.min >
-            this.elementConfig.extra.max_Y * dataRest.length
-        ) {
-          dataRest[i].object_coordinate_X =
-            dataRest[i].object_coordinate_X -
-            Math.trunc(dataRest[i].object_coordinate_X);
-          dataRest[i].object_coordinate_Y =
-            dataRest[i].object_coordinate_Y -
-            Math.trunc(dataRest[i].object_coordinate_Y);
-        }
-      }
-    },
-    maxdeltacoord(dataRest) {
-      //начальные значения для макс расстояний
-      this.coordX.max = dataRest[0].object_coordinate_X;
-      this.coordY.max = dataRest[0].object_coordinate_Y;
-
-      for (let i = 0; i < dataRest.length - 1; i++) {
-        if (dataRest[i].object_coordinate_X > this.coordX.max) {
-          this.coordX.max = dataRest[i].object_coordinate_X;
-        }
-
-        if (dataRest[i].object_coordinate_Y > this.coordY.max) {
-          this.coordY.max = dataRest[i].object_coordinate_Y;
-        }
-      }
-
-      this.coordX.delta = Number(this.coordX.max) - Number(this.coordX.min);
-      this.coordY.delta = Number(this.coordY.max) - Number(this.coordY.min);
-    },
-
-    accumulationCoords() {
-      this.$graphComponent.graph.clear();
-      this.nodesCoords = null;
-      const _alpha = Math.acos(
-        this.containerWidth /
-          Math.sqrt(this.containerWidth ** 2 + this.containerHeight ** 2)
-      );
-
-      this.nodesSource.forEach((node) => {
-        const _xc = node.point.x - this.containerWidth / 2;
-        const _yc = node.point.y - this.containerHeight / 2;
-
-        const _alphac = Math.acos(_xc / Math.sqrt(_xc ** 2 + _yc ** 2));
-
-        let _xn = null;
-        let _yn = null;
-        if (_alphac >= Math.PI / 2) {
-          _xn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.cos(_alpha + _alphac);
-          _yn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.sin(_alpha + _alphac);
-        } else {
-          _xn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.cos(_alpha - _alphac);
-          _yn = Math.sqrt(_xc ** 2 + _yc ** 2) * Math.sin(_alpha - _alphac);
-        }
-
-        const _x = _xn + this.containerWidth / 2;
-        const _y = _yn + this.containerHeight / 2;
-
-        if (this.nodesCoords) {
-          this.nodesCoords.push({ x: _x, y: _y });
-        } else {
-          this.nodesCoords = [];
-          this.nodesCoords.push({ x: _x, y: _y });
-        }
-      });
-    },
-    generateKproportion() {
-      this.Xmin = this.nodesCoords[0].x;
-      let Xmax = this.nodesCoords[0].x;
-      this.nodesCoords.forEach((node) => {
-        if (node.x > Xmax) {
-          Xmax = node.x;
-        }
-        if (node.x < this.Xmin) {
-          this.Xmin = node.x;
-        }
-      });
-      this.Kproportion = (Xmax - this.Xmin) / this.containerWidth;
-    },
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
@@ -288,32 +170,9 @@ export default {
       }
 
       //уникальная связь
-      if (this.isUniqEdges) {
-        this.edgesSource = this.uniqEdges(_allEdges);
-      } else {
-        this.edgesSource = _allEdges;
-      }
+      this.edgesSource = this.uniqEdges(_allEdges);
     },
-    uniqEdges(allEdges) {
-      let _acc = [];
 
-      for (let i = 0; i < allEdges.length; i++) {
-        let _isUniq = true;
-        for (let j = 0; j < _acc.length; j++) {
-          if (
-            _acc[j].style === allEdges[i].style &&
-            _acc[j].fromNode === allEdges[i].toNode &&
-            _acc[j].toNode === allEdges[i].fromNode
-          ) {
-            _isUniq = false;
-          }
-        }
-        if (_isUniq) {
-          _acc.push(allEdges[i]);
-        }
-      }
-      return _acc;
-    },
     generateNodes(dataRest) {
       let _allNodes = [];
       const _kX = this.containerWidth / this.coordX.delta;
@@ -373,6 +232,6 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  top: 0px;
+  top: 50px;
 }
 </style>
