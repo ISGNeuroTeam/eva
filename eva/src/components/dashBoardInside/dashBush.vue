@@ -1,5 +1,5 @@
 <template>
-  <div class="bush-wrapper">
+  <div id="bush-wrapper" >
     <div v-if="dragRes" class="buttons-wrapper">
       <v-icon
         @click="dragPanel"
@@ -8,6 +8,11 @@
         {{ icon.drag }}
       </v-icon>
     </div>
+    <div
+      v-if="panel.drag && dragRes"
+      class="drag-panel"
+      :style="`width: ${widthPanel}; height: ${heightPanel};`"
+    />
     <div class="bush-ygraph-container" :style="{ top: `${top}` }" ref="graph" />
   </div>
 </template>
@@ -29,6 +34,8 @@ export default {
     idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
     colorFrom: null, // цветовые переменные
+    widthFrom: null, // ширина родительского компонента
+    heightFrom: null, // выоста родительского компонента
   },
   data() {
     return {
@@ -51,6 +58,14 @@ export default {
       } else {
         return "60px";
       }
+    },
+    widthPanel(){
+      return this.widthFrom/10+'px'
+      
+    },
+    heightPanel(){
+      return this.heightFrom+'px'
+      
     },
     dragRes() {
       let dragRes = this.$store.getters.getDragRes({
@@ -270,9 +285,9 @@ export default {
         yfile.ExteriorLabelModelPosition.SOUTH
       );
     },
-    dragPanel(){
-      this.panel.drag = !this.panel.drag
-    }
+    dragPanel() {
+      this.panel.drag = !this.panel.drag;
+    },
   },
 };
 </script>
@@ -289,5 +304,8 @@ export default {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+}
+.drag-panel {
+  background: rosybrown;
 }
 </style>

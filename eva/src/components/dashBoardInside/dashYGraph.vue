@@ -26,8 +26,7 @@ export default {
     colorFrom: null,  // цветовые переменные
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // выоста родительского компонента
+    
   },
   data () {
     return {
