@@ -163,6 +163,10 @@ export default {
       const edgeRouter = new yfile.EdgeRouter();
       edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
       this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
+
+      const bridgeManager = new yfile.BridgeManager()
+      bridgeManager.canvasComponent = this.$graphComponent
+      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider())        
     },
     generateEdges(dataRest) {
       let _allEdges = [];
