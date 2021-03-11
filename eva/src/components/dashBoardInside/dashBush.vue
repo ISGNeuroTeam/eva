@@ -1,14 +1,23 @@
 <template>
   <div class="bush-wrapper">
+    <div v-if="dragRes" class="buttons-wrapper">
+      <v-icon
+        @click="dragPanel"
+        :color="panel.drag ? colorFrom.controlsActive : colorFrom.controls"
+      >
+        {{ icon.drag }}
+      </v-icon>
+    </div>
     <div class="bush-ygraph-container" :style="{ top: `${top}` }" ref="graph" />
   </div>
 </template>
-
 
 <script>
 import * as yfile from "yfiles";
 import licenseData from "./license.json";
 import NodeStyleDecorator from "./NodeStyleDecorator.js";
+
+import { mdiDrag } from "@mdi/js";
 
 yfile.License.value = licenseData; //проверка лицензии
 
@@ -26,6 +35,12 @@ export default {
       nodesSource: null, //ноды
       edgesSource: null, //связи
       maxWidthLibrary: 30,
+      panel: {
+        drag: false,
+      },
+      icon: {
+        drag: mdiDrag,
+      },
     };
   },
   computed: {
@@ -68,7 +83,7 @@ export default {
   watch: {
     dataRestFrom(_dataRest) {
       //очистка графа
-      this.$graphComponent.graph.clear()
+      this.$graphComponent.graph.clear();
       //генерируем и рисуем ноды
       this.generateNodes(_dataRest);
       this.drawNodes();
@@ -103,7 +118,8 @@ export default {
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
             style: new NodeStyleDecorator(
-              new yfile.ImageNodeStyle(`/svg/${_imgSource}`), `/svg/warnind.svg`
+              new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
+              `/svg/warnind.svg`
             ),
             labels: [this.nodesSource[index].label],
           });
@@ -163,12 +179,12 @@ export default {
     applyLayout() {
       const layoutData = new yfile.PolylineEdgeRouterData();
       const edgeRouter = new yfile.EdgeRouter();
-      
-      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;     
-      
-      const bridgeManager = new yfile.BridgeManager()
-      bridgeManager.canvasComponent = this.$graphComponent
-      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider())
+
+      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
+
+      const bridgeManager = new yfile.BridgeManager();
+      bridgeManager.canvasComponent = this.$graphComponent;
+      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider());
 
       this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
     },
@@ -254,6 +270,9 @@ export default {
         yfile.ExteriorLabelModelPosition.SOUTH
       );
     },
+    dragPanel(){
+      this.panel.drag = !this.panel.drag
+    }
   },
 };
 </script>
@@ -265,5 +284,10 @@ export default {
   right: 0;
   bottom: 0;
   top: 50px;
+}
+.buttons-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>
