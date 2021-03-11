@@ -67,6 +67,8 @@ export default {
   },
   watch: {
     dataRestFrom(_dataRest) {
+      //очистка графа
+      this.$graphComponent.graph.clear()
       //генерируем и рисуем ноды
       this.generateNodes(_dataRest);
       this.drawNodes();
@@ -161,12 +163,17 @@ export default {
     applyLayout() {
       const layoutData = new yfile.PolylineEdgeRouterData();
       const edgeRouter = new yfile.EdgeRouter();
+      
       edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
-      this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
+      edgeRouter.minimumEdgeToEdgeDistance = 8 
 
+     
+      
       const bridgeManager = new yfile.BridgeManager()
       bridgeManager.canvasComponent = this.$graphComponent
-      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider())        
+      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider())
+
+      this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
     },
     generateEdges(dataRest) {
       let _allEdges = [];
