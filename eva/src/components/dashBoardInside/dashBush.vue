@@ -164,10 +164,7 @@ export default {
       const layoutData = new yfile.PolylineEdgeRouterData();
       const edgeRouter = new yfile.EdgeRouter();
       
-      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
-      edgeRouter.minimumEdgeToEdgeDistance = 8 
-
-     
+      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;     
       
       const bridgeManager = new yfile.BridgeManager()
       bridgeManager.canvasComponent = this.$graphComponent
