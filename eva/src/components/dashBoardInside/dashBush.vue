@@ -167,6 +167,7 @@ export default {
         : 30;
     },
     drawEdges() {
+      console.log(this.edgesSource)
       this.edgesSource.forEach((edge) => {
         let _fNode = null;
         let _tNode = null;
@@ -192,16 +193,20 @@ export default {
       });
     },
     applyLayout() {
-      const layoutData = new yfile.PolylineEdgeRouterData();
-      const edgeRouter = new yfile.EdgeRouter();
-
-      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
-
       const bridgeManager = new yfile.BridgeManager();
       bridgeManager.canvasComponent = this.$graphComponent;
-      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider());
+      
+
+      const layoutData = new yfile.PolylineEdgeRouterData();
+      const edgeRouter = new yfile.EdgeRouter();
+      
+      edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
+      edgeRouter.integratedEdgeLabeling = true
 
       this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
+      bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider());
+
+
     },
     generateEdges(dataRest) {
       let _allEdges = [];
@@ -224,6 +229,16 @@ export default {
 
       //уникальная связь
       this.edgesSource = this.uniqEdges(_allEdges);
+      //sort TODO!!
+      let _sort =[]
+      this.edgesSource.forEach(edge=>{
+        if(edge.style==='oil'){
+          _sort.unshift(edge)
+        } else {
+          _sort.push(edge)
+        }
+      })
+      this.edgesSource=_sort
     },
 
     uniqEdges(allEdges) {
