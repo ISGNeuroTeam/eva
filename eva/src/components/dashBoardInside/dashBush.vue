@@ -5,7 +5,7 @@
       class="error-message"
       :style="`height: ${heightPanel};`"
     >
-      Ошибка library
+      Ошибка формата входных данных
     </div>
     <div v-else>
       <div v-if="dragRes" class="buttons-wrapper">
