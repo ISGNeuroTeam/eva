@@ -147,7 +147,7 @@ export default {
     generateElementConfig(dataRest) {
       const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
       try {
-        this.elementConfig = JSON.parse(_tmp + "}");
+        this.elementConfig = JSON.parse(_tmp);
       } catch {
         this.jsonError = true;
       }
