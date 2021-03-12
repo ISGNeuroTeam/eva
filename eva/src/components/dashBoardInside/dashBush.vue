@@ -1,6 +1,20 @@
 <template>
-  <div id="bush-wrapper" >
-    <div v-if="dragRes" class="buttons-wrapper">
+  <div id="bush-wrapper">
+    <div
+      v-if="jsonError"
+      class="error-message"
+      :style="`height: ${heightPanel};`"
+    >
+      Ошибка library
+    </div>
+    <div v-else>
+      <div
+        class="bush-ygraph-container"
+        :style="{ top: `${top}` }"
+        ref="graph"
+      />
+    </div>
+    <!-- <div v-if="dragRes" class="buttons-wrapper">
       <v-icon
         @click="dragPanel"
         :color="panel.drag ? colorFrom.controlsActive : colorFrom.controls"
@@ -12,8 +26,7 @@
       v-if="panel.drag && dragRes"
       class="drag-panel"
       :style="`width: ${widthPanel}; height: ${heightPanel};`"
-    />
-    <div class="bush-ygraph-container" :style="{ top: `${top}` }" ref="graph" />
+    /> -->
   </div>
 </template>
 
@@ -22,7 +35,7 @@ import * as yfile from "yfiles";
 import licenseData from "./license.json";
 import NodeStyleDecorator from "./NodeStyleDecorator.js";
 
-import { mdiDrag } from "@mdi/js";
+// import { mdiDrag } from "@mdi/js";
 
 yfile.License.value = licenseData; //проверка лицензии
 
@@ -41,13 +54,10 @@ export default {
     return {
       nodesSource: null, //ноды
       edgesSource: null, //связи
-      maxWidthLibrary: 30,
-      panel: {
-        drag: false,
-      },
-      icon: {
-        drag: mdiDrag,
-      },
+      maxElementWidth: 0, //макс ширина элемента
+      maxEdgeWidth: 0, //макс размер узла
+      jsonError: false,
+      elementConfig: null, //библиотека
     };
   },
   computed: {
@@ -59,13 +69,11 @@ export default {
         return "60px";
       }
     },
-    widthPanel(){
-      return this.widthFrom/10+'px'
-      
+    widthPanel() {
+      return this.widthFrom / 10 + "px";
     },
-    heightPanel(){
-      return this.heightFrom+'px'
-      
+    heightPanel() {
+      return this.heightFrom + "px";
     },
     dragRes() {
       let dragRes = this.$store.getters.getDragRes({
@@ -79,40 +87,67 @@ export default {
       }
     },
     containerWidth() {
-      return Math.floor(this.$refs.graph.clientWidth) - this.maxWidthLibrary;
+      return Math.floor(this.$refs.graph.clientWidth) - this.maxElementWidth;
     },
     containerHeight() {
       return Math.floor(this.$refs.graph.clientHeight);
-    },
-    elementConfig() {
-      if (this.dataRestFrom) {
-        const _tmp = this.dataRestFrom[
-          this.dataRestFrom.length - 1
-        ].ID.replaceAll("'", '"');
-        return JSON.parse(_tmp + "}");
-      } else {
-        return null;
-      }
     },
   },
   watch: {
     dataRestFrom(_dataRest) {
       //очистка графа
       this.$graphComponent.graph.clear();
-      //генерируем и рисуем ноды
-      this.generateNodes(_dataRest);
-      this.drawNodes();
-      //генерируем и рисуем связи
-      this.generateEdges(_dataRest);
-      this.drawEdges();
-      //применяем layot
-      this.applyLayout();
+      //библиотека
+      this.generateElementConfig(_dataRest);
+      //если из dataRest забрали библиотеку
+      if (!this.jsonError) {
+        //maxwidthlib
+        this.getMaxElementWidth();
+        //maxWidthEdge
+        this.getMaxEdgeWidth();
+        //генерируем и рисуем ноды
+        this.generateNodes(_dataRest);
+        this.drawNodes();
+        //генерируем и рисуем связи
+        this.generateEdges(_dataRest);
+        this.drawEdges();
+        //применяем layot
+        this.applyLayout();
+      }
     },
   },
   mounted() {
     this.createGraph();
   },
   methods: {
+    generateElementConfig(dataRest) {
+      const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
+      try {
+        this.elementConfig = JSON.parse(_tmp + "}");
+      } catch {
+        this.jsonError = true;
+      }
+    },
+    getMaxElementWidth() {
+      const _index = Object.keys(this.elementConfig.library.primitives)[0];
+      let _max = this.elementConfig.library.primitives[_index].width;
+      Object.values(this.elementConfig.library.primitives).forEach((pr) => {
+        if (pr.width > _max) {
+          _max = pr.width;
+        }
+      });
+      this.maxElementWidth = _max;
+    },
+    getMaxEdgeWidth() {
+      const _index = Object.keys(this.elementConfig.library.egdes)[0];
+      let _max = this.elementConfig.library.egdes[_index].width;
+      Object.values(this.elementConfig.library.egdes).forEach((edge) => {
+        if (edge.width > _max) {
+          _max = edge.width;
+        }
+      });
+      this.maxEdgeWidth = _max;
+    },
     drawNodes() {
       //для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
@@ -167,7 +202,6 @@ export default {
         : 30;
     },
     drawEdges() {
-      console.log(this.edgesSource)
       this.edgesSource.forEach((edge) => {
         let _fNode = null;
         let _tNode = null;
@@ -193,20 +227,19 @@ export default {
       });
     },
     applyLayout() {
-      const bridgeManager = new yfile.BridgeManager();
-      bridgeManager.canvasComponent = this.$graphComponent;
-      
-
       const layoutData = new yfile.PolylineEdgeRouterData();
       const edgeRouter = new yfile.EdgeRouter();
-      
+      //чтобы узлы не сливались
+      edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance =
+        this.maxEdgeWidth * 2;
+
       edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
-      edgeRouter.integratedEdgeLabeling = true
 
       this.$graphComponent.graph.applyLayout(edgeRouter, layoutData);
+
+      const bridgeManager = new yfile.BridgeManager();
+      bridgeManager.canvasComponent = this.$graphComponent;
       bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider());
-
-
     },
     generateEdges(dataRest) {
       let _allEdges = [];
@@ -230,15 +263,15 @@ export default {
       //уникальная связь
       this.edgesSource = this.uniqEdges(_allEdges);
       //sort TODO!!
-      let _sort =[]
-      this.edgesSource.forEach(edge=>{
-        if(edge.style==='oil'){
-          _sort.unshift(edge)
+      let _sort = [];
+      this.edgesSource.forEach((edge) => {
+        if (edge.style === "oil") {
+          _sort.unshift(edge);
         } else {
-          _sort.push(edge)
+          _sort.push(edge);
         }
-      })
-      this.edgesSource=_sort
+      });
+      this.edgesSource = _sort;
     },
 
     uniqEdges(allEdges) {
@@ -268,7 +301,7 @@ export default {
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
             dataRest[i].object_coordinate_X * this.containerWidth +
-              this.maxWidthLibrary / 2,
+              this.maxElementWidth / 2,
             dataRest[i].object_coordinate_Y * this.containerHeight
           ),
           label: dataRest[i].object_label,
@@ -320,7 +353,10 @@ export default {
   flex-direction: row;
   justify-content: space-between;
 }
-.drag-panel {
-  background: rosybrown;
+.error-message {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 25px;
 }
 </style>
