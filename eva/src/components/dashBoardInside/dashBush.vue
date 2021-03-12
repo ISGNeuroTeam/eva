@@ -8,25 +8,25 @@
       Ошибка library
     </div>
     <div v-else>
+      <div v-if="dragRes" class="buttons-wrapper">
+        <v-icon :color="'white'">
+          {{ icon.close }}
+        </v-icon>
+      </div>
+      <div v-else class="buttons-wrapper">
+        <v-icon :color="'white'" @click="clickViewMode" v-if="isViewMode">
+          {{ icon.move }}
+        </v-icon>
+        <v-icon :color="'white'" @click="clickEditorMode" v-else>
+          {{ icon.pencil }}
+        </v-icon>
+      </div>
       <div
         class="bush-ygraph-container"
         :style="{ top: `${top}` }"
         ref="graph"
       />
     </div>
-    <!-- <div v-if="dragRes" class="buttons-wrapper">
-      <v-icon
-        @click="dragPanel"
-        :color="panel.drag ? colorFrom.controlsActive : colorFrom.controls"
-      >
-        {{ icon.drag }}
-      </v-icon>
-    </div>
-    <div
-      v-if="panel.drag && dragRes"
-      class="drag-panel"
-      :style="`width: ${widthPanel}; height: ${heightPanel};`"
-    /> -->
   </div>
 </template>
 
@@ -35,7 +35,7 @@ import * as yfile from "yfiles";
 import licenseData from "./license.json";
 import NodeStyleDecorator from "./NodeStyleDecorator.js";
 
-// import { mdiDrag } from "@mdi/js";
+import { mdiClose, mdiCursorMove, mdiPencil } from "@mdi/js";
 
 yfile.License.value = licenseData; //проверка лицензии
 
@@ -57,7 +57,13 @@ export default {
       maxElementWidth: 0, //макс ширина элемента
       maxEdgeWidth: 0, //макс размер узла
       jsonError: false,
+      isViewMode: true,
       elementConfig: null, //библиотека
+      icon: {
+        close: mdiClose,
+        move: mdiCursorMove,
+        pencil: mdiPencil,
+      },
     };
   },
   computed: {
@@ -94,6 +100,14 @@ export default {
     },
   },
   watch: {
+    dragRes(val) {
+      if (val === true) {
+        this.$graphComponent.inputMode = null;
+      } else {
+        this.isViewMode = true;
+        this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
+      }
+    },
     dataRestFrom(_dataRest) {
       //очистка графа
       this.$graphComponent.graph.clear();
@@ -120,6 +134,16 @@ export default {
     this.createGraph();
   },
   methods: {
+    clickViewMode() {
+      this.isViewMode = false;
+      this.$graphComponent.inputMode = new yfile.GraphEditorInputMode({
+        showHandleItems: yfile.GraphItemTypes.ALL & ~yfile.GraphItemTypes.NODE,
+      });
+    },
+    clickEditorMode() {
+      this.isViewMode = true;
+      this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
+    },
     generateElementConfig(dataRest) {
       const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
       try {
@@ -315,7 +339,12 @@ export default {
 
     createGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
-      this.$graphComponent.inputMode = null;
+      if (this.dragRes) {
+        this.$graphComponent.inputMode = null;
+      } else {
+        this.isViewMode = true;
+        this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
+      }
 
       this.initializeDefaultStyles();
     },
@@ -332,9 +361,6 @@ export default {
       this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(
         yfile.ExteriorLabelModelPosition.SOUTH
       );
-    },
-    dragPanel() {
-      this.panel.drag = !this.panel.drag;
     },
   },
 };
