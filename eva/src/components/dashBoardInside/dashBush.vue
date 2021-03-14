@@ -147,7 +147,7 @@ export default {
     generateElementConfig(dataRest) {
       const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
       try {
-        this.elementConfig = JSON.parse(_tmp);
+        this.elementConfig = JSON.parse(_tmp + "}");
       } catch {
         this.jsonError = true;
       }
@@ -356,6 +356,12 @@ export default {
           backgroundFill: "#0a0a0a",
         }
       );
+      this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle(
+        {
+          stroke: `3px white`,
+        }
+      );
+
       //положение label относительно ноды
       const labelModel = new yfile.ExteriorLabelModel({ insets: 4 });
       this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(
