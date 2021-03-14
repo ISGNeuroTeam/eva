@@ -33,7 +33,6 @@
 <script>
 import * as yfile from "yfiles";
 import licenseData from "./license.json";
-import NodeStyleDecorator from "./NodeStyleDecorator.js";
 
 import { mdiClose, mdiCursorMove, mdiPencil } from "@mdi/js";
 
@@ -191,10 +190,7 @@ export default {
         if (this.nodesSource[index].anomaly === true) {
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
-            style: new NodeStyleDecorator(
-              new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
-              `/svg/warnind.svg`
-            ),
+            style: new yfile.ImageNodeStyle(`/svg/warning_${_imgSource}`),
             labels: [this.nodesSource[index].label],
           });
         } else {
