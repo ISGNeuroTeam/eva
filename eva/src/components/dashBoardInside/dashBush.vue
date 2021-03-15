@@ -176,24 +176,27 @@ export default {
       this.$graphNodes = null;
 
       this.nodesSource.forEach((node, index) => {
-        let _imgSource = null;
-        if (this.nodesSource[index].status === true) {
+        let _node;
+        let _imgSource;
+        if (this.nodesSource[index].anomaly === true) {
           _imgSource = this.elementConfig.library.primitives[
             this.nodesSource[index].type
           ].image_on;
-        } else {
-          _imgSource = this.elementConfig.library.primitives[
-            this.nodesSource[index].type
-          ].image_off;
-        }
-        let _node;
-        if (this.nodesSource[index].anomaly === true) {
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
             style: new yfile.ImageNodeStyle(`/svg/warning_${_imgSource}`),
             labels: [this.nodesSource[index].label],
           });
         } else {
+          if (this.nodesSource[index].status === true) {
+            _imgSource = this.elementConfig.library.primitives[
+              this.nodesSource[index].type
+            ].image_on;
+          } else {
+            _imgSource = this.elementConfig.library.primitives[
+              this.nodesSource[index].type
+            ].image_off;
+          }
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
             style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
