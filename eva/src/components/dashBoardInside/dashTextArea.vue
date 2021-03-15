@@ -11,8 +11,10 @@
       :height="height" 
       no-resize 
       @keypress.enter="setTockenByPress($event)"
+      @blur="setTockenBlur($event)"
     />
-    <v-btn 
+    <v-btn
+      v-if="searchBtn" 
       small 
       :color="color.controls" 
       class="accept-btn" 
@@ -75,9 +77,21 @@ export default {
         otstup = 45;
       }
       return `${this.heightFrom - otstup}px`
+    },
+    searchBtn() {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
+      return options.searchBtn;
     }
   },  
   methods: {
+    setTockenBlur(event){
+      event.preventDefault();
+      this.$store.commit('setTextArea', {idDash: this.idDash, id: this.id, textarea: this.textarea});
+      this.setTocken();
+    },
     acceptTextArea: function() {
       this.$store.commit('setTextArea', {idDash: this.idDash, id: this.id, textarea: this.textarea});
       this.setTocken();

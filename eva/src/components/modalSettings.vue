@@ -150,6 +150,34 @@
             </div>
           </div>
           <!-- end lastResult-->
+          <!-- start searchBtn-->
+          <div 
+            v-if="checkOptions('searchBtn')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              searchBtn
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Показывать кнопку поиска
+            </div>
+            <div class="status-option item">
+              <v-switch   
+                v-model="options.searchBtn"  
+                class="switch" 
+                :color="color.controls" 
+                :style="{color:color.text}" 
+                :label="String(options.searchBtn)" 
+              />
+            </div>
+          </div>
+          <!-- end searchBtn-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 

@@ -5,9 +5,7 @@ import {  mdiGraph, mdiGestureTap, mdiBrush, mdiViewGrid,
 export default {  
   tools: [
     {name: 'Таблица', img: mdiTableLarge, type: 'table'},
-    //{name: 'Линейный график', img: mdiChartLine, type: 'lineChart'},
     {name: 'Мультилинейный график', img: mdiChartMultiline, type: 'multiLine'},
-    //{name: 'Cтолбцовая диаграмма', img: mdiPoll , type: 'barchart'},
     {name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart'},
     {name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select'},
     {name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker'},
@@ -30,10 +28,6 @@ export default {
       width: 480,
       height: 205
     },
-    // lineChart: {
-    //   width: 700,
-    //   height: 400
-    // },
     piechart: {
       width: 600,
       height: 550,
@@ -66,10 +60,6 @@ export default {
       width: 400,
       height: 80
     },
-    // barchart: {
-    //   width: 700,
-    //   height: 450
-    // },
     tile: {
       width: 470,
       height: 400
@@ -89,7 +79,6 @@ export default {
   },
   icons: {
     table: mdiTableLarge,
-    //lineChart: mdiChartLine,
     multiLine: mdiChartMultiline,
     piechart: mdiChartPie,
     graph: mdiGraph,
@@ -99,24 +88,21 @@ export default {
     single: mdiNumeric,
     button: mdiGestureTap,
     textarea: mdiCardTextOutline,
-  //  barchart: mdiPoll,
     tile: mdiViewGrid,
     csvg: mdiBrush,
     ygraph: mdiGraphql,
     bush: mdiChartScatterPlot
   }, 
   options: {
-    //lineChart: ['visible','level','boxShadow','lastDot'],
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult'], 
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes'],
-    //barchart: ['visible','level','boxShadow'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult'],
     select: ['visible','level','boxShadow','multiple'],
     picker: ['visible','level'],
     graph: ['visible','level','boxShadow'],
     single: ['visible','level','subnumber','color','boxShadow','fontSize', 'lastResult'],
     button: ['visible','level','color','backgroundcolor','name','fontSize','underline'],
-    textarea: ['visible','level'],
+    textarea: ['visible','level', 'searchBtn'],
     guntt: ['visible','level','timeFormat'],
     tile: ['visible','level','widthTile','heightTile'],
     csvg: ['visible','level','tooltip'],

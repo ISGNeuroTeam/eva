@@ -1164,6 +1164,7 @@ export default {  // приблизительный объект хранили�
           Vue.set(state[id.idDash][id.id].options, 'level',1);
           Vue.set(state[id.idDash][id.id].options, 'boxShadow',false);
           Vue.set(state[id.idDash][id.id].options, 'lastResult',false);
+          Vue.set(state[id.idDash][id.id].options, 'searchBtn',false);
         }
         return state[id.idDash][id.id].options
       }
