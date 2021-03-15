@@ -141,9 +141,15 @@
       :class="{opencode:opencode}" 
       :style=" {background:color.backElement, color:color.text}"
     >
+      <div class="iconsNavigations">
       <v-icon :color="'white'" @click="fastForwardClick">
         {{ fastForwardIcon }}
       </v-icon>
+       <v-icon :color="'white'" @click="openModal">
+        {{ plus_icon }}
+      </v-icon>
+      </div>
+
       <div 
         v-for="sear in searches" 
         :key="sear.sid" 
@@ -1600,6 +1606,12 @@ export default {
 <style lang="sass" > 
 
         @import '../sass/dashPanelBoard.sass'
-    
-    
+</style>
+
+<style>
+.iconsNavigations {
+   display: flex;
+  justify-content: center;
+  flex-direction: row;
+  }
 </style>
