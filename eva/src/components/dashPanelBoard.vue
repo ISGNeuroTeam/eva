@@ -141,6 +141,9 @@
       :class="{opencode:opencode}" 
       :style=" {background:color.backElement, color:color.text}"
     >
+      <v-icon :color="'white'" @click="fastForwardClick">
+        {{ fastForwardIcon }}
+      </v-icon>
       <div 
         v-for="sear in searches" 
         :key="sear.sid" 
@@ -636,7 +639,7 @@
 
 <script>
 
-import { mdiPlusBox, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
+import { mdiPlusBox, mdiFastForward, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
 
 //import { match } from 'minimatch'
 
@@ -678,6 +681,7 @@ export default {
       clock: mdiClockOutline,
       download: mdiArrowDownBold,
       paper: mdiFileDocumentOutline,
+      fastForwardIcon: mdiFastForward,
       help_elem: true,
       help_coral: 'fill:teal',
       opencode: false,
@@ -1065,7 +1069,26 @@ export default {
       }
                   
     },
-
+    fastForwardClick(){
+      this.searches.forEach(search=>{
+        this.$set(this.loadings,search.sid,true);
+        this.$store.commit('setLoading', {search: search.sid, idDash: this.idDash, should: true, error: false });
+        
+        this.$store.getters.getDataApi({search: search, idDash: this.idDash}).then(response=>{
+          if( response.length === 0) {
+            this.$store.commit('setLoading', {search: search.sid, idDash: this.idDash, should: false, error: true  });  
+            this.$set(this.loadings, search.sid,false);  // выключаем строку загрузки
+          } else {
+            this.$store.getters.putIntoDB(response, search.sid, this.idDash).then(()=>{
+              this.$store.getters.refreshElements(this.idDash, search.sid, );
+              this.$store.commit('setLoading', {search: search.sid, idDash: this.idDash, should: false, error: false  }); 
+              this.disabledDS[search.sid] = false;
+            })
+          }
+        })
+        this.$set(this.loadings,search.sid,false);
+      })
+    },
     startSearch: async function(event) {
 
       this.$set(this.loadings,event.sid,true);
