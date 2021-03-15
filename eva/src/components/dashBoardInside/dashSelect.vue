@@ -5,7 +5,7 @@
       ref="selectBlock"
       class="select-with-data" 
     >
-      <div class="arrow-block">
+      <div class="arrow-block" v-if="dataModeFrom">
         <v-icon 
           v-if="!open" 
           class=" arrow-down arrows-select" 
@@ -125,6 +125,7 @@ export default {
     colorFrom: null,
     dataLoadingFrom: null,
     widthFrom: null,
+    dataModeFrom: null
   },
   data () {
     return {  
