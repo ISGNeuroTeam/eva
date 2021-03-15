@@ -1610,7 +1610,7 @@ export default {
 
 <style>
 .iconsNavigations {
-   display: flex;
+  display: flex;
   justify-content: center;
   flex-direction: row;
   }

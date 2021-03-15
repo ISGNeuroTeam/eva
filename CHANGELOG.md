@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- "суфикс" to "суффикс" in tocken dashboard
+- "суфикс" to "суффикс" in token dashboard
 
 ## [1.55.0]
 
