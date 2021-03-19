@@ -1,11 +1,12 @@
 
 import {  mdiGraph, mdiGestureTap, mdiBrush, mdiViewGrid, 
-  mdiCardTextOutline, mdiChartGantt, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql,mdiChartScatterPlot } from '@mdi/js'
+  mdiCardTextOutline, mdiChartGantt, mdiMapMarker, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql,mdiChartScatterPlot } from '@mdi/js'
 
 export default {  
   tools: [
     {name: 'Таблица', img: mdiTableLarge, type: 'table'},
     {name: 'Мультилинейный график', img: mdiChartMultiline, type: 'multiLine'},
+    {name: 'Карта',img: mdiMapMarker, type: 'map'},
     {name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart'},
     {name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select'},
     {name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker'},
@@ -75,6 +76,10 @@ export default {
     bush: {
       width: 930,
       height: 850
+    },
+    map: {
+      width: 930,
+      height: 850
     }  
   },
   icons: {
@@ -91,7 +96,8 @@ export default {
     tile: mdiViewGrid,
     csvg: mdiBrush,
     ygraph: mdiGraphql,
-    bush: mdiChartScatterPlot
+    bush: mdiChartScatterPlot,
+    map: mdiMapMarker
   }, 
   options: {
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult'], 
@@ -107,7 +113,8 @@ export default {
     tile: ['visible','level','widthTile','heightTile'],
     csvg: ['visible','level','tooltip'],
     ygraph: ['visible','level'],
-    bush: ['visible','level']
+    bush: ['visible','level'],
+    map: ['visible','level'],
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
   reports: {
@@ -115,10 +122,6 @@ export default {
       tooltip: 'Таблица',
       icon: mdiTableLarge
     },
-    // lineChart: {
-    //   tooltip: 'Линейный график',
-    //   icon: mdiChartLine
-    // },
     multiLine: {
       tooltip: 'Мультилинейный график',
       icon: mdiChartMultiline
@@ -127,10 +130,6 @@ export default {
       tooltip: 'Круговая диаграмма',
       icon: mdiChartPie
     },
-    // barchart: {
-    //   tooltip: 'Столбцовая диаграмма',
-    //   icon: mdiPoll
-    // },
     graph: {
       tooltip: 'Граф',
       icon: mdiGraph
@@ -154,6 +153,10 @@ export default {
     bush: {
       tooltip: 'Кустовая схема',
       icon: mdiChartScatterPlot
+    },
+    map: {
+      tooltip: 'Карта',
+      icon: mdiMapMarker
     }
   }
 }
