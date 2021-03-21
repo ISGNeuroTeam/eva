@@ -21,6 +21,15 @@ export default {
     return {
     };
   },
+  computed: {
+    osmserver() {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      return options.osmserver;
+    }
+  },
   methods: {
   },
   mounted() {
