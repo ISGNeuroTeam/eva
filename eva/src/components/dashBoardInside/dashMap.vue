@@ -87,7 +87,7 @@ export default {
           
     },
     createMap(){
-      this.tileLayer = L.tileLayer.colorFilter("http://192.168.4.209/osm/{z}/{x}/{y}.png", {
+      this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
         filter: ["grayscale:100%", "invert:100%"],
       });
       
