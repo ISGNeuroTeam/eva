@@ -1,11 +1,12 @@
 <template>
-  <div class="dash-template">
-      morozov
+  <div class="dash-map">
+    <div id="map" ref="map" :style="{ height: `calc(${Math.trunc(heightFrom)}px - ${top})` }" />
   </div>
 </template>
 
 
 <script>
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 export default {
@@ -23,20 +24,29 @@ export default {
     return {
       osmserver: null,
       error: null,
-      library: null
+      library: null,
+      map: null,
     };
   },
   computed: {
+    top() {
+      // для ряда управляющих иконок
+      if (document.body.clientWidth <= 1600) {
+        return "50px";
+      } else {
+        return "60px";
+      }
+    },
   },
   watch: {
     dataRestFrom(_dataRest) {
+      this.error = null;
       //получаем osm server
-      this.error = null
-      this.osmserver = this.getOSM()
-
+      this.getOSM();
       //получаем библиотеку
-      this.generateLibrary(_dataRest)
-    }
+      this.generateLibrary(_dataRest);
+      //создаем элемент карты
+    },
   },
   methods: {
     getOSM() {
@@ -44,10 +54,10 @@ export default {
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      if(options.osmserver){
-        return options.osmserver
+      if (options.osmserver) {
+        this.osmserver = options.osmserver;
       } else {
-        this.error = "Введите osm server"
+        this.error = "Введите osm server";
       }
     },
     generateLibrary(dataRest) {
@@ -58,8 +68,25 @@ export default {
         this.error = "Ошибка формата входных данных";
       }
     },
+    createMap() {
+      this.map = L.map(this.$refs.map, {
+        wheelPxPerZoomLevel: 600,
+        zoomSnap: 0,
+        center: [59.16, 74.1],
+        zoom: 10,
+        maxZoom: 17,
+      });
+    },
   },
   mounted() {
+    this.createMap();
   },
 };
 </script>
+
+<style>
+#map {
+  width: 100%;
+  position: relative;
+}
+</style>
