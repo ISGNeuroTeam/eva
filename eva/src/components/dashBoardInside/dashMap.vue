@@ -1,9 +1,8 @@
 <template>
   <div class="dash-map">
     <div
-      id="map"
-      ref="map"
-      :style="{ height: `calc(${Math.trunc(heightFrom)}px - ${top})` }"
+      id="mapContainer"
+      :style="{width: `${Math.trunc(widthFrom)}px`, height: `${Math.trunc(heightFrom) -top}px` }"
     />
   </div>
 </template>
@@ -37,9 +36,9 @@ export default {
     top() {
       // для ряда управляющих иконок
       if (document.body.clientWidth <= 1600) {
-        return "50px";
+        return 50;
       } else {
-        return "60px";
+        return 60;
       }
     },
   },
@@ -73,29 +72,34 @@ export default {
         this.error = "Ошибка формата входных данных";
       }
     },
-    createMap() {
-      this.map = L.map(this.$refs.map, {
-        wheelPxPerZoomLevel: 600,
-        zoomSnap: 0,
-        center: [59.16, 74.1],
-        zoom: 10,
-        maxZoom: 17,
-      });
-      L.tileLayer.colorFilter("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-        filter: ["grayscale:100%", "invert:100%"],
-      }).addTo(this.map);
-
+    initMap() {
+      // this.map = L.map(this.$refs.map, {
+      //   wheelPxPerZoomLevel: 600,
+      //   zoomSnap: 0,
+      //   center: [59.16, 74.1],
+      //   zoom: 10,
+      //   maxZoom: 17,
+      // });
+      this.map = L.map("mapContainer").setView([38.63, -90.23], 12);
+      this.tileLayer = L.tileLayer(
+        "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png",
+        {
+          maxZoom: 18,
+          attribution:
+            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
+        }
+      );
+      this.tileLayer.addTo(this.map);
     },
   },
   mounted() {
-    this.createMap();
+    this.initMap();
   },
 };
 </script>
 
 <style>
-#map {
-  width: 100%;
+#mapContainer {
   position: relative;
   background: #191919;
 }
