@@ -16,10 +16,9 @@
 
 
 <script>
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "leaflet.tilelayer.colorfilter";
-import "leaflet/dist/images/marker-shadow.png";
 
 export default {
   props: {
