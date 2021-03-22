@@ -178,6 +178,37 @@
             </div>
           </div>
           <!-- end searchBtn-->
+          <!-- start osmserver-->
+          <div 
+            v-if="checkOptions('osmserver')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              osmserver
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Сервер для набора title Пример:
+              http://192.168.4.209/osm/{z}/{x}/{y}.png
+            </div>
+            <div class="status-option item">
+              <v-text-field 
+                v-model="options.osmserver"   
+                clearable  
+                :color="color.text" 
+                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                outlined 
+                class="subnumber"  
+                hide-details
+              />
+            </div>
+          </div>
+          <!-- end osmserver-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 
