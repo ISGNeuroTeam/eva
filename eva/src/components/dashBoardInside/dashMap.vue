@@ -3,8 +3,8 @@
     <div
       id="mapContainer"
       :style="{
-        width: `${Math.trunc(widthFrom) - 20}px`,
-        height: `${Math.trunc(heightFrom) - top}px`,
+        width: `${Math.trunc(widthFrom)}px`,
+        height: `${Math.trunc(heightFrom) - top/2}px`,
       }"
     />
   </div>
@@ -87,7 +87,7 @@ export default {
           
     },
     createMap(){
-      this.tileLayer = L.tileLayer.colorFilter(this.osmserver+"{z}/{x}/{y}.png", {
+      this.tileLayer = L.tileLayer.colorFilter("http://192.168.4.209/osm/{z}/{x}/{y}.png", {
         filter: ["grayscale:100%", "invert:100%"],
       });
       
@@ -104,5 +104,7 @@ export default {
 #mapContainer {
   position: relative;
   background: #191919;
+  left: -20px;
+  top: 0px;
 }
 </style>
