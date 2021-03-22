@@ -19,10 +19,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.tilelayer.colorfilter";
-//кластеризация
-import 'leaflet.markercluster/dist/MarkerCluster.css'
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import 'leaflet.markercluster/dist/leaflet.markercluster.js'
+import "leaflet/dist/images/marker-shadow.png";
 
 export default {
   props: {
@@ -55,6 +52,7 @@ export default {
   },
   watch: {
     dataRestFrom(_dataRest) {
+      this.clearMap();
       this.error = null;
       //получаем osm server
       this.getOSM();
@@ -69,6 +67,11 @@ export default {
     },
   },
   methods: {
+    clearMap() {
+      this.map.eachLayer((layer) => {
+        this.map.removeLayer(layer);
+      });
+    },
     getOSM() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
@@ -104,6 +107,8 @@ export default {
           //id1 - center
           const _coord = JSON.parse(dataRest[i].coordinates);
           this.map.setView([_coord[0], _coord[1]]);
+          L.marker([_coord[0], _coord[1]])
+            .addTo(this.map)
         }
       }
     },
