@@ -99,7 +99,7 @@ export default {
         if (dataRest[i].ID === "1") {
           //id1 - center
           const _coord = JSON.parse(dataRest[i].coordinates);
-          this.map.setView([_coord[1], _coord[0]]);
+          this.map.setView([_coord[0], _coord[1]]);
         }
       }
     },
