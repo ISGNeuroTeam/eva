@@ -1,10 +1,14 @@
 <template>
   <div class="dash-map">
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
     <div
+      v-if="!error"
       id="mapContainer"
       :style="{
         width: `${Math.trunc(widthFrom)}px`,
-        height: `${Math.trunc(heightFrom) - top/2}px`,
+        height: `${Math.trunc(heightFrom) - top / 2}px`,
       }"
     />
   </div>
@@ -50,10 +54,14 @@ export default {
       this.error = null;
       //получаем osm server
       this.getOSM();
-      //получаем библиотеку
-      this.generateLibrary(_dataRest);
-      //создаем элемент карты
-      this.createMap()
+      if (!this.error) {
+        //получаем библиотеку
+        this.generateLibrary(_dataRest);
+        //создаем элемент карты
+        this.createMap();
+        //перемещаем к центру объекта их datarest
+        this.mapTocenter(_dataRest);
+      }
     },
   },
   methods: {
@@ -74,25 +82,34 @@ export default {
         this.library = JSON.parse(_tmp);
       } catch {
         this.error = "Ошибка формата входных данных";
+        this.map.remove();
+        this.map = null;
       }
     },
     initMap() {
       this.map = L.map("mapContainer", {
         wheelPxPerZoomLevel: 600,
         zoomSnap: 0,
-        center: [59.16, 74.1],
         zoom: 10,
         maxZoom: 17,
-      })
-          
+      });
     },
-    createMap(){
+    mapTocenter(dataRest) {
+      for (let i = 0; i < dataRest.length - 1; i++) {
+        if (dataRest[i].ID === "1") {
+          //id1 - center
+          const _coord = JSON.parse(dataRest[i].coordinates);
+          this.map.setView([_coord[1], _coord[0]]);
+        }
+      }
+    },
+    createMap() {
       this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
         filter: ["grayscale:100%", "invert:100%"],
       });
-      
-      this.tileLayer.addTo(this.map);  
-    }
+
+      this.tileLayer.addTo(this.map);
+    },
   },
   mounted() {
     this.initMap();
@@ -106,5 +123,11 @@ export default {
   background: #191919;
   left: -20px;
   top: 0px;
+}
+.error-message {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 25px;
 }
 </style>
