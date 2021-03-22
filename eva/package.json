@@ -56,6 +56,7 @@
     "file-saver": "^2.0.2",
     "jointjs": "^3.2.0",
     "leaflet": "^1.7.1",
+    "leaflet.tilelayer.colorfilter": "^1.2.5",
     "vue": "^2.6.10",
     "vue-async-computed": "^3.7.0",
     "vue-ctk-date-time-picker": "^2.4.0",

@@ -1,6 +1,10 @@
 <template>
   <div class="dash-map">
-    <div id="map" ref="map" :style="{ height: `calc(${Math.trunc(heightFrom)}px - ${top})` }" />
+    <div
+      id="map"
+      ref="map"
+      :style="{ height: `calc(${Math.trunc(heightFrom)}px - ${top})` }"
+    />
   </div>
 </template>
 
@@ -8,6 +12,7 @@
 <script>
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "leaflet.tilelayer.colorfilter";
 
 export default {
   props: {
@@ -76,6 +81,10 @@ export default {
         zoom: 10,
         maxZoom: 17,
       });
+      L.tileLayer.colorFilter("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+        filter: ["grayscale:100%", "invert:100%"],
+      }).addTo(this.map);
+
     },
   },
   mounted() {
@@ -88,5 +97,6 @@ export default {
 #map {
   width: 100%;
   position: relative;
+  background: #191919;
 }
 </style>
