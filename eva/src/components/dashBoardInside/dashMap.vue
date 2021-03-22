@@ -2,7 +2,10 @@
   <div class="dash-map">
     <div
       id="mapContainer"
-      :style="{width: `${Math.trunc(widthFrom)}px`, height: `${Math.trunc(heightFrom) -top}px` }"
+      :style="{
+        width: `${Math.trunc(widthFrom) - 20}px`,
+        height: `${Math.trunc(heightFrom) - top}px`,
+      }"
     />
   </div>
 </template>
@@ -50,6 +53,7 @@ export default {
       //получаем библиотеку
       this.generateLibrary(_dataRest);
       //создаем элемент карты
+      this.createMap()
     },
   },
   methods: {
@@ -73,24 +77,22 @@ export default {
       }
     },
     initMap() {
-      // this.map = L.map(this.$refs.map, {
-      //   wheelPxPerZoomLevel: 600,
-      //   zoomSnap: 0,
-      //   center: [59.16, 74.1],
-      //   zoom: 10,
-      //   maxZoom: 17,
-      // });
-      this.map = L.map("mapContainer").setView([38.63, -90.23], 12);
-      this.tileLayer = L.tileLayer(
-        "https://cartodb-basemaps-{s}.global.ssl.fastly.net/rastertiles/voyager/{z}/{x}/{y}.png",
-        {
-          maxZoom: 18,
-          attribution:
-            '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attribution">CARTO</a>',
-        }
-      );
-      this.tileLayer.addTo(this.map);
+      this.map = L.map("mapContainer", {
+        wheelPxPerZoomLevel: 600,
+        zoomSnap: 0,
+        center: [59.16, 74.1],
+        zoom: 10,
+        maxZoom: 17,
+      })
+          
     },
+    createMap(){
+      this.tileLayer = L.tileLayer.colorFilter(this.osmserver+"{z}/{x}/{y}.png", {
+        filter: ["grayscale:100%", "invert:100%"],
+      });
+      
+      this.tileLayer.addTo(this.map);  
+    }
   },
   mounted() {
     this.initMap();
