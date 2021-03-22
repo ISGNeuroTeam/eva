@@ -15,7 +15,7 @@
     />
     <div class="setting">
       <div class="labelSetting" :style="{color: colorFrom.text}">
-        Поменять режим отображения
+        Режим редактирования
       </div>
       <v-switch  
         v-model="mode" 
