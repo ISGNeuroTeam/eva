@@ -6,6 +6,8 @@
 
 
 <script>
+import L from "leaflet";
+
 export default {
   props: {
     // переменные полученные от родителя
@@ -19,18 +21,43 @@ export default {
   },
   data() {
     return {
+      osmserver: null,
+      error: null,
+      library: null
     };
   },
   computed: {
-    osmserver() {
+  },
+  watch: {
+    dataRestFrom(_dataRest) {
+      //получаем osm server
+      this.error = null
+      this.osmserver = this.getOSM()
+
+      //получаем библиотеку
+      this.generateLibrary(_dataRest)
+    }
+  },
+  methods: {
+    getOSM() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      return options.osmserver;
-    }
-  },
-  methods: {
+      if(options.osmserver){
+        return options.osmserver
+      } else {
+        this.error = "Введите osm server"
+      }
+    },
+    generateLibrary(dataRest) {
+      const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
+      try {
+        this.library = JSON.parse(_tmp);
+      } catch {
+        this.error = "Ошибка формата входных данных";
+      }
+    },
   },
   mounted() {
   },
