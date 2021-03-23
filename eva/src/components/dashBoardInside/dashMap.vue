@@ -61,7 +61,7 @@ export default {
         //создаем элемент карты
         this.createMap();
         //перемещаем к центру объекта их datarest
-        this.mapTocenter(_dataRest);
+        this.mapToCenter(_dataRest);
       }
     },
   },
@@ -100,14 +100,20 @@ export default {
         maxZoom: 17,
       });
     },
-    mapTocenter(dataRest) {
+    mapToCenter(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].ID === "1") {
           //id1 - center
-          const _coord = JSON.parse(dataRest[i].coordinates);
+          const _coord = dataRest[i].coordinates
+            .substring(1, dataRest[i].coordinates.length - 1)
+            .split(",");
           this.map.setView([_coord[0], _coord[1]]);
-          L.marker([_coord[0], _coord[1]])
-            .addTo(this.map)
+          L.marker([_coord[0], _coord[1]]).addTo(this.map);
+        } else if (dataRest[i].geometry_type === "Point") {
+          const _coord = dataRest[i].coordinates
+            .substring(1, dataRest[i].coordinates.length - 1)
+            .split(",");
+          L.marker([_coord[0], _coord[1]]).addTo(this.map);
         }
       }
     },
