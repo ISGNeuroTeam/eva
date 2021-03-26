@@ -104,19 +104,29 @@ export default {
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].ID === "1") {
           //id1 - center
-          const _coord = dataRest[i].coordinates
-            .substring(1, dataRest[i].coordinates.length - 1)
-            .split(",");
-          //делаем id1 - центром карты
-          this.map.setView([_coord[0], _coord[1]]);
-          L.marker([_coord[0], _coord[1]]).bindTooltip(dataRest[i].label, {permanent: true }).addTo(this.map);
-
+          this.addMarker(dataRest[i], true);
         } else if (dataRest[i].geometry_type === "Point") {
-          const _coord = dataRest[i].coordinates
-            .substring(1, dataRest[i].coordinates.length - 1)
-            .split(",");
-          L.marker([_coord[0], _coord[1]]).bindTooltip(dataRest[i].label, {permanent: true }).addTo(this.map);
+          this.addMarker(dataRest[i]);
         }
+      }
+    },
+    addMarker(element, center) {
+      const lib = this.library.objects[element.type];
+      const icon = L.icon({
+        iconUrl: `svg/${lib.image}`,
+        iconSize: [lib.width, lib.height],
+      });
+
+      const _coord = element.coordinates
+        .substring(1, element.coordinates.length - 1)
+        .split(",");
+
+      L.marker([_coord[0], _coord[1]], { icon: icon })
+        .bindTooltip(element.label, { permanent: true })
+        .addTo(this.map);
+
+      if (center === true) {
+        this.map.setView([_coord[0], _coord[1]]);
       }
     },
     createMap() {
