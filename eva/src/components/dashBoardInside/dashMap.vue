@@ -106,28 +106,35 @@ export default {
           this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false);
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
-          //console.log()
+          this.addLine(dataRest[i]);
         }
       }
     },
-    addMarker(element, center) {
+    addMarker(element, isCenter) {
       const lib = this.library.objects[element.type];
       const icon = L.icon({
         iconUrl: `svg/${lib.image}`,
         iconSize: [lib.width, lib.height],
       });
 
-      const _coord = element.coordinates
-        .substring(1, element.coordinates.length - 1)
-        .split(",");
+      const _coord = element.coordinates.split(",");
 
       L.marker([_coord[0], _coord[1]], { icon: icon })
         .bindTooltip(element.label, { permanent: true })
         .addTo(this.map);
 
-      if (center === true) {
+      if (isCenter === true) {
         this.map.setView([_coord[0], _coord[1]]);
       }
+    },
+    addLine(element) {
+      let latlngs = element.coordinates.split(";").map((point) => {
+        return point.split(",");
+      });
+      const lib = this.library.objects[element.type];
+      L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
+        this.map
+      );
     },
     createMap() {
       this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
