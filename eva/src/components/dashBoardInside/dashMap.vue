@@ -102,10 +102,10 @@ export default {
     },
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i++) {
-        if (dataRest[i].geometry_type.toLowerCase() === "point") {
+        if (dataRest[i].geometry_type?.toLowerCase() === "point") {
           this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false);
         }
-        if (dataRest[i].geometry_type.toLowerCase() === "line") {
+        if (dataRest[i].geometry_type?.toLowerCase() === "line") {
           //console.log()
         }
       }
