@@ -109,12 +109,13 @@ export default {
             .split(",");
           //делаем id1 - центром карты
           this.map.setView([_coord[0], _coord[1]]);
-          L.marker([_coord[0], _coord[1]]).addTo(this.map);
+          L.marker([_coord[0], _coord[1]]).bindTooltip(dataRest[i].label, {permanent: true }).addTo(this.map);
+
         } else if (dataRest[i].geometry_type === "Point") {
-          // const _coord = dataRest[i].coordinates
-          //   .substring(1, dataRest[i].coordinates.length - 1)
-          //   .split(",");
-          // L.marker([_coord[0], _coord[1]]).addTo(this.map);
+          const _coord = dataRest[i].coordinates
+            .substring(1, dataRest[i].coordinates.length - 1)
+            .split(",");
+          L.marker([_coord[0], _coord[1]]).bindTooltip(dataRest[i].label, {permanent: true }).addTo(this.map);
         }
       }
     },
