@@ -20,7 +20,6 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.tilelayer.colorfilter";
 
-import "leaflet-edgebuffer/src/leaflet.edgebuffer"
 
 export default {
   props: {
@@ -122,7 +121,7 @@ export default {
       const _coord = element.coordinates.split(",");
 
       L.marker([_coord[0], _coord[1]], { icon: icon })
-        .bindTooltip(element.label, { permanent: true })
+        .bindTooltip(element.label, { permanent: true, direction: 'bottom',offset: [0,lib.height/2] })
         .addTo(this.map);
 
       if (isCenter === true) {
@@ -141,7 +140,6 @@ export default {
     createMap() {
       this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
         filter: ["grayscale:100%", "invert:100%"],
-        edgeBufferTiles: 10
       });
 
       this.tileLayer.addTo(this.map);
@@ -165,5 +163,8 @@ export default {
   justify-content: center;
   flex-direction: column;
   font-size: 25px;
+}
+.leaflet-tooltip-left:before{
+  margin-right: 0;
 }
 </style>
