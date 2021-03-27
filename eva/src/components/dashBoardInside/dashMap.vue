@@ -113,7 +113,7 @@ export default {
     addMarker(element, isCenter) {
       const lib = this.library.objects[element.type];
       const icon = L.icon({
-        iconUrl: `svg/${lib.image}`,
+        iconUrl: `${window.location.origin}/svg/${lib.image}`,
         iconSize: [lib.width, lib.height],
       });
 
