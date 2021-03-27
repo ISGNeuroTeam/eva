@@ -20,6 +20,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.tilelayer.colorfilter";
 
+import "leaflet-edgebuffer/src/leaflet.edgebuffer"
+
 export default {
   props: {
     // переменные полученные от родителя
@@ -139,6 +141,7 @@ export default {
     createMap() {
       this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
         filter: ["grayscale:100%", "invert:100%"],
+        edgeBufferTiles: 10
       });
 
       this.tileLayer.addTo(this.map);
