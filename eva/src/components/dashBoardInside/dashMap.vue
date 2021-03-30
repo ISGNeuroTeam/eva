@@ -107,7 +107,7 @@ export default {
           this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false);
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
-          this.addLine(dataRest[i]);
+         // this.addLine(dataRest[i]);
         }
       }
     },
@@ -118,7 +118,8 @@ export default {
         iconSize: [lib.width, lib.height],
       });
 
-      const _coord = element.coordinates.split(",");
+      const _point =element.coordinates.split(":");
+      const _coord= _point[1].split(',')
 
       L.marker([_coord[0], _coord[1]], { icon: icon })
         .bindTooltip(element.label, { permanent: true, direction: 'bottom',offset: [0,lib.height/2] })
