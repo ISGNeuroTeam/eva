@@ -107,7 +107,7 @@ export default {
           this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false);
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
-         // this.addLine(dataRest[i]);
+          this.addLine(dataRest[i]);
         }
       }
     },
@@ -130,11 +130,14 @@ export default {
       }
     },
     addLine(element) {
-      let latlngs = element.coordinates.split(";").map((point) => {
-        return point.split(",");
-      });
-
       const lib = this.library.objects[element.type];
+
+      let latlngs = []
+      element.coordinates.split(";").forEach(point=>{
+        let p = point.split(":")
+        latlngs[p[0]-1]=p[1].split(',')
+      })
+      
       L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
         this.map
       );
