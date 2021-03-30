@@ -140,7 +140,7 @@ export default {
       }
       return true  
     },
-    strokeWidth() {
+    strokewidth() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
@@ -481,7 +481,7 @@ export default {
         // строим основную линию
 
         line =  svg.append('g')  // основная линия графика
-          .attr("clip-path", `url(#clip-${that.id})`);
+          .attr("clip-path", `url(#clip-${that.id})`)
 
                    
 
@@ -527,7 +527,7 @@ export default {
                 .attr("class", `line-${i}-${j}`)  // добовляем свой класс
                 .attr("fill", "none")
                 .attr("stroke", colorLine[i])
-                .attr("stroke-width", 1.5)
+                .attr("stroke-width", 15)
                 .attr("d", d3.line()
                   .x(function(d) {return x(d[xMetric]*secondTransf) })
                   .y(function(d) {return y(d[metricsName[i]]) })
@@ -577,7 +577,7 @@ export default {
               if (annotation.length != 0) {
                 annotation.forEach( (item,i) => {
                   if (d[item]) {
-                    verticalLine(d,item,metricsName.length+1+i,tooltip);
+                    verticalLine(d,item,metricsName.length+1+i,tooltip, this.strokewidth);
                     
                   }
 
@@ -828,7 +828,7 @@ export default {
           annotation.forEach( (item,i) => {
             data.forEach( d => {
               if (d[item]) {
-                verticalLine(d,item,metricsName.length+1+i,tooltip);
+                verticalLine(d,item,metricsName.length+1+i,tooltip, this.strokewidth);
               }
             })
             
@@ -1082,7 +1082,7 @@ export default {
                   .attr("class", `line-${i}-${j}`)  // добовляем свой класс
                   .attr("fill", "none")
                   .attr("stroke", colorLine[i])
-                  .attr("stroke-width", 1.5)
+                  .attr("stroke-width", this.strokewidth)
                   .attr("d", d3.line()
                     .x(function(d) {return x(d[xMetric]*secondTransf) })
                     .y(function(d) {return y[i](d[metric]) })
@@ -1550,7 +1550,7 @@ export default {
           .style("opacity", "0.3");
       }
 
-      function verticalLine(d,item,i,tooltip) {
+      function verticalLine(d,item,i,tooltip, strokewidth) {
         let group = svg
           .append("g")
           .attr("class","vetical-line-group");
@@ -1564,17 +1564,20 @@ export default {
           .attr("y2", height)
           .attr("xVal", d[xMetric]*secondTransf)
           .attr("stroke", colorLine[i])
+          .attr("stroke-width", strokewidth)
           .style("opacity", "0.7")
+
 
         group
           .append("circle")
           .attr("cx",  x(d[xMetric]*secondTransf) )
           .attr("cy", 20)
-          .attr("r", 5)
+          .attr("r", 2.5*strokewidth)
           .attr("xVal", d[xMetric]*secondTransf)
           .attr("opacity", "0.7")
           .attr("fill", colorLine[i])
           .attr("class","dot-vertical")
+          
           .on("mouseover", function() {
             tooltip
               .style("opacity","1")
