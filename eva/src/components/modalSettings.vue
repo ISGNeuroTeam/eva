@@ -209,6 +209,36 @@
             </div>
           </div>
           <!-- end osmserver-->
+          <!--start strokeWidth-->
+          <div 
+            v-if="checkOptions('strokeWidth')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              strokeWidth
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Толщина линий
+            </div>
+            <div class="status-option item">
+              <v-text-field 
+                v-model="options.strokeWidth"   
+                clearable  
+                :color="color.text" 
+                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                outlined 
+                class="subnumber"  
+                hide-details
+              />
+            </div>
+          </div>
+          <!--end strokeWidth-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 

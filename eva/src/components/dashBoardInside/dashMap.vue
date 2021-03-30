@@ -132,6 +132,7 @@ export default {
       let latlngs = element.coordinates.split(";").map((point) => {
         return point.split(",");
       });
+
       const lib = this.library.objects[element.type];
       L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
         this.map

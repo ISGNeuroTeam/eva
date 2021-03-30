@@ -140,6 +140,17 @@ export default {
       }
       return true  
     },
+    strokeWidth() {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options?.strokeWidth) {
+        return Number(options?.strokeWidth);
+      } else {
+        return 1;
+      }
+    }
   },
   watch: {
     metrics: function() {

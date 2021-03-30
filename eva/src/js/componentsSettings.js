@@ -100,7 +100,7 @@ export default {
     map: mdiMapMarker
   }, 
   options: {
-    multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult'], 
+    multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth'], 
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult'],
     select: ['visible','level','boxShadow','multiple'],
