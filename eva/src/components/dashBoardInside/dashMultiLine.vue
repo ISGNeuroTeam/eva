@@ -103,10 +103,20 @@ export default {
       return this.colorFrom
     },
     colorLegends: function() {
-      return [this.colorFrom.controls,this.colorFrom.controlsActive,
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options.thememultiline ==="Anna theme") {
+        return ["#ff0000", "#008000", '#0000ff', '#ffa500', '#009688', '#FFF587', '#c0c0c0', '#99ff99'];
+      } else {
+        return [this.colorFrom.controls,this.colorFrom.controlsActive,
         '#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22',
         '#CCCC00','#CC0000','#9933FF','#0099CC','#009966','#99CC00',
         '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F','#8B4513'];
+      }
+      
+      
     },
     dataLoading: function() {
       return this.dataLoadingFrom
@@ -146,11 +156,11 @@ export default {
         id: this.idFrom,
       });
       if (options?.strokeWidth) {
-        return Number(options?.strokeWidth);
+        return Number(options.strokeWidth);
       } else {
-        return 1;
+        return 1.5;
       }
-    }
+    },
   },
   watch: {
     metrics: function() {

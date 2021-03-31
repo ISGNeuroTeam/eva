@@ -239,6 +239,36 @@
             </div>
           </div>
           <!--end strokeWidth-->
+          <!--start thememultiline-->
+          <div 
+            v-if="checkOptions('thememultiline')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              thememultiline
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Цветовая тема
+            </div>
+            <div class="status-option item">
+              <v-select  
+                v-model="options.thememultiline"
+                :items="['default','Anna theme']" 
+                :color="color.controls" 
+                :style="{color:color.text, fill: color.text}"  
+                hide-details  
+                outlined  
+                class="subnumber"
+              /> 
+            </div>
+          </div>
+          <!--end thememultiline-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 
