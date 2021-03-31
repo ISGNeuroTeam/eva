@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - for multiline add prop stroke-width. Width line in graph
+- Anna theme for multiline
 
 ### Fixed
 
