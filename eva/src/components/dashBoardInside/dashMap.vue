@@ -20,6 +20,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.tilelayer.colorfilter";
 
+import "leaflet.markercluster";
 
 export default {
   props: {
@@ -63,6 +64,7 @@ export default {
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(_dataRest);
+        this.clustering(_dataRest);
       }
     },
   },
@@ -118,12 +120,12 @@ export default {
         iconSize: [lib.width, lib.height],
       });
 
-      const _point =element.coordinates.split(":");
-      const _coord= _point[1].split(',')
+      const _point = element.coordinates.split(":");
+      const _coord = _point[1].split(",");
 
-      L.marker([_coord[0], _coord[1]], { icon: icon })
-        .bindTooltip(element.label, { permanent: true, direction: 'bottom',offset: [0,lib.height/2] })
-        .addTo(this.map);
+      L.marker([_coord[0], _coord[1]], {
+        icon: icon,
+      }).addTo(this.map);
 
       if (isCenter === true) {
         this.map.setView([_coord[0], _coord[1]]);
@@ -132,15 +134,39 @@ export default {
     addLine(element) {
       const lib = this.library.objects[element.type];
 
-      let latlngs = []
-      element.coordinates.split(";").forEach(point=>{
-        let p = point.split(":")
-        latlngs[p[0]-1]=p[1].split(',')
-      })
-      
+      let latlngs = [];
+      element.coordinates.split(";").forEach((point) => {
+        let p = point.split(":");
+        latlngs[p[0] - 1] = p[1].split(",");
+      });
+
       L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
         this.map
       );
+    },
+    clustering(dataRest) {
+      const cluster = L.markerClusterGroup({});
+      for (let i = 0; i < dataRest.length - 1; i++) {
+        if (dataRest[i].geometry_type?.toLowerCase() === "point") {
+          this.addTooltip(cluster, dataRest[i]);
+        }
+      }
+    },
+    addTooltip(cluster, element) {
+      const lib = this.library.objects[element.type];
+      const icon = L.divIcon({
+        iconSize: [0, 0],
+      });
+
+      const _point = element.coordinates.split(":");
+      const _coord = _point[1].split(",");
+
+      const marker = L.marker([_coord[0], _coord[1]], {
+        icon: icon,
+      }).bindTooltip(element.label, { permanent: true, direction: 'bottom',offset: [0,lib.height/2] })
+
+      cluster.addLayer(marker);
+      this.map.addLayer(cluster);
     },
     createMap() {
       this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
@@ -169,7 +195,7 @@ export default {
   flex-direction: column;
   font-size: 25px;
 }
-.leaflet-tooltip-left:before{
+.leaflet-tooltip-left:before {
   margin-right: 0;
 }
 </style>
