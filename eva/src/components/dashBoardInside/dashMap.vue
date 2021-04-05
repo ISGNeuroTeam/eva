@@ -106,14 +106,18 @@ export default {
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false);
+          this.addMarker(
+            dataRest[i],
+            dataRest[i].ID === "1" ? true : false,
+            dataRest[i].type !== 1 && dataRest[i].type !== 3 ? true : false
+          );
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
           this.addLine(dataRest[i]);
         }
       }
     },
-    addMarker(element, isCenter) {
+    addMarker(element, isCenter, addTooltip) {
       const lib = this.library.objects[element.type];
       const icon = L.icon({
         iconUrl: `${window.location.origin}/svg/${lib.image}`,
@@ -122,10 +126,23 @@ export default {
 
       const _point = element.coordinates.split(":");
       const _coord = _point[1].split(",");
-
-      L.marker([_coord[0], _coord[1]], {
-        icon: icon,
-      }).addTo(this.map);
+      if (addTooltip === true) {
+        L.marker([_coord[0], _coord[1]], {
+          icon: icon,
+          zIndexOffset: -1000,
+        })
+          .bindTooltip(element.label, {
+            permanent: true,
+            direction: "bottom",
+            offset: [0, lib.height / 2],
+          })
+          .addTo(this.map);
+      } else {
+        L.marker([_coord[0], _coord[1]], {
+          icon: icon,
+          zIndexOffset: -1000,
+        }).addTo(this.map);
+      }
 
       if (isCenter === true) {
         this.map.setView([_coord[0], _coord[1]]);
@@ -145,14 +162,35 @@ export default {
       );
     },
     clustering(dataRest) {
-      const cluster = L.markerClusterGroup({});
+      const cluster = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        iconCreateFunction: (layer) => {
+          if (layer._zoom > 10) {
+            return L.divIcon({
+              iconSize: [0, 0],
+              html:
+                '<div class="leaflet-tooltip">' +
+                layer.getAllChildMarkers().map((f) => f.getTooltip()._content) +
+                "</div>",
+            });
+          } else {
+            return L.divIcon({
+              iconSize: [0, 0],
+            });
+          }
+        },
+      });
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addTooltip(cluster, dataRest[i]);
+          if (dataRest[i].type === 1 ) {
+            this.addTooltip(cluster, dataRest[i]);
+          }
+
         }
       }
     },
     addTooltip(cluster, element) {
+      console.log(element.label);
       const lib = this.library.objects[element.type];
       const icon = L.divIcon({
         iconSize: [0, 0],
@@ -163,10 +201,16 @@ export default {
 
       const marker = L.marker([_coord[0], _coord[1]], {
         icon: icon,
-      }).bindTooltip(element.label, { permanent: true, direction: 'bottom',offset: [0,lib.height/2] })
+      }).bindTooltip(element.label, {
+        permanent: true,
+        direction: "bottom",
+        offset: [0, lib.height / 2],
+      });
 
+     
       cluster.addLayer(marker);
       this.map.addLayer(cluster);
+      
     },
     createMap() {
       this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
