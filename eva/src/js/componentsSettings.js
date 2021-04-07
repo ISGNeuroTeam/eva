@@ -114,7 +114,7 @@ export default {
     csvg: ['visible','level','tooltip'],
     ygraph: ['visible','level'],
     bush: ['visible','level'],
-    map: ['visible','level', 'osmserver'],
+    map: ['visible','level', 'osmserver', 'maptheme'],
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
   reports: {

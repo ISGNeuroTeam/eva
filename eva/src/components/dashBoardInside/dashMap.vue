@@ -50,6 +50,17 @@ export default {
         return 60;
       }
     },
+    maptheme() {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options.maptheme) {
+        return options.maptheme
+      } else {
+        return "default"
+      }
+    }
   },
   watch: {
     dataRestFrom(_dataRest) {
@@ -67,6 +78,9 @@ export default {
         this.clustering(_dataRest);
       }
     },
+  },
+  mounted() {
+    this.initMap();
   },
   methods: {
     clearMap() {
@@ -163,48 +177,19 @@ export default {
           }
         },
       });
-      const clusterZ = L.markerClusterGroup({
-        showCoverageOnHover: false,
-        iconCreateFunction: (layer) => {
-          if (layer._zoom > 13) {
-            return L.divIcon({
-              iconSize: [0, 0],
-              html:
-                '<div class="leaflet-tooltip">' +
-                layer.getAllChildMarkers().map((f) => f.getTooltip()._content) +
-                "</div>",
-            });
-          } else {
-            return L.divIcon({
-              iconSize: [0, 0],
-            });
-          }
-        },
-      });
       const clusterOther = L.markerClusterGroup({
         showCoverageOnHover: false,
-        iconCreateFunction: (layer) => {
-          if (layer._zoom > 14) {
-            return L.divIcon({
-              iconSize: [0, 0],
-              html:
-                '<div class="leaflet-tooltip">' +
-                layer.getAllChildMarkers().map((f) => f.getTooltip()._content) +
-                "</div>",
-            });
-          } else {
-            return L.divIcon({
-              iconSize: [0, 0],
-            });
-          }
+        iconCreateFunction: () => {
+          return L.divIcon({
+            iconSize: [0, 0]
+          });
+
         },
       });
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
           if (dataRest[i].type === 1) {
             this.addTooltip(cluster, dataRest[i]);
-          } else if (dataRest[i].type === 3) {
-            this.addTooltip(clusterZ, dataRest[i]);
           } else {
             this.addTooltip(clusterOther, dataRest[i]);
           }
@@ -232,16 +217,19 @@ export default {
       this.map.addLayer(cluster);
     },
     createMap() {
-      this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
-        filter: ["grayscale:100%", "invert:100%"],
-      });
+      if(this.maptheme === 'black'){
+        this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
+          filter: ["grayscale:100%", "invert:100%"],
+        });
+      } else {
+        this.tileLayer = L.tileLayer.colorFilter(this.osmserver, );
+      }
+     
 
       this.tileLayer.addTo(this.map);
     },
   },
-  mounted() {
-    this.initMap();
-  },
+
 };
 </script>
 
