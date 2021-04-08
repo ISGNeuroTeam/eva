@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fix theme in autocomplete in dashSelect
 - "Поменять режим отображения" to "Режим редактирования" in dashSettings
+- true to да, false to нет in dashSettings
 
 ## [1.56.0]
 

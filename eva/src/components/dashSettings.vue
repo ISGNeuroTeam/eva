@@ -22,7 +22,7 @@
         class="switch" 
         :color="colorFrom.controls" 
         :style="{color:colorFrom.text}" 
-        :label="String(mode)" 
+        :label="russianLabel(mode)" 
       />
       <div 
         class="divider-setting" 
@@ -73,7 +73,7 @@
         class="switch" 
         :color="colorFrom.controls" 
         :style="{color:colorFrom.text,}" 
-        :label="String(dragresable)" 
+        :label="russianLabel(dragresable)" 
       />
       <div 
         class="divider-setting" 
@@ -90,7 +90,7 @@
         class="switch" 
         :color="colorFrom.controls" 
         :style="{color:colorFrom.text,}" 
-        :label="String(gridShow)" 
+        :label="russianLabel(gridShow)"
       />
     </div>
   </v-navigation-drawer>
@@ -156,6 +156,13 @@ export default {
     sendSizeGrid: function() {
       this.$store.commit('setSizeGrid', {id: this.idDashFrom,grid: JSON.parse(JSON.stringify(this.sizeGrid))});
     },
+    russianLabel(value){
+      if(value === true){
+        return "да"
+      } else {
+        return "нет"
+      }
+    }
   },
   mounted() {
     let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
