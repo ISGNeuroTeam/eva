@@ -244,6 +244,7 @@ export default {
     }
   },
   mounted() {
+    document.title=`EVA | ${this.$store.getters.getName(this.idDash)}`
     this.createStartClient();
     this.calcSizeCell();
     this.addScrollListener(); 

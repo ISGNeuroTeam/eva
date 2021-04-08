@@ -786,7 +786,7 @@ export default {
     }
   },
   mounted() {
-    
+    document.title="EVA | Конструирование отчетов"
     this.search = this.$store.getters.getPaperSearch;
     if (this.search.original_otl != '') {
       //this.getData();

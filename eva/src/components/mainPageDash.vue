@@ -404,6 +404,7 @@ export default {
   mounted() {  
     this.checkCookie();
     this.color = themes[this.theme];
+    document.title="EVA | Конструирование дашбордов"
   }
 }
 </script>
