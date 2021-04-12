@@ -162,7 +162,7 @@ export default {
       const cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         iconCreateFunction: (layer) => {
-          if (layer._zoom > 10) {
+          if (layer._zoom > 11) {
             return L.divIcon({
               iconSize: [0, 0],
               html:
@@ -177,22 +177,9 @@ export default {
           }
         },
       });
-      const clusterOther = L.markerClusterGroup({
-        showCoverageOnHover: false,
-        iconCreateFunction: () => {
-          return L.divIcon({
-            iconSize: [0, 0]
-          });
-
-        },
-      });
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          if (dataRest[i].type === 1) {
-            this.addTooltip(cluster, dataRest[i]);
-          } else {
-            this.addTooltip(clusterOther, dataRest[i]);
-          }
+          this.addTooltip(cluster, dataRest[i]);
         }
       }
     },
