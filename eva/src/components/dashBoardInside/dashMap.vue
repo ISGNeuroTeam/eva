@@ -39,6 +39,8 @@ export default {
       error: null,
       library: null,
       map: null,
+      clusterTextWidth: 3,
+      clusterTextCount: 5,
     };
   },
   computed: {
@@ -56,11 +58,11 @@ export default {
         id: this.idFrom,
       });
       if (options.maptheme) {
-        return options.maptheme
+        return options.maptheme;
       } else {
-        return "default"
+        return "default";
       }
-    }
+    },
   },
   watch: {
     dataRestFrom(_dataRest) {
@@ -161,14 +163,17 @@ export default {
     clustering(dataRest) {
       const cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
-        iconCreateFunction: (layer) => {
-          if (layer._zoom > 11) {
+        iconCreateFunction: (cluster) => {
+          const markers = cluster.getAllChildMarkers();
+          if (cluster._zoom > 10) {
+            let _html =
+              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextWidth}, 1fr);">` +
+              this.generateHtml(markers) +
+              "</div>";
+            console.log(_html);
             return L.divIcon({
               iconSize: [0, 0],
-              html:
-                '<div class="leaflet-tooltip">' +
-                layer.getAllChildMarkers().map((f) => f.getTooltip()._content) +
-                "</div>",
+              html: _html,
             });
           } else {
             return L.divIcon({
@@ -182,6 +187,23 @@ export default {
           this.addTooltip(cluster, dataRest[i]);
         }
       }
+    },
+    generateHtml(markers) {
+      let _html = "";
+      let _count = 0;
+      let i;
+      for (
+        i = 0;
+        i < markers.length - 1 && _count < this.clusterTextCount;
+        i++
+      ) {
+        _count++;
+        _html = _html + "<div>" + markers[i].getTooltip()._content + "</div>";
+      }
+      if (i !== markers.length - 1) {
+        _html = _html + "<div>...</div>";
+      }
+      return _html;
     },
     addTooltip(cluster, element) {
       const lib = this.library.objects[element.type];
@@ -204,19 +226,17 @@ export default {
       this.map.addLayer(cluster);
     },
     createMap() {
-      if(this.maptheme === 'black'){
+      if (this.maptheme === "black") {
         this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
           filter: ["grayscale:100%", "invert:100%"],
         });
       } else {
-        this.tileLayer = L.tileLayer.colorFilter(this.osmserver, );
+        this.tileLayer = L.tileLayer.colorFilter(this.osmserver);
       }
-     
 
       this.tileLayer.addTo(this.map);
     },
   },
-
 };
 </script>
 
@@ -235,5 +255,10 @@ export default {
 }
 .leaflet-tooltip-left:before {
   margin-right: 0;
+}
+.leaftet-grid {
+  display: grid;
+  grid-row-gap: 5px;
+  grid-column-gap: 5px;
 }
 </style>
