@@ -108,7 +108,7 @@ export default {
         id: this.idFrom,
       });
       if (options.thememultiline ==="Anna theme") {
-        return ["#ff0000", "#008000", '#0000ff', '#ffa500', '#009688', '#FFF587', '#c0c0c0', '#99ff99'];
+        return ["#ff0000", "#008000", '#0000ff', '#ffa500', '#009688', '#FFF587', '#c0c0c0', '#99ff99', '#ffc0cb', '#ff6347', '#808000', '#9932cc', '#fefe22'];
       } else {
         return [this.colorFrom.controls,this.colorFrom.controlsActive,
         '#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22',
