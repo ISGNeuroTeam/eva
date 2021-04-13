@@ -1459,18 +1459,19 @@ export default {
                   .style("opacity","1")
                   .style("visibility","visible")
                   .html(text)
-                  .style("top", (event.layerY-40)+"px")
+                  .style("top", (event.offsetY-40)+"px")
                   .style("right","auto")
-                  .style("left",(event.layerX+15)+"px");
-                if ((event.layerX+100) > width){
+                  .style("left",(event.offsetX+15)+"px");
+                if ((event.offsetX+100) > width){
                   tooltip
                     .style("left","auto")
-                    .style("right",(width - event.layerX+100)+"px");
+                    .style("right",(width - event.offsetX+100)+"px");
                 }
-                if(event.layerY-40+toolTopBlock.offsetHeight > height) {
+                if(event.offsetY-40+toolTopBlock.offsetHeight > height) {
                   tooltip
-                    .style("top", (event.layerY-10-toolTopBlock.offsetHeight)+"px")
+                    .style("top", (event.offsetY-toolTopBlock.offsetHeight)+"px")
                 }
+                
                 lineDot
                   .attr("opacity","0.7")
                   .attr("x1",  x(d[xMetric]*secondTransf))
