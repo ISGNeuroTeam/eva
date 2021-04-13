@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "Поменять режим отображения" to "Режим редактирования" in dashSettings
 - true to да, false to нет in dashSettings
 - dashSVG position tooltip
+- dashMultiline position tooltip
 
 ## [1.56.0]
 
