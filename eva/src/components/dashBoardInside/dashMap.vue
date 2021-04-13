@@ -39,7 +39,7 @@ export default {
       error: null,
       library: null,
       map: null,
-      clusterTextWidth: 3,
+      clusterTextColumnWidth: 3,
       clusterTextCount: 5,
     };
   },
@@ -167,7 +167,7 @@ export default {
           const markers = cluster.getAllChildMarkers();
           if (cluster._zoom > 10) {
             let _html =
-              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextWidth}, 1fr);">` +
+              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextColumnWidth}, 1fr);">` +
               this.generateHtml(markers) +
               "</div>";
             console.log(_html);
@@ -260,5 +260,6 @@ export default {
   display: grid;
   grid-row-gap: 5px;
   grid-column-gap: 5px;
+  justify-items: left;
 }
 </style>
