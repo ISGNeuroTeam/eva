@@ -39,8 +39,8 @@ export default {
       error: null,
       library: null,
       map: null,
-      clusterTextColumnWidth: 3,
-      clusterTextCount: 5,
+      clusterTextColumnWidth: 4,
+      clusterTextCount: 4,
     };
   },
   computed: {
