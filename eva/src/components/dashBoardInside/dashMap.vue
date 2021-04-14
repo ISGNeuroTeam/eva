@@ -229,7 +229,6 @@ export default {
               `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount}, 1fr);">` +
               this.generateHtml(markers) +
               "</div>";
-            console.log(_html);
             return L.divIcon({
               iconSize: [0, 0],
               html: _html,
