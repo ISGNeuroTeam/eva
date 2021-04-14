@@ -39,8 +39,8 @@ export default {
       error: null,
       library: null,
       map: null,
-      clusterTextColumnWidth: 4,
-      clusterTextCount: 4,
+      clusterTextCount: null,
+      maptheme: null
     };
   },
   computed: {
@@ -52,39 +52,63 @@ export default {
         return 60;
       }
     },
-    maptheme() {
-      let options = this.$store.getters.getOptions({
-        idDash: this.idDashFrom,
-        id: this.idFrom,
-      });
-      if (options.maptheme) {
-        return options.maptheme;
-      } else {
-        return "default";
-      }
-    },
   },
   watch: {
     dataRestFrom(_dataRest) {
+      //при обновлении данных перерисовать
+      this.reDrawMap(_dataRest)
+    },
+    clusterTextCount(){
+      this.reDrawMap(this.dataRestFrom)
+    },
+    maptheme(){
+      this.reDrawMap(this.dataRestFrom)
+    }
+  },
+  mounted() {
+    this.initMap();
+    this.initTheme();
+    this.initClusterTextCount()
+    
+  },
+  methods: {
+    reDrawMap(dataRest){
       this.clearMap();
       this.error = null;
       //получаем osm server
       this.getOSM();
       //получаем библиотеку
-      this.generateLibrary(_dataRest);
+      this.generateLibrary(dataRest);
       if (!this.error) {
         //создаем элемент карты
         this.createMap();
         //рисуем объекты на карте
-        this.drawObjects(_dataRest);
-        this.clustering(_dataRest);
+        this.drawObjects(dataRest);
+        this.clustering(dataRest);
       }
     },
-  },
-  mounted() {
-    this.initMap();
-  },
-  methods: {
+    initTheme(){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options.maptheme) {
+        this.maptheme =  options.maptheme;
+      } else {
+        this.maptheme =  "default";
+      }
+    },
+    initClusterTextCount(){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options.clusterTextCount) {
+        this.clusterTextCount =  options.clusterTextCount;
+      } else {
+        this.clusterTextCount =  4;
+      }
+    },
     clearMap() {
       this.map.eachLayer((layer) => {
         this.map.removeLayer(layer);
@@ -167,7 +191,7 @@ export default {
           const markers = cluster.getAllChildMarkers();
           if (cluster._zoom > 10) {
             let _html =
-              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextColumnWidth}, 1fr);">` +
+              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount}, 1fr);">` +
               this.generateHtml(markers) +
               "</div>";
             console.log(_html);
