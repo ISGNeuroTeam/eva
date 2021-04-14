@@ -3,12 +3,15 @@
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
+    <div v-if="!error" class="wrapper-property">
+      morozov
+    </div>
     <div
       v-if="!error"
       id="mapContainer"
       :style="{
         width: `${Math.trunc(widthFrom)}px`,
-        height: `${Math.trunc(heightFrom) - top / 2}px`,
+        height: `${Math.trunc(heightFrom) - top / 2 - 40}px`,
       }"
     />
   </div>
@@ -23,6 +26,7 @@ import "leaflet.tilelayer.colorfilter";
 import "leaflet.markercluster";
 
 export default {
+  name: "dashMap",
   props: {
     // переменные полученные от родителя
     idFrom: null, // id элемнета (table, graph-2)
@@ -285,5 +289,8 @@ export default {
   grid-row-gap: 5px;
   grid-column-gap: 5px;
   justify-items: left;
+}
+.wrapper-property{
+  height: 40px;
 }
 </style>
