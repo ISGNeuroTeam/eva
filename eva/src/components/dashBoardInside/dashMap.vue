@@ -4,14 +4,31 @@
       {{ error }}
     </div>
     <div v-if="!error" class="wrapper-property">
-      morozov
+      <v-select
+        v-model="maptheme"
+        class="select-property" 
+        :items="['default','black']"
+        label="Тема"
+        @change="changeMapTheme"
+      />
+      <v-select
+        v-model="clusterTextCount"
+        class="select-property"
+        :items="[3,4,5,6]"
+        label="Количество элементов в tooltip"
+        @change="changeClusterTextCount"
+      />
+      <v-select
+        class="select-property"
+        label="Порядок элементов"
+      />
     </div>
     <div
       v-if="!error"
       id="mapContainer"
       :style="{
         width: `${Math.trunc(widthFrom)}px`,
-        height: `${Math.trunc(heightFrom) - top / 2 - 40}px`,
+        height: `${Math.trunc(heightFrom) - top / 2 - 45}px`,
       }"
     />
   </div>
@@ -102,6 +119,13 @@ export default {
         this.maptheme =  "default";
       }
     },
+    changeMapTheme(val){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      options.maptheme = val
+    },
     initClusterTextCount(){
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
@@ -112,6 +136,13 @@ export default {
       } else {
         this.clusterTextCount =  4;
       }
+    },
+    changeClusterTextCount(val){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      options.clusterTextCount = val
     },
     clearMap() {
       this.map.eachLayer((layer) => {
@@ -292,5 +323,10 @@ export default {
 }
 .wrapper-property{
   height: 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.select-property{
+  width: 200px;
 }
 </style>
