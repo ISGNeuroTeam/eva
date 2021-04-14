@@ -537,7 +537,7 @@ export default {
                 .attr("class", `line-${i}-${j}`)  // добовляем свой класс
                 .attr("fill", "none")
                 .attr("stroke", colorLine[i])
-                .attr("stroke-width", 15)
+                .attr("stroke-width", this.strokewidth)
                 .attr("d", d3.line()
                   .x(function(d) {return x(d[xMetric]*secondTransf) })
                   .y(function(d) {return y(d[metricsName[i]]) })
