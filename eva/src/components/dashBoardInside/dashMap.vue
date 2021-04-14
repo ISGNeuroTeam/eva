@@ -14,7 +14,7 @@
       <v-select
         v-model="clusterTextCount"
         class="select-property"
-        :items="[3, 4, 5, 6]"
+        :items="[3, 4, 5]"
         label="Количество элементов в tooltip"
         @change="changeClusterTextCount"
       />
@@ -219,7 +219,6 @@ export default {
               `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount}, 1fr);">` +
               this.generateHtml(markers) +
               "</div>";
-            console.log(_html);
             return L.divIcon({
               iconSize: [0, 0],
               html: _html,
