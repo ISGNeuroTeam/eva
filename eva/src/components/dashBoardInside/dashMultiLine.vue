@@ -618,17 +618,17 @@ export default {
                 .style("opacity","1")
                 .style("visibility","visible")
                 .html(text)
-                .style("top", (event.layerY-40)+"px")
+                .style("top", (event.offsetY-40)+"px")
                 .style("right","auto")
-                .style("left",(event.layerX+15)+"px");
-              if ((event.layerX+100) > width){
+                .style("left",(event.offsetX+15)+"px");
+              if ((event.offsetX+100) > width){
                 tooltip
                   .style("left","auto")
-                  .style("right",(width - event.layerX+100)+"px");
+                  .style("right",(width - event.offsetX+100)+"px");
               }
-              if(event.layerY-40+toolTopBlock.offsetHeight > height) {
+              if(event.offsetY-40+toolTopBlock.offsetHeight > height) {
                 tooltip
-                  .style("top", (event.layerY-10-toolTopBlock.offsetHeight)+"px")
+                  .style("top", (event.offsetY-10-toolTopBlock.offsetHeight)+"px")
               }
 
               lineDot
@@ -733,7 +733,7 @@ export default {
         brushObj['selectionDown'] =  () => {
           brushObj.mouseDown = true;
           brushObj.clearBrush();
-          brushObj.startX = event.layerX-50;
+          brushObj.startX = event.offsetX-50;
           brush
             .append("rect")
             .attr("class", `selection`)
@@ -755,17 +755,17 @@ export default {
         brushObj['selectionMove'] = () => {
           if (brushObj.mouseDown) {
 
-            if ((event.layerX-50 - brushObj.startX) > 0) {
+            if ((event.offsetX-50 - brushObj.startX) > 0) {
               brushObj.direction = 'right';
-              brushObj.endX = event.layerX-50;
+              brushObj.endX = event.offsetX-50;
               brush.select(`.selection`)
-                .attr("width", event.layerX-50 - brushObj.startX)
+                .attr("width", event.offsetX-50 - brushObj.startX)
             } else {
               brushObj.direction = 'left';
-              brushObj.endX = brushObj.startX + (event.layerX-50 - brushObj.startX);
+              brushObj.endX = brushObj.startX + (event.offsetX-50 - brushObj.startX);
               brush.select(`.selection`)
-                .attr("x", brushObj.startX + (event.layerX-50 - brushObj.startX))
-                .attr("width", -(event.layerX-50 - brushObj.startX))
+                .attr("x", brushObj.startX + (event.offsetX-50 - brushObj.startX))
+                .attr("width", -(event.offsetX-50 - brushObj.startX))
             }
           
           }
@@ -934,37 +934,7 @@ export default {
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals));
 
-            
-            //if (Object.keys(metricOPt).length == 0 || metricOPt.type == 'Line chart') {
-
-            // let startX = 0;
-              // создаем область выделения
-              // brush = () => {
-
-              // }
-              
-                //.call(brush);
-              // brush = d3.brushX(x)                   // область выделения
-              //   .extent( [ [0,startY], [width,parseFloat(step)+20] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-              //   .on("start", () => { 
-              //     startX = d3.event.sourceEvent.layerX-50;
-              //   })
-              //   .on("brush", () => { 
-              //     if (d3.event.sourceEvent.layerX - startX-50 > 0) {
-              //       svg.select(".selection").attr('x', startX);
-              //       svg.select(".selection").attr('width', d3.event.sourceEvent.layerX - startX-50);
-              //       svg.select(".handle--w").attr('x',startX);
-              //       svg.select(".handle--e").attr('x',startX + d3.event.sourceEvent.layerX - startX-50);
-              //     } else {
-              //       svg.select(".selection").attr('x', startX + (d3.event.sourceEvent.layerX - startX-50));
-              //     }
-              //      console.log( svg.select(".selection").attr('x'), parseFloat(svg.select(".selection").attr('x')) + parseFloat(svg.select(".selection").attr('width')))
-              //    // console.log(d3.event.sourceEvent.layerX - startX-50)
-              //   })
-              //   .on("end", updateData )               // каждый раз как область выделения изменится вызовется функция
-              // brush.id = i;
-
-            //}
+          
 
             
 
@@ -981,26 +951,6 @@ export default {
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals));
 
-             //console.log(svg.selectAll(`.yAxis-${i} .tick`).select("text").nodes())
-
-            // if (Object.keys(metricOPt).length == 0 || metricOPt.type == 'Line chart') {
-              
-            //   // создаем область выделения
-            //   // brush = d3.brushX()                   // область выделения
-            //   //   .extent( [ [0,startY], [width, parseFloat(step*(i+1))+20] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-            //   //   .on("end", updateData)               // каждый раз как область выделения изменится вызовется функция
-            //   // brush.id = i;
-
-            //   brush = d3.brushX()                   // область выделения
-            //     .extent( [ [0,startY[i]], [width, parseFloat(step*(i+1))+20] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-            //     .on("end", updateData)               // каждый раз как область выделения изменится вызовется функция
-            //   brush.id = i;
-
-              
-
-              
-            // }
-            //console.log(brush)
 
             startY.push(parseFloat(step*(i+1))+20);
 
@@ -1291,7 +1241,7 @@ export default {
             brushObj['selectionDown'] =  () => {
               brushObj.mouseDown = true;
               brushObj.clearBrush();
-              brushObj.startX = event.layerX-50;
+              brushObj.startX = event.offsetX-50;
               brush
                 .append("rect")
                 .attr("class", `selection-${i}`)
@@ -1312,17 +1262,17 @@ export default {
 
             brushObj['selectionMove'] = () => {
               if (brushObj.mouseDown) {
-                if ((event.layerX-50 - brushObj.startX) > 0) {
+                if ((event.offsetX-50 - brushObj.startX) > 0) {
                   brushObj.direction = 'right';
-                  brushObj.endX = event.layerX-50;
+                  brushObj.endX = event.offsetX-50;
                   brush.select(`.selection-${i}`)
-                    .attr("width", event.layerX-50 - brushObj.startX)
+                    .attr("width", event.offsetX-50 - brushObj.startX)
                 } else {
                   brushObj.direction = 'left';
-                  brushObj.endX = brushObj.startX + (event.layerX-50 - brushObj.startX);
+                  brushObj.endX = brushObj.startX + (event.offsetX-50 - brushObj.startX);
                   brush.select(`.selection-${i}`)
-                    .attr("x", brushObj.startX + (event.layerX-50 - brushObj.startX))
-                    .attr("width", -(event.layerX-50 - brushObj.startX))
+                    .attr("x", brushObj.startX + (event.offsetX-50 - brushObj.startX))
+                    .attr("width", -(event.offsetX-50 - brushObj.startX))
                 }
               
               }
@@ -1594,13 +1544,13 @@ export default {
               .style("opacity","1")
               .style("visibility","visible")
               .html(`<p>${d[item]}</p>`)
-              .style("top", (event.layerY-30)+"px")
+              .style("top", (event.offsetY-30)+"px")
               .style("right","auto")
-              .style("left",(event.layerX+20)+"px");
-            if ((event.layerX+100) > width){
+              .style("left",(event.offsetX+20)+"px");
+            if ((event.offsetX+100) > width){
               tooltip
                 .style("left","auto")
-                .style("right",(width - event.layerX+110)+"px");
+                .style("right",(width - event.offsetX+110)+"px");
             }
           })  // при наведении мышки точка появляется
           .on("mouseout", function() {
