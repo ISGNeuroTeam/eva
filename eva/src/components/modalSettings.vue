@@ -269,36 +269,6 @@
             </div>
           </div>
           <!--end thememultiline-->
-          <!--start maptheme-->
-          <div 
-            v-if="checkOptions('maptheme')"
-            class="option-item" 
-          >
-            <div 
-              class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
-            >
-              maptheme
-            </div>
-            <div 
-              class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
-            >
-              Цветовая тема
-            </div>
-            <div class="status-option item">
-              <v-select  
-                v-model="options.maptheme"
-                :items="['default','black']" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
-                hide-details  
-                outlined  
-                class="subnumber"
-              /> 
-            </div>
-          </div>
-          <!--end maptheme-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 
