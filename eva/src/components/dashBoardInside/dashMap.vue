@@ -6,24 +6,22 @@
     <div v-if="!error" class="wrapper-property">
       <v-select
         v-model="maptheme"
-        class="select-property" 
-        :items="['default','black']"
+        class="select-property"
+        :items="['default', 'black']"
         label="Тема"
         @change="changeMapTheme"
       />
       <v-select
         v-model="clusterTextCount"
         class="select-property"
-        :items="[3,4,5,6]"
+        :items="[3, 4, 5, 6]"
         label="Количество элементов в tooltip"
         @change="changeClusterTextCount"
       />
-      <v-select
-        class="select-property"
-        label="Порядок элементов"
-      />
+      <v-select class="select-property" label="Порядок элементов" />
     </div>
     <div
+      ref="map"
       v-if="!error"
       id="mapContainer"
       :style="{
@@ -39,11 +37,8 @@
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.tilelayer.colorfilter";
-
 import "leaflet.markercluster";
-
 export default {
-  name: "dashMap",
   props: {
     // переменные полученные от родителя
     idFrom: null, // id элемнета (table, graph-2)
@@ -90,7 +85,6 @@ export default {
     this.initMap();
     this.initTheme();
     this.initClusterTextCount()
-    
   },
   methods: {
     reDrawMap(dataRest){
@@ -171,7 +165,7 @@ export default {
       }
     },
     initMap() {
-      this.map = L.map("mapContainer", {
+      this.map = L.map(this.$refs.map, {
         wheelPxPerZoomLevel: 600,
         zoomSnap: 0,
         zoom: 10,
@@ -194,27 +188,23 @@ export default {
         iconUrl: `${window.location.origin}/svg/${lib.image}`,
         iconSize: [lib.width, lib.height],
       });
-
       const _point = element.coordinates.split(":");
       const _coord = _point[1].split(",");
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
       }).addTo(this.map);
-
       if (isCenter === true) {
         this.map.setView([_coord[0], _coord[1]]);
       }
     },
     addLine(element) {
       const lib = this.library.objects[element.type];
-
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
         latlngs[p[0] - 1] = p[1].split(",");
       });
-
       L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
         this.map
       );
@@ -226,9 +216,10 @@ export default {
           const markers = cluster.getAllChildMarkers();
           if (cluster._zoom > 10) {
             let _html =
-              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount}, 1fr);">` +
+              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextColumnWidth}, 1fr);">` +
               this.generateHtml(markers) +
               "</div>";
+            console.log(_html);
             return L.divIcon({
               iconSize: [0, 0],
               html: _html,
@@ -268,10 +259,8 @@ export default {
       const icon = L.divIcon({
         iconSize: [0, 0],
       });
-
       const _point = element.coordinates.split(":");
       const _coord = _point[1].split(",");
-
       const marker = L.marker([_coord[0], _coord[1]], {
         icon: icon,
       }).bindTooltip(element.label, {
@@ -279,7 +268,6 @@ export default {
         direction: "bottom",
         offset: [0, lib.height / 2],
       });
-
       cluster.addLayer(marker);
       this.map.addLayer(cluster);
     },
@@ -291,13 +279,11 @@ export default {
       } else {
         this.tileLayer = L.tileLayer.colorFilter(this.osmserver);
       }
-
       this.tileLayer.addTo(this.map);
     },
   },
 };
 </script>
-
 <style>
 #mapContainer {
   position: relative;
