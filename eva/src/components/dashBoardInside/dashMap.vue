@@ -75,10 +75,10 @@ export default {
       this.reDrawMap(_dataRest)
     },
     clusterTextCount(){
-      this.reDrawMap(this.dataRestFrom)
+      this.clustering(this.dataRestFrom);
     },
     maptheme(){
-      this.reDrawMap(this.dataRestFrom)
+      this.createMap()
     }
   },
   mounted() {
