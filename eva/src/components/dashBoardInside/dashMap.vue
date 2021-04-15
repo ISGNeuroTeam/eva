@@ -56,7 +56,8 @@ export default {
       library: null,
       map: null,
       clusterTextCount: null,
-      maptheme: null
+      maptheme: null,
+      cluster: null
     };
   },
   computed: {
@@ -75,6 +76,7 @@ export default {
       this.reDrawMap(_dataRest)
     },
     clusterTextCount(){
+      this.clearCluster()
       this.clustering(this.dataRestFrom);
     },
     maptheme(){
@@ -210,7 +212,7 @@ export default {
       );
     },
     clustering(dataRest) {
-      const cluster = L.markerClusterGroup({
+      this.cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         iconCreateFunction: (cluster) => {
           const markers = cluster.getAllChildMarkers();
@@ -232,7 +234,7 @@ export default {
       });
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addTooltip(cluster, dataRest[i]);
+          this.addTooltip(this.cluster, dataRest[i]);
         }
       }
     },
@@ -253,6 +255,11 @@ export default {
       }
       return _html;
     },
+    clearCluster(){
+      if (this.map.hasLayer(this.cluster)) {
+        this.map.removeLayer(this.cluster);
+      }
+    },
     addTooltip(cluster, element) {
       const lib = this.library.objects[element.type];
       const icon = L.divIcon({
@@ -267,7 +274,11 @@ export default {
         direction: "bottom",
         offset: [0, lib.height / 2],
       });
+
       cluster.addLayer(marker);
+
+
+      // 
       this.map.addLayer(cluster);
     },
     createMap() {
