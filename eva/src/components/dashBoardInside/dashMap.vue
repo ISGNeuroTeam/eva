@@ -230,12 +230,15 @@ export default {
     },
     generateClusterPositionItems() {
       this.clusterPositionItems = null
-      Object.values(this.library.objects).forEach((object) => {
+      Object.entries(this.library.objects).forEach((object) => {
         if (object.image) {
+          // const _tmpObject = object[1]//value
+          // _tmpObject.id = Number(object[0])//key
+          // console.log(_tmpObject)
           if (this.clusterPositionItems === null) {
-            this.clusterPositionItems = [object];
+            this.clusterPositionItems = [_tmpObject];
           } else {
-            this.clusterPositionItems.push(object);
+            this.clusterPositionItems.push(_tmpObject);
           }
         }
       });
@@ -322,13 +325,13 @@ export default {
         i < markers.length - 1 && _count < this.clusterTextCount;
         i++
       ) {
-        _count++;
         _html = _html + "<div>" + markers[i].getTooltip()._content + "</div>";
-        //для разделителя
-        if (i <  this.clusterTextCount-1) {
-          _html = _html + `<div> ${this.clusterDelimiter} </div>`;
-        }
+        _html = _html + `<div> ${this.clusterDelimiter} </div>`;
+        _count++;        
       }
+      //удаление лишенего дилителя
+      _html= _html.substr(0,_html.length - `<div> ${this.clusterDelimiter} </div>`.length)
+      //закрываем leaftet-flex
       _html = _html +"</div>"
       if (i !== markers.length - 1) {
         _html = _html + "<div class ='leaftet-flex'>...</div>";
