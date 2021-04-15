@@ -22,13 +22,14 @@
         v-model="clusterDelimiter"
         label="Разделитель"
         @blur="blurClusterDelimiter"
-        @keyup.enter="blurClusterDelimiter" 
+        @keyup.enter="blurClusterDelimiter"
       />
       <v-select
         v-model="clusterPosition"
         class="select-property"
         :items="clusterPositionItems"
         item-text="name"
+        item-value="id"
         chips
         multiple 
         label="Порядок элементов"
@@ -75,7 +76,7 @@ export default {
       cluster: null,
       clusterPosition: null,
       clusterPositionItems: null,
-      clusterDelimiter: null
+      clusterDelimiter: null,
     };
   },
   computed: {
@@ -106,7 +107,7 @@ export default {
     this.initTheme();
     this.initClusterTextCount();
     this.initClusterPosition();
-    this.initClusterDelimiter()
+    this.initClusterDelimiter();
   },
   methods: {
     reDrawMap(dataRest) {
@@ -116,7 +117,7 @@ export default {
       this.getOSM();
       //получаем библиотеку
       this.generateLibrary(dataRest);
-      this.generateClusterPositionItems()
+      this.generateClusterPositionItems();
       if (!this.error) {
         //создаем элемент карты
         this.createMap();
@@ -154,7 +155,7 @@ export default {
         this.clusterTextCount = 4;
       }
     },
-    initClusterDelimiter(){
+    initClusterDelimiter() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
@@ -183,7 +184,7 @@ export default {
       });
       options.clusterTextCount = val;
     },
-    blurClusterPosition(){
+    blurClusterPosition() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
@@ -193,7 +194,7 @@ export default {
       this.clearCluster();
       this.clustering(this.dataRestFrom);
     },
-    blurClusterDelimiter(){
+    blurClusterDelimiter() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
@@ -229,12 +230,11 @@ export default {
       }
     },
     generateClusterPositionItems() {
-      this.clusterPositionItems = null
+      this.clusterPositionItems = null;
       Object.entries(this.library.objects).forEach((object) => {
-        if (object.image) {
-          // const _tmpObject = object[1]//value
-          // _tmpObject.id = Number(object[0])//key
-          // console.log(_tmpObject)
+        if (object[1].image) {
+          const _tmpObject = { ...object[1], id: Number(object[0]) };
+
           if (this.clusterPositionItems === null) {
             this.clusterPositionItems = [_tmpObject];
           } else {
@@ -327,12 +327,15 @@ export default {
       ) {
         _html = _html + "<div>" + markers[i].getTooltip()._content + "</div>";
         _html = _html + `<div> ${this.clusterDelimiter} </div>`;
-        _count++;        
+        _count++;
       }
       //удаление лишенего дилителя
-      _html= _html.substr(0,_html.length - `<div> ${this.clusterDelimiter} </div>`.length)
+      _html = _html.substr(
+        0,
+        _html.length - `<div> ${this.clusterDelimiter} </div>`.length
+      );
       //закрываем leaftet-flex
-      _html = _html +"</div>"
+      _html = _html + "</div>";
       if (i !== markers.length - 1) {
         _html = _html + "<div class ='leaftet-flex'>...</div>";
       }
@@ -400,6 +403,6 @@ export default {
 .wrapper-property {
   height: 40px;
   display: grid;
-  grid-template-columns: repeat(3,1fr) auto;
+  grid-template-columns: repeat(3, 1fr) auto;
 }
 </style>
