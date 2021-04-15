@@ -15,7 +15,7 @@
         v-model="clusterTextCount"
         class="select-property"
         :items="[3, 4, 5]"
-        label="Количество элементов в tooltip"
+        label="Количество элементов в строке подписей"
         @change="changeClusterTextCount"
       />
       <v-select
@@ -170,6 +170,9 @@ export default {
         id: this.idFrom,
       });
       options.clusterPosition = this.clusterPosition;
+
+      this.clearCluster();
+      this.clustering(this.dataRestFrom);
     },
     clearMap() {
       this.map.eachLayer((layer) => {

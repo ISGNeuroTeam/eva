@@ -193,7 +193,7 @@
               class="discribe-option item" 
               :style="{color:color.text, borderColor:color.text}"
             >
-              Сервер для набора title Пример:
+              Сервер для набора tile Пример:
               http://192.168.4.209/osm/{z}/{x}/{y}.png
             </div>
             <div class="status-option item">
