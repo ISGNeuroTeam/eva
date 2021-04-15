@@ -18,6 +18,12 @@
         label="Количество элементов в строке подписей"
         @change="changeClusterTextCount"
       />
+      <v-text-field
+        v-model="clusterDelimiter"
+        label="Разделитель"
+        @blur="blurClusterDelimiter"
+        @keyup.enter="blurClusterDelimiter" 
+      />
       <v-select
         v-model="clusterPosition"
         class="select-property"
@@ -69,6 +75,7 @@ export default {
       cluster: null,
       clusterPosition: null,
       clusterPositionItems: null,
+      clusterDelimiter: null
     };
   },
   computed: {
@@ -99,6 +106,7 @@ export default {
     this.initTheme();
     this.initClusterTextCount();
     this.initClusterPosition();
+    this.initClusterDelimiter()
   },
   methods: {
     reDrawMap(dataRest) {
@@ -146,6 +154,17 @@ export default {
         this.clusterTextCount = 4;
       }
     },
+    initClusterDelimiter(){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options.clusterDelimiter) {
+        this.clusterDelimiter = options.clusterDelimiter;
+      } else {
+        this.clusterDelimiter = ";";
+      }
+    },
     initClusterPosition() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
@@ -171,6 +190,15 @@ export default {
       });
       options.clusterPosition = this.clusterPosition;
 
+      this.clearCluster();
+      this.clustering(this.dataRestFrom);
+    },
+    blurClusterDelimiter(){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      options.clusterDelimiter = this.clusterDelimiter;
       this.clearCluster();
       this.clustering(this.dataRestFrom);
     },
@@ -264,7 +292,7 @@ export default {
           const markers = cluster.getAllChildMarkers();
           if (cluster._zoom > 10) {
             let _html =
-              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount}, 1fr);">` +
+              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount*2-1}, 1fr);">` +
               this.generateHtml(markers) +
               "</div>";
             return L.divIcon({
@@ -296,6 +324,10 @@ export default {
       ) {
         _count++;
         _html = _html + "<div>" + markers[i].getTooltip()._content + "</div>";
+        //для разделителя
+        if (i <  this.clusterTextCount - 1) {
+          _html = _html + `<div>${this.clusterDelimiter}</div>`;
+        }
       }
       if (i !== markers.length - 1) {
         _html = _html + "<div>...</div>";
@@ -365,6 +397,6 @@ export default {
 .wrapper-property {
   height: 40px;
   display: grid;
-  grid-template-columns: repeat(2,1fr) auto;
+  grid-template-columns: repeat(3,1fr) auto;
 }
 </style>
