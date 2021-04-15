@@ -57,7 +57,9 @@ export default {
       map: null,
       clusterTextCount: null,
       maptheme: null,
-      cluster: null
+      cluster: null,
+      clusterPosition: null,
+      clusterPositionItems: null,
     };
   },
   computed: {
@@ -73,29 +75,31 @@ export default {
   watch: {
     dataRestFrom(_dataRest) {
       //при обновлении данных перерисовать
-      this.reDrawMap(_dataRest)
+      this.reDrawMap(_dataRest);
     },
-    clusterTextCount(){
-      this.clearCluster()
+    clusterTextCount() {
+      this.clearCluster();
       this.clustering(this.dataRestFrom);
     },
-    maptheme(){
-      this.createMap()
-    }
+    maptheme() {
+      this.createMap();
+    },
   },
   mounted() {
     this.initMap();
     this.initTheme();
-    this.initClusterTextCount()
+    this.initClusterTextCount();
+    this.initClusterPosition();
   },
   methods: {
-    reDrawMap(dataRest){
+    reDrawMap(dataRest) {
       this.clearMap();
       this.error = null;
       //получаем osm server
       this.getOSM();
       //получаем библиотеку
       this.generateLibrary(dataRest);
+      this.generateClusterPositionItems()
       if (!this.error) {
         //создаем элемент карты
         this.createMap();
@@ -104,41 +108,52 @@ export default {
         this.clustering(dataRest);
       }
     },
-    initTheme(){
+    initTheme() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
       if (options.maptheme) {
-        this.maptheme =  options.maptheme;
+        this.maptheme = options.maptheme;
       } else {
-        this.maptheme =  "default";
+        this.maptheme = "default";
       }
     },
-    changeMapTheme(val){
+    changeMapTheme(val) {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      options.maptheme = val
+      options.maptheme = val;
     },
-    initClusterTextCount(){
+    initClusterTextCount() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
       if (options.clusterTextCount) {
-        this.clusterTextCount =  options.clusterTextCount;
+        this.clusterTextCount = options.clusterTextCount;
       } else {
-        this.clusterTextCount =  4;
+        this.clusterTextCount = 4;
       }
     },
-    changeClusterTextCount(val){
+    initClusterPosition() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      options.clusterTextCount = val
+      if (options.clusterTextCount) {
+        this.clusterPosition = options.clusterPosition;
+      } else {
+        this.clusterPosition = null;
+      }
+    },
+    changeClusterTextCount(val) {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      options.clusterTextCount = val;
     },
     clearMap() {
       this.map.eachLayer((layer) => {
@@ -165,6 +180,18 @@ export default {
         this.map.remove();
         this.map = null;
       }
+    },
+    generateClusterPositionItems() {
+      this.clusterPositionItems = null
+      Object.values(this.library.objects).forEach((object) => {
+        if (object.image) {
+          if (this.clusterPositionItems === null) {
+            this.clusterPositionItems = [object];
+          } else {
+            this.clusterPositionItems.push(object);
+          }
+        }
+      });
     },
     initMap() {
       this.map = L.map(this.$refs.map, {
@@ -232,6 +259,7 @@ export default {
           }
         },
       });
+      //sort
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
           this.addTooltip(this.cluster, dataRest[i]);
@@ -255,7 +283,7 @@ export default {
       }
       return _html;
     },
-    clearCluster(){
+    clearCluster() {
       if (this.map.hasLayer(this.cluster)) {
         this.map.removeLayer(this.cluster);
       }
@@ -277,8 +305,7 @@ export default {
 
       cluster.addLayer(marker);
 
-
-      // 
+      //
       this.map.addLayer(cluster);
     },
     createMap() {
@@ -316,12 +343,12 @@ export default {
   grid-column-gap: 5px;
   justify-items: left;
 }
-.wrapper-property{
+.wrapper-property {
   height: 40px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
-.select-property{
+.select-property {
   width: 200px;
 }
 </style>
