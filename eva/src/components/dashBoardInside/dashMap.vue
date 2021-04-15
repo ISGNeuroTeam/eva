@@ -31,9 +31,9 @@
         item-text="name"
         item-value="id"
         chips
-        multiple 
+        multiple
         label="Порядок элементов"
-        @blur="blurClusterPosition" 
+        @blur="blurClusterPosition"
       />
     </div>
     <div
@@ -272,7 +272,13 @@ export default {
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
-      }).addTo(this.map);
+      })
+        .addTo(this.map)
+        .bindTooltip(element.label,  {
+          permanent: false,
+          direction: "top",
+          className: "leaftet-hover"
+        })
       if (isCenter === true) {
         this.map.setView([_coord[0], _coord[1]]);
       }
@@ -404,5 +410,11 @@ export default {
   height: 40px;
   display: grid;
   grid-template-columns: repeat(3, 1fr) auto;
+}
+.leaftet-hover{
+  border: 2px solid #c88dcc;
+}
+.leaftet-hover::before{
+  margin-bottom: 0;
 }
 </style>
