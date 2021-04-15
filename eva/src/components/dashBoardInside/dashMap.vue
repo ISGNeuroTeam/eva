@@ -18,7 +18,16 @@
         label="Количество элементов в tooltip"
         @change="changeClusterTextCount"
       />
-      <v-select class="select-property" label="Порядок элементов" />
+      <v-select
+        v-model="clusterPosition"
+        class="select-property"
+        :items="clusterPositionItems"
+        item-text="name"
+        chips
+        multiple 
+        label="Порядок элементов"
+        @blur="blurClusterPosition" 
+      />
     </div>
     <div
       ref="map"
@@ -142,7 +151,7 @@ export default {
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      if (options.clusterTextCount) {
+      if (options.clusterPosition) {
         this.clusterPosition = options.clusterPosition;
       } else {
         this.clusterPosition = null;
@@ -154,6 +163,13 @@ export default {
         id: this.idFrom,
       });
       options.clusterTextCount = val;
+    },
+    blurClusterPosition(){
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      options.clusterPosition = this.clusterPosition;
     },
     clearMap() {
       this.map.eachLayer((layer) => {
@@ -346,9 +362,6 @@ export default {
 .wrapper-property {
   height: 40px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-.select-property {
-  width: 200px;
+  grid-template-columns: repeat(2,1fr) auto;
 }
 </style>
