@@ -14,7 +14,7 @@
       <v-select
         v-model="clusterTextCount"
         class="select-property"
-        :items="[3, 4, 5]"
+        :items="[3, 4, 5, 6]"
         label="Количество элементов в строке подписей"
         @change="changeClusterTextCount"
       />
@@ -292,7 +292,7 @@ export default {
           const markers = cluster.getAllChildMarkers();
           if (cluster._zoom > 10) {
             let _html =
-              `<div class='leaflet-tooltip leaftet-grid' style="grid-template-columns: repeat(${this.clusterTextCount*2-1}, 1fr);">` +
+              "<div class='leaflet-tooltip'>" +
               this.generateHtml(markers) +
               "</div>";
             return L.divIcon({
@@ -314,7 +314,7 @@ export default {
       }
     },
     generateHtml(markers) {
-      let _html = "";
+      let _html = "<div class ='leaftet-flex'>";
       let _count = 0;
       let i;
       for (
@@ -325,12 +325,13 @@ export default {
         _count++;
         _html = _html + "<div>" + markers[i].getTooltip()._content + "</div>";
         //для разделителя
-        if (i <  this.clusterTextCount - 1) {
-          _html = _html + `<div>${this.clusterDelimiter}</div>`;
+        if (i <  this.clusterTextCount-1) {
+          _html = _html + `<div> ${this.clusterDelimiter} </div>`;
         }
       }
+      _html = _html +"</div>"
       if (i !== markers.length - 1) {
-        _html = _html + "<div>...</div>";
+        _html = _html + "<div class ='leaftet-flex'>...</div>";
       }
       return _html;
     },
@@ -388,10 +389,9 @@ export default {
 .leaflet-tooltip-left:before {
   margin-right: 0;
 }
-.leaftet-grid {
-  display: grid;
-  grid-row-gap: 5px;
-  grid-column-gap: 5px;
+.leaftet-flex {
+  display: flex;
+  gap: 5px;
   justify-items: left;
 }
 .wrapper-property {
