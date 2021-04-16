@@ -309,7 +309,11 @@ export default {
       });
       L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
         this.map
-      );
+      ).bindTooltip(element.label,  {
+        permanent: false,
+        direction: "top",
+        className: "leaftet-hover"
+      })
     },
     clustering(dataRest) {
       this.cluster = L.markerClusterGroup({

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [UNRELEASED]
 
 ### Added
+- component map v1
 - for multiline add prop stroke-width. Width line in graph
 - Anna theme for multiline
 - title write position in system
