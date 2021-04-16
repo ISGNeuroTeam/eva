@@ -332,12 +332,21 @@ export default {
           }
         },
       });
-      //sort
-      for (let i = 0; i < dataRest.length - 1; i++) {
-        if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addTooltip(this.cluster, dataRest[i]);
-        }
+      const _sortDataRest =  this.sortForTooltip(dataRest)
+      for (let i = 0; i < _sortDataRest.length - 1; i++) {
+        this.addTooltip(this.cluster, _sortDataRest[i]);
       }
+    },
+    sortForTooltip(dataRest){
+      let _sortDataRest = []
+      this.clusterPosition.forEach(position=>{
+        dataRest.forEach(dr=>{
+          if(position===dr.type){
+            _sortDataRest.push(dr)
+          }
+        })
+      })
+      return _sortDataRest
     },
     generateHtml(markers) {
       let _html = "<div class ='leaftet-flex'>";
@@ -385,8 +394,6 @@ export default {
       });
 
       cluster.addLayer(marker);
-
-      //
       this.map.addLayer(cluster);
     },
     createMap() {
