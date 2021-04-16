@@ -189,7 +189,12 @@ export default {
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      options.clusterPosition = this.clusterPosition;
+      if(this.clusterPosition.length > 0){
+        options.clusterPosition = this.clusterPosition;
+      } else {
+        options.clusterPosition = null
+      }
+      
 
       this.clearCluster();
       this.clustering(this.dataRestFrom);
@@ -242,6 +247,18 @@ export default {
           }
         }
       });
+
+      if(!this.clusterPosition) {//пустые значения
+        Object.entries(this.library.objects).forEach((object) => {
+          if (object[1].image) {
+            if(this.clusterPosition === null){
+              this.clusterPosition = [ Number(object[0]) ]
+            } else {
+              this.clusterPosition.push(  Number(object[0])   )
+            }
+          }
+        })
+      }
     },
     initMap() {
       this.map = L.map(this.$refs.map, {
