@@ -15,9 +15,21 @@
       }"
       :height="height"
       fixed-header
+      hide-default-header
       :style="{ borderColor: colorFrom.border }"
       @current-items="updatePage"
-    />
+    >
+     <template v-slot:header="{ props: { headers } }">
+        <thead>
+          <tr>
+            <th v-for="header in headers">
+              <span>{{header.text}}</span>
+            </th>
+          </tr>
+        </thead>
+      </template>
+
+    </v-data-table>
     <div v-show="props.nodata" class="no-data-table">
       {{ props.message }}
     </div>
@@ -39,6 +51,7 @@ export default {
     heightFrom: null,
     dataReport: null,
     activeElemFrom: null,
+    dataModeFrom: null,
   },
   data() {
     return {
@@ -66,15 +79,15 @@ export default {
     idDash: function () {
       return this.idDashFrom;
     },
-    change: function() {
-      if(!this.dataRestFrom || this.dataRestFrom.length === 0){
+    change: function () {
+      if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
         this.props.itemsForTable = [];
-        this.props.nodata = true
+        this.props.nodata = true;
       } else {
-         this.getDataAsynchrony(this.dataRestFrom);
+        this.getDataAsynchrony(this.dataRestFrom);
       }
-      return true
-    },  
+      return true;
+    },
     color: function () {
       return this.colorFrom;
     },
@@ -110,6 +123,9 @@ export default {
     },
   },
   methods: {
+    cl(v){
+      console.log(v)
+    },
     getDataAsynchrony: function (data) {
       let prom = new Promise((resolve) => {
         if (data.error) {
