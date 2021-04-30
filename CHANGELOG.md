@@ -5,22 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [1.57.0]
 
 ### Added
+
 - component map v1
-- for multiline add prop stroke-width. Width line in graph
-- Anna theme for multiline
-- title write position in system
 
-### Fixed
+### Changed
 
-- fix theme in autocomplete in dashSelect
-- "Поменять режим отображения" to "Режим редактирования" in dashSettings
-- true to да, false to нет in dashSettings
-- dashSVG position tooltip
-- dashMultiline position tooltip
-- dashMultiline fix highlight
+- Jenkinsfile
+
 
 ## [1.56.0]
 
