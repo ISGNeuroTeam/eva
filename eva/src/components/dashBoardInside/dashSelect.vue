@@ -73,7 +73,7 @@
           :color="color.controls" 
           :data-elem="dataelemDeep" 
           hide-details  
-          class="select"
+          class="select theme--dark"
           label="Значение"  
           @change="setTocken"
           @click="changeColor" 

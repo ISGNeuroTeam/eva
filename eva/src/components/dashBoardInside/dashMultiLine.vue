@@ -103,10 +103,20 @@ export default {
       return this.colorFrom
     },
     colorLegends: function() {
-      return [this.colorFrom.controls,this.colorFrom.controlsActive,
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options.thememultiline ==="Anna theme") {
+        return ["#ff0000", "#008000", '#0000ff', '#ffa500', '#009688', '#FFF587', '#c0c0c0', '#99ff99', '#ffc0cb', '#ff6347', '#808000', '#9932cc', '#fefe22'];
+      } else {
+        return [this.colorFrom.controls,this.colorFrom.controlsActive,
         '#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22',
         '#CCCC00','#CC0000','#9933FF','#0099CC','#009966','#99CC00',
         '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F','#8B4513'];
+      }
+      
+      
     },
     dataLoading: function() {
       return this.dataLoadingFrom
@@ -139,6 +149,17 @@ export default {
         
       }
       return true  
+    },
+    strokewidth() {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+      if (options?.strokeWidth) {
+        return Number(options.strokeWidth);
+      } else {
+        return 1.5;
+      }
     },
   },
   watch: {
@@ -470,7 +491,7 @@ export default {
         // строим основную линию
 
         line =  svg.append('g')  // основная линия графика
-          .attr("clip-path", `url(#clip-${that.id})`);
+          .attr("clip-path", `url(#clip-${that.id})`)
 
                    
 
@@ -516,7 +537,7 @@ export default {
                 .attr("class", `line-${i}-${j}`)  // добовляем свой класс
                 .attr("fill", "none")
                 .attr("stroke", colorLine[i])
-                .attr("stroke-width", 1.5)
+                .attr("stroke-width", this.strokewidth)
                 .attr("d", d3.line()
                   .x(function(d) {return x(d[xMetric]*secondTransf) })
                   .y(function(d) {return y(d[metricsName[i]]) })
@@ -566,7 +587,7 @@ export default {
               if (annotation.length != 0) {
                 annotation.forEach( (item,i) => {
                   if (d[item]) {
-                    verticalLine(d,item,metricsName.length+1+i,tooltip);
+                    verticalLine(d,item,metricsName.length+1+i,tooltip, this.strokewidth);
                     
                   }
 
@@ -597,17 +618,17 @@ export default {
                 .style("opacity","1")
                 .style("visibility","visible")
                 .html(text)
-                .style("top", (event.layerY-40)+"px")
+                .style("top", (event.offsetY-40)+"px")
                 .style("right","auto")
-                .style("left",(event.layerX+15)+"px");
-              if ((event.layerX+100) > width){
+                .style("left",(event.offsetX+15)+"px");
+              if ((event.offsetX+100) > width){
                 tooltip
                   .style("left","auto")
-                  .style("right",(width - event.layerX+100)+"px");
+                  .style("right",(width - event.offsetX+100)+"px");
               }
-              if(event.layerY-40+toolTopBlock.offsetHeight > height) {
+              if(event.offsetY-40+toolTopBlock.offsetHeight > height) {
                 tooltip
-                  .style("top", (event.layerY-10-toolTopBlock.offsetHeight)+"px")
+                  .style("top", (event.offsetY-10-toolTopBlock.offsetHeight)+"px")
               }
 
               lineDot
@@ -712,7 +733,7 @@ export default {
         brushObj['selectionDown'] =  () => {
           brushObj.mouseDown = true;
           brushObj.clearBrush();
-          brushObj.startX = event.layerX-50;
+          brushObj.startX = event.offsetX-50;
           brush
             .append("rect")
             .attr("class", `selection`)
@@ -734,17 +755,17 @@ export default {
         brushObj['selectionMove'] = () => {
           if (brushObj.mouseDown) {
 
-            if ((event.layerX-50 - brushObj.startX) > 0) {
+            if ((event.offsetX-50 - brushObj.startX) > 0) {
               brushObj.direction = 'right';
-              brushObj.endX = event.layerX-50;
+              brushObj.endX = event.offsetX-50;
               brush.select(`.selection`)
-                .attr("width", event.layerX-50 - brushObj.startX)
+                .attr("width", event.offsetX-50 - brushObj.startX)
             } else {
               brushObj.direction = 'left';
-              brushObj.endX = brushObj.startX + (event.layerX-50 - brushObj.startX);
+              brushObj.endX = brushObj.startX + (event.offsetX-50 - brushObj.startX);
               brush.select(`.selection`)
-                .attr("x", brushObj.startX + (event.layerX-50 - brushObj.startX))
-                .attr("width", -(event.layerX-50 - brushObj.startX))
+                .attr("x", brushObj.startX + (event.offsetX-50 - brushObj.startX))
+                .attr("width", -(event.offsetX-50 - brushObj.startX))
             }
           
           }
@@ -817,7 +838,7 @@ export default {
           annotation.forEach( (item,i) => {
             data.forEach( d => {
               if (d[item]) {
-                verticalLine(d,item,metricsName.length+1+i,tooltip);
+                verticalLine(d,item,metricsName.length+1+i,tooltip, this.strokewidth);
               }
             })
             
@@ -913,37 +934,7 @@ export default {
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals));
 
-            
-            //if (Object.keys(metricOPt).length == 0 || metricOPt.type == 'Line chart') {
-
-            // let startX = 0;
-              // создаем область выделения
-              // brush = () => {
-
-              // }
-              
-                //.call(brush);
-              // brush = d3.brushX(x)                   // область выделения
-              //   .extent( [ [0,startY], [width,parseFloat(step)+20] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-              //   .on("start", () => { 
-              //     startX = d3.event.sourceEvent.layerX-50;
-              //   })
-              //   .on("brush", () => { 
-              //     if (d3.event.sourceEvent.layerX - startX-50 > 0) {
-              //       svg.select(".selection").attr('x', startX);
-              //       svg.select(".selection").attr('width', d3.event.sourceEvent.layerX - startX-50);
-              //       svg.select(".handle--w").attr('x',startX);
-              //       svg.select(".handle--e").attr('x',startX + d3.event.sourceEvent.layerX - startX-50);
-              //     } else {
-              //       svg.select(".selection").attr('x', startX + (d3.event.sourceEvent.layerX - startX-50));
-              //     }
-              //      console.log( svg.select(".selection").attr('x'), parseFloat(svg.select(".selection").attr('x')) + parseFloat(svg.select(".selection").attr('width')))
-              //    // console.log(d3.event.sourceEvent.layerX - startX-50)
-              //   })
-              //   .on("end", updateData )               // каждый раз как область выделения изменится вызовется функция
-              // brush.id = i;
-
-            //}
+          
 
             
 
@@ -960,26 +951,6 @@ export default {
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals));
 
-             //console.log(svg.selectAll(`.yAxis-${i} .tick`).select("text").nodes())
-
-            // if (Object.keys(metricOPt).length == 0 || metricOPt.type == 'Line chart') {
-              
-            //   // создаем область выделения
-            //   // brush = d3.brushX()                   // область выделения
-            //   //   .extent( [ [0,startY], [width, parseFloat(step*(i+1))+20] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-            //   //   .on("end", updateData)               // каждый раз как область выделения изменится вызовется функция
-            //   // brush.id = i;
-
-            //   brush = d3.brushX()                   // область выделения
-            //     .extent( [ [0,startY[i]], [width, parseFloat(step*(i+1))+20] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-            //     .on("end", updateData)               // каждый раз как область выделения изменится вызовется функция
-            //   brush.id = i;
-
-              
-
-              
-            // }
-            //console.log(brush)
 
             startY.push(parseFloat(step*(i+1))+20);
 
@@ -1071,7 +1042,7 @@ export default {
                   .attr("class", `line-${i}-${j}`)  // добовляем свой класс
                   .attr("fill", "none")
                   .attr("stroke", colorLine[i])
-                  .attr("stroke-width", 1.5)
+                  .attr("stroke-width", this.strokewidth)
                   .attr("d", d3.line()
                     .x(function(d) {return x(d[xMetric]*secondTransf) })
                     .y(function(d) {return y[i](d[metric]) })
@@ -1156,17 +1127,17 @@ export default {
                   .style("opacity","1")
                   .style("visibility","visible")
                   .html(text)
-                  .style("top", (event.layerY-40)+"px")
+                  .style("top", (event.offsetY-40)+"px")
                   .style("right","auto")
-                  .style("left",(event.layerX+15)+"px");
-                if ((event.layerX+100) > width){
+                  .style("left",(event.offsetX+15)+"px");
+                if ((event.offsetX+100) > width){
                   tooltip
                     .style("left","auto")
-                    .style("right",(width - event.layerX+100)+"px");
+                    .style("right",(width - event.offsetX+100)+"px");
                 }
-                if(event.layerY-40+toolTopBlock.offsetHeight > height) {
+                if(event.offsetY-40+toolTopBlock.offsetHeight > height) {
                   tooltip
-                    .style("top", (event.layerY-10-toolTopBlock.offsetHeight)+"px")
+                    .style("top", (event.offsetY-10-toolTopBlock.offsetHeight)+"px")
                 }
                 lineDot
                   .attr("opacity","0.7")
@@ -1270,7 +1241,7 @@ export default {
             brushObj['selectionDown'] =  () => {
               brushObj.mouseDown = true;
               brushObj.clearBrush();
-              brushObj.startX = event.layerX-50;
+              brushObj.startX = event.offsetX-50;
               brush
                 .append("rect")
                 .attr("class", `selection-${i}`)
@@ -1291,17 +1262,17 @@ export default {
 
             brushObj['selectionMove'] = () => {
               if (brushObj.mouseDown) {
-                if ((event.layerX-50 - brushObj.startX) > 0) {
+                if ((event.offsetX-50 - brushObj.startX) > 0) {
                   brushObj.direction = 'right';
-                  brushObj.endX = event.layerX-50;
+                  brushObj.endX = event.offsetX-50;
                   brush.select(`.selection-${i}`)
-                    .attr("width", event.layerX-50 - brushObj.startX)
+                    .attr("width", event.offsetX-50 - brushObj.startX)
                 } else {
                   brushObj.direction = 'left';
-                  brushObj.endX = brushObj.startX + (event.layerX-50 - brushObj.startX);
+                  brushObj.endX = brushObj.startX + (event.offsetX-50 - brushObj.startX);
                   brush.select(`.selection-${i}`)
-                    .attr("x", brushObj.startX + (event.layerX-50 - brushObj.startX))
-                    .attr("width", -(event.layerX-50 - brushObj.startX))
+                    .attr("x", brushObj.startX + (event.offsetX-50 - brushObj.startX))
+                    .attr("width", -(event.offsetX-50 - brushObj.startX))
                 }
               
               }
@@ -1438,18 +1409,19 @@ export default {
                   .style("opacity","1")
                   .style("visibility","visible")
                   .html(text)
-                  .style("top", (event.layerY-40)+"px")
+                  .style("top", (event.offsetY-40)+"px")
                   .style("right","auto")
-                  .style("left",(event.layerX+15)+"px");
-                if ((event.layerX+100) > width){
+                  .style("left",(event.offsetX+15)+"px");
+                if ((event.offsetX+100) > width){
                   tooltip
                     .style("left","auto")
-                    .style("right",(width - event.layerX+100)+"px");
+                    .style("right",(width - event.offsetX+100)+"px");
                 }
-                if(event.layerY-40+toolTopBlock.offsetHeight > height) {
+                if(event.offsetY-40+toolTopBlock.offsetHeight > height) {
                   tooltip
-                    .style("top", (event.layerY-10-toolTopBlock.offsetHeight)+"px")
+                    .style("top", (event.offsetY-toolTopBlock.offsetHeight)+"px")
                 }
+
                 lineDot
                   .attr("opacity","0.7")
                   .attr("x1",  x(d[xMetric]*secondTransf))
@@ -1539,7 +1511,7 @@ export default {
           .style("opacity", "0.3");
       }
 
-      function verticalLine(d,item,i,tooltip) {
+      function verticalLine(d,item,i,tooltip, strokewidth) {
         let group = svg
           .append("g")
           .attr("class","vetical-line-group");
@@ -1553,29 +1525,32 @@ export default {
           .attr("y2", height)
           .attr("xVal", d[xMetric]*secondTransf)
           .attr("stroke", colorLine[i])
+          .attr("stroke-width", strokewidth)
           .style("opacity", "0.7")
+
 
         group
           .append("circle")
           .attr("cx",  x(d[xMetric]*secondTransf) )
           .attr("cy", 20)
-          .attr("r", 5)
+          .attr("r", 2.5*strokewidth)
           .attr("xVal", d[xMetric]*secondTransf)
           .attr("opacity", "0.7")
           .attr("fill", colorLine[i])
           .attr("class","dot-vertical")
+          
           .on("mouseover", function() {
             tooltip
               .style("opacity","1")
               .style("visibility","visible")
               .html(`<p>${d[item]}</p>`)
-              .style("top", (event.layerY-30)+"px")
+              .style("top", (event.offsetY-30)+"px")
               .style("right","auto")
-              .style("left",(event.layerX+20)+"px");
-            if ((event.layerX+100) > width){
+              .style("left",(event.offsetX+20)+"px");
+            if ((event.offsetX+100) > width){
               tooltip
                 .style("left","auto")
-                .style("right",(width - event.layerX+110)+"px");
+                .style("right",(width - event.offsetX+110)+"px");
             }
           })  // при наведении мышки точка появляется
           .on("mouseout", function() {

@@ -7,10 +7,14 @@
     <div 
       v-show="noMsg==1"
       ref="csvg"
-      class="csvg-block" 
+      class="csvg-block"
+      @mouseover="positionTooltip"
+      @click="clickSvg"
+      @mouseout="mouseoutSvg" 
       :data-change="change" 
       :style="{width:`${widthFrom-40}px`,height:`${heightFrom-otstupBottom}px`}" 
       v-html="svg"
+     
     />
     <div 
       v-show="noMsg==0"
@@ -236,19 +240,7 @@ export default {
       } else {
         this.otstupBottom = 10; 
       }
-     // this.checkSize();
     },
-    // dataRestFrom: function(dataRest) {
-        
-    //   if (dataRest.length != 0 && dataRest[0].svg_filename && dataRest[0].svg_filename != '') {
-    //     this.dataFrom = dataRest[0];
-    //     this.getSvg(dataRest[0].svg_filename);
-    //     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id }); 
-    //   }
-    //   if (screen.width <= 1600) {
-    //     this.otstupBottom = 30;
-    //   }
-    // },
     widthFrom: function() {
       this.checkSize();
     },
@@ -503,31 +495,17 @@ export default {
       context.strokeStyle = this.color.text;
       context.stroke();
       context.lineWidth = 1;
-    } 
-
-  },
-  mounted() {
-        
-    this.$refs.csvg.addEventListener('click', event => {
-      let token = '';
-      let id = event.target.getAttribute('id');
-      if(id && id.indexOf('overlay') !=-1) {
-        token = id.split('overlay_')[1];
-        this.setClick(token,'object');
-      }
-        
-    })
-
-
-    this.$refs.csvg.addEventListener('mouseover', event => {
+    },
+    positionTooltip(event){
       let id = event.target.getAttribute('id');
       let token = '';
       let tooltipSize = this.$refs.tooltip.getBoundingClientRect();
-      let tooltipLeft = event.layerX + 40;
-      let tooltipTop = event.layerY - 50;
+      let tooltipLeft = event.offsetX + 40;
+      let tooltipTop = event.offsetY - 50;
+      
       let linkBlockSize = this.$refs.link.parentElement.getBoundingClientRect();
-      let linkLeft = event.layerX + 10;
-      let linkTop = event.layerY - 50;
+      let linkLeft = event.offsetX + 10;
+      let linkTop = event.offsetY - 50;
       let csvgSize = this.$refs.csvg.getBoundingClientRect();
       let direction = 'normal';
            
@@ -538,17 +516,17 @@ export default {
         this.tooltipOptions == false ? this.idTooltip = token : false;
 
         // выходит справа 
-        if ((event.layerX + 40 + tooltipSize.width) > csvgSize.width) {
-          tooltipLeft = event.layerX - 40 - tooltipSize.width;
-          linkLeft = event.layerX - 10 - linkBlockSize.width;
+        if ((event.offsetX + 40 + tooltipSize.width) > csvgSize.width) {
+          tooltipLeft = event.offsetX - 40 - tooltipSize.width;
+          linkLeft = event.offsetX - 10 - linkBlockSize.width;
           direction = 'right';
         } 
 
         // выходит сверху
 
-        if ((event.layerY - 50) < 0) {
-          tooltipTop = event.layerY + 50;
-          linkTop = event.layerY;
+        if ((event.offsetY - 50) < 0) {
+          tooltipTop = event.offsetY + 50;
+          linkTop = event.offsetY;
           if (direction == 'right') {
             direction = 'top-right';
           } else {
@@ -559,8 +537,8 @@ export default {
 
         // выходи снизу
 
-        if ((event.layerY - 50 + tooltipSize.height) > csvgSize.height) {
-          tooltipTop = event.layerY - 50 - tooltipSize.height;
+        if ((event.offsetY - 50 + tooltipSize.height) > csvgSize.height) {
+          tooltipTop = event.offsetY - 50 - tooltipSize.height;
         }
 
         this.$refs.tooltip.style.top = `${tooltipTop}px`;
@@ -575,19 +553,31 @@ export default {
         this.setOver(token);
         this.setLink(direction);
       }
-    
-    })
-
-    this.$refs.csvg.addEventListener('mouseout', event => {
+    },
+    clickSvg(event){
+      let token = '';
       let id = event.target.getAttribute('id');
       if(id && id.indexOf('overlay') !=-1) {
-        if (!this.tooltipPress) {
+        token = id.split('overlay_')[1];
+        this.setClick(token,'object');
+      }
+    },
+
+    mouseoutSvg(event){
+      if (this.timeout) clearTimeout(this.timeout);
+
+      this.timeout = setTimeout(() => {
+        let id = event.target.getAttribute('id');
+        if(id && id.indexOf('overlay') !=-1 && !this.tooltipPress) {
           this.tooltipShow = false;
           this.linkCanvasShow = false;
         }
-      }
-    })
+      }, 1000);
+      
+    } 
 
+  },
+  mounted() {
     this.$refs.svgBlock.addEventListener('keydown', event => {
       if(event.key == 'Control') {
         this.tooltipPress = !this.tooltipPress;

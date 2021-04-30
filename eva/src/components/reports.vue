@@ -280,50 +280,6 @@ export default {
     } 
   },
   asyncComputed: {
-    // async static_rows() {
-    //   if (this.shouldGet) {
-    //      this.data =  await this.getData(`reports-${this.search.sid}`);
-    //       console.log('update report')
-    //     // let statistic = '';
-    //     // this.rows = [];
-    //     // if (this.data.data.length != 0) {
-    //     //   console.log('create data report')
-    //     //   this.shema = this.data.shema;
-    //     //   this.data = this.data.data;
-    //     //   // let text = '';
-    //     //   // Object.keys(this.shema).forEach( (item,i) => {
-    //     //   //   statistic = this.createStatistic(item);
-    //     //   //   text = `${item}&nbsp;&nbsp;&nbsp;[${this.shema[item]}]`;
-    //     //   //   this.rows.push({'id': i,'text': text,'static': statistic});
-    //     //   // })
-    //     // }
-    //      this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: false}); 
-    //     return true
-    //   }    
-    // }, 
-
-    // async getDataRest() {
-    //   console.log(this.shouldGet)
-    //   if (this.shouldGet) {
-        
-    //     // let res =  await this.getDataAsynchrony();
-    //     // if (res) {    
-    //     //   return res
-    //     // }
-    //    // await this.getDataAsynchrony()
-     
-    //     this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: false}); 
-        
-        
-        
-    //   }
-    //  // return 'done'
-    //  //return []
-    //   return await this.getDataAsynchrony()
-      
-    // },
-
-
     async static_rows() {
       if (this.shouldGet) {
   
@@ -588,6 +544,7 @@ export default {
     },
   },
   mounted() {
+    document.title="EVA | Исследование данных"
     this.search = this.$store.getters.getReportSearch;
     if (this.search.original_otl != '') {
       this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: true});

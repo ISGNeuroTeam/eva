@@ -178,6 +178,97 @@
             </div>
           </div>
           <!-- end searchBtn-->
+          <!-- start osmserver-->
+          <div 
+            v-if="checkOptions('osmserver')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              osmserver
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Сервер для набора tile Пример:
+              http://192.168.4.209/osm/{z}/{x}/{y}.png
+            </div>
+            <div class="status-option item">
+              <v-text-field 
+                v-model="options.osmserver"   
+                clearable  
+                :color="color.text" 
+                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                outlined 
+                class="subnumber"  
+                hide-details
+              />
+            </div>
+          </div>
+          <!-- end osmserver-->
+          <!--start strokeWidth-->
+          <div 
+            v-if="checkOptions('strokeWidth')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              strokeWidth
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Толщина линий
+            </div>
+            <div class="status-option item">
+              <v-text-field 
+                v-model="options.strokeWidth"   
+                clearable  
+                :color="color.text" 
+                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                outlined 
+                class="subnumber"  
+                hide-details
+              />
+            </div>
+          </div>
+          <!--end strokeWidth-->
+          <!--start thememultiline-->
+          <div 
+            v-if="checkOptions('thememultiline')"
+            class="option-item" 
+          >
+            <div 
+              class="name-option item" 
+              :style="{color:color.text, borderColor:color.text}" 
+            >
+              thememultiline
+            </div>
+            <div 
+              class="discribe-option item" 
+              :style="{color:color.text, borderColor:color.text}"
+            >
+              Цветовая тема
+            </div>
+            <div class="status-option item">
+              <v-select  
+                v-model="options.thememultiline"
+                :items="['default','Anna theme']" 
+                :color="color.controls" 
+                :style="{color:color.text, fill: color.text}"  
+                hide-details  
+                outlined  
+                class="subnumber"
+              /> 
+            </div>
+          </div>
+          <!--end thememultiline-->
           <div 
             v-if="checkOptions('subnumber')"
             class="option-item" 

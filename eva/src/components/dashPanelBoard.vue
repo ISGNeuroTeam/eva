@@ -325,7 +325,7 @@
         >
           <v-text-field  
             v-model="tockensName[tocken.name]" 
-            class="tocken-name " 
+            class="tocken-name theme--dark" 
             :color="color.text" 
             outlined 
             label="Имя"
@@ -338,7 +338,7 @@
             label="Элемент" 
             hide-details  
             outlined 
-            class="tocken-elem" 
+            class="tocken-elem theme--dark" 
             @click="changeColor"
           />
           <v-select  
@@ -348,7 +348,7 @@
             label="Действие" 
             hide-details  
             outlined 
-            class="tocken-action" 
+            class="tocken-action theme--dark" 
             @click="changeColor"
           />
           <v-select  
@@ -358,12 +358,12 @@
             label="Свойство" 
             hide-details  
             outlined 
-            class="tocken-capture" 
+            class="tocken-capture theme--dark" 
             @click="changeColor"
           />
           <v-text-field  
             v-model="tocken.prefix"
-            class="tocken-prefix" 
+            class="tocken-prefix theme--dark" 
             :color="color.text" 
             label="Префикс"  
             outlined 
@@ -371,7 +371,7 @@
           />
           <v-text-field 
             v-model="tocken.sufix"  
-            class="tocken-sufix " 
+            class="tocken-sufix theme--dark" 
             :color="color.text" 
             label="Суффикс"  
             outlined 
@@ -379,7 +379,7 @@
           />
           <v-text-field 
             v-model="tocken.delimetr" 
-            class="tocken-delimetr " 
+            class="tocken-delimetr theme--dark" 
             :color="color.text" 
             label="Разделитель"  
             outlined 
@@ -424,7 +424,7 @@
       >
         <v-text-field  
           v-model="newTockenName"
-          class="tocken-name" 
+          class="tocken-name theme--dark" 
           :color="color.text" 
           label="Имя"  
           outlined 
@@ -436,7 +436,7 @@
           :color="color.text"
           hide-details  
           outlined 
-          class="tocken-elem" 
+          class="tocken-elem theme--dark" 
           label="Элемент"
           @click="changeColor"
         />
@@ -446,7 +446,7 @@
           :color="color.text"
           hide-details  
           outlined 
-          class="tocken-action" 
+          class="tocken-action theme--dark" 
           label="Действие" 
           @click="changeColor"
         />
@@ -455,13 +455,13 @@
           :color="color.text"  
           hide-details  
           outlined 
-          class="tocken-capture" 
+          class="tocken-capture theme--dark" 
           label="Свойство" 
           @click="changeColor"
         />
         <v-text-field  
           v-model="newTockenDop.prefix" 
-          class="tocken-prefix" 
+          class="tocken-prefix theme--dark" 
           :color="color.text" 
           label="Префикс"  
           outlined 
@@ -469,7 +469,7 @@
         />
         <v-text-field  
           v-model="newTockenDop.sufix"
-          class="tocken-sufix" 
+          class="tocken-sufix theme--dark" 
           :color="color.text" 
           label="Суффикс"  
           outlined 
@@ -477,7 +477,7 @@
         />
         <v-text-field  
           v-model="newTockenDop.delimetr"
-          class="tocken-delimetr" 
+          class="tocken-delimetr theme--dark" 
           :color="color.text"
           label="Разделитель"  
           outlined 

@@ -120,6 +120,7 @@ export default {
     },
   },
   mounted() {
+    document.title="EVA"
     this.color = themes[this.theme];
   }
 }
