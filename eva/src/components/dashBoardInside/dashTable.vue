@@ -15,19 +15,10 @@
       }"
       :height="height"
       fixed-header
-      hide-default-header
       :style="{ borderColor: colorFrom.border }"
       @current-items="updatePage"
     >
-     <template v-slot:header="{ props: { headers } }">
-        <thead>
-          <tr>
-            <th v-for="header in headers">
-              <span>{{header.text}}</span>
-            </th>
-          </tr>
-        </thead>
-      </template>
+  
 
     </v-data-table>
     <div v-show="props.nodata" class="no-data-table">
@@ -122,6 +113,15 @@ export default {
       this.$refs.tableBlock.style.backgroundColor = color.backElement;
     },
   },
+  mounted() {
+    this.$store.commit("setActions", {
+      actions: this.props.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
+    this.$refs.tableBlock.style.color = this.color.text;
+    this.$refs.tableBlock.style.backgroundColor = this.color.backElement;
+  },
   methods: {
     cl(v){
       console.log(v)
@@ -155,7 +155,7 @@ export default {
 
     createTitles: function (result) {
       let titles = Object.keys(result[0]).map((item) => {
-        return { text: item, value: item };
+        return { text: item, value: item, sortable: true };
       });
 
       this.props.titles = titles;
@@ -281,15 +281,6 @@ export default {
         this.clearColor();
       }
     },
-  },
-  mounted() {
-    this.$store.commit("setActions", {
-      actions: this.props.actions,
-      idDash: this.idDash,
-      id: this.id,
-    });
-    this.$refs.tableBlock.style.color = this.color.text;
-    this.$refs.tableBlock.style.backgroundColor = this.color.backElement;
   },
 };
 </script>
