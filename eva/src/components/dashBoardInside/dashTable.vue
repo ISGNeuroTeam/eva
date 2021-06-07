@@ -43,6 +43,7 @@ export default {
     dataReport: null,
     activeElemFrom: null,
     dataModeFrom: null,
+    titles: Array,
   },
   data() {
     return {
@@ -154,11 +155,19 @@ export default {
     },
 
     createTitles: function (result) {
-      let titles = Object.keys(result[0]).map((item) => {
+      let titlesParsed = Object.keys(result[0]).map((item) => {
         return { text: item, value: item, sortable: true };
       });
+      if (this.titles) {
+        let temp = [];
+        for (let x of this.titles) {
+          temp.push({ text: x, value: x, sortable: true });
+        }
+        this.props.titles = temp
+      } else {
+        this.props.titles = titlesParsed;
+      }
 
-      this.props.titles = titles;
     },
     createTockens: function (result) {
       let captures = Object.keys(result[0]);

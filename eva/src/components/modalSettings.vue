@@ -483,7 +483,7 @@
             </v-card-text>
               <v-checkbox
                 v-for="setting in settings" 
-                v-model="options.tableTitles"
+                v-model="tableTitles"
                 :key="setting"
                 :label="setting"
                 :value="setting">  
@@ -1177,6 +1177,7 @@ export default {
   },
   data() {
     return {
+      tableTitles:[],
       element: '',
       options: {
         tableTitles: [],
@@ -1232,15 +1233,17 @@ export default {
     }
   },
   watch: {
-
+    settings(newValue) {
+      this.tableTitles = newValue;
+    }
   },
   mounted() {
-    this.options.tableTitles = this.$store.getters.getSettings;
+    this.tableTitles = this.$store.getters.getSettings;
     // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
   },
   methods: {  
     setOptions: function() {  // отправляем настройки в хранилище
-
+      this.options.tableTitles = this.tableTitles;
       if(!this.options.level){
         this.options.level = 1;
       }
@@ -1267,6 +1270,7 @@ export default {
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
+        
       }
       if (this.element.indexOf('multiLine') != -1) {
         let updateMetrics = this.metrics.map( item => {

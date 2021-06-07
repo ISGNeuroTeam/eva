@@ -206,7 +206,8 @@
         :sizeTileFrom="props.sizeTile" 
         :tooltipFrom="props.tooltip"  
         :widthFrom="width" 
-        :heightFrom="height"  
+        :heightFrom="height"
+        :titles="props.options.tableTitles"
         @hideDS="hideDS($event)" 
         @setVissible="setVissible($event)" 
         @setLoading="setLoading($event)" 
@@ -449,6 +450,15 @@ export default {
     },
     searсhID(){
       return this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
+    },
+    settings() {
+      return this.$store.getters.getSettings;
+    },
+  },
+ 
+  watch: {
+    settings(newValue) {
+      this.props.options.tableTitles = newValue;
     }
   },
 
