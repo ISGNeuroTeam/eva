@@ -466,6 +466,32 @@
             </div>
           </div>
           <div 
+            v-if="checkOptions('titles')"
+            class="option-item" 
+          >
+            
+            <v-container fluid>
+              <v-card-text 
+              class="headline" 
+            >
+              <div 
+                class="settings-title" 
+                :style="{color:color.text,borderColor:color.text}"
+              >
+                Столбцы для отображение
+              </div>
+            </v-card-text>
+              <v-checkbox
+                v-for="setting in settings" 
+                v-model="options.tableTitles"
+                :key="setting"
+                :label="setting"
+                :value="setting">  
+              </v-checkbox>
+            </v-container>
+            
+          </div>
+          <div 
             v-if="checkOptions('timeFormat')"
             class="option-item" 
           >
@@ -1140,19 +1166,21 @@
 
 <script> 
 
-import  settings  from '../js/componentsSettings.js'
+import settings from '../js/componentsSettings.js'
 
-import {    mdiPlusBox, mdiMinusBox  } from '@mdi/js'
+import { mdiPlusBox, mdiMinusBox } from '@mdi/js'
 
 export default {
   props: {
     idDashFrom: null,
     colorFrom: null,
   },
-  data () {
+  data() {
     return {
       element: '',
-      options: {},
+      options: {
+        tableTitles: [],
+      },
       optionsItems: [],
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
@@ -1199,7 +1227,16 @@ export default {
     color: function() {
       return this.colorFrom
     },
+    settings() {
+      return this.$store.getters.getSettings;
+    }
+  },
+  watch: {
 
+  },
+  mounted() {
+    this.options.tableTitles = this.$store.getters.getSettings;
+    // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
   },
   methods: {  
     setOptions: function() {  // отправляем настройки в хранилище
@@ -1288,10 +1325,11 @@ export default {
         })
       }
     },
-    prepareOptions: function() {  //  понимает какие опции нужно вывести
+    prepareOptions() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции 
+      console.log(options)
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
-      this.options = {}; 
+      this.options = {};
       this.optionsItems = settings.options[elem];
       this.optionsItems.forEach( item => {
         if (Object.keys(options).includes(item)) {
@@ -1353,21 +1391,11 @@ export default {
       if (!this.options.change) {
         this.$set(this.options,'change',false);
       }
-
-
     }
-         
-  },
-  mounted() {
-    this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
   },
 }
 </script>
 
-<style lang="sass" > 
-
-
-    @import '../sass/modalSettings.sass'  
-
-    
+<style lang="sass">
+  @import '../sass/modalSettings.sass'  
 </style>

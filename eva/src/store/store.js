@@ -13,6 +13,11 @@ export default {  // приблизительный объект хранили�
     //     controlsActive: '#FF6D70',
     //     border: '#00000033',
     // },
+    modal: {
+      settings: {
+
+      }
+    }
   },
   mutations: {   
     setNameDash: (state, newName) => {    // изменения имени самого элемента
@@ -613,8 +618,7 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-        
-      return state[settings.idDash].modalSettings
+      state.modal.settings = settings.titles;
     },
     setTheme: (state, theme) => {    // устанавливает объект цвета в хранилище
       Vue.set(state, 'theme', theme);
@@ -1459,6 +1463,8 @@ export default {  // приблизительный объект хранили�
         return rest.getPaperVis(restAuth,url)
       }
     },
+    getSettings:(state) => 
+       state.modal.settings
   },
 }
 

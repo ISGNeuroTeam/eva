@@ -451,6 +451,22 @@ export default {
       return this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
     }
   },
+
+  mounted() {
+    this.props.icons = settings.icons;
+    this.page = this.$parent.$el.getAttribute('data-page');  // понимаем какая страница перед нами
+    this.props.name = this.$store.getters.getNameDash({idDash: this.idDash, id: this.element}); // получаем имя этой страницы
+
+    if (this.props.options.boxShadow) {
+      this.props.optionsBoxShadow = this.color.controlsActive;
+    } else {
+      this.props.optionsBoxShadow = 'transparent';
+    }
+
+    this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: true});
+      
+  },
+
   methods: {
     editName: function (props) {  // изменяем имя элемнета
       props.edit=true; 
@@ -465,7 +481,8 @@ export default {
       this.$store.commit('setSwitch',  { idDash: this.idDash, status: status, id: this.element } );
     },
     switchOP: function() {
-      this.$store.commit('setModalSettings',  { idDash: this.idDash, status: true, element: this.element } );
+      console.log( { idDash: this.idDash, status: true, element: this.element, titles: Object.keys(this.props.dataRestFilter[0]) } )
+      this.$store.commit('setModalSettings',  { idDash: this.idDash, status: true, element: this.element, titles: Object.keys(this.props.dataRestFilter[0]) } );
     },
     setShadow: function() {
       if (this.props.options.boxShadow) {
@@ -618,20 +635,6 @@ export default {
       link.remove(); // удаляем ссылку 
     }
   },
-  mounted() {
-    this.props.icons = settings.icons;
-    this.page = this.$parent.$el.getAttribute('data-page');  // понимаем какая страница перед нами
-    this.props.name = this.$store.getters.getNameDash({idDash: this.idDash, id: this.element}); // получаем имя этой страницы
-
-    if (this.props.options.boxShadow) {
-      this.props.optionsBoxShadow = this.color.controlsActive;
-    } else {
-      this.props.optionsBoxShadow = 'transparent';
-    }
-
-    this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: true});
-      
-  }   
 }
 
 
