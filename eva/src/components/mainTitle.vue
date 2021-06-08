@@ -102,7 +102,7 @@ export default {
   data () {
     return {
       page: 'dash',
-      mode: true,
+      mode: false,
       showSetting: false,
       rotate: '',
       color: { },

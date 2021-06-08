@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer
     v-model="gearShow"
-    fixed
+    absolute
     width="300"
     left
     class="left-dash-setting"
@@ -103,7 +103,7 @@
 export default {
   props: {
     colorFrom: null,
-    gearFrom: null,
+    gearFrom: Boolean,
     idDashFrom: null,
     permissionsFrom: null
   },
@@ -111,7 +111,7 @@ export default {
     return {
       gearShow: false,
       settings: {},
-      mode: true,
+      mode: false,
       sizeGrid: {
         vert: '32',
         hor: '18'
@@ -126,11 +126,11 @@ export default {
     },
     permissions: function() {
       if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
-        this.mode = false;
+        // this.mode = false;
         this.dragresable = false;
         this.gridShow = false;   
       } else {
-        this.mode = true;
+        // this.mode = true;
         this.dragresable = true;
         this.gridShow = true;  
       }
@@ -140,7 +140,6 @@ export default {
   watch: {
     gearFrom: function (gear) {
       gear ? this.gearShow = true : this.gearShow = false;
-
     },
     mode: function() {
       this.$emit("changeMode");
