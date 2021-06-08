@@ -480,6 +480,9 @@ export default {  // приблизительный объект хранили�
           Vue.set(state[options.idDash][options.id].options, item , options.options[item]); // просто обновляем ее значение на новое
         }
       })
+      if (options.titles) {
+        state[options.idDash].selectedTableTitles = options.titles;
+      }
         
     },
     letEventSet: (state, events) => {   // метод который обновляет какое-либо свойство у элемнета
@@ -618,8 +621,11 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-      state[settings.idDash].availableTableTitles = settings?.titles;
-      state[settings.idDash].selectedTableTitles = settings?.titles;
+      if (settings.element === 'table') {
+        Vue.set(state[settings.idDash], 'availableTableTitles', settings?.titles);
+        if(!state[settings.idDash].selectedTableTitles) 
+          Vue.set(state[settings.idDash], 'selectedTableTitles', settings?.titles);
+      }
     },
     setTheme: (state, theme) => {    // устанавливает объект цвета в хранилище
       Vue.set(state, 'theme', theme);
@@ -1466,7 +1472,7 @@ export default {  // приблизительный объект хранили�
     },
     getSelectedTableTitles: (state) => {
       return (id) => {
-        return state[id]?.table.options.selectedTableTitles;
+        return state[id]?.selectedTableTitles;
       }
     },
     getAvailableTableTitles: (state) => {

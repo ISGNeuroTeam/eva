@@ -481,8 +481,9 @@
               </div>
             </v-card-text>
               <v-checkbox
-                v-for="setting in getAvailableTableTitles(idDash)" 
-                v-model="tableTitles"
+                v-for="(setting) in getAvailableTableTitles(idDash)"
+                :input-value="tableTitles"
+                @change="titleHandler($event)"
                 :key="setting"
                 :label="setting"
                 :value="setting">  
@@ -1228,15 +1229,17 @@ export default {
       return this.colorFrom
     },
 
-    
+
     selectedTitles() {
-      return this.getSelectedTableTitles(this.idDash);
+      return this.$store.getters.getSelectedTableTitles(this.idDashFrom);
     },
 
     ...mapGetters([
       'getAvailableTableTitles',
       'getSelectedTableTitles',
+      
     ]),
+
   },
   watch: {
     selectedTitles(newValue) {
@@ -1244,12 +1247,21 @@ export default {
     }
   },
   mounted() {
-    this.tableTitles = this.getSelectedTableTitles(this.idDash);
+    this.tableTitles = this.getSelectedTableTitles(this.idDashFrom);
     // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
   },
-  methods: {  
+  methods: {
+    titleHandler(val) {
+      let temp = []
+      let orderArray = this.getAvailableTableTitles(this.idDash);
+      for (let setting of val) {
+        let index = orderArray.indexOf(setting);
+        temp.push({setting, index})
+      }
+      temp.sort((a, b) => a.index - b.index)
+      this.tableTitles = temp.map((el) => el.setting)
+    },
     setOptions: function() {  // отправляем настройки в хранилище
-      this.options.selectedTableTitles = this.tableTitles;
       if(!this.options.level){
         this.options.level = 1;
       }
@@ -1284,7 +1296,7 @@ export default {
         })
         this.$set(this.options,'metrics',updateMetrics);
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options });
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания

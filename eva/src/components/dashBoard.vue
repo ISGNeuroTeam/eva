@@ -220,7 +220,7 @@
 
 <script>
 
-import { mdiPencil,mdiCheckBold, mdiClose,  mdiArrowAll, mdiArrowExpandAll,  mdiCodeTags, mdiTrashCanOutline, mdiDatabase, mdiSettings, mdiChevronDown, mdiChevronUp, mdiDatabaseSearch, mdiArrowDownBold } from '@mdi/js'
+import { mdiPencil, mdiCheckBold, mdiClose, mdiArrowAll, mdiArrowExpandAll, mdiCodeTags, mdiTrashCanOutline, mdiDatabase, mdiSettings, mdiChevronDown, mdiChevronUp, mdiDatabaseSearch, mdiArrowDownBold } from '@mdi/js'
 import { mapGetters } from 'vuex';
 import  settings  from '../js/componentsSettings.js'
 
@@ -485,7 +485,6 @@ export default {
       this.$store.commit('setSwitch',  { idDash: this.idDash, status: status, id: this.element } );
     },
     switchOP: function() {
-      console.log( { idDash: this.idDash, status: true, element: this.element, titles: Object.keys(this.props.dataRestFilter[0]) } )
       this.$store.commit('setModalSettings',  { idDash: this.idDash, status: true, element: this.element, titles: Object.keys(this.props.dataRestFilter[0]) } );
     },
     setShadow: function() {
