@@ -109,6 +109,9 @@ export default {
     },
   },
   watch: {
+    titles(newValue) {
+      this.createTitles(newValue);
+    },
     color: function (color) {
       this.$refs.tableBlock.style.color = color.text;
       this.$refs.tableBlock.style.backgroundColor = color.backElement;
@@ -163,7 +166,7 @@ export default {
         for (let x of this.titles) {
           temp.push({ text: x, value: x, sortable: true });
         }
-        this.props.titles = temp
+        this.props.titles = temp;
       } else {
         this.props.titles = titlesParsed;
       }
