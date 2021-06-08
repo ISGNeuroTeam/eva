@@ -207,7 +207,7 @@
         :tooltipFrom="props.tooltip"  
         :widthFrom="width" 
         :heightFrom="height"
-        :titles="props.options.tableTitles"
+        :titles="getSelectedTableTitles(idDash)"
         @hideDS="hideDS($event)" 
         @setVissible="setVissible($event)" 
         @setLoading="setLoading($event)" 
@@ -221,7 +221,7 @@
 <script>
 
 import { mdiPencil,mdiCheckBold, mdiClose,  mdiArrowAll, mdiArrowExpandAll,  mdiCodeTags, mdiTrashCanOutline, mdiDatabase, mdiSettings, mdiChevronDown, mdiChevronUp, mdiDatabaseSearch, mdiArrowDownBold } from '@mdi/js'
-
+import { mapGetters } from 'vuex';
 import  settings  from '../js/componentsSettings.js'
 
 export default {
@@ -451,17 +451,11 @@ export default {
     searсhID(){
       return this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
     },
-    settings() {
-      return this.$store.getters.getSettings;
-    },
+    ...mapGetters([
+      'getSelectedTableTitles'
+    ])
   },
  
-  watch: {
-    settings(newValue) {
-      this.props.options.tableTitles = newValue;
-    }
-  },
-
   mounted() {
     this.props.icons = settings.icons;
     this.page = this.$parent.$el.getAttribute('data-page');  // понимаем какая страница перед нами

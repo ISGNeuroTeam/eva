@@ -15,7 +15,7 @@ export default {  // приблизительный объект хранили�
     // },
     modal: {
       settings: {
-
+        tableTitles: [],
       }
     }
   },
@@ -618,7 +618,8 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-      state.modal.settings = settings.titles;
+      state[settings.idDash].availableTableTitles = settings?.titles;
+      state[settings.idDash].selectedTableTitles = settings?.titles;
     },
     setTheme: (state, theme) => {    // устанавливает объект цвета в хранилище
       Vue.set(state, 'theme', theme);
@@ -1463,8 +1464,16 @@ export default {  // приблизительный объект хранили�
         return rest.getPaperVis(restAuth,url)
       }
     },
-    getSettings:(state) => 
-       state.modal.settings
+    getSelectedTableTitles: (state) => {
+      return (id) => {
+        return state[id]?.table.options.selectedTableTitles;
+      }
+    },
+    getAvailableTableTitles: (state) => {
+      return (id) => {
+        return state[id]?.availableTableTitles;
+      }
+    }
   },
 }
 

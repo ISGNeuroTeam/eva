@@ -469,7 +469,6 @@
             v-if="checkOptions('titles')"
             class="option-item" 
           >
-            
             <v-container fluid>
               <v-card-text 
               class="headline" 
@@ -482,7 +481,7 @@
               </div>
             </v-card-text>
               <v-checkbox
-                v-for="setting in settings" 
+                v-for="setting in getAvailableTableTitles(idDash)" 
                 v-model="tableTitles"
                 :key="setting"
                 :label="setting"
@@ -1169,6 +1168,7 @@
 import settings from '../js/componentsSettings.js'
 
 import { mdiPlusBox, mdiMinusBox } from '@mdi/js'
+import { mapGetters } from 'vuex';
 
 export default {
   props: {
@@ -1180,7 +1180,6 @@ export default {
       tableTitles:[],
       element: '',
       options: {
-        tableTitles: [],
       },
       optionsItems: [],
       tooltipSettingShow: false,
@@ -1228,22 +1227,29 @@ export default {
     color: function() {
       return this.colorFrom
     },
-    settings() {
-      return this.$store.getters.getSettings;
-    }
+
+    
+    selectedTitles() {
+      return this.getSelectedTableTitles(this.idDash);
+    },
+
+    ...mapGetters([
+      'getAvailableTableTitles',
+      'getSelectedTableTitles',
+    ]),
   },
   watch: {
-    settings(newValue) {
+    selectedTitles(newValue) {
       this.tableTitles = newValue;
     }
   },
   mounted() {
-    this.tableTitles = this.$store.getters.getSettings;
+    this.tableTitles = this.getSelectedTableTitles(this.idDash);
     // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
   },
   methods: {  
     setOptions: function() {  // отправляем настройки в хранилище
-      this.options.tableTitles = this.tableTitles;
+      this.options.selectedTableTitles = this.tableTitles;
       if(!this.options.level){
         this.options.level = 1;
       }
