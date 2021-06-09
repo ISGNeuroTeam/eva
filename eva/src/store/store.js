@@ -13,6 +13,11 @@ export default {  // приблизительный объект хранили�
     //     controlsActive: '#FF6D70',
     //     border: '#00000033',
     // },
+    modal: {
+      settings: {
+        tableTitles: [],
+      }
+    }
   },
   mutations: {   
     setNameDash: (state, newName) => {    // изменения имени самого элемента
@@ -93,6 +98,10 @@ export default {  // приблизительный объект хранили�
     },
     setSwitch: (state, status) => { // отдельно можно переключать отображения вариантов элемента между выбором ИС и результатами
       state[status.idDash][status.id].switch = status.status;
+      if (status.id.includes('table')) {
+        delete state[status.idDash][status.id].selectedTableTitles;
+        delete state[status.idDash][status.id].availableTableTitles
+      }
     },
     setShould: (state, status) => {  // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
@@ -475,6 +484,9 @@ export default {  // приблизительный объект хранили�
           Vue.set(state[options.idDash][options.id].options, item , options.options[item]); // просто обновляем ее значение на новое
         }
       })
+      if (options.titles) {
+        state[options.idDash][options.id].selectedTableTitles = options.titles;
+      }
         
     },
     letEventSet: (state, events) => {   // метод который обновляет какое-либо свойство у элемнета
@@ -613,8 +625,12 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-        
-      return state[settings.idDash].modalSettings
+      if (settings.element && settings.element.includes('table')) {
+        Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
+        if(!state[settings.idDash][settings.element].selectedTableTitles) {
+          Vue.set(state[settings.idDash][settings.element], 'selectedTableTitles', settings?.titles);
+        }
+      }
     },
     setTheme: (state, theme) => {    // устанавливает объект цвета в хранилище
       Vue.set(state, 'theme', theme);
@@ -1459,6 +1475,16 @@ export default {  // приблизительный объект хранили�
         return rest.getPaperVis(restAuth,url)
       }
     },
+    getSelectedTableTitles: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.selectedTableTitles;
+      }
+    },
+    getAvailableTableTitles: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.availableTableTitles;
+      }
+    }
   },
 }
 
