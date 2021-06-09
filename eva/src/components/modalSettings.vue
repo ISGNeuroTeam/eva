@@ -481,7 +481,7 @@
               </div>
             </v-card-text>
               <v-checkbox
-                v-for="(setting) in getAvailableTableTitles(idDash)"
+                v-for="(setting) in getAvailableTableTitles(idDash, element)"
                 :input-value="tableTitles"
                 @change="titleHandler($event)"
                 :key="setting"
@@ -1231,7 +1231,7 @@ export default {
 
 
     selectedTitles() {
-      return this.$store.getters.getSelectedTableTitles(this.idDashFrom);
+      return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
     },
 
     ...mapGetters([
@@ -1253,7 +1253,7 @@ export default {
   methods: {
     titleHandler(val) {
       let temp = []
-      let orderArray = this.getAvailableTableTitles(this.idDash);
+      let orderArray = this.getAvailableTableTitles(this.idDash, this.element);
       for (let setting of val) {
         let index = orderArray.indexOf(setting);
         temp.push({setting, index})

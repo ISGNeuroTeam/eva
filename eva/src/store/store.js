@@ -98,6 +98,10 @@ export default {  // приблизительный объект хранили�
     },
     setSwitch: (state, status) => { // отдельно можно переключать отображения вариантов элемента между выбором ИС и результатами
       state[status.idDash][status.id].switch = status.status;
+      if (status.id.includes('table')) {
+        delete state[status.idDash][status.id].selectedTableTitles;
+        delete state[status.idDash][status.id].availableTableTitles
+      }
     },
     setShould: (state, status) => {  // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
@@ -481,7 +485,7 @@ export default {  // приблизительный объект хранили�
         }
       })
       if (options.titles) {
-        state[options.idDash].selectedTableTitles = options.titles;
+        state[options.idDash][options.id].selectedTableTitles = options.titles;
       }
         
     },
@@ -621,10 +625,11 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-      if (settings.element === 'table') {
-        Vue.set(state[settings.idDash], 'availableTableTitles', settings?.titles);
-        if(!state[settings.idDash].selectedTableTitles) 
-          Vue.set(state[settings.idDash], 'selectedTableTitles', settings?.titles);
+      if (settings.element && settings.element.includes('table')) {
+        Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
+        if(!state[settings.idDash][settings.element].selectedTableTitles) {
+          Vue.set(state[settings.idDash][settings.element], 'selectedTableTitles', settings?.titles);
+        }
       }
     },
     setTheme: (state, theme) => {    // устанавливает объект цвета в хранилище
@@ -1471,13 +1476,13 @@ export default {  // приблизительный объект хранили�
       }
     },
     getSelectedTableTitles: (state) => {
-      return (id) => {
-        return state[id]?.selectedTableTitles;
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.selectedTableTitles;
       }
     },
     getAvailableTableTitles: (state) => {
-      return (id) => {
-        return state[id]?.availableTableTitles;
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.availableTableTitles;
       }
     }
   },

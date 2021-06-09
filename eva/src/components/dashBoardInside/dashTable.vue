@@ -110,7 +110,8 @@ export default {
   },
   watch: {
     titles(newValue) {
-      this.createTitles(newValue);
+      if (newValue)
+        this.createTitles(newValue);
     },
     color: function (color) {
       this.$refs.tableBlock.style.color = color.text;

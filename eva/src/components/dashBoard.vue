@@ -207,7 +207,7 @@
         :tooltipFrom="props.tooltip"  
         :widthFrom="width" 
         :heightFrom="height"
-        :titles="getSelectedTableTitles(idDash)"
+        :titles="getSelectedTableTitles(idDash, element)"
         @hideDS="hideDS($event)" 
         @setVissible="setVissible($event)" 
         @setLoading="setLoading($event)" 
