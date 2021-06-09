@@ -1349,7 +1349,6 @@ export default {
     },
     prepareOptions() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции 
-      console.log(options)
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
       this.options = {};
       this.optionsItems = settings.options[elem];
