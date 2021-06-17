@@ -103,7 +103,6 @@ export default {
     },
   },
   mounted() {
-    console.log("mounted");
     this.initMap();
     this.initTheme();
     this.initClusterTextCount();
@@ -112,7 +111,6 @@ export default {
   },
   methods: {
     reDrawMap(dataRest) {
-      console.log("redraw");
       this.clearMap();
       this.error = null;
       //получаем osm server
@@ -227,7 +225,6 @@ export default {
       }
     },
     generateLibrary(dataRest) {
-      console.log(dataRest[dataRest.length - 1])
       const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
       try {
         this.library = JSON.parse(_tmp);
@@ -325,7 +322,6 @@ export default {
                       isCenter
                     }
       ) {
-      console.log(element, text)
       let icon = L.divIcon({
         className: 'location-pin',
         riseOnHover: true,
