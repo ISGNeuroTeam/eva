@@ -301,6 +301,7 @@ export default {
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
+        riseOnHover: true,
       })
       .addTo(this.map)
       .bindTooltip(element.label,  {
@@ -323,10 +324,11 @@ export default {
                       iconSize=[30, 30],
                       isCenter
                     }
-                  ) {
+      ) {
       console.log(element, text)
       let icon = L.divIcon({
         className: 'location-pin',
+        riseOnHover: true,
         html: `<div class="leaflet-div-icon" 
         style="display: flex;
         flex-direction: row;
@@ -343,6 +345,7 @@ export default {
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
+        riseOnHover: true,
       })
       .addTo(this.map)
       .bindTooltip(element.label,  {
@@ -380,6 +383,7 @@ export default {
       }
       function highlightFeature(e) {
         var layer = e.target;
+        layer.bringToFront();
         layer.setStyle({
           weight: lib.width + 3,
           color: 'green',
