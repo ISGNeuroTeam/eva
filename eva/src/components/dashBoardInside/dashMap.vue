@@ -362,13 +362,33 @@ export default {
         let p = point.split(":");
         latlngs[p[0] - 1] = p[1].split(",");
       });
-      L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
-        this.map
-      ).bindTooltip(element.label,  {
+      L.polyline(latlngs, { color: lib.color, weight: lib.width})
+      .addTo(this.map)
+      .bindTooltip(element.label,  {
         permanent: false,
         direction: "top",
         className: "leaftet-hover"
       })
+      .on('mouseover', highlightFeature)
+      .on('mouseout', resetHighlight)
+      function resetHighlight(e) {
+        var layer = e.target;
+        layer.setStyle({
+          color: lib.color,
+          weight: lib.width,
+        });
+      }
+      function highlightFeature(e) {
+        var layer = e.target;
+        layer.setStyle({
+          weight: lib.width + 3,
+          color: 'green',
+        });
+        
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+      }
     },
     
     clustering(dataRest) {
