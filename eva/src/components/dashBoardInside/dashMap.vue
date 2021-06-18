@@ -276,16 +276,18 @@ export default {
     addMarker(element, isCenter) {
       const lib = this.library.objects[element.type];
       let type = this.getElementDrawType(element);
-      if (type === "SVG")
+      if (type === "SVG") {
         this.drawMarkerSVG(lib, element, isCenter)
-      else 
+      }
+      else {
         this.drawMarkerHTML({lib, element, isCenter})
+      }
     },
 
-    getElementDrawType(element, lib) {
-      if (element.type == 1)
-        return "html"
-      return 'SVG'
+    getElementDrawType(element) {
+      if (element.view_type == "SVG" || element.type == 1)
+        return "HTML"
+      return "SVG"
     },
 
     drawMarkerSVG(lib, element, isCenter) {
@@ -311,29 +313,31 @@ export default {
       }
     },
 
-    drawMarkerHTML(
-                    {
-                      lib,
-                      element,
-                      text='test',
-                      textColor='black',
-                      boxColor,
-                      iconSize=[30, 30],
-                      isCenter
-                    }
-      ) {
+    drawMarkerHTML({ lib, element, isCenter }) {
+      let {
+        textColor="#FFFFFF",
+        color="65, 62, 218",
+        opacity = 0.6,
+        object_label: text = "КП-240",
+        borderColor,
+        borderRadius="2px",
+        } = element;
+      console.log(element)
       let icon = L.divIcon({
         className: 'location-pin',
         riseOnHover: true,
         html: `<div class="leaflet-div-icon" 
-        style="display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        background: rgba(65, 62, 218, 0.6);
-        mix-blend-mode: normal;
-        border-radius: 2px;">
-      ${element.object_label || "КП-240"}</div>`,
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
+          background: rgba(${color}, ${opacity});
+          mix-blend-mode: normal;
+          border-radius: ${borderRadius};
+        ">
+          <span style="color:${textColor}">${text}<span>
+        </div>`,
         iconSize: [lib.width, lib.height],
       });
       const _point = element.coordinates.split(":");
