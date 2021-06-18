@@ -123,7 +123,7 @@ export default {
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(dataRest);
-        this.clustering(dataRest);
+        // this.clustering(dataRest);
       }
     },
     initTheme() {
@@ -319,10 +319,8 @@ export default {
         color="65, 62, 218",
         opacity = 0.6,
         object_label: text = "КП-240",
-        borderColor,
         borderRadius="2px",
         } = element;
-      console.log(element)
       let icon = L.divIcon({
         className: 'location-pin',
         riseOnHover: true,
