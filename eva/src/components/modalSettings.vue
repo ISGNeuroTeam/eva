@@ -866,6 +866,32 @@
               /> 
             </div>
           </div>
+
+          <div 
+            v-if="checkOptions('primitivesLibrary')"
+            class="option-item" 
+          >
+            <v-container fluid>
+              <v-card-text 
+              class="headline" 
+            >
+              <div 
+                class="settings-title" 
+                :style="{color:color.text,borderColor:color.text}"
+              >
+                Библиотека примитивов отображения
+              </div>
+            </v-card-text>
+              <v-textarea
+                name="input-7-1"
+                filled
+                label="JSON c примитивами"
+                auto-grow
+                v-model="options.primitivesLibrary"
+              ></v-textarea>
+            </v-container>
+          </div>
+
           <v-card-text 
             class="headline " 
           >
@@ -1237,7 +1263,6 @@ export default {
     ...mapGetters([
       'getAvailableTableTitles',
       'getSelectedTableTitles',
-      
     ]),
 
   },
