@@ -352,7 +352,7 @@ export default {
           mix-blend-mode: normal;
           border-radius: ${borderRadius};
         ">
-          <span style="color:${textColor}">${text}<span>
+          <span style="color:${textColor}">${element.label}<span>
         </div>`,
         iconSize: [width, height],
       });
