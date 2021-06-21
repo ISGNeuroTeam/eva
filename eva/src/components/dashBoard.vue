@@ -191,7 +191,7 @@
         </button>
       </v-card-text>
       <!--  Здесь подключаем элементы визуализации -->
-      <v-card-text 
+      <v-card-text
         :is="currentElem" 
         v-show="showElement"
         class="card-text element-itself" 
@@ -208,6 +208,7 @@
         :widthFrom="width" 
         :heightFrom="height"
         :titles="getSelectedTableTitles(idDash, element)"
+        :options="props.options"
         @hideDS="hideDS($event)" 
         @setVissible="setVissible($event)" 
         @setLoading="setLoading($event)" 

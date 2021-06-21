@@ -64,6 +64,7 @@ export default {
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     widthFrom: null, // ширина родительского компонента
     heightFrom: null, // выоста родительского компонента
+    options: Object,
   },
   data() {
     return {
@@ -116,7 +117,18 @@ export default {
       //получаем osm server
       this.getOSM();
       //получаем библиотеку
-      this.generateLibrary(dataRest); // get all icons that we need on map
+      if (!this.options?.primitivesLibrary) {
+        this.generateLibrary(dataRest); // get all icons that we need on map
+      }
+      else {
+        try {
+          this.library = JSON.parse(this.options.primitivesLibrary);
+        } catch {
+          this.error = "Ошибка формата входных данных";
+          this.map.remove();
+          this.map = null;
+        }
+      }
       this.generateClusterPositionItems();
       if (!this.error) {
         //создаем элемент карты
