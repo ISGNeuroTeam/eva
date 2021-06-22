@@ -163,9 +163,15 @@ export default {
         return { text: item, value: item, sortable: true };
       });
       if (this.titles) {
+        let allTitles = Object.keys(this.dataRestFrom[0]);
         let temp = [];
-        for (let x of this.titles) {
-          temp.push({ text: x, value: x, sortable: true });
+        for (let x of allTitles) {
+          if ((new Set(this.titles)).has(x)) {
+            temp.push({ text: x, value: x, sortable: true });
+          }
+          else {
+            temp.push({ text: x, value: x, sortable: true, align: ' d-none' });
+          }
         }
         this.props.titles = temp;
       } else {
