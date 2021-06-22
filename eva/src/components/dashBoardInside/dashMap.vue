@@ -348,17 +348,15 @@ export default {
         riseOnHover: true,
         html: `<div class="leaflet-div-icon" 
           style="
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          align-items: center;
-          background-color: ${color};
-          opacity: ${opacity};
-          mix-blend-mode: normal;
-          border: ${border};
-          border-radius: ${borderRadius}px;
-          width: ${width}px;
-          height: ${height}px;
+            background-color: ${color};
+            opacity: ${opacity};
+            mix-blend-mode: normal;
+            border: ${border};
+            border-radius: ${borderRadius}px;
+            padding: 2px 6px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600px;
         ">
           <span style="color:${textColor}">${element.label}<span>
         </div>`,
