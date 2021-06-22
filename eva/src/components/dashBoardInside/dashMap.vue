@@ -356,7 +356,7 @@ export default {
             padding: 2px 6px;
             display: inline-block;
             font-size: 14px;
-            font-weight: 600px;
+            font-weight: 600;
         ">
           <span style="color:${textColor}">${element.label}<span>
         </div>`,
