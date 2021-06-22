@@ -166,7 +166,7 @@ export default {
         let allTitles = Object.keys(this.dataRestFrom[0]);
         let temp = [];
         for (let x of allTitles) {
-          if ((new Set(this.titles)).has(x)) {
+          if (this.titles.includes(x)) {
             temp.push({ text: x, value: x, sortable: true });
           }
           else {
