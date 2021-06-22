@@ -303,10 +303,10 @@ export default {
     },
 
     getElementDrawType(lib) {
-      if (lib.view_type == "svg") {
-        return "SVG"
+      if (lib.view_type == "html") {
+        return "HTML"
       }
-      return "HTML"
+      return "SVG"
     },
 
     drawMarkerSVG(lib, element, isCenter) {
@@ -339,6 +339,7 @@ export default {
         opacity = 0.6,
         label_field: text = "КП-240",
         border_radius: borderRadius="2px",
+        border = "none",
         width,
         height,
       } = lib;
@@ -346,11 +347,18 @@ export default {
         className: 'location-pin',
         riseOnHover: true,
         html: `<div class="leaflet-div-icon" 
-        style="
+          style="
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          align-items: center;
           background-color: ${color};
           opacity: ${opacity};
           mix-blend-mode: normal;
-          border-radius: ${borderRadius};
+          border: ${border};
+          border-radius: ${borderRadius}px;
+          width: ${width}px;
+          height: ${height}px;
         ">
           <span style="color:${textColor}">${element.label}<span>
         </div>`,
