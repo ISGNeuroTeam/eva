@@ -466,6 +466,32 @@
             </div>
           </div>
           <div 
+            v-if="checkOptions('titles')"
+            class="option-item" 
+          >
+            <v-container fluid>
+              <v-card-text 
+              class="headline" 
+            >
+              <div 
+                class="settings-title" 
+                :style="{color:color.text,borderColor:color.text}"
+              >
+                Столбцы для отображение
+              </div>
+            </v-card-text>
+              <v-checkbox
+                v-for="(setting) in getAvailableTableTitles(idDash, element)"
+                :input-value="tableTitles"
+                @change="titleHandler($event)"
+                :key="setting"
+                :label="setting"
+                :value="setting">  
+              </v-checkbox>
+            </v-container>
+            
+          </div>
+          <div 
             v-if="checkOptions('timeFormat')"
             class="option-item" 
           >
@@ -840,6 +866,32 @@
               /> 
             </div>
           </div>
+
+          <div 
+            v-if="checkOptions('primitivesLibrary')"
+            class="option-item" 
+          >
+            <v-container fluid>
+              <v-card-text 
+              class="headline" 
+            >
+              <div 
+                class="settings-title" 
+                :style="{color:color.text,borderColor:color.text}"
+              >
+                Библиотека примитивов отображения
+              </div>
+            </v-card-text>
+              <v-textarea
+                name="input-7-1"
+                filled
+                label="JSON c примитивами"
+                auto-grow
+                v-model="options.primitivesLibrary"
+              ></v-textarea>
+            </v-container>
+          </div>
+
           <v-card-text 
             class="headline " 
           >
@@ -1140,19 +1192,22 @@
 
 <script> 
 
-import  settings  from '../js/componentsSettings.js'
+import settings from '../js/componentsSettings.js'
 
-import {    mdiPlusBox, mdiMinusBox  } from '@mdi/js'
+import { mdiPlusBox, mdiMinusBox } from '@mdi/js'
+import { mapGetters } from 'vuex';
 
 export default {
   props: {
     idDashFrom: null,
     colorFrom: null,
   },
-  data () {
+  data() {
     return {
+      tableTitles:[],
       element: '',
-      options: {},
+      options: {
+      },
       optionsItems: [],
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
@@ -1200,10 +1255,38 @@ export default {
       return this.colorFrom
     },
 
-  },
-  methods: {  
-    setOptions: function() {  // отправляем настройки в хранилище
 
+    selectedTitles() {
+      return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
+    },
+
+    ...mapGetters([
+      'getAvailableTableTitles',
+      'getSelectedTableTitles',
+    ]),
+
+  },
+  watch: {
+    selectedTitles(newValue) {
+      this.tableTitles = newValue;
+    }
+  },
+  mounted() {
+    this.tableTitles = this.getSelectedTableTitles(this.idDashFrom);
+    // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
+  },
+  methods: {
+    titleHandler(val) {
+      let temp = []
+      let orderArray = this.getAvailableTableTitles(this.idDash, this.element);
+      for (let setting of val) {
+        let index = orderArray.indexOf(setting);
+        temp.push({setting, index})
+      }
+      temp.sort((a, b) => a.index - b.index)
+      this.tableTitles = temp.map((el) => el.setting)
+    },
+    setOptions: function() {  // отправляем настройки в хранилище
       if(!this.options.level){
         this.options.level = 1;
       }
@@ -1230,6 +1313,7 @@ export default {
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
+        
       }
       if (this.element.indexOf('multiLine') != -1) {
         let updateMetrics = this.metrics.map( item => {
@@ -1237,7 +1321,7 @@ export default {
         })
         this.$set(this.options,'metrics',updateMetrics);
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options });
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1288,10 +1372,10 @@ export default {
         })
       }
     },
-    prepareOptions: function() {  //  понимает какие опции нужно вывести
+    prepareOptions() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции 
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
-      this.options = {}; 
+      this.options = {};
       this.optionsItems = settings.options[elem];
       this.optionsItems.forEach( item => {
         if (Object.keys(options).includes(item)) {
@@ -1353,21 +1437,11 @@ export default {
       if (!this.options.change) {
         this.$set(this.options,'change',false);
       }
-
-
     }
-         
-  },
-  mounted() {
-    this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );  
   },
 }
 </script>
 
-<style lang="sass" > 
-
-
-    @import '../sass/modalSettings.sass'  
-
-    
+<style lang="sass">
+  @import '../sass/modalSettings.sass'  
 </style>

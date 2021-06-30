@@ -1,7 +1,7 @@
 <template>
   <v-app :style="{background: color.back}">
     <header-top @permissions="setPermissions" />
-    <v-content>
+    <v-main>
       <v-container class="main-container container-dash">
         <v-card 
           class="main-card-dash" 
@@ -219,7 +219,7 @@
           </v-card-text>
         </v-card>
       </v-container>
-    </v-content>
+    </v-main>
     <footer-bottom />
     <modal-exim 
       :color="color" 

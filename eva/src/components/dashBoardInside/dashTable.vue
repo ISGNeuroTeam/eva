@@ -15,19 +15,10 @@
       }"
       :height="height"
       fixed-header
-      hide-default-header
       :style="{ borderColor: colorFrom.border }"
       @current-items="updatePage"
     >
-     <template v-slot:header="{ props: { headers } }">
-        <thead>
-          <tr>
-            <th v-for="header in headers">
-              <span>{{header.text}}</span>
-            </th>
-          </tr>
-        </thead>
-      </template>
+  
 
     </v-data-table>
     <div v-show="props.nodata" class="no-data-table">
@@ -52,6 +43,7 @@ export default {
     dataReport: null,
     activeElemFrom: null,
     dataModeFrom: null,
+    titles: Array,
   },
   data() {
     return {
@@ -117,10 +109,23 @@ export default {
     },
   },
   watch: {
+    titles(newValue) {
+      if (newValue)
+        this.createTitles(newValue);
+    },
     color: function (color) {
       this.$refs.tableBlock.style.color = color.text;
       this.$refs.tableBlock.style.backgroundColor = color.backElement;
     },
+  },
+  mounted() {
+    this.$store.commit("setActions", {
+      actions: this.props.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
+    this.$refs.tableBlock.style.color = this.color.text;
+    this.$refs.tableBlock.style.backgroundColor = this.color.backElement;
   },
   methods: {
     cl(v){
@@ -154,11 +159,25 @@ export default {
     },
 
     createTitles: function (result) {
-      let titles = Object.keys(result[0]).map((item) => {
-        return { text: item, value: item };
+      let titlesParsed = Object.keys(result[0]).map((item) => {
+        return { text: item, value: item, sortable: true };
       });
+      if (this.titles) {
+        let allTitles = Object.keys(this.dataRestFrom[0]);
+        let temp = [];
+        for (let x of allTitles) {
+          if (this.titles.includes(x)) {
+            temp.push({ text: x, value: x, sortable: true });
+          }
+          else {
+            temp.push({ text: x, value: x, sortable: true, align: ' d-none' });
+          }
+        }
+        this.props.titles = temp;
+      } else {
+        this.props.titles = titlesParsed;
+      }
 
-      this.props.titles = titles;
     },
     createTockens: function (result) {
       let captures = Object.keys(result[0]);
@@ -281,15 +300,6 @@ export default {
         this.clearColor();
       }
     },
-  },
-  mounted() {
-    this.$store.commit("setActions", {
-      actions: this.props.actions,
-      idDash: this.idDash,
-      id: this.id,
-    });
-    this.$refs.tableBlock.style.color = this.color.text;
-    this.$refs.tableBlock.style.backgroundColor = this.color.backElement;
   },
 };
 </script>

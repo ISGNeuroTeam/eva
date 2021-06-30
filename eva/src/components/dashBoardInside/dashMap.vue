@@ -64,6 +64,7 @@ export default {
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     widthFrom: null, // ширина родительского компонента
     heightFrom: null, // выоста родительского компонента
+    options: Object,
   },
   data() {
     return {
@@ -116,14 +117,25 @@ export default {
       //получаем osm server
       this.getOSM();
       //получаем библиотеку
-      this.generateLibrary(dataRest);
+      if (!this.options?.primitivesLibrary) {
+        this.generateLibrary(dataRest); // get all icons that we need on map
+      }
+      else {
+        try {
+          this.library = JSON.parse(this.options.primitivesLibrary);
+        } catch {
+          this.error = "Ошибка формата входных данных";
+          this.map.remove();
+          this.map = null;
+        }
+      }
       this.generateClusterPositionItems();
       if (!this.error) {
         //создаем элемент карты
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(dataRest);
-        this.clustering(dataRest);
+        // this.clustering(dataRest);
       }
     },
     initTheme() {
@@ -239,12 +251,7 @@ export default {
       Object.entries(this.library.objects).forEach((object) => {
         if (object[1].image) {
           const _tmpObject = { ...object[1], id: Number(object[0]) };
-
-          if (this.clusterPositionItems === null) {
-            this.clusterPositionItems = [_tmpObject];
-          } else {
-            this.clusterPositionItems.push(_tmpObject);
-          }
+          this.clusterPositionItems = [_tmpObject];
         }
       });
 
@@ -260,26 +267,49 @@ export default {
         })
       }
     },
+
     initMap() {
       this.map = L.map(this.$refs.map, {
-        wheelPxPerZoomLevel: 600,
+        wheelPxPerZoomLevel: 100,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 17,
       });
     },
+
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i++) {
+        const lib = this.library.objects[dataRest[i].type]; // choosing drawing type for each object
+        if (!lib) {                                         // if no lib for drawing object - just skip
+          continue;
+        }
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false);
+          this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false, lib);
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
-          this.addLine(dataRest[i]);
+          this.addLine(dataRest[i], lib);
         }
       }
     },
-    addMarker(element, isCenter) {
-      const lib = this.library.objects[element.type];
+
+    addMarker(element, isCenter, lib) {
+      let type = this.getElementDrawType(lib);
+      if (type === "SVG") {
+        this.drawMarkerSVG(lib, element, isCenter)
+      }
+      else {
+        this.drawMarkerHTML({lib, element, isCenter})
+      }
+    },
+
+    getElementDrawType(lib) {
+      if (lib.view_type == "html") {
+        return "HTML"
+      }
+      return "SVG"
+    },
+
+    drawMarkerSVG(lib, element, isCenter) {
       const icon = L.icon({
         iconUrl: `${window.location.origin}/svg/${lib.image}`,
         iconSize: [lib.width, lib.height],
@@ -289,32 +319,105 @@ export default {
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
+        riseOnHover: true,
       })
-        .addTo(this.map)
-        .bindTooltip(element.label,  {
-          permanent: false,
-          direction: "top",
-          className: "leaftet-hover"
-        })
+      .addTo(this.map)
+      .bindTooltip(element.label,  {
+        permanent: false,
+        direction: "top",
+        className: "leaftet-hover"
+      })
       if (isCenter === true) {
         this.map.setView([_coord[0], _coord[1]]);
       }
     },
-    addLine(element) {
-      const lib = this.library.objects[element.type];
+
+    drawMarkerHTML({ lib, element, isCenter }) {
+      let {
+        text_color: textColor = "#FFFFFF",
+        background_color: color="65, 62, 218",
+        opacity = 0.6,
+        label_field: text = "КП-240",
+        border_radius: borderRadius="2px",
+        border = "none",
+        width,
+        height,
+      } = lib;
+      let icon = L.divIcon({
+        className: 'location-pin',
+        riseOnHover: true,
+        html: `<div class="leaflet-div-icon" 
+          style="
+            background-color: ${color};
+            opacity: ${opacity};
+            mix-blend-mode: normal;
+            border: ${border};
+            border-radius: ${borderRadius}px;
+            padding: 2px 6px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+        ">
+          <span style="color:${textColor}">${element.label}<span>
+        </div>`,
+        iconSize: [width, height],
+      });
+      const _point = element.coordinates.split(":");
+      const _coord = _point[1].split(",");
+      L.marker([_coord[0], _coord[1]], {
+        icon: icon,
+        zIndexOffset: -1000,
+        riseOnHover: true,
+      })
+      .addTo(this.map)
+      .bindTooltip(element.label,  {
+        permanent: false,
+        direction: "top",
+        className: "leaftet-hover"
+      })
+      if (isCenter === true) {
+        this.map.setView([_coord[0], _coord[1]]);
+      }
+    },
+
+    addLine(element, lib) {
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
         latlngs[p[0] - 1] = p[1].split(",");
       });
-      L.polyline(latlngs, { color: lib.color, weight: lib.width }).addTo(
-        this.map
-      ).bindTooltip(element.label,  {
+      L.polyline(latlngs, { color: lib.color, weight: lib.width, opacity: lib.opacity })
+      .addTo(this.map)
+      .bindTooltip(element.label,  {
         permanent: false,
         direction: "top",
         className: "leaftet-hover"
       })
+      .on('mouseover', highlightFeature)
+      .on('mouseout', resetHighlight)
+
+      function resetHighlight(e) {
+        var layer = e.target;
+        layer.setStyle({
+          color: lib.color,
+          weight: lib.width,
+        });
+      }
+
+      function highlightFeature(e) {
+        var layer = e.target;
+        layer.bringToFront();
+        layer.setStyle({
+          weight: lib.width + 3,
+          color: lib.highlight_color,
+        });
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+      }
+
     },
+    
     clustering(dataRest) {
       this.cluster = L.markerClusterGroup({
         showCoverageOnHover: false,

@@ -48,7 +48,7 @@
           </v-btn>
         </div> 
       </v-card>
-      <v-content id="content">
+      <v-main id="content">
         <v-container class="dash-container">
            <div
             v-if="gridShow"
@@ -88,7 +88,7 @@
               <dash-settings :showFrom="showSetting"  ></dash-settings> 
           -->
         </v-container>
-      </v-content> 
+      </v-main> 
     </div>
     <footer-bottom />
   </v-app> 
@@ -102,7 +102,7 @@ export default {
   data () {
     return {
       page: 'dash',
-      mode: true,
+      mode: false,
       showSetting: false,
       rotate: '',
       color: { },

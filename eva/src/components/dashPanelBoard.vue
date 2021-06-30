@@ -668,7 +668,7 @@ export default {
       tocken_elem: false,
       profile_elem: false,
       save_elem: false,
-      edit_elem: true,
+      edit_elem: false,
       code_elem: false,
       check: mdiCheckBold,
       look: mdiEye,

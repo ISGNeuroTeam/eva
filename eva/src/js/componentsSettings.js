@@ -102,7 +102,7 @@ export default {
   options: {
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline'], 
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes'],
-    table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult'],
+    table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult', 'titles'],
     select: ['visible','level','boxShadow','multiple'],
     picker: ['visible','level'],
     graph: ['visible','level','boxShadow'],
@@ -114,7 +114,7 @@ export default {
     csvg: ['visible','level','tooltip'],
     ygraph: ['visible','level'],
     bush: ['visible','level'],
-    map: ['visible','level', 'osmserver'],
+    map: ['visible','level', 'osmserver', 'primitivesLibrary'],
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
   reports: {
