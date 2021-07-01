@@ -11,19 +11,19 @@
     <v-card :style="{background:color.backElement}">
       <v-card-text class="headline ">
         <div 
-          :style="{color:color.text}" 
+          :style="{color:color.text}"
           class="delete-title"
         >
           Вы точно хотите удалить 
           <span 
-            :style="{color:color.text}"  
+            :style="{color:color.text}"
             class="delete-name"
           >
             {{ deleteName }}
           </span> 
           <span 
             v-if="idTitle" 
-            :style="{color:color.text}"  
+            :style="{color:color.text}"
             class="delete-id"
           >
             {{ deleteId }}
@@ -35,7 +35,7 @@
         <v-spacer />
         <v-btn 
           small  
-          :color="color.controlsSystem" 
+          :color="color.controlsSystem"
           class="delete-btn" 
           @click="deleteBtn"
         >
@@ -43,7 +43,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="color.controlsActive" 
+          :color="color.controlsActive"
           class="delete-btn" 
           @click="cancelModal"
         >
@@ -91,8 +91,8 @@ export default {
       let color = {};
       if (this.colorFrom) {
         color = this.colorFrom
-      }        
-      return color 
+      }
+      return color
     },
     dataPage: function() {
       return this.dataPageFrom
@@ -137,7 +137,7 @@ export default {
     },
     changeStyle: function() {
       if (this.active) {
-        document.querySelector('.v-dialog').style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`; 
+        document.querySelector('.v-dialog').style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
       }
     },
   },

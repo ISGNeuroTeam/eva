@@ -1,27 +1,27 @@
 <template>
   <div 
     class="dash-main" 
-    :style="{background: color.panel}"
+    :style="{background: theme.$main_bg}"
   >
     <div class="main-title">
       <div 
         class="title-name" 
-        :style="{color:'#DADADA'}"
+        :style="{color:theme.$title}"
       >
         {{ name }}
       </div>
       <div 
         class="title-edit" 
       >
-        <v-tooltip 
+        <v-tooltip
           v-if="editPermission"
           bottom 
-          :color="color.controlsActive" 
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class="edit theme--dark" 
-              :style="{color:'#DADADA'}"
+              :style="{color:theme.$title}"
               v-on="on"
               @click="gearShow = !gearShow"
             >
@@ -35,12 +35,12 @@
     <div class="control-block">
       <v-tooltip 
         bottom 
-        :color="color.controlsActive"
+        :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="code theme--dark" 
-            :style="codeSwitch" 
+            class="code theme--dark"
+            :style="{color:theme.$title}"
             :class="{hide_control:!edit_elem}"  
             v-on="on" 
             @click="openEventCode"
@@ -52,12 +52,12 @@
       </v-tooltip>
       <v-tooltip 
         bottom 
-        :color="color.controlsActive"
+        :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="tocken theme--dark" 
-            :style="tockenSwitch" 
+            class="tocken theme--dark"
+            :style="{color:theme.$title}"
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
             @click="openTockenCode"
@@ -69,12 +69,12 @@
       </v-tooltip>
       <v-tooltip 
         bottom 
-        :color="color.controlsActive"
+        :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="search theme--dark" 
-            :style="searchSwitch" 
+            class="search theme--dark"
+            :style="{color:theme.$title}"
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
             @click="openSearchCode"
@@ -86,12 +86,12 @@
       </v-tooltip>
       <v-tooltip 
         bottom 
-        :color="color.controlsActive"
+        :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="tools theme--dark" 
-            :style="toolSwitch" 
+            class="tools theme--dark"
+            :style="{color:theme.$title}"
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
             @click="openToolPanel"
@@ -103,12 +103,12 @@
       </v-tooltip>
       <v-tooltip 
         bottom 
-        :color="color.controlsActive"
+        :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
           <v-icon 
-            class="profile theme--dark" 
-            :style="profileSwitch" 
+            class="profile theme--dark"
+            :style="{color:theme.$title}"
             :data-error="colorError"
             v-on="on" 
             @click="openProfile"
@@ -120,12 +120,12 @@
       </v-tooltip>
       <v-tooltip 
         bottom 
-        :color="color.controlsActive"
+        :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }"  v-if="editPermission">
           <v-icon 
-            class="save theme--dark" 
-            :style="saveSwitch" 
+            class="save theme--dark"
+            :style="{color:theme.$title}"
             v-on="on" 
             @click="openSave"
           >
@@ -139,13 +139,13 @@
       ref="blockCode"
       class="block-code" 
       :class="{opencode:opencode}" 
-      :style=" {background:color.backElement, color:color.text}"
+      :style=" {background:theme.$main_bg, color:theme.$main_text }"
     >
       <div class="iconsNavigations">
-      <v-icon :color="'white'" @click="fastForwardClick">
+      <v-icon :color="theme.$primary_button" @click="fastForwardClick">
         {{ fastForwardIcon }}
       </v-icon>
-       <v-icon :color="'white'" @click="openModal">
+       <v-icon :color="theme.$primary_button" @click="openModal">
         {{ plus_icon }}
       </v-icon>
       </div>
@@ -158,29 +158,29 @@
       >
         <div 
           class="search-id" 
-          :style="{ background:color.controls, color:'#fff', border: `1px solid ${color.controls}`}" 
+          :style="{ background:theme.$accent_ui_color, color:'#fff', border: `1px solid ${theme.$accent_ui_color}`}"
         >
           {{ checkSid(sear.sid) }}
         </div>
-        <div 
-          class="search-query" 
-          :style="{ background:color.backElement, color:color.text,border: `1px solid ${color.border}`}" 
+        <div
+          class="search-query"
+          :style="{ background:theme.$secondary_bg, color:theme.$main_text,border: `1px solid ${theme.$main_border}`}"
         >
           {{ sear.original_otl }}
-          <div 
-            class="loading-bar" 
-            :style="{background:color.controlsActive}"
+          <div
+            class="loading-bar"
+            :style="{background:theme.$accent_ui_color}"
             :class="{loading:loadings[sear.sid]}"
           />
         </div>
-        <v-tooltip 
+        <v-tooltip
           bottom 
-          :color="color.controlsActive"
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class=" search-play" 
-              :color="color.controls"
+              :color="theme.$primary_button"
               v-on="on" 
               @click="startSearch(sear)"
             >
@@ -191,12 +191,12 @@
         </v-tooltip>
         <v-tooltip 
           bottom 
-          :color="color.controlsActive"
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class=" search-pencil" 
-              :color="color.controls"
+              :color="theme.$primary_button"
               v-on="on" 
               @click="openEdit(sear.sid)"
             >
@@ -207,12 +207,12 @@
         </v-tooltip>
         <v-tooltip 
           bottom 
-          :color="color.controlsActive"
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class=" search-clock" 
-              :color="color.controls" 
+              :color="theme.$primary_button"
               v-on="on" 
               @click="openSchedule(sear.sid)"
             >
@@ -223,12 +223,12 @@
         </v-tooltip>
         <v-tooltip 
           bottom 
-          :color="color.controlsActive"
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class=" search-clock" 
-              :color="color.controls" 
+              :color="theme.$primary_button"
               :disabled="disabledDS[sear.sid]" 
               v-on="on"
               @click="exportSearch(sear.sid)"
@@ -240,12 +240,12 @@
         </v-tooltip>
         <v-tooltip 
           bottom 
-          :color="color.controlsActive"
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class=" search-clock" 
-              :color="color.controls" 
+              :color="theme.$primary_button"
               v-on="on"
               @click="modalPaperSid=sear.sid,modalPaper=true"
             >
@@ -256,12 +256,12 @@
         </v-tooltip>
         <v-tooltip 
           bottom 
-          :color="color.controlsActive"
+          :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
               class="search-trash" 
-              :color="color.controls"
+              :color="theme.$primary_button"
               v-on="on" 
               @click="deleteSearch(sear.sid)"
             >
@@ -274,7 +274,7 @@
       <v-btn 
         small 
         class="create-search"  
-        :color="color.controlsSystem"  
+        :color="theme.$primary_button"
         @click="openModal"
       >
         Создать
@@ -283,7 +283,7 @@
     <div 
       class="block-tool" 
       :class="{opentool:opentool}" 
-      :style="{ background:color.backElement, color:color.text}"
+      :style="{ background:theme.$main_bg, color:theme.$main_text}"
     >
       <div 
         v-for="tool in tools" 
@@ -293,16 +293,16 @@
         @mousedown="dragTool" 
       >
         <div 
-          class="tool-img" 
-          :style="{ background:color.controls, color:'#fff', border: `2px solid ${color.controls}`}"
+          class="tool-img"
+          :style="{ background:theme.$accent_ui_color,  border: `2px solid ${theme.$accent_ui_color}`}"
         >
-          <v-icon class="tool-img-itself">
+          <v-icon class="tool-img-itself" :style="{color:'#FFF'}">
             {{ `${tool.img}` }}
           </v-icon>
         </div>
         <div 
           class="tool-name" 
-          :style="{ background:color.backElement, color:color.text, border: `1px solid ${color.border}`}" 
+          :style="{ background:theme.$main_bg, color:theme.$main_text, border: `1px solid ${theme.$main_border}`}"
         >
           {{ tool.name }}
         </div>
@@ -311,13 +311,13 @@
     <div 
       class="block-tocken" 
       :class="{opentocken:opentocken}"  
-      :style="{ background:color.backElement, color:color.text}"
+      :style="{ background:theme.$main_bg, color:theme.$main_text}"
     >
       <div 
         v-for="(tocken, i) in tockens" 
         :key="tocken.name" 
         class="row-tocken" 
-        :style="{color: color.text}"
+        :style="{color: theme.$main_text}"
       >
         <div 
           class="row-data row-itself" 
@@ -326,7 +326,7 @@
           <v-text-field  
             v-model="tockensName[tocken.name]" 
             class="tocken-name theme--dark" 
-            :color="color.text" 
+            :color="theme.$accent_ui_color"
             outlined 
             label="Имя"
             hide-details
@@ -334,7 +334,7 @@
           <v-select  
             v-model="tocken.elem"
             :items="elements" 
-            :color="color.text"  
+            :color="theme.$accent_ui_color"
             label="Элемент" 
             hide-details  
             outlined 
@@ -344,7 +344,7 @@
           <v-select  
             v-model="tocken.action"
             :items="actions(tocken.elem)" 
-            :color="color.text" 
+            :color="theme.$accent_ui_color"
             label="Действие" 
             hide-details  
             outlined 
@@ -354,7 +354,7 @@
           <v-select  
             v-model="tocken.capture"
             :items="capture({action:tocken.action,elem: tocken.elem})" 
-            :color="color.text" 
+            :color="theme.$accent_ui_color"
             label="Свойство" 
             hide-details  
             outlined 
@@ -364,7 +364,7 @@
           <v-text-field  
             v-model="tocken.prefix"
             class="tocken-prefix theme--dark" 
-            :color="color.text" 
+            :color="theme.$accent_ui_color"
             label="Префикс"  
             outlined 
             hide-details 
@@ -372,7 +372,7 @@
           <v-text-field 
             v-model="tocken.sufix"  
             class="tocken-sufix theme--dark" 
-            :color="color.text" 
+            :color="theme.$accent_ui_color"
             label="Суффикс"  
             outlined 
             hide-details 
@@ -380,7 +380,7 @@
           <v-text-field 
             v-model="tocken.delimetr" 
             class="tocken-delimetr theme--dark" 
-            :color="color.text" 
+            :color="theme.$accent_ui_color"
             label="Разделитель"  
             outlined 
             hide-details 
@@ -389,13 +389,13 @@
         <p 
           class="tocken-view" 
           :class="{showView:lookTockens[i].show}" 
-          :color="color.controls" 
+          :color="theme.$main_text"
         >
           {{ tocken.value }}
         </p>
         <v-icon 
           class="row-check"  
-          :color="color.controls" 
+          :color="theme.$primary_button"
           :class="{showIcon:lookTockens[i].show}" 
           @click=" saveTocken()"
         >
@@ -403,14 +403,14 @@
         </v-icon>
         <v-icon 
           class="row-look"  
-          :color="lookTockens[i].color" 
+          :color="theme.$primary_button"
           @click="lookTocken(i)"
         > 
           {{ look }} 
         </v-icon>
         <v-icon 
           class="row-trash " 
-          :color="color.controls" 
+          :color="theme.$primary_button"
           :class="{showIcon:lookTockens[i].show}" 
           @click="deleteTocken(tocken.name)"
         >
@@ -420,12 +420,12 @@
       <div 
         class="row-tocken new" 
         :class="{opennewtocken:opennewtocken}" 
-        :style="{borderTop: `1px solid ${color.text}`}"
+        :style="{borderTop: `1px solid ${theme.$main_border}`}"
       >
         <v-text-field  
           v-model="newTockenName"
           class="tocken-name theme--dark" 
-          :color="color.text" 
+          :color="theme.$main_text"
           label="Имя"  
           outlined 
           hide-details 
@@ -433,7 +433,7 @@
         <v-select  
           v-model="newElem" 
           :items="elements"  
-          :color="color.text"
+          :color="theme.$main_text"
           hide-details  
           outlined 
           class="tocken-elem theme--dark" 
@@ -443,7 +443,7 @@
         <v-select  
           v-model="newAction" 
           :items="actions(newElem)" 
-          :color="color.text"
+          :color="theme.$main_text"
           hide-details  
           outlined 
           class="tocken-action theme--dark" 
@@ -452,7 +452,7 @@
         />
         <v-select  
           :items="capture({action:newAction,elem: newElem})" 
-          :color="color.text"  
+          :color="theme.$main_text"
           hide-details  
           outlined 
           class="tocken-capture theme--dark" 
@@ -462,7 +462,7 @@
         <v-text-field  
           v-model="newTockenDop.prefix" 
           class="tocken-prefix theme--dark" 
-          :color="color.text" 
+          :color="theme.$main_text"
           label="Префикс"  
           outlined 
           hide-details 
@@ -470,7 +470,7 @@
         <v-text-field  
           v-model="newTockenDop.sufix"
           class="tocken-sufix theme--dark" 
-          :color="color.text" 
+          :color="theme.$main_text"
           label="Суффикс"  
           outlined 
           hide-details 
@@ -478,14 +478,14 @@
         <v-text-field  
           v-model="newTockenDop.delimetr"
           class="tocken-delimetr theme--dark" 
-          :color="color.text"
+          :color="theme.$main_text"
           label="Разделитель"  
           outlined 
           hide-details 
         />
         <v-icon 
           class="row-check" 
-          :color="color.controls" 
+          :color="theme.$primary_button"
           @click=" saveTocken()"
         >
           {{ check }}
@@ -494,7 +494,7 @@
       <v-icon 
         v-if="showSign" 
         class="row-plus" 
-        :color="color.controls" 
+        :color="theme.$primary_button"
         @click="() => {showSign = !showSign; opennewtocken=!opennewtocken;}"
       >
         {{ plus_icon }}
@@ -502,7 +502,7 @@
       <v-icon 
         v-if="!showSign"
         class="row-minus" 
-        :color="color.controlsActive"
+        :color="theme.$primary_button"
         @click="() => {showSign = !showSign; opennewtocken=!opennewtocken;}"
       >
         {{ minus_icon }}
@@ -511,14 +511,14 @@
     <div 
       class="block-event" 
       :class="{openevent:openevent}" 
-      :style="{ background:color.backElement}"
+      :style="{ background:theme.$main_bg}"
     >
       <v-textarea  
         v-model="textarea_event"  
         spellcheck="false" 
         :textAreaFull="textareaEv" 
-        :color="color.text" 
-        :style="{color:color.text}" 
+        :color="theme.$main_text"
+        :style="{color:theme.$main_text}"
         auto-grow  
         outlined  
         class="textarea-event"  
@@ -528,7 +528,7 @@
       />
       <v-btn   
         class="event-btn" 
-        :color="color.controlsSystem" 
+        :color="theme.$primary_button"
         @click="setEvents"
       >
         Подтвердить
@@ -537,7 +537,7 @@
     <div 
       class="block-save" 
       :class="{opensave:opensave}" 
-      :style="{ background:color.backElement}"
+      :style="{ background:theme.$main_bg}"
     >
       <div 
         v-show="!errorSave"
@@ -545,7 +545,7 @@
       >
         <div 
           class="question-save" 
-          :style="{color:color.text}" 
+          :style="{color:theme.$main_text}"
         >
           Сохранить дашборд 
           <span class="save-name">
@@ -557,7 +557,7 @@
           <v-btn   
             class="save-btn" 
             small 
-            :color="color.controlsSystem" 
+            :color="theme.$primary_button"
             @click="saveDash"
           >
             Да
@@ -565,7 +565,7 @@
           <v-btn   
             class="save-btn" 
             small 
-            :color="color.controlsActive" 
+            :color="theme.$primary_button"
             @click="opensave = false; save_elem = false;"
           >
             Нет
@@ -578,7 +578,7 @@
       >
         <div 
           class="question-save" 
-          :style="{color:colorErrorSave}"
+          :style="{color:theme.$error_color}"
         >
           {{ msgErrorSave }}
         </div>
@@ -586,7 +586,7 @@
     </div>
     <div 
       class="warning-block" 
-      :style="{background:color.back, border:`1px solid ${color.border}`, color:color.text, bottom: `-${otstupBottom}px`}"
+      :style="{background:theme.$main_bg, border:`1px solid ${theme.$main_border}`, color:theme.$main_text, bottom: `-${otstupBottom}px`}"
     >
       <div class="warning-text">
         {{ msgWarn }}
@@ -594,7 +594,7 @@
       <div class="btn-warning">
         <v-btn 
           small 
-          :color="color.controls" 
+          :color="theme.$primary_button"
           class="warning-btn yes-btn" 
           @click="yesSearch"
         >
@@ -602,7 +602,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="color.controlsActive" 
+          :color="theme.$primary_button"
           class="warning-btn" 
           @click="noSearch"
         >
@@ -612,7 +612,6 @@
     </div>
     <modal-create-search 
       :idDashFrom="idDash" 
-      :colorFrom="color" 
       :modalFrom="activeModal" 
       :createBtnFrom="createSearchBtn" 
       :dataSearchFrom="newSearch"
@@ -621,20 +620,18 @@
     />
     <modal-schedule 
       :idDashFrom="idDash" 
-      :colorFrom="color" 
+      :colorFrom="theme"
       :modalFrom="activeSchedule" 
       :dataSidFrom="scheduleSid"
       @cancel="activeSchedule=false" 
     />
     <dash-settings 
-      :color-from="color" 
       :gear-from="gearShow"
       :permissions-from="permissionsFrom"
       :idDashFrom="idDashFrom"
       @changeMode="setEditMode"
     />
     <modal-paper 
-      :color="color" 
       :active="modalPaper"
       :sid=" modalPaperSid"
       :id-dash="idDash"
@@ -654,7 +651,6 @@ import  settings  from '../js/componentsSettings.js'
 export default {
   props: {
     idDashFrom: null,
-    colorFrom: null,
     permissionsFrom: null,
   },
   data () {
@@ -771,51 +767,9 @@ export default {
     },
     name: function() {
       return this.$store.getters.getName(this.idDash)
-    }, 
-    color: function() {
-      return this.colorFrom
     },
-    profileSwitch: function() {  // переключатель иконки импорта/экспорта 
-      if (this.profile_elem) {
-        return  `fill:${this.color.controlsActive}`;
-      } else {
-        return `fill:#DADADA`;
-      }
-    },
-    saveSwitch: function() {  // переключатель иконки импорта/экспорта 
-      if (this.save_elem) {
-        return  `fill:${this.color.controlsActive}`;
-      } else {
-        return `fill:#DADADA`;
-      }
-    },
-    searchSwitch: function() {  // переключатель иконки ИС (источников данных)
-      if (this.search_elem) {
-        return  `fill:${this.color.controlsActive}`;
-      } else {
-        return `fill:#DADADA`;
-      }   
-    },
-    toolSwitch: function() {  // тоже самое для инструментов
-      if (this.tool_elem) {
-        return  `fill:${this.color.controlsActive}`;
-      } else {
-        return `fill:#DADADA`;
-      }
-    },
-    tockenSwitch: function() {  // тоже самое для токенов
-      if (this.tocken_elem) {
-        return  `fill:${this.color.controlsActive}`;
-      } else {
-        return `fill:#DADADA`;
-      }
-    },
-    codeSwitch: function() {  // тоже самое для event
-      if (this.code_elem) {
-        return  `fill:${this.color.controlsActive}`;
-      } else {
-        return `fill:#DADADA`;
-      }
+    theme: function() {
+      return this.$store.getters.getTheme
     },
     editPermission: function() {
       if (this.permissionsFrom.includes('admin_all') || this.permissionsFrom.includes('editdash')) {
@@ -842,7 +796,7 @@ export default {
       
       tockens.forEach( item => {
         this.tockensName[item.name] = item.name;
-        this.lookTockens.push({show: false,color: this.color.controls})
+        this.lookTockens.push({show: false,color: this.theme.controls})
       })
       return tockens
     },
@@ -1005,10 +959,10 @@ export default {
     lookTocken: function(i) {
       if (!this.lookTockens[i].show) {
         this.lookTockens[i].show = true;
-        this.lookTockens[i].color = this.color.controlsActive;
+        this.lookTockens[i].color = this.theme.controlsActive;
       } else {
         this.lookTockens[i].show = false;
-        this.lookTockens[i].color = this.color.controls;
+        this.lookTockens[i].color = this.theme.controls;
       }
     },
     saveTocken: function() {  // функция которая сохраняет токен в хранилище
@@ -1525,10 +1479,10 @@ export default {
         
         document.querySelectorAll('.v-menu__content').forEach( item => {
           
-          item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
-          item.style.background = this.color.back;
-          item.style.color = this.color.text;
-          item.style.border = `1px solid ${this.color.border}`;
+          item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
+          item.style.background = this.theme.back;
+          item.style.color = this.theme.text;
+          item.style.border = `1px solid ${this.theme.border}`;
         })
       }
     },
@@ -1538,13 +1492,13 @@ export default {
       response.then( res => {
         this.errorSave = true;
         if (res.status == 200) {
-          this.colorErrorSave = this.color.controls;
+          this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
           this.$store.auth.getters.putLog(`Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${res.data.id}`);
           // console.log(res.data)
           this.updateDash({data: res.data,dash: dash})
         } else {
-          this.colorErrorSave = this.color.controlsActive;
+          this.colorErrorSave = this.theme.controlsActive;
           this.msgErrorSave = 'Не получилось. Попробуйте еще раз.';
         }
         setTimeout( () => {

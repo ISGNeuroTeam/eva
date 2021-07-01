@@ -2,6 +2,8 @@ import  rest from './storeRest.js';
 import  restAuth from '../storeAuth/storeRest.js';
 import  settings  from '../js/componentsSettings.js';
 
+import themes from '../js/themeSettings.js';
+
 export default {  // приблизительный объект хранилища, может отличаться от реального
   state: {
     theme: "dark",
@@ -1237,8 +1239,7 @@ export default {  // приблизительный объект хранили�
       if (!state.theme) {
         Vue.set(state, 'theme', 'dark');
       }
-      return state.theme
-      
+      return themes[state.theme]
     },
     getThemeBack(state) {
       return () => {

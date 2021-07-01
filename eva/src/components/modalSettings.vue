@@ -1,43 +1,43 @@
 <!-- Модальное окно для настройки дашборда -->
 
 <template>
-  <v-dialog  
-    v-model="active"  
-    width="1140"  
-    persistent 
+  <v-dialog
+    v-model="active"
+    width="1140"
+    persistent
     @keydown="checkEsc($event)"
-  > 
+  >
     <div class="settings-modal-block">
-      <v-card :style="{background:color.backElement}">
+      <v-card :style="{background:theme.$main_bg}">
         <v-card-text class="headline">
-          <div 
-            class="settings-title" 
-            :style="{color:color.text,borderColor:color.text}"
+          <div
+            class="settings-title"
+            :style="{color:theme.$title,borderColor:theme.$main_border}"
           >
-            Настройки 
-            <p>{{ element }}</p> 
+            Настройки
+            <p>{{ element }}</p>
           </div>
         </v-card-text>
-        <div 
-          ref="options" 
-          class="options-block" 
+        <div
+          ref="options"
+          class="options-block"
         >
           <div class="option-item">
-            <div 
-              class="name-option main item" 
-              :style="{color:color.text, borderBottom: `1px solid ${color.text}`}"
+            <div
+              class="name-option main item"
+              :style="{color:theme.$title, borderBottom: `1px solid ${theme.$main_border}`}"
             >
               Название
             </div>
-            <div 
+            <div
               class="discribe-option main item" 
-              :style="{color:color.text, borderBottom: `1px solid ${color.text}`}"
+              :style="{color:theme.$title, borderBottom: `1px solid ${theme.$main_border}`}"
             >
               Описание
             </div>
             <div 
               class="status-option main item" 
-              :style="{color:color.text, borderBottom: `1px solid ${color.text}`}"
+              :style="{color:theme.$title, borderBottom: `1px solid ${theme.$main_border}`}"
             >
               Статус
             </div>
@@ -48,13 +48,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               visible
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               Показывает / скрывает элемент
             </div>
@@ -62,8 +62,8 @@
               <v-switch   
                 v-model="options.visible"  
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text}" 
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}" 
                 :label="String(options.visible)" 
               />
             </div>
@@ -74,24 +74,24 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               level
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               Установить слой отображения элемента
             </div>
             <div class="status-option item">
-              <v-text-field 
+              <v-text-field
                 v-model="options.level"
-                clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
-                outlined 
-                class="subnumber"  
+                clearable
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
+                outlined
+                class="subnumber"
                 hide-details
               />  
             </div>
@@ -102,13 +102,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               boxShadow
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               Добавляет / удаляет тень
             </div>
@@ -116,8 +116,8 @@
               <v-switch  
                 v-model="options.boxShadow"    
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text,}"
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text,}"
                 :label="String(options.boxShadow)" 
               />
             </div>
@@ -129,13 +129,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               lastResult
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               Вывод предыдущих результатов
             </div>
@@ -143,8 +143,8 @@
               <v-switch   
                 v-model="options.lastResult"  
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text}" 
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}" 
                 :label="String(options.lastResult)" 
               />
             </div>
@@ -157,13 +157,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               searchBtn
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               Показывать кнопку поиска
             </div>
@@ -171,8 +171,8 @@
               <v-switch   
                 v-model="options.searchBtn"  
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text}" 
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}" 
                 :label="String(options.searchBtn)" 
               />
             </div>
@@ -185,13 +185,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               osmserver
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Сервер для набора tile Пример:
               http://192.168.4.209/osm/{z}/{x}/{y}.png
@@ -200,8 +200,8 @@
               <v-text-field 
                 v-model="options.osmserver"   
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -216,13 +216,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               strokeWidth
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Толщина линий
             </div>
@@ -230,8 +230,8 @@
               <v-text-field 
                 v-model="options.strokeWidth"   
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -246,13 +246,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}" 
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               thememultiline
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Цветовая тема
             </div>
@@ -260,8 +260,8 @@
               <v-select  
                 v-model="options.thememultiline"
                 :items="['default','Anna theme']" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
                 class="subnumber"
@@ -275,13 +275,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               subnumber
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выводит дополнительную надпись под числом
             </div>
@@ -289,8 +289,8 @@
               <v-text-field 
                 v-model="options.subnumber"   
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -303,13 +303,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               rowcolor
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать цвет которым подсветится нужная строка
             </div>
@@ -317,8 +317,8 @@
               <v-text-field 
                 v-model="options.rowcolor"  
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -331,13 +331,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               columncolor
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать цвет которым подсветится нужный столбец
             </div>
@@ -345,8 +345,8 @@
               <v-text-field 
                 v-model="options.columncolor" 
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}"
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -359,13 +359,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               cellcolor
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать цвет которым подсветится нужная ячейка
             </div>
@@ -373,8 +373,8 @@
               <v-text-field 
                 v-model="options.cellcolor" 
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber" 
                 hide-details
@@ -387,13 +387,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               color
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать цвет значения
             </div>
@@ -401,8 +401,8 @@
               <v-text-field 
                 v-model="options.color" 
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -415,13 +415,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               backgroundcolor
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать цвет фона
             </div>
@@ -429,8 +429,8 @@
               <v-text-field 
                 v-model="options.backgroundcolor"
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -443,13 +443,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               name
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать название кнопки
             </div>
@@ -457,8 +457,8 @@
               <v-text-field 
                 v-model="options.name"  
                 clearable  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber" 
                 hide-details
@@ -475,7 +475,7 @@
             >
               <div 
                 class="settings-title" 
-                :style="{color:color.text,borderColor:color.text}"
+                :style="{color:theme.$main_text,borderColor:theme.$main_border}"
               >
                 Столбцы для отображение
               </div>
@@ -484,6 +484,7 @@
                 v-for="(setting) in getAvailableTableTitles(idDash, element)"
                 :input-value="tableTitles"
                 @change="titleHandler($event)"
+                :style="{color:theme.$main_text}" 
                 :key="setting"
                 :label="setting"
                 :value="setting">  
@@ -497,13 +498,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               timeFormat
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать формат даты и времени
             </div>
@@ -512,8 +513,8 @@
                 v-model="options.timeFormat" 
                 clearable  
                 placeholder="%Y-%m-%d %H:%M:%S"  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"
                 hide-details
@@ -526,13 +527,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               widthTile
             </div>
             <div 
-              class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Введите ширину плитки
             </div>
@@ -541,8 +542,8 @@
                 v-model="options.widthTile" 
                 clearable  
                 placeholder="100"  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -555,13 +556,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               heightTile
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Введите высоту плитки
             </div>
@@ -570,8 +571,8 @@
                 v-model="options.heightTile"
                 clearable  
                 placeholder="100"  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -584,13 +585,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               fontSize
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Выбрать размер шрифта
             </div>
@@ -599,8 +600,8 @@
                 v-model="options.fontSize"
                 clearable  
                 placeholder="30"  
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
                 hide-details
@@ -613,13 +614,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               underline
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Подчеркивает текст кнопки
             </div>
@@ -627,8 +628,8 @@
               <v-switch  
                 v-model="options.underline"    
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text,}"
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}"
                 :label="String(options.underline)" 
               />
             </div>
@@ -639,13 +640,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               lastDot
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Показывать последнее значение
             </div>
@@ -653,8 +654,8 @@
               <v-switch  
                 v-model="options.lastDot" 
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text,}"
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}"
                 :label="String(options.lastDot)" 
               />
             </div>
@@ -665,13 +666,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               united
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Отображать ли все метрики на одной плоскости координат
             </div>
@@ -679,8 +680,8 @@
               <v-switch  
                 v-model="options.united" 
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text,}"
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}"
                 :label="String(options.united)" 
               />
             </div>
@@ -692,7 +693,7 @@
           >
             <div 
               class="settings-title" 
-              :style="{color:color.text,borderColor:color.text}"
+              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
             >
               Настройки режима United 
             </div>
@@ -704,7 +705,7 @@
             <v-icon 
               v-if="metrics.length==0"
               class="icon-plus" 
-              :color="color.controls" 
+              :color="theme.$primary_button" 
               @click="addMetrics"
             >
               {{ plus_icon }}
@@ -717,8 +718,8 @@
               <v-select  
                 v-model="metrics[i-1].name"
                 :items="metricsName" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
                 class="item-metric" 
@@ -728,8 +729,8 @@
               <v-select  
                 v-model="metrics[i-1].type"
                 :items="types" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
                 class="item-metric" 
@@ -741,8 +742,8 @@
                 clearable  
                 placeholder="0"  
                 label="Нижняя граница (ось Y)"
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 :disabled="metrics[i-1].manual"
                 outlined 
                 class="item-metric border"  
@@ -753,8 +754,8 @@
                 clearable  
                 placeholder="0"  
                 label="Верхняя граница (ось Y)"
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 :disabled="metrics[i-1].manual"
                 outlined 
                 class="item-metric border"  
@@ -762,22 +763,22 @@
               />
               <v-checkbox
                 v-model="metrics[i-1].manual"
-                :color="color.controls" 
-                :style="{color:color.text}"
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}"
                 class="item-metric checkbox"
                 label="Автоматически/Вручную"
                 hide-details
               />
               <v-icon 
                 class="icon-inside" 
-                :color="color.controls" 
+                :color="theme.$primary_button" 
                 @click="addMetrics"
               >
                 {{ plus_icon }}
               </v-icon>
               <v-icon 
                 class="icon-inside" 
-                :color="color.controls"  
+                :color="theme.$primary_button"  
                 @click="deleteMetrics(i-1)"
               >
                 {{ minus_icon }}
@@ -790,13 +791,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               multiple
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Возможность выбора нескольких значений
             </div>
@@ -804,8 +805,8 @@
               <v-switch  
                 v-model="options.multiple" 
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text,}" 
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}" 
                 :label="String(options.multiple)" 
               />
             </div>
@@ -816,13 +817,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               showlegend
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Показывать ли легенду
             </div>
@@ -830,8 +831,8 @@
               <v-switch  
                 v-model="options.showlegend" 
                 class="switch" 
-                :color="color.controls" 
-                :style="{color:color.text,}" 
+                :color="theme.$primary_button" 
+                :style="{color:theme.$main_text}" 
                 :label="String(options.showlegend)" 
               />
             </div>
@@ -842,13 +843,13 @@
           >
             <div 
               class="name-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               positionlegend
             </div>
             <div 
               class="discribe-option item" 
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}" 
             >
               Позиция легенды
             </div>
@@ -856,8 +857,8 @@
               <v-select  
                 v-model="options.positionlegend"
                 :items="['top','left','right','bottom']" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
                 class="subnumber" 
@@ -877,7 +878,7 @@
             >
               <div 
                 class="settings-title" 
-                :style="{color:color.text,borderColor:color.text}"
+                :style="{color:theme.$main_text,borderColor:theme.$main_border}"
               >
                 Библиотека примитивов отображения
               </div>
@@ -897,7 +898,7 @@
           >
             <div 
               class="settings-title" 
-              :style="{color:color.text,borderColor:color.text}"
+              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
             >
               Настройки круговой диаграммы 
             </div>
@@ -909,11 +910,11 @@
           >
             <div 
               class="divider-tooltip-setting" 
-              :style="{color:color.text}" 
+              :style="{color:theme.$main_text}" 
             >
               <p>Соотношение метрик</p>
               <div 
-                :style="{backgroundColor:color.text}" 
+                :style="{backgroundColor:theme.$main_text}" 
                 class="divider-line"
               />
             </div>  
@@ -925,8 +926,8 @@
                 :key="i+'metric'"
                 v-model="metricsRelation.relations[i-1]"
                 :items="metricsRelation.metrics" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
                 class="item-metric" 
@@ -936,11 +937,11 @@
             </div>
             <div 
               class="divider-tooltip-setting" 
-              :style="{color:color.text}" 
+              :style="{color:theme.$main_text}" 
             >
               <p>Цветовая схема</p>
               <div 
-                :style="{backgroundColor:color.text}" 
+                :style="{backgroundColor:theme.$main_text}" 
                 class="divider-line"
               />
             </div> 
@@ -950,8 +951,8 @@
               <v-select  
                 v-model="colorsPie.theme"
                 :items="themesArr" 
-                :color="color.controls" 
-                :style="{color:color.text, fill: color.text}"  
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
                 class="item-metric" 
@@ -964,20 +965,20 @@
                 clearable  
                 placeholder="green"  
                 label="Имя новой схема"
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="item-metric"  
                 hide-details
               />
               <v-text-field 
                 v-show="colorsPie.theme == 'custom'"
-                v-model="colorsPie.colors" 
-                clearable  
-                placeholder="red,#5F27FF,rgb(95, 39, 255)"  
+                v-model="colorsPie.colors"
+                clearable
+                placeholder="red,#5F27FF,rgb(95, 39, 255)"
                 label="Новая схема"
-                :color="color.text" 
-                :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+                :color="theme.$accent_ui_color"
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="item-metric"  
                 hide-details
@@ -991,7 +992,7 @@
         >
           <div 
             class="settings-title" 
-            :style="{color:color.text,borderColor:color.text}"
+            :style="{color:theme.$main_text,borderColor:theme.$main_border}"
           >
             Настройки tooltip 
           </div>
@@ -1003,18 +1004,18 @@
         >
           <div 
             class="divider-tooltip-setting" 
-            :style="{color:color.text}" 
+            :style="{color:theme.$main_text}" 
           >
             <p>Текст</p>
             <div 
-              :style="{backgroundColor:color.text}" 
+              :style="{backgroundColor:theme.$main_text}" 
               class="divider-line"
             />
-          </div>  
+          </div>
           <v-icon 
             v-if="tooltip.texts.length==0"
             class="icon-plus" 
-            :color="color.controls" 
+            :color="theme.$primary_button" 
             @click="addIntoTooltip('text')"
           >
             {{ plus_icon }}
@@ -1028,22 +1029,22 @@
               v-model="tooltip.texts[i-1]" 
               clearable  
               placeholder="Введите текст tooltip"  
-              :color="color.text" 
-              :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-text"  
               hide-details
             />
             <v-icon 
               class="icon-inside" 
-              :color="color.controls" 
+              :color="theme.$primary_button" 
               @click="addIntoTooltip('text')"
             >
               {{ plus_icon }}
             </v-icon>
             <v-icon 
               class="icon-inside" 
-              :color="color.controls"  
+              :color="theme.$primary_button"  
               @click="deleteFromTooltip('text',i-1)"
             >
               {{ minus_icon }}
@@ -1051,18 +1052,18 @@
           </div>
           <div 
             class="divider-tooltip-setting" 
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
           >
             <p>Ссылка</p>
             <div 
-              :style="{backgroundColor:color.text}" 
+              :style="{backgroundColor:theme.$main_text}" 
               class="divider-line"
             />
           </div>  
           <v-icon 
             v-if="tooltip.links.length==0"
-            class="icon-plus" 
-            :color="color.controls" 
+            class="icon-plus"
+            :color="theme.$primary_button" 
             @click="addIntoTooltip('link')"
           >
             {{ plus_icon }}
@@ -1076,8 +1077,8 @@
               v-model="tooltip.links[i-1].name" 
               clearable  
               placeholder="Введите название ссылки"  
-              :color="color.text" 
-              :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-link" 
               hide-details
@@ -1086,22 +1087,22 @@
               v-model="tooltip.links[i-1].url" 
               clearable  
               placeholder="Введите текст ссылки"  
-              :color="color.text" 
-              :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-link" 
               hide-details
             />
             <v-icon 
               class="icon-inside" 
-              :color="color.controls"  
+              :color="theme.$primary_button"  
               @click="addIntoTooltip('link')"
             >
               {{ plus_icon }}
             </v-icon>
             <v-icon 
               class="icon-inside" 
-              :color="color.controls"  
+              :color="theme.$primary_button"  
               @click="deleteFromTooltip('link',i-1)"
             >
               {{ minus_icon }}
@@ -1109,18 +1110,18 @@
           </div>
           <div 
             class="divider-tooltip-setting" 
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
           >
             <p>Кнопка</p>
             <div 
-              :style="{backgroundColor:color.text}" 
+              :style="{backgroundColor:theme.$main_text}" 
               class="divider-line"
             />
           </div>  
           <v-icon 
             v-if="tooltip.buttons.length==0" 
             class="icon-plus" 
-            :color="color.controls" 
+            :color="theme.$primary_button" 
             @click="addIntoTooltip('button')"
           >
             {{ plus_icon }}
@@ -1134,8 +1135,8 @@
               v-model="tooltip.buttons[i-1].name"
               clearable  
               placeholder="Введите название кнопки"  
-              :color="color.text" 
-              :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-button"  
               hide-details
@@ -1144,22 +1145,22 @@
               v-model="tooltip.buttons[i-1].id"
               clearable  
               placeholder="Введите id кнопки"  
-              :color="color.text" 
-              :style="{color:color.text, background: 'transparent', borderColor: color.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-button"  
               hide-details
             />  
-            <v-icon 
+            <v-icon
               class="icon-inside" 
-              :color="color.controls"  
+              :color="theme.$primary_button"  
               @click="addIntoTooltip('button')"
             >
               {{ plus_icon }}
             </v-icon>
-            <v-icon 
+            <v-icon
               class="icon-inside" 
-              :color="color.controls"  
+              :color="theme.$primary_button"  
               @click="deleteFromTooltip('button',i-1)"
             >
               {{ minus_icon }}
@@ -1170,7 +1171,7 @@
           <v-spacer />
           <v-btn 
             small 
-            :color="color.controlsSystem" 
+            :color="theme.$primary_button" 
             class="create-btn"
             @click="setOptions"
           >
@@ -1178,7 +1179,7 @@
           </v-btn>
           <v-btn 
             small 
-            :color="color.controlsActive" 
+            :color="theme.$primary_button" 
             class="create-btn" 
             @click="cancelModal"
           >
@@ -1200,7 +1201,6 @@ import { mapGetters } from 'vuex';
 export default {
   props: {
     idDashFrom: null,
-    colorFrom: null,
   },
   data() {
     return {
@@ -1251,11 +1251,9 @@ export default {
     idDash: function(){
       return this.idDashFrom
     },
-    color: function() {
-      return this.colorFrom
+    theme: function() {
+      return this.$store.getters.getTheme
     },
-
-
     selectedTitles() {
       return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
     },
@@ -1365,10 +1363,10 @@ export default {
         
         document.querySelectorAll('.v-menu__content').forEach( item => {
           
-          item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
-          item.style.background = this.color.back;
-          item.style.color = this.color.text;
-          item.style.border = `1px solid ${this.color.border}`;
+          item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
+          item.style.background = this.theme.$main_bg;
+          item.style.color = this.theme.$main_text;
+          item.style.border = `1px solid ${this.theme.$main_border}`;
         })
       }
     },

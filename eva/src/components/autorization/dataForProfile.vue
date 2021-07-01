@@ -2,18 +2,18 @@
   <div 
     class="field-profile more-data" 
     :data-active="active" 
-    :style="{borderColor: colorFrom.border }"
+    :style="{borderColor: theme.$main_border }"
   >
     <div 
       class="headline" 
-      :style="{color: colorFrom.text }" 
+      :style="{color: theme.$title }"
     >
       {{ alldata[essence][`${subessence}Name`] }}
     </div>
     <v-tabs   
       v-model="alldata[essence].tab[subessence]" 
-      :color="colorFrom.text"
-      :style="{background: colorFrom.backElement }"
+      :color="theme.$main_text"
+      :style="{background: theme.$main_bg }"
       @change="switchTab"
     >
       <v-tabs-slider />
@@ -39,8 +39,8 @@
           :append-icon="search"  
           label="Поиск" 
           class="search-row" 
-          :color="colorFrom.controls" 
-          :style="{color: colorFrom.text }"  
+          :color="theme.$accent_ui_color"
+          :style="{color: theme.$main_text }"
           single-line 
           hide-details 
         />
@@ -50,7 +50,7 @@
         >
           <v-data-table
             v-model="alldata[essence][subessence].selected"
-            :style="{background: colorFrom.backElement, color: colorFrom.text, borderColor: colorFrom.text }"
+            :style="{background: theme.$main_bg, color: theme.$main_text, borderColor: theme.$main_border }"
             hide-default-header
             :no-data-text="alldata[essence][subessence].nodata"
             :headers="alldata[essence][subessence].titles"
@@ -63,7 +63,7 @@
         <div class="control-btn">
           <v-btn 
             small  
-            :color="colorFrom.controlsActive"
+            :color="theme.$primary_button"
             class="control-btn-itself" 
             @click="deleteSelected(subessence)" 
           >
@@ -87,8 +87,8 @@
           :append-icon="search"  
           label="Поиск" 
           class="search-row" 
-          :color="colorFrom.controls" 
-          :style="{color: colorFrom.text }" 
+          :color="theme.$accent_ui_color"
+          :style="{color: theme.$main_text }"
           single-line 
           hide-details 
         />
@@ -98,7 +98,7 @@
         >
           <v-data-table
             v-model="alldata[essence][`all${subessence}`].selected"
-            :style="{background: colorFrom.backElement, color: colorFrom.text, borderColor: colorFrom.text }"
+            :style="{background: theme.$main_bg, color: theme.$main_text, borderColor: theme.$main_border }"
             hide-default-header
             :no-data-text="alldata[essence][subessence].nodata"
             :headers="alldata[essence][`all${subessence}`].titles"
@@ -111,7 +111,7 @@
         <div class="control-btn">
           <v-btn 
             small  
-            :color="colorFrom.controls"
+            :color="theme.$primary_button"
             class="control-btn-itself" 
             @click="addSelected(subessence)"
           >
@@ -136,7 +136,6 @@ export default {
     activeFrom: null,
     dataFrom: null,
     nameGroupFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -358,7 +357,10 @@ export default {
         this.switchTab();
       }
       return this.activeFrom
-    },    
+    },
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
   }, 
   methods: {
     getData: async function() {

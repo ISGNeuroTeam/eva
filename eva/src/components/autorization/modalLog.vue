@@ -7,11 +7,11 @@
   >
     <v-card  
       class="log-block" 
-      :style="{background: colorFrom.backElement }"
+      :style="{background: theme.$main_bg }"
     >
       <v-card-text 
         class="card-log" 
-        :style="{color: colorFrom.text }"
+        :style="{color: theme.$main_text }"
       >
         <div 
           class="log-body" 
@@ -20,11 +20,11 @@
       </v-card-text>
       <v-card-actions 
         class="btn-log" 
-        :style="{background: colorFrom.backElement }"
+        :style="{background: theme.$main_bg }"
       >
         <v-btn 
           small 
-          :color="colorFrom.controlsSystem" 
+          :color="theme.$primary_button "
           class="log-btn" 
           @click="clearLog(clear)"
         >
@@ -39,7 +39,7 @@
         <div class="right-btn">
           <v-btn 
             small 
-            :color="colorFrom.controlsSystem" 
+            :color="theme.$primary_button "
             class="log-btn" 
             @click="sendToBack"
           >
@@ -47,7 +47,7 @@
           </v-btn>
           <v-btn 
             small 
-            :color="colorFrom.controls" 
+            :color="theme.$primary_button "
             class="log-btn" 
             @click="cancelModal"
           >
@@ -67,7 +67,6 @@ import {  } from '@mdi/js'
 export default {
   props: {
     modalActive: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -85,6 +84,9 @@ export default {
         this.getLog();
       }
       return this.modalActive
+    },
+    theme: function() {
+      return this.$store.getters.getTheme
     },
   },  
   methods: {

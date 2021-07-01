@@ -1,7 +1,7 @@
 <template>
   <v-app 
     class="aut-app-profile" 
-    :style="{background: color.back }" 
+    :style="{background: theme.$secondary_bg }"
   >
     <header-top 
       :inside="true" 
@@ -12,10 +12,10 @@
         class="main-container" 
       >
         <v-card class="card-aut-table">
-          <v-card-text :style="{background: color.backElement }">
+          <v-card-text :style="{background: theme.$main_bg }">
             <v-tabs   
               v-model="tab" 
-              :color="color.text"  
+              :color="theme.$main_text"
               @change="getData"
             >
               <v-tabs-slider />
@@ -30,8 +30,7 @@
                 v-for="i in tabs.length" 
                 :key="i" 
                 class="item"
-                :value="`tab-${i}`" 
-                :style="{background: color.backElement}"
+                :value="`tab-${i}`"
               >
                 <div 
                   v-if="dataLoading"
@@ -40,16 +39,30 @@
                   <v-skeleton-loader
                     type="table-tbody"
                     tile
-                    :style="{background: color.backElement}"
+                    :style="{background: theme.$main_bg}"
                   />
                 </div>
                 <div
                   v-if="!dataLoading"
-                  class="table-tab"  
-                  :style="{background: color.backElement }"
+                  class="table-tab"
+                  :style="{background: theme.$main_bg }"
                 >
+                  <div class="d-flex justify-end">
+                    <v-btn
+                      v-if="adminRool"
+                      :color="theme.$primary_button"
+                      fab
+                      dark
+                      small
+                      @click="editUser('create','',i)"
+                    >
+                      <v-icon>
+                        {{ plus }}
+                      </v-icon>
+                    </v-btn>
+                  </div>
                   <v-data-table
-                    :style="{background: color.backElement, color: color.text, borderColor: color.text }"
+                    :style="{background: theme.$main_bg, color: theme.$main_text, borderColor: theme.$secondary_border }"
                     :headers="titles"
                     :items.sync="originData"
                     :items-per-page="15"
@@ -58,22 +71,23 @@
                     :sort-by="['roles']"
                   >
                     <template v-slot:item.color="{ item }">
-                      <div 
-                        class="square-profile" 
+                      <div
+                        class="square-profile"
                         :style="{backgroundColor:item.color}"
                       />
                     </template>
+
                     <template v-slot:item.actions="{ item }">
                       <v-tooltip 
                         bottom 
-                        :color="color.controlsActive"  
+                        :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
                             v-if="i == 1 ? true : showPencilRoot" 
                             v-model="item.actions"
                             class="editUser icon-aut" 
-                            :color="color.controls"
+                            :color="theme.$primary_button"
                             v-on="on" 
                             @click="editUser('edit',item,i)"
                           >
@@ -84,14 +98,14 @@
                       </v-tooltip>
                       <v-tooltip 
                         bottom 
-                        :color="color.controlsActive"  
+                        :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
                             v-if="adminRool" 
                             v-model="item.actions"
                             class="editUser icon-aut" 
-                            :color="color.controls"
+                            :color="theme.$primary_button"
                             v-on="on" 
                             @click="openDelete(item,i)"
                           >
@@ -102,21 +116,6 @@
                       </v-tooltip>
                     </template>
                   </v-data-table>
-                  <v-btn
-                    v-if="adminRool"
-                    :color="color.controls"
-                    fab
-                    dark
-                    small
-                    absolute
-                    top
-                    right
-                    @click="editUser('create','',i)"
-                  >
-                    <v-icon>
-                      {{ plus }}
-                    </v-icon>
-                  </v-btn>
                 </div>
               </v-tab-item>
             </v-tabs>
@@ -126,19 +125,17 @@
     </v-content>
     <footer-bottom />
     <modal-profile 
-      :activeFrom ="activeModal" 
-      :colorFrom="color" 
+      :active-from="activeModal"
       :create="createSome" 
-      :keyFrom="keyFrom"  
-      :curItemFrom="curItem" 
+      :key-from="keyFrom"  
+      :cur-item-from="curItem" 
       :passway="permission"  
-      :userFrom="user" 
+      :user-from="user" 
       @cancelModal="closeModal"
     />
-    <modal-delete-profile 
-      :activeDelete ="activeDelete" 
-      :colorFrom="color" 
-      :dataFrom="dataDelete" 
+    <modal-delete-profile
+      :active-delete="activeDelete"
+      :data-from="dataDelete"
       @cancelModal="closeModal"
     />
   </v-app>
@@ -147,8 +144,6 @@
 <script>
 
 import {   mdiPencil,  mdiPlus, mdiTrashCanOutline  } from '@mdi/js'
-
-import themes from '../../js/themeSettings.js';
 
 export default {
 
@@ -174,7 +169,6 @@ export default {
       dataDelete: {},
       curItem: {},
       permission: true,
-      color: { },
     } 
   },
   computed: { 
@@ -183,14 +177,11 @@ export default {
     },
     theme: function() {
       return this.$store.getters.getTheme
-    }
-  },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-      
     },
-  }, 
+  },
+  mounted() {
+    this.getData('tab-1');
+  },
   methods: {
     setPermissions: function(event) {
       if (event.includes('admin_all')) {
@@ -300,30 +291,30 @@ export default {
     setData: async function(role) {
       return await this.$store.auth.getters.getEssenceList(role,false)
     },
-    setColorHover: function(i) { 
+    setColorHover: function(i) {
 
       let table = {};
       let timeOut = setTimeout( async function tick() {
-      
+
         if (document.querySelector(`[data-id="${i}"]`)) {
           clearTimeout(timeOut);
           table = document.querySelector(`[data-id="${i}"]`);
           table.addEventListener('mouseover', event => {
             if(event.target.tagName.toLowerCase() == 'td') {
-              event.target.parentElement.style =`background: ${this.color.controlsActive} !important;color:${this.color.back}`;
+              event.target.parentElement.style =`background: ${this.theme.$accent_ui_color} !important;color:white`;
             }
           })
           table.addEventListener('mouseout', event => {
             if(event.target.tagName.toLowerCase() == 'td') {
-              event.target.parentElement.style =`background: transparent !important;color:${this.color.text}`;
+              event.target.parentElement.style =`background: transparent !important;color:${this.theme.$main_text}`;
             }
           })
 
         }  else {
-          timeOut = setTimeout(tick.bind(this), 100); 
+          timeOut = setTimeout(tick.bind(this), 100);
         }
       }.bind(this), 0);
-      
+
     },
     checkName: function(name) {
       if (name.length > 25) {
@@ -361,10 +352,6 @@ export default {
       this.activeModal = false;
       this.getData(`tab-${this.keyFrom}`);
     },
-  },
-  mounted() {
-    this.getData('tab-1');
-    this.color = themes[this.theme];
   } 
 }
 
