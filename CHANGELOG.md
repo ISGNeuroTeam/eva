@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.58.0]
+
+### Added
+
+- custom styles for layout objects on map (ex background color, text, html markup, highlighting)
+- sort in table component
+- add setting to show specific titles in table component
+
+### Changed
+
+- dashboard opens for viewing (not editable by default) 
+- turn off clustering in map component
+
 ## [1.57.1]
 
 ### Fixed
