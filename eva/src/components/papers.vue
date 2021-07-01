@@ -347,7 +347,6 @@
 
 import { mdiPlay, mdiSettings, mdiArrowLeftBold , mdiPlus, mdiContentSave } from '@mdi/js'
 //import  settings  from '../js/componentsSettings.js';
-import themes from '../js/themeSettings.js';
 
 export default {
 
@@ -449,15 +448,10 @@ export default {
       }
       return true
     }, 
-    theme: function() {
+    color: function() {
       return this.$store.getters.getTheme
     }
-  },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-    },
-  }, 
+  },   
   methods: {
     setPaper: async function() {
       if (this.uploadFile == '') {
@@ -810,7 +804,6 @@ export default {
       this.rowsCount = 6;
     }
     //this.unitedData.color=  this.color.controls;
-    this.color = themes[this.theme];
     Object.values(this.steps).forEach( item => {
       item.status = this.color.controls;
     })
