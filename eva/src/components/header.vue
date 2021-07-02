@@ -7,7 +7,7 @@
       <div class="nav-btn">
         <div 
           class="title-main" 
-          :style="{color: theme.$title}"
+          :style="{color: theme.$secondary_text}"
         >
           EVA
         </div>
@@ -18,7 +18,7 @@
           <template v-slot:activator="{ on }">
             <v-icon 
               class="home"  
-              :color="theme.$title"
+              :color="theme.$secondary_text"
               v-on="on" 
               @click="toHome"
             >
@@ -34,7 +34,7 @@
           <template v-slot:activator="{ on }">
             <v-icon 
               class="undo"
-              :color="theme.$title"
+              :color="theme.$secondary_text"
               v-on="on"
               @click="toBackward"
             >
@@ -47,7 +47,7 @@
       <div class="manage-btn">
         <div 
           class="id-user" 
-          :style="{color:theme.$title}"
+          :style="{color:theme.$secondary_text}"
         >
           {{ login }}
           | 
@@ -60,7 +60,7 @@
           <template v-slot:activator="{ on }">
             <v-icon 
               class="edit icon-aut" 
-              :color="theme.$title"
+              :color="theme.$secondary_text"
               v-on="on" 
               @click="openLogs()"
             >
@@ -77,7 +77,7 @@
           <template v-slot:activator="{ on }">
             <v-icon 
               class="edit icon-aut"
-              :color="theme.$title"
+              :color="theme.$secondary_text"
               v-on="on"
               @click="edit"
             >
@@ -93,7 +93,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               class="edit icon-aut"
-              :color="theme.$title"
+              :color="theme.$secondary_text"
               v-on="on"
               @click="openThemeModal"
             >
@@ -109,7 +109,7 @@
           <template v-slot:activator="{ on }">
             <v-icon 
               class="exit icon-aut"
-              :color="theme.$title"
+              :color="theme.$secondary_text"
               v-on="on" 
               @click="exit"
             >

@@ -219,11 +219,10 @@
             </v-card-text>
           </v-card>
         </div>
-      </v-container> 
+      </v-container>  
     </v-content>
     <footer-bottom />
     <modal-report 
-      :colorFrom="theme" 
       :modalFrom="modal" 
       :searchFrom="search"
       @cancelModal="cancelModal" 

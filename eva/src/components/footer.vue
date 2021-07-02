@@ -3,16 +3,17 @@
     class="footer-block" 
     :style="{color: theme.$main_text}"
   >
-    {{ version }}
+    {{ appVersion }}
   </div>    
 </template>
 
 
 <script>
+import {version} from './../../package.json'
 export default {
   data () {
     return {
-      version: '1.57.1',
+      appVersion: version,
     } 
   },
   computed: {

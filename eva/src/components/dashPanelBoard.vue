@@ -21,7 +21,7 @@
           <template v-slot:activator="{ on }">
             <v-icon 
               class="edit theme--dark" 
-              :style="{color:theme.$title}"
+              :style="{color:theme.$secondary_text}"
               v-on="on"
               @click="gearShow = !gearShow"
             >
@@ -40,7 +40,7 @@
         <template v-slot:activator="{ on }">
           <v-icon 
             class="code theme--dark"
-            :style="{color:theme.$title}"
+            :style="{color:theme.$secondary_text}"
             :class="{hide_control:!edit_elem}"  
             v-on="on" 
             @click="openEventCode"
@@ -57,7 +57,7 @@
         <template v-slot:activator="{ on }">
           <v-icon 
             class="tocken theme--dark"
-            :style="{color:theme.$title}"
+            :style="{color:theme.$secondary_text}"
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
             @click="openTockenCode"
@@ -74,7 +74,7 @@
         <template v-slot:activator="{ on }">
           <v-icon 
             class="search theme--dark"
-            :style="{color:theme.$title}"
+            :style="{color:theme.$secondary_text}"
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
             @click="openSearchCode"
@@ -91,7 +91,7 @@
         <template v-slot:activator="{ on }">
           <v-icon 
             class="tools theme--dark"
-            :style="{color:theme.$title}"
+            :style="{color:theme.$secondary_text}"
             :class="{hide_control:!edit_elem}" 
             v-on="on" 
             @click="openToolPanel"
@@ -108,7 +108,7 @@
         <template v-slot:activator="{ on }">
           <v-icon 
             class="profile theme--dark"
-            :style="{color:theme.$title}"
+            :style="{color:theme.$secondary_text}"
             :data-error="colorError"
             v-on="on" 
             @click="openProfile"
@@ -125,7 +125,7 @@
         <template v-slot:activator="{ on }"  v-if="editPermission">
           <v-icon 
             class="save theme--dark"
-            :style="{color:theme.$title}"
+            :style="{color:theme.$secondary_text}"
             v-on="on" 
             @click="openSave"
           >
