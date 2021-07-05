@@ -8,22 +8,22 @@
     class="modal-delete"  
     @keydown="checkEsc($event)"
   >
-    <v-card :style="{background:color.backElement}">
+    <v-card :style="{background:theme.$main_bg}">
       <v-card-text class="headline ">
         <div 
-          :style="{color:color.text}"
+          :style="{color:theme.$main_text}"
           class="delete-title"
         >
           Вы точно хотите удалить 
           <span 
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
             class="delete-name"
           >
             {{ deleteName }}
           </span> 
           <span 
             v-if="idTitle" 
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
             class="delete-id"
           >
             {{ deleteId }}
@@ -35,7 +35,7 @@
         <v-spacer />
         <v-btn 
           small  
-          :color="color.controlsSystem"
+          :color="theme.$primary_button"
           class="delete-btn" 
           @click="deleteBtn"
         >
@@ -43,7 +43,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="color.controlsActive"
+          :color="theme.$primary_button"
           class="delete-btn" 
           @click="cancelModal"
         >
@@ -61,7 +61,6 @@ export default {
   props: {
     idDashFrom: null,
     dataPageFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -87,12 +86,8 @@ export default {
       }  
       return title
     },
-    color: function() {
-      let color = {};
-      if (this.colorFrom) {
-        color = this.colorFrom
-      }
-      return color
+    theme: function() {
+      return this.$store.getters.getTheme
     },
     dataPage: function() {
       return this.dataPageFrom
@@ -137,7 +132,7 @@ export default {
     },
     changeStyle: function() {
       if (this.active) {
-        document.querySelector('.v-dialog').style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
+        document.querySelector('.v-dialog').style.boxShadow = `0 3px 1px -2px ${this.theme.$main_border},0 2px 2px 0 ${this.theme.$main_border},0 1px 5px 0 ${this.theme.$main_border}`;
       }
     },
   },

@@ -194,8 +194,8 @@
       <v-card-text
         :is="currentElem" 
         v-show="showElement"
-        class="card-text element-itself" 
-        :colorFrom="theme" 
+        class="card-text element-itself"
+        :colorFrom="theme"
         :style="{color:theme.$main_text, background:'transparent'}"  
         :idFrom="element"   
         :idDashFrom="idDash"  
