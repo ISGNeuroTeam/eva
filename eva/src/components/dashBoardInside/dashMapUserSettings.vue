@@ -138,7 +138,7 @@ export default {
       options: {
         selected: "яндекс",
         selectedLayer: "test",
-        zoomLevel: 25,
+        zoomLevel: 10,
         zoomStep: 25,
         showLegend: true,
       },
@@ -171,6 +171,7 @@ export default {
       idDash: this.idDashFrom,
       id: this.idElement,
     });
+    
     // init store for reactivity
     if (!options.showLegend) {
       let initOptions = {
@@ -184,6 +185,9 @@ export default {
         id: this.idElement,
         options: initOptions,
       });
+    } 
+    else {
+      this.options = options
     }
   },
   methods: {
