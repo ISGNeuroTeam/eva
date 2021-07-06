@@ -1,4 +1,6 @@
 #app
+    .table-block
+        background-color: var(--main_bg)
 
     .no-data-table
         font-size: 15px
@@ -6,7 +8,6 @@
         text-align: center
 
     .dash-table
-        // border: 2px solid rgba(0,0,0,.2)
         margin:  0
         overflow: hidden
         background-color: inherit !important
@@ -21,6 +22,27 @@
         .v-data-table__wrapper
             border-color: inherit
 
+            &::-webkit-scrollbar
+                width: 10px
+                background-color: var(--secondary_bg)
+
+
+            &::-webkit-scrollbar-thumb
+                border-radius: 10px
+                background-color: var(--secondary_text)
+
+
+            &::-webkit-scrollbar-track
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2)
+                border-radius: 10px
+                background-color: var(--secondary_bg)
+
+            &::-webkit-scrollbar-corner
+                background-color: var(--secondary_bg)
+
+
+
+
             table
                 border-color: inherit
 
@@ -32,6 +54,9 @@
 
                         td
                             border-color: inherit
+                    tr:hover
+                        color: var(--main_bg)
+                        background-color: var(--accent_ui_color)
 
 
    

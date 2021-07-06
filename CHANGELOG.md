@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - new color schema for light and dark themes
 - styles in all main gui components to support new color schema
+- styles in all visualization components on dashboard and search&reporting
 
 ## [1.58.0]
 

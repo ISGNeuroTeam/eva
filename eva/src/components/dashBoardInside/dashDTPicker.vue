@@ -6,11 +6,12 @@
     >
       <div 
         class="DTPicker-btn" 
-        :style="{background:colorSet.controls}" 
+        :style="{background:theme.$primary_button}"
         @click="openHidden"
       >
         <p>Выберите время и дату</p>
-        <v-icon 
+        <v-icon
+          :style="{color:theme.$main_text}"
           class="picker-arrow" 
         >
           {{ arrow.elem }}
@@ -18,45 +19,45 @@
       </div>
       <div 
         class="DTPicker-elem" 
-        :style="{boxShadow : `0 5px 5px -3px ${colorSet.border},0 8px 10px 1px ${colorSet.border},0 3px 14px 2px ${colorSet.border}`, background : colorSet.backElement, color : colorSet.text, border : `1px solid ${colorSet.border}`}"
+        :style="{boxShadow : `0 5px 5px -3px ${theme.$main_border},0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`, background : theme.$main_bg, color : theme.$main_text, border : `1px solid ${theme.$main_border}`}"
       >
         <div 
           class="name-of-picker" 
-          :style="{color:colorSet.controls}"
+          :style="{color:theme.$title}"
         > 
           Выбор времени
         </div>
         <div class="choose-period">
-          <p :style="{color:colorSet.text}">
+          <p :style="{color:theme.$main_text}">
             Последние
           </p>
           <v-text-field  
             v-model="last.every"
             class="textarea-item" 
             outlined 
-            :color="colorSet.text" 
-            :style="{color:colorSet.text}" 
+            :color="theme.$accent_ui_color"
+            :style="{color:theme.$main_text}"
             hide-details
             @input="setLast($event)" 
           />
         </div>
         <div class="choose-time">
           <v-chip 
-            :color="colorSet[color.hour]" 
+            :color="theme[color.hour]"
             class="time" 
             @click="setTime('hour')"
           >
             Часов
           </v-chip>
           <v-chip 
-            :color="colorSet[color.minute]" 
+            :color="theme[color.minute]"
             class="time" 
             @click="setTime('minute')"
           > 
             Минут
           </v-chip>
           <v-chip 
-            :color="colorSet[color.second]"
+            :color="theme[color.second]"
             class="time" 
             @click="setTime('second')"
           >
@@ -65,7 +66,7 @@
         </div>
         <div 
           class="name-of-picker" 
-          :style="{color:colorSet.controls}"
+          :style="{color:theme.$title}"
         > 
           Выбор времени и даты
         </div>
@@ -73,23 +74,23 @@
           v-model="start" 
           label="Начальная дата и время" 
           format="YYYY-MM-DD HH:mm"   
-          :color="colorSet.controlsActive" 
-          :button-color="colorSet.controls" 
+          :color="theme.$accent_ui_color"
+          :button-color="theme.$primary_button"
           class="dtpicker" 
           @validate="setTocken('dt')"
         />
         <DTPicker 
           v-model="end" 
           label="Конечная дата и время" 
-          format="YYYY-MM-DD HH:mm"  
-          :color="colorSet.controlsActive" 
-          :button-color="colorSet.controls" 
+          format="YYYY-MM-DD HH:mm"
+          :color="theme.$accent_ui_color"
+          :button-color="theme.$primary_button"
           class="dtpicker" 
           @validate="setTocken('dt')"
         />
         <div 
           class="name-of-picker" 
-          :style="{color:colorSet.controls}"
+          :style="{color:theme.$title}"
         > 
           Диапазон даты
         </div>
@@ -97,15 +98,15 @@
           v-model="range" 
           range  
           label="Диапазон дат" 
-          format="YYYY-MM-DD"  
-          :color="colorSet.controlsActive" 
-          :button-color="colorSet.controls" 
+          format="YYYY-MM-DD"
+          :color="theme.$accent_ui_color"
+          :button-color="theme.$primary_button"
           class="dtpicker range-picker" 
           @validate="setTocken('range')"
         />
         <div 
           class="name-of-picker" 
-          :style="{color:colorSet.controls}"
+          :style="{color:theme.$title}"
         >
           Ввод даты и времени вручную
         </div>
@@ -113,10 +114,10 @@
           v-model="start_custom.value"
           label="Начальная дата" 
           counter="500" 
-          :style="{color:colorSet.text}" 
+          :style="{color:theme.$main_text}"
           clearable 
           :append-icon="check" 
-          :color="colorSet[start_custom.color]" 
+          :color="theme[start_custom.color]"
           hide-details  
           outlined  
           class="dtpicker custom-picker"
@@ -127,10 +128,10 @@
           v-model="end_custom.value"
           label="Конечная дата" 
           counter="500"  
-          :style="{color:colorSet.text}" 
+          :style="{color:theme.$main_text}"
           clearable 
           :append-icon="check" 
-          :color="colorSet[end_custom.color]"
+          :color="theme[end_custom.color]"
           hide-details  
           outlined  
           class="dtpicker custom-picker"
@@ -140,7 +141,7 @@
         <div class="set-btn-block">
           <v-btn 
             small 
-            :color="colorFrom.controlsSystem" 
+            :color="theme.$primary_button"
             class="set-btn" 
             @click="setDate"
           >
@@ -149,10 +150,10 @@
         </div>   
       </div>
     </div>
-    <div 
+    <div
       class="current-date" 
-      :style="{color:colorFrom.text, border: `1px solid ${colorFrom.border}`}" 
-      :class="{show_curent:show_curent}" 
+      :style="{color:theme.$main_text, border: `1px solid ${theme.$main_border}`}"
+      :class="{show_curent:show_curent}"
     >
       {{ curDate }}
     </div>
@@ -169,7 +170,6 @@ export default {
     idFrom: null,
     idDashFrom: null,
     dataRestFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -186,9 +186,9 @@ export default {
         time: ''
       },
       color: {
-        hour: 'controls',
-        minute: 'controls',
-        second: 'controls',
+        hour: '$accent_ui_color',
+        minute: '$accent_ui_color',
+        second: '$accent_ui_color'
       },
       start_custom: {
         value: null,
@@ -223,9 +223,9 @@ export default {
     dataRest: function() {
       return this.dataRestFrom
     },
-    colorSet: function() {
-      return this.colorFrom
-    },
+    theme: function() {
+      return this.$store.getters.getTheme
+    }
   },  
   methods: {
     calcCurrentDate: function() { 
@@ -295,36 +295,17 @@ export default {
     },
     openHidden: function() {
       this.show_picker_elem = !this.show_picker_elem;
-      if( this.arrow.direct == 'down') {
+      if( this.arrow.direct === 'down') {
         this.arrow.direct = 'up';
         this.arrow.elem = this.up;
         this.show_curent = false;
-        this.setColor();
       } else {
         this.changeDate = !this.changeDate;
         this.arrow.direct = 'down';
         this.arrow.elem = this.down;
         this.showCurrent();
         this.curDate = this.calcCurrentDate();
-
       }
-
-    },
-    setColor: function() {
-      let elem = document.querySelector('.DTPicker-elem');
-      elem.querySelectorAll('.field-input').forEach( item => {
-        item.style.background = this.colorSet.back;
-        item.style.color = this.colorSet.text;
-        item.style.boxShadow = `0 0px 2px 0px ${this.colorSet.border},0 0px 2px 0px ${this.colorSet.border},0 0px 2px 0px ${this.colorSet.border}`;
-      });
-      elem.querySelectorAll('.datepicker').forEach( item => {
-        item.style.background = this.colorSet.back;
-        item.style.color = this.colorSet.text;
-        item.style.fill = this.colorSet.text;
-        item.style.borderColor = this.colorSet.text;
-        item.style.boxShadow = `0 0px 2px 0px ${this.colorSet.border},0 0px 2px 0px ${this.colorSet.border},0 0px 2px 0px ${this.colorSet.border}`;
-
-      })
     },
     customDate: function(elem) {
       elem == 'begin' ? this.start_custom.color = 'controls': this.end_custom.color = 'controls';
@@ -346,12 +327,12 @@ export default {
     setTime: function(time) {
       this.last.time = time;
       Object.keys(this.color).forEach( item => {
-        this.color[item] = 'controls';
+        this.color[item] = '$accent_ui_color';
       })
-      if (this.color[time] == 'controls') {
-        this.color[time] = 'controlsActive';
+      if (this.color[time] === '$accent_ui_color') {
+        this.color[time] = '$primary_button';
       } else {
-        this.color[time] = 'controls';
+        this.color[time] = '$accent_ui_color';
       }
       this.setTocken('time');
     },
@@ -367,7 +348,7 @@ export default {
         this.last.time = '';
         this.last.every = 0;
         Object.keys(this.color).forEach( item => {
-          this.color[item] = 'controls';
+          this.color[item] = '$accent_ui_color';
         })
         break
 
@@ -381,7 +362,7 @@ export default {
         this.last.time = '';
         this.last.every = 0;
         Object.keys(this.color).forEach( item => {
-          this.color[item] = 'controls';
+          this.color[item] = '$accent_ui_color';
         })
         break
 
@@ -394,7 +375,7 @@ export default {
         this.last.time = '';
         this.last.every = 0;
         Object.keys(this.color).forEach( item => {
-          this.color[item] = 'controls';
+          this.color[item] = '$accent_ui_color';
         })
         break
       case 'time':

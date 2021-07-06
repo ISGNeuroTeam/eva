@@ -17,14 +17,14 @@
            <v-icon 
             v-if="dataFromDB"
             class="icon"
-            :color="theme.$title"
+            :color="theme.$main_border"
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-icon
             v-if="props.dataRestFilter.length>0"
             class="icon"
-            :color="theme.$title"
+            :color="theme.$main_border"
             @click="exportDataCSV"
           >
             {{ mdiArrowDownBold }}
@@ -32,7 +32,7 @@
           <v-icon 
             v-show="dataMode"
             class="icon chart" 
-            :color="theme.$primary_button"
+            :color="theme.$accent_ui_color"
           >
             {{ props.icons[elemIcon] }}
           </v-icon>
@@ -84,7 +84,7 @@
               <template v-slot:activator="{ on }"  >
                 <v-icon 
                   class=" datasource" 
-                  :color="theme.$title" 
+                  :color="theme.$main_border" 
                   v-on="on" 
                   @click="switchDS(props)"
                 >
@@ -101,7 +101,7 @@
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class="pencil" 
-                  :color="theme.$title" 
+                  :color="theme.$main_border" 
                   v-on="on" 
                   @click="() => {props.edit=false; props.edit_icon=false; }"
                 >
@@ -118,7 +118,7 @@
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class=" check"
-                  :color="theme.$title"  
+                  :color="theme.$main_border"  
                   v-on="on"  
                   @click="editName(props)"
                 >
@@ -134,7 +134,7 @@
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class=" option"  
-                  :color="theme.$title"  
+                  :color="theme.$main_border"  
                   v-on="on" 
                   @click="switchOP()"
                 >
@@ -150,7 +150,7 @@
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class=" delete" 
-                  :color="theme.$title"
+                  :color="theme.$main_border"
                   v-on="on" 
                   @click="deleteDashBoard(props)"
                 >
@@ -194,8 +194,8 @@
       <v-card-text
         :is="currentElem" 
         v-show="showElement"
-        class="card-text element-itself" 
-        :colorFrom="theme" 
+        class="card-text element-itself"
+        :colorFrom="theme"
         :style="{color:theme.$main_text, background:'transparent'}"  
         :idFrom="element"   
         :idDashFrom="idDash"  

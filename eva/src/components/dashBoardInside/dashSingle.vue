@@ -17,13 +17,13 @@
       >
         <div 
           class="number-itself" 
-          :style="{color:color}"
+          :style="{color:'var(--accent_ui_color)'}"
         >
           {{ number }}
         </div>
         <div 
           class="number-sub" 
-          :style="{color:colorFrom.text}"
+          :style="{color:'var(--primary_button)'}"
         >
           {{ subnumber }}
         </div>
@@ -49,7 +49,6 @@ export default {
     dataRestFrom: null,
     dataLoadingFrom: null,
     widthFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -103,14 +102,6 @@ export default {
       } else {
         return '30'
       }
-    },
-    color: function() {
-      let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.id});
-      let color = this.colorFrom.controls;
-      if(options.color){
-        color = options.color;
-      } 
-      return color
     },
     changeSize: function() {
       let width = this.widthFrom; // присваиваем просто чтобы указать за каким свойством следить

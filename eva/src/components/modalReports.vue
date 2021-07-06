@@ -9,15 +9,15 @@
   >
     <v-card 
       class="reports-card" 
-      :style="{background: colorFrom.backElement}"
+      :style="{background: theme.$main_bg}"
     >
       <div class="textarea-block">
         <div class="times-block">
           <div class="time-block">
             <v-text-field  
               v-model="search.parametrs.tws"
-              :color="colorFrom.controls" 
-              :style="{color: colorFrom.text}"  
+              :color="theme.$accent_ui_color" 
+              :style="{color: theme.$main_text}"  
               class="textarea-item" 
               outlined 
               label="Временной интервал: начало"  
@@ -27,14 +27,14 @@
               v-model="tws"    
               :no-value-to-custom-elem="true"  
               format="YYYY-MM-DD HH:mm"  
-              :style="{fill: colorFrom.text, background: colorFrom.backElement, color: colorFrom.text}"   
-              :color="colorFrom.controlsActive" 
-              button-color="colorFrom.controls" 
+              :style="{fill: theme.$main_text, background: theme.$main_bg, color: theme.$main_text}"   
+              :color="theme.$accent_ui_color" 
+              button-color="theme.$controls" 
               class="dtpicker-report" 
             >
               <v-icon 
                 class="picker-report" 
-                :color="colorFrom.controls" 
+                :color="theme.$primary_button" 
               >
                 {{ pickerIcon }}
               </v-icon> 
@@ -43,8 +43,8 @@
           <div class="time-block">
             <v-text-field  
               v-model="search.parametrs.twf"
-              :color="colorFrom.controls" 
-              :style="{color: colorFrom.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color: theme.$main_text}" 
               class="textarea-item" 
               outlined 
               label="Временной интервал: конец"
@@ -52,16 +52,16 @@
             />
             <DTPicker 
               v-model="twf"   
-              :no-value-to-custom-elem="true"  
+              :no-value-to-custom-elem="true"
               format="YYYY-MM-DD HH:mm" 
-              :style="{fill: colorFrom.text, background: colorFrom.backElement, color: colorFrom.text}"  
-              :color="colorFrom.controlsActive" 
-              button-color="colorFrom.controls" 
+              :style="{fill: theme.$main_text, background: theme.$main_bg, color: theme.$main_text}"  
+              :color="theme.$accent_ui_color" 
+              button-color="theme.$controls" 
               class="dtpicker-report" 
             >
               <v-icon 
                 class="picker-report" 
-                :color="colorFrom.controls" 
+                :color="theme.$primary_button" 
               >
                 {{ pickerIcon }}
               </v-icon> 
@@ -69,13 +69,13 @@
           </div>
         </div>
         <v-expansion-panels class="expansion-panels"> 
-          <v-expansion-panel :style="{backgroundColor: colorFrom.backElement, color: colorFrom.text, border: `1px solid ${colorFrom.border}`}">
+          <v-expansion-panel :style="{backgroundColor: theme.$main_bg, color: theme.$main_text, border: `1px solid ${theme.$main_border}`}">
             <v-expansion-panel-header>Дополнительные параметры</v-expansion-panel-header>
             <v-expansion-panel-content class="order-expansion">
               <v-text-field  
                 v-model="search.parametrs.timeout"
-                :color="colorFrom.controls" 
-                :style="{color: colorFrom.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color: theme.$main_text}" 
                 class="textarea-item" 
                 outlined 
                 label="Timeout"  
@@ -83,8 +83,8 @@
               />
               <v-text-field  
                 v-model="search.parametrs.cache_ttl"
-                :color="colorFrom.controls" 
-                :style="{color: colorFrom.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color: theme.$main_text}" 
                 class="textarea-item"  
                 outlined 
                 label="Cache_ttl"  
@@ -92,8 +92,8 @@
               />
               <v-text-field 
                 v-model="search.parametrs.field_extraction" 
-                :color="colorFrom.controls"  
-                :style="{color: colorFrom.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color: theme.$main_text}" 
                 class="textarea-item" 
                 outlined 
                 label="Field_extraction"  
@@ -101,8 +101,8 @@
               />
               <v-text-field  
                 v-model="search.parametrs.preview" 
-                :color="colorFrom.controls" 
-                :style="{color: colorFrom.text}" 
+                :color="theme.$accent_ui_color" 
+                :style="{color: theme.$main_text}" 
                 class="textarea-item" 
                 outlined 
                 label="Preview" 
@@ -116,7 +116,7 @@
         <v-spacer />
         <v-btn 
           small 
-          :color="colorFrom.controlsSystem" 
+          :color="theme.$primary_button" 
           class="create-btn" 
           @click="setSearch"
         >
@@ -124,7 +124,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="colorFrom.controlsActive" 
+          :color="theme.$primary_button" 
           class="create-btn" 
           @click="cancelModal"
         >
@@ -144,7 +144,6 @@ export default {
   props: {
     searchFrom: null,
     modalFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -172,6 +171,9 @@ export default {
         this.search = this.searchFrom;
       }
       return this.modalFrom
+    },
+    theme: function() {
+      return this.$store.getters.getTheme
     },
   },
   watch: {
