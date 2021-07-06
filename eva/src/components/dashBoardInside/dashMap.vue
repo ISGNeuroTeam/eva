@@ -140,6 +140,7 @@ export default {
     const unsubscribe = store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
         this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
+        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep
         console.log(mutation.type);
         console.log(mutation.payload);
       }
@@ -176,6 +177,7 @@ export default {
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(dataRest);
+        this.map.setView(this.startingPoint, this.options.zoomLevel)
         // this.clustering(dataRest);
       }
     },
@@ -359,7 +361,7 @@ export default {
 
     initMap() {
       this.map = L.map(this.$refs.map, {
-        wheelPxPerZoomLevel: 100,
+        wheelPxPerZoomLevel: this.options.zoomStep || 10,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
@@ -373,10 +375,16 @@ export default {
           // if no lib for drawing object - just skip
           continue;
         }
+        if (dataRest[i].ID === "1") {
+          console.log("how many")
+          const _point =  dataRest[i].coordinates.split(":");
+          const _coord = _point[1].split(",");
+          this.startingPoint = [_coord[0], _coord[1]];
+        }
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
           this.addMarker(
             dataRest[i],
-            dataRest[i].ID === "1" ? true : false,
+            dataRest[i].ID === "1",
             lib
           );
         }
@@ -422,9 +430,6 @@ export default {
           direction: "top",
           className: "leaftet-hover",
         });
-      if (isCenter === true) {
-        this.map.setView([_coord[0], _coord[1], 20]);
-      }
     },
 
     drawMarkerHTML({ lib, element, isCenter }) {
@@ -470,9 +475,6 @@ export default {
           direction: "top",
           className: "leaftet-hover",
         });
-      if (isCenter === true) {
-        this.map.setView([_coord[0], _coord[1], 20]);
-      }
     },
 
     addLine(element, lib) {
