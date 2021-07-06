@@ -140,6 +140,7 @@ export default {
     const unsubscribe = store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
         this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
+        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep
         console.log(mutation.type);
         console.log(mutation.payload);
       }
@@ -360,7 +361,7 @@ export default {
 
     initMap() {
       this.map = L.map(this.$refs.map, {
-        wheelPxPerZoomLevel: 100,
+        wheelPxPerZoomLevel: this.options.zoomStep || 10,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,

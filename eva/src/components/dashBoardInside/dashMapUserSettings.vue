@@ -41,8 +41,8 @@
               <v-slider
                 v-model="options.zoomStep"
                 class="align-center"
-                max="20"
-                min="0"
+                max="200"
+                min="1"
               >
                 <template v-slot:label>
                   <v-text-field
