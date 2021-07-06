@@ -467,6 +467,10 @@ export default {  // приблизительный объект хранили�
         );
       }
     },
+    setLibrary: (state, options) => {
+      Vue.set(state[options.idDash][options.id].options, "library" , options.library);
+    },
+
     setOptions: (state, options) => {  // добовляем данные о скриншоте
 
       Object.keys(options.options).forEach( item => { // пробегаемся по всем настройкам, что к нам пришли
@@ -486,6 +490,11 @@ export default {  // приблизительный объект хранили�
       }
         
     },
+
+    updateOptions: (state, payload) => {
+      state[payload.idDash][payload.idElement].options = payload.options;
+    },
+
     letEventSet: (state, events) => {   // метод который обновляет какое-либо свойство у элемнета
       events.events.forEach(item => {
         if (!state[events.idDash][item.target].options) {  // если опций еще нет
@@ -1479,6 +1488,12 @@ export default {  // приблизительный объект хранили�
     getAvailableTableTitles: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.availableTableTitles;
+      }
+    },
+    getLibrary: (state) => {
+      return (dashId, elementId) => {
+        console.log(dashId, elementId)
+        return state[dashId][elementId]?.options?.library;
       }
     }
   },

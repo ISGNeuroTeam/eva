@@ -1,5 +1,5 @@
 <template>
-  <div class="dash-map">
+  <div class="dash-map" ref="container">
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
@@ -54,6 +54,10 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.tilelayer.colorfilter";
 import "leaflet.markercluster";
+import vuetify from "../../plugins/vuetify";
+import dashMapUserSettings from "./dashMapUserSettings.vue";
+import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
+
 export default {
   props: {
     // переменные полученные от родителя
@@ -66,8 +70,12 @@ export default {
     heightFrom: null, // выоста родительского компонента
     options: Object,
   },
+  components: {
+    dashMapUserSettings,
+  },
   data() {
     return {
+      showLegend: false,
       osmserver: null,
       error: null,
       library: null,
@@ -78,6 +86,8 @@ export default {
       clusterPosition: null,
       clusterPositionItems: null,
       clusterDelimiter: null,
+      isLegendGenerated: true,
+      isSettings: false,
     };
   },
   computed: {
@@ -88,6 +98,13 @@ export default {
       } else {
         return 60;
       }
+    },
+    testOptions() {
+      console.log("trigered");
+      return this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idElement,
+      });
     },
   },
   watch: {
@@ -109,27 +126,34 @@ export default {
     this.initClusterTextCount();
     this.initClusterPosition();
     this.initClusterDelimiter();
+    this.map.setView([0, 0], 0);
   },
   methods: {
+    initSettings() {
+      if (this.isSettings) return;
+      var ComponentClass = Vue.extend(dashMapUserSettings);
+      let test = new ComponentClass({
+        propsData: { idDashFrom: this.idDashFrom, idElement: this.idFrom },
+        vuetify,
+        store,
+      });
+      test.$mount();
+      let element = document.getElementsByClassName(
+        "leaflet-control-container"
+      );
+      let container = element[0];
+      container.appendChild(test.$el);
+      this.isSettings = true;
+    },
     reDrawMap(dataRest) {
       this.clearMap();
       this.error = null;
       //получаем osm server
       this.getOSM();
       //получаем библиотеку
-      if (!this.options?.primitivesLibrary) {
-        this.generateLibrary(dataRest); // get all icons that we need on map
-      }
-      else {
-        try {
-          this.library = JSON.parse(this.options.primitivesLibrary);
-        } catch {
-          this.error = "Ошибка формата входных данных";
-          this.map.remove();
-          this.map = null;
-        }
-      }
+      this.generateLibrary(dataRest, this.options?.primitivesLibrary); // get all icons that we need on map
       this.generateClusterPositionItems();
+      this.initSettings();
       if (!this.error) {
         //создаем элемент карты
         this.createMap();
@@ -201,12 +225,11 @@ export default {
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      if(this.clusterPosition.length > 0){
+      if (this.clusterPosition.length > 0) {
         options.clusterPosition = this.clusterPosition;
       } else {
-        options.clusterPosition = null
+        options.clusterPosition = null;
       }
-      
 
       this.clearCluster();
       this.clustering(this.dataRestFrom);
@@ -236,16 +259,64 @@ export default {
         this.error = "Введите osm server";
       }
     },
-    generateLibrary(dataRest) {
+    generateLibrary(dataRest, options) {
       const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
       try {
-        this.library = JSON.parse(_tmp);
+        if (options) {
+          this.library = JSON.parse(options);
+        } else {
+          this.library = JSON.parse(_tmp);
+        }
+        this.$store.commit("setLibrary", {
+          library: this.library,
+          id: this.idFrom, // id элемнета (table, graph-2)
+          idDash: this.idDashFrom,
+        });
       } catch {
         this.error = "Ошибка формата входных данных";
         this.map.remove();
         this.map = null;
       }
+
+      if (!this.isLegendGenerated) {
+        this.createLegend();
+      }
     },
+
+    createLegend() {
+      let generatedListHTML = "";
+      for (let x of Object.values(this.library.objects)) {
+        generatedListHTML += `<li>${x.name}</li>`;
+      }
+      L.Control.Legend = L.Control.extend({
+        onAdd: function (map) {
+          var img = L.DomUtil.create("div");
+          img.innerHTML = `
+              <div>
+                <p>Легенда</p>
+                <ul class="fa-ul">
+                ${generatedListHTML}
+                </ul>
+              </div>`;
+          img.style.width = `280px`;
+          img.style.maxHeight = `466px`;
+          img.style.background = "black";
+          return img;
+        },
+
+        onRemove: function (map) {
+          // Nothing to do here
+        },
+      });
+
+      L.control.legend = function (opts) {
+        return new L.Control.Legend(opts);
+      };
+
+      L.control.legend({ position: "bottomright" }).addTo(this.map);
+      this.isLegendGenerated = true;
+    },
+
     generateClusterPositionItems() {
       this.clusterPositionItems = null;
       Object.entries(this.library.objects).forEach((object) => {
@@ -255,16 +326,17 @@ export default {
         }
       });
 
-      if(!this.clusterPosition) {//пустые значения
+      if (!this.clusterPosition) {
+        //пустые значения
         Object.entries(this.library.objects).forEach((object) => {
           if (object[1].image) {
-            if(this.clusterPosition === null){
-              this.clusterPosition = [ Number(object[0]) ]
+            if (this.clusterPosition === null) {
+              this.clusterPosition = [Number(object[0])];
             } else {
-              this.clusterPosition.push(  Number(object[0])   )
+              this.clusterPosition.push(Number(object[0]));
             }
           }
-        })
+        });
       }
     },
 
@@ -273,18 +345,23 @@ export default {
         wheelPxPerZoomLevel: 100,
         zoomSnap: 0,
         zoom: 10,
-        maxZoom: 17,
+        maxZoom: 25,
       });
     },
 
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i++) {
         const lib = this.library.objects[dataRest[i].type]; // choosing drawing type for each object
-        if (!lib) {                                         // if no lib for drawing object - just skip
+        if (!lib) {
+          // if no lib for drawing object - just skip
           continue;
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addMarker(dataRest[i], dataRest[i].ID === "1" ? true : false, lib);
+          this.addMarker(
+            dataRest[i],
+            dataRest[i].ID === "1" ? true : false,
+            lib
+          );
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
           this.addLine(dataRest[i], lib);
@@ -295,18 +372,17 @@ export default {
     addMarker(element, isCenter, lib) {
       let type = this.getElementDrawType(lib);
       if (type === "SVG") {
-        this.drawMarkerSVG(lib, element, isCenter)
-      }
-      else {
-        this.drawMarkerHTML({lib, element, isCenter})
+        this.drawMarkerSVG(lib, element, isCenter);
+      } else {
+        this.drawMarkerHTML({ lib, element, isCenter });
       }
     },
 
     getElementDrawType(lib) {
       if (lib.view_type == "html") {
-        return "HTML"
+        return "HTML";
       }
-      return "SVG"
+      return "SVG";
     },
 
     drawMarkerSVG(lib, element, isCenter) {
@@ -321,30 +397,30 @@ export default {
         zIndexOffset: -1000,
         riseOnHover: true,
       })
-      .addTo(this.map)
-      .bindTooltip(element.label,  {
-        permanent: false,
-        direction: "top",
-        className: "leaftet-hover"
-      })
+        .addTo(this.map)
+        .bindTooltip(element.label, {
+          permanent: false,
+          direction: "top",
+          className: "leaftet-hover",
+        });
       if (isCenter === true) {
-        this.map.setView([_coord[0], _coord[1]]);
+        this.map.setView([_coord[0], _coord[1], 20]);
       }
     },
 
     drawMarkerHTML({ lib, element, isCenter }) {
       let {
         text_color: textColor = "#FFFFFF",
-        background_color: color="65, 62, 218",
+        background_color: color = "65, 62, 218",
         opacity = 0.6,
         label_field: text = "КП-240",
-        border_radius: borderRadius="2px",
+        border_radius: borderRadius = "2px",
         border = "none",
         width,
         height,
       } = lib;
       let icon = L.divIcon({
-        className: 'location-pin',
+        className: "location-pin",
         riseOnHover: true,
         html: `<div class="leaflet-div-icon" 
           style="
@@ -369,14 +445,14 @@ export default {
         zIndexOffset: -1000,
         riseOnHover: true,
       })
-      .addTo(this.map)
-      .bindTooltip(element.label,  {
-        permanent: false,
-        direction: "top",
-        className: "leaftet-hover"
-      })
+        .addTo(this.map)
+        .bindTooltip(element.label, {
+          permanent: false,
+          direction: "top",
+          className: "leaftet-hover",
+        });
       if (isCenter === true) {
-        this.map.setView([_coord[0], _coord[1]]);
+        this.map.setView([_coord[0], _coord[1], 20]);
       }
     },
 
@@ -386,15 +462,19 @@ export default {
         let p = point.split(":");
         latlngs[p[0] - 1] = p[1].split(",");
       });
-      L.polyline(latlngs, { color: lib.color, weight: lib.width, opacity: lib.opacity })
-      .addTo(this.map)
-      .bindTooltip(element.label,  {
-        permanent: false,
-        direction: "top",
-        className: "leaftet-hover"
+      L.polyline(latlngs, {
+        color: lib.color,
+        weight: lib.width,
+        opacity: lib.opacity,
       })
-      .on('mouseover', highlightFeature)
-      .on('mouseout', resetHighlight)
+        .addTo(this.map)
+        .bindTooltip(element.label, {
+          permanent: false,
+          direction: "top",
+          className: "leaftet-hover",
+        })
+        .on("mouseover", highlightFeature)
+        .on("mouseout", resetHighlight);
 
       function resetHighlight(e) {
         var layer = e.target;
@@ -412,12 +492,11 @@ export default {
           color: lib.highlight_color,
         });
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
+          layer.bringToFront();
         }
       }
-
     },
-    
+
     clustering(dataRest) {
       this.cluster = L.markerClusterGroup({
         showCoverageOnHover: false,
@@ -439,21 +518,21 @@ export default {
           }
         },
       });
-      const _sortDataRest =  this.sortForTooltip(dataRest)
+      const _sortDataRest = this.sortForTooltip(dataRest);
       for (let i = 0; i < _sortDataRest.length - 1; i++) {
         this.addTooltip(this.cluster, _sortDataRest[i]);
       }
     },
-    sortForTooltip(dataRest){
-      let _sortDataRest = []
-      this.clusterPosition.forEach(position=>{
-        dataRest.forEach(dr=>{
-          if(position===dr.type){
-            _sortDataRest.push(dr)
+    sortForTooltip(dataRest) {
+      let _sortDataRest = [];
+      this.clusterPosition.forEach((position) => {
+        dataRest.forEach((dr) => {
+          if (position === dr.type) {
+            _sortDataRest.push(dr);
           }
-        })
-      })
-      return _sortDataRest
+        });
+      });
+      return _sortDataRest;
     },
     generateHtml(markers) {
       let _html = "<div class ='leaftet-flex'>";
@@ -542,10 +621,10 @@ export default {
   display: grid;
   grid-template-columns: repeat(3, 1fr) auto;
 }
-.leaftet-hover{
+.leaftet-hover {
   border: 2px solid #c88dcc;
 }
-.leaftet-hover::before{
+.leaftet-hover::before {
   margin-bottom: 0;
 }
 </style>
