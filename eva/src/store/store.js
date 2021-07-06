@@ -1492,7 +1492,6 @@ export default {  // приблизительный объект хранили�
     },
     getLibrary: (state) => {
       return (dashId, elementId) => {
-        console.log(dashId, elementId)
         return state[dashId][elementId]?.options?.library;
       }
     }

@@ -88,6 +88,7 @@ export default {
       clusterDelimiter: null,
       isLegendGenerated: true,
       isSettings: false,
+      startingPoint: [],
     };
   },
   computed: {
@@ -100,14 +101,24 @@ export default {
       }
     },
     testOptions() {
-      console.log("trigered");
-      return this.$store.getters.getOptions({
+      console.log("here");
+      let newOptions = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
         id: this.idElement,
       });
+      
+      return newOptions;
     },
   },
   watch: {
+    options: {
+      deep: true,
+      handler(newVal) {
+        console.log("here");
+        console.log(newVal);
+      },
+    },
+
     dataRestFrom(_dataRest) {
       //при обновлении данных перерисовать
       this.reDrawMap(_dataRest);
@@ -126,7 +137,13 @@ export default {
     this.initClusterTextCount();
     this.initClusterPosition();
     this.initClusterDelimiter();
-    this.map.setView([0, 0], 0);
+    const unsubscribe = store.subscribe((mutation, state) => {
+      if (mutation.type == "updateOptions") {
+        this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
+        console.log(mutation.type);
+        console.log(mutation.payload);
+      }
+    });
   },
   methods: {
     initSettings() {
@@ -390,8 +407,10 @@ export default {
         iconUrl: `${window.location.origin}/svg/${lib.image}`,
         iconSize: [lib.width, lib.height],
       });
+
       const _point = element.coordinates.split(":");
       const _coord = _point[1].split(",");
+      this.startingPoint = [_coord[0], _coord[1]];
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,

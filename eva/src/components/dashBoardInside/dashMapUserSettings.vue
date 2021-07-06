@@ -6,13 +6,13 @@
 
         <v-dialog v-model="dialog" max-width="290">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn rounded color="black" v-bind="attrs" v-on="on">
+            <v-btn rounded color="#191919" v-bind="attrs" v-on="on">
               <v-icon :style="{ color: theme.$title }">{{
                 mdiSettings
               }}</v-icon>
             </v-btn>
           </template>
-          <v-card>
+          <v-card >
             <v-card-title class="text-h5"> Настройки </v-card-title>
             <v-card-text>
               <p>Подложка</p>
@@ -22,7 +22,7 @@
               <v-slider
                 v-model="options.zoomLevel"
                 class="align-center"
-                max="20"
+                max="25"
                 min="0"
               >
                 <template v-slot:label>
@@ -162,7 +162,6 @@ export default {
     options: {
       deep: true,
       handler(val) {
-        console.log("watcher", val, this.options);
         this.updateOptions(val);
       },
     },
@@ -172,7 +171,6 @@ export default {
       idDash: this.idDashFrom,
       id: this.idElement,
     });
-    console.log(options);
     // init store for reactivity
     if (!options.showLegend) {
       let initOptions = {
@@ -190,12 +188,6 @@ export default {
   },
   methods: {
     updateOptions(newOptions) {
-      console.log(
-        "fromupdate",
-        [this.idDashFrom],
-        [this.idElement],
-        newOptions
-      );
       this.$store.commit("updateOptions", {
         idDash: this.idDashFrom,
         idElement: this.idElement,
