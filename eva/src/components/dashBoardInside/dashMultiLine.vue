@@ -51,14 +51,11 @@
 
 
 <script>
-
 import * as d3 from "d3";
-
 
 export default {
   props: {
     dataRestFrom: null,
-    colorFrom: null,
     widthFrom: null,
     heightFrom: null,
     idFrom: null,
@@ -102,13 +99,10 @@ export default {
     theme: function() {
       return this.$store.getters.getTheme
     },
-    color: function() {
-      return this.colorFrom
-    },
     colorLegends: function() {
-      return [this.colorFrom.$grass,this.colorFrom.$forest, this.colorFrom.$blue, this.colorFrom.$plum,
-        this.colorFrom.$purple, this.colorFrom.$orange, this.colorFrom.$peach, this.colorFrom.$raspberry,
-        this.colorFrom.$coral, this.colorFrom.$beet,this.colorFrom.$sun, this.colorFrom.$kiwi,this.colorFrom.$sea];
+      return [this.theme.$grass,this.theme.$forest, this.theme.$blue, this.theme.$plum,
+        this.theme.$purple, this.theme.$orange, this.theme.$peach, this.theme.$raspberry,
+        this.theme.$coral, this.theme.$beet,this.theme.$sun, this.theme.$kiwi,this.theme.$sea];
     },
     dataLoading: function() {
       return this.dataLoadingFrom
@@ -135,7 +129,7 @@ export default {
         } else {
           this.getDataAsynchrony();
         }
-        if(this.color) this.getDataAsynchrony();
+        if(this.theme) this.getDataAsynchrony();
       }
       return true  
     },
@@ -243,17 +237,12 @@ export default {
       this.$store.commit('setMetricsMulti', {metrics: this.metrics, idDash: this.idDash, id: this.id });
     },
     createLineChart: function (props,that,sizeLine,time,united,lastDot,timeFormat,metricsOpt) {  // создает график
-
-      let colors = [this.color.controls,this.color.text,this.color.controlsActive,'#660099','#3366FF','#e5194a',]; // основные используемые цвета
       let colorLine = this.colorLegends;
 
       let otstupBottom = 50;
       if (screen.width <= 1600) {
         otstupBottom = 40;
       }
-
-
-
 
       let otstupTop = this.$refs.legends.getBoundingClientRect().height;
       // устанавливаем размер и отступы графика
@@ -410,7 +399,6 @@ export default {
 
       if (united){
 
-
         max = max.reduce(function(last, next) {   // находим максимальное значение среди всех метрик
           if (next > last){
             return next
@@ -439,7 +427,7 @@ export default {
           .attr("y1", 0)
           .attr("x2", width)
           .attr("y2", 0)
-          .attr("stroke", colors[1])
+          .attr("stroke", this.theme.$main_text)
           .style("opacity", "0.3");
 
         // создаем tooltip
@@ -447,9 +435,9 @@ export default {
         let tooltip = d3.select(this.$el.querySelector('.dash-multi'))
           .append("div")
           .attr("class", "tooltip")
-          .style("color",colors[1])
-          .style("background",this.color.backElement)
-          .style('border-color',colors[1])
+          .style("color",this.theme.$main_text)
+          .style("background",this.theme.$secondary_bg)
+          .style('border-color',this.theme.$main_border)
           .style('z-index','2')
           .text('');
 
@@ -463,7 +451,7 @@ export default {
           .attr("x2", 0)
           .attr("y1",20)
           .attr("y2", height)
-          .attr("stroke", that.colorFrom.text)
+          .attr("stroke", that.theme.$main_text)
           .style("stroke-dasharray", "3 3")
           .attr("opacity", "0");
 
@@ -730,7 +718,7 @@ export default {
             .attr("y",20)
             .attr("width", 0)
             .attr("height", height)
-            .style("fill",colors[2])
+            .style("fill",this.theme.$accent_ui_color)
             .style("opacity","0.3")
             .on("mousemove", () => {
               brushObj.selectionMove();
@@ -800,9 +788,9 @@ export default {
             d3.select(this.$el.querySelector('.dash-multi'))
               .append("div")
               .attr("class", `tooltip-separeted`)
-              .style("color",colors[1])
-              .style("background",this.color.backElement)
-              .style('border-color',colors[1])
+              .style("color",this.theme.$main_text)
+              .style("background",this.theme.$secondary_bg)
+              .style('border-color',this.theme.$main_border)
               .style('z-index','2')
               .text('');
 
@@ -817,7 +805,7 @@ export default {
           .attr("x2", 0)
           .attr("y1",20)
           .attr("y2", height)
-          .attr("stroke", that.colorFrom.text)
+          .attr("stroke", that.theme.$main_text)
           .style("stroke-dasharray", "3 3")
           .attr("opacity", "0");
 
@@ -848,7 +836,7 @@ export default {
               .attr("x2", width)
               .attr("y1",((step*i)+20))
               .attr("y2", ((step*i)+20))
-              .style("stroke", colors[1])
+              .style("stroke", this.theme.$main_text)
               .attr("opacity", "0.3");
           }
 
@@ -1045,7 +1033,7 @@ export default {
                     .attr("x2", width)
                     .attr("y1",y[i](0))
                     .attr("y2", y[i](0))
-                    .style("stroke", colors[1])
+                    .style("stroke", this.theme.$main_text)
                     .style("stroke-dasharray", "3 3")
                     .attr("opacity", "0.3")
 
@@ -1238,7 +1226,7 @@ export default {
                 .attr("y",startY[i])
                 .attr("width", 0)
                 .attr("height", parseFloat(step))
-                .style("fill",colors[2])
+                .style("fill",this.theme.$accent_ui_color)
                 .style("opacity","0.3")
                 .on("mousemove", () => {
                   brushObj.selectionMove();
@@ -1496,7 +1484,7 @@ export default {
           .attr("x2", 0)
           .attr("y1", 0)
           .attr("y2", - (height-20))
-          .attr("stroke", colors[1])
+          .attr("stroke", that.theme.$main_text)
           .style("opacity", "0.3");
       }
 
@@ -1556,7 +1544,7 @@ export default {
           .attr('transform', `translate(${x(d[xMetric]*secondTransf)-5},${y})`)
           .attr('font-size', `0.7em`)
           .attr('text-anchor','end')
-          .style('fill', that.colorFrom.text)
+          .style('fill', that.theme.$main_text)
           .text(d[metricText])
 
         if (elem == 'line') {

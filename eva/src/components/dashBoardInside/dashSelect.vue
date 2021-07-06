@@ -9,7 +9,7 @@
         <v-icon 
           v-if="!open" 
           class=" arrow-down arrows-select" 
-          :color="color.controls" 
+          :color="theme.$primary_button"
           @click="openSelect"
         >
           {{ down }}
@@ -17,7 +17,7 @@
         <v-icon 
           v-if="open"
           class="arrow-up arrows-select" 
-          :color="color.controlsActive" 
+          :color="theme.$main_text"
           @click="openSelect"
         >
           {{ up }}
@@ -31,22 +31,21 @@
         <v-select  
           v-model="elem"
           :items="dataRest" 
-          :color="color.controls" 
-          :style="{color:color.text, fill: color.text}"  
-          :data-elem="dataelem" 
+          :color="theme.$accent_ui_color"
+          :style="{color:theme.$main_text, fill: theme.$main_text}"
+          :data-elem="dataelem"
           hide-details  
           outlined 
           class="select-parent"  
           :loading="dataLoading" 
           label="Столбец данных"
           @change="getItem('elem')"
-          @click="changeColor"
         /> 
         <v-select  
           v-model="elemlink" 
-          :items="dataRest" 
-          :color="color.controls" 
-          :style="{color:color.text, fill: color.text}" 
+          :items="dataRest"
+          :color="theme.$accent_ui_color"
+          :style="{color:theme.$main_text, fill: theme.$main_text}"
           :data-elem="dataelemlink"
           hide-details  
           outlined 
@@ -54,13 +53,12 @@
           label="Связанный столбец данных"
           :loading="dataLoading" 
           @change="getItem('elemlink')"
-          @click="changeColor"
         /> 
       </div>
       <div 
         ref="targetBlock"
         class="target" 
-        :style="{width:widthInput,borderColor:color.border}" 
+        :style="{width:widthInput,borderColor:theme.$main_border}"
         :class="{select_show:select_show}"
       > 
         <v-autocomplete 
@@ -68,15 +66,14 @@
           :items="dataRestDeep"  
           solo 
           flat 
-          :multiple="multiple"    
-          :style="{color:color.text, fill: color.text}"
-          :color="color.controls" 
+          :multiple="multiple"
+          :color="theme.$accent_ui_color"
+          :style="{color:theme.$main_text, fill: theme.$main_text}"
           :data-elem="dataelemDeep" 
           hide-details  
           class="select theme--dark"
           label="Значение"  
           @change="setTocken"
-          @click="changeColor" 
         >
           <template 
             v-if="multiple"
@@ -87,7 +84,7 @@
               @click="selectItems"
             >
               <v-list-item-action>
-                <v-icon :color="elemDeep[String(multiple)].length > 0 ? color.controls : color.text">
+                <v-icon :color="elemDeep[String(multiple)].length > 0 ? theme.$primary_button : theme.$main_text">
                   {{ chooseIcon }}
                 </v-icon>
               </v-list-item-action>
@@ -175,8 +172,8 @@ export default {
       } 
       return data
     },
-    color: function() {
-      return this.colorFrom
+    theme: function() {
+      return this.$store.getters.getTheme
     },
     widthInput: function() {
       return `${this.widthFrom-70}px`
@@ -264,18 +261,6 @@ export default {
       this.source_show = !this.source_show;
       this.open = !this.open;
       this.select_show = !this.select_show;
-    },
-    changeColor: function() {
-      if (document.querySelectorAll('.v-menu__content').length != 0){
-        
-        document.querySelectorAll('.v-menu__content').forEach( item => {
-          
-          item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
-          item.style.background = this.color.back;
-          item.style.color = this.color.text;
-          item.style.border = `1px solid ${this.color.border}`;
-        })
-      }
     },
     selectItems: function() {
       if (this.chooseText == 'Выбрать все') {
@@ -397,12 +382,6 @@ export default {
       }
 
     }
-    // здесь мы ищем иконку стрелки у выпдающего списка, потому что почему-то втсроенный клик на ней не срабатывает, вот мы добавляем свой
-    this.$refs.targetBlock.querySelector('.v-input__append-inner').addEventListener('click', () => {
-      this.changeColor();
-    })
-
-       
   }, 
 }
 

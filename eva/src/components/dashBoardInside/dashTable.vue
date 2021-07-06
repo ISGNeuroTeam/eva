@@ -1,5 +1,8 @@
 <template>
-  <div ref="tableBlock" class="table-block" :data-change="change">
+  <div
+    class="table-block"
+    :data-change="change"
+  >
     <v-data-table
       v-show="!props.nodata"
       :ref="id"
@@ -15,13 +18,12 @@
       }"
       :height="height"
       fixed-header
-      :style="{ borderColor: colorFrom.border }"
-      @current-items="updatePage"
+      :style="{ borderColor: theme.$secondary_border }"
+    />
+    <div
+      v-show="props.nodata"
+      class="no-data-table"
     >
-  
-
-    </v-data-table>
-    <div v-show="props.nodata" class="no-data-table">
       {{ props.message }}
     </div>
   </div>
@@ -30,13 +32,11 @@
 
 
 <script>
-//import { setInterval } from 'timers';
 
 export default {
   props: {
     dataRestFrom: null,
     shouldGet: null,
-    colorFrom: null,
     idFrom: null,
     idDashFrom: null,
     heightFrom: null,
@@ -80,8 +80,8 @@ export default {
       }
       return true;
     },
-    color: function () {
-      return this.colorFrom;
+    theme: function() {
+      return this.$store.getters.getTheme
     },
     height: function () {
       let otstup = 100;
@@ -113,10 +113,6 @@ export default {
       if (newValue)
         this.createTitles(newValue);
     },
-    color: function (color) {
-      this.$refs.tableBlock.style.color = color.text;
-      this.$refs.tableBlock.style.backgroundColor = color.backElement;
-    },
   },
   mounted() {
     this.$store.commit("setActions", {
@@ -124,8 +120,6 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    this.$refs.tableBlock.style.color = this.color.text;
-    this.$refs.tableBlock.style.backgroundColor = this.color.backElement;
   },
   methods: {
     cl(v){
@@ -146,8 +140,8 @@ export default {
           : (this.props.hideFooter = false);
         this.createTitles(data);
         this.createTockens(data);
-        this.setColors();
-        this.clearColor();
+        // this.setColors();
+        // this.clearColor();
         if (this.props.justCreate) {
           this.selectRow();
           this.props.justCreate = false;
@@ -255,51 +249,7 @@ export default {
             }
           }
         });
-    },
-    setColors: function () {
-      let table = document.querySelector(`[data-id=${this.id}]`);
-
-      let zagolovok = table.querySelector("thead");
-      if (zagolovok != null) {
-        zagolovok.style.color = this.color.text;
-      }
-      table.addEventListener("mouseover", (event) => {
-        if (
-          event.target.tagName.toLowerCase() == "td" &&
-          !event.target.parentElement.classList.contains("event")
-        ) {
-          event.target.parentElement.style = `background: ${this.color.controls} !important;color:${this.color.back}`;
-        }
-      });
-      table.addEventListener("mouseout", (event) => {
-        if (event.target.tagName.toLowerCase() == "td") {
-          if (
-            !event.target.parentElement.classList.contains("selected") &&
-            !event.target.parentElement.classList.contains("event")
-          ) {
-            event.target.parentElement.style = `background: transparent !important;color:${this.color.text}`;
-          }
-        }
-      });
-    },
-    clearColor: function () {
-      let table = this.$refs[this.id].$el;
-      table.querySelectorAll("tbody tr").forEach((itemRow) => {
-        itemRow.classList.remove("selected");
-        itemRow.style.background = "transparent";
-        itemRow.style.color = this.color.text;
-        itemRow.querySelectorAll("td").forEach((itemTd) => {
-          itemTd.style.background = "transparent";
-          itemTd.style.color = "inherit";
-        });
-        itemRow.classList.remove("event");
-      });
-    },
-    updatePage: function () {
-      if (this.$refs[this.id]) {
-        this.clearColor();
-      }
-    },
+    }
   },
 };
 </script>
