@@ -68,13 +68,34 @@
         </v-dialog>
       </v-row>
 
-      <v-row align="end" align-content="end" v-show="options.showLegend" class="mb-5">
+      <v-row
+        align="end"
+        align-content="end"
+        v-show="options.showLegend"
+        class="mb-5"
+      >
         <v-spacer></v-spacer>
-        <v-card style="max-height: 466px" max-width="280" class="pa-5" color="#191919">
-          <v-subheader style="color: white"
-            ><v-icon :style="{ color: theme.$title }">{{ mdiList }}</v-icon
-            >Легенда</v-subheader
-          >
+        <v-card
+          style="max-height: 466px"
+          max-width="280"
+          class="pa-5"
+          color="#191919"
+        >
+          <v-subheader style="color: white" class="px-0">
+            <v-icon :style="{ color: theme.$title }">{{ mdiList }}</v-icon>
+            <span
+              style="
+                font-family: Proxima Nova;
+                font-size: 18px;
+                font-style: normal;
+                font-weight: 600;
+                line-height: 22px;
+                letter-spacing: 0em;
+                text-align: left;
+              ">
+              Легенда
+            </span>
+          </v-subheader>
           <v-divider></v-divider>
           <v-card width="240" outlined color="white">
             <v-list style="max-height: 382px" class="overflow-y-auto">
