@@ -11,11 +11,11 @@
       v-if="groupCheck"
       class="create-modal-block-group"  
     >
-      <v-card :style="{background:color.backElement}">
+      <v-card :style="{background:theme.$main_bg}">
         <v-card-text class="headline ">
           <div 
             class="create-title" 
-            :style="{color:color.text}"
+            :style="{color:theme.$title}"
           >
             {{ nameTitle }}
           </div>
@@ -25,16 +25,16 @@
             v-model="newGroup.name"
             hide-details  
             class="input-create"  
-            :style="{color:color.text}"  
-            :background-color="color.backElement" 
+            :style="{color:theme.$main_text}"
+            :background-color="theme.$main_bg"
             label="Имя группы" 
-            :color="color.controls" 
+            :color="theme.$primary_button"
             outlined  
             clearable  
           />
           <div 
             class="zagolovok-field input-create"  
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
           >
             Цвет группы
           </div>
@@ -49,7 +49,7 @@
               essence="group" 
               :dataFrom="dataRest" 
               :subessence="item" 
-              :colorFrom="color" 
+              :colorFrom="theme"
               :create="actionFrom"  
               :activeFrom="modalFrom" 
               @changeData="changeData"
@@ -58,7 +58,7 @@
           <div 
             class="warn" 
             :class="{showwarning:showwarning}" 
-            :style="{color:color.controlsActive}"
+            :style="{color:theme.$accent_ui_color}"
           >
             {{ nameWarn }}
           </div>
@@ -66,7 +66,7 @@
             <v-spacer />
             <v-btn 
               small 
-              :color="color.controls" 
+              :color="theme.$primary_button"
               class="create-btn"
               @click="createBtn(newGroup.name)"
             >
@@ -74,7 +74,7 @@
             </v-btn>
             <v-btn 
               small 
-              :color="color.controlsActive" 
+              :color="theme.$primary_button"
               class="create-btn" 
               @click="cancelModal(nameBtn.cancel)"
             >
@@ -89,11 +89,11 @@
       class="create-modal-block-group" 
       :class="{create_warning:create_warning}"
     >
-      <v-card :style="{background:color.backElement}">
+      <v-card :style="{background:theme.$main_bg}">
         <v-card-text class="headline ">
           <div 
             class="create-title" 
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
           >
             {{ nameTitle }}
           </div>
@@ -103,10 +103,10 @@
             v-model="newDash.name" 
             hide-details  
             class="input-create" 
-            :style="{color:color.text}"  
-            :background-color="color.backElement" 
+            :style="{color:theme.$main_text}"
+            :background-color="theme.$main_bg"
             label="Имя дашборда" 
-            :color="color.controls" 
+            :color="theme.$accent_ui_color"
             outlined  
             clearable  
           />
@@ -118,14 +118,14 @@
               :dataFrom="dataRest" 
               @changeData="changeData"  
               :create="actionFrom" 
-              :colorFrom="color" 
+              :colorFrom="theme"
               :activeFrom="modalFrom" 
             />
           </div>
           <div 
             class="warn" 
             :class="{showwarning:showwarning}" 
-            :style="{color:color.controlsActive}"
+            :style="{color:theme.$accent_ui_color}"
           >
             {{ nameWarn }}
           </div>
@@ -133,7 +133,7 @@
             <v-spacer />
             <v-btn 
               small 
-              :color="color.controls" 
+              :color="theme.$primary_button"
               class="create-btn" 
               @click="createBtn(newDash.name)"
             >
@@ -141,7 +141,7 @@
             </v-btn>
             <v-btn 
               small 
-              :color="color.controlsActive" 
+              :color="theme.$primary_button"
               class="create-btn" 
               @click="cancelModal(nameBtn.cancel)"
             >
@@ -160,7 +160,6 @@
 export default {
   props: {
     modalFrom: null,
-    colorFrom: null,
     groupFlagFrom: null,
     groupFrom: null,
     dashsFrom: null,
@@ -207,6 +206,9 @@ export default {
     }
   },
   computed: {
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
     active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет  
       if (this.modalFrom ) {
         if (this.dataFrom) {
@@ -241,9 +243,6 @@ export default {
         this.dataRest = this.getDataForEssence();  
       }
       return this.modalFrom
-    },
-    color: function() {
-      return this.colorFrom
     },
     groupCheck: function() { 
       return this.groupFlagFrom
@@ -403,18 +402,18 @@ export default {
         this.createBtn();
       }
     },
-    changeStyle: function() {
-      if (this.active) {
-        let dialog = document.querySelector('.v-dialog');
-        dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`; 
-        dialog.querySelectorAll('.v-input__slot').forEach( item => {
-          item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`; 
-        })
-        dialog.querySelectorAll('input').forEach( item => {
-          item.style.color = this.color.text;
-        })
-      }
-    },
+    // changeStyle: function() {
+    //   if (this.active) {
+    //     let dialog = document.querySelector('.v-dialog');
+    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
+    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
+    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
+    //     })
+    //     dialog.querySelectorAll('input').forEach( item => {
+    //       item.style.color = this.color.text;
+    //     })
+    //   }
+    // },
     changeData: function(event) {
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {}; 

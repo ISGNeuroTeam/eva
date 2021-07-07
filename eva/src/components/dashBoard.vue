@@ -7,7 +7,7 @@
   > 
     <v-card  
       class="dash-block"  
-      :style="{background:color.backElement, boxShadow:`0 3px 1px -2px ${color.border},0 2px 2px 0 ${color.border},0 1px 5px 0 ${color.border}`}"
+      :style="{background:theme.$main_bg, boxShadow:`0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`}"
     >   
       <v-card-title 
         v-show="props.disappear"
@@ -17,14 +17,14 @@
            <v-icon 
             v-if="dataFromDB"
             class="icon"
-            :color="color[setColorDS]"
+            :color="theme.$main_border"
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-icon
             v-if="props.dataRestFilter.length>0"
             class="icon"
-            :color="color[setColorDS]"
+            :color="theme.$main_border"
             @click="exportDataCSV"
           >
             {{ mdiArrowDownBold }}
@@ -32,7 +32,7 @@
           <v-icon 
             v-show="dataMode"
             class="icon chart" 
-            :color="color.controls"
+            :color="theme.$accent_ui_color"
           >
             {{ props.icons[elemIcon] }}
           </v-icon>
@@ -40,7 +40,7 @@
             <div
               v-if="props.edit"
               class="dash-title"  
-              :style="{color:color.text}"
+              :style="{color:theme.$main_text}"
             >
               {{ props.name }}
             </div>
@@ -48,7 +48,7 @@
               v-if="props.edit" 
               v-show="dataMode"
               class="dash-block-id"  
-              :style="{color:color.text}"
+              :style="{color:theme.$main_text}"
             >
               [ {{ element }} ]
             </div>
@@ -56,7 +56,7 @@
               v-if="props.edit" 
               v-show="dataMode"
               class="dash-block-sid"  
-              :style="{color:color.text, borderColor:color.text}"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               {{ props.sid }}
             </div>
@@ -65,8 +65,8 @@
               v-show="dataMode"
               v-model="props.name" 
               clearable 
-              :color="color.text" 
-              :style="{color:color.text}" 
+              :color="theme.$accent_ui_color" 
+              :style="{color:theme.$title}" 
               class="dash-edit-title" 
               hide-details 
             />             
@@ -79,12 +79,12 @@
           >
             <v-tooltip 
               bottom 
-              :color="color.controlsActive"
+              :color="theme.$accent_ui_color"
             > 
               <template v-slot:activator="{ on }"  >
                 <v-icon 
                   class=" datasource" 
-                  :color="color[setColorDS]" 
+                  :color="theme.$main_border" 
                   v-on="on" 
                   @click="switchDS(props)"
                 >
@@ -96,12 +96,12 @@
             <v-tooltip 
               v-if="props.edit_icon"
               bottom  
-              :color="color.controlsActive"
+              :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class="pencil" 
-                  :color="color.controlsInsideDash" 
+                  :color="theme.$main_border" 
                   v-on="on" 
                   @click="() => {props.edit=false; props.edit_icon=false; }"
                 >
@@ -113,12 +113,12 @@
             <v-tooltip 
               v-if="!props.edit_icon"
               bottom 
-              :color="color.controlsActive"
+              :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class=" check"
-                  :color="color.controlsActive"  
+                  :color="theme.$main_border"  
                   v-on="on"  
                   @click="editName(props)"
                 >
@@ -129,12 +129,12 @@
             </v-tooltip>
             <v-tooltip 
               bottom 
-              :color="color.controlsActive"
+              :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class=" option"  
-                  :color="color[setColorOp]"  
+                  :color="theme.$main_border"  
                   v-on="on" 
                   @click="switchOP()"
                 >
@@ -145,12 +145,12 @@
             </v-tooltip>
             <v-tooltip 
               bottom 
-              :color="color.controlsActive"
+              :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
                 <v-icon 
                   class=" delete" 
-                  :color="color.controlsInsideDash"
+                  :color="theme.$main_border"
                   v-on="on" 
                   @click="deleteDashBoard(props)"
                 >
@@ -168,13 +168,13 @@
       >
         <div 
           v-show="props.disappear"
-          :style="{borderColor:color.text, opacity: '0.2'}"   
+          :style="{borderColor:theme.$main_border, opacity: '0.2'}"   
           class="loading-divider" 
           :class="{loading:loadingSearch,loading:props.loading,noBorder:!dataMode}" 
         >
           <div 
             class="loading-bar " 
-            :style="{background: color.controlsActive}" 
+            :style="{background: theme.$primary_button}" 
           />
         </div>
       </div>
@@ -184,7 +184,7 @@
       >
         <button 
           class="selectDS" 
-          :style="{color: 'white', background: color.controls}" 
+          :style="{color: '#FFFFFF', background: theme.$primary_button}" 
           @click="chooseDS()"
         >
           Выберите источник данных
@@ -194,9 +194,9 @@
       <v-card-text
         :is="currentElem" 
         v-show="showElement"
-        class="card-text element-itself" 
-        :colorFrom="color" 
-        :style="{color:color.text, background:'transparent'}"  
+        class="card-text element-itself"
+        :colorFrom="theme"
+        :style="{color:theme.$main_text, background:'transparent'}"  
         :idFrom="element"   
         :idDashFrom="idDash"  
         :dataRestFrom="props.dataRestFilter" 
@@ -227,7 +227,6 @@ import  settings  from '../js/componentsSettings.js'
 
 export default {
   props: {
-    colorFrom: null,
     width: null,
     height: null,
     idDashFrom: null,
@@ -338,6 +337,9 @@ export default {
     },
   },
   computed: {
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
     idDash: function() { // получаем id страницы от родителя 
       return this.idDashFrom
     },
@@ -354,9 +356,6 @@ export default {
         this.props.disappear = true;
       }
       return this.dataModeFrom
-    },
-    color: function() {
-      return this.colorFrom
     },
     currentElem: function() { // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
       let nameElement = '';
@@ -376,20 +375,6 @@ export default {
         element = this.element.split('-')[0];
       } 
       return element  
-    },
-    setColorDS: function() {  // переключаем цвет иконок
-      if (!this.showElement){
-        return 'controlsActive';
-      } else {
-        return  'controlsInsideDash';
-      }
-    },
-    setColorOp: function() {  // переключаем цвет иконок
-      if (!this.props.showOptions){
-        return 'controlsActive';
-      } else {
-        return  'controlsInsideDash';
-      }
     },
     showElement: function() {  // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
       let show = false;
@@ -463,7 +448,7 @@ export default {
     this.props.name = this.$store.getters.getNameDash({idDash: this.idDash, id: this.element}); // получаем имя этой страницы
 
     if (this.props.options.boxShadow) {
-      this.props.optionsBoxShadow = this.color.controlsActive;
+      this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
       this.props.optionsBoxShadow = 'transparent';
     }
@@ -490,7 +475,7 @@ export default {
     },
     setShadow: function() {
       if (this.props.options.boxShadow) {
-        this.props.optionsBoxShadow =  this.color.controlsActive;
+        this.props.optionsBoxShadow =  this.theme.$primary_button;
       } 
       else{ 
         this.props.optionsBoxShadow =  `transparent`;

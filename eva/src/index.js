@@ -28,7 +28,7 @@ Vue.component('DTPicker', VueCtkDateTimePicker);   // сопоставляем �
 
 
 // далее объявляем компоненты так как потом будем их вызывать в html коде
-
+Vue.component('app', require('./App.vue').default)
 Vue.component('header-top', require('./components/header.vue').default)  // верхняя панель на странице
 Vue.component('footer-bottom', require('./components/footer.vue').default)  // верхняя панель на странице
 // Vue.component('main-page', require('./components/mainPage.vue').default)  // главная страница с приветствием и выбором разных дашбордов

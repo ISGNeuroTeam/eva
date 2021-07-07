@@ -8,13 +8,13 @@
     @keydown="checkEsc($event)"
   >
     <v-card 
-      :style="{background:colorDeliver.backElement}" 
+      :style="{background:theme.$main_bg}" 
       class="shedule-modal"
     >
       <div class="schedule-block">
         <div 
           class="zagolovok" 
-          :style="{color:colorDeliver.text}"
+          :style="{color:theme.$title}"
         >
           Расписание для запроса 
           <b>
@@ -23,44 +23,44 @@
         </div>
         <div class="tab-block">
           <v-tabs  
-            :color="colorDeliver.controls"  
-            :background-color="colorDeliver.backElement"
+            :color="theme.$primary_button"  
+            :background-color="theme.$main_bg"
           >
             <v-tabs-slider />
             <v-tab  
-              :style="{color:colorDeliver.text}"
+              :style="{color:theme.$main_text}"
             >
               Периодичность
             </v-tab>
-            <v-tab-item :style="{color:colorDeliver.text, background:colorDeliver.backElement}">
+            <v-tab-item :style="{color:theme.$main_text, background:theme.$main_bg}">
               <div class="every">
                 <p>Каждые</p>
                 <v-text-field 
                   v-model="every" 
-                  :color="colorDeliver.text" 
-                  :style="{color: colorDeliver.text, border: `1px solid ${colorDeliver.text}`}" 
-                  class="textarea-item" 
-                  outlined 
-                  :disabled="disabledEvery"  
+                  :color="theme.$accent_ui_color" 
+                  :style="{color: theme.$main_text, border: `1px solid ${theme.$main_border}`}" 
+                  class="textarea-item"
+                  outlined
+                  :disabled="disabledEvery"
                   hide-details
                 />
                 <div class="choose-time">
                   <v-chip 
-                    :color="colorDeliver[color.hour]" 
+                    :color="theme[color.hour]" 
                     class="time" 
                     @click="setTime('hour','every')"
                   >
                     Часов
                   </v-chip>
                   <v-chip 
-                    :color="colorDeliver[color.minute]"
+                    :color="theme[color.minute]"
                     class="time" 
                     @click="setTime('minute','every')"
                   > 
                     Минут
                   </v-chip>
                   <v-chip 
-                    :color="colorDeliver[color.second]" 
+                    :color="theme[color.second]" 
                     class="time" 
                     @click="setTime('second','every')"
                   >
@@ -70,16 +70,16 @@
               </div>
               <p 
                 class="time-select" 
-                :style="{color:colorDeliver.text, opacity:'0.5'}"
+                :style="{color:theme.$main_text}"
               >
                 Получать данные за последние
               </p>
-              <v-divider :style="{borderColor:colorDeliver.border, opacity:'0.5'}" />
+              <v-divider :style="{borderColor:theme.$main_bg, opacity:'0.5'}" />
               <div class="last">
                 <v-text-field 
                   v-model="everyLast"
-                  :color="colorDeliver.text" 
-                  :style="{color: colorDeliver.text, border: `1px solid ${colorDeliver.text}`}" 
+                  :color="theme.$accent_ui_color" 
+                  :style="{color: theme.$main_text, border: `1px solid ${theme.$main_border}`}" 
                   class="textarea-item" 
                   outlined 
                   :disabled="disabledEvery"  
@@ -87,21 +87,21 @@
                 />
                 <div class="choose-time">
                   <v-chip 
-                    :color="colorDeliver[colorLast.hour]" 
+                    :color="theme[colorLast.hour]" 
                     class="time" 
                     @click="setTime('hour','last')"
                   >
                     Часов
                   </v-chip>
                   <v-chip 
-                    :color="colorDeliver[colorLast.minute]" 
+                    :color="theme[colorLast.minute]" 
                     class="time" 
                     @click="setTime('minute','last')"
                   > 
                     Минут
                   </v-chip>
                   <v-chip 
-                    :color="colorDeliver[colorLast.second]" 
+                    :color="theme[colorLast.second]" 
                     class="time" 
                     @click="setTime('second','last')"
                   >
@@ -110,7 +110,7 @@
                 </div>
               </div>
             </v-tab-item>
-            <v-tab :style="{color:colorDeliver.text}">
+            <v-tab :style="{color:theme.$main_text}">
               Планирование
             </v-tab>
             <v-tab-item />
@@ -121,7 +121,7 @@
         <v-spacer />
         <v-btn 
           small 
-          :color="colorDeliver.controlsActive" 
+          :color="theme.$primary_button" 
           class="delete-btn" 
           :class="{disable:disabledStop}" 
           @click="cancelSchedule"
@@ -130,7 +130,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="colorDeliver.controlsSystem" 
+          :color="theme.$primary_button" 
           class="delete-btn" 
           :disabled="disabledStart" 
           @click="startSchedule"
@@ -139,7 +139,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="colorDeliver.controlsActive" 
+          :color="theme.$primary_button" 
           class="delete-btn" 
           @click="cancel"
         >
@@ -157,8 +157,7 @@ export default {
   props: {
     idDashFrom: null,
     modalFrom: null,
-    dataSidFrom: null,
-    colorFrom: null,
+    dataSidFrom: null
   },
   data () {
     return {
@@ -167,14 +166,14 @@ export default {
       everyLast: 0,
       timeLast: '',
       color: {
-        hour: 'controls',
-        minute: 'controls',
-        second: 'controls',
+        hour: '$accent_ui_color',
+        minute: '$accent_ui_color',
+        second: '$accent_ui_color',
       },
       colorLast: {
-        hour: 'controls',
-        minute: 'controls',
-        second: 'controls',
+        hour: '$accent_ui_color',
+        minute: '$accent_ui_color',
+        second: '$accent_ui_color',
       },
       disabledStop: true,
       disabledStart: false,
@@ -200,8 +199,8 @@ export default {
             this.time = this.schedulers[this.sid].time;
             this.everyLast = this.schedulers[this.sid].everyLast;
             this.timeLast = this.schedulers[this.sid].timeLast;
-            this.color[this.time] = "controlsActive";
-            this.colorLast[this.timeLast] = "controlsActive";
+            this.color[this.time] = "$primary_button";
+            this.colorLast[this.timeLast] = "$primary_button";
             this.disabledStop = false;
             this.disabledStart = true;
             this.disabledEvery = true;
@@ -212,8 +211,8 @@ export default {
             this.everyLast = 0;
             this.timeLast = '';
             Object.keys(this.color).forEach( item => {
-              this.color[item] = 'controls';
-              this.colorLast[item] = 'controls';
+              this.color[item] = '$accent_ui_color';
+              this.colorLast[item] = '$accent_ui_color';
             })
             this.disabledStop = true;
             this.disabledStart = false;
@@ -233,8 +232,8 @@ export default {
     searches: function() {
       return this.$store.getters.getSearches(this.idDash)
     },
-    colorDeliver: function() {
-      return this.colorFrom
+    theme: function() {
+      return this.$store.getters.getTheme
     },
   },
   methods: {
@@ -251,22 +250,22 @@ export default {
         if (tense == 'every') {
           this.time = time;
           Object.keys(this.color).forEach( item => {
-            this.color[item] = 'controls';
+            this.color[item] = '$accent_ui_color';
           })
-          if (this.color[time] == 'controls') {
-            this.color[time] = 'controlsActive';
+          if (this.color[time] == '$accent_ui_color') {
+            this.color[time] = '$primary_button';
           } else {
-            this.color[time] = 'controls';
+            this.color[time] = '$accent_ui_color';
           }           
         } else if (tense == 'last') {
           this.timeLast = time;
           Object.keys(this.colorLast).forEach( item => {
-            this.colorLast[item] = 'controls';
+            this.colorLast[item] = '$accent_ui_color';
           })
-          if (this.colorLast[time] == 'controls') {
-            this.colorLast[time] = 'controlsActive';
+          if (this.colorLast[time] == '$accent_ui_color') {
+            this.colorLast[time] = '$primary_button';
           } else {
-            this.colorLast[time] = 'controls';
+            this.colorLast[time] = '$accent_ui_color';
           }
         }
       }        

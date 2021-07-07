@@ -7,12 +7,12 @@
   >
     <v-card  
       class="delete-profile" 
-      :style="{background: colorFrom.backElement }"
+      :style="{background: theme.$main_bg }"
     >
       <v-card-text>
         <div 
           class="name-profile" 
-          :style="{color: colorFrom.text }"
+          :style="{color: theme.$title }"
           v-html="dataFrom.text" 
         />
       </v-card-text>
@@ -20,7 +20,7 @@
         <v-spacer />
         <v-btn 
           small  
-          :color="colorFrom.controlsSystem" 
+          :color="theme.$primary_button"
           class="profile-btn" 
           @click="deleteEssence"
         >
@@ -28,7 +28,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="colorFrom.controlsActive" 
+          :color="theme.$primary_button"
           class="profile-btn" 
           @click="cancelModal"
         >
@@ -48,7 +48,6 @@ export default {
   props: {
     activeDelete: null,
     dataFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -58,6 +57,9 @@ export default {
   computed: { 
     active: function() {
       return this.activeDelete
+    },
+    theme: function() {
+      return this.$store.getters.getTheme
     },
   },  
   methods: {

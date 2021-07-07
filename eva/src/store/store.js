@@ -2,6 +2,8 @@ import  rest from './storeRest.js';
 import  restAuth from '../storeAuth/storeRest.js';
 import  settings  from '../js/componentsSettings.js';
 
+import themes from '../js/themeSettings.js';
+
 export default {  // приблизительный объект хранилища, может отличаться от реального
   state: {
     theme: "dark",
@@ -465,6 +467,10 @@ export default {  // приблизительный объект хранили�
         );
       }
     },
+    setLibrary: (state, options) => {
+      Vue.set(state[options.idDash][options.id].options, "library" , options.library);
+    },
+
     setOptions: (state, options) => {  // добовляем данные о скриншоте
 
       Object.keys(options.options).forEach( item => { // пробегаемся по всем настройкам, что к нам пришли
@@ -484,6 +490,11 @@ export default {  // приблизительный объект хранили�
       }
         
     },
+
+    updateOptions: (state, payload) => {
+      state[payload.idDash][payload.idElement].options = payload.options;
+    },
+
     letEventSet: (state, events) => {   // метод который обновляет какое-либо свойство у элемнета
       events.events.forEach(item => {
         if (!state[events.idDash][item.target].options) {  // если опций еще нет
@@ -1237,8 +1248,7 @@ export default {  // приблизительный объект хранили�
       if (!state.theme) {
         Vue.set(state, 'theme', 'dark');
       }
-      return state.theme
-      
+      return themes[state.theme]
     },
     getThemeBack(state) {
       return () => {
@@ -1478,6 +1488,11 @@ export default {  // приблизительный объект хранили�
     getAvailableTableTitles: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.availableTableTitles;
+      }
+    },
+    getLibrary: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.options?.library;
       }
     }
   },

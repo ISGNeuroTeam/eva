@@ -5,32 +5,32 @@
     width="300"
     left
     class="left-dash-setting"
-    :color="colorFrom.text"
-    :style="{background: colorFrom.backElement, borderTop:`2px solid ${colorFrom.panel}`,borderBottom:`2px solid ${colorFrom.panel}`}"
+    :color="theme.$main_text"
+    :style="{background: theme.$main_bg, borderTop:`2px solid ${theme.$main_border}`,borderBottom:`2px solid ${theme.$main_border}`}"
     :permissions="permissions"
   >
     <div
       class="line-setting"
-      :style="{background: colorFrom.panel}"
+      :style="{background: theme.$main_bg}"
     />
     <div class="setting">
-      <div class="labelSetting" :style="{color: colorFrom.text}">
+      <div class="labelSetting" :style="{color: theme.$main_text}">
         Режим редактирования
       </div>
       <v-switch  
         v-model="mode" 
         class="switch" 
-        :color="colorFrom.controls" 
-        :style="{color:colorFrom.text}" 
+        :color="theme.$primary_button" 
+        :style="{color:theme.$main_text}" 
         :label="russianLabel(mode)" 
       />
       <div 
         class="divider-setting" 
-        :style="{background: colorFrom.controls}"
+        :style="{background: theme.$title}"
       />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{color: colorFrom.text}">
+      <div class="labelSetting" :style="{color: theme.$main_text}">
         Размер сетки
       </div>
       <div class="sizeGrid">
@@ -38,8 +38,8 @@
           v-model="sizeGrid.vert" 
           placeholder="24"  
           label="Вертикально"
-          :color="colorFrom.text" 
-          :style="{color:colorFrom.text, background: 'transparent', borderColor: colorFrom.text}" 
+          :color="theme.$accent_ui_color" 
+          :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
           outlined 
           class="sizeGridItem"  
           hide-details
@@ -50,46 +50,46 @@
           v-model="sizeGrid.hor" 
           placeholder="24"  
           label="Горизонтально"
-          :color="colorFrom.text" 
-          :style="{color:colorFrom.text, background: 'transparent', borderColor: colorFrom.text}" 
-          outlined 
-          class="sizeGridItem"  
+          :color="theme.$accent_ui_color" 
+          :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
+          outlined
+          class="sizeGridItem"
           hide-details
           @blur="sendSizeGrid"
           @keyup.enter="sendSizeGrid"
         />
       </div>
-      <div 
-        class="divider-setting" 
-        :style="{background: colorFrom.controls}"
+      <div
+        class="divider-setting"
+        :style="{background: theme.$title}"
       />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{color: colorFrom.text}">
+      <div class="labelSetting" :style="{color: theme.$main_text}">
         Перемещать/ изменять размер компонента
       </div>
       <v-switch  
         v-model="dragresable" 
         class="switch" 
-        :color="colorFrom.controls" 
-        :style="{color:colorFrom.text,}" 
+        :color="theme.$primary_button" 
+        :style="{color:theme.$main_text,}" 
         :label="russianLabel(dragresable)" 
       />
       <div 
         class="divider-setting" 
-        :style="{background: colorFrom.controls}"
+        :style="{background: theme.$title}"
       />
     </div>
     
     <div class="setting">
-      <div class="labelSetting" :style="{color: colorFrom.text}">
+      <div class="labelSetting" :style="{color: theme.$main_text}">
         Показывать сетку
       </div>
       <v-switch  
         v-model="gridShow" 
         class="switch" 
-        :color="colorFrom.controls" 
-        :style="{color:colorFrom.text,}" 
+        :color="theme.$primary_button" 
+        :style="{color:theme.$main_text,}" 
         :label="russianLabel(gridShow)"
       />
     </div>
@@ -102,7 +102,6 @@
 
 export default {
   props: {
-    colorFrom: null,
     gearFrom: Boolean,
     idDashFrom: null,
     permissionsFrom: null
@@ -121,6 +120,9 @@ export default {
     } 
   },
   computed: {
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
     active: function() {  
       return this.showFrom 
     },

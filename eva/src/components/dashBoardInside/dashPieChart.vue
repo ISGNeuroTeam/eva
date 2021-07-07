@@ -45,7 +45,7 @@
           />
           <div 
             class="text" 
-            :style="{color:color.text}"
+            :style="{color:theme.$main_text}"
           >
             {{ item.label }}
           </div>    
@@ -65,7 +65,6 @@ export default {
     idFrom: null,  // id элемнета (table, graph-2)
     idDashFrom: null, // id дашборда 
     dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null,  // цветовые переменные
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
     widthFrom: null, // ширина родительского компонента
@@ -82,21 +81,21 @@ export default {
       ],
       nodata: true,
       message: 'Нет данных для отображения',
-      colors: {
-        neitral: [
-          '#650075','#631B8F','#3A0085','#5F27FF','#6978FF',
-          '#003CFF','#0070A3','#50C9FF','#AEFAFF','#FFFFFF',
-          '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
-          '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
-        ],
-        indicted: [
-          '#FF7F37','#EB2F2F','#920000','#600000','#D34C00',
-          '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
-          '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
-          '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
-        ],
-        custom: []
-      },
+      // colors: {
+      //   neitral: [
+      //     '#650075','#631B8F','#3A0085','#5F27FF','#6978FF',
+      //     '#003CFF','#0070A3','#50C9FF','#AEFAFF','#FFFFFF',
+      //     '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
+      //     '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
+      //   ],
+      //   indicted: [
+      //     '#FF7F37','#EB2F2F','#920000','#600000','#D34C00',
+      //     '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
+      //     '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
+      //     '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
+      //   ],
+      //   custom: []
+      // },
       legends: [],
       positionLegends: 'row nowrap',
       selectedValue: [],
@@ -114,8 +113,24 @@ export default {
     dataRest: function() {
       return this.dataRestFrom
     },
-    color: function() {
-      return this.colorFrom
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
+    colors() {
+      return  {
+        neitral: [
+          this.theme.$grass,this.theme.$forest, this.theme.$blue, this.theme.$plum,
+          this.theme.$purple, this.theme.$orange, this.theme.$peach, this.theme.$raspberry,
+          this.theme.$coral, this.theme.$beet,this.theme.$sun, this.theme.$kiwi,this.theme.$sea
+        ],
+        indicted: [
+          '#FF7F37','#EB2F2F','#920000','#600000','#D34C00',
+          '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
+          '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
+          '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
+        ],
+        custom: []
+      }
     },
     dataLoading: function() {
       return this.dataLoadingFrom
@@ -180,9 +195,9 @@ export default {
         }
       }
 
-      if (this.dashOptions.themes)  {
-        this.colors = this.dashOptions.themes;
-      }
+      // if (this.dashOptions.themes)  {
+      //   this.colors = this.dashOptions.themes;
+      // }
 
       let onlyNum = true;
 
@@ -320,8 +335,8 @@ export default {
           }
         })
         .attr('fill', function(d){ return(color(d.data.key)) })
-        .attr("stroke", that.color.text)
-        .style("stroke-width", "1px")
+        .attr("stroke", that.theme.$main_bg)
+        .style("stroke-width", "2px")
         .on('click', function(d) {
           let selected = false;
           if (this.classList.contains('piepartSelect')) {

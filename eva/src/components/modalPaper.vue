@@ -8,11 +8,11 @@
       ref="paperBlock"
       class="paper-modal-block"
     >
-      <v-card :style="{background:color.backElement}">
+      <v-card :style="{background:theme.$main_bg}">
         <v-card-text class="headline ">
           <div 
             class="paper-title" 
-            :style="{color:color.text,borderColor:color.text}"
+            :style="{color:theme.$title}"
           >
             Создание отчета
           </div>
@@ -21,13 +21,12 @@
           <v-autocomplete 
             v-model="selectedFile" 
             :items="allFiles"  
-            outlined 
-            :style="{color:color.text, fill: color.text}"
-            :color="color.controls" 
+            outlined
+            :style="{color:theme.$main_text, fill: theme.$main_text}"
+            :color="theme.$accent_ui_color" 
             hide-details  
             class="file-get-itself"
             label="Выбрать отчет"  
-            @click="changeColor" 
           />
           <div class="error-block">
             <div 
@@ -35,7 +34,7 @@
               class="loading-block"
             >
               <v-icon 
-                :color="color.controls"
+                :color="theme.$primary_button"
                 medium
               >
                 {{ gear }}
@@ -44,14 +43,14 @@
             <div 
               class="error-msg" 
               :class="{showError:showError}"
-              :style="{color:color.controls}"
+              :style="{color:theme.$error_color}"
             >
               {{ errorMsg }}
             </div>
           </div>
           <v-btn 
             small 
-            :color="color.controls" 
+            :color="theme.$primary_button" 
             class="file-get-btn" 
             @click="startPaper"
           >
@@ -62,7 +61,7 @@
           <v-spacer />
           <v-btn 
             small 
-            :color="color.controlsActive" 
+            :color="theme.$primary_button" 
             class="close-btn" 
             @click="cancelModal"
           >
@@ -81,7 +80,6 @@
 
 export default {
   props: {
-    color: null,
     active: null,
     sid: null,
     idDash: null,
@@ -98,7 +96,9 @@ export default {
     } 
   },
   computed: { 
-
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
   },  
   watch: {
     active: function() {
@@ -277,7 +277,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="sass"  > 
   
   @import '../sass/modalPaper.sass'
    

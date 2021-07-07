@@ -8,11 +8,11 @@
     <v-card 
       v-if="passway" 
       class="passcard" 
-      :style="{backgroundColor: colorFrom.backElement }"
+      :style="{backgroundColor: theme.$main_bg }"
     >
       <v-card-text 
         class="card-text-profile" 
-        :style="{color: colorFrom.text }"
+        :style="{color: theme.$title }"
       >
         <div 
           class="headline"
@@ -22,8 +22,8 @@
         <v-text-field
           v-model="oldpass" 
           label="Старый пароль" 
-          :color="colorFrom.controls"  
-          :style="{color: colorFrom.text }" 
+          :color="theme.$accent_ui_color"
+          :style="{color: theme.$main_text }"
           class="field-profile" 
           type="password" 
           outlined  
@@ -32,9 +32,9 @@
         />
         <v-text-field 
           v-model="newpass"
-          label="Новый пароль" 
-          :color="colorFrom.controls"  
-          :style="{color: colorFrom.text }"  
+          label="Новый пароль"
+          :color="theme.$accent_ui_color"
+          :style="{color: theme.$main_text }"
           class="field-profile"
           type="password" 
           outlined 
@@ -45,7 +45,7 @@
       <div 
         class="msg-profile" 
         :class="{openMsg:openMsg}" 
-        :style="{color:colorMsg}"
+        :style="{color:theme.$error_color}"
       >
         {{ msg }}
       </div>
@@ -53,15 +53,15 @@
         <v-spacer />
         <v-btn 
           small  
-          :color="colorFrom.controlsSystem" 
+          :color="theme.$primary_button"
           class="profile-btn" 
           @click="changeBtn('pass')"
         >
           Изменить
         </v-btn>
         <v-btn 
-          small 
-          :color="colorFrom.controlsActive" 
+          small
+          :color="theme.$primary_button"
           class="profile-btn" 
           @click="cancelModal"
         >
@@ -72,11 +72,11 @@
     <v-card 
       v-if="!passway" 
       class="profile-tab" 
-      :style="{backgroundColor: colorFrom.backElement }"
+      :style="{backgroundColor: theme.$main_bg }"
     >
       <v-card-text   
         class="card-text-profile" 
-        :style="{color: colorFrom.text}"
+        :style="{color: theme.$title}"
       >
         <div class="headline">
           {{ titleModal }}
@@ -89,8 +89,8 @@
           <v-text-field 
             v-model="userData.username" 
             label="Логин пользователя" 
-            :color="colorFrom.controls"  
-            :style="{color: colorFrom.text }"  
+            :color="theme.$accent_ui_color"
+            :style="{color: theme.$main_text }"
             class="field-profile"
             outlined  
             hide-details 
@@ -99,8 +99,8 @@
           <v-text-field 
             v-model="userData.pass"
             label="Пароль пользователя" 
-            :color="colorFrom.controls"   
-            :style="{color: colorFrom.text }"  
+            :color="theme.$accent_ui_color"
+            :style="{color: theme.$main_text }"
             autocomplete="new-password" 
             class="field-profile" 
             placeholder="********"  
@@ -212,7 +212,7 @@
           <v-text-field 
             v-model="curItem.name" 
             label="Название индекса" 
-            :color="colorFrom.controls"   
+            :color="theme.$accent_ui_color"
             class="field-profile"  
             outlined  
             hide-details 
@@ -243,7 +243,7 @@
         <v-spacer />
         <v-btn 
           small  
-          :color="colorFrom.controlsSystem" 
+          :color="theme.$primary_button"
           class="profile-btn" 
           @click="changeBtn(create)"
         >
@@ -251,7 +251,7 @@
         </v-btn>
         <v-btn 
           small  
-          :color="colorFrom.controlsActive" 
+          :color="theme.$primary_button"
           class="profile-btn" 
           @click="cancelModal"
         >
@@ -275,7 +275,6 @@ export default {
     userFrom: null,
     keyFrom: null,
     curItemFrom: null,
-    colorFrom: null,
   },
   data () {
     return {
@@ -324,7 +323,8 @@ export default {
       },
       curItem: {},
       changedData: {},
-      dataRest: {}
+      dataRest: {},
+      colorFrom: {}
     } 
   },
   computed: { 
@@ -427,7 +427,13 @@ export default {
         return 'Редактировать'
       }
     },
-  },  
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
+  },
+  mounted(){
+    this.colorFrom = this.theme;
+  },
   methods: {
     getDataForEssence: async  function() {
       if (this.create) {

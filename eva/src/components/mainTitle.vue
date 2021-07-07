@@ -1,7 +1,7 @@
 <template>
   <v-app 
     class="aplication" 
-    :style="{background:color.back}"
+    :style="{background:theme.$secondary_bg}"
   >
     <header-top 
       :class="{openHeader:!openProfile}"
@@ -12,9 +12,9 @@
       v-if="prepared"
       class="body-block" 
     >
-      <dash-panel-bord  
-        :idDashFrom="idDash" 
-        :colorFrom="color" 
+      <dash-panel-bord
+        :id-dash-from="idDash" 
+        :color-from="theme"
         :style="{top:top, display:display}" 
         :permissions-from="permissions"
         @changeMode="changeMode" 
@@ -24,7 +24,7 @@
       <v-card 
         v-if="alreadyShow"
         class="already-block"  
-        :style="{color:color.text,background:color.backElement}"
+        :style="{color:theme.$main_text,background:theme.$main_bg}"
       >
         <div class="text-already">
           Существует более новая версия дашборда. Хотите обновить?
@@ -32,15 +32,15 @@
         <div class="btn-already">
           <v-btn 
             small 
-            :color="color.controlsSystem" 
+            :color="theme.$primary_button"
             class="create-btn" 
             @click="updateDash"
           >
             Да
           </v-btn>
           <v-btn 
-            small 
-            :color="color.controlsActive" 
+            small
+            :color="theme.$primary_button"
             class="create-btn" 
             @click="alreadyShow = false"
           >
@@ -50,37 +50,36 @@
       </v-card>
       <v-main id="content">
         <v-container class="dash-container">
-           <div
+          <div
             v-if="gridShow"
             class="overlay-grid"
             :data-grid="true"
-             :style="{height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${color.text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
-            rgba(0, 0, 0, 0) linear-gradient(${color.text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`}"
+            :style="{height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
+            rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`}"
           />
           <move-able 
             v-for="elem in elements" 
             :key="hash(elem)"  
-            :dataModeFrom="mode" 
-            :colorFrom="color" 
-            :idDashFrom="idDash" 
-            :dataElem="elem" 
-            :dataPageFrom="page"
-            :horizontalCell="horizontalCell"
-            :verticalCell="verticalCell"
-             
+            :data-mode-from="mode" 
+            :color-from="theme"
+            :id-dash-from="idDash" 
+            :data-elem="elem" 
+            :data-page-from="page"
+            :horizontal-cell="horizontalCell"
+            :vertical-cell="verticalCell"
           />
           <modal-delete 
-            :colorFrom="color" 
-            :idDashFrom="idDash" 
-            :dataPageFrom="page"
+            :color-from="theme"
+            :id-dash-from="idDash" 
+            :data-page-from="page"
           />
           <modal-search 
-            :colorFrom="color" 
-            :idDashFrom="idDash" 
+            :color-from="theme"
+            :id-dash-from="idDash" 
           />
           <modal-settings 
-            :colorFrom="color" 
-            :idDashFrom="idDash"   
+            :color-from="theme"
+            :id-dash-from="idDash"   
           />
             
           <!-- 
@@ -105,7 +104,6 @@ export default {
       mode: false,
       showSetting: false,
       rotate: '',
-      color: { },
       openProfile: false,
       alreadyDash: {},
       alreadyShow: false,
@@ -170,12 +168,15 @@ export default {
     }
   },  
   watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-    },
-     getSizeGrid: function() {
-       this.calcSizeCell()
-     }
+    getSizeGrid: function() {
+      this.calcSizeCell()
+    }
+  },
+  mounted() {
+    document.title=`EVA | ${this.$store.getters.getName(this.idDash)}`
+    this.createStartClient();
+    this.calcSizeCell();
+    this.addScrollListener();
   },
   methods: {
     hash: function(elem) {
@@ -226,39 +227,28 @@ export default {
     addScrollListener: function(){ 
       let otstup = 0;
       window.addEventListener('scroll' , () => {  // при увеличении экрана в высоту (вообще коненчо срабатывает при скролле страницы)       
-      if (document.querySelector('.aplication')) {
-        if (document.body.scrollHeight > document.body.clientHeight) { // если высота скролируемого экрана больше чем клиентского
+        if (document.querySelector('.aplication')) {
+          if (document.body.scrollHeight > document.body.clientHeight) { // если высота скролируемого экрана больше чем клиентского
           //добавляем размер
-          otstup = this.horizontalCell;
-        } else {
-          otstup = 0;
+            otstup = this.horizontalCell;
+          } else {
+            otstup = 0;
           //просто сработало событие
-        }
-        let _maxHeigth = (Math.round(document.querySelector('.aplication').clientHeight/this.horizontalCell)) * this.horizontalCell
-        this.deltaHorizontal = (_maxHeigth - this.startClientHeight)
+          }
+          let _maxHeigth = (Math.round(document.querySelector('.aplication').clientHeight/this.horizontalCell)) * this.horizontalCell
+          this.deltaHorizontal = (_maxHeigth - this.startClientHeight)
 
-        document.querySelector('.aplication').style.height =  `${document.body.scrollHeight+otstup}px`; // в любом случае расширяем контейнер до размеров экрана
-      }
-    })
+          document.querySelector('.aplication').style.height =  `${document.body.scrollHeight+otstup}px`; // в любом случае расширяем контейнер до размеров экрана
+        }
+      })
 
     }
-  },
-  mounted() {
-    document.title=`EVA | ${this.$store.getters.getName(this.idDash)}`
-    this.createStartClient();
-    this.calcSizeCell();
-    this.addScrollListener(); 
-
-    this.color = themes[this.theme];
   }
 }
 </script>
 
 <style > 
 
-    html,body {
-        background: #fafafa;
-    }
     .aplication {
         position: relative;
     }

@@ -36,6 +36,9 @@
     .united-block
       width: 100%
 
+    .v-select__selections
+        color: var(--main_text) !important
+
     .options-block
         display: flex
         flex-flow: column nowrap
@@ -49,6 +52,12 @@
             justify-content: center
             align-items: center
             width: 100%
+
+            .v-input__slot label
+                color: var(--main_text)
+
+            .v-icon
+                color: var(--main_text)
 
             .item
                 height: 70px
@@ -303,6 +312,7 @@
 
                         .v-label
                           top: 14px
+ 
 
                         .v-label--active
                           top: 18px 

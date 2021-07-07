@@ -1,46 +1,27 @@
 <template>
   <div 
     class="footer-block" 
-    :style="{color: color.text}"
+    :style="{color: theme.$main_text}"
   >
-    {{ version }}
+    {{ appVersion }}
   </div>    
 </template>
 
 
 <script>
-
-import themes from '../js/themeSettings.js';
-
+import {version} from './../../package.json'
 export default {
-
   data () {
     return {
-      version: '1.57.1',
-      color: { },
+      appVersion: version,
     } 
   },
-  computed: { 
-
+  computed: {
     theme: function() {
       return this.$store.getters.getTheme
     }
-  },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-      
-    },
-  },  
-  methods: {
-
   },
-  mounted() {
-    this.color = themes[this.theme];
-  }
 }
-
-
 </script>
 
 <style lang="sass" > 

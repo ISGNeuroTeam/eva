@@ -1,39 +1,38 @@
 <template>
-  <v-dialog  
-    v-model="active"  
-    width="500"  
-    persistent 
-  > 
+  <v-dialog
+    v-model="active"
+    width="500"
+    persistent
+  >
     <div class="exin-modal-block">
-      <v-card :style="{background:color.backElement}">
+      <v-card :style="{background:theme.$main_bg}">
         <v-card-text class="headline ">
-          <div 
+          <div
             class="exin-title" 
-            :style="{color:color.text,borderColor:color.text}"
+            :style="{color:theme.$title, borderColor:theme.$main_border}"
           >
-            Экспорт / Импорт 
+            Экспорт / Импорт
           </div>
         </v-card-text>
-        <div 
+        <div
           ref="blockExim" 
           class="block-exim" 
         >
-          <v-select 
+          <v-select
             v-model="selected" 
             :prepend-icon="selectImg" 
-            :style="{color:color.text, fill: color.text}" 
+            :style="{color:theme.$main_text, fill: theme.$main_text}"
             :items="elements[element]" 
             multiple  
-            :color="color.text"  
+            :color="theme.$accent_ui_color"
             hide-details  
             outlined 
             class="select-exp" 
-            :label="labelExp[element]" 
-            @click="changeColor"
-          /> 
+            :label="labelExp[element]"
+          />
           <v-btn 
             small  
-            :color="color.controls" 
+            :color="theme.$primary_button"
             class="export-btn" 
             @click="exportDash"
           >
@@ -41,18 +40,18 @@
           </v-btn>
           <p 
             class="msgExp" 
-            :style="{color:color[msgExp.color],opacity:msgExp.opacity}"
+            :style="{color:theme[msgExp.color],opacity:msgExp.opacity}"
           >
             {{ msgExp.text }}
           </p>
           <div 
             class="divider" 
-            :style="{backgroundColor:color.border,opacity:'0,3'}"
+            :style="{backgroundColor:theme.$main_border,opacity:'0,3'}"
           />
           <v-file-input 
             :prepend-icon="fileImg" 
-            :color="color.controls" 
-            :style="{color:color.text, fill: color.text}"  
+            :color="theme.$accent_ui_color"
+            :style="{color:theme.text, fill: theme.text}"
             class="file-itself" 
             hide-details  
             outlined 
@@ -61,7 +60,7 @@
           />
           <v-btn 
             small  
-            :color="color.controls" 
+            :color="theme.$primary_button"
             class="import-btn" 
             @click="importDash"
           >
@@ -69,7 +68,7 @@
           </v-btn>
           <p 
             class="msgImp" 
-            :style="{color:color[msgImp.color],opacity:msgImp.opacity}"
+            :style="{color:theme[msgImp.color],opacity:msgImp.opacity}"
           >
             {{ msgImp.text }}
           </p>
@@ -78,7 +77,7 @@
           <v-spacer />
           <v-btn 
             small 
-            :color="color.controlsActive" 
+            :color="theme.$primary_button"
             class="close-btn" 
             @click="closeModal"
           >
@@ -97,7 +96,6 @@ import {   mdiFileOutline, mdiFormatListBulleted   } from '@mdi/js'
 
 export default {
   props: {
-    color: null,
     active: null,
     dashboards: null,
     groups: null,
@@ -130,8 +128,13 @@ export default {
       selected: [],
     } 
   },
-  computed: { 
-
+  computed: {
+    theme: function() {
+      let currentTheme = this.$store.getters.getTheme
+      // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
+      // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
+      return currentTheme
+    }
   },  
   watch: {
     dashboards: function() {
@@ -255,25 +258,20 @@ export default {
     closeModal: function() {
       this.$emit('closeModal');
     },
-    changeColor: function() {
-      if (document.querySelectorAll('.v-menu__content').length != 0){
-        
-        document.querySelectorAll('.v-menu__content').forEach( item => {
-          
-          item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
-          item.style.background = this.color.back;
-          item.style.color = this.color.text;
-          item.style.border = `1px solid ${this.color.border}`;
-        })
-      }
-    },
+    // changeColor: function() {
+    //   document.querySelectorAll('.v-menu__content').forEach( item => {
+    //     item.style.background = this.theme.$secondary_bg;
+    //     item.style.color = this.theme.$main_text;
+    //     item.style.border = `1px solid ${this.theme.$main_border}`;
+    //   })
+    // },
   },
 }
 
 
 </script>
 
-<style lang="sass" > 
+<style lang="sass" >
   
   @import '../sass/modalExin.sass'
    

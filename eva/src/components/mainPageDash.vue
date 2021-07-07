@@ -1,18 +1,18 @@
 <template>
-  <v-app :style="{background: color.back}">
+  <v-app :style="{background: theme.$secondary_bg}">
     <header-top @permissions="setPermissions" />
     <v-main>
       <v-container class="main-container container-dash">
         <v-card 
           class="main-card-dash" 
-          :style="{background: color.back, boxShadow:'none'}"
+          :style="{background: theme.$secondary_bg, boxShadow:'none'}"
         >
           <v-card-text>
             <v-tabs  
               v-model="tab" 
               class="tab-dash" 
-              :color="color.text" 
-              :style="{background: color.back}"
+              :color="theme.$main_text"
+              :style="{background: theme.$secondary_bg}"
             > 
               <v-tabs-slider />
               <v-tab  
@@ -36,7 +36,7 @@
                   :key="i"
                   class="dash-group"    
                   :ripple="false"  
-                  :style="{background: color.backElement, color: color.text, borderColors: color.border}"
+                  :style="{background: theme.$main_bg, color: theme.$main_text, borderColors: theme.$main_border}"
                 >   
                   <v-card-title class="dash-group-title">
                     <div 
@@ -46,14 +46,14 @@
                     <div class="controls-group">
                       <v-tooltip 
                         bottom 
-                        :color="color.controlsActive"
+                        :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
-                          <v-icon 
-                            v-if="editGroupPermission" 
-                            class="edit control-group" 
-                            :color="color.controls"  
-                            v-on="on" 
+                          <v-icon
+                            v-if="editGroupPermission"
+                            class="edit control-group"
+                            :color="theme.$primary_button"
+                            v-on="on"
                             @click="() => {modalCreateGroup=true; createGroupFlag=true;actionBtn=false; curGroup=i-1 }"
                           >
                             {{ pencil }}
@@ -63,13 +63,13 @@
                       </v-tooltip>
                       <v-tooltip 
                         bottom 
-                        :color="color.controlsActive" 
+                        :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
                             v-if="editGroupPermission"
                             class="delete control-group"
-                            :color="color.controls"
+                            :color="theme.$primary_button"
                             v-on="on" 
                             @click="() => {nameDelete = allGroups[i-1].name, modalDelete=true,elemDelete='group',curGroup=i-1}" 
                           >
@@ -91,7 +91,7 @@
                 </v-card>
                 <v-btn
                   v-if="editGroupPermission"
-                  :color="color.controls"
+                  :color="theme.$primary_button"
                   fab
                   dark
                   small
@@ -107,7 +107,7 @@
                 </v-btn>
                 <v-btn
                   v-if="editGroupPermission"
-                  :color="color.controls"
+                  :color="theme.$primary_button"
                   fab 
                   dark  
                   small
@@ -130,7 +130,7 @@
                   :key="i" 
                   class="dash-group"    
                   :ripple="false"  
-                  :style="{background: color.backElement, color: color.text, borderColors: color.border}"
+                  :style="{background: theme.$main_bg, color: theme.$main_text, borderColors: theme.$main_border}"
                 >   
                   <v-card-title class="dash-group-title">
                     <div 
@@ -140,13 +140,13 @@
                     <div class="controls-group">
                       <v-tooltip 
                         bottom 
-                        :color="color.controlsActive"  
+                        :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
                             v-if="editDashPermission" 
                             class="edit control-group" 
-                            :color="color.controls" 
+                            :color="theme.$primary_button"
                             v-on="on" 
                             @click="() => {modalCreateGroup=true; createGroupFlag=false;actionBtn=false; curGroup=i-1 }"
                           >
@@ -157,13 +157,13 @@
                       </v-tooltip>
                       <v-tooltip 
                         bottom 
-                        :color="color.controlsActive" 
+                        :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
                             v-if="editDashPermission" 
                             class="delete control-group"
-                            :color="color.controls" 
+                            :color="theme.$primary_button"
                             v-on="on" 
                             @click="() => {nameDelete = allDashs[i-1].name, modalDelete=true,elemDelete='dash',curDash=i-1}"
                           >
@@ -185,7 +185,7 @@
                 </v-card>
                 <v-btn
                   v-if="editDashPermission"
-                  :color="color.controls"
+                  :color="theme.$primary_button"
                   fab 
                   dark  
                   small
@@ -201,7 +201,7 @@
                 </v-btn>
                 <v-btn
                   v-if="editDashPermission"
-                  :color="color.controls"
+                  :color="theme.$primary_button"
                   fab 
                   dark  
                   small
@@ -221,8 +221,7 @@
       </v-container>
     </v-main>
     <footer-bottom />
-    <modal-exim 
-      :color="color" 
+    <modal-exim
       :active="modalExim"  
       :curName="curName" 
       :dashboards="allDashs" 
@@ -240,23 +239,19 @@
       :dashFrom="allDashs[curGroup]" 
       :curGroupFrom="curGroup" 
       :groupFlagFrom="createGroupFlag" 
-      @createGroup="createGroup($event)"  
-      :colorFrom="color" 
+      @createGroup="createGroup($event)"
       @closeModal="closeModal"
     />
     <modal-delete-main 
       :modalFrom="modalDelete" 
       :nameFrom="nameDelete"
-      @deleteElem="deleteElem" 
-      :colorFrom="color"  
+      @deleteElem="deleteElem"
       @closeModal="modalDelete=false"  
     />
   </v-app> 
 </template>
 
 <script>
-
-import themes from '../js/themeSettings.js';
 
 import { mdiTrashCanOutline, mdiPlus, mdiPencil, mdiSwapVerticalBold } from '@mdi/js'
 
@@ -280,7 +275,6 @@ export default {
       modalExim: false,
       modalCreateGroup: false,
       element: 'dash',
-      color: { },
       createGroupFlag: false,
       nameDelete: '',
       modalDelete: false,
@@ -297,12 +291,6 @@ export default {
     theme: function() {
       return this.$store.getters.getTheme
     }
-  },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-      
-    },
   },
   methods: {
     getGroups: function() {
@@ -403,7 +391,6 @@ export default {
   },
   mounted() {  
     this.checkCookie();
-    this.color = themes[this.theme];
     document.title="EVA | Конструирование дашбордов"
   }
 }

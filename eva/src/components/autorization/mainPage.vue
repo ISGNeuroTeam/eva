@@ -1,7 +1,7 @@
 <template>
   <v-app 
     class="aut-app-main" 
-    :style="{backgroundColor:color.back}"
+    :style="{backgroundColor:theme.$secondary_bg}"
   >
     <header-top :inside="false" />
     <v-content>
@@ -9,65 +9,65 @@
         <div class="product-block">
           <v-card 
             class="product-block-itself" 
-            :style="{backgroundColor:color.backElement}"
+            :style="{backgroundColor:theme.$main_bg}"
             @click="openDash"  
           >   
             <v-card-text 
               class="product-text" 
-              :style="{color:color.text}" 
+              :style="{color:theme.$title}"
             >
               Конструирование <br> дашбордов
               <p 
                 class="delimetr" 
-                :style="{backgroundColor:color.text}"
+                :style="{backgroundColor:theme.$title}"
               />
             </v-card-text>
           </v-card>
           <v-card  
             class="product-block-itself" 
-            :style="{backgroundColor:color.backElement}"
+            :style="{backgroundColor:theme.$main_bg}"
             @click="openReport"
           >   
             <v-card-text 
               class="product-text" 
-              :style="{color:color.text}"
+              :style="{color:theme.$title}"
             >
               Исследование <br> данных
               <p 
                 class="delimetr" 
-                :style="{backgroundColor:color.text}"
+                :style="{backgroundColor:theme.$title}"
               />
             </v-card-text>
           </v-card>
           <v-card  
             class="product-block-itself" 
-            :style="{backgroundColor:color.backElement}"
+            :style="{backgroundColor:theme.$main_bg}"
             @click="openQuis"
           >   
             <v-card-text 
               class="product-text" 
-              :style="{color:color.text}"
+              :style="{color:theme.$title}"
             >
               Вопрос  <br>  ответ
               <p 
                 class="delimetr" 
-                :style="{backgroundColor:color.text}"
+                :style="{backgroundColor:theme.$title}"
               />
             </v-card-text>
           </v-card>
           <v-card  
             class="product-block-itself" 
-            :style="{backgroundColor:color.backElement}"
+            :style="{backgroundColor:theme.$main_bg}"
             @click="openPaper"
           >   
             <v-card-text 
               class="product-text" 
-              :style="{color:color.text}"
+              :style="{color:theme.$title}"
             >
               Конструирование  <br>  отчетов
               <p 
                 class="delimetr" 
-                :style="{backgroundColor:color.text}"
+                :style="{backgroundColor:theme.$title}"
               />
             </v-card-text>
           </v-card>
@@ -81,26 +81,17 @@
 
 <script>
 
-import themes from '../../js/themeSettings.js';
 
 export default {
 
   data () {
     return {
-      color: { },
     } 
   },
-  computed: { 
-
+  computed: {
     theme: function() {
       return this.$store.getters.getTheme
     }
-  },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-      
-    },
   },
   methods: {
     openDash: function() {
@@ -121,7 +112,6 @@ export default {
   },
   mounted() {
     document.title="EVA"
-    this.color = themes[this.theme];
   }
 }
 

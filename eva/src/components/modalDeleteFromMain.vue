@@ -8,11 +8,11 @@
     @keydown="checkEsc($event)"
   > 
     <div class="delete-modal-block">
-      <v-card :style="{background:color.backElement}">
+      <v-card :style="{background:theme.$main_bg}">
         <v-card-text class="headline ">
           <div 
             class="create-title" 
-            :style="{color:color.text}"
+            :style="{color:theme.$title}"
           >
             Вы точно хотите удалить 
             <p>
@@ -25,7 +25,7 @@
           <v-spacer />
           <v-btn 
             small 
-            :color="color.controls" 
+            :color="theme.$primary_button"
             class="create-btn" 
             @click="deleteBtn"
           >
@@ -33,7 +33,7 @@
           </v-btn>
           <v-btn 
             small 
-            :color="color.controlsActive" 
+            :color="theme.$primary_button"
             class="create-btn"
             @click="cancelModal"
           >
@@ -51,20 +51,18 @@
 export default {
   props: {
     modalFrom: null,
-    colorFrom: null,
     nameFrom: null,
   },
   data () {
     return {
-
     }
   },
   computed: {
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
     active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет  
       return this.modalFrom
-    },
-    color: function() {
-      return this.colorFrom
     },
     name: function() {
       return this.nameFrom
@@ -82,18 +80,18 @@ export default {
         this.cancelModal();
       }
     },
-    changeStyle: function() {
-      if (this.active) {
-        let dialog = document.querySelector('.v-dialog');
-        dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`; 
-        dialog.querySelectorAll('.v-input__slot').forEach( item => {
-          item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`; 
-        })
-        dialog.querySelectorAll('input').forEach( item => {
-          item.style.color = this.color.text;
-        })
-      }
-    },
+    // changeStyle: function() {
+    //   if (this.active) {
+    //     let dialog = document.querySelector('.v-dialog');
+    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
+    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
+    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
+    //     })
+    //     dialog.querySelectorAll('input').forEach( item => {
+    //       item.style.color = this.color.text;
+    //     })
+    //   }
+    // },
   },
 }
 </script>

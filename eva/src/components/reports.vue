@@ -1,7 +1,7 @@
 <template>
   <v-app 
     class="reports-app-main" 
-    :style="{background: color.back}"
+    :style="{background: theme.$secondary_bg}"
   >
     <header-top @setUsername="setUsername($event)" />
     <v-content>
@@ -12,18 +12,18 @@
         >
           <v-card 
             class="static-block" 
-            :style="{background: color.backElement, color: color.text}"
+            :style="{background: theme.$main_bg, color: theme.$main_text}"
           >
             <v-card-title class="static-title">
               <p>Статистика</p>
               <div 
                 class="static-divider"
-                :style="{background:color.controls}" 
+                :style="{background:theme.$main_text}" 
               />
             </v-card-title>
             <v-card-text 
               class="static-overflow-block" 
-              :style="{color:color.text}"
+              :style="{color:theme.$main_text}"
             >
               <div 
                 v-for="item in rows" 
@@ -36,11 +36,11 @@
           </v-card>
           <v-card 
             class="search-block" 
-            :style="{background: color.backElement, color: color.text}" 
+            :style="{background: theme.$main_bg, color: theme.$main_text}" 
           >
             <v-card-text 
               class="search-card-block" 
-              :style="{background: color.backElement, color: color.text}"
+              :style="{background: theme.$main_bg, color: theme.$main_text}"
             >
               <div 
                 class="loading-divider" 
@@ -48,7 +48,7 @@
               > 
                 <div 
                   class="loading-bar " 
-                  :style="{background: color.controls}" 
+                  :style="{background: theme.$primary_button}" 
                 />
               </div>
               <v-textarea 
@@ -60,7 +60,7 @@
                 no-resize 
                 hide-details  
                 :rows="rowsCount"
-                :style="{background: color.backElement, color: `${color.text} !important`}" 
+                :style="{background: theme.$main_bg, color: `${theme.$main_text} !important`}" 
                 placeholder="Введите запрос" 
               />
               <router-link 
@@ -69,11 +69,11 @@
               >
                 <v-tooltip 
                   bottom 
-                  :color="color.controlsActive" 
+                  :color="theme.$accent_ui_color" 
                 >
                   <template v-slot:activator="{ on }">
                     <v-btn
-                      :color="color.controls"
+                      :color="theme.$primary_button"
                       fab
                       dark 
                       small
@@ -91,11 +91,11 @@
               </router-link>
               <v-tooltip 
                 bottom 
-                :color="color.controlsActive" 
+                :color="theme.$accent_ui_color" 
               >
                 <template v-slot:activator="{ on }">
                   <v-btn
-                    :color="color.controls"
+                    :color="theme.$primary_button"
                     fab
                     dark 
                     small
@@ -113,11 +113,11 @@
               </v-tooltip>
               <v-tooltip 
                 bottom 
-                :color="color.controlsActive"  
+                :color="theme.$accent_ui_color"  
               >
                 <template v-slot:activator="{ on }">
                   <v-btn
-                    :color="color.controls"
+                    :color="theme.$primary_button"
                     fab
                     dark
                     small
@@ -137,15 +137,15 @@
           <v-card
             ref="vis" 
             class="static-vis" 
-            :style="{background: color.backElement, color: color.text}"
+            :style="{background: theme.$main_bg, color: theme.$main_text}"
           >
-            <v-card-text :style="{color: color.text}">
+            <v-card-text :style="{color: theme.$main_text}">
               <v-card-title class="title-vis">
                 <v-tooltip 
                   v-for="i in elements"
                   :key="aboutElem[i].key"
                   bottom 
-                  :color="color.controlsActive" 
+                  :color="theme.$accent_ui_color" 
                   @click="changeTab(i)" 
                 >
                   <template v-slot:activator="{ on }">
@@ -162,7 +162,7 @@
                 </v-tooltip>
                 <div 
                   class="divider-tab" 
-                  :style="{background: color.border}" 
+                  :style="{background: theme.$primary_button}" 
                 />
               </v-card-title>
               <v-card-text 
@@ -171,7 +171,7 @@
                 v-show="aboutElem[i].show"
                 :key="i" 
                 :idFrom="i" 
-                :colorFrom="color"  
+                :colorFrom="theme"  
                 :activeElemFrom="activeElem"
                 idDashFrom="reports" 
                 :widthFrom="size.width" 
@@ -186,7 +186,7 @@
               />
               <v-tooltip 
                 bottom 
-                :color="color.controlsActive"
+                :color="theme.$accent_ui_color"
               >
                 <template v-slot:activator="{ on }">
                   <v-icon 
@@ -205,12 +205,12 @@
           </v-card>
           <v-card 
             class="statistic-block" 
-            :style="{backgroundColor:color.controlsActive}" 
+            :style="{backgroundColor:theme.$secondary_bg, border: `1px solid ${theme.$main_border}`}" 
             :class="{showStatistic:showStatistic}"
           >
             <v-card-text>
               <v-data-table 
-                :style="{backgroundColor:color.controlsActive}"
+                :style="{backgroundColor:theme.$secondary_bg, color: theme.$main_text}"
                 disable-pagination
                 hide-default-footer
                 :headers="[{ text: 'value', value: 'value' },{ text: 'count', value: 'count' },{ text: '%', value: '%' }]"
@@ -219,11 +219,10 @@
             </v-card-text>
           </v-card>
         </div>
-      </v-container> 
+      </v-container>  
     </v-content>
     <footer-bottom />
     <modal-report 
-      :colorFrom="color" 
       :modalFrom="modal" 
       :searchFrom="search"
       @cancelModal="cancelModal" 
@@ -234,10 +233,8 @@
 
 
 <script>
-
 import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus } from '@mdi/js'
 import  settings  from '../js/componentsSettings.js';
-import themes from '../js/themeSettings.js';
 
 export default {
 
@@ -270,7 +267,6 @@ export default {
         color: '',
         united: false
       },
-      color: { },
       tooltipSvg: {
         'texts': [],
         'links': [],
@@ -297,6 +293,9 @@ export default {
     //   }
     //   return 'done'
     // },
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
     shouldGet: function() {  // понимаем нужно ли запрашивтаь данные с реста
       return this.$store.getters.getShouldGet({id: 'table', idDash: 'reports'})
     },
@@ -306,10 +305,10 @@ export default {
         this.$set(this.aboutElem,item,{});
         if (i == 0) {
           this.$set(this.aboutElem[item],'show',true);
-          this.$set(this.aboutElem[item],'color',this.color.controls);
+          this.$set(this.aboutElem[item],'color',this.theme.controls);
         } else {
           this.$set(this.aboutElem[item],'show',false);
-          this.$set(this.aboutElem[item],'color',this.color.text);
+          this.$set(this.aboutElem[item],'color',this.theme.text);
         }
         this.$set(this.aboutElem[item],'tooltip',settings.reports[item].tooltip);
         this.$set(this.aboutElem[item],'icon',settings.reports[item].icon);
@@ -318,16 +317,7 @@ export default {
       this.activeElem = 'table';
       return this.$store.getters.getReportElement
     }, 
-    theme: function() {
-      return this.$store.getters.getTheme
-    }
   },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-      
-    },
-  }, 
   methods: {
     getData: function() {
 
@@ -475,21 +465,21 @@ export default {
       Object.keys(this.aboutElem).forEach( item => {
         if (item != elem) {
           this.$set(this.aboutElem[item],'show',false);
-          this.$set(this.aboutElem[item],'color',this.color.text);
+          this.$set(this.aboutElem[item],'color',this.theme.text);
         } else {
           this.activeElem = item;
           this.$set(this.aboutElem[item],'show',true);
-          this.$set(this.aboutElem[item],'color',this.color.controls);
+          this.$set(this.aboutElem[item],'color',this.theme.controls);
         }
       })
     },
     changeUnited: function() {
       if (!this.unitedData.united) {
         this.unitedData.united = true;
-        this.unitedData.color = this.color.controlsActive;
+        this.unitedData.color = this.theme.controlsActive;
       } else {
         this.unitedData.united = false;
-        this.unitedData.color = this.color.controls;
+        this.unitedData.color = this.theme.controls;
       }
       this.$store.commit('setOptions',  { idDash: 'reports', id: 'multiLine', options: {united: this.unitedData.united} });
     },
@@ -566,8 +556,7 @@ export default {
     } else if (screen.width <= 1440) {
       this.rowsCount = 6;
     }
-    this.unitedData.color=  this.color.controls;
-    this.color = themes[this.theme];
+    this.unitedData.color=  this.theme.controls;
   } 
 }
 

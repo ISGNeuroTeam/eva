@@ -3,28 +3,28 @@
     <v-content>
       <v-container  
         class="main-container container-app" 
-        :style="{backgroundColor:color.back}"
+        :style="{backgroundColor:theme.$secondary_bg}"
       >  
         <div class="aut-container">
           <v-card 
             ref="authForm"
             class="card-aut"   
-            :style="{backgroundColor:color.backElement}"
+            :style="{backgroundColor:theme.$main_bg}"
           >
             <v-card-title 
               class="title-aut" 
-              :style="{color:color.text}"
+              :style="{color:theme.$main_text}"
             >
               Авторизация
             </v-card-title>
             <v-card-text 
               class="text-aut" 
-              :style="{color:color.text}"
+              :style="{color:theme.$main_text}"
             >
               <v-text-field 
                 v-model="user.username"
                 label="Логин" 
-                :color="color.controls" 
+                :color="theme.$accent_ui_color"
                 class="field-aut"
                 outlined  
                 hide-details 
@@ -33,7 +33,7 @@
               <v-text-field 
                 v-model="user.password"
                 label="Пароль" 
-                :color="color.controls"  
+                :color="theme.$accent_ui_color"
                 class="field-aut"
                 type="password" 
                 outlined  
@@ -42,7 +42,7 @@
               />
               <div 
                 class="error-msg" 
-                :style="{color:color.controlsActive}" 
+                :style="{color:theme.$error_color}"
                 :class="{errormsgshow:msg}"
               >
                 {{ msgText }}
@@ -51,7 +51,7 @@
             <v-card-actions>
               <v-btn 
                 class="btn-aut" 
-                :color="color.controlsSystem" 
+                :color="theme.$primary_button"
                 @click="sendAut"
               >  
                 Подтвердить 
@@ -72,8 +72,6 @@
 
 <script>
 
-import themes from '../../js/themeSettings.js';
-
 export default {
  
   data () {
@@ -82,19 +80,12 @@ export default {
       msg: false,
       msgText: '',
       msgg: '',
-      color: { },
     } 
   },
   computed: { 
     theme: function() {
       return this.$store.getters.getTheme
     }
-  },  
-  watch: {
-    theme: function (theme) {
-      this.color = themes[theme];
-      
-    },
   },
   methods: {
     sendAut: async function() { 
@@ -111,8 +102,8 @@ export default {
           .catch (error => {
             console.log(error);
             return {status: 300, result: 'Post не создался, возможно из-за неточностей в запросе'}
-          }) 
-          
+          })
+
         if (response.status == 200) {  // если получилось
           await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
             this.$store.auth.getters.putLog(`status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`);
@@ -151,7 +142,6 @@ export default {
         this.sendAut();
       }
     });
-    this.color = themes[this.theme];
   } 
 }
 

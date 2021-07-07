@@ -6,7 +6,7 @@
     width="500" 
     persistent 
   >
-    <v-card :style="{background: color.backElement, boxShadow: `0 3px 1px -2px ${color.border},0 2px 2px 0 ${color.border},0 1px 5px 0 ${color.border}`, color: color.text}">
+    <v-card :style="{background: theme.$main_bg, boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`, color: theme.$main_text}">
       <div class="searches-block">
         <div 
           v-for="sear in searches" 
@@ -16,13 +16,13 @@
         >
           <div 
             class="search-id" 
-            :style="{color:'white', background: color.controls, border: `2px solid ${color.controls}`}"
+            :style="{color:'#FFFFFF', background: theme.$accent_ui_color, border: `2px solid ${theme.$accent_ui_color}`}"
           >
             {{ checkSid(sear.sid) }}
           </div>
           <div 
             class="search-query" 
-            :style="{color: color.text, background: color.backElement, border: `1px solid ${color.text}`}"
+            :style="{color: theme.$main_text, background: theme.$secondary_bg, border: `1px solid ${theme.$main_border}`}"
           >
             {{ sear.original_otl }}
           </div>
@@ -32,7 +32,7 @@
         <v-spacer />
         <v-btn 
           small 
-          :color="color.controlsSystem" 
+          :color="theme.$primary_button" 
           class="delete-btn" 
           @click="startDS"
         >
@@ -40,7 +40,7 @@
         </v-btn>
         <v-btn 
           small 
-          :color="color.controlsActive" 
+          :color="theme.$primary_button" 
           class="delete-btn" 
           @click="cancelModal"
         >
@@ -57,15 +57,13 @@
 export default {
   props: {
     idDashFrom: null,
-    colorFrom: null
   },
   data () {
     return {
       currentId: 0,
     }
   },
-  computed: { 
-    
+  computed: {
     idDash: function() {  // получаем название элемнета от родителя
       return this.idDashFrom
     },
@@ -83,10 +81,9 @@ export default {
       }
       return searches
     },
-    color: function() {
-      return this.colorFrom
-    },
-
+    theme: function() {
+      return this.$store.getters.getTheme
+    }
   },
   methods: {
     startDS: function() {  //  если нажали на кнопку согласия
@@ -104,7 +101,7 @@ export default {
         item.style = 'box-shadow: none';  // и отключаем  обводку
       });
       this.currentId = search.sid; // затем получаем текст всего ИС который выбрали
-      elem.style = `box-shadow: 0px 0px 4px 3px  ${this.color.controlsActive}`;  // и делаем ему обводку
+      elem.style = `box-shadow: 0px 0px 4px 3px  ${this.theme.$accent_ui_color}`;  // и делаем ему обводку
     },
     checkSid: function(sid) {
       let newSid = sid;

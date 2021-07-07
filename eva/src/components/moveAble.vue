@@ -10,13 +10,12 @@
     :resizable="dragRes" 
     :data-grid="true"
     :grid="props.grid"
-    :style="{zIndex:props.zIndex, outlineColor: color.controlsActive, background: color.controlsActive, opacity:opacity }" 
+    :style="{zIndex:props.zIndex, outlineColor: theme.$accent_ui_color, background: theme.$accent_ui_color, opacity:opacity }" 
     @resizestop="sendSize"
     @dragstop="sendMove" 
   >
     <dash-board 
       :dataModeFrom="dataMode" 
-      :colorFrom="color" 
       :width="width"  
       :height="height"  
       :idDashFrom="idDash" 
@@ -58,6 +57,9 @@ export default {
     }
   },
   computed: {
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
     id: function() {  // название элемента, полученное от родителя
       return this.dataElem
     },
@@ -66,9 +68,6 @@ export default {
     },
     dataMode: function() {
       return this.dataModeFrom
-    },
-    color: function() {
-      return this.colorFrom
     },
     dragRes: function() {
       let dragRes = this.$store.getters.getDragResize(this.idDash);
