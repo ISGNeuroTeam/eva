@@ -106,7 +106,7 @@ export default {
         idDash: this.idDashFrom,
         id: this.idElement,
       });
-      
+
       return newOptions;
     },
   },
@@ -139,8 +139,11 @@ export default {
     this.initClusterDelimiter();
     const unsubscribe = store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
-        this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
-        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep
+        this.map.setView(
+          this.startingPoint,
+          mutation.payload.options.zoomLevel
+        );
+        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep;
         console.log(mutation.type);
         console.log(mutation.payload);
       }
@@ -177,7 +180,7 @@ export default {
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(dataRest);
-        this.map.setView(this.startingPoint, this.options.zoomLevel)
+        this.map.setView(this.startingPoint, this.options.zoomLevel);
         // this.clustering(dataRest);
       }
     },
@@ -360,12 +363,14 @@ export default {
     },
 
     initMap() {
+
       this.map = L.map(this.$refs.map, {
         wheelPxPerZoomLevel: this.options.zoomStep || 10,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
       });
+
     },
 
     drawObjects(dataRest) {
@@ -376,17 +381,12 @@ export default {
           continue;
         }
         if (dataRest[i].ID === "1") {
-          console.log("how many")
           const _point =  dataRest[i].coordinates.split(":");
           const _coord = _point[1].split(",");
           this.startingPoint = [_coord[0], _coord[1]];
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addMarker(
-            dataRest[i],
-            dataRest[i].ID === "1",
-            lib
-          );
+          this.addMarker(dataRest[i], dataRest[i].ID === "1", lib);
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
           this.addLine(dataRest[i], lib);
