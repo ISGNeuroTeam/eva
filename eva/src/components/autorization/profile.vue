@@ -84,7 +84,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
-                            v-if="i == 1 ? true : showPencilRoot" 
+                            v-if="i === 1 ? true : showPencilRoot"
                             v-model="item.actions"
                             class="editUser icon-aut" 
                             :color="theme.$primary_button"

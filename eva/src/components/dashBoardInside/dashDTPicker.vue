@@ -6,7 +6,7 @@
     >
       <div 
         class="DTPicker-btn" 
-        :style="{background:theme.$primary_button}"
+        :style="{background:theme.$accent_ui_color}"
         @click="openHidden"
       >
         <p>Выберите время и дату</p>
