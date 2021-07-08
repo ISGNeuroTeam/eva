@@ -72,7 +72,7 @@
         align="end"
         align-content="end"
         v-show="options.showLegend"
-        class="mb-5"
+        class="mb-5 mr-0"
       >
         <v-spacer></v-spacer>
         <v-card
@@ -255,7 +255,7 @@ export default {
 .med {
   height: 100%;
   position: absolute;
-  left: 0px;
+  /* left: 0px; */
   right: 0px;
   z-index: 1000000;
 }

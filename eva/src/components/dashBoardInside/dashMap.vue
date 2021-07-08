@@ -3,7 +3,7 @@
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
-    <div v-if="!error" class="wrapper-property">
+    <!-- <div v-if="!error" class="wrapper-property">
       <v-select
         v-model="maptheme"
         class="select-property"
@@ -35,7 +35,7 @@
         label="Порядок элементов"
         @blur="blurClusterPosition"
       />
-    </div>
+    </div> -->
     <div
       ref="map"
       v-if="!error"
@@ -100,25 +100,8 @@ export default {
         return 60;
       }
     },
-    testOptions() {
-      console.log("here");
-      let newOptions = this.$store.getters.getOptions({
-        idDash: this.idDashFrom,
-        id: this.idElement,
-      });
-
-      return newOptions;
-    },
   },
   watch: {
-    options: {
-      deep: true,
-      handler(newVal) {
-        console.log("here");
-        console.log(newVal);
-      },
-    },
-
     dataRestFrom(_dataRest) {
       //при обновлении данных перерисовать
       this.reDrawMap(_dataRest);
@@ -139,13 +122,8 @@ export default {
     this.initClusterDelimiter();
     const unsubscribe = store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
-        this.map.setView(
-          this.startingPoint,
-          mutation.payload.options.zoomLevel
-        );
-        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep;
-        console.log(mutation.type);
-        console.log(mutation.payload);
+        this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
+        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep
       }
     });
   },
