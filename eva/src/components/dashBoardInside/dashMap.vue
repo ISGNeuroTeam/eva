@@ -3,7 +3,7 @@
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
-    <div v-if="!error" class="wrapper-property">
+    <!-- <div v-if="!error" class="wrapper-property">
       <v-select
         v-model="maptheme"
         class="select-property"
@@ -35,7 +35,7 @@
         label="Порядок элементов"
         @blur="blurClusterPosition"
       />
-    </div>
+    </div> -->
     <div
       ref="map"
       v-if="!error"
@@ -100,25 +100,8 @@ export default {
         return 60;
       }
     },
-    testOptions() {
-      console.log("here");
-      let newOptions = this.$store.getters.getOptions({
-        idDash: this.idDashFrom,
-        id: this.idElement,
-      });
-      
-      return newOptions;
-    },
   },
   watch: {
-    options: {
-      deep: true,
-      handler(newVal) {
-        console.log("here");
-        console.log(newVal);
-      },
-    },
-
     dataRestFrom(_dataRest) {
       //при обновлении данных перерисовать
       this.reDrawMap(_dataRest);
@@ -141,8 +124,6 @@ export default {
       if (mutation.type == "updateOptions") {
         this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
         this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep
-        console.log(mutation.type);
-        console.log(mutation.payload);
       }
     });
   },
@@ -177,7 +158,7 @@ export default {
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(dataRest);
-        this.map.setView(this.startingPoint, this.options.zoomLevel)
+        this.map.setView(this.startingPoint, this.options.zoomLevel);
         // this.clustering(dataRest);
       }
     },
@@ -360,12 +341,14 @@ export default {
     },
 
     initMap() {
+
       this.map = L.map(this.$refs.map, {
         wheelPxPerZoomLevel: this.options.zoomStep || 10,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
       });
+
     },
 
     drawObjects(dataRest) {
@@ -376,17 +359,12 @@ export default {
           continue;
         }
         if (dataRest[i].ID === "1") {
-          console.log("how many")
           const _point =  dataRest[i].coordinates.split(":");
           const _coord = _point[1].split(",");
           this.startingPoint = [_coord[0], _coord[1]];
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addMarker(
-            dataRest[i],
-            dataRest[i].ID === "1",
-            lib
-          );
+          this.addMarker(dataRest[i], dataRest[i].ID === "1", lib);
         }
         if (dataRest[i].geometry_type?.toLowerCase() === "line") {
           this.addLine(dataRest[i], lib);
