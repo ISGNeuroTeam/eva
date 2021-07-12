@@ -7,16 +7,16 @@
         <v-dialog v-model="dialog" max-width="290">
           <template v-slot:activator="{ on, attrs }">
             <v-btn rounded color="#191919" v-bind="attrs" v-on="on">
-              <v-icon :style="{ color: theme.$title }">{{
-                mdiSettings
-              }}</v-icon>
+              <v-icon :style="{ color: theme.$title }">
+                {{ mdiSettings }}
+              </v-icon>
             </v-btn>
           </template>
-          <v-card >
+          <v-card>
             <v-card-title class="text-h5"> Настройки </v-card-title>
             <v-card-text>
               <p>Подложка</p>
-              <v-select :items="tileLayers" />
+              <v-select :items="tileLayers" item-text="name" item-value="tile"/>
 
               <p>Начальный зум</p>
               <v-slider
@@ -92,7 +92,8 @@
                 line-height: 22px;
                 letter-spacing: 0em;
                 text-align: left;
-              ">
+              "
+            >
               Легенда
             </span>
           </v-subheader>
@@ -123,10 +124,15 @@
 
 <script>
 import { mdiFormatListBulletedSquare, mdiSettings } from "@mdi/js";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet.tilelayer.colorfilter";
+import "leaflet.markercluster";
 export default {
   props: {
     idElement: String,
     idDashFrom: String,
+    map: Object,
   },
   data() {
     return {
@@ -134,7 +140,28 @@ export default {
       mdiList: mdiFormatListBulletedSquare,
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
-      tileLayers: ["test", "test1"],
+      tileLayers: [
+        {
+          name: "Яндекс карта",
+          tile: {},
+        },
+        {
+          name: "Google спутник",
+          tile: L.tileLayer(
+            "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+            {
+              subdomains: ["mt0", "mt1", "mt2", "mt3"],
+            }
+          ),
+        },
+        {
+          name: "Google карты",
+          tile: L.tileLayer(
+            "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+            { subdomains: ["mt0", "mt1", "mt2", "mt3"] }
+          ),
+        },
+      ],
       options: {
         selected: "яндекс",
         selectedLayer: "test",
@@ -171,7 +198,7 @@ export default {
       idDash: this.idDashFrom,
       id: this.idElement,
     });
-    
+
     // init store for reactivity
     if (!options.showLegend) {
       let initOptions = {
@@ -185,10 +212,10 @@ export default {
         id: this.idElement,
         options: initOptions,
       });
-    } 
-    else {
-      this.options = options
+    } else {
+      this.options = options;
     }
+    this.setTileLayer();
   },
   methods: {
     updateOptions(newOptions) {
@@ -198,6 +225,65 @@ export default {
         options: { ...this.dashSettings, ...newOptions },
       });
     },
+
+    setTileLayer() {
+      // this.map.removeLayer(grayscale);
+      // this.map.addLayer(streets);
+      // let test = L.tileLayer(
+      //   "http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU",
+      //   {
+      //     subdomains: ["01", "02", "03", "04"],
+      //     attribution: '<a http="yandex.ru" target="_blank">Яндекс</a>',
+      //     reuseTiles: true,
+      //     updateWhenIdle: false,
+      //   }
+      // ).addTo(this.map);
+      // this.map.addLayer(test)
+      // let baselayers = {
+      //   "Tile Layer 1": L.tileLayer(
+      //     "http://tile2.maps.2gis.com/tiles?x={x}&y={y}&z={z}"
+      //   ),
+      //   "Tile Layer 2": L.tileLayer(
+      //     "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
+      //     {
+      //       subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      //     }
+      //   ),
+      //   "Tile Layer 3": L.tileLayer(
+      //     "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
+      //     {
+      //       subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      //     }
+      //   ),
+      // };
+      // let overlays = {};
+      // baselayers["Tile Layer 1"].addTo(this.map);
+      // baselayers["Tile Layer 2"].addTo(this.map);
+      // L.control.layers(baselayers, overlays).addTo(this.map);
+      // L.tileLayer("http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}", {
+      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      // });
+      // L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      // }).addTo(this.map);
+      // let terrain = L.tileLayer(
+      //   "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+      //   {
+      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      //   }
+      // ).addTo(this.map);
+      // let terrain1 = L.tileLayer(
+      //   "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
+      //   {
+      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      //   }
+      // ).addTo(this.map);
+      // L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      // }).addTo(this.map);
+      // this.map.addLayer(terrain);
+    },
+
     setOptions: function () {
       // отправляем настройки в хранилище
       if (!this.options.level) {

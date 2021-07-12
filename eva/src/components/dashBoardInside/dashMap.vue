@@ -3,43 +3,10 @@
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
-    <!-- <div v-if="!error" class="wrapper-property">
-      <v-select
-        v-model="maptheme"
-        class="select-property"
-        :items="['default', 'black']"
-        label="Тема"
-        @change="changeMapTheme"
-      />
-      <v-select
-        v-model="clusterTextCount"
-        class="select-property"
-        :items="[3, 4, 5, 6]"
-        label="Количество элементов в строке подписей"
-        @change="changeClusterTextCount"
-      />
-      <v-text-field
-        v-model="clusterDelimiter"
-        label="Разделитель"
-        @blur="blurClusterDelimiter"
-        @keyup.enter="blurClusterDelimiter"
-      />
-      <v-select
-        v-model="clusterPosition"
-        class="select-property"
-        :items="clusterPositionItems"
-        item-text="name"
-        item-value="id"
-        chips
-        multiple
-        label="Порядок элементов"
-        @blur="blurClusterPosition"
-      />
-    </div> -->
     <div
-      ref="map"
       v-if="!error"
       id="mapContainer"
+      ref="map"
       :style="{
         width: `${Math.trunc(widthFrom)}px`,
         height: `${Math.trunc(heightFrom) - top / 2 - 45}px`,
@@ -57,7 +24,7 @@ import "leaflet.markercluster";
 import vuetify from "../../plugins/vuetify";
 import dashMapUserSettings from "./dashMapUserSettings.vue";
 import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
-
+import Vue from "vue";
 export default {
   props: {
     // переменные полученные от родителя
@@ -69,9 +36,6 @@ export default {
     widthFrom: null, // ширина родительского компонента
     heightFrom: null, // выоста родительского компонента
     options: Object,
-  },
-  components: {
-    dashMapUserSettings,
   },
   data() {
     return {
@@ -122,28 +86,16 @@ export default {
     this.initClusterDelimiter();
     const unsubscribe = store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
-        this.map.setView(this.startingPoint, mutation.payload.options.zoomLevel);
-        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep
+        this.map.setView(
+          this.startingPoint,
+          mutation.payload.options.zoomLevel
+        );
+        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep;
       }
     });
   },
   methods: {
-    initSettings() {
-      if (this.isSettings) return;
-      var ComponentClass = Vue.extend(dashMapUserSettings);
-      let test = new ComponentClass({
-        propsData: { idDashFrom: this.idDashFrom, idElement: this.idFrom },
-        vuetify,
-        store,
-      });
-      test.$mount();
-      let element = document.getElementsByClassName(
-        "leaflet-control-container"
-      );
-      let container = element[0];
-      container.appendChild(test.$el);
-      this.isSettings = true;
-    },
+    
     reDrawMap(dataRest) {
       this.clearMap();
       this.error = null;
@@ -162,6 +114,24 @@ export default {
         // this.clustering(dataRest);
       }
     },
+
+    initSettings() {
+      if (this.isSettings) return;
+      let ComponentClass = Vue.extend(dashMapUserSettings);
+      let test = new ComponentClass({
+        propsData: { idDashFrom: this.idDashFrom, idElement: this.idFrom, map: this.map },
+        vuetify,
+        store,
+      });
+      test.$mount();
+      let element = document.getElementsByClassName(
+        "leaflet-control-container"
+      );
+      let container = element[0];
+      container.appendChild(test.$el);
+      this.isSettings = true;
+    },
+
     initTheme() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDashFrom,
@@ -359,7 +329,7 @@ export default {
           continue;
         }
         if (dataRest[i].ID === "1") {
-          const _point =  dataRest[i].coordinates.split(":");
+          const _point = dataRest[i].coordinates.split(":");
           const _coord = _point[1].split(",");
           this.startingPoint = [_coord[0], _coord[1]];
         }
@@ -590,6 +560,34 @@ export default {
         this.tileLayer = L.tileLayer.colorFilter(this.osmserver);
       }
       this.tileLayer.addTo(this.map);
+      let test = L.tileLayer(
+        "http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU",
+        {
+          subdomains: ["01", "02", "03", "04"],
+          attribution: '<a http="yandex.ru" target="_blank">Яндекс</a>',
+          reuseTiles: true,
+          updateWhenIdle: false,
+        }
+      ).addTo(this.map);
+
+      
+      let terrain = L.tileLayer(
+        "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+        {
+          subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        }
+      ).addTo(this.map);
+
+      // let terrain1 = L.tileLayer(
+      //   "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
+      //   {
+      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      //   }
+      // ).addTo(this.map);
+
+      // L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
+      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      // }).addTo(this.map);
     },
   },
 };
