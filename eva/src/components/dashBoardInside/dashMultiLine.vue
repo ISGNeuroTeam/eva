@@ -1090,7 +1090,11 @@ export default {
                 let xVal = d[xMetric];
                 if (time) {
                   xVal = new Date( d[xMetric]*secondTransf );
-                  xVal = `${xVal.getDate()}-${xVal.getMonth()+1}-${xVal.getFullYear()}`;
+                  let currentHours = ('0' + xVal.getHours()).substr(-2);
+                  let currentMinutes = ('0' + xVal.getMinutes()).substr(-2);
+                  let currentSeconds = ('0' + xVal.getSeconds()).substr(-2);
+                  xVal = `${xVal.getDate()}-${xVal.getMonth()+1}-${xVal.getFullYear()} 
+                  ${currentHours}:${currentMinutes}:${currentSeconds}`;
                 }
                 let text =  '';
                 that.metrics.forEach( key => {
