@@ -30,11 +30,8 @@
   </v-navigation-drawer>
 </template>
 
-
 <script>
-
 // import {  mdiChevronDown, mdiChevronUp } from '@mdi/js'
-
 export default {
   props: {
     paleteFrom: Boolean,

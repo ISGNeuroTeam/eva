@@ -124,8 +124,10 @@
       :modal-active="modalActive"
       @cancelModal="modalActive=false" 
     />
-    <theme-settings 
-      :palete-from="paleteShow"
+    <modal-themes
+      :show="paleteShow"
+      :admin="isAdmin"
+      @closeModal="paleteShow = false"
     />
   </div>    
 </template>
@@ -159,7 +161,7 @@ export default {
       userPermissions: null
     } 
   },
-  computed: { 
+  computed: {
     colorError: function() {
       if (this.$store.getters.getColorError) {
         return this.color.controlsActive

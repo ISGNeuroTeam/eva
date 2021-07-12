@@ -95,11 +95,7 @@
     </div>
   </v-navigation-drawer>
 </template>
-
-
 <script>
-
-
 export default {
   props: {
     gearFrom: Boolean,

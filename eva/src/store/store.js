@@ -1244,6 +1244,12 @@ export default {  // приблизительный объект хранили�
 
       }
     },
+    getThemeTitle(state){
+      if (!state.theme) {
+        Vue.set(state, 'theme', 'dark');
+      }
+      return state.theme;
+    },
     getTheme(state) {
       if (!state.theme) {
         Vue.set(state, 'theme', 'dark');
