@@ -111,29 +111,30 @@
           <v-card width="240" outlined color="white">
             <v-list style="max-height: 382px" class="overflow-y-auto">
               <v-list-item
-                three-line
                 v-for="item in library.objects"
                 :key="item.name"
               >
                 <template v-if="item.image">
-                  <v-list-item-avatar>
+                  <v-list-item-avatar size="20px" style="align-self:center;">
                     <v-img :src="base_svg_url + item.image"></v-img>
                   </v-list-item-avatar>
 
-                  <v-list-item-content>
-                    <v-list-item-title v-text="item.name"></v-list-item-title>
-                  </v-list-item-content>
+                  <v-list-item-title style="text-align: left" v-text="item.name"></v-list-item-title>
                 </template>
 
                 <template v-else-if="item.background_color">
-                  <v-list-item-avatar v-html="createHtmlIcon(item)" />
-                  <v-list-item-content>
-                    <v-list-item-title v-text="item.name" />
-                  </v-list-item-content>
+                  <v-list-item-avatar
+                    size="20px"
+                    
+                    v-html="createHtmlIcon(item)"
+                    style="align-self:center; border-radius: 0%"
+                  />
+
+                  <v-list-item-title style="text-align: left" v-text="item.name" />
                 </template>
 
                 <template v-else>
-                  <v-list-item-avatar>
+                  <v-list-item-avatar size="20px" style="align-self:center">
                     <div>
                       <svg height="210" width="200">
                         <line
@@ -148,7 +149,7 @@
                     </div>
                   </v-list-item-avatar>
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.name" />
+                    <v-list-item-title style="text-align: left" v-text="item.name" />
                   </v-list-item-content>
                 </template>
               </v-list-item>
@@ -297,23 +298,8 @@ export default {
             font-size: 14px;
             font-weight: 600;
         ">
-          <span style="color:${textColor}">test<span>
+          <span style="color:${textColor}">кп<span>
         </div>`;
-
-      return icon;
-      const _point = element.coordinates.split(":");
-      const _coord = _point[1].split(",");
-      L.marker([_coord[0], _coord[1]], {
-        icon: icon,
-        zIndexOffset: -1000,
-        riseOnHover: true,
-      })
-        .addTo(this.map)
-        .bindTooltip(element.label, {
-          permanent: false,
-          direction: "top",
-          className: "leaftet-hover",
-        });
     },
     updateTileLayer(e) {
       this.map.removeLayer(this.currentTile);
