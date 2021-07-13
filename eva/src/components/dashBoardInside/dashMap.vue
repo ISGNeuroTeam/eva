@@ -334,6 +334,13 @@ export default {
         zoom: 10,
         maxZoom: 25,
       });
+      this.map.on("zoomend", () => {
+        let layers = document.getElementsByClassName("leaflet-marker-icon");
+        for (let x of layers) {
+          x.style.width = (x.naturalWidth / 10) * this.map.getZoom() + "px";
+          x.style.height = (x.naturalHeight / 10) * this.map.getZoom() + "px";
+        }
+      });
     },
 
     drawObjects(dataRest) {
@@ -382,7 +389,7 @@ export default {
       const _point = element.coordinates.split(":");
       const _coord = _point[1].split(",");
       this.startingPoint = [_coord[0], _coord[1]];
-      L.marker([_coord[0], _coord[1]], {
+      let marker = L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
         riseOnHover: true,
@@ -393,6 +400,7 @@ export default {
           direction: "top",
           className: "leaftet-hover",
         });
+      L.DomUtil.addClass(marker._icon, "className");
     },
 
     drawMarkerHTML({ lib, element, isCenter }) {
