@@ -52,14 +52,17 @@
                 min="1"
               >
                 <template v-slot:label>
-                  <v-text-field
-                    v-model="options.zoomStep"
-                    class="mt-0 pt-0"
-                    hide-details
-                    single-line
-                    type="number"
-                    style="width: 60px"
-                  />
+                  <span>
+                    1/
+                    <v-text-field
+                      v-model="options.zoomStep"
+                      class="mt-0 pt-0"
+                      hide-details
+                      single-line
+                      type="number"
+                      style="width: 60px"
+                    />
+                  </span>
                 </template>
               </v-slider>
 
