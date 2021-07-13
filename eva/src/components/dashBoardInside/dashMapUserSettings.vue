@@ -114,15 +114,43 @@
                 three-line
                 v-for="item in library.objects"
                 :key="item.name"
-                v-if="item.image"
               >
-                <v-list-item-avatar>
-                  <v-img :src="base_svg_url + item.image"></v-img>
-                </v-list-item-avatar>
+                <template v-if="item.image">
+                  <v-list-item-avatar>
+                    <v-img :src="base_svg_url + item.image"></v-img>
+                  </v-list-item-avatar>
 
-                <v-list-item-content>
-                  <v-list-item-title v-text="item.name"></v-list-item-title>
-                </v-list-item-content>
+                  <v-list-item-content>
+                    <v-list-item-title v-text="item.name"></v-list-item-title>
+                  </v-list-item-content>
+                </template>
+
+                <template v-else-if="item.background_color">
+                  <v-list-item-avatar v-html="createHtmlIcon(item)" />
+                  <v-list-item-content>
+                    <v-list-item-title v-text="item.name" />
+                  </v-list-item-content>
+                </template>
+
+                <template v-else>
+                  <v-list-item-avatar>
+                    <div>
+                      <svg height="210" width="200">
+                        <line
+                          x1="0"
+                          y1="0"
+                          x2="200"
+                          y2="200"
+                          :stroke="item.color"
+                          :stroke-width="item.width"
+                        />
+                      </svg>
+                    </div>
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title v-text="item.name" />
+                  </v-list-item-content>
+                </template>
               </v-list-item>
             </v-list>
           </v-card>
@@ -143,6 +171,7 @@ export default {
     idElement: String,
     idDashFrom: String,
     map: Object,
+    // library: Object
   },
   data() {
     return {
@@ -245,6 +274,47 @@ export default {
     this.setTileLayer();
   },
   methods: {
+    createHtmlIcon(lib) {
+      let {
+        text_color: textColor = "#FFFFFF",
+        background_color: color = "65, 62, 218",
+        opacity = 0.6,
+        label_field: text = "КП-240",
+        border_radius: borderRadius = "2px",
+        border = "none",
+        width = 20,
+        height = 20,
+      } = lib;
+      return `<div class="leaflet-div-icon" 
+          style="
+            background-color: ${color};
+            opacity: ${opacity};
+            mix-blend-mode: normal;
+            border: ${border};
+            border-radius: ${borderRadius}px;
+            padding: 2px 6px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+        ">
+          <span style="color:${textColor}">test<span>
+        </div>`;
+
+      return icon;
+      const _point = element.coordinates.split(":");
+      const _coord = _point[1].split(",");
+      L.marker([_coord[0], _coord[1]], {
+        icon: icon,
+        zIndexOffset: -1000,
+        riseOnHover: true,
+      })
+        .addTo(this.map)
+        .bindTooltip(element.label, {
+          permanent: false,
+          direction: "top",
+          className: "leaftet-hover",
+        });
+    },
     updateTileLayer(e) {
       this.map.removeLayer(this.currentTile);
       if (typeof e.tile === "string") {
