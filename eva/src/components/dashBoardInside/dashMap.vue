@@ -95,7 +95,6 @@ export default {
     });
   },
   methods: {
-    
     reDrawMap(dataRest) {
       this.clearMap();
       this.error = null;
@@ -119,7 +118,11 @@ export default {
       if (this.isSettings) return;
       let ComponentClass = Vue.extend(dashMapUserSettings);
       let test = new ComponentClass({
-        propsData: { idDashFrom: this.idDashFrom, idElement: this.idFrom, map: this.map },
+        propsData: {
+          idDashFrom: this.idDashFrom,
+          idElement: this.idFrom,
+          map: this.map,
+        },
         vuetify,
         store,
       });
@@ -223,7 +226,9 @@ export default {
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      if (options.osmserver) {
+      if (options.selectedLayer) {
+        this.osmserver = options.selectedLayer;
+      } else if (options.osmserver) {
         this.osmserver = options.osmserver;
       } else {
         this.error = "Введите osm server";
@@ -311,14 +316,12 @@ export default {
     },
 
     initMap() {
-
       this.map = L.map(this.$refs.map, {
         wheelPxPerZoomLevel: this.options.zoomStep || 10,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
       });
-
     },
 
     drawObjects(dataRest) {
@@ -552,42 +555,31 @@ export default {
       this.map.addLayer(cluster);
     },
     createMap() {
-      if (this.maptheme === "black") {
-        this.tileLayer = L.tileLayer.colorFilter(this.osmserver, {
-          filter: ["grayscale:100%", "invert:100%"],
-        });
+      let tileLayer;
+      if (!this.osmserver) return;
+      if (typeof this.osmserver === "string") {
+        if (this.maptheme === "black") {
+          tileLayer = L.tileLayer.colorFilter(this.osmserver, {
+            filter: ["grayscale:100%", "invert:100%"],
+          });
+        } else {
+          tileLayer = L.tileLayer.colorFilter(this.osmserver);
+        }
       } else {
-        this.tileLayer = L.tileLayer.colorFilter(this.osmserver);
+        if (!this.osmserver.tile) return;
+        
+        let temp = this.osmserver.tile;
+        if (typeof this.osmserver.tile === "string") {
+          temp = [this.osmserver.tile]
+        }
+        if (this.maptheme === "black") {
+          temp[1].filter = ["grayscale:100%", "invert:100%"];
+          tileLayer = L.tileLayer.colorFilter(...temp);
+        } else {
+          tileLayer = L.tileLayer(...temp);
+        }
       }
-      this.tileLayer.addTo(this.map);
-      let test = L.tileLayer(
-        "http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU",
-        {
-          subdomains: ["01", "02", "03", "04"],
-          attribution: '<a http="yandex.ru" target="_blank">Яндекс</a>',
-          reuseTiles: true,
-          updateWhenIdle: false,
-        }
-      ).addTo(this.map);
-
-      
-      let terrain = L.tileLayer(
-        "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-        {
-          subdomains: ["mt0", "mt1", "mt2", "mt3"],
-        }
-      ).addTo(this.map);
-
-      // let terrain1 = L.tileLayer(
-      //   "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
-      //   {
-      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      //   }
-      // ).addTo(this.map);
-
-      // L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
-      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      // }).addTo(this.map);
+      tileLayer.addTo(this.map);
     },
   },
 };

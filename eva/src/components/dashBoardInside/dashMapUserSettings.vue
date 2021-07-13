@@ -16,7 +16,14 @@
             <v-card-title class="text-h5"> Настройки </v-card-title>
             <v-card-text>
               <p>Подложка</p>
-              <v-select :items="tileLayers" item-text="name" item-value="tile"/>
+              <v-select
+                v-model="options.selectedLayer"
+                return-object
+                :items="tileLayers"
+                item-text="name"
+                item-value="tile[0]"
+                @change="updateTileLayer($event)"
+              />
 
               <p>Начальный зум</p>
               <v-slider
@@ -140,31 +147,48 @@ export default {
       mdiList: mdiFormatListBulletedSquare,
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
+      currentTile: {},
       tileLayers: [
         {
-          name: "Яндекс карта",
-          tile: {},
+          name: "Заданная в настройках",
+          tile: [],
         },
+        // {
+        //   name: "Яндекс карта",
+        //   tile: [
+        //     "http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU",
+        //     {
+        //       subdomains: ["01", "02", "03", "04"],
+        //       attribution: '<a http="yandex.ru" target="_blank">Яндекс</a>',
+        //       reuseTiles: true,
+        //       updateWhenIdle: false,
+        //     },
+        //   ],
+        // },
         {
           name: "Google спутник",
-          tile: L.tileLayer(
-            "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+          tile: [
+            "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
             {
               subdomains: ["mt0", "mt1", "mt2", "mt3"],
-            }
-          ),
+              attribution: '<a http="google.ru" target="_blank">Google</a>',
+            },
+          ],
         },
         {
           name: "Google карты",
-          tile: L.tileLayer(
+          tile: [
             "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-            { subdomains: ["mt0", "mt1", "mt2", "mt3"] }
-          ),
+            {
+              subdomains: ["mt0", "mt1", "mt2", "mt3"],
+              attribution: '<a http="google.ru" target="_blank">Google</a>',
+            },
+          ],
         },
       ],
       options: {
         selected: "яндекс",
-        selectedLayer: "test",
+        selectedLayer: "",
         zoomLevel: 10,
         zoomStep: 25,
         showLegend: true,
@@ -198,7 +222,7 @@ export default {
       idDash: this.idDashFrom,
       id: this.idElement,
     });
-
+    this.tileLayers[0].tile = options.osmserver;
     // init store for reactivity
     if (!options.showLegend) {
       let initOptions = {
@@ -218,6 +242,21 @@ export default {
     this.setTileLayer();
   },
   methods: {
+    updateTileLayer(e) {
+      this.map.removeLayer(this.currentTile);
+      if (typeof e.tile === "string") {
+        let temp = e.tile;
+        temp = [temp];
+        this.currentTile = L.tileLayer(...temp);
+        this.map.addLayer(this.currentTile);
+        this.updateOptions({ selectedLayer: temp[0] });
+        return;
+      }
+      this.currentTile = L.tileLayer(...e.tile);
+      this.map.addLayer(this.currentTile);
+      this.updateOptions({ selectedLayer: e.tile[0] });
+    },
+
     updateOptions(newOptions) {
       this.$store.commit("updateOptions", {
         idDash: this.idDashFrom,
