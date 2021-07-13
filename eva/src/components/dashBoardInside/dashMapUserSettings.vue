@@ -48,23 +48,31 @@
               <v-slider
                 v-model="options.zoomStep"
                 class="align-center"
-                max="200"
-                min="1"
+                max="1"
+                min="0.01"
+                step="0.01"
               >
                 <template v-slot:label>
-                  <span>
-                    1/
-                    <v-text-field
-                      v-model="options.zoomStep"
-                      class="mt-0 pt-0"
-                      hide-details
-                      single-line
-                      type="number"
-                      style="width: 60px"
-                    />
-                  </span>
+                  <v-text-field
+                    v-model="options.zoomStep"
+                    class="mt-0 pt-0"
+                    hide-details
+                    single-line
+                    type="number"
+                    style="width: 60px"
+                  />
                 </template>
               </v-slider>
+
+              <p>Начальная точка</p>
+              <v-row>
+                <v-col col="6">
+                  <v-text-field v-model="options.initialPoint.x" label="X" />
+                </v-col>
+                <v-col col="6">
+                  <v-text-field v-model="options.initialPoint.y" label="Y" />
+                </v-col>
+              </v-row>
 
               <p>Легенда карты</p>
               <v-checkbox
@@ -126,8 +134,8 @@
             >
               Легенда
             </span>
-            <v-spacer/>
-            <a style="align-self:center" @click="closeLegend">
+            <v-spacer />
+            <a style="align-self: center" @click="closeLegend">
               <svg
                 width="20"
                 height="20"
@@ -197,6 +205,7 @@
           </v-card>
         </v-card>
       </v-row>
+      
     </v-container>
   </div>
 </template>
@@ -263,7 +272,11 @@ export default {
         selected: "яндекс",
         selectedLayer: "",
         zoomLevel: 10,
-        zoomStep: 25,
+        zoomStep: 0.01,
+        initialPoint: {
+          x: 59.242065955847735,
+          y: 74.35169122692963,
+        },
         showLegend: true,
       },
     };
@@ -297,12 +310,13 @@ export default {
     });
     this.tileLayers[0].tile = options.osmserver;
     // init store for reactivity
-    if (!options.showLegend) {
+    if (!options.showLegend || !options.initialPoint) {
       let initOptions = {
         showLegend: true,
         zoomLevel: this.options.zoomLevel,
         zoomStep: this.options.zoomStep,
         selectedLayer: this.options.selectedLayer,
+        initialPoint: this.options.initialPoint,
       };
       this.$store.commit("setOptions", {
         idDash: this.idDashFrom,

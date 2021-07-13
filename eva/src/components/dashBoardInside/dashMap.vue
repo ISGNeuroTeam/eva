@@ -86,11 +86,18 @@ export default {
     this.initClusterDelimiter();
     const unsubscribe = store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
-        this.map.setView(
-          this.startingPoint,
-          mutation.payload.options.zoomLevel
-        );
-        this.map.wheelPxPerZoomLevel = mutation.payload.options.zoomStep;
+        if (this.options.initialPoint) {
+          this.map.setView(
+            [this.options.initialPoint.x, this.options.initialPoint.y],
+            mutation.payload.options.zoomLevel
+          );
+        } else {
+          this.map.setView(
+            this.startingPoint,
+            mutation.payload.options.zoomLevel
+          );
+        }
+        this.map.wheelPxPerZoomLevel = 200;
       }
     });
   },
@@ -109,7 +116,12 @@ export default {
         this.createMap();
         //рисуем объекты на карте
         this.drawObjects(dataRest);
-        this.map.setView(this.startingPoint, this.options.zoomLevel);
+        if (this.options.initialPoint)
+          this.map.setView(
+            [this.options.initialPoint.x, this.options.initialPoint.y],
+            this.options.zoomLevel
+          );
+        else this.map.setView(this.startingPoint, this.options.zoomLevel);
         // this.clustering(dataRest);
       }
     },
@@ -317,7 +329,7 @@ export default {
 
     initMap() {
       this.map = L.map(this.$refs.map, {
-        wheelPxPerZoomLevel: this.options.zoomStep || 10,
+        wheelPxPerZoomLevel: 1 / this.options.zoomStep || 30,
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
@@ -567,10 +579,10 @@ export default {
         }
       } else {
         if (!this.osmserver.tile) return;
-        
+
         let temp = this.osmserver.tile;
         if (typeof this.osmserver.tile === "string") {
-          temp = [this.osmserver.tile]
+          temp = [this.osmserver.tile];
         }
         if (this.maptheme === "black") {
           temp[1].filter = ["grayscale:100%", "invert:100%"];
