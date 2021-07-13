@@ -92,9 +92,29 @@
           color="#191919"
         >
           <v-subheader style="color: white" class="px-0">
-            <v-icon :style="{ color: theme.$title }">{{ mdiList }}</v-icon>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <g clip-path="url(#clip0)">
+                <path
+                  d="M19 5V19H5V5H19ZM20.1 3H3.9C3.4 3 3 3.4 3 3.9V20.1C3 20.5 3.4 21 3.9 21H20.1C20.5 21 21 20.5 21 20.1V3.9C21 3.4 20.5 3 20.1 3ZM11 7H17V9H11V7ZM11 11H17V13H11V11ZM11 15H17V17H11V15ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM7 15H9V17H7V15Z"
+                  fill="white"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0">
+                  <rect width="24" height="24" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+
             <span
               style="
+                margin-left: 10px;
                 font-family: Proxima Nova;
                 font-size: 18px;
                 font-style: normal;
@@ -106,34 +126,52 @@
             >
               Легенда
             </span>
+            <v-spacer/>
+            <a style="align-self:center" @click="closeLegend">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665 5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984 11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
+                  fill="#DADADA"
+                />
+              </svg>
+            </a>
           </v-subheader>
-          <v-divider></v-divider>
+
           <v-card width="240" outlined color="white">
             <v-list style="max-height: 382px" class="overflow-y-auto">
-              <v-list-item
-                three-line
-                v-for="item in library.objects"
-                :key="item.name"
-              >
+              <v-list-item v-for="item in library.objects" :key="item.name">
                 <template v-if="item.image">
-                  <v-list-item-avatar>
+                  <v-list-item-avatar size="20px" style="align-self: center">
                     <v-img :src="base_svg_url + item.image"></v-img>
                   </v-list-item-avatar>
 
-                  <v-list-item-content>
-                    <v-list-item-title v-text="item.name"></v-list-item-title>
-                  </v-list-item-content>
+                  <v-list-item-title
+                    style="text-align: left"
+                    v-text="item.name"
+                  ></v-list-item-title>
                 </template>
 
                 <template v-else-if="item.background_color">
-                  <v-list-item-avatar v-html="createHtmlIcon(item)" />
-                  <v-list-item-content>
-                    <v-list-item-title v-text="item.name" />
-                  </v-list-item-content>
+                  <v-list-item-avatar
+                    size="20px"
+                    v-html="createHtmlIcon(item)"
+                    style="align-self: center; border-radius: 0%"
+                  />
+
+                  <v-list-item-title
+                    style="text-align: left"
+                    v-text="item.name"
+                  />
                 </template>
 
                 <template v-else>
-                  <v-list-item-avatar>
+                  <v-list-item-avatar size="20px" style="align-self: center">
                     <div>
                       <svg height="210" width="200">
                         <line
@@ -148,7 +186,10 @@
                     </div>
                   </v-list-item-avatar>
                   <v-list-item-content>
-                    <v-list-item-title v-text="item.name" />
+                    <v-list-item-title
+                      style="text-align: left"
+                      v-text="item.name"
+                    />
                   </v-list-item-content>
                 </template>
               </v-list-item>
@@ -274,6 +315,9 @@ export default {
     this.setTileLayer();
   },
   methods: {
+    closeLegend() {
+      this.options.showLegend = false;
+    },
     createHtmlIcon(lib) {
       let {
         text_color: textColor = "#FFFFFF",
@@ -297,23 +341,8 @@ export default {
             font-size: 14px;
             font-weight: 600;
         ">
-          <span style="color:${textColor}">test<span>
+          <span style="color:${textColor}">кп<span>
         </div>`;
-
-      return icon;
-      const _point = element.coordinates.split(":");
-      const _coord = _point[1].split(",");
-      L.marker([_coord[0], _coord[1]], {
-        icon: icon,
-        zIndexOffset: -1000,
-        riseOnHover: true,
-      })
-        .addTo(this.map)
-        .bindTooltip(element.label, {
-          permanent: false,
-          direction: "top",
-          className: "leaftet-hover",
-        });
     },
     updateTileLayer(e) {
       this.map.removeLayer(this.currentTile);
