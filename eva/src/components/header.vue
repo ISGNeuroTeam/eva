@@ -250,7 +250,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
    @import '../sass/header.sass'
 

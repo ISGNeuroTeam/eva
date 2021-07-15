@@ -1,19 +1,35 @@
 module.exports = {
   root: true,
   env: {
-    node: true,
-    browser: true
+    node: true
   },
-  extends: [
-    "plugin:vue/recommended",
-    "eslint:recommended",
+  'extends': [
+    'plugin:vue/essential',
+    'eslint:recommended'
   ],
-  rules: {
-    "no-var": ["error"],  // нельзя использовать var, только let или const
-    "key-spacing": ["error"], // пробел между ключом свойства объекта и его значением {"key": "value"}
-    "indent": ["error",2],  //  следит за неправильными отступами от начала строки (в данном случае 2 пробела)
-  },
   parserOptions: {
-    parser: "babel-eslint"
-  } 
-};
+    parser: 'babel-eslint'
+  },
+  rules: {
+    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'no-unused-vars': 'warn',
+    'no-undef': 'warn',
+    'no-case-declarations': 'warn',
+    'vue/no-side-effects-in-computed-properties': 'warn',
+    'no-useless-escape': 'warn',
+    'vue/no-dupe-keys': 'warn',
+    'no-empty': 'warn',
+  },
+  overrides: [
+    {
+      files: [
+        '**/__tests__/*.{j,t}s?(x)',
+        '**/tests/unit/**/*.spec.{j,t}s?(x)'
+      ],
+      env: {
+        mocha: true
+      }
+    }
+  ]
+}

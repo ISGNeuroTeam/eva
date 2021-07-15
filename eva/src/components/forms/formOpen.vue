@@ -214,8 +214,8 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
 
-    @import '../../sass/formOpen.sass';
+    @import '../../sass/formOpen.sass'
 
 </style>
