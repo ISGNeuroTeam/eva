@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - heatmap visualization
 - heatmap metrics aggregation
+- heatmap ssp aggregation in watch
 
 ## [1.59.0]
 

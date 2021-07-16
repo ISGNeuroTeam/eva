@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="heatmap-header">
-      {{ filteredData }}
+      {{ dataRestFrom }}
       <!-- <v-data-table
         :headers="selectedHeaders"
         :items="filteredData"
@@ -52,25 +52,33 @@ export default {
     metricList: new Set(),
   }),
   computed: {
-    filteredData () {
-      this.dataRestFrom.forEach(data => {
-        this.metricList.add(data.variable);
-        console.log(data);
-      });
-      console.log(this.metricList);
-      return [];
-      // return [
-      //   { test1: 'qwe', test2: 'qwqe', test3: 'sdsdsd' },
-      //   { test1: 'qwe2', test2: 'qwqe2', test3: 'sdsdsd2' },
-      //   { test1: 'qwe3', test2: 'qwqe3', test3: 'sdsdsd3' },
-      // ];
-    },
     selectedHeaders () {
       return [
         { text: 'test1', value: 'test1'},
         { text: 'test2', value: 'test2'},
         { text: 'test3', value: 'test3'},
       ];
+    },
+  },
+  watch: {
+    dataRestFrom () {
+      const sspMaxDeep = new Set();
+      const sspObject = {};
+      this.dataRestFrom.forEach(data => {
+        const { ssp, variable } = data;
+        if (ssp) {
+          const sspData = ssp.split('/');
+          const maxDeep = Math.max(...sspMaxDeep.add(sspData.length));
+          for (let i = 0; i < maxDeep; i++) {
+            if (!sspObject[i]) sspObject[i] = new Set();
+            if (!sspData[i]) break;
+            sspObject[i].add(sspData[i].trim());
+          }
+        }
+        this.metricList.add(variable);
+      });
+      // объект с данными об иерархии
+      console.log(sspObject);
     },
   },
   mounted () {
@@ -84,6 +92,6 @@ export default {
 
 <style scoped>
 .heatmap-header {
-  background-color: red;
+
 }
 </style>
