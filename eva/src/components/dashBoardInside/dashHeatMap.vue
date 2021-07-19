@@ -1,10 +1,17 @@
 <template>
   <v-container>
     <v-row>
-      <v-select> </v-select>
+      <v-select
+        v-for="(ssp, i) in computedSSP"
+        :key="i"
+        :items="ssp"
+      />
+      <v-select
+        :items="Array.from(metricList)"
+      />
     </v-row>
     <v-row>
-      <dash-heat-map-linear :value="10"/>
+      <dash-heat-map-linear :value="58" />
       <div class="heatmap-header">
         <v-data-table
           :headers="selectedHeaders"
@@ -21,7 +28,6 @@
           </template>
         </v-data-table>
       </div>
-      
     </v-row>
   </v-container>
 </template>
@@ -64,6 +70,7 @@ export default {
     metricList: new Set(),
     allDates: new Set(),
     users: {},
+    sspObject: {},
     userCount: new Set(),
   }),
   computed: {
@@ -85,12 +92,17 @@ export default {
         test.push([key, [this.users[key]]])
       }
       return test
-    }
+    },
+
+    computedSSP() {
+      return Object.values(this.sspObject)
+        .map(item => [...item])
+        .reverse();
+    },
   },
   watch: {
     dataRestFrom() {
       const sspMaxDeep = new Set();
-      const sspObject = {};
       let dates = new Set();
       this.dataRestFrom.forEach((data) => {
         const { ssp, variable, День, user } = data;
@@ -101,9 +113,9 @@ export default {
           const sspData = ssp.split("/");
           const maxDeep = Math.max(...sspMaxDeep.add(sspData.length));
           for (let i = 0; i < maxDeep; i++) {
-            if (!sspObject[i]) sspObject[i] = new Set();
+            if (!this.sspObject[i]) this.$set(this.sspObject, i, new Set());
             if (!sspData[i]) break;
-            sspObject[i].add(sspData[i].trim());
+            this.sspObject[i].add(sspData[i].trim());
           }
         }
 
@@ -120,7 +132,6 @@ export default {
       });
 
       // объект с данными об иерархии
-      // console.log(sspObject);
       // console.log(Array.from(dates));
       dates = Array.from(dates).sort((a, b) => new Date(b) - new Date(a));
       this.allDates = dates;
