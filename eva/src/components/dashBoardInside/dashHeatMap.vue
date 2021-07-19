@@ -4,29 +4,34 @@
       <v-select> </v-select>
     </v-row>
     <v-row>
+      <dash-heat-map-linear :value="10"/>
       <div class="heatmap-header">
         <v-data-table
           :headers="selectedHeaders"
-          :items="filteredData"
+          :items="computedData"
           :items-per-page="5"
           class="elevation-1"
         >
           <template v-slot:item="{ headers, item, index }">
             <tr>
-              <td v-for="i in item">
-                {{ index }}
-                {{ item.user }}
+              <td v-for="val in item">
+                {{ val }}
               </td>
             </tr>
           </template>
         </v-data-table>
       </div>
+      
     </v-row>
   </v-container>
 </template>
 
 <script>
+import DashHeatMapLinear from "./dashHeatMapLinear.vue"
 export default {
+  components: {
+    DashHeatMapLinear,
+  },
   props: {
     idFrom: {
       type: String,
@@ -73,6 +78,14 @@ export default {
         });
       return [];
     },
+
+    computedData() {
+      let test =[];
+      for ( let key in  this.users) {
+        test.push([key, [this.users[key]]])
+      }
+      return test
+    }
   },
   watch: {
     dataRestFrom() {
@@ -97,12 +110,9 @@ export default {
         // users
         if (user) {
           if (this.users[user]) {
-            console.log(this.users[user]);
-            this.$set(this.users[user],День, { [variable]: data.value });
-            console.log(this.users[user].get(День));
+            this.$set(this.users[user], День, { [variable]: data.value });
           } else {
-            console.log("created");
-            this.$set(this.users,user, new Map());
+            this.$set(this.users, user, new Map());
           }
         }
         this.userCount.add(user);
@@ -112,7 +122,6 @@ export default {
       // объект с данными об иерархии
       // console.log(sspObject);
       // console.log(Array.from(dates));
-      console.log(Array.from(this.userCount).length);
       dates = Array.from(dates).sort((a, b) => new Date(b) - new Date(a));
       this.allDates = dates;
 
