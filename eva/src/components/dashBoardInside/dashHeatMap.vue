@@ -1,21 +1,28 @@
 <template>
-  <div>
-    <div class="heatmap-header">
-      {{ dataRestFrom }}
-      <!-- <v-data-table
-        :headers="selectedHeaders"
-        :items="filteredData"
-        :items-per-page="5"
-        class="elevation-1"
-      >
-        <template v-slot:item="{ headers, item }">
-          <tr v-for="i in item">
-            {{ i }}
-          </tr>
-        </template>
-      </v-data-table> -->
-    </div>
-  </div>
+  <v-container>
+    <v-row>
+      <v-select> </v-select>
+    </v-row>
+    <v-row>
+      <div class="heatmap-header">
+        <v-data-table
+          :headers="selectedHeaders"
+          :items="filteredData"
+          :items-per-page="5"
+          class="elevation-1"
+        >
+          <template v-slot:item="{ headers, item, index }">
+            <tr>
+              <td v-for="i in item">
+                {{ index }}
+                {{ item.user }}
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -23,11 +30,11 @@ export default {
   props: {
     idFrom: {
       type: String,
-      default: '',
+      default: "",
     },
     idDashFrom: {
       type: String,
-      default: '',
+      default: "",
     },
     widthFrom: {
       type: Number,
@@ -50,24 +57,35 @@ export default {
   },
   data: () => ({
     metricList: new Set(),
+    allDates: new Set(),
+    users: {},
+    userCount: new Set(),
   }),
   computed: {
-    selectedHeaders () {
-      return [
-        { text: 'test1', value: 'test1'},
-        { text: 'test2', value: 'test2'},
-        { text: 'test3', value: 'test3'},
-      ];
+    filteredData() {
+      return this.dataRestFrom;
+    },
+
+    selectedHeaders() {
+      if (Array.isArray(this.allDates))
+        return this.allDates.slice(0, 7).map((val) => {
+          return { text: val, value: val };
+        });
+      return [];
     },
   },
   watch: {
-    dataRestFrom () {
+    dataRestFrom() {
       const sspMaxDeep = new Set();
       const sspObject = {};
-      this.dataRestFrom.forEach(data => {
-        const { ssp, variable } = data;
+      let dates = new Set();
+      this.dataRestFrom.forEach((data) => {
+        const { ssp, variable, День, user } = data;
+        if (День) {
+          dates.add(День);
+        }
         if (ssp) {
-          const sspData = ssp.split('/');
+          const sspData = ssp.split("/");
           const maxDeep = Math.max(...sspMaxDeep.add(sspData.length));
           for (let i = 0; i < maxDeep; i++) {
             if (!sspObject[i]) sspObject[i] = new Set();
@@ -75,23 +93,38 @@ export default {
             sspObject[i].add(sspData[i].trim());
           }
         }
+
+        // users
+        if (user) {
+          if (this.users[user]) {
+            console.log(this.users[user]);
+            this.$set(this.users[user],День, { [variable]: data.value });
+            console.log(this.users[user].get(День));
+          } else {
+            console.log("created");
+            this.$set(this.users,user, new Map());
+          }
+        }
+        this.userCount.add(user);
         this.metricList.add(variable);
       });
+
       // объект с данными об иерархии
-      console.log(sspObject);
+      // console.log(sspObject);
+      // console.log(Array.from(dates));
+      console.log(Array.from(this.userCount).length);
+      dates = Array.from(dates).sort((a, b) => new Date(b) - new Date(a));
+      this.allDates = dates;
+
+      this.$forceUpdate();
     },
   },
-  mounted () {
-
-  },
-  methods: {
-
-  },
+  mounted() {},
+  methods: {},
 };
 </script>
 
 <style scoped>
 .heatmap-header {
-
 }
 </style>
