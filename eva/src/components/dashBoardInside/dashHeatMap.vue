@@ -3,9 +3,9 @@
     <v-row>
       <v-select v-for="(ssp, i) in computedSSP" :key="i" :items="ssp" />
       <v-select v-model="selectedMetric" :items="Array.from(metricList)" />
+      <v-select v-model="period" :items="periods" />
     </v-row>
     <v-row>
-      <dash-heat-map-linear :value="58" />
       <div class="heatmap-header">
         <v-data-table
           :headers="selectedHeaders"
@@ -13,6 +13,7 @@
           :items-per-page="5"
           class="elevation-1"
         >
+          <template v-slot:headers="{ headers }"> </template>
           <template v-slot:item="{ headers, item, index }">
             <tr>
               <template v-for="(val, index) in item">
@@ -21,12 +22,21 @@
                 </td>
                 <template v-else v-for="(i, index) in headers">
                   <td v-if="index != 0">
-                    <dash-heat-map-linear
-                      v-if="val[headers[index].value]"
-                      :value="
+                    <template
+                      v-if="
+                        val[headers[index].value] &&
                         showProperty(val[headers[index].value], selectedMetric)
                       "
-                    />
+                    >
+                      <dash-heat-map-linear
+                        :value="
+                          showProperty(
+                            val[headers[index].value],
+                            selectedMetric
+                          )
+                        "
+                      />
+                    </template>
                     <template v-else> Нет данных </template>
                   </td>
                 </template>
@@ -80,6 +90,8 @@ export default {
     sspObject: {},
     userCount: new Set(),
     selectedMetric: "",
+    period: "",
+    periods: {},
   }),
   computed: {
     filteredData() {
@@ -156,7 +168,7 @@ export default {
       if (object[property]) {
         console.log(object, property, object[property]);
         return object[property];
-      } else "Нет данных";
+      } else null;
     },
   },
 };
