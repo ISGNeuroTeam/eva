@@ -13,7 +13,16 @@
           :items-per-page="5"
           class="elevation-1"
         >
-          <template v-slot:headers="{ headers }"> </template>
+          <!-- <template
+            v-slot:header="{ props: { headers } }"
+          >
+            <thead>
+              <tr>
+                {{headers}}
+                <th :colspan="headers.length">This is a header</th>
+              </tr>
+            </thead>
+          </template> -->
           <template v-slot:item="{ headers, item, index }">
             <tr>
               <template v-for="(val, index) in item">
@@ -91,7 +100,7 @@ export default {
     userCount: new Set(),
     selectedMetric: "",
     period: "",
-    periods: {},
+    periods: [],
   }),
   computed: {
     filteredData() {
@@ -103,7 +112,11 @@ export default {
         return [
           {},
           ...this.allDates.slice(0, 7).map((val) => {
-            return { text: val, value: val };
+            let formatedDate = new Date(`${val}`);
+            return {
+              text: formatedDate.toLocaleDateString("ru"),
+              value: val,
+            };
           }),
         ];
       }
@@ -111,7 +124,6 @@ export default {
     },
 
     computedData() {
-      console.log("computed", Object.entries(this.users));
       return Object.entries(this.users);
     },
 
@@ -155,7 +167,7 @@ export default {
 
       // объект с данными об иерархии
       // console.log(Array.from(dates));
-      dates = Array.from(dates).sort((a, b) => new Date(b) - new Date(a));
+      dates = Array.from(dates).sort((a, b) => new Date(a) - new Date(b));
       this.allDates = dates;
 
       this.$forceUpdate();
@@ -164,9 +176,7 @@ export default {
   mounted() {},
   methods: {
     showProperty(object, property) {
-      console.log(object, property);
       if (object[property]) {
-        console.log(object, property, object[property]);
         return object[property];
       } else null;
     },
