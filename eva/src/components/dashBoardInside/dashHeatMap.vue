@@ -13,16 +13,6 @@
           :items-per-page="5"
           class="elevation-1"
         >
-          <!-- <template
-            v-slot:header="{ props: { headers } }"
-          >
-            <thead>
-              <tr>
-                {{headers}}
-                <th :colspan="headers.length">This is a header</th>
-              </tr>
-            </thead>
-          </template> -->
           <template v-slot:item="{ headers, item, index }">
             <tr>
               <template v-for="(val, index) in item">
