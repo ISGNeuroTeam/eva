@@ -1,14 +1,8 @@
 <template>
   <v-container>
     <v-row>
-      <v-select
-        v-for="(ssp, i) in computedSSP"
-        :key="i"
-        :items="ssp"
-      />
-      <v-select
-        :items="Array.from(metricList)"
-      />
+      <v-select v-for="(ssp, i) in computedSSP" :key="i" :items="ssp" />
+      <v-select v-model="selectedMetric" :items="Array.from(metricList)" />
     </v-row>
     <v-row>
       <dash-heat-map-linear :value="58" />
@@ -21,9 +15,22 @@
         >
           <template v-slot:item="{ headers, item, index }">
             <tr>
-              <td v-for="val in item">
-                {{ val }}
-              </td>
+              <template v-for="(val, index) in item">
+                <td v-if="index == 0">
+                  {{ val }}
+                </td>
+                <template v-else v-for="(i, index) in headers">
+                  <td v-if="index != 0">
+                    <dash-heat-map-linear
+                      v-if="val[headers[index].value]"
+                      :value="
+                        showProperty(val[headers[index].value], selectedMetric)
+                      "
+                    />
+                    <template v-else> Нет данных </template>
+                  </td>
+                </template>
+              </template>
             </tr>
           </template>
         </v-data-table>
@@ -33,7 +40,7 @@
 </template>
 
 <script>
-import DashHeatMapLinear from "./dashHeatMapLinear.vue"
+import DashHeatMapLinear from "./dashHeatMapLinear.vue";
 export default {
   components: {
     DashHeatMapLinear,
@@ -72,6 +79,7 @@ export default {
     users: {},
     sspObject: {},
     userCount: new Set(),
+    selectedMetric: "",
   }),
   computed: {
     filteredData() {
@@ -79,24 +87,25 @@ export default {
     },
 
     selectedHeaders() {
-      if (Array.isArray(this.allDates))
-        return this.allDates.slice(0, 7).map((val) => {
-          return { text: val, value: val };
-        });
+      if (Array.isArray(this.allDates)) {
+        return [
+          {},
+          ...this.allDates.slice(0, 7).map((val) => {
+            return { text: val, value: val };
+          }),
+        ];
+      }
       return [];
     },
 
     computedData() {
-      let test =[];
-      for ( let key in  this.users) {
-        test.push([key, [this.users[key]]])
-      }
-      return test
+      console.log("computed", Object.entries(this.users));
+      return Object.entries(this.users);
     },
 
     computedSSP() {
       return Object.values(this.sspObject)
-        .map(item => [...item])
+        .map((item) => [...item])
         .reverse();
     },
   },
@@ -124,11 +133,12 @@ export default {
           if (this.users[user]) {
             this.$set(this.users[user], День, { [variable]: data.value });
           } else {
-            this.$set(this.users, user, new Map());
+            this.$set(this.users, user, {});
           }
         }
         this.userCount.add(user);
         this.metricList.add(variable);
+        this.selectedMetric = Array.from(this.metricList)[0];
       });
 
       // объект с данными об иерархии
@@ -140,7 +150,15 @@ export default {
     },
   },
   mounted() {},
-  methods: {},
+  methods: {
+    showProperty(object, property) {
+      console.log(object, property);
+      if (object[property]) {
+        console.log(object, property, object[property]);
+        return object[property];
+      } else "Нет данных";
+    },
+  },
 };
 </script>
 
