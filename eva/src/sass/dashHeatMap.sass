@@ -1,0 +1,23 @@
+.container::v-deep
+
+  thead
+    background-color: var(--secondary_bg)
+
+    span
+      color: var(--main_text)
+
+  tbody
+    tr
+      color: var(--main_text)
+
+      &:nth-of-type(odd)
+        background-color: var(--main_bg)
+
+        &:hover td
+          background-color: var(--main_bg)
+
+      &:nth-of-type(even)
+        background-color: var(--secondary_bg)
+
+        &:hover td
+          background-color: var(--secondary_bg)
