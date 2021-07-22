@@ -1,9 +1,11 @@
 import Vue from "vue"
 window.Vue = require('vue') // подключаем Vue
 window.Vue = Vue
+import "./fonts.css"
+import "./scroll.css"
+import "./yfiles/es-modules/yfiles.css"
 
-
-import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
+// import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 
 import store from './store/index.js' // подключаем файл с настройками хранилища Vuex
 
@@ -18,7 +20,7 @@ import router from './route/index.js'  // подключаем файл с на�
 import screenshot from './plugins/screenshot.js'  // подключаем файл с настройками плагина для скриншотов
 
 import AsyncComputed from 'vue-async-computed'  // позволяет создавтаь асинхронные computed
- 
+Vue.use(AsyncComputed)
 import VueDraggableResizable from 'vue-draggable-resizable'   // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.component('vue-draggable-resizable', VueDraggableResizable) // сопоставляем подключенный компонент с комопнентом vue
 
@@ -65,6 +67,7 @@ Vue.component('dash-piechart', require('./components/dashBoardInside/dashPieChar
 Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vue').default)  // граф. новая версия
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default)  // компонент куст. на yfiles
 Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) //компонент карта
+Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) //компонент карта
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
 //Vue.component('dash-search', require('./components/dashBoardInside/dashSearch.vue').default)  // элемнет поиска пока не актуален
@@ -79,14 +82,12 @@ Vue.component('modal-report', require('./components/modalReports.vue').default) 
 Vue.component('modal-delete-profile', require('./components/autorization/modalDeleteProfile.vue').default)  // модалка для удаления сущностей пользователей
 Vue.component('modal-log', require('./components/autorization/modalLog.vue').default)  // модалка для вывода лога
 Vue.component('data-profile', require('./components/autorization/dataForProfile.vue').default)  //  компонент для получения данных для пользователя
-import App from "./App.vue";
+
 
 store.form = storeForm;
 store.auth = storeAuth;
+import App from "./App.vue";
 
-import "./fonts.css"
-import "./scroll.css"
-import "./yfiles/es-modules/yfiles.css"
 Vue.config.productionTip = true
 // создаем экземпляр vue где подключаем самое главное переадрасицию, визуализацию элемнетов и хранилище
 new Vue({
@@ -95,5 +96,5 @@ new Vue({
   router: router,
   screenshot: screenshot,
   render: h => h(App)
-}).$mount('#app')
+}).$mount('#mount')
 

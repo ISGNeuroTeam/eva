@@ -13,13 +13,13 @@ module.exports = {
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-unused-vars': 'warn',
-    'no-undef': 'warn',
-    'no-case-declarations': 'warn',
-    'vue/no-side-effects-in-computed-properties': 'warn',
-    'no-useless-escape': 'warn',
-    'vue/no-dupe-keys': 'warn',
-    'no-empty': 'warn',
+    'no-unused-vars': 'error',
+    'no-undef': 'error',
+    'no-case-declarations': 'error',
+    'vue/no-side-effects-in-computed-properties': 'error',
+    'no-useless-escape': 'error',
+    'vue/no-dupe-keys': 'error',
+    'no-empty': 'error',
   },
   overrides: [
     {

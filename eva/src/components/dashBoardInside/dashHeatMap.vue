@@ -13,14 +13,14 @@
           :items-per-page="5"
           class="elevation-1"
         >
-          <template v-slot:item="{ headers, item, index }">
+          <template v-slot:item="{ headers, item }">
             <tr>
               <template v-for="(val, index) in item">
-                <td v-if="index == 0">
+                <td v-if="index == 0" :key="index">
                   {{ val }}
                 </td>
                 <template v-else v-for="(i, index) in headers">
-                  <td v-if="index != 0">
+                  <td v-if="index != 0" :key="index">
                     <template
                       v-if="
                         val[headers[index].value] &&
@@ -51,6 +51,7 @@
 <script>
 import DashHeatMapLinear from "./dashHeatMapLinear.vue";
 export default {
+  name: "heatmap",
   components: {
     DashHeatMapLinear,
   },
@@ -175,6 +176,4 @@ export default {
 </script>
 
 <style scoped>
-.heatmap-header {
-}
 </style>
