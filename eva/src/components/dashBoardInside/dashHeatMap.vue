@@ -1,59 +1,58 @@
 <template>
-  <v-container>
+  <v-container class="container">
     <v-row>
       <v-select v-for="(ssp, i) in computedSSP" :key="i" :items="ssp" />
       <v-select v-model="selectedMetric" :items="Array.from(metricList)" />
       <v-select v-model="period" :items="periods" />
     </v-row>
     <v-row>
-      <div class="heatmap-header">
-        <v-data-table
-          :headers="selectedHeaders"
-          :items="computedData"
-          :items-per-page="5"
-          class="elevation-1"
+      <v-data-table
+        :headers="selectedHeaders"
+        :items="computedData"
+        :items-per-page="5"
+        disable-sort
+        class="table elevation-1"
+      >
+        <!-- <template
+          v-slot:header="{ props: { headers } }"
         >
-          <!-- <template
-            v-slot:header="{ props: { headers } }"
-          >
-            <thead>
-              <tr>
-                {{headers}}
-                <th :colspan="headers.length">This is a header</th>
-              </tr>
-            </thead>
-          </template> -->
-          <template v-slot:item="{ headers, item, index }">
+          <thead>
             <tr>
-              <template v-for="(val, index) in item">
-                <td v-if="index == 0">
-                  {{ val }}
-                </td>
-                <template v-else v-for="(i, index) in headers">
-                  <td v-if="index != 0">
-                    <template
-                      v-if="
-                        val[headers[index].value] &&
-                        showProperty(val[headers[index].value], selectedMetric)
-                      "
-                    >
-                      <dash-heat-map-linear
-                        :value="
-                          showProperty(
-                            val[headers[index].value],
-                            selectedMetric
-                          )
-                        "
-                      />
-                    </template>
-                    <template v-else> Нет данных </template>
-                  </td>
-                </template>
-              </template>
+              {{headers}}
+              <th :colspan="headers.length">This is a header</th>
             </tr>
-          </template>
-        </v-data-table>
-      </div>
+          </thead>
+        </template> -->
+        <template v-slot:item="{ headers, item, index }">
+          <tr>
+            <template v-for="(val, index) in item">
+              <td v-if="index == 0">
+                {{ val }}
+              </td>
+              <template v-else v-for="(i, index) in headers">
+                <td v-if="index != 0">
+                  <template
+                    v-if="
+                      val[headers[index].value] &&
+                      showProperty(val[headers[index].value], selectedMetric)
+                    "
+                  >
+                    <dash-heat-map-linear
+                      :value="
+                        showProperty(
+                          val[headers[index].value],
+                          selectedMetric
+                        )
+                      "
+                    />
+                  </template>
+                  <template v-else> Нет данных </template>
+                </td>
+              </template>
+            </template>
+          </tr>
+        </template>
+      </v-data-table>
     </v-row>
   </v-container>
 </template>
@@ -184,7 +183,28 @@ export default {
 };
 </script>
 
-<style scoped>
-.heatmap-header {
+<style lang="sass" scoped>
+.container {
+  tbody {
+    tr {
+      color: var(--main_text);
+
+      &:nth-of-type(odd) {
+        background-color: var(--secondary_bg);
+
+        &:hover td {
+          background-color: var(--secondary_bg);
+        }
+      }
+
+      &:nth-of-type(even) {
+        background-color: var(--main_bg);
+
+        &:hover td {
+          background-color: var(--main_bg);
+        }
+      }
+    }
+  }
 }
 </style>
