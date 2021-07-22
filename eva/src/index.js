@@ -5,7 +5,7 @@ import "./fonts.css"
 import "./scroll.css"
 import "./yfiles/es-modules/yfiles.css"
 
-// import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
+import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 
 import store from './store/index.js' // подключаем файл с настройками хранилища Vuex
 
@@ -66,8 +66,8 @@ Vue.component('dash-csvg', require('./components/dashBoardInside/dashCSvg.vue').
 Vue.component('dash-piechart', require('./components/dashBoardInside/dashPieChart.vue').default)  // элемент  визуализации svg
 Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vue').default)  // граф. новая версия
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default)  // компонент куст. на yfiles
-Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) //компонент карта
-Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) //компонент карта
+Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) // компонент карта
+Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) // компонент тепловая карта
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
 //Vue.component('dash-search', require('./components/dashBoardInside/dashSearch.vue').default)  // элемнет поиска пока не актуален

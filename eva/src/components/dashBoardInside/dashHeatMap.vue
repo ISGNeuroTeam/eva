@@ -19,7 +19,7 @@
                 <td v-if="index == 0" :key="index">
                   {{ val }}
                 </td>
-                <template v-else v-for="(i, index) in headers">
+                <template v-for="(i, index) in headers" v-else >
                   <td v-if="index != 0" :key="index">
                     <template
                       v-if="
@@ -164,7 +164,7 @@ export default {
       this.$forceUpdate();
     },
   },
-  mounted() {},
+  
   methods: {
     showProperty(object, property) {
       if (object[property]) {
