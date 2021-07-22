@@ -40,14 +40,6 @@ export default {
       }
     }
   },
-  created() {
-    console.log(1);
-  },
-  mounted() {
-    console.log(process.env.NODE_ENV);
-  },
-  methods: {
-  }
 }
 </script>
 
