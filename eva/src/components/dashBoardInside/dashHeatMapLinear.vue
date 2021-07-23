@@ -5,7 +5,22 @@
     :background-color="backColor"
     height="30"
   >
-    <strong>{{ calculatedValue }}%</strong>
+    <v-tooltip
+      v-if="comment"
+      bottom
+    >
+      <template v-slot:activator="{ on }">
+        <strong
+          v-on="on"
+          v-text="calculatedValue + '%'"
+        />
+      </template>
+      <span v-text="comment" />
+    </v-tooltip>
+    <strong
+      v-else
+      v-text="calculatedValue + '%'"
+    />
   </v-progress-linear>
 </template>
 
@@ -15,7 +30,11 @@ export default {
     value: {
       type: Number,
       default: 0,
-    }
+    },
+    comment: {
+      type: String,
+      default: '',
+    },
   },
   data: () => ({
     color: 'green',

@@ -49,6 +49,12 @@
                         selectedMetric
                       )
                     "
+                    :comment="
+                      showProperty(
+                        val[headers[index].value],
+                        'description'
+                      )
+                    "
                   />
                   <span v-else>Нет данных</span>
                 </td>
@@ -140,7 +146,9 @@ export default {
       const dates = new Set();
 
       this.dataRestFrom.forEach((data) => {
-        const { fio, ssp, user, variable, value, 'День': day } = data;
+        const {
+          fio, ssp, user, variable, value, 'День': day, _decription: description
+        } = data;
 
         if (day) {
           dates.add(day);
@@ -158,7 +166,7 @@ export default {
 
         if (user) {
           if (this.users[user]) {
-            this.$set(this.users[user], day, { [variable]: value });
+            this.$set(this.users[user], day, { description, [variable]: value });
           } else {
             this.$set(this.users, user, { fio });
           }
