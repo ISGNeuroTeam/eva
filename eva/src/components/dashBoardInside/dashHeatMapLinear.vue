@@ -3,11 +3,15 @@
     :value="calculatedValue"
     :color="calculatedColor"
     :background-color="backColor"
-    height="30"
+    :height="height"
   >
     <v-tooltip
       v-if="comment"
       bottom
+      nudge-top="15"
+      color="var(--secondary_bg)"
+      content-class="elevation-2"
+      transition="fade-transition"
     >
       <template v-slot:activator="{ on }">
         <strong
@@ -15,7 +19,10 @@
           v-text="calculatedValue + '%'"
         />
       </template>
-      <span v-text="comment" />
+      <span
+        :style="{ color: calculatedColor }"
+        v-text="comment"
+      />
     </v-tooltip>
     <strong
       v-else
@@ -31,13 +38,16 @@ export default {
       type: Number,
       default: 0,
     },
+    height: {
+      type: Number,
+      default: 30,
+    },
     comment: {
       type: String,
       default: '',
     },
   },
   data: () => ({
-    color: 'green',
     backColor: '#dadada',
   }),
   computed: {
