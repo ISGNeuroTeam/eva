@@ -396,7 +396,7 @@ export default {
 }
 </script>
 
-<style lang="sass" >   // подключаем стили для этого компонента
+<style lang="scss" >   // подключаем стили для этого компонента
 
     @import '../sass/mainPageDash.sass'
     

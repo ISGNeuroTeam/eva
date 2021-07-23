@@ -1,5 +1,5 @@
 import  rest from './storeRest.js';
-
+import Vue from "vue";
 export default  {
   state: {
 
