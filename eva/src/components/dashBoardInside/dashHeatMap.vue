@@ -18,6 +18,7 @@
         :items-per-page="computedData.length"
         hide-default-footer
         disable-sort
+        fixed-header
         height="300"
       >
         <template v-slot:item="{ headers, item }">
