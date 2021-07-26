@@ -1,21 +1,37 @@
 <template>
   <v-container class="container">
     <v-row>
-      <v-select
+      <v-col
         v-for="(ssp, i) in computedSSP"
         :key="i"
-        :items="ssp"
-      />
-      <v-select
-        v-model="selectedMetric"
-        :items="Array.from(metricList)"
-      />
+        cols="3"
+      >
+        <v-select
+          :items="ssp"
+          :append-icon="mdiChevronDown"
+          dense
+          class="select"
+          outlined
+          hide-details
+        />
+      </v-col>
+      <v-col cols="3">
+        <v-select
+          v-model="selectedMetric"
+          :items="Array.from(metricList)"
+          :append-icon="mdiChevronDown"
+          class="select"
+          dense
+          outlined
+          hide-details
+        />
+      </v-col>
     </v-row>
-    <v-row>
+    <v-row justify="center">
       <v-data-table
         :headers="selectedHeaders"
         :items="computedData"
-        :items-per-page="computedData.length"
+        :items-per-page="-1"
         hide-default-footer
         disable-sort
         fixed-header
@@ -70,6 +86,8 @@
 
 <script>
 import DashHeatMapLinear from "./dashHeatMapLinear.vue";
+import { mdiChevronDown } from '@mdi/js';
+
 export default {
   components: {
     DashHeatMapLinear,
@@ -103,6 +121,7 @@ export default {
     dataLoadingFrom: null,
   },
   data: () => ({
+    mdiChevronDown,
     metricList: new Set(),
     allDates: new Set(),
     users: {},
