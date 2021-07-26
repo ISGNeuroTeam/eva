@@ -147,7 +147,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
    // настройки стилей в файле dashPanelBoard.sass
 

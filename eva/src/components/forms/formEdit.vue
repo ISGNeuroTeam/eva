@@ -118,7 +118,7 @@ export default {
            let form = {  // создаем объект формы
                template_id: this.idForm,  // id шаблона
                form_name: form_name,  // имя формы
-               content: newcontent  // контент формы
+             //  content: newcontent  // контент формы
            };
 
            this.$store.form.commit('saveForm', form);  // сохраняем форму в базу данных
@@ -189,8 +189,8 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
 
-    @import '../../sass/formEdit.sass';
+    @import '../../sass/formEdit.sass'
 
 </style>

@@ -1,7 +1,7 @@
 import  rest from './storeRest.js';
 import  restAuth from '../storeAuth/storeRest.js';
 import  settings  from '../js/componentsSettings.js';
-
+import Vue from "vue";
 import themes from '../js/themeSettings.js';
 
 export default {  // приблизительный объект хранилища, может отличаться от реального

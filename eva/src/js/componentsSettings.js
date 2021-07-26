@@ -1,8 +1,8 @@
 
-import {  mdiGraph, mdiGestureTap, mdiBrush, mdiViewGrid, 
-  mdiCardTextOutline, mdiChartGantt, mdiMapMarker, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql,mdiChartScatterPlot } from '@mdi/js'
+import {  mdiGraph, mdiGestureTap, mdiBrush, mdiViewGrid,
+  mdiCardTextOutline, mdiChartGantt, mdiMapMarker, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql, mdiChartScatterPlot, mdiGrid } from '@mdi/js'
 
-export default {  
+export default {
   tools: [
     {name: 'Таблица', img: mdiTableLarge, type: 'table'},
     {name: 'Мультилинейный график', img: mdiChartMultiline, type: 'multiLine'},
@@ -19,6 +19,7 @@ export default {
     {name: 'Кнопка', img: mdiGestureTap , type: 'button'},
     {name: 'Текстовый блок', img: mdiCardTextOutline , type: 'textarea'},
     {name: 'Граф_old', img: mdiGraph , type: 'graph'},
+    {name: 'Тепловая карта', img: mdiGrid , type: 'heatmap'},
   ],
   size: {
     picker: {
@@ -64,7 +65,7 @@ export default {
     tile: {
       width: 470,
       height: 400
-    },  
+    },
     csvg: {
       width: 500,
       height: 400
@@ -80,7 +81,11 @@ export default {
     map: {
       width: 930,
       height: 850
-    }  
+    },
+    heatmap: {
+      width: 500,
+      height: 300
+    }
   },
   icons: {
     table: mdiTableLarge,
@@ -97,10 +102,11 @@ export default {
     csvg: mdiBrush,
     ygraph: mdiGraphql,
     bush: mdiChartScatterPlot,
-    map: mdiMapMarker
-  }, 
+    map: mdiMapMarker,
+    heatmap: mdiGrid
+  },
   options: {
-    multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline'], 
+    multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline'],
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult', 'titles'],
     select: ['visible','level','boxShadow','multiple'],
@@ -157,6 +163,10 @@ export default {
     map: {
       tooltip: 'Карта',
       icon: mdiMapMarker
+    },
+    heatmap: {
+      tooltip: 'Тепловая карта',
+      icon: mdiGrid
     }
   }
 }

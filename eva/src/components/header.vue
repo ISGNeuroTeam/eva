@@ -136,7 +136,7 @@
 <script>
 
 import { mdiDoor, mdiCompare, mdiAccountEdit, mdiPalette, mdiUndoVariant,  mdiHomeVariantOutline, mdiScriptTextOutline } from '@mdi/js'
-
+import Vue from "vue";
 import VueJWT from 'vuejs-jwt'
 
 Vue.use(VueJWT, {'storage': 'cookie','keyName': 'eva_token'})
@@ -252,7 +252,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
    @import '../sass/header.sass'
 

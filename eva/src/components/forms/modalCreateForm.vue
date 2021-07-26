@@ -98,8 +98,8 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
 
-    @import '../../sass/modalCreateForm.sass';
+    @import '../../sass/modalCreateForm.sass'
 
 </style>
