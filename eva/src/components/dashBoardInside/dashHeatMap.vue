@@ -13,20 +13,6 @@
         disable-sort
         class="table elevation-1"
       >
-        <!-- <template
-          v-slot:header="{ props: { headers } }"
-        >
-<<<<<<< HEAD
-          <template v-slot:item="{ headers, item, index }">
-=======
-          <thead>
->>>>>>> ff95a72dd8e73054a610e7b87c719145413543f7
-            <tr>
-              {{headers}}
-              <th :colspan="headers.length">This is a header</th>
-            </tr>
-          </thead>
-        </template> -->
         <template v-slot:item="{ headers, item, index }">
           <tr>
             <template v-for="(val, index) in item">
