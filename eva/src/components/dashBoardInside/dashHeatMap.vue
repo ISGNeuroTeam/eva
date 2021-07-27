@@ -13,14 +13,14 @@
         disable-sort
         class="table elevation-1"
       >
-        <template v-slot:item="{ headers, item, index }">
+        <template v-slot:item="{ headers, item }">
           <tr>
             <template v-for="(val, index) in item">
-              <td v-if="index == 0">
+              <td v-if="index == 0" :key="index">
                 {{ val }}
               </td>
-              <template v-else v-for="(i, index) in headers">
-                <td v-if="index != 0">
+              <template v-for="(i, index) in headers" v-else >
+                <td v-if="index != 0" :key="index">
                   <template
                     v-if="
                       val[headers[index].value] &&
@@ -50,6 +50,7 @@
 <script>
 import DashHeatMapLinear from "./dashHeatMapLinear.vue";
 export default {
+  name: "heatmap",
   components: {
     DashHeatMapLinear,
   },
@@ -162,7 +163,7 @@ export default {
       this.$forceUpdate();
     },
   },
-  mounted() {},
+  
   methods: {
     showProperty(object, property) {
       if (object[property]) {
@@ -173,7 +174,7 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
+<style lang="scss" scoped>
 .container {
   tbody {
     tr {

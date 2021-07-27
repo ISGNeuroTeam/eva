@@ -1,7 +1,9 @@
-
+import Vue from "vue"
 window.Vue = require('vue') // подключаем Vue
-
-//import Vue from "vue"
+window.Vue = Vue
+import "./fonts.css"
+import "./scroll.css"
+import "./yfiles/es-modules/yfiles.css"
 
 import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 
@@ -18,7 +20,7 @@ import router from './route/index.js'  // подключаем файл с на�
 import screenshot from './plugins/screenshot.js'  // подключаем файл с настройками плагина для скриншотов
 
 import AsyncComputed from 'vue-async-computed'  // позволяет создавтаь асинхронные computed
-
+Vue.use(AsyncComputed)
 import VueDraggableResizable from 'vue-draggable-resizable'   // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.component('vue-draggable-resizable', VueDraggableResizable) // сопоставляем подключенный компонент с комопнентом vue
 
@@ -34,7 +36,7 @@ Vue.component('footer-bottom', require('./components/footer.vue').default)  // �
 // Vue.component('main-page', require('./components/mainPage.vue').default)  // главная страница с приветствием и выбором разных дашбордов
 // Vue.component('main-title', require('./components/mainTitle.vue').default)  // страница самого дашборда с разными элементами
 Vue.component('move-able', require('./components/moveAble.vue').default)  // обертка элемнета для drag-and-drop
-Vue.component('dash-board', require('./components/dashBoard.vue').default) // сам элемент
+Vue.component('dash-board', require('./components/dashBoard.vue').default) // сам элемент 
 Vue.component('dash-panel-bord', require('./components/dashPanelBoard.vue').default) // верхняя панель дашборда с разными инструментами
 Vue.component('modal-delete', require('./components/modalDelete.vue').default)  // модальное окно для удаления чего-либо
 Vue.component('modal-delete-main', require('./components/modalDeleteFromMain.vue').default)  // модальное окно для удаления групп и дашбордов
@@ -64,7 +66,7 @@ Vue.component('dash-csvg', require('./components/dashBoardInside/dashCSvg.vue').
 Vue.component('dash-piechart', require('./components/dashBoardInside/dashPieChart.vue').default)  // элемент  визуализации svg
 Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vue').default)  // граф. новая версия
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default)  // компонент куст. на yfiles
-Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) //компонент карта
+Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) // компонент карта
 Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) // компонент тепловая карта
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
@@ -84,16 +86,15 @@ Vue.component('data-profile', require('./components/autorization/dataForProfile.
 
 store.form = storeForm;
 store.auth = storeAuth;
+import App from "./App.vue";
 
-import "./fonts.css"
-import "./scroll.css"
-import "./yfiles/es-modules/yfiles.css"
-
+Vue.config.productionTip = true
 // создаем экземпляр vue где подключаем самое главное переадрасицию, визуализацию элемнетов и хранилище
 new Vue({
   store: store,
   vuetify: vuetify,
   router: router,
   screenshot: screenshot,
-  el: "#app"
-})
+  render: h => h(App)
+}).$mount('#mount')
+

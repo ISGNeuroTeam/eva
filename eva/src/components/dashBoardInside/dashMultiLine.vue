@@ -1090,8 +1090,11 @@ export default {
                 let xVal = d[xMetric];
                 if (time) {
                   xVal = new Date( d[xMetric]*secondTransf );
+                  let currentHours = ('0' + xVal.getHours()).substr(-2);
+                  let currentMinutes = ('0' + xVal.getMinutes()).substr(-2);
+                  let currentSeconds = ('0' + xVal.getSeconds()).substr(-2);
                   xVal = `${xVal.getDate()}-${xVal.getMonth()+1}-${xVal.getFullYear()} 
-                  ${xVal.getHours()}:${xVal.getMinutes()}:${xVal.getSeconds()}`;
+                  ${currentHours}:${currentMinutes}:${currentSeconds}`;
                 }
                 let text =  '';
                 that.metrics.forEach( key => {
@@ -1879,7 +1882,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
      @import '../../sass/dashMultiLine.sass'
     

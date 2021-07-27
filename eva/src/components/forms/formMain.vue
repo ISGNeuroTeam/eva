@@ -112,8 +112,8 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
 
-    @import '../../sass/formMain.sass';
+    @import '../../sass/formMain.sass'
 
 </style>

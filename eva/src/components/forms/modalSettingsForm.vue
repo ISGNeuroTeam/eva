@@ -161,8 +161,8 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
 
-    @import '../../sass/modalSettingsForm.sass';
+    @import '../../sass/modalSettingsForm.sass'
 
 </style>

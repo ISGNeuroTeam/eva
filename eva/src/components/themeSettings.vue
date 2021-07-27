@@ -112,7 +112,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
     @import '../sass/themeSettings.sass'
 
