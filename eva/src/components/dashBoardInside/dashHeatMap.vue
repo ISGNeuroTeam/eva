@@ -1,42 +1,79 @@
 <template>
   <v-container class="container">
     <v-row>
-      <v-select v-for="(ssp, i) in computedSSP" :key="i" :items="ssp" />
-      <v-select v-model="selectedMetric" :items="Array.from(metricList)" />
-      <v-select v-model="period" :items="periods" />
+      <v-col
+        v-for="(ssp, i) in computedSSP"
+        :key="i"
+        cols="3"
+      >
+        <v-select
+          :items="ssp"
+          :append-icon="mdiChevronDown"
+          dense
+          class="select"
+          outlined
+          hide-details
+        />
+      </v-col>
+      <v-col cols="3">
+        <v-select
+          v-model="selectedMetric"
+          :items="Array.from(metricList)"
+          :append-icon="mdiChevronDown"
+          class="select"
+          dense
+          outlined
+          hide-details
+        />
+      </v-col>
     </v-row>
-    <v-row>
+    <v-row justify="center">
       <v-data-table
         :headers="selectedHeaders"
         :items="computedData"
-        :items-per-page="5"
+        :items-per-page="-1"
+        hide-default-footer
         disable-sort
-        class="table elevation-1"
+        fixed-header
+        height="300"
       >
         <template v-slot:item="{ headers, item }">
           <tr>
             <template v-for="(val, index) in item">
-              <td v-if="index == 0" :key="index">
-                {{ val }}
-              </td>
-              <template v-for="(i, index) in headers" v-else >
-                <td v-if="index != 0" :key="index">
-                  <template
+              <td
+                v-if="index === 0 && item[1].fio"
+                :key="index"
+                style="text-align: left;"
+                v-text="item[1].fio"
+              />
+              <td
+                v-else-if="index === 0"
+                :key="index"
+                style="text-align: left;"
+                v-text="val"
+              />
+
+              <template v-for="(header, index) in headers" v-else >
+                <td v-if="index !== 0" :key="index">
+                  <DashHeatMapLinear
                     v-if="
                       val[headers[index].value] &&
                       showProperty(val[headers[index].value], selectedMetric)
                     "
-                  >
-                    <dash-heat-map-linear
-                      :value="
-                        showProperty(
-                          val[headers[index].value],
-                          selectedMetric
-                        )
-                      "
-                    />
-                  </template>
-                  <template v-else> Нет данных </template>
+                    :value="
+                      showProperty(
+                        val[headers[index].value],
+                        selectedMetric
+                      )
+                    "
+                    :comment="
+                      showProperty(
+                        val[headers[index].value],
+                        'description'
+                      )
+                    "
+                  />
+                  <span v-else>Нет данных</span>
                 </td>
               </template>
             </template>
@@ -49,6 +86,8 @@
 
 <script>
 import DashHeatMapLinear from "./dashHeatMapLinear.vue";
+import { mdiChevronDown } from '@mdi/js';
+
 export default {
   name: "heatmap",
   components: {
@@ -83,6 +122,7 @@ export default {
     dataLoadingFrom: null,
   },
   data: () => ({
+    mdiChevronDown,
     metricList: new Set(),
     allDates: new Set(),
     users: {},
@@ -101,12 +141,10 @@ export default {
       if (Array.isArray(this.allDates)) {
         return [
           {},
-          ...this.allDates.slice(0, 7).map((val) => {
-            let formatedDate = new Date(`${val}`);
-            return {
-              text: formatedDate.toLocaleDateString("ru"),
-              value: val,
-            };
+          ...this.allDates.slice(0, 7).map((value) => {
+            const formatedDate = new Date(`${value}`);
+            const text = formatedDate.toLocaleDateString("ru");
+            return { value, text };
           }),
         ];
       }
@@ -126,12 +164,17 @@ export default {
   watch: {
     dataRestFrom() {
       const sspMaxDeep = new Set();
-      let dates = new Set();
+      const dates = new Set();
+
       this.dataRestFrom.forEach((data) => {
-        const { ssp, variable, День, user } = data;
-        if (День) {
-          dates.add(День);
+        const {
+          fio, ssp, user, variable, value, 'День': day, _decription: description
+        } = data;
+
+        if (day) {
+          dates.add(day);
         }
+
         if (ssp) {
           const sspData = ssp.split("/");
           const maxDeep = Math.max(...sspMaxDeep.add(sspData.length));
@@ -142,60 +185,31 @@ export default {
           }
         }
 
-        // users
         if (user) {
           if (this.users[user]) {
-            this.$set(this.users[user], День, { [variable]: data.value });
+            this.$set(this.users[user], day, { description, [variable]: value });
           } else {
-            this.$set(this.users, user, {});
+            this.$set(this.users, user, { fio });
           }
         }
+
         this.userCount.add(user);
         this.metricList.add(variable);
         this.selectedMetric = Array.from(this.metricList)[0];
       });
 
-      // объект с данными об иерархии
-      // console.log(Array.from(dates));
-      dates = Array.from(dates).sort((a, b) => new Date(a) - new Date(b));
-      this.allDates = dates;
-
+      this.allDates = Array.from(dates).sort((a, b) => new Date(a) - new Date(b));
       this.$forceUpdate();
     },
   },
-  
   methods: {
     showProperty(object, property) {
-      if (object[property]) {
-        return object[property];
-      } else null;
+      return object[property] ? object[property] : null;
     },
   },
 };
 </script>
 
-<style lang="scss" scoped>
-.container {
-  tbody {
-    tr {
-      color: var(--main_text);
-
-      &:nth-of-type(odd) {
-        background-color: var(--secondary_bg);
-
-        &:hover td {
-          background-color: var(--secondary_bg);
-        }
-      }
-
-      &:nth-of-type(even) {
-        background-color: var(--main_bg);
-
-        &:hover td {
-          background-color: var(--main_bg);
-        }
-      }
-    }
-  }
-}
+<style lang="sass" scoped>
+@import './../../sass/dashHeatMap'
 </style>
