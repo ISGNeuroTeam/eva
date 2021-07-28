@@ -5,7 +5,7 @@ import "./fonts.css"
 import "./scroll.css"
 import "./yfiles/es-modules/yfiles.css"
 
-import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
+//import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 
 import store from './store/index.js' // подключаем файл с настройками хранилища Vuex
 
