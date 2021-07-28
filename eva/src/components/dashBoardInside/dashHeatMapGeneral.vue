@@ -19,7 +19,7 @@
               <tr v-for="(item, index) in dataRestFrom.y" :key="item.name">
                 <td>{{ item }}</td>
                 <td
-                  v-for="i in testData.metric.slice((dataRestFrom.x.length - 1) * index, (testData.x.length - 1) * (index + 1))"
+                  v-for="i in dataRestFrom.metric.slice((dataRestFrom.x.length - 1) * index, (dataRestFrom.x.length - 1) * (index + 1))"
                   :key="i"
                 >
                   {{ i }}
