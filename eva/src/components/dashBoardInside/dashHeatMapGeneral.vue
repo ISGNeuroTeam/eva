@@ -6,8 +6,11 @@
           <template v-slot:default>
             <thead>
               <tr>
+                <th>
+                  
+                </th>
                 <th
-                  v-for="(i, index) in dataRestFrom.x"
+                  v-for="(i, index) in filteredY"
                   :key="index"
                   class="text-center"
                 >
@@ -16,13 +19,15 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in dataRestFrom.y" :key="item.name">
-                <td>{{ item }}</td>
+              <tr v-for="(x, index) in filteredX" :key="index">
+                <td>
+                  {{filteredX[index]}}
+                </td>
                 <td
-                  v-for="i in testData.metric.slice((dataRestFrom.x.length - 1) * index, (testData.x.length - 1) * (index + 1))"
-                  :key="i"
+                  v-for="(y, index) in filteredY"
+                  :key="index"
                 >
-                  {{ i }}
+                  {{filteredData[x][y]}}
                 </td>
               </tr>
             </tbody>
@@ -35,16 +40,52 @@
 
 <script>
 export default {
-  name: "heatmap",
+  name: "heatmapGeneral",
   props: {
-    dataRestFrom: Object,
+    dataRestFrom: Array,
   },
   data() {
     return {
       testData: {},
+      x: new Set(),
+      y: new Set(),
+      updateData: 0,
+      data: {},
+      xField: "x",
+      yField: "y",
+      dataField: "metric",
+      renderData: "metadata",
     };
   },
-
+  computed: {
+    filteredData() {
+      console.log("updated");
+      return this.updateData && this.data
+    },
+    filteredY() {
+      return this.updateData && Array.from(this.y)
+    },
+    filteredX() {
+      return this.updateData && Array.from(this.x)
+    }
+  },
+  watch: {
+    dataRestFrom() {
+      this.x = new Set();
+      this.y = new Set();
+      this.updateData = 0;
+      this.data = {};
+      console.log("test")
+      for (let obj of this.dataRestFrom) {
+        this.x.add(obj[this.xField])
+        this.y.add(obj[this.yField])
+        if (!this.data[obj[this.xField]])
+          this.data[obj[this.xField]] = {}
+        this.data[obj[this.xField]][obj[this.yField]] = obj[this.dataField]
+        this.updateData += 1;
+      }
+    }
+  },
   mounted() {
     this.testData = {
       y: ["name1", "name 2", "name 3"],
