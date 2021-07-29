@@ -7,12 +7,11 @@
             <thead>
               <tr>
                 <th>
-                  
                 </th>
                 <th
                   v-for="(i, index) in filteredY"
                   :key="index"
-                  class="text-center"
+                  class="text-center header"
                 >
                   {{ i }}
                 </th>
@@ -85,13 +84,6 @@ export default {
         this.updateData += 1;
       }
     }
-  },
-  mounted() {
-    this.testData = {
-      y: ["name1", "name 2", "name 3"],
-      x: ["", "дата один", "date 2", "date 3"],
-      metric: [10, 10, 10, 10, 10, 10, 1, 2, 3],
-    };
   },
 };
 </script>
