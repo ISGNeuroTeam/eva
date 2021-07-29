@@ -3,8 +3,8 @@
     class="aut-app-profile" 
     :style="{background: theme.$secondary_bg }"
   >
-    <header-top 
-      :inside="true" 
+    <header-top
+      :inside="true"
       @permissions="setPermissions"
     />
     <v-content>

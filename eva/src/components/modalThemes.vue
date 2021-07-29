@@ -43,7 +43,7 @@
           </v-icon>
         </v-toolbar>
         <v-card-text
-          v-if="mode === 'standard'"
+          v-if="mode === 'select'"
           :style="{color: theme.$main_text, fontSize:'15px'}"
         >
           Выберете тему
@@ -156,7 +156,7 @@
                 class="file-upload-input"
                 type="file"
                 accept="image/*"
-                @change="getImage"
+                @change="uploadImage"
               >
               <div class="upload-text">
                 <svg
@@ -221,14 +221,14 @@
             <v-btn
               :color="theme.$main_bg"
               :style="{color:theme.$main_text}"
-              @click="mode = 'standard'"
+              @click="toSelectMode"
             >
               Отмена
             </v-btn>
             <v-btn
               :color="theme.$primary_button"
-              :style="{color:'#FFF'}"
-              @click="saveTheme"
+              :style="{color:'#FFF', marginLeft: '10px'}"
+              @click="saveNewTheme"
             >
               Сохранить
             </v-btn>
@@ -262,10 +262,8 @@ export default {
       mdiPlusCircleOutline,
       mdiWindowClose,
       mdiPencil,
-      themeTitles: [
-        {name: 'dark'},
-        {name: 'light'}
-      ],
+      select: this.$store.getters.getThemeTitle,
+      themeTitles: [],
       newTitle: '',
       opacity: 1,
       fields: [
@@ -321,7 +319,7 @@ export default {
         }
       ],
       imagePreview: null,
-      mode: 'standard'
+      mode: 'select',
     }
   },
   computed: {
@@ -330,22 +328,37 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme
-    },
-    select: {
-      get: function () {
-        return this.$store.getters.getThemeTitle
-      },
-      set: function (value) {
-        this.$store.commit('setTheme', value);
-      }
     }
   },
+  watch: {
+    select: async function (selectedTheme) {
+      if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
+        let response = await fetch(`/api/theme?themeName=${selectedTheme}`);
+        let themeData = await response.json();
+        let content = JSON.parse(themeData.content)
+        this.$store.commit('setTheme', content);
+      } else this.$store.commit('setDefaultTheme', selectedTheme);
+    }
+  },
+  async created() {
+    await this.getThemeList();
+  },
   methods: {
-    closeModal() {
-      this.mode = 'standard'
-      this.$emit('closeModal')
+    resetForm(){
+      this.newTitle = '';
+      this.opacity = 1;
+      this.imagePreview = null;
+      this.fields.forEach(field => field.value = "#8F8F9C");
     },
-    getImage() {
+    closeModal() {
+      this.$emit('closeModal');
+      this.toSelectMode();
+    },
+    toSelectMode(){
+      this.mode = 'select';
+      this.resetForm();
+    },
+    uploadImage() {
       const image = this.$refs.imageInput.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(image);
@@ -353,12 +366,49 @@ export default {
         this.imagePreview = e.target.result;
       };
     },
-    removeImage(){
+    removeImage() {
       this.imagePreview = null;
       this.opacity = 1;
     },
-    saveTheme(){
-      console.log('coming soon...')
+    async saveNewTheme() {
+      if (this.newTitle) {
+        let themeObject = {
+          themeName: this.newTitle,
+          settings: {
+            $image_opacity: this.opacity,
+            $background_image: `url(${this.imagePreview})`
+          }
+        }
+        this.fields.forEach(field => {
+          themeObject.settings[field.propName] = field.value;
+        });
+
+        try {
+          let res = await fetch('/api/theme/create',
+            {
+              method:'POST',
+              body:JSON.stringify(themeObject)
+            }
+          )
+          if(res.status !== 200) return;
+          this.mode = 'select'
+          await this.getThemeList()
+        } catch (e) {
+          console.log(e)
+        }
+      }
+    },
+    async getThemeList() {
+      try {
+        let response = await fetch('/api/themes');
+        let themeTitles = await response.json();
+        this.themeTitles = [
+          {name: 'dark'},
+          {name: 'light'},
+        ].concat(themeTitles);
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }
@@ -366,6 +416,6 @@ export default {
 
 <style lang="scss">
 
-@import '../sass/modalThemes.sass'
+@import '../sass/modalThemes.sass';
 
 </style>

@@ -1,7 +1,7 @@
 <template>
   <v-app class="application-aut">
     <v-content>
-      <v-container  
+      <v-container
         class="main-container container-app" 
         :style="{backgroundColor:theme.$secondary_bg}"
       >  

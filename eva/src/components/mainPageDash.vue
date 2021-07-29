@@ -3,16 +3,16 @@
     <header-top @permissions="setPermissions" />
     <v-main>
       <v-container class="main-container container-dash">
-        <v-card 
-          class="main-card-dash" 
-          :style="{background: theme.$secondary_bg, boxShadow:'none'}"
+        <v-card
+          class="main-card-dash"
+          :style="{background: 'none', boxShadow:'none'}"
         >
           <v-card-text>
             <v-tabs  
               v-model="tab" 
               class="tab-dash" 
               :color="theme.$main_text"
-              :style="{background: theme.$secondary_bg}"
+              :style="{background: 'none'}"
             > 
               <v-tabs-slider />
               <v-tab  

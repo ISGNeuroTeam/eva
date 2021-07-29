@@ -247,10 +247,24 @@ export default {
 }
 </script>
 
-<style > 
+<style lang="scss">
 
     .aplication {
         position: relative;
+    }
+    .aplication:before {
+        content: ' ';
+        display: block;
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: var(--image_opacity);
+        background-image: var(--background_image);
+        background-repeat: no-repeat;
+        background-position: 50% 0;
+        background-size: cover;
     }
     .aplication .already-block {
         display: flex;

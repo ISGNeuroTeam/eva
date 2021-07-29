@@ -49,6 +49,7 @@ Vue.component('modal-settings', require('./components/modalSettings.vue').defaul
 Vue.component('theme-settings', require('./components/themeSettings.vue').default)  // настройки системы
 Vue.component('dash-settings', require('./components/dashSettings.vue').default)  // настройки дашборда
 Vue.component('modal-paper', require('./components/modalPaper.vue').default)  // настройки дашборда
+Vue.component('modal-themes', require('./components/modalThemes.vue').default)  // настройки темы
 
 Vue.component('dash-table', require('./components/dashBoardInside/dashTable.vue').default)  // элемент таблицы
 Vue.component('dash-guntt', require('./components/dashBoardInside/dashGuntt.vue').default)  // элемент диаграммы ганта
