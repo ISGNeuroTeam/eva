@@ -5,34 +5,34 @@ import "./fonts.css"
 import "./scroll.css"
 import "./yfiles/es-modules/yfiles.css"
 
-import regeneratorRuntime from "regenerator-runtime"; // НЕ УДАЛЯТЬ
+//import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 
-import store from "./store/index.js"; // подключаем файл с настройками хранилища Vuex
+import store from './store/index.js' // подключаем файл с настройками хранилища Vuex
 
-import storeForm from "./storeForm/index.js"; // подключаем файл с настройками хранилища Vuex (формы)
+import storeForm from './storeForm/index.js' // подключаем файл с настройками хранилища Vuex (формы)
 
-import storeAuth from "./storeAuth/index.js"; // подключаем файл с настройками хранилища Vuex (авторизация)
+import storeAuth from './storeAuth/index.js' // подключаем файл с настройками хранилища Vuex (авторизация)
 
-import vuetify from "./plugins/vuetify.js"; // подключаем визуальную библиотеку Vuetify для красивого отображения элемнетов
+import vuetify from './plugins/vuetify.js' // подключаем визуальную библиотеку Vuetify для красивого отображения элемнетов
 
-import router from "./route/index.js"; // подключаем файл с настройками адресации между компонентами
+import router from './route/index.js'  // подключаем файл с настройками адресации между компонентами
 
-import screenshot from "./plugins/screenshot.js"; // подключаем файл с настройками плагина для скриншотов
+import screenshot from './plugins/screenshot.js'  // подключаем файл с настройками плагина для скриншотов
 
 import AsyncComputed from 'vue-async-computed'  // позволяет создавтаь асинхронные computed
 Vue.use(AsyncComputed)
 import VueDraggableResizable from 'vue-draggable-resizable'   // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.component('vue-draggable-resizable', VueDraggableResizable) // сопоставляем подключенный компонент с комопнентом vue
 
-import VueCtkDateTimePicker from "vue-ctk-date-time-picker"; // подключаем компонент для выбора даты и времени
-import "vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css"; // подключаем стили для этого компонента
-Vue.component("DTPicker", VueCtkDateTimePicker); // сопоставляем подключенный компонент с комопнентом vue
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';  // подключаем компонент для выбора даты и времени
+import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';  // подключаем стили для этого компонента
+Vue.component('DTPicker', VueCtkDateTimePicker);   // сопоставляем подключенный компонент с комопнентом vue
 
 
 // далее объявляем компоненты так как потом будем их вызывать в html коде
-Vue.component("app", require("./App.vue").default);
-Vue.component("header-top", require("./components/header.vue").default); // верхняя панель на странице
-Vue.component("footer-bottom", require("./components/footer.vue").default); // верхняя панель на странице
+Vue.component('app', require('./App.vue').default)
+Vue.component('header-top', require('./components/header.vue').default)  // верхняя панель на странице
+Vue.component('footer-bottom', require('./components/footer.vue').default)  // верхняя панель на странице
 // Vue.component('main-page', require('./components/mainPage.vue').default)  // главная страница с приветствием и выбором разных дашбордов
 // Vue.component('main-title', require('./components/mainTitle.vue').default)  // страница самого дашборда с разными элементами
 Vue.component('move-able', require('./components/moveAble.vue').default)  // обертка элемнета для drag-and-drop
@@ -69,20 +69,22 @@ Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vu
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default)  // компонент куст. на yfiles
 Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) // компонент карта
 Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) // компонент тепловая карта
+Vue.component('dash-heatmapGeneral', require('./components/dashBoardInside/dashHeatMapGeneral.vue').default) // компонент тепловая карта
+
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
 //Vue.component('dash-search', require('./components/dashBoardInside/dashSearch.vue').default)  // элемнет поиска пока не актуален
 // Vue.component('dash-filter', require('./components/dashBoardInside/dashFilter.vue').default)  // фильтр для таблицы пока не актуален
-Vue.component("modal-create-form", require("./components/forms/modalCreateForm.vue").default); // элемент создания формы
-Vue.component("modal-choose-element", require("./components/forms/modalChooseElement.vue").default); // элемент выбора элементов
-Vue.component("modal-setting-form", require("./components/forms/modalSettingsForm.vue").default); // элемент настроек элемента
-Vue.component("template-elements-form", require("./components/forms/formTemplateElements.vue").default); // элемент шаблона элемнета формы
+Vue.component('modal-create-form', require('./components/forms/modalCreateForm.vue').default)  // элемент создания формы
+Vue.component('modal-choose-element', require('./components/forms/modalChooseElement.vue').default)  // элемент выбора элементов
+Vue.component('modal-setting-form', require('./components/forms/modalSettingsForm.vue').default)  // элемент настроек элемента
+Vue.component('template-elements-form', require('./components/forms/formTemplateElements.vue').default)  // элемент шаблона элемнета формы
 
-Vue.component("modal-profile", require("./components/autorization/modalProfile.vue").default); // верхняя панель на странице
-Vue.component("modal-report", require("./components/modalReports.vue").default); // модальное окно для компонента Search&Reports
-Vue.component("modal-delete-profile", require("./components/autorization/modalDeleteProfile.vue").default); // модалка для удаления сущностей пользователей
-Vue.component("modal-log", require("./components/autorization/modalLog.vue").default); // модалка для вывода лога
-Vue.component("data-profile", require("./components/autorization/dataForProfile.vue").default); //  компонент для получения данных для пользователя
+Vue.component('modal-profile', require('./components/autorization/modalProfile.vue').default)  // верхняя панель на странице
+Vue.component('modal-report', require('./components/modalReports.vue').default)  // модальное окно для компонента Search&Reports
+Vue.component('modal-delete-profile', require('./components/autorization/modalDeleteProfile.vue').default)  // модалка для удаления сущностей пользователей
+Vue.component('modal-log', require('./components/autorization/modalLog.vue').default)  // модалка для вывода лога
+Vue.component('data-profile', require('./components/autorization/dataForProfile.vue').default)  //  компонент для получения данных для пользователя
 
 
 store.form = storeForm;
@@ -98,3 +100,4 @@ new Vue({
   screenshot: screenshot,
   render: h => h(App)
 }).$mount('#mount')
+
