@@ -11,6 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - heatmap visualization
 - heatmap metrics aggregation
 - heatmap ssp aggregation in watch
+- custom theme creation
+- image background from theme
+- custom theme editing and deleting
+
+### Changed
+- modal for selecting current application theme
+
+### Removed
+- old color props from default themes
 
 ## [1.59.0]
 

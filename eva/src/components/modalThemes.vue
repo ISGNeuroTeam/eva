@@ -56,9 +56,29 @@
             item-text="name"
             item-value="name"
           />
+          <div v-if="admin && select !== 'dark' && select !== 'light'" class="theme-control-btn-block">
+            <div :style="{color:theme.$ok_color, marginRight: '30px'}"  class="btn" @click="editTheme">
+              <v-icon
+                :color="theme.$ok_color"
+                :style="{width: '19px', height: '19px'}"
+              >
+                {{ mdiPencil }}
+              </v-icon>
+              Редактировать
+            </div>
+            <div :style="{color:theme.$error_color}" class="btn" @click="deleteTheme">
+              <v-icon
+                :color="theme.$error_color"
+                :style="{width: '19px', height: '19px'}"
+              >
+                {{ mdiTrashCanOutline }}
+              </v-icon>
+              Удалить
+            </div>
+          </div>
           <div
             v-if="admin"
-            :style="{color:theme.$accent_ui_color, width:'170px'}"
+            :style="{color:theme.$accent_ui_color, width:'170px', fontWeight: '600'}"
             class="add-theme-button"
             @click="mode ='create'"
           >
@@ -72,7 +92,7 @@
           </div>
         </v-card-text>
         <v-card-text
-          v-if="mode === 'create'"
+          v-if="mode === 'create' || mode === 'edit'"
           :style="{color: theme.$main_text, fontSize:'15px'}"
         >
           Название темы
@@ -217,7 +237,7 @@
           </div>
         </v-card-text>
         <v-card-actions class="justify-end">
-          <div v-if="mode === 'create'">
+          <div v-if="mode === 'create' || mode === 'edit'">
             <v-btn
               :color="theme.$main_bg"
               :style="{color:theme.$main_text}"
@@ -249,7 +269,7 @@
 </template>
 
 <script>
-import {mdiCompare, mdiPlusCircleOutline, mdiWindowClose, mdiPencil} from '@mdi/js'
+import {mdiCompare, mdiPlusCircleOutline, mdiWindowClose, mdiPencil, mdiTrashCanOutline} from '@mdi/js'
 
 export default {
   props: {
@@ -262,6 +282,7 @@ export default {
       mdiPlusCircleOutline,
       mdiWindowClose,
       mdiPencil,
+      mdiTrashCanOutline,
       select: this.$store.getters.getThemeTitle,
       themeTitles: [],
       newTitle: '',
@@ -320,6 +341,7 @@ export default {
       ],
       imagePreview: null,
       mode: 'select',
+      error:false,
     }
   },
   computed: {
@@ -344,7 +366,7 @@ export default {
     await this.getThemeList();
   },
   methods: {
-    resetForm(){
+    resetForm() {
       this.newTitle = '';
       this.opacity = 1;
       this.imagePreview = null;
@@ -354,9 +376,34 @@ export default {
       this.$emit('closeModal');
       this.toSelectMode();
     },
-    toSelectMode(){
+    toSelectMode() {
       this.mode = 'select';
       this.resetForm();
+    },
+    editTheme() {
+      let themeObject = this.$store.getters.getTheme;
+      let themeTitle = this.$store.getters.getThemeTitle;
+      this.fields.forEach(field => {
+        field.value = themeObject[field.propName];
+      });
+      this.opacity = themeObject.$image_opacity;
+      this.imagePreview = themeObject.$background_image ? themeObject.$background_image.slice(4,-1) : themeObject.$background_image;
+      this.newTitle = themeTitle;
+      this.mode = 'edit';
+    },
+    async deleteTheme() {
+      try {
+        await fetch(`/api/theme/delete`, {
+          method: 'DELETE',
+          body: JSON.stringify({
+            themeName: this.select
+          })
+        });
+        await this.getThemeList();
+        this.select = 'dark';
+      } catch (e) {
+        console.log(e)
+      }
     },
     uploadImage() {
       const image = this.$refs.imageInput.files[0];
@@ -372,11 +419,23 @@ export default {
     },
     async saveNewTheme() {
       if (this.newTitle) {
+        if(this.mode === 'edit') {
+          try {
+            await fetch(`/api/theme/delete`, {
+              method: 'DELETE',
+              body: JSON.stringify({
+                themeName: this.select
+              })
+            });
+          } catch (e) {
+            console.log(e)
+          }
+        }
         let themeObject = {
           themeName: this.newTitle,
           settings: {
             $image_opacity: this.opacity,
-            $background_image: `url(${this.imagePreview})`
+            $background_image: this.imagePreview ? `url(${this.imagePreview})` : null
           }
         }
         this.fields.forEach(field => {
@@ -391,11 +450,16 @@ export default {
             }
           )
           if(res.status !== 200) return;
+          let themeData = await res.json();
+          let content = JSON.parse(themeData)
+          this.$store.commit('setTheme', content);
           this.mode = 'select'
           await this.getThemeList()
         } catch (e) {
           console.log(e)
         }
+      } else {
+        this.error = true
       }
     },
     async getThemeList() {
