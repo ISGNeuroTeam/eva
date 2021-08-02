@@ -14,7 +14,7 @@
           >
             {{ mdiCompare }}
           </v-icon>
-          <v-card-title>
+          <v-card-title class="modal-title">
             Настройки темы
           </v-card-title>
           <svg
