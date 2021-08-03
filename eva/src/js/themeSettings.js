@@ -1,14 +1,5 @@
 export default {
   dark: {
-    back: '#060606',
-    backElement: '#191919',
-    text: '#DADADA',
-    controls: '#6e96c5',
-    controlsSystem: '#004799',
-    controlsActive: '#41C4FF',
-    controlsInsideDash: '#DADADA',
-    panel: '#191919',
-    border: '#FFFFFF33',
     $main_bg: '#3C3B45',
     $secondary_bg: '#232126',
     $secondary_border: '#8F8F9C',
@@ -37,15 +28,6 @@ export default {
     $sea: '#86D9DE'
   },
   light: {
-    back: '#ffffff',
-    backElement: 'white',
-    text: '#4a4a4a',
-    controls: '#6e96c5',
-    controlsSystem: '#004799',
-    controlsActive: '#41C4FF',
-    controlsInsideDash: '#6e96c5',
-    panel: '#2B68B1',
-    border: '#00000033',
     $main_bg: '#FFFFFF',
     $secondary_bg: '#F4F4FA',
     $secondary_border: '#E5E5F2',
