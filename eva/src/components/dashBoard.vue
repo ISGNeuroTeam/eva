@@ -438,8 +438,13 @@ export default {
       return this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
     },
     ...mapGetters([
-      'getSelectedTableTitles'
+      'getSelectedTableTitles',
+      'getSelectedDataFormat'
     ])
+  },
+
+  watch: {
+    
   },
  
   mounted() {

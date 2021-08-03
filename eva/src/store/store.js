@@ -631,7 +631,7 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-      if (settings.element && settings.element.includes('table')) {
+      if (settings.element && (settings.element.includes('table') || settings.element.includes('heatmapGeneral'))) {
         Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
         if(!state[settings.idDash][settings.element].selectedTableTitles) {
           Vue.set(state[settings.idDash][settings.element], 'selectedTableTitles', settings?.titles);
@@ -1488,6 +1488,16 @@ export default {  // приблизительный объект хранили�
     getAvailableTableTitles: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.availableTableTitles;
+      }
+    },
+    getSelectedDataFormat: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.selectedDataFormat;
+      }
+    },
+    getAvailableDataFormat: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.availableDataFormat;
       }
     },
     getLibrary: (state) => {

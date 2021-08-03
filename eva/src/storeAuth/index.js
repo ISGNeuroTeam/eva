@@ -9,6 +9,7 @@ import store from './store.js'
 
 
 export default new Vuex.Store({
+  strict: true,
   modules: {
     store
   },
