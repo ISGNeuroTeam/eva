@@ -55,22 +55,31 @@ export default {
     },
     filteredY() {
       let temp = Array.from(this.y);
-      let up = (a, b) => {
-        return new Date(a) - new Date(b);
-      };
-      let down = (a, b) => {
-        return new Date(b) - new Date(a);
-      };
-      let sort;
-      if (this.yFieldSort === "По возрастанию")
-        sort = up;
-      else 
-        sort = down
-      temp.sort(sort)
+      if (this.yFieldFormat === "Строка") {
+        if (this.yFieldSort === "По возрастанию")
+          temp.sort();
+        else
+          temp.sort().reverse();
+      }
+      else {
+        let sort = this.chooseSort(this.yFieldFormat, this.yFieldSort);
+        temp.sort(sort);
+      }
       return this.updateData && temp;
     },
     filteredX() {
-      return this.updateData && Array.from(this.x);
+      let temp = Array.from(this.x);
+      if (this.xFieldFormat === "Строка") {
+        if (this.xFieldSort === "По возрастанию")
+          temp.sort();
+        else
+          temp.sort().reverse();
+      }
+      else {
+        let sort = this.chooseSort(this.xFieldFormat, this.xFieldSort);
+        temp.sort(sort);
+      }
+      return this.updateData && temp;
     },
   },
   watch: {
@@ -96,7 +105,31 @@ export default {
   },
   methods: {
     chooseSort(dataFormat, sortType) {
+      if (dataFormat === "Дата") {
+        let up = (a, b) => {
+          return new Date(a) - new Date(b);
+        };
+        let down = (a, b) => {
+          return new Date(b) - new Date(a);
+        };
 
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      } else if (dataFormat === "Число") {
+        let up = (a, b) => {
+          return a - b;
+        };
+        let down = (a, b) => {
+          return b - a;
+        };
+
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      }
     },
     render() {
       this.x = new Set();
