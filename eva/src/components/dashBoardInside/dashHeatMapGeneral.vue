@@ -1,39 +1,34 @@
 <template>
-  <v-container class="container">
-    <v-row>
-      <v-col>
-        <v-simple-table dense>
-          <template v-slot:default>
-            <thead>
-              <tr>
-                <th>
-                </th>
-                <th
-                  v-for="(i, index) in filteredY"
-                  :key="index"
-                  class="text-center header"
-                >
-                  {{ i }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(x, index) in filteredX" :key="index">
-                <td>
-                  {{filteredX[index]}}
-                </td>
-                <td
-                  v-for="(y, index) in filteredY"
-                  :key="index"
-                >
-                  {{filteredData[x][y]}}
-                </td>
-              </tr>
-            </tbody>
-          </template>
-        </v-simple-table>
-      </v-col>
-    </v-row>
+  <v-container class="container px-0">
+    <v-simple-table dense fixed-header class="heatmap-table" height="100%">
+      <template v-slot:default>
+        <thead>
+          <tr>
+            <th class="table-th"/>
+            <th
+              v-for="(y, index) in filteredY"
+              :key="index"
+              class="text-center table-th"
+              v-text="y"
+            />
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(x, index) in filteredX" :key="index">
+            <td
+              class="text-left"
+              v-text="filteredX[index]"
+            />
+            <td
+              v-for="(y, index) in filteredY"
+              :key="index"
+            >
+              {{filteredData[x][y]}}
+            </td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
   </v-container>
 </template>
 
@@ -89,5 +84,5 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import './../../sass/dashHeatMap'
+@import './../../sass/dashHeatMapGeneral'
 </style>
