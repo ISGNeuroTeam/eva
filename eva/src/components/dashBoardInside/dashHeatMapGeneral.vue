@@ -86,12 +86,18 @@ export default {
         if (newVal.data) this.dataField = newVal.data;
         if (newVal.x) this.renderData = newVal.metadata;
         if (newVal.ySort) this.yFieldSort = newVal.ySort;
+        if (newVal.ySort) this.xFieldSort = newVal.xSort;
+        if (newVal.ySort) this.yFieldFormat = newVal.yFormat;
+        if (newVal.ySort) this.xFieldFormat = newVal.xFormat;
         this.updateData += 1;
         this.render();
       },
     },
   },
   methods: {
+    chooseSort(dataFormat, sortType) {
+
+    },
     render() {
       this.x = new Set();
       this.y = new Set();

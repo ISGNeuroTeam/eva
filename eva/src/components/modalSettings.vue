@@ -1396,7 +1396,10 @@ export default {
         this.options.y = this.y;
         this.options.data = this.data;
         this.options.metadata = this.metadata;
+        this.options.yFormat = this.yFormat;
         this.options.ySort = this.ySort;
+        this.options.xFormat = this.xFormat;
+        this.options.xSort = this.xSort;
       }
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();
