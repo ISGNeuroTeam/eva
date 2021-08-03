@@ -482,16 +482,41 @@
             </v-card-text>
               <v-checkbox
                 v-for="(setting) in getAvailableTableTitles(idDash, element)"
-                :input-value="tableTitles"
-                @change="titleHandler($event)"
-                :style="{color:theme.$main_text}" 
                 :key="setting"
+                :input-value="tableTitles"
+                :style="{color:theme.$main_text}" 
                 :label="setting"
-                :value="setting">  
+                :value="setting"
+                @change="titleHandler($event)">  
               </v-checkbox>
             </v-container>
             
           </div>
+
+          <div 
+            v-if="checkOptions('dataFormat')"
+            class="option-item" 
+            :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+          >
+            <v-container fluid>
+              <v-card-text 
+              class="headline" 
+            >
+              <div 
+                class="settings-title" 
+                :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+              >
+                Формат данных
+              </div>
+            </v-card-text>
+              <v-row :style="{color:theme.$main_text}" >x: <v-select v-model="x" :items="tableTitles" /> <v-select :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" >y: <v-select v-model="y" :items="tableTitles" /> <v-select :items="tableTitles" /></v-row>
+              <v-row :style="{color:theme.$main_text}" >data: <v-select v-model="data" :items="tableTitles" /> <v-select :items="tableTitles" /></v-row>
+              <v-row :style="{color:theme.$main_text}" >metadata: <v-select v-model="metadata" :items="tableTitles" /> <v-select :items="tableTitles" /></v-row>
+            </v-container>
+            
+          </div>
+
           <div 
             v-if="checkOptions('timeFormat')"
             class="option-item" 
@@ -884,11 +909,11 @@
               </div>
             </v-card-text>
               <v-textarea
+                v-model="options.primitivesLibrary"
                 name="input-7-1"
                 filled
                 label="JSON c примитивами"
                 auto-grow
-                v-model="options.primitivesLibrary"
               ></v-textarea>
             </v-container>
           </div>
@@ -1205,6 +1230,7 @@ export default {
   data() {
     return {
       tableTitles:[],
+      dataFormat: {},
       element: '',
       options: {
       },
@@ -1232,6 +1258,10 @@ export default {
       metrics: [],
       types: ['Line chart', 'Bar chart'],
       metricsName: [],
+      x: '',
+      y: '',
+      metadata: '',
+      data: '',
     }
   },
   computed: { 
@@ -1245,6 +1275,13 @@ export default {
         }
         this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
+        let test = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
+        if (this.element.includes("heatmapGeneral")) {
+          this.x = test.x
+          this.y = test.y
+          this.data = test.data
+          this.metadata = test.metadata
+        }
       }
       return this.$store.getters.getModalSettings(this.idDash).status;
     },
@@ -1261,6 +1298,8 @@ export default {
     ...mapGetters([
       'getAvailableTableTitles',
       'getSelectedTableTitles',
+      'getAvailableDataFormat',
+      'getSelectedDataFormat',
     ]),
 
   },
@@ -1318,6 +1357,13 @@ export default {
           return JSON.parse(JSON.stringify(item))
         })
         this.$set(this.options,'metrics',updateMetrics);
+      }
+
+      if(this.element.includes('heatmapGeneral')) {
+        this.options.x = this.x;
+        this.options.y = this.y;
+        this.options.data = this.data;
+        this.options.metadata = this.metadata;
       }
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();

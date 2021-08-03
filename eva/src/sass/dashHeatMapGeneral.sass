@@ -1,0 +1,33 @@
+$dash-loading-height: 3px
+
+@mixin container-height($dash-header-height)
+  height: calc(100% - (#{$dash-header-height} + #{$dash-loading-height}))
+
+.container::v-deep
+  @include container-height($dash-header-height: 35px)
+
+  @media screen and (max-width: 1600px)
+    @include container-height($dash-header-height: 25px)
+
+  .heatmap-table
+    height: 100%
+
+    .table-th
+      color: var(--main_text)
+      background-color: var(--secondary_bg)
+
+  tbody
+    tr
+      color: var(--main_text)
+
+      &:nth-of-type(odd)
+        background-color: var(--main_bg)
+
+        &:hover td
+          background-color: var(--main_bg)
+
+      &:nth-of-type(even)
+        background-color: var(--secondary_bg)
+
+        &:hover td
+          background-color: var(--secondary_bg)

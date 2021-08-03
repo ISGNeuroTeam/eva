@@ -127,6 +127,7 @@ export default {
     ygraph: ['visible','level'],
     bush: ['visible','level'],
     map: ['visible','level', 'osmserver', 'primitivesLibrary'],
+    heatmapGeneral: ['visible','level', 'dataFormat']
 
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
