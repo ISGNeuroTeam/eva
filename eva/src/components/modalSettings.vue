@@ -509,10 +509,30 @@
                 Формат данных
               </div>
             </v-card-text>
-              <v-row :style="{color:theme.$main_text}" >x: <v-select v-model="x" :items="tableTitles" /> <v-select :items="tableTitles" /> </v-row>
-              <v-row :style="{color:theme.$main_text}" >y: <v-select v-model="y" :items="tableTitles" /> <v-select :items="tableTitles" /></v-row>
-              <v-row :style="{color:theme.$main_text}" >data: <v-select v-model="data" :items="tableTitles" /> <v-select :items="tableTitles" /></v-row>
-              <v-row :style="{color:theme.$main_text}" >metadata: <v-select v-model="metadata" :items="tableTitles" /> <v-select :items="tableTitles" /></v-row>
+              <v-row :style="{color:theme.$main_text}" >
+                <v-col col="4">
+                  <v-select label="x:" v-model="x" :items="tableTitles" />
+                </v-col>
+                <v-col col="4">
+                   <v-select v-model="xFormat" :items="dataFormat" />
+                </v-col>
+                <v-col col="4">
+                   <v-select v-model="xSort" :items="sortType" />
+                </v-col>
+              </v-row>
+              <v-row :style="{color:theme.$main_text}" >
+                <v-col col="4">
+                  <v-select label="y:" v-model="y" :items="tableTitles" />
+                </v-col>
+                <v-col col="4">
+                   <v-select v-model="yFormat" :items="dataFormat" />
+                </v-col>
+                <v-col col="4">
+                   <v-select v-model="ySort" :items="sortType" />
+                </v-col>
+              </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select label="data:" v-model="data" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select label="metadata:" v-model="metadata" :items="tableTitles" /> </v-row>
             </v-container>
             
           </div>
@@ -1230,7 +1250,6 @@ export default {
   data() {
     return {
       tableTitles:[],
-      dataFormat: {},
       element: '',
       options: {
       },
@@ -1262,6 +1281,19 @@ export default {
       y: '',
       metadata: '',
       data: '',
+      xFormat: 'Строка',
+      yFormat: 'Дата',
+      xSort: 'По возрастанию',
+      ySort: 'По убыванию',
+      dataFormat: [
+        'Дата',
+        'Строка',
+        'Число',
+      ],
+      sortType: [
+        "По возрастанию",
+        "По убыванию"
+      ]
     }
   },
   computed: { 
