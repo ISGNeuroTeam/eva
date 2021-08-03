@@ -4,7 +4,7 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th class="table-th"/>
+            <th class="table-th" />
             <th
               v-for="(y, index) in filteredY"
               :key="index"
@@ -15,15 +15,9 @@
         </thead>
         <tbody>
           <tr v-for="(x, index) in filteredX" :key="index">
-            <td
-              class="text-left"
-              v-text="filteredX[index]"
-            />
-            <td
-              v-for="(y, index) in filteredY"
-              :key="index"
-            >
-              {{filteredData[x][y]}}
+            <td class="text-left" v-text="filteredX[index]" />
+            <td v-for="(y, index) in filteredY" :key="index">
+              {{ filteredData[x][y] }}
             </td>
           </tr>
         </tbody>
@@ -48,6 +42,10 @@ export default {
       xField: "x",
       yField: "y",
       dataField: "metric",
+      xFieldFormat: "Строка",
+      xFieldSort: "По возрастанию",
+      yFieldFormat: "Дата",
+      yFieldSort: "По возрастанию",
       renderData: "metadata",
     };
   },
@@ -56,7 +54,20 @@ export default {
       return this.updateData && this.data;
     },
     filteredY() {
-      return this.updateData && Array.from(this.y);
+      let temp = Array.from(this.y);
+      let up = (a, b) => {
+        return new Date(a) - new Date(b);
+      };
+      let down = (a, b) => {
+        return new Date(b) - new Date(a);
+      };
+      let sort;
+      if (this.yFieldSort === "По возрастанию")
+        sort = up;
+      else 
+        sort = down
+      temp.sort(sort)
+      return this.updateData && temp;
     },
     filteredX() {
       return this.updateData && Array.from(this.x);
@@ -74,6 +85,7 @@ export default {
         if (newVal.y) this.yField = newVal.y;
         if (newVal.data) this.dataField = newVal.data;
         if (newVal.x) this.renderData = newVal.metadata;
+        if (newVal.ySort) this.yFieldSort = newVal.ySort;
         this.updateData += 1;
         this.render();
       },

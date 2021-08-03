@@ -1284,7 +1284,7 @@ export default {
       xFormat: 'Строка',
       yFormat: 'Дата',
       xSort: 'По возрастанию',
-      ySort: 'По убыванию',
+      ySort: 'По возрастанию',
       dataFormat: [
         'Дата',
         'Строка',
@@ -1396,6 +1396,7 @@ export default {
         this.options.y = this.y;
         this.options.data = this.data;
         this.options.metadata = this.metadata;
+        this.options.ySort = this.ySort;
       }
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();
