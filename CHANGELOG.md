@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - old color props from default themes
 
+### Changed
+- heatmapGeneral table cells border and table width
+- heatmapLinear component styles and visible value
+
 ## [1.59.0]
 
 ### Added

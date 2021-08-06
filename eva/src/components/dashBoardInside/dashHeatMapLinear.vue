@@ -16,11 +16,11 @@
       transition="fade-transition"
     >
       <template v-slot:activator="{ on }">
-        <strong v-on="on" v-text="calculatedValue + '%'"/>
+        <strong v-on="on" v-text="title"/>
       </template>
       <span :style="{ color }" v-text="comment"/>
     </v-tooltip>
-    <strong v-else v-text="calculatedValue + '%'"/>
+    <strong v-else v-text="title"/>
   </v-progress-linear>
 </template>
 
@@ -30,6 +30,10 @@ export default {
     value: {
       type: Number,
       default: 0,
+    },
+    title: {
+      type: [String, Number],
+      default: '',
     },
     color: {
       type: String,
@@ -65,4 +69,5 @@ export default {
 <style lang="sass" scoped>
 .progress-bar-linear
   min-width: 50px
+  border-radius: 5px
 </style>
