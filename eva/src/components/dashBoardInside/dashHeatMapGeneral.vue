@@ -1,5 +1,5 @@
 <template>
-  <v-container class="container px-0">
+  <div class="heatmap-container px-0">
     <v-simple-table dense fixed-header class="heatmap-table" height="100%">
       <template v-slot:default>
         <thead>
@@ -19,6 +19,7 @@
             <td v-for="y in filteredY" :key="y" class="py-2">
               <DashHeatMapLinear
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"
+                :title="filteredData[x][y].value"
                 :value="filteredData[x][y].metadata.progress_bar_value"
                 :color="filteredData[x][y].metadata.progress_bar_color"
                 :comment="filteredData[x][y].metadata.description"
@@ -32,7 +33,7 @@
         </tbody>
       </template>
     </v-simple-table>
-  </v-container>
+  </div>
 </template>
 
 <script>
