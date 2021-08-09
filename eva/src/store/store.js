@@ -23,6 +23,9 @@ export default {  // приблизительный объект хранили�
       state[size.idDash][size.id].width = size.width;
       state[size.idDash][size.id].height = size.height;
     },
+    // setVisualizationTab: (state, tab) => {
+    //   state[]
+    // },
     setSearch: (state, search) => {   // сохранение нового search (источника данных)
             
       if (search.reload) {  // если источник данных уже есть то
@@ -322,7 +325,7 @@ export default {  // приблизительный объект хранили�
         }
       }
 
-      state[dashboard.idDash][id] = data; 
+      state[dashboard.idDash][id] = {...data, tab: state[dashboard.idDash].currentTab};
 
       state[dashboard.idDash].elements.push(id);
     },
@@ -733,23 +736,52 @@ export default {  // приблизительный объект хранили�
       }
       state[gridShow.id].gridShow = gridShow.item;
     },
+    addNewTab: (state, payload) => {
+      state[payload.idDash].tabList.push({id:payload.tabID, name:payload.tabName});
+    },
+    changeCurrentTab: (state, payload) => {
+      state[payload.idDash].currentTab = payload.tab;
+    },
+    deleteDashTab: (state, payload) => {
+      state[payload.idDash].elements.forEach((elem, index) => {
+        if (state[payload.idDash][elem].tab === payload.tabID || (!state[payload.idDash][elem].tab && payload.tabID === 1)) {
+          delete state[payload.idDash][elem];
+          state[payload.idDash].elements.splice(index, 1);
+        }
+      });
+      state[payload.idDash].tabList = state[payload.idDash].tabList.filter(tab => tab.id !== payload.tabID);
+      if (state[payload.idDash].currentTab === payload.tabID) {
+        Vue.set(state[payload.idDash], 'currentTab', state[payload.idDash].tabList[0].id)
+      }
+    }
   },
   actions: {
     
   },
   getters: {
+    getDashTabs: state => id => {
+      if (!state[id].tabList) {
+        state[id]['tabList'] =  [{id: 1, name: 'Без названия'}];
+      }
+      console.table(state[id].tabList)
+      return state[id].tabList;
+    },
+    getCurrentDashTab: state => id => {
+      if (!state[id].currentTab) {
+        Vue.set(state[id], 'currentTab', 1);
+      }
+      return state[id].currentTab;
+    },
     getName(state) {  // получаем имя дашборда
       return (id) => {
         return state[id].name
       }
     },
-    getElements(state) {  // получаем все элемнеты дашборда
-      return (id) => {
-        if (!state[id].elements) {
-          Vue.set(state[id], 'elements', []);
-        }
-        return state[id].elements
+    getElements : state => id => {
+      if (!state[id].elements) {
+        Vue.set(state[id], 'elements', []);
       }
+      return state[id].elements.map(elem => ({tab: state[id][elem].tab ? state[id][elem].tab : 1, elem}));
     },
     getNameDash(state) {  // получаем имя самого элемента
       return (ids) => {
@@ -1291,26 +1323,27 @@ export default {  // приблизительный объект хранили�
           result.then( stateFrom => {
             if(stateFrom) {
                     
-              if (!state[id]) { 
+              if (!state[id]) {
                 Vue.set(state, id, {});
-               
                 if (stateFrom.body != '') {
-                  
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                 }
                 Vue.set(state[id], 'name', stateFrom.name);
                 Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                 Vue.set(state[id], 'modified', stateFrom.modified);
-              } 
+              }
               if (stateFrom.modified > state[id].modified) {
                 resolve({status: 'exist', body:stateFrom.body,name: stateFrom.name, id: stateFrom.id, modified: stateFrom.modified  })
-              } 
+              }
               if (first) {
                 if (stateFrom.body != '') {
+                  console.table(state[id].tabList)
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                   Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                   Vue.set(state[id], 'name', stateFrom.name);
                   Vue.set(state[id], 'modified', stateFrom.modified);
+                  console.table(state[id].tabList)
+                  // Vue.set(state[id], 'tabList' , [{id: 1, name: 'Без названия'}])
                 }
               }
               resolve({status: 'finish'})

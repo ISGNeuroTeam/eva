@@ -57,13 +57,13 @@
             :style="{height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`}"
           />
-          <move-able 
-            v-for="elem in elements" 
-            :key="hash(elem)"  
-            :data-mode-from="mode" 
+          <move-able
+            v-for="elem in elements"
+            :key="hash(elem.elem)"
+            :data-mode-from="mode"
             :color-from="theme"
-            :id-dash-from="idDash" 
-            :data-elem="elem" 
+            :id-dash-from="idDash"
+            :data-elem="elem.elem"
             :data-page-from="page"
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
@@ -81,7 +81,6 @@
             :color-from="theme"
             :id-dash-from="idDash"   
           />
-            
           <!-- 
               НЕ УДАЛЯТЬ ЦВЕТОВЫЕ НАСТРОЙКИ
               <dash-settings :showFrom="showSetting"  ></dash-settings> 
@@ -89,14 +88,37 @@
         </v-container>
       </v-main> 
     </div>
+    <div v-show="showTabs" class="tab-panel">
+      <div
+        v-for="tab in tabs"
+        :key="tab.id"
+        :class="{active: currentTab === tab.id, hover: tab.hover}"
+        class="tab-item"
+        @click="clickTab(tab.id)"
+        @mouseover="tabOver(tab)"
+        @mouseleave="tabLeave(tab)"
+        @dblclick="editTabName(tab)"
+      >
+        {{ tab.name }}
+        <svg v-if="tab.hover && tabsMoreOne" class="delete-cross" width="10" height="10" viewBox="0 0 8 8"  xmlns="http://www.w3.org/2000/svg" @click.stop="deleteTab(tab.id)">
+          <path
+            d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
+            :fill="theme.$main_border"
+          />
+        </svg>
+
+      </div>
+      <div id="plus-icon" @click="addNewTab">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z"/>
+        </svg>
+      </div>
+    </div>
     <footer-bottom />
-  </v-app> 
+  </v-app>
 </template>
 
-<script> 
-
-import themes from '../js/themeSettings.js';
-
+<script>
 export default {
   data () {
     return {
@@ -115,20 +137,18 @@ export default {
       startClientHeight: 0,
       startClientWidth: 0,
       verticalCell: 0,
-      horizontalCell: 0
+      horizontalCell: 0,
+      showTabs: true,
+      currentTab: 1,
+      // tabs: []
     }
-  },   
+  },
   computed: {
     idDash: function() {   // получаем id страницы от родителя
       return this.$route.params.id
     },
     elements: function() {  // получаем название элемента  от родителя
-      let elements = [];
-        
-      if (this.letElements) {
-        elements =  this.$store.getters.getElements(this.idDash)
-      } 
-      return elements
+      return this.letElements ? this.$store.getters.getElements(this.idDash).filter(elem => elem.tab === this.currentTab) : [];
     },
     top: function() {
       if (this.openProfile) {
@@ -141,7 +161,7 @@ export default {
         return '0px'
       }
     },
-    headerTop: function (){
+    headerTop: function () {
       if(document.body.clientWidth <=1400){
         return 40
       } else {
@@ -160,13 +180,19 @@ export default {
     },
     gridShow: function() {
       let gridShow = this.$store.getters.getGridShow(this.idDash);
-      gridShow == 'true' ? gridShow = true : gridShow = false;
+      gridShow === 'true' ? gridShow = true : gridShow = false;
       return gridShow;
     },
-    getSizeGrid: function(){
+    getSizeGrid: function() {
       return this.$store.getters.getSizeGrid(this.idDash)
+    },
+    tabsMoreOne() {
+      return this.tabs.length > 1;
+    },
+    tabs() {
+      return JSON.parse(JSON.stringify(this.$store.getters.getDashTabs(this.idDash)))
     }
-  },  
+  },
   watch: {
     getSizeGrid: function() {
       this.calcSizeCell()
@@ -177,8 +203,38 @@ export default {
     this.createStartClient();
     this.calcSizeCell();
     this.addScrollListener();
+    this.currentTab = this.$store.getters.getCurrentDashTab(this.idDash);
   },
   methods: {
+    clickTab(tabID) {
+      this.$store.commit('changeCurrentTab', {idDash: this.idDash, tab: tabID});
+      this.currentTab = tabID;
+    },
+    addNewTab() {
+      let tabID = [...this.tabs].sort((a,b) => b.id - a.id)[0].id + 1;
+      this.$store.commit('addNewTab', {idDash: this.idDash, tabID, tabName: 'Без названия'})
+      this.tabs.push({id: tabID, name: 'Без названия'});
+    },
+    deleteTab(tabID) {
+      if (this.tabsMoreOne) {
+        this.$store.commit('deleteDashTab', {idDash: this.idDash, tabID});
+        if (tabID !== this.currentTab) {
+          this.tabs = this.tabs.filter(tab => tab.id !== tabID);
+        } else {
+          this.tabs = this.tabs.filter(tab => tab.id !== tabID);
+          this.currentTab = this.tabs[0].id;
+        }
+      }
+    },
+    editTabName(tab) {
+
+    },
+    tabOver(tab) {
+      this.$set(tab, 'hover' , true)
+    },
+    tabLeave(tab) {
+      this.$set(tab, 'hover' , false)
+    },
     hash: function(elem) {
       return `${elem}#${this.idDash}`
     },
@@ -188,8 +244,8 @@ export default {
     openSettings: function() {
       this.showSetting = !this.showSetting;
     },
-    setPermissions: function(event) { 
-      this.permissions = event;       
+    setPermissions: function(event) {
+      this.permissions = event;
     },
     checkOver: function() {
       this.letElements = true;
@@ -206,14 +262,14 @@ export default {
     checkAlreadyDash: function() {
       let response =  this.$store.getters.checkAlreadyDash(this.$route.params.id);
       response.then( res => {
-        if (res.status == 'exist') {  
+        if (res.status == 'exist') {
           this.alreadyShow = true;
           this.alreadyDash = res;
-        } 
+        }
         this.prepared = true;
       })
     },
-    createStartClient: function(){ 
+    createStartClient: function(){
       //первоначальные значения высоты и ширины
       this.startClientHeight = document.body.clientHeight - this.headerTop
       this.startClientWidth = document.body.clientWidth
@@ -224,9 +280,9 @@ export default {
       this.verticalCell = Number((this.startClientWidth /grid.vert).toFixed(1));
       this.horizontalCell = Number((this.startClientHeight/ grid.hor).toFixed(1));
     },
-    addScrollListener: function(){ 
+    addScrollListener: function(){
       let otstup = 0;
-      window.addEventListener('scroll' , () => {  // при увеличении экрана в высоту (вообще коненчо срабатывает при скролле страницы)       
+      window.addEventListener('scroll' , () => {  // при увеличении экрана в высоту (вообще коненчо срабатывает при скролле страницы)
         if (document.querySelector('.aplication')) {
           if (document.body.scrollHeight > document.body.clientHeight) { // если высота скролируемого экрана больше чем клиентского
           //добавляем размер
@@ -249,66 +305,6 @@ export default {
 
 <style lang="scss">
 
-    .aplication {
-        position: relative;
-    }
-    .aplication:before {
-        content: ' ';
-        display: block;
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        opacity: var(--image_opacity);
-        background-image: var(--background_image);
-        background-repeat: no-repeat;
-        background-position: 50% 0;
-        background-size: cover;
-    }
-    .aplication .already-block {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: flex-start;
-        align-items: center;
-        padding: 15px;
-        position: absolute;
-        top: 60px;
-        left: 10px;
-        z-index: 12;
-    }
-    .aplication .already-block .text-already {
-        font-size: 15px
-    } 
-    .aplication .already-block .btn-already {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: flex-start;
-        align-items: center; 
-    } 
-    .aplication .already-block .btn-already .create-btn {
-        color: white;
-        margin-left: 10px;
-        cursor: pointer
-    } 
-    .aplication .dash-container {
-        max-width: 100%;
-        padding: 0;
-    }
+@import '../sass/mainTitle.sass';
 
-    .overlay-grid {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      opacity: 0.2;
-      transition: all ease 0.3s
-    }
-    .dash-grid-layout {
-      margin-top: 50px
-    }
-    .dash-grid-layout .dash-grid-item {
-      background: black;
-      color: white;
-    }
-    
 </style>

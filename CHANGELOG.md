@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - custom theme creation
 - image background from theme
 - custom theme editing and deleting
+- theme support in graph component
 
 ### Changed
 - modal for selecting current application theme
