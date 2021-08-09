@@ -10,17 +10,17 @@
     :resizable="dragRes" 
     :data-grid="true"
     :grid="props.grid"
-    :style="{zIndex:props.zIndex, outlineColor: theme.$accent_ui_color, background: theme.$accent_ui_color, opacity:opacity }" 
+    :style="{zIndex:props.zIndex, outlineColor: theme.$accent_ui_color }"
     @resizestop="sendSize"
     @dragstop="sendMove" 
   >
     <dash-board 
-      :dataModeFrom="dataMode" 
+      :data-mode-from="dataMode" 
       :width="width"  
       :height="height"  
-      :idDashFrom="idDash" 
-      :dataPageFrom="dataPageFrom" 
-      :dataElemFrom="id" 
+      :id-dash-from="idDash" 
+      :data-page-from="dataPageFrom" 
+      :data-elem-from="id" 
       @SetLevel="props.zIndex = $event" 
       @SetOpacity="changeOpacity($event)" 
     />
@@ -28,8 +28,6 @@
 </template>
 
 <script>
-
-
 export default {
   props: {
     dataModeFrom: null,
@@ -37,8 +35,8 @@ export default {
     dataElem: null,
     colorFrom: null,
     dataPageFrom: null,
-    verticalCell:null,
-    horizontalCell:null
+    verticalCell: null,
+    horizontalCell: null
   },
   data () {
     return {
@@ -84,9 +82,9 @@ export default {
   },
   watch: {
     top: function(val) {
-       if(val <= this.headerTop){
-         val = this.headerTop
-       }
+      if(val <= this.headerTop){
+        val = this.headerTop
+      }
     },
     left: function() {
       let clientWidth = document.querySelector('#app').clientWidth;
@@ -108,6 +106,10 @@ export default {
       this.createGrid()
       this.drawElement()
     }
+  },
+  created() {
+    this.createGrid()
+    this.drawElement()
   },
   methods: {
     drawElement: function() {
@@ -139,7 +141,6 @@ export default {
       }
 
       this.$store.commit('setPosDash', {top: top,left: left, id: this.id, idDash: this.idDash});
-
     },
     sendSize(x,y,width,height) {  // отправляем размер элемента
     //для количества ячеек по высоте  округляем до целого
@@ -150,7 +151,6 @@ export default {
       let newWidth =  Math.round(width/this.verticalCell);
       let newHeight = Math.round(height/this.horizontalCell);
       this.$store.commit('setSizeDash', {width: newWidth, height: newHeight, id: this.id, idDash: this.idDash});
-      
     },
     changeOpacity(event){
       this.opacity = event;
@@ -159,17 +159,11 @@ export default {
       this.props.grid = [this.verticalCell, this.horizontalCell]
     }
 
-  },
-  created() {
-    this.createGrid()
-    this.drawElement()
   }
 }
 </script>
 
 <style >
-
-
 .vdr {
   touch-action: none;
   position: absolute;

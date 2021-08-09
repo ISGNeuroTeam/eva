@@ -1,20 +1,15 @@
 import  rest from './storeRest.js';
 import  restAuth from '../storeAuth/storeRest.js';
 import  settings  from '../js/componentsSettings.js';
-
+import Vue from "vue";
 import themes from '../js/themeSettings.js';
 
 export default {  // приблизительный объект хранилища, может отличаться от реального
   state: {
-    theme: "dark",
-    // color: {
-    //     back: '#fafafa',
-    //     backElement: '#FFF',
-    //     text: '#333',
-    //     controls: '#008080',
-    //     controlsActive: '#FF6D70',
-    //     border: '#00000033',
-    // },
+    theme: {
+      name:'dark',
+      settings: themes['dark']
+    },
   },
   mutations: {   
     setNameDash: (state, newName) => {    // изменения имени самого элемента
@@ -631,7 +626,7 @@ export default {  // приблизительный объект хранили�
       }
       state[settings.idDash].modalSettings.status = settings.status;  // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-      if (settings.element && settings.element.includes('table')) {
+      if (settings.element && (settings.element.includes('table') || settings.element.includes('heatmapGeneral'))) {
         Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
         if(!state[settings.idDash][settings.element].selectedTableTitles) {
           Vue.set(state[settings.idDash][settings.element], 'selectedTableTitles', settings?.titles);
@@ -639,7 +634,12 @@ export default {  // приблизительный объект хранили�
       }
     },
     setTheme: (state, theme) => {    // устанавливает объект цвета в хранилище
-      Vue.set(state, 'theme', theme);
+      state.theme.name = theme.themeName;
+      state.theme.settings = Object.assign({}, themes['dark'], theme.settings);
+    },
+    setDefaultTheme: (state, themeName) => {
+      state.theme.name = themeName;
+      state.theme.settings = themes[themeName];
     },
     setThemeBack: (state, theme) => {    // устанавливает объект цвета в хранилище
       rest.setThemeBack(theme,restAuth);
@@ -683,18 +683,10 @@ export default {  // приблизительный объект хранили�
     },
     clearState: (state) => {
       Object.keys(state).forEach( key => {
-        if (key != 'color') {
+        if (key !== 'theme') {
           delete state[key];
         }
       })
-    // Vue.set(state, 'color',{
-    //     back: '#fafafa',
-    //     backElement: '#FFF',
-    //     text: '#333',
-    //     controls: '#008080',
-    //     controlsActive: '#FF6D70',
-    //     border: '#00000033',
-    // });
     },
     setMetricsMulti: (state,dash) => {
       let metrics = [...[],...dash.metrics];
@@ -1244,11 +1236,11 @@ export default {  // приблизительный объект хранили�
 
       }
     },
+    getThemeTitle(state){
+      return state.theme.name;
+    },
     getTheme(state) {
-      if (!state.theme) {
-        Vue.set(state, 'theme', 'dark');
-      }
-      return themes[state.theme]
+      return state.theme.settings;
     },
     getThemeBack(state) {
       return () => {
@@ -1488,6 +1480,16 @@ export default {  // приблизительный объект хранили�
     getAvailableTableTitles: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.availableTableTitles;
+      }
+    },
+    getSelectedDataFormat: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.selectedDataFormat;
+      }
+    },
+    getAvailableDataFormat: (state) => {
+      return (dashId, elementId) => {
+        return state[dashId][elementId]?.availableDataFormat;
       }
     },
     getLibrary: (state) => {

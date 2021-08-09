@@ -3,8 +3,8 @@
     class="aut-app-profile" 
     :style="{background: theme.$secondary_bg }"
   >
-    <header-top 
-      :inside="true" 
+    <header-top
+      :inside="true"
       @permissions="setPermissions"
     />
     <v-content>
@@ -84,7 +84,7 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon 
-                            v-if="i == 1 ? true : showPencilRoot" 
+                            v-if="i === 1 ? true : showPencilRoot"
                             v-model="item.actions"
                             class="editUser icon-aut" 
                             :color="theme.$primary_button"
@@ -358,7 +358,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
    @import '../../sass/profile.sass'
 

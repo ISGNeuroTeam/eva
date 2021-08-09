@@ -95,11 +95,7 @@
     </div>
   </v-navigation-drawer>
 </template>
-
-
 <script>
-
-
 export default {
   props: {
     gearFrom: Boolean,
@@ -183,7 +179,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
     @import '../sass/dashSettings.sass'
 

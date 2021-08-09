@@ -124,8 +124,10 @@
       :modal-active="modalActive"
       @cancelModal="modalActive=false" 
     />
-    <theme-settings 
-      :palete-from="paleteShow"
+    <modal-themes
+      :show="paleteShow"
+      :admin="isAdmin"
+      @closeModal="paleteShow = false"
     />
   </div>    
 </template>
@@ -134,7 +136,7 @@
 <script>
 
 import { mdiDoor, mdiCompare, mdiAccountEdit, mdiPalette, mdiUndoVariant,  mdiHomeVariantOutline, mdiScriptTextOutline } from '@mdi/js'
-
+import Vue from "vue";
 import VueJWT from 'vuejs-jwt'
 
 Vue.use(VueJWT, {'storage': 'cookie','keyName': 'eva_token'})
@@ -159,7 +161,7 @@ export default {
       userPermissions: null
     } 
   },
-  computed: { 
+  computed: {
     colorError: function() {
       if (this.$store.getters.getColorError) {
         return this.color.controlsActive
@@ -250,7 +252,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
    @import '../sass/header.sass'
 

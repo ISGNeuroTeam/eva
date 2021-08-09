@@ -29,10 +29,7 @@
   </div>
 </template>
 
-
-
 <script>
-
 export default {
   props: {
     dataRestFrom: null,
@@ -122,9 +119,6 @@ export default {
     });
   },
   methods: {
-    cl(v){
-      console.log(v)
-    },
     getDataAsynchrony: function (data) {
       let prom = new Promise((resolve) => {
         if (data.error) {
@@ -140,8 +134,6 @@ export default {
           : (this.props.hideFooter = false);
         this.createTitles(data);
         this.createTockens(data);
-        // this.setColors();
-        // this.clearColor();
         if (this.props.justCreate) {
           this.selectRow();
           this.props.justCreate = false;
@@ -254,6 +246,6 @@ export default {
 };
 </script>
 
-<style lang="sass" >
+<style lang="scss" >
 @import '../../sass/dashTable.sass'
 </style>

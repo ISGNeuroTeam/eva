@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.60.0]
+
+### Added
+- heatmapGeneral visualization
+- heatmap visualization
+- heatmap metrics aggregation
+- heatmap custom x, y, data, metadata fields
+- heatmap ssp aggregation in watch
+- custom theme creation
+- image background from theme
+- custom theme editing and deleting
+
+### Changed
+- modal for selecting current application theme
+
+### Removed
+- old color props from default themes
+
+### Changed
+- heatmapGeneral table cells border and table width
+- heatmapLinear component styles and visible value
+
 ## [1.59.0]
 
 ### Added
@@ -27,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- dashboard opens for viewing (not editable by default) 
+- dashboard opens for viewing (not editable by default)
 - turn off clustering in map component
 
 ## [1.57.1]
@@ -143,7 +165,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.42.23] [improveBarChart]
 ### Changed
 
-- change bar chart component 
+- change bar chart component
 
 ## [1.41.23] [tooLargeLogs]
 ### Fixed
@@ -260,7 +282,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.30.14] [notContainTable]
 ### Fixed
 
-- fix height of table, when table don`t have footer 
+- fix height of table, when table don`t have footer
 
 ## [1.30.13] [addSomeColor]
 ### Added
@@ -535,7 +557,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.5] [hideHead]
 ### Changed
 
-- hide all elements exept name of component when switch look 
+- hide all elements exept name of component when switch look
 
 - remove most margin and padding from most component
 
@@ -653,7 +675,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0]
 ### Added
 
-- new component Guntt based on D3 (instead Guntt based on Google charts) 
+- new component Guntt based on D3 (instead Guntt based on Google charts)
 
 ## [1.0.0]
 ### Added
@@ -716,8 +738,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
                     - delete dashboard
 
                 - vizualization block
-                
-- search and reporting 
+
+- search and reporting
     - statistics block
     - search block
         - start search

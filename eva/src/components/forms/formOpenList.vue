@@ -124,8 +124,8 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
 
-    @import '../../sass/formOpenList.sass';
+    @import '../../sass/formOpenList.sass'
 
 </style>

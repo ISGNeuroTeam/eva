@@ -30,11 +30,8 @@
   </v-navigation-drawer>
 </template>
 
-
 <script>
-
 // import {  mdiChevronDown, mdiChevronUp } from '@mdi/js'
-
 export default {
   props: {
     paleteFrom: Boolean,
@@ -112,7 +109,7 @@ export default {
 
 </script>
 
-<style lang="sass" > 
+<style lang="scss" > 
   
     @import '../sass/themeSettings.sass'
 
