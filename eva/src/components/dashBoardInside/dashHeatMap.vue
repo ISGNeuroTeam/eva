@@ -1,210 +1,187 @@
 <template>
-  <v-container class="container">
-    <v-row>
-      <v-col
-        v-for="(ssp, i) in computedSSP"
-        :key="i"
-        cols="3"
-      >
-        <v-select
-          :items="ssp"
-          :append-icon="mdiChevronDown"
-          dense
-          class="select"
-          outlined
-          hide-details
-        />
-      </v-col>
-      <v-col cols="3">
-        <v-select
-          v-model="selectedMetric"
-          :items="Array.from(metricList)"
-          :append-icon="mdiChevronDown"
-          class="select"
-          dense
-          outlined
-          hide-details
-        />
-      </v-col>
-    </v-row>
-    <v-row justify="center">
-      <v-data-table
-        :headers="selectedHeaders"
-        :items="computedData"
-        :items-per-page="-1"
-        hide-default-footer
-        disable-sort
-        fixed-header
-        height="300"
-      >
-        <template v-slot:item="{ headers, item }">
+  <div class="heatmap-container px-0">
+    <v-simple-table dense fixed-header class="heatmap-table" height="100%">
+      <template v-slot:default>
+        <thead>
           <tr>
-            <template v-for="(val, index) in item">
-              <td
-                v-if="index === 0 && item[1].fio"
-                :key="index"
-                style="text-align: left;"
-                v-text="item[1].fio"
-              />
-              <td
-                v-else-if="index === 0"
-                :key="index"
-                style="text-align: left;"
-                v-text="val"
-              />
-
-              <template v-for="(header, index) in headers" v-else >
-                <td v-if="index !== 0" :key="index">
-                  <DashHeatMapLinear
-                    v-if="
-                      val[headers[index].value] &&
-                      showProperty(val[headers[index].value], selectedMetric)
-                    "
-                    :value="
-                      showProperty(
-                        val[headers[index].value],
-                        selectedMetric
-                      )
-                    "
-                    :comment="
-                      showProperty(
-                        val[headers[index].value],
-                        'description'
-                      )
-                    "
-                  />
-                  <span v-else>Нет данных</span>
-                </td>
-              </template>
-            </template>
+            <th class="table-th"/>
+            <th
+              v-for="(y, index) in filteredY"
+              :key="index"
+              class="text-center table-th"
+              v-text="y"
+            />
           </tr>
-        </template>
-      </v-data-table>
-    </v-row>
-  </v-container>
+        </thead>
+        <tbody>
+          <tr v-for="x in filteredX" :key="x">
+            <td class="text-left" v-text="x"/>
+            <td v-for="y in filteredY" :key="y" class="py-2">
+              <DashHeatMapLinear
+                v-if="filteredData[x][y] && filteredData[x][y].metadata"
+                :title="filteredData[x][y].value"
+                :value="filteredData[x][y].metadata.progress_bar_value"
+                :color="filteredData[x][y].metadata.progress_bar_color"
+                :comment="filteredData[x][y].metadata.description"
+              />
+              <span
+                v-else-if="filteredData[x][y]"
+                v-text="filteredData[x][y].value"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </template>
+    </v-simple-table>
+  </div>
 </template>
 
 <script>
-import DashHeatMapLinear from "./dashHeatMapLinear.vue";
-import { mdiChevronDown } from '@mdi/js';
+import DashHeatMapLinear from './dashHeatMapLinear.vue';
 
 export default {
   name: "heatmap",
-  components: {
-    DashHeatMapLinear,
-  },
+  components: { DashHeatMapLinear },
   props: {
-    idFrom: {
-      type: String,
-      default: "",
-    },
-    idDashFrom: {
-      type: String,
-      default: "",
-    },
-    widthFrom: {
-      type: Number,
-      default: 0,
-    },
-    heightFrom: {
-      type: Number,
-      default: 0,
-    },
-    colorFrom: {
-      type: Object,
-      default: () => ({}),
-    },
-    dataRestFrom: {
-      type: Array,
-      default: () => [],
-    },
-    dataReport: null,
-    dataLoadingFrom: null,
+    dataRestFrom: Array,
+    options: Object,
   },
   data: () => ({
-    mdiChevronDown,
-    metricList: new Set(),
-    allDates: new Set(),
-    users: {},
-    sspObject: {},
-    userCount: new Set(),
-    selectedMetric: "",
-    period: "",
-    periods: [],
+    x: new Set(),
+    y: new Set(),
+    updateData: 0,
+    data: {},
+    xField: "x",
+    yField: "y",
+    dataField: "metric",
+    xFieldFormat: "Строка",
+    xFieldSort: "По возрастанию",
+    yFieldFormat: "Дата",
+    yFieldSort: "По возрастанию",
+    renderData: "metadata",
   }),
   computed: {
     filteredData() {
-      return this.dataRestFrom;
+      return this.updateData && this.data;
     },
 
-    selectedHeaders() {
-      if (Array.isArray(this.allDates)) {
-        return [
-          {},
-          ...this.allDates.slice(0, 7).map((value) => {
-            const formatedDate = new Date(`${value}`);
-            const text = formatedDate.toLocaleDateString("ru");
-            return { value, text };
-          }),
-        ];
+    filteredY() {
+      let temp = Array.from(this.y);
+      if (this.yFieldFormat === "Строка") {
+        if (this.yFieldSort === "По возрастанию")
+          temp.sort();
+        else
+          temp.sort().reverse();
       }
-      return [];
+      else {
+        let sort = this.chooseSort(this.yFieldFormat, this.yFieldSort);
+        temp.sort(sort);
+      }
+      return this.updateData && temp;
     },
 
-    computedData() {
-      return Object.entries(this.users);
-    },
-
-    computedSSP() {
-      return Object.values(this.sspObject)
-        .map((item) => [...item])
-        .reverse();
+    filteredX() {
+      let temp = Array.from(this.x);
+      if (this.xFieldFormat === "Строка") {
+        if (this.xFieldSort === "По возрастанию")
+          temp.sort();
+        else
+          temp.sort().reverse();
+      }
+      else {
+        let sort = this.chooseSort(this.xFieldFormat, this.xFieldSort);
+        temp.sort(sort);
+      }
+      return this.updateData && temp;
     },
   },
   watch: {
     dataRestFrom() {
-      const sspMaxDeep = new Set();
-      const dates = new Set();
+      this.render();
+    },
 
-      this.dataRestFrom.forEach((data) => {
-        const {
-          fio, ssp, user, variable, value, 'День': day, _decription: description
-        } = data;
-
-        if (day) {
-          dates.add(day);
-        }
-
-        if (ssp) {
-          const sspData = ssp.split("/");
-          const maxDeep = Math.max(...sspMaxDeep.add(sspData.length));
-          for (let i = 0; i < maxDeep; i++) {
-            if (!this.sspObject[i]) this.$set(this.sspObject, i, new Set());
-            if (!sspData[i]) break;
-            this.sspObject[i].add(sspData[i].trim());
-          }
-        }
-
-        if (user) {
-          if (this.users[user]) {
-            this.$set(this.users[user], day, { description, [variable]: value });
-          } else {
-            this.$set(this.users, user, { fio });
-          }
-        }
-
-        this.userCount.add(user);
-        this.metricList.add(variable);
-        this.selectedMetric = Array.from(this.metricList)[0];
-      });
-
-      this.allDates = Array.from(dates).sort((a, b) => new Date(a) - new Date(b));
-      this.$forceUpdate();
+    options: {
+      deep: true,
+      immediate: true,
+      handler(newVal) {
+        if (newVal.x) this.xField = newVal.x;
+        if (newVal.y) this.yField = newVal.y;
+        if (newVal.data) this.dataField = newVal.data;
+        if (newVal.x) this.renderData = newVal.metadata;
+        if (newVal.ySort) this.yFieldSort = newVal.ySort;
+        if (newVal.ySort) this.xFieldSort = newVal.xSort;
+        if (newVal.ySort) this.yFieldFormat = newVal.yFormat;
+        if (newVal.ySort) this.xFieldFormat = newVal.xFormat;
+        this.updateData += 1;
+        this.render();
+      },
     },
   },
   methods: {
-    showProperty(object, property) {
-      return object[property] ? object[property] : null;
+    chooseSort(dataFormat, sortType) {
+      if (dataFormat === "Дата") {
+        let up = (a, b) => {
+          return new Date(a) - new Date(b);
+        };
+        let down = (a, b) => {
+          return new Date(b) - new Date(a);
+        };
+
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      } else if (dataFormat === "Число") {
+        let up = (a, b) => {
+          return a - b;
+        };
+        let down = (a, b) => {
+          return b - a;
+        };
+
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      }
+    },
+
+    render() {
+      this.x = new Set();
+      this.y = new Set();
+      this.updateData = 0;
+      this.data = {};
+      for (let obj of this.dataRestFrom) {
+        const xField = obj[this.xField];
+        const yField = obj[this.yField];
+
+        if (!this.data[xField]) {
+          this.data[xField] = {};
+        }
+
+        this.data[xField][yField] = {
+          value: obj[this.dataField],
+          metadata: this.parseMetadata(obj.metadata),
+        };
+
+        this.x.add(xField);
+        this.y.add(yField);
+        this.updateData += 1;
+      }
+    },
+
+    /**
+     * Transform metadata string to object.
+     * @param {string} data Metadata string.
+     * @returns {(object | null)} Metadata object or null.
+     */
+    parseMetadata(data = null) {
+      try {
+        if (typeof data !== 'string') return null;
+        return !data ? null : JSON.parse(data.replaceAll(`'`, `"`));
+      } catch (err) {
+        return null;
+      }
     },
   },
 };

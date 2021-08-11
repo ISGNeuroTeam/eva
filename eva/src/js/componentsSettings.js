@@ -20,7 +20,6 @@ export default {
     {name: 'Текстовый блок', img: mdiCardTextOutline , type: 'textarea'},
     {name: 'Граф_old', img: mdiGraph , type: 'graph'},
     {name: 'Тепловая карта', img: mdiGrid , type: 'heatmap'},
-    {name: 'Универсальная тепловая карта', img: mdiGrid, type: 'heatmapGeneral'}
   ],
   size: {
     picker: {
@@ -87,10 +86,6 @@ export default {
       width: 500,
       height: 300
     },
-    heatmapGeneral: {
-      width: 500,
-      height: 300
-    }
   },
   icons: {
     table: mdiTableLarge,
@@ -109,7 +104,6 @@ export default {
     bush: mdiChartScatterPlot,
     map: mdiMapMarker,
     heatmap: mdiGrid,
-    heatmapGeneral: mdiGrid,
   },
   options: {
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline'],
@@ -127,7 +121,7 @@ export default {
     ygraph: ['visible','level'],
     bush: ['visible','level'],
     map: ['visible','level', 'osmserver', 'primitivesLibrary'],
-    heatmapGeneral: ['visible','level', 'dataFormat']
+    heatmap: ['visible','level', 'dataFormat'],
 
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
@@ -176,9 +170,5 @@ export default {
       tooltip: 'Тепловая карта',
       icon: mdiGrid
     },
-    heatmapGeneral: {
-      tooltip: 'Универсальная тепловая карта',
-      icon: mdiGrid
-    }
   }
 }
