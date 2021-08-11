@@ -36,7 +36,7 @@ Vue.component('footer-bottom', require('./components/footer.vue').default)  // �
 // Vue.component('main-page', require('./components/mainPage.vue').default)  // главная страница с приветствием и выбором разных дашбордов
 // Vue.component('main-title', require('./components/mainTitle.vue').default)  // страница самого дашборда с разными элементами
 Vue.component('move-able', require('./components/moveAble.vue').default)  // обертка элемнета для drag-and-drop
-Vue.component('dash-board', require('./components/dashBoard.vue').default) // сам элемент 
+Vue.component('dash-board', require('./components/dashBoard.vue').default) // сам элемент
 Vue.component('dash-panel-bord', require('./components/dashPanelBoard.vue').default) // верхняя панель дашборда с разными инструментами
 Vue.component('modal-delete', require('./components/modalDelete.vue').default)  // модальное окно для удаления чего-либо
 Vue.component('modal-delete-main', require('./components/modalDeleteFromMain.vue').default)  // модальное окно для удаления групп и дашбордов
@@ -69,8 +69,6 @@ Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vu
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default)  // компонент куст. на yfiles
 Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) // компонент карта
 Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) // компонент тепловая карта
-Vue.component('dash-heatmapGeneral', require('./components/dashBoardInside/dashHeatMapGeneral.vue').default) // компонент тепловая карта
-
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
 //Vue.component('dash-search', require('./components/dashBoardInside/dashSearch.vue').default)  // элемнет поиска пока не актуален
@@ -100,4 +98,3 @@ new Vue({
   screenshot: screenshot,
   render: h => h(App)
 }).$mount('#mount')
-
