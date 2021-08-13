@@ -3,23 +3,25 @@
     class="table-block"
     :data-change="change"
   >
-    <v-data-table
-      v-show="!props.nodata"
-      :ref="id"
-      v-model="props.input"
-      :headers="props.titles"
-      :items.sync="props.itemsForTable"
-      class="dash-table report-table"
-      :data-id="id"
-      item-key="none"
-      :hide-default-footer="props.hideFooter"
-      :footer-props="{
-        itemsPerPageOptions: [100, 500, 1000, -1],
-      }"
-      :height="height"
-      fixed-header
-      :style="{ borderColor: theme.$secondary_border }"
-    />
+    <div class="v-data-table--container">
+      <v-data-table
+        v-show="!props.nodata"
+        :ref="id"
+        v-model="props.input"
+        :headers="props.titles"
+        :items.sync="props.itemsForTable"
+        class="dash-table report-table"
+        :data-id="id"
+        item-key="none"
+        :hide-default-footer="props.hideFooter"
+        :footer-props="{
+          itemsPerPageOptions: [100, 500, 1000, -1],
+        }"
+        :height="height"
+        fixed-header
+        :style="{ borderColor: theme.$secondary_border }"
+      />
+    </div>
     <div
       v-show="props.nodata"
       class="no-data-table"
