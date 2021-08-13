@@ -20,7 +20,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-icon 
-              class="edit theme--dark" 
+              class="edit theme--dark home" 
               :style="{color:theme.$secondary_text}"
               v-on="on"
               @click="gearShow = !gearShow"
@@ -29,6 +29,40 @@
             </v-icon> 
           </template>
           <span>Открыть настройки дашборда</span>
+        </v-tooltip>
+      </div>
+      <div>
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="home"  
+              :color="theme.$secondary_text"
+              v-on="on" 
+              @click="toHome"
+            >
+              {{ home }}
+            </v-icon>
+          </template>
+          <span>На главную</span>
+        </v-tooltip>
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="undo"
+              :color="theme.$secondary_text"
+              v-on="on"
+              @click="toBackward"
+            >
+              {{ undo }}
+            </v-icon>
+          </template>
+          <span>Назад</span>
         </v-tooltip>
       </div>
     </div>
@@ -642,7 +676,7 @@
 
 <script>
 
-import { mdiPlusBox, mdiFastForward, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
+import { mdiPlusBox, mdiFastForward, mdiPlay, mdiEye, mdiFileDocumentOutline, mdiUndoVariant, mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
 
 //import { match } from 'minimatch'
 
@@ -662,6 +696,7 @@ export default {
       tool_elem: false,
       // tool_coral: 'fill:teal',
       tocken_elem: false,
+      undo: mdiUndoVariant,
       profile_elem: false,
       save_elem: false,
       edit_elem: false,
@@ -787,6 +822,7 @@ export default {
     textareaEv: function() {
       let eventFull = this.$store.getters.getEventFull(this.idDash);
       if (eventFull != ''){
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         this.textarea_event = eventFull;
       }     
       return true
@@ -819,6 +855,7 @@ export default {
     },
     colorError: function() {
       if (this.$store.getters.getColorError ) {
+        // eslint-disable-next-line vue/no-side-effects-in-computed-properties
         this.profile_elem = true;
         if (this.permissionsFrom.includes('admin_all')){
           this.$emit('openProfile',true);
@@ -840,6 +877,12 @@ export default {
     openSchedule: function(id) {
       this.scheduleSid = id;
       this.activeSchedule = true;
+    },
+    toHome: function() {
+      this.$router.push(`/main`);
+    },
+    toBackward: function() {
+      this.$router.go(-1);
     },
     openEdit: function(id) {   // окно с редактированием search
       this.openSearch();  // то открываем его 
@@ -1066,8 +1109,8 @@ export default {
         let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash);
         responseDB
           .then(
-            result => {
-              let refresh =  this.$store.getters.refreshElements(this.idDash, event.sid, );
+            () => {
+              // let refresh =  this.$store.getters.refreshElements(this.idDash, event.sid, );
               this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  }); 
               this.disabledDS[event.sid] = false;
             },
@@ -1121,7 +1164,7 @@ export default {
           db.createObjectStore('searches'); // create it
         }
 
-        request.onsuccess = event => {
+        request.onsuccess = () => {
           db = request.result;
           console.log("successEvent: " + db);
         };
@@ -1129,9 +1172,9 @@ export default {
       }
 
 
-      let promise = new Promise((resolve, reject) => {
+      let promise = new Promise((resolve) => {
 
-        request.onsuccess =  event => {
+        request.onsuccess = () => {
 
           db = request.result;
 
@@ -1142,7 +1185,7 @@ export default {
 
           let query = searches.get(`${this.idDash}-${sid}`); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = event => { // (4)
+          query.onsuccess = () => { // (4)
             resolve(query.result);
           };
 
@@ -1209,7 +1252,7 @@ export default {
         this.avatar = avatar;  // и храним объект нашего  аватара 
 
       }
-      document.onclick = (event) => { // при клике на элемент
+      document.onclick = () => { // при клике на элемент
         avatar.remove(); // удаляем аватар из дерева dom
       }  
     },
@@ -1381,6 +1424,7 @@ export default {
                 doing.splice(0,1);
                 doing = doing.join(',');
                 if (doing.indexOf('[') != -1 && doing.indexOf(']') != -1) {
+                  // eslint-disable-next-line no-useless-escape
                   doing = doing.match(/[^\[]+(?=\])/g);
                 } else {
                   doing = doing.split(',');
@@ -1405,6 +1449,7 @@ export default {
                 if (doing[1].indexOf('[') != -1) {
                   doing.splice(0,1);
                   doing = doing.join(',');
+                  // eslint-disable-next-line no-useless-escape
                   doing = doing.match(/[^\[]+(?=\])/g);
                   prop = doing[0].split(',');
                   value = doing[1].split(',');
@@ -1515,9 +1560,6 @@ export default {
     },
     toHichName: function(name) {
       return name[0].toUpperCase() + name.slice(1);
-    },
-    toHome: function() {
-      this.$router.push(`/main`);
     },
   }, 
   mounted () {
