@@ -4,33 +4,47 @@
     :style="{background: theme.$main_bg}"
   >
     <div class="main-title">
+      <div class="logo-block">
+        <EvaLogo />
+      </div>
       <div 
         class="title-name" 
         :style="{color:theme.$title}"
       >
         {{ name }}
       </div>
-      <div 
-        class="title-edit" 
+      <v-tooltip 
+        bottom 
+        :color="theme.$accent_ui_color"
       >
-        <v-tooltip
-          v-if="editPermission"
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="edit theme--dark" 
-              :style="{color:theme.$secondary_text}"
-              v-on="on"
-              @click="gearShow = !gearShow"
-            >
-              {{ gear }}
-            </v-icon> 
-          </template>
-          <span>Открыть настройки дашборда</span>
-        </v-tooltip>
-      </div>
+        <template v-slot:activator="{ on }">
+          <v-icon 
+            class="home"  
+            :color="theme.$secondary_text"
+            v-on="on" 
+            @click="toHome"
+          >
+            {{ home }}
+          </v-icon>
+        </template>
+        <span>На главную</span>
+      </v-tooltip>
+      <v-tooltip 
+        bottom 
+        :color="theme.$accent_ui_color"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon 
+            class="undo"
+            :color="theme.$secondary_text"
+            v-on="on"
+            @click="toBackward"
+          >
+            {{ undo }}
+          </v-icon>
+        </template>
+        <span>Назад</span>
+      </v-tooltip>
     </div>
     <div class="control-block">
       <v-tooltip 
@@ -101,6 +115,41 @@
         </template>
         <span>Визуализации</span>
       </v-tooltip>
+      <div class="edit-container">
+        <v-tooltip
+          v-if="editPermission"
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="edit edit-icon theme--dark" 
+              :style="{color:theme.$secondary_text}"
+              v-on="on"
+              @click="gearShow = !gearShow"
+            >
+              {{ gear }}
+            </v-icon> 
+          </template>
+          <span>Открыть настройки дашборда</span>
+        </v-tooltip>
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }"  v-if="editPermission">
+            <v-icon 
+              class="save theme--dark"
+              :style="{color:theme.$secondary_text}"
+              v-on="on" 
+              @click="openSave"
+            >
+              {{ save_icon }}
+            </v-icon>
+          </template>
+          <span>Сохранить</span>
+        </v-tooltip>
+      </div>
       <v-tooltip 
         bottom 
         :color="theme.$accent_ui_color"
@@ -118,22 +167,12 @@
         </template>
         <span>Профиль</span>
       </v-tooltip>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
+      <div 
+        class="id-user profile-login" 
+        :style="{color:theme.$secondary_text}"
       >
-        <template v-slot:activator="{ on }"  v-if="editPermission">
-          <v-icon 
-            class="save theme--dark"
-            :style="{color:theme.$secondary_text}"
-            v-on="on" 
-            @click="openSave"
-          >
-            {{ save_icon }}
-          </v-icon>
-        </template>
-        <span>Сохранить</span>
-      </v-tooltip>
+        {{ login }}
+      </div>
     </div>
     <div 
       ref="blockCode"
@@ -642,20 +681,33 @@
 
 <script>
 
-import { mdiPlusBox, mdiFastForward, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
-
+import { mdiPlusBox, mdiFastForward, mdiUndoVariant, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
+import EvaLogo from '../images/eva-logo.svg';
+import HtmlIcon from '../images/html.svg';
+import MatematicsIcon from '../images/matematics.svg';
+import BaseIcon from '../images/base.svg';
+import BriefcaseIcon from '../images/briefcase.svg';
 //import { match } from 'minimatch'
 
 import  settings  from '../js/componentsSettings.js'
 
 export default {
+  components: {
+    EvaLogo,
+    HtmlIcon,
+    MatematicsIcon,
+    BaseIcon,
+    BriefcaseIcon
+  },
   props: {
     idDashFrom: null,
     permissionsFrom: null,
   },
   data () {
     return {
+      login: '',
       search_elem: false,
+      undo: mdiUndoVariant,
       help_icon: mdiHelpCircleOutline,
       //search_coral: 'fill:teal',
       search_icon: mdiDatabase,
@@ -827,8 +879,11 @@ export default {
       } 
       return true
     }
-  },
+  },  
   methods: {
+    toBackward: function() {
+      this.$router.go(-1);
+    },
     setEditMode: function() {
       this.edit_elem = !this.edit_elem;
       this.$emit('changeMode');
@@ -840,6 +895,16 @@ export default {
     openSchedule: function(id) {
       this.scheduleSid = id;
       this.activeSchedule = true;
+    },
+    getCookie: async function() {
+      //console.log(this.$jwt.hasToken())
+      console.log('mounted')
+      if(this.$jwt.hasToken()) {
+        this.login = this.$jwt.decode().username;    
+        console.log('login', this.login, this.$jwt.decode().username)      
+      } else {
+        this.$router.push(`/`);
+      }
     },
     openEdit: function(id) {   // окно с редактированием search
       this.openSearch();  // то открываем его 
@@ -1521,6 +1586,7 @@ export default {
     },
   }, 
   mounted () {
+    this.getCookie();
     this.tools =  settings.tools;
 
     document.onmouseup = event => {  // а при отпускании кнопки при перетаскивании
