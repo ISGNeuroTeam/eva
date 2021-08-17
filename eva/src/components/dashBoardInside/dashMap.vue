@@ -55,6 +55,7 @@ export default {
       isLegendGenerated: true,
       isSettings: false,
       startingPoint: [],
+      mode: [],
       pipelineData: [
         {
           ID: 1750033596,
@@ -288,6 +289,16 @@ export default {
     };
   },
   computed: {
+    idDash: function() { // получаем id страницы от родителя 
+      return this.idDashFrom
+    },
+    element: function() {  // получаем название элемента
+      return this.idFrom
+    },
+    option() {
+      return this.$store.getters.getOptions({idDash: this.idDash, id: this.element});
+    },
+
     top() {
       // для ряда управляющих иконок
       if (document.body.clientWidth <= 1600) {
@@ -309,6 +320,12 @@ export default {
     maptheme() {
       this.createMap();
     },
+    options: {
+      deep: true,
+      handler(val, oldVal) {
+        console.log(val)
+      }
+    }
   },
   mounted() {
     this.initMap();
@@ -682,7 +699,8 @@ export default {
     },
 
     addLine(element, lib) {
-      if (element.ID != "1750023024") return;
+      console.log(this.option.mode[0])
+      if (this.option.mode[0] == "Мониторинг" && element.ID != "1751045030") return;
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
@@ -705,7 +723,7 @@ export default {
         .bindTooltip(tooltip)
         .on("mouseover", highlightFeature)
         .on("mouseout", resetHighlight);
-      line.setTooltipContent("hello");
+      line.setTooltipContent(element.label);
       let previousPoint = 0;
       let dist = 0;
       let route = line.getLatLngs().map((el) => {
@@ -734,7 +752,7 @@ export default {
         });
       }
       let pipelineData = this.pipelineData;
-
+      let option = this.option
       function highlightFeature(e) {
         const closest = (arr, num) => {
           return (
@@ -756,7 +774,7 @@ export default {
         let newLinePoly = L.polyline(newLine.geometry.coordinates);
         let distances = utils.accumulatedLengths(newLinePoly);
         let sum = distances[distances.length - 1];
-
+        console.log(sum)
         let closestData = closest(pipelineData, sum);
         let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
         console.log(pipelineInfo);
@@ -769,7 +787,9 @@ export default {
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-        line.setTooltipContent(newDiv);
+        console.log(option)
+        if (option?.mode[0] == "Мониторинг")
+          line.setTooltipContent(newDiv);
         var layer = e.target;
         layer.bringToFront();
         layer.setStyle({

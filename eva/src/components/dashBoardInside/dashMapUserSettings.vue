@@ -2,10 +2,23 @@
   <div class="med">
     <v-container class="fill-height" style="align-items: normal">
       <v-row class="ma-0">
-        <v-spacer></v-spacer>
-        <v-col cols="4">
-          <v-select :items="mode" label="Режим" multiple/>
-        </v-col>
+        <v-btn
+          rounded
+          color="#191919"
+          dark
+          @click="toggleSelect = !toggleSelect"
+        >
+          Режим
+        </v-btn>
+        <v-select
+          :menu-props="{ value: toggleSelect }"
+          style="visibility:hidden;background: white; position: absolute"
+          v-model="options.mode"
+          :items="mode"
+          label="Режим"
+          multiple
+        />
+        <v-spacer/>
         <v-dialog v-model="dialog" max-width="290">
           <template v-slot:activator="{ on, attrs }">
             <v-btn rounded color="#191919" v-bind="attrs" v-on="on">
@@ -235,6 +248,7 @@ export default {
   },
   data() {
     return {
+      toggleSelect: false,
       mode: ["Мониторинг", "Сравнение", "Аналитика", "Поиск", "Режим 5"],
       mdiSettings: mdiSettings,
       mdiList: mdiFormatListBulletedSquare,
@@ -289,6 +303,7 @@ export default {
           y: 74.35169122692963,
         },
         showLegend: true,
+        mode: "",
       },
     };
   },
