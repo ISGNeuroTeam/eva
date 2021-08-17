@@ -25,6 +25,8 @@ import vuetify from "../../plugins/vuetify";
 import dashMapUserSettings from "./dashMapUserSettings.vue";
 import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
 import Vue from "vue";
+import * as turf from "@turf/turf";
+import * as utils from "leaflet-geometryutil";
 export default {
   props: {
     // переменные полученные от родителя
@@ -53,6 +55,236 @@ export default {
       isLegendGenerated: true,
       isSettings: false,
       startingPoint: [],
+      pipelineData: [
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1100.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.199112454343823,
+          T: 25.057585186148636,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1105.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.168336769003016,
+          T: 25.066058710865445,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1110.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.093703920224474,
+          T: 25.202715337382333,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1115.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.20104747867972,
+          T: 25.02528828665911,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1120.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.088552234333275,
+          T: 25.193711035939376,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1125.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.15084020062758,
+          T: 25.225189455924742,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1130.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.137999512532023,
+          T: 25.169263667848288,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1135.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.11151280146448,
+          T: 25.232233147484106,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1140.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.039687872008482,
+          T: 25.245048316875163,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1145.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.171993488258817,
+          T: 25.04155093589985,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1150.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.249320663545525,
+          T: 25.004733638831148,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+        {
+          ID: 1750033596,
+          label: "уз. в к31->уз.к41",
+          type: "Водовод",
+          start_altitude: 82.1,
+          end_altitude: 93.0,
+          pos: 1155.0,
+          L: 4157.0,
+          D: 273.0,
+          S: 20.0,
+          pipe_material: "сталь 20",
+          cover_int: "нет покрытия",
+          P: 20.266725073717407,
+          T: 25.050002193171043,
+          P_start: 26.0,
+          P_end: 32.0,
+          avaria: "Нет",
+          repair: "Нет",
+        },
+      ],
     };
   },
   computed: {
@@ -445,28 +677,57 @@ export default {
           permanent: false,
           direction: "top",
           className: "leaftet-hover",
+          interactive: true,
         });
     },
 
     addLine(element, lib) {
+
+      
+
+      if (element.ID != "1750023024") return;
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
         latlngs[p[0] - 1] = p[1].split(",");
       });
-      L.polyline(latlngs, {
+      let line = L.polyline(latlngs, {
         color: lib.color,
         weight: lib.width,
         opacity: lib.opacity,
-      })
+      });
+      let tooltip = L.tooltip({
+        permanent: false,
+        direction: "top",
+        className: "leaftet-hover",
+        sticky: true,
+      });
+
+      line
         .addTo(this.map)
-        .bindTooltip(element.label, {
-          permanent: false,
-          direction: "top",
-          className: "leaftet-hover",
-        })
+        .bindTooltip(tooltip)
         .on("mouseover", highlightFeature)
         .on("mouseout", resetHighlight);
+      line.setTooltipContent("hello");
+      let previousPoint = 0;
+      let dist = 0;
+      let route = line.getLatLngs().map((el) => {
+        return [el.lat, el.lng];
+      });
+      let lineTurf = turf.lineString(route);
+      let newLine = turf.lineSlice(
+        route[0],
+        [59.24622380205539, 74.56146240234376],
+        lineTurf
+      );
+      let newLinePoly = L.polyline(newLine.geometry.coordinates);
+
+      line.getLatLngs().forEach(function (current) {
+        if (previousPoint) {
+          dist += previousPoint.distanceTo(current);
+        }
+        previousPoint = current;
+      });
 
       function resetHighlight(e) {
         var layer = e.target;
@@ -475,8 +736,44 @@ export default {
           weight: lib.width,
         });
       }
+      let pipelineData = this.pipelineData
 
       function highlightFeature(e) {
+
+        const closest = (arr, num) => {
+        return (
+          arr.reduce((acc, val) => {
+            if (Math.abs(val.pos - num) < Math.abs(acc)) {
+              return val.pos - num;
+            } else {
+              return acc;
+            }
+          }, Infinity) + num
+        );
+      };
+
+      
+        let newLine = turf.lineSlice(
+          route[0],
+          [e.latlng.lat, e.latlng.lng],
+          lineTurf
+        );
+        let newLinePoly = L.polyline(newLine.geometry.coordinates);
+        let distances = utils.accumulatedLengths(newLinePoly);
+        let sum = distances[distances.length - 1];
+        
+        let closestData = closest(pipelineData, sum)
+        let pipelineInfo = pipelineData.find(el => el.pos == closestData)
+        console.log(pipelineInfo)
+
+        // div for tooltip 
+        var newDiv = document.createElement("div");
+        newDiv.innerHTML =`
+          <p>${pipelineInfo.label}</p>
+          <p>V${pipelineInfo.P}</p>
+          <p>S${pipelineInfo.S}</p>
+          <p>L${pipelineInfo.L}</p>`;
+        line.setTooltipContent(newDiv);
         var layer = e.target;
         layer.bringToFront();
         layer.setStyle({
@@ -487,6 +784,8 @@ export default {
           layer.bringToFront();
         }
       }
+
+      
     },
 
     clustering(dataRest) {
