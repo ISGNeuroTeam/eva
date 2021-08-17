@@ -150,29 +150,51 @@
           <span>Сохранить</span>
         </v-tooltip>
       </div>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
+      <v-menu :nudge-width="100" class="profile-block" :rounded="0" offset-y>
         <template v-slot:activator="{ on }">
-          <v-icon 
-            class="profile theme--dark"
-            :style="{color:theme.$secondary_text}"
-            :data-error="colorError"
-            v-on="on" 
-            @click="openProfile"
+          <div
+            class="dropdown-profile"
+            v-on="on"
           >
-            {{ profile_icon }}
-          </v-icon>
+            <v-icon 
+              :data-error="colorError"
+              :style="{color:theme.$secondary_text}"
+              class="profile theme--dark"
+            >
+              {{ profile_icon }}
+            </v-icon>
+            <div 
+              class="id-user profile-login" 
+              :style="{color:theme.$secondary_text}"
+            >
+              {{ login }}
+            </div>
+          </div>
         </template>
-        <span>Профиль</span>
-      </v-tooltip>
-      <div 
-        class="id-user profile-login" 
-        :style="{color:theme.$secondary_text}"
-      >
-        {{ login }}
-      </div>
+        <v-list class="profile-dropdown--list">
+          <v-list-item>
+            <v-list-item-title class="profile-dropdown--title">Профиль</v-list-item-title>
+          </v-list-item>
+          <div v-for="item in profileDropdownButtons" :key="item.id">
+            <v-list-item v-if="!item.hide">
+              <v-btn
+                class="profile-dropdown--button"
+                icon
+                v-on="on"
+                @click="item.onClick"
+              >
+                <v-icon 
+                  class="edit icon-aut"
+                  :color="theme.$secondary_text"
+                >
+                  {{ item.icon }}
+                </v-icon>
+                {{ item.label }}
+              </v-btn>
+            </v-list-item>
+          </div>
+        </v-list>
+      </v-menu>
     </div>
     <div 
       ref="blockCode"
@@ -657,12 +679,21 @@
       @startSearch="startSearch($event)"  
       @cancelModal="cancelModal"
     />
+    <modal-themes
+      :show="paleteShow"
+      :admin="isAdmin"
+      @closeModal="paleteShow = false"
+    />
     <modal-schedule 
       :idDashFrom="idDash" 
       :colorFrom="theme"
       :modalFrom="activeSchedule" 
       :dataSidFrom="scheduleSid"
       @cancel="activeSchedule=false" 
+    />
+    <modal-log 
+      :modal-active="modalActive"
+      @cancelModal="modalActive=false" 
     />
     <dash-settings 
       :gear-from="gearShow"
@@ -681,12 +712,8 @@
 
 <script>
 
-import { mdiPlusBox, mdiFastForward, mdiUndoVariant, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
+import { mdiPlusBox, mdiDoor, mdiCompare, mdiScriptTextOutline, mdiFastForward, mdiUndoVariant, mdiAccountEdit, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
 import EvaLogo from '../images/eva-logo.svg';
-import HtmlIcon from '../images/html.svg';
-import MatematicsIcon from '../images/matematics.svg';
-import BaseIcon from '../images/base.svg';
-import BriefcaseIcon from '../images/briefcase.svg';
 //import { match } from 'minimatch'
 
 import  settings  from '../js/componentsSettings.js'
@@ -694,10 +721,6 @@ import  settings  from '../js/componentsSettings.js'
 export default {
   components: {
     EvaLogo,
-    HtmlIcon,
-    MatematicsIcon,
-    BaseIcon,
-    BriefcaseIcon
   },
   props: {
     idDashFrom: null,
@@ -706,11 +729,13 @@ export default {
   data () {
     return {
       login: '',
+      userEdit: mdiAccountEdit,
       search_elem: false,
       undo: mdiUndoVariant,
       help_icon: mdiHelpCircleOutline,
       //search_coral: 'fill:teal',
       search_icon: mdiDatabase,
+      modalActive: false,
       tool_elem: false,
       // tool_coral: 'fill:teal',
       tocken_elem: false,
@@ -756,8 +781,36 @@ export default {
       lookTockens: [],
       tools: [],
       avatar: null,
+      mdiCompare: mdiCompare,
       tempTocken: {},
       change: {},
+      profileDropdownButtons: [
+        {
+          id: 1,
+          label: 'Редактировать',
+          icon: mdiAccountEdit,
+          onClick: this.edit
+        },
+        {
+          id: 2,
+          label: 'Тема',
+          icon: mdiCompare,
+          onClick: this.openThemeModal
+        },
+        {
+          id: 3,
+          label: 'Логи',
+          icon: mdiScriptTextOutline,
+          onClick: this.openLogs,
+          hide: !this.isAdmin
+        },
+        {
+          id: 4,
+          label: 'Выйти',
+          icon: mdiDoor,
+          onClick: this.exit,
+        },
+      ],
       textarea: '',
       showSign: true,
       newTockenName: null,
@@ -784,6 +837,7 @@ export default {
         },
       },
       activeModal: false,
+      paleteShow: false,
       activeSchedule: false,
       scheduleSid: -1,
       loadings: { },
@@ -804,6 +858,13 @@ export default {
   computed: {
     idDash: function() {  // получаем id страницы переданного от родителя
       return this.idDashFrom
+    },
+    isAdmin() {
+      if (this.userPermissions && this.userPermissions.includes('admin_all')) {
+        return true
+      } else {
+        return false
+      }
     },
     searches: function() {  // массив со всеми ИС на странице
       let searchesRes = [];
@@ -881,8 +942,24 @@ export default {
     }
   },  
   methods: {
+    exit: function() {
+      document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
+      document.cookie = `eva_token=''; max-age=0 ; path=/`;
+      this.$store.commit('clearState');
+      this.$router.push(`/`); 
+    },
+    openThemeModal(){
+      this.paleteShow = !this.paleteShow;
+    },
+    openLogs: function() {
+      this.modalActive=true;
+      this.$store.commit('setErrorLogs',false);
+    },
     toBackward: function() {
       this.$router.go(-1);
+    },
+    edit: function() {
+      this.$router.push(`/profile`);  
     },
     setEditMode: function() {
       this.edit_elem = !this.edit_elem;
