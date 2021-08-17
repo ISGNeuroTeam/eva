@@ -11,7 +11,7 @@
         class="title-name" 
         :style="{color:theme.$title}"
       >
-        {{ name }}
+        {{ titlePage }}
       </div>
       <v-tooltip 
         bottom 
@@ -206,6 +206,7 @@ export default {
     return {
       login: '',
       user: {},
+      titlePage: this.$router.history.current.name,
       door: mdiDoor,
       mdiCompare: mdiCompare,
       userEdit: mdiAccountEdit,
