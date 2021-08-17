@@ -682,9 +682,6 @@ export default {
     },
 
     addLine(element, lib) {
-
-      
-
       if (element.ID != "1750023024") return;
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
@@ -736,23 +733,21 @@ export default {
           weight: lib.width,
         });
       }
-      let pipelineData = this.pipelineData
+      let pipelineData = this.pipelineData;
 
       function highlightFeature(e) {
-
         const closest = (arr, num) => {
-        return (
-          arr.reduce((acc, val) => {
-            if (Math.abs(val.pos - num) < Math.abs(acc)) {
-              return val.pos - num;
-            } else {
-              return acc;
-            }
-          }, Infinity) + num
-        );
-      };
+          return (
+            arr.reduce((acc, val) => {
+              if (Math.abs(val.pos - num) < Math.abs(acc)) {
+                return val.pos - num;
+              } else {
+                return acc;
+              }
+            }, Infinity) + num
+          );
+        };
 
-      
         let newLine = turf.lineSlice(
           route[0],
           [e.latlng.lat, e.latlng.lng],
@@ -761,18 +756,19 @@ export default {
         let newLinePoly = L.polyline(newLine.geometry.coordinates);
         let distances = utils.accumulatedLengths(newLinePoly);
         let sum = distances[distances.length - 1];
-        
-        let closestData = closest(pipelineData, sum)
-        let pipelineInfo = pipelineData.find(el => el.pos == closestData)
-        console.log(pipelineInfo)
 
-        // div for tooltip 
+        let closestData = closest(pipelineData, sum);
+        let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
+        console.log(pipelineInfo);
+
+        // div for tooltip
         var newDiv = document.createElement("div");
-        newDiv.innerHTML =`
+        newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
           <p>${pipelineInfo.label}</p>
-          <p>V${pipelineInfo.P}</p>
-          <p>S${pipelineInfo.S}</p>
-          <p>L${pipelineInfo.L}</p>`;
+          <p>P ${pipelineInfo.P}</p>
+          <p>S ${pipelineInfo.S}</p>
+          <p>L ${pipelineInfo.L}</p>
+          </div>`;
         line.setTooltipContent(newDiv);
         var layer = e.target;
         layer.bringToFront();
@@ -784,8 +780,6 @@ export default {
           layer.bringToFront();
         }
       }
-
-      
     },
 
     clustering(dataRest) {
@@ -930,7 +924,11 @@ export default {
   grid-template-columns: repeat(3, 1fr) auto;
 }
 .leaftet-hover {
-  border: 2px solid #c88dcc;
+  border: 2px solid #191919;
+  border-radius: 5px;
+  text-align: left;
+  background-color: #191919;
+  color: white;
 }
 .leaftet-hover::before {
   margin-bottom: 0;
