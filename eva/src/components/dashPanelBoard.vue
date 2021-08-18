@@ -150,7 +150,7 @@
           <span>Сохранить</span>
         </v-tooltip>
       </div>
-      <v-menu :nudge-width="100" class="profile-block" :rounded="0" offset-y>
+      <v-menu :nudge-width="100" class="profile-block" offset-y>
         <template v-slot:activator="{ on }">
           <div
             class="dropdown-profile"
@@ -725,6 +725,7 @@ export default {
   props: {
     idDashFrom: null,
     permissionsFrom: null,
+    inside: null
   },
   data () {
     return {
@@ -789,7 +790,8 @@ export default {
           id: 1,
           label: 'Редактировать',
           icon: mdiAccountEdit,
-          onClick: this.edit
+          onClick: this.edit,
+          hide: this.inside
         },
         {
           id: 2,
@@ -853,6 +855,7 @@ export default {
       disabledDS: {},
       modalPaperSid: '',
       modalPaper: false,
+      userPermissions: null
     }
   },
   computed: {
@@ -906,7 +909,7 @@ export default {
     },
     tockens: function() {  // получения всех токенов на страницы
       let tockens = this.$store.getters.getTockens(this.idDash);
-      
+
       tockens.forEach( item => {
         this.tockensName[item.name] = item.name;
         this.lookTockens.push({show: false,color: this.theme.controls})
@@ -941,6 +944,11 @@ export default {
       return true
     }
   },  
+  watch: {
+    userPermissions() {
+      this.profileDropdownButtons = this.profileDropdownButtons.map((item) => item.id === 3 ? ({ ...item, hide: !this.isAdmin }) : item);
+    }
+  },
   methods: {
     exit: function() {
       document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
@@ -975,13 +983,33 @@ export default {
     },
     getCookie: async function() {
       //console.log(this.$jwt.hasToken())
-      console.log('mounted')
       if(this.$jwt.hasToken()) {
-        this.login = this.$jwt.decode().username;    
-        console.log('login', this.login, this.$jwt.decode().username)      
+        this.login = this.$jwt.decode().username;
+        //let id = this.$jwt.decode().user_id;
+        let permissions = [];
+
+        let response = await fetch(`/api/user/permissions`)
+          .catch (error => {
+            console.log(error);
+            return {status: 300, result: 'Post не создался, возможно из-за неточностей в запросе'}
+          }) 
+        if (response.status == 200) {  // если получилось
+          await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
+            permissions = res.data;
+            this.userPermissions = permissions
+            
+            this.$emit('permissions',permissions);
+            this.$emit('setUsername',this.login);
+            this.$emit('checkOver');
+          }) 
+        } else {
+          this.exit();
+        }
+                         
       } else {
         this.$router.push(`/`);
       }
+
     },
     openEdit: function(id) {   // окно с редактированием search
       this.openSearch();  // то открываем его 
