@@ -3,7 +3,7 @@
     class="reports-app-main" 
     :style="{background: theme.$secondary_bg}"
   >
-    <header-top @setUsername="setUsername($event)" />
+    <dash-panel-bord @setUsername="setUsername($event)" />
     <v-content>
       <v-container class="main-container container-report">
         <div 

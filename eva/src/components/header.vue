@@ -1,49 +1,102 @@
 <template>
   <div 
-    class="header-block" 
+    class="header-block dash-main" 
     :style="{background: theme.$main_bg, height: height }"
   >
-    <div class="aut-panel">
-      <div class="nav-btn">
-        <div 
-          class="title-main" 
-          :style="{color: theme.$secondary_text}"
-        >
-          EVA
-        </div>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="home"  
-              :color="theme.$secondary_text"
-              v-on="on" 
-              @click="toHome"
-            >
-              {{ home }}
-            </v-icon>
-          </template>
-          <span>На главную</span>
-        </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="undo"
-              :color="theme.$secondary_text"
-              v-on="on"
-              @click="toBackward"
-            >
-              {{ undo }}
-            </v-icon>
-          </template>
-          <span>Назад</span>
-        </v-tooltip>
+    <div class="main-title">
+      <div class="logo-block">
+        <EvaLogo />
       </div>
+      <div 
+        class="title-name" 
+        :style="{color:theme.$title}"
+      >
+        {{ titlePage }}
+      </div>
+      <v-tooltip 
+        bottom 
+        :color="theme.$accent_ui_color"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon 
+            class="home"  
+            :color="theme.$secondary_text"
+            v-on="on" 
+            @click="toHome"
+          >
+            {{ home }}
+          </v-icon>
+        </template>
+        <span>На главную</span>
+      </v-tooltip>
+      <v-tooltip 
+        bottom 
+        :color="theme.$accent_ui_color"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon 
+            class="undo"
+            :color="theme.$secondary_text"
+            v-on="on"
+            @click="toBackward"
+          >
+            {{ undo }}
+          </v-icon>
+        </template>
+        <span>Назад</span>
+      </v-tooltip>
+    </div>
+    <div class="control-block">
+      <v-menu :nudge-width="100" class="profile-block" offset-y>
+        <template v-slot:activator="{ on }">
+          <div
+            class="dropdown-profile"
+            v-on="on"
+          >
+            <v-icon 
+              :data-error="colorError"
+              :style="{color:theme.$secondary_text}"
+              class="profile theme--dark"
+            >
+              {{ profile_icon }}
+            </v-icon>
+            <div 
+              class="id-user profile-login" 
+              :style="{color:theme.$secondary_text}"
+            >
+              {{ login }}
+            </div>
+          </div>
+        </template>
+        <v-list class="profile-dropdown--list">
+          <v-list-item>
+            <v-list-item-title class="profile-dropdown--title">Профиль</v-list-item-title>
+          </v-list-item>
+          <div v-for="item in profileDropdownButtons" :key="item.id">
+            <v-list-item v-if="!item.hide">
+              <v-btn
+                class="profile-dropdown--button"
+                icon
+                v-on="on"
+                @click="item.onClick"
+              >
+                <v-icon 
+                  class="edit icon-aut"
+                  :color="theme.$secondary_text"
+                >
+                  {{ item.icon }}
+                </v-icon>
+                {{ item.label }}
+              </v-btn>
+            </v-list-item>
+          </div>
+        </v-list>
+      </v-menu>
+    </div>
+
+    <!-- test -->
+    <!-- <div class="aut-panel">
+      
       <div class="manage-btn">
         <div 
           class="id-user" 
@@ -119,7 +172,7 @@
           <span>Выйти из профиля</span>
         </v-tooltip>
       </div>   
-    </div>
+    </div> -->
     <modal-log 
       :modal-active="modalActive"
       @cancelModal="modalActive=false" 
@@ -135,13 +188,17 @@
 
 <script>
 
-import { mdiDoor, mdiCompare, mdiAccountEdit, mdiPalette, mdiUndoVariant,  mdiHomeVariantOutline, mdiScriptTextOutline } from '@mdi/js'
+import { mdiDoor, mdiCompare, mdiVariable, mdiCodeTags, mdiAccount, mdiAccountEdit, mdiPalette, mdiUndoVariant,  mdiHomeVariantOutline, mdiScriptTextOutline } from '@mdi/js'
 import Vue from "vue";
 import VueJWT from 'vuejs-jwt'
+import EvaLogo from '../images/eva-logo.svg';
 
 Vue.use(VueJWT, {'storage': 'cookie','keyName': 'eva_token'})
 
 export default {
+  components: {
+    EvaLogo
+  },
   props: {
     inside: null
   },
@@ -149,15 +206,47 @@ export default {
     return {
       login: '',
       user: {},
+      titlePage: this.$router.history.current.name,
       door: mdiDoor,
       mdiCompare: mdiCompare,
       userEdit: mdiAccountEdit,
+      code_icon: mdiCodeTags,
+      tocken_icon: mdiVariable,
+      profile_icon: mdiAccount,
       log: mdiScriptTextOutline,
       modalActive: false,
       home: mdiHomeVariantOutline,
       undo: mdiUndoVariant,
       palete: mdiPalette,
       paleteShow: false,
+      profileDropdownButtons: [
+        {
+          id: 1,
+          label: 'Редактировать',
+          icon: mdiAccountEdit,
+          onClick: this.edit,
+          hide: this.inside
+        },
+        {
+          id: 2,
+          label: 'Тема',
+          icon: mdiCompare,
+          onClick: this.openThemeModal
+        },
+        {
+          id: 3,
+          label: 'Логи',
+          icon: mdiScriptTextOutline,
+          onClick: this.openLogs,
+          hide: !this.isAdmin
+        },
+        {
+          id: 4,
+          label: 'Выйти',
+          icon: mdiDoor,
+          onClick: this.exit,
+        },
+      ],
       userPermissions: null
     } 
   },
@@ -173,7 +262,7 @@ export default {
       if (screen.width < 1400) {
         return '40px'
       } else {
-        return "50px"
+        return "41px"
       }
     },
     theme: function() {
@@ -185,6 +274,11 @@ export default {
       } else {
         return false
       }
+    }
+  },
+  watch: {
+    userPermissions() {
+      this.profileDropdownButtons = this.profileDropdownButtons.map((item) => item.id === 3 ? ({ ...item, hide: !this.isAdmin }) : item);
     }
   },
   mounted() {

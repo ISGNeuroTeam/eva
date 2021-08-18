@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.61.0]
+
+### Added
+- new mode for map monitoring
+
+### Changed
+- heatMapGeneral visualization component renamed to heatMap
+- changed header for project and dashboards, fixed bug with header for tables
+
+### Removed
+- first heatMap visualization component and its styles
+
 ## [1.60.0]
 
 ### Added
