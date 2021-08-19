@@ -1496,9 +1496,18 @@ export default {
                   element = bodyArray.splice(0, i);
                 }
               })
-              
 
-              if(this.event.event == 'OnTokenCompare') {
+              if (this.event.event == 'OnDataCompare') { 
+                if (element.length > 2 && element[1].indexOf('[') == -1){
+                  this.$set(this.event,'compare',element[0]);
+                  this.$set(this.event,'column',element[1]);
+                  this.$set(this.event,'row',element.splice(2, element.length-1).join(',')); 
+                } else {
+                  this.$set(this.event,'compare',element[0]);
+                  this.$set(this.event,'sense',element.splice(1, element.length-1).join(',')); 
+                }
+                      
+              } else if(this.event.event == 'OnTokenCompare') {
                 this.$set(this.event,'compare',element[0]);
                 this.$set(this.event,'token',element[1]);
                 this.$set(this.event,'tokenval',element.splice(2, element.length-1).join(','));
