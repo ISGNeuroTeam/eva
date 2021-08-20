@@ -123,6 +123,23 @@
         >
           <template v-slot:activator="{ on }">
             <v-icon 
+              class="filter filter-icon theme--dark" 
+              :style="{color:theme.$secondary_text}"
+              v-on="on"
+              @click="openFilterPanel"
+            >
+              {{ filterIcon }}
+            </v-icon> 
+          </template>
+          <span>Открыть настройки фильтров</span>
+        </v-tooltip>
+        <v-tooltip
+          v-if="editPermission"
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
               class="edit edit-icon theme--dark" 
               :style="{color:theme.$secondary_text}"
               v-on="on"
@@ -368,6 +385,17 @@
           {{ tool.name }}
         </div>
       </div>
+    </div>
+    <div 
+      class="block-filter" 
+      :class="{openfilter}" 
+      :style="{ background:theme.$main_bg, color:theme.$main_text}"
+    >
+      <dash-filter-panel
+        :permissions-from="permissionsFrom"
+        :idDashFrom="idDashFrom"
+      >
+      </dash-filter-panel>
     </div>
     <div 
       class="block-tocken" 
@@ -712,15 +740,17 @@
 
 <script>
 
-import { mdiPlusBox, mdiDoor, mdiCompare, mdiScriptTextOutline, mdiFastForward, mdiUndoVariant, mdiAccountEdit, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold } from '@mdi/js'
+import { mdiPlusBox, mdiDoor, mdiCompare, mdiScriptTextOutline, mdiFastForward, mdiUndoVariant, mdiAccountEdit, mdiPlay, mdiEye, mdiFileDocumentOutline,  mdiArrowDownBold, mdiContentSave, mdiAccount,    mdiHomeVariantOutline,  mdiSettings, mdiHelpCircleOutline, mdiClockOutline,  mdiDatabase,mdiTableEdit,mdiCodeTags, mdiTrashCanOutline, mdiMinusBox, mdiToolbox ,   mdiPencil,  mdiVariable, mdiCheckBold,  mdiSwapVerticalBold, mdiFilter } from '@mdi/js'
 import EvaLogo from '../images/eva-logo.svg';
 //import { match } from 'minimatch'
 
 import  settings  from '../js/componentsSettings.js'
+import DashFilterPanel from './dashFilterPanel.vue';
 
 export default {
   components: {
     EvaLogo,
+    DashFilterPanel,
   },
   props: {
     idDashFrom: null,
@@ -769,11 +799,13 @@ export default {
       opentool: false,
       opentocken: false,
       opensearch: false,
+      openfilter:false,
       opensave: false,
       openexim: false,
       sign: true,
       gearShow: false,
       gear: mdiSettings,
+      filterIcon: mdiFilter,
       exim: mdiSwapVerticalBold,
       home: mdiHomeVariantOutline,
       openhelp: false,
@@ -784,6 +816,7 @@ export default {
       mdiCompare: mdiCompare,
       tempTocken: {},
       change: {},
+      filterModalShow:false,
       profileDropdownButtons: [
         {
           id: 1,
@@ -1042,6 +1075,19 @@ export default {
     openToolPanel: function() {
       this.tool_elem = !this.tool_elem;
       this.opentool = !this.opentool;
+      this.save_elem = false;
+      this.opensave = false;
+      this.opencode = false;
+      this.search_elem = false;
+      this.tocken_elem = false;
+      this.opentocken = false;
+      this.code_elem = false;
+      this.openevent = false;
+    },
+    openFilterPanel: function(){
+      this.openfilter = !this.openfilter;
+      this.opentool = false;
+      this.tool_elem = false;
       this.save_elem = false;
       this.opensave = false;
       this.opencode = false;
@@ -1701,7 +1747,6 @@ export default {
 </script>
 
 <style lang="scss" > 
-
         @import '../sass/dashPanelBoard.sass'
 </style>
 

@@ -114,6 +114,9 @@
         .edit-icon
             margin-right: 20px
             margin-left: 20px
+        
+        .filter-icon
+            margin-left: 10px
 
         .search
             margin-right: 20px
@@ -773,6 +776,27 @@
             .minus
                 fill: #FF6D70
 
+    
+    .block-filter
+        position: absolute
+        width: 1080px
+        height: auto
+        overflow-y: auto
+        top: 55px
+        right: 20px
+        border: 2px solid rgba(0,0,0,0.2)
+        border-radius: 4px
+        background: white
+        padding: 20px
+        opacity: 0
+        visibility: hidden
+        display: flex
+        flex-flow: column nowrap
+        justify-content: flex-start
+        align-items: flex-start
+        transition: all 0.4s ease
+        transform: translateY(-100%)
+
     .warning-block
         position: absolute
         bottom: -350px
@@ -814,6 +838,12 @@
         z-index:4
 
     .opentool
+        opacity: 1
+        visibility: visible
+        transform: translateY(0)
+        z-index:4
+    
+    .openfilter
         opacity: 1
         visibility: visible
         transform: translateY(0)
