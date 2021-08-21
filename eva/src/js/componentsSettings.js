@@ -20,6 +20,7 @@ export default {
     {name: 'Текстовый блок', img: mdiCardTextOutline , type: 'textarea'},
     {name: 'Граф_old', img: mdiGraph , type: 'graph'},
     {name: 'Тепловая карта', img: mdiGrid , type: 'heatmap'},
+    {name: 'Single Value', img: mdiNumeric, type: 'singleValue'},
   ],
   size: {
     picker: {
@@ -86,6 +87,10 @@ export default {
       width: 500,
       height: 300
     },
+    singleValue: {
+      width: 500,
+      height: 300,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -104,6 +109,7 @@ export default {
     bush: mdiChartScatterPlot,
     map: mdiMapMarker,
     heatmap: mdiGrid,
+    singleValue: mdiNumeric,
   },
   options: {
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline'],
@@ -122,7 +128,7 @@ export default {
     bush: ['visible','level'],
     map: ['visible','level', 'osmserver', 'primitivesLibrary'],
     heatmap: ['visible','level', 'dataFormat'],
-
+    singleValue: ['visible', 'level'],
   },
   reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
   reports: {
@@ -169,6 +175,10 @@ export default {
     heatmap: {
       tooltip: 'Тепловая карта',
       icon: mdiGrid
+    },
+    singleValue: {
+      tooltip: 'Single Value',
+      icon: mdiNumeric
     },
   }
 }

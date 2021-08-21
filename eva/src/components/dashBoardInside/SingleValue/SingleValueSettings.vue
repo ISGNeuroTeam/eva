@@ -1,0 +1,263 @@
+<template>
+  <v-dialog
+    v-model="isOpen"
+    persistent
+    scrollable
+    max-width="560"
+  >
+    <v-card class="dialog-content">
+      <v-card-title class="header">
+        <v-icon left class="icon-main" v-text="mdiSettings"/>
+        <span class="main-title">Настройки Single Value</span>
+        <v-icon right class="icon-close" @click="close" v-text="mdiClose"/>
+      </v-card-title>
+
+      <v-divider :color="theme.$secondary_border"/>
+
+      <v-card-text class="content pa-0">
+        <div class="content-section">
+          <span class="section-title">Название</span>
+          <v-text-field
+            v-model="settings.title"
+            dense
+            outlined
+            hide-details
+            class="input-element"
+          />
+        </div>
+
+        <div class="content-section offset">
+          <span class="section-title">Количество показателей</span>
+          <v-select
+            v-model="settings.metricCount"
+            :items="[1, 2, 3, 4, 5, 6]"
+            :append-icon="mdiChevronDown"
+            dense
+            outlined
+            hide-details
+            menu-props="offsetY"
+            class="input-element"
+            @change="settings.template = 1"
+          />
+        </div>
+
+        <div v-if="settings.metricCount > 1" class="content-section pt-0">
+          <span class="section-title bold">Выберите шаблон</span>
+          <div class="templates-container">
+            <div
+              v-for="n in templatesForMetrics[settings.metricCount]"
+              :key="`data-template-${n}`"
+              class="data-template"
+              :class="`metric-${settings.metricCount} v-${n} ${n === settings.template ? 'active' : ''}`"
+              @click="settings.template = n"
+            >
+              <div
+                v-for="n in settings.metricCount"
+                :key="`item-${n}`"
+                class="item"
+                :style="`grid-area: item-${n}`"
+                v-text="n"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="content-section style-settings-header">
+          <span class="section-title">Настройка стилей</span>
+          <span class="show-all-title">Показать все</span>
+        </div>
+
+        <div
+          v-for="(metric, i) in settings.metricOptions"
+          :key="`metric-${metric.id}`"
+          class="metric-section"
+          :class="{ expanded: metric.expanded }"
+        >
+          <div class="metric-header">
+            <span class="title-wrapper" @click="metric.expanded = !metric.expanded">
+              <span class="metric-title">
+                Показатель {{ i + 1 }} - {{ !metric.title ? 'Нет подписи' : metric.title }}
+              </span>
+              <v-icon
+                size="26"
+                class="mx-1"
+                :color="theme.$accent_ui_color"
+                v-text="metric.expanded ? mdiChevronUp : mdiChevronDown"
+              />
+            </span>
+            <v-icon size="16" :color="theme.$main_border" v-text="mdiMenu"/>
+          </div>
+
+          <div class="content-section">
+            <span class="section-title">Подпись (необязательно)</span>
+            <v-text-field
+              v-model="metric.title"
+              dense
+              outlined
+              hide-details
+              class="input-element"
+            />
+          </div>
+
+          <div class="content-section">
+            <span class="section-title">Иконка подписи (необязательно)</span>
+            <div class="icons-container">
+              <div
+                title="Без иконки"
+                class="icon"
+                :class="{ selected: no_icon.id === metric.icon }"
+                @click="metric.icon = no_icon.id"
+                v-html="no_icon.svg"
+              />
+              <div
+                v-for="icon in iconList"
+                :key="icon.id"
+                class="icon"
+                :class="{ selected: icon.id === metric.icon }"
+                @click="metric.icon = icon.id"
+                v-html="icon.svg"
+              />
+            </div>
+          </div>
+
+          <div class="content-section font-selects-box">
+            <div class="content-section pa-0">
+              <span class="section-title">Размер шрифта (px)</span>
+              <v-select
+                v-model="metric.fontSize"
+                :items="fontSizeList"
+                :append-icon="mdiChevronDown"
+                dense
+                outlined
+                hide-details
+                menu-props="offsetY"
+                class="input-element"
+              />
+            </div>
+            <div class="content-section pa-0">
+              <span class="section-title">Насыщенность шрифта</span>
+              <v-select
+                v-model="metric.fontWeight"
+                :items="fontWeightList"
+                :append-icon="mdiChevronDown"
+                dense
+                outlined
+                hide-details
+                menu-props="offsetY"
+                class="input-element"
+              >
+                <template v-slot:selection="{ item }">{{ item.title }}</template>
+                <template v-slot:item="{ item }">
+                  <span :style="{ fontWeight: item.value }" v-text="item.title"/>
+                </template>
+              </v-select>
+            </div>
+          </div>
+
+          <div class="content-section">
+            <span class="section-title">Цвет шрифта</span>
+            <div class="color-selects">
+              <div
+                v-for="color in colorsList"
+                :key="color.name"
+                class="color-select"
+                :class="{ selected: metric.color === color.name }"
+                @click="metric.color = color.name"
+                v-text="color.title"
+              />
+            </div>
+          </div>
+        </div>
+      </v-card-text>
+
+      <v-divider :color="theme.$secondary_border"/>
+
+      <v-card-actions class="footer px-6">
+        <v-btn text depressed class="btn-cancel" @click="close">Отмена</v-btn>
+        <v-btn depressed class="btn-save" @click="save">Сохранить</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+</template>
+
+<script>
+import metricTitleIcons from './metricTitleIcons';
+import { no_icon } from './metricTitleIcons';
+import {
+  mdiMenu,
+  mdiClose,
+  mdiSettings,
+  mdiChevronUp,
+  mdiChevronDown,
+} from '@mdi/js';
+
+export default {
+  name: 'SingleValueSettings',
+  props: {
+    isOpen: { type: Boolean, default: false },
+    receivedSettings: { type: Object, default: () => ({}) },
+  },
+  data: () => ({
+    no_icon,
+    mdiMenu,
+    mdiClose,
+    mdiSettings,
+    mdiChevronUp,
+    mdiChevronDown,
+    /** Local settings object based on receivedSettings props. */
+    settings: {},
+    /** Font size select items. */
+    fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
+    /** Font weight select items. */
+    fontWeightList: [
+      { value: 200, title: 'Regular (200)' },
+      { value: 400, title: 'Medium (400)' },
+      { value: 800, title: 'Bold (800)' },
+    ],
+    /** Metric title color select items. */
+    colorsList: [
+      { name: 'main', title: 'Основной' },
+      { name: 'secondary', title: 'Дополнительный' },
+      { name: 'range', title: 'Диапазоны' },
+    ],
+    /**
+     * The number of available templates for the selected number of metrics.
+     * Data fornat: { <metricsNumber>: <availableTemplatesNumber> }.
+     */
+    templatesForMetrics: { 2: 2, 3: 6, 4: 7, 5: 5, 6: 2 },
+  }),
+  computed: {
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+
+    iconList() {
+      return metricTitleIcons.filter(icon => icon.id !== 'no_icon');
+    },
+  },
+  watch: {
+    receivedSettings(newValue) {
+      this.settings = { ...newValue };
+    },
+  },
+  methods: {
+    save() {
+      const settings = { ...this.settings };
+      this.$emit('save', settings);
+      this.close();
+    },
+
+    close() {
+      const { metricOptions } = this.settings;
+      for (const metric of metricOptions) {
+         metric.expanded = false;
+      }
+      this.$emit('close');
+    },
+  }
+};
+</script>
+
+<style lang="sass" scoped>
+@import './sass/SingleValueSettings'
+</style>

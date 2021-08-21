@@ -1,0 +1,53 @@
+// -------------------- colors --------------------
+
+$secondary-text: var(--secondary_text)
+
+// -------------------- vars --------------------
+
+$dash-loading-height: 3px
+
+// -------------------- mixins --------------------
+
+@mixin text-truncated()
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+@mixin container-height($dash-header-height)
+  height: calc(100% - (#{$dash-header-height} + #{$dash-loading-height}))
+
+// -------------------- styles --------------------
+
+.single-value-container::v-deep
+  display: flex
+  flex-direction: column
+  @include container-height(0px)
+
+  &.header-active
+    @include container-height(35px)
+
+  @media screen and (max-width: 1600px)
+    &.header-active
+      @include container-height(25px)
+
+  .header
+    display: flex
+    align-items: center
+    justify-content: space-between
+
+    .data-title
+      color: $secondary-text
+      font-size: 12px
+      font-weight: 400
+      line-height: 15px
+      letter-spacing: 1.25px
+      text-transform: uppercase
+      @include text-truncated()
+
+    .settings-icon
+      margin-left: 8px
+      color: $secondary-text
+
+  .content
+    flex: 1 0
+    display: grid
