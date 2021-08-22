@@ -30,7 +30,7 @@
           <span class="section-title">Количество показателей</span>
           <v-select
             v-model="settings.metricCount"
-            :items="[1, 2, 3, 4, 5, 6]"
+            :items="metricCountList"
             :append-icon="mdiChevronDown"
             dense
             outlined
@@ -48,14 +48,14 @@
               v-for="n in templatesForMetrics[settings.metricCount]"
               :key="`data-template-${n}`"
               class="data-template"
-              :class="`metric-${settings.metricCount} v-${n} ${n === settings.template ? 'active' : ''}`"
+              :class="`metric-${settings.metricCount} v-${n} ${n === settings.template ? 'selected' : ''}`"
               @click="settings.template = n"
             >
               <div
                 v-for="n in settings.metricCount"
                 :key="`item-${n}`"
                 class="item"
-                :style="`grid-area: item-${n}`"
+                :style="{ gridArea: `item-${n}`}"
                 v-text="n"
               />
             </div>
@@ -64,7 +64,11 @@
 
         <div class="content-section style-settings-header">
           <span class="section-title">Настройка стилей</span>
-          <span class="show-all-title">Показать все</span>
+          <span
+            class="show-all-title"
+            @click="showAllMetrics"
+            v-html="showAllTitle"
+          />
         </div>
 
         <div
@@ -156,7 +160,7 @@
 
           <div class="content-section">
             <span class="section-title">Цвет шрифта</span>
-            <div class="color-selects">
+            <div class="color-selects-box">
               <div
                 v-for="color in colorsList"
                 :key="color.name"
@@ -234,6 +238,30 @@ export default {
     iconList() {
       return metricTitleIcons.filter(icon => icon.id !== 'no_icon');
     },
+
+    showAllTitle() {
+      return this.isAllMetricsExpanded ? 'Скрыть все' : 'Показать все';
+    },
+
+    isAllMetricsExpanded() {
+      const { metricOptions = [] } = this.settings;
+      return metricOptions.every(m => m.expanded === true);
+    },
+
+    metricCountList() {
+      const { metricOptions = [] } = this.settings;
+      const metricCount = metricOptions.length;
+      const countList = [];
+
+      if (metricCount > 0) {
+        const max = metricCount <= 6 ? metricCount : 6;
+        for (let i = 0; i < max; i++) {
+          countList.push(i + 1);
+        }
+      }
+
+      return [1,2,3,4,5,6];
+    },
   },
   watch: {
     receivedSettings(newValue) {
@@ -242,17 +270,28 @@ export default {
   },
   methods: {
     save() {
-      const settings = { ...this.settings };
-      this.$emit('save', settings);
+      this.$emit('save', { ...this.settings });
       this.close();
     },
 
     close() {
-      const { metricOptions } = this.settings;
-      for (const metric of metricOptions) {
-         metric.expanded = false;
-      }
+      this.toggleAllMetrics(false);
       this.$emit('close');
+    },
+
+    showAllMetrics() {
+      if (this.isAllMetricsExpanded) {
+        this.toggleAllMetrics(false);
+      } else {
+        this.toggleAllMetrics(true);
+      }
+    },
+
+    toggleAllMetrics(value = true) {
+      const { metricOptions = [] } = this.settings;
+      for (const metric of metricOptions) {
+        metric.expanded = value;
+      }
     },
   }
 };

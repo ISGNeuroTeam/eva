@@ -6,22 +6,40 @@
     <div class="header">
       <span class="data-title" v-text="tokenizedTitle"/>
       <v-icon
-        v-show="!dataModeFrom"
+        v-show="dataModeFrom"
         size="22"
         class="settings-icon"
         @click.stop="openSettings"
         v-text="mdiSettings"
       />
     </div>
-    <div class="content pt-3">
-      template = {{ metricCount }} - {{ template }}
+
+    <div class="content pt-3" :class="metricTemplateClass">
       <div
         v-for="metric in metricList"
         :key="`metric-${metric.id}`"
+        class="item"
+        :style="{ gridArea: `item-${metric.id}` }"
       >
-        {{ metric.title }} = {{ metric.value }}
+        <span class="metric-title">
+          <span
+            v-show="metric.icon !== 'no_icon'"
+            class="icon"
+            v-html="getIconSvgByID(metric.icon)"
+          />
+          <span
+            class="title-text"
+            v-text="metric.title"
+          />
+        </span>
+        <span
+          class="metric-value"
+          :class="`color-${metric.color}`"
+          v-text="metric.value"
+        />
       </div>
     </div>
+
     <SingleValueSettings
       :is-open="isSettingsComponentOpen"
       :received-settings="providedSettings"
@@ -57,9 +75,17 @@ export default {
     isSettingsComponentOpen: false,
   }),
   computed: {
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+
     tokenizedTitle() {
       const title = this.options?.settings?.title || '';
       return title.replaceAll('<title>', this.titleToken);
+    },
+
+    metricTemplateClass() {
+      return `metric-${this.metricCount} v-${this.template}`;
     },
   },
   watch: {
@@ -88,7 +114,7 @@ export default {
           title: metric,
           color: 'main',
           icon: 'no_icon',
-          fontSize: 18,
+          fontSize: 16,
           fontWeight: 200,
         };
 
@@ -133,15 +159,30 @@ export default {
     },
 
     saveSettings(settings = {}) {
-      const { metricCount, template } = settings;
+      const { metricCount, template, metricOptions } = settings;
       this.template = template;
       this.metricCount = metricCount;
       /** Applying settings from the SingleValueSettings. */
       this.options.settings = { ...settings };
+      /** Updated local metricList array. */
+      for (const updatedMetric of metricOptions) {
+        const { icon, title, color, fontSize, fontWeight } = updatedMetric;
+        const metric = this.metricList.find(m => m.id === updatedMetric.id);
+        metric.icon = icon;
+        metric.title = title;
+        metric.color = color;
+        metric.fontSize = fontSize;
+        metric.fontWeight = fontWeight;
+      }
     },
 
     closeSettings() {
       this.isSettingsComponentOpen = false;
+    },
+
+    getIconSvgByID(id) {
+      const icon = this.metricTitleIcons.find(m => m.id === id);
+      return icon.svg;
     },
   },
 };

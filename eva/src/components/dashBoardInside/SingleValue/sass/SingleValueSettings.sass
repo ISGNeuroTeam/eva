@@ -1,3 +1,7 @@
+// -------------------- import templates mixins --------------------
+
+@import './metricTemplates'
+
 // -------------------- colors --------------------
 
 $title: var(--title)
@@ -14,6 +18,8 @@ $accent_ui_color: var(--accent_ui_color)
 // -------------------- vars --------------------
 
 $header-height: 60px
+$icon-width: 30px
+$metric-header-height: 40px
 
 // -------------------- mixins --------------------
 
@@ -21,12 +27,6 @@ $header-height: 60px
   white-space: nowrap
   overflow: hidden
   text-overflow: ellipsis
-
-@mixin gtr($rows)
-  grid-template-rows: repeat(#{$rows}, 1fr)
-
-@mixin gtc($cols)
-  grid-template-columns: repeat(#{$cols}, 1fr)
 
 // -------------------- styles --------------------
 
@@ -138,6 +138,7 @@ $header-height: 60px
           background-color: $secondary_border
           border-radius: 4px
           cursor: pointer
+          @include templates-for-all-metric-variants()
 
           .item
             display: flex
@@ -150,132 +151,12 @@ $header-height: 60px
             font-weight: 600
             user-select: none
 
-          &.active
+          &.selected
             box-shadow: 0 0 0 1px $primary_button inset
 
             .item
               color: #fff
               background-color: $primary_button
-
-          // -------------------- templates for 2 metrics --------------------
-
-          &.metric-2.v-1
-            @include gtr(1)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2'
-
-          &.metric-2.v-2
-            @include gtr(2)
-            @include gtc(1)
-            grid-template-areas: 'item-1' 'item-2'
-
-          // -------------------- templates for 3 metrics --------------------
-
-          &.metric-3.v-1
-            @include gtr(2)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-1 item-3'
-
-          &.metric-3.v-2
-            @include gtr(2)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-3' 'item-2 item-3'
-
-          &.metric-3.v-3
-            @include gtr(2)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-1' 'item-2 item-3'
-
-          &.metric-3.v-4
-            @include gtr(2)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-3 item-3'
-
-          &.metric-3.v-5
-            @include gtr(1)
-            @include gtc(3)
-            grid-template-areas: 'item-1 item-2 item-3'
-
-          &.metric-3.v-6
-            @include gtr(3)
-            @include gtc(1)
-            grid-template-areas: 'item-1' 'item-2' 'item-3'
-
-          // -------------------- templates for 4 metrics --------------------
-
-          &.metric-4.v-1
-            @include gtr(2)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-3 item-4'
-
-          &.metric-4.v-2
-            @include gtr(2)
-            @include gtc(3)
-            grid-template-areas: 'item-1 item-1 item-1' 'item-2 item-3 item-4'
-
-          &.metric-4.v-3
-            @include gtr(2)
-            @include gtc(3)
-            grid-template-areas: 'item-1 item-2 item-3' 'item-4 item-4 item-4'
-
-          &.metric-4.v-4
-            @include gtr(3)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-1 item-3' 'item-1 item-4'
-
-          &.metric-4.v-5
-            @include gtr(3)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-4' 'item-2 item-4' 'item-3 item-4'
-
-          &.metric-4.v-6
-            @include gtr(4)
-            @include gtc(1)
-            grid-template-areas: 'item-1' 'item-2' 'item-3' 'item-4'
-
-          &.metric-4.v-7
-            @include gtr(1)
-            @include gtc(4)
-            grid-template-areas: 'item-1 item-2 item-3 item-4'
-
-          // -------------------- templates for 5 metrics --------------------
-
-          &.metric-5.v-1
-            @include gtr(3)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-1' 'item-2 item-3' 'item-4 item-5'
-
-          &.metric-5.v-2
-            @include gtr(3)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-3 item-4' 'item-5 item-5'
-
-          &.metric-5.v-3
-            @include gtr(3)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-3 item-4' 'item-5 .'
-
-          &.metric-5.v-4
-            @include gtr(5)
-            @include gtc(1)
-            grid-template-areas: 'item-1' 'item-2' 'item-3' 'item-4' 'item-5'
-
-          &.metric-5.v-5
-            @include gtr(1)
-            @include gtc(5)
-            grid-template-areas: 'item-1 item-2 item-3 item-4 item-5'
-
-          // -------------------- templates for 6 metrics --------------------
-
-          &.metric-6.v-1
-            @include gtr(3)
-            @include gtc(2)
-            grid-template-areas: 'item-1 item-2' 'item-3 item-4' 'item-5 item-6'
-
-          &.metric-6.v-2
-            @include gtr(2)
-            @include gtc(3)
-            grid-template-areas: 'item-1 item-2 item-3' 'item-4 item-5 item-6'
 
       &.style-settings-header
         flex-direction: row
@@ -295,8 +176,6 @@ $header-height: 60px
           user-select: none
           text-decoration: underline
           @include text-truncated()
-
-    $metric-header-height: 40px
 
     .metric-section
       background-color: $main_bg
@@ -328,8 +207,6 @@ $header-height: 60px
             font-size: 15px
             font-weight: 600
             @include text-truncated()
-
-      $icon-width: 30px
 
       .icons-container
         display: grid
@@ -369,7 +246,7 @@ $header-height: 60px
         grid-template-columns: repeat(auto-fill, minmax(45%, 1fr))
         gap: 10px 20px
 
-      .color-selects
+      .color-selects-box
         margin-top: 4px
         display: grid
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))
