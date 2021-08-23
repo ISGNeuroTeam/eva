@@ -1,16 +1,12 @@
 <template>
-  <div>
-    <v-container>
-      <v-row>
-        {{ filterPart.token.name }}
-      </v-row>
-      <v-row>
-        <v-col>
-          {{ filterPart.token.capture }} 
-					({{ filterPart.values.length }})
-        </v-col>
-      </v-row>
-    </v-container>
+  <div class="pa-1 filter-part">
+    <div>
+      {{ filterPart.token.name }}
+    </div>
+    <div>
+      {{ filterPart.token.capture }}
+      ({{ filterPart.values.length }})
+    </div>
   </div>
 </template>
 
@@ -21,4 +17,9 @@
   };
 </script>
 
-<style></style>
+<style scoped>
+.filter-part{
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0;
+}
+</style>

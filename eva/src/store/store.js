@@ -264,11 +264,15 @@ export default {
 
         searches.forEach(async item => {
           // также при обновлении токена нужно заново запускать серч и обновлять информацию
+          // (If token changed without focusedFilter)
           if (
             item.original_otl.indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||
             String(item.parametrs.tws).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) !=
               -1 ||
-            String(item.parametrs.twf).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1
+            (String(item.parametrs.twf).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) !=
+              -1 &&
+              // check focusedFilter
+              !state[tocken.idDash].focusedFilter)
           ) {
             // если в тексте запроса есть наш токен
 
@@ -308,9 +312,11 @@ export default {
         //чтобы dashBoard еще раз сделал запрос
         Object.keys(state[tocken.idDash]).forEach(dashElement => {
           if (
-            dashElement.includes('table') ||
-            dashElement.includes('single') ||
-            dashElement.includes('multiLine')
+            !state[tocken.idDash].focusedFilter &&
+            (dashElement.includes('table') ||
+              dashElement.includes('single') ||
+              dashElement.includes('multiLine'))
+            // check focusedFilter
           ) {
             tocken.store.commit('setShould', {
               idDash: tocken.idDash,
@@ -904,8 +910,12 @@ export default {
         }
       }
     },
-    setFocusedFilter: (state, filter) => {
-      state[filter.idDash].focusedFilter = filter;
+    setFocusedFilter: (state, { idDash, filter }) => {
+      state[idDash].focusedFilter = filter;
+    },
+    refreshFilter(state, filter) {
+      let foundFilter = state[filter.idDash].filters.find(val => filter.id === val.id);
+      foundFilter.parts.forEach(part => (part.values = []));
     },
   },
   getters: {

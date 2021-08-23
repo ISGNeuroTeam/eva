@@ -1,31 +1,52 @@
 <template>
   <v-container>
-    <v-btn @click="addFilter">Добавить фильтр</v-btn>
+    <v-btn @click="addFilter" class="mb-1">Добавить фильтр</v-btn>
 
-    <v-list dense>
-      <v-list-item-group v-model="focusedRow">
-        <v-list-item v-for="filter in filters" :key="filter.id">
-          <v-row justify="space-between">
+    <v-list dense flat>
+      <v-list-item-group v-model="focusedRow" active-class="focused-filter">
+        <v-list-item v-for="filter in filters" :key="filter.id" class="ma-1 filter-row">
+          <v-row justify="space-between" align="center">
             <!-- FILTER ID -->
-            <v-col>
-              {{ filter.id }}
+            <v-col cols="2">
+              <v-card flat>
+                <v-card-title>
+                  {{ filter.id }}
+                </v-card-title>
+              </v-card>
             </v-col>
+
+            <v-divider vertical></v-divider>
 
             <!-- FILTER PARTS -->
-            <v-col>
-              <v-sheet class="mx-auto" max-width="600">
-                <v-slide-group show-arrows>
-                  <v-slide-item v-for="(part, index) in filter.parts" :key="index">
-                    <filter-part :filterPart="part"></filter-part>
-                  </v-slide-item>
-                </v-slide-group>
-              </v-sheet>
+            <v-col cols="8" class="d-flex align-center justify-left">
+              <v-slide-group show-arrows>
+                <v-slide-item v-for="(part, index) in filter.parts" :key="index">
+                  <filter-part :filterPart="part"></filter-part>
+                </v-slide-item>
+              </v-slide-group>
+              <v-row align="center">
+                <v-btn
+                  rounded
+                  x-small
+                  outlined
+                  class="text-capitalize ml-6"
+                  @click="triggerFilterPartModal()"
+                >
+                  <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
+                </v-btn>
+              </v-row>
             </v-col>
 
+            <v-divider vertical></v-divider>
+
             <!-- FILTER BUTTONS -->
-            <v-col>
-              <v-btn @click="triggerFilterPartModal()">add</v-btn>
-              <v-btn @click="deleteFilter(filter)">delete</v-btn>
+            <v-col cols="2">
+              <v-btn icon small color="red" @click="deleteFilter(filter)"
+                ><v-icon>{{ trashIcon }}</v-icon></v-btn
+              >
+              <v-btn icon small @click="refreshFilter(filter)"
+                ><v-icon>{{ refreshIcon }}</v-icon></v-btn
+              >
             </v-col>
 
             <v-dialog max-width="1000" v-model="partModalShow">
@@ -36,12 +57,13 @@
             </v-dialog>
           </v-row>
         </v-list-item>
-
-        <v-list-item v-for="(tmp, index) in tempFilters" :key="index">
-          <v-text-field v-model="tmp.id"></v-text-field>
-          <v-btn @click="saveTempFilter(index)">save</v-btn>
-        </v-list-item>
       </v-list-item-group>
+
+      <v-list-item v-for="(tmp, index) in tempFilters" :key="index">
+        <v-text-field v-model="tmp.id"></v-text-field>
+        <v-btn rounded small class="ma-1" @click="saveTempFilter(index)">Сохранить</v-btn>
+        <v-btn rounded small class="ma-1" @click="removeTempFilter(index)">Отменить</v-btn>
+      </v-list-item>
     </v-list>
   </v-container>
 </template>
@@ -49,6 +71,7 @@
 <script>
   import FilterPartModal from './filters/FilterPartModal';
   import FilterPart from './filters/FilterPart';
+  import { mdiPlusCircleOutline, mdiTrashCanOutline, mdiRefresh } from '@mdi/js';
 
   export default {
     name: 'DashFilterPanel',
@@ -59,15 +82,24 @@
     data() {
       return {
         filters: [],
-        focusedRow:null,
+        focusedRow: null,
         tempFilters: [],
         partModalShow: false,
+        plusIcon: mdiPlusCircleOutline,
+        trashIcon: mdiTrashCanOutline,
+        refreshIcon: mdiRefresh,
       };
     },
-    watch:{
-      focusedRow(rowNumber){
-        this.$store.commit("setFocusedFilter", this.filters[rowNumber])
-      }
+    watch: {
+      focusedRow(rowNumber) {
+        if (rowNumber === undefined) {
+          this.$store.commit('setFocusedFilter', { idDash: this.idDashFrom, filter: null });
+        }
+        this.$store.commit('setFocusedFilter', {
+          idDash: this.idDashFrom,
+          filter: this.filters[rowNumber],
+        });
+      },
     },
     methods: {
       addFilter() {
@@ -76,6 +108,9 @@
           id: '',
           parts: [],
         });
+      },
+      removeTempFilter(index) {
+        this.tempFilters.splice(index, 1);
       },
       saveTempFilter(index) {
         let candidate = this.tempFilters[index];
@@ -93,6 +128,9 @@
       deleteFilter(filter) {
         this.$store.commit('deleteFilter', filter);
         this.filters = this.$store.getters.getFilters(this.idDashFrom);
+      },
+      refreshFilter(filter) {
+        this.$store.commit('refreshFilter', filter);
       },
       triggerFilterPartModal() {
         this.partModalShow = !this.partModalShow;
