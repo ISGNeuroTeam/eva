@@ -253,7 +253,7 @@ export default {
     },
     updateDash: function() {
       this.$store.commit('updateDash',{dash: this.alreadyDash,modified: this.alreadyDash.modified});
-      this.$store.auth.getters.putLog(`Обновлен дашборд ${this.toHichName(this.alreadyDash.name)} с id ${this.alreadyDash.id}`);
+      this.$store.auth.getters.putLog(`Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${this.alreadyDash.id}`);
       this.alreadyShow = false;
     },
     toHichName: function(name) {

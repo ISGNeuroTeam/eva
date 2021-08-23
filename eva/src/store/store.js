@@ -1461,12 +1461,12 @@ export default {  // приблизительный объект хранили�
     },
     getSizeGrid: (state) => {
       return (id) => {
-        if (!state[id].grid) {
+        if (!state[id]?.grid) {
           Vue.set(state[id], 'grid', {});
-          Vue.set(state[id].grid, 'vert', '32');
-          Vue.set(state[id].grid, 'hor', '18');
+          Vue.set(state[id]?.grid, 'vert', '32');
+          Vue.set(state[id]?.grid, 'hor', '18');
         }
-        return state[id].grid
+        return state[id]?.grid
       }
     },
     getDragResize: (state) => {

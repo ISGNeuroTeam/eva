@@ -1,9 +1,11 @@
 <template>
   <v-progress-linear
-    :value="calculatedValue"
-    :color="calculatedColor"
-    :background-color="backColor"
+    class="progress-bar-linear"
+    :color="color"
     :height="height"
+    :value="calculatedValue"
+    :background-color="backColor"
+    :style="{ width: `${width}px` }"
   >
     <v-tooltip
       v-if="comment"
@@ -14,20 +16,11 @@
       transition="fade-transition"
     >
       <template v-slot:activator="{ on }">
-        <strong
-          v-on="on"
-          v-text="calculatedValue + '%'"
-        />
+        <strong v-on="on" v-text="title"/>
       </template>
-      <span
-        :style="{ color: calculatedColor }"
-        v-text="comment"
-      />
+      <span :style="{ color }" v-text="comment"/>
     </v-tooltip>
-    <strong
-      v-else
-      v-text="calculatedValue + '%'"
-    />
+    <strong v-else v-text="title"/>
   </v-progress-linear>
 </template>
 
@@ -37,6 +30,18 @@ export default {
     value: {
       type: Number,
       default: 0,
+    },
+    title: {
+      type: [String, Number],
+      default: '',
+    },
+    color: {
+      type: String,
+      default: '#03a9f4',
+    },
+    width: {
+      type: Number,
+      default: 50,
     },
     height: {
       type: Number,
@@ -52,18 +57,17 @@ export default {
   }),
   computed: {
     calculatedValue() {
-      return this.value < 0 ? 0 : Math.round(this.value);
-    },
-
-    calculatedColor() {
-      // yellow
-      let color = '#ffe26c';
-      // green
-      if (this.calculatedValue > 50) color = '#7ae072';
-      // red
-      if (this.calculatedValue > 100) color = '#ea564e';
-      return color;
+      let { value } = this;
+      if (value <= 0) value = 0;
+      if (value >= 100) value = 100;
+      return Math.round(value);
     },
   }
 };
 </script>
+
+<style lang="sass" scoped>
+.progress-bar-linear
+  min-width: 50px
+  border-radius: 5px
+</style>
