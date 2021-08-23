@@ -167,7 +167,7 @@
           <span>Сохранить</span>
         </v-tooltip>
       </div>
-      <v-menu :nudge-width="100" class="profile-block" :rounded="0" offset-y>
+      <v-menu :nudge-width="100" class="profile-block" :rounded="false" offset-y>
         <template v-slot:activator="{ on }">
           <div
             class="dropdown-profile"
@@ -759,6 +759,7 @@ export default {
   data () {
     return {
       login: '',
+      on:false,
       userEdit: mdiAccountEdit,
       search_elem: false,
       undo: mdiUndoVariant,
@@ -816,7 +817,6 @@ export default {
       mdiCompare: mdiCompare,
       tempTocken: {},
       change: {},
-      filterModalShow:false,
       profileDropdownButtons: [
         {
           id: 1,
@@ -1037,6 +1037,7 @@ export default {
     // возможно стоит переделать под цикл или типа того. ПОДУМАТЬ НАД ЭТИМ!
     openProfile: function() {  // дальше будут фукнции отвечающие за переключение между разными инструментами, суть проста, если один открыт закрываем все остальные
       this.profile_elem = !this.profile_elem;
+      this.openfilter = false;
       this.opentool = false;
       this.tool_elem = false;
       this.tocken_elem = false;
@@ -1051,6 +1052,7 @@ export default {
       this.errorSave = false;
       this.save_elem = !this.save_elem;
       this.opensave = !this.opensave;
+      this.openfilter = false;
       this.opentool = false;
       this.tool_elem = false;
       this.tocken_elem = false;
@@ -1063,6 +1065,7 @@ export default {
     openSearchCode: function() {
       this.search_elem = !this.search_elem;
       this.opencode = !this.opencode;
+      this.openfilter = false;
       this.save_elem = false;
       this.opensave = false;
       this.opentool = false;
@@ -1075,6 +1078,7 @@ export default {
     openToolPanel: function() {
       this.tool_elem = !this.tool_elem;
       this.opentool = !this.opentool;
+      this.openfilter = false;
       this.save_elem = false;
       this.opensave = false;
       this.opencode = false;
@@ -1100,6 +1104,7 @@ export default {
     openTockenCode: function() {
       this.tocken_elem = !this.tocken_elem;
       this.opentocken = !this.opentocken;
+      this.openfilter = false;
       this.save_elem = false;
       this.opensave = false;
       this.opentool = false;
@@ -1112,6 +1117,7 @@ export default {
     openEventCode: function() {
       this.code_elem = !this.code_elem;
       this.openevent = !this.openevent;
+      this.openfilter = false;
       this.save_elem = false;
       this.opensave = false;
       this.opentool = false;
