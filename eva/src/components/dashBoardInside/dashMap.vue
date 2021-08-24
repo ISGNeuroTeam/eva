@@ -41,6 +41,10 @@ export default {
   },
   data() {
     return {
+      actions: [
+        { name: "refresh", capture: [] },
+        { name: "button", capture: [] },
+      ],
       showLegend: false,
       osmserver: null,
       error: null,
@@ -289,14 +293,19 @@ export default {
     };
   },
   computed: {
-    idDash: function() { // получаем id страницы от родителя 
-      return this.idDashFrom
+    idDash: function () {
+      // получаем id страницы от родителя
+      return this.idDashFrom;
     },
-    element: function() {  // получаем название элемента
-      return this.idFrom
+    element: function () {
+      // получаем название элемента
+      return this.idFrom;
     },
     option() {
-      return this.$store.getters.getOptions({idDash: this.idDash, id: this.element});
+      return this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.element,
+      });
     },
 
     top() {
@@ -323,9 +332,9 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        console.log(val)
-      }
-    }
+        console.log(val);
+      },
+    },
   },
   mounted() {
     this.initMap();
@@ -349,8 +358,21 @@ export default {
         this.map.wheelPxPerZoomLevel = 200;
       }
     });
+    this.createTokens();
+    this.$store.commit("setActions", {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.element,
+    });
   },
   methods: {
+    createTokens: function (result) {
+      let captures = ["top_left_point", "bottom_right_point", "zoom_level"];
+      console.log(captures)
+      this.actions.forEach((item, i) => {
+        this.$set(this.actions[i], "capture", captures);
+      });
+    },
     reDrawMap(dataRest) {
       this.clearMap();
       this.error = null;
@@ -699,8 +721,8 @@ export default {
     },
 
     addLine(element, lib) {
-      console.log(this.option.mode[0])
-      if (this.option.mode[0] == "Мониторинг" && element.ID != "1751045030") return;
+      if (this.option.mode[0] == "Мониторинг" && element.ID != "1751045030")
+        return;
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
@@ -752,7 +774,7 @@ export default {
         });
       }
       let pipelineData = this.pipelineData;
-      let option = this.option
+      let option = this.option;
       function highlightFeature(e) {
         const closest = (arr, num) => {
           return (
@@ -774,7 +796,6 @@ export default {
         let newLinePoly = L.polyline(newLine.geometry.coordinates);
         let distances = utils.accumulatedLengths(newLinePoly);
         let sum = distances[distances.length - 1];
-        console.log(sum)
         let closestData = closest(pipelineData, sum);
         let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
         console.log(pipelineInfo);
@@ -787,9 +808,8 @@ export default {
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-        console.log(option)
-        if (option?.mode[0] == "Мониторинг")
-          line.setTooltipContent(newDiv);
+        console.log(option);
+        if (option?.mode[0] == "Мониторинг") line.setTooltipContent(newDiv);
         var layer = e.target;
         layer.bringToFront();
         layer.setStyle({
