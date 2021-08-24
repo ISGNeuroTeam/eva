@@ -60,6 +60,8 @@ export default {
       isSettings: false,
       startingPoint: [],
       mode: [],
+      leftBottom: 0,
+      rightTop: 0,
       pipelineData: [
         {
           ID: 1750033596,
@@ -356,6 +358,7 @@ export default {
           );
         }
         this.map.wheelPxPerZoomLevel = 200;
+        this.updateToken(mutation.payload.options.zoomLevel, this.map.getBounds());
       }
     });
     this.createTokens();
@@ -366,9 +369,38 @@ export default {
     });
   },
   methods: {
+    updateToken(value, test) {
+      console.log(test)
+      let tokens = this.$store.getters.getTockens(this.idDash);
+      console.log("tok", tokens);
+      Object.keys(tokens).forEach((i) => {
+        if (tokens[i].elem == this.element && tokens[i].action == "button" && tokens[i].capture == "zoom_level") {
+          this.$store.commit("setTocken", {
+            tocken: tokens[i],
+            idDash: this.idDash,
+            value: value,
+            store: this.$store,
+          });
+        } else if (tokens[i].elem == this.element && tokens[i].action == "button" && tokens[i].capture == "top_left_point") {
+          this.$store.commit("setTocken", {
+            tocken: tokens[i],
+            idDash: this.idDash,
+            value: this.leftBottom[1],
+            store: this.$store,
+          });
+        } else if (tokens[i].elem == this.element && tokens[i].action == "button" && tokens[i].capture == "bottom_right_point") {
+          this.$store.commit("setTocken", {
+            tocken: tokens[i],
+            idDash: this.idDash,
+            value: this.rightTop[1],
+            store: this.$store,
+          });
+        }
+      });
+    },
     createTokens: function (result) {
       let captures = ["top_left_point", "bottom_right_point", "zoom_level"];
-      console.log(captures)
+      console.log(captures);
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], "capture", captures);
       });
@@ -604,6 +636,11 @@ export default {
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
+      });
+      this.map.on("moveend", () => {
+        [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds())
+        console.log("moved");
+        this.updateToken(this.map.getZoom())
       });
       this.map.on("zoomend", () => {
         let layers = document.getElementsByClassName("leaflet-marker-icon");
