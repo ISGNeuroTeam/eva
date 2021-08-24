@@ -3,11 +3,17 @@
     <v-btn @click="addFilter" class="mb-1">Добавить фильтр</v-btn>
 
     <v-list dense flat>
-      <v-list-item-group v-model="focusedRow" active-class="focused-filter">
-        <v-list-item v-for="filter in filters" :key="filter.id" class="ma-1 filter-row">
+      <v-list-item-group>
+        <v-list-item
+          :ripple="false"
+          v-for="(filter, index) in filters"
+          :key="filter.id"
+          class="ma-1 filter-row"
+          :class="focusedRow === index ? 'focused-filter' : ''"
+        >
           <v-row justify="space-between" align="center">
             <!-- FILTER ID -->
-            <v-col cols="2">
+            <v-col cols="2" @click="focusRow(index)">
               <v-card flat>
                 <v-card-title>
                   {{ filter.id }}
@@ -19,11 +25,23 @@
 
             <!-- FILTER PARTS -->
             <v-col cols="8" class="d-flex align-center justify-left">
-              <v-slide-group show-arrows>
-                <v-slide-item v-for="(part, index) in filter.parts" :key="index">
-                  <filter-part :filterPart="part"></filter-part>
-                </v-slide-item>
-              </v-slide-group>
+              <v-sheet max-width="450">
+                <v-slide-group show-arrows>
+                  <v-slide-item v-for="(part, index) in filter.parts" :key="index">
+                    <filter-part :filterPart="part"></filter-part>
+                  </v-slide-item>
+                </v-slide-group>
+              </v-sheet>
+              <div v-if="filterChanged" class="d-flex">
+                <v-btn icon color="green" @click="applyTempParts">
+                  <v-icon> {{ acceptIcon }}</v-icon>
+                </v-btn>
+                <v-divider></v-divider>
+                <v-btn icon color="red" v-if="filterChanged" @click="declineTempParts">
+                  <v-icon> {{ declineIcon }}</v-icon>
+                </v-btn>
+              </div>
+
               <v-row align="center">
                 <v-btn
                   rounded
@@ -71,7 +89,13 @@
 <script>
   import FilterPartModal from './filters/FilterPartModal';
   import FilterPart from './filters/FilterPart';
-  import { mdiPlusCircleOutline, mdiTrashCanOutline, mdiRefresh } from '@mdi/js';
+  import {
+    mdiPlusCircleOutline,
+    mdiTrashCanOutline,
+    mdiRefresh,
+    mdiCheck,
+    mdiClose,
+  } from '@mdi/js';
 
   export default {
     name: 'DashFilterPanel',
@@ -88,26 +112,42 @@
         plusIcon: mdiPlusCircleOutline,
         trashIcon: mdiTrashCanOutline,
         refreshIcon: mdiRefresh,
+        acceptIcon: mdiCheck,
+        declineIcon: mdiClose,
+        filterChanged: false,
       };
     },
     watch: {
       focusedRow(rowNumber) {
-        if (rowNumber === undefined) {
-          this.$store.commit('setFocusedFilter', { idDash: this.idDashFrom, filter: null });
+        if (!Number.isFinite(rowNumber)) {
+          this.$store.commit('clearFocusedFilter', this.idDashFrom);
+          this.filterChanged = false;
+        } else {
+          this.$store.commit('setFocusedFilter', this.filters[rowNumber]);
+          this.filterChanged = true;
         }
-        this.$store.commit('setFocusedFilter', {
-          idDash: this.idDashFrom,
-          filter: this.filters[rowNumber],
-        });
       },
     },
     methods: {
+      focusRow(index) {
+        this.focusedRow = index;
+      },
       addFilter() {
         this.tempFilters.push({
           idDash: this.idDashFrom,
           id: '',
           parts: [],
         });
+      },
+      applyTempParts() {
+        this.filterChanged = false;
+        this.focusedRow = null;
+        this.$store.commit('restartSearches', this.idDashFrom);
+      },
+      declineTempParts() {
+        this.$store.commit('declineFilterChanges', this.idDashFrom);
+        this.filterChanged = false;
+        this.focusedRow = null;
       },
       removeTempFilter(index) {
         this.tempFilters.splice(index, 1);
@@ -138,6 +178,7 @@
     },
     mounted() {
       this.filters = this.$store.getters.getFilters(this.idDashFrom);
+      this.$store.commit('clearFocusedFilter', this.idDashFrom);
     },
   };
 </script>

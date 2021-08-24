@@ -117,7 +117,7 @@ export default {
       // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
     },
-    setTocken: (state, tocken) => {
+    setTocken(state, tocken) {
       // сохранение токена в хранилище
 
       let id = -1;
@@ -258,78 +258,11 @@ export default {
           });
         }
 
-        let searches = state[tocken.idDash].searches;
-        // console.log(searches);
-        let response = {};
-
-        searches.forEach(async item => {
-          // также при обновлении токена нужно заново запускать серч и обновлять информацию
-          // (If token changed without focusedFilter)
-          if (
-            item.original_otl.indexOf(`$${state[tocken.idDash].tockens[id].name}$`) != -1 ||
-            String(item.parametrs.tws).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) !=
-              -1 ||
-            (String(item.parametrs.twf).indexOf(`$${state[tocken.idDash].tockens[id].name}$`) !=
-              -1 &&
-              // check focusedFilter
-              !state[tocken.idDash].focusedFilter)
-          ) {
-            // если в тексте запроса есть наш токен
-
-            tocken.store.commit('setLoading', {
-              search: item.sid,
-              idDash: tocken.idDash,
-              should: true,
-              error: false,
-            });
-
-            response = await tocken.store.getters.getDataApi({
-              search: item,
-              idDash: tocken.idDash,
-            });
-            if (response.length != 0) {
-              let responseDB = tocken.store.getters.putIntoDB(response, item.sid, tocken.idDash);
-              responseDB.then(result => {
-                let refresh = tocken.store.getters.refreshElements(tocken.idDash, item.sid);
-                tocken.store.commit('setLoading', {
-                  search: item.sid,
-                  idDash: tocken.idDash,
-                  should: false,
-                  error: false,
-                });
-              });
-            } else {
-              tocken.store.commit('setLoading', {
-                search: item.sid,
-                idDash: tocken.idDash,
-                should: false,
-                error: true,
-              });
-            }
-          }
-        });
-        //для компонента table и single и multiLine -- сделать Should в true
-        //чтобы dashBoard еще раз сделал запрос
-        Object.keys(state[tocken.idDash]).forEach(dashElement => {
-          if (
-            !state[tocken.idDash].focusedFilter &&
-            (dashElement.includes('table') ||
-              dashElement.includes('single') ||
-              dashElement.includes('multiLine'))
-            // check focusedFilter
-          ) {
-            tocken.store.commit('setShould', {
-              idDash: tocken.idDash,
-              id: dashElement,
-              status: true,
-            });
-          }
-        });
-
-        // Add value to filter
-        if (state[tocken.idDash].focusedFilter) {
-          tocken.store.commit('addTokenToFilter', tocken);
-        }
+        this.commit('restartSearches', tocken.idDash);
+      }
+      // Add value to temp values of filter
+      if (state[tocken.idDash].focusedFilter) {
+        tocken.store.commit('addTokenToTempFilterParts', tocken);
       }
     },
     setActions: (state, actions) => {
@@ -903,19 +836,83 @@ export default {
       }
       state[gridShow.id].gridShow = gridShow.item;
     },
-    addTokenToFilter: (state, tocken) => {
+    clearFocusedFilter(state, idDash) {
+      state[idDash].focusedFilter = null;
+      state[idDash].stashedFilterParts = null;
+    },
+    setFocusedFilter: (state, filter) => {
+      state[filter.idDash].focusedFilter = filter;
+      state[filter.idDash].stashedFilterParts = [];
+      for (let part of filter.parts) {
+        state[filter.idDash].stashedFilterParts.push({ ...part, values: [...part.values] });
+      }
+    },
+    addTokenToTempFilterParts: (state, tocken) => {
       for (let part of state[tocken.idDash].focusedFilter.parts) {
         if (part.token.name === tocken.tocken.name) {
-          part.values.push(part.token.value);
+          part.values.push(tocken.value);
         }
       }
     },
-    setFocusedFilter: (state, { idDash, filter }) => {
-      state[idDash].focusedFilter = filter;
+    declineFilterChanges(state, idDash) {
+      state[idDash].focusedFilter.parts = state[idDash].stashedFilterParts;
     },
     refreshFilter(state, filter) {
       let foundFilter = state[filter.idDash].filters.find(val => filter.id === val.id);
       foundFilter.parts.forEach(part => (part.values = []));
+    },
+    restartSearches(state, idDash) {
+      let searches = state[idDash].searches;
+      let response = {};
+
+      searches.forEach(async item => {
+        this.commit('setLoading', {
+          search: item.sid,
+          idDash: idDash,
+          should: true,
+          error: false,
+        });
+
+        response = await this.getters.getDataApi({
+          search: item,
+          idDash: idDash,
+        });
+        if (response.length != 0) {
+          let responseDB = this.getters.putIntoDB(response, item.sid, idDash);
+          responseDB.then(result => {
+            this.commit('setLoading', {
+              search: item.sid,
+              idDash: idDash,
+              should: false,
+              error: false,
+            });
+          });
+        } else {
+          this.commit('setLoading', {
+            search: item.sid,
+            idDash: idDash,
+            should: false,
+            error: true,
+          });
+        }
+      });
+      //для компонента table и single и multiLine -- сделать Should в true
+      //чтобы dashBoard еще раз сделал запрос
+      Object.keys(state[idDash]).forEach(dashElement => {
+        if (
+          !state[idDash].focusedFilter &&
+          (dashElement.includes('table') ||
+            dashElement.includes('single') ||
+            dashElement.includes('multiLine'))
+          // check focusedFilter
+        ) {
+          this.commit('setShould', {
+            idDash: idDash,
+            id: dashElement,
+            status: true,
+          });
+        }
+      });
     },
   },
   getters: {
@@ -1109,6 +1106,43 @@ export default {
         let tws = search.parametrs.tws;
         let twf = search.parametrs.twf;
         let reg = null;
+
+        if (state[idDash].filters) {
+          Object.values(state[idDash].filters).forEach(filter => {
+            reg = new RegExp(`\\$${filter.id}\\$`, 'g');
+            if (otl.indexOf(`$${filter.id}$`) != -1) {
+              let filterOtlText = '';
+              if (filter.parts.length > 0) {
+                for (let idxPart in filter.parts) {
+                  if (filter.parts[idxPart].values.length > 0) {
+                    const part = filter.parts[idxPart];
+                    if (idxPart == 0) {
+                      filterOtlText += 'search (';
+                    } else {
+                      filterOtlText += ' AND (';
+                    }
+
+                    for (let idxVal in part.values) {
+                      let value = part.values[idxVal];
+
+                      if (idxVal == part.values.length - 1) {
+                        if (part.values.length > 1) filterOtlText += ` ${part.operation} `;
+                        filterOtlText += `${part.fieldName}="${value}")`;
+                      } else if (idxVal == 0) {
+                        filterOtlText += `${part.fieldName}="${value}"`;
+                        if (part.values.length == 0) filterOtlText += ')';
+                      } else {
+                        filterOtlText += ` ${part.operation} ${part.fieldName}="${value}"`;
+                      }
+                    }
+                  }
+                }
+              }
+
+              otl = otl.replace(reg, filterOtlText);
+            }
+          });
+        }
 
         if (state[idDash].tockens) {
           Object.keys(state[idDash].tockens).forEach(item => {
@@ -1709,6 +1743,11 @@ export default {
     getFilters: state => {
       return dashId => {
         return state[dashId].filters ? state[dashId].filters : [];
+      };
+    },
+    getFocusedFilter(state) {
+      return dashId => {
+        return state[dashId].focusedFilter;
       };
     },
   },

@@ -14,8 +14,8 @@
           <v-row>
             <v-col>
               <v-select
-                v-model="temp.token"
-                :items="$store.getters.getTockens(filter.idDash)"
+                @change="setToken"
+                :items="tokens"
                 item-text="name"
                 label="Токены"
                 return-object
@@ -47,6 +47,7 @@
         operations: ['OR', 'AND', 'REPLACE'],
         temp: {
           operation: 'OR',
+          fieldName: null,
           token: null,
           values: [],
         },
@@ -55,10 +56,14 @@
       };
     },
     methods: {
-      addFilterPart(){
-        this.filter.parts.push(this.temp)
-        this.$emit('triggerFilterPartModal')
-      }
+      setToken(token) {
+        this.temp.token = token;
+        this.temp.fieldName = token.capture;
+      },
+      addFilterPart() {
+        this.filter.parts.push(this.temp);
+        this.$emit('triggerFilterPartModal');
+      },
     },
     filters: {
       partTypeFilter(tab) {
@@ -69,6 +74,8 @@
         return tabTextMap[tab];
       },
     },
-    mounted() {},
+    mounted() {
+      this.tokens = this.$store.getters.getTockens(this.filter.idDash);
+    },
   };
 </script>
