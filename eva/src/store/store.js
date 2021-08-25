@@ -262,7 +262,7 @@ export default {
       }
       // Add value to temp values of filter
       if (state[tocken.idDash].focusedFilter) {
-        tocken.store.commit('addTokenToTempFilterParts', tocken);
+        tocken.store.commit('addTokenToFilterParts', tocken);
       }
     },
     setActions: (state, actions) => {
@@ -847,10 +847,10 @@ export default {
         state[filter.idDash].stashedFilterParts.push({ ...part, values: [...part.values] });
       }
     },
-    addTokenToTempFilterParts: (state, tocken) => {
+    addTokenToFilterParts: (state, tocken) => {
       for (let part of state[tocken.idDash].focusedFilter.parts) {
         if (part.token.name === tocken.tocken.name) {
-          part.values.push(tocken.value);
+          if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
         }
       }
     },
@@ -863,7 +863,6 @@ export default {
     },
     restartSearches(state, idDash) {
       let searches = state[idDash].searches;
-      let response = {};
 
       searches.forEach(async item => {
         this.commit('setLoading', {
@@ -873,7 +872,7 @@ export default {
           error: false,
         });
 
-        response = await this.getters.getDataApi({
+        let response = await this.getters.getDataApi({
           search: item,
           idDash: idDash,
         });
@@ -904,7 +903,6 @@ export default {
           (dashElement.includes('table') ||
             dashElement.includes('single') ||
             dashElement.includes('multiLine'))
-          // check focusedFilter
         ) {
           this.commit('setShould', {
             idDash: idDash,
@@ -1113,10 +1111,11 @@ export default {
             if (otl.indexOf(`$${filter.id}$`) != -1) {
               let filterOtlText = '';
               if (filter.parts.length > 0) {
+                let firstPartWithValuesIndex = 0;
                 for (let idxPart in filter.parts) {
                   if (filter.parts[idxPart].values.length > 0) {
                     const part = filter.parts[idxPart];
-                    if (idxPart == 0) {
+                    if (idxPart == firstPartWithValuesIndex) {
                       filterOtlText += 'search (';
                     } else {
                       filterOtlText += ' AND (';
@@ -1135,6 +1134,8 @@ export default {
                         filterOtlText += ` ${part.operation} ${part.fieldName}="${value}"`;
                       }
                     }
+                  } else {
+                    firstPartWithValuesIndex += 1;
                   }
                 }
               }

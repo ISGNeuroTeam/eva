@@ -6,14 +6,14 @@
       <v-list-item-group>
         <v-list-item
           :ripple="false"
-          v-for="(filter, index) in filters"
+          v-for="(filter, indexFilter) in filters"
           :key="filter.id"
           class="ma-1 filter-row"
-          :class="focusedRow === index ? 'focused-filter' : ''"
+          :class="focusedRow === indexFilter ? 'focused-filter' : ''"
         >
           <v-row justify="space-between" align="center">
             <!-- FILTER ID -->
-            <v-col cols="2" @click="focusRow(index)">
+            <v-col cols="2" @click="focusRow(indexFilter)">
               <v-card flat>
                 <v-card-title>
                   {{ filter.id }}
@@ -27,8 +27,13 @@
             <v-col cols="8" class="d-flex align-center justify-left">
               <v-sheet max-width="450">
                 <v-slide-group show-arrows>
-                  <v-slide-item v-for="(part, index) in filter.parts" :key="index">
-                    <filter-part :filterPart="part"></filter-part>
+                  <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
+                    <filter-part
+                      :filter="filter"
+                      :filterPart="part"
+                      :deleteFilterPart="deleteFilterPart"
+                      :isFocused="focusedRow===indexFilter"
+                    ></filter-part>
                   </v-slide-item>
                 </v-slide-group>
               </v-sheet>
@@ -140,14 +145,16 @@
         });
       },
       applyTempParts() {
-        this.filterChanged = false;
-        this.focusedRow = null;
+        this.$store.commit('clearFocusedFilter', this.idDashFrom);
         this.$store.commit('restartSearches', this.idDashFrom);
+        this.focusedRow = null;
+        this.filterChanged = false;
       },
       declineTempParts() {
         this.$store.commit('declineFilterChanges', this.idDashFrom);
-        this.filterChanged = false;
+        this.$store.commit('clearFocusedFilter', this.idDashFrom);
         this.focusedRow = null;
+        this.filterChanged = false;
       },
       removeTempFilter(index) {
         this.tempFilters.splice(index, 1);
@@ -169,7 +176,12 @@
         this.$store.commit('deleteFilter', filter);
         this.filters = this.$store.getters.getFilters(this.idDashFrom);
       },
+      deleteFilterPart(filter, filterPart) {
+        let filterIndex = filter.parts.indexOf(filterPart)
+        filter.parts.splice(filterIndex,1)
+      },
       refreshFilter(filter) {
+        this.filterChanged = true;
         this.$store.commit('refreshFilter', filter);
       },
       triggerFilterPartModal() {

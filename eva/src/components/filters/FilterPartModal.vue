@@ -24,8 +24,7 @@
               </v-select>
             </v-col>
             <v-col>
-              <v-select v-model="temp.operation" :items="operations" label="Операции" filled>
-              </v-select>
+              <v-select v-model="temp.operation" :items="operations" label="Операции" filled/>
             </v-col>
           </v-row>
         </v-tab-item>
