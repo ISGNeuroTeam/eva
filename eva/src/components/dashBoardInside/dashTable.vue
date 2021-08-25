@@ -50,10 +50,8 @@ export default {
     return {
       props: {
         titles: [],
-        superheroes: [],
         nodata: true,
         message: "Нет данных для отображения",
-        hash: 0,
         actions: [
           { name: "click", capture: [] },
           { name: "mouseover", capture: [] },
@@ -129,93 +127,6 @@ export default {
     this.$refs.tableBlock.style.backgroundColor = this.color.backElement;
   },
   methods: {
-    getDataAsynchrony: function (data) {
-      
-      let prom = new Promise( resolve => {
-        if(data.error) {
-          this.props.message = data.error;
-          this.props.nodata = true;
-        } else {
-          resolve(data)
-        }
-      })
-      prom.then( (data) => {
-        data.length <= 100 ? this.props.hideFooter = true : this.props.hideFooter = false;
-        this.createTitles(data);
-        this.createTockens(data);
-        this.setColors();
-        this.clearColor();
-        this.setEventColor();
-        if (this.props.justCreate) {
-          this.selectRow();
-          this.props.justCreate = false;
-        }
-            
-        this.props.nodata = false;
-        this.props.itemsForTable = data;
-      })
-    },
-    createTitles: function(result) {
-      let titles = Object.keys(result[0]).map( item => {
-        return {text: item, value: item}
-      });
-      this.props.titles = titles;
-    },
-    createTockens: function(result) {
-      let captures = Object.keys(result[0]);
-      this.props.actions.forEach( (item,i) => {
-        this.$set(this.props.actions[i],'capture',captures);
-      });
-    },
-    selectRow: function() {
-        
-      document.querySelector(`[data-id=${this.id}]`).addEventListener('click', event => {
-                          
-                      
-        if (event.target.tagName.toLowerCase() == "td") {
-          if (event.target.parentElement.classList.contains('selected')) {
-            event.target.parentElement.classList.remove('selected');
-          } else {
-            event.target.parentElement.parentElement.querySelectorAll('.selected').forEach( item => {
-              item.classList.remove('selected');
-              item.style =`background: transparent !important`;
-            })
-            event.target.parentElement.classList.add('selected');
-          }
-          let tockens = this.$store.getters.getTockens(this.idDash);
-                                 
-                                
-          Object.keys(tockens).forEach( i =>{
-                
-            if (tockens[i].elem == this.id && tockens[i].action == 'click') {
-              let row = [];
-              let value = '';
-              event.target.parentElement.childNodes.forEach( item => {
-                row.push(item.textContent);
-              })
-              this.$refs[this.id].$el.querySelector('thead tr').childNodes.forEach( (item,j) => {
-                if(item.textContent == tockens[i].capture){
-                  value = row[j];
-                }
-              })
-              this.$store.commit('setTocken', {tocken: tockens[i], idDash: this.idDash, value: value, store: this.$store });
-            }
-          })
-          let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onclick', element: this.id, partelement: 'row'});
-          if (events.length != 0) {
-            events.forEach( item => {
-              if(item.action == 'set'){
-                this.$store.commit('letEventSet', {events: events, idDash: this.idDash });
-              } else if (item.action == 'go') {
-                this.$store.commit('letEventGo', {event: item, idDash: this.idDash, route: this.$router, store: this.$store });
-               // this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
-              }
-            });
-          }
-        }
-      })
-         
-    },
     setColors: function() {
       
       let table = document.querySelector(`[data-id=${this.id}]`);
