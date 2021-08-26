@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div class="dash-filter-panel">
     <v-btn @click="addFilter" class="mb-1">Добавить фильтр</v-btn>
 
     <v-list dense flat>
@@ -25,24 +25,24 @@
 
             <!-- FILTER PARTS -->
             <v-col cols="8" class="d-flex align-center justify-left">
-              <v-sheet max-width="450">
+              <v-sheet max-width="1000">
                 <v-slide-group show-arrows>
                   <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
                     <filter-part
                       :filter="filter"
                       :filterPart="part"
                       :deleteFilterPart="deleteFilterPart"
-                      :isFocused="focusedRow===indexFilter"
+                      :isFocused="focusedRow === indexFilter"
                     ></filter-part>
                   </v-slide-item>
                 </v-slide-group>
               </v-sheet>
-              <div v-if="filterChanged" class="d-flex">
+              <div v-if="focusedRow === indexFilter" class="d-flex">
                 <v-btn icon color="green" @click="applyTempParts">
                   <v-icon> {{ acceptIcon }}</v-icon>
                 </v-btn>
                 <v-divider></v-divider>
-                <v-btn icon color="red" v-if="filterChanged" @click="declineTempParts">
+                <v-btn icon color="red" @click="declineTempParts">
                   <v-icon> {{ declineIcon }}</v-icon>
                 </v-btn>
               </div>
@@ -88,7 +88,7 @@
         <v-btn rounded small class="ma-1" @click="removeTempFilter(index)">Отменить</v-btn>
       </v-list-item>
     </v-list>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -119,23 +119,20 @@
         refreshIcon: mdiRefresh,
         acceptIcon: mdiCheck,
         declineIcon: mdiClose,
-        filterChanged: false,
       };
     },
     watch: {
       focusedRow(rowNumber) {
         if (!Number.isFinite(rowNumber)) {
           this.$store.commit('clearFocusedFilter', this.idDashFrom);
-          this.filterChanged = false;
         } else {
           this.$store.commit('setFocusedFilter', this.filters[rowNumber]);
-          this.filterChanged = true;
         }
       },
     },
     methods: {
       focusRow(index) {
-        this.focusedRow = index;
+        if (this.focusedRow === null) this.focusedRow = index;
       },
       addFilter() {
         this.tempFilters.push({
@@ -177,8 +174,8 @@
         this.filters = this.$store.getters.getFilters(this.idDashFrom);
       },
       deleteFilterPart(filter, filterPart) {
-        let filterIndex = filter.parts.indexOf(filterPart)
-        filter.parts.splice(filterIndex,1)
+        let filterIndex = filter.parts.indexOf(filterPart);
+        filter.parts.splice(filterIndex, 1);
       },
       refreshFilter(filter) {
         this.filterChanged = true;

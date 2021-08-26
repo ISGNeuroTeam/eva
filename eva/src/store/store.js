@@ -257,12 +257,12 @@ export default {
             }
           });
         }
-
-        this.commit('restartSearches', tocken.idDash);
       }
       // Add value to temp values of filter
       if (state[tocken.idDash].focusedFilter) {
         tocken.store.commit('addTokenToFilterParts', tocken);
+      } else {
+        this.commit('restartSearches', tocken.idDash);
       }
     },
     setActions: (state, actions) => {

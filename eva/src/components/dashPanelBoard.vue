@@ -1,391 +1,743 @@
 <template>
-  <div 
-    class="dash-main" 
-    :style="{background: theme.$main_bg}"
-  >
-    <div class="main-title">
-      <div class="logo-block">
-        <EvaLogo />
-      </div>
-      <div 
-        class="title-name" 
-        :style="{color:theme.$title}"
-      >
-        {{ name }}
-      </div>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-icon 
-            class="home"  
-            :color="theme.$secondary_text"
-            v-on="on" 
-            @click="toHome"
-          >
-            {{ home }}
-          </v-icon>
-        </template>
-        <span>На главную</span>
-      </v-tooltip>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-icon 
-            class="undo"
-            :color="theme.$secondary_text"
-            v-on="on"
-            @click="toBackward"
-          >
-            {{ undo }}
-          </v-icon>
-        </template>
-        <span>Назад</span>
-      </v-tooltip>
-    </div>
-    <div class="control-block">
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-icon 
-            class="code theme--dark"
-            :style="{color:theme.$secondary_text}"
-            :class="{hide_control:!edit_elem}"  
-            v-on="on" 
-            @click="openEventCode"
-          >
-            {{ code_icon }}
-          </v-icon>
-        </template>
-        <span>События</span>
-      </v-tooltip>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-icon 
-            class="tocken theme--dark"
-            :style="{color:theme.$secondary_text}"
-            :class="{hide_control:!edit_elem}" 
-            v-on="on" 
-            @click="openTockenCode"
-          >
-            {{ tocken_icon }}
-          </v-icon>
-        </template>
-        <span>Токены</span>
-      </v-tooltip>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-icon 
-            class="search theme--dark"
-            :style="{color:theme.$secondary_text}"
-            :class="{hide_control:!edit_elem}" 
-            v-on="on" 
-            @click="openSearchCode"
-          >
-            {{ search_icon }}
-          </v-icon>
-        </template>
-        <span>Источники даных</span>
-      </v-tooltip>
-      <v-tooltip 
-        bottom 
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-icon 
-            class="tools theme--dark"
-            :style="{color:theme.$secondary_text}"
-            :class="{hide_control:!edit_elem}" 
-            v-on="on" 
-            @click="openToolPanel"
-          >
-            {{ tool_icon }}
-          </v-icon>
-        </template>
-        <span>Визуализации</span>
-      </v-tooltip>
-      <div class="edit-container">
-        <v-tooltip
-          v-if="editPermission"
+  <div>
+    <div 
+      class="dash-main" 
+      :style="{background: theme.$main_bg}"
+    >
+      <div class="main-title">
+        <div class="logo-block">
+          <EvaLogo />
+        </div>
+        <div 
+          class="title-name" 
+          :style="{color:theme.$title}"
+        >
+          {{ name }}
+        </div>
+        <v-tooltip 
           bottom 
           :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon 
-              class="filter filter-icon theme--dark" 
-              :style="{color:theme.$secondary_text}"
-              v-on="on"
-              @click="openFilterPanel"
+              class="home"  
+              :color="theme.$secondary_text"
+              v-on="on" 
+              @click="toHome"
             >
-              {{ filterIcon }}
-            </v-icon> 
+              {{ home }}
+            </v-icon>
           </template>
-          <span>Открыть настройки фильтров</span>
-        </v-tooltip>
-        <v-tooltip
-          v-if="editPermission"
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="edit edit-icon theme--dark" 
-              :style="{color:theme.$secondary_text}"
-              v-on="on"
-              @click="gearShow = !gearShow"
-            >
-              {{ gear }}
-            </v-icon> 
-          </template>
-          <span>Открыть настройки дашборда</span>
+          <span>На главную</span>
         </v-tooltip>
         <v-tooltip 
           bottom 
           :color="theme.$accent_ui_color"
         >
-          <template v-slot:activator="{ on }"  v-if="editPermission">
+          <template v-slot:activator="{ on }">
             <v-icon 
-              class="save theme--dark"
-              :style="{color:theme.$secondary_text}"
-              v-on="on" 
-              @click="openSave"
+              class="undo"
+              :color="theme.$secondary_text"
+              v-on="on"
+              @click="toBackward"
             >
-              {{ save_icon }}
+              {{ undo }}
             </v-icon>
           </template>
-          <span>Сохранить</span>
+          <span>Назад</span>
         </v-tooltip>
       </div>
-      <v-menu :nudge-width="100" class="profile-block" :rounded="false" offset-y>
-        <template v-slot:activator="{ on }">
-          <div
-            class="dropdown-profile"
-            v-on="on"
-          >
+      <div class="control-block">
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
             <v-icon 
-              :data-error="colorError"
+              class="code theme--dark"
               :style="{color:theme.$secondary_text}"
-              class="profile theme--dark"
+              :class="{hide_control:!edit_elem}"  
+              v-on="on" 
+              @click="openEventCode"
             >
-              {{ profile_icon }}
+              {{ code_icon }}
             </v-icon>
-            <div 
-              class="id-user profile-login" 
+          </template>
+          <span>События</span>
+        </v-tooltip>
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="tocken theme--dark"
               :style="{color:theme.$secondary_text}"
+              :class="{hide_control:!edit_elem}" 
+              v-on="on" 
+              @click="openTockenCode"
             >
-              {{ login }}
-            </div>
-          </div>
-        </template>
-        <v-list class="profile-dropdown--list">
-          <v-list-item>
-            <v-list-item-title class="profile-dropdown--title">Профиль</v-list-item-title>
-          </v-list-item>
-          <div v-for="item in profileDropdownButtons" :key="item.id">
-            <v-list-item v-if="!item.hide">
-              <v-btn
-                class="profile-dropdown--button"
-                icon
+              {{ tocken_icon }}
+            </v-icon>
+          </template>
+          <span>Токены</span>
+        </v-tooltip>
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="search theme--dark"
+              :style="{color:theme.$secondary_text}"
+              :class="{hide_control:!edit_elem}" 
+              v-on="on" 
+              @click="openSearchCode"
+            >
+              {{ search_icon }}
+            </v-icon>
+          </template>
+          <span>Источники даных</span>
+        </v-tooltip>
+        <v-tooltip 
+          bottom 
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon 
+              class="tools theme--dark"
+              :style="{color:theme.$secondary_text}"
+              :class="{hide_control:!edit_elem}" 
+              v-on="on" 
+              @click="openToolPanel"
+            >
+              {{ tool_icon }}
+            </v-icon>
+          </template>
+          <span>Визуализации</span>
+        </v-tooltip>
+        <div class="edit-container">
+          <v-tooltip
+            v-if="editPermission"
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class="filter filter-icon theme--dark" 
+                :style="{color:theme.$secondary_text}"
                 v-on="on"
-                @click="item.onClick"
+                @click="openFilterPanel"
               >
-                <v-icon 
-                  class="edit icon-aut"
-                  :color="theme.$secondary_text"
-                >
-                  {{ item.icon }}
-                </v-icon>
-                {{ item.label }}
-              </v-btn>
+                {{ filterIcon }}
+              </v-icon> 
+            </template>
+            <span>Открыть настройки фильтров</span>
+          </v-tooltip>
+          <v-tooltip
+            v-if="editPermission"
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class="edit edit-icon theme--dark" 
+                :style="{color:theme.$secondary_text}"
+                v-on="on"
+                @click="gearShow = !gearShow"
+              >
+                {{ gear }}
+              </v-icon> 
+            </template>
+            <span>Открыть настройки дашборда</span>
+          </v-tooltip>
+          <v-tooltip 
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }"  v-if="editPermission">
+              <v-icon 
+                class="save theme--dark"
+                :style="{color:theme.$secondary_text}"
+                v-on="on" 
+                @click="openSave"
+              >
+                {{ save_icon }}
+              </v-icon>
+            </template>
+            <span>Сохранить</span>
+          </v-tooltip>
+        </div>
+        <v-menu :nudge-width="100" class="profile-block" :rounded="false" offset-y>
+          <template v-slot:activator="{ on }">
+            <div
+              class="dropdown-profile"
+              v-on="on"
+            >
+              <v-icon 
+                :data-error="colorError"
+                :style="{color:theme.$secondary_text}"
+                class="profile theme--dark"
+              >
+                {{ profile_icon }}
+              </v-icon>
+              <div 
+                class="id-user profile-login" 
+                :style="{color:theme.$secondary_text}"
+              >
+                {{ login }}
+              </div>
+            </div>
+          </template>
+          <v-list class="profile-dropdown--list">
+            <v-list-item>
+              <v-list-item-title class="profile-dropdown--title">Профиль</v-list-item-title>
             </v-list-item>
-          </div>
-        </v-list>
-      </v-menu>
-    </div>
-    <div 
-      ref="blockCode"
-      class="block-code" 
-      :class="{opencode:opencode}" 
-      :style=" {background:theme.$main_bg, color:theme.$main_text }"
-    >
-      <div class="iconsNavigations">
-      <v-icon :color="theme.$primary_button" @click="fastForwardClick">
-        {{ fastForwardIcon }}
-      </v-icon>
-       <v-icon :color="theme.$primary_button" @click="openModal">
-        {{ plus_icon }}
-      </v-icon>
+            <div v-for="item in profileDropdownButtons" :key="item.id">
+              <v-list-item v-if="!item.hide">
+                <v-btn
+                  class="profile-dropdown--button"
+                  icon
+                  v-on="on"
+                  @click="item.onClick"
+                >
+                  <v-icon 
+                    class="edit icon-aut"
+                    :color="theme.$secondary_text"
+                  >
+                    {{ item.icon }}
+                  </v-icon>
+                  {{ item.label }}
+                </v-btn>
+              </v-list-item>
+            </div>
+          </v-list>
+        </v-menu>
       </div>
+      <div 
+        ref="blockCode"
+        class="block-code" 
+        :class="{opencode:opencode}" 
+        :style=" {background:theme.$main_bg, color:theme.$main_text }"
+      >
+        <div class="iconsNavigations">
+        <v-icon :color="theme.$primary_button" @click="fastForwardClick">
+          {{ fastForwardIcon }}
+        </v-icon>
+        <v-icon :color="theme.$primary_button" @click="openModal">
+          {{ plus_icon }}
+        </v-icon>
+        </div>
 
-      <div 
-        v-for="sear in searches" 
-        :key="sear.sid" 
-        class="searches-one" 
-        @click="openEditSearch($event,sear.sid)"
-      >
         <div 
-          class="search-id" 
-          :style="{ background:theme.$accent_ui_color, color:'#fff', border: `1px solid ${theme.$accent_ui_color}`}"
+          v-for="sear in searches" 
+          :key="sear.sid" 
+          class="searches-one" 
+          @click="openEditSearch($event,sear.sid)"
         >
-          {{ checkSid(sear.sid) }}
-        </div>
-        <div
-          class="search-query"
-          :style="{ background:theme.$secondary_bg, color:theme.$main_text,border: `1px solid ${theme.$main_border}`}"
-        >
-          {{ sear.original_otl }}
+          <div 
+            class="search-id" 
+            :style="{ background:theme.$accent_ui_color, color:'#fff', border: `1px solid ${theme.$accent_ui_color}`}"
+          >
+            {{ checkSid(sear.sid) }}
+          </div>
           <div
-            class="loading-bar"
-            :style="{background:theme.$accent_ui_color}"
-            :class="{loading:loadings[sear.sid]}"
-          />
-        </div>
-        <v-tooltip
-          bottom 
-          :color="theme.$accent_ui_color"
+            class="search-query"
+            :style="{ background:theme.$secondary_bg, color:theme.$main_text,border: `1px solid ${theme.$main_border}`}"
+          >
+            {{ sear.original_otl }}
+            <div
+              class="loading-bar"
+              :style="{background:theme.$accent_ui_color}"
+              :class="{loading:loadings[sear.sid]}"
+            />
+          </div>
+          <v-tooltip
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class=" search-play" 
+                :color="theme.$primary_button"
+                v-on="on" 
+                @click="startSearch(sear)"
+              >
+                {{ play }}
+              </v-icon>
+            </template>
+            <span>Запустить ИД</span>
+          </v-tooltip>
+          <v-tooltip 
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class=" search-pencil" 
+                :color="theme.$primary_button"
+                v-on="on" 
+                @click="openEdit(sear.sid)"
+              >
+                {{ pencil }}
+              </v-icon>
+            </template>
+            <span>Редактировать ИД</span>
+          </v-tooltip>
+          <v-tooltip 
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class=" search-clock" 
+                :color="theme.$primary_button"
+                v-on="on" 
+                @click="openSchedule(sear.sid)"
+              >
+                {{ clock }}
+              </v-icon>
+            </template>
+            <span>Планировщик</span>
+          </v-tooltip>
+          <v-tooltip 
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class=" search-clock" 
+                :color="theme.$primary_button"
+                :disabled="disabledDS[sear.sid]" 
+                v-on="on"
+                @click="exportSearch(sear.sid)"
+              >
+                {{ download }}
+              </v-icon>
+            </template>
+            <span>Экспортировать ИД</span>
+          </v-tooltip>
+          <v-tooltip 
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class=" search-clock" 
+                :color="theme.$primary_button"
+                v-on="on"
+                @click="modalPaperSid=sear.sid,modalPaper=true"
+              >
+                {{ paper }}
+              </v-icon>
+            </template>
+            <span>Создать отчет</span>
+          </v-tooltip>
+          <v-tooltip 
+            bottom 
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon 
+                class="search-trash" 
+                :color="theme.$primary_button"
+                v-on="on" 
+                @click="deleteSearch(sear.sid)"
+              >
+                {{ trash }}
+              </v-icon>
+            </template>
+            <span>Удалить ИД</span> 
+          </v-tooltip>
+        </div>      
+        <v-btn 
+          small 
+          class="create-search"  
+          :color="theme.$primary_button"
+          @click="openModal"
         >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class=" search-play" 
-              :color="theme.$primary_button"
-              v-on="on" 
-              @click="startSearch(sear)"
-            >
-              {{ play }}
-            </v-icon>
-          </template>
-          <span>Запустить ИД</span>
-        </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class=" search-pencil" 
-              :color="theme.$primary_button"
-              v-on="on" 
-              @click="openEdit(sear.sid)"
-            >
-              {{ pencil }}
-            </v-icon>
-          </template>
-          <span>Редактировать ИД</span>
-        </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class=" search-clock" 
-              :color="theme.$primary_button"
-              v-on="on" 
-              @click="openSchedule(sear.sid)"
-            >
-              {{ clock }}
-            </v-icon>
-          </template>
-          <span>Планировщик</span>
-        </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class=" search-clock" 
-              :color="theme.$primary_button"
-              :disabled="disabledDS[sear.sid]" 
-              v-on="on"
-              @click="exportSearch(sear.sid)"
-            >
-              {{ download }}
-            </v-icon>
-          </template>
-          <span>Экспортировать ИД</span>
-        </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class=" search-clock" 
-              :color="theme.$primary_button"
-              v-on="on"
-              @click="modalPaperSid=sear.sid,modalPaper=true"
-            >
-              {{ paper }}
-            </v-icon>
-          </template>
-          <span>Создать отчет</span>
-        </v-tooltip>
-        <v-tooltip 
-          bottom 
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon 
-              class="search-trash" 
-              :color="theme.$primary_button"
-              v-on="on" 
-              @click="deleteSearch(sear.sid)"
-            >
-              {{ trash }}
-            </v-icon>
-          </template>
-          <span>Удалить ИД</span> 
-        </v-tooltip>
-      </div>      
-      <v-btn 
-        small 
-        class="create-search"  
-        :color="theme.$primary_button"
-        @click="openModal"
-      >
-        Создать
-      </v-btn>
-    </div>
-    <div 
-      class="block-tool" 
-      :class="{opentool:opentool}" 
-      :style="{ background:theme.$main_bg, color:theme.$main_text}"
-    >
+          Создать
+        </v-btn>
+      </div>
       <div 
-        v-for="tool in tools" 
-        :key="tool.name"  
-        class="tool-one draggable"
-        :data-type="tool.type" 
-        @mousedown="dragTool" 
+        class="block-tool" 
+        :class="{opentool:opentool}" 
+        :style="{ background:theme.$main_bg, color:theme.$main_text}"
       >
         <div 
-          class="tool-img"
-          :style="{ background:theme.$accent_ui_color,  border: `2px solid ${theme.$accent_ui_color}`}"
+          v-for="tool in tools" 
+          :key="tool.name"  
+          class="tool-one draggable"
+          :data-type="tool.type" 
+          @mousedown="dragTool" 
         >
-          <v-icon class="tool-img-itself" :style="{color:'#FFF'}">
-            {{ `${tool.img}` }}
+          <div 
+            class="tool-img"
+            :style="{ background:theme.$accent_ui_color,  border: `2px solid ${theme.$accent_ui_color}`}"
+          >
+            <v-icon class="tool-img-itself" :style="{color:'#FFF'}">
+              {{ `${tool.img}` }}
+            </v-icon>
+          </div>
+          <div 
+            class="tool-name" 
+            :style="{ background:theme.$main_bg, color:theme.$main_text, border: `1px solid ${theme.$main_border}`}"
+          >
+            {{ tool.name }}
+          </div>
+        </div>
+      </div>
+      <!-- <div 
+        class="block-filter" 
+        :class="{openfilter}" 
+        :style="{ background:theme.$main_bg, color:theme.$main_text}"
+      >
+        <dash-filter-panel
+          :permissions-from="permissionsFrom"
+          :idDashFrom="idDashFrom"
+        >
+        </dash-filter-panel>
+      </div> -->
+      <div 
+        class="block-tocken" 
+        :class="{opentocken:opentocken}"  
+        :style="{ background:theme.$main_bg, color:theme.$main_text}"
+      >
+        <div 
+          v-for="(tocken, i) in tockens" 
+          :key="tocken.name" 
+          class="row-tocken" 
+          :style="{color: theme.$main_text}"
+        >
+          <div 
+            class="row-data row-itself" 
+            :class="{showTocken:!lookTockens[i].show}"  
+          >
+            <v-text-field  
+              v-model="tockensName[tocken.name]" 
+              class="tocken-name theme--dark" 
+              :color="theme.$accent_ui_color"
+              outlined 
+              label="Имя"
+              hide-details
+            />
+            <v-select  
+              v-model="tocken.elem"
+              :items="elements" 
+              :color="theme.$accent_ui_color"
+              label="Элемент" 
+              hide-details  
+              outlined 
+              class="tocken-elem theme--dark" 
+              @click="changeColor"
+            />
+            <v-select  
+              v-model="tocken.action"
+              :items="actions(tocken.elem)" 
+              :color="theme.$accent_ui_color"
+              label="Действие" 
+              hide-details  
+              outlined 
+              class="tocken-action theme--dark" 
+              @click="changeColor"
+            />
+            <v-select  
+              v-model="tocken.capture"
+              :items="capture({action:tocken.action,elem: tocken.elem})" 
+              :color="theme.$accent_ui_color"
+              label="Свойство" 
+              hide-details  
+              outlined 
+              class="tocken-capture theme--dark" 
+              @click="changeColor"
+            />
+            <v-text-field  
+              v-model="tocken.prefix"
+              class="tocken-prefix theme--dark" 
+              :color="theme.$accent_ui_color"
+              label="Префикс"  
+              outlined 
+              hide-details 
+            />
+            <v-text-field 
+              v-model="tocken.sufix"  
+              class="tocken-sufix theme--dark" 
+              :color="theme.$accent_ui_color"
+              label="Суффикс"  
+              outlined 
+              hide-details 
+            />
+            <v-text-field 
+              v-model="tocken.delimetr" 
+              class="tocken-delimetr theme--dark" 
+              :color="theme.$accent_ui_color"
+              label="Разделитель"  
+              outlined 
+              hide-details 
+            />
+          </div>
+          <p 
+            class="tocken-view" 
+            :class="{showView:lookTockens[i].show}" 
+            :color="theme.$main_text"
+          >
+            {{ tocken.value }}
+          </p>
+          <v-icon 
+            class="row-check"  
+            :color="theme.$primary_button"
+            :class="{showIcon:lookTockens[i].show}" 
+            @click=" saveTocken()"
+          >
+            {{ check }}
+          </v-icon>
+          <v-icon 
+            class="row-look"  
+            :color="theme.$primary_button"
+            @click="lookTocken(i)"
+          > 
+            {{ look }} 
+          </v-icon>
+          <v-icon 
+            class="row-trash " 
+            :color="theme.$primary_button"
+            :class="{showIcon:lookTockens[i].show}" 
+            @click="deleteTocken(tocken.name)"
+          >
+            {{ trash }}
           </v-icon>
         </div>
         <div 
-          class="tool-name" 
-          :style="{ background:theme.$main_bg, color:theme.$main_text, border: `1px solid ${theme.$main_border}`}"
+          class="row-tocken new" 
+          :class="{opennewtocken:opennewtocken}" 
+          :style="{borderTop: `1px solid ${theme.$main_border}`}"
         >
-          {{ tool.name }}
+          <v-text-field  
+            v-model="newTockenName"
+            class="tocken-name theme--dark" 
+            :color="theme.$main_text"
+            label="Имя"  
+            outlined 
+            hide-details 
+          />
+          <v-select  
+            v-model="newElem" 
+            :items="elements"  
+            :color="theme.$main_text"
+            hide-details  
+            outlined 
+            class="tocken-elem theme--dark" 
+            label="Элемент"
+            @click="changeColor"
+          />
+          <v-select  
+            v-model="newAction" 
+            :items="actions(newElem)" 
+            :color="theme.$main_text"
+            hide-details  
+            outlined 
+            class="tocken-action theme--dark" 
+            label="Действие" 
+            @click="changeColor"
+          />
+          <v-select  
+            :items="capture({action:newAction,elem: newElem})" 
+            :color="theme.$main_text"
+            hide-details  
+            outlined 
+            class="tocken-capture theme--dark" 
+            label="Свойство" 
+            @click="changeColor"
+          />
+          <v-text-field  
+            v-model="newTockenDop.prefix" 
+            class="tocken-prefix theme--dark" 
+            :color="theme.$main_text"
+            label="Префикс"  
+            outlined 
+            hide-details 
+          />
+          <v-text-field  
+            v-model="newTockenDop.sufix"
+            class="tocken-sufix theme--dark" 
+            :color="theme.$main_text"
+            label="Суффикс"  
+            outlined 
+            hide-details 
+          />
+          <v-text-field  
+            v-model="newTockenDop.delimetr"
+            class="tocken-delimetr theme--dark" 
+            :color="theme.$main_text"
+            label="Разделитель"  
+            outlined 
+            hide-details 
+          />
+          <v-icon 
+            class="row-check" 
+            :color="theme.$primary_button"
+            @click=" saveTocken()"
+          >
+            {{ check }}
+          </v-icon>
+        </div>
+        <v-icon 
+          v-if="showSign" 
+          class="row-plus" 
+          :color="theme.$primary_button"
+          @click="() => {showSign = !showSign; opennewtocken=!opennewtocken;}"
+        >
+          {{ plus_icon }}
+        </v-icon>
+        <v-icon 
+          v-if="!showSign"
+          class="row-minus" 
+          :color="theme.$primary_button"
+          @click="() => {showSign = !showSign; opennewtocken=!opennewtocken;}"
+        >
+          {{ minus_icon }}
+        </v-icon>
+      </div>
+      <div 
+        class="block-event" 
+        :class="{openevent:openevent}" 
+        :style="{ background:theme.$main_bg}"
+      >
+        <v-textarea  
+          v-model="textarea_event"  
+          spellcheck="false" 
+          :textAreaFull="textareaEv" 
+          :color="theme.$main_text"
+          :style="{color:theme.$main_text}"
+          auto-grow  
+          outlined  
+          class="textarea-event"  
+          label="Начните писать событие"  
+          hide-details 
+          clearable  
+        />
+        <v-btn   
+          class="event-btn" 
+          :color="theme.$primary_button"
+          @click="setEvents"
+        >
+          Подтвердить
+        </v-btn>
+      </div>
+      <div 
+        class="block-save" 
+        :class="{opensave:opensave}" 
+        :style="{ background:theme.$main_bg}"
+      >
+        <div 
+          v-show="!errorSave"
+          class="save-obertka"
+        >
+          <div 
+            class="question-save" 
+            :style="{color:theme.$main_text}"
+          >
+            Сохранить дашборд 
+            <span class="save-name">
+              {{ name }}
+            </span>
+            ?
+          </div>
+          <div class="buttons-save">
+            <v-btn   
+              class="save-btn" 
+              small 
+              :color="theme.$primary_button"
+              @click="saveDash"
+            >
+              Да
+            </v-btn>
+            <v-btn   
+              class="save-btn" 
+              small 
+              :color="theme.$primary_button"
+              @click="opensave = false; save_elem = false;"
+            >
+              Нет
+            </v-btn>
+          </div>
+        </div>
+        <div 
+          v-show="errorSave" 
+          class="save-obertka message-save"
+        >
+          <div 
+            class="question-save" 
+            :style="{color:theme.$error_color}"
+          >
+            {{ msgErrorSave }}
+          </div>
         </div>
       </div>
+      <div 
+        class="warning-block" 
+        :style="{background:theme.$main_bg, border:`1px solid ${theme.$main_border}`, color:theme.$main_text, bottom: `-${otstupBottom}px`}"
+      >
+        <div class="warning-text">
+          {{ msgWarn }}
+        </div>
+        <div class="btn-warning">
+          <v-btn 
+            small 
+            :color="theme.$primary_button"
+            class="warning-btn yes-btn" 
+            @click="yesSearch"
+          >
+            Да
+          </v-btn>
+          <v-btn 
+            small 
+            :color="theme.$primary_button"
+            class="warning-btn" 
+            @click="noSearch"
+          >
+            Нет
+          </v-btn>
+        </div>
+      </div>
+      <modal-create-search 
+        :idDashFrom="idDash" 
+        :modalFrom="activeModal" 
+        :createBtnFrom="createSearchBtn" 
+        :dataSearchFrom="newSearch"
+        @startSearch="startSearch($event)"  
+        @cancelModal="cancelModal"
+      />
+      <modal-themes
+        :show="paleteShow"
+        :admin="isAdmin"
+        @closeModal="paleteShow = false"
+      />
+      <modal-schedule 
+        :idDashFrom="idDash" 
+        :colorFrom="theme"
+        :modalFrom="activeSchedule" 
+        :dataSidFrom="scheduleSid"
+        @cancel="activeSchedule=false" 
+      />
+      <modal-log 
+        :modal-active="modalActive"
+        @cancelModal="modalActive=false" 
+      />
+      <dash-settings 
+        :gear-from="gearShow"
+        :permissions-from="permissionsFrom"
+        :idDashFrom="idDashFrom"
+        @changeMode="setEditMode"
+      />
+      <modal-paper 
+        :active="modalPaper"
+        :sid=" modalPaperSid"
+        :id-dash="idDash"
+        @cancelModal="cancelModal"
+      />
     </div>
+
     <div 
       class="block-filter" 
       :class="{openfilter}" 
@@ -397,344 +749,6 @@
       >
       </dash-filter-panel>
     </div>
-    <div 
-      class="block-tocken" 
-      :class="{opentocken:opentocken}"  
-      :style="{ background:theme.$main_bg, color:theme.$main_text}"
-    >
-      <div 
-        v-for="(tocken, i) in tockens" 
-        :key="tocken.name" 
-        class="row-tocken" 
-        :style="{color: theme.$main_text}"
-      >
-        <div 
-          class="row-data row-itself" 
-          :class="{showTocken:!lookTockens[i].show}"  
-        >
-          <v-text-field  
-            v-model="tockensName[tocken.name]" 
-            class="tocken-name theme--dark" 
-            :color="theme.$accent_ui_color"
-            outlined 
-            label="Имя"
-            hide-details
-          />
-          <v-select  
-            v-model="tocken.elem"
-            :items="elements" 
-            :color="theme.$accent_ui_color"
-            label="Элемент" 
-            hide-details  
-            outlined 
-            class="tocken-elem theme--dark" 
-            @click="changeColor"
-          />
-          <v-select  
-            v-model="tocken.action"
-            :items="actions(tocken.elem)" 
-            :color="theme.$accent_ui_color"
-            label="Действие" 
-            hide-details  
-            outlined 
-            class="tocken-action theme--dark" 
-            @click="changeColor"
-          />
-          <v-select  
-            v-model="tocken.capture"
-            :items="capture({action:tocken.action,elem: tocken.elem})" 
-            :color="theme.$accent_ui_color"
-            label="Свойство" 
-            hide-details  
-            outlined 
-            class="tocken-capture theme--dark" 
-            @click="changeColor"
-          />
-          <v-text-field  
-            v-model="tocken.prefix"
-            class="tocken-prefix theme--dark" 
-            :color="theme.$accent_ui_color"
-            label="Префикс"  
-            outlined 
-            hide-details 
-          />
-          <v-text-field 
-            v-model="tocken.sufix"  
-            class="tocken-sufix theme--dark" 
-            :color="theme.$accent_ui_color"
-            label="Суффикс"  
-            outlined 
-            hide-details 
-          />
-          <v-text-field 
-            v-model="tocken.delimetr" 
-            class="tocken-delimetr theme--dark" 
-            :color="theme.$accent_ui_color"
-            label="Разделитель"  
-            outlined 
-            hide-details 
-          />
-        </div>
-        <p 
-          class="tocken-view" 
-          :class="{showView:lookTockens[i].show}" 
-          :color="theme.$main_text"
-        >
-          {{ tocken.value }}
-        </p>
-        <v-icon 
-          class="row-check"  
-          :color="theme.$primary_button"
-          :class="{showIcon:lookTockens[i].show}" 
-          @click=" saveTocken()"
-        >
-          {{ check }}
-        </v-icon>
-        <v-icon 
-          class="row-look"  
-          :color="theme.$primary_button"
-          @click="lookTocken(i)"
-        > 
-          {{ look }} 
-        </v-icon>
-        <v-icon 
-          class="row-trash " 
-          :color="theme.$primary_button"
-          :class="{showIcon:lookTockens[i].show}" 
-          @click="deleteTocken(tocken.name)"
-        >
-          {{ trash }}
-        </v-icon>
-      </div>
-      <div 
-        class="row-tocken new" 
-        :class="{opennewtocken:opennewtocken}" 
-        :style="{borderTop: `1px solid ${theme.$main_border}`}"
-      >
-        <v-text-field  
-          v-model="newTockenName"
-          class="tocken-name theme--dark" 
-          :color="theme.$main_text"
-          label="Имя"  
-          outlined 
-          hide-details 
-        />
-        <v-select  
-          v-model="newElem" 
-          :items="elements"  
-          :color="theme.$main_text"
-          hide-details  
-          outlined 
-          class="tocken-elem theme--dark" 
-          label="Элемент"
-          @click="changeColor"
-        />
-        <v-select  
-          v-model="newAction" 
-          :items="actions(newElem)" 
-          :color="theme.$main_text"
-          hide-details  
-          outlined 
-          class="tocken-action theme--dark" 
-          label="Действие" 
-          @click="changeColor"
-        />
-        <v-select  
-          :items="capture({action:newAction,elem: newElem})" 
-          :color="theme.$main_text"
-          hide-details  
-          outlined 
-          class="tocken-capture theme--dark" 
-          label="Свойство" 
-          @click="changeColor"
-        />
-        <v-text-field  
-          v-model="newTockenDop.prefix" 
-          class="tocken-prefix theme--dark" 
-          :color="theme.$main_text"
-          label="Префикс"  
-          outlined 
-          hide-details 
-        />
-        <v-text-field  
-          v-model="newTockenDop.sufix"
-          class="tocken-sufix theme--dark" 
-          :color="theme.$main_text"
-          label="Суффикс"  
-          outlined 
-          hide-details 
-        />
-        <v-text-field  
-          v-model="newTockenDop.delimetr"
-          class="tocken-delimetr theme--dark" 
-          :color="theme.$main_text"
-          label="Разделитель"  
-          outlined 
-          hide-details 
-        />
-        <v-icon 
-          class="row-check" 
-          :color="theme.$primary_button"
-          @click=" saveTocken()"
-        >
-          {{ check }}
-        </v-icon>
-      </div>
-      <v-icon 
-        v-if="showSign" 
-        class="row-plus" 
-        :color="theme.$primary_button"
-        @click="() => {showSign = !showSign; opennewtocken=!opennewtocken;}"
-      >
-        {{ plus_icon }}
-      </v-icon>
-      <v-icon 
-        v-if="!showSign"
-        class="row-minus" 
-        :color="theme.$primary_button"
-        @click="() => {showSign = !showSign; opennewtocken=!opennewtocken;}"
-      >
-        {{ minus_icon }}
-      </v-icon>
-    </div>
-    <div 
-      class="block-event" 
-      :class="{openevent:openevent}" 
-      :style="{ background:theme.$main_bg}"
-    >
-      <v-textarea  
-        v-model="textarea_event"  
-        spellcheck="false" 
-        :textAreaFull="textareaEv" 
-        :color="theme.$main_text"
-        :style="{color:theme.$main_text}"
-        auto-grow  
-        outlined  
-        class="textarea-event"  
-        label="Начните писать событие"  
-        hide-details 
-        clearable  
-      />
-      <v-btn   
-        class="event-btn" 
-        :color="theme.$primary_button"
-        @click="setEvents"
-      >
-        Подтвердить
-      </v-btn>
-    </div>
-    <div 
-      class="block-save" 
-      :class="{opensave:opensave}" 
-      :style="{ background:theme.$main_bg}"
-    >
-      <div 
-        v-show="!errorSave"
-        class="save-obertka"
-      >
-        <div 
-          class="question-save" 
-          :style="{color:theme.$main_text}"
-        >
-          Сохранить дашборд 
-          <span class="save-name">
-            {{ name }}
-          </span>
-          ?
-        </div>
-        <div class="buttons-save">
-          <v-btn   
-            class="save-btn" 
-            small 
-            :color="theme.$primary_button"
-            @click="saveDash"
-          >
-            Да
-          </v-btn>
-          <v-btn   
-            class="save-btn" 
-            small 
-            :color="theme.$primary_button"
-            @click="opensave = false; save_elem = false;"
-          >
-            Нет
-          </v-btn>
-        </div>
-      </div>
-      <div 
-        v-show="errorSave" 
-        class="save-obertka message-save"
-      >
-        <div 
-          class="question-save" 
-          :style="{color:theme.$error_color}"
-        >
-          {{ msgErrorSave }}
-        </div>
-      </div>
-    </div>
-    <div 
-      class="warning-block" 
-      :style="{background:theme.$main_bg, border:`1px solid ${theme.$main_border}`, color:theme.$main_text, bottom: `-${otstupBottom}px`}"
-    >
-      <div class="warning-text">
-        {{ msgWarn }}
-      </div>
-      <div class="btn-warning">
-        <v-btn 
-          small 
-          :color="theme.$primary_button"
-          class="warning-btn yes-btn" 
-          @click="yesSearch"
-        >
-          Да
-        </v-btn>
-        <v-btn 
-          small 
-          :color="theme.$primary_button"
-          class="warning-btn" 
-          @click="noSearch"
-        >
-          Нет
-        </v-btn>
-      </div>
-    </div>
-    <modal-create-search 
-      :idDashFrom="idDash" 
-      :modalFrom="activeModal" 
-      :createBtnFrom="createSearchBtn" 
-      :dataSearchFrom="newSearch"
-      @startSearch="startSearch($event)"  
-      @cancelModal="cancelModal"
-    />
-    <modal-themes
-      :show="paleteShow"
-      :admin="isAdmin"
-      @closeModal="paleteShow = false"
-    />
-    <modal-schedule 
-      :idDashFrom="idDash" 
-      :colorFrom="theme"
-      :modalFrom="activeSchedule" 
-      :dataSidFrom="scheduleSid"
-      @cancel="activeSchedule=false" 
-    />
-    <modal-log 
-      :modal-active="modalActive"
-      @cancelModal="modalActive=false" 
-    />
-    <dash-settings 
-      :gear-from="gearShow"
-      :permissions-from="permissionsFrom"
-      :idDashFrom="idDashFrom"
-      @changeMode="setEditMode"
-    />
-    <modal-paper 
-      :active="modalPaper"
-      :sid=" modalPaperSid"
-      :id-dash="idDash"
-      @cancelModal="cancelModal"
-    />
   </div>
 </template>
 

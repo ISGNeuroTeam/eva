@@ -5,12 +5,12 @@
   >
     <div class="v-data-table--container">
       <v-data-table
+        class="dash-table report-table"
         v-show="!props.nodata"
         :ref="id"
         v-model="props.input"
         :headers="props.titles"
         :items.sync="props.itemsForTable"
-        class="dash-table report-table"
         :data-id="id"
         item-key="none"
         :hide-default-footer="props.hideFooter"
