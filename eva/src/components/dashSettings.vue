@@ -102,11 +102,11 @@
         Вкладки
       </div>
       <v-switch
-        v-model="tabs"
+        v-model="showTabs"
         class="switch"
         :color="theme.$primary_button"
         :style="{color:theme.$main_text,}"
-        :label="labels[tabs]"
+        :label="labels[showTabs]"
       />
     </div>
   </v-navigation-drawer>
@@ -134,7 +134,7 @@ export default {
       },
       dragresable: true,
       gridShow: true,
-      tabs: true
+      showTabs: false,
     } 
   },
   computed: {
@@ -167,6 +167,9 @@ export default {
     gridShow: function() {
       this.$store.commit('setGridShow', {id: this.idDashFrom,item: String(this.gridShow)});
     },
+    showTabs () {
+      this.$store.commit('setTabMode', {idDash: this.idDashFrom, mode: this.showTabs});
+    }
   },
   mounted() {
     let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
@@ -179,6 +182,7 @@ export default {
       dragRes === 'true' ? dragRes = true : dragRes = false;
       this.dragresable =  dragRes;
     }
+    this.showTabs = this.$store.getters.getShowTabs(this.idDashFrom);
   },
   methods: {
     sendSizeGrid: function() {

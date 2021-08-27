@@ -59,11 +59,11 @@
           />
           <move-able
             v-for="elem in elements"
-            :key="hash(elem.elem)"
+            :key="hash(elem)"
             :data-mode-from="mode"
             :color-from="theme"
             :id-dash-from="idDash"
-            :data-elem="elem.elem"
+            :data-elem="elem"
             :data-page-from="page"
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
@@ -81,10 +81,6 @@
             :color-from="theme"
             :id-dash-from="idDash"   
           />
-          <!-- 
-              НЕ УДАЛЯТЬ ЦВЕТОВЫЕ НАСТРОЙКИ
-              <dash-settings :showFrom="showSetting"  ></dash-settings> 
-          -->
         </v-container>
       </v-main> 
     </div>
@@ -92,20 +88,27 @@
       <div
         v-for="tab in tabs"
         :key="tab.id"
-        :class="{active: currentTab === tab.id, hover: tab.hover}"
+        :class="{active: currentTab === tab.id,'edit-mode-tab': mode,  hover: tab.hover }"
         class="tab-item"
         @click="clickTab(tab.id)"
-        @mouseover="tabOver(tab)"
-        @mouseleave="tabLeave(tab)"
-        @dblclick="editTabName(tab)"
+        @mouseover="tabOver(tab.id)"
+        @mouseleave="tabLeave(tab.id)"
       >
-        {{ tab.name }}
-        <svg v-if="tab.hover && tabsMoreOne" class="delete-cross" width="10" height="10" viewBox="0 0 8 8"  xmlns="http://www.w3.org/2000/svg" @click.stop="deleteTab(tab.id)">
-          <path
-            d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
-            :fill="theme.$main_border"
-          />
-        </svg>
+        <div v-if="tab.id !== editableTabID">
+          {{ tab.name }}
+          <svg v-if="mode" class="edit-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" @click.stop="enterEditMode(tab)">
+            <path d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z" fill="#8E8D9E"/>
+          </svg>
+          <svg v-if="mode && tabsMoreOne" class="delete-cross" width="13" height="13" viewBox="0 0 8 8"  xmlns="http://www.w3.org/2000/svg" @click.stop="deleteTab(tab.id)">
+            <path
+              d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
+              :fill="theme.$main_border"
+            />
+          </svg>
+        </div>
+        <div v-else>
+          <input v-model="tempName" class="tab-name-input" type="text" @keypress.enter="editTabName">
+        </div>
 
       </div>
       <div id="plus-icon" @click="addNewTab">
@@ -133,14 +136,14 @@ export default {
       prepared: false,
       colorChange: false,
       permissions: [],
-      deltaHorizontal: 0,//сколько надо увеличить высоту overlay-grid,по первое знач-500,
+      deltaHorizontal: 0, //сколько надо увеличить высоту overlay-grid,по первое знач-500,
       startClientHeight: 0,
       startClientWidth: 0,
       verticalCell: 0,
       horizontalCell: 0,
-      showTabs: true,
-      currentTab: 1,
-      // tabs: []
+      tabEditMode: false,
+      tempName: '',
+      editableTabID: 0
     }
   },
   computed: {
@@ -148,7 +151,7 @@ export default {
       return this.$route.params.id
     },
     elements: function() {  // получаем название элемента  от родителя
-      return this.letElements ? this.$store.getters.getElements(this.idDash).filter(elem => elem.tab === this.currentTab) : [];
+      return this.letElements ? this.$store.getters.getElements(this.idDash) : [];
     },
     top: function() {
       if (this.openProfile) {
@@ -161,37 +164,43 @@ export default {
         return '0px'
       }
     },
-    headerTop: function () {
+    headerTop () {
       if(document.body.clientWidth <=1400){
         return 40
       } else {
         return 50
       }
     },
-    theme: function() {
+    theme () {
       return this.$store.getters.getTheme
     },
-    display: function() {
+    display () {
       if (this.$route.query.header === 'false'){
         return 'none'
       } else {
         return 'flex'
       }
     },
-    gridShow: function() {
+    gridShow () {
       let gridShow = this.$store.getters.getGridShow(this.idDash);
       gridShow === 'true' ? gridShow = true : gridShow = false;
       return gridShow;
     },
-    getSizeGrid: function() {
+    getSizeGrid () {
       return this.$store.getters.getSizeGrid(this.idDash)
     },
-    tabsMoreOne() {
+    tabs () {
+      return this.$store.getters.getDashTabs(this.idDash);
+    },
+    tabsMoreOne () {
       return this.tabs.length > 1;
     },
-    tabs() {
-      return JSON.parse(JSON.stringify(this.$store.getters.getDashTabs(this.idDash)))
-    }
+    showTabs () {
+      return this.$store.getters.getShowTabs(this.idDash);
+    },
+    currentTab () {
+      return this.$store.getters.getCurrentDashTab(this.idDash);
+    },
   },
   watch: {
     getSizeGrid: function() {
@@ -199,41 +208,51 @@ export default {
     }
   },
   mounted() {
-    document.title=`EVA | ${this.$store.getters.getName(this.idDash)}`
+    document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`;
     this.createStartClient();
     this.calcSizeCell();
     this.addScrollListener();
-    this.currentTab = this.$store.getters.getCurrentDashTab(this.idDash);
   },
   methods: {
     clickTab(tabID) {
-      this.$store.commit('changeCurrentTab', {idDash: this.idDash, tab: tabID});
-      this.currentTab = tabID;
+      if (!this.tabEditMode) {
+        this.$store.commit('changeCurrentTab', {idDash: this.idDash, tab: tabID});
+      }
     },
     addNewTab() {
-      let tabID = [...this.tabs].sort((a,b) => b.id - a.id)[0].id + 1;
-      this.$store.commit('addNewTab', {idDash: this.idDash, tabID, tabName: 'Без названия'})
-      this.tabs.push({id: tabID, name: 'Без названия'});
+      if (!this.tabEditMode) {
+        let tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
+        this.$store.commit('addNewTab', {idDash: this.idDash, tabID, tabName: 'Без названия'})
+      }
     },
     deleteTab(tabID) {
       if (this.tabsMoreOne) {
         this.$store.commit('deleteDashTab', {idDash: this.idDash, tabID});
-        if (tabID !== this.currentTab) {
-          this.tabs = this.tabs.filter(tab => tab.id !== tabID);
-        } else {
-          this.tabs = this.tabs.filter(tab => tab.id !== tabID);
-          this.currentTab = this.tabs[0].id;
-        }
       }
     },
-    editTabName(tab) {
-
+    enterEditMode(tab) {
+      if (!this.tabEditMode && !this.editableTabID) {
+        this.tabEditMode = true;
+        this.editableTabID = tab.id;
+        this.tempName = tab.name;
+      }
     },
-    tabOver(tab) {
-      this.$set(tab, 'hover' , true)
+    editTabName() {
+      if (this.tempName) {
+        this.$store.commit('editTabName', {idDash: this.idDash, tabID: this.editableTabID, newName: this.tempName})
+        this.tabEditMode = false;
+        this.editableTabID = 0;
+        this.tempName = '';
+      }
     },
-    tabLeave(tab) {
-      this.$set(tab, 'hover' , false)
+    getTabs () {
+      return this.$store.getters.getDashTabs(this.idDash).map(tab => ({ ...tab, hover: false }));
+    },
+    tabOver(tabID) {
+      this.$store.commit('tabOver',{idDash: this.idDash, tabID});
+    },
+    tabLeave(tabID) {
+      this.$store.commit('tabLeave',{idDash: this.idDash, tabID});
     },
     hash: function(elem) {
       return `${elem}#${this.idDash}`

@@ -70,6 +70,12 @@
     box-shadow: 0 0 4px var(--main_border)
     align-items: center
 
+    .tab-name-input
+      height: 20px
+      color: var(--main_text)
+      background-color: var(--secondary_bg)
+      padding: 0 5px
+
     .tab-item
       min-width: 97px
       padding: 0 30px
@@ -83,18 +89,33 @@
       &:hover
         background-color: rgba(var(--primary_button-rgb), 0.08)
 
+    .edit-mode-tab
+      padding: 0 50px 0 30px
+
       .delete-cross
         position: absolute
         right: 6px
-        top: 15px
+        top: 13px
         cursor: pointer
 
         &:hover
           path
             fill: var(--error_color)
 
+      .edit-icon
+        position: absolute
+        top: 13px
+        right: 26px
+        cursor: pointer
+
+        &:hover
+          path
+            fill: var(--primary_button)
+
     .active
+      color: var(--primary_button)
       font-weight: 600
+      background-color: rgba(var(--primary_button-rgb), 0.16)
 
     #plus-icon
       display: flex

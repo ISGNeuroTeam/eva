@@ -279,7 +279,6 @@ export default {
       }) 
      
     if (response.status == 200) {  // если получилось
-     
       await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
         data = res.data; 
         restAuth.putLog(`Состояние приложения успешно получено.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`);
@@ -290,7 +289,6 @@ export default {
       restAuth.putLog(`Состояние приложения получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`);
       return response
     }
-
     return data
   },
   async getSvg(svg,restAuth) { 
@@ -390,7 +388,6 @@ export default {
   },
   async getThemeBack(restAuth) { 
     let data = [];
-    
     let response = await fetch(`/api/user/setting`)
       .catch (error => {
         restAuth.putLog(`Настройки пользователя получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`);
@@ -407,7 +404,6 @@ export default {
       restAuth.putLog(`Настройки пользователя получить не удалось&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`);
       return response
     }
-
     return data
   },
   async setThemeBack(theme,restAuth) { 
@@ -566,6 +562,4 @@ export default {
     }
     return data
   },
-  
- 
 };
