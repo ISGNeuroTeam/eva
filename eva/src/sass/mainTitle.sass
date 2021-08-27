@@ -69,6 +69,10 @@
     display: flex
     box-shadow: 0 0 4px var(--main_border)
     align-items: center
+    overflow-x: auto
+
+    &::-webkit-scrollbar
+      display: none
 
     .tab-name-input
       height: 20px
@@ -77,14 +81,15 @@
       padding: 0 5px
 
     .tab-item
-      min-width: 97px
       padding: 0 30px
       line-height: 40px
+      height: 40px
       text-align: center
       border-right: 1px solid var(--secondary_border)
       font-size: 15px
       color: var(--main_text)
       position: relative
+      white-space: nowrap
 
       &:hover
         background-color: rgba(var(--primary_button-rgb), 0.08)

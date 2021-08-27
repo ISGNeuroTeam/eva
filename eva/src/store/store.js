@@ -324,7 +324,9 @@ export default {  // приблизительный объект хранили�
         }
       }
 
-      state[dashboard.idDash][id] = {...data, tab: state[dashboard.idDash].currentTab};
+      state[dashboard.idDash][id] = data;
+      state[dashboard.idDash][id].tab = state[dashboard.idDash].currentTab;
+
 
       state[dashboard.idDash].elements.push(id);
     },
@@ -736,7 +738,7 @@ export default {  // приблизительный объект хранили�
       state[gridShow.id].gridShow = gridShow.item;
     },
     addNewTab: (state, payload) => {
-      state[payload.idDash].tabList.push({id: payload.tabID, name: payload.tabName, hover: false});
+      state[payload.idDash].tabList.push({id: payload.tabID, name: payload.tabName});
     },
     changeCurrentTab: (state, payload) => {
       state[payload.idDash].currentTab = payload.tab;
@@ -757,14 +759,6 @@ export default {  // приблизительный объект хранили�
         Vue.set(state[idDash], 'currentTab', state[idDash].tabList[0].id)
       }
     },
-    tabOver: (state, payload) => {
-      const tab = state[payload.idDash].tabList.find(tab => tab.id === payload.tabID);
-      Vue.set(tab, 'hover', true);
-    },
-    tabLeave: (state, payload) => {
-      const tab = state[payload.idDash].tabList.find(tab => tab.id === payload.tabID);
-      Vue.set(tab, 'hover', false);
-    },
     setTabMode: (state, payload) => {
       state[payload.idDash].tabs = payload.mode;
     },
@@ -783,7 +777,7 @@ export default {  // приблизительный объект хранили�
   getters: {
     getDashTabs: state => id => {
       if (!state[id].tabList) {
-        Vue.set(state[id], 'tabList' ,[{id: 1, name: 'Без названия', hover: false}]);
+        Vue.set(state[id], 'tabList' ,[{id: 1, name: 'Без названия'}]);
       }
       return state[id].tabList;
     },

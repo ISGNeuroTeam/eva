@@ -88,13 +88,13 @@
       <div
         v-for="tab in tabs"
         :key="tab.id"
-        :class="{active: currentTab === tab.id,'edit-mode-tab': mode,  hover: tab.hover }"
+        :class="{active: currentTab === tab.id,'edit-mode-tab': mode,  hover: tab.id === hoveredTabID }"
         class="tab-item"
         @click="clickTab(tab.id)"
         @mouseover="tabOver(tab.id)"
         @mouseleave="tabLeave(tab.id)"
       >
-        <div v-if="tab.id !== editableTabID">
+        <div v-if="tab.id !== editableTabID" style="height: 40px">
           {{ tab.name }}
           <svg v-if="mode" class="edit-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" @click.stop="enterEditMode(tab)">
             <path d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z" fill="#8E8D9E"/>
@@ -143,7 +143,8 @@ export default {
       horizontalCell: 0,
       tabEditMode: false,
       tempName: '',
-      editableTabID: 0
+      editableTabID: 0,
+      hoveredTabID: 0
     }
   },
   computed: {
@@ -245,14 +246,11 @@ export default {
         this.tempName = '';
       }
     },
-    getTabs () {
-      return this.$store.getters.getDashTabs(this.idDash).map(tab => ({ ...tab, hover: false }));
-    },
     tabOver(tabID) {
-      this.$store.commit('tabOver',{idDash: this.idDash, tabID});
+      this.hoveredTabID = tabID;
     },
-    tabLeave(tabID) {
-      this.$store.commit('tabLeave',{idDash: this.idDash, tabID});
+    tabLeave() {
+      this.hoveredTabID = 0;
     },
     hash: function(elem) {
       return `${elem}#${this.idDash}`
