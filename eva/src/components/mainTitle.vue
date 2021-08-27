@@ -111,7 +111,7 @@
         </div>
 
       </div>
-      <div id="plus-icon" @click="addNewTab">
+      <div v-if="mode" id="plus-icon" @click="addNewTab">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z"/>
         </svg>
