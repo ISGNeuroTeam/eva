@@ -300,39 +300,37 @@ export default {
   asyncComputed: {
     async prepareData() {  // подготавливаем данные для отображения
       if (this.shouldGet) {
-       
-        let searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
-        let searchName = `${this.idDash}-${searchId}`;
-        let search = this.$store.getters.getSearch({idDash: this.idDash, id: this.element});
-        if  (searchId == -1) {
-          this.props.sid = ''
-        } else { 
-          this.props.sid = searchId
-        }
 
-        let fromDB
-        this.dataFromDB = true
-        this.getDataFromDB(searchName).then(result=>{
-          fromDB = result
-          this.props.dataRestFilter = fromDB;
-        })
+      let searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
+      let searchName = `${this.idDash}-${searchId}`;
+      let search = this.$store.getters.getSearch({idDash: this.idDash, id: this.element});
+      if  (searchId == -1) {
+        this.props.sid = ''
+      } else { 
+        this.props.sid = searchId
+      }
 
-        this.getDataFromRest(search)
-          .then(result=>{
-            this.props.dataRestFilter = result
-            this.dataFromDB = false
-            if(result.length===0 && this.lastResult){
-              this.props.dataRestFilter = fromDB
-            }
-          },
-          () => {
-            if(this.lastResult){
-              this.props.dataRestFilter = fromDB
-            } else {
-              this.props.dataRestFilter = []
-            }
+      let fromDB
+      this.dataFromDB = true
+      this.getDataFromDB(searchName).then(result=>{
+        fromDB = result
+        this.props.dataRestFilter = fromDB;
+      })
+      this.getDataFromRest(search).then(result=>{
+          this.props.dataRestFilter = result
+          this.dataFromDB = false
+          if(result.length===0 && this.lastResult){
+            this.props.dataRestFilter = fromDB
           }
-          )
+        },
+        () => {
+          if(this.lastResult){
+            this.props.dataRestFilter = fromDB
+          } else {
+            this.props.dataRestFilter = []
+          }
+        }
+      )
       }
       this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});         
                
@@ -515,7 +513,6 @@ export default {
       this.$store.commit('setModalDelete', { id: this.idDash, status: true, elem: this.element, name: props.name, page: this.dataPageFrom}); 
     },
     getDataFromDB: function(searсhID) {   // получение данных с indexindDB
-
     
       let db = null;
     
@@ -613,7 +610,6 @@ export default {
       this.$emit('SetLevel',level);
     },
     getDataFromRest: async function(event) {
-
       // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false }); 
     

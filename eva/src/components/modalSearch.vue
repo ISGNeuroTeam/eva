@@ -85,6 +85,9 @@ export default {
       return this.$store.getters.getTheme
     }
   },
+  created() {
+    this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
+  },
   methods: {
     startDS: function() {  //  если нажали на кнопку согласия
       if (this.currentId != 0) { // проверяем выбран ли хоть один ИС
@@ -111,9 +114,6 @@ export default {
       return newSid 
     },
   },
-  created() {
-    this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
-  }
 }
 </script>
 

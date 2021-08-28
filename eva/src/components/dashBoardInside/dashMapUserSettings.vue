@@ -11,12 +11,13 @@
           Режим
         </v-btn>
         <v-select
+          v-model="options.mode"
           :menu-props="{ value: toggleSelect }"
           style="visibility:hidden;background: white; position: absolute"
-          v-model="options.mode"
           :items="mode"
           label="Режим"
           multiple
+          @change="updatePipeDataSource"
         />
         <v-spacer/>
         <v-dialog v-model="dialog" max-width="290">
@@ -95,6 +96,15 @@
                 label="Включить отображение легенды"
                 color="secondary"
                 hide-details
+              />
+
+              <p>ИД для режима мониторинга</p>
+              <v-select
+                v-model="options.search"
+                item-text="sid"
+                :items="searches"
+                :return-object="true"
+                @change="updatePipeDataSource"
               />
             </v-card-text>
           </v-card>
@@ -255,23 +265,12 @@ export default {
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
       currentTile: {},
+      searches: [],
       tileLayers: [
         {
           name: "Заданная в настройках",
           tile: [],
         },
-        // {
-        //   name: "Яндекс карта",
-        //   tile: [
-        //     "http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU",
-        //     {
-        //       subdomains: ["01", "02", "03", "04"],
-        //       attribution: '<a http="yandex.ru" target="_blank">Яндекс</a>',
-        //       reuseTiles: true,
-        //       updateWhenIdle: false,
-        //     },
-        //   ],
-        // },
         {
           name: "Google спутник",
           tile: [
@@ -304,6 +303,7 @@ export default {
         },
         showLegend: true,
         mode: "",
+        search: "",
       },
     };
   },
@@ -324,12 +324,16 @@ export default {
   watch: {
     options: {
       deep: true,
-      handler(val) {
+      handler(val, oldVal) {
+        console.log("update on mount", val, oldVal)
+        if (val.mode != oldVal.mode) 
+          this.updatePipeDataSource();
         this.updateOptions(val);
       },
     },
   },
-  mounted() {
+  mounted() {    
+    console.log("mount")
     let options = this.$store.getters.getOptions({
       idDash: this.idDashFrom,
       id: this.idElement,
@@ -352,9 +356,20 @@ export default {
     } else {
       this.options = options;
     }
-    this.setTileLayer();
+    
+    this.searches = this.loadDataForPipe();
+    console.log(this.searches)
   },
   methods: {
+    updatePipeDataSource() {
+      this.$emit("updatePipeDataSource", this.options.search)
+    },
+    loadDataForPipe() {
+      let searches = this.$store.getters.getSearches(this.idDashFrom)
+      console.log(searches)
+      return searches;
+
+    },
     closeLegend() {
       this.options.showLegend = false;
     },
@@ -405,64 +420,6 @@ export default {
         idElement: this.idElement,
         options: { ...this.dashSettings, ...newOptions },
       });
-    },
-
-    setTileLayer() {
-      // this.map.removeLayer(grayscale);
-      // this.map.addLayer(streets);
-      // let test = L.tileLayer(
-      //   "http://vec{s}.maps.yandex.net/tiles?l=map&v=4.55.2&z={z}&x={x}&y={y}&scale=2&lang=ru_RU",
-      //   {
-      //     subdomains: ["01", "02", "03", "04"],
-      //     attribution: '<a http="yandex.ru" target="_blank">Яндекс</a>',
-      //     reuseTiles: true,
-      //     updateWhenIdle: false,
-      //   }
-      // ).addTo(this.map);
-      // this.map.addLayer(test)
-      // let baselayers = {
-      //   "Tile Layer 1": L.tileLayer(
-      //     "http://tile2.maps.2gis.com/tiles?x={x}&y={y}&z={z}"
-      //   ),
-      //   "Tile Layer 2": L.tileLayer(
-      //     "http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-      //     {
-      //       subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      //     }
-      //   ),
-      //   "Tile Layer 3": L.tileLayer(
-      //     "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
-      //     {
-      //       subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      //     }
-      //   ),
-      // };
-      // let overlays = {};
-      // baselayers["Tile Layer 1"].addTo(this.map);
-      // baselayers["Tile Layer 2"].addTo(this.map);
-      // L.control.layers(baselayers, overlays).addTo(this.map);
-      // L.tileLayer("http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}", {
-      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      // });
-      // L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
-      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      // }).addTo(this.map);
-      // let terrain = L.tileLayer(
-      //   "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
-      //   {
-      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      //   }
-      // ).addTo(this.map);
-      // let terrain1 = L.tileLayer(
-      //   "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
-      //   {
-      //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      //   }
-      // ).addTo(this.map);
-      // L.tileLayer("http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}", {
-      //   subdomains: ["mt0", "mt1", "mt2", "mt3"],
-      // }).addTo(this.map);
-      // this.map.addLayer(terrain);
     },
 
     setOptions: function () {
