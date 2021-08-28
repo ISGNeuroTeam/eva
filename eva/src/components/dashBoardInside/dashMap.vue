@@ -62,236 +62,7 @@ export default {
       mode: [],
       leftBottom: 0,
       rightTop: 0,
-      pipelineData: [
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1100.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.199112454343823,
-          T: 25.057585186148636,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1105.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.168336769003016,
-          T: 25.066058710865445,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1110.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.093703920224474,
-          T: 25.202715337382333,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1115.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.20104747867972,
-          T: 25.02528828665911,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1120.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.088552234333275,
-          T: 25.193711035939376,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1125.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.15084020062758,
-          T: 25.225189455924742,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1130.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.137999512532023,
-          T: 25.169263667848288,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1135.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.11151280146448,
-          T: 25.232233147484106,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1140.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.039687872008482,
-          T: 25.245048316875163,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1145.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.171993488258817,
-          T: 25.04155093589985,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1150.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.249320663545525,
-          T: 25.004733638831148,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-        {
-          ID: 1750033596,
-          label: "уз. в к31->уз.к41",
-          type: "Водовод",
-          start_altitude: 82.1,
-          end_altitude: 93.0,
-          pos: 1155.0,
-          L: 4157.0,
-          D: 273.0,
-          S: 20.0,
-          pipe_material: "сталь 20",
-          cover_int: "нет покрытия",
-          P: 20.266725073717407,
-          T: 25.050002193171043,
-          P_start: 26.0,
-          P_end: 32.0,
-          avaria: "Нет",
-          repair: "Нет",
-        },
-      ],
+      pipelineData: [],
     };
   },
   computed: {
@@ -338,7 +109,7 @@ export default {
       },
     },
   },
-  mounted() {
+  async mounted() {
     this.initMap();
     this.initTheme();
     this.initClusterTextCount();
@@ -358,7 +129,10 @@ export default {
           );
         }
         this.map.wheelPxPerZoomLevel = 200;
-        this.updateToken(mutation.payload.options.zoomLevel, this.map.getBounds());
+        this.updateToken(
+          mutation.payload.options.zoomLevel,
+          this.map.getBounds()
+        );
       }
     });
     this.createTokens();
@@ -367,28 +141,87 @@ export default {
       idDash: this.idDash,
       id: this.element,
     });
+    await this.loadDataForPipe();
   },
   methods: {
+    getDataFromRest: async function (event) {
+      // this.$set(this.loadings,event.sid,true);
+      this.$store.commit("setLoading", {
+        search: event.sid,
+        idDash: this.idDash,
+        should: true,
+        error: false,
+      });
+
+      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
+      let response = await this.$store.getters.getDataApi({
+        search: event,
+        idDash: this.idDash,
+      }); // собственно проводим все операции с данными
+      // вызывая метод в хранилище
+      if (response.length == 0) {
+        // если что-то пошло не так
+        this.$store.commit("setLoading", {
+          search: event.sid,
+          idDash: this.idDash,
+          should: false,
+          error: true,
+        });
+      } else {
+        // если все нормально
+
+        let responseDB = this.$store.getters.putIntoDB(
+          response,
+          event.sid,
+          this.idDash
+        );
+        responseDB.then((result) => {
+          this.$store.commit("setLoading", {
+            search: event.sid,
+            idDash: this.idDash,
+            should: false,
+            error: false,
+          });
+        });
+      }
+
+      return response;
+    },
+    async loadDataForPipe(search) {
+      let test = await this.getDataFromRest(search);
+      this.pipelineData = test;
+      this.reDrawMap(this.dataRestFrom);
+    },
     updateToken(value, test) {
-      console.log(test)
       let tokens = this.$store.getters.getTockens(this.idDash);
-      console.log("tok", tokens);
       Object.keys(tokens).forEach((i) => {
-        if (tokens[i].elem == this.element && tokens[i].action == "button" && tokens[i].capture == "zoom_level") {
+        if (
+          tokens[i].elem == this.element &&
+          tokens[i].action == "button" &&
+          tokens[i].capture == "zoom_level"
+        ) {
           this.$store.commit("setTocken", {
             tocken: tokens[i],
             idDash: this.idDash,
             value: value,
             store: this.$store,
           });
-        } else if (tokens[i].elem == this.element && tokens[i].action == "button" && tokens[i].capture == "top_left_point") {
+        } else if (
+          tokens[i].elem == this.element &&
+          tokens[i].action == "button" &&
+          tokens[i].capture == "top_left_point"
+        ) {
           this.$store.commit("setTocken", {
             tocken: tokens[i],
             idDash: this.idDash,
             value: this.leftBottom[1],
             store: this.$store,
           });
-        } else if (tokens[i].elem == this.element && tokens[i].action == "button" && tokens[i].capture == "bottom_right_point") {
+        } else if (
+          tokens[i].elem == this.element &&
+          tokens[i].action == "button" &&
+          tokens[i].capture == "bottom_right_point"
+        ) {
           this.$store.commit("setTocken", {
             tocken: tokens[i],
             idDash: this.idDash,
@@ -400,7 +233,6 @@ export default {
     },
     createTokens: function (result) {
       let captures = ["top_left_point", "bottom_right_point", "zoom_level"];
-      console.log(captures);
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], "capture", captures);
       });
@@ -441,7 +273,9 @@ export default {
         vuetify,
         store,
       });
+      test.$on("updatePipeDataSource", (e) => this.loadDataForPipe(e));
       test.$mount();
+
       let element = document.getElementsByClassName(
         "leaflet-control-container"
       );
@@ -638,9 +472,8 @@ export default {
         maxZoom: 25,
       });
       this.map.on("moveend", () => {
-        [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds())
-        console.log("moved");
-        this.updateToken(this.map.getZoom())
+        [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
+        this.updateToken(this.map.getZoom());
       });
       this.map.on("zoomend", () => {
         let layers = document.getElementsByClassName("leaflet-marker-icon");
@@ -758,8 +591,18 @@ export default {
     },
 
     addLine(element, lib) {
-      if (this.option.mode[0] == "Мониторинг" && element.ID != "1751045030")
-        return;
+      let option = this.option;
+      let pipelineDataDictionary = {}
+      for (let x of this.pipelineData) {
+        if (!pipelineDataDictionary[x.ID])
+          pipelineDataDictionary[x.ID] = []
+        pipelineDataDictionary[x.ID].push(x)
+      }
+      
+      let pipelineData = pipelineDataDictionary[element.ID]
+
+      if (option?.mode[0] == "Мониторинг" && !pipelineDataDictionary[element.ID]) 
+        return
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
@@ -784,18 +627,11 @@ export default {
         .on("mouseout", resetHighlight);
       line.setTooltipContent(element.label);
       let previousPoint = 0;
-      let dist = 0;
       let route = line.getLatLngs().map((el) => {
         return [el.lat, el.lng];
       });
       let lineTurf = turf.lineString(route);
-      let newLine = turf.lineSlice(
-        route[0],
-        [59.24622380205539, 74.56146240234376],
-        lineTurf
-      );
-      let newLinePoly = L.polyline(newLine.geometry.coordinates);
-
+      let dist = 0;
       line.getLatLngs().forEach(function (current) {
         if (previousPoint) {
           dist += previousPoint.distanceTo(current);
@@ -810,9 +646,21 @@ export default {
           weight: lib.width,
         });
       }
-      let pipelineData = this.pipelineData;
-      let option = this.option;
+      
+      
+      
       function highlightFeature(e) {
+        var layer = e.target;
+        layer.bringToFront();
+        layer.setStyle({
+          weight: lib.width + 3,
+          color: lib.highlight_color,
+        });
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+          layer.bringToFront();
+        }
+        if (!pipelineDataDictionary[element.ID])
+          return
         const closest = (arr, num) => {
           return (
             arr.reduce((acc, val) => {
@@ -824,38 +672,30 @@ export default {
             }, Infinity) + num
           );
         };
+        if (option?.mode[0] == "Мониторинг") {
+          let newLine = turf.lineSlice(
+            route[0],
+            [e.latlng.lat, e.latlng.lng],
+            lineTurf
+          );
+          let newLinePoly = L.polyline(newLine.geometry.coordinates);
+          let distances = utils.accumulatedLengths(newLinePoly);
+          let sum = distances[distances.length - 1];
 
-        let newLine = turf.lineSlice(
-          route[0],
-          [e.latlng.lat, e.latlng.lng],
-          lineTurf
-        );
-        let newLinePoly = L.polyline(newLine.geometry.coordinates);
-        let distances = utils.accumulatedLengths(newLinePoly);
-        let sum = distances[distances.length - 1];
-        let closestData = closest(pipelineData, sum);
-        let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
-        console.log(pipelineInfo);
+          let closestData = closest(pipelineData, sum);
+          let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
 
-        // div for tooltip
-        var newDiv = document.createElement("div");
-        newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
+          // div for tooltip
+          var newDiv = document.createElement("div");
+          newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
           <p>${pipelineInfo.label}</p>
           <p>P ${pipelineInfo.P}</p>
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-        console.log(option);
-        if (option?.mode[0] == "Мониторинг") line.setTooltipContent(newDiv);
-        var layer = e.target;
-        layer.bringToFront();
-        layer.setStyle({
-          weight: lib.width + 3,
-          color: lib.highlight_color,
-        });
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-          layer.bringToFront();
+          line.setTooltipContent(newDiv);
         }
+        
       }
     },
 

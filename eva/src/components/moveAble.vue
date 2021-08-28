@@ -14,7 +14,7 @@
     @resizestop="sendSize"
     @dragstop="sendMove" 
   >
-    <dash-board 
+    <dash-board
       :data-mode-from="dataMode" 
       :width="width"  
       :height="height"  
@@ -150,6 +150,8 @@ export default {
 
       let newWidth =  Math.round(width/this.verticalCell);
       let newHeight = Math.round(height/this.horizontalCell);
+      this.height = height;
+      this.width = width;
       this.$store.commit('setSizeDash', {width: newWidth, height: newHeight, id: this.id, idDash: this.idDash});
     },
     changeOpacity(event){
