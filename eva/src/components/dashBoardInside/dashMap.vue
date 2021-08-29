@@ -25,6 +25,8 @@ import vuetify from "../../plugins/vuetify";
 import dashMapUserSettings from "./dashMapUserSettings.vue";
 import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
 import Vue from "vue";
+import * as turf from "@turf/turf";
+import * as utils from "leaflet-geometryutil";
 export default {
   props: {
     // переменные полученные от родителя
@@ -39,6 +41,10 @@ export default {
   },
   data() {
     return {
+      actions: [
+        { name: "refresh", capture: [] },
+        { name: "button", capture: [] },
+      ],
       showLegend: false,
       osmserver: null,
       error: null,
@@ -53,9 +59,28 @@ export default {
       isLegendGenerated: true,
       isSettings: false,
       startingPoint: [],
+      mode: [],
+      leftBottom: 0,
+      rightTop: 0,
+      pipelineData: [],
     };
   },
   computed: {
+    idDash: function () {
+      // получаем id страницы от родителя
+      return this.idDashFrom;
+    },
+    element: function () {
+      // получаем название элемента
+      return this.idFrom;
+    },
+    option() {
+      return this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.element,
+      });
+    },
+
     top() {
       // для ряда управляющих иконок
       if (document.body.clientWidth <= 1600) {
@@ -77,8 +102,14 @@ export default {
     maptheme() {
       this.createMap();
     },
+    options: {
+      deep: true,
+      handler(val, oldVal) {
+        console.log(val);
+      },
+    },
   },
-  mounted() {
+  async mounted() {
     this.initMap();
     this.initTheme();
     this.initClusterTextCount();
@@ -98,10 +129,114 @@ export default {
           );
         }
         this.map.wheelPxPerZoomLevel = 200;
+        this.updateToken(
+          mutation.payload.options.zoomLevel,
+          this.map.getBounds()
+        );
       }
     });
+    this.createTokens();
+    this.$store.commit("setActions", {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.element,
+    });
+    await this.loadDataForPipe();
   },
   methods: {
+    getDataFromRest: async function (event) {
+      // this.$set(this.loadings,event.sid,true);
+      this.$store.commit("setLoading", {
+        search: event.sid,
+        idDash: this.idDash,
+        should: true,
+        error: false,
+      });
+
+      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
+      let response = await this.$store.getters.getDataApi({
+        search: event,
+        idDash: this.idDash,
+      }); // собственно проводим все операции с данными
+      // вызывая метод в хранилище
+      if (response.length == 0) {
+        // если что-то пошло не так
+        this.$store.commit("setLoading", {
+          search: event.sid,
+          idDash: this.idDash,
+          should: false,
+          error: true,
+        });
+      } else {
+        // если все нормально
+
+        let responseDB = this.$store.getters.putIntoDB(
+          response,
+          event.sid,
+          this.idDash
+        );
+        responseDB.then((result) => {
+          this.$store.commit("setLoading", {
+            search: event.sid,
+            idDash: this.idDash,
+            should: false,
+            error: false,
+          });
+        });
+      }
+
+      return response;
+    },
+    async loadDataForPipe(search) {
+      let test = await this.getDataFromRest(search);
+      this.pipelineData = test;
+      this.reDrawMap(this.dataRestFrom);
+    },
+    updateToken(value, test) {
+      let tokens = this.$store.getters.getTockens(this.idDash);
+      Object.keys(tokens).forEach((i) => {
+        if (
+          tokens[i].elem == this.element &&
+          tokens[i].action == "button" &&
+          tokens[i].capture == "zoom_level"
+        ) {
+          this.$store.commit("setTocken", {
+            tocken: tokens[i],
+            idDash: this.idDash,
+            value: value,
+            store: this.$store,
+          });
+        } else if (
+          tokens[i].elem == this.element &&
+          tokens[i].action == "button" &&
+          tokens[i].capture == "top_left_point"
+        ) {
+          this.$store.commit("setTocken", {
+            tocken: tokens[i],
+            idDash: this.idDash,
+            value: this.leftBottom[1],
+            store: this.$store,
+          });
+        } else if (
+          tokens[i].elem == this.element &&
+          tokens[i].action == "button" &&
+          tokens[i].capture == "bottom_right_point"
+        ) {
+          this.$store.commit("setTocken", {
+            tocken: tokens[i],
+            idDash: this.idDash,
+            value: this.rightTop[1],
+            store: this.$store,
+          });
+        }
+      });
+    },
+    createTokens: function (result) {
+      let captures = ["top_left_point", "bottom_right_point", "zoom_level"];
+      this.actions.forEach((item, i) => {
+        this.$set(this.actions[i], "capture", captures);
+      });
+    },
     reDrawMap(dataRest) {
       this.clearMap();
       this.error = null;
@@ -138,7 +273,9 @@ export default {
         vuetify,
         store,
       });
+      test.$on("updatePipeDataSource", (e) => this.loadDataForPipe(e));
       test.$mount();
+
       let element = document.getElementsByClassName(
         "leaflet-control-container"
       );
@@ -334,6 +471,10 @@ export default {
         zoom: 10,
         maxZoom: 25,
       });
+      this.map.on("moveend", () => {
+        [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
+        this.updateToken(this.map.getZoom());
+      });
       this.map.on("zoomend", () => {
         let layers = document.getElementsByClassName("leaflet-marker-icon");
         for (let x of layers) {
@@ -445,28 +586,58 @@ export default {
           permanent: false,
           direction: "top",
           className: "leaftet-hover",
+          interactive: true,
         });
     },
 
     addLine(element, lib) {
+      let option = this.option;
+      let pipelineDataDictionary = {}
+      for (let x of this.pipelineData) {
+        if (!pipelineDataDictionary[x.ID])
+          pipelineDataDictionary[x.ID] = []
+        pipelineDataDictionary[x.ID].push(x)
+      }
+      
+      let pipelineData = pipelineDataDictionary[element.ID]
+
+      if (option?.mode[0] == "Мониторинг" && !pipelineDataDictionary[element.ID]) 
+        return
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
         latlngs[p[0] - 1] = p[1].split(",");
       });
-      L.polyline(latlngs, {
+      let line = L.polyline(latlngs, {
         color: lib.color,
         weight: lib.width,
         opacity: lib.opacity,
-      })
+      });
+      let tooltip = L.tooltip({
+        permanent: false,
+        direction: "top",
+        className: "leaftet-hover",
+        sticky: true,
+      });
+
+      line
         .addTo(this.map)
-        .bindTooltip(element.label, {
-          permanent: false,
-          direction: "top",
-          className: "leaftet-hover",
-        })
+        .bindTooltip(tooltip)
         .on("mouseover", highlightFeature)
         .on("mouseout", resetHighlight);
+      line.setTooltipContent(element.label);
+      let previousPoint = 0;
+      let route = line.getLatLngs().map((el) => {
+        return [el.lat, el.lng];
+      });
+      let lineTurf = turf.lineString(route);
+      let dist = 0;
+      line.getLatLngs().forEach(function (current) {
+        if (previousPoint) {
+          dist += previousPoint.distanceTo(current);
+        }
+        previousPoint = current;
+      });
 
       function resetHighlight(e) {
         var layer = e.target;
@@ -475,7 +646,9 @@ export default {
           weight: lib.width,
         });
       }
-
+      
+      
+      
       function highlightFeature(e) {
         var layer = e.target;
         layer.bringToFront();
@@ -486,6 +659,43 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
+        if (!pipelineDataDictionary[element.ID])
+          return
+        const closest = (arr, num) => {
+          return (
+            arr.reduce((acc, val) => {
+              if (Math.abs(val.pos - num) < Math.abs(acc)) {
+                return val.pos - num;
+              } else {
+                return acc;
+              }
+            }, Infinity) + num
+          );
+        };
+        if (option?.mode[0] == "Мониторинг") {
+          let newLine = turf.lineSlice(
+            route[0],
+            [e.latlng.lat, e.latlng.lng],
+            lineTurf
+          );
+          let newLinePoly = L.polyline(newLine.geometry.coordinates);
+          let distances = utils.accumulatedLengths(newLinePoly);
+          let sum = distances[distances.length - 1];
+
+          let closestData = closest(pipelineData, sum);
+          let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
+
+          // div for tooltip
+          var newDiv = document.createElement("div");
+          newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
+          <p>${pipelineInfo.label}</p>
+          <p>P ${pipelineInfo.P}</p>
+          <p>S ${pipelineInfo.S}</p>
+          <p>L ${pipelineInfo.L}</p>
+          </div>`;
+          line.setTooltipContent(newDiv);
+        }
+        
       }
     },
 
@@ -631,7 +841,11 @@ export default {
   grid-template-columns: repeat(3, 1fr) auto;
 }
 .leaftet-hover {
-  border: 2px solid #c88dcc;
+  border: 2px solid #191919;
+  border-radius: 5px;
+  text-align: left;
+  background-color: #191919;
+  color: white;
 }
 .leaftet-hover::before {
   margin-bottom: 0;

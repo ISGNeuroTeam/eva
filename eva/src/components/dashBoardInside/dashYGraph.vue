@@ -1,12 +1,14 @@
 <template>
   <div class="ygraph-wrapper">
      <v-row align="start">
-      <v-icon @click="changeInputMode" 
-       :color="isEditor ? colorFrom.controlsActive : colorFrom.controls">
+      <v-icon
+        :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
+        @click="changeInputMode"
+      >
        {{iconArrowAll}}
       </v-icon>
      </v-row>
-     <div class="ygraph-component-container" :style="{top:`${top}`}" ref="graph"/>
+     <div ref="graph" class="ygraph-component-container" :style="{top:`${top}`}"/>
   </div>
 </template>
 
@@ -134,39 +136,38 @@ export default {
     },
     colorFont(){
       const nodes = this.$graphComponent.graph.nodes
-      nodes.forEach(node=>{
+      nodes.forEach(node=> {
         //node.labels.elementAt(0) -- label который name
-        this.$graphComponent.graph.setStyle(node.labels.elementAt(0), 
-          this.labelStyle(true) 
+        this.$graphComponent.graph.setStyle(node.labels.elementAt(0),
+          this.labelStyle(true)
         )
         //node.labels.elementAt(1) -- label который label
-        this.$graphComponent.graph.setStyle(node.labels.elementAt(1), 
-          this.labelStyle(false) 
+        this.$graphComponent.graph.setStyle(node.labels.elementAt(1),
+          this.labelStyle(false)
         )
       })
 
       const edges = this.$graphComponent.graph.edges
-      edges.forEach(edge=>{
+      edges.forEach(edge=> {
         this.$graphComponent.graph.setStyle(edge.labels.elementAt(0),
           this.labelStyle(false, this.colorFrom.backElement)  
         )
       })      
     },
-    labelStyle(isBold, backgroundFill=null) {
+    labelStyle(isBold, backgroundFill = null) {
         return new yfile.DefaultLabelStyle({
           font: isBold? new yfile.Font({fontSize: 70, fontFamily: 'sefif',  fontWeight: 'BOLD'}) : new yfile.Font({fontSize: 70, fontFamily: 'sefif'}),
-          textFill: this.colorFrom.text,
+          textFill: this.colorFrom.$main_text,
           backgroundFill: backgroundFill,
         })
     },
-    initializeDefaultStyles(){    
+    initializeDefaultStyles() {
       this.$graphComponent.graph.nodeDefaults.style = this.nodeStyle('#0AB3FF')
       this.$graphComponent.graph.nodeDefaults.size = new yfile.Size(120, 120)
 
       this.$graphComponent.graph.edgeDefaults.style = this.edgeStyle('#0AB3FF')
       this.$graphComponent.graph.edgeDefaults.labels.style.minimumSize = new yfile.Size(70*3, 0)
     },
-
     applyGraphBuilder() {
       this.$graphComponent.graph.clear()
 

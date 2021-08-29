@@ -233,6 +233,8 @@ export default {
     dataElemFrom: null,
     dataModeFrom: null,
     dataPageFrom: null,
+
+    colorFrom: null,
   },
   data () {
     return {
@@ -308,29 +310,27 @@ export default {
           this.props.sid = searchId
         }
 
-        let fromDB
-        this.dataFromDB = true
-        this.getDataFromDB(searchName).then(result=>{
-          fromDB = result
-          this.props.dataRestFilter = fromDB;
-        })
-
-        this.getDataFromRest(search)
-          .then(result=>{
-            this.props.dataRestFilter = result
-            this.dataFromDB = false
-            if(result.length===0 && this.lastResult){
-              this.props.dataRestFilter = fromDB
-            }
-          },
-          () => {
-            if(this.lastResult){
-              this.props.dataRestFilter = fromDB
-            } else {
-              this.props.dataRestFilter = []
-            }
+      let fromDB
+      this.dataFromDB = true
+      this.getDataFromDB(searchName).then(result=>{
+        fromDB = result
+        this.props.dataRestFilter = fromDB;
+      })
+      this.getDataFromRest(search).then(result=>{
+          this.props.dataRestFilter = result
+          this.dataFromDB = false
+          if(result.length===0 && this.lastResult){
+            this.props.dataRestFilter = fromDB
           }
-          )
+        },
+        () => {
+          if(this.lastResult){
+            this.props.dataRestFilter = fromDB
+          } else {
+            this.props.dataRestFilter = []
+          }
+        }
+      )
       }
       this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});
 
@@ -445,7 +445,24 @@ export default {
     ...mapGetters([
       'getSelectedTableTitles',
       'getSelectedDataFormat'
-    ])
+    ]),
+    color: function() {
+      return this.colorFrom
+    },
+    setColorDS: function() {  // переключаем цвет иконок
+      if (!this.showElement){
+        return 'controlsActive';
+      } else {
+        return  'controlsInsideDash';
+      }
+    },
+    setColorOp: function() {  // переключаем цвет иконок
+      if (!this.props.showOptions){
+        return 'controlsActive';
+      } else {
+        return  'controlsInsideDash';
+      }
+    },
   },
 
   watch: {
@@ -501,8 +518,7 @@ export default {
       this.$store.commit('setModalDelete', { id: this.idDash, status: true, elem: this.element, name: props.name, page: this.dataPageFrom});
     },
     getDataFromDB: function(searсhID) {   // получение данных с indexindDB
-
-
+    
       let db = null;
 
       let request = indexedDB.open("EVA",1);
@@ -599,7 +615,6 @@ export default {
       this.$emit('SetLevel',level);
     },
     getDataFromRest: async function(event) {
-
       // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false });
 
@@ -631,6 +646,246 @@ export default {
       const searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
       link.setAttribute("download", `${this.idDash}-${searchId}.csv`); // указываем имя файла
       link.click(); // жмем на скачку
+      link.remove(); // удаляем ссылку 
+    },
+
+    // moveElem: function (props) {  // переключаем режим разрешения перемещения элемента 
+    //   if (props.move_elem) {
+    //     props.arrow_coral = 'controlsActive';
+    //     this.$emit('moveElem');  // так как это переключается у родителя, мы вынуждены вызывать событие на родителе и передавтаь туда данные
+    //     props.move_elem = !props.move_elem;
+    //   } else {
+    //     props.arrow_coral = 'controlsInsideDash';
+    //     this.$emit('moveElem');
+    //     this.$emit('sendMove');
+    //     props.move_elem = !props.move_elem;
+    //   }
+    // },
+    // resizeElem: function (props) {  // тоже самое для режима изменения размера
+    //   if (props.resize_elem) {
+    //     props.resize_arrow_coral = 'controlsActive';
+    //     props.transition = !props.transition;
+    //     this.$emit('resizeElem');
+    //     props.resize_elem = !props.resize_elem;
+    //   } else {
+    //     props.resize_arrow_coral = 'controlsInsideDash';
+    //     props.transition = !props.transition;
+    //     this.$emit('resizeElem');
+    //     this.$emit('sendSize');
+    //     props.resize_elem = !props.resize_elem;
+    //   }
+    // },
+    getData: function(searсhID) {   // асинхронная функция для получения даных с реста
+    
+      let db = null;
+    
+      let request = indexedDB.open("EVA",1);  
+      request.onerror = function(event) {
+        console.log("error: ",event);
+      };
+      request.onupgradeneeded = event => {
+        console.log('create');
+        db = event.target.result;
+        if (!db.objectStoreNames.contains('searches')) { // if there's no "books" store
+          db.createObjectStore('searches'); // create it
+        }
+        request.onsuccess = event => {
+          db = request.result;
+          console.log("successEvent: " + db);
+        };
+      }
+      let promise = new Promise((resolve, reject) => {
+        request.onsuccess =  event => {
+          db = request.result;
+          let transaction = db.transaction("searches"); // (1)
+          // получить хранилище объектов для работы с ним
+          let searches = transaction.objectStore("searches"); // (2)
+          let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
+          query.onsuccess = event => { // (4)
+            if (query.result) {
+              resolve(query.result);
+            } else {
+              resolve([])
+            }
+          };
+          query.onerror = function() {
+            console.log("Ошибка", query.error);
+          };                   
+        };    
+      });
+      return promise
+      
+    },
+    checkFilter: function() {
+      let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'OnDataCompare', element: this.element});
+      let data = [];
+      let incl = false;
+      let columnDel = '';
+      let event = {};
+      this.props.dataRestFilter = [];
+             
+      events.forEach( item => {
+        event = {...{},...item};
+          
+        if(event.prop == 'filter' && event.value == 'true') {
+          data = JSON.parse(JSON.stringify(this.props.dataRest));
+          event.row =  event.row.replace(/\[|\]/g, '').split(',');
+            
+          if (event.column.indexOf('!') != -1) {
+            columnDel = event.column.replace('!', '');
+            this.props.dataRest.forEach( (itemFil,i) => {
+              if (Object.keys(itemFil).includes(columnDel)) {
+                delete data[i][columnDel]
+              }
+            });
+          } else  {
+            switch(event.compare) {
+            case 'equals':
+              let notArr = [];
+              event.row.forEach( notElem => {
+                if ( notElem.indexOf('!') != -1) {
+                  notArr.push(notElem.substr(1));
+                }
+              })
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  if (notArr.length != 0) {
+                    if (!notArr.includes(String(itemFil[event.column]))) {
+                      return itemFil
+                    } 
+                  } else {
+                    if (event.row.includes(String(itemFil[event.column]))) {
+                      return itemFil
+                    } 
+                  }
+                      
+                });
+              } else {
+                data = data.filter( itemFil => {
+                  if (notArr.length != 0) {
+                    incl = true;
+                    Object.values(itemFil).forEach( val => {
+                      if(notArr.includes(String(val))) {
+                        incl = false;
+                      }
+                    })
+                  } else {
+                    incl = false
+                    Object.values(itemFil).forEach( val => {
+                      if(event.row.includes(String(val))) {
+                        incl = true;
+                      }
+                    })
+                  }
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case "over":
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  incl = true;
+                  event.row.forEach( row => {
+                    if ( parseFloat(itemFil[event.column]) <= parseFloat(row)) {
+                      incl = false;
+                    }
+                  })
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case "less":
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  incl = true;
+                  event.row.forEach( row => {
+                    if ( parseFloat(itemFil[event.column]) >= parseFloat(row)) {
+                      incl = false;
+                    }
+                  })
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case 'in':
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  if (event.row.includes(String(itemFil[event.column]))) {
+                    return itemFil
+                  } 
+                });
+              } else {
+                data = data.filter( itemFil => {
+                  incl = false
+                  Object.values(itemFil).forEach( val => {
+                    if(event.row.includes(String(val))) {
+                      incl = true;
+                    }
+                  })
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case "between":
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  incl = false;
+                  let min,max;
+                  if(parseFloat(event.row[0]) > parseFloat(event.row[1])) {
+                    max = event.row[0]; 
+                    min = event.row[1];
+                  } else {
+                    max = event.row[1]; 
+                    min = event.row[0];
+                  }
+                  if ( parseFloat(itemFil[event.column]) > min && parseFloat(itemFil[event.column]) < max){
+                    incl = true;
+                  }
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            }
+          }
+          if (this.props.dataRestFilter.length == 0) {
+            this.props.dataRestFilter = [...this.props.dataRestFilter ,...data];
+          } else {  // если в массив результирующем уже что-то было, то надо добавить только новые элементы
+            data.forEach( itemData => {    // пробегаемся по все мотфильтрвоанным элементам
+              let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
+              let keys = Object.keys(itemData);  // ключи объекта внутри фильтрованного массива
+              this.props.dataRestFilter.forEach( itemDataRest => {  // пробегаемся пов сем отфильтрованным данным
+                let equalRest = true;  // переменная которая скажет полностью совпал объект внутри результирующего массива
+                keys.forEach( key => {  // пробегаемся по кажлому полю в объекте
+                  if (itemData[key] != itemDataRest[key]){  // если значения поля из только что отфильтрованного массива, не равно значени в уже до
+                                                          // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
+                    equalRest = false;   // поэтому присваиваем переменной значение мол строки отличаются
+                  }
+                })
+                if (equalRest) {  // а вот если строка в только что отфлильтрованном массиве полностью совпала со строкой в уже до этого отфильтрованном
+                  equal = true;  // то присваиваем true переменной которай говорит что такая строка уже есть
+                }
+              })
+              if (!equal) {  // и вот если такой строки все же нет
+                this.props.dataRestFilter.push(itemData); // то смело добовляем ее в результирующий массив
+              }
+            })
+          }
+        }                
+      })
+      if (data.length == 0) {
+        this.props.dataRestFilter = JSON.parse(JSON.stringify(this.props.dataRest));
+      }
+             
       link.remove(); // удаляем ссылку
     }
   },
