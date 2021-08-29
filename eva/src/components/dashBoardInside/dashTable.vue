@@ -113,7 +113,7 @@ export default {
   },
   mounted() {
     this.$store.commit("setActions", {
-      actions: this.props.actions,
+      actions: JSON.parse(JSON.stringify(this.props.actions)),
       idDash: this.idDash,
       id: this.id,
     });
