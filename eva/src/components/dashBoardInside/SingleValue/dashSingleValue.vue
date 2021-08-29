@@ -16,10 +16,10 @@
 
     <div class="content pt-3" :class="metricTemplateClass">
       <div
-        v-for="metric in metricList"
+        v-for="metric in dataToRender"
         :key="`metric-${metric.id}`"
         class="item"
-        :style="{ gridArea: `item-${metric.id}` }"
+        :style="{ gridArea: `item-${metric.listOrder+1}` }"
       >
         <span class="metric-title">
           <span
@@ -73,8 +73,16 @@ export default {
     template: 1,
     providedSettings: {},
     isSettingsComponentOpen: false,
+    update: 1,
   }),
   computed: {
+
+    dataToRender() {
+      let temp = [...this.metricList].sort((a,b) => a.listOrder - b.listOrder)
+      console.log(temp)
+      return this.update && temp.slice(0, this.metricCount);
+    },
+
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -94,7 +102,7 @@ export default {
       const metricOptions = [];
       let idCount = 1;
 
-      for (const data of this.dataRestFrom) {
+      for (const [index, data] of this.dataRestFrom.entries()) {
         const { metric, value, order, metadata } = data;
 
         if (metric === '_title') {
@@ -116,6 +124,7 @@ export default {
           icon: 'no_icon',
           fontSize: 16,
           fontWeight: 200,
+          listOrder: order - 1,
         };
 
         metricList.push({ value, ...defaultMetricOption });
@@ -159,13 +168,14 @@ export default {
     },
 
     saveSettings(settings = {}) {
+      console.log(settings)
       const { metricCount, template, metricOptions } = settings;
       this.template = template;
       this.metricCount = metricCount;
       /** Applying settings from the SingleValueSettings. */
       this.options.settings = { ...settings };
       /** Updated local metricList array. */
-      for (const updatedMetric of metricOptions) {
+      for (const [index, updatedMetric] of metricOptions.entries()) {
         const { icon, title, color, fontSize, fontWeight } = updatedMetric;
         const metric = this.metricList.find(m => m.id === updatedMetric.id);
         metric.icon = icon;
@@ -173,7 +183,9 @@ export default {
         metric.color = color;
         metric.fontSize = fontSize;
         metric.fontWeight = fontWeight;
+        metric.listOrder = index;
       }
+      this.update++;
     },
 
     closeSettings() {
@@ -182,7 +194,7 @@ export default {
 
     getIconSvgByID(id) {
       const icon = this.metricTitleIcons.find(m => m.id === id);
-      return icon.svg;
+      return icon?.svg;
     },
   },
 };

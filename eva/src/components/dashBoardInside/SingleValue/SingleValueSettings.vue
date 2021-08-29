@@ -55,7 +55,7 @@
                 v-for="n in settings.metricCount"
                 :key="`item-${n}`"
                 class="item"
-                :style="{ gridArea: `item-${n}`}"
+                :style="{ gridArea: `item-${n}` }"
                 v-text="n"
               />
             </div>
@@ -70,111 +70,116 @@
             v-html="showAllTitle"
           />
         </div>
-
-        <div
-          v-for="(metric, i) in settings.metricOptions"
-          :key="`metric-${metric.id}`"
-          class="metric-section"
-          :class="{ expanded: metric.expanded }"
-        >
-          <div class="metric-header">
-            <span class="title-wrapper" @click="metric.expanded = !metric.expanded">
-              <span class="metric-title">
-                Показатель {{ i + 1 }} - {{ !metric.title ? 'Нет подписи' : metric.title }}
-              </span>
-              <v-icon
-                size="26"
-                class="mx-1"
-                :color="theme.$accent_ui_color"
-                v-text="metric.expanded ? mdiChevronUp : mdiChevronDown"
-              />
-            </span>
-            <v-icon size="16" :color="theme.$main_border" v-text="mdiMenu"/>
-          </div>
-
-          <div class="content-section">
-            <span class="section-title">Подпись (необязательно)</span>
-            <v-text-field
-              v-model="metric.title"
-              dense
-              outlined
-              hide-details
-              class="input-element"
-            />
-          </div>
-
-          <div class="content-section">
-            <span class="section-title">Иконка подписи (необязательно)</span>
-            <div class="icons-container">
-              <div
-                title="Без иконки"
-                class="icon"
-                :class="{ selected: no_icon.id === metric.icon }"
-                @click="metric.icon = no_icon.id"
-                v-html="no_icon.svg"
-              />
-              <div
-                v-for="icon in iconList"
-                :key="icon.id"
-                class="icon"
-                :class="{ selected: icon.id === metric.icon }"
-                @click="metric.icon = icon.id"
-                v-html="icon.svg"
-              />
-            </div>
-          </div>
-
-          <div class="content-section font-selects-box">
-            <div class="content-section pa-0">
-              <span class="section-title">Размер шрифта (px)</span>
-              <v-select
-                v-model="metric.fontSize"
-                :items="fontSizeList"
-                :append-icon="mdiChevronDown"
-                dense
-                outlined
-                hide-details
-                menu-props="offsetY"
-                class="input-element"
-              />
-            </div>
-            <div class="content-section pa-0">
-              <span class="section-title">Насыщенность шрифта</span>
-              <v-select
-                v-model="metric.fontWeight"
-                :items="fontWeightList"
-                :append-icon="mdiChevronDown"
-                dense
-                outlined
-                hide-details
-                menu-props="offsetY"
-                class="input-element"
+        <draggable v-model="settings.metricOptions" @end="update()">
+          <div
+            v-for="(metric, i) in settings.metricOptions"
+            :key="`metric-${metric.id}`"
+            class="metric-section"
+            :class="{ expanded: metric.expanded }"
+          >
+            <div class="metric-header">
+              <span
+                class="title-wrapper"
+                @click="metric.expanded = !metric.expanded"
               >
-                <template v-slot:selection="{ item }">{{ item.title }}</template>
-                <template v-slot:item="{ item }">
-                  <span :style="{ fontWeight: item.value }" v-text="item.title"/>
-                </template>
-              </v-select>
+                <span class="metric-title">
+                  Показатель {{ i + 1 }} -
+                  {{ !metric.title ? "Нет подписи" : metric.title }}
+                </span>
+                <v-icon
+                  size="26"
+                  class="mx-1"
+                  :color="theme.$accent_ui_color"
+                  v-text="metric.expanded ? mdiChevronUp : mdiChevronDown"
+                />
+              </span>
+              <v-icon size="16" :color="theme.$main_border" v-text="mdiMenu"/>
             </div>
-          </div>
 
-          <div class="content-section">
-            <span class="section-title">Цвет шрифта</span>
-            <div class="color-selects-box">
-              <div
-                v-for="color in colorsList"
-                :key="color.name"
-                class="color-select"
-                :class="{ selected: metric.color === color.name }"
-                @click="metric.color = color.name"
-                v-text="color.title"
+            <div class="content-section">
+              <span class="section-title">Подпись (необязательно)</span>
+              <v-text-field
+                v-model="metric.title"
+                dense
+                outlined
+                hide-details
+                class="input-element"
               />
             </div>
+
+            <div class="content-section">
+              <span class="section-title">Иконка подписи (необязательно)</span>
+              <div class="icons-container">
+                <div
+                  title="Без иконки"
+                  class="icon"
+                  :class="{ selected: no_icon.id === metric.icon }"
+                  @click="metric.icon = no_icon.id"
+                  v-html="no_icon.svg"
+                />
+                <div
+                  v-for="icon in iconList"
+                  :key="icon.id"
+                  class="icon"
+                  :class="{ selected: icon.id === metric.icon }"
+                  @click="metric.icon = icon.id"
+                  v-html="icon.svg"
+                />
+              </div>
+            </div>
+
+            <div class="content-section font-selects-box">
+              <div class="content-section pa-0">
+                <span class="section-title">Размер шрифта (px)</span>
+                <v-select
+                  v-model="metric.fontSize"
+                  :items="fontSizeList"
+                  :append-icon="mdiChevronDown"
+                  dense
+                  outlined
+                  hide-details
+                  menu-props="offsetY"
+                  class="input-element"
+                />
+              </div>
+              <div class="content-section pa-0">
+                <span class="section-title">Насыщенность шрифта</span>
+                <v-select
+                  v-model="metric.fontWeight"
+                  :items="fontWeightList"
+                  :append-icon="mdiChevronDown"
+                  dense
+                  outlined
+                  hide-details
+                  menu-props="offsetY"
+                  class="input-element"
+                >
+                  <template v-slot:selection="{ item }">{{ item.title }}</template>
+                  <template v-slot:item="{ item }">
+                    <span :style="{ fontWeight: item.value }" v-text="item.title"/>
+                  </template>
+                </v-select>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <span class="section-title">Цвет шрифта</span>
+              <div class="color-selects-box">
+                <div
+                  v-for="color in colorsList"
+                  :key="color.name"
+                  class="color-select"
+                  :class="{ selected: metric.color === color.name }"
+                  @click="metric.color = color.name"
+                  v-text="color.title"
+                />
+              </div>
+            </div>
           </div>
-        </div>
+        </draggable>
       </v-card-text>
 
-      <v-divider :color="theme.$secondary_border"/>
+      <v-divider :color="theme.$secondary_border" />
 
       <v-card-actions class="footer px-6">
         <v-btn text depressed class="btn-cancel" @click="close">Отмена</v-btn>
@@ -185,18 +190,22 @@
 </template>
 
 <script>
-import metricTitleIcons from './metricTitleIcons';
-import { no_icon } from './metricTitleIcons';
+import metricTitleIcons from "./metricTitleIcons";
+import { no_icon } from "./metricTitleIcons";
+import draggable from "vuedraggable";
 import {
   mdiMenu,
   mdiClose,
   mdiSettings,
   mdiChevronUp,
   mdiChevronDown,
-} from '@mdi/js';
+} from "@mdi/js";
 
 export default {
-  name: 'SingleValueSettings',
+  name: "SingleValueSettings",
+  comments: {
+    draggable,
+  },
   props: {
     isOpen: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
@@ -214,15 +223,15 @@ export default {
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
     fontWeightList: [
-      { value: 200, title: 'Regular (200)' },
-      { value: 400, title: 'Medium (400)' },
-      { value: 800, title: 'Bold (800)' },
+      { value: 200, title: "Regular (200)" },
+      { value: 400, title: "Medium (400)" },
+      { value: 800, title: "Bold (800)" },
     ],
     /** Metric title color select items. */
     colorsList: [
-      { name: 'main', title: 'Основной' },
-      { name: 'secondary', title: 'Дополнительный' },
-      { name: 'range', title: 'Диапазоны' },
+      { name: "main", title: "Основной" },
+      { name: "secondary", title: "Дополнительный" },
+      { name: "range", title: "Диапазоны" },
     ],
     /**
      * The number of available templates for the selected number of metrics.
@@ -236,16 +245,16 @@ export default {
     },
 
     iconList() {
-      return metricTitleIcons.filter(icon => icon.id !== 'no_icon');
+      return metricTitleIcons.filter((icon) => icon.id !== "no_icon");
     },
 
     showAllTitle() {
-      return this.isAllMetricsExpanded ? 'Скрыть все' : 'Показать все';
+      return this.isAllMetricsExpanded ? "Скрыть все" : "Показать все";
     },
 
     isAllMetricsExpanded() {
       const { metricOptions = [] } = this.settings;
-      return metricOptions.every(m => m.expanded === true);
+      return metricOptions.every((m) => m.expanded === true);
     },
 
     metricCountList() {
@@ -260,7 +269,7 @@ export default {
         }
       }
 
-      return [1,2,3,4,5,6];
+      return [1, 2, 3, 4, 5, 6];
     },
   },
   watch: {
@@ -270,13 +279,17 @@ export default {
   },
   methods: {
     save() {
-      this.$emit('save', { ...this.settings });
+      this.$emit("save", { ...this.settings });
       this.close();
+    },
+
+    update() {
+      this.$emit("save", { ...this.settings });
     },
 
     close() {
       this.toggleAllMetrics(false);
-      this.$emit('close');
+      this.$emit("close");
     },
 
     showAllMetrics() {
@@ -293,7 +306,7 @@ export default {
         metric.expanded = value;
       }
     },
-  }
+  },
 };
 </script>
 
