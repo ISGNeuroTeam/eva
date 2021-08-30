@@ -1367,11 +1367,13 @@ export default {  // приблизительный объект хранили�
                   Vue.set(state[id], 'modified', stateFrom.modified);
                 }
               }
-              state[id].elements.forEach(elem => {
-                if (!state[id][elem].tab) {
-                  Vue.set(state[id][elem], 'tab', 1);
-                }
-              })
+              if (state[id].elements) {
+                state[id].elements.forEach(elem => {
+                  if (!state[id][elem].tab) {
+                    Vue.set(state[id][elem], 'tab', 1);
+                  }
+                })
+              }
               resolve({status: 'finish'})
             // }
             } else {
