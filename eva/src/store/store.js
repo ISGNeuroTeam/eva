@@ -850,7 +850,7 @@ export default {
     addTokenToFilterParts: (state, tocken) => {
       let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
       for (let part of focusedFilterParts) {
-        if (part.token.name === tocken.tocken.name) {
+        if (part.type === 'token' && part.token.name === tocken.tocken.name) {
           if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
         }
       }
@@ -1115,8 +1115,8 @@ export default {
               if (filter.parts.length > 0) {
                 let firstPartWithValuesIndex = 0;
                 for (let idxPart in filter.parts) {
-                  if (filter.parts[idxPart].values.length > 0) {
-                    const part = filter.parts[idxPart];
+                  const part = filter.parts[idxPart];
+                  if (filter.parts[idxPart].values.length > 0 && part.type !== 'manual') {
                     if (idxPart == firstPartWithValuesIndex) {
                       filterOtlText += 'search (';
                     } else {

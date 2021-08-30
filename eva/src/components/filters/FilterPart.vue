@@ -61,7 +61,6 @@
     },
     methods: {
       clearValues() {
-        console.log(this.$store);
         this.filterPart.values = [];
       },
     },

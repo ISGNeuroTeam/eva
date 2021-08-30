@@ -179,7 +179,6 @@
       },
       deleteFilterPart(filter, filterPart) {
         let filterIndex = filter.parts.indexOf(filterPart);
-        console.log(filterIndex);
         filter.parts.splice(filterIndex, 1);
       },
       refreshFilter(filter) {
@@ -187,16 +186,25 @@
         this.$store.commit('refreshFilter', filter);
       },
       openFilterPartModal(filterPart) {
-        this.filterPartInModal = filterPart ? filterPart : {};
+        this.filterPartInModal = filterPart ? filterPart : {
+          type: 'token',
+          operation: 'OR',
+          fieldName: null,
+          token: null,
+          values: [],
+          fieldType: 'string',
+          exactString: false,
+          regExpString: false,
+        };
         this.filterPartModalShow = true;
       },
       saveFilterPart(filter, filterPart) {
         if (filterPart && filter.parts.indexOf(filterPart) === -1) filter.parts.push(filterPart);
-        this.filterPartInModal = null;
+        this.filterPartInModal = {};
         this.filterPartModalShow = false;
       },
       closeFilterPart(){
-        this.filterPartInModal = null;
+        this.filterPartInModal = {};
         this.filterPartModalShow = false;
       }
     },
