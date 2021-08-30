@@ -848,11 +848,13 @@ export default {
       }
     },
     addTokenToFilterParts: (state, tocken) => {
-      for (let part of state[tocken.idDash].focusedFilter.parts) {
+      let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
+      for (let part of focusedFilterParts) {
         if (part.token.name === tocken.tocken.name) {
           if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
         }
       }
+      focusedFilterParts.sort((part1, part2) => part2.values.length - part1.values.length);
     },
     declineFilterChanges(state, idDash) {
       state[idDash].focusedFilter.parts = state[idDash].stashedFilterParts;

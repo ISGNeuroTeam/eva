@@ -11,7 +11,7 @@
           class="ma-1 filter-row"
           :class="focusedRow === indexFilter ? 'focused-filter' : ''"
         >
-          <v-row justify="space-between" align="center">
+				<v-row align="center">
             <!-- FILTER ID -->
             <v-col cols="2" @click="focusRow(indexFilter)">
               <v-card flat>
@@ -29,9 +29,10 @@
                 <v-slide-group show-arrows>
                   <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
                     <filter-part
+                      @deleteFilterPart="deleteFilterPart"
+                      @editFilterPart="openFilterPartModal"
                       :filter="filter"
                       :filterPart="part"
-                      :deleteFilterPart="deleteFilterPart"
                       :isFocused="focusedRow === indexFilter"
                     ></filter-part>
                   </v-slide-item>
@@ -53,7 +54,7 @@
                   x-small
                   outlined
                   class="text-capitalize ml-6"
-                  @click="triggerFilterPartModal()"
+                  @click="openFilterPartModal()"
                 >
                   <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
                 </v-btn>
@@ -63,7 +64,7 @@
             <v-divider vertical></v-divider>
 
             <!-- FILTER BUTTONS -->
-            <v-col cols="2">
+            <v-col cols="2" v-if="focusedRow === indexFilter">
               <v-btn icon small color="red" @click="deleteFilter(filter)"
                 ><v-icon>{{ trashIcon }}</v-icon></v-btn
               >
@@ -72,10 +73,12 @@
               >
             </v-col>
 
-            <v-dialog max-width="1000" v-model="partModalShow">
+            <v-dialog max-width="1000" v-model="filterPartModalShow" persistent>
               <filter-part-modal
                 :filter="filter"
-                @triggerFilterPartModal="triggerFilterPartModal"
+                :filterPart="filterPartInModal"
+                @saveFilterPart="saveFilterPart"
+                @closeFilterPart="closeFilterPart"
               ></filter-part-modal>
             </v-dialog>
           </v-row>
@@ -111,9 +114,10 @@
     data() {
       return {
         filters: [],
-        focusedRow: null,
         tempFilters: [],
-        partModalShow: false,
+        focusedRow: null,
+        filterPartModalShow: false,
+        filterPartInModal: {},
         plusIcon: mdiPlusCircleOutline,
         trashIcon: mdiTrashCanOutline,
         refreshIcon: mdiRefresh,
@@ -175,15 +179,26 @@
       },
       deleteFilterPart(filter, filterPart) {
         let filterIndex = filter.parts.indexOf(filterPart);
+        console.log(filterIndex);
         filter.parts.splice(filterIndex, 1);
       },
       refreshFilter(filter) {
         this.filterChanged = true;
         this.$store.commit('refreshFilter', filter);
       },
-      triggerFilterPartModal() {
-        this.partModalShow = !this.partModalShow;
+      openFilterPartModal(filterPart) {
+        this.filterPartInModal = filterPart ? filterPart : {};
+        this.filterPartModalShow = true;
       },
+      saveFilterPart(filter, filterPart) {
+        if (filterPart && filter.parts.indexOf(filterPart) === -1) filter.parts.push(filterPart);
+        this.filterPartInModal = null;
+        this.filterPartModalShow = false;
+      },
+      closeFilterPart(){
+        this.filterPartInModal = null;
+        this.filterPartModalShow = false;
+      }
     },
     mounted() {
       this.filters = this.$store.getters.getFilters(this.idDashFrom);

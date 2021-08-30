@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <div>
-          {{ filterPart.token.name }}
+          {{ elemName }}
         </div>
         <div>
           {{ filterPart.fieldName }}
@@ -13,10 +13,22 @@
           <v-btn icon x-small outlined @click="clearValues">
             <v-icon>{{ refreshIcon }}</v-icon>
           </v-btn>
-          <v-btn icon x-small outlined class="mx-2">
+          <v-btn
+            icon
+            x-small
+            outlined
+            class="mx-2"
+            @click="$emit('editFilterPart', filterPart)"
+          >
             <v-icon>{{ editIcon }}</v-icon>
           </v-btn>
-          <v-btn icon x-small color="red" outlined @click="$emit('deleteFilterPart', filterPart)">
+          <v-btn
+            icon
+            x-small
+            color="red"
+            outlined
+            @click="$emit('deleteFilterPart', filter, filterPart)"
+          >
             <v-icon>{{ closeIcon }}</v-icon>
           </v-btn>
         </div>
@@ -30,7 +42,7 @@
 
   export default {
     name: 'FilterPart',
-    props: ['filter', 'filterPart', 'deleteFilterPart', 'isFocused'],
+    props: ['filter', 'filterPart', 'isFocused'],
     data() {
       return {
         closeIcon: mdiClose,
@@ -38,8 +50,18 @@
         editIcon: mdiPencil,
       };
     },
+    computed: {
+      elemName() {
+        if (this.filterPart.token)
+          return this.$store.state.store[this.filter.idDash][this.filterPart.token.elem].name_elem;
+        else {
+          return 'Ручной фильтр';
+        }
+      },
+    },
     methods: {
       clearValues() {
+        console.log(this.$store);
         this.filterPart.values = [];
       },
     },
