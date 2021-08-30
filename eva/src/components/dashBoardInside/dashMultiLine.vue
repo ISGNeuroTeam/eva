@@ -150,6 +150,10 @@ export default {
       this.setMetrics();
     }
   },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.props.actions, idDash: this.idDash, id: this.id });
+    this.$refs.lineChart.parentElement.style.overflow = 'hidden';
+  },
   methods: {
     getDataAsynchrony: function() {
       let united = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).united;
@@ -233,10 +237,10 @@ export default {
         }
       });
     },
-    setMetrics: function() {
+    setMetrics () {
       this.$store.commit('setMetricsMulti', {metrics: this.metrics, idDash: this.idDash, id: this.id });
     },
-    createLineChart: function (props,that,sizeLine,time,united,lastDot,timeFormat,metricsOpt) {  // создает график
+    createLineChart (props,that,sizeLine,time,united,lastDot,timeFormat,metricsOpt) {  // создает график
       let colorLine = this.colorLegends;
 
       let otstupBottom = 50;
@@ -414,10 +418,15 @@ export default {
           .range([ height, 20 ]);
 
         // добавляем ось Y
-        svg.append("g")
+        let yAxis = svg.append("g")
           .attr("class","yAxis")
           .call(d3.axisLeft(y).ticks(y.ticks().length/2));
 
+        yAxis.append("text")
+          .attr("fill", "#000")
+          .attr("dy", "1em")
+          .attr("text-anchor", "end")
+          .text("Price ($)");
 
         // отрисуем сетку сперва для вертикальных тиков
         svg.selectAll("g.yAxis g.tick")
@@ -429,8 +438,6 @@ export default {
           .attr("y2", 0)
           .attr("stroke", this.theme.$main_text)
           .style("opacity", "0.3");
-
-        // создаем tooltip
 
         let tooltip = d3.select(this.$el.querySelector('.dash-multi'))
           .append("div")
@@ -887,33 +894,26 @@ export default {
             }
           }
 
-
-
-
           let textsNodes = [];
 
-
           if (i == 0 ) {
-
-
-
             y.push(d3.scaleLinear()
               .domain([minYBottom, maxYTop])
               .range([ parseFloat(step)+20,startY[i] ]));
 
-            //console.log(y[i].ticks())
-
-
-
-
             // добавляем ось Y
-            svg.append("g")
+            let yAxis = svg.append("g")
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals));
 
-
-
-
+            yAxis.selectAll('.tick').filter((d, i, list) =>  {
+              return i === list.length - 1;
+            }).append("text")
+              .attr("fill", "#000")
+              .attr("dy", "0.8em")
+              .attr("dx", "0.8em")
+              .attr("text-anchor", "start")
+              .text("Price ($)");
 
             startY.push(parseFloat(step)+20);
 
@@ -924,16 +924,21 @@ export default {
               .range([ parseFloat(step*(i+1))+20, startY[i] ]));
 
             // добавляем ось Y
-            svg.append("g")
+            let yAxis = svg.append("g")
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals));
 
+            yAxis.selectAll('.tick').filter((d, i, list) =>  {
+              return i === list.length - 1;
+            }).append("text")
+              .attr("fill", "#000")
+              .attr("dy", "0.8em")
+              .attr("dx", "0.8em")
+              .attr("text-anchor", "start")
+              .text("Price ($)");
 
             startY.push(parseFloat(step*(i+1))+20);
-
-
           }
-
 
           textsNodes = svg.selectAll(`.yAxis-${i} .tick`).select("text").nodes();
 
@@ -1445,26 +1450,10 @@ export default {
 
                 lineDot
                   .attr("opacity","0")
-
-
               })  // при уводе мышки исчезает, только если это не точка выходящяя порог
-
-
           }
-
-
-
         })
-
-
-
-
-
-
-
       }
-
-
       // function checkName(name) {  // функция которая проверяет не слишком ли длинное название и сокращает его
       //   if (name.length > 10) {  // если там больше 10 символов
       //     name = name.substring(0,10) + '...'; // обрезаем и добовляем троеточие
@@ -1569,7 +1558,6 @@ export default {
         }
       }
 
-
       function updateData (extent,brushObj,id) {  // функция которая вызывается каждый раз, когда происходит выделение области (brush)
 
         //let extent = d3.event.selection;  // значения выделенной области
@@ -1587,20 +1575,14 @@ export default {
           //that.$store.commit('setDiapasonDash', {diapason: diapason, id: props.id});  // заносим в хранилище
 
           that.setClick(diapason, 'select');  // вызываем функцию создающию токены
-
-
-
+          
           //if (d3.event.target.id != undefined) {
 
           zoom(extent,id,brushObj);  // делаем зумирование  графика
           // } else {
           //   zoom(extent,brushObj);  // делаем зумирование  графика
           // }
-
-
-
         }
-
       }
 
       function zoom(extent,id,brushObj) {  // функция делающяя зумирование графика
@@ -1689,13 +1671,8 @@ export default {
           } else {
             lineChange = line[i];
           }
-
-
-
+          
           if (AllLinesWithBreak[i]) {
-
-
-
             AllLinesWithBreak[i].forEach( (lineItself,j) => {
               lineChange  // основная линия
                 .select(`.line-${i}-${j}`)
@@ -1756,9 +1733,6 @@ export default {
             .transition()
             .duration(dauration)
             .attr("cx",  function() {  return x(this.getAttribute("xVal")) } )
-
-
-
         }
 
       }
@@ -1806,8 +1780,6 @@ export default {
         }
         return value
       }
-
-
     },
     createLegends: function(metricsName){
       let colorLine = this.colorLegends;
@@ -1831,8 +1803,6 @@ export default {
 
       let setTocken = (value) => {
         this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: value, store: this.$store });
-
-
       }
 
       Object.keys(tockens).forEach( i =>{
@@ -1852,9 +1822,7 @@ export default {
           setTocken(point[1]);
         }
       })
-
-
-
+      
       let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onclick', element: this.id, partelement: 'point'});
 
       if (events.length != 0) {
@@ -1869,21 +1837,14 @@ export default {
           }
         })
       }
-
     },
-
-  },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.props.actions, idDash: this.idDash, id: this.id });
-    this.$refs.lineChart.parentElement.style.overflow = 'hidden';
   },
 }
-
 
 </script>
 
 <style lang="scss" > 
   
-     @import '../../sass/dashMultiLine.sass'
+     @import '../../sass/dashMultiLine.sass';
     
 </style>
