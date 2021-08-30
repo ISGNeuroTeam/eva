@@ -98,8 +98,9 @@
 </template>
 
 <script>
-  import FilterPartModal from './filters/FilterPartModal';
-  import FilterPart from './filters/FilterPart';
+  import FilterPartModal from './dash-filter-panel/FilterPartModal';
+  import FilterPart from './dash-filter-panel/FilterPart';
+
   import {
     mdiPlusCircleOutline,
     mdiTrashCanOutline,
