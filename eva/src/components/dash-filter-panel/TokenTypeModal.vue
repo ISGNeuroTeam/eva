@@ -12,6 +12,11 @@
         <v-select v-model="temp.operationToken" :items="operations" label="Операции" filled />
       </v-col>
     </v-row>
+    <v-switch
+      v-model="temp.invertMatches"
+      label="Убрать совпадения из результатов"
+      class="ml-4"
+    ></v-switch>
   </div>
 </template>
 <script>
@@ -24,9 +29,14 @@
         currentToken: null,
       };
     },
+    computed: {
+      theme() {
+        return this.$store.getters.getTheme;
+      },
+    },
     watch: {
       currentToken(token) {
-        if (token) {
+        if (token && this.temp.filterPartType === 'token') {
           this.temp.token = token;
           this.temp.fieldName = token.capture;
         }

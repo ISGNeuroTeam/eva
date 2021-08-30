@@ -129,6 +129,11 @@
         declineIcon: mdiClose,
       };
     },
+    computed: {
+      theme() {
+        return this.$store.getters.getTheme;
+      },
+    },
     watch: {
       focusedRow(rowNumber) {
         if (!Number.isFinite(rowNumber)) {
@@ -195,6 +200,7 @@
           operationToken: 'OR',
           token: null,
           values: [],
+          invertMatches:false,
           fieldType: 'string',
           operationManual:"exactMatch",
           fieldName: null,

@@ -1134,26 +1134,12 @@ export default {
                             }
                             break;
                           case 'number':
-                            let numberOperationMap = {
-                              greater: '>',
-                              less: '<',
-                              equal: '=',
-                              greaterEqual: '>=',
-                              lessEqual: '<=',
-                            };
-
-                            filterOtlText += `${part.fieldName}${
-                              numberOperationMap[part.operationManual]
-                            }${part.value})`;
+                            filterOtlText += `${part.fieldName}${part.operationManual}${part.value})`;
                             break;
                           case 'date':
-                            let dateOperationMap = {
-                              earlier: '<',
-                              later: '>',
-                            };
-                            filterOtlText += `${part.fieldName}${
-                              dateOperationMap[part.operationManual]
-                            }${Date.parse(part.value) / 1000})`;
+                            filterOtlText += `${part.fieldName}${part.operationManual}${
+                              Date.parse(part.value) / 1000
+                            })`;
                             break;
                         }
                         break;

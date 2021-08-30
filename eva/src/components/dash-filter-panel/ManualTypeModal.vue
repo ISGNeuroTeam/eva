@@ -10,28 +10,30 @@
         :style="{ color: theme.$main_text }"
         class="textarea-item"
         outlined
-        label="Временной интервал: начало"
+        label="Значение"
         placeholder="0"
         hide-details
-      />
-      <DTPicker
-        v-model="temp.value"
-        :no-value-to-custom-elem="true"
-        format="YYYY-MM-DD HH:mm"
-        :style="{ fill: theme.$main_text, background: theme.$main_bg, color: theme.$main_text }"
-        :color="theme.$accent_ui_color"
-        :button-color="theme.$primary_button"
-        class="dtpicker-search"
       >
-        <v-icon class="picker-search" :color="theme.$primary_button">
-          {{ pickerIcon }}
-        </v-icon>
-      </DTPicker>
+        <DTPicker
+          v-model="temp.value"
+          :no-value-to-custom-elem="true"
+          format="YYYY-MM-DD HH:mm"
+          :style="{ fill: theme.$main_text, background: theme.$main_bg, color: theme.$main_text }"
+          :color="theme.$accent_ui_color"
+          :button-color="theme.$primary_button"
+          class="dtpicker-search"
+        >
+          <v-icon class="picker-search" :color="theme.$primary_button">
+            {{ pickerIcon }}
+          </v-icon>
+        </DTPicker>
+      </v-text-field>
     </div>
     <div v-else>Значение: <v-text-field v-model="temp.value" /></div>
     <v-tabs v-model="currentOperationTab" centered grow filled>
       <v-tab v-for="(tab, index) in operationMap[temp.fieldType]" :key="index">{{ tab }} </v-tab>
     </v-tabs>
+    <v-switch v-model="temp.invertMatches" label="Убрать совпадения из результатов" class="ml-4"></v-switch>
   </div>
 </template>
 <script>
@@ -40,7 +42,7 @@
     name: 'ManualTypeModal',
     props: ['temp'],
     computed: {
-      theme: function () {
+      theme() {
         return this.$store.getters.getTheme;
       },
     },
@@ -51,8 +53,8 @@
         pickedDate: '',
         operationMap: {
           string: ['match', 'exactMatch'],
-          date: ['earlier', 'later'],
-          number: ['greater', 'less', 'equal', 'greaterEqual', 'lessEqual'],
+          date: ['<', '>'],
+          number: ['<', '>', '=', '>=', '<='],
         },
         pickerIcon: mdiCalendarMonth,
       };
@@ -69,7 +71,9 @@
         immediate: true,
         handler(val) {
           if (Object.keys(this.operationMap).includes(val.fieldType)) {
-            let manualOperationMapIndex = this.operationMap[val.fieldType].indexOf(val.operationManual);
+            let manualOperationMapIndex = this.operationMap[val.fieldType].indexOf(
+              val.operationManual
+            );
             this.currentOperationTab = manualOperationMapIndex !== -1 ? manualOperationMapIndex : 0;
           }
         },
@@ -80,22 +84,22 @@
 
 <style lang="sass">
 
-.dtpicker-search
-    position: absolute
-    top: 30px
-    width: 24px
-    right: 10px
-    cursor: pointer
-
-    .datepicker
-      top: -225px !important
-      left: -160px !important
-
-    &:nth-child(2)
-      margin-left: 20px
+  .dtpicker-search
+      position: absolute
+      top: 30px
+      width: 24px
+      right: 10px
+      cursor: pointer
 
       .datepicker
         top: -225px !important
-        left: auto !important
-        right: 85px !important
+        left: -160px !important
+
+      &:nth-child(2)
+        margin-left: 20px
+
+        .datepicker
+          top: -225px !important
+          left: auto !important
+          right: 85px !important
 </style>
