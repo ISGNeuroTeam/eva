@@ -24,7 +24,7 @@
             <v-divider vertical></v-divider>
 
             <!-- FILTER PARTS -->
-            <v-col cols="8" class="d-flex align-center justify-left">
+            <v-col cols="8" class="d-flex align-center">
               <v-sheet max-width="1000">
                 <v-slide-group show-arrows>
                   <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
@@ -38,15 +38,6 @@
                   </v-slide-item>
                 </v-slide-group>
               </v-sheet>
-              <div v-if="focusedRow === indexFilter" class="d-flex">
-                <v-btn icon color="green" @click="applyTempParts">
-                  <v-icon> {{ acceptIcon }}</v-icon>
-                </v-btn>
-                <v-divider></v-divider>
-                <v-btn icon color="red" @click="declineTempParts">
-                  <v-icon> {{ declineIcon }}</v-icon>
-                </v-btn>
-              </div>
 
               <v-row align="center">
                 <v-btn
@@ -59,6 +50,18 @@
                   <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
                 </v-btn>
               </v-row>
+
+
+              <div v-if="focusedRow === indexFilter" class="d-flex">
+                <v-btn icon color="green" @click="applyTempParts">
+                  <v-icon> {{ acceptIcon }}</v-icon>
+                </v-btn>
+                <v-divider></v-divider>
+                <v-btn icon color="red" @click="declineTempParts">
+                  <v-icon> {{ declineIcon }}</v-icon>
+                </v-btn>
+              </div>
+
             </v-col>
 
             <v-divider vertical></v-divider>
@@ -187,14 +190,14 @@
       },
       openFilterPartModal(filterPart) {
         this.filterPartInModal = filterPart ? filterPart : {
-          type: 'token',
-          operation: 'OR',
-          fieldName: null,
+          filterPartType: 'token',
+          operationToken: 'OR',
           token: null,
           values: [],
           fieldType: 'string',
-          exactString: false,
-          regExpString: false,
+          operationManual:"exactMatch",
+          fieldName: null,
+          value:null,
         };
         this.filterPartModalShow = true;
       },

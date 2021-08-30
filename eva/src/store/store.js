@@ -850,7 +850,7 @@ export default {
     addTokenToFilterParts: (state, tocken) => {
       let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
       for (let part of focusedFilterParts) {
-        if (part.type === 'token' && part.token.name === tocken.tocken.name) {
+        if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
           if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
         }
       }
@@ -1116,25 +1116,62 @@ export default {
                 let firstPartWithValuesIndex = 0;
                 for (let idxPart in filter.parts) {
                   const part = filter.parts[idxPart];
-                  if (filter.parts[idxPart].values.length > 0 && part.type !== 'manual') {
+                  if (part.values.length > 0 || part.filterPartType === 'manual') {
                     if (idxPart == firstPartWithValuesIndex) {
                       filterOtlText += 'search (';
                     } else {
                       filterOtlText += ' AND (';
                     }
 
-                    for (let idxVal in part.values) {
-                      let value = part.values[idxVal];
+                    switch (part.filterPartType) {
+                      case 'manual':
+                        switch (part.fieldType) {
+                          case 'string':
+                            if (part.operationManual === 'exactMatch') {
+                              filterOtlText += `${part.fieldName}="${part.value}")`;
+                            } else {
+                              filterOtlText += `${part.fieldName}="*${part.value}*")`;
+                            }
+                            break;
+                          case 'number':
+                            let numberOperationMap = {
+                              greater: '>',
+                              less: '<',
+                              equal: '=',
+                              greaterEqual: '>=',
+                              lessEqual: '<=',
+                            };
 
-                      if (idxVal == part.values.length - 1) {
-                        if (part.values.length > 1) filterOtlText += ` ${part.operation} `;
-                        filterOtlText += `${part.fieldName}="${value}")`;
-                      } else if (idxVal == 0) {
-                        filterOtlText += `${part.fieldName}="${value}"`;
-                        if (part.values.length == 0) filterOtlText += ')';
-                      } else {
-                        filterOtlText += ` ${part.operation} ${part.fieldName}="${value}"`;
-                      }
+                            filterOtlText += `${part.fieldName}${
+                              numberOperationMap[part.operationManual]
+                            }${part.value})`;
+                            break;
+                          case 'date':
+                            let dateOperationMap = {
+                              earlier: '<',
+                              later: '>',
+                            };
+                            filterOtlText += `${part.fieldName}${
+                              dateOperationMap[part.operationManual]
+                            }${Date.parse(part.value) / 1000})`;
+                            break;
+                        }
+                        break;
+                      case 'token':
+                        for (let idxVal in part.values) {
+                          let value = part.values[idxVal];
+
+                          if (idxVal == part.values.length - 1) {
+                            if (part.values.length > 1) filterOtlText += ` ${part.operationToken} `;
+                            filterOtlText += `${part.fieldName}="${value}")`;
+                          } else if (idxVal == 0) {
+                            filterOtlText += `${part.fieldName}="${value}"`;
+                            if (part.values.length == 0) filterOtlText += ')';
+                          } else {
+                            filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value}"`;
+                          }
+                        }
+                        break;
                     }
                   } else {
                     firstPartWithValuesIndex += 1;

@@ -44,12 +44,12 @@
     },
     watch: {
       currentTab(val) {
-        this.temp.type = this.typeMap[val];
+        this.temp.filterPartType = this.typeMap[val];
       },
       filterPart: {
         immediate: true,
         handler(filterPart) {
-          this.currentTab = filterPart ? this.typeMap.indexOf(filterPart.type) : 0;
+          this.currentTab = filterPart ? this.typeMap.indexOf(filterPart.filterPartType) : 0;
           this.temp = filterPart;
         },
       },
