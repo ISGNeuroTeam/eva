@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ability to pin certain visual component on all tabs
 - global rbg CSS variables for theme colors (only HEX was before)
 
+### Fixed
+- bug with dashboard without elements after tabs integrations
+
 ## [1.62.0]
 
 ### Added
