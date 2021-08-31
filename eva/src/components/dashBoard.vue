@@ -1,20 +1,20 @@
 <template>
-  <div 
-    class="dash-layout" 
-    :options="String(options)" 
-    :class="{show_board:props.differentOptions.visible}" 
-    :style="{boxShadow:` 0 0 5px 5px ${props.optionsBoxShadow}`}" 
-  > 
-    <v-card  
-      class="dash-block"  
+  <div
+    class="dash-layout"
+    :options="String(options)"
+    :class="{show_board:props.differentOptions.visible}"
+    :style="{boxShadow:` 0 0 5px 5px ${props.optionsBoxShadow}`}"
+  >
+    <v-card
+      class="dash-block"
       :style="{background:theme.$main_bg, boxShadow:`0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`}"
-    >   
-      <v-card-title 
+    >
+      <v-card-title
         v-show="props.disappear"
         class="card-title open_title"
       >
         <div class="name-dash">
-           <v-icon 
+           <v-icon
             v-if="dataFromDB"
             class="icon"
             :color="theme.$main_border"
@@ -29,9 +29,9 @@
           >
             {{ mdiArrowDownBold }}
           </v-icon>
-          <v-icon 
+          <v-icon
             v-show="dataMode"
-            class="icon chart" 
+            class="icon chart"
             :color="theme.$accent_ui_color"
           >
             {{ props.icons[elemIcon] }}
@@ -39,53 +39,53 @@
           <div class="dash-capture">
             <div
               v-if="props.edit"
-              class="dash-title"  
+              class="dash-title"
               :style="{color:theme.$main_text}"
             >
               {{ props.name }}
             </div>
-            <div 
-              v-if="props.edit" 
+            <div
+              v-if="props.edit"
               v-show="dataMode"
-              class="dash-block-id"  
+              class="dash-block-id"
               :style="{color:theme.$main_text}"
             >
               [ {{ element }} ]
             </div>
-            <div 
-              v-if="props.edit" 
+            <div
+              v-if="props.edit"
               v-show="dataMode"
-              class="dash-block-sid"  
+              class="dash-block-sid"
               :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               {{ props.sid }}
             </div>
-            <v-text-field 
-              v-if="!props.edit" 
+            <v-text-field
+              v-if="!props.edit"
               v-show="dataMode"
-              v-model="props.name" 
-              clearable 
-              :color="theme.$accent_ui_color" 
-              :style="{color:theme.$title}" 
-              class="dash-edit-title" 
-              hide-details 
-            />             
+              v-model="props.name"
+              clearable
+              :color="theme.$accent_ui_color"
+              :style="{color:theme.$title}"
+              class="dash-edit-title"
+              hide-details
+            />
           </div>
         </div>
         <div class="settings-dash-block" v-show="dataMode">
-          <div 
-            class="settings-dash" 
+          <div
+            class="settings-dash"
             :class="{settings_move:props.open_gear}"
           >
-            <v-tooltip 
-              bottom 
+            <v-tooltip
+              bottom
               :color="theme.$accent_ui_color"
-            > 
+            >
               <template v-slot:activator="{ on }"  >
-                <v-icon 
-                  class=" datasource" 
-                  :color="theme.$main_border" 
-                  v-on="on" 
+                <v-icon
+                  class=" datasource"
+                  :color="theme.$main_border"
+                  v-on="on"
                   @click="switchDS(props)"
                 >
                   {{ props.mdiDatabase }}
@@ -93,33 +93,33 @@
               </template>
               <span>Источник данных</span>
             </v-tooltip>
-            <v-tooltip 
+            <v-tooltip
               v-if="props.edit_icon"
-              bottom  
+              bottom
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <v-icon 
-                  class="pencil" 
-                  :color="theme.$main_border" 
-                  v-on="on" 
+                <v-icon
+                  class="pencil"
+                  :color="theme.$main_border"
+                  v-on="on"
                   @click="() => {props.edit=false; props.edit_icon=false; }"
                 >
                   {{ props.mdiPencil }}
-                </v-icon> 
+                </v-icon>
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip 
+            <v-tooltip
               v-if="!props.edit_icon"
-              bottom 
+              bottom
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <v-icon 
+                <v-icon
                   class=" check"
-                  :color="theme.$main_border"  
-                  v-on="on"  
+                  :color="theme.$main_border"
+                  v-on="on"
                   @click="editName(props)"
                 >
                   {{ props.mdiCheckBold }}
@@ -127,15 +127,15 @@
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip 
-              bottom 
+            <v-tooltip
+              bottom
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <v-icon 
-                  class=" option"  
-                  :color="theme.$main_border"  
-                  v-on="on" 
+                <v-icon
+                  class=" option"
+                  :color="theme.$main_border"
+                  v-on="on"
                   @click="switchOP()"
                 >
                   {{ props.mdiSettings }}
@@ -143,15 +143,15 @@
               </template>
               <span>Настройки</span>
             </v-tooltip>
-            <v-tooltip 
-              bottom 
+            <v-tooltip
+              bottom
               :color="theme.$accent_ui_color"
             >
               <template v-slot:activator="{ on }">
-                <v-icon 
-                  class=" delete" 
+                <v-icon
+                  class=" delete"
                   :color="theme.$main_border"
-                  v-on="on" 
+                  v-on="on"
                   @click="deleteDashBoard(props)"
                 >
                   {{ props.mdiTrashCanOutline }}
@@ -162,29 +162,29 @@
           </div>
         </div>
       </v-card-title>
-      <div 
+      <div
         v-if="!props.hideLoad"
         class="loading-block"
       >
-        <div 
+        <div
           v-show="props.disappear"
-          :style="{borderColor:theme.$main_border, opacity: '0.2'}"   
-          class="loading-divider" 
-          :class="{loading:loadingSearch,loading:props.loading,noBorder:!dataMode}" 
+          :style="{borderColor:theme.$main_border, opacity: '0.2'}"
+          class="loading-divider"
+          :class="{loading:loadingSearch,loading:props.loading,noBorder:!dataMode}"
         >
-          <div 
-            class="loading-bar " 
-            :style="{background: theme.$primary_button}" 
+          <div
+            class="loading-bar "
+            :style="{background: theme.$primary_button}"
           />
         </div>
       </div>
-      <v-card-text 
+      <v-card-text
         v-show="!showElement"
-        class="card-text"  
+        class="card-text"
       >
-        <button 
-          class="selectDS" 
-          :style="{color: '#FFFFFF', background: theme.$primary_button}" 
+        <button
+          class="selectDS"
+          :style="{color: '#FFFFFF', background: theme.$primary_button}"
           @click="chooseDS()"
         >
           Выберите источник данных
@@ -192,31 +192,31 @@
       </v-card-text>
       <!--  Здесь подключаем элементы визуализации -->
       <v-card-text
-        :is="currentElem" 
+        :is="currentElem"
         v-show="showElement"
         class="card-text element-itself"
         :colorFrom="theme"
-        :style="{color:theme.$main_text, background:'transparent'}"  
-        :idFrom="element"   
-        :idDashFrom="idDash"  
-        :dataRestFrom="props.dataRestFilter" 
-        :dataModeFrom="dataMode" 
-        :shouldFrom="shouldGet" 
-        :timeFormatFrom="props.timeFormat"  
-        :sizeTileFrom="props.sizeTile" 
-        :tooltipFrom="props.tooltip"  
-        :widthFrom="width" 
+        :style="{color:theme.$main_text, background:'transparent'}"
+        :idFrom="element"
+        :idDashFrom="idDash"
+        :dataRestFrom="props.dataRestFilter"
+        :dataModeFrom="dataMode"
+        :shouldFrom="shouldGet"
+        :timeFormatFrom="props.timeFormat"
+        :sizeTileFrom="props.sizeTile"
+        :tooltipFrom="props.tooltip"
+        :widthFrom="width"
         :heightFrom="height"
         :titles="getSelectedTableTitles(idDash, element)"
         :options="props.options"
-        @hideDS="hideDS($event)" 
-        @setVissible="setVissible($event)" 
-        @setLoading="setLoading($event)" 
+        @hideDS="hideDS($event)"
+        @setVissible="setVissible($event)"
+        @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
       />
       <!-- ------------>
     </v-card>
-  </div> 
+  </div>
 </template>
 
 <script>
@@ -233,6 +233,8 @@ export default {
     dataElemFrom: null,
     dataModeFrom: null,
     dataPageFrom: null,
+
+    colorFrom: null,
   },
   data () {
     return {
@@ -240,8 +242,8 @@ export default {
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
       props: {
-        id: '', 
-        sid: '', 
+        id: '',
+        sid: '',
         name: '',
         mdiPencil: mdiPencil,
         mdiCheckBold: mdiCheckBold ,
@@ -298,49 +300,47 @@ export default {
   asyncComputed: {
     async prepareData() {  // подготавливаем данные для отображения
       if (this.shouldGet) {
-       
+
         let searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
         let searchName = `${this.idDash}-${searchId}`;
         let search = this.$store.getters.getSearch({idDash: this.idDash, id: this.element});
         if  (searchId == -1) {
           this.props.sid = ''
-        } else { 
+        } else {
           this.props.sid = searchId
         }
 
-        let fromDB
-        this.dataFromDB = true
-        this.getDataFromDB(searchName).then(result=>{
-          fromDB = result
-          this.props.dataRestFilter = fromDB;
-        })
-
-        this.getDataFromRest(search)
-          .then(result=>{
-            this.props.dataRestFilter = result
-            this.dataFromDB = false
-            if(result.length===0 && this.lastResult){
-              this.props.dataRestFilter = fromDB
-            }
-          },
-          () => {
-            if(this.lastResult){
-              this.props.dataRestFilter = fromDB
-            } else {
-              this.props.dataRestFilter = []
-            }
+      let fromDB
+      this.dataFromDB = true
+      this.getDataFromDB(searchName).then(result=>{
+        fromDB = result
+        this.props.dataRestFilter = fromDB;
+      })
+      this.getDataFromRest(search).then(result=>{
+          this.props.dataRestFilter = result
+          this.dataFromDB = false
+          if(result.length===0 && this.lastResult){
+            this.props.dataRestFilter = fromDB
           }
-          )
+        },
+        () => {
+          if(this.lastResult){
+            this.props.dataRestFilter = fromDB
+          } else {
+            this.props.dataRestFilter = []
+          }
+        }
+      )
       }
-      this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});         
-               
+      this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});
+
     },
   },
   computed: {
     theme: function() {
       return this.$store.getters.getTheme
     },
-    idDash: function() { // получаем id страницы от родителя 
+    idDash: function() { // получаем id страницы от родителя
       return this.idDashFrom
     },
     element: function() {  // получаем название элемента
@@ -349,7 +349,12 @@ export default {
     dataMode: function() {
       this.changeOptions(this.dataModeFrom);
       if (!this.dataModeFrom) {
-        if (this.element.split('-')[0] == 'button' || this.element.split('-')[0] == 'csvg' || this.element.split('-')[0] == 'tile') {
+        if (
+          this.element.split('-')[0] == 'button' ||
+          this.element.split('-')[0] == 'csvg' ||
+          this.element.split('-')[0] == 'tile' ||
+          this.element.split('-')[0] == 'singleValue'
+        ) {
           this.props.disappear = false;
         }
       } else {
@@ -362,7 +367,7 @@ export default {
       if (this.element) {
         let element = this.element.split('-')[0];
         nameElement = `dash-${element}`;
-      }    
+      }
       return nameElement
     },
     loadingSearch: function() {
@@ -373,8 +378,8 @@ export default {
       let element = '';
       if (this.element) {
         element = this.element.split('-')[0];
-      } 
-      return element  
+      }
+      return element
     },
     showElement: function() {  // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
       let show = false;
@@ -398,9 +403,9 @@ export default {
       return options.lastResult;
     },
     options: function() {
-      
+
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element});
-              
+
       Object.keys(options).forEach( item => {
         this.props.options[item] = options[item];
       })
@@ -429,7 +434,7 @@ export default {
       }
 
       this.$emit('SetLevel',this.props.options.level)
-          
+
       this.setShadow();
 
       return options.change
@@ -440,13 +445,30 @@ export default {
     ...mapGetters([
       'getSelectedTableTitles',
       'getSelectedDataFormat'
-    ])
+    ]),
+    color: function() {
+      return this.colorFrom
+    },
+    setColorDS: function() {  // переключаем цвет иконок
+      if (!this.showElement){
+        return 'controlsActive';
+      } else {
+        return  'controlsInsideDash';
+      }
+    },
+    setColorOp: function() {  // переключаем цвет иконок
+      if (!this.props.showOptions){
+        return 'controlsActive';
+      } else {
+        return  'controlsInsideDash';
+      }
+    },
   },
 
   watch: {
-    
+
   },
- 
+
   mounted() {
     this.props.icons = settings.icons;
     this.page = this.$parent.$el.getAttribute('data-page');  // понимаем какая страница перед нами
@@ -459,12 +481,12 @@ export default {
     }
 
     this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: true});
-      
+
   },
 
   methods: {
     editName: function (props) {  // изменяем имя элемнета
-      props.edit=true; 
+      props.edit=true;
       props.edit_icon=true;
       this.$store.commit('setNameDash', {name: props.name, id: this.element, idDash: this.idDash });
     },
@@ -481,8 +503,8 @@ export default {
     setShadow: function() {
       if (this.props.options.boxShadow) {
         this.props.optionsBoxShadow =  this.theme.$primary_button;
-      } 
-      else{ 
+      }
+      else{
         this.props.optionsBoxShadow =  `transparent`;
       }
     },
@@ -493,14 +515,13 @@ export default {
       this.props.loading = event;
     },
     deleteDashBoard: function ( props ) { // вызываем окно для удаления элемнета
-      this.$store.commit('setModalDelete', { id: this.idDash, status: true, elem: this.element, name: props.name, page: this.dataPageFrom}); 
+      this.$store.commit('setModalDelete', { id: this.idDash, status: true, elem: this.element, name: props.name, page: this.dataPageFrom});
     },
     getDataFromDB: function(searсhID) {   // получение данных с indexindDB
-
     
       let db = null;
-    
-      let request = indexedDB.open("EVA",1);  
+
+      let request = indexedDB.open("EVA",1);
 
 
       request.onerror = function(event) {
@@ -548,14 +569,14 @@ export default {
 
           query.onerror = function() {
             console.log("Ошибка", query.error);
-          };                   
+          };
 
-        };    
+        };
 
       });
 
       return promise
-      
+
     },
     openTitle: function() {  // открываем закрываем шапку элемнета
       if(this.props.arrow.direct == "up") {
@@ -594,22 +615,21 @@ export default {
       this.$emit('SetLevel',level);
     },
     getDataFromRest: async function(event) {
-
       // this.$set(this.loadings,event.sid,true);
-      this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false }); 
-    
+      this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false });
+
       this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
       let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными
       // вызывая метод в хранилище
-      if ( response.length == 0) {  // если что-то пошло не так 
-        this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });  
+      if ( response.length == 0) {  // если что-то пошло не так
+        this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });
       } else {  // если все нормально
 
         let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash);
         responseDB
           .then(
             result => {
-              this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  }); 
+              this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  });
             },
           );
       }
@@ -620,13 +640,253 @@ export default {
       let keys = Object.keys(this.props.dataRestFilter[0]); // получаем ключи для заголовков столбцов
       csvContent += encodeURIComponent(keys.join(',') + "\n"); // добавляем ключи в файл
       csvContent += encodeURIComponent(this.props.dataRestFilter.map( item =>  Object.values(item).join(",")).join("\n"));
-      
+
       const link = document.createElement("a"); // создаем ссылку
       link.setAttribute('href',csvContent); // указываем ссылке что надо скачать наш файл csv
       const searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
-      link.setAttribute("download", `${this.idDash}-${searchId}.csv`); // указываем имя файла 
+      link.setAttribute("download", `${this.idDash}-${searchId}.csv`); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку 
+    },
+
+    // moveElem: function (props) {  // переключаем режим разрешения перемещения элемента 
+    //   if (props.move_elem) {
+    //     props.arrow_coral = 'controlsActive';
+    //     this.$emit('moveElem');  // так как это переключается у родителя, мы вынуждены вызывать событие на родителе и передавтаь туда данные
+    //     props.move_elem = !props.move_elem;
+    //   } else {
+    //     props.arrow_coral = 'controlsInsideDash';
+    //     this.$emit('moveElem');
+    //     this.$emit('sendMove');
+    //     props.move_elem = !props.move_elem;
+    //   }
+    // },
+    // resizeElem: function (props) {  // тоже самое для режима изменения размера
+    //   if (props.resize_elem) {
+    //     props.resize_arrow_coral = 'controlsActive';
+    //     props.transition = !props.transition;
+    //     this.$emit('resizeElem');
+    //     props.resize_elem = !props.resize_elem;
+    //   } else {
+    //     props.resize_arrow_coral = 'controlsInsideDash';
+    //     props.transition = !props.transition;
+    //     this.$emit('resizeElem');
+    //     this.$emit('sendSize');
+    //     props.resize_elem = !props.resize_elem;
+    //   }
+    // },
+    getData: function(searсhID) {   // асинхронная функция для получения даных с реста
+    
+      let db = null;
+    
+      let request = indexedDB.open("EVA",1);  
+      request.onerror = function(event) {
+        console.log("error: ",event);
+      };
+      request.onupgradeneeded = event => {
+        console.log('create');
+        db = event.target.result;
+        if (!db.objectStoreNames.contains('searches')) { // if there's no "books" store
+          db.createObjectStore('searches'); // create it
+        }
+        request.onsuccess = event => {
+          db = request.result;
+          console.log("successEvent: " + db);
+        };
+      }
+      let promise = new Promise((resolve, reject) => {
+        request.onsuccess =  event => {
+          db = request.result;
+          let transaction = db.transaction("searches"); // (1)
+          // получить хранилище объектов для работы с ним
+          let searches = transaction.objectStore("searches"); // (2)
+          let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
+          query.onsuccess = event => { // (4)
+            if (query.result) {
+              resolve(query.result);
+            } else {
+              resolve([])
+            }
+          };
+          query.onerror = function() {
+            console.log("Ошибка", query.error);
+          };                   
+        };    
+      });
+      return promise
+      
+    },
+    checkFilter: function() {
+      let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'OnDataCompare', element: this.element});
+      let data = [];
+      let incl = false;
+      let columnDel = '';
+      let event = {};
+      this.props.dataRestFilter = [];
+             
+      events.forEach( item => {
+        event = {...{},...item};
+          
+        if(event.prop == 'filter' && event.value == 'true') {
+          data = JSON.parse(JSON.stringify(this.props.dataRest));
+          event.row =  event.row.replace(/\[|\]/g, '').split(',');
+            
+          if (event.column.indexOf('!') != -1) {
+            columnDel = event.column.replace('!', '');
+            this.props.dataRest.forEach( (itemFil,i) => {
+              if (Object.keys(itemFil).includes(columnDel)) {
+                delete data[i][columnDel]
+              }
+            });
+          } else  {
+            switch(event.compare) {
+            case 'equals':
+              let notArr = [];
+              event.row.forEach( notElem => {
+                if ( notElem.indexOf('!') != -1) {
+                  notArr.push(notElem.substr(1));
+                }
+              })
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  if (notArr.length != 0) {
+                    if (!notArr.includes(String(itemFil[event.column]))) {
+                      return itemFil
+                    } 
+                  } else {
+                    if (event.row.includes(String(itemFil[event.column]))) {
+                      return itemFil
+                    } 
+                  }
+                      
+                });
+              } else {
+                data = data.filter( itemFil => {
+                  if (notArr.length != 0) {
+                    incl = true;
+                    Object.values(itemFil).forEach( val => {
+                      if(notArr.includes(String(val))) {
+                        incl = false;
+                      }
+                    })
+                  } else {
+                    incl = false
+                    Object.values(itemFil).forEach( val => {
+                      if(event.row.includes(String(val))) {
+                        incl = true;
+                      }
+                    })
+                  }
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case "over":
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  incl = true;
+                  event.row.forEach( row => {
+                    if ( parseFloat(itemFil[event.column]) <= parseFloat(row)) {
+                      incl = false;
+                    }
+                  })
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case "less":
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  incl = true;
+                  event.row.forEach( row => {
+                    if ( parseFloat(itemFil[event.column]) >= parseFloat(row)) {
+                      incl = false;
+                    }
+                  })
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case 'in':
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  if (event.row.includes(String(itemFil[event.column]))) {
+                    return itemFil
+                  } 
+                });
+              } else {
+                data = data.filter( itemFil => {
+                  incl = false
+                  Object.values(itemFil).forEach( val => {
+                    if(event.row.includes(String(val))) {
+                      incl = true;
+                    }
+                  })
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            case "between":
+              if (event.column != '') {
+                data = data.filter( itemFil => {
+                  incl = false;
+                  let min,max;
+                  if(parseFloat(event.row[0]) > parseFloat(event.row[1])) {
+                    max = event.row[0]; 
+                    min = event.row[1];
+                  } else {
+                    max = event.row[1]; 
+                    min = event.row[0];
+                  }
+                  if ( parseFloat(itemFil[event.column]) > min && parseFloat(itemFil[event.column]) < max){
+                    incl = true;
+                  }
+                  if (incl) {
+                    return itemFil
+                  }
+                });
+              }
+              break
+            }
+          }
+          if (this.props.dataRestFilter.length == 0) {
+            this.props.dataRestFilter = [...this.props.dataRestFilter ,...data];
+          } else {  // если в массив результирующем уже что-то было, то надо добавить только новые элементы
+            data.forEach( itemData => {    // пробегаемся по все мотфильтрвоанным элементам
+              let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
+              let keys = Object.keys(itemData);  // ключи объекта внутри фильтрованного массива
+              this.props.dataRestFilter.forEach( itemDataRest => {  // пробегаемся пов сем отфильтрованным данным
+                let equalRest = true;  // переменная которая скажет полностью совпал объект внутри результирующего массива
+                keys.forEach( key => {  // пробегаемся по кажлому полю в объекте
+                  if (itemData[key] != itemDataRest[key]){  // если значения поля из только что отфильтрованного массива, не равно значени в уже до
+                                                          // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
+                    equalRest = false;   // поэтому присваиваем переменной значение мол строки отличаются
+                  }
+                })
+                if (equalRest) {  // а вот если строка в только что отфлильтрованном массиве полностью совпала со строкой в уже до этого отфильтрованном
+                  equal = true;  // то присваиваем true переменной которай говорит что такая строка уже есть
+                }
+              })
+              if (!equal) {  // и вот если такой строки все же нет
+                this.props.dataRestFilter.push(itemData); // то смело добовляем ее в результирующий массив
+              }
+            })
+          }
+        }                
+      })
+      if (data.length == 0) {
+        this.props.dataRestFilter = JSON.parse(JSON.stringify(this.props.dataRest));
+      }
+             
+      link.remove(); // удаляем ссылку
     }
   },
 }
@@ -634,9 +894,9 @@ export default {
 
 </script>
 
-<style lang="scss" > 
-  
+<style lang="scss" >
+
     @import '../sass/dashBoard.sass'
-   
-  
+
+
 </style>

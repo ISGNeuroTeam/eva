@@ -2,7 +2,7 @@
   <v-navigation-drawer
     v-model="gearShow"
     absolute
-    width="300"
+    width="320"
     left
     class="left-dash-setting"
     :color="theme.$main_text"
@@ -22,7 +22,7 @@
         class="switch" 
         :color="theme.$primary_button" 
         :style="{color:theme.$main_text}" 
-        :label="russianLabel(mode)" 
+        :label="labels[mode]"
       />
       <div 
         class="divider-setting" 
@@ -73,7 +73,7 @@
         class="switch" 
         :color="theme.$primary_button" 
         :style="{color:theme.$main_text,}" 
-        :label="russianLabel(dragresable)" 
+        :label="labels[dragresable]"
       />
       <div 
         class="divider-setting" 
@@ -90,11 +90,28 @@
         class="switch" 
         :color="theme.$primary_button" 
         :style="{color:theme.$main_text,}" 
-        :label="russianLabel(gridShow)"
+        :label="labels[gridShow]"
+      />
+      <div
+        class="divider-setting"
+        :style="{background: theme.$title}"
+      />
+    </div>
+    <div class="setting">
+      <div class="labelSetting" :style="{color: theme.$main_text}">
+        Вкладки
+      </div>
+      <v-switch
+        v-model="showTabs"
+        class="switch"
+        :color="theme.$primary_button"
+        :style="{color:theme.$main_text,}"
+        :label="labels[showTabs]"
       />
     </div>
   </v-navigation-drawer>
 </template>
+
 <script>
 export default {
   props: {
@@ -111,16 +128,18 @@ export default {
         vert: '32',
         hor: '18'
       },
+      labels: {
+        true: 'да',
+        false: 'нет'
+      },
       dragresable: true,
-      gridShow: true
+      gridShow: true,
+      showTabs: false,
     } 
   },
   computed: {
     theme: function() {
       return this.$store.getters.getTheme
-    },
-    active: function() {  
-      return this.showFrom 
     },
     permissions: function() {
       if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
@@ -148,17 +167,8 @@ export default {
     gridShow: function() {
       this.$store.commit('setGridShow', {id: this.idDashFrom,item: String(this.gridShow)});
     },
-  },
-  methods: {
-    sendSizeGrid: function() {
-      this.$store.commit('setSizeGrid', {id: this.idDashFrom,grid: JSON.parse(JSON.stringify(this.sizeGrid))});
-    },
-    russianLabel(value){
-      if(value === true){
-        return "да"
-      } else {
-        return "нет"
-      }
+    showTabs () {
+      this.$store.commit('setTabMode', {idDash: this.idDashFrom, mode: this.showTabs});
     }
   },
   mounted() {
@@ -169,19 +179,22 @@ export default {
       this.dragresable = false;
     } else {
       let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
-      dragRes == 'true' ? dragRes = true : dragRes = false;
+      dragRes === 'true' ? dragRes = true : dragRes = false;
       this.dragresable =  dragRes;
     }
-    
+    this.showTabs = this.$store.getters.getShowTabs(this.idDashFrom);
+  },
+  methods: {
+    sendSizeGrid: function() {
+      this.$store.commit('setSizeGrid', {id: this.idDashFrom,grid: JSON.parse(JSON.stringify(this.sizeGrid))});
+    },
   } 
 }
-
 
 </script>
 
 <style lang="scss" > 
   
-    @import '../sass/dashSettings.sass'
-
+@import '../sass/dashSettings.sass';
    
 </style>

@@ -705,6 +705,31 @@
               />
             </div>
           </div>
+          <div
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              pinned
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Закрепить на всех вкладках
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.pinned"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.pinned)"
+              />
+            </div>
+          </div>
           <div 
             v-if="checkOptions('united')"
             class="option-item" 
@@ -1390,7 +1415,6 @@ export default {
         })
         this.$set(this.options,'metrics',updateMetrics);
       }
-
       if(this.element.includes('heatmapGeneral')) {
         this.options.x = this.x;
         this.options.y = this.y;
@@ -1512,6 +1536,9 @@ export default {
           if (item == 'underline') {
             this.$set(this.options,item,false);
           }
+          if (item == 'pinned') {
+            this.$set(this.options,item,false);
+          }
         }
       })
       if (!this.options.change) {
@@ -1523,5 +1550,5 @@ export default {
 </script>
 
 <style lang="scss">
-  @import '../sass/modalSettings.sass'  
+  @import '../sass/modalSettings.sass';
 </style>

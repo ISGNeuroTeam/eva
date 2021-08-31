@@ -5,13 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## Unreleased
 
 ### Added
 - dashFilterPanel
+- tabs on dashboards
+- ability to enable/disable tabs on dashboard in dash settings
+- ability to pin certain visual component on all tabs
+- global rbg CSS variables for theme colors (only HEX was before)
+
+### Fixed
+- bug with dashboard without elements after tabs integrations
+
+## [1.62.0]
+
+### Added
+- tokens for maps
+
+### Fixed
+- bugs with main header
+- bugs with table component header
+
+## [1.61.0]
+
+### Added
+- new mode for map monitoring
 
 ### Changed
 - heatMapGeneral visualization component renamed to heatMap
+- changed header for project and dashboards, fixed bug with header for tables
 
 ### Removed
 - first heatMap visualization component and its styles
@@ -27,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - custom theme creation
 - image background from theme
 - custom theme editing and deleting
+- theme support in graph component
 
 ### Changed
 - modal for selecting current application theme

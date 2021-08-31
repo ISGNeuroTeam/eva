@@ -758,6 +758,7 @@ export default {
   props: {
     idDashFrom: null,
     permissionsFrom: null,
+    inside: null
   },
   data () {
     return {
@@ -825,7 +826,8 @@ export default {
           id: 1,
           label: 'Редактировать',
           icon: mdiAccountEdit,
-          onClick: this.edit
+          onClick: this.edit,
+          hide: this.inside
         },
         {
           id: 2,
@@ -889,6 +891,7 @@ export default {
       disabledDS: {},
       modalPaperSid: '',
       modalPaper: false,
+      userPermissions: null
     }
   },
   computed: {
@@ -942,7 +945,7 @@ export default {
     },
     tockens: function() {  // получения всех токенов на страницы
       let tockens = this.$store.getters.getTockens(this.idDash);
-      
+
       tockens.forEach( item => {
         this.tockensName[item.name] = item.name;
         this.lookTockens.push({show: false,color: this.theme.controls})
@@ -950,7 +953,7 @@ export default {
       return tockens
     },
     elements: function() {  // получение всех элемнета на странице
-      return this.$store.getters.getElements(this.idDash)
+      return this.$store.getters.getElements(this.idDash);
     },
     actions: function() { // получение всех событий элемента на странице
       return function(element){
@@ -977,6 +980,11 @@ export default {
       return true
     }
   },  
+  watch: {
+    userPermissions() {
+      this.profileDropdownButtons = this.profileDropdownButtons.map((item) => item.id === 3 ? ({ ...item, hide: !this.isAdmin }) : item);
+    }
+  },
   methods: {
     exit: function() {
       document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
@@ -1011,13 +1019,33 @@ export default {
     },
     getCookie: async function() {
       //console.log(this.$jwt.hasToken())
-      console.log('mounted')
       if(this.$jwt.hasToken()) {
-        this.login = this.$jwt.decode().username;    
-        console.log('login', this.login, this.$jwt.decode().username)      
+        this.login = this.$jwt.decode().username;
+        //let id = this.$jwt.decode().user_id;
+        let permissions = [];
+
+        let response = await fetch(`/api/user/permissions`)
+          .catch (error => {
+            console.log(error);
+            return {status: 300, result: 'Post не создался, возможно из-за неточностей в запросе'}
+          }) 
+        if (response.status == 200) {  // если получилось
+          await response.json().then( res => {  // переводим полученные данные из json в нормальный объект
+            permissions = res.data;
+            this.userPermissions = permissions
+            
+            this.$emit('permissions',permissions);
+            this.$emit('setUsername',this.login);
+            this.$emit('checkOver');
+          }) 
+        } else {
+          this.exit();
+        }
+                         
       } else {
         this.$router.push(`/`);
       }
+
     },
     openEdit: function(id) {   // окно с редактированием search
       this.openSearch();  // то открываем его 
@@ -1523,9 +1551,18 @@ export default {
                   element = bodyArray.splice(0, i);
                 }
               })
-              
 
-              if(this.event.event == 'OnTokenCompare') {
+              if (this.event.event == 'OnDataCompare') { 
+                if (element.length > 2 && element[1].indexOf('[') == -1){
+                  this.$set(this.event,'compare',element[0]);
+                  this.$set(this.event,'column',element[1]);
+                  this.$set(this.event,'row',element.splice(2, element.length-1).join(',')); 
+                } else {
+                  this.$set(this.event,'compare',element[0]);
+                  this.$set(this.event,'sense',element.splice(1, element.length-1).join(',')); 
+                }
+                      
+              } else if(this.event.event == 'OnTokenCompare') {
                 this.$set(this.event,'compare',element[0]);
                 this.$set(this.event,'token',element[1]);
                 this.$set(this.event,'tokenval',element.splice(2, element.length-1).join(','));

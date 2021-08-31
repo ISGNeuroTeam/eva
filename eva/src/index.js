@@ -69,6 +69,7 @@ Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vu
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default)  // компонент куст. на yfiles
 Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default) // компонент карта
 Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default) // компонент тепловая карта
+Vue.component('dash-singleValue', require('./components/dashBoardInside/SingleValue/dashSingleValue.vue').default) // компонент Single Value
 
 //Vue.component('block-exim', require('./components/blockExim.vue').default)  // блок экспорта импорта
 //Vue.component('dash-search', require('./components/dashBoardInside/dashSearch.vue').default)  // элемнет поиска пока не актуален
