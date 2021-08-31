@@ -37,7 +37,7 @@
       Значение
       <v-text-field v-model="temp.value" />
     </div>
-    <v-tabs v-model="currentOperationTab" centered grow filled >
+    <v-tabs v-model="currentOperationTab" centered grow filled>
       <v-tab v-for="(tab, index) in operationMap[temp.fieldType]" :key="index"
         >{{ getOperationManualTitle(tab) }}
       </v-tab>
@@ -86,7 +86,9 @@
     },
     methods: {
       getOperationManualTitle(operation) {
-        return this.operationManualTitleMap[this.temp.fieldType][operation];
+        if (this.temp.fieldType === 'string')
+          return this.operationManualTitleMap[this.temp.fieldType][operation];
+        else return operation;
       },
     },
     watch: {
