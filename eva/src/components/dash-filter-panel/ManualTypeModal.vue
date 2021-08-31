@@ -1,9 +1,13 @@
 <template>
   <div>
-    Имя поля: <v-text-field v-model="temp.fieldName" />
-    <v-select v-model="temp.fieldType" :items="fieldTypes" label="Тип поля" filled />
+    Имя поля
+    <v-text-field outlined v-model="temp.fieldName" />
+
+    Тип
+    <v-select outlined v-model="temp.fieldType" :items="fieldTypes"/>
 
     <div v-if="temp.fieldType === 'date'">
+      Дата
       <v-text-field
         v-model="temp.value"
         :color="theme.$accent_ui_color"
@@ -29,11 +33,15 @@
         </DTPicker>
       </v-text-field>
     </div>
-    <div v-else>Значение: <v-text-field v-model="temp.value" /></div>
+    <div v-else>
+      Значение
+      <v-text-field v-model="temp.value" />
+    </div>
     <v-tabs v-model="currentOperationTab" centered grow filled>
       <v-tab v-for="(tab, index) in operationMap[temp.fieldType]" :key="index">{{ tab }} </v-tab>
     </v-tabs>
-    <v-switch v-model="temp.invertMatches" label="Убрать совпадения из результатов" class="ml-4"></v-switch>
+    <v-switch v-model="temp.invertMatches" label="Убрать совпадения из результатов" class="ml-4">
+    </v-switch>
   </div>
 </template>
 <script>
@@ -82,7 +90,7 @@
   };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 
   .dtpicker-search
       position: absolute

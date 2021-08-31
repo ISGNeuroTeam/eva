@@ -5,10 +5,12 @@
       class="ma-4 new-filter-button d-flex align-center"
       small
       rounded
-      :color="theme.$ok_color"
+      text
+      :color="theme.$title"
+      :style="{ opacity: 0.6, 'background-color': theme.$ok_color }"
     >
       <v-icon x-small>{{ plusIcon }}</v-icon>
-      <h6 class="pl-1">Новый фильтр</h6>
+      <div class="pl-1">Новый фильтр</div>
     </v-btn>
 
     <div>
@@ -19,7 +21,12 @@
         :class="focusedRow === indexFilter ? 'focused-filter-row' : ''"
         class="filter-row"
       >
-        <v-row no-gutters class="d-flex align-center" @click="focusRow(indexFilter)">
+        <v-row
+          no-gutters
+          class="d-flex align-center"
+          style="height: 100%"
+          @click="focusRow(indexFilter)"
+        >
           <!-- FILTER ID -->
           <v-col
             cols="1"
@@ -45,13 +52,20 @@
                     v-for="(part, indexPart) in filter.parts"
                     :key="indexPart"
                   >
-                    <filter-part
-                      @deleteFilterPart="deleteFilterPart"
-                      @editFilterPart="openFilterPartModal"
-                      :idDash="idDashFrom"
-                      :filterPart="part"
-                      :isFocused="focusedRow === indexFilter"
-                    ></filter-part>
+                    <div
+                      @click.stop.prevent="
+                        indexFilter === focusedRow
+                          ? openFilterPartModal(part)
+                          : focusRow(indexFilter)
+                      "
+                    >
+                      <filter-part
+                        @deleteFilterPart="deleteFilterPart"
+                        :idDash="idDashFrom"
+                        :filterPart="part"
+                        :isFocused="focusedRow === indexFilter"
+                      ></filter-part>
+                    </div>
                   </v-slide-item>
 
                   <div class="d-flex align-center" v-if="focusedRow === indexFilter">
@@ -92,11 +106,22 @@
         </v-row>
       </div>
 
-      <div v-for="(tmp, index) in tempFilters" :key="index">
-        <v-text-field v-model="tmp.id"></v-text-field>
-        <v-btn rounded small class="ma-1" @click="saveTempFilter(index)">Сохранить</v-btn>
-        <v-btn rounded small class="ma-1" @click="removeTempFilter(index)">Отменить</v-btn>
-      </div>
+      <v-row v-for="(tmp, index) in tempFilters" :key="index">
+        <v-col cols="3" class="ml-12">
+          <v-text-field outlined :color="theme.$ok_color" v-model="tmp.id"></v-text-field>
+        </v-col>
+        <v-col class="d-flex align-center">
+          <v-btn
+            rounded
+            small
+            class="ma-1"
+            :style="{ 'background-color': theme.$ok_color, opacity: 0.5 }"
+            @click="saveTempFilter(index)"
+            >Сохранить</v-btn
+          >
+          <v-btn rounded small class="ma-1" @click="removeTempFilter(index)">Отменить</v-btn>
+        </v-col>
+      </v-row>
     </div>
 
     <v-dialog max-width="400" v-model="filterPartModalShow" persistent>

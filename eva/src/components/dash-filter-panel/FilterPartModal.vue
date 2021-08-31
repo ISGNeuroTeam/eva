@@ -1,8 +1,7 @@
 <template>
   <v-card>
-    <v-card-title class="text-h5"> Часть фильтра</v-card-title>
     <v-card-subtitle>
-      <v-tabs v-model="currentTab" centered grow>
+      <v-tabs hide-slider centered grow v-model="currentTab">
         <v-tab v-for="(tab, index) in typeTabs" :key="index">
           {{ tab.title }}
         </v-tab>
@@ -35,12 +34,17 @@
       return {
         currentTab: 0,
         typeTabs: [
-          { title: 'Ручная', componentName: 'ManualTypeModal' },
+          { title: 'Конфигуратор', componentName: 'ManualTypeModal' },
           { title: 'Токен', componentName: 'TokenTypeModal' },
         ],
         typeMap: ['manual', 'token'],
         temp: {},
       };
+    },
+    computed: {
+      theme() {
+        return this.$store.getters.getTheme;
+      },
     },
     watch: {
       currentTab(val) {
@@ -64,3 +68,8 @@
     },
   };
 </script>
+
+<style lang="sass" scoped>
+  .active-type-tab
+    background-color: var(--primary_button)
+</style>

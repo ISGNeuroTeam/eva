@@ -1,17 +1,10 @@
 <template>
   <div>
-    <v-row>
-      <v-col>
-        <select v-model="currentToken" placeholder="Токен">
-          <option v-for="(token, index) in tokens" :key="index" :value="token">
-            {{ token.name }}
-          </option>
-        </select>
-      </v-col>
-      <v-col>
-        <v-select v-model="temp.operationToken" :items="operations" label="Операции" filled />
-      </v-col>
-    </v-row>
+    Токен
+    <v-select outlined v-model="currentToken" :items="tokens" item-text="name" return-object dense>
+    </v-select>
+    Операция
+    <v-select outlined dense v-model="temp.operationToken" :items="operations" />
     <v-switch
       v-model="temp.invertMatches"
       label="Убрать совпадения из результатов"
