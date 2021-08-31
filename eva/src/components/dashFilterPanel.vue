@@ -6,8 +6,8 @@
       small
       rounded
       text
-      :color="theme.$title"
-      :style="{ opacity: 0.6, 'background-color': theme.$ok_color }"
+      :color="theme.$secondary_bg"
+      :style="{ 'background-color': theme.$ok_color }"
     >
       <v-icon x-small>{{ plusIcon }}</v-icon>
       <div class="pl-1">Новый фильтр</div>
@@ -16,7 +16,7 @@
     <div>
       <div
         v-for="(filter, indexFilter) in filters"
-        :key="indexFilter"
+        :key="`${filter.id}-${indexFilter}`"
         :style="{ 'border-color': theme.$primary_button, 'background-color': theme.$main_bg }"
         :class="focusedRow === indexFilter ? 'focused-filter-row' : ''"
         class="filter-row"
@@ -31,77 +31,84 @@
           <v-col
             cols="1"
             class="d-flex align-center justify-center"
+            style="height: 100%"
             :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
           >
-            <h2>
+            <h3>
               {{ filter.id }}
-            </h2>
+            </h3>
           </v-col>
 
           <!-- FILTER PARTS -->
           <v-col
-            class="d-flex align-center"
+            class="d-flex align-center justify-space-between"
+            style="width: 100%"
             cols="10"
             :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
           >
-            <div class="d-flex align-center justify-space-between" style="width: 100%">
-              <v-sheet>
-                <v-slide-group show-arrows>
-                  <v-slide-item
-                    :style="{ 'background-color': theme.$main_bg }"
-                    v-for="(part, indexPart) in filter.parts"
-                    :key="indexPart"
+            <v-sheet :style="{ 'background-color': theme.$main_bg }">
+              <v-slide-group show-arrows>
+                <v-slide-item
+                  v-for="(part, indexPart) in filter.parts"
+                  :key="indexPart"
+                  :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
+                >
+                  <div
+                    @click.stop.prevent="
+                      indexFilter === focusedRow ? openFilterPartModal(part) : focusRow(indexFilter)
+                    "
                   >
-                    <div
-                      @click.stop.prevent="
-                        indexFilter === focusedRow
-                          ? openFilterPartModal(part)
-                          : focusRow(indexFilter)
-                      "
-                    >
-                      <filter-part
-                        @deleteFilterPart="deleteFilterPart"
-                        :idDash="idDashFrom"
-                        :filterPart="part"
-                        :isFocused="focusedRow === indexFilter"
-                      ></filter-part>
-                    </div>
-                  </v-slide-item>
-
-                  <div class="d-flex align-center" v-if="focusedRow === indexFilter">
-                    <v-btn
-                      class="text-capitalize ml-6"
-                      outlined
-                      rounded
-                      x-small
-                      :color="theme.$primary_button"
-                      @click.stop.prevent="openFilterPartModal()"
-                    >
-                      <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
-                    </v-btn>
+                    <filter-part
+                      @deleteFilterPart="deleteFilterPart"
+                      :idDash="idDashFrom"
+                      :filterPart="part"
+                      :isFocused="focusedRow === indexFilter"
+                    ></filter-part>
                   </div>
-                </v-slide-group>
-              </v-sheet>
+                </v-slide-item>
 
-              <div v-if="focusedRow === indexFilter">
-                <v-btn icon color="green" @click.stop.prevent="applyTempParts">
-                  <v-icon> {{ acceptIcon }}</v-icon>
-                </v-btn>
-                <v-btn icon color="red" @click.stop.prevent="declineTempParts">
-                  <v-icon> {{ declineIcon }}</v-icon>
-                </v-btn>
-              </div>
+                <div class="d-flex align-center" v-if="focusedRow === indexFilter">
+                  <v-btn
+                    class="text-capitalize ml-6"
+                    outlined
+                    rounded
+                    x-small
+                    :color="theme.$primary_button"
+                    @click.stop.prevent="openFilterPartModal()"
+                  >
+                    <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
+                  </v-btn>
+                </div>
+              </v-slide-group>
+            </v-sheet>
+
+            <div v-if="focusedRow === indexFilter">
+              <v-btn icon color="green" @click.stop.prevent="applyTempParts">
+                <v-icon> {{ acceptIcon }}</v-icon>
+              </v-btn>
+              <v-btn icon :color="theme.$error_color" @click.stop.prevent="declineTempParts">
+                <v-icon> {{ declineIcon }}</v-icon>
+              </v-btn>
             </div>
           </v-col>
 
           <!-- FILTER BUTTONS -->
-          <v-col cols="1" class="d-flex align-center" v-if="focusedRow === indexFilter">
-            <v-btn icon small color="red" @click.stop.prevent="deleteFilter(filter)"
-              ><v-icon>{{ trashIcon }}</v-icon></v-btn
-            >
+          <v-col cols="1" class="d-flex align-center justify-center" v-if="focusedRow === indexFilter">
+            <v-btn
+              icon
+              small
+              @click.stop.prevent="reverseFilter(filter)"
+              :style="{
+                'color': filter.invertMatches ? theme.$ok_color : null,
+              }"
+              ><v-icon>{{ reverseIcon }}</v-icon>
+            </v-btn>
             <v-btn icon small @click.stop.prevent="refreshFilter(filter)"
-              ><v-icon>{{ refreshIcon }}</v-icon></v-btn
-            >
+              ><v-icon>{{ refreshIcon }}</v-icon>
+            </v-btn>
+            <v-btn icon small :color="theme.$error_color" @click.stop.prevent="deleteFilter(filter)">
+              <v-icon>{{ trashIcon }}</v-icon>
+            </v-btn>
           </v-col>
         </v-row>
       </div>
@@ -145,6 +152,7 @@
     mdiRefresh,
     mdiCheck,
     mdiClose,
+    mdiSwapHorizontal,
   } from '@mdi/js';
 
   export default {
@@ -165,6 +173,7 @@
         refreshIcon: mdiRefresh,
         acceptIcon: mdiCheck,
         declineIcon: mdiClose,
+        reverseIcon: mdiSwapHorizontal,
       };
     },
     computed: {
@@ -185,6 +194,11 @@
       },
     },
     methods: {
+      reverseFilter(filter) {
+        this.$nextTick(() => {
+          filter.invertMatches = !filter.invertMatches;
+        });
+      },
       focusRow(index) {
         if (this.focusedRow === null) this.focusedRow = index;
       },
@@ -192,6 +206,7 @@
         this.tempFilters.push({
           idDash: this.idDashFrom,
           id: '',
+          invertMatches: false,
           parts: [],
         });
       },
@@ -225,6 +240,9 @@
       },
       deleteFilter(filter) {
         this.$store.commit('deleteFilter', filter);
+        this.$store.commit('declineFilterChanges', this.idDashFrom);
+        this.$store.commit('clearFocusedFilter', this.idDashFrom);
+        this.focusedRow = null;
         this.filters = this.$store.getters.getFilters(this.idDashFrom);
       },
       deleteFilterPart(filterPart) {
@@ -243,7 +261,6 @@
               operationToken: 'OR',
               token: null,
               values: [],
-              invertMatches: false,
               fieldType: 'string',
               operationManual: 'exactMatch',
               fieldName: null,
@@ -275,6 +292,7 @@
 
   .dash-filter-panel
     width: 100%
+    max-height: 300px
 
   .filter-row
     padding: 2px
@@ -285,4 +303,7 @@
     padding: 0
     border: 2px solid
     border-radius: 4px
+
+  .reverse-button-active
+    border:4px solid red
 </style>

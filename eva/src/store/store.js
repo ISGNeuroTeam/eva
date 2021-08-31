@@ -1118,10 +1118,14 @@ export default {
                   const part = filter.parts[idxPart];
                   if (part.values.length > 0 || part.filterPartType === 'manual') {
                     if (idxPart == firstPartWithValuesIndex) {
-                      filterOtlText += 'search (';
+                      filterOtlText += 'search';
                     } else {
-                      filterOtlText += ' AND (';
+                      filterOtlText += ' AND';
                     }
+
+                    if (filter.invertMatches) filterOtlText += ' NOT';
+
+                    filterOtlText += ' (';
 
                     switch (part.filterPartType) {
                       case 'manual':

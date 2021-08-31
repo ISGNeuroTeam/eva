@@ -5,11 +5,6 @@
     </v-select>
     Операция
     <v-select outlined dense v-model="temp.operationToken" :items="operations" />
-    <v-switch
-      v-model="temp.invertMatches"
-      label="Убрать совпадения из результатов"
-      class="ml-4"
-    ></v-switch>
   </div>
 </template>
 <script>

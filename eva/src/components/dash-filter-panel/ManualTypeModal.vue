@@ -4,7 +4,7 @@
     <v-text-field outlined v-model="temp.fieldName" />
 
     Тип
-    <v-select outlined v-model="temp.fieldType" :items="fieldTypes"/>
+    <v-select outlined v-model="temp.fieldType" :items="fieldTypes" />
 
     <div v-if="temp.fieldType === 'date'">
       Дата
@@ -40,8 +40,6 @@
     <v-tabs v-model="currentOperationTab" centered grow filled>
       <v-tab v-for="(tab, index) in operationMap[temp.fieldType]" :key="index">{{ tab }} </v-tab>
     </v-tabs>
-    <v-switch v-model="temp.invertMatches" label="Убрать совпадения из результатов" class="ml-4">
-    </v-switch>
   </div>
 </template>
 <script>
@@ -63,6 +61,23 @@
           string: ['match', 'exactMatch'],
           date: ['<', '>'],
           number: ['<', '>', '=', '>=', '<='],
+        },
+        operationManualTitleMap: {
+          string: {
+            exactMatch: 'Точное совпадение',
+            match: 'Подстрока',
+          },
+          number: {
+            '>': 'Больше',
+            '<': 'Меньше',
+            '=': 'Равно',
+            '>=': 'Больше или равно',
+            '<=': 'Меньше или равно',
+          },
+          date: {
+            '>': 'Позже',
+            '<': 'Раньше',
+          },
         },
         pickerIcon: mdiCalendarMonth,
       };

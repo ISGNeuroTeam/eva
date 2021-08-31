@@ -3,27 +3,31 @@
     <v-row @click.self="$emit('editFilterPart', filterPart)">
       <v-col>
         <div v-if="filterPart.filterPartType === 'token'">
-          <div>
+          <h4>
             <b>
               {{ elemName }}
             </b>
-          </div>
-          <div>
-            {{ filterPart.fieldName }}
-            ({{ filterPart.values.length }})
+          </h4>
+          <div class="align-center d-flex">
+            <h5>
+              {{ filterPart.fieldName }}
+              ({{ filterPart.values.length }})
+            </h5>
             <v-menu offset-y :close-on-content-click="false" max-height="300">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon x-small v-bind="attrs" v-on="on">
                   <v-icon>{{ dropDownIcon }}</v-icon>
                 </v-btn>
               </template>
-              <v-list>
+              <v-list :style="{ 'background-color': theme.$main_bg, 'border': `1px solid ${theme.$secondary_border}`}">
                 <v-list-item
                   v-for="(value, index) in filterPart.values"
                   :key="index"
                   class="align-center d-flex"
                 >
-                  {{ value }}
+                  <h5 :style="{ color: theme.$main_text }">
+                    {{ value }}
+                  </h5>
                   <v-spacer></v-spacer>
                   <v-btn icon x-small outlined class="ml-2" @click="removeValue(index)">
                     <v-icon>{{ closeIcon }}</v-icon>
@@ -35,24 +39,20 @@
         </div>
 
         <div v-else>
-          <div>
-            <b> {{ filterPart.fieldName }}: {{ filterPart.value }} </b>
-          </div>
-          <div>{{ filterPart.operationManual }}</div>
+          <h4>
+            <b>
+              {{ filterPart.fieldName }} {{ filterPart.operationManual }} {{ filterPart.value }}
+            </b>
+          </h4>
+          <h5>({{ filterPart.fieldType }})</h5>
         </div>
       </v-col>
 
       <v-col class="d-flex flex-column align-center justify-space-between" v-if="isFocused">
-        <v-btn icon x-small outlined @click="clearValues">
+        <v-btn icon x-small outlined @click.stop.prevent="clearValues">
           <v-icon>{{ refreshIcon }}</v-icon>
         </v-btn>
-        <v-btn
-          icon
-          x-small
-          color="red"
-          outlined
-          @click="$emit('deleteFilterPart', filterPart)"
-        >
+        <v-btn icon x-small color="red" outlined @click.stop.prevent="$emit('deleteFilterPart', filterPart)">
           <v-icon>{{ closeIcon }}</v-icon>
         </v-btn>
       </v-col>
