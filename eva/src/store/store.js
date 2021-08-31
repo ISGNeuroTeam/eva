@@ -374,7 +374,6 @@ export default {
 
       state[dashboard.idDash][id] = data;
       state[dashboard.idDash][id].tab = state[dashboard.idDash].currentTab;
-
       state[dashboard.idDash].elements.push(id);
     },
     deleteDashBoard: (state, dashboard) => {
@@ -1627,7 +1626,6 @@ export default {
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
-
                 if (stateFrom.body != '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                 }
