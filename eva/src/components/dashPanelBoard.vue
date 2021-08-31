@@ -917,7 +917,7 @@ export default {
       return tockens
     },
     elements: function() {  // получение всех элемнета на странице
-      return this.$store.getters.getElements(this.idDash)
+      return this.$store.getters.getElements(this.idDash);
     },
     actions: function() { // получение всех событий элемента на странице
       return function(element){

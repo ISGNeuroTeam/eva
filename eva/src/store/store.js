@@ -23,6 +23,9 @@ export default {  // приблизительный объект хранили�
       state[size.idDash][size.id].width = size.width;
       state[size.idDash][size.id].height = size.height;
     },
+    // setVisualizationTab: (state, tab) => {
+    //   state[]
+    // },
     setSearch: (state, search) => {   // сохранение нового search (источника данных)
             
       if (search.reload) {  // если источник данных уже есть то
@@ -262,7 +265,6 @@ export default {  // приблизительный объект хранили�
     },
     setDash: (state, dash) => {  // обновляем порядок layout на странице
       let dashboard = dash.data;
-      //console.log(dashboard)
       if (!state[dashboard.id]) {
         Vue.set(state, dashboard.id , {});
         Vue.set(state[dashboard.id], 'name' , dashboard.name);
@@ -322,7 +324,9 @@ export default {  // приблизительный объект хранили�
         }
       }
 
-      state[dashboard.idDash][id] = data; 
+      state[dashboard.idDash][id] = data;
+      state[dashboard.idDash][id].tab = state[dashboard.idDash].currentTab;
+
 
       state[dashboard.idDash].elements.push(id);
     },
@@ -733,23 +737,72 @@ export default {  // приблизительный объект хранили�
       }
       state[gridShow.id].gridShow = gridShow.item;
     },
+    addNewTab: (state, payload) => {
+      state[payload.idDash].tabList.push({id: payload.tabID, name: payload.tabName});
+    },
+    changeCurrentTab: (state, payload) => {
+      state[payload.idDash].currentTab = payload.tab;
+    },
+    deleteDashTab: (state, payload) => {
+      const { idDash, tabID } = payload;
+      const tempArr = [];
+      state[idDash].elements.forEach(elem => {
+        if (state[idDash][elem].tab === tabID) {
+          delete state[idDash][elem];
+          tempArr.push(elem);
+        }
+      });
+      state[idDash].elements = state[idDash].elements.filter(elem => !tempArr.includes(elem));
+
+      state[idDash].tabList = state[idDash].tabList.filter(tab => tab.id !== tabID);
+      if (state[idDash].currentTab === tabID) {
+        Vue.set(state[idDash], 'currentTab', state[idDash].tabList[0].id)
+      }
+    },
+    setTabMode: (state, payload) => {
+      state[payload.idDash].tabs = payload.mode;
+    },
+    editTabName: (state, payload) => {
+      const { idDash, tabID, newName } = payload;
+      const tab = state[idDash].tabList.find(tab => tab.id === tabID);
+      if (tab) {
+        tab.name = newName;
+      }
+    }
   },
+
   actions: {
     
   },
   getters: {
+    getDashTabs: state => id => {
+      if (!state[id].tabList) {
+        Vue.set(state[id], 'tabList' ,[{id: 1, name: 'Без названия'}]);
+      }
+      return state[id].tabList;
+    },
+    getCurrentDashTab: state => id => {
+      if (!state[id].currentTab) {
+        Vue.set(state[id], 'currentTab', 1);
+      }
+      return state[id].currentTab;
+    },
+    getShowTabs: state => idDash => {
+      if (!state[idDash].tabs) {
+        Vue.set(state[idDash], 'tabs' ,false);
+      }
+      return state[idDash].tabs;
+    },
     getName(state) {  // получаем имя дашборда
       return (id) => {
         return state[id].name
       }
     },
-    getElements(state) {  // получаем все элемнеты дашборда
-      return (id) => {
-        if (!state[id].elements) {
-          Vue.set(state[id], 'elements', []);
-        }
-        return state[id].elements
+    getElements : state => id => {
+      if (!state[id].elements) {
+        Vue.set(state[id], 'elements', []);
       }
+      return state[id].elements.filter(elem => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned );
     },
     getNameDash(state) {  // получаем имя самого элемента
       return (ids) => {
@@ -1180,6 +1233,9 @@ export default {  // приблизительный объект хранили�
           Vue.set(state[id.idDash][id.id].options, 'lastResult',false);
           Vue.set(state[id.idDash][id.id].options, 'searchBtn',false);
         }
+        if (!state[id.idDash][id.id].options.pinned){
+          Vue.set(state[id.idDash][id.id].options, 'pinned',false);
+        }
         return state[id.idDash][id.id].options
       }
     },
@@ -1291,20 +1347,18 @@ export default {  // приблизительный объект хранили�
           result.then( stateFrom => {
             if(stateFrom) {
                     
-              if (!state[id]) { 
+              if (!state[id]) {
                 Vue.set(state, id, {});
-               
                 if (stateFrom.body != '') {
-                  
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                 }
                 Vue.set(state[id], 'name', stateFrom.name);
                 Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                 Vue.set(state[id], 'modified', stateFrom.modified);
-              } 
+              }
               if (stateFrom.modified > state[id].modified) {
                 resolve({status: 'exist', body:stateFrom.body,name: stateFrom.name, id: stateFrom.id, modified: stateFrom.modified  })
-              } 
+              }
               if (first) {
                 if (stateFrom.body != '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
@@ -1312,6 +1366,13 @@ export default {  // приблизительный объект хранили�
                   Vue.set(state[id], 'name', stateFrom.name);
                   Vue.set(state[id], 'modified', stateFrom.modified);
                 }
+              }
+              if (state[id].elements) {
+                state[id].elements.forEach(elem => {
+                  if (!state[id][elem].tab) {
+                    Vue.set(state[id][elem], 'tab', 1);
+                  }
+                })
               }
               resolve({status: 'finish'})
             // }
