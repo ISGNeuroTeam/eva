@@ -387,17 +387,6 @@
           </div>
         </div>
       </div>
-      <!-- <div 
-        class="block-filter" 
-        :class="{openfilter}" 
-        :style="{ background:theme.$main_bg, color:theme.$main_text}"
-      >
-        <dash-filter-panel
-          :permissions-from="permissionsFrom"
-          :idDashFrom="idDashFrom"
-        >
-        </dash-filter-panel>
-      </div> -->
       <div 
         class="block-tocken" 
         :class="{opentocken:opentocken}"  

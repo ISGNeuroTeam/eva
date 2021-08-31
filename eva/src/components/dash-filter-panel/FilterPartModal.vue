@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <v-card-title class="text-h5"> Часть фильтра "{{ filter.id }}" </v-card-title>
+    <v-card-title class="text-h5"> Часть фильтра</v-card-title>
     <v-card-subtitle>
       <v-tabs v-model="currentTab" centered grow>
         <v-tab v-for="(tab, index) in typeTabs" :key="index">
@@ -11,7 +11,7 @@
     <v-card-text>
       <v-tabs-items v-model="currentTab">
         <v-tab-item v-for="(tab, index) in typeTabs" :key="index">
-          <component :is="tab.componentName" :filter="filter" :temp="temp"></component>
+          <component :is="tab.componentName" :idDash="idDash" :temp="temp"></component>
         </v-tab-item>
       </v-tabs-items>
       <v-btn @click="saveFilterPartModal" class="ma-2">Сохранить</v-btn>
@@ -26,7 +26,7 @@
 
   export default {
     name: 'FilterPartModal',
-    props: ['filter', 'filterPart'],
+    props: ['idDash', 'filterPart'],
     components: {
       ManualTypeModal,
       TokenTypeModal,
@@ -56,7 +56,7 @@
     },
     methods: {
       saveFilterPartModal() {
-        this.$emit('saveFilterPart', this.filter, this.temp);
+        this.$emit('saveFilterPart', this.temp);
       },
       closeFilterPartModal() {
         this.$emit('closeFilterPart', this.temp);

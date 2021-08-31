@@ -22,7 +22,7 @@
 <script>
   export default {
     name: 'TokenTypeModal',
-    props: ['temp', 'filter'],
+    props: ['temp', 'idDash'],
     data() {
       return {
         operations: ['OR', 'AND', 'REPLACE'],
@@ -50,7 +50,7 @@
     },
     computed: {
       tokens() {
-        return this.$store.getters.getTockens(this.filter.idDash);
+        return this.$store.getters.getTockens(this.idDash);
       },
     },
   };

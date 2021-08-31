@@ -1,6 +1,6 @@
 <template>
   <div class="pa-1 filter-part">
-    <v-row>
+    <v-row @click.self="$emit('editFilterPart', filterPart)">
       <v-col>
         <div v-if="filterPart.filterPartType === 'token'">
           <div>
@@ -40,24 +40,21 @@
           </div>
           <div>{{ filterPart.operationManual }}</div>
         </div>
+      </v-col>
 
-        <div class="d-flex justify-left mt-1" v-if="isFocused">
-          <v-btn icon x-small outlined @click="clearValues">
-            <v-icon>{{ refreshIcon }}</v-icon>
-          </v-btn>
-          <v-btn icon x-small outlined class="mx-2" @click="$emit('editFilterPart', filterPart)">
-            <v-icon>{{ editIcon }}</v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            x-small
-            color="red"
-            outlined
-            @click="$emit('deleteFilterPart', filter, filterPart)"
-          >
-            <v-icon>{{ closeIcon }}</v-icon>
-          </v-btn>
-        </div>
+      <v-col class="d-flex flex-column align-center justify-space-between" v-if="isFocused">
+        <v-btn icon x-small outlined @click="clearValues">
+          <v-icon>{{ refreshIcon }}</v-icon>
+        </v-btn>
+        <v-btn
+          icon
+          x-small
+          color="red"
+          outlined
+          @click="$emit('deleteFilterPart', filterPart)"
+        >
+          <v-icon>{{ closeIcon }}</v-icon>
+        </v-btn>
       </v-col>
     </v-row>
   </div>
@@ -68,7 +65,7 @@
 
   export default {
     name: 'FilterPart',
-    props: ['filter', 'filterPart', 'isFocused'],
+    props: ['idDash', 'filterPart', 'isFocused'],
     data() {
       return {
         closeIcon: mdiClose,
@@ -83,7 +80,7 @@
       },
       elemName() {
         if (this.filterPart.token)
-          return this.$store.state.store[this.filter.idDash][this.filterPart.token.elem].name_elem;
+          return this.$store.state.store[this.idDash][this.filterPart.token.elem].name_elem;
         else {
           return 'Ручной фильтр';
         }
