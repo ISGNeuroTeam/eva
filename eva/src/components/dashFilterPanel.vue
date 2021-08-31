@@ -51,7 +51,6 @@
                 <v-slide-item
                   v-for="(part, indexPart) in filter.parts"
                   :key="indexPart"
-                  :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
                 >
                   <div
                     @click.stop.prevent="
