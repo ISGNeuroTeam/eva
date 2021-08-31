@@ -250,7 +250,7 @@ export default {
 
       let otstupTop = this.$refs.legends.getBoundingClientRect().height;
       // устанавливаем размер и отступы графика
-      let margin = {top: otstupTop-10, right: 20, bottom: 20, left: 40},
+      let margin = {top: otstupTop-10, right: 20, bottom: 20, left: 70},
         width = sizeLine.width - margin.left - margin.right - 20,
         height = sizeLine.height - margin.top - margin.bottom - otstupBottom;
 
@@ -329,6 +329,7 @@ export default {
         //.attr("data-id",props.id)
         .attr('class',"graph-svg")
         .append("g")
+        .attr('class',"main-g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // добовляем ось x
@@ -416,14 +417,18 @@ export default {
         y = d3.scaleLinear()
           .domain([0, max+otstupProcent])
           .range([ height, 20 ]);
-
         // добавляем ось Y
+        let test = 'кг'
         let yAxis = svg.append("g")
           .attr("class","yAxis")
-          .call(d3.axisLeft(y).ticks(y.ticks().length/2));
+          .call(d3.axisLeft(y).ticks(y.ticks().length/2).tickFormat(x => `${x} кг/м^3`));
+        let values = y.ticks();
+        let leftMargin = values[values.length] + 'кг/м^3'
+        leftMargin = leftMargin.length * 4.5;
+        svg.attr("transform", "translate(" + leftMargin + "," + margin.top + ")");
 
         yAxis.append("text")
-          .attr("fill", "#000")
+          .attr("fill", "#FFF")
           .attr("dy", "1em")
           .attr("text-anchor", "end")
           .text("Price ($)");
