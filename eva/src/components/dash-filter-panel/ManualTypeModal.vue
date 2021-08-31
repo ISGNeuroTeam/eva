@@ -14,24 +14,22 @@
         :style="{ color: theme.$main_text }"
         class="textarea-item"
         outlined
-        label="Значение"
         placeholder="0"
         hide-details
       >
-        <DTPicker
-          v-model="temp.value"
-          :no-value-to-custom-elem="true"
-          format="YYYY-MM-DD HH:mm"
-          :style="{ fill: theme.$main_text, background: theme.$main_bg, color: theme.$main_text }"
-          :color="theme.$accent_ui_color"
-          :button-color="theme.$primary_button"
-          class="dtpicker-search"
-        >
-          <v-icon class="picker-search" :color="theme.$primary_button">
-            {{ pickerIcon }}
-          </v-icon>
-        </DTPicker>
       </v-text-field>
+      <DTPicker
+        v-model="temp.value"
+        :no-value-to-custom-elem="true"
+        format="YYYY-MM-DD HH:mm"
+        :color="theme.$accent_ui_color"
+        :button-color="theme.$primary_button"
+        class="dtpicker-search"
+      >
+        <v-icon class="picker-search" :color="theme.$primary_button">
+          {{ pickerIcon }}
+        </v-icon>
+      </DTPicker>
     </div>
     <div v-else>
       Значение
@@ -56,7 +54,8 @@
     },
     data() {
       return {
-        fieldTypes: ['string', 'number', 'date'],
+        // fieldTypes: ['string', 'number', 'date'],
+        fieldTypes: ['string', 'number'],
         currentOperationTab: 0,
         pickedDate: '',
         operationMap: {
@@ -118,20 +117,12 @@
 
   .dtpicker-search
       position: absolute
-      top: 30px
-      width: 24px
-      right: 10px
+      top: 1px
       cursor: pointer
 
-      .datepicker
-        top: -225px !important
-        left: -160px !important
 
       &:nth-child(2)
         margin-left: 20px
 
         .datepicker
-          top: -225px !important
-          left: auto !important
-          right: 85px !important
 </style>
