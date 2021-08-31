@@ -37,8 +37,10 @@
       Значение
       <v-text-field v-model="temp.value" />
     </div>
-    <v-tabs v-model="currentOperationTab" centered grow filled>
-      <v-tab v-for="(tab, index) in operationMap[temp.fieldType]" :key="index">{{ tab }} </v-tab>
+    <v-tabs v-model="currentOperationTab" centered grow filled >
+      <v-tab v-for="(tab, index) in operationMap[temp.fieldType]" :key="index"
+        >{{ getOperationManualTitle(tab) }}
+      </v-tab>
     </v-tabs>
   </div>
 </template>
@@ -58,7 +60,7 @@
         currentOperationTab: 0,
         pickedDate: '',
         operationMap: {
-          string: ['match', 'exactMatch'],
+          string: ['exactMatch', 'match'],
           date: ['<', '>'],
           number: ['<', '>', '=', '>=', '<='],
         },
@@ -67,20 +69,25 @@
             exactMatch: 'Точное совпадение',
             match: 'Подстрока',
           },
-          number: {
-            '>': 'Больше',
-            '<': 'Меньше',
-            '=': 'Равно',
-            '>=': 'Больше или равно',
-            '<=': 'Меньше или равно',
-          },
-          date: {
-            '>': 'Позже',
-            '<': 'Раньше',
-          },
+          // number: {
+          //   '>': 'Больше',
+          //   '<': 'Меньше',
+          //   '=': 'Равно',
+          //   '>=': 'Больше или равно',
+          //   '<=': 'Меньше или равно',
+          // },
+          // date: {
+          //   '>': 'Позже',
+          //   '<': 'Раньше',
+          // },
         },
         pickerIcon: mdiCalendarMonth,
       };
+    },
+    methods: {
+      getOperationManualTitle(operation) {
+        return this.operationManualTitleMap[this.temp.fieldType][operation];
+      },
     },
     watch: {
       pickedDate(newVal) {
