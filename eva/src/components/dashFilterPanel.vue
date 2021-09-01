@@ -10,7 +10,7 @@
       :style="{ 'background-color': theme.$ok_color }"
     >
       <v-icon x-small>{{ plusIcon }}</v-icon>
-      <div class="pl-1">Новый фильтр</div>
+      <div class="pl-1" :style="{ color: theme.$secondary_bg }">Новый фильтр</div>
     </v-btn>
 
     <div>
@@ -32,11 +32,9 @@
             cols="1"
             class="d-flex align-center justify-center"
             style="height: 100%"
-            :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
+            :style="{ 'border-right': `1px solid ${theme.$secondary_border}`, color: theme.$title }"
           >
-            <h3>
-              {{ filter.id }}
-            </h3>
+            {{ filter.id }}
           </v-col>
 
           <!-- FILTER PARTS -->
@@ -51,6 +49,7 @@
                 <v-slide-item
                   v-for="(part, indexPart) in filter.parts"
                   :key="indexPart"
+                  :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
                 >
                   <div
                     @click.stop.prevent="
@@ -92,20 +91,27 @@
           </v-col>
 
           <!-- FILTER BUTTONS -->
-          <v-col cols="1" class="d-flex align-center justify-center" v-if="focusedRow === indexFilter">
+          <v-col
+            cols="1"
+            class="d-flex align-center justify-center"
+            v-if="focusedRow === indexFilter"
+          >
             <v-btn
               icon
               small
+              :color="filter.invertMatches ? theme.$primary_button : undefined"
               @click.stop.prevent="reverseFilter(filter)"
-              :style="{
-                'color': filter.invertMatches ? theme.$ok_color : null,
-              }"
               ><v-icon>{{ reverseIcon }}</v-icon>
             </v-btn>
             <v-btn icon small @click.stop.prevent="refreshFilter(filter)"
               ><v-icon>{{ refreshIcon }}</v-icon>
             </v-btn>
-            <v-btn icon small :color="theme.$error_color" @click.stop.prevent="deleteFilter(filter)">
+            <v-btn
+              icon
+              small
+              :color="theme.$error_color"
+              @click.stop.prevent="deleteFilter(filter)"
+            >
               <v-icon>{{ trashIcon }}</v-icon>
             </v-btn>
           </v-col>
@@ -194,9 +200,7 @@
     },
     methods: {
       reverseFilter(filter) {
-        this.$nextTick(() => {
-          filter.invertMatches = !filter.invertMatches;
-        });
+        filter.invertMatches = !filter.invertMatches;
       },
       focusRow(index) {
         if (this.focusedRow === null) this.focusedRow = index;

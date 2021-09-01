@@ -3,23 +3,32 @@
     <v-row @click.self="$emit('editFilterPart', filterPart)">
       <v-col>
         <div v-if="filterPart.filterPartType === 'token'">
-          <h4>
-            <b>
-              {{ elemName }}
-            </b>
+          <h4 :style="{ color: theme.$title }">
+            {{ elemName }}
           </h4>
           <div class="align-center d-flex">
-            <h5>
+            <h5 :style="{ color: theme.$secondary_text }">
               {{ filterPart.fieldName }}
               ({{ filterPart.values.length }})
             </h5>
             <v-menu offset-y :close-on-content-click="false" max-height="300">
               <template v-slot:activator="{ on, attrs }">
-                <v-btn icon x-small v-bind="attrs" v-on="on">
+                <v-btn
+                  icon
+                  x-small
+                  v-bind="attrs"
+                  v-on="on"
+                  :style="{ color: theme.$secondary_text }"
+                >
                   <v-icon>{{ dropDownIcon }}</v-icon>
                 </v-btn>
               </template>
-              <v-list :style="{ 'background-color': theme.$main_bg, 'border': `1px solid ${theme.$secondary_border}`}">
+              <v-list
+                :style="{
+                  'background-color': theme.$main_bg,
+                  border: `1px solid ${theme.$secondary_border}`,
+                }"
+              >
                 <v-list-item
                   v-for="(value, index) in filterPart.values"
                   :key="index"
@@ -39,12 +48,10 @@
         </div>
 
         <div v-else>
-          <h4>
-            <b>
-              {{ filterPart.fieldName }} {{ filterPart.operationManual }} {{ filterPart.value }}
-            </b>
+          <h4 :style="{ color: theme.$title }">
+            {{ filterPart.fieldName }} {{ filterPart.operationManual }} {{ filterPart.value }}
           </h4>
-          <h5>({{ filterPart.fieldType }})</h5>
+          <h5 :style="{ color: theme.$secondary_text }">({{ filterPart.fieldType }})</h5>
         </div>
       </v-col>
 
@@ -52,7 +59,13 @@
         <v-btn icon x-small outlined @click.stop.prevent="clearValues">
           <v-icon>{{ refreshIcon }}</v-icon>
         </v-btn>
-        <v-btn icon x-small color="red" outlined @click.stop.prevent="$emit('deleteFilterPart', filterPart)">
+        <v-btn
+          icon
+          x-small
+          color="red"
+          outlined
+          @click.stop.prevent="$emit('deleteFilterPart', filterPart)"
+        >
           <v-icon>{{ closeIcon }}</v-icon>
         </v-btn>
       </v-col>
