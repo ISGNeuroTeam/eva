@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+- unit setting to multiline component
+
 ### Fixed
 - hover on first row in table
 
@@ -22,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - bug with dashboard without elements after tabs integrations
+- bug with captions not moving while zooming on MultiLine
 
 ## [1.62.0]
 
