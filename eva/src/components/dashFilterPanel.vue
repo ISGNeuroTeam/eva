@@ -28,11 +28,7 @@
           @click="focusRow(indexFilter)"
         >
           <!-- FILTER ID -->
-          <v-col
-            cols="1"
-            class="d-flex align-center justify-center"
-            style="height: 100%"
-          >
+          <v-col cols="1" class="d-flex align-center justify-center" style="height: 100%">
             {{ filter.id }}
           </v-col>
 
@@ -45,10 +41,7 @@
           >
             <v-sheet :style="{ 'background-color': theme.$main_bg }">
               <v-slide-group show-arrows>
-                <v-slide-item
-                  v-for="(part, indexPart) in filter.parts"
-                  :key="indexPart"
-                >
+                <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
                   <div
                     @click.stop.prevent="
                       indexFilter === focusedRow ? openFilterPartModal(part) : focusRow(indexFilter)
@@ -91,7 +84,7 @@
           <!-- FILTER BUTTONS -->
           <v-col
             cols="1"
-            class="d-flex align-center justify-center"
+            class="d-flex align-center justify-space-around"
             v-if="focusedRow === indexFilter"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
@@ -104,6 +97,9 @@
             </v-btn>
             <v-btn icon small @click.stop.prevent="refreshFilter(filter)"
               ><v-icon>{{ refreshIcon }}</v-icon>
+            </v-btn>
+            <v-btn icon small @click.stop.prevent="openFilterPreviewModal(filter)"
+              ><v-icon>{{ eyeIcon }}</v-icon>
             </v-btn>
             <v-btn
               icon
@@ -141,14 +137,22 @@
         :filterPart="filterPartInModal"
         @saveFilterPart="saveFilterPart"
         @closeFilterPart="closeFilterPart"
-      ></filter-part-modal>
+      />
+    </v-dialog>
+
+    <v-dialog max-width="400" v-model="showFilterPreviewModal" persistent>
+      <filter-preview-modal
+        @closeFilterPreviewModal="closeFilterPreviewModal"
+        :filter="filterInPreviewModal"
+      />
     </v-dialog>
   </div>
 </template>
 
 <script>
-  import FilterPartModal from './dash-filter-panel/FilterPartModal';
   import FilterPart from './dash-filter-panel/FilterPart';
+  import FilterPartModal from './dash-filter-panel/FilterPartModal';
+  import FilterPreviewModal from './dash-filter-panel/FilterPreviewModal';
 
   import {
     mdiPlusCircleOutline,
@@ -157,11 +161,12 @@
     mdiCheck,
     mdiClose,
     mdiSwapHorizontal,
+    mdiEyeOutline,
   } from '@mdi/js';
 
   export default {
     name: 'DashFilterPanel',
-    components: { FilterPartModal, FilterPart },
+    components: { FilterPartModal, FilterPart, FilterPreviewModal },
     props: {
       idDashFrom: null,
     },
@@ -172,12 +177,15 @@
         focusedRow: null,
         filterPartModalShow: false,
         filterPartInModal: {},
+        filterInPreviewModal: null,
+        showFilterPreviewModal: false,
         plusIcon: mdiPlusCircleOutline,
         trashIcon: mdiTrashCanOutline,
         refreshIcon: mdiRefresh,
         acceptIcon: mdiCheck,
         declineIcon: mdiClose,
         reverseIcon: mdiSwapHorizontal,
+        eyeIcon: mdiEyeOutline,
       };
     },
     computed: {
@@ -279,6 +287,14 @@
       closeFilterPart() {
         this.filterPartInModal = {};
         this.filterPartModalShow = false;
+      },
+      openFilterPreviewModal(filter) {
+        this.filterInPreviewModal = filter;
+        this.showFilterPreviewModal = true;
+      },
+      closeFilterPreviewModal() {
+        this.filterInPreviewModal = null;
+        this.showFilterPreviewModal = false;
       },
     },
     mounted() {

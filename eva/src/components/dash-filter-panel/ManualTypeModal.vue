@@ -44,27 +44,29 @@
       <v-text-field v-model="temp.value" outlined :background-color="theme.$main_bg" />
     </div>
     <v-slide-group v-model="currentOperationTab" mandatory>
-      <v-slide-item
-        v-for="(tab, index) in operationMap[temp.fieldType]"
-        style="text-transform: none; font-size: 12px; box-shadow: none"
-        :key="index"
-        v-slot="{ active, toggle }"
-      >
-        <v-btn
-          @click="toggle"
-          :style="
-            active
-              ? {
-                  'background-color': theme.$primary_button,
-                  color: theme.$main_bg,
-                  'border-radius': '3px',
-                }
-              : undefined
-          "
+      <div style="width:100%" class="d-flex justify-space-around">
+        <v-slide-item
+          v-for="(tab, index) in operationMap[temp.fieldType]"
+          style="text-transform: none; font-size: 12px; box-shadow: none"
+          :key="index"
+          v-slot="{ active, toggle }"
         >
-          {{ getOperationManualTitle(tab) }}
-        </v-btn>
-      </v-slide-item>
+          <v-btn
+            @click="toggle"
+            :style="
+              active
+                ? {
+                    'background-color': theme.$primary_button,
+                    color: theme.$main_bg,
+                    'border-radius': '3px',
+                  }
+                : {'background-color':theme.$main_bg}
+            "
+          >
+            {{ getOperationManualTitle(tab) }}
+          </v-btn>
+        </v-slide-item>
+      </div>
     </v-slide-group>
   </div>
 </template>

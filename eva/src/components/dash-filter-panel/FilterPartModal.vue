@@ -1,7 +1,7 @@
 <template>
   <v-card :style="{ 'background-color': theme.$secondary_bg }">
     <v-card-title :style="{ color: theme.$title, 'background-color': theme.$main_bg }">
-      <v-icon class="pr-2">{{ settingsIcon }}</v-icon
+      <v-icon :color="theme.$title" class="pr-2">{{ settingsIcon }}</v-icon
       >Настройки фильтра
     </v-card-title>
     <v-card-subtitle class="mt-5">
