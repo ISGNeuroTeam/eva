@@ -5,41 +5,31 @@
       >Настройки фильтра
     </v-card-title>
     <v-card-subtitle class="mt-5">
-      <v-tabs
-        v-model="currentTab"
-        :style="{
-          color: theme.$title,
-          'background-color': theme.$main_bg,
-          'border-radius': '4px',
-        }"
-        hide-slider
-        centered
-        grow
-      >
-        <v-tab
-          v-for="(item, index) in typeMap"
-          style="text-transform: none"
-          :key="index"
-          :style="
-            currentTab === index
-              ? {
-                  'background-color': theme.$primary_button,
-                  color: theme.$main_bg,
-                  'border-radius': '3px',
-                }
-              : undefined
-          "
-        >
-          {{ item.title }}
-        </v-tab>
-      </v-tabs>
+      <v-item-group v-model="currentTab" mandatory>
+        <v-item v-for="(item, index) in typeMap" :key="index" v-slot="{ active, toggle }"
+          ><v-btn
+            depressed
+            style="text-transform: none; width: 50%"
+            :style="
+              active
+                ? {
+                    'background-color': theme.$primary_button,
+                    color: theme.$main_bg,
+                    'border-radius': '3px',
+                  }
+                : {
+                    'background-color': theme.$main_bg,
+                  }
+            "
+            @click="toggle"
+          >
+            {{ item.title }}
+          </v-btn>
+        </v-item>
+      </v-item-group>
     </v-card-subtitle>
     <v-card-text>
-      <v-tabs-items v-model="currentTab">
-        <v-tab-item v-for="(item, index) in typeMap" :key="index">
-          <component :is="item.componentName" :idDash="idDash" :temp="temp"></component>
-        </v-tab-item>
-      </v-tabs-items>
+      <component :is="typeMap[currentTab].componentName" :idDash="idDash" :temp="temp"></component>
       <div class="d-flex justify-end">
         <v-btn text @click="closeFilterPartModal" class="ma-2" style="text-transform: none"
           >Отменить</v-btn

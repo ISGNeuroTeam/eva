@@ -11,7 +11,12 @@
               {{ filterPart.fieldName }}
               ({{ filterPart.values.length }})
             </h5>
-            <v-menu offset-y :close-on-content-click="false" max-height="300">
+            <v-menu
+              offset-y
+              :close-on-content-click="false"
+              max-height="300"
+              v-if="filterPart.values.length > 0"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   icon
