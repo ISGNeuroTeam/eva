@@ -1,5 +1,3 @@
-<!-- Модальное окно для настройки дашборда -->
-
 <template>
   <v-dialog
     v-model="active"
@@ -151,7 +149,7 @@
           </div>
           <!-- end lastResult-->
           <!-- start searchBtn-->
-          <div 
+          <div
             v-if="checkOptions('searchBtn')"
             class="option-item" 
           >
@@ -294,7 +292,7 @@
                 outlined 
                 class="subnumber"  
                 hide-details
-              />  
+              />
             </div>
           </div>
           <div 
@@ -785,9 +783,9 @@
               :key="i"
               class="options-item-tooltip"  
             >
-              <v-select  
+              <v-select
                 v-model="metrics[i-1].name"
-                :items="metricsName" 
+                :items="metricsName.map(el => el.name)"
                 :color="theme.$accent_ui_color" 
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
@@ -963,18 +961,34 @@
             </v-container>
           </div>
 
-          <v-card-text 
-            class="headline " 
+          <v-container fluid>
+            <v-row>
+              <div v-for="metric in metricsName" :key="metric.name">
+                {{ metric.name }}
+                <v-text-field
+                  v-model="metricUnits[metric.name]"
+                  :color="theme.$accent_ui_color"
+                  :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
+                  outlined
+                  class="subnumber"
+                  hide-details
+                />
+              </div>
+            </v-row>
+          </v-container>
+          <v-card-text
+            v-if="checkOptions('piechartSettings')"
+            class="headline "
           >
-            <div 
-              class="settings-title" 
+            <div
+              class="settings-title"
               :style="{color:theme.$main_text,borderColor:theme.$main_border}"
             >
-              Настройки круговой диаграммы 
+              Настройки круговой диаграммы
             </div>
           </v-card-text>
-
-          <div 
+          <div
+            v-if="checkOptions('piechartSettings')"
             ref="options" 
             class="options-block"  
           >
@@ -1318,7 +1332,8 @@ export default {
       sortType: [
         "По возрастанию",
         "По убыванию"
-      ]
+      ],
+      metricUnits: {}
     }
   },
   computed: { 
@@ -1327,11 +1342,16 @@ export default {
         this.element = this.$store.getters.getModalSettings(this.idDash).element;  // получаем для каокго элемнета вывести настройки
         if (this.element.indexOf('csvg') != -1) { 
           this.tooltipSettingShow = true;
-        } else {   
+        } else {
           this.tooltipSettingShow = false;
         }
         this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
+        if (this.element.startsWith("multiLine")) {
+          this.metricsName.forEach(metric => {
+            this.metricUnits[metric.name] = metric.units;
+          })
+        }
         let test = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
         if (this.element.includes("heatmapGeneral")) {
           this.x = test.x
@@ -1424,6 +1444,9 @@ export default {
         this.options.ySort = this.ySort;
         this.options.xFormat = this.xFormat;
         this.options.xSort = this.xSort;
+      }
+      if (this.element.startsWith("multiLine")) {
+        this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
       }
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();

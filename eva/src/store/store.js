@@ -693,14 +693,25 @@ export default {  // приблизительный объект хранили�
       })
     },
     setMetricsMulti: (state,dash) => {
-      let metrics = [...[],...dash.metrics];
+      let metrics = dash.metrics.map(metric => ({name: metric, units: ''}));
       metrics.splice(0,1);
-      //console.log(dash.idDash,dash.id)
       if (!state[dash.idDash][dash.id].metrics) {
-        state[dash.idDash][dash.id].metrics = [];
+        Vue.set(state[dash.idDash][dash.id], 'metrics', [])
+      } else {
+        metrics.forEach(metric => {
+          const temp = state[dash.idDash][dash.id].metrics.find(m => m.name === metric.name)
+          if (temp) {
+            metric.units = temp.units;
+          }
+        })
       }
-      //Vue.set(state[dash.idDash][dash.id], 'metrics',[]);
       state[dash.idDash][dash.id].metrics = metrics;
+    },
+    setMultilineMetricUnits: (state, payload) => {
+      const { idDash, elem, units } = payload;
+      state[idDash][elem].metrics.forEach(metric => {
+        metric.units = units[metric.name] ? units[metric.name] : '';
+      })
     },
     setMetricsPie: (state,dash) => {
       let metrics = [...[],...dash.metrics];
@@ -1481,10 +1492,9 @@ export default {  // приблизительный объект хранили�
     getMetricsMulti: (state) => {
       return (dash) => {
         if (!state[dash.idDash][dash.id].metrics) {
-          state[dash.idDash][dash.id].metrics = [];
+          Vue.set(state[dash.idDash][dash.id], 'metrics', []);
         }
         return state[dash.idDash][dash.id].metrics
-
       }
     },
     getSizeGrid: (state) => {
