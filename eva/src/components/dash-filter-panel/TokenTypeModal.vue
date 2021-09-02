@@ -1,10 +1,23 @@
 <template>
-  <div>
+  <div :style="{ 'background-color': theme.$secondary_bg }">
     Токен
-    <v-select outlined v-model="currentToken" :items="tokens" item-text="name" return-object dense>
-    </v-select>
+    <v-select
+      :items="tokens"
+      item-text="name"
+      v-model="currentToken"
+      return-object
+      :background-color="theme.$main_bg"
+      outlined
+      dense
+    />
     Операция
-    <v-select outlined dense v-model="temp.operationToken" :items="operations" />
+    <v-select
+      :background-color="theme.$main_bg"
+      v-model="temp.operationToken"
+      :items="operations"
+      outlined
+      dense
+    />
   </div>
 </template>
 <script>
@@ -16,11 +29,6 @@
         operations: ['OR', 'AND', 'REPLACE'],
         currentToken: null,
       };
-    },
-    computed: {
-      theme() {
-        return this.$store.getters.getTheme;
-      },
     },
     watch: {
       currentToken(token) {
@@ -39,6 +47,9 @@
     computed: {
       tokens() {
         return this.$store.getters.getTockens(this.idDash);
+      },
+      theme() {
+        return this.$store.getters.getTheme;
       },
     },
   };

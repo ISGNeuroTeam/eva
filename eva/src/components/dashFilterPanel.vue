@@ -32,7 +32,6 @@
             cols="1"
             class="d-flex align-center justify-center"
             style="height: 100%"
-            :style="{ 'border-right': `1px solid ${theme.$secondary_border}`, color: theme.$title }"
           >
             {{ filter.id }}
           </v-col>
@@ -42,14 +41,13 @@
             class="d-flex align-center justify-space-between"
             style="width: 100%"
             cols="10"
-            :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
+            :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <v-sheet :style="{ 'background-color': theme.$main_bg }">
               <v-slide-group show-arrows>
                 <v-slide-item
                   v-for="(part, indexPart) in filter.parts"
                   :key="indexPart"
-                  :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
                 >
                   <div
                     @click.stop.prevent="
@@ -95,6 +93,7 @@
             cols="1"
             class="d-flex align-center justify-center"
             v-if="focusedRow === indexFilter"
+            :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <v-btn
               icon

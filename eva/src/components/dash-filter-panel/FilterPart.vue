@@ -38,7 +38,7 @@
                     {{ value }}
                   </h5>
                   <v-spacer></v-spacer>
-                  <v-btn icon x-small outlined class="ml-2" @click="removeValue(index)">
+                  <v-btn icon x-small class="ml-2" @click="removeValue(index)">
                     <v-icon>{{ closeIcon }}</v-icon>
                   </v-btn>
                 </v-list-item>
@@ -56,14 +56,13 @@
       </v-col>
 
       <v-col class="d-flex flex-column align-center justify-space-between" v-if="isFocused">
-        <v-btn icon x-small outlined @click.stop.prevent="clearValues">
+        <v-btn icon x-small @click.stop.prevent="clearValues">
           <v-icon>{{ refreshIcon }}</v-icon>
         </v-btn>
         <v-btn
           icon
           x-small
-          color="red"
-          outlined
+          :color="theme.$error_color"
           @click.stop.prevent="$emit('deleteFilterPart', filterPart)"
         >
           <v-icon>{{ closeIcon }}</v-icon>

@@ -1,20 +1,58 @@
 <template>
-  <v-card>
-    <v-card-subtitle>
-      <v-tabs hide-slider centered grow v-model="currentTab">
-        <v-tab v-for="(tab, index) in typeTabs" :key="index">
-          {{ tab.title }}
+  <v-card :style="{ 'background-color': theme.$secondary_bg }">
+    <v-card-title :style="{ color: theme.$title, 'background-color': theme.$main_bg }">
+      <v-icon class="pr-2">{{ settingsIcon }}</v-icon
+      >Настройки фильтра
+    </v-card-title>
+    <v-card-subtitle class="mt-5">
+      <v-tabs
+        v-model="currentTab"
+        :style="{
+          color: theme.$title,
+          'background-color': theme.$main_bg,
+          'border-radius': '4px',
+        }"
+        hide-slider
+        centered
+        grow
+      >
+        <v-tab
+          v-for="(item, index) in typeMap"
+          style="text-transform: none"
+          :key="index"
+          :style="
+            currentTab === index
+              ? {
+                  'background-color': theme.$primary_button,
+                  color: theme.$main_bg,
+                  'border-radius': '3px',
+                }
+              : undefined
+          "
+        >
+          {{ item.title }}
         </v-tab>
       </v-tabs>
     </v-card-subtitle>
     <v-card-text>
       <v-tabs-items v-model="currentTab">
-        <v-tab-item v-for="(tab, index) in typeTabs" :key="index">
-          <component :is="tab.componentName" :idDash="idDash" :temp="temp"></component>
+        <v-tab-item v-for="(item, index) in typeMap" :key="index">
+          <component :is="item.componentName" :idDash="idDash" :temp="temp"></component>
         </v-tab-item>
       </v-tabs-items>
-      <v-btn @click="saveFilterPartModal" class="ma-2">Сохранить</v-btn>
-      <v-btn @click="closeFilterPartModal" class="ma-2">Отменить</v-btn>
+      <div class="d-flex justify-end">
+        <v-btn text @click="closeFilterPartModal" class="ma-2" style="text-transform: none"
+          >Отменить</v-btn
+        >
+        <v-btn
+          style="text-transform: none"
+          :color="theme.$primary_button"
+          :style="{ color: theme.$secondary_bg }"
+          @click="saveFilterPartModal"
+          class="ma-2"
+          >Сохранить</v-btn
+        >
+      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -22,6 +60,7 @@
 <script>
   import ManualTypeModal from './ManualTypeModal';
   import TokenTypeModal from './TokenTypeModal';
+  import { mdiSettings } from '@mdi/js';
 
   export default {
     name: 'FilterPartModal',
@@ -33,12 +72,12 @@
     data() {
       return {
         currentTab: 0,
-        typeTabs: [
-          { title: 'Конфигуратор', componentName: 'ManualTypeModal' },
-          { title: 'Токен', componentName: 'TokenTypeModal' },
+        typeMap: [
+          { title: 'Токен', componentName: 'TokenTypeModal', type: 'token' },
+          { title: 'Ручной ввод', componentName: 'ManualTypeModal', type: 'manual' },
         ],
-        typeMap: ['manual', 'token'],
         temp: {},
+        settingsIcon: mdiSettings,
       };
     },
     computed: {
@@ -48,13 +87,20 @@
     },
     watch: {
       currentTab(val) {
-        this.temp.filterPartType = this.typeMap[val];
+        this.temp.filterPartType = this.typeMap[val].type;
       },
       filterPart: {
         immediate: true,
         handler(filterPart) {
-          this.currentTab = filterPart ? this.typeMap.indexOf(filterPart.filterPartType) : 0;
-          this.temp = filterPart;
+          let itemIndex = this.typeMap.findIndex(item => item.type === filterPart.filterPartType);
+          if (itemIndex !== -1) {
+            this.currentTab = itemIndex;
+            this.temp = filterPart;
+          } else {
+            throw new Error(
+              `Type "${filterPart.filterPartType}" of filter part does not recognized`
+            );
+          }
         },
       },
     },
@@ -69,7 +115,4 @@
   };
 </script>
 
-<style lang="sass" scoped>
-  .active-type-tab
-    background-color: var(--primary_button)
-</style>
+<style lang="sass" scoped></style>
