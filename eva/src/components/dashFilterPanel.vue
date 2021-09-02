@@ -46,6 +46,8 @@
                     @click.stop.prevent="
                       indexFilter === focusedRow ? openFilterPartModal(part) : focusRow(indexFilter)
                     "
+                    :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
+
                   >
                     <filter-part
                       @deleteFilterPart="deleteFilterPart"
@@ -91,14 +93,18 @@
             <v-btn
               icon
               small
-              :color="filter.invertMatches ? theme.$primary_button : undefined"
+              :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
               @click.stop.prevent="reverseFilter(filter)"
               ><v-icon>{{ reverseIcon }}</v-icon>
             </v-btn>
-            <v-btn icon small @click.stop.prevent="refreshFilter(filter)"
+            <v-btn icon small @click.stop.prevent="refreshFilter(filter)" :color="theme.$main_text"
               ><v-icon>{{ refreshIcon }}</v-icon>
             </v-btn>
-            <v-btn icon small @click.stop.prevent="openFilterPreviewModal(filter)"
+            <v-btn
+              icon
+              small
+              @click.stop.prevent="openFilterPreviewModal(filter)"
+              :color="theme.$main_text"
               ><v-icon>{{ eyeIcon }}</v-icon>
             </v-btn>
             <v-btn

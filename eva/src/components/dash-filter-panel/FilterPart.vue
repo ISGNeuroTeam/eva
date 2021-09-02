@@ -61,7 +61,7 @@
       </v-col>
 
       <v-col class="d-flex flex-column align-center justify-space-between" v-if="isFocused">
-        <v-btn icon x-small @click.stop.prevent="clearValues">
+        <v-btn icon x-small @click.stop.prevent="clearValues" :color="theme.$main_text">
           <v-icon>{{ refreshIcon }}</v-icon>
         </v-btn>
         <v-btn

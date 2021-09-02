@@ -14,11 +14,12 @@
               active
                 ? {
                     'background-color': theme.$primary_button,
-                    color: theme.$main_bg,
+                    color: theme.$secondary_bg,
                     'border-radius': '3px',
                   }
                 : {
                     'background-color': theme.$main_bg,
+                    color: theme.$main_text,
                   }
             "
             @click="toggle"
@@ -30,11 +31,20 @@
     </v-card-subtitle>
     <v-card-text>
       <component :is="typeMap[currentTab].componentName" :idDash="idDash" :temp="temp"></component>
+      <v-switch v-model="filterPart.invertMatches" 
+        ><h5 slot="label" :style="{ color: theme.$secondary_text }">Вычитать значения</h5></v-switch
+      >
       <div class="d-flex justify-end">
-        <v-btn text @click="closeFilterPartModal" class="ma-2" style="text-transform: none"
+        <v-btn
+          text
+          @click="closeFilterPartModal"
+          class="ma-2"
+          style="text-transform: none"
+          :style="{ color: theme.$main_text }"
           >Отменить</v-btn
         >
         <v-btn
+          depressed
           style="text-transform: none"
           :color="theme.$primary_button"
           :style="{ color: theme.$secondary_bg }"

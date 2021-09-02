@@ -26,11 +26,7 @@ export function filterCompile(filter) {
           case 'manual':
             switch (part.fieldType) {
               case 'string':
-                if (part.operationManual === 'exactMatch') {
-                  filterOtlText += `${part.fieldName}="${part.value}")`;
-                } else {
-                  filterOtlText += `${part.fieldName}="*${part.value}*")`;
-                }
+                filterOtlText += `${part.fieldName}="${part.value}")`;
                 break;
               case 'number':
                 filterOtlText += `${part.fieldName}${part.operationManual}${part.value})`;

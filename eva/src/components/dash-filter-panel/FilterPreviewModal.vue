@@ -36,7 +36,7 @@
     },
     watch: {
       filter() {
-        this.filterOtlText = filterCompile(this.filter);
+        if (this.filter) this.filterOtlText = filterCompile(this.filter);
       },
     },
     computed: {

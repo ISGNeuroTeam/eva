@@ -1,19 +1,31 @@
 <template>
-  <div :style="{ 'background-color': theme.$secondary_bg }">
+  <div
+    :style="{ 'background-color': theme.$secondary_bg, color: theme.$main_text }"
+    class="manual-type-filter-modal"
+  >
     Имя поля
-    <v-text-field outlined v-model="temp.fieldName" :background-color="theme.$main_bg" />
-
+    <v-text-field
+      hide-details
+      outlined
+      dense
+      v-model="temp.fieldName"
+      :background-color="theme.$main_bg"
+      style="padding-bottom: 10px"
+    />
     Тип
     <v-select
-      outlined
       v-model="temp.fieldType"
       item-value="value"
       item-text="title"
       :items="fieldTypes"
       :background-color="theme.$main_bg"
+      style="padding-bottom: 10px"
+      hide-details
+      outlined
+      dense
     />
 
-    <div v-if="temp.fieldType === 'date'">
+    <div v-if="temp.fieldType === 'date'" style="position: relative; padding-bottom: 10px">
       Дата
       <v-text-field
         v-model="temp.value"
@@ -21,9 +33,10 @@
         :color="theme.$accent_ui_color"
         :style="{ color: theme.$main_text }"
         class="textarea-item"
-        outlined
         placeholder="0"
         hide-details
+        outlined
+        dense
       >
       </v-text-field>
       <DTPicker
@@ -39,14 +52,20 @@
         </v-icon>
       </DTPicker>
     </div>
-    <div v-else>
+    <div v-else style="padding-bottom: 10px">
       Значение
-      <v-text-field v-model="temp.value" outlined :background-color="theme.$main_bg" />
+      <v-text-field
+        v-model="temp.value"
+        :background-color="theme.$main_bg"
+        hide-details
+        outlined
+        dense
+      />
     </div>
     <v-slide-group v-model="currentOperationTab" mandatory>
-      <div style="width:100%" class="d-flex justify-space-around">
+      <div style="width: 100%" class="d-flex justify-space-around">
         <v-slide-item
-          v-for="(tab, index) in operationMap[temp.fieldType]"
+          v-for="(item, index) in operationMap[temp.fieldType]"
           style="text-transform: none; font-size: 12px; box-shadow: none"
           :key="index"
           v-slot="{ active, toggle }"
@@ -60,10 +79,10 @@
                     color: theme.$main_bg,
                     'border-radius': '3px',
                   }
-                : {'background-color':theme.$main_bg}
+                : { 'background-color': theme.$main_bg, color:theme.$main_text }
             "
           >
-            {{ getOperationManualTitle(tab) }}
+            {{ getOperationManualTitle(item) }}
           </v-btn>
         </v-slide-item>
       </div>
@@ -91,14 +110,14 @@
         currentOperationTab: 0,
         pickedDate: '',
         operationMap: {
-          string: ['exactMatch', 'match'],
+          string: [],
           date: ['<', '>'],
           number: ['<', '>', '=', '>=', '<='],
         },
         operationManualTitleMap: {
           string: {
             exactMatch: 'Полное совпадение',
-            match: 'Регулярное выражение',
+            regExp: 'Регулярное выражение',
           },
           // number: {
           //   '>': 'Больше',
@@ -145,16 +164,32 @@
   };
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
+  .manual-type-filter-modal
 
-  .dtpicker-search
-      position: absolute
-      top: 1px
-      cursor: pointer
+    .v-text-field__slot input
+      color: var(--main_text)
+
+    .v-input__slot fieldset
+      color: var(--main_text) !important
+
+    .v-input__control
+      .v-icon
+        color: var(--main_text) !important
+
+    .v-select__selections
+      color: var(--main_text) !important
+    .v-input input
+      min-height: auto !important
+
+    .dtpicker-search
+        position: absolute
+        top: 1px
+        cursor: pointer
 
 
-      &:nth-child(2)
-        margin-left: 20px
+        &:nth-child(2)
+          margin-left: 20px
 
-        .datepicker
+          .datepicker
 </style>
