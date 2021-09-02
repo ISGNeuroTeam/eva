@@ -25,7 +25,11 @@
       dense
     />
 
-    <div v-if="temp.fieldType === 'date'" style="position: relative; padding-bottom: 10px">
+    <div
+      v-if="temp.fieldType === 'date'"
+      style="position: relative; padding-bottom: 10px"
+      class="filter-date-type-form"
+    >
       Дата
       <v-text-field
         v-model="temp.value"
@@ -38,19 +42,27 @@
         outlined
         dense
       >
+        <v-btn
+          icon
+          slot="append"
+          :color="theme.$primary_button"
+          @click="showDatePicker = !showDatePicker"
+        >
+          <v-icon :style="{ color: `${theme.$primary_button} !important` }">
+            {{ calendarIcon }}
+          </v-icon>
+        </v-btn>
       </v-text-field>
-      <DTPicker
-        v-model="temp.value"
-        :no-value-to-custom-elem="true"
-        format="YYYY-MM-DD HH:mm"
-        :color="theme.$accent_ui_color"
-        :button-color="theme.$primary_button"
-        class="dtpicker-search"
-      >
-        <v-icon class="picker-search" :color="theme.$primary_button">
-          {{ pickerIcon }}
-        </v-icon>
-      </DTPicker>
+      <v-dialog v-model="showDatePicker" max-width="400" class="dash-picker">
+        <DTPicker
+          inline
+          v-model="temp.value"
+          format="YYYY-MM-DD HH:mm"
+          class="dtpicker"
+          :color="theme.$accent_ui_color"
+          :button-color="theme.$primary_button"
+        />
+      </v-dialog>
     </div>
     <div v-else style="padding-bottom: 10px">
       Значение
@@ -72,6 +84,7 @@
         >
           <v-btn
             @click="toggle"
+            style="font-size: 12px; width: 100px"
             :style="
               active
                 ? {
@@ -79,7 +92,7 @@
                     color: theme.$main_bg,
                     'border-radius': '3px',
                   }
-                : { 'background-color': theme.$main_bg, color:theme.$main_text }
+                : { 'background-color': theme.$main_bg, color: theme.$main_text }
             "
           >
             {{ getOperationManualTitle(item) }}
@@ -108,37 +121,35 @@
           { value: 'date', title: 'Дата' },
         ],
         currentOperationTab: 0,
-        pickedDate: '',
         operationMap: {
           string: [],
           date: ['<', '>'],
-          number: ['<', '>', '=', '>=', '<='],
+          number: ['>', '<', '='],
         },
         operationManualTitleMap: {
-          string: {
-            exactMatch: 'Полное совпадение',
-            regExp: 'Регулярное выражение',
+          number: {
+            '>': 'Больше',
+            '<': 'Меньше',
+            '=': 'Равно',
           },
-          // number: {
-          //   '>': 'Больше',
-          //   '<': 'Меньше',
-          //   '=': 'Равно',
-          //   '>=': 'Больше или равно',
-          //   '<=': 'Меньше или равно',
-          // },
-          // date: {
-          //   '>': 'Позже',
-          //   '<': 'Раньше',
-          // },
+          date: {
+            '>': 'Позже',
+            '<': 'Раньше',
+          },
         },
-        pickerIcon: mdiCalendarMonth,
+        showDatePicker: false,
+        calendarIcon: mdiCalendarMonth,
       };
     },
     methods: {
       getOperationManualTitle(operation) {
-        if (this.temp.fieldType === 'string')
-          return this.operationManualTitleMap[this.temp.fieldType][operation];
-        else return operation;
+        return this.operationManualTitleMap[this.temp.fieldType][operation];
+      },
+      openDatePicker() {
+        this.showDatePicker = true;
+      },
+      closeDatePicker() {
+        this.showDatePicker = false;
       },
     },
     watch: {
@@ -165,7 +176,11 @@
 </script>
 
 <style lang="sass">
+
+
+
   .manual-type-filter-modal
+    color: var(--main_text) !important
 
     .v-text-field__slot input
       color: var(--main_text)
@@ -181,15 +196,4 @@
       color: var(--main_text) !important
     .v-input input
       min-height: auto !important
-
-    .dtpicker-search
-        position: absolute
-        top: 1px
-        cursor: pointer
-
-
-        &:nth-child(2)
-          margin-left: 20px
-
-          .datepicker
 </style>

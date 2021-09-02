@@ -35,8 +35,11 @@
       };
     },
     watch: {
-      filter() {
-        if (this.filter) this.filterOtlText = filterCompile(this.filter);
+      filter: {
+        immediate:true,
+        handler(filter) {
+          if (filter) this.filterOtlText = filterCompile(filter);
+        },
       },
     },
     computed: {

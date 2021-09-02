@@ -54,9 +54,9 @@
 
         <div v-else>
           <h4 :style="{ color: theme.$title }">
-            {{ filterPart.fieldName }} {{ filterPart.operationManual }} {{ filterPart.value }}
+            {{ filterPart.fieldName }}: {{ filterPart.value }}
           </h4>
-          <h5 :style="{ color: theme.$secondary_text }">({{ filterPart.fieldType }})</h5>
+          <h5 :style="{ color: theme.$secondary_text }">({{ filterPart.fieldType }}) {{operationManualTitle}}</h5>
         </div>
       </v-col>
 
@@ -89,7 +89,18 @@
         refreshIcon: mdiRefresh,
         editIcon: mdiPencil,
         dropDownIcon: mdiChevronDown,
-      };
+        operationManualTitleMap: {
+          number: {
+            '>': 'Больше',
+            '<': 'Меньше',
+            '=': 'Равно',
+          },
+          date: {
+            '>': 'Позже',
+            '<': 'Раньше',
+          },
+        }
+      }
     },
     computed: {
       theme() {
@@ -102,6 +113,9 @@
           return 'Ручной фильтр';
         }
       },
+      operationManualTitle(){
+        return this.operationManualTitleMap[this.filterPart.fieldType][this.filterPart.operationManual];
+      }
     },
     methods: {
       clearValues() {
