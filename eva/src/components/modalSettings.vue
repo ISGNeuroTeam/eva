@@ -140,8 +140,8 @@
             <div class="status-option item">
               <v-switch   
                 v-model="options.lastResult"  
-                class="switch" 
-                :color="theme.$primary_button" 
+                class="switch"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text}" 
                 :label="String(options.lastResult)" 
               />
@@ -168,8 +168,8 @@
             <div class="status-option item">
               <v-switch   
                 v-model="options.searchBtn"  
-                class="switch" 
-                :color="theme.$primary_button" 
+                class="switch"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text}" 
                 :label="String(options.searchBtn)" 
               />
@@ -197,8 +197,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.osmserver"   
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -228,7 +228,7 @@
               <v-text-field 
                 v-model="options.strokeWidth"   
                 clearable  
-                :color="theme.$accent_ui_color" 
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -257,8 +257,8 @@
             <div class="status-option item">
               <v-select  
                 v-model="options.thememultiline"
-                :items="['default','Anna theme']" 
-                :color="theme.$accent_ui_color" 
+                :items="['default','Anna theme']"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
@@ -286,8 +286,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.subnumber"   
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -314,8 +314,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.rowcolor"  
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -342,8 +342,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.columncolor" 
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined 
                 class="subnumber"  
@@ -370,8 +370,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.cellcolor" 
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber" 
@@ -398,8 +398,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.color" 
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -426,8 +426,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.backgroundcolor"
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -454,8 +454,8 @@
             <div class="status-option item">
               <v-text-field 
                 v-model="options.name"  
-                clearable  
-                :color="theme.$accent_ui_color" 
+                clearable
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber" 
@@ -509,7 +509,7 @@
             </v-card-text>
               <v-row :style="{color:theme.$main_text}" >
                 <v-col col="4">
-                  <v-select label="x:" v-model="x" :items="tableTitles" />
+                  <v-select v-model="x" label="x:" :items="tableTitles" />
                 </v-col>
                 <v-col col="4">
                    <v-select v-model="xFormat" :items="dataFormat" />
@@ -520,7 +520,7 @@
               </v-row>
               <v-row :style="{color:theme.$main_text}" >
                 <v-col col="4">
-                  <v-select label="y:" v-model="y" :items="tableTitles" />
+                  <v-select v-model="y" label="y:" :items="tableTitles" />
                 </v-col>
                 <v-col col="4">
                    <v-select v-model="yFormat" :items="dataFormat" />
@@ -529,8 +529,8 @@
                    <v-select v-model="ySort" :items="sortType" />
                 </v-col>
               </v-row>
-              <v-row :style="{color:theme.$main_text}" ><v-select label="data:" v-model="data" :items="tableTitles" /> </v-row>
-              <v-row :style="{color:theme.$main_text}" ><v-select label="metadata:" v-model="metadata" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select v-model="data" label="data:" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select v-model="metadata" label="metadata:" :items="tableTitles" /> </v-row>
             </v-container>
             
           </div>
@@ -555,8 +555,8 @@
               <v-text-field 
                 v-model="options.timeFormat" 
                 clearable  
-                placeholder="%Y-%m-%d %H:%M:%S"  
-                :color="theme.$accent_ui_color" 
+                placeholder="%Y-%m-%d %H:%M:%S"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"
@@ -584,8 +584,8 @@
               <v-text-field 
                 v-model="options.widthTile" 
                 clearable  
-                placeholder="100"  
-                :color="theme.$accent_ui_color" 
+                placeholder="100"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -613,8 +613,8 @@
               <v-text-field 
                 v-model="options.heightTile"
                 clearable  
-                placeholder="100"  
-                :color="theme.$accent_ui_color" 
+                placeholder="100"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -642,8 +642,8 @@
               <v-text-field 
                 v-model="options.fontSize"
                 clearable  
-                placeholder="30"  
-                :color="theme.$accent_ui_color" 
+                placeholder="30"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="subnumber"  
@@ -754,6 +754,37 @@
               />
             </div>
           </div>
+          <div
+            v-if="!options.united"
+            v-for="metric in metricsName"
+            :key="metric.name"
+            class="option-item"
+          >
+            <div
+
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              {{ metric.name }} units
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Единицы измерения для линии {{ metric.name }}
+            </div>
+            <div class="status-option item">
+              <v-text-field
+                v-model="metricUnits[metric.name]"
+                clearable
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
+                outlined
+                class="subnumber"
+                hide-details
+              />
+            </div>
+          </div>
          
           <v-card-text 
             v-if="!options.united && checkOptions('united')"
@@ -786,7 +817,7 @@
               <v-select
                 v-model="metrics[i-1].name"
                 :items="metricsName.map(el => el.name)"
-                :color="theme.$accent_ui_color" 
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
@@ -796,8 +827,8 @@
               /> 
               <v-select  
                 v-model="metrics[i-1].type"
-                :items="types" 
-                :color="theme.$accent_ui_color" 
+                :items="types"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
@@ -810,7 +841,7 @@
                 clearable  
                 placeholder="0"  
                 label="Нижняя граница (ось Y)"
-                :color="theme.$accent_ui_color" 
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 :disabled="metrics[i-1].manual"
                 outlined 
@@ -822,7 +853,7 @@
                 clearable  
                 placeholder="0"  
                 label="Верхняя граница (ось Y)"
-                :color="theme.$accent_ui_color" 
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 :disabled="metrics[i-1].manual"
                 outlined 
@@ -924,8 +955,8 @@
             <div class="status-option item">
               <v-select  
                 v-model="options.positionlegend"
-                :items="['top','left','right','bottom']" 
-                :color="theme.$accent_ui_color" 
+                :items="['top','left','right','bottom']"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
@@ -960,22 +991,6 @@
               ></v-textarea>
             </v-container>
           </div>
-
-          <v-container fluid>
-            <v-row>
-              <div v-for="metric in metricsName" :key="metric.name">
-                {{ metric.name }}
-                <v-text-field
-                  v-model="metricUnits[metric.name]"
-                  :color="theme.$accent_ui_color"
-                  :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
-                  outlined
-                  class="subnumber"
-                  hide-details
-                />
-              </div>
-            </v-row>
-          </v-container>
           <v-card-text
             v-if="checkOptions('piechartSettings')"
             class="headline "
@@ -1009,8 +1024,8 @@
                 v-for="i in metricsRelation.metrics.length" 
                 :key="i+'metric'"
                 v-model="metricsRelation.relations[i-1]"
-                :items="metricsRelation.metrics" 
-                :color="theme.$accent_ui_color" 
+                :items="metricsRelation.metrics"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
@@ -1034,8 +1049,8 @@
             >
               <v-select  
                 v-model="colorsPie.theme"
-                :items="themesArr" 
-                :color="theme.$accent_ui_color" 
+                :items="themesArr"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"  
                 hide-details  
                 outlined  
@@ -1049,7 +1064,7 @@
                 clearable  
                 placeholder="green"  
                 label="Имя новой схема"
-                :color="theme.$accent_ui_color" 
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="item-metric"  
@@ -1061,7 +1076,7 @@
                 clearable
                 placeholder="red,#5F27FF,rgb(95, 39, 255)"
                 label="Новая схема"
-                :color="theme.$accent_ui_color"
+                :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
                 outlined 
                 class="item-metric"  
@@ -1112,8 +1127,8 @@
             <v-text-field 
               v-model="tooltip.texts[i-1]" 
               clearable  
-              placeholder="Введите текст tooltip"  
-              :color="theme.$accent_ui_color" 
+              placeholder="Введите текст tooltip"
+              :color="theme.$primary_button"
               :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-text"  
@@ -1160,8 +1175,8 @@
             <v-text-field 
               v-model="tooltip.links[i-1].name" 
               clearable  
-              placeholder="Введите название ссылки"  
-              :color="theme.$accent_ui_color" 
+              placeholder="Введите название ссылки"
+              :color="theme.$primary_button"
               :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-link" 
@@ -1170,8 +1185,8 @@
             <v-text-field 
               v-model="tooltip.links[i-1].url" 
               clearable  
-              placeholder="Введите текст ссылки"  
-              :color="theme.$accent_ui_color" 
+              placeholder="Введите текст ссылки"
+              :color="theme.$primary_button"
               :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-link" 
@@ -1218,8 +1233,8 @@
             <v-text-field 
               v-model="tooltip.buttons[i-1].name"
               clearable  
-              placeholder="Введите название кнопки"  
-              :color="theme.$accent_ui_color" 
+              placeholder="Введите название кнопки"
+              :color="theme.$primary_button"
               :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-button"  
@@ -1228,8 +1243,8 @@
             <v-text-field 
               v-model="tooltip.buttons[i-1].id"
               clearable  
-              placeholder="Введите id кнопки"  
-              :color="theme.$accent_ui_color" 
+              placeholder="Введите id кнопки"
+              :color="theme.$primary_button"
               :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
               outlined 
               class="item-button"  

@@ -248,10 +248,9 @@ export default {
 
       let otstupTop = this.$refs.legends.getBoundingClientRect().height;
       // устанавливаем размер и отступы графика
-      let margin = {top: otstupTop-10, right: 20, bottom: 20, left: 70},
+      let margin = {top: otstupTop-10, right: 50, bottom: 20, left: 70},
         width = sizeLine.width - margin.left - margin.right - 20,
         height = sizeLine.height - margin.top - margin.bottom - otstupBottom;
-
 
       let graphics = d3.select(this.$el.querySelector('.dash-multi')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график
 
@@ -415,6 +414,7 @@ export default {
         y = d3.scaleLinear()
           .domain([0, max+otstupProcent])
           .range([ height, 20 ]);
+
         // добавляем ось Y
         svg.append("g")
           .attr("class","yAxis")
@@ -804,6 +804,7 @@ export default {
         }
         let metricUnits = this.$store.getters.getMetricsMulti({idDash:this.idDash, id:this.id});
         // линии отделяющие графики друг от друга
+        let maxLength = 0;
         metricsName.forEach((metric,i) => {
           if (i !== 0) {
             svg.append("g")
@@ -861,12 +862,16 @@ export default {
               .range([ parseFloat(step)+20,startY[i] ]));
 
             // добавляем ось Y
-            let a = svg.append("g")
+            let yAxis = svg.append("g")
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals).tickFormat(x => `${x} ${metricUnits[i].units}`));
 
+            yAxis.selectAll(".tick>text").each(function(d) {
+              let w = this.getBBox().width;
+              if (w > maxLength) maxLength = w;
+            });
+
             startY.push(parseFloat(step)+20);
-            a.selectAll('text')._groups[0].forEach(text => console.log(text.textLength.baseVal.value));
 
           } else {
             y.push(d3.scaleLinear()
@@ -874,9 +879,14 @@ export default {
               .range([ parseFloat(step*(i+1))+20, startY[i] ]));
 
             // добавляем ось Y
-            svg.append("g")
+            let yAxis = svg.append("g")
               .attr("class",`yAxis-${i}`)
               .call(d3.axisLeft(y[i]).tickValues(tickvals).tickFormat(x => `${x} ${metricUnits[i].units}`));
+
+            yAxis.selectAll(".tick>text").each(function(d) {
+              let w = this.getBBox().width;
+              if (w > maxLength) maxLength = w;
+            });
 
             startY.push(parseFloat(step*(i+1))+20);
           }
@@ -1394,7 +1404,8 @@ export default {
               })  // при уводе мышки исчезает, только если это не точка выходящяя порог
           }
         })
-        // svg.attr("transform", "translate(" + maxLength + "," + margin.top + ")");
+        maxLength += 15
+        svg.attr("transform", "translate(" + maxLength + "," + margin.top + ")");
       }
       // function checkName(name) {  // функция которая проверяет не слишком ли длинное название и сокращает его
       //   if (name.length > 10) {  // если там больше 10 символов
