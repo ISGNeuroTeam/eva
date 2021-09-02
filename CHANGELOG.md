@@ -8,14 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- dashFilterPanel
+- unit setting to multiline component
+
+### Fixed
+- hover on first row in table
+
+## [1.63.0]
+
+### Added
 - tabs on dashboards
 - ability to enable/disable tabs on dashboard in dash settings
 - ability to pin certain visual component on all tabs
 - global rbg CSS variables for theme colors (only HEX was before)
+- SingleValue visualization
+- data source for pipeline monitoring mode
 
 ### Fixed
 - bug with dashboard without elements after tabs integrations
+- bug with captions not moving while zooming on MultiLine
 
 ## [1.62.0]
 
