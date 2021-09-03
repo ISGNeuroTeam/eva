@@ -114,7 +114,6 @@
     },
     data() {
       return {
-        // fieldTypes: ['string', 'number', 'date'],
         fieldTypes: [
           { value: 'string', title: 'Строка' },
           { value: 'number', title: 'Число' },
@@ -153,12 +152,11 @@
       },
     },
     watch: {
-      pickedDate(newVal) {
-        console.log(newVal);
-      },
-      currentOperationTab(index) {
-        if (this.operationMap[this.temp.fieldType])
+      currentOperationTab:{
+        immediate:true,
+        handler(index) {
           this.temp.operationManual = this.operationMap[this.temp.fieldType][index];
+        }
       },
       temp: {
         immediate: true,

@@ -3,7 +3,7 @@
     <v-row @click.self="$emit('editFilterPart', filterPart)">
       <v-col>
         <div v-if="filterPart.filterPartType === 'token'">
-          <h4 :style="{ color: theme.$title }">
+          <h4 :style="{ color: theme.$main_text }">
             {{ elemName }}
           </h4>
           <div class="align-center d-flex">
@@ -53,7 +53,7 @@
         </div>
 
         <div v-else>
-          <h4 :style="{ color: theme.$title }">
+          <h4 :style="{ color: theme.$main_text }">
             {{ filterPart.fieldName }}: {{ filterPart.value }}
           </h4>
           <h5 :style="{ color: theme.$secondary_text }">({{ filterPart.fieldType }}) {{operationManualTitle}}</h5>
