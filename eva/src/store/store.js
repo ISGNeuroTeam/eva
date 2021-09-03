@@ -913,6 +913,12 @@ export default {
       let foundFilter = state[filter.idDash].filters.find(val => filter.id === val.id);
       foundFilter.parts.forEach(part => (part.values = []));
     },
+    removeFilterPartValue(state, { idDash, filterIndex, filterPartIndex, valueIndex }) {
+      state[idDash].filters[filterIndex].parts[filterPartIndex].values.splice(valueIndex, 1);
+    },
+    refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
+      state[idDash].filters[filterIndex].parts[filterPartIndex].values = [];
+    },
     restartSearches(state, idDash) {
       let searches = state[idDash].searches;
 

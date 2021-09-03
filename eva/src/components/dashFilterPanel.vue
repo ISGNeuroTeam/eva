@@ -24,12 +24,12 @@
           <v-col
             class="d-flex align-center justify-space-between"
             style="width: 100%"
-            :cols="editPermission?10:11"
+            :cols="editPermission ? 10 : 11"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <div class="d-flex">
               <v-sheet :style="{ 'background-color': theme.$main_bg }" max-width="1200px">
-                <v-slide-group >
+                <v-slide-group>
                   <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
                     <div
                       @click.stop.prevent="
@@ -43,6 +43,8 @@
                         @deleteFilterPart="deleteFilterPart"
                         :idDash="idDashFrom"
                         :filterPart="part"
+                        :filterPartIndex="indexPart"
+                        :filterIndex="filterIndex"
                         :editPermission="editPermission"
                         :isFocused="focusedRow === filterIndex"
                       ></filter-part>
@@ -96,7 +98,7 @@
           <v-col
             cols="1"
             class="d-flex align-center justify-space-around"
-            v-if="focusedRow === filterIndex&&editPermission"
+            v-if="focusedRow === filterIndex && editPermission"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <v-btn
@@ -127,7 +129,10 @@
           </v-col>
         </v-row>
         <div>
-          <div v-if="!(filterIndex === tempFilterIndex)" class="align-self-end new-filter-row">
+          <div
+            v-if="!(filterIndex === tempFilterIndex) && !(filterIndex === focusedRow)"
+            class="align-self-end new-filter-row"
+          >
             <div
               class="new-filter-row-button subtitle-2"
               :style="{ color: theme.$ok_color }"
@@ -184,18 +189,46 @@
       </div>
     </div>
 
-    <v-btn
+    <v-row
+      no-gutters
       v-else
-      class="ma-4 new-filter-button d-flex align-center"
-      small
-      rounded
-      text
-      :color="theme.$secondary_bg"
-      :style="{ 'background-color': theme.$ok_color, opacity: 0.5 }"
+      class="temp-filter-container"
+      :style="{ 'background-color': theme.$main_bg }"
     >
-      <v-icon x-small>{{ plusIcon }}</v-icon>
-      <div :style="{ color: theme.$secondary_bg }">Новый фильтр</div>
-    </v-btn>
+      <v-col cols="3" class="ml-12">
+        <v-text-field hide-details outlined dense v-model="tempFilter.id"></v-text-field>
+      </v-col>
+      <v-col class="d-flex align-center">
+        <v-btn
+          rounded
+          small
+          class="ma-1"
+          style="text-transform: none"
+          :style="{
+            'background-color': 'rgba(76, 217, 100, 0.14)',
+            color: theme.$ok_color,
+            'font-size': '14px',
+          }"
+          depressed
+          @click="saveTempFilter"
+          >сохранить</v-btn
+        >
+        <v-btn
+          rounded
+          small
+          class="ma-1"
+          @click="declineTempFilter"
+          style="text-transform: none"
+          :style="{
+            color: theme.$error_color,
+            'background-color': 'rgba(255, 59, 48, 0.14)',
+            'font-size': '14px',
+          }"
+          depressed
+          >отменить</v-btn
+        >
+      </v-col>
+    </v-row>
 
     <v-dialog max-width="400" v-model="filterPartModalShow" persistent>
       <filter-part-modal
@@ -293,7 +326,7 @@
         this.filterChanged = false;
       },
       declineTempFilter() {
-        this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false };
+        this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] };
         this.tempFilterIndex = -1;
       },
       saveTempFilter() {
@@ -302,11 +335,12 @@
         } else if (!this.tempFilter.id) {
           console.log('Введите имя');
         } else {
+          if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0;
           this.$store.commit('createFilter', {
             filter: this.tempFilter,
             index: this.tempFilterIndex,
           });
-          this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false };
+          this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] };
           this.tempFilterIndex = -1;
           this.filters = this.$store.getters.getFilters(this.idDashFrom);
         }
@@ -364,7 +398,7 @@
     },
     mounted() {
       this.filters = this.$store.getters.getFilters(this.idDashFrom);
-      this.tempFilter = { idDash: this.idDashFrom, id: '', invertMatches: false };
+      this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] };
       this.$store.commit('clearFocusedFilter', this.idDashFrom);
     },
   };
