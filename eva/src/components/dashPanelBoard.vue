@@ -118,7 +118,6 @@
         </v-tooltip>
         <div class="edit-container">
           <v-tooltip
-            v-if="editPermission"
             bottom 
             :color="theme.$accent_ui_color"
           >
@@ -735,7 +734,7 @@
       <dash-filter-panel
         :permissions-from="permissionsFrom"
         :idDashFrom="idDashFrom"
-        :isAdmin="isAdmin"
+        :editPermission="editPermission"
       >
       </dash-filter-panel>
     </div>

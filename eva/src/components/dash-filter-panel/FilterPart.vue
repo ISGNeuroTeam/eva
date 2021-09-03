@@ -56,7 +56,9 @@
           <h4 :style="{ color: theme.$main_text }">
             {{ filterPart.fieldName }}: {{ filterPart.value }}
           </h4>
-          <h5 :style="{ color: theme.$secondary_text }">({{ filterPart.fieldType }}) {{operationManualTitle}}</h5>
+          <h5 :style="{ color: theme.$secondary_text }">
+            ({{ filterPart.fieldType }}) {{ operationManualTitle }}
+          </h5>
         </div>
       </v-col>
 
@@ -67,6 +69,7 @@
         <v-btn
           icon
           x-small
+          v-if="editPermission || filterPart.filterPartType === 'manual'"
           :color="theme.$error_color"
           @click.stop.prevent="$emit('deleteFilterPart', filterPart)"
         >
@@ -82,7 +85,7 @@
 
   export default {
     name: 'FilterPart',
-    props: ['idDash', 'filterPart', 'isFocused'],
+    props: ['idDash', 'filterPart', 'isFocused', 'editPermission'],
     data() {
       return {
         closeIcon: mdiClose,
@@ -99,8 +102,8 @@
             '>': 'Позже',
             '<': 'Раньше',
           },
-        }
-      }
+        },
+      };
     },
     computed: {
       theme() {
@@ -113,9 +116,11 @@
           return 'Ручной фильтр';
         }
       },
-      operationManualTitle(){
-        return this.filterPart.operationManual?this.operationManualTitleMap[this.filterPart.fieldType][this.filterPart.operationManual]:"";
-      }
+      operationManualTitle() {
+        return this.filterPart.operationManual
+          ? this.operationManualTitleMap[this.filterPart.fieldType][this.filterPart.operationManual]
+          : '';
+      },
     },
     methods: {
       clearValues() {

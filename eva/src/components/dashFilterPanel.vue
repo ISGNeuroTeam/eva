@@ -24,12 +24,12 @@
           <v-col
             class="d-flex align-center justify-space-between"
             style="width: 100%"
-            cols="10"
+            :cols="editPermission?10:11"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <div class="d-flex">
-              <v-sheet :style="{ 'background-color': theme.$main_bg }" max-width="1000px">
-                <v-slide-group>
+              <v-sheet :style="{ 'background-color': theme.$main_bg }" max-width="1200px">
+                <v-slide-group >
                   <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
                     <div
                       @click.stop.prevent="
@@ -43,6 +43,7 @@
                         @deleteFilterPart="deleteFilterPart"
                         :idDash="idDashFrom"
                         :filterPart="part"
+                        :editPermission="editPermission"
                         :isFocused="focusedRow === filterIndex"
                       ></filter-part>
                     </div>
@@ -71,6 +72,23 @@
               <v-btn icon :color="theme.$error_color" @click.stop.prevent="declineTempParts">
                 <v-icon> {{ declineIcon }}</v-icon>
               </v-btn>
+              <!-- When editPermission false refresh and reverse buttons into filterParts -->
+              <v-btn
+                icon
+                small
+                v-if="!editPermission"
+                :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
+                @click.stop.prevent="reverseFilter(filter)"
+                ><v-icon>{{ reverseIcon }}</v-icon>
+              </v-btn>
+              <v-btn
+                icon
+                small
+                @click.stop.prevent="refreshFilter(filter)"
+                :color="theme.$main_text"
+                v-if="!editPermission"
+                ><v-icon>{{ refreshIcon }}</v-icon>
+              </v-btn>
             </div>
           </v-col>
 
@@ -78,7 +96,7 @@
           <v-col
             cols="1"
             class="d-flex align-center justify-space-around"
-            v-if="focusedRow === filterIndex"
+            v-if="focusedRow === filterIndex&&editPermission"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <v-btn
@@ -108,7 +126,7 @@
             </v-btn>
           </v-col>
         </v-row>
-        <div >
+        <div>
           <div v-if="!(filterIndex === tempFilterIndex)" class="align-self-end new-filter-row">
             <div
               class="new-filter-row-button subtitle-2"
@@ -122,7 +140,12 @@
             </div>
           </div>
 
-          <v-row no-gutters v-if="filterIndex === tempFilterIndex" class="temp-filter-container" :style="{'background-color':theme.$main_bg}">
+          <v-row
+            no-gutters
+            v-if="filterIndex === tempFilterIndex"
+            class="temp-filter-container"
+            :style="{ 'background-color': theme.$main_bg }"
+          >
             <v-col cols="3" class="ml-12">
               <v-text-field hide-details outlined dense v-model="tempFilter.id"></v-text-field>
             </v-col>
@@ -179,6 +202,7 @@
         :idDash="idDashFrom"
         :filterPart="filterPartInModal"
         :filterPartIndex="filterPartIndexInModal"
+        :editPermission="editPermission"
         @saveFilterPart="saveFilterPart"
         @closeFilterPartModal="closeFilterPartModal"
       />
@@ -211,7 +235,7 @@
   export default {
     name: 'DashFilterPanel',
     components: { FilterPartModal, FilterPart, FilterPreviewModal },
-    props: ['isAdmin','idDashFrom'],
+    props: ['editPermission', 'idDashFrom'],
     data() {
       return {
         filters: [],

@@ -64,7 +64,7 @@
 
   export default {
     name: 'FilterPartModal',
-    props: ['idDash', 'filterPart', 'filterPartIndex'],
+    props: ['idDash', 'filterPart', 'filterPartIndex', 'editPermission'],
     components: {
       ManualTypeModal,
       TokenTypeModal,
@@ -72,15 +72,18 @@
     data() {
       return {
         currentTab: 0,
-        typeMap: [
-          { title: 'Токен', componentName: 'TokenTypeModal', type: 'token' },
-          { title: 'Ручной ввод', componentName: 'ManualTypeModal', type: 'manual' },
-        ],
         temp: {},
         settingsIcon: mdiSettings,
       };
     },
     computed: {
+      typeMap() {
+        let mapOfTypes = [
+          { title: 'Токен', componentName: 'TokenTypeModal', type: 'token' },
+          { title: 'Ручной ввод', componentName: 'ManualTypeModal', type: 'manual' },
+        ];
+        return this.editPermission ? mapOfTypes : mapOfTypes.slice(1);
+      },
       theme() {
         return this.$store.getters.getTheme;
       },
