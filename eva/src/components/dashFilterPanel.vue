@@ -1,31 +1,19 @@
 <template>
   <div class="dash-filter-panel" :style="{ 'background-color': theme.$secondary_bg }">
-    <v-btn
-      @click="addFilter"
-      class="ma-4 new-filter-button d-flex align-center"
-      small
-      rounded
-      text
-      :color="theme.$secondary_bg"
-      :style="{ 'background-color': theme.$ok_color }"
-    >
-      <v-icon x-small>{{ plusIcon }}</v-icon>
-      <div class="pl-1" :style="{ color: theme.$secondary_bg }">Новый фильтр</div>
-    </v-btn>
-
-    <div>
+    <div v-if="filters.length > 0">
       <div
-        v-for="(filter, indexFilter) in filters"
-        :key="`${filter.id}-${indexFilter}`"
-        :style="{ 'border-color': theme.$primary_button, 'background-color': theme.$main_bg }"
-        :class="focusedRow === indexFilter ? 'focused-filter-row' : ''"
+        v-for="(filter, filterIndex) in filters"
+        :key="`${filter.id}-${filterIndex}`"
+        :style="{ height: filterIndex === tempFilterIndex ? '100%' : '60px' }"
+        :class="focusedRow === filterIndex ? 'focused-filter-row' : ''"
         class="filter-row"
       >
         <v-row
           no-gutters
           class="d-flex align-center"
           style="height: 100%"
-          @click="focusRow(indexFilter)"
+          :style="{ 'border-color': theme.$primary_button, 'background-color': theme.$main_bg }"
+          @click="focusRow(filterIndex)"
         >
           <!-- FILTER ID -->
           <v-col cols="1" class="d-flex align-center justify-center" style="height: 100%">
@@ -39,15 +27,15 @@
             cols="10"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
-            <div class="d-flex ">
+            <div class="d-flex">
               <v-sheet :style="{ 'background-color': theme.$main_bg }" max-width="1000px">
                 <v-slide-group>
                   <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
                     <div
                       @click.stop.prevent="
-                        indexFilter === focusedRow
+                        filterIndex === focusedRow
                           ? openFilterPartModal(part, indexPart)
-                          : focusRow(indexFilter)
+                          : focusRow(filterIndex)
                       "
                       :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
                     >
@@ -55,14 +43,14 @@
                         @deleteFilterPart="deleteFilterPart"
                         :idDash="idDashFrom"
                         :filterPart="part"
-                        :isFocused="focusedRow === indexFilter"
+                        :isFocused="focusedRow === filterIndex"
                       ></filter-part>
                     </div>
                   </v-slide-item>
                 </v-slide-group>
               </v-sheet>
 
-              <div class="d-flex align-center" v-if="focusedRow === indexFilter">
+              <div class="d-flex align-center" v-if="focusedRow === filterIndex">
                 <v-btn
                   class="text-capitalize ml-6"
                   outlined
@@ -76,7 +64,7 @@
               </div>
             </div>
 
-            <div v-if="focusedRow === indexFilter">
+            <div v-if="focusedRow === filterIndex">
               <v-btn icon color="green" @click.stop.prevent="applyTempParts">
                 <v-icon> {{ acceptIcon }}</v-icon>
               </v-btn>
@@ -90,7 +78,7 @@
           <v-col
             cols="1"
             class="d-flex align-center justify-space-around"
-            v-if="focusedRow === indexFilter"
+            v-if="focusedRow === filterIndex"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
             <v-btn
@@ -120,25 +108,56 @@
             </v-btn>
           </v-col>
         </v-row>
-      </div>
+        <div>
+          <div v-if="!(filterIndex === tempFilterIndex)" class="align-self-end new-filter-row">
+            <div
+              class="new-filter-row-button subtitle-2"
+              :style="{ color: theme.$ok_color }"
+              @click.stop.prevent="tempFilterIndex = filterIndex"
+            >
+              <div class="new-filter-row-button-text">
+                <v-icon small :color="theme.$ok_color"> {{ plusIcon }}</v-icon>
+                Новый фильтр
+              </div>
+            </div>
+          </div>
 
-      <v-row v-for="(tmp, index) in tempFilters" :key="index">
-        <v-col cols="3" class="ml-12">
-          <v-text-field outlined :color="theme.$ok_color" v-model="tmp.id"></v-text-field>
-        </v-col>
-        <v-col class="d-flex align-center">
-          <v-btn
-            rounded
-            small
-            class="ma-1"
-            :style="{ 'background-color': theme.$ok_color, opacity: 0.5 }"
-            @click="saveTempFilter(index)"
-            >Сохранить</v-btn
-          >
-          <v-btn rounded small class="ma-1" @click="removeTempFilter(index)">Отменить</v-btn>
-        </v-col>
-      </v-row>
+          <v-row v-if="filterIndex === tempFilterIndex" class="temp-filter-container">
+            <v-col cols="3" class="ml-12">
+              <v-text-field hide-details outlined dense v-model="tempFilter.id"></v-text-field>
+            </v-col>
+            <v-col class="d-flex align-center">
+              <v-btn
+                rounded
+                small
+                class="ma-1"
+                style="text-transform:none"
+                :style="{ 'background-color': 'rgba(76, 217, 100, 0.14)', color:theme.$ok_color,'font-size':'14px'}"
+                @click="saveTempFilter"
+                >сохранить</v-btn
+              >
+              <v-btn rounded small class="ma-1" @click="declineTempFilter"
+                style="text-transform:none"
+                :style="{ 'background-color': 'rgba(255, 59, 48, 0.14)', color:theme.$error_color,'font-size':'14px'}"
+              >отменить</v-btn>
+            </v-col>
+          </v-row>
+        </div>
+      </div>
     </div>
+
+    <v-btn
+      v-else
+      class="ma-4 new-filter-button d-flex align-center"
+      small
+      rounded
+      text
+      :color="theme.$secondary_bg"
+      :style="{ 'background-color': theme.$ok_color, opacity: 0.5 }"
+    >
+      <v-icon x-small>{{ plusIcon }}</v-icon>
+      <div class="pl-1" :style="{ color: theme.$secondary_bg }">Новый фильтр</div>
+    </v-btn>
 
     <v-dialog max-width="400" v-model="filterPartModalShow" persistent>
       <filter-part-modal
@@ -183,7 +202,8 @@
     data() {
       return {
         filters: [],
-        tempFilters: [],
+        tempFilter: {},
+        tempFilterIndex: -1,
         focusedRow: null,
         filterPartModalShow: false,
         filterPartInModal: null,
@@ -223,14 +243,6 @@
       focusRow(index) {
         if (this.focusedRow === null) this.focusedRow = index;
       },
-      addFilter() {
-        this.tempFilters.push({
-          idDash: this.idDashFrom,
-          id: '',
-          invertMatches: false,
-          parts: [],
-        });
-      },
       applyTempParts() {
         this.$store.commit('clearFocusedFilter', this.idDashFrom);
         this.$store.commit('restartSearches', this.idDashFrom);
@@ -243,19 +255,22 @@
         this.focusedRow = null;
         this.filterChanged = false;
       },
-      removeTempFilter(index) {
-        this.tempFilters.splice(index, 1);
+      declineTempFilter() {
+        this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false };
+        this.tempFilterIndex = -1;
       },
-      saveTempFilter(index) {
-        let candidate = this.tempFilters[index];
-
-        if (this.filters.some(filter => filter.id === candidate.id)) {
+      saveTempFilter() {
+        if (this.filters.some(filter => filter.id === this.tempFilter.id)) {
           console.log('Фильтр с таким именем существует');
-        } else if (!candidate.id) {
+        } else if (!this.tempFilter.id) {
           console.log('Введите имя');
         } else {
-          this.tempFilters.splice(index, 1);
-          this.$store.commit('createFilter', candidate);
+          this.$store.commit('createFilter', {
+            filter: this.tempFilter,
+            index: this.tempFilterIndex,
+          });
+          this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false };
+          this.tempFilterIndex = -1;
           this.filters = this.$store.getters.getFilters(this.idDashFrom);
         }
       },
@@ -312,14 +327,60 @@
     },
     mounted() {
       this.filters = this.$store.getters.getFilters(this.idDashFrom);
+      this.tempFilter = { idDash: this.idDashFrom, id: '', invertMatches: false };
       this.$store.commit('clearFocusedFilter', this.idDashFrom);
     },
   };
 </script>
 
+<style lang="sass">
+
+  .temp-filter-container
+    margin-top: 10px
+
+    .v-text-field__slot input
+      color: var(--main_text)
+
+    .v-input__slot fieldset
+      color: var(--main_text) !important
+
+    .v-input__control
+      .v-icon
+        color: var(--main_text) !important
+
+    .v-select__selections
+      color: var(--main_text) !important
+
+    .v-input input
+      min-height: auto !important
+</style>
+
 <style lang="sass" scoped>
-  .new-filter-button
-    opacity: 0.5
+  .new-filter-row
+    position: relative
+    width:100%
+    height: 18px
+
+    &:hover .new-filter-row-button
+      visibility: visible
+
+    .new-filter-row-button
+      position: absolute
+      width: 100%
+      background-color: rgba(76, 217, 100, 0.24)
+      visibility: hidden
+      border-radius: 3px
+      bottom: 3px
+
+      .new-filter-row-button-text
+        opacity: 0.8
+        margin-left: 20px
+        font-style: normal
+        font-weight: 600
+        font-size: 12px
+        line-height: 15px
+        padding: 2px
+
 
   .dash-filter-panel
     width: 100%
@@ -327,7 +388,6 @@
 
   .filter-row
     padding: 2px
-    height: 60px !important
     margin: 20px 0 20px 0
 
   .focused-filter-row

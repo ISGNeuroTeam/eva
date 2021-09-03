@@ -532,7 +532,7 @@ export default {
         );
       }
     },
-    createFilter(state, filter) {
+    createFilter(state, { filter, index }) {
       if (!state[filter.idDash].filters) {
         Vue.set(state[filter.idDash], 'filters', []);
       }
@@ -540,8 +540,7 @@ export default {
       if (state[filter.idDash].filters.find(filterInState => filterInState.id === filter.id)) {
         alert('Фильтр с таким именем уже существует');
       } else {
-        state[filter.idDash].filters.push(filter);
-        console.log('Фильтр добавлен');
+        state[filter.idDash].filters.splice(index + 1, 0, filter);
       }
     },
     deleteFilter(state, filter) {
