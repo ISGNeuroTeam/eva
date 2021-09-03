@@ -108,7 +108,7 @@
             </v-btn>
           </v-col>
         </v-row>
-        <div>
+        <div :style="{'background-color':theme.$main_bg}">
           <div v-if="!(filterIndex === tempFilterIndex)" class="align-self-end new-filter-row">
             <div
               class="new-filter-row-button subtitle-2"
@@ -131,15 +131,30 @@
                 rounded
                 small
                 class="ma-1"
-                style="text-transform:none"
-                :style="{ 'background-color': 'rgba(76, 217, 100, 0.14)', color:theme.$ok_color,'font-size':'14px'}"
+                style="text-transform: none"
+                :style="{
+                  'background-color': 'rgba(76, 217, 100, 0.14)',
+                  color: theme.$ok_color,
+                  'font-size': '14px',
+                }"
+                depressed
                 @click="saveTempFilter"
                 >сохранить</v-btn
               >
-              <v-btn rounded small class="ma-1" @click="declineTempFilter"
-                style="text-transform:none"
-                :style="{ 'background-color': 'rgba(255, 59, 48, 0.14)', color:theme.$error_color,'font-size':'14px'}"
-              >отменить</v-btn>
+              <v-btn
+                rounded
+                small
+                class="ma-1"
+                @click="declineTempFilter"
+                style="text-transform: none"
+                :style="{
+                  color: theme.$error_color,
+                  'background-color': 'rgba(255, 59, 48, 0.14)',
+                  'font-size': '14px',
+                }"
+                depressed
+                >отменить</v-btn
+              >
             </v-col>
           </v-row>
         </div>
@@ -197,7 +212,8 @@
     name: 'DashFilterPanel',
     components: { FilterPartModal, FilterPart, FilterPreviewModal },
     props: {
-      idDashFrom: null,
+      isadmin: Boolean,
+      idDashFrom: Number,
     },
     data() {
       return {

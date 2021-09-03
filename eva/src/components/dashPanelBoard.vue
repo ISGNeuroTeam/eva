@@ -735,6 +735,7 @@
       <dash-filter-panel
         :permissions-from="permissionsFrom"
         :idDashFrom="idDashFrom"
+        :isAdmin="isAdmin"
       >
       </dash-filter-panel>
     </div>
