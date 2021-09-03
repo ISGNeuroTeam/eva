@@ -5,7 +5,13 @@
       >Предпросмотр
     </v-card-title>
     <v-card-text :style="{ 'background-color': theme.$secondary_bg }">
-      <div :style="{ 'background-color': theme.$main_bg, 'margin-top': '20px' }">
+      <div
+        :style="{
+          'background-color': theme.$main_bg,
+          'margin-top': '20px',
+          color: theme.$main_text,
+        }"
+      >
         {{ filterOtlText }}
       </div>
     </v-card-text>
@@ -36,7 +42,7 @@
     },
     watch: {
       filter: {
-        immediate:true,
+        immediate: true,
         handler(filter) {
           if (filter) this.filterOtlText = filterCompile(filter);
         },
