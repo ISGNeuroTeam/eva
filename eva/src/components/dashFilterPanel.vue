@@ -108,7 +108,7 @@
             </v-btn>
           </v-col>
         </v-row>
-        <div :style="{'background-color':theme.$main_bg}">
+        <div >
           <div v-if="!(filterIndex === tempFilterIndex)" class="align-self-end new-filter-row">
             <div
               class="new-filter-row-button subtitle-2"
@@ -122,7 +122,7 @@
             </div>
           </div>
 
-          <v-row v-if="filterIndex === tempFilterIndex" class="temp-filter-container">
+          <v-row no-gutters v-if="filterIndex === tempFilterIndex" class="temp-filter-container" :style="{'background-color':theme.$main_bg}">
             <v-col cols="3" class="ml-12">
               <v-text-field hide-details outlined dense v-model="tempFilter.id"></v-text-field>
             </v-col>
@@ -171,7 +171,7 @@
       :style="{ 'background-color': theme.$ok_color, opacity: 0.5 }"
     >
       <v-icon x-small>{{ plusIcon }}</v-icon>
-      <div class="pl-1" :style="{ color: theme.$secondary_bg }">Новый фильтр</div>
+      <div :style="{ color: theme.$secondary_bg }">Новый фильтр</div>
     </v-btn>
 
     <v-dialog max-width="400" v-model="filterPartModalShow" persistent>
@@ -211,10 +211,7 @@
   export default {
     name: 'DashFilterPanel',
     components: { FilterPartModal, FilterPart, FilterPreviewModal },
-    props: {
-      isadmin: Boolean,
-      idDashFrom: Number,
-    },
+    props: ['isAdmin','idDashFrom'],
     data() {
       return {
         filters: [],
@@ -352,7 +349,8 @@
 <style lang="sass">
 
   .temp-filter-container
-    margin-top: 10px
+    margin-top: 20px !important
+    padding: 10px 0 10px 0
 
     .v-text-field__slot input
       color: var(--main_text)
@@ -403,8 +401,7 @@
     max-height: 300px
 
   .filter-row
-    padding: 2px
-    margin: 20px 0 20px 0
+    margin: 30px 0 30px 0
 
   .focused-filter-row
     padding: 0
