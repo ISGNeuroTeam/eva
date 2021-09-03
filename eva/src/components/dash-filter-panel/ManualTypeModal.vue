@@ -53,7 +53,7 @@
           </v-icon>
         </v-btn>
       </v-text-field>
-      <v-dialog v-model="showDatePicker" max-width="400" class="dash-picker">
+      <v-dialog v-model="showDatePicker" max-width="400">
         <DTPicker
           inline
           v-model="temp.value"
@@ -175,8 +175,6 @@
 
 <style lang="sass">
 
-
-
   .manual-type-filter-modal
     color: var(--main_text) !important
 
@@ -192,6 +190,8 @@
 
     .v-select__selections
       color: var(--main_text) !important
+
     .v-input input
       min-height: auto !important
+
 </style>

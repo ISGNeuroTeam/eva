@@ -31,7 +31,7 @@
     </v-card-subtitle>
     <v-card-text>
       <component :is="typeMap[currentTab].componentName" :idDash="idDash" :temp="temp"></component>
-      <v-switch v-model="filterPart.invertMatches" 
+      <v-switch :color="theme.$primary_button" v-model="temp.invertMatches"
         ><h5 slot="label" :style="{ color: theme.$secondary_text }">Вычитать значения</h5></v-switch
       >
       <div class="d-flex justify-end">
@@ -64,7 +64,7 @@
 
   export default {
     name: 'FilterPartModal',
-    props: ['idDash', 'filterPart'],
+    props: ['idDash', 'filterPart', 'filterPartIndex'],
     components: {
       ManualTypeModal,
       TokenTypeModal,
@@ -92,24 +92,26 @@
       filterPart: {
         immediate: true,
         handler(filterPart) {
-          let itemIndex = this.typeMap.findIndex(item => item.type === filterPart.filterPartType);
-          if (itemIndex !== -1) {
-            this.currentTab = itemIndex;
-            this.temp = filterPart;
-          } else {
-            throw new Error(
-              `Type "${filterPart.filterPartType}" of filter part does not recognized`
-            );
+          if (filterPart) {
+            let itemIndex = this.typeMap.findIndex(item => item.type === filterPart.filterPartType);
+            if (itemIndex !== -1) {
+              this.currentTab = itemIndex;
+              this.temp = filterPart;
+            } else {
+              throw new Error(
+                `Type "${filterPart.filterPartType}" of filter part does not recognized`
+              );
+            }
           }
         },
       },
     },
     methods: {
       saveFilterPartModal() {
-        this.$emit('saveFilterPart', this.temp);
+        this.$emit('saveFilterPart', this.temp, this.filterPartIndex);
       },
       closeFilterPartModal() {
-        this.$emit('closeFilterPart', this.temp);
+        this.$emit('closeFilterPartModal');
       },
     },
   };

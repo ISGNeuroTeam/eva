@@ -1,6 +1,6 @@
 <template>
   <div class="pa-1 filter-part">
-    <v-row @click.self="$emit('editFilterPart', filterPart)">
+    <v-row>
       <v-col>
         <div v-if="filterPart.filterPartType === 'token'">
           <h4 :style="{ color: theme.$main_text }">
@@ -114,7 +114,7 @@
         }
       },
       operationManualTitle(){
-        return this.operationManualTitleMap[this.filterPart.fieldType][this.filterPart.operationManual];
+        return this.filterPart.operationManual?this.operationManualTitleMap[this.filterPart.fieldType][this.filterPart.operationManual]:"";
       }
     },
     methods: {

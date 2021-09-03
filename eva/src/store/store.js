@@ -552,6 +552,11 @@ export default {
       let index = state[filter.idDash].filters.indexOf(filter);
       state[filter.idDash].filters.splice(index, 1);
     },
+    saveFilterPart(state, { idDash, filterPart, index }) {
+      filterPart.values = [];
+      if (Number.isFinite(index)) state[idDash].focusedFilter.parts[index] = filterPart;
+      else state[idDash].focusedFilter.parts.push(filterPart);
+    },
     setLibrary: (state, options) => {
       Vue.set(state[options.idDash][options.id].options, 'library', options.library);
     },

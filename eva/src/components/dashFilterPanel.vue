@@ -39,39 +39,42 @@
             cols="10"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
-            <v-sheet :style="{ 'background-color': theme.$main_bg }">
-              <v-slide-group show-arrows>
-                <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
-                  <div
-                    @click.stop.prevent="
-                      indexFilter === focusedRow ? openFilterPartModal(part) : focusRow(indexFilter)
-                    "
-                    :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
+            <div class="d-flex ">
+              <v-sheet :style="{ 'background-color': theme.$main_bg }" max-width="1000px">
+                <v-slide-group>
+                  <v-slide-item v-for="(part, indexPart) in filter.parts" :key="indexPart">
+                    <div
+                      @click.stop.prevent="
+                        indexFilter === focusedRow
+                          ? openFilterPartModal(part, indexPart)
+                          : focusRow(indexFilter)
+                      "
+                      :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
+                    >
+                      <filter-part
+                        @deleteFilterPart="deleteFilterPart"
+                        :idDash="idDashFrom"
+                        :filterPart="part"
+                        :isFocused="focusedRow === indexFilter"
+                      ></filter-part>
+                    </div>
+                  </v-slide-item>
+                </v-slide-group>
+              </v-sheet>
 
-                  >
-                    <filter-part
-                      @deleteFilterPart="deleteFilterPart"
-                      :idDash="idDashFrom"
-                      :filterPart="part"
-                      :isFocused="focusedRow === indexFilter"
-                    ></filter-part>
-                  </div>
-                </v-slide-item>
-
-                <div class="d-flex align-center" v-if="focusedRow === indexFilter">
-                  <v-btn
-                    class="text-capitalize ml-6"
-                    outlined
-                    rounded
-                    x-small
-                    :color="theme.$primary_button"
-                    @click.stop.prevent="openFilterPartModal()"
-                  >
-                    <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
-                  </v-btn>
-                </div>
-              </v-slide-group>
-            </v-sheet>
+              <div class="d-flex align-center" v-if="focusedRow === indexFilter">
+                <v-btn
+                  class="text-capitalize ml-6"
+                  outlined
+                  rounded
+                  x-small
+                  :color="theme.$primary_button"
+                  @click.stop.prevent="openFilterPartModal()"
+                >
+                  <v-icon x-small left> {{ plusIcon }}</v-icon> Добавить
+                </v-btn>
+              </div>
+            </div>
 
             <div v-if="focusedRow === indexFilter">
               <v-btn icon color="green" @click.stop.prevent="applyTempParts">
@@ -141,8 +144,9 @@
       <filter-part-modal
         :idDash="idDashFrom"
         :filterPart="filterPartInModal"
+        :filterPartIndex="filterPartIndexInModal"
         @saveFilterPart="saveFilterPart"
-        @closeFilterPart="closeFilterPart"
+        @closeFilterPartModal="closeFilterPartModal"
       />
     </v-dialog>
 
@@ -182,7 +186,8 @@
         tempFilters: [],
         focusedRow: null,
         filterPartModalShow: false,
-        filterPartInModal: {},
+        filterPartInModal: null,
+        filterPartIndexInModal: null,
         filterInPreviewModal: null,
         showFilterPreviewModal: false,
         plusIcon: mdiPlusCircleOutline,
@@ -269,29 +274,31 @@
         this.filterChanged = true;
         this.$store.commit('refreshFilter', filter);
       },
-      openFilterPartModal(filterPart) {
+      openFilterPartModal(filterPart, index) {
+        this.filterPartIndexInModal = index;
         this.filterPartInModal = filterPart
-          ? filterPart
+          ? { ...filterPart }
           : {
-              filterPartType: 'token',
+              filterPartType: 'manual',
               operationToken: 'OR',
               token: null,
-              values: [],
-              fieldType: 'string',
-              operationManual: 'exactMatch',
+              fieldType: 'number',
+              operationManual: '>',
               fieldName: null,
               value: null,
+              invertMatches: false,
             };
         this.filterPartModalShow = true;
       },
-      saveFilterPart(filterPart) {
-        if (filterPart && this.focusedFilter.parts.indexOf(filterPart) === -1)
-          this.focusedFilter.parts.push(filterPart);
-        this.filterPartInModal = {};
+      saveFilterPart(filterPart, index) {
+        this.$store.commit('saveFilterPart', { idDash: this.idDashFrom, filterPart, index }); // Save into focused filter
+        this.filterPartInModal = null; // setup default filterPart into openFilterPartModal method
+        this.filterPartIndexInModal = null;
         this.filterPartModalShow = false;
       },
-      closeFilterPart() {
-        this.filterPartInModal = {};
+      closeFilterPartModal() {
+        this.filterPartInModal = null;
+        this.filterPartIndexInModal = null;
         this.filterPartModalShow = false;
       },
       openFilterPreviewModal(filter) {
