@@ -151,7 +151,7 @@
       },
       refreshFilterPart() {
         let { idDash, filterIndex, filterPartIndex } = this;
-        this.$store.commit('refresFilterPart', { idDash, filterIndex, filterPartIndex });
+        this.$store.commit('refreshFilterPart', { idDash, filterIndex, filterPartIndex });
       },
     },
   };
