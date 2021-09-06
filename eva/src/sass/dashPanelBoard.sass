@@ -53,7 +53,7 @@
     top: 0
     left: 0
     width: 100%
-    z-index: 4
+    z-index: 5
     transition: all 0.4s ease
 
     .dropdown-profile
@@ -119,6 +119,9 @@
         .edit-icon
             margin-right: 20px
             margin-left: 20px
+        
+        .filter-icon
+            margin-left: 10px
 
         .search
             margin-right: 20px
@@ -778,6 +781,8 @@
             .minus
                 fill: #FF6D70
 
+    
+
     .warning-block
         position: absolute
         bottom: -350px
@@ -823,7 +828,7 @@
         visibility: visible
         transform: translateY(0)
         z-index:4
-
+    
     .opentocken
         opacity: 1
         visibility: visible
@@ -989,4 +994,25 @@
                 height: 20px
                 margin-right: 10px
 
+.block-filter
+    position: absolute
+    width: 100%
+    height: auto
+    overflow-y: auto
+    top: 55px
+    border-bottom: 2px solid rgba(0,0,0,0.2)
+    border-radius: 4px
+    visibility: hidden
+    display: flex
+    flex-flow: column nowrap
+    justify-content: flex-start
+    align-items: flex-start
+    transition: all 0.4s ease
+    transform: translateY(-100%)
+
+.openfilter
+    visibility: visible
+    position: relative
+    transform: translateY(0)
+    z-index: 3
 
