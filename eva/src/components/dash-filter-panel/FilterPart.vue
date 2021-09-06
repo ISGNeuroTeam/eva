@@ -68,8 +68,7 @@
           x-small
           v-show="filterPart.filterPartType==='token'"
           :color="theme.$main_text"
-          @click.stop.prevent="clearValues"
-          @click="refreshFilterPart"
+          @click.stop.prevent="refreshFilterPart"
         >
           <v-icon>{{ refreshIcon }}</v-icon>
         </v-btn>
@@ -142,9 +141,6 @@
       },
     },
     methods: {
-      clearValues() {
-        this.filterPart.values = [];
-      },
       removeValue(valueIndex) {
         let { idDash, filterIndex, filterPartIndex } = this;
         this.$store.commit('removeFilterPartValue', { idDash, filterIndex, filterPartIndex, valueIndex });
