@@ -748,7 +748,7 @@ import EvaLogo from '../images/eva-logo.svg';
 //import { match } from 'minimatch'
 
 import  settings  from '../js/componentsSettings.js'
-import DashFilterPanel from './dashFilterPanel.vue';
+import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
 
 export default {
   components: {

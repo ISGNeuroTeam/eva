@@ -6,6 +6,7 @@
     </v-card-title>
     <v-card-text :style="{ 'background-color': theme.$secondary_bg }">
       <div
+        v-if="filterOtlText !== ''"
         :style="{
           'background-color': theme.$main_bg,
           'margin-top': '20px',
@@ -13,6 +14,18 @@
         }"
       >
         {{ filterOtlText }}
+      </div>
+      <div
+        v-else
+        :style="{
+          'margin-top': '20px',
+          color: theme.$main_text,
+        }"
+      >
+        <div class="subtitle-1">Фильтр пуст</div>
+        <div class="subtitle-2">
+          Заполните фильтр, чтобы посмотреть, сформированный им, текст запроса
+        </div>
       </div>
     </v-card-text>
     <div class="d-flex justify-end">

@@ -315,9 +315,9 @@
 </template>
 
 <script>
-  import FilterPart from './dash-filter-panel/FilterPart';
-  import FilterPartModal from './dash-filter-panel/FilterPartModal';
-  import FilterPreviewModal from './dash-filter-panel/FilterPreviewModal';
+  import FilterPart from './FilterPart';
+  import FilterPartModal from './FilterPartModal';
+  import FilterPreviewModal from './FilterPreviewModal';
 
   import {
     mdiPlusCircleOutline,
