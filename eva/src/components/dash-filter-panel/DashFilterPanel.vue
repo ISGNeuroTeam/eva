@@ -452,9 +452,6 @@
 
 <style lang="sass">
 
-  .temp-filter-container
-    margin-top: 4px !important
-    padding: 10px 0 10px 0
 
     .v-text-field__slot input
       color: var(--main_text)
@@ -474,6 +471,10 @@
 </style>
 
 <style lang="sass" scoped>
+  .temp-filter-container
+    margin-top: 4px !important
+    padding: 10px 0 10px 0
+
   .new-filter-row
     position: absolute
     width:100%
@@ -505,8 +506,8 @@
 
   .filter-row-container
     height: 100%
-    border-top:4px solid var(--secondary_bg)
-    border-bottom:4px solid var(--secondary_bg)
+    border-top:2px solid var(--secondary_bg)
+    border-bottom:2px solid var(--secondary_bg)
 
     .filter-row
       height: 60px
@@ -514,6 +515,5 @@
   .focused-filter-row
     border-top: 2px solid var(--main_border)
     border-bottom: 2px solid var(--main_border)
-    margin: 2px 0 2px 0
-    border-radius: 4px
+    height: 100%
 </style>
