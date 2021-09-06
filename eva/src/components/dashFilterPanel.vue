@@ -4,14 +4,12 @@
       <div
         v-for="(filter, filterIndex) in filters"
         :key="`${filter.id}-${filterIndex}`"
-        :style="{ height: filterIndex === tempFilterIndex ? '100%' : '60px' }"
         :class="{ 'focused-filter-row': focusedRow === filterIndex }"
-        class="filter-row"
+        class="filter-row-container"
       >
         <v-row
           no-gutters
-          class="d-flex align-center"
-          style="height: 100%"
+          class="d-flex align-center filter-row"
           :style="{ 'border-color': theme.$primary_button, 'background-color': theme.$main_bg }"
           @click="focusRow(filterIndex)"
         >
@@ -67,29 +65,64 @@
             </div>
 
             <div v-if="focusedRow === filterIndex">
-              <v-btn icon color="green" @click.stop.prevent="applyTempParts">
-                <v-icon> {{ acceptIcon }}</v-icon>
-              </v-btn>
-              <v-btn icon :color="theme.$error_color" @click.stop.prevent="declineTempParts">
-                <v-icon> {{ declineIcon }}</v-icon>
-              </v-btn>
+              <v-tooltip bottom :color="theme.$accent_ui_color">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    color="green"
+                    @click.stop.prevent="applyTempParts"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon> {{ acceptIcon }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>Сохранить изменения</span>
+              </v-tooltip>
+              <v-tooltip bottom :color="theme.$accent_ui_color">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    :color="theme.$error_color"
+                    @click.stop.prevent="declineTempParts"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    <v-icon> {{ declineIcon }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>Отменить изменения</span>
+              </v-tooltip>
               <!-- When editPermission false refresh and reverse buttons into filterParts -->
-              <v-btn
-                icon
-                small
-                v-if="!editPermission"
-                :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
-                @click.stop.prevent="reverseFilter(filter)"
-                ><v-icon>{{ reverseIcon }}</v-icon>
-              </v-btn>
-              <v-btn
-                icon
-                small
-                @click.stop.prevent="refreshFilter(filter)"
-                :color="theme.$main_text"
-                v-if="!editPermission"
-                ><v-icon>{{ refreshIcon }}</v-icon>
-              </v-btn>
+              <v-tooltip v-if="!editPermission" bottom :color="theme.$accent_ui_color">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                    :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
+                    @click.stop.prevent="reverseFilter(filter)"
+                    ><v-icon>{{ reverseIcon }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>Вычесть отфильтрованные значения</span>
+              </v-tooltip>
+              <v-tooltip v-if="!editPermission" bottom :color="theme.$accent_ui_color">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    icon
+                    small
+                    v-bind="attrs"
+                    v-on="on"
+                    @click.stop.prevent="refreshFilter(filter)"
+                    :color="theme.$main_text"
+                    v-if="!editPermission"
+                    ><v-icon>{{ refreshIcon }}</v-icon>
+                  </v-btn>
+                </template>
+                <span>Сбросить собранные токенами значения</span>
+              </v-tooltip>
             </div>
           </v-col>
 
@@ -100,31 +133,63 @@
             v-if="focusedRow === filterIndex && editPermission"
             :style="{ 'border-left': `1px solid ${theme.$secondary_border}` }"
           >
-            <v-btn
-              icon
-              small
-              :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
-              @click.stop.prevent="reverseFilter(filter)"
-              ><v-icon>{{ reverseIcon }}</v-icon>
-            </v-btn>
-            <v-btn icon small @click.stop.prevent="refreshFilter(filter)" :color="theme.$main_text"
-              ><v-icon>{{ refreshIcon }}</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              small
-              @click.stop.prevent="openFilterPreviewModal(filter)"
-              :color="theme.$main_text"
-              ><v-icon>{{ eyeIcon }}</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              small
-              :color="theme.$error_color"
-              @click.stop.prevent="deleteFilter(filter)"
-            >
-              <v-icon>{{ trashIcon }}</v-icon>
-            </v-btn>
+            <v-tooltip bottom :color="theme.$accent_ui_color">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                  :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
+                  @click.stop.prevent="reverseFilter(filter)"
+                  ><v-icon>{{ reverseIcon }}</v-icon>
+                </v-btn>
+              </template>
+              <span>Вычесть отфильтрованные значения</span>
+            </v-tooltip>
+            <v-tooltip bottom :color="theme.$accent_ui_color">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                  @click.stop.prevent="refreshFilter(filter)"
+                  :color="theme.$main_text"
+                  ><v-icon>{{ refreshIcon }}</v-icon>
+                </v-btn>
+              </template>
+              <span>Сбросить собранные токенами значения</span>
+            </v-tooltip>
+            <v-tooltip bottom :color="theme.$accent_ui_color">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                  @click.stop.prevent="openFilterPreviewModal(filter)"
+                  :color="theme.$main_text"
+                  ><v-icon>{{ eyeIcon }}</v-icon>
+                </v-btn>
+              </template>
+              <span>Посмотреть текст запроса фильтра</span>
+            </v-tooltip>
+            <v-tooltip bottom :color="theme.$accent_ui_color">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                  :color="theme.$error_color"
+                  @click.stop.prevent="deleteFilter(filter)"
+                >
+                  <v-icon>{{ trashIcon }}</v-icon>
+                </v-btn>
+              </template>
+              <span>Удалить фильтр</span>
+            </v-tooltip>
           </v-col>
         </v-row>
         <div>
@@ -424,15 +489,15 @@
 
 <style lang="sass" scoped>
   .new-filter-row
-    position: relative
+    position: absolute
     width:100%
     height: 18px
+    margin-top: -7px
 
     &:hover .new-filter-row-button
       visibility: visible
 
     .new-filter-row-button
-      position: absolute
       width: 100%
       background-color: rgba(76, 217, 100, 0.24)
       visibility: hidden
@@ -447,15 +512,21 @@
         font-size: 12px
         line-height: 15px
         padding: 2px
-
+  
+  .temp-filter-container
+    padding: 20px
 
   .dash-filter-panel
     width: 100%
     max-height: 300px
 
-  .filter-row
-    height: 60px !important
+  .filter-row-container
+    height: 100%
     margin: 4px 0 26px 0
+
+    .filter-row
+      height: 60px
+
 
   .focused-filter-row
     border: 2px solid
