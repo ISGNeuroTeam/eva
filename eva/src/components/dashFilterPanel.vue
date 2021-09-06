@@ -5,7 +5,7 @@
         v-for="(filter, filterIndex) in filters"
         :key="`${filter.id}-${filterIndex}`"
         :style="{ height: filterIndex === tempFilterIndex ? '100%' : '60px' }"
-        :class="focusedRow === filterIndex ? 'focused-filter-row' : ''"
+        :class="{ 'focused-filter-row': focusedRow === filterIndex }"
         class="filter-row"
       >
         <v-row
@@ -454,10 +454,10 @@
     max-height: 300px
 
   .filter-row
-    margin: 30px 0 30px 0
+    height: 60px !important
+    margin: 4px 0 26px 0
 
   .focused-filter-row
-    padding: 0
     border: 2px solid
     border-radius: 4px
 
