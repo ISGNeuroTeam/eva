@@ -23,9 +23,6 @@
         }"
       >
         <div class="subtitle-1">Фильтр пуст</div>
-        <div class="subtitle-2">
-          Заполните фильтр, чтобы посмотреть, сформированный им, текст запроса
-        </div>
       </div>
     </v-card-text>
     <div class="d-flex justify-end">
