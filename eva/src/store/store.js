@@ -913,6 +913,9 @@ export default {
       let foundFilter = state[filter.idDash].filters.find(val => filter.id === val.id);
       foundFilter.parts.forEach(part => (part.values = []));
     },
+    deleteFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
+      state[idDash].filters[filterIndex].parts.splice(filterPartIndex, 1);
+    },
     removeFilterPartValue(state, { idDash, filterIndex, filterPartIndex, valueIndex }) {
       state[idDash].filters[filterIndex].parts[filterPartIndex].values.splice(valueIndex, 1);
     },

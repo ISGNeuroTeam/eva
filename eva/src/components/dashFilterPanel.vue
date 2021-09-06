@@ -40,7 +40,6 @@
                       :style="{ 'border-right': `1px solid ${theme.$secondary_border}` }"
                     >
                       <filter-part
-                        @deleteFilterPart="deleteFilterPart"
                         :idDash="idDashFrom"
                         :filterPart="part"
                         :filterPartIndex="indexPart"
@@ -351,10 +350,6 @@
         this.$store.commit('clearFocusedFilter', this.idDashFrom);
         this.focusedRow = null;
         this.filters = this.$store.getters.getFilters(this.idDashFrom);
-      },
-      deleteFilterPart(filterPart) {
-        let filterIndex = this.focusedFilter.parts.indexOf(filterPart);
-        this.focusedFilter.parts.splice(filterIndex, 1);
       },
       refreshFilter(filter) {
         this.filterChanged = true;

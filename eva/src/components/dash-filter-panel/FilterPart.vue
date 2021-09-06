@@ -9,13 +9,13 @@
           <div class="align-center d-flex">
             <h5 :style="{ color: theme.$secondary_text }">
               {{ filterPart.fieldName }}
-              ({{ filterPartValues.length }})
+              ({{ filterPart.values.length }})
             </h5>
             <v-menu
               offset-y
               :close-on-content-click="false"
               max-height="300"
-              v-if="filterPartValues.length > 0"
+              v-if="filterPart.values.length > 0"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -35,7 +35,7 @@
                 }"
               >
                 <v-list-item
-                  v-for="(value, index) in filterPartValues"
+                  v-for="(value, index) in filterPart.values"
                   :key="index"
                   class="align-center d-flex"
                 >
@@ -66,7 +66,7 @@
         <v-btn
           icon
           x-small
-          v-show="filterPart.filterPartType==='token'"
+          v-show="filterPart.filterPartType === 'token'"
           :color="theme.$main_text"
           @click.stop.prevent="refreshFilterPart"
         >
@@ -78,7 +78,9 @@
           v-if="editPermission || filterPart.filterPartType === 'manual'"
           class="justify-end"
           :color="theme.$error_color"
-          @click.stop.prevent="$emit('deleteFilterPart', filterPart)"
+          @click.stop.prevent="
+            $store.commit('deleteFilterPart', { idDash, filterIndex, filterPartIndex })
+          "
         >
           <v-icon>{{ closeIcon }}</v-icon>
         </v-btn>
@@ -123,10 +125,6 @@
       theme() {
         return this.$store.getters.getTheme;
       },
-      filterPartValues() {
-        return this.$store.getters.getFilters(this.idDash)[this.filterIndex].parts[this.filterPartIndex]
-          .values;
-      },
       elemName() {
         if (this.filterPart.token)
           return this.$store.state.store[this.idDash][this.filterPart.token.elem].name_elem;
@@ -143,7 +141,12 @@
     methods: {
       removeValue(valueIndex) {
         let { idDash, filterIndex, filterPartIndex } = this;
-        this.$store.commit('removeFilterPartValue', { idDash, filterIndex, filterPartIndex, valueIndex });
+        this.$store.commit('removeFilterPartValue', {
+          idDash,
+          filterIndex,
+          filterPartIndex,
+          valueIndex,
+        });
       },
       refreshFilterPart() {
         let { idDash, filterIndex, filterPartIndex } = this;
