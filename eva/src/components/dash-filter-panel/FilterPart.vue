@@ -68,7 +68,7 @@
           x-small
           v-show="filterPart.filterPartType === 'token'"
           :color="theme.$main_text"
-          @click.stop.prevent="refreshFilterPart"
+          @click.stop.prevent="$store.commit('refreshFilterPart', { idDash, filterIndex, filterPartIndex })"
         >
           <v-icon>{{ refreshIcon }}</v-icon>
         </v-btn>
@@ -147,10 +147,6 @@
           filterPartIndex,
           valueIndex,
         });
-      },
-      refreshFilterPart() {
-        let { idDash, filterIndex, filterPartIndex } = this;
-        this.$store.commit('refreshFilterPart', { idDash, filterIndex, filterPartIndex });
       },
     },
   };

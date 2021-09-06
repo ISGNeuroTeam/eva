@@ -5,15 +5,15 @@
   >
     Токен
     <v-select
-      v-model="currentToken"
+      v-model="temp.token"
       :items="tokens"
       item-text="name"
       return-object
+      :background-color="theme.$main_bg"
+      style="padding-bottom: 10px"
       hide-details
       outlined
       dense
-      style="padding-bottom: 10px"
-      :background-color="theme.$main_bg"
     />
     Операция
     <v-select
@@ -33,22 +33,7 @@
     data() {
       return {
         operations: ['OR', 'AND', 'REPLACE'],
-        currentToken: null,
       };
-    },
-    watch: {
-      currentToken(token) {
-        if (token && this.temp.filterPartType === 'token') {
-          this.temp.token = token;
-          this.temp.fieldName = token.capture;
-        }
-      },
-      temp: {
-        immediate: true,
-        handler(val) {
-          this.currentToken = val.token;
-        },
-      },
     },
     computed: {
       tokens() {
@@ -57,6 +42,17 @@
       theme() {
         return this.$store.getters.getTheme;
       },
+    },
+    mounted() {
+      this.$set(this.temp, 'token', this.temp.token);
+      this.$watch(
+        'temp.token',
+        newVal => {
+          this.currentToken = this.temp.token
+          this.temp.fieldName = newVal.capture;
+        },
+        { immediate: true }
+      );
     },
   };
 </script>
