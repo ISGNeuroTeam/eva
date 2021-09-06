@@ -505,13 +505,15 @@
 
   .filter-row-container
     height: 100%
-    border:4px solid var(--secondary_bg)
+    border-top:4px solid var(--secondary_bg)
+    border-bottom:4px solid var(--secondary_bg)
 
     .filter-row
       height: 60px
 
   .focused-filter-row
-    border: 2px solid var(--main_border)
-    margin: 2px
+    border-top: 2px solid var(--main_border)
+    border-bottom: 2px solid var(--main_border)
+    margin: 2px 0 2px 0
     border-radius: 4px
 </style>
