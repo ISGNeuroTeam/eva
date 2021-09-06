@@ -505,16 +505,13 @@
 
   .filter-row-container
     height: 100%
-    margin-top:4px
+    border:4px solid var(--secondary_bg)
 
     .filter-row
       height: 60px
 
-
   .focused-filter-row
-    border: 2px solid
+    border: 2px solid var(--main_border)
+    margin: 2px
     border-radius: 4px
-
-  .reverse-button-active
-    border:4px solid red
 </style>
