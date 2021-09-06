@@ -254,8 +254,8 @@
     </div>
 
     <v-row
-      no-gutters
       v-else
+      no-gutters
       class="temp-filter-container"
       :style="{ 'background-color': theme.$main_bg }"
     >
@@ -276,20 +276,6 @@
           depressed
           @click="saveTempFilter"
           >сохранить</v-btn
-        >
-        <v-btn
-          rounded
-          small
-          class="ma-1"
-          @click="declineTempFilter"
-          style="text-transform: none"
-          :style="{
-            color: theme.$error_color,
-            'background-color': 'rgba(255, 59, 48, 0.14)',
-            'font-size': '14px',
-          }"
-          depressed
-          >отменить</v-btn
         >
       </v-col>
     </v-row>
@@ -467,7 +453,7 @@
 <style lang="sass">
 
   .temp-filter-container
-    margin-top: 20px !important
+    margin-top: 4px !important
     padding: 10px 0 10px 0
 
     .v-text-field__slot input
@@ -512,9 +498,6 @@
         font-size: 12px
         line-height: 15px
         padding: 2px
-  
-  .temp-filter-container
-    padding: 20px
 
   .dash-filter-panel
     width: 100%
@@ -522,7 +505,7 @@
 
   .filter-row-container
     height: 100%
-    margin: 4px 0 26px 0
+    margin-top:4px
 
     .filter-row
       height: 60px
