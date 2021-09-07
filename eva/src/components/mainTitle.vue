@@ -6,8 +6,6 @@
     <dash-panel-bord
       v-if="prepared"
       :id-dash-from="idDash" 
-      :color-from="theme"
-      :style="{top:top, display:display}" 
       :permissions-from="permissions"
       @changeMode="changeMode" 
       @openProfile="event => {openProfile = event}" 
@@ -155,17 +153,6 @@ export default {
     elements: function() {  // получаем название элемента  от родителя
       return this.letElements ? this.$store.getters.getElements(this.idDash) : [];
     },
-    top: function() {
-      if (this.openProfile) {
-        if (screen.width < 1400) {
-          return '40px'
-        } else {
-          return '50px'
-        }
-      } else {
-        return '0px'
-      }
-    },
     headerTop () {
       if(document.body.clientWidth <=1400){
         return 40
@@ -175,13 +162,6 @@ export default {
     },
     theme () {
       return this.$store.getters.getTheme
-    },
-    display () {
-      if (this.$route.query.header === 'false'){
-        return 'none'
-      } else {
-        return 'flex'
-      }
     },
     gridShow () {
       let gridShow = this.$store.getters.getGridShow(this.idDash);

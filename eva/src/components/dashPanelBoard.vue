@@ -124,19 +124,24 @@
           </v-tooltip>
         </div>
         <v-menu :nudge-width="100" class="profile-block" :rounded="false" offset-y>
-          <template v-slot:activator="{ on }">
-            <div class="dropdown-profile" v-on="on">
-              <v-icon
-                :data-error="colorError"
-                :style="{ color: theme.$secondary_text }"
-                class="profile theme--dark"
-              >
-                {{ profile_icon }}
-              </v-icon>
-              <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
-                {{ login }}
-              </div>
-            </div>
+          <template v-slot:activator="{ on: onMenu }">
+            <v-tooltip bottom :color="theme.$accent_ui_color">
+              <template v-slot:activator="{ on: onTooltip }">
+                <div class="dropdown-profile" v-on="{ ...onMenu, ...onTooltip }">
+                  <v-icon
+                    :data-error="colorError"
+                    :style="{ color: theme.$secondary_text }"
+                    class="profile theme--dark"
+                  >
+                    {{ profile_icon }}
+                  </v-icon>
+                  <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
+                    {{ login }}
+                  </div>
+                </div>
+              </template>
+              <span>Меню профиля</span>
+            </v-tooltip>
           </template>
           <v-list class="profile-dropdown--list">
             <v-list-item>

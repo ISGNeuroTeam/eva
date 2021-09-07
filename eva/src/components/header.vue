@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="header-block dash-main" 
+    class="dash-main" 
     :style="{background: theme.$main_bg, height: height }"
   >
     <div class="main-title">
@@ -348,7 +348,6 @@ export default {
 
 <style lang="scss" > 
   
-   @import '../sass/header.sass'
-
+   @import '../sass/dashPanelBoard.sass'
    
 </style>
