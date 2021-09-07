@@ -3,8 +3,18 @@
     class="aplication" 
     :style="{background:theme.$secondary_bg}"
   >
+    <dash-panel-bord
+      v-if="prepared"
+      :id-dash-from="idDash" 
+      :color-from="theme"
+      :style="{top:top, display:display}" 
+      :permissions-from="permissions"
+      @changeMode="changeMode" 
+      @openProfile="event => {openProfile = event}" 
+      @openSettings="openSettings" 
+    />
     <header-top 
-      :class="{openHeader:!openProfile}"
+      v-else
       @permissions="setPermissions" 
       @checkOver="checkOver"
     />
@@ -12,15 +22,6 @@
       v-if="prepared"
       class="body-block" 
     >
-      <dash-panel-bord
-        :id-dash-from="idDash" 
-        :color-from="theme"
-        :style="{top:top, display:display}" 
-        :permissions-from="permissions"
-        @changeMode="changeMode" 
-        @openProfile="event => {openProfile = event}" 
-        @openSettings="openSettings" 
-      />
       <v-card 
         v-if="alreadyShow"
         class="already-block"  
