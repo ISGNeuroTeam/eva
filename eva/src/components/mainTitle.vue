@@ -1,52 +1,52 @@
 <template>
-  <v-app 
-    class="aplication" 
+  <v-app
+    class="aplication"
     :style="{background:theme.$secondary_bg}"
   >
-    <header-top 
+    <header-top
       :class="{openHeader:!openProfile}"
-      @permissions="setPermissions" 
+      @permissions="setPermissions"
       @checkOver="checkOver"
     />
-    <div 
+    <div
       v-if="prepared"
-      class="body-block" 
+      class="body-block"
     >
       <dash-panel-bord
-        :id-dash-from="idDash" 
+        :id-dash-from="idDash"
         :color-from="theme"
-        :style="{top:top, display:display}" 
+        :style="{top:top, display:display}"
         :permissions-from="permissions"
-        @changeMode="changeMode" 
-        @openProfile="event => {openProfile = event}" 
-        @openSettings="openSettings" 
+        @changeMode="changeMode"
+        @openProfile="event => {openProfile = event}"
+        @openSettings="openSettings"
       />
-      <v-card 
+      <v-card
         v-if="alreadyShow"
-        class="already-block"  
+        class="already-block"
         :style="{color:theme.$main_text,background:theme.$main_bg}"
       >
         <div class="text-already">
           Существует более новая версия дашборда. Хотите обновить?
         </div>
         <div class="btn-already">
-          <v-btn 
-            small 
+          <v-btn
+            small
             :color="theme.$primary_button"
-            class="create-btn" 
+            class="create-btn"
             @click="updateDash"
           >
             Да
           </v-btn>
-          <v-btn 
+          <v-btn
             small
             :color="theme.$primary_button"
-            class="create-btn" 
+            class="create-btn"
             @click="alreadyShow = false"
           >
             Нет
           </v-btn>
-        </div> 
+        </div>
       </v-card>
       <v-main id="content">
         <v-container class="dash-container">
@@ -57,38 +57,42 @@
             :style="{height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`}"
           />
-          <move-able
-            v-for="elem in elements"
-            :key="hash(elem)"
-            :data-mode-from="mode"
+<!--          <move-able-->
+<!--            v-for="elem in elements"-->
+<!--            :key="hash(elem)"-->
+<!--            :data-mode-from="mode"-->
+<!--            :color-from="theme"-->
+<!--            :id-dash-from="idDash"-->
+<!--            :data-elem="elem"-->
+<!--            :data-page-from="page"-->
+<!--            :horizontal-cell="horizontalCell"-->
+<!--            :vertical-cell="verticalCell"-->
+<!--          />-->
+          <modal-delete
             :color-from="theme"
             :id-dash-from="idDash"
-            :data-elem="elem"
-            :data-page-from="page"
-            :horizontal-cell="horizontalCell"
-            :vertical-cell="verticalCell"
-          />
-          <modal-delete 
-            :color-from="theme"
-            :id-dash-from="idDash" 
             :data-page-from="page"
           />
-          <modal-search 
+          <modal-search
             :color-from="theme"
-            :id-dash-from="idDash" 
+            :id-dash-from="idDash"
           />
-          <modal-settings 
+          <modal-settings
             :color-from="theme"
-            :id-dash-from="idDash"   
+            :id-dash-from="idDash"
           />
         </v-container>
-      </v-main> 
+      </v-main>
     </div>
     <div v-show="showTabs" class="tab-panel">
       <div
         v-for="tab in tabs"
         :key="tab.id"
-        :class="{active: currentTab === tab.id,'edit-mode-tab': mode,  hover: tab.id === hoveredTabID }"
+        :class="{
+          active: currentTab === tab.id,
+          'edit-mode-tab': mode,
+          hover: tab.id === hoveredTabID,
+        }"
         class="tab-item"
         @click="clickTab(tab.id)"
         @mouseover="tabOver(tab.id)"
@@ -113,7 +117,7 @@
       </div>
       <div v-if="mode" id="plus-icon" @click="addNewTab">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z"/>
+          <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z" />
         </svg>
       </div>
     </div>
@@ -209,12 +213,49 @@ export default {
     }
   },
   mounted() {
-    document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`;
-    this.createStartClient();
-    this.calcSizeCell();
-    this.addScrollListener();
+    document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
+    this.createStartClient()
+    this.calcSizeCell()
+    this.addScrollListener()
+    const searches = this.$store.getters.getSearches(this.idDash)
+    console.log(searches)
+    Promise.allSettled(searches.map(search => this.getDataFromRest(search)))
+      .then(results => {
+        results.forEach((result, num) => {
+          if (result.status == "fulfilled") {
+            console.log('fulfilled')
+            console.log(result)
+          }
+          if (result.status == "rejected") {
+            console.log('rejected')
+            console.log(result)
+          }
+        });
+      });
   },
   methods: {
+    getDataFromRest: async function(event) {
+      console.log(123)
+      // this.$set(this.loadings,event.sid,true);
+      this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false });
+
+      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
+      let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными
+      // вызывая метод в хранилище
+      if ( response.length == 0) {  // если что-то пошло не так
+        this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });
+      } else {  // если все нормально
+
+        let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash);
+        responseDB
+          .then(
+            result => {
+              this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  });
+            },
+          );
+      }
+      return response
+    },
     clickTab(tabID) {
       if (!this.tabEditMode) {
         this.$store.commit('changeCurrentTab', {idDash: this.idDash, tab: tabID});

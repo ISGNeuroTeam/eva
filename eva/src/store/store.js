@@ -1608,7 +1608,7 @@ export default {
                   name: stateFrom.name,
                   id: stateFrom.id,
                   modified: stateFrom.modified,
-                });
+                })
               }
               if (first) {
                 if (stateFrom.body != '') {

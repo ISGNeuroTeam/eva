@@ -253,7 +253,7 @@ export default {
   computed: {
     colorError: function() {
       if (this.$store.getters.getColorError) {
-        return this.color.controlsActive
+        return this.theme.$error_color
       } else {
         return 'white'
       } 
@@ -265,7 +265,7 @@ export default {
         return "41px"
       }
     },
-    theme: function() {
+    theme: function () {
       return this.$store.getters.getTheme
     },
     isAdmin() {

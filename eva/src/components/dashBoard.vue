@@ -304,36 +304,36 @@ export default {
         let searchId = this.$store.getters.getSearchID({idDash: this.idDash, id: this.element});
         let searchName = `${this.idDash}-${searchId}`;
         let search = this.$store.getters.getSearch({idDash: this.idDash, id: this.element});
-        if  (searchId == -1) {
+        if (searchId === -1) {
           this.props.sid = ''
         } else {
           this.props.sid = searchId
         }
 
-      let fromDB
-      this.dataFromDB = true
-      this.getDataFromDB(searchName).then(result=>{
-        fromDB = result
-        this.props.dataRestFilter = fromDB;
-      })
-      this.getDataFromRest(search).then(result=>{
-          this.props.dataRestFilter = result
-          this.dataFromDB = false
-          if(result.length===0 && this.lastResult){
-            this.props.dataRestFilter = fromDB
+        let fromDB
+        this.dataFromDB = true
+        this.getDataFromDB(searchName).then(result=>{
+          console.log(result)
+          fromDB = result
+          this.props.dataRestFilter = fromDB;
+        })
+        this.getDataFromRest(search).then(result=>{
+            this.props.dataRestFilter = result
+            this.dataFromDB = false
+            if(result.length===0 && this.lastResult){
+              this.props.dataRestFilter = fromDB
+            }
+          },
+          () => {
+            if(this.lastResult){
+              this.props.dataRestFilter = fromDB
+            } else {
+              this.props.dataRestFilter = []
+            }
           }
-        },
-        () => {
-          if(this.lastResult){
-            this.props.dataRestFilter = fromDB
-          } else {
-            this.props.dataRestFilter = []
-          }
-        }
-      )
+        )
       }
-      this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: false});
-
+      this.$store.commit('setShould', { idDash: this.idDash, id: this.element, status: false});
     },
   },
   computed: {
@@ -388,10 +388,11 @@ export default {
       }
       return show
     },
-    shouldGet: function() {  // понимаем нужно ли запрашивтаь данные с реста
-      let should = false;
-      if (this.element){
-        should =  this.$store.getters.getShouldGet({id: this.element, idDash: this.idDash});
+    shouldGet() {
+      // понимаем нужно ли запрашивтаь данные с реста
+      let should = false
+      if (this.element) {
+        should = this.$store.getters.getShouldGet({ id: this.element, idDash: this.idDash })
       }
       return should
     },
@@ -464,24 +465,17 @@ export default {
       }
     },
   },
-
-  watch: {
-
-  },
-
   mounted() {
     this.props.icons = settings.icons;
     this.page = this.$parent.$el.getAttribute('data-page');  // понимаем какая страница перед нами
-    this.props.name = this.$store.getters.getNameDash({idDash: this.idDash, id: this.element}); // получаем имя этой страницы
+    this.props.name = this.$store.getters.getNameDash({ idDash: this.idDash, id: this.element }); // получаем имя этой страницы
 
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
       this.props.optionsBoxShadow = 'transparent';
     }
-
-    this.$store.commit('setShould', { idDash: this.idDash,  id: this.element, status: true});
-
+    this.$store.commit('setShould', { idDash: this.idDash, id: this.element, status: true});
   },
 
   methods: {
@@ -518,12 +512,8 @@ export default {
       this.$store.commit('setModalDelete', { id: this.idDash, status: true, elem: this.element, name: props.name, page: this.dataPageFrom});
     },
     getDataFromDB: function(searсhID) {   // получение данных с indexindDB
-    
       let db = null;
-
       let request = indexedDB.open("EVA",1);
-
-
       request.onerror = function(event) {
         console.log("error: ",event);
       };
@@ -534,18 +524,12 @@ export default {
         if (!db.objectStoreNames.contains('searches')) { // if there's no "books" store
           db.createObjectStore('searches'); // create it
         }
-
         request.onsuccess = event => {
           db = request.result;
           console.log("successEvent: " + db);
         };
-
       }
-
-
       let promise = new Promise((resolve, reject) => {
-
-
         request.onsuccess =  event => {
 
           db = request.result;
@@ -554,8 +538,6 @@ export default {
 
           // получить хранилище объектов для работы с ним
           let searches = transaction.objectStore("searches"); // (2)
-
-
 
           let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
 
@@ -570,13 +552,9 @@ export default {
           query.onerror = function() {
             console.log("Ошибка", query.error);
           };
-
         };
-
       });
-
       return promise
-
     },
     openTitle: function() {  // открываем закрываем шапку элемнета
       if(this.props.arrow.direct == "up") {
@@ -676,9 +654,7 @@ export default {
     //   }
     // },
     getData: function(searсhID) {   // асинхронная функция для получения даных с реста
-    
       let db = null;
-    
       let request = indexedDB.open("EVA",1);  
       request.onerror = function(event) {
         console.log("error: ",event);
@@ -714,7 +690,6 @@ export default {
         };    
       });
       return promise
-      
     },
     checkFilter: function() {
       let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'OnDataCompare', element: this.element});
@@ -885,18 +860,12 @@ export default {
       if (data.length == 0) {
         this.props.dataRestFilter = JSON.parse(JSON.stringify(this.props.dataRest));
       }
-             
       link.remove(); // удаляем ссылку
     }
   },
 }
-
-
 </script>
 
 <style lang="scss" >
-
-    @import '../sass/dashBoard.sass'
-
-
+    @import '../sass/dashBoard.sass';
 </style>
