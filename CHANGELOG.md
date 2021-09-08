@@ -13,10 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - inability to do anything with other tabs while editing one
+- log button returns into dashboard header
 
 ### Fixed
 - hover on first row in table
 - time format on x-axis while zooming
+- header height equal in main menu and dashboard
+- double header after incorrect search
 
 ## [1.63.0]
 
