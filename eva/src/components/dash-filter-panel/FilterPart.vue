@@ -9,13 +9,13 @@
           <div class="align-center d-flex">
             <h5 :style="{ color: theme.$secondary_text }">
               {{ filterPart.fieldName }}
-              ({{ filterPart.values.length }})
+              ({{ filterPartValues.length }})
             </h5>
             <v-menu
               offset-y
               :close-on-content-click="false"
               max-height="300"
-              v-if="filterPart.values.length > 0"
+              v-if="filterPartValues.length > 0"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -35,7 +35,7 @@
                 }"
               >
                 <v-list-item
-                  v-for="(value, index) in filterPart.values"
+                  v-for="(value, index) in filterPartValues"
                   :key="index"
                   class="align-center d-flex"
                 >
@@ -137,6 +137,10 @@
           ? this.operationManualTitleMap[this.filterPart.fieldType][this.filterPart.operationManual]
           : '';
       },
+      filterPartValues(){
+        if (this.filterPart.token)
+          return this.$store.state.store[this.idDash].filters[this.filterIndex].parts[this.filterPartIndex].values;
+      }
     },
     methods: {
       removeValue(valueIndex) {
