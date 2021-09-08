@@ -4,27 +4,24 @@
     :style="{background:theme.$secondary_bg}"
   >
     <header-top
-      :class="{openHeader:!openProfile}"
+      :class="{ openHeader: !openProfile }"
       @permissions="setPermissions"
       @checkOver="checkOver"
     />
-    <div
-      v-if="prepared"
-      class="body-block"
-    >
+    <div v-if="prepared" class="body-block">
       <dash-panel-bord
         :id-dash-from="idDash"
         :color-from="theme"
-        :style="{top:top, display:display}"
+        :style="{ top: top, display: display }"
         :permissions-from="permissions"
         @changeMode="changeMode"
-        @openProfile="event => {openProfile = event}"
+        @openProfile="event => { openProfile = event}"
         @openSettings="openSettings"
       />
       <v-card
         v-if="alreadyShow"
         class="already-block"
-        :style="{color:theme.$main_text,background:theme.$main_bg}"
+        :style="{ color: theme.$main_text, background: theme.$main_bg }"
       >
         <div class="text-already">
           Существует более новая версия дашборда. Хотите обновить?
@@ -57,17 +54,17 @@
             :style="{height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`}"
           />
-<!--          <move-able-->
-<!--            v-for="elem in elements"-->
-<!--            :key="hash(elem)"-->
-<!--            :data-mode-from="mode"-->
-<!--            :color-from="theme"-->
-<!--            :id-dash-from="idDash"-->
-<!--            :data-elem="elem"-->
-<!--            :data-page-from="page"-->
-<!--            :horizontal-cell="horizontalCell"-->
-<!--            :vertical-cell="verticalCell"-->
-<!--          />-->
+          <move-able
+            v-for="elem in elements"
+            :key="hash(elem)"
+            :data-mode-from="mode"
+            :color-from="theme"
+            :id-dash-from="idDash"
+            :data-elem="elem"
+            :data-page-from="page"
+            :horizontal-cell="horizontalCell"
+            :vertical-cell="verticalCell"
+          />
           <modal-delete
             :color-from="theme"
             :id-dash-from="idDash"
@@ -224,7 +221,7 @@ export default {
     this.calcSizeCell()
     this.addScrollListener()
     const searches = this.$store.getters.getSearches(this.idDash)
-    console.log(searches)
+    // console.log(searches)
     Promise.allSettled(searches.map(search => this.getDataFromRest(search)))
       .then(results => {
         results.forEach((result, num) => {
@@ -241,7 +238,7 @@ export default {
   },
   methods: {
     getDataFromRest: async function(event) {
-      console.log(123)
+      // console.log(123)
       // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false });
 
