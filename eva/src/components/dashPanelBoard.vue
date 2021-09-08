@@ -127,7 +127,7 @@
           <v-tooltip bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on }">
               <v-icon
-                class="filter control-button theme--dark"
+                class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
                 v-on="on"
                 @click="openLogs"
