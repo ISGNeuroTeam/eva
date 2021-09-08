@@ -4,8 +4,7 @@
       <v-row class="ma-0">
         <v-btn
           rounded
-          color="#191919"
-          dark
+          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
           @click="toggleSelect = !toggleSelect"
         >
           Режим
@@ -13,7 +12,7 @@
         <v-select
           v-model="options.mode"
           :menu-props="{ value: toggleSelect }"
-          style="visibility:hidden;background: white; position: absolute"
+          :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
           :items="mode"
           label="Режим"
           multiple
@@ -22,15 +21,16 @@
         <v-spacer/>
         <v-dialog v-model="dialog" max-width="290">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn rounded color="#191919" v-bind="attrs" v-on="on">
-              <v-icon :style="{ color: theme.$title }">
+            <v-btn rounded :style="`background: ${theme.$secondary_bg}`" v-bind="attrs" v-on="on">
+              <v-icon :style="{ color: theme.$main_text }">
                 {{ mdiSettings }}
               </v-icon>
             </v-btn>
           </template>
-          <v-card>
-            <v-card-title class="text-h5"> Настройки </v-card-title>
-            <v-card-text>
+          <v-card
+          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text} !important`">
+            <v-card-title class="text-h5" > Настройки </v-card-title>
+            <v-card-text :style="`color: ${theme.$main_text} !important`">
               <p>Подложка</p>
               <v-select
                 v-model="options.selectedLayer"
@@ -44,6 +44,7 @@
               <p>Начальный зум</p>
               <v-slider
                 v-model="options.zoomLevel"
+                :style="`color: ${theme.$main_text} !important`"
                 class="align-center"
                 max="25"
                 min="0"
@@ -83,20 +84,26 @@
               <p>Начальная точка</p>
               <v-row>
                 <v-col col="6">
-                  <v-text-field v-model="options.initialPoint.x" label="X" />
+                  <v-text-field :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
                 </v-col>
                 <v-col col="6">
-                  <v-text-field v-model="options.initialPoint.y" label="Y" />
+                  <v-text-field :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
                 </v-col>
               </v-row>
 
               <p>Легенда карты</p>
               <v-checkbox
                 v-model="options.showLegend"
-                label="Включить отображение легенды"
-                color="secondary"
+                
                 hide-details
-              />
+                
+              >
+              <template v-slot:label>
+                <span :style="`color: ${theme.$secondary_text} !important`">
+                  Включить отображение легенды
+                </span>
+                </template>
+              </v-checkbox>
 
               <p>ИД для режима мониторинга</p>
               <v-select
@@ -475,12 +482,32 @@ export default {
 };
 </script>
 
-<style>
-.med {
-  height: 100%;
-  position: absolute;
+<style lang="sass" >
+
+
+.med 
+  height: 100%
+  position: absolute
   /* left: 0px; */
-  right: 0px;
-  z-index: 1000000;
-}
+  right: 0px
+  z-index: 1000000
+
+.theme--light.v-input input, .theme--light.v-input textarea 
+  color: var(--main_text) !important
+
+.v-text-field__slot label
+  color: var(--main_text) !important
+.med
+  color: var(--main_text) !important
+  .v-text-field__slot input
+    color: var(--main_text) !important
+  .v-input__slot fieldset
+    color: var(--main_text) !important
+  .v-input__control
+    .v-icon
+      color: var(--main_text) !important
+  .v-select__selections
+    color: var(--main_text) !important
+  .v-input input
+    min-height: auto !important
 </style>

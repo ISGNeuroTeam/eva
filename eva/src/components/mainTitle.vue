@@ -88,11 +88,7 @@
       <div
         v-for="tab in tabs"
         :key="tab.id"
-        :class="{
-          active: currentTab === tab.id,
-          'edit-mode-tab': mode,
-          hover: tab.id === hoveredTabID,
-        }"
+        :class="{ active: currentTab === tab.id,'edit-mode-tab': mode,  hover: tab.id === hoveredTabID }"
         class="tab-item"
         @click="clickTab(tab.id)"
         @mouseover="tabOver(tab.id)"
@@ -101,7 +97,7 @@
         <div v-if="tab.id !== editableTabID" style="height: 40px">
           {{ tab.name }}
           <svg v-if="mode" class="edit-icon" width="14" height="14" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" @click.stop="enterEditMode(tab)">
-            <path d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z" fill="#8E8D9E"/>
+            <path d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z" :fill="theme.$main_border"/>
           </svg>
           <svg v-if="mode && tabsMoreOne" class="delete-cross" width="13" height="13" viewBox="0 0 8 8"  xmlns="http://www.w3.org/2000/svg" @click.stop="deleteTab(tab.id)">
             <path
@@ -112,12 +108,15 @@
         </div>
         <div v-else>
           <input v-model="tempName" class="tab-name-input" type="text" @keypress.enter="editTabName">
+          <svg @click.stop.prevent="editTabName" id="submit-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7.9375 14.7142L3.8125 10.5892L4.99083 9.41089L7.93875 12.3555L7.9375 12.3567L15.0083 5.28589L16.1867 6.46422L9.11583 13.5359L7.93833 14.7134L7.9375 14.7142Z" :fill="theme.$main_border"/>
+          </svg>
         </div>
 
       </div>
       <div v-if="mode" id="plus-icon" @click="addNewTab">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z" />
+          <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z" :fill="theme.$main_border"/>
         </svg>
       </div>
     </div>
@@ -210,6 +209,13 @@ export default {
   watch: {
     getSizeGrid: function() {
       this.calcSizeCell()
+    },
+    mode () {
+      if (!this.mode) {
+        this.editableTabID = 0
+        this.tempName = ''
+        this.tabEditMode = false
+      }
     }
   },
   mounted() {
@@ -268,7 +274,7 @@ export default {
       }
     },
     deleteTab(tabID) {
-      if (this.tabsMoreOne) {
+      if (this.tabsMoreOne && !this.tabEditMode) {
         this.$store.commit('deleteDashTab', {idDash: this.idDash, tabID});
       }
     },
