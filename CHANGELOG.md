@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - unit setting to multiline component
+- submit button while editing tab name
+
+### Changed
+- inability to do anything with other tabs while editing one
 
 ### Fixed
 - hover on first row in table
