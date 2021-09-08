@@ -26,67 +26,69 @@
         </v-tooltip>
       </div>
       <div class="control-block">
-        <v-tooltip bottom :color="theme.$accent_ui_color">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              class="code theme--dark"
-              :style="{ color: theme.$secondary_text }"
-              :class="{ hide_control: !edit_elem }"
-              v-on="on"
-              @click="openEventCode"
-            >
-              {{ code_icon }}
-            </v-icon>
-          </template>
-          <span>События</span>
-        </v-tooltip>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              class="tocken theme--dark"
-              :style="{ color: theme.$secondary_text }"
-              :class="{ hide_control: !edit_elem }"
-              v-on="on"
-              @click="openTockenCode"
-            >
-              {{ tocken_icon }}
-            </v-icon>
-          </template>
-          <span>Токены</span>
-        </v-tooltip>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              class="search theme--dark"
-              :style="{ color: theme.$secondary_text }"
-              :class="{ hide_control: !edit_elem }"
-              v-on="on"
-              @click="openSearchCode"
-            >
-              {{ search_icon }}
-            </v-icon>
-          </template>
-          <span>Источники даных</span>
-        </v-tooltip>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
-          <template v-slot:activator="{ on }">
-            <v-icon
-              class="tools theme--dark"
-              :style="{ color: theme.$secondary_text }"
-              :class="{ hide_control: !edit_elem }"
-              v-on="on"
-              @click="openToolPanel"
-            >
-              {{ tool_icon }}
-            </v-icon>
-          </template>
-          <span>Визуализации</span>
-        </v-tooltip>
-        <div class="edit-container">
+        <div class="edit-container" :class="{ hide_control: !edit_elem }">
           <v-tooltip bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on }">
               <v-icon
-                class="filter filter-icon theme--dark"
+                class="control-button theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                :class="{ hide_control: !edit_elem }"
+                v-on="on"
+                @click="openEventCode"
+              >
+                {{ code_icon }}
+              </v-icon>
+            </template>
+            <span>События</span>
+          </v-tooltip>
+          <v-tooltip bottom :color="theme.$accent_ui_color">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="control-button theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                :class="{ hide_control: !edit_elem }"
+                v-on="on"
+                @click="openTockenCode"
+              >
+                {{ tocken_icon }}
+              </v-icon>
+            </template>
+            <span>Токены</span>
+          </v-tooltip>
+          <v-tooltip bottom :color="theme.$accent_ui_color">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="control-button theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                :class="{ hide_control: !edit_elem }"
+                v-on="on"
+                @click="openSearchCode"
+              >
+                {{ search_icon }}
+              </v-icon>
+            </template>
+            <span>Источники даных</span>
+          </v-tooltip>
+          <v-tooltip bottom :color="theme.$accent_ui_color">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="control-button theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                :class="{ hide_control: !edit_elem }"
+                v-on="on"
+                @click="openToolPanel"
+              >
+                {{ tool_icon }}
+              </v-icon>
+            </template>
+            <span>Визуализации</span>
+          </v-tooltip>
+        </div>
+        <div class="user-control-panel">
+          <v-tooltip bottom :color="theme.$accent_ui_color">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
                 v-on="on"
                 @click="openFilterPanel"
@@ -99,7 +101,7 @@
           <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on }">
               <v-icon
-                class="edit edit-icon theme--dark"
+                class="control-button edit-icon theme--dark"
                 :style="{ color: theme.$secondary_text }"
                 v-on="on"
                 @click="gearShow = !gearShow"
@@ -112,7 +114,7 @@
           <v-tooltip bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on }" v-if="editPermission">
               <v-icon
-                class="save theme--dark"
+                class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
                 v-on="on"
                 @click="openSave"
@@ -122,8 +124,21 @@
             </template>
             <span>Сохранить</span>
           </v-tooltip>
+          <v-tooltip bottom :color="theme.$accent_ui_color">
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="filter control-button theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                v-on="on"
+                @click="openLogs"
+              >
+                {{ logIcon }}
+              </v-icon>
+            </template>
+            <span>Открыть окно логов</span>
+          </v-tooltip>
         </div>
-        <v-menu :nudge-width="100" class="profile-block" :rounded="false" offset-y>
+        <v-menu :nudge-width="100" :rounded="false" offset-y>
           <template v-slot:activator="{ on: onMenu }">
             <v-tooltip bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on: onTooltip }">
@@ -755,6 +770,7 @@
         filterIcon: mdiFilter,
         exim: mdiSwapVerticalBold,
         home: mdiHomeVariantOutline,
+        logIcon: mdiScriptTextOutline,
         openhelp: false,
         newDashBoard: {},
         lookTockens: [],
@@ -779,13 +795,6 @@
           },
           {
             id: 3,
-            label: 'Логи',
-            icon: mdiScriptTextOutline,
-            onClick: this.openLogs,
-            hide: !this.isAdmin,
-          },
-          {
-            id: 4,
             label: 'Выйти',
             icon: mdiDoor,
             onClick: this.exit,

@@ -1,7 +1,7 @@
 <template>
   <div 
     class="dash-main" 
-    :style="{background: theme.$main_bg, height: height }"
+    :style="{background: theme.$main_bg, height}"
   >
     <div class="main-title">
       <div class="logo-block">
@@ -260,9 +260,9 @@ export default {
     },
     height: function() {
       if (screen.width < 1400) {
-        return '40px'
+        return '50px'
       } else {
-        return "41px"
+        return "51px"
       }
     },
     theme: function() {
