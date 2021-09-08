@@ -171,13 +171,6 @@
         }
       },
     },
-    watch: {
-      userPermissions() {
-        this.profileDropdownButtons = this.profileDropdownButtons.map(item =>
-          item.id === 3 ? { ...item, hide: !this.isAdmin } : item
-        );
-      },
-    },
     mounted() {
       this.getCookie();
     },
