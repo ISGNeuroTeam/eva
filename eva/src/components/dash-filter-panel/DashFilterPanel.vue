@@ -1,6 +1,6 @@
 <template>
   <div class="dash-filter-panel" :style="{ 'background-color': theme.$secondary_bg }">
-    <div v-if="filters.length > 0">
+    <div v-if="filters.length > 0" style="padding-bottom:10px" :style="{ 'background-color': theme.$secondary_bg }">
       <div
         v-for="(filter, filterIndex) in filters"
         :key="`${filter.id}-${filterIndex}`"
