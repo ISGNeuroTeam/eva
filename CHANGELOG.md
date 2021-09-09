@@ -5,18 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [1.64.0]
 
 ### Added
+- filter panel to dashboard
 - unit setting to multiline component
 - submit button while editing tab name
+- value styles for single value component
+- theme support in map component settings
 
 ### Changed
 - inability to do anything with other tabs while editing one
+- log button moved back from dropdown list to header
 
 ### Fixed
 - hover on first row in table
 - time format on x-axis while zooming
+- header height equal in main menu and dashboard
+- double header after incorrect search
+- dash filter styles and UI
 
 ## [1.63.0]
 
