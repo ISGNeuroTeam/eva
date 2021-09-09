@@ -113,7 +113,7 @@ export default {
   },
   options: {
     multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline', 'pinned'],
-    piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes', 'pinned'],
+    piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes', 'pinned', 'piechartSettings'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult', 'titles', 'pinned'],
     select: ['visible','level','boxShadow','multiple', 'pinned'],
     picker: ['visible','level', 'pinned'],

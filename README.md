@@ -42,8 +42,6 @@ To run module test
 npm run test
 ```
 
-## Deployment
-
 
 ## Built With
 
@@ -51,6 +49,9 @@ npm run test
 * [Vuetify](https://vuetifyjs.com/ru/getting-started/quick-start/) -  different elements of interface
 * [Material Design Icons](https://materialdesignicons.com/) - different icons in interface
 * [D3.js](https://github.com/d3/d3/wiki) - draw different vizualization elements
+
+## Compatible with
+* ot_simple_rest 1.8.0
 
 ## Contributing
 

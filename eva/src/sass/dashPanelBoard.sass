@@ -15,6 +15,9 @@
     .v-menu__content
         margin-top: 10px
 
+.profile-dropdown
+    margin: 0 20px 0 20px
+
 .profile-dropdown--title
     padding-left: 10px
     font-weight: bold
@@ -29,7 +32,7 @@
     padding-left: 10px
     margin-top: 8px
 
-    &:hover 
+    &:hover
         background-color: rgba(var(--secondary_text), 0.25) !important
 
     .edit
@@ -41,22 +44,23 @@
 
     .v-list-item
         padding: 0
- 
+
 .dash-main
     border-bottom: 1px solid var(--secondary_border)
     display: flex
     flex-flow: row nowrap
     justify-content: space-between
-    align-items: center 
+    align-items: center
     // border-bottom: 1px solid rgba(0,0,0,0.2)
     position: fixed
     top: 0
     left: 0
     width: 100%
-    z-index: 4
+    z-index: 5
     transition: all 0.4s ease
 
     .dropdown-profile
+        margin: 0 20px 0 20px
         display: flex
         align-items: center
         cursor: pointer
@@ -65,11 +69,9 @@
         margin-left: 20px
         display: flex
         align-items: center
-    
-    .profile-login
-        margin-right: 20px
 
-    .main-title 
+
+    .main-title
         display: flex
         flex-flow: row nowrap
         justify-content: flex-start
@@ -95,7 +97,7 @@
             .exim
                 cursor: pointer
                 margin-left: 10px
-                
+
 
             .hide_control
                 opacity: 0
@@ -103,7 +105,7 @@
 
         .home
             cursor: pointer
-            margin-right: 15px 
+            margin-right: 15px
 
     .control-block
         position: relative
@@ -111,46 +113,16 @@
         display: flex
         align-items: center
 
-        .edit-container
-            border-left: 1px solid var(--secondary_border)
+        .user-control-panel
             border-right: 1px solid var(--secondary_border)
-            margin-right: 20px
 
-        .edit-icon
-            margin-right: 20px
-            margin-left: 20px
+            .control-button:first-child
+                margin-left:  20px
 
-        .search
-            margin-right: 20px
-            cursor: pointer
-            opacity: 1
-            visibility: visible
+        .edit-container
+            border-right: 1px solid var(--secondary_border)
 
-        .tools
-            margin-right: 20px
-            cursor: pointer
-            opacity: 1
-            visibility: visible
-        
-        .tocken
-            margin-right: 20px
-            cursor: pointer
-            opacity: 1
-            visibility: visible
-
-        .code
-            margin-right: 20px
-            cursor: pointer
-            opacity: 1
-            visibility: visible
-
-        .profile
-            margin-right: 10px
-            cursor: pointer
-            opacity: 1
-            visibility: visible
-
-        .save
+        .control-button
             margin-right: 20px
             cursor: pointer
             opacity: 1
@@ -159,105 +131,6 @@
         .hide_control
             opacity: 0
             visibility: hidden
-        
-
-    // .block-exim
-    //     position: absolute
-    //     width: auto
-    //     height: auto
-    //     width: 400px
-    //     top: 55px
-    //     left: 20px
-    //     border-radius: 4px
-    //     padding: 20px
-    //     opacity: 0
-    //     visibility: hidden
-    //     display: flex
-    //     flex-flow: column nowrap
-    //     justify-content: flex-start
-    //     align-items: center
-    //     transition: all 0.4s ease
-    //     transform: translateY(-100%)
-
-    //     .export-btn
-    //         color: white
-    //         padding: 20px 15px
-
-    //     .import-btn
-    //         color: white
-    //         padding: 20px 15px
-
-    //     .msgExp
-    //         margin: 0
-    //         padding: 0
-    //         margin-top: 10px
-    //         transition: all 0.4s ease
-        
-    //     .msgImp
-    //         margin: 0
-    //         padding: 0
-    //         margin-top: 10px
-    //         transition: all 0.4s ease
-
-    //     .divider
-    //         margin: 10px 0
-    //         width: 100%
-    //         height: 2px
-    //         margin-bottom: 15px
-
-    //     .file-itself
-    //         margin-bottom: 15px
-    //         width: 100%
-
-    //         .v-input__prepend-outer
-    //             margin-top: 8px
-
-    //         .v-input__control
-
-    //             .v-input__slot
-    //                 min-height: 40px
-
-    //                 .v-text-field__slot
-    //                     padding: 0
-
-    //                     .v-label
-    //                         top: 13px
-
-    //                     .v-file-input__text
-    //                         cursor: pointer
-
-    // .block-exin
-    //     position: absolute
-    //     width: auto
-    //     height: auto
-    //     top: 55px
-    //     right: 20px
-    //     border: 2px solid rgba(0,0,0,0.2)
-    //     border-radius: 4px
-    //     background: white
-    //     padding: 20px
-    //     opacity: 0
-    //     visibility: hidden
-    //     transition: all 0.4s ease
-    //     display: flex
-    //     flex-flow: column nowrap
-    //     justify-content: flex-start
-    //     align-items: flex-start
-
-        // .exin-btn
-        //     border-radius: 4px
-        //     fonct-size: 16px
-        //     padding: 10px 20px
-        //     width: 165px
-        //     margin-bottom: 20px
-        //     cursor: pointer
-        //     transition: all 0.4s ease
-
-        //     &:last-child
-        //         margin-bottom: 0
-
-        //     // &:hover
-        //     //     box-shadow: 0px 0px 4px 3px  #FF6D70
 
     .block-event
         position: absolute
@@ -358,7 +231,7 @@
             .question-save
                 width: 100%
 
-            
+
 
         .save-btn
             color: white
@@ -458,7 +331,7 @@
                 width: 120px
                 margin-right: 15px
                 color: inherit
-            
+
             .tocken-action
                 width: 120px
                 margin-right: 15px
@@ -509,7 +382,7 @@
             .showTocken
                 opacity: 1
                 visibility: visible
-        
+
         .v-label
             font-size: 14px
             top: 13px
@@ -582,37 +455,6 @@
             .tool-name
                 padding: 7px 15px
 
-        // .tool-one
-        //     display: flex
-        //     flex-flow: row nowrap
-        //     justify-content: flex-start
-        //     align-items: center
-        //     width: 100%
-        //     cursor: pointer
-        //     margin: 10px 0
-
-        //     .tool-img
-        //         background: teal
-        //         fill: white
-        //         padding: 5px 15px
-        //         border-radius: 10px 0 0 10px
-        //         cursor: pointer
-        //         border: 2px solid teal
-
-        //         .tool-img-itself
-        //             fill: white
-        //             width: 30px
-        //             height: 30px
-
-        //     .tool-name
-        //         padding: 7px 15px
-        //         font-size: 18px
-        //         color: rgba(0,0,0,0.7)
-        //         border: 2px solid rgba(0,0,0,.2)
-        //         border-radius: 0 10px 10px 0
-        //         width: 100%
-        //         cursor: pointer
-
     .block-code
         position: absolute
         width: 550px
@@ -684,7 +526,7 @@
                 min-width: 20px
                 min-height: 20px
 
-            
+
             .search-pencil
                 width: 20px
                 height: 20px
@@ -714,11 +556,11 @@
             color: white
             margin-left: 400px
             margin-top: 10px
-                
+
         .textarea-block
             overflow: hidden
             opacity: 0
-            height: 0 
+            height: 0
             min-height: 0
             width: 70%
             margin: 0px auto 0 auto
@@ -763,13 +605,13 @@
             height: 660px
             opacity: 1
             min-height: 660px
-            
+
         .sign-block
             width: 100%
             text-align: center
-     
+
             .sign
-                margin-top: 10px 
+                margin-top: 10px
                 cursor: pointer
 
             .plus
@@ -777,6 +619,8 @@
 
             .minus
                 fill: #FF6D70
+
+
 
     .warning-block
         position: absolute
@@ -799,7 +643,7 @@
         align-items: center
 
         .warning-text
-            font-size: 12px  
+            font-size: 12px
             margin-left: 5px
 
         .warning-btn
@@ -807,9 +651,9 @@
             color: white
 
     .warning-block-show
-        opacity: 1 
-        z-index: 3 
-        visibility: visible 
+        opacity: 1
+        z-index: 3
+        visibility: visible
 
 
     .opencode
@@ -877,116 +721,25 @@
         cursor: pointer
         background: white
 
-// .openProfile
-//     top: 52px
-    //     div
-    //         white-space: nowrap
+.block-filter
+    position: absolute
+    width: 100%
+    height: auto
+    overflow: hidden
+    top: 55px
+    background-color: var(--main_bg)
+    border-bottom: 2px solid var(--secondary_border)
+    border-radius: 0 0 4px 4px
+    visibility: hidden
+    display: flex
+    flex-flow: column nowrap
+    justify-content: flex-start
+    align-items: flex-start
+    transition: all 0.4s ease
+    transform: translateY(-100%)
 
-    //     .create-btn
-    //         position: absolute
-    //         right: 5px
-    //         bottom: 0px
-    //         color: white
-
-    //     .help
-    //         position: absolute
-    //         left: 10px
-    //         bottom: 0px
-
-    // .help-block
-    //     position: absolute
-    //     border: 2px solid rgba(0,0,0,0.2)
-    //     border-radius: 4px
-    //     background: white
-    //     padding: 10px
-    //     transition: all 0.4s ease
-    //     top: 160px
-    //     height: auto
-    //     right: 20px
-    //     z-index: 1
-    //     color: rgba(0,0,0,.54)
-    //     font-size: .775rem
-    //     opacity: 0
-    //     visibility: hidden
-
-    // .openhelp
-    //     opacity: 1
-    //     visibility: visible
-
-    // .opencode
-    //     height: 100px
-    //     opacity: 1
-    
-
-@media screen and (max-width: 1400px) 
-
-    .dash-main 
-        .profile-login
-            margin-right: 10px
-        
-        .block-tool
-            width: 370px
-            padding: 10px
-
-            .tool-one
-                margin: 5px 0
-
-                .tool-img
-                    padding: 3px 10px
-
-                .tool-name 
-                    padding: 5px 20px
-
-
-        .main-title 
-
-            .title-name
-                font-size: 16px
-                margin: 8px 20px
-
-            .title-edit
-                margin-top: 3px
-
-                .edit
-                    width: 20px
-                    height: 20px
-
-        .control-block
-            .edit-container
-                margin-right: 10px
-
-            .edit-icon
-                margin-right: 10px
-                margin-left: 10px
-
-            .search
-                width: 20px
-                height: 20px
-                margin-right: 10px
-
-            .tools
-                width: 20px
-                height: 20px
-                margin-right: 10px
-            
-            .tocken
-                width: 20px
-                height: 20px
-                margin-right: 10px
-
-            .code
-                width: 20px
-                height: 20px
-                margin-right: 10px
-
-            .profile
-                width: 20px
-                height: 20px
-                margin-right: 10px
-
-            .save
-                width: 20px
-                height: 20px
-                margin-right: 10px
-
-
+    &.openfilter
+        visibility: visible
+        position: relative
+        transform: translateY(0)
+        z-index: 3

@@ -66,6 +66,9 @@ export default {
     };
   },
   computed: {
+    theme() {
+      return this.$store.getters.getTheme;
+    },
     idDash: function () {
       // получаем id страницы от родителя
       return this.idDashFrom;
@@ -592,17 +595,19 @@ export default {
 
     addLine(element, lib) {
       let option = this.option;
-      let pipelineDataDictionary = {}
+      let pipelineDataDictionary = {};
       for (let x of this.pipelineData) {
-        if (!pipelineDataDictionary[x.ID])
-          pipelineDataDictionary[x.ID] = []
-        pipelineDataDictionary[x.ID].push(x)
+        if (!pipelineDataDictionary[x.ID]) pipelineDataDictionary[x.ID] = [];
+        pipelineDataDictionary[x.ID].push(x);
       }
-      
-      let pipelineData = pipelineDataDictionary[element.ID]
 
-      if (option?.mode[0] == "Мониторинг" && !pipelineDataDictionary[element.ID]) 
-        return
+      let pipelineData = pipelineDataDictionary[element.ID];
+
+      if (
+        option?.mode[0] == "Мониторинг" &&
+        !pipelineDataDictionary[element.ID]
+      )
+        return;
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
@@ -646,9 +651,7 @@ export default {
           weight: lib.width,
         });
       }
-      
-      
-      
+
       function highlightFeature(e) {
         var layer = e.target;
         layer.bringToFront();
@@ -659,8 +662,7 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
-        if (!pipelineDataDictionary[element.ID])
-          return
+        if (!pipelineDataDictionary[element.ID]) return;
         const closest = (arr, num) => {
           return (
             arr.reduce((acc, val) => {
@@ -695,7 +697,6 @@ export default {
           </div>`;
           line.setTooltipContent(newDiv);
         }
-        
       }
     },
 

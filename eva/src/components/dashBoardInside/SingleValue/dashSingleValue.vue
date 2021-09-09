@@ -35,6 +35,10 @@
         <span
           class="metric-value"
           :class="`color-${metric.color}`"
+          :style="`
+            font-size: ${metric.fontSize || 16}px;
+            font-weight: ${metric.fontWeight || 200};
+            `"
           v-text="metric.value"
         />
       </div>
