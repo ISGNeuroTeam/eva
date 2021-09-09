@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - time format on x-axis while zooming
 - header height equal in main menu and dashboard
 - double header after incorrect search
+- dash filter styles and UI
 
 ## [1.63.0]
 

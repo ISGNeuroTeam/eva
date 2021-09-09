@@ -654,13 +654,8 @@
       />
     </div>
 
-    <div
-      class="block-filter"
-      :class="{ openfilter }"
-      :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
-    >
+    <div class="block-filter" :class="{ openfilter }">
       <dash-filter-panel
-        :style="{ background: theme.$main_bg, color: theme.$main_text }"
         :permissions-from="permissionsFrom"
         :idDashFrom="idDashFrom"
         :editPermission="editPermission"
