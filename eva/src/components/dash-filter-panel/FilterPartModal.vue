@@ -111,6 +111,8 @@
     },
     methods: {
       saveFilterPartModal() {
+        if (this.temp.filterPartType === 'token' && !this.temp.token)
+          return;
         this.$emit('saveFilterPart', this.temp, this.filterPartIndex);
       },
       closeFilterPartModal() {
