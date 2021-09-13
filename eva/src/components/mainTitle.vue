@@ -53,8 +53,8 @@
             v-if="gridShow"
             class="overlay-grid"
             :data-grid="true"
-            :style="{height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
-            rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`}"
+            :style="{ height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,top:`${headerTop}px` ,background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
+            rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px` }"
           />
           <move-able
             v-for="elem in elements"
@@ -111,7 +111,6 @@
             <path d="M7.9375 14.7142L3.8125 10.5892L4.99083 9.41089L7.93875 12.3555L7.9375 12.3567L15.0083 5.28589L16.1867 6.46422L9.11583 13.5359L7.93833 14.7134L7.9375 14.7142Z" :fill="theme.$main_border"/>
           </svg>
         </div>
-
       </div>
       <div v-if="mode" id="plus-icon" @click="addNewTab">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -146,7 +145,7 @@ export default {
       tabEditMode: false,
       tempName: '',
       editableTabID: 0,
-      hoveredTabID: 0
+      hoveredTabID: 0,
     }
   },
   computed: {
@@ -188,7 +187,7 @@ export default {
     },
   },
   watch: {
-    getSizeGrid: function() {
+    getSizeGrid () {
       this.calcSizeCell()
     },
     mode () {
@@ -197,28 +196,32 @@ export default {
         this.tempName = ''
         this.tabEditMode = false
       }
-    }
+    },
   },
-  mounted() {
+  async mounted() {
+    console.log('before async ')
+    await this.checkAlreadyDash()
+    console.log('test async')
     document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
     this.createStartClient()
     this.calcSizeCell()
     this.addScrollListener()
+
     const searches = this.$store.getters.getSearches(this.idDash)
-    // console.log(searches)
-    Promise.allSettled(searches.map(search => this.getDataFromRest(search)))
-      .then(results => {
-        results.forEach((result, num) => {
-          if (result.status == "fulfilled") {
-            console.log('fulfilled')
-            console.log(result)
-          }
-          if (result.status == "rejected") {
-            console.log('rejected')
-            console.log(result)
-          }
-        });
-      });
+    console.log(searches)
+    // Promise.allSettled(searches.map(search => this.getDataFromRest(search)))
+    //   .then(results => {
+    //     results.forEach((result) => {
+    //       if (result.status === "fulfilled") {
+    //         // console.log('fulfilled')
+    //         // console.log(result)
+    //       }
+    //       if (result.status === "rejected") {
+    //         // console.log('rejected')
+    //         // console.log(result)
+    //       }
+    //     });
+    //   });
   },
   methods: {
     getDataFromRest: async function(event) {
@@ -229,7 +232,7 @@ export default {
       this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
       let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными
       // вызывая метод в хранилище
-      if ( response.length == 0) {  // если что-то пошло не так
+      if ( response.length === 0) {  // если что-то пошло не так
         this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });
       } else {  // если все нормально
 
@@ -269,32 +272,32 @@ export default {
     editTabName() {
       if (this.tempName) {
         this.$store.commit('editTabName', {idDash: this.idDash, tabID: this.editableTabID, newName: this.tempName})
-        this.tabEditMode = false;
-        this.editableTabID = 0;
-        this.tempName = '';
+        this.tabEditMode = false
+        this.editableTabID = 0
+        this.tempName = ''
       }
     },
     tabOver(tabID) {
-      this.hoveredTabID = tabID;
+      this.hoveredTabID = tabID
     },
     tabLeave() {
-      this.hoveredTabID = 0;
+      this.hoveredTabID = 0
     },
     hash: function(elem) {
       return `${elem}#${this.idDash}`
     },
     changeMode: function() {
-      this.mode = !this.mode;
+      this.mode = !this.mode
     },
     openSettings: function() {
-      this.showSetting = !this.showSetting;
+      this.showSetting = !this.showSetting
     },
     setPermissions: function(event) {
-      this.permissions = event;
+      this.permissions = event
     },
     checkOver: function() {
-      this.letElements = true;
-      this.checkAlreadyDash();
+      this.letElements = true
+      // this.checkAlreadyDash();
     },
     updateDash: function() {
       this.$store.commit('updateDash',{dash: this.alreadyDash,modified: this.alreadyDash.modified});
@@ -304,15 +307,14 @@ export default {
     toHichName: function(name) {
       return name[0].toUpperCase() + name.slice(1);
     },
-    checkAlreadyDash: function() {
-      let response =  this.$store.getters.checkAlreadyDash(this.$route.params.id);
-      response.then( res => {
-        if (res.status == 'exist') {
-          this.alreadyShow = true;
-          this.alreadyDash = res;
-        }
-        this.prepared = true;
-      })
+    checkAlreadyDash: async function() {
+      let response = await this.$store.getters.checkAlreadyDash(this.$route.params.id);
+      if (response.status === 'exist') {
+        this.alreadyShow = true;
+        this.alreadyDash = response;
+      }
+      this.prepared = true;
+      console.log('loaded dash')
     },
     createStartClient: function(){
       //первоначальные значения высоты и ширины

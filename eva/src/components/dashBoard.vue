@@ -168,9 +168,9 @@
       >
         <div
           v-show="props.disappear"
-          :style="{borderColor:theme.$main_border, opacity: '0.2'}"
+          :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
           class="loading-divider"
-          :class="{loading:loadingSearch,loading:props.loading,noBorder:!dataMode}"
+          :class="{ loading: loadingSearch, loading: props.loading, noBorder: !dataMode}"
         >
           <div
             class="loading-bar "
@@ -191,29 +191,29 @@
         </button>
       </v-card-text>
       <!--  Здесь подключаем элементы визуализации -->
-      <v-card-text
-        :is="currentElem"
-        v-show="showElement"
-        class="card-text element-itself"
-        :colorFrom="theme"
-        :style="{color:theme.$main_text, background:'transparent'}"
-        :idFrom="element"
-        :idDashFrom="idDash"
-        :dataRestFrom="props.dataRestFilter"
-        :dataModeFrom="dataMode"
-        :shouldFrom="shouldGet"
-        :timeFormatFrom="props.timeFormat"
-        :sizeTileFrom="props.sizeTile"
-        :tooltipFrom="props.tooltip"
-        :widthFrom="width"
-        :heightFrom="height"
-        :titles="getSelectedTableTitles(idDash, element)"
-        :options="props.options"
-        @hideDS="hideDS($event)"
-        @setVissible="setVissible($event)"
-        @setLoading="setLoading($event)"
-        @hideLoading="props.hideLoad = true"
-      />
+<!--      <v-card-text-->
+<!--        :is="currentElem"-->
+<!--        v-show="showElement"-->
+<!--        class="card-text element-itself"-->
+<!--        :colorFrom="theme"-->
+<!--        :style="{color:theme.$main_text, background:'transparent'}"-->
+<!--        :idFrom="element"-->
+<!--        :idDashFrom="idDash"-->
+<!--        :dataRestFrom="props.dataRestFilter"-->
+<!--        :dataModeFrom="dataMode"-->
+<!--        :shouldFrom="shouldGet"-->
+<!--        :timeFormatFrom="props.timeFormat"-->
+<!--        :sizeTileFrom="props.sizeTile"-->
+<!--        :tooltipFrom="props.tooltip"-->
+<!--        :widthFrom="width"-->
+<!--        :heightFrom="height"-->
+<!--        :titles="getSelectedTableTitles(idDash, element)"-->
+<!--        :options="props.options"-->
+<!--        @hideDS="hideDS($event)"-->
+<!--        @setVissible="setVissible($event)"-->
+<!--        @setLoading="setLoading($event)"-->
+<!--        @hideLoading="props.hideLoad = true"-->
+<!--      />-->
       <!-- ------------>
     </v-card>
   </div>
@@ -233,8 +233,6 @@ export default {
     dataElemFrom: null,
     dataModeFrom: null,
     dataPageFrom: null,
-
-    colorFrom: null,
   },
   data () {
     return {
@@ -313,7 +311,7 @@ export default {
         let fromDB
         this.dataFromDB = true
         this.getDataFromDB(searchName).then(result=>{
-          console.log(result)
+          // console.log(result)
           fromDB = result
           this.props.dataRestFilter = fromDB;
         })
@@ -404,7 +402,6 @@ export default {
       return options.lastResult;
     },
     options: function() {
-
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element});
 
       Object.keys(options).forEach( item => {
@@ -447,9 +444,6 @@ export default {
       'getSelectedTableTitles',
       'getSelectedDataFormat'
     ]),
-    color: function() {
-      return this.colorFrom
-    },
     setColorDS: function() {  // переключаем цвет иконок
       if (!this.showElement){
         return 'controlsActive';

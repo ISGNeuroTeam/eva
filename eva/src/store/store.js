@@ -1591,6 +1591,7 @@ export default {
         return new Promise((resolve, reject) => {
           let result = rest.getState(id, restAuth);
           result.then(stateFrom => {
+            // console.log(stateFrom)
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
