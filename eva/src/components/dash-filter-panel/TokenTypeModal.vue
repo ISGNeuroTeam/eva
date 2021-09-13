@@ -48,8 +48,10 @@
       this.$watch(
         'temp.token',
         newVal => {
-          this.currentToken = this.temp.token
-          this.temp.fieldName = newVal.capture;
+          if (newVal) {
+            this.currentToken = newVal;
+            this.temp.fieldName = newVal.capture;
+          }
         },
         { immediate: true }
       );

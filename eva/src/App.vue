@@ -41,6 +41,6 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style>
+  @import "./yfiles/es-modules/yfiles.css"
 </style>
