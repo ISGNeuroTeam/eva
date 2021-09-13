@@ -34,7 +34,6 @@ export default {
     // },
     setSearch: (state, search) => {
       // сохранение нового search (источника данных)
-
       if (search.reload) {
         // если источник данных уже есть то
         state[search.idDash].searches.forEach((item, i) => {
@@ -1013,6 +1012,20 @@ export default {
         elem => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
       );
     },
+    getElementsWithSearches: state => id => {
+      return state[id].elements
+        .filter(
+          (elem) => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
+        )
+        .map((elem) => ({ elem, search: state[id][elem].search }))
+    },
+    getAllElements: state => id => {
+      if (!state[id].elements) {
+        Vue.set(state[id], 'elements', []);
+      }
+      return state[id].elements;
+    },
+
     getNameDash(state) {
       // получаем имя самого элемента
       return ids => {

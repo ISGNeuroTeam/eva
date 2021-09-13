@@ -1,6 +1,6 @@
 <template>
-  <v-app 
-    class="aplication" 
+  <v-app
+    class="aplication"
     :style="{background:theme.$secondary_bg}"
   >
     <dash-panel-bord
@@ -13,12 +13,12 @@
     />
     <header-top
       v-else
-      @permissions="setPermissions" 
+      @permissions="setPermissions"
       @checkOver="checkOver"
     />
-    <div 
+    <div
       v-if="prepared"
-      class="body-block" 
+      class="body-block"
     >
       <v-card
         v-if="alreadyShow"
@@ -58,14 +58,15 @@
           />
           <move-able
             v-for="elem in elements"
-            :key="hash(elem)"
+            :key="hash(elem.elem)"
             :data-mode-from="mode"
-            :color-from="theme"
             :id-dash-from="idDash"
-            :data-elem="elem"
+            :data-elem="elem.elem"
             :data-page-from="page"
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
+            :loading="checkLoading(elem)"
+            :data="getElementData(elem)"
           />
           <modal-delete
             :color-from="theme"
@@ -146,6 +147,8 @@ export default {
       tempName: '',
       editableTabID: 0,
       hoveredTabID: 0,
+      loadingDash: true,
+      dataObject: {},
     }
   },
   computed: {
@@ -153,7 +156,7 @@ export default {
       return this.$route.params.id
     },
     elements: function() {  // получаем название элемента  от родителя
-      return this.letElements ? this.$store.getters.getElements(this.idDash) : [];
+      return this.loadingDash ? [] : this.$store.getters.getElementsWithSearches(this.idDash)
     },
     headerTop () {
       if(document.body.clientWidth <=1400){
@@ -166,24 +169,24 @@ export default {
       return this.$store.getters.getTheme
     },
     gridShow () {
-      let gridShow = this.$store.getters.getGridShow(this.idDash);
-      gridShow === 'true' ? gridShow = true : gridShow = false;
-      return gridShow;
+      return this.loadingDash ? false : this.$store.getters.getGridShow(this.idDash) === 'true'
     },
     getSizeGrid () {
-      return this.$store.getters.getSizeGrid(this.idDash)
+      return this.loadingDash
+        ? { hor: '18', vert: '32' }
+        : this.$store.getters.getSizeGrid(this.idDash)
     },
     tabs () {
-      return this.$store.getters.getDashTabs(this.idDash);
+      return this.loadingDash ? [] : this.$store.getters.getDashTabs(this.idDash)
     },
     tabsMoreOne () {
-      return this.tabs.length > 1;
+      return this.tabs.length > 1
     },
     showTabs () {
-      return this.$store.getters.getShowTabs(this.idDash);
+      return this.loadingDash ? false : this.$store.getters.getShowTabs(this.idDash)
     },
     currentTab () {
-      return this.$store.getters.getCurrentDashTab(this.idDash);
+      return this.loadingDash ? 0 : this.$store.getters.getCurrentDashTab(this.idDash)
     },
   },
   watch: {
@@ -199,53 +202,55 @@ export default {
     },
   },
   async mounted() {
-    console.log('before async ')
     await this.checkAlreadyDash()
-    console.log('test async')
     document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
     this.createStartClient()
     this.calcSizeCell()
     this.addScrollListener()
 
     const searches = this.$store.getters.getSearches(this.idDash)
-    console.log(searches)
-    // Promise.allSettled(searches.map(search => this.getDataFromRest(search)))
-    //   .then(results => {
-    //     results.forEach((result) => {
-    //       if (result.status === "fulfilled") {
-    //         // console.log('fulfilled')
-    //         // console.log(result)
-    //       }
-    //       if (result.status === "rejected") {
-    //         // console.log('rejected')
-    //         // console.log(result)
-    //       }
-    //     });
-    //   });
+
+    searches.forEach(search => this.dataObject[search.sid] = { data: [], loading: true })
+    this.loadingDash = false
+
+    await Promise.allSettled(searches.map(search => this.$store.getters.getDataApi({ search, idDash: this.idDash }).then(res => {
+      this.dataObject[search.sid].data = res
+      this.$set(this.dataObject[search.sid], 'loading', false)
+    })))
   },
   methods: {
-    getDataFromRest: async function(event) {
-      // console.log(123)
-      // this.$set(this.loadings,event.sid,true);
-      this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false });
-
-      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
-      let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными
-      // вызывая метод в хранилище
-      if ( response.length === 0) {  // если что-то пошло не так
-        this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });
-      } else {  // если все нормально
-
-        let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash);
-        responseDB
-          .then(
-            result => {
-              this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  });
-            },
-          );
-      }
-      return response
+    checkLoading(elem) {
+      // console.log('check loading')
+      if (elem.search === -1) return false
+      return this.dataObject[elem.search].loading
     },
+    getElementData(elem) {
+      // console.log('get data')
+      if (elem.search === -1) return []
+      return this.dataObject[elem.search].data
+    },
+    // getDataFromRest: async function(event) {
+    //   // console.log(123)
+    //   // this.$set(this.loadings,event.sid,true);
+    //   this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: true, error: false });
+    //
+    //   this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
+    //   let response = await this.$store.getters.getDataApi({search: event, idDash: this.idDash}); // собственно проводим все операции с данными
+    //   // вызывая метод в хранилище
+    //   if ( response.length === 0) {  // если что-то пошло не так
+    //     this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: true  });
+    //   } else {  // если все нормально
+    //
+    //     let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash);
+    //     responseDB
+    //       .then(
+    //         result => {
+    //           this.$store.commit('setLoading', {search: event.sid, idDash: this.idDash, should: false, error: false  });
+    //         },
+    //       );
+    //   }
+    //   return response
+    // },
     clickTab(tabID) {
       if (!this.tabEditMode) {
         this.$store.commit('changeCurrentTab', {idDash: this.idDash, tab: tabID});
@@ -296,7 +301,7 @@ export default {
       this.permissions = event
     },
     checkOver: function() {
-      this.letElements = true
+      // this.letElements = true
       // this.checkAlreadyDash();
     },
     updateDash: function() {
@@ -314,7 +319,6 @@ export default {
         this.alreadyDash = response;
       }
       this.prepared = true;
-      console.log('loaded dash')
     },
     createStartClient: function(){
       //первоначальные значения высоты и ширины

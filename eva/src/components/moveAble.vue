@@ -1,28 +1,29 @@
 <template>
-  <vue-draggable-resizable 
+  <vue-draggable-resizable
     ref="dragres"
     :key="reload"
-    :w="width" 
-    :h="height" 
-    :x="left" 
-    :y="top" 
-    :draggable="dragRes" 
-    :resizable="dragRes" 
+    :w="width"
+    :h="height"
+    :x="left"
+    :y="top"
+    :draggable="dragRes"
+    :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
-    :style="{zIndex:props.zIndex, outlineColor: theme.$accent_ui_color }"
+    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color }"
     @resizestop="sendSize"
-    @dragstop="sendMove" 
+    @dragstop="sendMove"
   >
     <dash-board
-      :data-mode-from="dataMode" 
-      :width="width"  
-      :height="height"  
-      :id-dash-from="idDash" 
-      :data-page-from="dataPageFrom" 
-      :data-elem-from="id" 
-      @SetLevel="props.zIndex = $event" 
-      @SetOpacity="changeOpacity($event)" 
+      :data-mode-from="dataMode"
+      :width="width"
+      :height="height"
+      :id-dash-from="idDash"
+      :data-page-from="dataPageFrom"
+      :data-elem-from="id"
+      :loading="loading"
+      @SetLevel="props.zIndex = $event"
+      @SetOpacity="changeOpacity($event)"
     />
   </vue-draggable-resizable>
 </template>
@@ -33,10 +34,10 @@ export default {
     dataModeFrom: null,
     idDashFrom: null,
     dataElem: null,
-    colorFrom: null,
     dataPageFrom: null,
     verticalCell: null,
-    horizontalCell: null
+    horizontalCell: null,
+    loading: null,
   },
   data () {
     return {
@@ -50,8 +51,8 @@ export default {
         vue_drag: false,
         zIndex: 1,
         step: {},
-        grid: [60,60]
-      }
+        grid: [60, 60],
+      },
     }
   },
   computed: {

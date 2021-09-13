@@ -149,7 +149,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class=" delete"
+                  class="delete"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="deleteDashBoard(props)"
@@ -170,7 +170,7 @@
           v-show="props.disappear"
           :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
           class="loading-divider"
-          :class="{ loading: loadingSearch, loading: props.loading, noBorder: !dataMode}"
+          :class="{ loading: loading, noBorder: !dataMode}"
         >
           <div
             class="loading-bar "
@@ -184,37 +184,35 @@
       >
         <button
           class="selectDS"
-          :style="{color: '#FFFFFF', background: theme.$primary_button}"
+          :style="{ color: '#FFFFFF', background: theme.$primary_button }"
           @click="chooseDS()"
         >
           Выберите источник данных
         </button>
       </v-card-text>
-      <!--  Здесь подключаем элементы визуализации -->
-<!--      <v-card-text-->
-<!--        :is="currentElem"-->
-<!--        v-show="showElement"-->
-<!--        class="card-text element-itself"-->
-<!--        :colorFrom="theme"-->
-<!--        :style="{color:theme.$main_text, background:'transparent'}"-->
-<!--        :idFrom="element"-->
-<!--        :idDashFrom="idDash"-->
-<!--        :dataRestFrom="props.dataRestFilter"-->
-<!--        :dataModeFrom="dataMode"-->
-<!--        :shouldFrom="shouldGet"-->
-<!--        :timeFormatFrom="props.timeFormat"-->
-<!--        :sizeTileFrom="props.sizeTile"-->
-<!--        :tooltipFrom="props.tooltip"-->
-<!--        :widthFrom="width"-->
-<!--        :heightFrom="height"-->
-<!--        :titles="getSelectedTableTitles(idDash, element)"-->
-<!--        :options="props.options"-->
-<!--        @hideDS="hideDS($event)"-->
-<!--        @setVissible="setVissible($event)"-->
-<!--        @setLoading="setLoading($event)"-->
-<!--        @hideLoading="props.hideLoad = true"-->
-<!--      />-->
-      <!-- ------------>
+      <v-card-text
+        :is="currentElem"
+        v-show="showElement"
+        class="card-text element-itself"
+        :colorFrom="theme"
+        :style="{ color: theme.$main_text, background: 'transparent' }"
+        :idFrom="element"
+        :idDashFrom="idDash"
+        :dataRestFrom="props.dataRestFilter"
+        :dataModeFrom="dataMode"
+        :shouldFrom="shouldGet"
+        :timeFormatFrom="props.timeFormat"
+        :sizeTileFrom="props.sizeTile"
+        :tooltipFrom="props.tooltip"
+        :widthFrom="width"
+        :heightFrom="height"
+        :titles="getSelectedTableTitles(idDash, element)"
+        :options="props.options"
+        @hideDS="hideDS($event)"
+        @setVissible="setVissible($event)"
+        @setLoading="setLoading($event)"
+        @hideLoading="props.hideLoad = true"
+      />
     </v-card>
   </div>
 </template>
@@ -233,6 +231,10 @@ export default {
     dataElemFrom: null,
     dataModeFrom: null,
     dataPageFrom: null,
+    loading: {
+      type: Boolean,
+      default: true,
+    },
   },
   data () {
     return {
