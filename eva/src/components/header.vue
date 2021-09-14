@@ -44,7 +44,6 @@
         <template v-slot:activator="{ on }">
           <div class="dropdown-profile" v-on="on">
             <v-icon
-              :data-error="colorError"
               :style="{ color: theme.$secondary_text }"
               class="profile theme--dark"
             >
@@ -146,13 +145,6 @@
       };
     },
     computed: {
-      colorError: function () {
-        if (this.$store.getters.getColorError) {
-          return this.color.controlsActive;
-        } else {
-          return 'white';
-        }
-      },
       height: function () {
         if (screen.width < 1400) {
           return '50px';
