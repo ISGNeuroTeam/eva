@@ -728,7 +728,7 @@ export default {
       state[settings.idDash].modalSettings.element = settings.element;
       if (
         settings.element &&
-        (settings.element.includes('table') || settings.element.includes('heatmapGeneral'))
+        (settings.element.includes('table') || settings.element.includes('heatmap'))
       ) {
         Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
         if (!state[settings.idDash][settings.element].selectedTableTitles) {
@@ -854,26 +854,6 @@ export default {
       }
       state[gridShow.id].gridShow = gridShow.item;
     },
-    clearFocusedFilter(state, idDash) {
-      state[idDash].focusedFilter = null;
-      state[idDash].stashedFilterParts = null;
-    },
-    setFocusedFilter: (state, filter) => {
-      state[filter.idDash].focusedFilter = filter;
-      state[filter.idDash].stashedFilterParts = [];
-      for (let part of filter.parts) {
-        state[filter.idDash].stashedFilterParts.push({ ...part, values: [...part.values] });
-      }
-    },
-    addTokenToFilterParts: (state, tocken) => {
-      let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
-      for (let part of focusedFilterParts) {
-        if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
-          if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
-        }
-      }
-      focusedFilterParts.sort((part1, part2) => part2.values.length - part1.values.length);
-    },
     addNewTab: (state, payload) => {
       state[payload.idDash].tabList.push({ id: payload.tabID, name: payload.tabName });
     },
@@ -905,6 +885,32 @@ export default {
       if (tab) {
         tab.name = newName;
       }
+    },
+    clearFocusedFilter(state, idDash) {
+      state[idDash].focusedFilter = null;
+      state[idDash].stashedFilterParts = null;
+    },
+    setFocusedFilter(state, filter) {
+      state[filter.idDash].focusedFilter = filter;
+      state[filter.idDash].stashedFilterParts = [];
+      for (let part of filter.parts) {
+        state[filter.idDash].stashedFilterParts.push({ ...part, values: [...part.values] });
+      }
+    },
+    addTokenToFilterParts(state, tocken) {
+      let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
+      for (let part of focusedFilterParts) {
+        if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
+          if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
+        }
+      }
+      this.commit('sortFilterParts', { idDash: tocken.idDash });
+    },
+    sortFilterParts(state, { idDash }) {
+      // idDash as property to case when sort not for focusedFilter (backward compatibility)
+      state[idDash].focusedFilter.parts.sort(
+        (part1, part2) => part2.values.length - part1.values.length
+      );
     },
     declineFilterChanges(state, idDash) {
       state[idDash].focusedFilter.parts = state[idDash].stashedFilterParts;
@@ -963,6 +969,7 @@ export default {
           !state[idDash].focusedFilter &&
           (dashElement.includes('table') ||
             dashElement.includes('single') ||
+            dashElement.includes('heatmap') ||
             dashElement.includes('multiLine'))
         ) {
           this.commit('setShould', {

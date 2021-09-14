@@ -30,7 +30,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               class="control-button theme--dark"
-              :style="{ color: theme.$secondary_text }"
+              :color="$store.getters.getColorError ? theme.$primary_button : theme.$secondary_text"
               v-on="on"
               @click="openLogs"
             >
@@ -43,11 +43,7 @@
       <v-menu :nudge-width="100" class="profile-block" offset-y>
         <template v-slot:activator="{ on }">
           <div class="dropdown-profile" v-on="on">
-            <v-icon
-              :data-error="colorError"
-              :style="{ color: theme.$secondary_text }"
-              class="profile theme--dark"
-            >
+            <v-icon :style="{ color: theme.$secondary_text }" class="profile theme--dark">
               {{ profile_icon }}
             </v-icon>
             <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
@@ -146,13 +142,6 @@
       };
     },
     computed: {
-      colorError: function () {
-        if (this.$store.getters.getColorError) {
-          return this.color.controlsActive;
-        } else {
-          return 'white';
-        }
-      },
       height: function () {
         if (screen.width < 1400) {
           return '50px';
