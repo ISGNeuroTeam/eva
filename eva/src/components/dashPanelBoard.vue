@@ -128,7 +128,9 @@
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
-                :style="{ color: theme.$secondary_text }"
+                :color="
+                  $store.getters.getColorError ? theme.$primary_button : theme.$secondary_text
+                "
                 v-on="on"
                 @click="openLogs"
               >
@@ -143,11 +145,7 @@
             <v-tooltip bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on: onTooltip }">
                 <div class="dropdown-profile" v-on="{ ...onMenu, ...onTooltip }">
-                  <v-icon
-                    :data-error="colorError"
-                    :style="{ color: theme.$secondary_text }"
-                    class="profile theme--dark"
-                  >
+                  <v-icon :style="{ color: theme.$secondary_text }" class="profile theme--dark">
                     {{ profile_icon }}
                   </v-icon>
                   <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
@@ -929,15 +927,6 @@
           });
           return capture;
         };
-      },
-      colorError: function () {
-        if (this.$store.getters.getColorError) {
-          this.profile_elem = true;
-          if (this.permissionsFrom.includes('admin_all')) {
-            this.$emit('openProfile', true);
-          }
-        }
-        return true;
       },
     },
     watch: {

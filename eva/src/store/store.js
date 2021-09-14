@@ -727,7 +727,7 @@ export default {
       state[settings.idDash].modalSettings.element = settings.element;
       if (
         settings.element &&
-        (settings.element.includes('table') || settings.element.includes('heatmapGeneral'))
+        (settings.element.includes('table') || settings.element.includes('heatmap'))
       ) {
         Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
         if (!state[settings.idDash][settings.element].selectedTableTitles) {
@@ -968,8 +968,8 @@ export default {
           !state[idDash].focusedFilter &&
           (dashElement.includes('table') ||
             dashElement.includes('single') ||
-            dashElement.includes('multiLine')||
-            dashElement.includes('heatmap'))
+            dashElement.includes('heatmap') ||
+            dashElement.includes('multiLine'))
         ) {
           this.commit('setShould', {
             idDash: idDash,
@@ -1611,7 +1611,6 @@ export default {
         return new Promise((resolve, reject) => {
           let result = rest.getState(id, restAuth);
           result.then(stateFrom => {
-            // console.log(stateFrom)
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
@@ -1629,7 +1628,7 @@ export default {
                   name: stateFrom.name,
                   id: stateFrom.id,
                   modified: stateFrom.modified,
-                })
+                });
               }
               if (first) {
                 if (stateFrom.body != '') {
