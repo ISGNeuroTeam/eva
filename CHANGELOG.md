@@ -5,10 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELEASED]
+## [1.65.0]
+
+### Changed
+- UI of filter row in filter panel
+- 'token' type filter parts are sorting by the count of values in them click after "accept changes"
 
 ### Fixed
+- log icon highlights after error in search
 - heatmap is not updated when the value in the select is changed
+- problem with disappearing graph while zooming
 
 ## [1.64.0]
 
