@@ -65,8 +65,8 @@
             :data-page-from="page"
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
-            :loading="checkLoading(elem)"
             :data="getElementData(elem)"
+            :loading="checkLoading(elem)"
           />
           <modal-delete
             :color-from="theme"
@@ -159,7 +159,7 @@ export default {
       return this.loadingDash ? [] : this.$store.getters.getElementsWithSearches(this.idDash)
     },
     headerTop () {
-      if(document.body.clientWidth <=1400){
+      if (document.body.clientWidth <= 1400){
         return 40
       } else {
         return 50
@@ -210,22 +210,22 @@ export default {
 
     const searches = this.$store.getters.getSearches(this.idDash)
 
-    searches.forEach(search => this.dataObject[search.sid] = { data: [], loading: true })
+    searches.forEach(search => this.$set(this.dataObject, search.sid, { data: [], loading: true }))
     this.loadingDash = false
 
     await Promise.allSettled(searches.map(search => this.$store.getters.getDataApi({ search, idDash: this.idDash }).then(res => {
-      this.dataObject[search.sid].data = res
+      this.$set(this.dataObject[search.sid], 'data', res)
       this.$set(this.dataObject[search.sid], 'loading', false)
+      // this.dataObject[search.sid] = { data: res, loading: false}
     })))
+    console.log(this.dataObject)
   },
   methods: {
     checkLoading(elem) {
-      // console.log('check loading')
       if (elem.search === -1) return false
       return this.dataObject[elem.search].loading
     },
     getElementData(elem) {
-      // console.log('get data')
       if (elem.search === -1) return []
       return this.dataObject[elem.search].data
     },

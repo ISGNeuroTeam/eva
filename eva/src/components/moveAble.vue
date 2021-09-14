@@ -14,6 +14,7 @@
     @resizestop="sendSize"
     @dragstop="sendMove"
   >
+    {{ loading }}
     <dash-board
       :data-mode-from="dataMode"
       :width="width"
@@ -37,7 +38,11 @@ export default {
     dataPageFrom: null,
     verticalCell: null,
     horizontalCell: null,
-    loading: null,
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    data: Array,
   },
   data () {
     return {

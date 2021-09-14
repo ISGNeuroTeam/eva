@@ -968,7 +968,8 @@ export default {
           !state[idDash].focusedFilter &&
           (dashElement.includes('table') ||
             dashElement.includes('single') ||
-            dashElement.includes('multiLine'))
+            dashElement.includes('multiLine')||
+            dashElement.includes('heatmap'))
         ) {
           this.commit('setShould', {
             idDash: idDash,
