@@ -728,7 +728,7 @@ export default {
       state[settings.idDash].modalSettings.element = settings.element;
       if (
         settings.element &&
-        (settings.element.includes('table') || settings.element.includes('heatmapGeneral'))
+        (settings.element.includes('table') || settings.element.includes('heatmap'))
       ) {
         Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
         if (!state[settings.idDash][settings.element].selectedTableTitles) {
@@ -969,6 +969,7 @@ export default {
           !state[idDash].focusedFilter &&
           (dashElement.includes('table') ||
             dashElement.includes('single') ||
+            dashElement.includes('heatmap') ||
             dashElement.includes('multiLine'))
         ) {
           this.commit('setShould', {
