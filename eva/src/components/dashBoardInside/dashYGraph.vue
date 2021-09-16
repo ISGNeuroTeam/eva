@@ -26,9 +26,7 @@ export default {
     idDashFrom: null, // id дашборда 
     dataRestFrom: null, // данные полученые после выполнения запроса
     colorFrom: null,  // цветовые переменные
-    shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
-    
   },
   data () {
     return {

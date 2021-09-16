@@ -9,7 +9,7 @@
       class="dash-block"
       :style="{
         background: theme.$main_bg,
-        boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`
+        boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
       <v-card-title v-show="props.disappear" class="card-title open_title">
@@ -18,26 +18,18 @@
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-icon
-            v-if="props.dataRestFilter.length > 0"
+            v-if="searchData.length > 0"
             class="icon"
             :color="theme.$main_border"
             @click="exportDataCSV"
           >
             {{ mdiArrowDownBold }}
           </v-icon>
-          <v-icon
-            v-show="dataMode"
-            class="icon chart"
-            :color="theme.$accent_ui_color"
-          >
+          <v-icon v-show="dataMode" class="icon chart" :color="theme.$accent_ui_color">
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
-            <div
-              v-if="props.edit"
-              class="dash-title"
-              :style="{ color: theme.$main_text }"
-            >
+            <div v-if="props.edit" class="dash-title" :style="{ color: theme.$main_text }">
               {{ props.name }}
             </div>
             <div
@@ -54,7 +46,7 @@
               class="dash-block-sid"
               :style="{
                 color: theme.$main_text,
-                borderColor: theme.$main_border
+                borderColor: theme.$main_border,
               }"
             >
               {{ props.sid }}
@@ -71,15 +63,12 @@
             />
           </div>
         </div>
-        <div class="settings-dash-block" v-show="dataMode">
-          <div
-            class="settings-dash"
-            :class="{ settings_move: props.open_gear }"
-          >
+        <div v-show="dataMode" class="settings-dash-block">
+          <div class="settings-dash" :class="{ settings_move: props.open_gear }">
             <v-tooltip bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class=" datasource"
+                  class="datasource"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="switchDS(props)"
@@ -89,11 +78,7 @@
               </template>
               <span>Источник данных</span>
             </v-tooltip>
-            <v-tooltip
-              v-if="props.edit_icon"
-              bottom
-              :color="theme.$accent_ui_color"
-            >
+            <v-tooltip v-if="props.edit_icon" bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="pencil"
@@ -101,8 +86,8 @@
                   v-on="on"
                   @click="
                     () => {
-                      props.edit = false;
-                      props.edit_icon = false;
+                      props.edit = false
+                      props.edit_icon = false
                     }
                   "
                 >
@@ -111,14 +96,10 @@
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip
-              v-if="!props.edit_icon"
-              bottom
-              :color="theme.$accent_ui_color"
-            >
+            <v-tooltip v-if="!props.edit_icon" bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class=" check"
+                  class="check"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="editName(props)"
@@ -130,12 +111,7 @@
             </v-tooltip>
             <v-tooltip bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on }">
-                <v-icon
-                  class=" option"
-                  :color="theme.$main_border"
-                  v-on="on"
-                  @click="switchOP()"
-                >
+                <v-icon class="option" :color="theme.$main_border" v-on="on" @click="switchOP()">
                   {{ props.mdiSettings }}
                 </v-icon>
               </template>
@@ -164,10 +140,7 @@
           class="loading-divider"
           :class="{ loading: loading, noBorder: !dataMode }"
         >
-          <div
-            class="loading-bar "
-            :style="{ background: theme.$primary_button }"
-          />
+          <div class="loading-bar" :style="{ background: theme.$primary_button }" />
         </div>
       </div>
       <v-card-text v-show="!showElement" class="card-text">
@@ -187,9 +160,8 @@
         :style="{ color: theme.$main_text, background: 'transparent' }"
         :idFrom="element"
         :idDashFrom="idDash"
-        :dataRestFrom="props.dataRestFilter"
+        :dataRestFrom="searchData"
         :dataModeFrom="dataMode"
-        :shouldFrom="shouldGet"
         :timeFormatFrom="props.timeFormat"
         :sizeTileFrom="props.sizeTile"
         :tooltipFrom="props.tooltip"
@@ -220,10 +192,10 @@ import {
   mdiChevronDown,
   mdiChevronUp,
   mdiDatabaseSearch,
-  mdiArrowDownBold
-} from "@mdi/js";
-import { mapGetters } from "vuex";
-import settings from "../js/componentsSettings.js";
+  mdiArrowDownBold,
+} from '@mdi/js'
+import { mapGetters } from 'vuex'
+import settings from '../js/componentsSettings.js'
 
 export default {
   props: {
@@ -235,29 +207,30 @@ export default {
     dataPageFrom: null,
     loading: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    searchData: Array,
   },
   data() {
     return {
-      dataFromDB: true,
-      mdiDatabaseSearch: mdiDatabaseSearch,
-      mdiArrowDownBold: mdiArrowDownBold,
+      dataFromDB: false,
+      mdiDatabaseSearch,
+      mdiArrowDownBold,
       props: {
-        id: "",
-        sid: "",
-        name: "",
-        mdiPencil: mdiPencil,
-        mdiCheckBold: mdiCheckBold,
-        mdiClose: mdiClose,
-        mdiArrowAll: mdiArrowAll,
-        mdiArrowExpandAll: mdiArrowExpandAll,
-        mdiCodeTags: mdiCodeTags,
-        mdiTrashCanOutline: mdiTrashCanOutline,
-        mdiDatabase: mdiDatabase,
-        mdiSettings: mdiSettings,
-        mdiChevronUp: mdiChevronUp,
-        mdiChevronDown: mdiChevronDown,
+        id: '',
+        sid: '',
+        name: '',
+        mdiPencil,
+        mdiCheckBold,
+        mdiClose,
+        mdiArrowAll,
+        mdiArrowExpandAll,
+        mdiCodeTags,
+        mdiTrashCanOutline,
+        mdiDatabase,
+        mdiSettings,
+        mdiChevronUp,
+        mdiChevronDown,
         icons: {},
         edit: true,
         edit_icon: true,
@@ -265,462 +238,364 @@ export default {
         resize_elem: true,
         datasource_elem: true,
         showOptions: true,
-        arrow_coral: "controlsInsideDash",
-        resize_arrow_coral: "controlsInsideDash",
-        code_coral: "fill:teal",
+        arrow_coral: 'controlsInsideDash',
+        resize_arrow_coral: 'controlsInsideDash',
+        code_coral: 'fill:teal',
         transition: true,
-        element: "",
-        page: "",
+        element: '',
+        page: '',
         dataRest: [],
-        dataRestFilter: [],
         loading: false,
         open_gear: true,
         arrow: {
-          direct: "down",
-          elem: mdiChevronDown
+          direct: 'down',
+          elem: mdiChevronDown,
         },
         open_title: false,
         options: {
           visible: true,
           change: false,
           level: 1,
-          boxShadow: false
+          boxShadow: false,
         },
-        optionsBoxShadow: "transparent",
+        optionsBoxShadow: 'transparent',
         differentOptions: {
-          visible: true
+          visible: true,
         },
         disappear: true,
-        timeFormat: "",
+        timeFormat: '',
         sizeTile: {},
         hideLoad: false,
         tooltip: {},
-        metricsMulti: []
-      }
-    };
-  },
-  asyncComputed: {
-    async prepareData() {
-      // подготавливаем данные для отображения
-      if (this.shouldGet) {
-        let searchId = this.$store.getters.getSearchID({
-          idDash: this.idDash,
-          id: this.element
-        });
-        let searchName = `${this.idDash}-${searchId}`;
-        let search = this.$store.getters.getSearch({
-          idDash: this.idDash,
-          id: this.element
-        });
-        if (searchId === -1) {
-          this.props.sid = "";
-        } else {
-          this.props.sid = searchId;
-        }
-
-        let fromDB;
-        this.dataFromDB = true;
-        this.getDataFromDB(searchName).then(result => {
-          // console.log(result)
-          fromDB = result;
-          this.props.dataRestFilter = fromDB;
-        });
-        this.getDataFromRest(search).then(
-          result => {
-            this.props.dataRestFilter = result;
-            this.dataFromDB = false;
-            if (result.length === 0 && this.lastResult) {
-              this.props.dataRestFilter = fromDB;
-            }
-          },
-          () => {
-            if (this.lastResult) {
-              this.props.dataRestFilter = fromDB;
-            } else {
-              this.props.dataRestFilter = [];
-            }
-          }
-        );
-      }
-      this.$store.commit("setShould", {
-        idDash: this.idDash,
-        id: this.element,
-        status: false
-      });
+        metricsMulti: [],
+      },
     }
   },
   computed: {
-    theme: function() {
-      return this.$store.getters.getTheme;
+    theme: function () {
+      return this.$store.getters.getTheme
     },
-    idDash: function() {
-      // получаем id страницы от родителя
-      return this.idDashFrom;
+    idDash: function () {
+      return this.idDashFrom
     },
-    element: function() {
-      // получаем название элемента
-      return this.dataElemFrom;
+    element: function () {
+      return this.dataElemFrom
     },
-    dataMode: function() {
-      this.changeOptions(this.dataModeFrom);
+    dataMode: function () {
+      this.changeOptions(this.dataModeFrom)
       if (!this.dataModeFrom) {
         if (
-          this.element.split("-")[0] == "button" ||
-          this.element.split("-")[0] == "csvg" ||
-          this.element.split("-")[0] == "tile" ||
-          this.element.split("-")[0] == "singleValue"
+          this.element.split('-')[0] === 'button' ||
+          this.element.split('-')[0] === 'csvg' ||
+          this.element.split('-')[0] === 'tile' ||
+          this.element.split('-')[0] === 'singleValue'
         ) {
-          this.props.disappear = false;
+          this.props.disappear = false
         }
       } else {
-        this.props.disappear = true;
+        this.props.disappear = true
       }
-      return this.dataModeFrom;
+      return this.dataModeFrom
     },
-    currentElem: function() {
+    currentElem: function () {
       // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
-      let nameElement = "";
+      let nameElement = ''
       if (this.element) {
-        let element = this.element.split("-")[0];
-        nameElement = `dash-${element}`;
+        let element = this.element.split('-')[0]
+        nameElement = `dash-${element}`
       }
-      return nameElement;
+      return nameElement
     },
-    loadingSearch: function() {
-      this.setLoading(
-        this.$store.getters.getLoading(this.element, this.idDash)
-      );
-      return this.$store.getters.getLoading(this.element, this.idDash);
-    },
-    elemIcon: function() {
-      let element = "";
+    elemIcon: function () {
+      let element = ''
       if (this.element) {
-        element = this.element.split("-")[0];
+        element = this.element.split('-')[0]
       }
-      return element;
+      return element
     },
-    showElement: function() {
+    showElement: function () {
       // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
-      let show = false;
+      let show = false
       if (this.element) {
         show = this.$store.getters.getSwitch({
           idDash: this.idDash,
-          id: this.element
-        });
-      }
-      return show;
-    },
-    shouldGet() {
-      // понимаем нужно ли запрашивтаь данные с реста
-      let should = false;
-      if (this.element) {
-        should = this.$store.getters.getShouldGet({
           id: this.element,
-          idDash: this.idDash
-        });
+        })
       }
-      return should;
+      return show
     },
-    lastResult: function() {
+    lastResult: function () {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
-        id: this.element
-      });
-      return options.lastResult;
+        id: this.element,
+      })
+      return options.lastResult
     },
-    options: function() {
+    options: function () {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
-        id: this.element
-      });
+        id: this.element,
+      })
 
-      Object.keys(options).forEach(item => {
-        this.props.options[item] = options[item];
-      });
+      Object.keys(options).forEach((item) => {
+        this.props.options[item] = options[item]
+      })
 
       if (this.props.options.timeFormat) {
-        this.props.timeFormat = this.props.options.timeFormat;
+        this.props.timeFormat = this.props.options.timeFormat
       }
       if (this.props.options.widthTile) {
-        this.$set(this.props.sizeTile, "width", this.props.options.widthTile);
+        this.$set(this.props.sizeTile, 'width', this.props.options.widthTile)
       } else {
-        this.$set(this.props.sizeTile, "width", "");
+        this.$set(this.props.sizeTile, 'width', '')
       }
       if (this.props.options.heightTile) {
-        this.$set(this.props.sizeTile, "height", this.props.options.heightTile);
+        this.$set(this.props.sizeTile, 'height', this.props.options.heightTile)
       } else {
-        this.$set(this.props.sizeTile, "height", "");
+        this.$set(this.props.sizeTile, 'height', '')
       }
       if (this.props.options.tooltip) {
-        Object.keys(this.props.options.tooltip).forEach(item => {
-          this.$set(this.props.tooltip, item, this.props.options.tooltip[item]);
-        });
+        Object.keys(this.props.options.tooltip).forEach((item) => {
+          this.$set(this.props.tooltip, item, this.props.options.tooltip[item])
+        })
       } else {
-        this.$set(this.props.tooltip, "texts", []);
-        this.$set(this.props.tooltip, "links", []);
-        this.$set(this.props.tooltip, "buttons", []);
+        this.$set(this.props.tooltip, 'texts', [])
+        this.$set(this.props.tooltip, 'links', [])
+        this.$set(this.props.tooltip, 'buttons', [])
       }
 
-      this.$emit("SetLevel", this.props.options.level);
+      this.$emit('SetLevel', this.props.options.level)
 
-      this.setShadow();
+      this.setShadow()
 
-      return options.change;
+      return options.change
     },
-    searсhID() {
-      return this.$store.getters.getSearchID({
-        idDash: this.idDash,
-        id: this.element
-      });
-    },
-    ...mapGetters(["getSelectedTableTitles", "getSelectedDataFormat"]),
-    setColorDS: function() {
-      // переключаем цвет иконок
-      if (!this.showElement) {
-        return "controlsActive";
-      } else {
-        return "controlsInsideDash";
-      }
-    },
-    setColorOp: function() {
-      // переключаем цвет иконок
-      if (!this.props.showOptions) {
-        return "controlsActive";
-      } else {
-        return "controlsInsideDash";
-      }
-    }
+    ...mapGetters(['getSelectedTableTitles', 'getSelectedDataFormat']),
   },
   mounted() {
-    this.props.icons = settings.icons;
-    this.page = this.$parent.$el.getAttribute("data-page"); // понимаем какая страница перед нами
+    this.props.icons = settings.icons
+    this.page = this.$parent.$el.getAttribute('data-page') // понимаем какая страница перед нами
     this.props.name = this.$store.getters.getNameDash({
       idDash: this.idDash,
-      id: this.element
-    }); // получаем имя этой страницы
+      id: this.element,
+    }) // получаем имя этой страницы
 
     if (this.props.options.boxShadow) {
-      this.props.optionsBoxShadow = this.theme.$primary_button;
+      this.props.optionsBoxShadow = this.theme.$primary_button
     } else {
-      this.props.optionsBoxShadow = "transparent";
+      this.props.optionsBoxShadow = 'transparent'
     }
-    this.$store.commit("setShould", {
+    this.$store.commit('setShould', {
       idDash: this.idDash,
       id: this.element,
-      status: true
-    });
+      status: true,
+    })
   },
 
   methods: {
-    editName: function(props) {
+    editName: function (props) {
       // изменяем имя элемнета
-      props.edit = true;
-      props.edit_icon = true;
-      this.$store.commit("setNameDash", {
+      props.edit = true
+      props.edit_icon = true
+      this.$store.commit('setNameDash', {
         name: props.name,
         id: this.element,
-        idDash: this.idDash
-      });
+        idDash: this.idDash,
+      })
     },
-    chooseDS: function() {
+    chooseDS: function () {
       // открываем модальное окно с выбором ИС (источник данных)
-      this.$store.commit("setModalSearch", {
+      this.$store.commit('setModalSearch', {
         id: this.idDash,
         status: true,
-        elem: this.element
-      });
+        elem: this.element,
+      })
     },
-    switchDS: function() {
+    switchDS: function () {
       // переключаем между режимами выбора данных и их отображением
-      let status = !this.showElement;
-      this.$store.commit("setSwitch", {
+      let status = !this.showElement
+      this.$store.commit('setSwitch', {
         idDash: this.idDash,
         status: status,
-        id: this.element
-      });
+        id: this.element,
+      })
     },
-    switchOP: function() {
-      this.$store.commit("setModalSettings", {
+    switchOP: function () {
+      this.$store.commit('setModalSettings', {
         idDash: this.idDash,
         status: true,
         element: this.element,
-        titles: Object.keys(this.props.dataRestFilter[0])
-      });
+        titles: Object.keys(this.searchData[0]),
+      })
     },
-    setShadow: function() {
+    setShadow: function () {
       if (this.props.options.boxShadow) {
-        this.props.optionsBoxShadow = this.theme.$primary_button;
+        this.props.optionsBoxShadow = this.theme.$primary_button
       } else {
-        this.props.optionsBoxShadow = `transparent`;
+        this.props.optionsBoxShadow = `transparent`
       }
     },
-    setLoading: function(event) {
-      if (this.element.indexOf("button") != -1) {
-        this.props.hideLoad = !event;
+    setLoading: function (event) {
+      if (this.element.indexOf('button') != -1) {
+        this.props.hideLoad = !event
       }
-      this.props.loading = event;
+      this.props.loading = event
     },
-    deleteDashBoard: function(props) {
+    deleteDashBoard: function (props) {
       // вызываем окно для удаления элемнета
-      this.$store.commit("setModalDelete", {
+      this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: this.element,
         name: props.name,
-        page: this.dataPageFrom
-      });
+        page: this.dataPageFrom,
+      })
     },
-    getDataFromDB: function(searсhID) {
+    getDataFromDB: function (searсhID) {
       // получение данных с indexindDB
-      let db = null;
-      let request = indexedDB.open("EVA", 1);
-      request.onerror = function(event) {
-        console.log("error: ", event);
-      };
+      let db = null
+      let request = indexedDB.open('EVA', 1)
+      request.onerror = function (event) {
+        console.log('error: ', event)
+      }
 
-      request.onupgradeneeded = event => {
-        console.log("create");
-        db = event.target.result;
-        if (!db.objectStoreNames.contains("searches")) {
+      request.onupgradeneeded = (event) => {
+        console.log('create')
+        db = event.target.result
+        if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
-          db.createObjectStore("searches"); // create it
+          db.createObjectStore('searches') // create it
         }
-        request.onsuccess = event => {
-          db = request.result;
-          console.log("successEvent: " + db);
-        };
-      };
+        request.onsuccess = (event) => {
+          db = request.result
+          console.log('successEvent: ' + db)
+        }
+      }
       let promise = new Promise((resolve, reject) => {
-        request.onsuccess = event => {
-          db = request.result;
+        request.onsuccess = (event) => {
+          db = request.result
 
-          let transaction = db.transaction("searches"); // (1)
+          let transaction = db.transaction('searches') // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore("searches"); // (2)
+          let searches = transaction.objectStore('searches') // (2)
 
-          let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
+          let query = searches.get(String(searсhID)) // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = event => {
+          query.onsuccess = (event) => {
             // (4)
             if (query.result) {
-              resolve(query.result);
+              resolve(query.result)
             } else {
-              resolve([]);
+              resolve([])
             }
-          };
+          }
 
-          query.onerror = function() {
-            console.log("Ошибка", query.error);
-          };
-        };
-      });
-      return promise;
+          query.onerror = function () {
+            console.log('Ошибка', query.error)
+          }
+        }
+      })
+      return promise
     },
-    openTitle: function() {
+    openTitle: function () {
       // открываем закрываем шапку элемнета
-      if (this.props.arrow.direct == "up") {
-        this.props.arrow.elem = this.props.mdiChevronDown;
-        this.props.arrow.direct = "down";
+      if (this.props.arrow.direct == 'up') {
+        this.props.arrow.elem = this.props.mdiChevronDown
+        this.props.arrow.direct = 'down'
       } else {
-        this.props.arrow.elem = this.props.mdiChevronUp;
-        this.props.arrow.direct = "up";
+        this.props.arrow.elem = this.props.mdiChevronUp
+        this.props.arrow.direct = 'up'
       }
-      this.props.open_title = !this.props.open_title;
+      this.props.open_title = !this.props.open_title
     },
-    hideDS: function() {
+    hideDS: function () {
       // функция которая для определенного элемента сразу вносит ряд настроек визуализации=
-      this.$store.commit("setSwitch", {
+      this.$store.commit('setSwitch', {
         idDash: this.idDash,
         status: true,
-        id: this.element
-      }); // сразу переключаем элемнет на отображение данных,
+        id: this.element,
+      }) // сразу переключаем элемнет на отображение данных,
     },
-    setVissible: function(event) {
-      if (event.split("-")[0] == "picker" || event.split("-")[0] == "guntt") {
+    setVissible: function (event) {
+      if (event.split('-')[0] == 'picker' || event.split('-')[0] == 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
-        this.$el.querySelector(".dash-block").style.overflow = "visible"; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
+        this.$el.querySelector('.dash-block').style.overflow = 'visible' // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
       }
     },
-    changeOptions: function(mode) {
-      let level = this.props.options.level;
-      let opacity = 1;
+    changeOptions: function (mode) {
+      let level = this.props.options.level
+      let opacity = 1
       if (mode) {
-        this.props.differentOptions.visible = true;
+        this.props.differentOptions.visible = true
       } else {
         if (!this.props.options.visible) {
-          this.props.differentOptions.visible = false;
-          opacity = 0;
+          this.props.differentOptions.visible = false
+          opacity = 0
         } else {
-          this.props.differentOptions.visible = true;
-          opacity = 1;
+          this.props.differentOptions.visible = true
+          opacity = 1
         }
       }
-      this.$emit("SetOpacity", opacity);
-      this.$emit("SetLevel", level);
+      this.$emit('SetOpacity', opacity)
+      this.$emit('SetLevel', level)
     },
-    getDataFromRest: async function(event) {
-      // this.$set(this.loadings,event.sid,true);
-      this.$store.commit("setLoading", {
-        search: event.sid,
-        idDash: this.idDash,
-        should: true,
-        error: false
-      });
-
-      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
-      let response = await this.$store.getters.getDataApi({
-        search: event,
-        idDash: this.idDash
-      }); // собственно проводим все операции с данными
-      // вызывая метод в хранилище
-      if (response.length == 0) {
-        // если что-то пошло не так
-        this.$store.commit("setLoading", {
-          search: event.sid,
-          idDash: this.idDash,
-          should: false,
-          error: true
-        });
-      } else {
-        // если все нормально
-
-        let responseDB = this.$store.getters.putIntoDB(
-          response,
-          event.sid,
-          this.idDash
-        );
-        responseDB.then(result => {
-          this.$store.commit("setLoading", {
-            search: event.sid,
-            idDash: this.idDash,
-            should: false,
-            error: false
-          });
-        });
-      }
-      return response;
-    },
+    // getDataFromRest: async function (event) {
+    //   // this.$set(this.loadings,event.sid,true);
+    //   this.$store.commit('setLoading', {
+    //     search: event.sid,
+    //     idDash: this.idDash,
+    //     should: true,
+    //     error: false,
+    //   })
+    //
+    //   this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`)
+    //   let response = await this.$store.getters.getDataApi({
+    //     search: event,
+    //     idDash: this.idDash,
+    //   }) // собственно проводим все операции с данными
+    //   // вызывая метод в хранилище
+    //   if (response.length == 0) {
+    //     // если что-то пошло не так
+    //     this.$store.commit('setLoading', {
+    //       search: event.sid,
+    //       idDash: this.idDash,
+    //       should: false,
+    //       error: true,
+    //     })
+    //   } else {
+    //     // если все нормально
+    //
+    //     let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash)
+    //     responseDB.then((result) => {
+    //       this.$store.commit('setLoading', {
+    //         search: event.sid,
+    //         idDash: this.idDash,
+    //         should: false,
+    //         error: false,
+    //       })
+    //     })
+    //   }
+    //   return response
+    // },
     exportDataCSV() {
-      let csvContent = "data:text/csv;charset=utf-8,"; // задаем кодировку csv файла
-      let keys = Object.keys(this.props.dataRestFilter[0]); // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(",") + "\n"); // добавляем ключи в файл
+      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
+      let keys = Object.keys(this.searchData[0]) // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
       csvContent += encodeURIComponent(
-        this.props.dataRestFilter
-          .map(item => Object.values(item).join(","))
-          .join("\n")
-      );
+        this.searchData.map((item) => Object.values(item).join(',')).join('\n')
+      )
 
-      const link = document.createElement("a"); // создаем ссылку
-      link.setAttribute("href", csvContent); // указываем ссылке что надо скачать наш файл csv
+      const link = document.createElement('a') // создаем ссылку
+      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
       const searchId = this.$store.getters.getSearchID({
         idDash: this.idDash,
-        id: this.element
-      });
-      link.setAttribute("download", `${this.idDash}-${searchId}.csv`); // указываем имя файла
-      link.click(); // жмем на скачку
-      link.remove(); // удаляем ссылку
+        id: this.element,
+      })
+      link.setAttribute('download', `${this.idDash}-${searchId}.csv`) // указываем имя файла
+      link.click() // жмем на скачку
+      link.remove() // удаляем ссылку
     },
 
     // moveElem: function (props) {  // переключаем режим разрешения перемещения элемента
@@ -749,241 +624,235 @@ export default {
     //     props.resize_elem = !props.resize_elem;
     //   }
     // },
-    getData: function(searсhID) {
+    getData: function (searсhID) {
       // асинхронная функция для получения даных с реста
-      let db = null;
-      let request = indexedDB.open("EVA", 1);
-      request.onerror = function(event) {
-        console.log("error: ", event);
-      };
-      request.onupgradeneeded = event => {
-        console.log("create");
-        db = event.target.result;
-        if (!db.objectStoreNames.contains("searches")) {
+      let db = null
+      let request = indexedDB.open('EVA', 1)
+      request.onerror = function (event) {
+        console.log('error: ', event)
+      }
+      request.onupgradeneeded = (event) => {
+        console.log('create')
+        db = event.target.result
+        if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
-          db.createObjectStore("searches"); // create it
+          db.createObjectStore('searches') // create it
         }
-        request.onsuccess = event => {
-          db = request.result;
-          console.log("successEvent: " + db);
-        };
-      };
+        request.onsuccess = (event) => {
+          db = request.result
+          console.log('successEvent: ' + db)
+        }
+      }
       let promise = new Promise((resolve, reject) => {
-        request.onsuccess = event => {
-          db = request.result;
-          let transaction = db.transaction("searches"); // (1)
+        request.onsuccess = (event) => {
+          db = request.result
+          let transaction = db.transaction('searches') // (1)
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore("searches"); // (2)
-          let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
-          query.onsuccess = event => {
+          let searches = transaction.objectStore('searches') // (2)
+          let query = searches.get(String(searсhID)) // (3) return store.get('Ire Aderinokun');
+          query.onsuccess = (event) => {
             // (4)
             if (query.result) {
-              resolve(query.result);
+              resolve(query.result)
             } else {
-              resolve([]);
+              resolve([])
             }
-          };
-          query.onerror = function() {
-            console.log("Ошибка", query.error);
-          };
-        };
-      });
-      return promise;
+          }
+          query.onerror = function () {
+            console.log('Ошибка', query.error)
+          }
+        }
+      })
+      return promise
     },
-    checkFilter: function() {
+    checkFilter: function () {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "OnDataCompare",
-        element: this.element
-      });
-      let data = [];
-      let incl = false;
-      let columnDel = "";
-      let event = {};
-      this.props.dataRestFilter = [];
+        event: 'OnDataCompare',
+        element: this.element,
+      })
+      let data = []
+      let incl = false
+      let columnDel = ''
+      let event = {}
+      this.searchData = []
 
-      events.forEach(item => {
-        event = { ...{}, ...item };
+      events.forEach((item) => {
+        event = { ...{}, ...item }
 
-        if (event.prop == "filter" && event.value == "true") {
-          data = JSON.parse(JSON.stringify(this.props.dataRest));
-          event.row = event.row.replace(/\[|\]/g, "").split(",");
+        if (event.prop == 'filter' && event.value == 'true') {
+          data = JSON.parse(JSON.stringify(this.props.dataRest))
+          event.row = event.row.replace(/\[|\]/g, '').split(',')
 
-          if (event.column.indexOf("!") != -1) {
-            columnDel = event.column.replace("!", "");
+          if (event.column.indexOf('!') != -1) {
+            columnDel = event.column.replace('!', '')
             this.props.dataRest.forEach((itemFil, i) => {
               if (Object.keys(itemFil).includes(columnDel)) {
-                delete data[i][columnDel];
+                delete data[i][columnDel]
               }
-            });
+            })
           } else {
             switch (event.compare) {
-              case "equals":
-                let notArr = [];
-                event.row.forEach(notElem => {
-                  if (notElem.indexOf("!") != -1) {
-                    notArr.push(notElem.substr(1));
+              case 'equals':
+                let notArr = []
+                event.row.forEach((notElem) => {
+                  if (notElem.indexOf('!') != -1) {
+                    notArr.push(notElem.substr(1))
                   }
-                });
-                if (event.column != "") {
-                  data = data.filter(itemFil => {
+                })
+                if (event.column != '') {
+                  data = data.filter((itemFil) => {
                     if (notArr.length != 0) {
                       if (!notArr.includes(String(itemFil[event.column]))) {
-                        return itemFil;
+                        return itemFil
                       }
                     } else {
                       if (event.row.includes(String(itemFil[event.column]))) {
-                        return itemFil;
+                        return itemFil
                       }
                     }
-                  });
+                  })
                 } else {
-                  data = data.filter(itemFil => {
+                  data = data.filter((itemFil) => {
                     if (notArr.length != 0) {
-                      incl = true;
-                      Object.values(itemFil).forEach(val => {
+                      incl = true
+                      Object.values(itemFil).forEach((val) => {
                         if (notArr.includes(String(val))) {
-                          incl = false;
+                          incl = false
                         }
-                      });
+                      })
                     } else {
-                      incl = false;
-                      Object.values(itemFil).forEach(val => {
+                      incl = false
+                      Object.values(itemFil).forEach((val) => {
                         if (event.row.includes(String(val))) {
-                          incl = true;
+                          incl = true
                         }
-                      });
+                      })
                     }
                     if (incl) {
-                      return itemFil;
+                      return itemFil
                     }
-                  });
+                  })
                 }
-                break;
-              case "over":
-                if (event.column != "") {
-                  data = data.filter(itemFil => {
-                    incl = true;
-                    event.row.forEach(row => {
-                      if (
-                        parseFloat(itemFil[event.column]) <= parseFloat(row)
-                      ) {
-                        incl = false;
+                break
+              case 'over':
+                if (event.column != '') {
+                  data = data.filter((itemFil) => {
+                    incl = true
+                    event.row.forEach((row) => {
+                      if (parseFloat(itemFil[event.column]) <= parseFloat(row)) {
+                        incl = false
                       }
-                    });
+                    })
                     if (incl) {
-                      return itemFil;
+                      return itemFil
                     }
-                  });
+                  })
                 }
-                break;
-              case "less":
-                if (event.column != "") {
-                  data = data.filter(itemFil => {
-                    incl = true;
-                    event.row.forEach(row => {
-                      if (
-                        parseFloat(itemFil[event.column]) >= parseFloat(row)
-                      ) {
-                        incl = false;
+                break
+              case 'less':
+                if (event.column != '') {
+                  data = data.filter((itemFil) => {
+                    incl = true
+                    event.row.forEach((row) => {
+                      if (parseFloat(itemFil[event.column]) >= parseFloat(row)) {
+                        incl = false
                       }
-                    });
+                    })
                     if (incl) {
-                      return itemFil;
+                      return itemFil
                     }
-                  });
+                  })
                 }
-                break;
-              case "in":
-                if (event.column != "") {
-                  data = data.filter(itemFil => {
+                break
+              case 'in':
+                if (event.column != '') {
+                  data = data.filter((itemFil) => {
                     if (event.row.includes(String(itemFil[event.column]))) {
-                      return itemFil;
+                      return itemFil
                     }
-                  });
+                  })
                 } else {
-                  data = data.filter(itemFil => {
-                    incl = false;
-                    Object.values(itemFil).forEach(val => {
+                  data = data.filter((itemFil) => {
+                    incl = false
+                    Object.values(itemFil).forEach((val) => {
                       if (event.row.includes(String(val))) {
-                        incl = true;
+                        incl = true
                       }
-                    });
+                    })
                     if (incl) {
-                      return itemFil;
+                      return itemFil
                     }
-                  });
+                  })
                 }
-                break;
-              case "between":
-                if (event.column != "") {
-                  data = data.filter(itemFil => {
-                    incl = false;
-                    let min, max;
+                break
+              case 'between':
+                if (event.column != '') {
+                  data = data.filter((itemFil) => {
+                    incl = false
+                    let min, max
                     if (parseFloat(event.row[0]) > parseFloat(event.row[1])) {
-                      max = event.row[0];
-                      min = event.row[1];
+                      max = event.row[0]
+                      min = event.row[1]
                     } else {
-                      max = event.row[1];
-                      min = event.row[0];
+                      max = event.row[1]
+                      min = event.row[0]
                     }
                     if (
                       parseFloat(itemFil[event.column]) > min &&
                       parseFloat(itemFil[event.column]) < max
                     ) {
-                      incl = true;
+                      incl = true
                     }
                     if (incl) {
-                      return itemFil;
+                      return itemFil
                     }
-                  });
+                  })
                 }
-                break;
+                break
             }
           }
-          if (this.props.dataRestFilter.length == 0) {
-            this.props.dataRestFilter = [...this.props.dataRestFilter, ...data];
+          if (this.searchData.length === 0) {
+            this.searchData = [...this.searchData, ...data]
           } else {
             // если в массив результирующем уже что-то было, то надо добавить только новые элементы
-            data.forEach(itemData => {
+            data.forEach((itemData) => {
               // пробегаемся по все мотфильтрвоанным элементам
-              let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
-              let keys = Object.keys(itemData); // ключи объекта внутри фильтрованного массива
-              this.props.dataRestFilter.forEach(itemDataRest => {
+              let equal = false // переменная которая скажет встречается ли такая строка уже в выборке
+              let keys = Object.keys(itemData) // ключи объекта внутри фильтрованного массива
+              this.searchData.forEach((itemDataRest) => {
                 // пробегаемся пов сем отфильтрованным данным
-                let equalRest = true; // переменная которая скажет полностью совпал объект внутри результирующего массива
-                keys.forEach(key => {
+                let equalRest = true // переменная которая скажет полностью совпал объект внутри результирующего массива
+                keys.forEach((key) => {
                   // пробегаемся по кажлому полю в объекте
                   if (itemData[key] != itemDataRest[key]) {
                     // если значения поля из только что отфильтрованного массива, не равно значени в уже до
                     // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
-                    equalRest = false; // поэтому присваиваем переменной значение мол строки отличаются
+                    equalRest = false // поэтому присваиваем переменной значение мол строки отличаются
                   }
-                });
+                })
                 if (equalRest) {
                   // а вот если строка в только что отфлильтрованном массиве полностью совпала со строкой в уже до этого отфильтрованном
-                  equal = true; // то присваиваем true переменной которай говорит что такая строка уже есть
+                  equal = true // то присваиваем true переменной которай говорит что такая строка уже есть
                 }
-              });
+              })
               if (!equal) {
                 // и вот если такой строки все же нет
-                this.props.dataRestFilter.push(itemData); // то смело добовляем ее в результирующий массив
+                this.searchData.push(itemData) // то смело добовляем ее в результирующий массив
               }
-            });
+            })
           }
         }
-      });
+      })
       if (data.length == 0) {
-        this.props.dataRestFilter = JSON.parse(
-          JSON.stringify(this.props.dataRest)
-        );
+        this.searchData = JSON.parse(JSON.stringify(this.props.dataRest))
       }
-      link.remove(); // удаляем ссылку
-    }
-  }
-};
+      link.remove() // удаляем ссылку
+    },
+  },
+}
 </script>
 
 <style lang="scss">
-@import "../sass/dashBoard.sass";
+@import '../sass/dashBoard.sass';
 </style>

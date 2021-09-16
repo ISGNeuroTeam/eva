@@ -29,22 +29,17 @@ export default {
       state[size.idDash][size.id].width = size.width;
       state[size.idDash][size.id].height = size.height;
     },
-    // setVisualizationTab: (state, tab) => {
-    //   state[]
-    // },
-    setSearch: (state, search) => {
-      // сохранение нового search (источника данных)
-      if (search.reload) {
-        // если источник данных уже есть то
-        state[search.idDash].searches.forEach((item, i) => {
-          // пробегаемся по всем источникам данных
-          if (search.search.sid == item.sid) {
-            // если нашли нужный
-            state[search.idDash].searches[i] = search.search;
+    setSearch: (state, payload) => {
+      const { idDash, reload, search } = payload
+      search.status = 'empty'
+      if (reload) {
+        state[idDash].searches.forEach((item, i) => {
+          if (search.sid === item.sid) {
+            Vue.set(state[idDash].searches, i, search)
           }
-        });
+        })
       } else {
-        state[search.idDash].searches.push(search.search); // если источника данных (далее ИС, а то устал писать)  нет то просто добовляем его
+        state[idDash].searches.push(search)
       }
     },
     deleteSearch: (state, search) => {
@@ -979,6 +974,11 @@ export default {
         }
       });
     },
+    updateSearchStatus: (state, payload) => {
+      const { idDash, sid, status } = payload
+      const search = state[idDash].searches.find((search) => search.sid === sid)
+      Vue.set(search, 'status', status)
+    },
   },
   getters: {
     getDashTabs: state => id => {
@@ -1608,13 +1608,13 @@ export default {
     },
     checkAlreadyDash: state => {
       return (id, first) => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           let result = rest.getState(id, restAuth);
           result.then(stateFrom => {
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
-                if (stateFrom.body != '') {
+                if (stateFrom.body !== '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                 }
                 Vue.set(state[id], 'name', stateFrom.name);
@@ -1631,7 +1631,7 @@ export default {
                 });
               }
               if (first) {
-                if (stateFrom.body != '') {
+                if (stateFrom.body !== '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                   Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                   Vue.set(state[id], 'name', stateFrom.name);
@@ -1644,6 +1644,9 @@ export default {
                     Vue.set(state[id][elem], 'tab', 1);
                   }
                 });
+              }
+              if (state[id].searches) {
+                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'))
               }
               resolve({ status: 'finish' });
               // }
