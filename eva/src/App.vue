@@ -13,9 +13,8 @@ export default {
       let styleObject = {}
       Object.keys(currentTheme).forEach((key) => {
         styleObject[key.replace('$', '--')] = currentTheme[key]
-        if (key !== '$background_image') {
+        if (key !== '$background_image')
           styleObject[key.replace('$', '--') + '-rgb'] = this.hexToRGB(currentTheme[key])
-        }
       })
       return styleObject
     },
