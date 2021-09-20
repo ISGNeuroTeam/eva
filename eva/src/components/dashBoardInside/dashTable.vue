@@ -180,28 +180,22 @@
               event.target.parentElement.classList.add('selected');
             }
 
-            let tockens = this.$store.getters.getTockens(this.idDash);
+            let headers = Array.from(this.$refs[this.id].$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
 
-            Object.keys(tockens).forEach(i => {
-              if (tockens[i].elem == this.id && tockens[i].action == 'click') {
-                let row = [];
-                let value = '';
-                event.target.parentElement.childNodes.forEach(item => {
-                  row.push(item.textContent);
-                });
-                this.$refs[this.id].$el.querySelector('thead tr').childNodes.forEach((item, j) => {
-                  if (item.textContent == tockens[i].capture) {
-                    value = row[j];
-                  }
-                });
+            let cellRowIndex = Array.from(event.target.parentElement.childNodes).findIndex(item => item==event.target);
 
+            let tokens = this.$store.getters.getTockens(this.idDash);
+
+           tokens.forEach(token => {
+              if (token.elem == this.id && token.action == 'click' && headers[cellRowIndex]===token.capture) {
+                let value = event.target.textContent
                 this.$store.commit('setTocken', {
-                  tocken: tockens[i],
+                  tocken: token,
                   idDash: this.idDash,
-                  value: value,
                   store: this.$store,
+                  value,
                 });
-              }
+              };
             });
 
             let events = this.$store.getters.getEvents({
