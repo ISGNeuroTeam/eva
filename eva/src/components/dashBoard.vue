@@ -385,13 +385,7 @@ export default {
     } else {
       this.props.optionsBoxShadow = 'transparent'
     }
-    this.$store.commit('setShould', {
-      idDash: this.idDash,
-      id: this.element,
-      status: true,
-    })
   },
-
   methods: {
     editName: function (props) {
       // изменяем имя элемнета

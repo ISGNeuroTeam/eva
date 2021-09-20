@@ -5,7 +5,7 @@
         :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
         @click="changeInputMode"
       >
-       {{iconArrowAll}}
+       {{ iconArrowAll }}
       </v-icon>
      </v-row>
      <div ref="graph" class="ygraph-component-container" :style="{top:`${top}`}"/>
@@ -23,7 +23,7 @@ export default {
   name: "dashYGraph",
   props: {  // переменные полученные от родителя
     idFrom: null,  // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда 
+    idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
     colorFrom: null,  // цветовые переменные
     dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
@@ -36,7 +36,7 @@ export default {
       edgesSource: null,
       errorColor: '#D34C00',//цвет ошибки
       colors: ['#AEFAFF', '#0AB3FF', '#003CFF', '#7100FF'],
-      startColor: '#C7C7C7',//цвет старт и финиш 
+      startColor: '#C7C7C7',//цвет старт и финиш
       actions: [
         {name: 'click',
           capture: []
@@ -45,10 +45,10 @@ export default {
           capture: []
         },
       ],
-    } 
+    }
   },
-  computed: { 
-    top () {// для ряда управляющих иконок 
+  computed: {
+    top () {// для ряда управляющих иконок
       if(document.body.clientWidth <=1600){
         return '50px'
       } else {
@@ -67,7 +67,19 @@ export default {
     colorFrom(){
       this.colorFont()
     }
-  },  
+  },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
+    this.createGraph()
+    setTimeout(() => {
+      this.generateNodesEdges(this.dataRestFrom)
+      this.applyGraphBuilder()
+      this.colorFont()
+      this.colorNodes()
+      this.colorEdges()
+    }, 100)
+    // this.$graphComponent.fitGraphBounds()
+  },
   methods: {
     changeInputMode(){ // меняем режим графика
       if(this.isEditor){
@@ -77,7 +89,6 @@ export default {
       }
       this.isEditor = !this.isEditor
     },
-
     colorEdges(){
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=>{
@@ -97,8 +108,8 @@ export default {
       })
     },
     edgeStyle(color) {
-      return new yfile.PolylineEdgeStyle({ 
-        stroke: `6px ${color}`, 
+      return new yfile.PolylineEdgeStyle({
+        stroke: `6px ${color}`,
         targetArrow: new yfile.Arrow({
           fill: color,
           scale: 5,
@@ -119,14 +130,14 @@ export default {
               this.nodeStyle(this.errorColor)
             )
          } else {
-            this.$graphComponent.graph.setStyle(node, 
+            this.$graphComponent.graph.setStyle(node,
               this.nodeStyle(this.colors[node.tag-1])
             )
          }
        })
     },
     nodeStyle(color) {
-      return  new  yfile.ShapeNodeStyle({
+      return new yfile.ShapeNodeStyle({
         fill: color,
         shape: 'ELLIPSE',
         stroke: color,
@@ -148,9 +159,9 @@ export default {
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=> {
         this.$graphComponent.graph.setStyle(edge.labels.elementAt(0),
-          this.labelStyle(false, this.colorFrom.backElement)  
+          this.labelStyle(false, this.colorFrom.backElement)
         )
-      })      
+      })
     },
     labelStyle(isBold, backgroundFill = null) {
         return new yfile.DefaultLabelStyle({
@@ -170,7 +181,7 @@ export default {
       this.$graphComponent.graph.clear()
 
       const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
-     
+
       this.$nodesSource = graphBuilder.createNodesSource({
         data: this.nodesSource,
         id: 'id',
@@ -180,7 +191,7 @@ export default {
           item.color
         }
       })
-      
+
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
@@ -205,7 +216,7 @@ export default {
        if( edgeDataItem.label !== "-"){
            return edgeDataItem.label
          }
-      })    
+      })
 
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
@@ -225,7 +236,6 @@ export default {
       this.$graphComponent.graph.applyLayout(layout, layoutData)
       this.$graphComponent.fitGraphBounds()
     },
-
     createGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
       this.$graphComponent.inputMode = null
@@ -233,12 +243,11 @@ export default {
       this.initializeDefaultStyles()
 
       //убираем надпись о license
-      document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
-        item.children[1].style.opacity = 0
-        item.children[2].style.opacity = 0
-      })
+      // document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
+      //   item.children[1].style.opacity = 0
+      //   item.children[2].style.opacity = 0
+      // })
     },
-
     generateNodesEdges(dataRest){
       let _allNodes = []
       let _allEdges = []
@@ -267,17 +276,13 @@ export default {
       this.nodesSource = Object.values(_nodesSource)
       this.edgesSource = _allEdges
     },
-  },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-    this.createGraph();
-  } 
+  }
 }
 
 
 </script>
 
-<style lang="css" > 
+<style lang="css" >
 .ygraph-component-container {
   position: absolute;
   left: 0;
@@ -285,5 +290,5 @@ export default {
   bottom: 0;
 }
 
-   
+
 </style>

@@ -161,7 +161,7 @@ export default {
   data() {
     return {
       page: 'dash',
-      mode: false,
+      mode: true,
       showSetting: false,
       rotate: '',
       openProfile: false,
@@ -368,7 +368,7 @@ export default {
       let offset = 0
       window.addEventListener('scroll', () => {
         // при увеличении экрана в высоту (вообще коненчо срабатывает при скролле страницы)
-        if (document.querySelector('.aplication')) {
+        if (document.querySelector('.application')) {
           if (document.body.scrollHeight > document.body.clientHeight) {
             // если высота скролируемого экрана больше чем клиентского
             //добавляем размер
@@ -378,11 +378,11 @@ export default {
             //просто сработало событие
           }
           let _maxHeigth =
-            Math.round(document.querySelector('.aplication').clientHeight / this.horizontalCell) *
+            Math.round(document.querySelector('.application').clientHeight / this.horizontalCell) *
             this.horizontalCell
           this.deltaHorizontal = _maxHeigth - this.startClientHeight
 
-          document.querySelector('.aplication').style.height = `${
+          document.querySelector('.application').style.height = `${
             document.body.scrollHeight + offset
           }px` // в любом случае расширяем контейнер до размеров экрана
         }
