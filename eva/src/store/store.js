@@ -604,11 +604,19 @@ export default {
       });
     },
     letEventGo: async (state, event) => {
+      
       // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({}, event.event);
+      console.log("hello", item)
       if (item.prop[0] != '') {
         let tockens = state[event.idDash].tockens;
         let id = -1;
+        console.log(item)
+        if (Number.isInteger(+item.target)) {
+         id = item.target
+         console.log('id', id)
+        }
+        
         let tockensTarget = [];
         Object.keys(state).forEach(key => {
           if (state[key].name) {
@@ -640,6 +648,7 @@ export default {
             { name: item.target, idgroup: state[event.idDash].idgroup },
             restAuth
           );
+          console.log(response)
           if (response) {
             id = response.id;
             Vue.set(state, response.id, {});
@@ -653,9 +662,9 @@ export default {
           }
         }
 
-        if (state[id].tockens) {
-          tockensTarget = state[id].tockens;
-        }
+        // if (state[id].tockens) {
+        //   tockensTarget = state[id].tockens;
+        // }
 
         item.prop.forEach((itemProp, j) => {
           tockensTarget.forEach((itemTock, i) => {

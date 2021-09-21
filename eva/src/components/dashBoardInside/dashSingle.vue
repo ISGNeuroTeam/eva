@@ -191,6 +191,7 @@ export default {
             
     },
     setClick: function() {
+      console.log("clicked")
 
       let tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
@@ -207,6 +208,7 @@ export default {
       })
 
       let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onclick', element: this.id, partelement: 'empty'});
+      console.log(events)
       if (events.length != 0) {
         events.forEach( item => {
           if(item.action == 'set'){
