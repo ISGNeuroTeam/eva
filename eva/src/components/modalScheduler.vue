@@ -236,132 +236,14 @@ export default {
       return this.$store.getters.getTheme
     },
   },
-  methods: {
-    cancel: function() {  // закрываем окно
-      this.$emit("cancel");
-    },
-    checkEsc: function(event) {
-      if (event.code =="Escape") {
-        this.cancel();
-      }
-    },
-    setTime: function(time,tense) {  // выставляем время и меняем цвета у кнопок 
-      if (!this.disabledEvery) {
-        if (tense == 'every') {
-          this.time = time;
-          Object.keys(this.color).forEach( item => {
-            this.color[item] = '$accent_ui_color';
-          })
-          if (this.color[time] == '$accent_ui_color') {
-            this.color[time] = '$primary_button';
-          } else {
-            this.color[time] = '$accent_ui_color';
-          }           
-        } else if (tense == 'last') {
-          this.timeLast = time;
-          Object.keys(this.colorLast).forEach( item => {
-            this.colorLast[item] = '$accent_ui_color';
-          })
-          if (this.colorLast[time] == '$accent_ui_color') {
-            this.colorLast[time] = '$primary_button';
-          } else {
-            this.colorLast[time] = '$accent_ui_color';
-          }
-        }
-      }        
-    },
-    countTime(time,every) {  // переводим строковые значения времени в числовые
-      let period = 0;
-      switch(time) {
-      case 'second':
-        period = Number(every) 
-        break
-        
-      case 'minute':
-        period = Number(every)   *60
-        break
-
-      case 'hour':
-        period = Number(every)  *3600
-        break
-    
-      }
-      return period
-    },
-    executeSearch: function(searches,sid,shedule) {  // выполняем серч меняя его временны рамки
-      let curTimeLast = 0;
-      let tws = 0; 
-      let twf = 0;
-      if (shedule.everyLast != 0) {
-        curTimeLast = this.countTime(shedule.timeLast, shedule.everyLast);
-        tws = Math.floor(new Date().getTime()/1000-curTimeLast);
-        twf = Math.floor(new Date().getTime()/1000);
-      }
-      searches.forEach( async item => {
-        if (item.sid  ==  sid ) {  
-          item.parametrs.tws = tws;
-          item.parametrs.twf = twf;
-          this.$store.commit('setSearch', {search: item, idDash: this.idDash, reload: true });
-          this.$store.commit('setLoading', {search: item.sid, idDash: this.idDash, should: true, error: false });   
-          let response = await this.$store.getters.getDataApi({search: item, idDash: this.idDash});
-            
-          if ( response.status == 200) {
-            let responseDB = this.$store.getters.putIntoDB(response.result, sid, this.idDash);
-            responseDB
-              .then(
-                result => {
-                  let refresh =  this.$store.getters.refreshElements(this.idDash, sid, );
-                  this.$store.commit('setLoading', {search: item.sid, idDash: this.idDash, should: false, error: false });  
-                },
-              );
-          } else {
-            this.$store.commit('setLoading', {search: item.sid, idDash: this.idDash, should: false, error: true });  
-          }
-        }
-      }); 
-    },
-    startSchedule: function() {  // запускаем планировщик
-
-      let shedule = {
-        time: this.time,
-        every: this.every,
-        timeLast: this.timeLast,
-        everyLast: this.everyLast,
-      };
-      let sid = this.sid;
-
-      this.$store.commit('setSchedule', {idDash: this.idDash, sid: this.sid, every: this.every, time: this.time, everyLast: this.everyLast, timeLast: this.timeLast}); 
-      let searches = this.$store.getters.getSearches(this.idDash);
-      let curTime = this.countTime(shedule.time, shedule.every)*1000;
-      this.executeSearch(searches,sid,shedule); // сперва первый раз просто выполняем серч
-      this.timers[sid] = setInterval( () => { 
-        this.executeSearch(searches,sid,shedule);  // а затем уже выполняем его в цикле
-            
-      },curTime) 
-      this.cancel();
-    },
-    cancelSchedule: function() {  // отменить планировщик
-      this.$store.commit('deleteSchedule', {idDash: this.idDash, sid: this.sid});
-      this.every = 0;
-      this.color[this.time] = "teal";
-      this.time = '';
-      this.disabledStop = true;
-      this.disabledStart = false;
-      this.disabledEvery = false;
-      this.msg = "Не запущен";
-      clearInterval(this.timers[this.sid]);
-      delete this.timers[this.sid];
-    },
-               
-  },
   mounted() {
     // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
     let schedulers = this.schedulers;
     let searches = this.$store.getters.getSearches(this.idDash);
     let shedule = {};
     let curTime = {};
-    
-    if (Object.keys(schedulers).length != 0) {  // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить 
+
+    if (Object.keys(schedulers).length != 0) {  // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
       Object.keys(schedulers).forEach( items => {   // пробегаемся по всем планировщикам
         shedule = {  // создаем объект на основе настроек планировщика
           time: schedulers[items].time,
@@ -374,10 +256,121 @@ export default {
         this.timers[items] = setInterval( () => {  // и запускаем в цикле
           this.executeSearch(searches,items,shedule);
         },curTime)
-        
+
       });
     }
- 
+
+  },
+  methods: {
+    cancel: function() {  // закрываем окно
+      this.$emit("cancel");
+    },
+    checkEsc: function(event) {
+      if (event.code =="Escape") {
+        this.cancel();
+      }
+    },
+    setTime: function(time,tense) {  // выставляем время и меняем цвета у кнопок
+      if (!this.disabledEvery) {
+        if (tense == 'every') {
+          this.time = time;
+          Object.keys(this.color).forEach( item => {
+            this.color[item] = '$accent_ui_color';
+          })
+          if (this.color[time] == '$accent_ui_color') {
+            this.color[time] = '$primary_button';
+          } else {
+            this.color[time] = '$accent_ui_color';
+          }
+        } else if (tense == 'last') {
+          this.timeLast = time;
+          Object.keys(this.colorLast).forEach( item => {
+            this.colorLast[item] = '$accent_ui_color';
+          })
+          if (this.colorLast[time] == '$accent_ui_color') {
+            this.colorLast[time] = '$primary_button';
+          } else {
+            this.colorLast[time] = '$accent_ui_color';
+          }
+        }
+      }
+    },
+    countTime(time,every) {  // переводим строковые значения времени в числовые
+      let period = 0;
+      switch(time) {
+      case 'second':
+        period = Number(every)
+        break
+
+      case 'minute':
+        period = Number(every)   *60
+        break
+
+      case 'hour':
+        period = Number(every)  *3600
+        break
+
+      }
+      return period
+    },
+    executeSearch: function(searches,sid,shedule) {  // выполняем серч меняя его временны рамки
+      let curTimeLast = 0
+      let tws = 0
+      let twf = 0
+      if (shedule.everyLast !== 0) {
+        curTimeLast = this.countTime(shedule.timeLast, shedule.everyLast)
+        tws = Math.floor(new Date().getTime()/1000-curTimeLast)
+        twf = Math.floor(new Date().getTime()/1000)
+      }
+      searches.forEach((item) => {
+        if (item.sid === sid ) {
+          item.parametrs.tws = tws
+          item.parametrs.twf = twf
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: item.sid,
+            status: 'empty',
+          })
+        }
+      })
+    },
+    startSchedule() { // запускаем планировщик
+      let shedule = {
+        time: this.time,
+        every: this.every,
+        timeLast: this.timeLast,
+        everyLast: this.everyLast,
+      }
+      let sid = this.sid
+
+      this.$store.commit('setSchedule', {
+        idDash: this.idDash,
+        sid: this.sid,
+        every: this.every,
+        time: this.time,
+        everyLast: this.everyLast,
+        timeLast: this.timeLast,
+      })
+      let searches = this.$store.getters.getSearches(this.idDash)
+      let curTime = this.countTime(shedule.time, shedule.every) * 1000
+      this.executeSearch(searches, sid, shedule) // сперва первый раз просто выполняем серч
+      this.timers[sid] = setInterval(() => {
+        this.executeSearch(searches, sid, shedule) // а затем уже выполняем его в цикле
+      }, curTime)
+      this.cancel()
+    },
+    cancelSchedule: function() {  // отменить планировщик
+      this.$store.commit('deleteSchedule', { idDash: this.idDash, sid: this.sid });
+      this.every = 0;
+      this.color[this.time] = "teal";
+      this.time = '';
+      this.disabledStop = true;
+      this.disabledStart = false;
+      this.disabledEvery = false;
+      this.msg = "Не запущен";
+      clearInterval(this.timers[this.sid]);
+      delete this.timers[this.sid];
+    },
   },
  
 }

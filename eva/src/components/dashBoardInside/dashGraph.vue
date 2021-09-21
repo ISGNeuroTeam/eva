@@ -91,7 +91,7 @@ export default {
     idFrom: null,
     idDashFrom: null,
     dataRestFrom: null,
-    shouldFrom: null,
+    // shouldFrom: null,
     colorFrom: null,
     dataLoadingFrom: null,
     heightFrom: null,
@@ -156,16 +156,16 @@ export default {
       }
       return true
     },
-    shouldGet: function() {
-      if (this.shouldFrom) {
-        if (this.mount) {
-          this.mount = false;
-        } else {
-          this.tree[this.direct] = {};
-        }
-      }
-      return this.shouldFrom
-    },
+    // shouldGet: function() {
+    //   if (this.shouldFrom) {
+    //     if (this.mount) {
+    //       this.mount = false;
+    //     } else {
+    //       this.tree[this.direct] = {};
+    //     }
+    //   }
+    //   return this.shouldFrom
+    // },
     dataLoading: function() {
       return this.dataLoadingFrom
     },
