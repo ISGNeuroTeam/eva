@@ -1,28 +1,30 @@
 <template>
-  <vue-draggable-resizable 
+  <vue-draggable-resizable
     ref="dragres"
     :key="reload"
-    :w="width" 
-    :h="height" 
-    :x="left" 
-    :y="top" 
-    :draggable="dragRes" 
-    :resizable="dragRes" 
+    :w="width"
+    :h="height"
+    :x="left"
+    :y="top"
+    :draggable="dragRes"
+    :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
-    :style="{zIndex:props.zIndex, outlineColor: theme.$accent_ui_color }"
+    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color }"
     @resizestop="sendSize"
-    @dragstop="sendMove" 
+    @dragstop="sendMove"
   >
     <dash-board
-      :data-mode-from="dataMode" 
-      :width="width"  
-      :height="height"  
-      :id-dash-from="idDash" 
-      :data-page-from="dataPageFrom" 
-      :data-elem-from="id" 
-      @SetLevel="props.zIndex = $event" 
-      @SetOpacity="changeOpacity($event)" 
+      :data-mode-from="dataModeFrom"
+      :width="width"
+      :height="height"
+      :id-dash-from="idDash"
+      :data-page-from="dataPageFrom"
+      :data-elem-from="id"
+      :loading="loading"
+      :searchData="searchData"
+      @SetLevel="props.zIndex = $event"
+      @SetOpacity="changeOpacity($event)"
     />
   </vue-draggable-resizable>
 </template>
@@ -33,12 +35,16 @@ export default {
     dataModeFrom: null,
     idDashFrom: null,
     dataElem: null,
-    colorFrom: null,
     dataPageFrom: null,
     verticalCell: null,
-    horizontalCell: null
+    horizontalCell: null,
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    searchData: Array,
   },
-  data () {
+  data() {
     return {
       opacity: 1,
       top: 0,
@@ -50,30 +56,30 @@ export default {
         vue_drag: false,
         zIndex: 1,
         step: {},
-        grid: [60,60]
-      }
+        grid: [60, 60],
+      },
     }
   },
   computed: {
-    theme: function() {
+    theme() {
       return this.$store.getters.getTheme
     },
-    id: function() {  // название элемента, полученное от родителя
+    id() {
       return this.dataElem
     },
-    idDash: function() {  // id страницы, полученное от родителя
+    idDash() {
       return this.idDashFrom
     },
-    dataMode: function() {
+    dataMod() {
       return this.dataModeFrom
     },
-    dragRes: function() {
-      let dragRes = this.$store.getters.getDragResize(this.idDash);
-      dragRes == 'true' ? dragRes = true : dragRes = false;
-      return dragRes;
+    dragRes() {
+      let dragRes = this.$store.getters.getDragResize(this.idDash)
+      dragRes === 'true' ? (dragRes = true) : (dragRes = false)
+      return dragRes
     },
-    headerTop: function (){
-      if(document.body.clientWidth <=1400){
+    headerTop() {
+      if (document.body.clientWidth <= 1400) {
         return 40
       } else {
         return 50
@@ -81,86 +87,77 @@ export default {
     },
   },
   watch: {
-    top: function(val) {
-      if(val <= this.headerTop){
-        val = this.headerTop
+    top(val) {
+      if (val <= this.headerTop) val = this.headerTop
+    },
+    left() {
+      let clientWidth = document.querySelector('#app').clientWidth
+      if (this.left < 0) this.left = 0
+      if (this.left + this.width > clientWidth) {
+        this.left = clientWidth - this.width
       }
     },
-    left: function() {
-      let clientWidth = document.querySelector('#app').clientWidth;
-  
-      if (this.left < 0) {
-        this.left = 0;
-      } 
-      if ((this.left+this.width) >  clientWidth) {
-        this.left = clientWidth - this.width;
-      } 
-    },
-    verticalCell: function(){
-      this.reload ++ 
+    verticalCell() {
+      this.reload++
       this.createGrid()
       this.drawElement()
     },
-    horizontalCell: function(){
-      this.reload ++ 
+    horizontalCell() {
+      this.reload++
       this.createGrid()
       this.drawElement()
-    }
+    },
   },
   created() {
     this.createGrid()
     this.drawElement()
   },
   methods: {
-    drawElement: function() {
-      let pos = this.$store.getters.getPosDash({idDash: this.idDash, id: this.id});
+    drawElement() {
+      let pos = this.$store.getters.getPosDash({ idDash: this.idDash, id: this.id })
 
-      this.left = pos.left*this.verticalCell;
-      this.top = pos.top*this.horizontalCell + this.headerTop;
+      this.left = pos.left * this.verticalCell
+      this.top = pos.top * this.horizontalCell + this.headerTop
 
-      let size = this.$store.getters.getSizeDash({idDash: this.idDash, id: this.id});
+      let size = this.$store.getters.getSizeDash({ idDash: this.idDash, id: this.id })
 
-      let width = size.width*this.verticalCell;
-      let height = size.height*this.horizontalCell;
+      let width = size.width * this.verticalCell
+      let height = size.height * this.horizontalCell
 
-      this.width  = width;
-      this.height = height;
+      this.width = width
+      this.height = height
     },
-    sendMove(x,y) {  // отправляем позицию элемнета в хранилище
-      let leftFrom = x;
-      let topFrom = y;
-      
-      let top = Math.round((topFrom - this.headerTop)/this.horizontalCell)
-      if (top < 0 ) { 
-        top = 0
-      }
+    sendMove(x, y) {
+      let top = Math.round((y - this.headerTop) / this.horizontalCell)
+      if (top < 0) top = 0
 
-      let left =  Math.round(leftFrom/this.verticalCell);
-      if (left < 0 ) {
-        left = 0
-      }
+      let left = Math.round(x / this.verticalCell)
+      if (left < 0) left = 0
 
-      this.$store.commit('setPosDash', {top: top,left: left, id: this.id, idDash: this.idDash});
+      this.$store.commit('setPosDash', { top: top, left: left, id: this.id, idDash: this.idDash })
     },
-    sendSize(x,y,width,height) {  // отправляем размер элемента
-    //для количества ячеек по высоте  округляем до целого
-      let top = Math.round((y - this.headerTop)/this.horizontalCell)
-      let left =  Math.round(x/this.verticalCell);
-      this.$store.commit('setPosDash', {top: top,left: left, id: this.id, idDash: this.idDash});
+    sendSize(x, y, width, height) {
+      let top = Math.round((y - this.headerTop) / this.horizontalCell)
+      let left = Math.round(x / this.verticalCell)
+      this.$store.commit('setPosDash', { top: top, left: left, id: this.id, idDash: this.idDash })
 
-      let newWidth =  Math.round(width/this.verticalCell);
-      let newHeight = Math.round(height/this.horizontalCell);
-      this.height = height;
-      this.width = width;
-      this.$store.commit('setSizeDash', {width: newWidth, height: newHeight, id: this.id, idDash: this.idDash});
+      let newWidth = Math.round(width / this.verticalCell)
+      let newHeight = Math.round(height / this.horizontalCell)
+      this.height = height
+      this.width = width
+      this.$store.commit('setSizeDash', {
+        width: newWidth,
+        height: newHeight,
+        id: this.id,
+        idDash: this.idDash,
+      })
     },
-    changeOpacity(event){
-      this.opacity = event;
+    changeOpacity(event) {
+      this.opacity = event
     },
-    createGrid(){
+    createGrid() {
       this.props.grid = [this.verticalCell, this.horizontalCell]
-    }
-
+    },
   }
 }
 </script>
@@ -170,11 +167,11 @@ export default {
   touch-action: none;
   position: absolute;
   box-sizing: border-box;
-  outline: none ;
+  outline: none;
   border-radius: 4px;
-  transition: transform ease 0.3s
+  transition: transform ease 0.3s;
 }
-.vdr.active.resizable{
+.vdr.active.resizable {
   outline-color: inherit;
   outline: 2px dashed;
 }

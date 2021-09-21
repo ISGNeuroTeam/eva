@@ -29,23 +29,17 @@ export default {
       state[size.idDash][size.id].width = size.width;
       state[size.idDash][size.id].height = size.height;
     },
-    // setVisualizationTab: (state, tab) => {
-    //   state[]
-    // },
-    setSearch: (state, search) => {
-      // сохранение нового search (источника данных)
-
-      if (search.reload) {
-        // если источник данных уже есть то
-        state[search.idDash].searches.forEach((item, i) => {
-          // пробегаемся по всем источникам данных
-          if (search.search.sid == item.sid) {
-            // если нашли нужный
-            state[search.idDash].searches[i] = search.search;
+    setSearch: (state, payload) => {
+      const { idDash, reload, search } = payload
+      search.status = 'empty'
+      if (reload) {
+        state[idDash].searches.forEach((item, i) => {
+          if (search.sid === item.sid) {
+            Vue.set(state[idDash].searches, i, search)
           }
-        });
+        })
       } else {
-        state[search.idDash].searches.push(search.search); // если источника данных (далее ИС, а то устал писать)  нет то просто добовляем его
+        state[idDash].searches.push(search)
       }
     },
     deleteSearch: (state, search) => {
@@ -121,152 +115,157 @@ export default {
       // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
     },
-    setTocken(state, tocken) {
+    setTocken(state, payload) {
+      const { tocken, idDash, value } = payload;
       // сохранение токена в хранилище
-
       let id = -1;
-
-      Object.keys(state[tocken.idDash].tockens).forEach(item => {
+      Object.keys(state[idDash].tockens).forEach(item => {
         // ищем пришедший токен среди всех токенов
-
         if (
-          state[tocken.idDash].tockens[item].name == tocken.tocken.name &&
-          state[tocken.idDash].tockens[item].action == tocken.tocken.action &&
-          state[tocken.idDash].tockens[item].capture == tocken.tocken.capture
+          state[idDash].tockens[item].name === tocken.name &&
+          state[idDash].tockens[item].action === tocken.action &&
+          state[idDash].tockens[item].capture === tocken.capture
         ) {
           id = item;
         }
       });
-
-      if (id != -1) {
+      if (id !== -1) {
         // если токен нашелся
 
-        state[tocken.idDash].tockens[id].value = tocken.value;
+        state[idDash].tockens[id].value = value;
 
         let eventAll = []; // сюда будем заносить все события с нужным токеном
 
-        if (state[tocken.idDash].events) {
+        if (state[idDash].events) {
           // если события вообще есть
-          state[tocken.idDash].events.forEach((item, i) => {
+          state[idDash].events.forEach((item, i) => {
             // пробегаемся по всем
-            if (item.token == state[tocken.idDash].tockens[id].name) {
+            if (item.token === state[idDash].tockens[id].name) {
               // если в нашем событии есть упоминание нашего токена
               eventAll.push(i); // то добовляем событие в заготовленный массив
             }
           });
         }
 
-        if (eventAll.length != 0) {
+        if (eventAll.length !== 0) {
           // если список события с токеном внутри есть
           let data = null;
           eventAll.forEach(item => {
             // пробегаемся по всем событиям
 
             switch (
-              state[tocken.idDash].events[item].compare // проверяем какое именно событие должно произойти
+              state[idDash].events[item].compare // проверяем какое именно событие должно произойти
             ) {
               case 'equals':
-                let value = state[tocken.idDash].tockens[id].value.replace(/\s/g, ''); // в случаях когда нужно сравнить значения токена по равенству,
+                let value = state[idDash].tockens[id].value.replace(/\s/g, ''); // в случаях когда нужно сравнить значения токена по равенству,
                 // это может быть строка, а значит нужно обрезать пробелы, чтобы сравнение было корректным
-                if (value == state[tocken.idDash].events[item].tokenval) {
+                if (value === state[idDash].events[item].tokenval) {
                   // сравниваем значения в событии и значение токена
 
-                  tocken.store.commit('letEventSet', {
-                    events: [state[tocken.idDash].events[item]],
-                    idDash: tocken.idDash,
+                  this.commit('letEventSet', {
+                    events: [state[idDash].events[item]],
+                    idDash,
                   }); // вызываем метод обновляйщий элемент
                 }
                 break;
               case 'over': // все тоже самое для других событий
                 if (
-                  state[tocken.idDash].tockens[id].value >
-                  state[tocken.idDash].events[item].tokenval
+                  state[idDash].tockens[id].value >
+                  state[idDash].events[item].tokenval
                 ) {
-                  tocken.store.commit('letEventSet', {
-                    events: [state[tocken.idDash].events[item]],
-                    idDash: tocken.idDash,
+                  this.commit('letEventSet', {
+                    events: [state[idDash].events[item]],
+                    idDash,
                   });
                 }
                 break;
               case 'less':
                 if (
-                  state[tocken.idDash].tockens[id].value <
-                  state[tocken.idDash].events[item].tokenval
+                  state[idDash].tockens[id].value <
+                  state[idDash].events[item].tokenval
                 ) {
-                  tocken.store.commit('letEventSet', {
-                    events: [state[tocken.idDash].events[item]],
-                    idDash: tocken.idDash,
+                  this.commit('letEventSet', {
+                    events: [state[idDash].events[item]],
+                    idDash,
                   });
                 }
                 break;
               case 'in': // для события вхождения значеия в массив
-                data = state[tocken.idDash].events[item].tokenval.replace(/\[|\]/g, '').split(','); // отбрасываем скобки массива и разбиваем на масив элемнетов по запятой
+                data = state[idDash].events[item].tokenval.replace(/\[|\]/g, '').split(','); // отбрасываем скобки массива и разбиваем на масив элемнетов по запятой
                 let k = -1;
                 data.forEach(item => {
                   // каждое значнеие нужно сравнить со значением в событии
-                  if (!Number(item) && Number(state[tocken.idDash].tockens[id].value)) {
+                  if (!Number(item) && Number(state[idDash].tockens[id].value)) {
                     // нам нужно проверить что это цифры сравниваются
-                    if (Number(item) == Number(state[tocken.idDash].tockens[id].value)) {
+                    if (Number(item) === Number(state[idDash].tockens[id].value)) {
                       // и если число вошло в массив чисел
                       k = 0; // то меняем переменную
                     }
                   } else {
-                    if (item == state[tocken.idDash].tockens[id].value) {
+                    if (item === state[idDash].tockens[id].value) {
                       // предполагаю что это излишне ПРОВЕРИТЬ!!!!
                       k = 0;
                     }
                   }
                 });
-                if (k != -1) {
+                if (k !== -1) {
                   // если число нашлось
-                  tocken.store.commit('letEventSet', {
-                    events: [state[tocken.idDash].events[item]],
-                    idDash: tocken.idDash,
+                  this.commit('letEventSet', {
+                    events: [state[idDash].events[item]],
+                    idDash,
                   }); // вызываем метод обновляйщий элемент
                 }
                 break;
               case 'between': // тоже самое для условия что токен внутри рамок массива
-                data = state[tocken.idDash].events[item].tokenval.replace(/\[|\]/g, '').split(',');
+                data = state[idDash].events[item].tokenval.replace(/\[|\]/g, '').split(',');
 
                 if (
                   Number(data[0]) &&
                   Number(data[1]) &&
-                  Number(state[tocken.idDash].tockens[id].value)
+                  Number(state[idDash].tockens[id].value)
                 ) {
                   // нам нужно проверить что это цифры сравниваются
                   if (
-                    Number(state[tocken.idDash].tockens[id].value) >= Number(data[0]) &&
-                    Number(state[tocken.idDash].tockens[id].value) <= Number(data[1])
+                    Number(state[idDash].tockens[id].value) >= Number(data[0]) &&
+                    Number(state[idDash].tockens[id].value) <= Number(data[1])
                   ) {
                     // и если число вошло в массив чисел
                     k = 0; // то меняем переменную
                   }
                 } else {
                   if (
-                    state[tocken.idDash].tockens[id].value >= data[0] &&
-                    state[tocken.idDash].tockens[id].value <= data[1]
+                    state[idDash].tockens[id].value >= data[0] &&
+                    state[idDash].tockens[id].value <= data[1]
                   ) {
                     // предполагаю что это излишне ПРОВЕРИТЬ!!!!
                     k = 0;
                   }
                 }
-                if (k != -1) {
+                if (k !== -1) {
                   // если число нашлось
-                  tocken.store.commit('letEventSet', {
-                    events: [state[tocken.idDash].events[item]],
-                    idDash: tocken.idDash,
+                  this.commit('letEventSet', {
+                    events: [state[idDash].events[item]],
+                    idDash,
                   }); // вызываем метод обновляйщий элемент
                 }
                 break;
             }
           });
         }
+
+        state[idDash].searches.forEach((search) => {
+          if (search.original_otl.includes(`$${tocken.name}$`)) {
+            this.commit('updateSearchStatus', {
+              idDash,
+              sid: search.sid,
+              status: 'empty',
+            })
+          }
+        })
       }
       // Add value to temp values of filter
-      if (state[tocken.idDash].focusedFilter) {
-        tocken.store.commit('addTokenToFilterParts', tocken);
-      } else {
-        this.commit('restartSearches', tocken.idDash);
+      if (state[idDash].focusedFilter) {
+        this.commit('addTokenToFilterParts', payload);
       }
     },
     setActions: (state, actions) => {
@@ -937,57 +936,23 @@ export default {
     refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
       state[idDash].filters[filterIndex].parts[filterPartIndex].values = [];
     },
-    restartSearches(state, idDash) {
-      let searches = state[idDash].searches;
-
-      searches.forEach(async item => {
-        this.commit('setLoading', {
-          search: item.sid,
-          idDash: idDash,
-          should: true,
-          error: false,
-        });
-
-        let response = await this.getters.getDataApi({
-          search: item,
-          idDash: idDash,
-        });
-        if (response.length != 0) {
-          let responseDB = this.getters.putIntoDB(response, item.sid, idDash);
-          responseDB.then(result => {
-            this.commit('setLoading', {
-              search: item.sid,
-              idDash: idDash,
-              should: false,
-              error: false,
-            });
-          });
-        } else {
-          this.commit('setLoading', {
-            search: item.sid,
-            idDash: idDash,
-            should: false,
-            error: true,
-          });
+    restartSearches(state, payload) {
+      const { idDash, filter } = payload
+      const searches = state[idDash].searches
+      searches.forEach((search) => {
+        if (search.original_otl.includes(`$${filter}$`)) {
+          this.commit('updateSearchStatus', {
+            idDash,
+            sid: search.sid,
+            status: 'empty',
+          })
         }
-      });
-      //для компонента table и single и multiLine -- сделать Should в true
-      //чтобы dashBoard еще раз сделал запрос
-      Object.keys(state[idDash]).forEach(dashElement => {
-        if (
-          !state[idDash].focusedFilter &&
-          (dashElement.includes('table') ||
-            dashElement.includes('single') ||
-            dashElement.includes('heatmap') ||
-            dashElement.includes('multiLine'))
-        ) {
-          this.commit('setShould', {
-            idDash: idDash,
-            id: dashElement,
-            status: true,
-          });
-        }
-      });
+      })
+    },
+    updateSearchStatus: (state, payload) => {
+      const { idDash, sid, status } = payload
+      const search = state[idDash].searches.find((search) => search.sid === sid)
+      Vue.set(search, 'status', status)
     },
   },
   getters: {
@@ -1023,6 +988,20 @@ export default {
         elem => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
       );
     },
+    getElementsWithSearches: state => id => {
+      return state[id].elements
+        .filter(
+          (elem) => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
+        )
+        .map((elem) => ({ elem, search: state[id][elem].search }))
+    },
+    getAllElements: state => id => {
+      if (!state[id].elements) {
+        Vue.set(state[id], 'elements', []);
+      }
+      return state[id].elements;
+    },
+
     getNameDash(state) {
       // получаем имя самого элемента
       return ids => {
@@ -1604,13 +1583,13 @@ export default {
     },
     checkAlreadyDash: state => {
       return (id, first) => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           let result = rest.getState(id, restAuth);
           result.then(stateFrom => {
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
-                if (stateFrom.body != '') {
+                if (stateFrom.body !== '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                 }
                 Vue.set(state[id], 'name', stateFrom.name);
@@ -1627,7 +1606,7 @@ export default {
                 });
               }
               if (first) {
-                if (stateFrom.body != '') {
+                if (stateFrom.body !== '') {
                   Vue.set(state, id, JSON.parse(stateFrom.body));
                   Vue.set(state[id], 'idgroup', stateFrom.idgroup);
                   Vue.set(state[id], 'name', stateFrom.name);
@@ -1640,6 +1619,9 @@ export default {
                     Vue.set(state[id][elem], 'tab', 1);
                   }
                 });
+              }
+              if (state[id].searches) {
+                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'))
               }
               resolve({ status: 'finish' });
               // }

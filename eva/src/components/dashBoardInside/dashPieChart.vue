@@ -81,21 +81,6 @@ export default {
       ],
       nodata: true,
       message: 'Нет данных для отображения',
-      // colors: {
-      //   neitral: [
-      //     '#650075','#631B8F','#3A0085','#5F27FF','#6978FF',
-      //     '#003CFF','#0070A3','#50C9FF','#AEFAFF','#FFFFFF',
-      //     '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
-      //     '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
-      //   ],
-      //   indicted: [
-      //     '#FF7F37','#EB2F2F','#920000','#600000','#D34C00',
-      //     '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
-      //     '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
-      //     '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
-      //   ],
-      //   custom: []
-      // },
       legends: [],
       positionLegends: 'row nowrap',
       selectedValue: [],
@@ -143,7 +128,7 @@ export default {
     },
     change: function() {
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
-        let graphics = d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
+        let graphics = d3.select(document.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
         if(graphics.length != 0){  
           graphics[0].remove(); 
           //если строим заново(изменились данные) - очищаем токены
@@ -156,13 +141,19 @@ export default {
       }
       return true  
     },
-  },  
+  },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
+  },
+  beforeUpdate() {
+    this.setMetrics()
+  },
   methods: {
-    setMetrics(){
+    setMetrics() {
       this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDashFrom, id: this.idFrom });
       this.$store.commit('setThemePie', {
         themes: this.colors,
-        idDash: this.idDashFrom, 
+        idDash: this.idDashFrom,
         id: this.idFrom
       });
     },
@@ -170,7 +161,7 @@ export default {
 
       if(this.dataRestFrom.error) {  // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
-      } 
+      }
 
       let showlegend = this.dashOptions.showlegend;
 
@@ -217,13 +208,13 @@ export default {
           let legendsSize = {};
           if (this.legends.length > 0) {
             let timeOut = setTimeout( function tick() {  // важно чтобы наш график построился толкьо после того когда создался блок с легендой
-                
-              if (this.$refs.legends.getBoundingClientRect().width != 0) { 
+
+              if (this.$refs.legends.getBoundingClientRect().width != 0) {
                 legendsSize = {width: Math.round(this.$refs.legends.getBoundingClientRect().width), height: Math.round(this.$refs.legends.getBoundingClientRect().height)};
                 this.createPieChart(this.dataRestFrom, this, this.dashSize, metrics, legendsSize, positionlegend, colorsPie); // и собственно создаем график
                 clearTimeout(timeOut);
               } else {
-                timeOut = setTimeout(tick.bind(this), 100); 
+                timeOut = setTimeout(tick.bind(this), 100);
               }
             }.bind(this), 0);
 
@@ -248,35 +239,32 @@ export default {
         })
       }
     },
-
     createPieChart: function (dataFrom,that,sizeLine,metrics,legendsSize,positionlegend,colorsPie) {  // создает диаграмму
       d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove();
       let width = sizeLine['width']-40; // отступ по бокам
       let height = sizeLine['height']-35; // минус шапка
       let margin = 40; // отступ от контейнера
 
-      switch(positionlegend ) {
-
+      switch (positionlegend) {
         case 'right':
-          this.positionLegends = 'row nowrap';
-          width = width - legendsSize.width;
+          this.positionLegends = 'row nowrap'
+          width = width - legendsSize.width
           break
 
         case 'left':
-          this.positionLegends = 'row-reverse nowrap';
-          width = width - legendsSize.width;
+          this.positionLegends = 'row-reverse nowrap'
+          width = width - legendsSize.width
           break
 
         case 'top':
-          this.positionLegends = 'column-reverse nowrap';
-          height = height - legendsSize.height - 40;  // 40 - margin у legends
+          this.positionLegends = 'column-reverse nowrap'
+          height = height - legendsSize.height - 40
           break
 
         case 'bottom':
-          this.positionLegends = 'column nowrap';
-          height = height - legendsSize.height - 40;
+          this.positionLegends = 'column nowrap'
+          height = height - legendsSize.height - 40
           break
-  
       }
 
       let radius = Math.min(width, height) / 2 - margin // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
@@ -317,7 +305,7 @@ export default {
 
       let selectedValue = this.selectedValue
 
-      svg   // строим круговую диаграмму  - по сути каждая часть это жлемент path нарисованный через arc функцию
+      svg
         .selectAll('pies')
         .data(data_ready)
         .enter()
@@ -328,7 +316,7 @@ export default {
         )
         .attr('class',function(d) {
           let index = selectedValue.indexOf(`(${d.data.key},${d.data.value})`);
-          if (index != -1) {
+          if (index !== -1) {
             return 'piepart piepartSelect'
           } else {
             return 'piepart'
@@ -389,7 +377,7 @@ export default {
         value += ']';
       } else if (this.selectedValue.length == 1) {
         value = this.selectedValue[0]
-      } 
+      }
       let tockens = this.$store.getters.getTockens(this.idDashFrom);
       let tocken = {};
 
@@ -401,16 +389,9 @@ export default {
         }
         if (tockens[i].elem == this.idFrom && tockens[i].action == 'click') {
           this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDashFrom, value: value, store: this.$store });
-        } 
+        }
       })
-
     }
-  },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-  },
-  beforeUpdate() {
-    this.setMetrics()
   }
 }
 

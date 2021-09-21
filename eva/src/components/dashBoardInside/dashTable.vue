@@ -29,7 +29,7 @@
 export default {
   props: {
     dataRestFrom: null,
-    shouldGet: null,
+    //shouldGet: null,
     idFrom: null,
     idDashFrom: null,
     heightFrom: null,

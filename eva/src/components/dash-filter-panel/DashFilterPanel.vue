@@ -326,7 +326,7 @@
       applyTempParts() {
         this.$store.commit('sortFilterParts', { idDash: this.idDashFrom });
         this.$store.commit('clearFocusedFilter', this.idDashFrom);
-        this.$store.commit('restartSearches', this.idDashFrom);
+        this.$store.commit('restartSearches', { idDash: this.idDashFrom, filter: this.filters[this.focusedRow].id});
         this.focusedRow = null;
         this.filterChanged = false;
       },
