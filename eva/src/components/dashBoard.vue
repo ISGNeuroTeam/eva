@@ -72,10 +72,139 @@
             />
           </div>
         </div>
-        <div class="settings-dash-block" v-show="dataMode">
+        <div class="settings-dash-block" >
+          <div class="settings-dash">
+            <v-dialog v-model="fullScreenMode" >
+              <template v-slot:activator="{ on: onFullScreen }"  >
+                <v-tooltip
+                  bottom
+                  :color="theme.$accent_ui_color"
+                >
+                  <template v-slot:activator="{ on: onTooltip }"  >
+                    <v-icon
+                      class="expand"
+                      :color="theme.$main_border"
+                      v-on="{...onFullScreen,...onTooltip}"
+                      @click="fullScreenMode=!fullScreenMode"
+                    >
+                      {{ props.mdiArrowExpand }}
+                    </v-icon>
+                  </template>
+                  <span>На весь экран</span>
+                </v-tooltip>
+              </template>
+              <div class="full-screen-dialog">
+                <v-card
+                  class="dash-block"
+                  :style="{background:theme.$main_bg, boxShadow:`0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`}"
+                >
+                  <v-card-title
+                    v-show="props.disappear"
+                    class="card-title open_title"
+                  >
+                    <div class="name-dash">
+                      <v-icon
+                        v-if="dataFromDB"
+                        class="icon"
+                        :color="theme.$main_border"
+                      >
+                        {{ mdiDatabaseSearch }}
+                      </v-icon>
+                      <v-icon
+                        v-show="dataMode"
+                        class="icon chart"
+                        :color="theme.$accent_ui_color"
+                      >
+                        {{ props.icons[elemIcon] }}
+                      </v-icon>
+                      <div class="dash-capture">
+                        <div
+                          v-if="props.edit"
+                          class="dash-title"
+                          :style="{color:theme.$main_text}"
+                        >
+                          {{ props.name }}
+                        </div>
+                        <div
+                          v-if="props.edit"
+                          v-show="dataMode"
+                          class="dash-block-id"
+                          :style="{color:theme.$main_text}"
+                        >
+                          [ {{ element }} ]
+                        </div>
+                        <div
+                          v-if="props.edit"
+                          v-show="dataMode"
+                          class="dash-block-sid"
+                          :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+                        >
+                          {{ props.sid }}
+                        </div>
+                        <v-text-field
+                          v-if="!props.edit"
+                          v-show="dataMode"
+                          v-model="props.name"
+                          clearable
+                          :color="theme.$accent_ui_color"
+                          :style="{color:theme.$title}"
+                          class="dash-edit-title"
+                          hide-details
+                        />
+                      </div>
+                    </div>
+                    <div class="settings-dash-block" >
+                      <div class="settings-dash">
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                        >
+                          <template v-slot:activator="{ on }"  >
+                            <v-icon
+                              class="expand"
+                              :color="theme.$main_border"
+                              v-on="on"
+                              @click="fullScreenMode=!fullScreenMode"
+                            >
+                              {{ props.mdiArrowCollapse }}
+                            </v-icon>
+                          </template>
+                          <span>Свернуть</span>
+                        </v-tooltip>
+                      </div>
+                    </div>
+                  </v-card-title>
+                  <v-card-text
+                    :is="currentElem"
+                    v-show="showElement"
+                    class="card-text element-itself"
+                    :colorFrom="theme"
+                    :style="{color:theme.$main_text, background:'transparent'}"
+                    :idFrom="element"
+                    :idDashFrom="idDash"
+                    :dataRestFrom="props.dataRestFilter"
+                    :dataModeFrom="dataMode"
+                    :shouldFrom="shouldGet"
+                    :timeFormatFrom="props.timeFormat"
+                    :sizeTileFrom="props.sizeTile"
+                    :tooltipFrom="props.tooltip"
+                    :widthFrom="width"
+                    :heightFrom="height"
+                    :titles="getSelectedTableTitles(idDash, element)"
+                    :options="props.options"
+                    @hideDS="hideDS($event)"
+                    @setVissible="setVissible($event)"
+                    @setLoading="setLoading($event)"
+                    @hideLoading="props.hideLoad = true"
+                  />
+                </v-card>
+              </div>
+            </v-dialog>
+          </div>
           <div
             class="settings-dash"
             :class="{settings_move:props.open_gear}"
+            v-show="dataMode"
           >
             <v-tooltip
               bottom
@@ -221,7 +350,7 @@
 
 <script>
 
-import { mdiPencil, mdiCheckBold, mdiClose, mdiArrowAll, mdiArrowExpandAll, mdiCodeTags, mdiTrashCanOutline, mdiDatabase, mdiSettings, mdiChevronDown, mdiChevronUp, mdiDatabaseSearch, mdiArrowDownBold } from '@mdi/js'
+import { mdiPencil, mdiCheckBold, mdiClose, mdiArrowAll, mdiArrowExpandAll, mdiCodeTags, mdiTrashCanOutline, mdiDatabase, mdiSettings, mdiChevronDown, mdiChevronUp, mdiDatabaseSearch, mdiArrowDownBold, mdiArrowExpand, mdiArrowCollapse } from '@mdi/js'
 import { mapGetters } from 'vuex';
 import  settings  from '../js/componentsSettings.js'
 
@@ -241,6 +370,7 @@ export default {
       dataFromDB: true,
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
+      fullScreenMode:false,
       props: {
         id: '',
         sid: '',
@@ -256,6 +386,8 @@ export default {
         mdiSettings: mdiSettings,
         mdiChevronUp: mdiChevronUp,
         mdiChevronDown: mdiChevronDown,
+        mdiArrowExpand: mdiArrowExpand,
+        mdiArrowCollapse: mdiArrowCollapse,
         icons: {},
         edit: true,
         edit_icon: true,

@@ -186,17 +186,17 @@
 
             let tokens = this.$store.getters.getTockens(this.idDash);
 
-           tokens.forEach(token => {
-              if (token.elem == this.id && token.action == 'click' && headers[cellRowIndex]===token.capture) {
-                let value = event.target.textContent
-                this.$store.commit('setTocken', {
-                  tocken: token,
-                  idDash: this.idDash,
-                  store: this.$store,
-                  value,
-                });
-              };
-            });
+            tokens.forEach(token => {
+                if (token.elem == this.id && token.action == 'click' && headers[cellRowIndex]===token.capture) {
+                  let value = event.target.textContent
+                  this.$store.commit('setTocken', {
+                    tocken: token,
+                    idDash: this.idDash,
+                    store: this.$store,
+                    value,
+                  });
+                };
+              });
 
             let events = this.$store.getters.getEvents({
               idDash: this.idDash,
