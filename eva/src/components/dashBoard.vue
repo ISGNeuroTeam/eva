@@ -170,12 +170,11 @@
                     v-show="showElement"
                     class="card-text element-itself"
                     :colorFrom="theme"
-                    :style="{color:theme.$main_text, background:'transparent'}"
+                    :style="{ color: theme.$main_text, background: 'transparent' }"
                     :idFrom="element"
                     :idDashFrom="idDash"
-                    :dataRestFrom="props.dataRestFilter"
+                    :dataRestFrom="searchData"
                     :dataModeFrom="dataMode"
-                    :shouldFrom="shouldGet"
                     :timeFormatFrom="props.timeFormat"
                     :sizeTileFrom="props.sizeTile"
                     :tooltipFrom="props.tooltip"
@@ -201,7 +200,7 @@
               bottom
               :color="theme.$accent_ui_color"
             >
-              <template v-slot:activator="{ on }"  >
+              <template v-slot:activator="{ on }">
                 <v-icon
                   class="datasource"
                   :color="theme.$main_border"
