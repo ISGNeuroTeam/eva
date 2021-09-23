@@ -292,6 +292,7 @@ export default {
 
     this.$refs['tab-panel'].onwheel = this.scroll
     this.checkTabOverflow()
+    window.onresize = this.checkTabOverflow
   },
   methods: {
     scroll(event) {
@@ -308,7 +309,7 @@ export default {
         const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel']
         scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false)
         if (clientWidth < scrollWidth) {
-          this.rightDots = clientWidth + scrollLeft !== scrollWidth
+          this.rightDots = Math.floor(clientWidth + scrollLeft) !== scrollWidth
         } else this.rightDots = false
       }, 0)
     },
