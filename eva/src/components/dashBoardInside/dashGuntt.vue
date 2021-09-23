@@ -61,7 +61,7 @@ export default {
       ],
       msgText: 'Нет данных для отображения',
       noMsg: true,
-      colors: [this.colorFrom.controls,this.colorFrom.controlsActive,'#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22'],
+      colors: [this.colorFrom.controls || this.colorFrom.$accent_ui_color,this.colorFrom.controlsActive || this.colorFrom.$primary_button_hover,'#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22'],
       legends: [],
       firstTime: true // определяем первый ли раз зашли на страницу, ничего лучше не придумал
     } 
@@ -421,7 +421,6 @@ export default {
           return width;
         })
         .attr("height", barHeight)
-        .attr("fill",'none')
         .attr("stroke", "none")
         .attr("opacity", 0.2);
 
@@ -459,7 +458,8 @@ export default {
               j = i;
             }
           })
-          return this.colors[j]
+          
+          return this.colors.filter(Boolean)[j]
         });
                                     
 
@@ -481,13 +481,13 @@ export default {
           })
         }
 
-        moveTooltip();
+        moveTooltip(event);
 
         tooltipBlock.innerHTML = tooltip;
         tooltipBlock.style.opacity = '0.9';
         tooltipBlock.style.visibility = 'visible';
-      }).on('mousemove', function() {
-        moveTooltip();
+      }).on('mousemove', function(event) {
+        moveTooltip(event);
 
       }).on('mouseout', function() {
         tooltipBlock.style.opacity = '0';
@@ -529,8 +529,8 @@ export default {
 
         tooltipBlock.style.opacity = '0.9';
         tooltipBlock.style.visibility = 'visible';
-      }).on('mousemove', function() {
-        moveTooltip();
+      }).on('mousemove', function(event) {
+        moveTooltip(event);
       }).on('mouseout', function() {
         tooltipBlock.style.opacity = '0';
         tooltipBlock.style.visibility = 'hidden';
@@ -626,19 +626,18 @@ export default {
       // легенда
 
 
-      function moveTooltip() {
-        let x = d3.event.layerX + 10;
-        let y = d3.event.layerY -10 - tooltipBlock.offsetHeight;
-        if (y < 0) {
-          y = 0;
-          x += 5;
-        }
-        if(x-20+tooltipBlock.offsetWidth>width-otstupRight) {
-          x = d3.event.layerX - 10 - tooltipBlock.offsetWidth;
-        }
-            
-        tooltipBlock.style.top = y+'px';
-        tooltipBlock.style.left = x+'px';
+      function moveTooltip(event) {
+        let x = d3.event.offsetY - 50;
+        let y = d3.event.offsetX + 30;
+        // if (y < 0) {
+        //   y = 0;
+        //   x += 5;
+        // }
+        // if(x-20+tooltipBlock.offsetWidth>width-otstupRight) {
+        //   x = d3.event.layerX - 10 - tooltipBlock.offsetWidth;
+        // }
+        tooltipBlock.style.top = x+'px';
+        tooltipBlock.style.left = y+'px';
       }
 
       function transformDescription(text) {
