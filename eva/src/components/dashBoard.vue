@@ -296,6 +296,7 @@
         :idDashFrom="idDash"
         :dataRestFrom="searchData"
         :dataModeFrom="dataMode"
+        :loading="loading"
         :timeFormatFrom="props.timeFormat"
         :sizeTileFrom="props.sizeTile"
         :tooltipFrom="props.tooltip"
