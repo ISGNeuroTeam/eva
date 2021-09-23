@@ -10,6 +10,7 @@
         }
       "
       @openSettings="openSettings"
+      @downloadData="exportDataCSV"
     />
     <div class="body-block">
       <v-card
@@ -64,6 +65,7 @@
             :vertical-cell="verticalCell"
             :searchData="getElementData(elem)"
             :loading="checkLoading(elem)"
+            @downloadData="exportDataCSV"
           />
           <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
@@ -295,6 +297,21 @@ export default {
     window.onresize = this.checkTabOverflow
   },
   methods: {
+    exportDataCSV(searchName) {
+      const searchData = this.dataObject[searchName].data
+      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
+      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
+      csvContent += encodeURIComponent(
+        searchData.map((item) => Object.values(item).join(',')).join('\n')
+      )
+
+      const link = document.createElement('a') // создаем ссылку
+      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('download', `${this.idDash}-${searchName}.csv`) // указываем имя файла
+      link.click() // жмем на скачку
+      link.remove() // удаляем ссылку
+    },
     scroll(event) {
       // event.preventDefault()
       this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY

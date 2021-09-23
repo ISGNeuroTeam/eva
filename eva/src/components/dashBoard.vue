@@ -699,22 +699,11 @@ export default {
     //   return response
     // },
     exportDataCSV() {
-      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
-      let keys = Object.keys(this.searchData[0]) // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
-      csvContent += encodeURIComponent(
-        this.searchData.map((item) => Object.values(item).join(',')).join('\n')
-      )
-
-      const link = document.createElement('a') // создаем ссылку
-      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
       const searchId = this.$store.getters.getSearchID({
         idDash: this.idDash,
         id: this.element,
       })
-      link.setAttribute('download', `${this.idDash}-${searchId}.csv`) // указываем имя файла
-      link.click() // жмем на скачку
-      link.remove() // удаляем ссылку
+      this.$emit('downloadData', searchId)
     },
 
     // moveElem: function (props) {  // переключаем режим разрешения перемещения элемента

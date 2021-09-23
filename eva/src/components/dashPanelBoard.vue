@@ -264,7 +264,7 @@
               <v-icon
                 class="search-clock"
                 :color="theme.$primary_button"
-                :disabled="disabledDS[search.sid]"
+                :disabled="search.status !== 'downloaded'"
                 v-on="on"
                 @click="exportSearch(search.sid)"
               >
@@ -1309,63 +1309,64 @@ export default {
       }
     },
     exportSearch: function (sid) {
-      let db = null;
-
-      let request = indexedDB.open('EVA', 1);
-
-      request.onerror = function (event) {
-        console.log('error: ', event);
-      };
-
-      request.onupgradeneeded = event => {
-        console.log('create');
-        db = event.target.result;
-        if (!db.objectStoreNames.contains('searches')) {
-          // if there's no "books" store
-          db.createObjectStore('searches'); // create it
-        }
-
-        request.onsuccess = event => {
-          db = request.result;
-          console.log('successEvent: ' + db);
-        };
-      };
-
-      let promise = new Promise((resolve, reject) => {
-        request.onsuccess = event => {
-          db = request.result;
-
-          let transaction = db.transaction('searches'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
-
-          let query = searches.get(`${this.idDash}-${sid}`); // (3) return store.get('Ire Aderinokun');
-
-          query.onsuccess = event => {
-            // (4)
-            resolve(query.result);
-          };
-
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
-          };
-        };
-      });
-
-      promise.then(res => {
-        let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
-        let keys = Object.keys(res[0]); // получаем ключи для заголовков столбцов
-        csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
-        csvContent += encodeURIComponent(
-          res.map(item => Object.values(item).join(',')).join('\n')
-        ); // добовляем все значения по ключам в файл
-        let link = this.$refs.blockCode.appendChild(document.createElement('a')); // создаем ссылку
-        link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
-        link.setAttribute('download', `${this.idDash}-${sid}.csv`); // указываем имя файла
-        link.click(); // жмем на скачку
-        link.remove(); // удаляем ссылку
-      });
+      this.$emit('downloadData', sid)
+      // let db = null;
+      //
+      // let request = indexedDB.open('EVA', 1);
+      //
+      // request.onerror = function (event) {
+      //   console.log('error: ', event);
+      // };
+      //
+      // request.onupgradeneeded = event => {
+      //   console.log('create');
+      //   db = event.target.result;
+      //   if (!db.objectStoreNames.contains('searches')) {
+      //     // if there's no "books" store
+      //     db.createObjectStore('searches'); // create it
+      //   }
+      //
+      //   request.onsuccess = event => {
+      //     db = request.result;
+      //     console.log('successEvent: ' + db);
+      //   };
+      // };
+      //
+      // let promise = new Promise((resolve, reject) => {
+      //   request.onsuccess = event => {
+      //     db = request.result;
+      //
+      //     let transaction = db.transaction('searches'); // (1)
+      //
+      //     // получить хранилище объектов для работы с ним
+      //     let searches = transaction.objectStore('searches'); // (2)
+      //
+      //     let query = searches.get(`${this.idDash}-${sid}`); // (3) return store.get('Ire Aderinokun');
+      //
+      //     query.onsuccess = event => {
+      //       // (4)
+      //       resolve(query.result);
+      //     };
+      //
+      //     query.onerror = function () {
+      //       console.log('Ошибка', query.error);
+      //     };
+      //   };
+      // });
+      //
+      // promise.then(res => {
+      //   let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
+      //   let keys = Object.keys(res[0]); // получаем ключи для заголовков столбцов
+      //   csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
+      //   csvContent += encodeURIComponent(
+      //     res.map(item => Object.values(item).join(',')).join('\n')
+      //   ); // добовляем все значения по ключам в файл
+      //   let link = this.$refs.blockCode.appendChild(document.createElement('a')); // создаем ссылку
+      //   link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
+      //   link.setAttribute('download', `${this.idDash}-${sid}.csv`); // указываем имя файла
+      //   link.click(); // жмем на скачку
+      //   link.remove(); // удаляем ссылку
+      // });
     },
     checkDataSearch: async function (sid) {
       let response = await this.$store.getters.checkDataSearch(`${this.idDash}-${sid}`);
