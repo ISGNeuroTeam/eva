@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Added
 - zoom in/out and fitContent control buttons in graph component
+- control buttons on graph component disabled when data is loading
+- overflow dots in tab panel from right and left sides of panel
+- scroll without shift of tab panel
+
+### Changed 
+- max width of tab is 200px
 
 ### Fixed
 - bug with custom themes crushing application

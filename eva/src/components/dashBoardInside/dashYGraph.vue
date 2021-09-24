@@ -9,6 +9,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
+              :disabled="loading"
               v-on="on"
               @click="changeInputMode"
             >
@@ -25,6 +26,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
               v-on="on"
               @click="zoomIn"
             >
@@ -41,6 +43,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
               v-on="on"
               @click="zoomOut"
             >
@@ -57,6 +60,7 @@
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
               v-on="on"
               @click="fitContent"
             >
@@ -85,7 +89,10 @@ export default {
     idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
     colorFrom: null,  // цветовые переменные
-    dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
+    loading: {
+      type: Boolean,
+      default: true,
+    },  // сообщает что компонент в режиме получения данных
   },
   data () {
     return {
@@ -139,6 +146,7 @@ export default {
       this.colorFont()
       this.colorNodes()
       this.colorEdges()
+      this.fitContent()
     }, 100)
     // this.$graphComponent.fitGraphBounds()
   },

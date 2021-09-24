@@ -9,9 +9,11 @@
       </div>
       <v-tooltip bottom :color="theme.$accent_ui_color">
         <template v-slot:activator="{ on }">
-          <v-icon class="home" :color="theme.$secondary_text" v-on="on" @click="toHome">
-            {{ home }}
-          </v-icon>
+          <router-link to="main">
+            <v-icon class="home" :color="theme.$secondary_text" v-on="on">
+              {{ home }}
+            </v-icon>
+          </router-link>
         </template>
         <span>На главную</span>
       </v-tooltip>
@@ -40,16 +42,22 @@
           <span>Открыть окно логов</span>
         </v-tooltip>
       </div>
-      <v-menu :nudge-width="100" class="profile-block" offset-y>
-        <template v-slot:activator="{ on }">
-          <div class="dropdown-profile" v-on="on">
-            <v-icon :style="{ color: theme.$secondary_text }" class="profile theme--dark">
-              {{ profile_icon }}
-            </v-icon>
-            <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
-              {{ login }}
-            </div>
-          </div>
+
+      <v-menu :nudge-width="100" :rounded="false" offset-y>
+        <template v-slot:activator="{ on: onMenu }">
+          <v-tooltip bottom :color="theme.$accent_ui_color">
+            <template v-slot:activator="{ on: onTooltip }">
+              <div class="dropdown-profile" v-on="{ ...onMenu, ...onTooltip }">
+                <v-icon :style="{ color: theme.$secondary_text }" class="profile theme--dark">
+                  {{ profile_icon }}
+                </v-icon>
+                <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
+                  {{ login }}
+                </div>
+              </div>
+            </template>
+            <span>Меню профиля</span>
+          </v-tooltip>
         </template>
         <v-list class="profile-dropdown--list">
           <v-list-item>
@@ -57,7 +65,7 @@
           </v-list-item>
           <div v-for="item in profileDropdownButtons" :key="item.id">
             <v-list-item v-if="!item.hide">
-              <v-btn class="profile-dropdown--button" icon v-on="on" @click="item.onClick">
+              <v-btn class="profile-dropdown--button" icon @click="item.onClick">
                 <v-icon class="edit icon-aut" :color="theme.$secondary_text">
                   {{ item.icon }}
                 </v-icon>
