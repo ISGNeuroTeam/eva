@@ -606,7 +606,7 @@ export default {
       
       // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({}, event.event);
-      console.log("hello", item)
+      console.log("hello", event)
       if (item.prop[0] != '') {
         let tockens = state[event.idDash].tockens;
         let id = -1;
@@ -678,6 +678,7 @@ export default {
         });
 
         event.route.push(`/dashboards/${id}`);
+        
 
         let searches = state[id].searches;
 
@@ -722,6 +723,7 @@ export default {
             });
           });
         }
+        //event.route.go();
       }
     },
     setModalSettings: (state, settings) => {

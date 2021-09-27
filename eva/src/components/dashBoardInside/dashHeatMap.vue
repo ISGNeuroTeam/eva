@@ -15,7 +15,10 @@
         </thead>
         <tbody>
           <tr v-for="x in filteredX" :key="x">
-            <td class="text-left" v-text="x"/>
+            <td class="text-left" v-text="x" v-if="xFieldFormat != 'Пользователь'"/>
+            <td class="text-left" v-else>
+              hello
+            </td>
             <td v-for="y in filteredY" :key="y" class="py-2">
               <DashHeatMapLinear
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"

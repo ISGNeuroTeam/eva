@@ -197,7 +197,7 @@ export default {
             function tick() {
               console.log(table)
               console.log(table.querySelectorAll("thead th"))
-              debugger
+              table.querySelectorAll("thead th").style ="background-color: red";
               if (table.querySelectorAll("thead th").length != 0) {
                 clearTimeout(readyTh);
                 let sp = 0;
@@ -212,7 +212,9 @@ export default {
 
                 table.querySelectorAll("tbody tr").forEach((itemRow) => {
                   itemRow.querySelectorAll("td").forEach((itemTd, i) => {
+                    console.log(itemRow);
                     if (i == column) {
+                      console.log("eq", itemTd.innerText, eventObj[index]["row"])
                       let needItem = null,
                         row,
                         k = -1;
