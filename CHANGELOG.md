@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+### Added
+- heatmap progress-bar for the full table cell width
 
 ## [1.66.0]
 ### Added
@@ -15,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - scroll without shift of tab panel
 - can take token from fullscreen table
 
-### Changed 
+### Changed
 - max width of tab is 200px
 
 ### Fixed
