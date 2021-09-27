@@ -10,9 +10,9 @@
       {{ props.message }}
     </div>
     <div
-      v-show="!dataLoading" 
-      :class="props.class" 
-      class="dash-multi" 
+      v-show="!dataLoading"
+      :class="props.class"
+      class="dash-multi"
       :data-status="change"
     />
     <div 
@@ -150,6 +150,10 @@ export default {
       this.setMetrics();
     }
   },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.props.actions, idDash: this.idDash, id: this.id });
+    this.$refs.lineChart.parentElement.style.overflow = 'hidden';
+  },
   methods: {
     getDataAsynchrony: function() {
       let united = this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).united;
@@ -160,8 +164,6 @@ export default {
         metricsOpt = [...[],...this.$store.getters.getOptions({idDash: this.idDash, id: this.id}).metrics];
       }
       let prom = new Promise( resolve => { // создаем promise чтобы затем отрисовать график асинхронно
-
-
         let sizeLine = {'width': 0,'height': 0};  // получаем размеры от родителя
         sizeLine['width'] = this.width;
         sizeLine['height'] = this.height;
@@ -191,11 +193,11 @@ export default {
           this.props.nodata = false; // то убираем соощение о отсутствии данных
           this.props.result = this.dataRestFrom;  // заносим все данные в переменную
 
-          if (this.props.legends.length == 0) {
+          if (this.props.legends.length === 0) {
             this.metrics = [];
 
             let metricsName = Object.keys(this.props.result[0]).filter( item => {
-              if (item.indexOf('caption') == -1 && item.indexOf('annotation') == -1) {
+              if (item.indexOf('caption') === -1 && item.indexOf('annotation') === -1) {
                 return item
               }
             });
@@ -233,10 +235,10 @@ export default {
         }
       });
     },
-    setMetrics: function() {
+    setMetrics () {
       this.$store.commit('setMetricsMulti', {metrics: this.metrics, idDash: this.idDash, id: this.id });
     },
-    createLineChart: function (props,that,sizeLine,time,united,lastDot,timeFormat,metricsOpt) {  // создает график
+    createLineChart (props,that,sizeLine,time,united,lastDot,timeFormat,metricsOpt) {  // создает график
       let colorLine = this.colorLegends;
 
       let otstupBottom = 50;
@@ -246,14 +248,13 @@ export default {
 
       let otstupTop = this.$refs.legends.getBoundingClientRect().height;
       // устанавливаем размер и отступы графика
-      let margin = {top: otstupTop-10, right: 20, bottom: 20, left: 40},
+      let margin = {top: otstupTop-10, right: 50, bottom: 20, left: 70},
         width = sizeLine.width - margin.left - margin.right - 20,
         height = sizeLine.height - margin.top - margin.bottom - otstupBottom;
 
-
       let graphics = d3.select(this.$el.querySelector('.dash-multi')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график
 
-      if(graphics.length != 0){  // если график уже есть
+      if(graphics.length !== 0){  // если график уже есть
         graphics[0].remove(); // удаляем его
       }
 
@@ -271,7 +272,7 @@ export default {
       let metricsName = [...[],...that.metrics];  // массив из всех метрик что доступны на графике и в нужном нам порядке
       metricsName.splice(0,1);
 
-      if(metricsName.length == 0){ // если метрик вообще не найдено
+      if(metricsName.length === 0){ // если метрик вообще не найдено
         this.props.nodata = true;  // показываем сообщение о некорректности данных
         this.props.result = [];  // очищаем массив результатов
         this.props.message = "Ни одной метрики не найдено. Проверьте корректность данных";  // выводим сообщение
@@ -325,6 +326,7 @@ export default {
         //.attr("data-id",props.id)
         .attr('class',"graph-svg")
         .append("g")
+        .attr('class',"main-g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       // добовляем ось x
@@ -347,11 +349,10 @@ export default {
       }
 
       let annotation = Object.keys(data[0]).filter( item => {
-        if (item.indexOf('annotation') != -1) {
+        if (item.indexOf('annotation') !== -1) {
           return item
         }
       })
-
 
       if (time) {
         !timeFormat ? timeFormat = '%Y-%m-%d %H:%M:%S' : false;
@@ -362,7 +363,7 @@ export default {
             .tickFormat(d3.timeFormat(timeFormat))
             .tickValues(
               x.ticks().filter( (item,i) => {
-                if (i%deliter == 0) {
+                if (i%deliter === 0) {
                   return item
                 }
               })
@@ -383,7 +384,7 @@ export default {
       verticalLineX();
 
       // создаем область графика, все-что вне этой области не будет отрисованно
-      let clip = svg.append("defs").append("svg:clipPath")
+      svg.append("defs").append("svg:clipPath")
         .attr("id", `clip-${that.id}`)
         .append("svg:rect")
         .attr("width", width )
@@ -418,7 +419,6 @@ export default {
           .attr("class","yAxis")
           .call(d3.axisLeft(y).ticks(y.ticks().length/2));
 
-
         // отрисуем сетку сперва для вертикальных тиков
         svg.selectAll("g.yAxis g.tick")
           .append("line")
@@ -429,8 +429,6 @@ export default {
           .attr("y2", 0)
           .attr("stroke", this.theme.$main_text)
           .style("opacity", "0.3");
-
-        // создаем tooltip
 
         let tooltip = d3.select(this.$el.querySelector('.dash-multi'))
           .append("div")
@@ -470,15 +468,11 @@ export default {
         line =  svg.append('g')  // основная линия графика
           .attr("clip-path", `url(#clip-${that.id})`)
 
-
-
-
         AllLinesWithBreak = [];
 
         let mustSee = [];
 
         metricsName.forEach( (item,i) => {
-
           let nullValue = -1;
           let dotDate = null;
           let linesWithBreak = [];
@@ -486,16 +480,17 @@ export default {
           let allDotHover = [];
           if (extraDot.length > 0) {
             extraDot.forEach( (item,j) => {
-              if (metricsName[i] == item.column) {
+              if (metricsName[i] === item.column) {
                 nullValue = j
               }
             })
           }
-          if(nullValue == -1) {
+
+          if(nullValue === -1) {
 
             data.forEach( line => {
-              if (!Number(line[metricsName[i]]) && line[metricsName[i]] != 0) {
-                onelinesWithBreak.length == 1 ? mustSee.push(onelinesWithBreak[0]) : false;
+              if (!Number(line[metricsName[i]]) && line[metricsName[i]] !== 0) {
+                onelinesWithBreak.length === 1 ? mustSee.push(onelinesWithBreak[0]) : false;
                 linesWithBreak.push(onelinesWithBreak);
                 onelinesWithBreak = [];
               } else {
@@ -503,8 +498,7 @@ export default {
               }
             })
 
-
-            onelinesWithBreak.length == 1 ? mustSee.push(onelinesWithBreak[0]) : false;
+            onelinesWithBreak.length === 1 ? mustSee.push(onelinesWithBreak[0]) : false;
             linesWithBreak.push(onelinesWithBreak);
             AllLinesWithBreak.push(linesWithBreak);
             linesWithBreak.forEach( (lineItself,j) => {
@@ -520,29 +514,24 @@ export default {
                   .y(function(d) {return y(d[metricsName[i]]) })
                 )
             })
-
-
             dotDate = data;
-
           } else {
             dotDate = [extraDot[nullValue]];
           }
-
-
           svg
             .append("g")
             .selectAll('dot')
             .data(dotDate)
             .enter()
             .append("circle")
-            .attr("cx", function(d) { return x(d[xMetric]*secondTransf) } )
-            .attr("cy", function(d) {  return y(d[metricsName[i]])  } )
+            .attr("cx", function(d) { return x(d[xMetric]*secondTransf)})
+            .attr("cy", function(d) { return y(d[metricsName[i]])})
             .attr("r", 5)
             .attr('metric',metricsName[i])
             .attr("fill",colorLine[i])
             .style("opacity",function(d,j) {
               let opacity = 0;
-              if (nullValue != -1) {
+              if (nullValue !== -1) {
                 opacity =  1
               }
               mustSee.forEach( item => {
@@ -551,7 +540,7 @@ export default {
                 }
               })
               if (lastDot) {
-                if (j == data.length-1) { // если это последняя точка, то
+                if (j === data.length-1) { // если это последняя точка, то
                   opacity = 1;  // и постоянно ее отображаем
                   putLabelDot('data-last-dote',`last-dot-text-${metricsName[i]}`,d,y(d[metricsName[i]])-5,metricsName[i],this,that,'line',brushObj);
                 }
@@ -561,13 +550,12 @@ export default {
                 putLabelDot('data-with-caption',`caption-dot-text-${metricsName[i]}`,d,y(d[metricsName[i]])-5,`_${metricsName[i]}_caption`,this,that,'line',brushObj);
               }
 
-              if (annotation.length != 0) {
+              if (annotation.length !== 0) {
                 annotation.forEach( (item,i) => {
                   if (d[item]) {
                     verticalLine(d,item,metricsName.length+1+i,tooltip, this.strokewidth);
 
                   }
-
                 })
               }
               return opacity
@@ -582,10 +570,10 @@ export default {
               }
               let text =  '';
               Object.keys(d).forEach( key => {
-                if (key == xMetric) {
+                if (key === xMetric) {
                   text += `<p><span>${key}</span> : ${xVal}</p>`;
                 } else {
-                  if (key.indexOf('annotation') == -1) {
+                  if (key.indexOf('annotation') === -1) {
                     text += `<p><span>${key}</span> : ${d[key]}</p>`;
                   }
 
@@ -615,7 +603,7 @@ export default {
 
               allDotHover = svg.selectAll('circle').nodes().filter( dot => {
                 if(dot.classList.contains('dot')){
-                  if (dot.getAttribute('cx') == x(d[xMetric]*secondTransf) && dot['__data__'][dot.getAttribute('metric')] != null ) {
+                  if (dot.getAttribute('cx') === x(d[xMetric]*secondTransf) && dot['__data__'][dot.getAttribute('metric')] != null ) {
                     dot.style="opacity:1";
                     return dot
                   }
@@ -626,22 +614,18 @@ export default {
               if (brushObj.mouseDown) {
                 brushObj.selectionMove();
               }
-
-
-
               this.style="opacity:1"
-
             })  // при наведении мышки точка появляется
             .on("mouseout", function(d) {
               let opacity = 1;
               if (!this.getAttribute("data-last-dote")) {
-                if (nullValue == -1) {
+                if (nullValue === -1) {
                   opacity = 0;
                 }
 
                 allDotHover.forEach( dot => {
                   //console.log(dot['__data__'])
-                  if (extraDot.indexOf(dot['__data__']) == -1) {
+                  if (extraDot.indexOf(dot['__data__']) === -1) {
                     dot.style=`opacity:0`;
                   }
                   if (dot.getAttribute("data-with-caption")) {
@@ -655,7 +639,7 @@ export default {
               }
 
               mustSee.forEach( item => {
-                if (item[metricsName[i]] == d[metricsName[i]]) {
+                if (item[metricsName[i]] === d[metricsName[i]]) {
                   opacity =  1
                 }
               })
@@ -676,8 +660,6 @@ export default {
             })
 
         })
-
-
         // добовляем область выделения
         // line
         //   .append("g")
@@ -724,14 +706,12 @@ export default {
               brushObj.selectionMove();
             })
             .on("mouseup", () => {
-
               brushObj.selectionUp();
             })
         }
 
         brushObj['selectionMove'] = () => {
           if (brushObj.mouseDown) {
-
             if ((event.offsetX-50 - brushObj.startX) > 0) {
               brushObj.direction = 'right';
               brushObj.endX = event.offsetX-50;
@@ -744,7 +724,6 @@ export default {
                 .attr("x", brushObj.startX + (event.offsetX-50 - brushObj.startX))
                 .attr("width", -(event.offsetX-50 - brushObj.startX))
             }
-
           }
         }
 
@@ -759,7 +738,6 @@ export default {
           if (brush.select(`.selection`).attr("width") > 5) {
             updateData([brushObj.startX,brushObj.endX],brushObj,-1)
           }
-
         }
 
         brushObj['clearBrush'] = () => {
@@ -772,16 +750,12 @@ export default {
         }
 
       } else {
-
-
         let step = ((height-20)/metricsName.length).toFixed(5);
         let startY = [20];
         let maxYTop,minYBottom;
         y = [];
         line = [];
         AllLinesWithBreak = [];
-
-
 
         // создаем tooltip
         let tooltip =
@@ -811,7 +785,7 @@ export default {
 
         // создаем вертикальные линии
 
-        if (annotation.length != 0) {
+        if (annotation.length !== 0) {
           annotation.forEach( (item,i) => {
             data.forEach( d => {
               if (d[item]) {
@@ -821,15 +795,11 @@ export default {
 
           })
         }
-
-
-
+        let metricUnits = this.$store.getters.getMetricsMulti({idDash:this.idDash, id:this.id});
         // линии отделяющие графики друг от друга
-        metricsName.forEach( (metric,i) => {
-
-
-
-          if (i != 0) {
+        let maxLength = 0;
+        metricsName.forEach((metric,i) => {
+          if (i !== 0) {
             svg.append("g")
               .append("line")
               .attr("x1", 0)
@@ -840,20 +810,18 @@ export default {
               .attr("opacity", "0.3");
           }
 
-
-
           let metricOPt = {};
-          if (metricsOpt.length != 0) {
+          if (metricsOpt.length !== 0) {
 
             metricsOpt.forEach( item => {
-              if (item.name == metric) {
+              if (item.name === metric) {
                 metricOPt = {...{},...item};
               }
             })
 
           }
           let minY, maxY;
-          if (Object.keys(metricOPt).length == 0) {
+          if (Object.keys(metricOPt).length === 0) {
             minY = min[i];
             maxY = max[i];
           } else {
@@ -865,19 +833,11 @@ export default {
               maxY = parseFloat(metricOPt.upborder);
             }
           }
+          maxYTop = maxY + 0.1 * Math.abs(maxY);
+          minYBottom = minY - 0.1 * Math.abs(minY);
 
-          maxYTop = maxY + 0.1*Math.abs(maxY);
-          minYBottom = minY-0.1*Math.abs(minY);
-
-          // svg.append("defs").append("svg:clipPath")
-          //   .attr("id", `clip-${that.id}-${i}`)
-          //   .append("svg:rect")
-          //   .attr("width", width )
-          //   .attr("height", parseFloat(step)+20)
-          //   .attr("x", 0)
-          //   .attr("y", startY);
           let tickvals = [];
-          if (minYBottom == maxYTop) {
+          if (minYBottom === maxYTop) {
             tickvals = [minYBottom];
           } else {
             if (minYBottom < 0) {
@@ -887,61 +847,50 @@ export default {
             }
           }
 
-
-
-
           let textsNodes = [];
 
-
-          if (i == 0 ) {
-
-
-
+          if (i === 0) {
             y.push(d3.scaleLinear()
               .domain([minYBottom, maxYTop])
               .range([ parseFloat(step)+20,startY[i] ]));
 
-            //console.log(y[i].ticks())
-
-
-
-
             // добавляем ось Y
-            svg.append("g")
+            let yAxis = svg.append("g")
               .attr("class",`yAxis-${i}`)
-              .call(d3.axisLeft(y[i]).tickValues(tickvals));
+              .call(d3.axisLeft(y[i]).tickValues(tickvals).tickFormat(x => `${x} ${metricUnits[i] ? metricUnits[i].units : ''}`));
 
-
-
-
+            yAxis.selectAll(".tick>text").each(function(d) {
+              let w = this.getBBox().width;
+              if (w > maxLength) maxLength = w;
+            });
 
             startY.push(parseFloat(step)+20);
 
           } else {
-
             y.push(d3.scaleLinear()
               .domain([minYBottom, maxYTop])
               .range([ parseFloat(step*(i+1))+20, startY[i] ]));
 
             // добавляем ось Y
-            svg.append("g")
+            let yAxis = svg.append("g")
               .attr("class",`yAxis-${i}`)
-              .call(d3.axisLeft(y[i]).tickValues(tickvals));
+              .call(d3.axisLeft(y[i]).tickValues(tickvals).tickFormat(x => `${x} ${metricUnits[i] ? metricUnits[i].units : ''}`));
 
+            yAxis.selectAll(".tick>text").each(function(d) {
+              let w = this.getBBox().width;
+              if (w > maxLength) maxLength = w;
+            });
 
             startY.push(parseFloat(step*(i+1))+20);
-
-
           }
-
 
           textsNodes = svg.selectAll(`.yAxis-${i} .tick`).select("text").nodes();
 
           textsNodes.forEach( (item,l) => {
             if (textsNodes.length > 1) {
-              if (l == 0) {
+              if (l === 0) {
                 item.style["transform"] = "translateY(-5px)";
-              } else if (l == textsNodes.length-1) {
+              } else if (l === textsNodes.length-1) {
                 item.style["transform"] = "translateY(5px)";
               }
             } else {
@@ -956,14 +905,12 @@ export default {
           //     }
           //   })
 
-
-          if (Object.keys(metricOPt).length == 0 || metricOPt.type == 'Line chart') {
+          if (Object.keys(metricOPt).length === 0 || metricOPt.type === 'Line chart') {
 
             // строим основную линию
 
             line.push(svg.append('g')  // основная линия графика
               .attr("clip-path", `url(#clip-${that.id})`));
-
 
             let nullValue = -1;
             let dotDate = null;
@@ -979,7 +926,6 @@ export default {
             brushObj['startX'] = 0;
             brushObj['endX'] = 0;
 
-
             if (extraDot.length > 0) {
               extraDot.forEach( (item,j) => {
                 if (metric == item.column) {
@@ -993,22 +939,19 @@ export default {
                 return item
               }
             })
-            //console.log(cutData)
-
-
 
             if(nullValue == -1) {
 
               cutData.forEach( line => {
-                if (!Number(line[metric]) && line[metric] != 0) {
-                  onelinesWithBreak.length == 1 ? mustSee.push(onelinesWithBreak[0]) : false;
+                if (!Number(line[metric]) && line[metric] !== 0) {
+                  onelinesWithBreak.length === 1 ? mustSee.push(onelinesWithBreak[0]) : false;
                   linesWithBreak.push(onelinesWithBreak);
                   onelinesWithBreak = [];
                 } else {
                   onelinesWithBreak.push(line);
                 }
               })
-              onelinesWithBreak.length == 1 ? mustSee.push(onelinesWithBreak[0]) : false;
+              onelinesWithBreak.length === 1 ? mustSee.push(onelinesWithBreak[0]) : false;
               linesWithBreak.push(onelinesWithBreak);
               AllLinesWithBreak[i] = (linesWithBreak);
               linesWithBreak.forEach( (lineItself,j) => {
@@ -1038,18 +981,11 @@ export default {
                     .attr("opacity", "0.3")
 
                 }
-
-
               })
-
-
               dotDate = cutData;
-
             } else {
               dotDate = [extraDot[nullValue]];
             }
-
-
 
             svg
               .append("g")
@@ -1064,16 +1000,16 @@ export default {
               .attr('metric',metric)
               .style("opacity",function(d,j) {
                 let opacity = 0;
-                if (nullValue != -1) {
+                if (nullValue !== -1) {
                   opacity =  1;
                 }
                 mustSee.forEach( item => {
-                  if (item[metric] == d[metric]) {
+                  if (item[metric] === d[metric]) {
                     opacity =  1;
                   }
                 })
                 if (lastDot) {
-                  if (j == data.length-1) { // если это последняя точка, то
+                  if (j === data.length-1) { // если это последняя точка, то
                     opacity = 1;  // и постоянно ее отображаем
                     putLabelDot('data-last-dote',`last-dot-text-${metric}`,d,y[i](d[metric])-5,metric,this,that,'line',brushObj);
                   }
@@ -1098,7 +1034,7 @@ export default {
                 }
                 let text =  '';
                 that.metrics.forEach( key => {
-                  if (key == xMetric) {
+                  if (key === xMetric) {
                     text += `<p><span>${key}</span> : ${xVal}</p>`;
                   } else {
                     text += `<p><span>${key}</span> : ${d[key]}</p>`;
@@ -1127,7 +1063,7 @@ export default {
 
                 allDotHover = svg.selectAll('circle').nodes().filter( dot => {
                   if(dot.classList.contains('dot')){
-                    if (dot.getAttribute('cx') == x(d[xMetric]*secondTransf) && dot['__data__'][dot.getAttribute('metric')] != null ) {
+                    if (dot.getAttribute('cx') === x(d[xMetric]*secondTransf) && dot['__data__'][dot.getAttribute('metric')] != null ) {
                       dot.style="opacity:1";
                       return dot
                     }
@@ -1145,12 +1081,12 @@ export default {
               .on("mouseout", function(d) {
                 let opacity = 1;
                 if (!this.getAttribute("data-last-dote") ) {
-                  if (nullValue == -1) {
+                  if (nullValue === -1) {
                     opacity = 0;
                   }
                   allDotHover.forEach( dot => {
 
-                    if (extraDot.indexOf(dot['__data__']) == -1) {
+                    if (extraDot.indexOf(dot['__data__']) === -1) {
                       dot.style=`opacity:0`;
                     }
                     if (dot.getAttribute("data-with-caption")) {
@@ -1166,7 +1102,7 @@ export default {
 
 
                 mustSee.forEach( item => {
-                  if (item[metric] == d[metric]) {
+                  if (item[metric] === d[metric]) {
                     opacity =  1;
                   }
                 })
@@ -1261,7 +1197,7 @@ export default {
 
             brushObj['selectionUp'] = () => {
               brushObj.mouseDown = false;
-              if (brushObj.direction == 'left') {
+              if (brushObj.direction === 'left') {
                 let change = 0;
                 change = brushObj.startX;
                 brushObj.startX = brushObj.endX;
@@ -1275,7 +1211,7 @@ export default {
 
             brushObj['clearBrush'] = () => {
               brushObj.selections = brush.selectAll(`.selection-${i}`).nodes();
-              if (brushObj.selections.length != 0) {
+              if (brushObj.selections.length !== 0) {
                 brushObj.selections.forEach( (item,i) => {
                   brushObj.selections[i].remove()
                 })
@@ -1283,7 +1219,7 @@ export default {
             }
 
 
-          } else if (Object.keys(metricOPt).length != 0 || metricOPt.type == 'Bar chart') {
+          } else if (Object.keys(metricOPt).length !== 0 || metricOPt.type === 'Bar chart') {
 
             //line.push('Bar chart');  // добовляем в массив заглушку, чтобы собюсти порядок следования линий для линейных графиков
             let allDotHover = [];
@@ -1353,14 +1289,14 @@ export default {
               })
               .attr("height", function(d,j) {
                 if (lastDot) {
-                  if (j == cutData.length - 1) {
+                  if (j === cutData.length - 1) {
                     putLabelDot('data-last-bar','last-bar-text',d,y[i](d[metricOPt.name])-5,metricOPt.name,this,that,'bar');
                   }
                 }
                 if (d[`_${metricOPt.name}_caption`]) {
                   putLabelDot('data-with-caption','caption-bar-text',d,y[i](d[metricOPt.name])-5,`_${metricOPt.name}_caption`,this,that,'bar');
                 }
-                if (d[metricOPt.name] == 0) {
+                if (d[metricOPt.name] === 0) {
                   return 0
                 }
                 if (negative) {
@@ -1380,7 +1316,7 @@ export default {
                 }
                 let text =  '';
                 that.metrics.forEach( key => {
-                  if (key == xMetric) {
+                  if (key === xMetric) {
                     text += `<p><span>${key}</span> : ${xVal}</p>`;
                   } else {
                     text += `<p><span>${key}</span> : ${d[key]}</p>`;
@@ -1410,7 +1346,7 @@ export default {
 
                 allDotHover = svg.selectAll('circle').nodes().filter( dot => {
                   if(dot.classList.contains('dot')){
-                    if (dot['__data__'][xMetric] == d[xMetric]*secondTransf && dot['__data__'][dot.getAttribute('metric')] != null ) {
+                    if (dot['__data__'][xMetric] === d[xMetric]*secondTransf && dot['__data__'][dot.getAttribute('metric')] != null ) {
                       dot.style="opacity:1";
                       return dot
                     }
@@ -1422,7 +1358,7 @@ export default {
               .on("mouseout", function() {
                 if (!this.getAttribute("data-last-bar") ) {
                   allDotHover.forEach( dot => {
-                    if (extraDot.indexOf(dot['__data__']) == -1) {
+                    if (extraDot.indexOf(dot['__data__']) === -1) {
                       dot.style=`opacity:0`;
                     }
                     if (dot.getAttribute("data-with-caption")) {
@@ -1445,26 +1381,12 @@ export default {
 
                 lineDot
                   .attr("opacity","0")
-
-
               })  // при уводе мышки исчезает, только если это не точка выходящяя порог
-
-
           }
-
-
-
         })
-
-
-
-
-
-
-
+        maxLength += 15
+        svg.attr("transform", "translate(" + maxLength + "," + margin.top + ")");
       }
-
-
       // function checkName(name) {  // функция которая проверяет не слишком ли длинное название и сокращает его
       //   if (name.length > 10) {  // если там больше 10 символов
       //     name = name.substring(0,10) + '...'; // обрезаем и добовляем троеточие
@@ -1475,7 +1397,7 @@ export default {
       function verticalLineX() {
 
         let linesX = svg.selectAll(`.grid-line-x`).nodes();
-        if (linesX.length != 0) {
+        if (linesX.length !== 0) {
           linesX.forEach( (item,i) => {
             linesX[i].remove()
           })
@@ -1551,7 +1473,7 @@ export default {
           .style('fill', that.theme.$main_text)
           .text(d[metricText])
 
-        if (elem == 'line') {
+        if (elem === 'line') {
           text
             .on("mouseover", function() {
               if(brushObj.mouseDown) {
@@ -1568,7 +1490,6 @@ export default {
             })
         }
       }
-
 
       function updateData (extent,brushObj,id) {  // функция которая вызывается каждый раз, когда происходит выделение области (brush)
 
@@ -1587,20 +1508,14 @@ export default {
           //that.$store.commit('setDiapasonDash', {diapason: diapason, id: props.id});  // заносим в хранилище
 
           that.setClick(diapason, 'select');  // вызываем функцию создающию токены
-
-
-
+          
           //if (d3.event.target.id != undefined) {
 
           zoom(extent,id,brushObj);  // делаем зумирование  графика
           // } else {
           //   zoom(extent,brushObj);  // делаем зумирование  графика
           // }
-
-
-
         }
-
       }
 
       function zoom(extent,id,brushObj) {  // функция делающяя зумирование графика
@@ -1611,14 +1526,13 @@ export default {
         //   line.select(`.brush`).call(brush.move, null);  // убираем область выделения
         // }
         brushObj.clearBrush();
-
         if (time) {
           xAxis.transition().duration(secondTransf)
             .call(d3.axisBottom(x)
-              .tickFormat(d3.timeFormat('%d-%m-%Y '))
+              .tickFormat(d3.timeFormat(timeFormat))
               .tickValues(
                 x.ticks().filter( (item,i) => {
-                  if (i%2 == 0) {
+                  if (i%2 === 0) {
                     return item
                   }
                 })
@@ -1631,7 +1545,7 @@ export default {
 
         verticalLineX();
 
-        if (id == -1) {
+        if (id === -1) {
           metricsName.forEach( (item,i) => {
 
             changeZoom(1000,i);   // вызываем функцию которая перересует все линии и точки как надо
@@ -1642,15 +1556,14 @@ export default {
 
 
         svg.on("dblclick",function(){  // если дважды щелкнуть по любому месту
-
           if (time) {
             x.domain(d3.extent(data, function(d) {   return  new Date(d[xMetric]*secondTransf) })); // то вернем ось х в исходное состояние
             xAxis.transition().duration(secondTransf)
               .call(d3.axisBottom(x)
-                .tickFormat(d3.timeFormat('%d-%m-%Y '))
+                .tickFormat(d3.timeFormat(timeFormat))
                 .tickValues(
                   x.ticks().filter( (item,i) => {
-                    if (i%2 == 0) {
+                    if (i%2 === 0) {
                       return item
                     }
                   })
@@ -1667,18 +1580,16 @@ export default {
           // metricsName.forEach( (item,i) => {
           //   changeZoom(300,i);    // вызываем функцию которая перересует все линии и точки как надо
           // })
-          if (id == -1) {
-            metricsName.forEach( (item,i) => {
-              changeZoom(300,i);   // вызываем функцию которая перересует все линии и точки как надо
-            })
-          } else {
-            changeZoom(300,id);   // вызываем функцию которая перересует все линии и точки как надо
-          }
+          // if (id ===-1) {
+          metricsName.forEach( (item,i) => {
+            changeZoom(300,i);   // вызываем функцию которая перересует все линии и точки как надо
+          })
+          // } else {
+          //   changeZoom(300,id);   // вызываем функцию которая перересует все линии и точки как надо
+          // }
           // changeZoom(300);  // и вернем все линии  в исходное состояние
 
         });
-
-
 
         function changeZoom(dauration,i) {  // функция которая перерисовывает все линии
           let lineChange;
@@ -1689,13 +1600,8 @@ export default {
           } else {
             lineChange = line[i];
           }
-
-
-
+          
           if (AllLinesWithBreak[i]) {
-
-
-
             AllLinesWithBreak[i].forEach( (lineItself,j) => {
               lineChange  // основная линия
                 .select(`.line-${i}-${j}`)
@@ -1756,9 +1662,6 @@ export default {
             .transition()
             .duration(dauration)
             .attr("cx",  function() {  return x(this.getAttribute("xVal")) } )
-
-
-
         }
 
       }
@@ -1769,9 +1672,9 @@ export default {
         let count = {};
         Object.values(data).forEach( item => {
           Object.keys(item).forEach( (key,i) => {
-            if (i !=0) {
+            if (i !== 0) {
 
-              if (!Number(item[key]) && item[key] != 0) {
+              if (!Number(item[key]) && item[key] !== 0) {
                 if (!nullArr.includes(key)) {
                   nullArr.push(key)
                 }
@@ -1788,7 +1691,7 @@ export default {
 
 
         nullArr = nullArr.filter( item => {
-          if (count[item] == 1) {
+          if (count[item] === 1) {
             return item
           }
         })
@@ -1798,7 +1701,7 @@ export default {
 
             Object.values(data).filter( item => {
 
-              if (Number(item[key]) || Number(item[key]) == 0) {
+              if (Number(item[key]) || Number(item[key]) === 0) {
                 value.push({...item,...{column: key}});
               }
             });
@@ -1806,8 +1709,6 @@ export default {
         }
         return value
       }
-
-
     },
     createLegends: function(metricsName){
       let colorLine = this.colorLegends;
@@ -1831,8 +1732,6 @@ export default {
 
       let setTocken = (value) => {
         this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: value, store: this.$store });
-
-
       }
 
       Object.keys(tockens).forEach( i =>{
@@ -1841,49 +1740,40 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         }
-        if (tockens[i].elem == this.id && tockens[i].action == action && tockens[i].capture == 'pointX') {
+        if (tockens[i].elem === this.id && tockens[i].action === action && tockens[i].capture === 'pointX') {
           setTocken(point.x);
 
-        } else if (tockens[i].elem == this.id && tockens[i].action == action && tockens[i].capture == 'pointY') {
+        } else if (tockens[i].elem === this.id && tockens[i].action === action && tockens[i].capture === 'pointY') {
           setTocken(point.y);
-        } else if (tockens[i].elem == this.id && tockens[i].action == action && tockens[i].capture == 'start') {
+        } else if (tockens[i].elem === this.id && tockens[i].action === action && tockens[i].capture === 'start') {
           setTocken(point[0]);
-        } else if (tockens[i].elem == this.id && tockens[i].action == action && tockens[i].capture == 'end') {
+        } else if (tockens[i].elem === this.id && tockens[i].action === action && tockens[i].capture === 'end') {
           setTocken(point[1]);
         }
       })
-
-
-
+      
       let events = this.$store.getters.getEvents({idDash: this.idDash, event: 'onclick', element: this.id, partelement: 'point'});
 
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach( item => {
-          if(item.action == 'set'){
+          if(item.action === 'set'){
             this.$store.commit('letEventSet', {events: events, idDash: this.idDash,  });
-          } else if (item.action == 'go') {
-            if (action != 'select') {
+          } else if (item.action === 'go') {
+            if (action !== 'select') {
               this.$store.commit('letEventGo', {event: item, idDash: this.idDash, route: this.$router, store: this.$store });
              // this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
             }
           }
         })
       }
-
     },
-
-  },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.props.actions, idDash: this.idDash, id: this.id });
-    this.$refs.lineChart.parentElement.style.overflow = 'hidden';
   },
 }
-
 
 </script>
 
 <style lang="scss" > 
   
-     @import '../../sass/dashMultiLine.sass'
+     @import '../../sass/dashMultiLine.sass';
     
 </style>

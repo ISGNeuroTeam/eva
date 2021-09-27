@@ -1,6 +1,17 @@
 #app
+    .v-data-table--container
+        background-color: var(--main_bg)
+
+    .v-data-table-header 
+        th
+            white-space: nowrap
+
+
     .table-block
         background-color: var(--main_bg)
+
+        .v-data-table--fixed-header > .v-data-table__wrapper > table > thead > tr > th
+            top: -1px
 
     .no-data-table
         font-size: 15px
@@ -73,10 +84,6 @@
         tr
             cursor: pointer
             background-color: inherit
-
-
-            &:hover
-                //background: rgba(255, 109, 112, 0.2) !important
 
         th
             color: inherit !important
@@ -222,9 +229,6 @@
         font-size: 12px !important
 
     .dash-table
-
-        .v-data-table__wrapper
-            //height: 185px !important
 
         thead
 

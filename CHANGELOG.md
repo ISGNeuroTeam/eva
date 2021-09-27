@@ -5,6 +5,90 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## [1.66.0]
+### Added
+- zoom in/out and fitContent control buttons in graph component
+- control buttons on graph component disabled when data is loading
+- overflow dots in tab panel from right and left sides of panel
+- scroll without shift of tab panel
+- can take token from fullscreen table
+
+### Changed 
+- max width of tab is 200px
+
+### Fixed
+- bug with custom themes crushing application
+- problem with data source reloading when switching tab on dashboard
+- bug with gant diagramm colors and tooltop
+
+## [1.65.0]
+
+### Changed
+- UI of filter row in filter panel
+- 'token' type filter parts are sorting by the count of values in them click after "accept changes"
+
+### Fixed
+- log icon highlights after error in search
+- heatmap is not updated when the value in the select is changed
+- problem with disappearing graph while zooming
+
+## [1.64.0]
+
+### Added
+- filter panel to dashboard
+- unit setting to multiline component
+- submit button while editing tab name
+- value styles for single value component
+- theme support in map component settings
+
+### Changed
+- inability to do anything with other tabs while editing one
+- log button moved back from dropdown list to header
+
+### Fixed
+- hover on first row in table
+- time format on x-axis while zooming
+- header height equal in main menu and dashboard
+- double header after incorrect search
+- dash filter styles and UI
+
+## [1.63.0]
+
+### Added
+- tabs on dashboards
+- ability to enable/disable tabs on dashboard in dash settings
+- ability to pin certain visual component on all tabs
+- global rbg CSS variables for theme colors (only HEX was before)
+- SingleValue visualization
+- data source for pipeline monitoring mode
+
+### Fixed
+- bug with dashboard without elements after tabs integrations
+- bug with captions not moving while zooming on MultiLine
+
+## [1.62.0]
+
+### Added
+- tokens for maps
+
+### Fixed
+- bugs with main header
+- bugs with table component header
+
+## [1.61.0]
+
+### Added
+- new mode for map monitoring
+
+### Changed
+- heatMapGeneral visualization component renamed to heatMap
+- changed header for project and dashboards, fixed bug with header for tables
+
+### Removed
+- first heatMap visualization component and its styles
+
 ## [1.60.0]
 
 ### Added
@@ -16,6 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - custom theme creation
 - image background from theme
 - custom theme editing and deleting
+- theme support in graph component
 
 ### Changed
 - modal for selecting current application theme

@@ -239,7 +239,27 @@ export default {
     dataLoading: function() {
       return this.dataLoadingFrom
     },
-  },  
+  },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+    let selected =  this.$store.getters.getSelected({idDash: this.idDash, id: this.id })
+    if (selected){
+      selected.elem ? this.elem = selected.elem : false;
+      selected.elemlink ? this.elemlink = selected.elemlink : false;
+      if (this.elem != 'Выберите элемент' && this.elemlink != 'Выберите связанный столбец данных') {
+        this.openSelect();
+      }
+      if (selected.elemDeep.length != 0 || selected.elemDeep != '')  {
+        this.elemDeep[String(this.multiple)] = selected.elemDeep;
+        this.chooseText = 'Очистить Все';
+        this.chooseIcon = mdiSquare;
+      } else {
+        this.chooseText = 'Выбрать все';
+        this.chooseIcon = mdiCropSquare;
+      }
+
+    }
+  },
   methods: {
     getItem: function(element) {
       switch (element){
@@ -282,14 +302,14 @@ export default {
         }
       })
 
-      this.topArray = sorted(selected);        
+      this.topArray = sorted(selected);
       this.bottomArray = sorted(data);
 
       data = [...this.topArray,...this.bottomArray];
-      
+
       function sorted(data) {
         if (Number(data[0])) {
-    
+
           data = data.sort( (a,b) => {
             return a-b
           });
@@ -299,98 +319,80 @@ export default {
         return data
       }
 
-                
-            
+
+
       return data
     },
-    setTocken: function() {
-      this.$store.commit('setSelected', {element: 'elemDeep',value: this.elemDeep[String(this.multiple)], idDash: this.idDash, id: this.id });
-      let tockens = this.$store.getters.getTockens(this.idDash);
-      let name = '';
-      let curTocken = {};
-      let data = this.dataReady;
-      Object.keys(tockens).forEach( i =>{
-        if (tockens[i].elem == this.id && tockens[i].action == 'change') {
-          curTocken = tockens[i];
-          name = tockens[i].name;
+    setTocken() {
+      this.$store.commit('setSelected', {
+        element: 'elemDeep',
+        value: this.elemDeep[String(this.multiple)],
+        idDash: this.idDash,
+        id: this.id,
+      })
+      let tockens = this.$store.getters.getTockens(this.idDash)
+      let name = ''
+      let curTocken = {}
+      let data = this.dataReady
+      Object.keys(tockens).forEach((i) => {
+        if (tockens[i].elem === this.id && tockens[i].action === 'change') {
+          curTocken = tockens[i]
+          name = tockens[i].name
         }
       })
-      let value = null;
-      if (String(this.multiple) == 'true') {
-        value = [...[],...this.elemDeep[String(this.multiple)]];
+      let value = null
+      if (String(this.multiple) === 'true') {
+        value = [...[], ...this.elemDeep[String(this.multiple)]]
         for (let i = 0; i < data.length; i++) {
-          value.forEach((deep,j) => {
-            if (data[i][this.elem] == deep) {
-              value[j] = data[i][this.elemlink];
+          value.forEach((deep, j) => {
+            if (data[i][this.elem] === deep) {
+              value[j] = data[i][this.elemlink]
             }
           })
         }
       } else {
         for (let i = 0; i < data.length; i++) {
-          if (data[i][this.elem] == this.elemDeep[String(this.multiple)]) {
-            value = [data[i][this.elemlink]];
+          if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
+            value = [data[i][this.elemlink]]
             break
           }
         }
       }
 
-      if (curTocken.prefix && curTocken.prefix != '') {
-        value = value.map( item => {
-          return `${curTocken.prefix}${item}`;
+      if (curTocken.prefix && curTocken.prefix !== '') {
+        value = value.map((item) => {
+          return `${curTocken.prefix}${item}`
         })
       }
-      if (curTocken.sufix && curTocken.sufix != '') {
-        value = value.map( item => {
-          return `${item}${curTocken.sufix}`;
+      if (curTocken.sufix && curTocken.sufix !== '') {
+        value = value.map((item) => {
+          return `${item}${curTocken.sufix}`
         })
       }
-      if (curTocken.delimetr && curTocken.delimetr != '') {
-        value = value.join(curTocken.delimetr);
+      if (curTocken.delimetr && curTocken.delimetr !== '') {
+        value = value.join(curTocken.delimetr)
       } else {
-        value = value.join(','); 
+        value = value.join(',')
       }
-            
-      let  tocken = {
+      let tocken = {
         name: name,
         action: 'change',
         capture: '',
       }
-      if (name != '') {
-          
-          
-        this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: value, store: this.$store });
-
+      if (name !== '') {
+        this.$store.commit('setTocken', {
+          tocken: tocken,
+          idDash: this.idDash,
+          value: value,
+        })
       }
     },
-  },  
-  mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
-    let selected =  this.$store.getters.getSelected({idDash: this.idDash, id: this.id })
-    if (selected){
-      selected.elem ? this.elem = selected.elem : false;
-      selected.elemlink ? this.elemlink = selected.elemlink : false;
-      if (this.elem != 'Выберите элемент' && this.elemlink != 'Выберите связанный столбец данных') {
-        this.openSelect();
-      }
-      if (selected.elemDeep.length != 0 || selected.elemDeep != '')  {
-        this.elemDeep[String(this.multiple)] = selected.elemDeep;
-        this.chooseText = 'Очистить Все';
-        this.chooseIcon = mdiSquare;
-      } else {
-        this.chooseText = 'Выбрать все';
-        this.chooseIcon = mdiCropSquare;
-      }
-
-    }
   }, 
 }
 
  
 </script>
 
-<style lang="scss" > 
-  
-    @import '../../sass/dashSelect.sass'
-
-   
+<style lang="scss" >
+@import '../../sass/dashSelect.sass';
 </style>

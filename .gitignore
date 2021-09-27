@@ -4,6 +4,7 @@ eva/dist/
 build/
 eva-*.tar.gz
 .idea
+.DS_Store
 
 *-lock.*
 .vscode/

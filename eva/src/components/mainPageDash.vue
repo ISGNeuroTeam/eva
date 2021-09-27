@@ -336,7 +336,7 @@ export default {
       }
     },
     goToDash: function(i) {
-      this.$store.commit('setDash',{data: this.allDashs[i], getters: this.$store.getters.checkAlreadyDash});
+      // this.$store.commit('setDash',{data: this.allDashs[i], getters: this.$store.getters.checkAlreadyDash});
       this.$router.push(`/dashboards/${this.allDashs[i].id}`);
     },
     deleteElem: function() {
