@@ -570,7 +570,7 @@ export default {
         .attr("font-size", 11)
         .attr("text-anchor", "start")
         .style("opacity","0.8")
-        .attr("fill", this.colorFrom.text);
+        .attr("fill", this.colorFrom.text || 'white');
 
             
 
