@@ -17,16 +17,23 @@
           <tr v-for="x in filteredX" :key="x">
             <td class="text-left" v-text="x"/>
             <td v-for="y in filteredY" :key="y" class="pa-0">
-              <div class="td-inner">
+              <div
+                v-if="filteredData[x][y] && filteredData[x][y].metadata"
+                class="td-inner"
+                :style="{ backgroundColor: filteredData[x][y].metadata.background_color }"
+              >
                 <DashHeatMapLinear
-                  v-if="filteredData[x][y] && filteredData[x][y].metadata"
                   :title="filteredData[x][y].value"
                   :value="filteredData[x][y].metadata.progress_bar_value"
                   :color="filteredData[x][y].metadata.progress_bar_color"
                   :comment="filteredData[x][y].metadata.description"
                 />
-                <span v-else-if="filteredData[x][y]" v-text="filteredData[x][y].value" />
               </div>
+              <div
+                v-else-if="filteredData[x][y]"
+                class="td-inner"
+                v-text="filteredData[x][y].value"
+              />
             </td>
           </tr>
         </tbody>

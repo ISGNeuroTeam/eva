@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Added
 - heatmap progress-bar for the full table cell width
+- setting heatmap table cell color from 'background_color' metadata key
 
 ## [1.66.0]
 ### Added
