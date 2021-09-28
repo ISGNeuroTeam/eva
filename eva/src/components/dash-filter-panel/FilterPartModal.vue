@@ -1,10 +1,10 @@
 <template>
   <v-card :style="{ 'background-color': theme.$secondary_bg }">
-    <v-card-title :style="{ color: theme.$title, 'background-color': theme.$main_bg }">
+    <v-card-title :style="{ color: theme.$title, 'background-color': theme.$main_bg }" class="mb-5">
       <v-icon :color="theme.$title" class="pr-2">{{ settingsIcon }}</v-icon
       >Настройки фильтра
     </v-card-title>
-    <v-card-subtitle class="mt-5">
+    <v-card-subtitle v-if="editMode && typeMap.length > 1" class="mt-5">
       <v-item-group v-model="currentTab" mandatory>
         <v-item v-for="(item, index) in typeMap" :key="index" v-slot="{ active, toggle }"
           ><v-btn
@@ -64,7 +64,7 @@
 
   export default {
     name: 'FilterPartModal',
-    props: ['idDash', 'filterPart', 'filterPartIndex', 'editPermission'],
+    props: ['idDash', 'filterPart', 'filterPartIndex', 'editPermission', 'editMode'],
     components: {
       ManualTypeModal,
       TokenTypeModal,

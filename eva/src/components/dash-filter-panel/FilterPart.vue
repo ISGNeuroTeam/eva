@@ -57,6 +57,7 @@
       />
       <v-icon
         v-if="editPermission || filterPart.filterPartType === 'manual'"
+        v-show="editMode"
         :color="theme.$error_color"
         size="20"
         @click.stop.prevent="
@@ -80,6 +81,7 @@
       'editPermission',
       'filterPartIndex',
       'filterIndex',
+      'editMode'
     ],
     data() {
       return {

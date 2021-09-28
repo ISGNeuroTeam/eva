@@ -26,13 +26,13 @@
         </v-tooltip>
       </div>
       <div class="control-block">
-        <div class="edit-container" :class="{ hide_control: !edit_elem }">
+        <div class="edit-container" :class="{ hide_control: !editMode }">
           <v-tooltip bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
-                :class="{ hide_control: !edit_elem }"
+                :class="{ hide_control: !editMode }"
                 v-on="on"
                 @click="openEventCode"
               >
@@ -46,7 +46,7 @@
               <v-icon
                 class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
-                :class="{ hide_control: !edit_elem }"
+                :class="{ hide_control: !editMode }"
                 v-on="on"
                 @click="openTockenCode"
               >
@@ -60,7 +60,7 @@
               <v-icon
                 class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
-                :class="{ hide_control: !edit_elem }"
+                :class="{ hide_control: !editMode }"
                 v-on="on"
                 @click="openSearchCode"
               >
@@ -74,7 +74,7 @@
               <v-icon
                 class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
-                :class="{ hide_control: !edit_elem }"
+                :class="{ hide_control: !editMode }"
                 v-on="on"
                 @click="openToolPanel"
               >
@@ -657,6 +657,7 @@
         :permissions-from="userPermissions"
         :idDashFrom="idDashFrom"
         :editPermission="editPermission"
+        :editMode="editMode"
       >
       </dash-filter-panel>
     </div>
@@ -723,7 +724,7 @@ export default {
       tocken_elem: false,
       profile_elem: false,
       save_elem: false,
-      edit_elem: true,
+      editMode: true,
       code_elem: false,
       check: mdiCheckBold,
       look: mdiEye,
@@ -917,13 +918,6 @@ export default {
       };
     },
   },
-  watch: {
-    userPermissions() {
-      this.profileDropdownButtons = this.profileDropdownButtons.map(item =>
-        item.id === 3 ? { ...item, hide: !this.isAdmin } : item
-      );
-    },
-  },
   mounted() {
     this.getCookie();
     this.tools = settings.tools;
@@ -981,7 +975,7 @@ export default {
       this.$router.push(`/profile`);
     },
     setEditMode: function () {
-      this.edit_elem = !this.edit_elem;
+      this.editMode = !this.editMode;
       this.$emit('changeMode');
     },
     cancelModal: function () {
