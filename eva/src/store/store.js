@@ -932,7 +932,7 @@ export default {
       state[idDash].filters[filterIndex].parts[filterPartIndex].values.splice(valueIndex, 1);
     },
     refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
-      state[idDash].filters[filterIndex].parts[filterPartIndex].values = [];
+      Vue.set(state[idDash].filters[filterIndex].parts[filterPartIndex], 'values', [])
     },
     restartSearches(state, payload) {
       const { idDash, filter } = payload

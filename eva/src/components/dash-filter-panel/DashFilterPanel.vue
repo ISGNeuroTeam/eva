@@ -59,6 +59,7 @@
                   :filterPartIndex="partIndex"
                   :filterIndex="filterIndex"
                   :editPermission="editPermission"
+                  :editMode="editMode"
                   :isFocused="focusedRow === filterIndex"
                 />
               </div>
@@ -145,6 +146,7 @@
             <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
+                  v-show="editMode"
                   :color="theme.$main_text"
                   icon
                   v-bind="attrs"
@@ -160,6 +162,7 @@
             <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
+                  v-show="editMode"
                   :color="theme.$error_color"
                   icon
                   v-bind="attrs"
@@ -233,6 +236,7 @@
         :filterPart="filterPartInModal"
         :filterPartIndex="filterPartIndexInModal"
         :editPermission="editPermission"
+        :editMode="editMode"
         @saveFilterPart="saveFilterPart"
         @closeFilterPartModal="closeFilterPartModal"
       />
@@ -267,7 +271,11 @@ import {
 export default {
   name: 'DashFilterPanel',
   components: { FilterPartModal, FilterPart, FilterPreviewModal },
-  props: ['editPermission', 'idDashFrom'],
+  props: {
+    editPermission: Boolean,
+    idDashFrom: String,
+    editMode: Boolean
+  },
   data() {
     return {
       mdiChevronLeft,

@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - setting heatmap table cell color from 'background_color' metadata key
 - heatmap progress-bar sizes set to 200 (min) x 50 px
 
+### Changed
+- moved some controls of filter panel to dashboard 'edit' mode
+- tabs on filter setting modal window are now hiding when only manual input is available
+- max width of filter part title restricted to 250px
+
+### Fixed
+- when logged as regular user 'log out' options in dropdown menu was hidden on dashboard page
+- clicking reset filter part item doesn't give any visual feedback
+- 'add new filter' button are now displaying correctly
+
 ## [1.66.0]
 ### Added
 - zoom in/out and fitContent control buttons in graph component
@@ -25,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - bug with custom themes crushing application
 - problem with data source reloading when switching tab on dashboard
-- bug with gant diagramm colors and tooltop
+- bug with gant diagram colors and tooltips
 
 ## [1.65.0]
 
