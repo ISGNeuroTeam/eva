@@ -4,7 +4,7 @@
       <template v-slot:default>
         <thead>
           <tr>
-            <th class="table-th"/>
+            <th class="table-th" />
             <th
               v-for="(y, index) in filteredY"
               :key="index"
@@ -15,12 +15,34 @@
         </thead>
         <tbody>
           <tr v-for="x in filteredX" :key="x">
-            <td class="text-left" v-text="x"/>
+            <td class="text-left">
+              <span v-if="!((''+ x).includes('@'))">
+                {{ x }}
+              </span>
+              <v-menu v-else open-on-hover top offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                  <span dark v-bind="attrs" v-on="on">
+                    {{ x }}
+                  </span>
+                </template>
+
+                <v-list>
+                  <v-list-item v-for="(item, index) in ['Детали']" :key="index">
+                    <v-list-item-title style="color: black"
+                      ><a @click="setClick(x)">{{ item }}</a></v-list-item-title
+                    >
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </td>
+
             <td v-for="y in filteredY" :key="y" class="pa-0">
               <div
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"
                 class="td-inner"
-                :style="{ backgroundColor: filteredData[x][y].metadata.background_color }"
+                :style="{
+                  backgroundColor: filteredData[x][y].metadata.background_color,
+                }"
               >
                 <DashHeatMapLinear
                   :title="filteredData[x][y].value"
@@ -43,7 +65,7 @@
 </template>
 
 <script>
-import DashHeatMapLinear from './dashHeatMapLinear.vue';
+import DashHeatMapLinear from "./dashHeatMapLinear.vue";
 
 export default {
   name: "heatmap",
@@ -51,6 +73,8 @@ export default {
   props: {
     dataRestFrom: Array,
     options: Object,
+    idFrom: null,
+    idDashFrom: null,
   },
   data: () => ({
     x: new Set(),
@@ -67,6 +91,20 @@ export default {
     renderData: "metadata",
   }),
   computed: {
+    id: function () {
+      return this.idFrom;
+    },
+    idDash: function () {
+      return this.idDashFrom;
+    },
+    events() {
+      let events = this.$store.getters.getEvents({
+        idDash: this.idDash,
+        event: "OnDataCompare",
+        element: this.id,
+      });
+      return events;
+    },
     filteredData() {
       return this.updateData && this.data;
     },
@@ -74,12 +112,9 @@ export default {
     filteredY() {
       let temp = Array.from(this.y);
       if (this.yFieldFormat === "Строка") {
-        if (this.yFieldSort === "По возрастанию")
-          temp.sort();
-        else
-          temp.sort().reverse();
-      }
-      else {
+        if (this.yFieldSort === "По возрастанию") temp.sort();
+        else temp.sort().reverse();
+      } else {
         let sort = this.chooseSort(this.yFieldFormat, this.yFieldSort);
         temp.sort(sort);
       }
@@ -89,12 +124,9 @@ export default {
     filteredX() {
       let temp = Array.from(this.x);
       if (this.xFieldFormat === "Строка") {
-        if (this.xFieldSort === "По возрастанию")
-          temp.sort();
-        else
-          temp.sort().reverse();
-      }
-      else {
+        if (this.xFieldSort === "По возрастанию") temp.sort();
+        else temp.sort().reverse();
+      } else {
         let sort = this.chooseSort(this.xFieldFormat, this.xFieldSort);
         temp.sort(sort);
       }
@@ -124,6 +156,28 @@ export default {
     },
   },
   methods: {
+    setClick: function (tokenValue) {
+      let events = this.$store.getters.getEvents({
+        idDash: this.idDash,
+        event: "onclick",
+        element: this.id,
+        partelement: "empty",
+      });
+      if (events.length != 0) {
+        events.forEach((item) => {
+          if (item.action == "go") {
+            item.value[0] = tokenValue;
+            this.$store.commit("letEventGo", {
+              event: item,
+              idDash: this.idDash,
+              route: this.$router,
+              store: this.$store,
+            });
+            //this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
+          }
+        });
+      }
+    },
     chooseSort(dataFormat, sortType) {
       if (dataFormat === "Дата") {
         let up = (a, b) => {
@@ -183,7 +237,7 @@ export default {
      */
     parseMetadata(data = null) {
       try {
-        if (typeof data !== 'string') return null;
+        if (typeof data !== "string") return null;
         return !data ? null : JSON.parse(data.replaceAll(`'`, `"`));
       } catch (err) {
         return null;
