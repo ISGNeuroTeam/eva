@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - heatmap progress-bar for the full table cell width
 - setting heatmap table cell color from 'background_color' metadata key
 - heatmap progress-bar sizes set to 200 (min) x 50 px
+- reverse icon status for filter parts
 
 ### Changed
 - moved some controls of filter panel to dashboard 'edit' mode
