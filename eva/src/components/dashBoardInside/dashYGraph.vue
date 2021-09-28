@@ -1,14 +1,77 @@
 <template>
   <div class="ygraph-wrapper">
-     <v-row align="start">
-      <v-icon
-        :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
-        @click="changeInputMode"
-      >
-       {{ iconArrowAll }}
-      </v-icon>
-     </v-row>
-     <div ref="graph" class="ygraph-component-container" :style="{top:`${top}`}"/>
+    <div class="button-block">
+      <v-row align="start">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="changeInputMode"
+            >
+              {{ iconArrowAll }}
+            </v-icon>
+          </template>
+          <span>Перемещение по графу</span>
+        </v-tooltip>
+
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="zoomIn"
+            >
+              {{ mdiMagnifyPlus }}
+            </v-icon>
+          </template>
+          <span>Увеличить</span>
+        </v-tooltip>
+
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="zoomOut"
+            >
+              {{ mdiMagnifyMinus }}
+            </v-icon>
+          </template>
+          <span>Уменьшить</span>
+        </v-tooltip>
+
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="fitContent"
+            >
+              {{ mdiFitToPageOutline }}
+            </v-icon>
+          </template>
+          <span>Выровнять</span>
+        </v-tooltip>
+      </v-row>
+    </div>
+    <div ref="graph" class="ygraph-component-container" :style="{ top: `${top}` }"/>
   </div>
 </template>
 
@@ -16,7 +79,7 @@
 <script>
 import * as yfile from 'yfiles'
 import licenseData from './license.json'
-import { mdiArrowAll } from '@mdi/js'
+import { mdiArrowAll, mdiMagnifyPlus, mdiFitToPageOutline, mdiMagnifyMinus } from '@mdi/js'
 yfile.License.value = licenseData//проверка лицензии
 
 export default {
@@ -26,11 +89,17 @@ export default {
     idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
     colorFrom: null,  // цветовые переменные
-    dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
+    loading: {
+      type: Boolean,
+      default: true,
+    },  // сообщает что компонент в режиме получения данных
   },
   data () {
     return {
       iconArrowAll: mdiArrowAll,
+      mdiMagnifyPlus,
+      mdiFitToPageOutline,
+      mdiMagnifyMinus,
       isEditor: false,
       nodesSource : null,
       edgesSource: null,
@@ -48,8 +117,8 @@ export default {
     }
   },
   computed: {
-    top () {// для ряда управляющих иконок
-      if(document.body.clientWidth <=1600){
+    top() {// для ряда управляющих иконок
+      if (document.body.clientWidth <=1600){
         return '50px'
       } else {
         return '60px'
@@ -77,10 +146,23 @@ export default {
       this.colorFont()
       this.colorNodes()
       this.colorEdges()
+      this.fitContent()
     }, 100)
     // this.$graphComponent.fitGraphBounds()
   },
   methods: {
+    zoomIn() {
+      const { ICommand } = yfile
+      ICommand.INCREASE_ZOOM.execute(null, this.$graphComponent)
+    },
+    zoomOut() {
+      const { ICommand } = yfile
+      ICommand.DECREASE_ZOOM.execute(null, this.$graphComponent)
+    },
+    fitContent() {
+      const { ICommand } = yfile
+      ICommand.FIT_GRAPH_BOUNDS.execute(null, this.$graphComponent)
+    },
     changeInputMode(){ // меняем режим графика
       if(this.isEditor){
         this.$graphComponent.inputMode = null
@@ -283,6 +365,10 @@ export default {
 </script>
 
 <style lang="css" >
+.ygraph-wrapper .button-block {
+  position: absolute;
+  top: 50px;
+}
 .ygraph-component-container {
   position: absolute;
   left: 0;

@@ -22,10 +22,46 @@ $transition: all 0.4s ease
     flex-flow: row nowrap
     align-items: center
 
-.dash-layout
+// .full-screen-dialog
+
+//     .card-title
+//         justify-content: space-between
+//         overflow: hidden
+//         transition: all 0.4s ease
+//         height: 0
+//         padding: 0
+
+    
+//         .name-dash
+//             @extend %flex
+//             justify-content: flex-start
+//             transition: all 0.4s ease
+
+//             .icon
+//                 min-width: 20px
+//                 min-height: 20px
+//                 width: 20px
+//                 height: 20px
+//                 margin-bottom: 3px
+
+//             .chart
+//                 margin-right: 5px
+
+//             .dash-capture
+//                 display: flex
+//                 flex-flow: row nowrap
+//                 justify-content: flex-start
+//                 align-items: center
+
+//                 .dash-title
+//                     cursor: default
+//                     font-size: 1rem
+//                     font-weight: bold
+
+.dash-layout, .full-screen-dialog
     width: 100%
     height: 100%
-    opacity: 0 
+    // opacity: 0 
     //visibility: hidden
     transition: all 0.4s ease
     position: relative
@@ -138,37 +174,6 @@ $transition: all 0.4s ease
                         opacity: 0.7
                         border-bottom: 1px dotted
 
-                    
-                        
-
-
-            // .fixed_name_dash
-            //     position: absolute
-            //     bottom: 0
-            //     animation: 1s ease show
-            //     border: 1px solid rgba(0,0,0,0.3)
-            //     box-shadow: 0 0 1px rgba(0,0,0,0.4)
-            //     padding: 3px
-            //     right: 0
-            //     border-radius: 4px 0 0 0
-            //     background-color: white
-            //     z-index: 3
-
-            //     .dash-title
-            //         font-size: 1rem
-
-            //     .dash-block-id
-            //         font-size: 0.665rem
-            //         margin-left: 5px
-            //         margin-top: 3px
-
-            //     .icon
-            //         width: 20px
-            //         height: 20px
-            //         margin-right: 5px
-
-
-
             .settings-dash-block
                 display: flex
                 flex-flow: row nowrap
@@ -215,6 +220,12 @@ $transition: all 0.4s ease
                         margin-left: 10px
                         width: 20px
                         height: 20px
+                    
+                    .expand
+                        margin-right: 10px
+                        width: 20px
+                        height: 20px
+                        cursor: pointer
 
                 .settings_move
                     transform: translateX(0px)
@@ -447,6 +458,7 @@ $transition: all 0.4s ease
     .dash-layout
 
         .dash-block
+
 
             .card-title
                 height: 25px

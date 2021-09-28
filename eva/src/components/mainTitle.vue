@@ -10,6 +10,7 @@
         }
       "
       @openSettings="openSettings"
+      @downloadData="exportDataCSV"
     />
     <div class="body-block">
       <v-card
@@ -64,6 +65,7 @@
             :vertical-cell="verticalCell"
             :searchData="getElementData(elem)"
             :loading="checkLoading(elem)"
+            @downloadData="exportDataCSV"
           />
           <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
@@ -71,75 +73,91 @@
         </v-container>
       </v-main>
     </div>
-    <div v-show="showTabs" class="tab-panel">
-      <div
-        v-for="tab in tabs"
-        :key="tab.id"
-        :class="{
-          active: currentTab === tab.id,
-          'edit-mode-tab': mode,
-          hover: tab.id === hoveredTabID,
-        }"
-        class="tab-item"
-        @click="clickTab(tab.id)"
-        @mouseover="tabOver(tab.id)"
-        @mouseleave="tabLeave(tab.id)"
-      >
-        <div v-if="tab.id !== editableTabID" style="height: 40px">
-          {{ tab.name }}
-          <svg
-            v-if="mode"
-            class="edit-icon"
-            width="14"
-            height="14"
-            viewBox="0 0 12 12"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            @click.stop="enterEditMode(tab)"
-          >
-            <path
-              d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z"
-              :fill="theme.$main_border"
+    <div v-show="showTabs" class="tab-panel-wrapper">
+      <v-tooltip top :color="theme.$accent_ui_color">
+        <template v-slot:activator="{ on }">
+          <div v-show="leftDots" class="dots" v-on="on" @click="moveScroll(0)">...</div>
+        </template>
+        <span>В начало</span>
+      </v-tooltip>
+      <div ref="tab-panel" class="tab-panel">
+        <div
+          v-for="tab in tabs"
+          :key="tab.id"
+          :class="{
+            active: currentTab === tab.id,
+            'edit-mode-tab': mode,
+            hover: tab.id === hoveredTabID,
+          }"
+          class="tab-item"
+          @click="clickTab(tab.id)"
+          @mouseover="tabOver(tab.id)"
+          @mouseleave="tabLeave(tab.id)"
+        >
+          <div v-if="tab.id !== editableTabID" style="height: 40px">
+            <div class="tab-title">{{ tab.name }}</div>
+            <svg
+              v-if="mode"
+              class="edit-icon"
+              width="14"
+              height="14"
+              viewBox="0 0 12 12"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              @click.stop="enterEditMode(tab)"
+            >
+              <path
+                d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z"
+                :fill="theme.$main_border"
+              />
+            </svg>
+            <svg
+              v-if="mode && tabsMoreOne"
+              class="delete-cross"
+              width="13"
+              height="13"
+              viewBox="0 0 8 8"
+              xmlns="http://www.w3.org/2000/svg"
+              @click.stop="deleteTab(tab.id)"
+            >
+              <path
+                d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
+                :fill="theme.$main_border"
+              />
+            </svg>
+          </div>
+          <div v-else>
+            <input
+              v-model="tempName"
+              class="tab-name-input"
+              type="text"
+              @keypress.enter="editTabName"
             />
-          </svg>
-          <svg
-            v-if="mode && tabsMoreOne"
-            class="delete-cross"
-            width="13"
-            height="13"
-            viewBox="0 0 8 8"
-            xmlns="http://www.w3.org/2000/svg"
-            @click.stop="deleteTab(tab.id)"
-          >
-            <path
-              d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
-              :fill="theme.$main_border"
-            />
-          </svg>
-        </div>
-        <div v-else>
-          <input
-            v-model="tempName"
-            class="tab-name-input"
-            type="text"
-            @keypress.enter="editTabName"
-          />
-          <svg
-            id="submit-icon"
-            width="20"
-            height="20"
-            viewBox="0 0 20 20"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            @click.stop.prevent="editTabName"
-          >
-            <path
-              d="M7.9375 14.7142L3.8125 10.5892L4.99083 9.41089L7.93875 12.3555L7.9375 12.3567L15.0083 5.28589L16.1867 6.46422L9.11583 13.5359L7.93833 14.7134L7.9375 14.7142Z"
-              :fill="theme.$main_border"
-            />
-          </svg>
+            <svg
+              id="submit-icon"
+              width="20"
+              height="20"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              @click.stop.prevent="editTabName"
+            >
+              <path
+                d="M7.9375 14.7142L3.8125 10.5892L4.99083 9.41089L7.93875 12.3555L7.9375 12.3567L15.0083 5.28589L16.1867 6.46422L9.11583 13.5359L7.93833 14.7134L7.9375 14.7142Z"
+                :fill="theme.$main_border"
+              />
+            </svg>
+          </div>
         </div>
       </div>
+      <v-tooltip top :color="theme.$accent_ui_color">
+        <template v-slot:activator="{ on }">
+          <div v-show="rightDots" class="dots" v-on="on" @click="moveScroll($refs['tab-panel'].scrollWidth)">
+            ...
+          </div>
+        </template>
+        <span>В конец</span>
+      </v-tooltip>
       <div v-if="mode" id="plus-icon" @click="addNewTab">
         <svg
           width="14"
@@ -152,7 +170,6 @@
         </svg>
       </div>
     </div>
-    <footer-bottom />
   </v-app>
 </template>
 
@@ -182,6 +199,8 @@ export default {
       loadingDash: true,
       dataObject: {},
       firstLoad: true,
+      leftDots: true,
+      rightDots: true,
     }
   },
   computed: {
@@ -272,8 +291,45 @@ export default {
     this.createStartClient()
     this.calcSizeCell()
     this.addScrollListener()
+
+    this.$refs['tab-panel'].onwheel = this.scroll
+    this.checkTabOverflow()
+    window.onresize = this.checkTabOverflow
   },
   methods: {
+    exportDataCSV(searchName) {
+      const searchData = this.dataObject[searchName].data
+      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
+      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
+      csvContent += encodeURIComponent(
+        searchData.map((item) => Object.values(item).join(',')).join('\n')
+      )
+
+      const link = document.createElement('a') // создаем ссылку
+      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('download', `${this.idDash}-${searchName}.csv`) // указываем имя файла
+      link.click() // жмем на скачку
+      link.remove() // удаляем ссылку
+    },
+    scroll(event) {
+      // event.preventDefault()
+      this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY
+      this.checkTabOverflow()
+    },
+    moveScroll(value) {
+      this.$refs['tab-panel'].scrollLeft = value
+      this.checkTabOverflow()
+    },
+    checkTabOverflow() {
+      setTimeout(() => {
+        const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel']
+        scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false)
+        if (clientWidth < scrollWidth) {
+          this.rightDots = Math.floor(clientWidth + scrollLeft) !== scrollWidth
+        } else this.rightDots = false
+      }, 0)
+    },
     checkLoading(elem) {
       if (elem.search === -1) return false
       return this.dataObject[elem.search].loading
@@ -292,11 +348,13 @@ export default {
         let tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1
         this.$store.commit('addNewTab', { idDash: this.idDash, tabID, tabName: 'Без названия' })
       }
+      this.checkTabOverflow()
     },
     deleteTab(tabID) {
       if (this.tabsMoreOne && !this.tabEditMode) {
         this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID })
       }
+      this.checkTabOverflow()
     },
     enterEditMode(tab) {
       if (!this.tabEditMode && !this.editableTabID) {
@@ -304,6 +362,7 @@ export default {
         this.editableTabID = tab.id
         this.tempName = tab.name
       }
+      this.checkTabOverflow()
     },
     editTabName() {
       if (this.tempName) {

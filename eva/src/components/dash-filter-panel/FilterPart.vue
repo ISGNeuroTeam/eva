@@ -151,6 +151,7 @@
     .part-title
       color: var(--main_text)
       font-weight: 600
+      max-width: 300px
       white-space: nowrap
       overflow: hidden
       text-overflow: ellipsis

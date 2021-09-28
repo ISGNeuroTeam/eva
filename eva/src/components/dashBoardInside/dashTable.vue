@@ -326,31 +326,23 @@ export default {
               event.target.parentElement.classList.add("selected");
             }
 
-            let tockens = this.$store.getters.getTockens(this.idDash);
+            let headers = Array.from(this.$refs[this.id].$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
 
-            Object.keys(tockens).forEach((i) => {
-              if (tockens[i].elem == this.id && tockens[i].action == "click") {
-                let row = [];
-                let value = "";
-                event.target.parentElement.childNodes.forEach((item) => {
-                  row.push(item.textContent);
-                });
-                this.$refs[this.id].$el
-                  .querySelector("thead tr")
-                  .childNodes.forEach((item, index) => {
-                    if (item.textContent == tockens[i].capture) {
-                      value = row[index];
-                    }
+            let cellRowIndex = Array.from(event.target.parentElement.childNodes).findIndex(item => item==event.target);
+
+            let tokens = this.$store.getters.getTockens(this.idDash);
+
+            tokens.forEach(token => {
+                if (token.elem == this.id && token.action == 'click' && headers[cellRowIndex]===token.capture) {
+                  let value = event.target.textContent
+                  this.$store.commit('setTocken', {
+                    tocken: token,
+                    idDash: this.idDash,
+                    store: this.$store,
+                    value,
                   });
-
-                this.$store.commit("setTocken", {
-                  tocken: tockens[i],
-                  idDash: this.idDash,
-                  value: value,
-                  store: this.$store,
-                });
-              }
-            });
+                };
+              });
 
             let events = this.$store.getters.getEvents({
               idDash: this.idDash,

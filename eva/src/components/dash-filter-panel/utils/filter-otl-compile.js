@@ -9,18 +9,19 @@ export function filterCompile(filter) {
 
       if (part.values.length > 0 || part.filterPartType === 'manual') {
         if (idxPart == firstPartWithValuesIndex) {
-          filterOtlText += 'search';
+          filterOtlText += 'search ';
+
+          // If filter inverted to open parenthesis to "NOT" directive of whole search text
+          if (filter.invertMatches) filterOtlText += 'NOT (';
+
         } else {
-          filterOtlText += ' AND';
+          filterOtlText += ' AND ';
         }
 
-        // If filter inverted
-        if (filter.invertMatches) filterOtlText += ' NOT';
-
         // If part inverted
-        if (part.invertMatches) filterOtlText += ' NOT';
+        if (part.invertMatches) filterOtlText += 'NOT ';
 
-        filterOtlText += ' (';
+        filterOtlText += '(';
 
         switch (part.filterPartType) {
           case 'manual':
@@ -54,10 +55,15 @@ export function filterCompile(filter) {
             }
             break;
         }
+
       } else {
         firstPartWithValuesIndex += 1;
       }
     }
+
+    // If filter inverted to close parenthesis of "NOT" directive
+    if (filter.invertMatches && filterOtlText!=='') filterOtlText += ')';
+
   }
 
   return filterOtlText;

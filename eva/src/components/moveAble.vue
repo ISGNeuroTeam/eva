@@ -25,6 +25,7 @@
       :searchData="searchData"
       @SetLevel="props.zIndex = $event"
       @SetOpacity="changeOpacity($event)"
+      @downloadData="$emit('downloadData', $event)"
     />
   </vue-draggable-resizable>
 </template>
