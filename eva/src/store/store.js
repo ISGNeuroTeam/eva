@@ -603,16 +603,14 @@ export default {
       });
     },
     letEventGo: async (state, event) => {
-      
+      event.route.push(`/dashboards/${id}`);
       // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({}, event.event);
-      console.log("hello", event)
       if (item.prop[0] == '') {
           return;
       }
       let tockens = state[event.idDash].tockens;
       let id = -1;
-      console.log(item)
       if (Number.isInteger(+item.target)) {
         id = item.target
         console.log('id', id)
@@ -649,7 +647,6 @@ export default {
           { name: item.target, idgroup: state[event.idDash].idgroup },
           restAuth
         );
-        console.log(response)
         if (response) {
           id = response.id;
           Vue.set(state, response.id, {});
