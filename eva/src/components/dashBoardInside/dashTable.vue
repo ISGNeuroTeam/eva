@@ -57,6 +57,14 @@ export default {
     };
   },
   computed: {
+    events() {
+      let events = this.$store.getters.getEvents({
+        idDash: this.idDash,
+        event: "OnDataCompare",
+        element: this.id,
+      });
+      return events
+    },
     id: function () {
       return this.idFrom;
     },
@@ -104,6 +112,9 @@ export default {
     titles(newValue) {
       if (newValue) this.createTitles(newValue);
     },
+    events() {
+      this.setEventColor();
+    }
   },
   mounted() {
     this.$store.commit("setActions", {
@@ -174,7 +185,6 @@ export default {
         event: "OnDataCompare",
         element: this.id,
       });
-      console.log(events)
       let table, column;
       let eventObj = {};
       events.forEach((item, index) => {
@@ -195,8 +205,6 @@ export default {
           
           let readyTh = setTimeout(
             function tick() {
-              console.log(table)
-              console.log(table.querySelectorAll("thead th"))
               table.querySelectorAll("thead th").style ="background-color: red";
               if (table.querySelectorAll("thead th").length != 0) {
                 clearTimeout(readyTh);
@@ -209,12 +217,14 @@ export default {
                     sp++;
                   }
                 });
-
+                
                 table.querySelectorAll("tbody tr").forEach((itemRow) => {
                   itemRow.querySelectorAll("td").forEach((itemTd, i) => {
-                    console.log(itemRow);
+                    
+                    
                     if (i == column) {
-                      console.log("eq", itemTd.innerText, eventObj[index]["row"])
+                      
+                      // itemRow.style.backgroundColor = 'yellow';
                       let needItem = null,
                         row,
                         k = -1;
@@ -262,31 +272,31 @@ export default {
                           }
                           break;
                       }
-
                       if (needItem != null) {
                         needItem.classList.add("event");
                       }
                     }
                   });
                 });
-
+                
                 if (table.querySelectorAll(".event").length > 0) {
                   if (item.prop[0] == "rowcolor") {
-                    table.querySelectorAll(".event").forEach((res) => {
+                    let rows = table.querySelectorAll(".event");
+                    rows.forEach((res) => {
                       res.style.background = eventObj[index]["color"];
-                      res.style.color = this.color.back;
+                      //res.style.color = this.color.back;
                     });
                   } else if (item.prop[0] == "cellcolor") {
                     table.querySelectorAll(".event").forEach((res) => {
                       res.children[column].style.background =
                         eventObj[index]["color"];
-                      res.children[column].style.color = this.color.back;
+                      //res.children[column].style.color = this.color.back;
                     });
                   } else if (item.prop[0] == "columncolor") {
                     table.querySelectorAll("tbody tr").forEach((itemRow) => {
                       itemRow.children[column].style.background =
                         eventObj[index]["color"];
-                      itemRow.children[column].style.color = this.color.back;
+                      //itemRow.children[column].style.color = this.color.back;
                     });
                   }
                 }
@@ -300,7 +310,6 @@ export default {
       });
     },
     selectRow: function () {
-      console.log("test")
       document
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener("click", (event) => {
