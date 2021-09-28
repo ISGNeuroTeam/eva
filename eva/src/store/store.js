@@ -607,123 +607,122 @@ export default {
       // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({}, event.event);
       console.log("hello", event)
-      if (item.prop[0] != '') {
-        let tockens = state[event.idDash].tockens;
-        let id = -1;
-        console.log(item)
-        if (Number.isInteger(+item.target)) {
-         id = item.target
-         console.log('id', id)
-        }
-        
-        let tockensTarget = [];
-        Object.keys(state).forEach(key => {
-          if (state[key].name) {
-            if (state[key].name.toLowerCase() == item.target.toLowerCase()) {
-              id = key;
-            }
-          }
-        });
-
-        let values = {};
-        let changed = [];
-
-        item.value.forEach((itemValue, k) => {
-          if (itemValue.indexOf('$') != -1) {
-            itemValue = itemValue.replace(/\$/g, '');
-
-            tockens.forEach((tockenDeep, l) => {
-              if (tockenDeep.name == itemValue) {
-                values[k] = tockenDeep.value;
-              }
-            });
-          } else {
-            values[k] = itemValue;
-          }
-        });
-
-        if (id == -1) {
-          let response = await rest.getDashByName(
-            { name: item.target, idgroup: state[event.idDash].idgroup },
-            restAuth
-          );
-          console.log(response)
-          if (response) {
-            id = response.id;
-            Vue.set(state, response.id, {});
-
-            if (response.body != '') {
-              Vue.set(state, id, JSON.parse(response.body));
-            }
-            Vue.set(state[response.id], 'name', response.name);
-            Vue.set(state[response.id], 'idgroup', response.idgroup);
-            Vue.set(state[response.id], 'modified', response.modified);
+      if (item.prop[0] == '') {
+          return;
+      }
+      let tockens = state[event.idDash].tockens;
+      let id = -1;
+      console.log(item)
+      if (Number.isInteger(+item.target)) {
+        id = item.target
+        console.log('id', id)
+      }
+      
+      let tockensTarget = [];
+      Object.keys(state).forEach(key => {
+        if (state[key].name) {
+          if (state[key].name.toLowerCase() == item.target.toLowerCase()) {
+            id = key;
           }
         }
+      });
 
-        // if (state[id].tockens) {
-        //   tockensTarget = state[id].tockens;
-        // }
+      let values = {};
+      let changed = [];
 
-        item.prop.forEach((itemProp, j) => {
-          tockensTarget.forEach((itemTock, i) => {
-            if (itemProp == itemTock.name) {
-              if (itemTock.elem.indexOf('select') != -1) {
-                state[id][itemTock.elem].selected.elemDeep = values[j];
-              }
-              state[id].tockens[i].value = values[j];
-              changed.push(itemProp);
+      item.value.forEach((itemValue, k) => {
+        if (itemValue.indexOf('$') != -1) {
+          itemValue = itemValue.replace(/\$/g, '');
+
+          tockens.forEach((tockenDeep, l) => {
+            if (tockenDeep.name == itemValue) {
+              values[k] = tockenDeep.value;
             }
           });
+        } else {
+          values[k] = itemValue;
+        }
+      });
+
+      if (id == -1) {
+        let response = await rest.getDashByName(
+          { name: item.target, idgroup: state[event.idDash].idgroup },
+          restAuth
+        );
+        console.log(response)
+        if (response) {
+          id = response.id;
+          Vue.set(state, response.id, {});
+
+          if (response.body != '') {
+            Vue.set(state, id, JSON.parse(response.body));
+          }
+          Vue.set(state[response.id], 'name', response.name);
+          Vue.set(state[response.id], 'idgroup', response.idgroup);
+          Vue.set(state[response.id], 'modified', response.modified);
+        }
+      }
+      if (state[id].tockens) {
+        tockensTarget = state[id].tockens;
+      }
+
+      item.prop.forEach((itemProp, j) => {
+        tockensTarget.forEach((itemTock, i) => {
+          if (itemProp == itemTock.name) {
+            if (itemTock.elem.indexOf('select') != -1) {
+              state[id][itemTock.elem].selected.elemDeep = values[j];
+            }
+            state[id].tockens[i].value = values[j];
+            changed.push(itemProp);
+          }
         });
+      });
 
-        event.route.push(`/dashboards/${id}`);
-        
+      event.route.push(`/dashboards/${id}`);
+      // event.route.go();
 
-        let searches = state[id].searches;
+      let searches = state[id].searches;
 
-        let response = {};
+      let response = {};
 
-        if (searches) {
-          searches.forEach(async item => {
-            // также при обновлении токена нужно заново запускать серч и обновлять информацию
+      if (searches) {
+        searches.forEach(async item => {
+          // также при обновлении токена нужно заново запускать серч и обновлять информацию
 
-            changed.forEach(async itemTok => {
-              if (item.original_otl.indexOf(`$${itemTok}$`) != -1) {
-                // если в тексте запроса есть наш токен
+          changed.forEach(async itemTok => {
+            if (item.original_otl.indexOf(`$${itemTok}$`) != -1) {
+              // если в тексте запроса есть наш токен
 
-                event.store.commit('setLoading', {
-                  search: item.sid,
-                  idDash: id,
-                  should: true,
-                  error: false,
-                });
+              event.store.commit('setLoading', {
+                search: item.sid,
+                idDash: id,
+                should: true,
+                error: false,
+              });
 
-                response = await event.store.getters.getDataApi({ search: item, idDash: id });
-                if (response.length != 0) {
-                  let responseDB = event.store.getters.putIntoDB(response, item.sid, id);
-                  responseDB.then(result => {
-                    let refresh = event.store.getters.refreshElements(id, item.sid);
-                    event.store.commit('setLoading', {
-                      search: item.sid,
-                      idDash: id,
-                      should: false,
-                      error: false,
-                    });
-                  });
-                } else {
+              response = await event.store.getters.getDataApi({ search: item, idDash: id });
+              if (response.length != 0) {
+                let responseDB = event.store.getters.putIntoDB(response, item.sid, id);
+                responseDB.then(result => {
+                  let refresh = event.store.getters.refreshElements(id, item.sid);
                   event.store.commit('setLoading', {
                     search: item.sid,
                     idDash: id,
                     should: false,
-                    error: true,
+                    error: false,
                   });
-                }
+                });
+              } else {
+                event.store.commit('setLoading', {
+                  search: item.sid,
+                  idDash: id,
+                  should: false,
+                  error: true,
+                });
               }
-            });
+            }
           });
-        }
-        //event.route.go();
+        });
       }
     },
     setModalSettings: (state, settings) => {
