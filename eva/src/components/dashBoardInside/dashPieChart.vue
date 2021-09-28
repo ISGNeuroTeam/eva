@@ -95,9 +95,6 @@ export default {
         id: this.idFrom
       })
     },
-    dataRest: function() {
-      return this.dataRestFrom
-    },
     theme: function() {
       return this.$store.getters.getTheme
     },
@@ -142,11 +139,21 @@ export default {
       return true  
     },
   },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-  },
-  beforeUpdate() {
-    this.setMetrics()
+  watch: {
+    dataRestFrom(){
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
+        let graphics = d3.select(document.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
+        if(graphics.length != 0){  
+          graphics[0].remove(); 
+          //если строим заново(изменились данные) - очищаем токены
+          this.selectedValue = []
+          this.setTocken()
+          this.createPieChartDash();
+        } else {
+          this.createPieChartDash()
+        }
+      }
+    }
   },
   methods: {
     setMetrics() {
@@ -185,10 +192,6 @@ export default {
           nametheme: '',
         }
       }
-
-      // if (this.dashOptions.themes)  {
-      //   this.colors = this.dashOptions.themes;
-      // }
 
       let onlyNum = true;
 
@@ -289,16 +292,6 @@ export default {
         .domain(data)
         .range(that.colors[colorsPie.theme])
 
-      // let tooltip = d3.select(this.$el.querySelector(`.${this.idFrom}`))
-      //   .append("div")
-      //   .attr("class", "tooltip")
-      //   .style("color",this.colors.text)
-      //   .style("background",this.color.backElement)
-      //   .style('border-color',this.colors.text)
-      //   .style('z-index','2')
-      //   .style("opacity","0")
-      //   .style("visibility","hidden")
-      //   .text('');
       let pie = d3.pie()  // вычисляем позицию каждого кусочка диаграммы
         .value(function(d) {return d.value; })
       let data_ready = pie(d3.entries(data))
@@ -392,7 +385,13 @@ export default {
         }
       })
     }
-  }
+  },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
+  },
+  beforeUpdate() {
+    this.setMetrics()
+  },
 }
 
 </script>
