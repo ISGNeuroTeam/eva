@@ -2,7 +2,7 @@
   <v-progress-linear
     class="progress-bar-linear"
     background-color="#dadada"
-    :height="30"
+    :height="50"
     :color="calculatedColor"
     :value="calculatedValue"
   >
@@ -50,6 +50,7 @@ export default {
 
 <style lang="sass" scoped>
 .progress-bar-linear
+  min-width: 200px
   border-radius: 6px
 
   .title-text
