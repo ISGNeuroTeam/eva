@@ -10,13 +10,13 @@
           Режим
         </v-btn>
         <v-select
-          v-model="options.mode"
+          :value="options.mode"
           :menu-props="{ value: toggleSelect }"
           :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
           :items="mode"
           label="Режим"
           multiple
-          @change="updatePipeDataSource"
+          @change="updatePipeDataSource($event)"
         />
         <v-spacer/>
         <v-dialog v-model="dialog" max-width="290">
@@ -368,12 +368,14 @@ export default {
     console.log(this.searches)
   },
   methods: {
-    updatePipeDataSource() {
+    updatePipeDataSource(e) {
+      let set = new Set(e);
+      set.delete(this.options.mode[0])
+      this.options.mode = Array.from(set);
       this.$emit("updatePipeDataSource", this.options.search)
     },
     loadDataForPipe() {
       let searches = this.$store.getters.getSearches(this.idDashFrom)
-      console.log(searches)
       return searches;
 
     },
