@@ -16,16 +16,22 @@
         <tbody>
           <tr v-for="x in filteredX" :key="x">
             <td class="text-left" v-text="x"/>
-            <td v-for="y in filteredY" :key="y" class="py-2">
-              <DashHeatMapLinear
+            <td v-for="y in filteredY" :key="y" class="pa-0">
+              <div
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"
-                :title="filteredData[x][y].value"
-                :value="filteredData[x][y].metadata.progress_bar_value"
-                :color="filteredData[x][y].metadata.progress_bar_color"
-                :comment="filteredData[x][y].metadata.description"
-              />
-              <span
+                class="td-inner"
+                :style="{ backgroundColor: filteredData[x][y].metadata.background_color }"
+              >
+                <DashHeatMapLinear
+                  :title="filteredData[x][y].value"
+                  :value="filteredData[x][y].metadata.progress_bar_value"
+                  :color="filteredData[x][y].metadata.progress_bar_color"
+                  :comment="filteredData[x][y].metadata.description"
+                />
+              </div>
+              <div
                 v-else-if="filteredData[x][y]"
+                class="td-inner"
                 v-text="filteredData[x][y].value"
               />
             </td>
