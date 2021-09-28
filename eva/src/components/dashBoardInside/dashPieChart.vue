@@ -125,7 +125,7 @@ export default {
     },
     change: function() {
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
-        let graphics = d3.select(document.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
+        let graphics = d3.select(this.$refs.piechartItself).selectAll('svg').nodes();
         if(graphics.length != 0){  
           graphics[0].remove(); 
           //если строим заново(изменились данные) - очищаем токены
@@ -142,7 +142,7 @@ export default {
   watch: {
     dataRestFrom(){
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
-        let graphics = d3.select(document.querySelector(`.${this.idFrom}`)).selectAll('svg').nodes();
+        let graphics = d3.select(this.$refs.piechartItself).selectAll('svg').nodes();
         if(graphics.length != 0){  
           graphics[0].remove(); 
           //если строим заново(изменились данные) - очищаем токены
@@ -205,7 +205,7 @@ export default {
           this.nodata = true;  // показываем сообщение о некорректности данных
           this.legends = [];
           this.message = "К сожалению данных слишком много для построения диаграммы";  // выводим сообщение
-          d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+          d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
         } else {
           this.createLegend(this.dataRestFrom,metrics,showlegend,colorsPie);
           let legendsSize = {};
@@ -230,7 +230,7 @@ export default {
         this.nodata = true;  // показываем сообщение о некорректности данных
         this.message = "К сожалению данные не подходят к диаграмме";  // выводим сообщение
         this.legends = [];
-        d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+        d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
       }
     },
 
@@ -243,7 +243,7 @@ export default {
       }
     },
     createPieChart: function (dataFrom,that,sizeLine,metrics,legendsSize,positionlegend,colorsPie) {  // создает диаграмму
-      d3.select(this.$el.querySelector(`.${this.idFrom}`)).selectAll('svg').remove();
+      d3.select(this.$refs.piechartItself).selectAll('svg').remove();
       let width = sizeLine['width']-40; // отступ по бокам
       let height = sizeLine['height']-35; // минус шапка
       let margin = 40; // отступ от контейнера
@@ -272,7 +272,7 @@ export default {
 
       let radius = Math.min(width, height) / 2 - margin // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
 
-      let svg = d3.select(`.${this.idFrom}`)  // добовляем svg объект в нужный div
+      let svg = d3.select(this.$refs.piechartItself)  // добовляем svg объект в нужный div
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -322,23 +322,11 @@ export default {
           let selected = false;
           if (this.classList.contains('piepartSelect')) {
             this.classList.remove('piepartSelect');
-            // tooltip
-            //   .style("opacity","0")
-            //   .style("visibility","hidden");
             selected = false;
           } else {
             this.classList.add('piepartSelect');
-            // tooltip
-            //   .style("opacity","1")
-            //   .style("visibility","visible")
-            //   .style("top", (event.layerY-40)+"px")
-            //   .style("left",(event.layerX+15)+"px");
             selected = true;
           }
-          // tooltip
-          //   .attr('index',d.index)
-          //   .html(`#${d.data.key} - ${d.data.value}%`);
-
           return that.setClick(d,selected)
         })
     },
@@ -388,9 +376,6 @@ export default {
   },
   mounted() {
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-  },
-  beforeUpdate() {
-    this.setMetrics()
   },
 }
 
