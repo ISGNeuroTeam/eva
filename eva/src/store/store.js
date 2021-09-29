@@ -603,7 +603,58 @@ export default {
       });
     },
     letEventGo: async (state, event) => {
-      event.route.push(`/dashboards/${id}`);
+      //load dash
+      let loader = (id, first) => {
+        return new Promise((resolve) => {
+          let result = rest.getState(id, restAuth);
+          result.then(stateFrom => {
+            if (stateFrom) {
+              if (!state[id]) {
+                Vue.set(state, id, {});
+                if (stateFrom.body !== '') {
+                  Vue.set(state, id, JSON.parse(stateFrom.body));
+                }
+                Vue.set(state[id], 'name', stateFrom.name);
+                Vue.set(state[id], 'idgroup', stateFrom.idgroup);
+                Vue.set(state[id], 'modified', stateFrom.modified);
+              }
+              if (stateFrom.modified > state[id].modified) {
+                resolve({
+                  status: 'exist',
+                  body: stateFrom.body,
+                  name: stateFrom.name,
+                  id: stateFrom.id,
+                  modified: stateFrom.modified,
+                });
+              }
+              if (first) {
+                if (stateFrom.body !== '') {
+                  Vue.set(state, id, JSON.parse(stateFrom.body));
+                  Vue.set(state[id], 'idgroup', stateFrom.idgroup);
+                  Vue.set(state[id], 'name', stateFrom.name);
+                  Vue.set(state[id], 'modified', stateFrom.modified);
+                }
+              }
+              if (state[id].elements) {
+                state[id].elements.forEach(elem => {
+                  if (!state[id][elem].tab) {
+                    Vue.set(state[id][elem], 'tab', 1);
+                  }
+                });
+              }
+              if (state[id].searches) {
+                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'))
+              }
+              resolve({ status: 'finish' });
+              // }
+            } else {
+              resolve({ status: 'failed' });
+            }
+          });
+        });
+      }
+
+
       // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({}, event.event);
       if (item.prop[0] == '') {
@@ -615,6 +666,9 @@ export default {
         id = item.target
         console.log('id', id)
       }
+      if (id)
+        await loader(id);
+      
       
       let tockensTarget = [];
       Object.keys(state).forEach(key => {
@@ -659,7 +713,7 @@ export default {
           Vue.set(state[response.id], 'modified', response.modified);
         }
       }
-      if (state[id].tockens) {
+      if (state[id] && state[id].tockens) {
         tockensTarget = state[id].tockens;
       }
 
@@ -675,9 +729,9 @@ export default {
         });
       });
 
-      event.route.push(`/dashboards/${id}`);
+      //event.route.push(`/dashboards/${id}`);
       // event.route.go();
-
+      event.route.push(`/dashboards/${id}`);
       let searches = state[id].searches;
 
       let response = {};
