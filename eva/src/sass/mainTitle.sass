@@ -1,4 +1,4 @@
-.aplication
+.application
   position: relative
 
   &:before
@@ -14,6 +14,15 @@
     background-repeat: no-repeat
     background-position: 50% 0
     background-size: cover
+
+  .body-block
+    height: 100%
+    #content
+      height: 100%
+      .loading-circle
+        position: absolute
+        top: 45%
+        left: 50%
 
   .already-block
     display: flex
@@ -58,87 +67,106 @@
       background: black
       color: white
 
-  .tab-panel
+  .tab-panel-wrapper
     z-index: 1
     position: fixed
     bottom: 0
     left: 0
     width: 100%
     height: 40px
-    background-color: var(--main_bg)
     display: flex
+    background-color: var(--main_bg)
     box-shadow: 0 0 4px var(--main_border)
-    align-items: center
-    overflow-x: auto
 
-    &::-webkit-scrollbar
-      display: none
-
-    .tab-name-input
-      height: 20px
+    .dots
+      background-color: var(--main_bg)
       color: var(--main_text)
-      background-color: var(--secondary_bg)
-      padding: 0 5px
-
-    .tab-item
-      padding: 0 30px
       line-height: 40px
-      height: 40px
-      text-align: center
-      border-right: 1px solid var(--secondary_border)
-      font-size: 15px
-      color: var(--main_text)
-      position: relative
-      white-space: nowrap
+      padding: 0 15px
+      box-shadow: 0 0 4px var(--main_border)
       cursor: pointer
 
       &:hover
         background-color: rgba(var(--primary_button-rgb), 0.08)
 
-    .edit-mode-tab
-      padding: 0 50px 0 30px
+    .tab-panel
+      display: flex
+      align-items: center
+      overflow-x: auto
 
-      .delete-cross
-        position: absolute
-        right: 6px
-        top: 13px
+      &::-webkit-scrollbar
+        display: none
+
+      .tab-name-input
+        height: 20px
+        color: var(--main_text)
+        background-color: var(--secondary_bg)
+        padding: 0 5px
+
+      .tab-item
+        padding: 0 30px
+        line-height: 40px
+        height: 40px
+        text-align: center
+        border-right: 1px solid var(--secondary_border)
+        font-size: 15px
+        color: var(--main_text)
+        position: relative
+        white-space: nowrap
         cursor: pointer
 
         &:hover
-          path
-            fill: var(--error_color)
+          background-color: rgba(var(--primary_button-rgb), 0.08)
 
-      .edit-icon
+        .tab-title
+          max-width: 200px
+          white-space: nowrap
+          overflow: hidden
+          text-overflow: ellipsis
+
+      .edit-mode-tab
+        padding: 0 50px 0 30px
+
+        .delete-cross
+          position: absolute
+          right: 6px
+          top: 13px
+          cursor: pointer
+
+          &:hover
+            path
+              fill: var(--error_color)
+
+        .edit-icon
+          position: absolute
+          top: 13px
+          right: 26px
+          cursor: pointer
+
+          &:hover
+            path
+              fill: var(--primary_button)
+
+      .active
+        color: var(--primary_button)
+        font-weight: 600
+        background-color: rgba(var(--primary_button-rgb), 0.16)
+
+
+      #submit-icon
         position: absolute
-        top: 13px
-        right: 26px
-        cursor: pointer
+        top: 10px
+        right: 18px
 
         &:hover
           path
             fill: var(--primary_button)
 
-    .active
-      color: var(--primary_button)
-      font-weight: 600
-      background-color: rgba(var(--primary_button-rgb), 0.16)
-
     #plus-icon
       display: flex
       align-items: center
-      width: 30px
-      justify-content: center
-      margin-left: 10px
+      margin: 0 15px
       height: 40px
-
-      &:hover
-        path
-          fill: var(--primary_button)
-
-    #submit-icon
-      position: absolute
-      top: 10px
-      right: 18px
 
       &:hover
         path

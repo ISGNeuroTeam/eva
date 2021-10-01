@@ -80,10 +80,9 @@ export default {
     update: 1,
   }),
   computed: {
-
     dataToRender() {
       let temp = [...this.metricList].sort((a,b) => a.listOrder - b.listOrder)
-      console.log(temp)
+      // console.log(temp)
       return this.update && temp.slice(0, this.metricCount);
     },
 
@@ -102,6 +101,29 @@ export default {
   },
   watch: {
     dataRestFrom() {
+      this.setVisual()
+    },
+  },
+  mounted() {
+    /** Getting saved component options from the store. */
+    const { idFrom: id, idDashFrom: idDash } = this;
+    const options = { ...this.$store.getters.getOptions({ id, idDash }) };
+    if (!options.settings) {
+      options.settings = {
+        title: '',
+        template: 1,
+        metricCount: 1,
+        metricOptions: {},
+      };
+    }
+    const { template, metricCount } = options.settings;
+    this.options = options;
+    this.template = template;
+    this.metricCount = metricCount;
+    this.setVisual();
+  },
+  methods: {
+    setVisual() {
       const metricList = [];
       const metricOptions = [];
       let idCount = 1;
@@ -138,25 +160,6 @@ export default {
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
     },
-  },
-  mounted() {
-    /** Getting saved component options from the store. */
-    const { idFrom: id, idDashFrom: idDash } = this;
-    const options = { ...this.$store.getters.getOptions({ id, idDash }) };
-    if (!options.settings) {
-      options.settings = {
-        title: '',
-        template: 1,
-        metricCount: 1,
-        metricOptions: {},
-      };
-    }
-    const { template, metricCount } = options.settings;
-    this.options = options;
-    this.template = template;
-    this.metricCount = metricCount;
-  },
-  methods: {
     updateOptions() {
       this.$store.commit('setOptions', {
         id: this.idFrom,

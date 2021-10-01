@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.67.0]
+### Added
+- heatmap progress-bar for the full table cell width
+- setting heatmap table cell color from 'background_color' metadata key
+- heatmap progress-bar sizes set to 200 (min) x 50 px
+- reverse icon status for filter parts
+- go to dashboard event
+- compare event for table to color rows, cells and columns
+
+### Changed
+- moved some controls of filter panel to dashboard 'edit' mode
+- tabs on filter setting modal window are now hiding when only manual input is available
+- max width of filter part title restricted to 250px
+
+### Fixed
+- when logged as regular user 'log out' options in dropdown menu was hidden on dashboard page
+- clicking reset filter part item doesn't give any visual feedback
+- 'add new filter' button are now displaying correctly
+- redrawing pie chart after token changes
+
+## [1.66.0]
+### Added
+- zoom in/out and fitContent control buttons in graph component
+- control buttons on graph component disabled when data is loading
+- overflow dots in tab panel from right and left sides of panel
+- scroll without shift of tab panel
+- can take token from fullscreen table
+
+### Changed
+- max width of tab is 200px
+
+### Fixed
+- bug with custom themes crushing application
+- problem with data source reloading when switching tab on dashboard
+- bug with gant diagram colors and tooltips
+
 ## [1.65.0]
 
 ### Changed

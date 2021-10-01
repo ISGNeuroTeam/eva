@@ -1,7 +1,5 @@
 <template>
-  <div 
-    class="dash-guntt" 
-  >
+  <div class="dash-guntt" :class="idDashClass()">
     <div class="legend-block">
       <div 
         v-for="i in legends.length" 
@@ -37,7 +35,6 @@
 
 
 <script>
-
 import * as d3 from "d3"
 
 export default {
@@ -61,7 +58,7 @@ export default {
       ],
       msgText: 'Нет данных для отображения',
       noMsg: true,
-      colors: [this.colorFrom.controls,this.colorFrom.controlsActive,'#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22'],
+      colors: [this.colorFrom.controls || this.colorFrom.$accent_ui_color,this.colorFrom.controlsActive || this.colorFrom.$primary_button_hover,'#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22'],
       legends: [],
       firstTime: true // определяем первый ли раз зашли на страницу, ничего лучше не придумал
     } 
@@ -87,7 +84,7 @@ export default {
             } else {
              
               
-              let graphics = d3.select(this.$el.querySelector('.guntt-block')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
+              let graphics = d3.select(this.$el.querySelector(`.guntt-block`)).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
             
               if(graphics.length != 0){  // если график уже есть
                 graphics[0].remove();  // удаляем его
@@ -136,8 +133,8 @@ export default {
               this.prepareChart(this.dataRestFrom);
             } else {
               
-              
-              let graphics = d3.select(this.$el.querySelector('.guntt-block')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
+              // .dash-guntt-${this.id}
+              let graphics = d3.select(this.$el.querySelector(`.guntt-block`)).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
             
               if(graphics.length != 0){  // если график уже есть
                 graphics[0].remove();  // удаляем его
@@ -166,7 +163,7 @@ export default {
             } else {
               
               
-              let graphics = d3.select(this.$el.querySelector('.guntt-block')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
+              let graphics = d3.select(this.$el.querySelector(`.guntt-block`)).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
             
               if(graphics.length != 0){  // если график уже есть
                 graphics[0].remove();  // удаляем его
@@ -195,7 +192,7 @@ export default {
             } else {
               
               
-              let graphics = d3.select(this.$el.querySelector('.guntt-block')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
+              let graphics = d3.select(this.$el.querySelector(`.guntt-block`)).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
             
               if(graphics.length != 0){  // если график уже есть
                 graphics[0].remove();  // удаляем его
@@ -217,7 +214,7 @@ export default {
               this.prepareChart(this.dataRestFrom);
             } else {
               
-              let graphics = d3.select(this.$el.querySelector('.guntt-block')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
+              let graphics = d3.select(this.$el.querySelector(`.guntt-block`)).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
             
               if(graphics.length != 0){  // если график уже есть
                 graphics[0].remove();  // удаляем его
@@ -232,15 +229,25 @@ export default {
     }
   }, 
   methods: {
+    idDashClass() {
+      return `dash-guntt-${this.id}`;
+    },
     prepareChart: function(dataRest) {
-
       let prom = new Promise( resolve => { // создаем promise чтобы затем отрисовать график асинхронно
 
         let sizeChart = {'width': 0,'height': 0};  // получаем размеры от родителя
         sizeChart['width'] = this.widthFrom;
         sizeChart['height'] = this.heightFrom;
         this.actions[0].capture = Object.keys(dataRest[0]);
-        this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+        if (
+          this.$store.state.store[this.idDash][this.idFrom].actions.length !== this.actions.length
+        ) {
+          this.$store.commit('setActions', {
+            actions: this.actions,
+            idDash: this.idDash,
+            id: this.id,
+          })
+        }
         resolve(sizeChart)
 
       })
@@ -277,14 +284,14 @@ export default {
         data.push({...{},...item})
       })
     
-      let graphics = d3.select(this.$el.querySelector('.guntt-block')).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
+      let graphics = d3.select(this.$el.querySelector(`.guntt-block`)).selectAll('svg').nodes(); // получаем область в которой будем рисовтаь график 
       
 
       if(graphics.length != 0){  // если график уже есть
         graphics[0].remove();  // удаляем его
       }
 
-      let svg = d3.select(this.$el.querySelector('.guntt-block'))
+      let svg = d3.select(this.$el.querySelector(`.guntt-block`))
         .append("svg")
         .attr("width", width)
         .attr("height", height)
@@ -421,7 +428,6 @@ export default {
           return width;
         })
         .attr("height", barHeight)
-        .attr("fill",'none')
         .attr("stroke", "none")
         .attr("opacity", 0.2);
 
@@ -430,7 +436,7 @@ export default {
         .selectAll("rect")
         .data(data)
         .enter();
-                
+          console.log(data, 'data', this.id)
       let lines = bars.append("rect")
         .attr("rx", 3)
         .attr("ry", 3)
@@ -459,7 +465,8 @@ export default {
               j = i;
             }
           })
-          return this.colors[j]
+          
+          return this.colors.filter(Boolean)[j]
         });
                                     
 
@@ -481,13 +488,13 @@ export default {
           })
         }
 
-        moveTooltip();
+        moveTooltip(event);
 
         tooltipBlock.innerHTML = tooltip;
         tooltipBlock.style.opacity = '0.9';
         tooltipBlock.style.visibility = 'visible';
-      }).on('mousemove', function() {
-        moveTooltip();
+      }).on('mousemove', function(event) {
+        moveTooltip(event);
 
       }).on('mouseout', function() {
         tooltipBlock.style.opacity = '0';
@@ -529,8 +536,8 @@ export default {
 
         tooltipBlock.style.opacity = '0.9';
         tooltipBlock.style.visibility = 'visible';
-      }).on('mousemove', function() {
-        moveTooltip();
+      }).on('mousemove', function(event) {
+        moveTooltip(event);
       }).on('mouseout', function() {
         tooltipBlock.style.opacity = '0';
         tooltipBlock.style.visibility = 'hidden';
@@ -570,7 +577,7 @@ export default {
         .attr("font-size", 11)
         .attr("text-anchor", "start")
         .style("opacity","0.8")
-        .attr("fill", this.colorFrom.text);
+        .attr("fill", this.colorFrom.text || 'white');
 
             
 
@@ -626,19 +633,18 @@ export default {
       // легенда
 
 
-      function moveTooltip() {
-        let x = d3.event.layerX + 10;
-        let y = d3.event.layerY -10 - tooltipBlock.offsetHeight;
-        if (y < 0) {
-          y = 0;
-          x += 5;
-        }
-        if(x-20+tooltipBlock.offsetWidth>width-otstupRight) {
-          x = d3.event.layerX - 10 - tooltipBlock.offsetWidth;
-        }
-            
-        tooltipBlock.style.top = y+'px';
-        tooltipBlock.style.left = x+'px';
+      function moveTooltip(event) {
+        let x = d3.event.offsetY - 50;
+        let y = d3.event.offsetX + 30;
+        // if (y < 0) {
+        //   y = 0;
+        //   x += 5;
+        // }
+        // if(x-20+tooltipBlock.offsetWidth>width-otstupRight) {
+        //   x = d3.event.layerX - 10 - tooltipBlock.offsetWidth;
+        // }
+        tooltipBlock.style.top = x+'px';
+        tooltipBlock.style.left = y+'px';
       }
 
       function transformDescription(text) {

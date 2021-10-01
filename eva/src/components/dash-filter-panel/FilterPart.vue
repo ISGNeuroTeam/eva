@@ -2,7 +2,12 @@
   <div class="part-container">
     <div class="data-col">
       <template v-if="filterPart.filterPartType === 'token'">
-        <div class="part-title" v-text="elemName" />
+        <div class="part-title">
+          <svg v-if="filterPart.invertMatches" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5.99998 13.3334L2.66665 10.6667L5.99998 8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998 8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z" :fill="theme.$main_text"/>
+          </svg>
+          {{ elemName }}
+        </div>
         <div class="part-subtitle">
           <span>{{ filterPart.fieldName }} ({{ filterPartValues.length }})</span>
           <v-menu
@@ -40,7 +45,12 @@
         </div>
       </template>
       <template v-else>
-        <div class="part-title">{{ filterPart.fieldName }}: {{ filterPart.value }}</div>
+        <div class="part-title">
+          <svg v-if="filterPart.invertMatches" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-1">
+            <path d="M5.99998 13.3334L2.66665 10.6667L5.99998 8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998 8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z" :fill="theme.$main_text"/>
+          </svg>
+          {{ filterPart.fieldName }}: {{ filterPart.value }}
+        </div>
         <div class="part-subtitle" v-text="`(${filterPart.fieldType}) ${operationManualTitle}`" />
       </template>
     </div>
@@ -57,6 +67,7 @@
       />
       <v-icon
         v-if="editPermission || filterPart.filterPartType === 'manual'"
+        v-show="editMode"
         :color="theme.$error_color"
         size="20"
         @click.stop.prevent="
@@ -80,6 +91,7 @@
       'editPermission',
       'filterPartIndex',
       'filterIndex',
+      'editMode'
     ],
     data() {
       return {
@@ -151,9 +163,12 @@
     .part-title
       color: var(--main_text)
       font-weight: 600
+      max-width: 300px
       white-space: nowrap
       overflow: hidden
       text-overflow: ellipsis
+      display: flex
+      align-items: center
 
     .part-subtitle
       display: flex

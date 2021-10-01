@@ -1,73 +1,59 @@
 <template>
   <v-progress-linear
     class="progress-bar-linear"
-    :color="color"
-    :height="height"
+    background-color="#dadada"
+    :height="50"
+    :color="calculatedColor"
     :value="calculatedValue"
-    :background-color="backColor"
-    :style="{ width: `${width}px` }"
   >
+    <span v-if="!comment" class="title-text" v-text="title" />
     <v-tooltip
-      v-if="comment"
+      v-else
       bottom
       nudge-top="15"
-      color="var(--secondary_bg)"
       content-class="elevation-2"
       transition="fade-transition"
+      :color="theme.$secondary_bg"
     >
       <template v-slot:activator="{ on }">
-        <strong v-on="on" v-text="title"/>
+        <span class="title-text" v-on="on" v-text="title" />
       </template>
-      <span :style="{ color }" v-text="comment"/>
+      <span :style="{ color: calculatedColor }" v-text="comment" />
     </v-tooltip>
-    <strong v-else v-text="title"/>
   </v-progress-linear>
 </template>
 
 <script>
 export default {
   props: {
-    value: {
-      type: Number,
-      default: 0,
+    title: { type: [String, Number], default: '' },
+    value: { type: Number, default: 0 },
+    color: { type: String, default: '' },
+    comment: { type: String, default: '' },
+  },
+  computed: {
+    theme() {
+      return this.$store.getters.getTheme
     },
-    title: {
-      type: [String, Number],
-      default: '',
+
+    calculatedColor() {
+      return !this.color ? this.theme.$accent_ui_color : this.color
     },
-    color: {
-      type: String,
-      default: '#03a9f4',
-    },
-    width: {
-      type: Number,
-      default: 50,
-    },
-    height: {
-      type: Number,
-      default: 30,
-    },
-    comment: {
-      type: String,
-      default: '',
+
+    calculatedValue() {
+      const value = this.value <= 0 ? 0 : this.value
+      return Math.round(value >= 100 ? 100 : value)
     },
   },
-  data: () => ({
-    backColor: '#dadada',
-  }),
-  computed: {
-    calculatedValue() {
-      let { value } = this;
-      if (value <= 0) value = 0;
-      if (value >= 100) value = 100;
-      return Math.round(value);
-    },
-  }
-};
+}
 </script>
 
 <style lang="sass" scoped>
 .progress-bar-linear
-  min-width: 50px
-  border-radius: 5px
+  min-width: 200px
+  border-radius: 6px
+
+  .title-text
+    color: #060606
+    font-weight: 600
 </style>

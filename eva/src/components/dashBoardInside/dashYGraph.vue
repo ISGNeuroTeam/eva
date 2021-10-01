@@ -1,14 +1,77 @@
 <template>
   <div class="ygraph-wrapper">
-     <v-row align="start">
-      <v-icon
-        :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
-        @click="changeInputMode"
-      >
-       {{iconArrowAll}}
-      </v-icon>
-     </v-row>
-     <div ref="graph" class="ygraph-component-container" :style="{top:`${top}`}"/>
+    <div class="button-block">
+      <v-row align="start">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="isEditor ? colorFrom.$primary_button : colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="changeInputMode"
+            >
+              {{ iconArrowAll }}
+            </v-icon>
+          </template>
+          <span>Перемещение по графу</span>
+        </v-tooltip>
+
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="zoomIn"
+            >
+              {{ mdiMagnifyPlus }}
+            </v-icon>
+          </template>
+          <span>Увеличить</span>
+        </v-tooltip>
+
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="zoomOut"
+            >
+              {{ mdiMagnifyMinus }}
+            </v-icon>
+          </template>
+          <span>Уменьшить</span>
+        </v-tooltip>
+
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              :color="colorFrom.$accent_ui_color"
+              :disabled="loading"
+              v-on="on"
+              @click="fitContent"
+            >
+              {{ mdiFitToPageOutline }}
+            </v-icon>
+          </template>
+          <span>Выровнять</span>
+        </v-tooltip>
+      </v-row>
+    </div>
+    <div ref="graph" class="ygraph-component-container" :style="{ top: `${top}` }"/>
   </div>
 </template>
 
@@ -16,29 +79,33 @@
 <script>
 import * as yfile from 'yfiles'
 import licenseData from './license.json'
-import { mdiArrowAll } from '@mdi/js'
+import { mdiArrowAll, mdiMagnifyPlus, mdiFitToPageOutline, mdiMagnifyMinus } from '@mdi/js'
 yfile.License.value = licenseData//проверка лицензии
 
 export default {
   name: "dashYGraph",
   props: {  // переменные полученные от родителя
     idFrom: null,  // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда 
+    idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
     colorFrom: null,  // цветовые переменные
-    shouldFrom: null, // меняется в момент выбора источника данных у дашборда
-    dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
-    
+    loading: {
+      type: Boolean,
+      default: true,
+    },  // сообщает что компонент в режиме получения данных
   },
   data () {
     return {
       iconArrowAll: mdiArrowAll,
+      mdiMagnifyPlus,
+      mdiFitToPageOutline,
+      mdiMagnifyMinus,
       isEditor: false,
       nodesSource : null,
       edgesSource: null,
       errorColor: '#D34C00',//цвет ошибки
       colors: ['#AEFAFF', '#0AB3FF', '#003CFF', '#7100FF'],
-      startColor: '#C7C7C7',//цвет старт и финиш 
+      startColor: '#C7C7C7',//цвет старт и финиш
       actions: [
         {name: 'click',
           capture: []
@@ -47,11 +114,11 @@ export default {
           capture: []
         },
       ],
-    } 
+    }
   },
-  computed: { 
-    top () {// для ряда управляющих иконок 
-      if(document.body.clientWidth <=1600){
+  computed: {
+    top() {// для ряда управляющих иконок
+      if (document.body.clientWidth <=1600){
         return '50px'
       } else {
         return '60px'
@@ -69,8 +136,33 @@ export default {
     colorFrom(){
       this.colorFont()
     }
-  },  
+  },
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
+    this.createGraph()
+    setTimeout(() => {
+      this.generateNodesEdges(this.dataRestFrom)
+      this.applyGraphBuilder()
+      this.colorFont()
+      this.colorNodes()
+      this.colorEdges()
+      this.fitContent()
+    }, 100)
+    // this.$graphComponent.fitGraphBounds()
+  },
   methods: {
+    zoomIn() {
+      const { ICommand } = yfile
+      ICommand.INCREASE_ZOOM.execute(null, this.$graphComponent)
+    },
+    zoomOut() {
+      const { ICommand } = yfile
+      ICommand.DECREASE_ZOOM.execute(null, this.$graphComponent)
+    },
+    fitContent() {
+      const { ICommand } = yfile
+      ICommand.FIT_GRAPH_BOUNDS.execute(null, this.$graphComponent)
+    },
     changeInputMode(){ // меняем режим графика
       if(this.isEditor){
         this.$graphComponent.inputMode = null
@@ -79,7 +171,6 @@ export default {
       }
       this.isEditor = !this.isEditor
     },
-
     colorEdges(){
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=>{
@@ -99,8 +190,8 @@ export default {
       })
     },
     edgeStyle(color) {
-      return new yfile.PolylineEdgeStyle({ 
-        stroke: `6px ${color}`, 
+      return new yfile.PolylineEdgeStyle({
+        stroke: `6px ${color}`,
         targetArrow: new yfile.Arrow({
           fill: color,
           scale: 5,
@@ -121,14 +212,14 @@ export default {
               this.nodeStyle(this.errorColor)
             )
          } else {
-            this.$graphComponent.graph.setStyle(node, 
+            this.$graphComponent.graph.setStyle(node,
               this.nodeStyle(this.colors[node.tag-1])
             )
          }
        })
     },
     nodeStyle(color) {
-      return  new  yfile.ShapeNodeStyle({
+      return new yfile.ShapeNodeStyle({
         fill: color,
         shape: 'ELLIPSE',
         stroke: color,
@@ -150,9 +241,9 @@ export default {
       const edges = this.$graphComponent.graph.edges
       edges.forEach(edge=> {
         this.$graphComponent.graph.setStyle(edge.labels.elementAt(0),
-          this.labelStyle(false, this.colorFrom.backElement)  
+          this.labelStyle(false, this.colorFrom.backElement)
         )
-      })      
+      })
     },
     labelStyle(isBold, backgroundFill = null) {
         return new yfile.DefaultLabelStyle({
@@ -172,7 +263,7 @@ export default {
       this.$graphComponent.graph.clear()
 
       const graphBuilder = new yfile.GraphBuilder(this.$graphComponent.graph)
-     
+
       this.$nodesSource = graphBuilder.createNodesSource({
         data: this.nodesSource,
         id: 'id',
@@ -182,7 +273,7 @@ export default {
           item.color
         }
       })
-      
+
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>nodeDataItem.name)
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
@@ -207,7 +298,7 @@ export default {
        if( edgeDataItem.label !== "-"){
            return edgeDataItem.label
          }
-      })    
+      })
 
       this.$graphComponent.graph = graphBuilder.buildGraph()
       //отступы для нод
@@ -227,7 +318,6 @@ export default {
       this.$graphComponent.graph.applyLayout(layout, layoutData)
       this.$graphComponent.fitGraphBounds()
     },
-
     createGraph() {
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
       this.$graphComponent.inputMode = null
@@ -235,12 +325,11 @@ export default {
       this.initializeDefaultStyles()
 
       //убираем надпись о license
-      document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
-        item.children[1].style.opacity = 0
-        item.children[2].style.opacity = 0
-      })
+      // document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
+      //   item.children[1].style.opacity = 0
+      //   item.children[2].style.opacity = 0
+      // })
     },
-
     generateNodesEdges(dataRest){
       let _allNodes = []
       let _allEdges = []
@@ -269,17 +358,17 @@ export default {
       this.nodesSource = Object.values(_nodesSource)
       this.edgesSource = _allEdges
     },
-  },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-    this.createGraph();
-  } 
+  }
 }
 
 
 </script>
 
-<style lang="css" > 
+<style lang="css" >
+.ygraph-wrapper .button-block {
+  position: absolute;
+  top: 50px;
+}
 .ygraph-component-container {
   position: absolute;
   left: 0;
@@ -287,5 +376,5 @@ export default {
   bottom: 0;
 }
 
-   
+
 </style>

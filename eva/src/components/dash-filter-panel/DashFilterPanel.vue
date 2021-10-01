@@ -28,6 +28,10 @@
         <div
           class="filter-container"
           :class="{ focused: focusedRow === filterIndex }"
+          :style="{
+            marginBottom:
+              filterIndex + 1 === filters.length && !(filterIndex === tempFilterIndex) ? '10px' : 0,
+          }"
           @click="focusRow(filterIndex)"
         >
           <!-- FILTER ID -->
@@ -55,6 +59,7 @@
                   :filterPartIndex="partIndex"
                   :filterIndex="filterIndex"
                   :editPermission="editPermission"
+                  :editMode="editMode"
                   :isFocused="focusedRow === filterIndex"
                 />
               </div>
@@ -141,6 +146,7 @@
             <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
+                  v-show="editMode"
                   :color="theme.$main_text"
                   icon
                   v-bind="attrs"
@@ -156,6 +162,7 @@
             <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
+                  v-show="editMode"
                   :color="theme.$error_color"
                   icon
                   v-bind="attrs"
@@ -177,7 +184,18 @@
           @click="tempFilterIndex = filterIndex"
         >
           <div class="inner-content">
-            <v-icon small left :color="theme.$ok_color" v-text="plusIcon" />
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M7.00002 12.8334C3.77836 12.8334 1.16669 10.2217 1.16669 7.00002C1.16669 3.77836 3.77836 1.16669 7.00002 1.16669C10.2217 1.16669 12.8334 3.77836 12.8334 7.00002C12.8298 10.2202 10.2202 12.8298 7.00002 12.8334ZM2.33335 7.10035C2.36095 9.66774 4.45733 11.7306 7.02484 11.7169C9.59234 11.703 11.6664 9.61773 11.6664 7.05019C11.6664 4.48265 9.59234 2.39739 7.02484 2.38352C4.45733 2.36979 2.36095 4.43263 2.33335 7.00002V7.10035ZM7.58335 9.91669H6.41669V7.58335H4.08335V6.41669H6.41669V4.08335H7.58335V6.41669H9.91669V7.58335H7.58335V9.91669Z"
+                :fill="theme.$ok_color"
+              />
+            </svg>
             <span>Новый фильтр</span>
           </div>
         </div>
@@ -218,6 +236,7 @@
         :filterPart="filterPartInModal"
         :filterPartIndex="filterPartIndexInModal"
         :editPermission="editPermission"
+        :editMode="editMode"
         @saveFilterPart="saveFilterPart"
         @closeFilterPartModal="closeFilterPartModal"
       />
@@ -233,351 +252,359 @@
 </template>
 
 <script>
-  import FilterPart from './FilterPart.vue';
-  import FilterPartModal from './FilterPartModal';
-  import FilterPreviewModal from './FilterPreviewModal';
+import FilterPart from './FilterPart.vue'
+import FilterPartModal from './FilterPartModal'
+import FilterPreviewModal from './FilterPreviewModal'
 
-  import {
-    mdiPlusCircleOutline,
-    mdiTrashCanOutline,
-    mdiRefresh,
-    mdiCheck,
-    mdiClose,
-    mdiSwapHorizontal,
-    mdiEyeOutline,
-    mdiChevronLeft,
-    mdiChevronRight,
-  } from '@mdi/js';
+import {
+  mdiPlusCircleOutline,
+  mdiTrashCanOutline,
+  mdiRefresh,
+  mdiCheck,
+  mdiClose,
+  mdiSwapHorizontal,
+  mdiEyeOutline,
+  mdiChevronLeft,
+  mdiChevronRight,
+} from '@mdi/js'
 
-  export default {
-    name: 'DashFilterPanel',
-    components: { FilterPartModal, FilterPart, FilterPreviewModal },
-    props: ['editPermission', 'idDashFrom'],
-    data() {
-      return {
-        mdiChevronLeft,
-        mdiChevronRight,
-        filters: [],
-        tempFilter: {},
-        tempFilterIndex: -1,
-        focusedRow: null,
-        filterPartModalShow: false,
-        filterPartInModal: null,
-        filterPartIndexInModal: null,
-        filterInPreviewModal: null,
-        showFilterPreviewModal: false,
-        plusIcon: mdiPlusCircleOutline,
-        trashIcon: mdiTrashCanOutline,
-        refreshIcon: mdiRefresh,
-        acceptIcon: mdiCheck,
-        declineIcon: mdiClose,
-        reverseIcon: mdiSwapHorizontal,
-        eyeIcon: mdiEyeOutline,
-      };
+export default {
+  name: 'DashFilterPanel',
+  components: { FilterPartModal, FilterPart, FilterPreviewModal },
+  props: {
+    editPermission: Boolean,
+    idDashFrom: String,
+    editMode: Boolean
+  },
+  data() {
+    return {
+      mdiChevronLeft,
+      mdiChevronRight,
+      filters: [],
+      tempFilter: {},
+      tempFilterIndex: -1,
+      focusedRow: null,
+      filterPartModalShow: false,
+      filterPartInModal: null,
+      filterPartIndexInModal: null,
+      filterInPreviewModal: null,
+      showFilterPreviewModal: false,
+      plusIcon: mdiPlusCircleOutline,
+      trashIcon: mdiTrashCanOutline,
+      refreshIcon: mdiRefresh,
+      acceptIcon: mdiCheck,
+      declineIcon: mdiClose,
+      reverseIcon: mdiSwapHorizontal,
+      eyeIcon: mdiEyeOutline,
+    }
+  },
+  computed: {
+    theme() {
+      return this.$store.getters.getTheme
     },
-    computed: {
-      theme() {
-        return this.$store.getters.getTheme;
-      },
-      focusedFilter() {
-        return this.$store.getters.getFocusedFilter(this.idDashFrom);
-      },
+    focusedFilter() {
+      return this.$store.getters.getFocusedFilter(this.idDashFrom)
     },
-    watch: {
-      focusedRow(rowNumber) {
-        if (!Number.isFinite(rowNumber)) {
-          this.$store.commit('clearFocusedFilter', this.idDashFrom);
-        } else {
-          this.$store.commit('setFocusedFilter', this.filters[rowNumber]);
-        }
-      },
+  },
+  watch: {
+    focusedRow(rowNumber) {
+      if (!Number.isFinite(rowNumber)) {
+        this.$store.commit('clearFocusedFilter', this.idDashFrom)
+      } else {
+        this.$store.commit('setFocusedFilter', this.filters[rowNumber])
+      }
     },
-    methods: {
-      scrollFilterParts(filterIndex, isPrev = false) {
-        const slider = this.$refs[`filter-${filterIndex}-parts-slider`][0];
-        /** scroll to 1/5 of the visible slider width */
-        const scroll = Math.floor(slider.clientWidth / 5);
-        slider.scrollLeft += isPrev ? -scroll : scroll;
-      },
+  },
+  mounted() {
+    this.filters = this.$store.getters.getFilters(this.idDashFrom)
+    this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] }
+    this.$store.commit('clearFocusedFilter', this.idDashFrom)
+  },
+  methods: {
+    scrollFilterParts(filterIndex, isPrev = false) {
+      const slider = this.$refs[`filter-${filterIndex}-parts-slider`][0]
+      /** scroll to 1/5 of the visible slider width */
+      const scroll = Math.floor(slider.clientWidth / 5)
+      slider.scrollLeft += isPrev ? -scroll : scroll
+    },
 
-      checkSliderOverflow(index) {
-        console.log('Check SLIDE num: ', `filter-${index}-parts-slider`);
+    checkSliderOverflow(index) {
+      console.log('Check SLIDE num: ', `filter-${index}-parts-slider`)
 
-        const slider = this.$refs[`filter-${index}-parts-slider`];
-        if (!slider) return false;
+      const slider = this.$refs[`filter-${index}-parts-slider`]
+      if (!slider) return false
 
-        const { clientWidth, scrollWidth } = slider[0];
-        console.log(
-          'clientWidth : scrollWidth',
-          clientWidth,
-          ':',
-          scrollWidth,
-          scrollWidth > clientWidth
-        );
-        // this.$nextTick(() => {});
-        return scrollWidth > clientWidth ? true : false;
-      },
-      reverseFilter(filter) {
-        filter.invertMatches = !filter.invertMatches;
-      },
-      focusRow(index) {
-        if (this.focusedRow === null) this.focusedRow = index;
-      },
-      applyTempParts() {
-        this.$store.commit('sortFilterParts', { idDash: this.idDashFrom });
-        this.$store.commit('clearFocusedFilter', this.idDashFrom);
-        this.$store.commit('restartSearches', this.idDashFrom);
-        this.focusedRow = null;
-        this.filterChanged = false;
-      },
-      declineTempParts() {
-        this.$store.commit('sortFilterParts', { idDash: this.idDashFrom });
-        this.$store.commit('declineFilterChanges', this.idDashFrom);
-        this.$store.commit('clearFocusedFilter', this.idDashFrom);
-        this.focusedRow = null;
-        this.filterChanged = false;
-      },
-      declineTempFilter() {
-        this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] };
-        this.tempFilterIndex = -1;
-      },
-      saveTempFilter() {
-        if (this.filters.some(filter => filter.id === this.tempFilter.id)) {
-          console.log('Фильтр с таким именем существует');
-        } else if (!this.tempFilter.id) {
-          console.log('Введите имя');
-        } else {
-          if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0;
-          this.$store.commit('createFilter', {
-            filter: this.tempFilter,
-            index: this.tempFilterIndex,
-          });
-          this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] };
-          this.tempFilterIndex = -1;
-          this.filters = this.$store.getters.getFilters(this.idDashFrom);
-        }
-      },
-      deleteFilter(filter) {
-        this.$store.commit('deleteFilter', filter);
-        this.$store.commit('declineFilterChanges', this.idDashFrom);
-        this.$store.commit('clearFocusedFilter', this.idDashFrom);
-        this.focusedRow = null;
-        this.filters = this.$store.getters.getFilters(this.idDashFrom);
-      },
-      refreshFilter(filter) {
-        this.filterChanged = true;
-        this.$store.commit('refreshFilter', filter);
-      },
-      openFilterPartModal(filterPart, index) {
-        this.filterPartIndexInModal = index;
-        this.filterPartInModal = filterPart
-          ? { ...filterPart }
-          : {
-              filterPartType: 'manual',
-              operationToken: 'OR',
-              token: null,
-              fieldType: 'number',
-              operationManual: '>',
-              fieldName: null,
-              value: null,
-              invertMatches: false,
-            };
-        this.filterPartModalShow = true;
-      },
-      saveFilterPart(filterPart, index) {
-        this.$store.commit('saveFilterPart', { idDash: this.idDashFrom, filterPart, index }); // Save into focused filter
-        this.filterPartInModal = null; // setup default filterPart into openFilterPartModal method
-        this.filterPartIndexInModal = null;
-        this.filterPartModalShow = false;
-      },
-      closeFilterPartModal() {
-        this.filterPartInModal = null;
-        this.filterPartIndexInModal = null;
-        this.filterPartModalShow = false;
-      },
-      openFilterPreviewModal(filter) {
-        this.filterInPreviewModal = filter;
-        this.showFilterPreviewModal = true;
-      },
-      closeFilterPreviewModal() {
-        this.filterInPreviewModal = null;
-        this.showFilterPreviewModal = false;
-      },
+      const { clientWidth, scrollWidth } = slider[0]
+      console.log(
+        'clientWidth : scrollWidth',
+        clientWidth,
+        ':',
+        scrollWidth,
+        scrollWidth > clientWidth
+      )
+      // this.$nextTick(() => {});
+      return scrollWidth > clientWidth ? true : false
     },
-    mounted() {
-      this.filters = this.$store.getters.getFilters(this.idDashFrom);
-      this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] };
-      this.$store.commit('clearFocusedFilter', this.idDashFrom);
+    reverseFilter(filter) {
+      filter.invertMatches = !filter.invertMatches
     },
-  };
+    focusRow(index) {
+      if (this.focusedRow === null) this.focusedRow = index
+    },
+    applyTempParts() {
+      this.$store.commit('sortFilterParts', { idDash: this.idDashFrom })
+      this.$store.commit('clearFocusedFilter', this.idDashFrom)
+      this.$store.commit('restartSearches', {
+        idDash: this.idDashFrom,
+        filter: this.filters[this.focusedRow].id,
+      })
+      this.focusedRow = null
+      this.filterChanged = false
+    },
+    declineTempParts() {
+      this.$store.commit('sortFilterParts', { idDash: this.idDashFrom })
+      this.$store.commit('declineFilterChanges', this.idDashFrom)
+      this.$store.commit('clearFocusedFilter', this.idDashFrom)
+      this.focusedRow = null
+      this.filterChanged = false
+    },
+    declineTempFilter() {
+      this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] }
+      this.tempFilterIndex = -1
+    },
+    saveTempFilter() {
+      if (this.filters.some((filter) => filter.id === this.tempFilter.id)) {
+        console.log('Фильтр с таким именем существует')
+      } else if (!this.tempFilter.id) {
+        console.log('Введите имя')
+      } else {
+        if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0
+        this.$store.commit('createFilter', {
+          filter: this.tempFilter,
+          index: this.tempFilterIndex,
+        })
+        this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] }
+        this.tempFilterIndex = -1
+        this.filters = this.$store.getters.getFilters(this.idDashFrom)
+      }
+    },
+    deleteFilter(filter) {
+      this.$store.commit('deleteFilter', filter)
+      this.$store.commit('declineFilterChanges', this.idDashFrom)
+      this.$store.commit('clearFocusedFilter', this.idDashFrom)
+      this.focusedRow = null
+      this.filters = this.$store.getters.getFilters(this.idDashFrom)
+    },
+    refreshFilter(filter) {
+      this.filterChanged = true
+      this.$store.commit('refreshFilter', filter)
+    },
+    openFilterPartModal(filterPart, index) {
+      this.filterPartIndexInModal = index
+      this.filterPartInModal = filterPart
+        ? { ...filterPart }
+        : {
+            filterPartType: 'manual',
+            operationToken: 'OR',
+            token: null,
+            fieldType: 'number',
+            operationManual: '>',
+            fieldName: null,
+            value: null,
+            invertMatches: false,
+          }
+      this.filterPartModalShow = true
+    },
+    saveFilterPart(filterPart, index) {
+      this.$store.commit('saveFilterPart', { idDash: this.idDashFrom, filterPart, index }) // Save into focused filter
+      this.filterPartInModal = null // setup default filterPart into openFilterPartModal method
+      this.filterPartIndexInModal = null
+      this.filterPartModalShow = false
+    },
+    closeFilterPartModal() {
+      this.filterPartInModal = null
+      this.filterPartIndexInModal = null
+      this.filterPartModalShow = false
+    },
+    openFilterPreviewModal(filter) {
+      this.filterInPreviewModal = filter
+      this.showFilterPreviewModal = true
+    },
+    closeFilterPreviewModal() {
+      this.filterInPreviewModal = null
+      this.showFilterPreviewModal = false
+    },
+  },
+}
 </script>
 
 <style lang="sass" scoped>
-  $main_text: var(--main_text)
-  $main_border: var(--main_border)
-  $secondary_text: var(--secondary_text)
-  $secondary_bg: var(--secondary_bg)
-  $secondary_border: var(--secondary_border)
-  $primary_button: var(--primary_button)
-  $ok_color: var(--ok_color)
-  $ok_color-rgb: var(--ok_color-rgb)
-  $error_color: var(--error_color)
-  $accent_ui_color: var(--accent_ui_color)
+$main_text: var(--main_text)
+$main_border: var(--main_border)
+$secondary_text: var(--secondary_text)
+$secondary_bg: var(--secondary_bg)
+$secondary_border: var(--secondary_border)
+$primary_button: var(--primary_button)
+$ok_color: var(--ok_color)
+$ok_color-rgb: var(--ok_color-rgb)
+$error_color: var(--error_color)
+$accent_ui_color: var(--accent_ui_color)
 
-  $filter-container-height: 60px
+$filter-container-height: 60px
 
-  .dash-filter-panel
-    width: 100%
-    max-height: calc((#{$filter-container-height} * 3) + 9px)
-    overflow-y: auto
+.dash-filter-panel
+  width: 100%
+  max-height: calc((#{$filter-container-height} * 3) + 18px)
+  overflow-y: auto
 
-    &::-webkit-scrollbar
-      width: 6px
+  &::-webkit-scrollbar
+    width: 6px
 
-    &::-webkit-scrollbar-track
-      background-color: transparent
+  &::-webkit-scrollbar-track
+    background-color: transparent
 
-    &::-webkit-scrollbar-thumb
-      background-color: $main_border
+  &::-webkit-scrollbar-thumb
+    background-color: $main_border
 
-    .add-new-filter-form
-      display: flex
-      align-items: center
-      height: $filter-container-height
-      padding: 0 20px
+  .add-new-filter-form
+    display: flex
+    align-items: center
+    height: $filter-container-height
+    padding: 0 20px
 
-      .action-btn
-        font-size: 14px
-        font-weight: 600
-        text-transform: none
-        margin-left: 20px
+    .action-btn
+      font-size: 14px
+      font-weight: 600
+      text-transform: none
+      margin-left: 20px
 
-        &.save
-          color: $ok_color
-          background-color: rgba($ok_color-rgb, .14)
+      &.save
+        color: $ok_color
+        background-color: rgba($ok_color-rgb, .14)
 
-        &.decline
-          color: var(--error_color)
-          background-color: rgba(var(--error_color-rgb), .14)
+      &.decline
+        color: var(--error_color)
+        background-color: rgba(var(--error_color-rgb), .14)
 
-      .input-box::v-deep
-        max-width: 350px
+    .input-box::v-deep
+      max-width: 350px
 
-        &.v-text-field--outlined
-          input
-            color: $main_text
-            caret-color: $accent_ui_color
-            font-size: 15px
+      &.v-text-field--outlined
+        input
+          color: $main_text
+          caret-color: $accent_ui_color
+          font-size: 15px
 
+        fieldset
+          border: 1px solid $main_border
+          transition: border-color .3s
+
+        &.v-input--is-focused
           fieldset
-            border: 1px solid $main_border
-            transition: border-color .3s
+            border-color: $accent_ui_color
 
-          &.v-input--is-focused
-            fieldset
-              border-color: $accent_ui_color
+  .filter-row
+    position: relative
 
-    .filter-row
-      position: relative
+    $add-new-filter-block-height: 4px
+    $add-new-filter-inner-height: 18px
 
-      $add-new-filter-block-height: 4px
-      $add-new-filter-inner-height: 18px
 
-      .add-new-filter-block
+    .add-new-filter-block
+      position: absolute
+      bottom: 0
+      width: 100%
+      height: $add-new-filter-block-height
+      transform: translateY(50%)
+      z-index: 1
+
+      .inner-content
         position: absolute
         bottom: 0
         width: 100%
-        height: $add-new-filter-block-height
-        transform: translateY(50%)
-        z-index: 1
+        height: $add-new-filter-inner-height
+        transform: translateY(calc((#{$add-new-filter-inner-height} - #{$add-new-filter-block-height}) / 2))
+        display: flex
+        align-items: center
+        background-color: rgba($ok_color-rgb, .24)
+        cursor: pointer
+        color: $ok_color
+        font-size: 12px
+        font-weight: 600
+        line-height: 15px
+        padding: 0 20px
+        visibility: hidden
 
-        .inner-content
-          position: absolute
-          bottom: 0
-          width: 100%
-          height: $add-new-filter-inner-height
-          transform: translateY(calc((#{$add-new-filter-inner-height} - #{$add-new-filter-block-height}) / 2))
+      &:hover .inner-content
+        visibility: visible
+
+    .filter-container
+      display: flex
+      padding: 0 20px
+      height: $filter-container-height
+      border-top: 2px solid $secondary_bg
+      border-bottom: 2px solid $secondary_bg
+      transition: border-color .3s
+
+      &.focused
+        border-color: $main_border
+
+      .filter-id
+        align-self: center
+        min-width: 80px
+        max-width: 200px
+        color: $main_text
+        white-space: nowrap
+        overflow: hidden
+        text-overflow: ellipsis
+
+      .filter-parts
+        min-width: 0
+        display: flex
+        margin-left: 20px
+        border-left: 1px solid $secondary_border
+        border-right: 1px solid $secondary_border
+
+        .scroll-btn
           display: flex
           align-items: center
-          background-color: rgba($ok_color-rgb, .24)
+          justify-content: center
           cursor: pointer
-          color: $ok_color
-          font-size: 12px
-          font-weight: 600
-          line-height: 15px
-          padding: 0 20px
-          visibility: hidden
+          padding: 0 10px
 
-        &:hover .inner-content
-          visibility: visible
+          .icon
+            color: $secondary_text
 
-      .filter-container
-        display: flex
-        padding: 0 20px
-        height: $filter-container-height
-        border-top: 2px solid $secondary_bg
-        border-bottom: 2px solid $secondary_bg
-        transition: border-color .3s
+          &:hover .icon
+            color: $primary_button
 
-        &.focused
-          border-color: $main_border
-
-        .filter-id
-          align-self: center
-          min-width: 80px
-          max-width: 200px
-          color: $main_text
-          white-space: nowrap
-          overflow: hidden
-          text-overflow: ellipsis
-
-        .filter-parts
-          min-width: 0
+        .slider
+          flex: 1 0
           display: flex
-          margin-left: 20px
+          overflow-x: hidden
           border-left: 1px solid $secondary_border
           border-right: 1px solid $secondary_border
 
-          .scroll-btn
-            display: flex
-            align-items: center
-            justify-content: center
-            cursor: pointer
-            padding: 0 10px
+          .slide
+            padding: 0 15px
 
-            .icon
-              color: $secondary_text
+            &:not(:last-child)
+              border-right: 1px solid $secondary_border
 
-            &:hover .icon
-              color: $primary_button
+      .add-part-btn
+        align-self: center
+        margin: 0 20px
+        background-color: rgba(var(--primary_button-rgb), .14)
+        color: $primary_button
+        font-weight: 600
+        text-transform: none
 
-          .slider
-            flex: 1 0
-            display: flex
-            overflow-x: hidden
-            border-left: 1px solid $secondary_border
-            border-right: 1px solid $secondary_border
-
-            .slide
-              padding: 0 15px
-
-              &:not(:last-child)
-                border-right: 1px solid $secondary_border
-
-        .add-part-btn
-          align-self: center
-          margin: 0 20px
-          background-color: rgba(var(--primary_button-rgb), .14)
-          color: $primary_button
-          font-weight: 600
-          text-transform: none
-
-        .filter-buttons
-          flex-shrink: 0
-          margin-left: auto
-          display: flex
-          align-items: center
-          justify-content: flex-end
-          border-left: 1px solid $secondary_border
-          padding-left: 20px
+      .filter-buttons
+        flex-shrink: 0
+        margin-left: auto
+        display: flex
+        align-items: center
+        justify-content: flex-end
+        border-left: 1px solid $secondary_border
+        padding-left: 20px
 </style>

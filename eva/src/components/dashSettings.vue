@@ -123,7 +123,7 @@ export default {
     return {
       gearShow: false,
       settings: {},
-      mode: false,
+      mode: true,
       sizeGrid: {
         vert: '32',
         hor: '18'
