@@ -1,3 +1,17 @@
+# [1.66.0] - UI controls for graph component, tabs UI changes and bugfixes
+
+### New
+- New controls in graph component: zoom in/out and fitContent control buttons
+- Overflow dots in tab panel from right and left sides of panel
+- Scroll without shift of tab panel
+- Can take token from fullscreen table
+- Max width of tab is 200px
+
+### Bugfix
+- Custom themes now not crushing application
+- Data source not reloading when switching tab on dashboard
+- Correct colors and tooltips in gant diagramm
+
 # [1.65.0] - Filter UI changes, filter parts order and bugfixes
 
 ### New
