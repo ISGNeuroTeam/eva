@@ -1,3 +1,20 @@
+# [1.67.0] - New events, UI visual and interaction changes/fixes
+
+### New
+- Heatmap progress-bar are now displayed in full cell width and minor styling changes.
+- Reversed filter parts are now indicated with reverse logo.
+- 'Go to dashboard' event.
+- Compare event to color rows, columns and cells for table visualization component.
+- Certain controls on filter panel are available only in dashboard edit mode.
+- Max width of filter part title is restricted to 250px.
+
+### Bugfix
+- When logged as regular user 'log out' options in dropdown menu was hidden on dashboard page.
+- Clicking reset filter part item doesn't give any visual feedback.
+- 'Add new filter' button are now displaying correctly.
+- Pie chart redraws correctly after token change.
+- Tabs in filter modal are shown only when both modes are available.
+
 # [1.66.0] - UI controls for graph component, tabs UI changes and bugfixes
 
 ### New
