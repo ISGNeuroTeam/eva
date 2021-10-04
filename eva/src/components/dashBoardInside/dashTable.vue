@@ -326,7 +326,7 @@ export default {
               event.target.parentElement.classList.add("selected");
             }
 
-            let headers = Array.from(this.$refs[this.id].$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
+            let headers = Array.from(this.$refs.table.$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
 
             let cellRowIndex = Array.from(event.target.parentElement.childNodes).findIndex(item => item==event.target);
 

@@ -48,7 +48,7 @@
             class="overlay-grid"
             :data-grid="true"
             :style="{
-              height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,
+              height: `calc(100% - ${headerTop}px`,
               top: `${headerTop}px`,
               background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
@@ -436,14 +436,11 @@ export default {
             offset = 0
             //просто сработало событие
           }
-          let _maxHeigth =
-            Math.round(document.querySelector('.application').clientHeight / this.horizontalCell) *
-            this.horizontalCell
-          this.deltaHorizontal = _maxHeigth - this.startClientHeight
 
           document.querySelector('.application').style.height = `${
             document.body.scrollHeight + offset
           }px` // в любом случае расширяем контейнер до размеров экрана
+
         }
       })
     },
