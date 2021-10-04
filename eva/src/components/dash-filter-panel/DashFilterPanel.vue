@@ -415,8 +415,8 @@ export default {
           }
       this.filterPartModalShow = true
     },
-    saveFilterPart(filterPart, index) {
-      this.$store.commit('saveFilterPart', { idDash: this.idDashFrom, filterPart, index }) // Save into focused filter
+    saveFilterPart(filterPart, filterPartIndex) {
+      this.$store.commit('saveFilterPart', { idDash: this.idDashFrom, filterPart, filterPartIndex }) // Save into focused filter
       this.filterPartInModal = null // setup default filterPart into openFilterPartModal method
       this.filterPartIndexInModal = null
       this.filterPartModalShow = false

@@ -8,6 +8,7 @@
       v-model="temp.token"
       :disabled="!editMode"
       :items="tokens"
+      @change="changeToken"
       item-text="name"
       return-object
       :background-color="theme.$main_bg"
@@ -44,6 +45,11 @@
       theme() {
         return this.$store.getters.getTheme;
       },
+    },
+    methods: {
+      changeToken(){
+        this.temp.values = []
+      }
     },
     mounted() {
       this.$set(this.temp, 'token', this.temp.token);
