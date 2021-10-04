@@ -9,7 +9,6 @@
       :items="tokenNameList"
       :disabled="!editMode"
       @change="changeToken"
-      item-text="name"
       :background-color="theme.$main_bg"
       style="padding-bottom: 10px"
       hide-details
