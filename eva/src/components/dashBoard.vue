@@ -343,7 +343,6 @@ export default {
       fullScreenMode:false,
       props: {
         id: '',
-        sid: '',
         name: '',
         mdiPencil: mdiPencil,
         mdiCheckBold: mdiCheckBold ,
