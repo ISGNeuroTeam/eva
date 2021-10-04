@@ -6,6 +6,7 @@
     Токен
     <v-select
       v-model="temp.token"
+      :disabled="!editMode"
       :items="tokens"
       item-text="name"
       return-object
@@ -18,6 +19,7 @@
     Операция
     <v-select
       v-model="temp.operationToken"
+      :disabled="!editMode"
       :items="operations"
       :background-color="theme.$main_bg"
       hide-details
@@ -29,7 +31,7 @@
 <script>
   export default {
     name: 'TokenTypeModal',
-    props: ['temp', 'idDash'],
+    props: ['temp', 'idDash', "editMode"],
     data() {
       return {
         operations: ['OR', 'AND', 'REPLACE'],
