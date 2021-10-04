@@ -12,7 +12,7 @@
       @click="clickSvg"
       @mouseout="mouseoutSvg" 
       :data-change="change" 
-      :style="{width:`${widthFrom-40}px`,height:`${heightFrom-otstupBottom}px`}" 
+      :style="{width:isFullScreen?'100%':`${widthFrom-40}px`,height:isFullScreen?'100%':`${heightFrom-otstupBottom}px`}" 
       v-html="svg"
      
     />
@@ -142,6 +142,7 @@ export default {
     dataModeFrom: null, // выключена ли шапка или включена
     activeElemFrom: null,
     dataReport: null,
+    isFullScreen:null,
   },
   data () {
     return {
