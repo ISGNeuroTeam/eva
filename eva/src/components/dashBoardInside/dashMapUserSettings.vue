@@ -13,6 +13,7 @@
           :value="options.mode"
           :menu-props="{ value: toggleSelect }"
           :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+          class="test"
           :items="mode"
           label="Режим"
           multiple
@@ -485,7 +486,9 @@ export default {
 </script>
 
 <style lang="sass" >
-
+.menuable__content__active 
+  width: 300px
+  
 
 .med 
   height: 100%
