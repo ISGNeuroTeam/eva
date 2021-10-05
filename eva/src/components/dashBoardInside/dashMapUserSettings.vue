@@ -85,10 +85,10 @@
               <p>Начальная точка</p>
               <v-row>
                 <v-col col="6">
-                  <v-text-field :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
+                  <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
                 </v-col>
                 <v-col col="6">
-                  <v-text-field :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
+                  <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
                 </v-col>
               </v-row>
 
