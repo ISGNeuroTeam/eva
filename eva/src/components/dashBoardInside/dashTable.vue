@@ -41,6 +41,7 @@ export default {
   },
   data() {
     return {
+      eventRows: [],
       props: {
         titles: [],
         nodata: true,
@@ -53,6 +54,7 @@ export default {
         justCreate: true,
         hideFooter: false,
         itemsForTable: [],
+        
       },
     };
   },
@@ -111,6 +113,9 @@ export default {
   watch: {
     titles(newValue) {
       if (newValue) this.createTitles(newValue);
+    },
+    dataRestFrom() {
+      this.setEventColor();
     },
     events() {
       this.setEventColor();
@@ -180,6 +185,14 @@ export default {
       });
     },
     setEventColor: function () {
+      console.log('setColor', this.eventRows)
+      if (this.eventRows.length > 0) {
+        for (let x of this.eventRows) {
+          x.style.background = "";
+          x.classList.remove('event');
+        }
+      }
+      this.eventRows = []
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: "OnDataCompare",
@@ -274,6 +287,7 @@ export default {
                       }
                       if (needItem != null) {
                         needItem.classList.add("event");
+                        this.eventRows.push(needItem);
                       }
                     }
                   });
@@ -326,7 +340,7 @@ export default {
               event.target.parentElement.classList.add("selected");
             }
 
-            let headers = Array.from(this.$refs[this.id].$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
+            let headers = Array.from(this.$refs.table.$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
 
             let cellRowIndex = Array.from(event.target.parentElement.childNodes).findIndex(item => item==event.target);
 

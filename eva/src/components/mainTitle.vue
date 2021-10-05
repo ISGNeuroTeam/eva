@@ -313,7 +313,7 @@ export default {
       link.remove() // удаляем ссылку
     },
     scroll(event) {
-      // event.preventDefault()
+      event.preventDefault()
       this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY
       this.checkTabOverflow()
     },
@@ -326,7 +326,7 @@ export default {
         const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel']
         scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false)
         if (clientWidth < scrollWidth) {
-          this.rightDots = Math.floor(clientWidth + scrollLeft) !== scrollWidth
+          this.rightDots = clientWidth + scrollLeft < scrollWidth + 5 && clientWidth + scrollLeft < scrollWidth - 5
         } else this.rightDots = false
       }, 0)
     },
