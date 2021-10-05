@@ -178,8 +178,8 @@
                     :timeFormatFrom="props.timeFormat"
                     :sizeTileFrom="props.sizeTile"
                     :tooltipFrom="props.tooltip"
-                    :widthFrom="width"
-                    :heightFrom="height"
+                    :widthFrom="fullScreenWidth"
+                    :heightFrom="fullScreenHeight"
                     :titles="getSelectedTableTitles(idDash, element)"
                     :options="props.options"
                     :is-full-screen="true"
@@ -398,6 +398,12 @@ export default {
     }
   },
   computed: {
+    fullScreenWidth(){
+      return 0.8*window.innerWidth
+    },
+    fullScreenHeight(){
+      return 0.8*window.innerHeight
+    },
     theme: function () {
       return this.$store.getters.getTheme
     },
