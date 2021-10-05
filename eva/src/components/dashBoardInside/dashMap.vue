@@ -602,11 +602,7 @@ export default {
 
       let pipelineData = pipelineDataDictionary[element.ID];
 
-      if (
-        option?.mode[0] == "Мониторинг" &&
-        !pipelineDataDictionary[element.ID]
-      )
-        return;
+      
       let latlngs = [];
       element.coordinates.split(";").forEach((point) => {
         let p = point.split(":");
