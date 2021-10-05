@@ -1142,7 +1142,6 @@ export default {
     getCapture(state) {
       // получаем массив с событиями элемента
       return elem => {
-        console.log(elem, 'capture')
         if (state[elem.idDash][elem.elem]) {
           let j = -1;
           Object.keys(state[elem.idDash][elem.elem].actions).forEach(item => {

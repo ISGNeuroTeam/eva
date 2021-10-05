@@ -436,7 +436,6 @@ export default {
         .selectAll("rect")
         .data(data)
         .enter();
-          console.log(data, 'data', this.id)
       let lines = bars.append("rect")
         .attr("rx", 3)
         .attr("ry", 3)
@@ -459,7 +458,7 @@ export default {
         .attr("stroke", "none")
         .style("cursor",'pointer')
         .attr("fill", (d) => {
-          let j = -1;
+          let j = 0;
           phases.forEach( (item,i) => {
             if (item == d.phase) {
               j = i;
