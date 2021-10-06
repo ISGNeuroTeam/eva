@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - control buttons on graph component disabled when data is loading
 - overflow dots in tab panel from right and left sides of panel
 - scroll without shift of tab panel
+- logic render few guntts in dashboard
 
 ### Changed 
 - max width of tab is 200px
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - bug with custom themes crushing application
 - problem with data source reloading when switching tab on dashboard
+- fixed problems with render guntts and open on full screen
 
 ## [1.65.0]
 
