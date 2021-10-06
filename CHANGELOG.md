@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - log icon highlights after error in search
 - heatmap is not updated when the value in the select is changed
 - problem with disappearing graph while zooming
+- problem with move elements to dashboard
 
 ## [1.64.0]
 
