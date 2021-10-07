@@ -97,7 +97,6 @@
                   small
                   absolute
                   class="plus-icon"
-                  top
                   right
                   @click="() => {modalCreateGroup=true; createGroupFlag=true; actionBtn=true; curGroup=-1}"
                 >
@@ -112,7 +111,7 @@
                   dark  
                   small
                   absolute
-                  top
+                  class="exim-icon"
                   right
                   @click="() => {modalExim=true;element='group'}"
                 >
@@ -191,7 +190,6 @@
                   small
                   class="plus-icon"
                   absolute
-                  top
                   right
                   @click="() => {modalCreateGroup=true; createGroupFlag=false; actionBtn='create'; curGroup=curGroup}"
                 >
@@ -205,8 +203,8 @@
                   fab 
                   dark  
                   small
+                  class="exim-icon"
                   absolute
-                  top
                   right
                   @click="() => {modalExim=true;element='dash'}"
                 >
