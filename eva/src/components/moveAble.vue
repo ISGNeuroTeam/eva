@@ -134,7 +134,6 @@ export default {
 
       let left = Math.round(x / this.verticalCell)
       if (left < 0) left = 0
-      console.log({ top: top, left: left, id: this.id, idDash: this.idDash })
       this.$store.commit('setPosDash', { top: top, left: left, id: this.id, idDash: this.idDash })
     },
     sendSize(x, y, width, height) {
