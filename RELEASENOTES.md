@@ -1,3 +1,22 @@
+# [1.68.0] - GIS value mask and monitoring mode changes. Visualization fixes and full screen adaptation. Minor bugfixes.
+
+### New
+- GIS. Added value mask for coordinates in map component.
+- GIS. All pipes are showing in monitoring mode.
+- New settings 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth' for MultiLine component.
+- Removed scroll ability with shift+wheel on tab panel.
+- Token and operation selectors in filter part modal are disabled out of edit mode.
+- Values in token type filter part are cleared only after switching tokens.
+- Full screen mode for all visualizations has a persist height.
+- Data-tooltip visual style in multiLine component.
+
+### Bugfix
+- Infinite scroll on tab panel.
+- Displaying all existing dashboard tokens in filter part modal.
+- Problem with render gantt and opening in full screen mode.
+- Correct render of several gantt diagrams in dashboard.
+- GIS. Fix width of modes in map component.
+
 # [1.67.0] - New events, UI visual and interaction changes/fixes
 
 ### New
@@ -27,7 +46,7 @@
 ### Bugfix
 - Custom themes now not crushing application
 - Data source not reloading when switching tab on dashboard
-- Correct colors and tooltips in gant diagramm
+- Correct colors and tooltips in gant diagram
 
 # [1.65.0] - Filter UI changes, filter parts order and bugfixes
 
