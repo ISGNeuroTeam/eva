@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- GIS. value mask for coordinates in map component
 
 ### Changed
 - removed scroll ability with shift+wheel on tab panel
+- GIS. show all pipes on monitoring mode 
 - token selector and operation selector into filter part modal without edit mode are disabled
 - values into token type filter part are cleared only after switching tokens
 - all visualizations in full screen mode have a persist height
@@ -17,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - bug with infinite scroll on tab panel
 - displaying all exists tokens on dashboard in filter part modal
+- GIS. fix width of modes in map component
 
 ## [1.67.0]
 ### Added
@@ -45,7 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - overflow dots in tab panel from right and left sides of panel
 - scroll without shift of tab panel
 - can take token from fullscreen table
-- logic render few guntts in dashboard
+
 ### Changed
 - max width of tab is 200px
 
@@ -53,7 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bug with custom themes crushing application
 - problem with data source reloading when switching tab on dashboard
 - bug with gant diagram colors and tooltips
-- fixed problems with render guntts and open on full screen
 
 ## [1.65.0]
 
@@ -65,7 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - log icon highlights after error in search
 - heatmap is not updated when the value in the select is changed
 - problem with disappearing graph while zooming
-- problem with move elements to dashboard
 
 ## [1.64.0]
 
