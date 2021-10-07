@@ -30,7 +30,7 @@
       </v-item-group>
     </v-card-subtitle>
     <v-card-text>
-      <component :is="typeMap[currentTab].componentName" :idDash="idDash" :temp="temp"></component>
+      <component :is="typeMap[currentTab].componentName" :idDash="idDash" :temp="temp" :edit-mode="editMode"></component>
       <v-switch :color="theme.$primary_button" v-model="temp.invertMatches"
         ><h5 slot="label" :style="{ color: theme.$secondary_text }">Вычитать значения</h5></v-switch
       >

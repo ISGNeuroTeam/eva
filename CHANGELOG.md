@@ -7,12 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- GIS. value mask for coordinates in map component
 
 ### Changed
 - removed scroll ability with shift+wheel on tab panel
+- GIS. show all pipes on monitoring mode 
+- token selector and operation selector into filter part modal without edit mode are disabled
+- values into token type filter part are cleared only after switching tokens
+- all visualizations in full screen mode have a persist height
 
 ### Fixed
 - bug with infinite scroll on tab panel
+- displaying all exists tokens on dashboard in filter part modal
+- GIS. fix width of modes in map component
 
 ## [1.67.0]
 ### Added
