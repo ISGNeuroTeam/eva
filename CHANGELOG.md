@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.68.0]
 ### Added
 - GIS. value mask for coordinates in map component
-- multiLine component 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth' settings
 
 ### Changed
 - removed scroll ability with shift+wheel on tab panel
@@ -16,7 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - values in token type filter part are cleared only after switching tokens
 - full screen mode for all visualizations has a persist height
 - GIS. show all pipes on monitoring mode
-- data-tooltip visual style in multiLine component
 
 ### Fixed
 - bug with infinite scroll on tab panel
