@@ -1,3 +1,13 @@
+# [1.68.2] - Hotfix of critical dashboard bug
+
+### Bugfix
+- Bug with visual components get stuck at the top of dashboard.
+
+# [1.68.1] - RELEASENOTES and CHANGELOG fix
+
+### Bugfix
+- Removed multiline changes from [CHANGELOG](CHANGELOG.md) and [RELEASENOTES](RELEASENOTES.md).
+
 # [1.68.0] - GIS value mask and monitoring mode changes. Visualization fixes and full screen adaptation. Minor bugfixes.
 
 ### New
