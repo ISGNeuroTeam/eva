@@ -39,7 +39,11 @@
               :style="{ color: theme.$main_text }"
             >
               [ {{ element }} ]
+              <span v-if="dataSourseTitle !== -1" class="ml-1">
+                {{ dataSourseTitle }}
+              </span>
             </div>
+
             <div
               v-if="props.edit"
               v-show="dataMode"
@@ -123,6 +127,9 @@
                           :style="{color:theme.$main_text}"
                         >
                           [ {{ element }} ]
+                          <span v-if="dataSourseTitle !== -1" class="ml-1">
+                            {{ dataSourseTitle }}
+                          </span>
                         </div>
                         <div
                           v-if="props.edit"
@@ -334,6 +341,7 @@ export default {
       default: false,
     },
     searchData: Array,
+    dataSourseTitle: null,
   },
   data() {
     return {
