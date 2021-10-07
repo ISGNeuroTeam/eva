@@ -185,7 +185,6 @@ export default {
       });
     },
     setEventColor: function () {
-      console.log('setColor', this.eventRows)
       if (this.eventRows.length > 0) {
         for (let x of this.eventRows) {
           x.style.background = "";
