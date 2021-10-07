@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - bug with infinite scroll on tab panel
 - displaying all exists tokens on dashboard in filter part modal
+- added data source name to visualization again
 
 ## [1.67.0]
 ### Added
