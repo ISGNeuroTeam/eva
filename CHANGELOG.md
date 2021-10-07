@@ -10,13 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - removed scroll ability with shift+wheel on tab panel
-- token selector and operation selector into filter part modal without edit mode are disabled
-- values into token type filter part are cleared only after switching tokens
-- all visualizations in full screen mode have a persist height
+- token and operation selectors in filter part modal are disabled out of edit mode
+- values in token type filter part are cleared only after switching tokens
+- full screen mode for all visualizations has a persist height
 
 ### Fixed
 - bug with infinite scroll on tab panel
-- displaying all exists tokens on dashboard in filter part modal
+- displaying all existing dashboard tokens in filter part modal
+- problem with render gantt and opening in full screen mode
+- logic render few gantt in dashboard
 
 ## [1.67.0]
 ### Added
@@ -45,15 +47,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - overflow dots in tab panel from right and left sides of panel
 - scroll without shift of tab panel
 - can take token from fullscreen table
-- logic render few guntts in dashboard
+
 ### Changed
 - max width of tab is 200px
 
 ### Fixed
 - bug with custom themes crushing application
 - problem with data source reloading when switching tab on dashboard
-- bug with gant diagram colors and tooltips
-- fixed problems with render guntts and open on full screen
+- bug with gantt diagram colors and tooltips
 
 ## [1.65.0]
 
