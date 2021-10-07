@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - bug with infinite scroll on tab panel
+- but with data for full screen single value
 
 ## [1.67.0]
 ### Added
