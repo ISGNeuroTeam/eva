@@ -118,7 +118,7 @@ export default {
       let pos = this.$store.getters.getPosDash({ idDash: this.idDash, id: this.id })
 
       this.left = pos.left * this.verticalCell
-      this.top = pos.top + this.headerTop
+      this.top = pos.top * this.horizontalCell + this.headerTop
 
       let size = this.$store.getters.getSizeDash({ idDash: this.idDash, id: this.id })
 

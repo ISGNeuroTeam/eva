@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.68.2]
+### Fixed
+- bug with visual components get stuck at the top of dashboard
+
+## [1.68.1]
+### Fixed
+- removed multiline changes from [CHANGELOG](CHANGELOG.md) and [RELEASENOTES](RELEASENOTES.md).
+
 ## [1.68.0]
 ### Added
 - GIS. value mask for coordinates in map component
