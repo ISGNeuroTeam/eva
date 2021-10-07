@@ -3,12 +3,10 @@
 ### New
 - GIS. Added value mask for coordinates in map component.
 - GIS. All pipes are showing in monitoring mode.
-- New settings 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth' for MultiLine component.
 - Removed scroll ability with shift+wheel on tab panel.
 - Token and operation selectors in filter part modal are disabled out of edit mode.
 - Values in token type filter part are cleared only after switching tokens.
 - Full screen mode for all visualizations has a persist height.
-- Data-tooltip visual style in multiLine component.
 
 ### Bugfix
 - Infinite scroll on tab panel.
