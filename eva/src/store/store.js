@@ -550,9 +550,8 @@ export default {
       let index = state[filter.idDash].filters.indexOf(filter);
       state[filter.idDash].filters.splice(index, 1);
     },
-    saveFilterPart(state, { idDash, filterPart, index }) {
-      filterPart.values = [];
-      if (Number.isFinite(index)) state[idDash].focusedFilter.parts[index] = filterPart;
+    saveFilterPart(state, { idDash, filterPart, filterPartIndex }) {
+      if (Number.isFinite(filterPartIndex)) state[idDash].focusedFilter.parts[filterPartIndex] = filterPart;
       else state[idDash].focusedFilter.parts.push(filterPart);
     },
     setLibrary: (state, options) => {
@@ -1142,7 +1141,6 @@ export default {
     getCapture(state) {
       // получаем массив с событиями элемента
       return elem => {
-        console.log(elem, 'capture')
         if (state[elem.idDash][elem.elem]) {
           let j = -1;
           Object.keys(state[elem.idDash][elem.elem].actions).forEach(item => {
