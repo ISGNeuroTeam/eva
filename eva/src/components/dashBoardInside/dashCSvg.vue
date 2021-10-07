@@ -12,7 +12,7 @@
       @click="clickSvg"
       @mouseout="mouseoutSvg" 
       :data-change="change" 
-      :style="{width:isFullScreen?'100%':`${widthFrom-40}px`,height:isFullScreen?'100%':`${heightFrom-otstupBottom}px`}" 
+      :style="{width: svgStyleWidth,height: svgStyleHeight}" 
       v-html="svg"
      
     />
@@ -185,6 +185,12 @@ export default {
     },
     idDash: function() { 
       return this.idDashFrom
+    },
+    svgStyleWidth(){
+      return `${this.widthFrom-40}px`
+    },
+    svgStyleHeight(){
+      return `${this.heightFrom-this.otstupBottom}px`
     },
     color: function() {
       return this.colorFrom

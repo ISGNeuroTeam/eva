@@ -5,14 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.68.2]
+### Fixed
+- bug with visual components get stuck at the top of dashboard
+
+## [1.68.1]
+### Fixed
+- removed multiline changes from [CHANGELOG](CHANGELOG.md) and [RELEASENOTES](RELEASENOTES.md).
+
+## [1.68.0]
 ### Added
+- GIS. value mask for coordinates in map component
 
 ### Changed
 - removed scroll ability with shift+wheel on tab panel
+- token and operation selectors in filter part modal are disabled out of edit mode
+- values in token type filter part are cleared only after switching tokens
+- full screen mode for all visualizations has a persist height
+- GIS. show all pipes on monitoring mode
 
 ### Fixed
 - bug with infinite scroll on tab panel
+- displaying all existing dashboard tokens in filter part modal
+- problem with render gantt and opening in full screen mode
+- correct render of several gantt diagrams in dashboard
+- GIS. fix width of modes in map component
+- bug with data for full screen single value
 
 ## [1.67.0]
 ### Added
@@ -41,14 +59,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - overflow dots in tab panel from right and left sides of panel
 - scroll without shift of tab panel
 - can take token from fullscreen table
-
 ### Changed
 - max width of tab is 200px
 
 ### Fixed
 - bug with custom themes crushing application
 - problem with data source reloading when switching tab on dashboard
-- bug with gant diagram colors and tooltips
+- bug with gantt diagram colors and tooltips
 
 ## [1.65.0]
 
@@ -60,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - log icon highlights after error in search
 - heatmap is not updated when the value in the select is changed
 - problem with disappearing graph while zooming
+- problem with move elements to dashboard
 
 ## [1.64.0]
 
