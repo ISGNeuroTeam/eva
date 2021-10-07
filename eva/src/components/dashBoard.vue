@@ -43,7 +43,6 @@
                 {{ dataSourseTitle }}
               </span>
             </div>
-
             <div
               v-if="props.edit"
               v-show="dataMode"
