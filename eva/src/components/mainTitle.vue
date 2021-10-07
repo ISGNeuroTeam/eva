@@ -48,7 +48,7 @@
             class="overlay-grid"
             :data-grid="true"
             :style="{
-              height: `calc(100vh - ${headerTop}px + ${deltaHorizontal}px)`,
+              height: `calc(100% - ${headerTop}px`,
               top: `${headerTop}px`,
               background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
@@ -313,7 +313,7 @@ export default {
       link.remove() // удаляем ссылку
     },
     scroll(event) {
-      // event.preventDefault()
+      event.preventDefault()
       this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY
       this.checkTabOverflow()
     },
@@ -326,7 +326,7 @@ export default {
         const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel']
         scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false)
         if (clientWidth < scrollWidth) {
-          this.rightDots = Math.floor(clientWidth + scrollLeft) !== scrollWidth
+          this.rightDots = clientWidth + scrollLeft < scrollWidth + 5 && clientWidth + scrollLeft < scrollWidth - 5
         } else this.rightDots = false
       }, 0)
     },
@@ -436,14 +436,11 @@ export default {
             offset = 0
             //просто сработало событие
           }
-          let _maxHeigth =
-            Math.round(document.querySelector('.application').clientHeight / this.horizontalCell) *
-            this.horizontalCell
-          this.deltaHorizontal = _maxHeigth - this.startClientHeight
 
           document.querySelector('.application').style.height = `${
             document.body.scrollHeight + offset
           }px` // в любом случае расширяем контейнер до размеров экрана
+
         }
       })
     },
