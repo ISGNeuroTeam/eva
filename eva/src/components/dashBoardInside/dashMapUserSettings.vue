@@ -333,7 +333,6 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        console.log("update on mount", val, oldVal)
         if (val.mode != oldVal.mode) 
           this.updatePipeDataSource();
         this.updateOptions(val);
@@ -341,7 +340,6 @@ export default {
     },
   },
   mounted() {    
-    console.log("mount")
     let options = this.$store.getters.getOptions({
       idDash: this.idDashFrom,
       id: this.idElement,
@@ -366,7 +364,6 @@ export default {
     }
     
     this.searches = this.loadDataForPipe();
-    console.log(this.searches)
   },
   methods: {
     updatePipeDataSource(e) {

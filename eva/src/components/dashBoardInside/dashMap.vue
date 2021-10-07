@@ -107,7 +107,6 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        console.log(val);
       },
     },
   },
