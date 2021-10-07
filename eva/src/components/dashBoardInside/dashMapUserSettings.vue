@@ -13,6 +13,7 @@
           :value="options.mode"
           :menu-props="{ value: toggleSelect }"
           :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+          class="test"
           :items="mode"
           label="Режим"
           multiple
@@ -84,10 +85,10 @@
               <p>Начальная точка</p>
               <v-row>
                 <v-col col="6">
-                  <v-text-field :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
+                  <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
                 </v-col>
                 <v-col col="6">
-                  <v-text-field :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
+                  <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
                 </v-col>
               </v-row>
 
@@ -332,7 +333,6 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        console.log("update on mount", val, oldVal)
         if (val.mode != oldVal.mode) 
           this.updatePipeDataSource();
         this.updateOptions(val);
@@ -340,7 +340,6 @@ export default {
     },
   },
   mounted() {    
-    console.log("mount")
     let options = this.$store.getters.getOptions({
       idDash: this.idDashFrom,
       id: this.idElement,
@@ -365,7 +364,6 @@ export default {
     }
     
     this.searches = this.loadDataForPipe();
-    console.log(this.searches)
   },
   methods: {
     updatePipeDataSource(e) {
@@ -485,7 +483,9 @@ export default {
 </script>
 
 <style lang="sass" >
-
+.menuable__content__active 
+  width: 300px
+  
 
 .med 
   height: 100%

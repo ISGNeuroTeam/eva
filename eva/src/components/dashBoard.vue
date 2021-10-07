@@ -84,7 +84,7 @@
                   <span>На весь экран</span>
                 </v-tooltip>
               </template>
-              <div class="full-screen-dialog">
+              <div class="full-screen-dialog" :style="{ height:'80vh' }">
                 <v-card
                   class="dash-block"
                   :style="{background:theme.$main_bg, boxShadow:`0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`}"
@@ -170,7 +170,7 @@
                     v-show="showElement"
                     class="card-text element-itself"
                     :colorFrom="theme"
-                    :style="{ color: theme.$main_text, background: 'transparent' }"
+                    :style="{ color: theme.$main_text, background: 'transparent'}"
                     :idFrom="element"
                     :idDashFrom="idDash"
                     :dataRestFrom="searchData"
@@ -178,8 +178,8 @@
                     :timeFormatFrom="props.timeFormat"
                     :sizeTileFrom="props.sizeTile"
                     :tooltipFrom="props.tooltip"
-                    :widthFrom="width"
-                    :heightFrom="height"
+                    :widthFrom="fullScreenWidth"
+                    :heightFrom="fullScreenHeight"
                     :titles="getSelectedTableTitles(idDash, element)"
                     :options="props.options"
                     :is-full-screen="true"
@@ -398,6 +398,12 @@ export default {
     }
   },
   computed: {
+    fullScreenWidth(){
+      return 0.8*window.innerWidth
+    },
+    fullScreenHeight(){
+      return 0.8*window.innerHeight
+    },
     theme: function () {
       return this.$store.getters.getTheme
     },
