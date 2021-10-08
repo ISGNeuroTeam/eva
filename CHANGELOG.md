@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - changed position of plus and exim btns on visualizations
 - redesign single value from design
+- problem with cansel changes when we dont want to save them
 
 ## [1.68.2]
 ### Fixed

@@ -315,7 +315,7 @@ export default {
 
     save() {
       this.$emit("save", { ...this.settings });
-      this.close();
+      this.close(true);
     },
 
     handleChangeCount(count) {
@@ -331,14 +331,12 @@ export default {
       this.$emit("save", { ...this.settings });
     },
 
-    close() {
+    close(save = false) {
+      if (!save || typeof save === 'object') {
+        this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
+      }
       this.toggleAllMetrics(false);
       this.$emit("close");
-      this.settings = {
-        ...this.settings,
-        title: this.defaultSettings.title,
-        metricOptions: this.defaultSettings.metricOptions
-      };
     },
 
     showAllMetrics() {
