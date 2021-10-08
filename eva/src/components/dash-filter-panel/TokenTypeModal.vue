@@ -5,10 +5,10 @@
   >
     Токен
     <v-select
-      v-model="temp.token"
-      :items="tokens"
-      item-text="name"
-      return-object
+      v-model="currentTokenName"
+      :items="tokenNameList"
+      :disabled="!editMode"
+      @change="changeToken"
       :background-color="theme.$main_bg"
       style="padding-bottom: 10px"
       hide-details
@@ -18,6 +18,7 @@
     Операция
     <v-select
       v-model="temp.operationToken"
+      :disabled="!editMode"
       :items="operations"
       :background-color="theme.$main_bg"
       hide-details
@@ -29,32 +30,47 @@
 <script>
   export default {
     name: 'TokenTypeModal',
-    props: ['temp', 'idDash'],
+    props: ['temp', 'idDash', "editMode"],
     data() {
       return {
+        currentToken:null,
+        currentTokenName:"",
         operations: ['OR', 'AND', 'REPLACE'],
       };
     },
     computed: {
-      tokens() {
-        return this.$store.getters.getTockens(this.idDash);
+      tokenNameList() {
+        return this.$store.getters.getTockens(this.idDash).map(tkn=>tkn.name);
       },
       theme() {
         return this.$store.getters.getTheme;
       },
     },
+    watch: {
+      currentTokenName(tknName){
+        this.temp.token = this.$store.getters.getTockens(this.idDash).find(tkn=>tkn.name===tknName)
+        this.temp.fieldName = this.temp.token.capture;
+      }
+    },
+    methods: {
+      changeToken(){
+        this.temp.values = []
+      }
+    },
     mounted() {
-      this.$set(this.temp, 'token', this.temp.token);
-      this.$watch(
-        'temp.token',
-        newVal => {
-          if (newVal) {
-            this.currentToken = newVal;
-            this.temp.fieldName = newVal.capture;
-          }
-        },
-        { immediate: true }
-      );
+      if(this.temp.token) {
+        this.currentTokenName = this.temp.token.name
+        this.$set(this.temp, 'token', this.temp.token);
+        this.$watch(
+          'temp.token',
+          newVal => {
+            if (newVal) {
+              this.currentTokenName = newVal.name
+            }
+          },
+          { immediate: true }
+        );
+      }
     },
   };
 </script>

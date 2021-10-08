@@ -729,6 +729,136 @@
             </div>
           </div>
           <div
+            v-if="checkOptions('isDataAlwaysShow')"
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              isDataAlwaysShow
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Постоянное отображение данных на графике
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.isDataAlwaysShow"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.isDataAlwaysShow)"
+              />
+              <v-radio-group
+                v-if="options.isDataAlwaysShow"
+                v-model="options.isDataAlwaysShow"
+                class="ml-10"
+              >
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="data"
+                  value="data"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="caption"
+                  value="caption"
+                />
+              </v-radio-group>
+            </div>
+          </div>
+          <div
+            v-if="checkOptions('xAxisCaptionRotate')"
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              xAxisCaptionRotate
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Градус наклона подписей на оси X
+            </div>
+            <div class="status-option item">
+              <v-radio-group v-model="options.xAxisCaptionRotate">
+                <div class="d-flex align-center">
+                  <v-radio
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text}"
+                    label="0"
+                    :value="0"
+                  />
+                  <v-radio
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text}"
+                    class="ml-2"
+                    label="45"
+                    :value="45"
+                  />
+                  <v-radio
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text}"
+                    class="ml-2"
+                    label="-45"
+                    :value="-45"
+                  />
+                  <v-radio
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text}"
+                    class="ml-2"
+                    label="90"
+                    :value="90"
+                  />
+                  <v-radio
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text}"
+                    class="ml-2"
+                    label="-90"
+                    :value="-90"
+                  />
+                </div>
+              </v-radio-group>
+            </div>
+          </div>
+          <div
+            v-if="checkOptions('barplotBarWidth')"
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              barplotBarWidth
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Ширина столбцов барплот-графика
+            </div>
+            <div class="status-option item">
+              <v-text-field
+                v-model="options.barplotBarWidth"
+                :color="theme.$primary_button"
+                :style="{ color: theme.$main_text, background: 'transparent', borderColor: theme.$main_border }"
+                class="subnumber"
+                type="number"
+                min="0"
+                outlined
+                hide-details
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('united')"
             class="option-item"
           >
@@ -1549,6 +1679,15 @@ export default {
           this.$set(this.options,item,null);
           if (item == 'united') {
             this.$set(this.options,item,false);
+          }
+          if (item === 'isDataAlwaysShow') {
+            this.$set(this.options, item, false);
+          }
+          if (item === 'xAxisCaptionRotate') {
+            this.$set(this.options, item, 0);
+          }
+          if (item === 'barplotBarWidth') {
+            this.$set(this.options, item, 0);
           }
           if (item == 'lastDot') {
             this.$set(this.options,item,false);
