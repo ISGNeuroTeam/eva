@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - changed position of plus and exim btns on visualizations
+- add color to handlers for resizing
 
 ## [1.68.2]
 ### Fixed
