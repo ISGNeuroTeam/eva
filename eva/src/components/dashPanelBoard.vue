@@ -1403,7 +1403,6 @@ export default {
 
       document.onmousemove = event => {
         // при движении мыши
-
         avatar.style.left = event.pageX - shiftX + 'px'; // мы перемещаем на самом деле наш автар, а не сам объект
         avatar.style.top = event.pageY - shiftY + 'px';
         this.avatar = avatar; // и храним объект нашего  аватара
@@ -1417,6 +1416,7 @@ export default {
       // функция создания нового элемнета
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
+        const top = Number(this.avatar.style.top.replace('px', ''))
         let coord = this.avatar.getBoundingClientRect(); // берем координаты аватара
         let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
         this.avatar.remove(); // удаляем аватар из дерева dom
@@ -1446,8 +1446,7 @@ export default {
         this.$set(this.newDashBoard[type], 'height', size.hor);
 
         let pos = this.calcGrid(coord.top, coord.left, step, 'pos');
-
-        this.$set(this.newDashBoard[type], 'top', pos.hor + pageYOffset);
+        this.$set(this.newDashBoard[type], 'top', top);
         this.$set(this.newDashBoard[type], 'left', pos.vert);
 
         // this.$set(this.newDashBoard[type],'width',settings.size[type].width);
@@ -1461,7 +1460,6 @@ export default {
         this.$set(this.newDashBoard[type], 'search', -1);
         this.$set(this.newDashBoard[type], 'switch', false);
         this.$set(this.newDashBoard[type], 'actions', []);
-
         this.$store.commit('createDashBoard', {
           idDash: this.idDash,
           dashboard: this.newDashBoard,

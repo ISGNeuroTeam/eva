@@ -3,6 +3,7 @@
     class="single-value-container pa-3"
     :class="{ 'header-active': dataModeFrom }"
   >
+    {{ this.metricCount }}
     <div class="header">
       <span class="data-title" v-text="tokenizedTitle"/>
       <v-icon
@@ -47,6 +48,7 @@
     <SingleValueSettings
       :is-open="isSettingsComponentOpen"
       :received-settings="providedSettings"
+      :updateCount="updateCount"
       @save="saveSettings"
       @close="closeSettings"
     />
@@ -73,7 +75,7 @@ export default {
     titleToken: '',
     options: {},
     metricList: [],
-    metricCount: 1,
+    metricCount: 0,
     template: 1,
     providedSettings: {},
     isSettingsComponentOpen: false,
@@ -106,23 +108,35 @@ export default {
   },
   mounted() {
     /** Getting saved component options from the store. */
-    const { idFrom: id, idDashFrom: idDash } = this;
-    const options = { ...this.$store.getters.getOptions({ id, idDash }) };
-    if (!options.settings) {
-      options.settings = {
-        title: '',
-        template: 1,
-        metricCount: 1,
-        metricOptions: {},
-      };
-    }
-    const { template, metricCount } = options.settings;
-    this.options = options;
-    this.template = template;
-    this.metricCount = metricCount;
-    this.setVisual();
+    this.init();
   },
   methods: {
+    init() {
+      const { idFrom: id, idDashFrom: idDash } = this;
+      const options = { ...this.$store.getters.getOptions({ id, idDash }) };
+      if (!options.settings) {
+        options.settings = {
+          title: '',
+          template: 1,
+          metricCount: this.metricCount || 1,
+          metricOptions: {},
+        };
+      }
+      const { template, metricCount } = options.settings;
+      this.options = options;
+      this.template = template;
+      this.metricCount = this.metricCount || metricCount;
+      this.setVisual();
+    },
+    updateCount(count) {
+      const { idFrom: id, idDashFrom: idDash } = this;
+      const options = { ...this.$store.getters.getOptions({ id, idDash }) };
+      this.metricCount = count;
+
+      const newSettings = options.settings ? { ...options.settings, metricCount: count } : { metricCount: count }
+      this.$store.commit('setOptions', newSettings)
+      this.setVisual();
+    },
     setVisual() {
       const metricList = [];
       const metricOptions = [];
@@ -145,7 +159,7 @@ export default {
 
         const defaultMetricOption = {
           id: metricID,
-          title: metric,
+          title: metric || data.phase,
           color: 'main',
           icon: 'no_icon',
           fontSize: 16,
@@ -175,7 +189,6 @@ export default {
     },
 
     saveSettings(settings = {}) {
-      console.log(settings)
       const { metricCount, template, metricOptions } = settings;
       this.template = template;
       this.metricCount = metricCount;
