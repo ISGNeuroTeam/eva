@@ -24,12 +24,12 @@
             hide-details
             class="input-element"
           />
-          <v-checkbox
-            :input-value="true"
-            label="Отображение шапки компонента"
-            :style="{color:theme.$main_text}"
-            :value="true">
-          </v-checkbox>
+          <br />
+          <label class="checkbox-google">
+            <input type="checkbox">
+            <span class="checkbox-google-switch"></span> &nbsp;
+            Отображение шапки компонента
+          </label>
         </div>
 
         <div class="content-section offset">
@@ -174,11 +174,25 @@
                 <div
                   v-for="color in colorsList"
                   :key="color.name"
+                  
                   class="color-select"
                   :class="{ selected: metric.color === color.name }"
                   @click="metric.color = color.name"
-                  v-text="color.title"
-                />
+                >
+                  <div
+                    v-if="color.colorGrad"
+                    :class="{'gradient-style': color.colorGrad}"
+                    :style="{
+                      background: color.colorGrad
+                    }"
+                    v-text="color.title"
+                  ></div>
+                  <div
+                    v-else
+                    :style="{color: getColor(color.name)}"
+                    v-text="color.title"
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
@@ -206,6 +220,7 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from "@mdi/js";
+import './sass/checkboxGoogle.css'
 
 export default {
   name: "SingleValueSettings",
@@ -215,6 +230,7 @@ export default {
   props: {
     isOpen: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
+    defaultSettings: { type: Object, default: () => ({}) },
     updateCount: Function
   },
   data: () => ({
@@ -238,7 +254,7 @@ export default {
     colorsList: [
       { name: "main", title: "Основной" },
       { name: "secondary", title: "Дополнительный" },
-      { name: "range", title: "Диапазоны" },
+      { name: "range", title: "Диапазоны", colorGrad: 'linear-gradient(270.08deg, #FF5147 1.92%, #FFE065 53.99%, #5BD97A 99.93%)' },
     ],
     /**
      * The number of available templates for the selected number of metrics.
@@ -281,7 +297,7 @@ export default {
   },
   watch: {
     receivedSettings(newValue) {
-      this.settings = { ...newValue };
+      this.settings = JSON.parse(JSON.stringify(newValue));
     },
     settings() {
       if (this.updateCount) {
@@ -290,6 +306,13 @@ export default {
     }
   },
   methods: {
+    getColor(name) {
+      return ({
+        secondary: this.theme.$secondary_text,
+        main: this.theme.$blue,
+      })[name]
+    },
+
     save() {
       this.$emit("save", { ...this.settings });
       this.close();
@@ -311,6 +334,11 @@ export default {
     close() {
       this.toggleAllMetrics(false);
       this.$emit("close");
+      this.settings = {
+        ...this.settings,
+        title: this.defaultSettings.title,
+        metricOptions: this.defaultSettings.metricOptions
+      };
     },
 
     showAllMetrics() {

@@ -3,7 +3,6 @@
     class="single-value-container pa-3"
     :class="{ 'header-active': dataModeFrom }"
   >
-    {{ this.metricCount }}
     <div class="header">
       <span class="data-title" v-text="tokenizedTitle"/>
       <v-icon
@@ -49,6 +48,7 @@
       :is-open="isSettingsComponentOpen"
       :received-settings="providedSettings"
       :updateCount="updateCount"
+      :default-settings="defaultSettings"
       @save="saveSettings"
       @close="closeSettings"
     />
@@ -78,6 +78,7 @@ export default {
     metricCount: 0,
     template: 1,
     providedSettings: {},
+    defaultSettings: {},
     isSettingsComponentOpen: false,
     update: 1,
   }),
@@ -162,7 +163,7 @@ export default {
           title: metric || data.phase,
           color: 'main',
           icon: 'no_icon',
-          fontSize: 16,
+          fontSize: 54,
           fontWeight: 200,
           listOrder: order - 1,
         };
@@ -185,6 +186,7 @@ export default {
     openSettings() {
       /** Updating the settings provided to the SingleValueSettings. */
       this.providedSettings = { ... this.options.settings };
+      this.defaultSettings = { ... this.options.settings }
       this.isSettingsComponentOpen = true;
     },
 

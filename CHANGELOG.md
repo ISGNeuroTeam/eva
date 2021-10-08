@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - clicking reset filter part item doesn't give any visual feedback
 - 'add new filter' button are now displaying correctly
 - redrawing pie chart after token changes
+- redesign single value from design
 
 ## [1.66.0]
 ### Added
