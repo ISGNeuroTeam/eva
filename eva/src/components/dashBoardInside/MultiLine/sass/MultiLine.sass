@@ -1,0 +1,64 @@
+@import ./../../../../sass/_colors
+
+.multiline-container
+  position: relative
+
+  .nodata-block
+    padding: 15px
+    text-align: center
+    color: $main_text
+
+  .legend
+    position: absolute
+    top: 0
+    left: 0
+    display: flex
+    flex-flow: row wrap
+    justify-content: flex-end
+    align-items: center
+    padding: 0 20px 0 50px
+    width: 100%
+
+    .legend-item
+      display: flex
+      flex-flow: row wrap
+      justify-content: flex-start
+      align-items: center
+      margin-left: 20px
+
+      .circle
+        border-radius: 50%
+        width: 10px
+        height: 10px
+        margin-right: 10px
+
+      .text
+        font-size: 14px
+
+  .svg-container::v-deep
+    .dot
+      cursor: pointer
+
+    .graph-tooltip
+      position: absolute
+      background-color: $secondary_bg
+      border: 1px solid $main_border
+      border-radius: 4px
+      color: $main_text
+      padding: 5px 5px
+      font-size: 12px
+      white-space: nowrap
+      text-align: left
+      opacity: 0
+      visibility: hidden
+      z-index: 2
+
+      p
+        margin: 0
+        padding: 0
+        white-space: nowrap
+        text-align: left
+
+        span
+          font-weight: bold
+          display: inline-block
