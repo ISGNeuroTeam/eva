@@ -334,7 +334,7 @@ export default {
                 .querySelectorAll(".selected")
                 .forEach((item) => {
                   item.classList.remove("selected");
-                  item.style = `background: transparent !important`;
+                  // item.style = `background: transparent !important`;
                 });
               event.target.parentElement.classList.add("selected");
             }
