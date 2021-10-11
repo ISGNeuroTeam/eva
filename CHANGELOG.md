@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - changed position of plus and exim btns on visualizations
 - bug with disappearing rows in tables after repeated click
+- fix move elements to dashboard
 
 ## [1.68.2]
 ### Fixed
