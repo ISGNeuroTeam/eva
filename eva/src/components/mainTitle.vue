@@ -1,6 +1,7 @@
 <template>
   <v-app class="application" :style="{ background: theme.$secondary_bg }">
     <dash-panel-bord
+      :horizontal-cell="horizontalCell"
       v-if="prepared"
       :id-dash-from="idDash"
       @changeMode="changeMode"
