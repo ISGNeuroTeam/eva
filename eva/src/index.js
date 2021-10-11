@@ -53,7 +53,7 @@ Vue.component('dash-table', require('./components/dashBoardInside/dashTable.vue'
 Vue.component('dash-guntt', require('./components/dashBoardInside/dashGuntt.vue').default); // элемент диаграммы ганта
 Vue.component('dash-graph', require('./components/dashBoardInside/dashGraph.vue').default); // элемент графа
 Vue.component('dash-lineChart', require('./components/dashBoardInside/dashLineChart.vue').default); // элемент графика
-Vue.component('dash-multiLine', require('./components/dashBoardInside/dashMultiLine.vue').default); // элемент графика с несоклькими линиями
+Vue.component('dash-multiLine', require('./components/dashBoardInside/MultiLine/MultiLine.vue').default); // элемент графика с несоклькими линиями
 Vue.component('dash-select', require('./components/dashBoardInside/dashSelect.vue').default); // элемент графика
 Vue.component('dash-picker', require('./components/dashBoardInside/dashDTPicker.vue').default); // элемент выбора даты и времени
 Vue.component('dash-single', require('./components/dashBoardInside/dashSingle.vue').default); // элемент вывода числа

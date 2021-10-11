@@ -112,7 +112,22 @@ export default {
     singleValue: mdiNumeric,
   },
   options: {
-    multiLine: ['visible','level','boxShadow','united','lastDot','metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline', 'pinned'],
+    multiLine: [
+      'visible',
+      'level',
+      'boxShadow',
+      'united',
+      'lastDot',
+      'metrics',
+      'timeFormat',
+      'lastResult',
+      'strokeWidth',
+      'thememultiline',
+      'pinned',
+      'isDataAlwaysShow',
+      'xAxisCaptionRotate',
+      'barplotBarWidth',
+    ],
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes', 'pinned', 'piechartSettings'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult', 'titles', 'pinned'],
     select: ['visible','level','boxShadow','multiple', 'pinned'],
@@ -130,7 +145,7 @@ export default {
     heatmap: ['visible','level', 'dataFormat', 'pinned'],
     singleValue: ['visible', 'level', 'pinned'],
   },
-  reporstElements: ['table','multiLine','piechart','guntt','tile','csvg'],
+  reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
   reports: {
     table: {
       tooltip: 'Таблица',
