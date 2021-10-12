@@ -71,6 +71,8 @@ export default {
     idDashFrom: String,
     dataRestFrom: Array,
     dataModeFrom: Boolean,
+    updateSettings: Function,
+    currentSettings: Object
   },
   data: () => ({
     mdiSettings,
@@ -109,16 +111,20 @@ export default {
     dataRestFrom() {
       this.setVisual()
     },
+    currentSettings() {
+      this.providedSettings = { ... this.currentSettings }
+      this.init(this.currentSettings)
+    }
   },
   mounted() {
     /** Getting saved component options from the store. */
     this.init();
   },
   methods: {
-    init() {
+    init(settings) {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = { ...this.$store.getters.getOptions({ id, idDash }) };
-      if (!options.settings) {
+      if (!options.settings && !settings) {
         options.settings = {
           title: '',
           template: 1,
@@ -126,11 +132,19 @@ export default {
           metricOptions: {},
         };
       }
-      const { template, metricCount } = options.settings;
-      this.options = options;
+      const { template, metricCount } = settings || options.settings;
+
+      this.options = {
+        ...options,
+        settings: settings || options.settings,
+      };
       this.template = template;
       this.metricCount = this.metricCount || metricCount;
-      this.setVisual();
+      if (settings) {
+        this.updateVisual(settings)
+      } else {
+        this.setVisual();
+      }
     },
     updateCount(count) {
       const { idFrom: id, idDashFrom: idDash } = this;
@@ -139,6 +153,9 @@ export default {
 
       const newSettings = options.settings ? { ...options.settings, metricCount: count } : { metricCount: count }
       this.$store.commit('setOptions', newSettings)
+      if (this.updateSettings) {
+        this.updateSettings(newSettings)
+      }
       this.setVisual();
     },
     setVisual() {
@@ -178,6 +195,13 @@ export default {
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
     },
+    updateVisual(settings) {
+      this.metricList = settings.metricOptions.map((item, idx) => ({
+        ...item,
+        listOrder: idx,
+        color: 'main',
+      }))
+    },
     updateOptions() {
       this.$store.commit('setOptions', {
         id: this.idFrom,
@@ -210,7 +234,16 @@ export default {
         metric.fontWeight = fontWeight;
         metric.listOrder = index;
       }
-      this.providedSettings = settings;
+      const newSettings = { ...settings, metricOptions };
+      this.providedSettings = newSettings;
+      this.$store.commit('setOptions', {
+        id: this.idFrom,
+        idDash: this.idDashFrom,
+        options: { ...this.options, settings: newSettings },
+      });
+      if (this.updateSettings) {
+        this.updateSettings(newSettings)
+      }
       this.update++;
     },
 

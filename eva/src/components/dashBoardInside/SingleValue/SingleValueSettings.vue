@@ -322,6 +322,7 @@ export default {
     },
 
     save() {
+      console.log(this.settings, 'this.settings')
       this.$emit("save", { ...this.settings });
       this.close(true);
     },

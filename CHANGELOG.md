@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bug with disappearing rows in tables after repeated click
 - problem with cansel changes when we dont want to save them
 - single value design bugs
+- single value fixed open fullscreen
 
 ## [1.68.2]
 ### Fixed

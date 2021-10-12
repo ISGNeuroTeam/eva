@@ -175,6 +175,8 @@
                     :timeFormatFrom="props.timeFormat"
                     :sizeTileFrom="props.sizeTile"
                     :tooltipFrom="props.tooltip"
+                    :currentSettings="settings"
+                    :updateSettings="updateSettings"
                     :widthFrom="fullScreenWidth"
                     :heightFrom="fullScreenHeight"
                     :titles="getSelectedTableTitles(idDash, element)"
@@ -304,6 +306,8 @@
         :heightFrom="height"
         :titles="getSelectedTableTitles(idDash, element)"
         :options="props.options"
+        :currentSettings="settings"
+        :updateSettings="updateSettings"
         :is-full-screen="false"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"
@@ -355,6 +359,7 @@ export default {
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
       fullScreenMode: false,
+      settings: {},
       props: {
         id: "",
         name: "",
@@ -533,6 +538,10 @@ export default {
     }
   },
   methods: {
+    updateSettings(settings) {
+      this.settings = JSON.parse(JSON.stringify(settings));
+    },
+
     editName: function (props) {
       // изменяем имя элемнета
       props.edit = true;
