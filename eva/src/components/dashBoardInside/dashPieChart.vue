@@ -66,7 +66,6 @@ export default {
   },
   data() {
     return {
-      actions: [{ name: 'click', capture: [] }],
       nodata: true,
       message: 'Нет данных для отображения',
       legends: [],
@@ -146,7 +145,7 @@ export default {
         if (graphics.length != 0) {
           graphics[0].remove();
           //если строим заново(изменились данные) - очищаем токены
-          this.setTocken();
+          this.setToken();
           this.createPieChartDash();
         } else {
           this.createPieChartDash();
@@ -157,6 +156,15 @@ export default {
   },
   watch: {
     dataRestFrom() {
+      const captures = Object.keys(this.dataRestFrom[0]);
+      const actions = [{ name: 'click', capture: captures }];
+
+      this.$store.commit('setActions', {
+        actions,
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize) {
         let graphics = d3
           .select(this.$refs.piechartItself)
@@ -165,7 +173,7 @@ export default {
         if (graphics.length != 0) {
           graphics[0].remove();
           //если строим заново(изменились данные) - очищаем токены
-          this.setTocken();
+          this.setToken();
           this.createPieChartDash();
         } else {
           this.createPieChartDash();
@@ -180,16 +188,16 @@ export default {
         .each(function(_, pieIndex) {
           if (pieIndex === legendLineIndex) {
             this.classList.add('piepartSelect');
-          }
-          else if (this.classList.contains('piepartSelect')) this.classList.remove('piepartSelect');
+          } else if (this.classList.contains('piepartSelect')) this.classList.remove('piepartSelect');
         });
-      
-      d3.select(this.$refs.legends).selectAll(".legend-line").each(function(_, idx){
-        if (legendLineIndex===idx){
-          this.classList.add("legend-line_hover")
-        }
-        else if (this.classList.contains('legend-line_hover')) this.classList.remove('legend-line_hover');
-      })
+
+      d3.select(this.$refs.legends)
+        .selectAll('.legend-line')
+        .each(function(_, idx) {
+          if (legendLineIndex === idx) {
+            this.classList.add('legend-line_hover');
+          } else if (this.classList.contains('legend-line_hover')) this.classList.remove('legend-line_hover');
+        });
     },
     setMetrics() {
       this.$store.commit('setMetricsPie', {
@@ -368,7 +376,8 @@ export default {
       const tooltipEl = this.$refs.chartTooltip;
       const tooltipOffset = { x: 30, y: 5 };
 
-      const hoverLegendLine = this.hoverLegendLine.bind(this)
+      const hoverLegendLine = this.hoverLegendLine.bind(this);
+      const setToken = this.setToken.bind(this)
 
       svg
         .selectAll('pies')
@@ -394,7 +403,7 @@ export default {
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
           tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
           tooltipEl.style.visibility = 'visible';
-          hoverLegendLine(pieIndex)
+          hoverLegendLine(pieIndex);
         })
         .on('mousemove', function(d) {
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
@@ -403,37 +412,26 @@ export default {
         .on('mouseout', function(d) {
           this.classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
-          hoverLegendLine(null)
-        });
+          hoverLegendLine(null);
+        })
+        .on('click',(_, i)=>setToken(i));
     },
-    setTocken: function() {
-      let value = '';
-      let tockens = this.$store.getters.getTockens(this.idDashFrom);
-      let tocken = {};
+    setToken(pieIndex) {
+      let tokens = this.$store.getters.getTockens(this.idDashFrom);
 
-      Object.keys(tockens).forEach(i => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (tockens[i].elem == this.idFrom && tockens[i].action == 'click') {
+      tokens.forEach(tocken=>{
+        if(tocken.elem == this.idFrom){
+          const value = this.dataRestFrom[pieIndex][tocken.capture]
           this.$store.commit('setTocken', {
             tocken,
             value,
             idDash: this.idDashFrom,
             store: this.$store,
           });
+
         }
-      });
+      })
     },
-  },
-  mounted() {
-    this.$store.commit('setActions', {
-      actions: this.actions,
-      idDash: this.idDashFrom,
-      id: this.idFrom,
-    });
   },
 };
 </script>
