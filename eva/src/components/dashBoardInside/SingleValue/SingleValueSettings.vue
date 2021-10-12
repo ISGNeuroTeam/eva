@@ -26,7 +26,7 @@
           />
           <br />
           <label class="checkbox-google">
-            <input type="checkbox">
+            <input type="checkbox" :checked="settings.showTitle" @change="handleChangeShowTitle">
             <span class="checkbox-google-switch"></span> &nbsp;
             Отображение шапки компонента
           </label>
@@ -230,7 +230,6 @@ export default {
   props: {
     isOpen: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
-    defaultSettings: { type: Object, default: () => ({}) },
     updateCount: Function
   },
   data: () => ({
@@ -247,7 +246,7 @@ export default {
     /** Font weight select items. */
     fontWeightList: [
       { value: 200, title: "Regular (200)" },
-      { value: 500, title: "Medium (500)" },
+      { value: 600, title: "Medium (500)" },
       { value: 800, title: "Bold (800)" },
     ],
     /** Metric title color select items. */
@@ -306,6 +305,15 @@ export default {
     }
   },
   methods: {
+    handleChangeShowTitle() {
+      if (this.settings) {
+        this.settings = {
+          ...JSON.parse(JSON.stringify(this.settings)),
+          showTitle: this.settings.showTitle ? false : true
+        }
+      }
+    },
+
     getColor(name) {
       return ({
         secondary: this.theme.$secondary_text,
@@ -315,7 +323,7 @@ export default {
 
     save() {
       this.$emit("save", { ...this.settings });
-      this.close();
+      this.close(true);
     },
 
     handleChangeCount(count) {
@@ -331,14 +339,12 @@ export default {
       this.$emit("save", { ...this.settings });
     },
 
-    close() {
+    close(save = false) {
+      if (!save || typeof save === 'object') {
+        this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
+      }
       this.toggleAllMetrics(false);
       this.$emit("close");
-      this.settings = {
-        ...this.settings,
-        title: this.defaultSettings.title,
-        metricOptions: this.defaultSettings.metricOptions
-      };
     },
 
     showAllMetrics() {

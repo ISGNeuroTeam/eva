@@ -4,7 +4,9 @@
     :class="{ 'header-active': dataModeFrom }"
   >
     <div class="header">
-      <span class="data-title" v-text="tokenizedTitle"/>
+      <div>
+        <span v-if="providedSettings.showTitle" class="data-title" v-text="tokenizedTitle"/>
+      </div>
       <v-icon
         v-show="dataModeFrom"
         size="22"
@@ -39,8 +41,9 @@
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
             `"
-          v-text="metric.value"
-        />
+        >
+          <span v-text="metric.value"></span>
+        </span>
       </div>
     </div>
 
@@ -207,6 +210,7 @@ export default {
         metric.fontWeight = fontWeight;
         metric.listOrder = index;
       }
+      this.providedSettings = settings;
       this.update++;
     },
 
