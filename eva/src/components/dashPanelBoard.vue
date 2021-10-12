@@ -413,6 +413,14 @@
               outlined
               hide-details
             />
+            <v-text-field
+                v-model="tocken.defaultValue"
+                class="tocken-default-value theme--dark"
+                :color="theme.$accent_ui_color"
+                label="По умолчанию"
+                outlined
+                hide-details
+            />
           </div>
           <p
             class="tocken-view"
@@ -506,6 +514,14 @@
             label="Разделитель"
             outlined
             hide-details
+          />
+          <v-text-field
+              v-model="newTockenDop.defaultValue"
+              class="tocken-default-value theme--dark"
+              :color="theme.$accent_ui_color"
+              label="По умолчанию"
+              outlined
+              hide-details
           />
           <v-icon class="row-check" :color="theme.$primary_button" @click="saveTocken()">
             {{ check }}
@@ -794,7 +810,9 @@ export default {
       showSign: true,
       newTockenName: null,
       opennewtocken: false,
-      newTockenDop: {},
+      newTockenDop: {
+        defaultValue: '*'
+      },
       newElem: '',
       newAction: '',
       tockensName: {},
@@ -1193,6 +1211,9 @@ export default {
         delimetr: parent.querySelector('.tocken-delimetr').querySelector('input')
           ? parent.querySelector('.tocken-delimetr').querySelector('input').value
           : '',
+        defaultValue: parent.querySelector('.tocken-default-value').querySelector('input')
+            ? parent.querySelector('.tocken-default-value').querySelector('input').value
+            : '',
         resetData: true, //сделать норм
       };
 
