@@ -271,6 +271,7 @@ export default {
               status: 'pending',
             })
             this.$store.getters.getDataApi({ search, idDash: this.idDash }).then((res) => {
+              console.log(res)
               this.$store.commit('updateSearchStatus', {
                 idDash: this.idDash,
                 sid: search.sid,

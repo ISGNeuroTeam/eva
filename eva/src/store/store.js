@@ -13,7 +13,6 @@ export default {
       settings: themes['dark'],
     },
   },
-
   mutations: {
     setNameDash: (state, newName) => {
       // изменения имени самого элемента
@@ -32,14 +31,14 @@ export default {
     setSearch: (state, payload) => {
       const { idDash, reload, search } = payload
       search.status = 'empty'
-      if (reload) {
+      if (reload) {getDataApi
         state[idDash].searches.forEach((item, i) => {
           if (search.sid === item.sid) {
             Vue.set(state[idDash].searches, i, search)
           }
         })
       } else {
-        state[idDash].searches.push(search)
+        state[idDash].searches.push({...search})
       }
     },
     deleteSearch: (state, search) => {
