@@ -31,7 +31,7 @@ export default {
     setSearch: (state, payload) => {
       const { idDash, reload, search } = payload
       search.status = 'empty'
-      if (reload) {getDataApi
+      if (reload) {
         state[idDash].searches.forEach((item, i) => {
           if (search.sid === item.sid) {
             Vue.set(state[idDash].searches, i, search)

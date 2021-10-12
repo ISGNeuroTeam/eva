@@ -844,7 +844,6 @@ export default {
     },
     searches: function () {
       // массив со всеми ИС на странице
-      console.log('triggered')
       let searchesRes = [];
       if (this.idDash) {
         let searches = this.$store.getters.getSearches(this.idDash);
