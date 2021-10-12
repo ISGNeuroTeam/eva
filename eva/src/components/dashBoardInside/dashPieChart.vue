@@ -6,7 +6,7 @@
 
     <div
       ref="chartTooltip"
-      style="position: absolute;visibility:hidden;border-radius:2px;padding:5px"
+      style="position: absolute;visibility:hidden;border-radius:3px;padding:5px"
       :style="{
         color: theme.$main_text,
         backgroundColor: theme.$secondary_bg,
@@ -31,7 +31,13 @@
         :data-change="change"
       />
       <div ref="legends" class="legend-block-pie">
-        <div v-for="item in legends" :key="item.label" class="legend-line">
+        <div
+          v-for="(item, idx) in legends"
+          :key="idx"
+          class="legend-line"
+          @mouseover="hoverLegendLine(idx)"
+          @mouseleave="hoverLegendLine(null)"
+        >
           <div class="square" :style="{ backgroundColor: item.color }" />
           <div class="text" :style="{ color: theme.$main_text }">
             {{ item.label }}
@@ -65,7 +71,6 @@ export default {
       message: 'Нет данных для отображения',
       legends: [],
       positionLegends: 'row nowrap',
-      selectedValue: [],
       timeout: '',
       tolate: false,
     };
@@ -132,7 +137,7 @@ export default {
         height: this.heightFrom,
       };
     },
-    change: function() {
+    change() {
       if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize) {
         let graphics = d3
           .select(this.$refs.piechartItself)
@@ -141,7 +146,6 @@ export default {
         if (graphics.length != 0) {
           graphics[0].remove();
           //если строим заново(изменились данные) - очищаем токены
-          this.selectedValue = [];
           this.setTocken();
           this.createPieChartDash();
         } else {
@@ -161,7 +165,6 @@ export default {
         if (graphics.length != 0) {
           graphics[0].remove();
           //если строим заново(изменились данные) - очищаем токены
-          this.selectedValue = [];
           this.setTocken();
           this.createPieChartDash();
         } else {
@@ -171,6 +174,23 @@ export default {
     },
   },
   methods: {
+    hoverLegendLine(legendLineIndex) {
+      d3.select(this.$refs.pieChart)
+        .selectAll('.piepart')
+        .each(function(_, pieIndex) {
+          if (pieIndex === legendLineIndex) {
+            this.classList.add('piepartSelect');
+          }
+          else if (this.classList.contains('piepartSelect')) this.classList.remove('piepartSelect');
+        });
+      
+      d3.select(this.$refs.legends).selectAll(".legend-line").each(function(_, idx){
+        if (legendLineIndex===idx){
+          this.classList.add("legend-line_hover")
+        }
+        else if (this.classList.contains('legend-line_hover')) this.classList.remove('legend-line_hover');
+      })
+    },
     setMetrics() {
       this.$store.commit('setMetricsPie', {
         metrics: Object.keys(this.dataRestFrom[0]),
@@ -282,7 +302,7 @@ export default {
         data.forEach((item, i) => {
           this.legends.push({
             color: this.colors[colorsPie.theme][i],
-            label: `#${item[metrics[0]]} - ${item[metrics[1]]}%`,
+            label: `${item[metrics[0]]} - ${item[metrics[1]]}`,
           });
         });
       }
@@ -342,15 +362,13 @@ export default {
         .domain(data)
         .range(this.colors[colorsPie.theme]);
 
-      let pie = d3
-        .pie() // вычисляем позицию каждого кусочка диаграммы
-        .value(d => d.value);
+      let pie = d3.pie().value(d => d.value);
       let data_ready = pie(d3.entries(data));
 
-      let setClickMethod = this.setClick.bind(this);
-      let selectedValue = this.selectedValue;
       const tooltipEl = this.$refs.chartTooltip;
-      const tooltipOffset = { x: 10, y: 80 };
+      const tooltipOffset = { x: 30, y: 5 };
+
+      const hoverLegendLine = this.hoverLegendLine.bind(this)
 
       svg
         .selectAll('pies')
@@ -364,65 +382,32 @@ export default {
             .innerRadius(0)
             .outerRadius(radius)
         )
-        .attr('class', d => {
-          let index = this.selectedValue.indexOf(`(${d.data.key},${d.data.value})`);
-          if (index !== -1) {
-            return 'piepart piepartSelect';
-          } else {
-            return 'piepart';
-          }
-        })
+        .attr('class', 'piepart')
         .attr('fill', d => {
           return color(d.data.key);
         })
         .attr('stroke', this.theme.$main_bg)
         .style('stroke-width', '2px')
-        .on('mouseover', function(d) {
-          if (!this.classList.contains('piepartSelect')) this.classList.add('piepartSelect');
-          tooltipEl.textContent = `${d.data.key}, ${d.data.value}%`;
-          tooltipEl.style.left = `${event.pageX + tooltipOffset.x}px`;
-          tooltipEl.style.top = `${event.pageY - tooltipOffset.y}px`;
+        .on('mouseover', function(d, pieIndex) {
+          this.classList.add('piepartSelect');
+          tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
+          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
           tooltipEl.style.visibility = 'visible';
+          hoverLegendLine(pieIndex)
         })
         .on('mousemove', function(d) {
-          tooltipEl.style.left = `${event.pageX + tooltipOffset.x}px`;
-          tooltipEl.style.top = `${event.pageY - tooltipOffset.y}px`;
+          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
         })
         .on('mouseout', function(d) {
-          if (!selectedValue.includes(`(${d.data.key},${d.data.value})`))
-            this.classList.remove('piepartSelect');
+          this.classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
+          hoverLegendLine(null)
         });
-    },
-    setClick(part, selected) {
-      if (selected) {
-        this.selectedValue.push(`(${part.data.key},${part.data.value})`);
-      } else {
-        let index = this.selectedValue.indexOf(`(${part.data.key},${part.data.value})`);
-        this.selectedValue.splice(index, 1);
-      }
-      if (!this.tolate) {
-        this.tolate = true;
-        this.timeout = setTimeout(() => {
-          this.tolate = false;
-          this.setTocken();
-        }, 1500);
-      }
     },
     setTocken: function() {
       let value = '';
-      if (this.selectedValue.length > 1) {
-        value = '[';
-        this.selectedValue.forEach((item, i) => {
-          value += item;
-          if (i != this.selectedValue.length - 1) {
-            value += ',';
-          }
-        });
-        value += ']';
-      } else if (this.selectedValue.length == 1) {
-        value = this.selectedValue[0];
-      }
       let tockens = this.$store.getters.getTockens(this.idDashFrom);
       let tocken = {};
 
@@ -434,9 +419,9 @@ export default {
         };
         if (tockens[i].elem == this.idFrom && tockens[i].action == 'click') {
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
+            value,
             idDash: this.idDashFrom,
-            value: value,
             store: this.$store,
           });
         }
@@ -453,6 +438,6 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import '../../sass/dashPieChart.sass';
+<style lang="sass">
+@import '../../sass/dashPieChart.sass'
 </style>
