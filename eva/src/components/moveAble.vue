@@ -10,7 +10,7 @@
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
-    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color }"
+    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color, backgroundColor: theme.$accent_ui_color, }"
     @resizestop="sendSize"
     @dragstop="sendMove"
   >
