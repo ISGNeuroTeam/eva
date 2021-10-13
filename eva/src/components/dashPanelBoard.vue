@@ -845,11 +845,7 @@ export default {
       return document.body.clientWidth <= 1400 ? 40 : 50
     },
     isAdmin() {
-      if (this.userPermissions && this.userPermissions.includes('admin_all')) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.userPermissions && this.userPermissions.includes('admin_all');
     },
     searches: function () {
       // массив со всеми ИС на странице
@@ -858,7 +854,6 @@ export default {
         let searches = this.$store.getters.getSearches(this.idDash);
         searches.forEach((item) => {
           this.$set(this.change, item.sid, false);
-          this.checkDataSearch(item.sid);
         });
         searchesRes = searches;
       }
@@ -1367,14 +1362,14 @@ export default {
       //   link.remove(); // удаляем ссылку
       // });
     },
-    checkDataSearch: async function (sid) {
-      let response = await this.$store.getters.checkDataSearch(`${this.idDash}-${sid}`);
-      if (response) {
-        this.$set(this.disabledDS, sid, false);
-      } else {
-        this.$set(this.disabledDS, sid, true);
-      }
-    },
+    // checkDataSearch: async function (sid) {
+    //   let response = await this.$store.getters.checkDataSearch(`${this.idDash}-${sid}`);
+    //   if (response) {
+    //     this.$set(this.disabledDS, sid, false);
+    //   } else {
+    //     this.$set(this.disabledDS, sid, true);
+    //   }
+    // },
     dragTool: function (event) {
       // функция для перетаскивания нового элемнета на полотно (остальную область, ну вы поняли короче)
 

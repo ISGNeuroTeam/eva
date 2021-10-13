@@ -65,6 +65,7 @@
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
             :searchData="getElementData(elem)"
+            :dataSourseTitle="elem.search"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
           />

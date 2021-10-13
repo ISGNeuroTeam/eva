@@ -15,8 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - changed position of plus and exim btns on visualizations
+- add color to handlers for resizing
 - bug with disappearing rows in tables after repeated click
-- fix move elements to dashboard
+- added data source name to visualizations again
+- infinite loading of new datasource
+- bug with visual elements drops far to the bottom of the page
 
 ## [1.68.2]
 ### Fixed
