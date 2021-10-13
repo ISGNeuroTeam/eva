@@ -118,7 +118,7 @@ export default {
   },
   mounted() {
     /** Getting saved component options from the store. */
-    this.init();
+    this.init(null, true);
   },
   methods: {
     getColor(metric) {
@@ -139,7 +139,7 @@ export default {
 
       return null;
     },
-    init(settings) {
+    init(settings, up) {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = { ...this.$store.getters.getOptions({ id, idDash }) };
       if (!options.settings && !settings) {
@@ -151,6 +151,10 @@ export default {
         };
       }
       const { template, metricCount } = settings || options.settings;
+
+      if (this.updateSettings && up) {
+        this.updateSettings(settings || options.settings)
+      }
 
       this.options = {
         ...options,
