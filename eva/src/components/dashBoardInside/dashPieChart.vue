@@ -35,7 +35,7 @@
           v-for="(item, idx) in legends"
           :key="idx"
           class="legend-line"
-          :class="selectedPieIndex === idx ? 'legend-line_selected' : ''"
+          :class="selectedPieIndex === idx ? 'legend-line_selected legend-line_hover' : ''"
           @mouseover="hoverLegendLine(idx)"
           @mouseleave="hoverLegendLine(null)"
           @click="selectedPieIndex = idx"
@@ -148,7 +148,6 @@ export default {
         if (graphics.length != 0) {
           graphics[0].remove();
           //если строим заново(изменились данные) - очищаем токены
-          this.setToken();
           this.createPieChartDash();
         } else {
           this.createPieChartDash();
@@ -158,31 +157,33 @@ export default {
     },
   },
   watch: {
-    selectedPieIndex(newVal){
-      if(newVal!==null) this.setToken(newVal)
+    selectedPieIndex(newVal) {
+      console.log(newVal);
+      if (newVal !== null) this.setToken(newVal);
     },
-    dataRestFrom() {
-      const captures = Object.keys(this.dataRestFrom[0]);
-      const actions = [{ name: 'click', capture: captures }];
+    dataRestFrom(newVal) {
+      if (newVal[0]) {
+        const captures = Object.keys(this.dataRestFrom[0]);
+        const actions = [{ name: 'click', capture: captures }];
 
-      this.$store.commit('setActions', {
-        actions,
-        idDash: this.idDashFrom,
-        id: this.idFrom,
-      });
+        this.$store.commit('setActions', {
+          actions,
+          idDash: this.idDashFrom,
+          id: this.idFrom,
+        });
 
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize) {
-        let graphics = d3
-          .select(this.$refs.piechartItself)
-          .selectAll('svg')
-          .nodes();
-        if (graphics.length != 0) {
-          graphics[0].remove();
-          //если строим заново(изменились данные) - очищаем токены
-          this.setToken();
-          this.createPieChartDash();
-        } else {
-          this.createPieChartDash();
+        if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize) {
+          let graphics = d3
+            .select(this.$refs.piechartItself)
+            .selectAll('svg')
+            .nodes();
+          if (graphics.length != 0) {
+            graphics[0].remove();
+            //если строим заново(изменились данные) - очищаем токены
+            this.createPieChartDash();
+          } else {
+            this.createPieChartDash();
+          }
         }
       }
     },
@@ -193,8 +194,7 @@ export default {
         .selectAll('.piepart')
         .each((_, i, nodes) => {
           const node = nodes[i];
-          if (i === legendLineIndex)
-            node.classList.add('piepartSelect');
+          if (i === legendLineIndex) node.classList.add('piepartSelect');
           else if (node.classList.contains('piepartSelect') && this.selectedPieIndex !== i)
             node.classList.remove('piepartSelect');
         });
@@ -425,13 +425,13 @@ export default {
           hoverLegendLine(null);
         })
         .on('click', (_, i, nodes) => {
-          const node = nodes[i]
+          const node = nodes[i];
           if (this.selectedPieIndex === i) {
             this.selectedPieIndex = null;
             node.classList.remove('piepartSelect');
           } else {
             this.selectedPieIndex = i;
-            node.classList.add('piepartSelect')
+            node.classList.add('piepartSelect');
           }
         });
     },
