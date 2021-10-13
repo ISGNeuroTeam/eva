@@ -709,6 +709,7 @@ export default {
   props: {
     idDashFrom: null,
     inside: null,
+    horizontalCell: null
   },
   data() {
     return {
@@ -838,6 +839,10 @@ export default {
   computed: {
     idDash: function () {
       return this.idDashFrom
+    },
+
+    headerTop() {
+      return document.body.clientWidth <= 1400 ? 40 : 50
     },
     isAdmin() {
       return this.userPermissions && this.userPermissions.includes('admin_all');
@@ -1412,6 +1417,7 @@ export default {
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
         const top = Number(this.avatar.style.top.replace('px', ''))
+
         let coord = this.avatar.getBoundingClientRect(); // берем координаты аватара
         let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
         this.avatar.remove(); // удаляем аватар из дерева dom
@@ -1441,7 +1447,7 @@ export default {
         this.$set(this.newDashBoard[type], 'height', size.hor);
 
         let pos = this.calcGrid(coord.top, coord.left, step, 'pos');
-        this.$set(this.newDashBoard[type], 'top', top);
+        this.$set(this.newDashBoard[type], 'top', top / this.horizontalCell);
         this.$set(this.newDashBoard[type], 'left', pos.vert);
 
         // this.$set(this.newDashBoard[type],'width',settings.size[type].width);
