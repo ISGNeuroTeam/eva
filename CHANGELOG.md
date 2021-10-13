@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - multiLine component data-tooltip visual style
+- color picker for dashboard groups
 
 ### Fixed
 - changed position of plus and exim btns on visualizations

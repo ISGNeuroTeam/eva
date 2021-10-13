@@ -33,15 +33,49 @@
             clearable  
           />
           <div 
-            class="zagolovok-field input-create"  
+            class="title-field input-create"
             :style="{color:theme.$main_text}"
           >
             Цвет группы
           </div>
-          <v-color-picker
-            v-model="newGroup.color" 
-            class="colorPicker input-create" 
-          />
+          <div class="color-picker-wrapper">
+            <div
+              v-for="color in colors"
+              :key="color" class="color-box"
+              :class="{ active: colorInputMode === 'preset' && newGroup.color === color}"
+              :style="{ backgroundColor: color }"
+              @click="setPresetGroupColor(color)"
+            >
+              <svg v-show="colorInputMode === 'preset' && newGroup.color === color" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z" fill="white"/>
+              </svg>
+            </div>
+            <div class="custom-color-block">
+              <div
+                class="color-box custom-color"
+                :style="{ backgroundColor: pickedColor }"
+                @click="setCustomGroupColor(pickedColor)"
+              >
+                <svg v-show="colorInputMode === 'custom'" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z" fill="white"/>
+                </svg>
+              </div>
+              <v-menu
+                :close-on-content-click="false"
+              >
+                <template v-slot:activator="{ on }">
+                  <svg id="edit-icon" v-on="on" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.41999 20.5789C4.13948 20.5784 3.87206 20.4601 3.68299 20.2529C3.49044 20.0474 3.39476 19.7694 3.41999 19.4889L3.66499 16.7949L14.983 5.48091L18.52 9.0169L7.20499 20.3299L4.51099 20.5749C4.47999 20.5779 4.44899 20.5789 4.41999 20.5789ZM19.226 8.30991L15.69 4.77391L17.811 2.65291C17.9986 2.46513 18.2531 2.35962 18.5185 2.35962C18.7839 2.35962 19.0384 2.46513 19.226 2.65291L21.347 4.77391C21.5348 4.96147 21.6403 5.216 21.6403 5.48141C21.6403 5.74681 21.5348 6.00134 21.347 6.18891L19.227 8.30891L19.226 8.30991Z" :fill="theme.$main_border"/>
+                  </svg>
+                </template>
+                <v-color-picker
+                  v-model="pickedColor"
+                  dot-size="17"
+                />
+              </v-menu>
+              Свой цвет
+            </div>
+          </div>
           <div class="profile-block">
             <data-profile 
               v-for="item in Object.keys(group.tab)" 
@@ -203,17 +237,30 @@ export default {
           groups: null,
         },
       },
+      colorInputMode: 'preset',
+      pickedColor: '',
     }
   },
   computed: {
     theme: function() {
       return this.$store.getters.getTheme
     },
+    colors() {
+      return [this.theme.$coral, this.theme.$beet, this.theme.$raspberry, this.theme.$peach, this.theme.$orange,
+        this.theme.$sun, this.theme.$kiwi, this.theme.$grass, this.theme.$forest, this.theme.$sea, this.theme.$blue,
+        this.theme.$plum, this.theme.$purple]
+    },
     active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет  
       if (this.modalFrom ) {
         if (this.dataFrom) {
           this.newGroup.name = this.dataFrom.name;
           this.newGroup.color = this.dataFrom.color;
+          if (this.colors.includes(this.dataFrom.color)) {
+            this.colorInputMode = 'preset'
+          } else {
+            this.colorInputMode = 'custom'
+            this.pickedColor = this.dataFrom.color
+          }
         } else {
           this.newGroup.name = '';
           this.newGroup.color = '';
@@ -251,11 +298,32 @@ export default {
       return this.groupFrom
     },
     dashs: function() {
-      return  this.dashsFrom
+      return this.dashsFrom
     }
   },
-  methods: {  
-    createBtn: function (name) {  // при нажатии на кнопку создать 
+  watch: {
+    pickedColor(color) {
+      if(this.colorInputMode === 'custom')
+        this.setGroupColor(color)
+    }
+  },
+  mounted() {
+    this.create_warning = false; // выключаем все предупреждения что были включены
+    this.pickedColor = this.theme.$main_bg
+  },
+  methods: {
+    setGroupColor(color) {
+      this.newGroup.color = color;
+    },
+    setPresetGroupColor(color){
+      this.colorInputMode = 'preset';
+      this.setGroupColor(color)
+    },
+    setCustomGroupColor(color) {
+      this.colorInputMode = 'custom';
+      this.setGroupColor(color)
+    },
+    createBtn: function (name) {  // при нажатии на кнопку создать
       let flag = false;
       if (!name || name == '') {  //  если пользователь не ввел имя
         this.showwarning = true;  //  показываем предупреждение
@@ -267,7 +335,7 @@ export default {
         let essence = '';
         if (this.groupCheck) {
           this.groups.forEach( item => {  // для этого просматриваем все дашборды на странице (но берем их из хранилища)
-            item.name.toLowerCase() == name.toLowerCase() ? flag = true: false 
+            item.name.toLowerCase() == name.toLowerCase() ? flag = true: false
           });
           dataObj = {name: this.newGroup.name, color: this.newGroup.color, };
           if (Object.keys(this.changedData).length != 0) {
@@ -277,18 +345,18 @@ export default {
             })
           }
           if (this.curGroupFrom != -1) {
-            dataObj.id = this.groupFrom[this.curGroupFrom].id;              
+            dataObj.id = this.groupFrom[this.curGroupFrom].id;
           }
           essence = 'group';
           warnText = 'Такая группа уже существует. Хотите изменить её?'
         } else {
           this.dashs.forEach( item => {  // для этого просматриваем все дашборды на странице (но берем их из хранилища)
-            item.name.toLowerCase() == name.toLowerCase() ? flag = true: false 
-          });          
+            item.name.toLowerCase() == name.toLowerCase() ? flag = true: false
+          });
           dataObj = {name: this.newDash.name,};
 
           if (this.newDash.id != '') {
-            dataObj.id = this.newDash.id; 
+            dataObj.id = this.newDash.id;
           }
           dataObj.idgroup = this.curGroupFrom;
 
@@ -297,7 +365,7 @@ export default {
             Object.keys(keys).forEach( item => {
               dataObj[item] = keys[item];
             })
-          } 
+          }
           essence = 'dash';
           warnText = 'Такой дашборд уже существует. Хотите изменить его?'
         }
@@ -307,7 +375,7 @@ export default {
           this.nameBtn.create = 'Создать';
           this.nameBtn.cancel = 'Отмена';
           this.nameWarn = '';
-        } else {  // а иначе 
+        } else {  // а иначе
           if (this.nameBtn.create != 'Да') {
             this.showwarning = true;  //  показываем предупреждение
             this.nameBtn.create = 'Да';
@@ -327,7 +395,7 @@ export default {
       if (btn == "Отмена") {
         this.$emit('closeModal');  // передаем в родителя чтобы выключили модалку
         this.name = '';  // очищаем имя
-      } 
+      }
       this.showwarning = false;
       this.nameBtn.create = 'Создать';
       this.nameBtn.cancel = 'Отмена';
@@ -352,7 +420,7 @@ export default {
           if (essence == 'dash') {
             res.json().then (data => {
               this.createDash({id: data.id, name: group.name, idgroup: group.idgroup, modified: data.modified});
-            }) 
+            })
           }
           this.$emit('closeModal');  // передаем в родителя чтобы выключили модалку
         } else if (res.status == 409) {
@@ -380,7 +448,7 @@ export default {
       } else {
         role = 'dash';
         data = this.dashs;
-      } 
+      }
       if (this.actionFrom) {
         let allData = {};
         let keys =[];
@@ -391,9 +459,9 @@ export default {
         let result =  await Promise.all(promise);
         result.forEach( (item,i) => {
           allData[keys[i]] = item;
-        })        
+        })
         return allData
-      } 
+      }
       return this.$store.auth.getters.getEssence(role,data[this.curGroupFrom].id)
 
     },
@@ -416,13 +484,10 @@ export default {
     // },
     changeData: function(event) {
       if (!this.changedData[event.essence]) {
-        this.changedData[event.essence] = {}; 
+        this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
     }
-  },
-  mounted() {
-    this.create_warning = false; // выключаем все предупреждения что были включены
   },
 }
 </script>
