@@ -15,11 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - changed position of plus and exim btns on visualizations
+- add color to handlers for resizing
 - redesign single value from design
 - bug with disappearing rows in tables after repeated click
 - problem with cansel changes when we dont want to save them
 - single value design bugs
 - single value fixed open fullscreen
+- added data source name to visualizations again
+- infinite loading of new datasource
+- fixed save and unsave settings for signle value
+- fixed move elements for single value, updated move for burger icon
 
 ## [1.68.2]
 ### Fixed

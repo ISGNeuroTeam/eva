@@ -12,7 +12,7 @@
         boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
-      <v-card-title v-show="props.disappear" class="card-title open_title">
+      <v-card-title v-show="element.split('-')[0] === 'singleValue' ? settings.showTitle : props.disappear" class="card-title open_title">
         <div class="name-dash">
           <v-icon v-if="dataFromDB" class="icon" :color="theme.$main_border">
             {{ mdiDatabaseSearch }}
@@ -43,6 +43,9 @@
               :style="{ color: theme.$main_text }"
             >
               [ {{ element }} ]
+              <span v-if="dataSourseTitle !== -1" class="ml-1">
+                {{ dataSourseTitle }}
+              </span>
             </div>
             <div
               v-if="props.edit"
@@ -120,6 +123,9 @@
                           :style="{ color: theme.$main_text }"
                         >
                           [ {{ element }} ]
+                          <span v-if="dataSourseTitle !== -1" class="ml-1">
+                            {{ dataSourseTitle }}
+                          </span>
                         </div>
                         <div
                           v-if="props.edit"
@@ -352,6 +358,7 @@ export default {
       default: false,
     },
     searchData: Array,
+    dataSourseTitle: null,
   },
   data() {
     return {
@@ -359,7 +366,9 @@ export default {
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
       fullScreenMode: false,
-      settings: {},
+      settings: {
+        showTitle: true
+      },
       props: {
         id: "",
         name: "",
@@ -438,8 +447,7 @@ export default {
         if (
           this.element.split("-")[0] === "button" ||
           this.element.split("-")[0] === "csvg" ||
-          this.element.split("-")[0] === "tile" ||
-          this.element.split("-")[0] === "singleValue"
+          this.element.split("-")[0] === "tile"
         ) {
           this.props.disappear = false;
         }

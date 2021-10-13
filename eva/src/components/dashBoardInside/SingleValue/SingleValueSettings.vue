@@ -26,7 +26,7 @@
           />
           <br />
           <label class="checkbox-google">
-            <input type="checkbox" :checked="settings.showTitle" @change="handleChangeShowTitle">
+            <input type="checkbox" :checked="settings.showTitle || false" @change="handleChangeShowTitle">
             <span class="checkbox-google-switch"></span> &nbsp;
             Отображение шапки компонента
           </label>
@@ -76,7 +76,7 @@
             v-html="showAllTitle"
           />
         </div>
-        <draggable v-model="settings.metricOptions" @end="update()">
+        <draggable v-model="settings.metricOptions" handle=".burger" @end="update()">
           <div
             v-for="(metric, i) in settings.metricOptions"
             :key="`metric-${metric.id}`"
@@ -99,7 +99,7 @@
                   v-text="metric.expanded ? mdiChevronUp : mdiChevronDown"
                 />
               </span>
-              <v-icon size="16" :color="theme.$main_border" v-text="mdiMenu"/>
+              <v-icon size="16" class="burger" style="cursor: move" :color="theme.$main_border" v-text="mdiMenu"/>
             </div>
 
             <div class="content-section">
@@ -162,7 +162,7 @@
                 >
                   <template v-slot:selection="{ item }">{{ item.title }}</template>
                   <template v-slot:item="{ item }">
-                    <span :style="{ fontWeight: item.value }" v-text="item.title"/>
+                    <span :style="{ fontWeight: item.value, fontFamily: getFamily(item) }" v-text="item.title"/>
                   </template>
                 </v-select>
               </div>
@@ -245,8 +245,8 @@ export default {
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
     fontWeightList: [
-      { value: 200, title: "Regular (200)" },
-      { value: 600, title: "Medium (500)" },
+      { value: 400, title: "Regular (200)" },
+      { value: 500, title: "Medium (500)" },
       { value: 800, title: "Bold (800)" },
     ],
     /** Metric title color select items. */
@@ -305,6 +305,7 @@ export default {
     }
   },
   methods: {
+    getFamily() {},
     handleChangeShowTitle() {
       if (this.settings) {
         this.settings = {
@@ -322,22 +323,17 @@ export default {
     },
 
     save() {
-      console.log(this.settings, 'this.settings')
       this.$emit("save", { ...this.settings });
       this.close(true);
     },
 
     handleChangeCount(count) {
       this.settings.template = 1
-      this.settings = {
-        ...this.settings,
-        template: 1,
-        metricCount: count
-      }
+      this.settings.metricCount = count
     },
 
     update() {
-      this.$emit("save", { ...this.settings });
+      // this.$emit("save", { ...this.settings });
     },
 
     close(save = false) {
