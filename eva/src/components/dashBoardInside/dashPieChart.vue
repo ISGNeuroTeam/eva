@@ -35,8 +35,10 @@
           v-for="(item, idx) in legends"
           :key="idx"
           class="legend-line"
+          :class="selectedPieIndex === idx ? 'legend-line_selected' : ''"
           @mouseover="hoverLegendLine(idx)"
           @mouseleave="hoverLegendLine(null)"
+          @click="selectedPieIndex = idx"
         >
           <div class="square" :style="{ backgroundColor: item.color }" />
           <div class="text" :style="{ color: theme.$main_text }">
@@ -67,6 +69,7 @@ export default {
   data() {
     return {
       nodata: true,
+      selectedPieIndex: null,
       message: 'Нет данных для отображения',
       legends: [],
       positionLegends: 'row nowrap',
@@ -155,6 +158,9 @@ export default {
     },
   },
   watch: {
+    selectedPieIndex(newVal){
+      if(newVal!==null) this.setToken(newVal)
+    },
     dataRestFrom() {
       const captures = Object.keys(this.dataRestFrom[0]);
       const actions = [{ name: 'click', capture: captures }];
@@ -185,18 +191,22 @@ export default {
     hoverLegendLine(legendLineIndex) {
       d3.select(this.$refs.pieChart)
         .selectAll('.piepart')
-        .each(function(_, pieIndex) {
-          if (pieIndex === legendLineIndex) {
-            this.classList.add('piepartSelect');
-          } else if (this.classList.contains('piepartSelect')) this.classList.remove('piepartSelect');
+        .each((_, i, nodes) => {
+          const node = nodes[i];
+          if (i === legendLineIndex)
+            node.classList.add('piepartSelect');
+          else if (node.classList.contains('piepartSelect') && this.selectedPieIndex !== i)
+            node.classList.remove('piepartSelect');
         });
 
       d3.select(this.$refs.legends)
         .selectAll('.legend-line')
-        .each(function(_, idx) {
-          if (legendLineIndex === idx) {
-            this.classList.add('legend-line_hover');
-          } else if (this.classList.contains('legend-line_hover')) this.classList.remove('legend-line_hover');
+        .each((_, i, nodes) => {
+          const node = nodes[i];
+          if (legendLineIndex === i) {
+            node.classList.add('legend-line_hover');
+          } else if (node.classList.contains('legend-line_hover'))
+            node.classList.remove('legend-line_hover');
         });
     },
     setMetrics() {
@@ -377,7 +387,6 @@ export default {
       const tooltipOffset = { x: 30, y: 5 };
 
       const hoverLegendLine = this.hoverLegendLine.bind(this);
-      const setToken = this.setToken.bind(this)
 
       svg
         .selectAll('pies')
@@ -397,40 +406,49 @@ export default {
         })
         .attr('stroke', this.theme.$main_bg)
         .style('stroke-width', '2px')
-        .on('mouseover', function(d, pieIndex) {
-          this.classList.add('piepartSelect');
+        .on('mouseover', (d, i, nodes) => {
+          const node = nodes[i];
+          if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
           tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
           tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
           tooltipEl.style.visibility = 'visible';
-          hoverLegendLine(pieIndex);
+          hoverLegendLine(i);
         })
         .on('mousemove', function(d) {
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
           tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
         })
-        .on('mouseout', function(d) {
-          this.classList.remove('piepartSelect');
+        .on('mouseout', (_, i, nodes) => {
+          if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
           hoverLegendLine(null);
         })
-        .on('click',(_, i)=>setToken(i));
+        .on('click', (_, i, nodes) => {
+          const node = nodes[i]
+          if (this.selectedPieIndex === i) {
+            this.selectedPieIndex = null;
+            node.classList.remove('piepartSelect');
+          } else {
+            this.selectedPieIndex = i;
+            node.classList.add('piepartSelect')
+          }
+        });
     },
     setToken(pieIndex) {
       let tokens = this.$store.getters.getTockens(this.idDashFrom);
 
-      tokens.forEach(tocken=>{
-        if(tocken.elem == this.idFrom){
-          const value = this.dataRestFrom[pieIndex][tocken.capture]
+      tokens.forEach(tocken => {
+        if (tocken.elem == this.idFrom) {
+          const value = this.dataRestFrom[pieIndex][tocken.capture];
           this.$store.commit('setTocken', {
             tocken,
             value,
             idDash: this.idDashFrom,
             store: this.$store,
           });
-
         }
-      })
+      });
     },
   },
 };
