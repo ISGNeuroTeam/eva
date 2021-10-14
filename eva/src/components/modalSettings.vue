@@ -789,43 +789,45 @@
               Градус наклона подписей на оси X
             </div>
             <div class="status-option item">
-              <v-radio-group v-model="options.xAxisCaptionRotate">
-                <div class="d-flex align-center">
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    label="0"
-                    :value="0"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="45"
-                    :value="45"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="-45"
-                    :value="-45"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="90"
-                    :value="90"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="-90"
-                    :value="-90"
-                  />
-                </div>
+              <v-radio-group
+                v-model="options.xAxisCaptionRotate"
+                :column="false"
+
+              >
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="0"
+                  :value="0"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="45"
+                  :value="45"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="-45"
+                  :value="-45"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="90"
+                  :value="90"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="-90"
+                  :value="-90"
+                />
               </v-radio-group>
             </div>
           </div>
@@ -913,6 +915,80 @@
                 class="subnumber"
                 hide-details
               />
+            </div>
+          </div>
+
+          <v-card-text
+            v-if="options.united && checkOptions('united')"
+            class="headline pa-0"
+          >
+            <div
+              class="settings-title"
+              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+            >
+              Привязка осей
+            </div>
+          </v-card-text>
+
+          <div
+            v-if="options.united && checkOptions('united')"
+            class="options-block united-block pa-0"
+          >
+            <div class="d-flex">
+              <v-radio-group
+                v-model="multilineYAxesBinding.axesCount"
+                style="margin-left: 250px; margin-top: 0;"
+              >
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="Одна ось"
+                  :value="1"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="Две оси"
+                  :value="2"
+                />
+              </v-radio-group>
+              <div
+                v-if="multilineYAxesBinding.axesCount === 2"
+                style="margin-left: 50px"
+              >
+                <div
+                  v-for="(metric, i) in Object.keys(multilineYAxesBinding.metrics)"
+                  :key="`metric-${i}`"
+                  class="pb-3"
+                >
+                  <div class="d-flex align-center">
+                    <span>
+                      Привязка метрики
+                      <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
+                    </span>
+                    <v-radio-group
+                      v-model="multilineYAxesBinding.metrics[metric]"
+                      hide-details
+                      :column="false"
+                      class="ma-0 ml-5"
+                    >
+                      <v-radio
+                        :color="theme.$primary_button"
+                        :style="{ color:theme.$main_text }"
+                        label="Слева"
+                        :value="'left'"
+                      />
+                      <v-radio
+                        :color="theme.$primary_button"
+                        :style="{ color:theme.$main_text }"
+                        class="ml-2"
+                        label="Справа"
+                        :value="'right'"
+                      />
+                    </v-radio-group>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1461,6 +1537,7 @@ export default {
       metrics: [],
       types: ['Line chart', 'Bar chart'],
       metricsName: [],
+      multilineYAxesBinding: { axesCount: 1, metrics: {} },
       x: '',
       y: '',
       metadata: '',
@@ -1493,8 +1570,19 @@ export default {
         this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
+          const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
+          if (opt.yAxesBinding) {
+            this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount
+          } else {
+            this.multilineYAxesBinding.axesCount = 1
+          }
           this.metricsName.forEach(metric => {
             this.metricUnits[metric.name] = metric.units;
+            if (opt.yAxesBinding && opt.yAxesBinding.metrics) {
+              this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name]
+            } else {
+              this.multilineYAxesBinding.metrics[metric.name] = 'left'
+            }
           })
         }
         let test = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
@@ -1592,6 +1680,7 @@ export default {
       }
       if (this.element.startsWith("multiLine")) {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
+        this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
       this.cancelModal();
