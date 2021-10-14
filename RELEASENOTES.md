@@ -1,3 +1,17 @@
+# [1.69.0] - New multiline settings and tooltip changes, color picker for groups and bugfixes
+### New
+- Added new settings to multiLine component: 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth'.
+- Changed multiLine component data-tooltip visual style.
+- Color picker for dashboard groups now contains preset colors from theme, and also you can create a custom one.
+
+### Bugfix
+- Plus and exim buttons are now displaying correctly while on groups/dashboards selection page.
+- Resize handles are back visible while resizing components on dashboard.
+- Rows in tables doesn't disappear anymore while clicking them.
+- Added data source name to header of visualizations again.
+- Infinite loading of created datasource in datasource panel.
+- Bug with visual elements drops far to the bottom of the page.
+
 # [1.68.2] - Hotfix of critical dashboard bug
 
 ### Bugfix

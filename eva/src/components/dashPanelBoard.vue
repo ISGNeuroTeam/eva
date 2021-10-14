@@ -709,6 +709,7 @@ export default {
   props: {
     idDashFrom: null,
     inside: null,
+    horizontalCell: null
   },
   data() {
     return {
@@ -839,12 +840,12 @@ export default {
     idDash: function () {
       return this.idDashFrom
     },
+
+    headerTop() {
+      return document.body.clientWidth <= 1400 ? 40 : 50
+    },
     isAdmin() {
-      if (this.userPermissions && this.userPermissions.includes('admin_all')) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.userPermissions && this.userPermissions.includes('admin_all');
     },
     searches: function () {
       // массив со всеми ИС на странице
@@ -853,7 +854,6 @@ export default {
         let searches = this.$store.getters.getSearches(this.idDash);
         searches.forEach((item) => {
           this.$set(this.change, item.sid, false);
-          this.checkDataSearch(item.sid);
         });
         searchesRes = searches;
       }
@@ -1362,14 +1362,14 @@ export default {
       //   link.remove(); // удаляем ссылку
       // });
     },
-    checkDataSearch: async function (sid) {
-      let response = await this.$store.getters.checkDataSearch(`${this.idDash}-${sid}`);
-      if (response) {
-        this.$set(this.disabledDS, sid, false);
-      } else {
-        this.$set(this.disabledDS, sid, true);
-      }
-    },
+    // checkDataSearch: async function (sid) {
+    //   let response = await this.$store.getters.checkDataSearch(`${this.idDash}-${sid}`);
+    //   if (response) {
+    //     this.$set(this.disabledDS, sid, false);
+    //   } else {
+    //     this.$set(this.disabledDS, sid, true);
+    //   }
+    // },
     dragTool: function (event) {
       // функция для перетаскивания нового элемнета на полотно (остальную область, ну вы поняли короче)
 
@@ -1417,6 +1417,7 @@ export default {
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
         const top = Number(this.avatar.style.top.replace('px', ''))
+
         let coord = this.avatar.getBoundingClientRect(); // берем координаты аватара
         let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
         this.avatar.remove(); // удаляем аватар из дерева dom
@@ -1446,7 +1447,7 @@ export default {
         this.$set(this.newDashBoard[type], 'height', size.hor);
 
         let pos = this.calcGrid(coord.top, coord.left, step, 'pos');
-        this.$set(this.newDashBoard[type], 'top', top);
+        this.$set(this.newDashBoard[type], 'top', top / this.horizontalCell);
         this.$set(this.newDashBoard[type], 'left', pos.vert);
 
         // this.$set(this.newDashBoard[type],'width',settings.size[type].width);

@@ -13,7 +13,6 @@ export default {
       settings: themes['dark'],
     },
   },
-
   mutations: {
     setNameDash: (state, newName) => {
       // изменения имени самого элемента
@@ -39,7 +38,7 @@ export default {
           }
         })
       } else {
-        state[idDash].searches.push(search)
+        state[idDash].searches.push({...search})
       }
     },
     deleteSearch: (state, search) => {

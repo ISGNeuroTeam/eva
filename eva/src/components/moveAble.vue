@@ -10,7 +10,7 @@
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
-    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color }"
+    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color, backgroundColor: theme.$accent_ui_color, }"
     @resizestop="sendSize"
     @dragstop="sendMove"
   >
@@ -23,6 +23,7 @@
       :data-elem-from="id"
       :loading="loading"
       :searchData="searchData"
+      :dataSourseTitle="dataSourseTitle"
       @SetLevel="props.zIndex = $event"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
@@ -44,6 +45,7 @@ export default {
       default: false,
     },
     searchData: Array,
+    dataSourseTitle: null,
   },
   data() {
     return {
@@ -134,7 +136,6 @@ export default {
 
       let left = Math.round(x / this.verticalCell)
       if (left < 0) left = 0
-      console.log({ top: top, left: left, id: this.id, idDash: this.idDash })
       this.$store.commit('setPosDash', { top: top, left: left, id: this.id, idDash: this.idDash })
     },
     sendSize(x, y, width, height) {

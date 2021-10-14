@@ -24,20 +24,26 @@
             hide-details
             class="input-element"
           />
+          <v-checkbox
+            :input-value="true"
+            label="Отображение шапки компонента"
+            :style="{color:theme.$main_text}"
+            :value="true">
+          </v-checkbox>
         </div>
 
         <div class="content-section offset">
           <span class="section-title">Количество показателей</span>
           <v-select
-            v-model="settings.metricCount"
             :items="metricCountList"
             :append-icon="mdiChevronDown"
             dense
             outlined
+            :value="settings.metricCount"
             hide-details
             menu-props="offsetY"
             class="input-element"
-            @change="settings.template = 1"
+            @change="handleChangeCount"
           />
         </div>
 
@@ -209,6 +215,7 @@ export default {
   props: {
     isOpen: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
+    updateCount: Function
   },
   data: () => ({
     no_icon,
@@ -224,7 +231,7 @@ export default {
     /** Font weight select items. */
     fontWeightList: [
       { value: 200, title: "Regular (200)" },
-      { value: 400, title: "Medium (400)" },
+      { value: 500, title: "Medium (500)" },
       { value: 800, title: "Bold (800)" },
     ],
     /** Metric title color select items. */
@@ -276,11 +283,25 @@ export default {
     receivedSettings(newValue) {
       this.settings = { ...newValue };
     },
+    settings() {
+      if (this.updateCount) {
+        this.updateCount(this.settings.metricCount);
+      }
+    }
   },
   methods: {
     save() {
       this.$emit("save", { ...this.settings });
       this.close();
+    },
+
+    handleChangeCount(count) {
+      this.settings.template = 1
+      this.settings = {
+        ...this.settings,
+        template: 1,
+        metricCount: count
+      }
     },
 
     update() {
