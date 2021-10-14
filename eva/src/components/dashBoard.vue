@@ -185,6 +185,8 @@
                     :sizeTileFrom="props.sizeTile"
                     :tooltipFrom="props.tooltip"
                     :widthFrom="fullScreenWidth"
+                    :defaultTextarea="textarea"
+                    :handleChangeTextarea="handleChangeTextarea"
                     :heightFrom="fullScreenHeight"
                     :titles="getSelectedTableTitles(idDash, element)"
                     :options="props.options"
@@ -308,7 +310,9 @@
         :sizeTileFrom="props.sizeTile"
         :tooltipFrom="props.tooltip"
         :widthFrom="width"
+        :defaultTextarea="textarea"
         :heightFrom="height"
+        :handleChangeTextarea="handleChangeTextarea"
         :titles="getSelectedTableTitles(idDash, element)"
         :options="props.options"
         :is-full-screen="false"
@@ -348,6 +352,7 @@ export default {
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
       fullScreenMode:false,
+      textarea: "",
       props: {
         id: '',
         name: '',
@@ -526,6 +531,9 @@ export default {
     }
   },
   methods: {
+    handleChangeTextarea(textarea) {
+      this.textarea = textarea
+    },
     editName: function (props) {
       // изменяем имя элемнета
       props.edit = true

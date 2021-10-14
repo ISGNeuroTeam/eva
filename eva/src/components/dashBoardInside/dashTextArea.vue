@@ -38,6 +38,8 @@ export default {
     idDashFrom: null, // id дашборда 
     colorFrom: null,  // цветовые переменные
     heightFrom: null, // выоста родительского компонента
+    defaultTextarea: String,
+    handleChangeTextarea: Function,
   },
   data () {
     return {
@@ -86,14 +88,25 @@ export default {
       return options.searchBtn;
     }
   },  
+  watch: {
+    defaultTextarea() {
+      this.textarea = this.defaultTextarea;
+    }
+  },
   methods: {
     setTockenBlur(event){
       event.preventDefault();
       this.$store.commit('setTextArea', {idDash: this.idDash, id: this.id, textarea: this.textarea});
+      if (this.handleChangeTextarea) {
+        this.handleChangeTextarea(this.textarea)
+      }
       this.setTocken();
     },
     acceptTextArea: function() {
       this.$store.commit('setTextArea', {idDash: this.idDash, id: this.id, textarea: this.textarea});
+      if (this.handleChangeTextarea) {
+        this.handleChangeTextarea(this.textarea)
+      }
       this.setTocken();
     },
     setTockenByPress: function(event) {
