@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bug with disappearing rows in tables after repeated click
 - added data source name to visualizations again
 - infinite loading of new datasource
+- bug with visual elements drops far to the bottom of the page
 
 ## [1.68.2]
 ### Fixed
