@@ -38,7 +38,7 @@
           class="metric-value"
           :class="`color-${metric.color}`"
           :style="`
-            color: ${getColor(metric)}
+            color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
             `"
@@ -122,6 +122,7 @@ export default {
   },
   methods: {
     getColor(metric) {
+      console.log(metric)
       if (metric.color === 'range') {
         if (Number(metric.value)) {
           const val = Number(metric.value);
@@ -208,7 +209,7 @@ export default {
           color: 'main',
           icon: 'no_icon',
           fontSize: 54,
-          fontWeight: 200,
+          fontWeight: 400,
           listOrder: order - 1,
         };
 
@@ -224,6 +225,7 @@ export default {
       this.metricList = settings.metricOptions.map((item, idx) => ({
         ...item,
         listOrder: idx,
+        fontWeight: 400,
         color: 'main',
         value: this.metricList.find(m => m.startId === item.startId)?.value
       }))
