@@ -165,7 +165,7 @@ export default {
       if (settings) {
         this.updateVisual(settings)
       } else {
-        this.setVisual();
+        this.setVisual(settings);
       }
     },
     updateCount(count) {
@@ -181,7 +181,7 @@ export default {
       
       this.setVisual();
     },
-    setVisual() {
+    setVisual(settings) {
       const metricList = [];
       const metricOptions = [];
       let idCount = 1;
@@ -203,6 +203,7 @@ export default {
 
         const defaultMetricOption = {
           id: metricID,
+          startId: metricID,
           title: metric || data.phase,
           color: 'main',
           icon: 'no_icon',
@@ -224,6 +225,7 @@ export default {
         ...item,
         listOrder: idx,
         color: 'main',
+        value: this.metricList.find(m => m.startId === item.startId)?.value
       }))
     },
     updateOptions() {
