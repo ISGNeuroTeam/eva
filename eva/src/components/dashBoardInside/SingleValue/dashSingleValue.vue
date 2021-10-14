@@ -122,7 +122,6 @@ export default {
   },
   methods: {
     getColor(metric) {
-      console.log(metric)
       if (metric.color === 'range') {
         if (Number(metric.value)) {
           const val = Number(metric.value);
@@ -226,7 +225,6 @@ export default {
         ...item,
         listOrder: idx,
         fontWeight: 400,
-        color: 'main',
         value: this.metricList.find(m => m.startId === item.startId)?.value
       }))
     },
