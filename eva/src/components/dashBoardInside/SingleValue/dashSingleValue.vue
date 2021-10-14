@@ -129,7 +129,7 @@ export default {
             return '#FF5147';
           }
 
-          if (val === 0) {
+          if (val > 0 && val <= 10) {
             return '#FFE065';
           }
 
