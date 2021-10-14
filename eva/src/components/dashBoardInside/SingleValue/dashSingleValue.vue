@@ -122,14 +122,26 @@ export default {
   },
   methods: {
     getColor(metric) {
+      if (metric.metadata) {
+        console.log(metric)
+      }
+      if (!metric.metadata) {
+        return undefined;
+      }
+      const ranges = eval('({obj:[' + metric.metadata + ']})').obj[0];
+      Object.keys(ranges).forEach(key => {
+        ranges[key] = ranges[key].split(':').map(Number);
+      });
+
+
       if (metric.color === 'range') {
         if (Number(metric.value)) {
           const val = Number(metric.value);
-          if (val < 0) {
+          if (val >= ranges.red[0] && val <= ranges.red[1]) {
             return '#FF5147';
           }
 
-          if (val > 0 && val <= 10) {
+          if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
             return '#FFE065';
           }
 
@@ -208,6 +220,7 @@ export default {
         const defaultMetricOption = {
           id: metricID,
           startId: metricID,
+          metadata: metadata,
           title: metric || data.phase,
           color: 'main',
           icon: 'no_icon',
