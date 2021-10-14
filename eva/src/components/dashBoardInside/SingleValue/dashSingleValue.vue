@@ -137,7 +137,11 @@ export default {
         }
       }
 
-      return null;
+      if (metric.color === 'secondary') {
+        return '#e0e0ec';
+      }
+
+      return '#5980f8';
     },
     init(settings, up) {
       const { idFrom: id, idDashFrom: idDash } = this;
