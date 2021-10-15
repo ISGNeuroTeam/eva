@@ -101,6 +101,7 @@
               </span>
               <v-icon size="16" class="burger" style="cursor: move" :color="theme.$main_border" v-text="mdiMenu"/>
             </div>
+            {{ metric.name }}: {{ metric.listOrder }}
 
             <div class="content-section">
               <span class="section-title">Подпись (необязательно)</span>
@@ -296,10 +297,14 @@ export default {
   },
   watch: {
     receivedSettings(newValue) {
-      this.settings = JSON.parse(JSON.stringify(newValue));
+      const newSettings = JSON.parse(JSON.stringify(newValue));
+      this.settings = {
+        ...newSettings,
+        metricOptions: newSettings.metricOptions.sort((a, b) => a.listOrder - b.listOrder),
+      };
     },
-    settings() {
-      if (this.updateCount) {
+    settings(old, newSet) {
+      if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
     }
@@ -323,7 +328,6 @@ export default {
     },
 
     save() {
-      console.log(this.settings, 'this.settings')
       this.$emit("save", { ...this.settings });
       this.close(true);
     },

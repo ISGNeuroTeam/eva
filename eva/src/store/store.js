@@ -559,7 +559,6 @@ export default {
 
     setOptions: (state, options) => {
       // добовляем данные о скриншоте
-
       Object.keys(options.options).forEach(item => {
         // пробегаемся по всем настройкам, что к нам пришли
         if (item == 'change') {

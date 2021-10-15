@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed save and unsave settings for signle value
 - fixed move elements for single value, updated move for burger icon
 - fixed colors for metrics value
+- bug with update state for settings single value
 
 ## [1.68.2]
 ### Fixed

@@ -538,7 +538,6 @@ export default {
       idDash: this.idDash,
       id: this.element,
     }); // получаем имя этой страницы
-
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
