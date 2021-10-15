@@ -1565,7 +1565,6 @@ export default {
         this.options.tooltip = this.tooltip;
       }
       if (this.element.indexOf('piechart') != -1) {
-        console.log(this.metricsRelation);
         this.options.metricsRelation = JSON.parse(JSON.stringify(this.metricsRelation));
         this.options.colorsPie = this.colorsPie;
         if (this.colorsPie.theme == 'custom') {
