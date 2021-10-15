@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - piechart tooltips
 - select pie of piechart by legend
+- default color for new group
 
 ### Changed
 - Assigning a value to a piechart token

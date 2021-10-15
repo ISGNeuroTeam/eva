@@ -250,7 +250,8 @@ export default {
         this.theme.$sun, this.theme.$kiwi, this.theme.$grass, this.theme.$forest, this.theme.$sea, this.theme.$blue,
         this.theme.$plum, this.theme.$purple]
     },
-    active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет  
+    active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет
+      this.pickedColor = this.theme.$main_bg
       if (this.modalFrom ) {
         if (this.dataFrom) {
           this.newGroup.name = this.dataFrom.name;
@@ -263,7 +264,8 @@ export default {
           }
         } else {
           this.newGroup.name = '';
-          this.newGroup.color = '';
+          this.newGroup.color = this.colors[0];
+          this.colorInputMode = 'preset'
         }
         if (this.dashFrom) {
           this.newDash.name = this.dashFrom.name;
