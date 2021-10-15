@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- piechart tooltips
+- select pie of piechart by legend
 
 ### Changed
+- Assigning a value to a piechart token
 - DEV: added beforeEach hook in router to redirect unauthorized users
 
 ### Fixed
-- unauthorized users weren't redirected to login page if they tried to open dashboard from link
+- unauthorized users weren't redirected to login page if they tried to open dashboard from
 
 ## [1.69.0]
 ### Added

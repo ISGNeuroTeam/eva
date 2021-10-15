@@ -1,172 +1,228 @@
 <template>
-  <div 
-    ref="pieChart"
-    class="piechart-block"
-  >
-    <div 
-      v-if="nodata"
-      class="nodata" 
-    > 
+  <div ref="pieChart" class="piechart-block">
+    <div v-if="nodata" class="nodata">
       {{ message }}
     </div>
-    
-    <div 
-      v-show="dataLoading"
-      class="loading"
+
+    <div
+      ref="chartTooltip"
+      style="position: absolute;visibility:hidden;border-radius:3px;padding:5px"
+      :style="{
+        color: theme.$main_text,
+        backgroundColor: theme.$secondary_bg,
+        border: `1px solid ${theme.$secondary_border}`,
+      }"
     >
+      Наведите курсор на график
+    </div>
+
+    <div v-show="dataLoading" class="loading">
       <div class="preloader">
         <div class="stable" />
         <div class="dynamic" />
       </div>
-      <p> Загружаю данные... </p>
+      <p>Загружаю данные...</p>
     </div>
-    <div 
-      class="piechart-legend-block"
-      :style="{flexFlow: positionLegends}"
-    >
-      <div  
-        v-show="!dataLoading" 
+    <div class="piechart-legend-block" :style="{ flexFlow: positionLegends }">
+      <div
+        v-show="!dataLoading"
         ref="piechartItself"
-        :class="`dash-piechart ${this.idFrom}`" 
+        :class="`dash-piechart ${this.idFrom}`"
         :data-change="change"
       />
-      <div 
-        ref="legends"
-        class="legend-block-pie"
-      >
-        <div 
-          v-for="item in legends" 
-          :key="item.label"
-          class="legend-line" 
+      <div ref="legends" class="legend-block-pie">
+        <div
+          v-for="(item, idx) in legends"
+          :key="idx"
+          class="legend-line"
+          :class="selectedPieIndex === idx ? 'legend-line_selected legend-line_hover' : ''"
+          @mouseover="hoverLegendLine(idx)"
+          @mouseleave="hoverLegendLine(null)"
+          @click="selectedPieIndex = idx"
         >
-          <div 
-            class="square" 
-            :style="{backgroundColor:item.color}"
-          />
-          <div 
-            class="text" 
-            :style="{color:theme.$main_text}"
-          >
+          <div class="square" :style="{ backgroundColor: item.color }" />
+          <div class="text" :style="{ color: theme.$main_text }">
             {{ item.label }}
-          </div>    
+          </div>
         </div>
       </div>
     </div>
-  </div>  
+  </div>
 </template>
 
-
 <script>
-
-import * as d3 from "d3";
+import * as d3 from 'd3';
 
 export default {
-  props: {  // переменные полученные от родителя
-    idFrom: null,  // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда 
+  props: {
+    // переменные полученные от родителя
+    idFrom: null, // id элемнета (table, graph-2)
+    idDashFrom: null, // id дашборда
     dataRestFrom: null, // данные полученые после выполнения запроса
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
-    dataLoadingFrom: null,  // сообщает что компонент в режиме получения данных
+    dataLoadingFrom: null, // сообщает что компонент в режиме получения данных
     widthFrom: null, // ширина родительского компонента
     heightFrom: null, // высота родительского компонента
     activeElemFrom: null, // id активного элемента
     dataReport: null, // проверяет что элемент в исследовании данных
   },
-  data () {
+  data() {
     return {
-      actions: [
-        {name: 'click',
-          capture: []
-        },
-      ],
       nodata: true,
+      selectedPieIndex: null,
       message: 'Нет данных для отображения',
       legends: [],
       positionLegends: 'row nowrap',
-      selectedValue: [],
       timeout: '',
       tolate: false,
-    } 
+    };
   },
-  computed: {  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    dashOptions(){
+  computed: {
+    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
+    dashOptions() {
       return this.$store.getters.getOptions({
-        idDash: this.idDashFrom, 
-        id: this.idFrom
-      })
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
     },
     theme: function() {
-      return this.$store.getters.getTheme
+      return this.$store.getters.getTheme;
     },
     colors() {
-      return  {
+      return {
         neitral: [
-          this.theme.$grass,this.theme.$forest, this.theme.$blue, this.theme.$plum,
-          this.theme.$purple, this.theme.$orange, this.theme.$peach, this.theme.$raspberry,
-          this.theme.$coral, this.theme.$beet,this.theme.$sun, this.theme.$kiwi,this.theme.$sea
+          this.theme.$grass,
+          this.theme.$forest,
+          this.theme.$blue,
+          this.theme.$plum,
+          this.theme.$purple,
+          this.theme.$orange,
+          this.theme.$peach,
+          this.theme.$raspberry,
+          this.theme.$coral,
+          this.theme.$beet,
+          this.theme.$sun,
+          this.theme.$kiwi,
+          this.theme.$sea,
         ],
         indicted: [
-          '#FF7F37','#EB2F2F','#920000','#600000','#D34C00',
-          '#660099','#3366FF','#e5194a','#fbbe18','#26295a',
-          '#CCCC00','#CC0000','#9933FF','#0099CC','#009966',
-          '#FF4500','#FFC125','#FF6A6A','#483D8B','#2F4F4F'
+          '#FF7F37',
+          '#EB2F2F',
+          '#920000',
+          '#600000',
+          '#D34C00',
+          '#660099',
+          '#3366FF',
+          '#e5194a',
+          '#fbbe18',
+          '#26295a',
+          '#CCCC00',
+          '#CC0000',
+          '#9933FF',
+          '#0099CC',
+          '#009966',
+          '#FF4500',
+          '#FFC125',
+          '#FF6A6A',
+          '#483D8B',
+          '#2F4F4F',
         ],
-        custom: []
-      }
+        custom: [],
+      };
     },
     dataLoading: function() {
-      return this.dataLoadingFrom
+      return this.dataLoadingFrom;
     },
     dashSize() {
       return {
         width: this.widthFrom,
-        height: this.heightFrom
-      }
+        height: this.heightFrom,
+      };
     },
-    change: function() {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
-        let graphics = d3.select(this.$refs.piechartItself).selectAll('svg').nodes();
-        if(graphics.length != 0){  
-          graphics[0].remove(); 
+    change() {
+      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize) {
+        let graphics = d3
+          .select(this.$refs.piechartItself)
+          .selectAll('svg')
+          .nodes();
+        if (graphics.length != 0) {
+          graphics[0].remove();
           //если строим заново(изменились данные) - очищаем токены
-          this.selectedValue = []
-          this.setTocken()
           this.createPieChartDash();
         } else {
-          this.createPieChartDash()
+          this.createPieChartDash();
         }
       }
-      return true  
+      return true;
     },
   },
   watch: {
-    dataRestFrom(){
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize ) {
-        let graphics = d3.select(this.$refs.piechartItself).selectAll('svg').nodes();
-        if(graphics.length != 0){  
-          graphics[0].remove(); 
-          //если строим заново(изменились данные) - очищаем токены
-          this.selectedValue = []
-          this.setTocken()
+    selectedPieIndex(newVal) {
+      console.log(newVal);
+      if (newVal !== null) this.setToken(newVal);
+    },
+    dataRestFrom(newVal) {
+      if (newVal[0]) {
+        const captures = Object.keys(this.dataRestFrom[0]);
+        const actions = [{ name: 'click', capture: captures }];
+
+        this.setMetrics();
+
+        this.$store.commit('setActions', {
+          actions,
+          idDash: this.idDashFrom,
+          id: this.idFrom,
+        });
+
+        let graphics = d3
+          .select(this.$refs.piechartItself)
+          .selectAll('svg')
+          .nodes();
+        if (graphics.length != 0) {
+          graphics[0].remove();
           this.createPieChartDash();
         } else {
-          this.createPieChartDash()
+          this.createPieChartDash();
         }
       }
-    }
+    },
   },
   methods: {
+    hoverLegendLine(legendLineIndex) {
+      d3.select(this.$refs.pieChart)
+        .selectAll('.piepart')
+        .each((_, i, nodes) => {
+          const node = nodes[i];
+          if (i === legendLineIndex) node.classList.add('piepartSelect');
+          else if (node.classList.contains('piepartSelect') && this.selectedPieIndex !== i)
+            node.classList.remove('piepartSelect');
+        });
+
+      d3.select(this.$refs.legends)
+        .selectAll('.legend-line')
+        .each((_, i, nodes) => {
+          const node = nodes[i];
+          if (legendLineIndex === i) {
+            node.classList.add('legend-line_hover');
+          } else if (node.classList.contains('legend-line_hover'))
+            node.classList.remove('legend-line_hover');
+        });
+    },
     setMetrics() {
-      this.$store.commit('setMetricsPie', {metrics: Object.keys(this.dataRestFrom[0]), idDash: this.idDashFrom, id: this.idFrom });
+      this.$store.commit('setMetricsPie', {
+        metrics: Object.keys(this.dataRestFrom[0]),
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       this.$store.commit('setThemePie', {
         themes: this.colors,
         idDash: this.idDashFrom,
-        id: this.idFrom
+        id: this.idFrom,
       });
     },
     createPieChartDash: function() {
-
-      if(this.dataRestFrom.error) {  // смотрим если с ошибкой
+      if (this.dataRestFrom.error) {
+        // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
       }
 
@@ -179,7 +235,7 @@ export default {
       let positionlegend = this.dashOptions.positionlegend;
 
       if (positionlegend == undefined) {
-        positionlegend = 'right'
+        positionlegend = 'right';
       }
 
       let colorsPie = this.dashOptions.colorsPie;
@@ -190,200 +246,213 @@ export default {
           theme: 'neitral',
           colors: '',
           nametheme: '',
-        }
+        };
       }
-
-      let onlyNum = true;
 
       let metrics = this.dashOptions.metricsRelation.relations;
 
-      typeof(this.dataRestFrom[0][metrics[1]]) != 'number' ? onlyNum = false : false
-
-      if (onlyNum){  // если все-таки число
+      if (typeof this.dataRestFrom[0][metrics[1]] == 'number') {
+        // если все-таки число
         this.nodata = false; // то убираем соощение о отсутствии данных
-        if (this.dataRestFrom.length > 20) {  // если элемнетов больше 20
-          this.nodata = true;  // показываем сообщение о некорректности данных
+        if (this.dataRestFrom.length > 20) {
+          // если элемнетов больше 20
+          this.nodata = true; // показываем сообщение о некорректности данных
           this.legends = [];
-          this.message = "К сожалению данных слишком много для построения диаграммы";  // выводим сообщение
-          d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+          this.message = 'К сожалению данных слишком много для построения диаграммы'; // выводим сообщение
+          d3.select(this.$refs.piechartItself)
+            .selectAll('svg')
+            .remove(); // и еще график очищаем, чтобы не мешался
         } else {
-          this.createLegend(this.dataRestFrom,metrics,showlegend,colorsPie);
-          let legendsSize = {};
+          this.createLegend(this.dataRestFrom, metrics, showlegend, colorsPie);
+          let legendSize = {};
           if (this.legends.length > 0) {
-            let timeOut = setTimeout( function tick() {  // важно чтобы наш график построился толкьо после того когда создался блок с легендой
+            let timeOut = setTimeout(
+              function tick() {
+                // важно чтобы наш график построился толкьо после того когда создался блок с легендой
 
-              if (this.$refs.legends.getBoundingClientRect().width != 0) {
-                legendsSize = {width: Math.round(this.$refs.legends.getBoundingClientRect().width), height: Math.round(this.$refs.legends.getBoundingClientRect().height)};
-                this.createPieChart(this.dataRestFrom, this, this.dashSize, metrics, legendsSize, positionlegend, colorsPie); // и собственно создаем график
-                clearTimeout(timeOut);
-              } else {
-                timeOut = setTimeout(tick.bind(this), 100);
-              }
-            }.bind(this), 0);
-
+                if (this.$refs.legends.getBoundingClientRect().width != 0) {
+                  legendSize = {
+                    width: Math.round(this.$refs.legends.getBoundingClientRect().width),
+                    height: Math.round(this.$refs.legends.getBoundingClientRect().height),
+                  };
+                  this.createPieChart(
+                    this.dataRestFrom,
+                    this.dashSize,
+                    metrics,
+                    legendSize,
+                    positionlegend,
+                    colorsPie
+                  ); // и собственно создаем график
+                  clearTimeout(timeOut);
+                } else {
+                  timeOut = setTimeout(tick.bind(this), 100);
+                }
+              }.bind(this),
+              0
+            );
           } else {
-            legendsSize = {width: 0, height: 0};
-            this.createPieChart(this.dataRestFrom,this,this.dashSize, metrics, legendsSize, positionlegend, colorsPie); // и собственно создаем график
+            legendSize = { width: 0, height: 0 };
+            this.createPieChart(
+              this.dataRestFrom,
+              this.dashSize,
+              metrics,
+              legendSize,
+              positionlegend,
+              colorsPie
+            ); // и собственно создаем график
           }
         }
-      } else {  // если первое значение первого элемнета (подразумеваем что это time не число)
-        this.nodata = true;  // показываем сообщение о некорректности данных
-        this.message = "К сожалению данные не подходят к диаграмме";  // выводим сообщение
+      } else {
+        // если первое значение первого элемнета (подразумеваем что это time не число)
+        this.nodata = true; // показываем сообщение о некорректности данных
+        this.message = 'К сожалению данные не подходят к диаграмме'; // выводим сообщение
         this.legends = [];
-        d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+        d3.select(this.$refs.piechartItself)
+          .selectAll('svg')
+          .remove(); // и еще график очищаем, чтобы не мешался
       }
     },
 
-    createLegend: function(data,metrics,showlegend,colorsPie) {
+    createLegend: function(data, metrics, showlegend, colorsPie) {
       this.legends = [];
       if (showlegend) {
-        data.forEach( (item,i) => {
-          this.legends.push({color: this.colors[colorsPie.theme][i], label: `#${item[metrics[0]]} - ${item[metrics[1]]}%`})
-        })
+        data.forEach((item, i) => {
+          this.legends.push({
+            color: this.colors[colorsPie.theme][i],
+            label: `${item[metrics[0]]} - ${item[metrics[1]]}`,
+          });
+        });
       }
     },
-    createPieChart: function (dataFrom,that,sizeLine,metrics,legendsSize,positionlegend,colorsPie) {  // создает диаграмму
-      d3.select(this.$refs.piechartItself).selectAll('svg').remove();
-      let width = sizeLine['width']-40; // отступ по бокам
-      let height = sizeLine['height']-35; // минус шапка
-      let margin = 40; // отступ от контейнера
+    createPieChart(dataFrom, sizeLine, metrics, legendSize, positionlegend, colorsPie) {
+      // создает диаграмму
+      d3.select(this.$refs.piechartItself)
+        .selectAll('svg')
+        .remove();
+      const MARGIN = 40; // отступ от контейнера
+      let width = sizeLine['width'] - MARGIN; // отступ по бокам
+      let height = sizeLine['height'] - 35; // минус шапка
 
       switch (positionlegend) {
         case 'right':
-          this.positionLegends = 'row nowrap'
-          width = width - legendsSize.width
-          break
+          this.positionLegends = 'row nowrap';
+          width = width - legendSize.width;
+          break;
 
         case 'left':
-          this.positionLegends = 'row-reverse nowrap'
-          width = width - legendsSize.width
-          break
+          this.positionLegends = 'row-reverse nowrap';
+          width = width - legendSize.width;
+          break;
 
         case 'top':
-          this.positionLegends = 'column-reverse nowrap'
-          height = height - legendsSize.height - 40
-          break
+          this.positionLegends = 'column-reverse nowrap';
+          height = height - legendSize.height - MARGIN;
+          break;
 
         case 'bottom':
-          this.positionLegends = 'column nowrap'
-          height = height - legendsSize.height - 40
-          break
+          this.positionLegends = 'column nowrap';
+          height = height - legendSize.height - MARGIN;
+          break;
       }
 
-      let radius = Math.min(width, height) / 2 - margin // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+      let radius = Math.min(width, height) / 2 - MARGIN; // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
 
-      let svg = d3.select(this.$refs.piechartItself)  // добовляем svg объект в нужный div
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+      let svg = d3
+        .select(this.$refs.piechartItself) // добовляем svg объект в нужный div
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
 
       let data = {};
 
       let selectedDefault = [];
 
-      dataFrom.forEach( item => {
+      dataFrom.forEach(item => {
         data[item[metrics[0]]] = item[metrics[1]];
-        selectedDefault.push(item[metrics[2]])
+        selectedDefault.push(item[metrics[2]]);
       });
 
-      let color = d3.scaleOrdinal() // устанавливаем цветовую схему для pie chart
+      let color = d3
+        .scaleOrdinal() // устанавливаем цветовую схему для pie chart
         .domain(data)
-        .range(that.colors[colorsPie.theme])
+        .range(this.colors[colorsPie.theme]);
 
-      let pie = d3.pie()  // вычисляем позицию каждого кусочка диаграммы
-        .value(function(d) {return d.value; })
-      let data_ready = pie(d3.entries(data))
+      let pie = d3.pie().value(d => d.value);
+      let data_ready = pie(d3.entries(data));
 
-      let selectedValue = this.selectedValue
+      const tooltipEl = this.$refs.chartTooltip;
+      const tooltipOffset = { x: 30, y: 5 };
+
+      const hoverLegendLine = this.hoverLegendLine.bind(this);
 
       svg
         .selectAll('pies')
         .data(data_ready)
         .enter()
         .append('path')
-        .attr('d', d3.arc()
-          .innerRadius(0)
-          .outerRadius(radius)
+        .attr(
+          'd',
+          d3
+            .arc()
+            .innerRadius(0)
+            .outerRadius(radius)
         )
-        .attr('class',function(d) {
-          let index = selectedValue.indexOf(`(${d.data.key},${d.data.value})`);
-          if (index !== -1) {
-            return 'piepart piepartSelect'
+        .attr('class', 'piepart')
+        .attr('fill', d => {
+          return color(d.data.key);
+        })
+        .attr('stroke', this.theme.$main_bg)
+        .style('stroke-width', '2px')
+        .on('mouseover', (d, i, nodes) => {
+          const node = nodes[i];
+          if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
+          tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
+          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
+          tooltipEl.style.visibility = 'visible';
+          hoverLegendLine(i);
+        })
+        .on('mousemove', function(d) {
+          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
+        })
+        .on('mouseout', (_, i, nodes) => {
+          if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
+          tooltipEl.style.visibility = 'hidden';
+          hoverLegendLine(null);
+        })
+        .on('click', (_, i, nodes) => {
+          const node = nodes[i];
+          if (this.selectedPieIndex === i) {
+            this.selectedPieIndex = null;
+            node.classList.remove('piepartSelect');
           } else {
-            return 'piepart'
+            this.selectedPieIndex = i;
+            node.classList.add('piepartSelect');
           }
-        })
-        .attr('fill', function(d){ return(color(d.data.key)) })
-        .attr("stroke", that.theme.$main_bg)
-        .style("stroke-width", "2px")
-        .on('click', function(d) {
-          let selected = false;
-          if (this.classList.contains('piepartSelect')) {
-            this.classList.remove('piepartSelect');
-            selected = false;
-          } else {
-            this.classList.add('piepartSelect');
-            selected = true;
-          }
-          return that.setClick(d,selected)
-        })
+        });
     },
-    setClick: function(part,selected) {
-      if (selected) {
-        this.selectedValue.push(`(${part.data.key},${part.data.value})`);
-      } else {
-        let index = this.selectedValue.indexOf(`(${part.data.key},${part.data.value})`);
-        this.selectedValue.splice(index,1);
-      }
-      if (!this.tolate) {
-        this.tolate = true;
-        this.timeout = setTimeout( () => {
-          this.tolate = false;
-          this.setTocken();
-        },1500)
-      }
+    setToken(pieIndex) {
+      let tokens = this.$store.getters.getTockens(this.idDashFrom);
+
+      tokens.forEach(tocken => {
+        if (tocken.elem == this.idFrom) {
+          const value = this.dataRestFrom[pieIndex][tocken.capture];
+          this.$store.commit('setTocken', {
+            tocken,
+            value,
+            idDash: this.idDashFrom,
+            store: this.$store,
+          });
+        }
+      });
     },
-    setTocken: function() {
-      let value = '';
-      if (this.selectedValue.length > 1) {
-        value = '[';
-        this.selectedValue.forEach( (item,i) => {
-          value += item;
-          if (i != this.selectedValue.length-1) {
-            value += ','
-          }
-        })
-        value += ']';
-      } else if (this.selectedValue.length == 1) {
-        value = this.selectedValue[0]
-      }
-      let tockens = this.$store.getters.getTockens(this.idDashFrom);
-      let tocken = {};
-
-      Object.keys(tockens).forEach( i =>{
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture
-        }
-        if (tockens[i].elem == this.idFrom && tockens[i].action == 'click') {
-          this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDashFrom, value: value, store: this.$store });
-        }
-      })
-    }
   },
-  mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDashFrom, id: this.idFrom });
-  },
-}
-
+};
 </script>
 
-<style lang="scss" > 
-  
-    @import '../../sass/dashPieChart.sass'
-
-   
+<style lang="sass">
+@import '../../sass/dashPieChart.sass'
 </style>
