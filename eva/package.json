@@ -1,7 +1,7 @@
 {
   "name": "eva",
-  "version": "1.68.2",
-  "description": "Evolution Vizualization Application",
+  "version": "1.69.0",
+  "description": "Evolution Visualization Application",
   "author": "Fred",
   "license": "ISC",
   "private": true,
