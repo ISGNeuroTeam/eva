@@ -141,7 +141,8 @@
                 :data-ready="dataReady"
                 :rows="rowsCount"
                 :style="{background: color.backElement, color: `${color.text} !important`}" 
-                placeholder="Введите запрос" 
+                placeholder="Введите запрос"
+                @keyup.ctrl.enter="addLineBreaks"
               />
               <v-tooltip 
                 bottom 
@@ -669,6 +670,11 @@ export default {
       this.steps['2'].text = 'Запрос завершился ошибкой ';
       this.steps['2'].error.push(() => 'false')
 
+    },
+    addLineBreaks: function(event) {
+      this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replace('\n', '')
+      this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
     },
     setUsername: function(event) {
       this.search.parametrs.username = event;
