@@ -18,10 +18,10 @@
 
     <div class="content pt-3" :class="metricTemplateClass">
       <div
-        v-for="metric in dataToRender"
+        v-for="(metric, idx) in dataToRender"
         :key="`metric-${metric.id}`"
         class="item"
-        :style="{ gridArea: `item-${metric.listOrder+1}` }"
+        :style="{ gridArea: `item-${idx + 1}` }"
       >
         <span class="metric-title">
           <span
@@ -115,10 +115,8 @@ export default {
 
     },
     currentSettings() {
-      if (this.currentSettings.metricOptions.length > 0) {
-        this.providedSettings = { ... this.currentSettings }
-        this.init({ ... this.currentSettings })
-      }
+      this.providedSettings = { ... this.currentSettings }
+      this.init({ ... this.currentSettings })
     }
   },
   mounted() {
@@ -202,8 +200,7 @@ export default {
       let idCount = 1;
 
       for (const [index, data] of this.dataRestFrom.entries()) {
-        const { metric, value, order, metadata } = data;
-
+        const { metric, value, order, metadata, _time } = data;
         if (metric === '_title') {
           this.titleToken = String(value);
           continue;
@@ -216,10 +213,13 @@ export default {
           range = null;
         }
 
-        const metricCurrent = metricOptionsCurrent?.find(m => m.startId === metricID || m.title === (metric || data.phase));
+        const startId = `${metric}_${_time}_${value}`
+
+        const metricCurrent = metricOptionsCurrent?.find(m => m.startId === startId);
+        
         const defaultMetricOption = {
           id: metricCurrent?.id || metricID,
-          startId: metricCurrent?.startId || metricID,
+          startId: metricCurrent?.startId || startId,
           metadata: metadata,
           title: metric || data.phase,
           color: metricCurrent?.color || 'main',

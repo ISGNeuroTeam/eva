@@ -101,7 +101,6 @@
               </span>
               <v-icon size="16" class="burger" style="cursor: move" :color="theme.$main_border" v-text="mdiMenu"/>
             </div>
-            {{ metric.name }}: {{ metric.listOrder }}
 
             <div class="content-section">
               <span class="section-title">Подпись (необязательно)</span>
