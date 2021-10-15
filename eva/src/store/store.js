@@ -865,7 +865,6 @@ export default {
     },
     setMetricsPie: (state, dash) => {
       let metrics = [...[], ...dash.metrics];
-      console.log(metrics);
       if (!state[dash.idDash][dash.id].options.metricsRelation) {
         state[dash.idDash][dash.id].options.metricsRelation = {};
         state[dash.idDash][dash.id].options.metricsRelation['relations'] = metrics;
