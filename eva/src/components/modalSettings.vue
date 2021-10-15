@@ -1151,16 +1151,16 @@
               class="options-item-tooltip"
             >
               <v-select
-                v-for="i in metricsRelation.metrics.length"
+                v-for="(label, i) in metricsRelation.namesMetric"
                 :key="i+'metric'"
-                v-model="metricsRelation.relations[i-1]"
+                v-model="metricsRelation.relations[i]"
                 :items="metricsRelation.metrics"
+                :label="metricsRelation.namesMetric[i]"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"
                 hide-details
                 outlined
                 class="item-metric"
-                :label="metricsRelation.namesMetric[i-1]"
                 @click="changeColor"
               />
             </div>
@@ -1449,7 +1449,7 @@ export default {
       metricsRelation: {
         metrics: [],
         relations: [],
-        namesMetric: ['Категория','Процентное соотношение','Выбрано']
+        namesMetric: ['Категория','Процентное соотношение']
       },
       colorsPie: {
         theme: 'neitral',
@@ -1565,6 +1565,7 @@ export default {
         this.options.tooltip = this.tooltip;
       }
       if (this.element.indexOf('piechart') != -1) {
+        console.log(this.metricsRelation);
         this.options.metricsRelation = JSON.parse(JSON.stringify(this.metricsRelation));
         this.options.colorsPie = this.colorsPie;
         if (this.colorsPie.theme == 'custom') {
@@ -1663,7 +1664,7 @@ export default {
             this.metricsRelation = {};
             this.$set(this.metricsRelation,'metrics', [...[],...options[item].metrics]);
             this.$set(this.metricsRelation,'relations', [...[],...options[item].relations]);
-            this.$set(this.metricsRelation,'namesMetric', ['Категория','Процентное соотношение','Выбрано']);
+            this.$set(this.metricsRelation,'namesMetric', ['Категория','Процентное соотношение']);
           } else if (item == 'colorsPie') {
             this.colorsPie = {};
             this.$set(this.colorsPie,'theme', options[item].theme);

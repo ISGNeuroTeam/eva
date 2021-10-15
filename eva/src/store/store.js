@@ -29,16 +29,16 @@ export default {
       state[size.idDash][size.id].height = size.height;
     },
     setSearch: (state, payload) => {
-      const { idDash, reload, search } = payload
-      search.status = 'empty'
+      const { idDash, reload, search } = payload;
+      search.status = 'empty';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
           if (search.sid === item.sid) {
-            Vue.set(state[idDash].searches, i, search)
+            Vue.set(state[idDash].searches, i, search);
           }
-        })
+        });
       } else {
-        state[idDash].searches.push({...search})
+        state[idDash].searches.push({ ...search });
       }
     },
     deleteSearch: (state, search) => {
@@ -168,10 +168,7 @@ export default {
                 }
                 break;
               case 'over': // все тоже самое для других событий
-                if (
-                  state[idDash].tockens[id].value >
-                  state[idDash].events[item].tokenval
-                ) {
+                if (state[idDash].tockens[id].value > state[idDash].events[item].tokenval) {
                   this.commit('letEventSet', {
                     events: [state[idDash].events[item]],
                     idDash,
@@ -179,10 +176,7 @@ export default {
                 }
                 break;
               case 'less':
-                if (
-                  state[idDash].tockens[id].value <
-                  state[idDash].events[item].tokenval
-                ) {
+                if (state[idDash].tockens[id].value < state[idDash].events[item].tokenval) {
                   this.commit('letEventSet', {
                     events: [state[idDash].events[item]],
                     idDash,
@@ -218,11 +212,7 @@ export default {
               case 'between': // тоже самое для условия что токен внутри рамок массива
                 data = state[idDash].events[item].tokenval.replace(/\[|\]/g, '').split(',');
 
-                if (
-                  Number(data[0]) &&
-                  Number(data[1]) &&
-                  Number(state[idDash].tockens[id].value)
-                ) {
+                if (Number(data[0]) && Number(data[1]) && Number(state[idDash].tockens[id].value)) {
                   // нам нужно проверить что это цифры сравниваются
                   if (
                     Number(state[idDash].tockens[id].value) >= Number(data[0]) &&
@@ -252,15 +242,15 @@ export default {
           });
         }
 
-        state[idDash].searches.forEach((search) => {
+        state[idDash].searches.forEach(search => {
           if (search.original_otl.includes(`$${tocken.name}$`)) {
             this.commit('updateSearchStatus', {
               idDash,
               sid: search.sid,
               status: 'empty',
-            })
+            });
           }
-        })
+        });
       }
       // Add value to temp values of filter
       if (state[idDash].focusedFilter) {
@@ -550,7 +540,8 @@ export default {
       state[filter.idDash].filters.splice(index, 1);
     },
     saveFilterPart(state, { idDash, filterPart, filterPartIndex }) {
-      if (Number.isFinite(filterPartIndex)) state[idDash].focusedFilter.parts[filterPartIndex] = filterPart;
+      if (Number.isFinite(filterPartIndex))
+        state[idDash].focusedFilter.parts[filterPartIndex] = filterPart;
       else state[idDash].focusedFilter.parts.push(filterPart);
     },
     setLibrary: (state, options) => {
@@ -565,8 +556,8 @@ export default {
         if (item == 'change') {
           // если это натсройка change
 
-          state[options.idDash][options.id].options.change =
-            !state[options.idDash][options.id].options.change; // то ее всегда меняем на противоположную, давая понять, что натсройки обновились
+          state[options.idDash][options.id].options.change = !state[options.idDash][options.id]
+            .options.change; // то ее всегда меняем на противоположную, давая понять, что натсройки обновились
         } else {
           // для любой другой настройки
           // if (item == 'metrics') {
@@ -603,7 +594,7 @@ export default {
     letEventGo: async (state, event) => {
       //load dash
       let loader = (id, first) => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           let result = rest.getState(id, restAuth);
           result.then(stateFrom => {
             if (stateFrom) {
@@ -641,7 +632,7 @@ export default {
                 });
               }
               if (state[id].searches) {
-                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'))
+                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'));
               }
               resolve({ status: 'finish' });
               // }
@@ -650,24 +641,21 @@ export default {
             }
           });
         });
-      }
-
+      };
 
       // при переходе на другой дашборд нам нужно обновить определенный токен
       let item = Object.assign({}, event.event);
       if (item.prop[0] == '') {
-          return;
+        return;
       }
       let tockens = state[event.idDash].tockens;
       let id = -1;
       if (Number.isInteger(+item.target)) {
-        id = item.target
-        console.log('id', id)
+        id = item.target;
+        console.log('id', id);
       }
-      if (id)
-        await loader(id);
-      
-      
+      if (id) await loader(id);
+
       let tockensTarget = [];
       Object.keys(state).forEach(key => {
         if (state[key].name) {
@@ -877,13 +865,13 @@ export default {
     },
     setMetricsPie: (state, dash) => {
       let metrics = [...[], ...dash.metrics];
+      console.log(metrics);
       if (!state[dash.idDash][dash.id].options.metricsRelation) {
         state[dash.idDash][dash.id].options.metricsRelation = {};
         state[dash.idDash][dash.id].options.metricsRelation['relations'] = metrics;
         state[dash.idDash][dash.id].options.metricsRelation['namesMetric'] = [
           'Категория',
           'Процентное соотношение',
-          'Выбрано',
         ];
       }
       state[dash.idDash][dash.id].options.metricsRelation['metrics'] = metrics;
@@ -984,25 +972,25 @@ export default {
       state[idDash].filters[filterIndex].parts[filterPartIndex].values.splice(valueIndex, 1);
     },
     refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
-      Vue.set(state[idDash].filters[filterIndex].parts[filterPartIndex], 'values', [])
+      Vue.set(state[idDash].filters[filterIndex].parts[filterPartIndex], 'values', []);
     },
     restartSearches(state, payload) {
-      const { idDash, filter } = payload
-      const searches = state[idDash].searches
-      searches.forEach((search) => {
+      const { idDash, filter } = payload;
+      const searches = state[idDash].searches;
+      searches.forEach(search => {
         if (search.original_otl.includes(`$${filter}$`)) {
           this.commit('updateSearchStatus', {
             idDash,
             sid: search.sid,
             status: 'empty',
-          })
+          });
         }
-      })
+      });
     },
     updateSearchStatus: (state, payload) => {
-      const { idDash, sid, status } = payload
-      const search = state[idDash].searches.find((search) => search.sid === sid)
-      Vue.set(search, 'status', status)
+      const { idDash, sid, status } = payload;
+      const search = state[idDash].searches.find(search => search.sid === sid);
+      Vue.set(search, 'status', status);
     },
   },
   getters: {
@@ -1041,9 +1029,9 @@ export default {
     getElementsWithSearches: state => id => {
       return state[id].elements
         .filter(
-          (elem) => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
+          elem => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
         )
-        .map((elem) => ({ elem, search: state[id][elem].search }))
+        .map(elem => ({ elem, search: state[id][elem].search }));
     },
     getAllElements: state => id => {
       if (!state[id].elements) {
@@ -1317,7 +1305,7 @@ export default {
 
           let request = indexedDB.open('EVA', 1);
 
-          request.onerror = function (event) {
+          request.onerror = function(event) {
             console.log('error:', event);
           };
 
@@ -1353,13 +1341,13 @@ export default {
 
             let query = searches.put(search, key); // (3)
 
-            query.onsuccess = function () {
+            query.onsuccess = function() {
               // (4)
               resolve('result');
               restAuth.putLog(`Добавлен запрос ${query.result}`);
             };
 
-            query.onerror = function () {
+            query.onerror = function() {
               console.log('Ошибка', query.error);
             };
           }
@@ -1393,7 +1381,7 @@ export default {
 
         let request = indexedDB.open('EVA', 1);
 
-        request.onerror = function (event) {
+        request.onerror = function(event) {
           console.log('error: ');
         };
 
@@ -1633,7 +1621,7 @@ export default {
     },
     checkAlreadyDash: state => {
       return (id, first) => {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
           let result = rest.getState(id, restAuth);
           result.then(stateFrom => {
             if (stateFrom) {
@@ -1671,7 +1659,7 @@ export default {
                 });
               }
               if (state[id].searches) {
-                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'))
+                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'));
               }
               resolve({ status: 'finish' });
               // }
@@ -1689,7 +1677,7 @@ export default {
 
           let request = indexedDB.open('EVA', 1);
 
-          request.onerror = function (event) {
+          request.onerror = function(event) {
             console.log('error:', event);
           };
 
@@ -1734,7 +1722,7 @@ export default {
               }
             };
 
-            query.onerror = function () {
+            query.onerror = function() {
               console.log('Ошибка', query.error);
             };
           }

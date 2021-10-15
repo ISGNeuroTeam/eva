@@ -166,24 +166,23 @@ export default {
         const captures = Object.keys(this.dataRestFrom[0]);
         const actions = [{ name: 'click', capture: captures }];
 
+        this.setMetrics();
+
         this.$store.commit('setActions', {
           actions,
           idDash: this.idDashFrom,
           id: this.idFrom,
         });
 
-        if (this.dataRestFrom && Object.keys(this.dataRestFrom).length && this.dashSize) {
-          let graphics = d3
-            .select(this.$refs.piechartItself)
-            .selectAll('svg')
-            .nodes();
-          if (graphics.length != 0) {
-            graphics[0].remove();
-            //если строим заново(изменились данные) - очищаем токены
-            this.createPieChartDash();
-          } else {
-            this.createPieChartDash();
-          }
+        let graphics = d3
+          .select(this.$refs.piechartItself)
+          .selectAll('svg')
+          .nodes();
+        if (graphics.length != 0) {
+          graphics[0].remove();
+          this.createPieChartDash();
+        } else {
+          this.createPieChartDash();
         }
       }
     },
