@@ -59,6 +59,7 @@ export default {
     minX: 0,
     maxX: 0,
     allLinesWithBreak: [],
+    unitedBars: []
   }),
   computed: {
     id() {
@@ -402,6 +403,15 @@ export default {
         this.changeZoom(x, yValue, 1000, id)
       }
 
+      this.unitedBars.forEach(bar => {
+        this.svg
+          .select(`#${bar.id}`)
+          .transition()
+          .duration(1000)
+          .attr('opacity', 0)
+          .attr('visibility', 'hidden')
+      })
+
       this.svg.on('dblclick', () => {
         if (this.isTime) {
           x.domain(d3.extent(this.dataRestFrom, (d) => new Date(d[this.xMetric] * this.secondTransf)))
@@ -418,6 +428,15 @@ export default {
           x.domain([this.minX, this.maxX])
           this.xAxis.transition().duration(1000).call(d3.axisBottom(x))
         }
+
+        this.unitedBars.forEach(bar => {
+          this.svg
+            .select(`#${bar.id}`)
+            .transition()
+            .duration(1000)
+            .attr('opacity', 1)
+            .attr('visibility', 'visible')
+        })
 
         this.createVerticalGridLines()
 
@@ -655,6 +674,8 @@ export default {
         const mustSee = []
         const brushObj = { ...this.defaultBrushObj }
 
+        const bars = []
+
         this.metricNames.forEach((metricName, metricIndex) => {
           const minVal = minMetricsValues[metricIndex]
           const maxVal = maxMetricsValues[metricIndex]
@@ -694,201 +715,336 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick text`)
             .attr('fill', this.legendColors[metricIndex])
 
-          const linesWithBreak = []
-          let dotDate = null
-          let nullValue = -1
-          let allDotHover = []
-          let onelinesWithBreak = []
+          if (yAxesBinding.metricTypes[metricName] === 'barplot') {
+            const thisMetrics = [...this.metrics]
+            let allDotHover = []
+            const dataRest = [...this.dataRestFrom]
 
-          extraDot.forEach((item, j) => {
-            if (metricName === item.column) nullValue = j
-          })
+            this.svg
+              .selectAll(`bar-${metricName}`)
+              .data(this.dataRestFrom)
+              .enter()
+              .append('rect')
+              .attr('id', (d, i) => {
+                const barID = `bar--${metricName}--${i}`
+                return barID
+              })
+              .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('y', (d) => yScale(d[metricName]))
+              .attr('width', () => {
+                if (!barplotBarWidth || barplotBarWidth <= 0) {
+                  return this.isTime
+                    ? d3.scaleBand()
+                        .range([0, this.width])
+                        .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                        .bandwidth()
+                    : x.bandwidth()
+                }
+                return barplotBarWidth
+              })
+              .attr('height', function (d, j) {
+                const setLabel = (attr, classText, metricText) => {
+                  putLabel(
+                    attr,
+                    classText,
+                    d,
+                    yScale(d[metricName]) - 5,
+                    metricText,
+                    this,
+                    'bar'
+                  )
+                }
 
-          if (nullValue !== -1) {
-            dotDate = [extraDot[nullValue]]
-          } else {
-            this.dataRestFrom.forEach((line) => {
-              if (!Number(line[metricName]) && line[metricName] !== 0) {
-                if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
-                linesWithBreak.push(onelinesWithBreak)
-                onelinesWithBreak = []
-              } else {
-                onelinesWithBreak.push(line)
-              }
-            })
+                if (isLastDotShow && j === dataRest.length - 1) {
+                  setLabel('data-last-bar', 'last-bar-text', metricName)
+                }
 
-            if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
+                const h = height - yScale(d[metricName])
 
-            linesWithBreak.push(onelinesWithBreak)
-            this.allLinesWithBreak.push(linesWithBreak)
+                const barID = `bar--${metricName}--${j}`
+                bars.push({ id: barID, height: h })
 
-            linesWithBreak.forEach((lineItself, lineIndex) => {
-              this.line
-                .append('path')
-                .datum(lineItself)
-                .attr('class', `line-${metricIndex}-${lineIndex}`)
-                .attr('fill', 'none')
-                .attr('stroke', this.legendColors[metricIndex])
-                .attr('stroke-width', this.strokeWidth)
-                .attr(
-                  'd',
-                  d3.line()
-                    .x((d) => x(d[xMetric] * this.secondTransf))
-                    .y((d) => yScale(d[metricName]))
+                return h
+              })
+              .attr('visibility', (d, i) => {
+                return i === dataRest.length - 1 ? 'hidden' : 'visible'
+              })
+              .attr('fill', this.legendColors[metricIndex])
+              .on('mouseenter', function (d) {
+                const date = new Date(d[xMetric] * secondTransf)
+
+                const xVal = !isTime
+                  ? d[xMetric]
+                  : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+
+                tooltip.html(
+                  thisMetrics.reduce((prev, cur) => {
+                    const value = cur === xMetric ? xVal : d[cur]
+                    return prev + `<p><span>${cur}</span>: ${value}</p>`
+                  }, '')
                 )
-            })
 
-            dotDate = this.dataRestFrom
+                const rectX = +d3.select(this).attr('x')
+
+                allDotHover = svg
+                  .selectAll('circle')
+                  .nodes()
+                  .filter((dot) => {
+                    if (
+                      dot.classList.contains('dot') &&
+                      dot['__data__'][xMetric] === d[xMetric] * secondTransf &&
+                      dot['__data__'][dot.getAttribute('metric')] !== null
+                    ) {
+                      dot.style.opacity = 1
+                      return dot
+                    }
+                  })
+
+                lineDot.attr('x1', rectX).attr('x2', rectX).attr('opacity', 0.7)
+                tooltip.style('opacity', 1).style('visibility', 'visible')
+              })
+              .on('mousemove', function () {
+                const { offsetX, offsetY } = d3.event
+                const tooltipWidth = tooltipBlock.offsetWidth
+                const tooltipHalfHeight = tooltipBlock.offsetHeight / 2
+
+                if (brushObj.mouseDown) brushObj.selectionMove()
+
+                let left = offsetX + 20
+                let top = offsetY - tooltipHalfHeight
+
+                if (left + tooltipWidth > width + margin.left + 15) {
+                  left = left - tooltipWidth - 20
+                }
+
+                if (top + tooltipHalfHeight > height) {
+                  top = top - tooltipHalfHeight
+                }
+
+                tooltip.style('left', `${left}px`).style('top', `${top}px`)
+              })
+              .on('mouseleave', function () {
+                if (!this.getAttribute('data-last-bar')) {
+                  allDotHover.forEach((dot) => {
+                    if (extraDot.indexOf(dot['__data__']) === -1) {
+                      dot.style.opacity = 0
+                    }
+                    if (dot.getAttribute('data-with-caption')) {
+                      dot.style.opacity = 1
+                    }
+                  })
+                }
+                lineDot.attr('opacity', 0)
+                tooltip.style('opacity', 0).style('visibility', 'hidden')
+              })
           }
 
-          this.svg
-            .append('g')
-            .selectAll('dot')
-            .data(dotDate)
-            .enter()
-            .append('circle')
-            .attr('class', `dot dot-${metricIndex}`)
-            .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
-            .attr('cy', (d) => yScale(d[metricName]))
-            .attr('r', 5)
-            .attr('metric', metricName)
-            .attr('fill', this.legendColors[metricIndex])
-            .style('opacity', function (d, j) {
-              let opacity = nullValue !== -1 ? 1 : 0
+          if (yAxesBinding.metricTypes[metricName] === 'linechart') {
+            const linesWithBreak = []
+            let dotDate = null
+            let nullValue = -1
+            let allDotHover = []
+            let onelinesWithBreak = []
 
-              mustSee.forEach((item) => {
-                if (item[metricName] == d[metricName]) opacity = 1
-              })
+            extraDot.forEach((item, j) => {
+              if (metricName === item.column) nullValue = j
+            })
 
-              const setLabel = (attr, classText, metricText) => {
-                putLabel(
-                  attr,
-                  classText,
-                  d,
-                  yScale(d[metricName]) - 5,
-                  metricText,
-                  this,
-                  'line',
-                  brushObj
-                )
-              }
-
-              if (isDataAlwaysShow && isDataAlwaysShow === 'data') {
-                opacity = 1
-                setLabel('data-always-dot', `data-always-dot-text-${metricName}`, metricName)
-              }
-
-              if (isDataAlwaysShow && isDataAlwaysShow === 'caption') {
-                opacity = 1
-                setLabel('data-always-dot', `data-always-dot-text-${metricName}`, `_${metricName}_caption`)
-              }
-
-              if (isLastDotShow && j === dataRestLength - 1) {
-                opacity = 1
-                setLabel('data-last-dot', `last-dot-text-${metricName}`, metricName)
-              }
-
-              annotationList.forEach((annotation, i) => {
-                if (d[annotation]) {
-                  createAnnotation(d, annotation, metricNamesCount + 1 + i, tooltip)
+            if (nullValue !== -1) {
+              dotDate = [extraDot[nullValue]]
+            } else {
+              this.dataRestFrom.forEach((line) => {
+                if (!Number(line[metricName]) && line[metricName] !== 0) {
+                  if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
+                  linesWithBreak.push(onelinesWithBreak)
+                  onelinesWithBreak = []
+                } else {
+                  onelinesWithBreak.push(line)
                 }
               })
 
-              return opacity
-            })
-            .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
-            .on('mouseup', () => brushObj.selectionUp())
-            .on('mousedown', () => brushObj.selectionDown())
-            .on('mouseenter', function (d) {
-              const date = new Date(d[xMetric] * secondTransf)
-              const day = date.getDate()
-              const month = date.getMonth()
-              const year = date.getFullYear()
+              if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
 
-              const xVal = isTime ? `${day}-${month + 1}-${year}` : d[xMetric]
+              linesWithBreak.push(onelinesWithBreak)
+              this.allLinesWithBreak.push(linesWithBreak)
 
-              tooltip.html(
-                Object.keys(d).reduce((prev, cur) => {
-                  let value = ''
-                  if (cur === xMetric) value = xVal
-                  else if (cur.indexOf('annotation') === -1) value = d[cur]
-                  return prev + `<p><span>${cur}</span>: ${value}</p>`
-                }, '')
-              )
-
-              const cx = d3.select(this).attr('cx')
-              const cy = d3.select(this).attr('cy')
-
-              const [mouseX, mouseY] = d3.mouse(this)
-              const diffX = Math.ceil(mouseX) - d3.event.offsetX
-              const diffY = Math.ceil(mouseY) - d3.event.offsetY
-
-              const tooltipWidth = tooltipBlock.offsetWidth
-              const tooltipHalfHeight = tooltipBlock.offsetHeight / 2
-
-              let left = cx - diffX + 20
-              let top = cy - diffY - tooltipHalfHeight
-
-              if (left + tooltipWidth > width - diffX) {
-                left = left - tooltipWidth - 25
-              }
-
-              if (top + tooltipHalfHeight > height) {
-                top = top - tooltipHalfHeight
-              }
-
-              tooltip.style('left', `${left}px`).style('top', `${top}px`)
-
-              allDotHover = svg
-                .selectAll('circle')
-                .nodes()
-                .filter((dot) => {
-                  if (
-                    dot.classList.contains('dot') &&
-                    dot['__data__'][dot.getAttribute('metric')] !== null &&
-                    dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
-                  ) {
-                    dot.style.opacity = 1
-                    return dot
-                  }
-                })
-
-              this.style.opacity = 1
-              lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7)
-              tooltip.style('opacity', 1).style('visibility', 'visible')
-            })
-            .on('mousemove', () => {
-              if (brushObj.mouseDown) brushObj.selectionMove()
-            })
-            .on('mouseleave', function (d) {
-              let opacity = 1
-
-              if (!this.getAttribute('data-last-dot')) {
-                allDotHover.forEach((dot) => {
-                  if (extraDot.indexOf(dot['__data__']) === -1) {
-                    dot.style.opacity = 0
-                  }
-                  if (dot.getAttribute('data-with-caption') || dot.getAttribute('data-always-dot')) {
-                    dot.style.opacity = 1
-                  }
-                })
-                opacity = nullValue === -1 ? 0 : opacity
-              }
-
-              if (
-                this.getAttribute('data-with-caption') ||
-                this.getAttribute('data-always-dot')
-              ) opacity = 1
-
-              mustSee.forEach((item) => {
-                if (item[metricName] === d[metricName]) opacity = 1
+              linesWithBreak.forEach((lineItself, lineIndex) => {
+                this.line
+                  .append('path')
+                  .datum(lineItself)
+                  .attr('class', `line-${metricIndex}-${lineIndex}`)
+                  .attr('fill', 'none')
+                  .attr('stroke', this.legendColors[metricIndex])
+                  .attr('stroke-width', this.strokeWidth)
+                  .attr(
+                    'd',
+                    d3.line()
+                      .x((d) => x(d[xMetric] * this.secondTransf))
+                      .y((d) => yScale(d[metricName]))
+                  )
               })
 
-              this.style.opacity = opacity
-              lineDot.attr('opacity', 0)
-              tooltip.style('opacity', 0).style('visibility', 'hidden')
-            })
+              dotDate = this.dataRestFrom
+            }
+
+            this.svg
+              .append('g')
+              .selectAll('dot')
+              .data(dotDate)
+              .enter()
+              .append('circle')
+              .attr('class', `dot dot-${metricIndex}`)
+              .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('cy', (d) => yScale(d[metricName]))
+              .attr('r', 5)
+              .attr('metric', metricName)
+              .attr('fill', this.legendColors[metricIndex])
+              .style('opacity', function (d, j) {
+                let opacity = nullValue !== -1 ? 1 : 0
+
+                mustSee.forEach((item) => {
+                  if (item[metricName] == d[metricName]) opacity = 1
+                })
+
+                const setLabel = (attr, classText, metricText) => {
+                  putLabel(
+                    attr,
+                    classText,
+                    d,
+                    yScale(d[metricName]) - 5,
+                    metricText,
+                    this,
+                    'line',
+                    brushObj
+                  )
+                }
+
+                if (isDataAlwaysShow && isDataAlwaysShow === 'data') {
+                  opacity = 1
+                  setLabel('data-always-dot', `data-always-dot-text-${metricName}`, metricName)
+                }
+
+                if (isDataAlwaysShow && isDataAlwaysShow === 'caption') {
+                  opacity = 1
+                  setLabel('data-always-dot', `data-always-dot-text-${metricName}`, `_${metricName}_caption`)
+                }
+
+                if (isLastDotShow && j === dataRestLength - 1) {
+                  opacity = 1
+                  setLabel('data-last-dot', `last-dot-text-${metricName}`, metricName)
+                }
+
+                annotationList.forEach((annotation, i) => {
+                  if (d[annotation]) {
+                    createAnnotation(d, annotation, metricNamesCount + 1 + i, tooltip)
+                  }
+                })
+
+                return opacity
+              })
+              .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
+              .on('mouseup', () => brushObj.selectionUp())
+              .on('mousedown', () => brushObj.selectionDown())
+              .on('mouseenter', function (d) {
+                const date = new Date(d[xMetric] * secondTransf)
+                const day = date.getDate()
+                const month = date.getMonth()
+                const year = date.getFullYear()
+
+                const xVal = isTime ? `${day}-${month + 1}-${year}` : d[xMetric]
+
+                tooltip.html(
+                  Object.keys(d).reduce((prev, cur) => {
+                    let value = ''
+                    if (cur === xMetric) value = xVal
+                    else if (cur.indexOf('annotation') === -1) value = d[cur]
+                    return prev + `<p><span>${cur}</span>: ${value}</p>`
+                  }, '')
+                )
+
+                const cx = d3.select(this).attr('cx')
+                const cy = d3.select(this).attr('cy')
+
+                const [mouseX, mouseY] = d3.mouse(this)
+                const diffX = Math.ceil(mouseX) - d3.event.offsetX
+                const diffY = Math.ceil(mouseY) - d3.event.offsetY
+
+                const tooltipWidth = tooltipBlock.offsetWidth
+                const tooltipHalfHeight = tooltipBlock.offsetHeight / 2
+
+                let left = cx - diffX + 20
+                let top = cy - diffY - tooltipHalfHeight
+
+                if (left + tooltipWidth > width - diffX) {
+                  left = left - tooltipWidth - 25
+                }
+
+                if (top + tooltipHalfHeight > height) {
+                  top = top - tooltipHalfHeight
+                }
+
+                tooltip.style('left', `${left}px`).style('top', `${top}px`)
+
+                allDotHover = svg
+                  .selectAll('circle')
+                  .nodes()
+                  .filter((dot) => {
+                    if (
+                      dot.classList.contains('dot') &&
+                      dot['__data__'][dot.getAttribute('metric')] !== null &&
+                      dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
+                    ) {
+                      dot.style.opacity = 1
+                      return dot
+                    }
+                  })
+
+                this.style.opacity = 1
+                lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7)
+                tooltip.style('opacity', 1).style('visibility', 'visible')
+              })
+              .on('mousemove', () => {
+                if (brushObj.mouseDown) brushObj.selectionMove()
+              })
+              .on('mouseleave', function (d) {
+                let opacity = 1
+
+                if (!this.getAttribute('data-last-dot')) {
+                  allDotHover.forEach((dot) => {
+                    if (extraDot.indexOf(dot['__data__']) === -1) {
+                      dot.style.opacity = 0
+                    }
+                    if (dot.getAttribute('data-with-caption') || dot.getAttribute('data-always-dot')) {
+                      dot.style.opacity = 1
+                    }
+                  })
+                  opacity = nullValue === -1 ? 0 : opacity
+                }
+
+                if (
+                  this.getAttribute('data-with-caption') ||
+                  this.getAttribute('data-always-dot')
+                ) opacity = 1
+
+                mustSee.forEach((item) => {
+                  if (item[metricName] === d[metricName]) opacity = 1
+                })
+
+                this.style.opacity = opacity
+                lineDot.attr('opacity', 0)
+                tooltip.style('opacity', 0).style('visibility', 'hidden')
+              })
+          }
         })
+
+        const sortedBars = bars.sort((a, b) => a.height - b.height)
+        sortedBars.reverse().forEach(item => {
+          this.svg
+            .append('use')
+            .attr('xlink:href',`#${item.id}`)
+        })
+
+        this.unitedBars = [...sortedBars]
 
         const brush = this.line.append('g').attr('class', 'brush')
 

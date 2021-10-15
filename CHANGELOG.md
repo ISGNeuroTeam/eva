@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ability to add an additional yAxis for multiLine component
 - ability to bind metrics to the left or right yAxis for multiLine component
+- ability to add some barplots and linecharts for multiLine component
 
 ## [1.69.0]
 ### Added

@@ -926,6 +926,58 @@
               class="settings-title"
               :style="{color:theme.$main_text,borderColor:theme.$main_border}"
             >
+              Выбор типа графика
+            </div>
+          </v-card-text>
+
+          <div
+            v-if="options.united && checkOptions('united')"
+            class="options-block united-block pa-0"
+          >
+            <div class="multiline-custom-opts">
+              <div style="margin-left: 350px">
+                <div
+                  v-for="(metric, i) in Object.keys(multilineYAxesBinding.metricTypes)"
+                  :key="`metric-${i}`"
+                  class="d-flex pb-3"
+                >
+                  <span :style="{ color: theme.$main_text }">
+                    Тип графика
+                    <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
+                  </span>
+                  <v-radio-group
+                    v-model="multilineYAxesBinding.metricTypes[metric]"
+                    hide-details
+                    :column="false"
+                    class="ma-0 ml-5"
+                  >
+                    <v-radio
+                      :color="theme.$primary_button"
+                      :style="{ color:theme.$main_text }"
+                      label="Линейный"
+                      :value="'linechart'"
+                    />
+                    <v-radio
+                      :color="theme.$primary_button"
+                      :style="{ color:theme.$main_text }"
+                      class="ml-2"
+                      label="Столбчатый"
+                      :value="'barplot'"
+                    />
+                  </v-radio-group>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <v-card-text
+            v-if="options.united && checkOptions('united')"
+            class="headline pa-0"
+          >
+            <div
+              class="settings-title"
+              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+            >
               Привязка осей
             </div>
           </v-card-text>
@@ -934,10 +986,10 @@
             v-if="options.united && checkOptions('united')"
             class="options-block united-block pa-0"
           >
-            <div class="d-flex">
+            <div class="d-flex multiline-custom-opts">
               <v-radio-group
                 v-model="multilineYAxesBinding.axesCount"
-                style="margin-left: 250px; margin-top: 0;"
+                style="margin-left: 350px; margin-top: 0;"
               >
                 <v-radio
                   :color="theme.$primary_button"
@@ -952,6 +1004,7 @@
                   :value="2"
                 />
               </v-radio-group>
+
               <div
                 v-if="multilineYAxesBinding.axesCount === 2"
                 style="margin-left: 50px"
@@ -962,8 +1015,8 @@
                   class="pb-3"
                 >
                   <div class="d-flex align-center">
-                    <span>
-                      Привязка метрики
+                    <span :style="{ color: theme.$main_text }">
+                      Привязка
                       <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
                     </span>
                     <v-radio-group
@@ -1537,7 +1590,8 @@ export default {
       metrics: [],
       types: ['Line chart', 'Bar chart'],
       metricsName: [],
-      multilineYAxesBinding: { axesCount: 1, metrics: {} },
+      multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
+      multilineYAxesTypes: {},
       x: '',
       y: '',
       metadata: '',
@@ -1571,17 +1625,21 @@ export default {
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
           const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
+
           if (opt.yAxesBinding) {
             this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount
           } else {
             this.multilineYAxesBinding.axesCount = 1
           }
+
           this.metricsName.forEach(metric => {
             this.metricUnits[metric.name] = metric.units;
-            if (opt.yAxesBinding && opt.yAxesBinding.metrics) {
+            if (opt.yAxesBinding && opt.yAxesBinding.metrics && opt.yAxesBinding.metricTypes) {
               this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name]
+              this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name]
             } else {
               this.multilineYAxesBinding.metrics[metric.name] = 'left'
+              this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart'
             }
           })
         }
