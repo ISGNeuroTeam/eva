@@ -142,7 +142,7 @@
                 :rows="rowsCount"
                 :style="{background: color.backElement, color: `${color.text} !important`}" 
                 placeholder="Введите запрос"
-                @keyup.ctrl.enter="addLineBreaks"
+                @keyup.ctrl.\="addLineBreaks"
               />
               <v-tooltip 
                 bottom 

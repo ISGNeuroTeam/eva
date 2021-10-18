@@ -31,7 +31,7 @@
           rows="5"
           placeholder="Origin otl"
           label="Текст ИД"
-          @keyup.ctrl.enter="addLineBreaks"
+          @keyup.ctrl.\="addLineBreaks"
         />
         <div class="times-block">
           <div class="time-block">

@@ -62,7 +62,7 @@
                 :rows="rowsCount"
                 :style="{background: theme.$main_bg, color: `${theme.$main_text} !important`}" 
                 placeholder="Введите запрос"
-                @keyup.ctrl.enter="addLineBreaks"
+                @keyup.ctrl.\="addLineBreaks"
               />
               <router-link 
                 :to="{ path: '/reports'}" 
