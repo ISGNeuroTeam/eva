@@ -1,3 +1,15 @@
+# [1.70.0] - PieChart tooltips, new MultiLine settings including bar appearance for lines
+### New
+- Tooltips for PieChart visualization.
+- Ability to select pies in PieChart by clicking legend.
+- Ability to add additional yAxis for MultiLine component.
+- Ability to bind metrics to the left or right yAxis for MultiLine component.
+- Ability to change line appearance to BarPlot on MultiLine.
+- Assigning a value to a PieChart token.
+
+### Bugfix
+- Unauthorized users weren't redirected to login page if they tried to open dashboard url.
+
 # [1.69.0] - New multiline settings and tooltip changes, color picker for groups and bugfixes
 ### New
 - Added new settings to multiLine component: 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth'.
