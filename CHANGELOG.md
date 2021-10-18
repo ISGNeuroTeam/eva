@@ -5,13 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.70.0]
+### Added
+- piechart tooltips
+- select pie of piechart by legend
+- ability to add an additional yAxis for multiLine component
+- ability to bind metrics to the left or right yAxis for multiLine component
+- ability to add some barplots and linecharts for multiLine component
+
+### Changed
+- Assigning a value to a piechart token
+- DEV: added beforeEach hook in router to redirect unauthorized users
+
+### Fixed
+- unauthorized users weren't redirected to login page if they tried to open dashboard from
+
+## [1.69.0]
 ### Added
 - multiLine component 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth' settings
 - DEV: _colors.sass file in main sass directory
 
 ### Changed
 - multiLine component data-tooltip visual style
+- color picker for dashboard groups
 
 ### Fixed
 - changed position of plus and exim btns on visualizations
@@ -28,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed colors for metrics value
 - bug with update state for settings single value
 - bug with template of simble value
+- bug with visual elements drops far to the bottom of the page
 
 ## [1.68.2]
 ### Fixed
