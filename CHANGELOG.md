@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- redesign single value from design
+- problem with cancel changes when we dont want to save them
+- single value design bugs
+- single value fixed open fullscreen
+- fixed save and unsave settings for single value
+- fixed move elements for single value, updated move for burger icon
+- fixed colors for metrics value
+- bug with update state for settings single value
+- bug with template of single value
+
 ## [1.70.0]
 ### Added
 - piechart tooltips
