@@ -58,6 +58,7 @@ export default {
     timeFormat: '',
     minX: 0,
     maxX: 0,
+    xAxisCaptionRotate: 0,
     allLinesWithBreak: [],
     unitedBars: []
   }),
@@ -171,6 +172,7 @@ export default {
       this.isTime = rowValue > 1000000000 && rowValue < 2000000000
       this.isUnitedMode = united
       this.timeFormat = timeFormat
+      this.xAxisCaptionRotate = xAxisCaptionRotate
 
       const metricOptions = metrics ? [...metrics] : []
 
@@ -178,7 +180,6 @@ export default {
         this.renderSVG(
           lastDot,
           isDataAlwaysShow,
-          xAxisCaptionRotate,
           barplotBarWidth,
           metricOptions,
           yAxesBinding
@@ -412,6 +413,8 @@ export default {
           .attr('visibility', 'hidden')
       })
 
+      this.setXAxisCaptionsRotate()
+
       this.svg.on('dblclick', () => {
         if (this.isTime) {
           x.domain(d3.extent(this.dataRestFrom, (d) => new Date(d[this.xMetric] * this.secondTransf)))
@@ -439,6 +442,7 @@ export default {
         })
 
         this.createVerticalGridLines()
+        this.setXAxisCaptionsRotate()
 
         this.metricNames.forEach((item, i) => this.changeZoom(x, yValue, 300, i))
       })
@@ -527,7 +531,40 @@ export default {
         })
     },
 
-    renderSVG(isLastDotShow, isDataAlwaysShow, xAxisCaptionRotate, barplotBarWidth, metricOptions, yAxesBinding) {
+    setXAxisCaptionsRotate() {
+      const captions = this.xAxis.selectAll('text')
+
+      switch (this.xAxisCaptionRotate) {
+        case 45:
+          captions
+            .style('text-anchor', 'start')
+            .attr('transform', `rotate(45)`)
+          break
+        case -45:
+          captions
+            .style('text-anchor', 'end')
+            .attr('transform', `rotate(-45)`)
+          break
+        case 90:
+          captions
+            .style('text-anchor', 'start')
+            .attr('transform', `rotate(90) translate(10, -12)`)
+          break
+        case -90:
+          captions
+            .style('text-anchor', 'end')
+            .attr('transform', `rotate(-90) translate(-10, -13)`)
+          break
+      }
+
+      const maxCaptionWidth = d3.max(
+        captions.nodes().map(node => node.getBBox().width)
+      )
+
+      return maxCaptionWidth
+    },
+
+    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding) {
       this.clearSvgContainer()
 
       const metricNamesCount = this.metricNames.length
@@ -600,10 +637,16 @@ export default {
         )
       } else this.xAxis.call(d3.axisBottom(x))
 
-      const xAxisCaptions = this.svg.selectAll('g.xAxis g.tick text')
+      const maxXAxisCaptionWidth = this.setXAxisCaptionsRotate()
 
-      if (xAxisCaptionRotate && xAxisCaptionRotate !== 0) {
-        xAxisCaptions.attr('transform', `rotate(${xAxisCaptionRotate})`)
+      if (this.xAxisCaptionRotate !== 0) {
+        if ([90, -90].includes(this.xAxisCaptionRotate)) {
+          this.height = this.height - maxXAxisCaptionWidth + 10
+        }
+        if ([45, -45].includes(this.xAxisCaptionRotate)) {
+          this.height = this.height - maxXAxisCaptionWidth + 40
+        }
+        this.xAxis.attr('transform', `translate(0, ${this.height})`)
       }
 
       this.line = this.isUnitedMode ? this.svg.append('g').attr('clip-path', `url(#clip-${this.id})`) : []
@@ -1054,7 +1097,7 @@ export default {
           .attr('x', 0)
           .attr('y', 20)
           .attr('width', this.width)
-          .attr('height', this.height)
+          .attr('height', this.height - 20)
           .attr('fill', 'none')
           .attr('pointer-events', 'all')
           .on('mouseup', () => brushObj.selectionUp())
@@ -1071,7 +1114,7 @@ export default {
             .attr('x', brushObj.startX)
             .attr('y', 20)
             .attr('width', 0)
-            .attr('height', this.height)
+            .attr('height', this.height - 20)
             .attr('fill', this.theme.$accent_ui_color)
             .style('opacity', 0.3)
             .on('mouseup', () => brushObj.selectionUp())

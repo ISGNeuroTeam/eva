@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed colors for metrics value
 - bug with update state for settings single value
 - bug with template of single value
+- multiline captions rotation on the x-axis
 
 ## [1.70.0]
 ### Added
