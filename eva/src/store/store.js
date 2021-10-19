@@ -1270,7 +1270,11 @@ export default {
             }
           });
         }
-
+        if (search.limit > 0 && !otl.includes('head')) {
+          // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
+          otl +='|head ' + search.limit
+        }
+        
         otl = otl.replace(/\r|\n/g, '');
 
         let formData = new FormData(); // формируем объект для передачи RESTу
@@ -1414,6 +1418,7 @@ export default {
             field_extraction: false,
             cache_ttl: 100,
           },
+          limit: 1000
         };
       }
     },
