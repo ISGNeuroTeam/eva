@@ -8,6 +8,7 @@ $main_text: var(--main_text)
 $main_border: var(--main_border)
 $secondary-text: var(--secondary_text)
 $accent_ui_color: var(--accent_ui_color)
+$blue: var(--blue)
 
 
 // -------------------- vars --------------------
@@ -25,6 +26,7 @@ $dash-loading-height: 3px
   height: calc(100% - (#{$dash-header-height} + #{$dash-loading-height}))
 
 // -------------------- styles --------------------
+
 
 .single-value-container::v-deep
   display: flex
@@ -100,7 +102,7 @@ $dash-loading-height: 3px
         @include text-truncated()
 
         &.color-main
-          color: $accent_ui_color
+          color: $blue
 
         &.color-secondary
-          color: $main_text
+          color: $secondary-text
