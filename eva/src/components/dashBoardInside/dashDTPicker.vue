@@ -73,7 +73,8 @@
         <DTPicker 
           v-model="start" 
           label="Начальная дата и время" 
-          format="YYYY-MM-DD HH:mm"   
+          format="YYYY-MM-DD HH:mm"
+          button-now-translation="Сейчас"
           :color="theme.$accent_ui_color"
           :button-color="theme.$primary_button"
           class="dtpicker" 
@@ -81,8 +82,9 @@
         />
         <DTPicker 
           v-model="end" 
-          label="Конечная дата и время" 
+          label="Конечная дата и время"
           format="YYYY-MM-DD HH:mm"
+          button-now-translation="Сейчас"
           :color="theme.$accent_ui_color"
           :button-color="theme.$primary_button"
           class="dtpicker" 
@@ -101,7 +103,8 @@
           format="YYYY-MM-DD"
           :color="theme.$accent_ui_color"
           :button-color="theme.$primary_button"
-          class="dtpicker range-picker" 
+          :custom-shortcuts="DTPickerCustomShortcuts"
+          class="dtpicker range-picker"
           @validate="setTocken('range')"
         />
         <div 
@@ -170,6 +173,21 @@ export default {
     idFrom: null,
     idDashFrom: null,
     dataRestFrom: null,
+    DTPickerCustomShortcuts: {
+      type: Array,
+      default: function _default() {
+        return [
+          { key: 'thisWeek', label: 'текущая неделя', value: 'isoWeek' },
+          { key: 'lastWeek', label: 'пред. неделя', value: '-isoWeek' },
+          { key: 'last7Days', label: 'последние 7 дней', value: 7 },
+          { key: 'last30Days', label: 'последние 30 дней', value: 30 },
+          { key: 'thisMonth', label: 'текущий месяц', value: 'month' },
+          { key: 'lastMonth', label: 'пред. месяц', value: '-month' },
+          { key: 'thisYear', label: 'текущий год', value: 'year' },
+          { key: 'lastYear', label: 'пред. год', value: '-year' }
+        ];
+      }
+    },
   },
   data () {
     return {
