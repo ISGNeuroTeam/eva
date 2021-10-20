@@ -176,6 +176,7 @@ export default {
 .vdr.active.resizable {
   outline-color: inherit;
   outline: 2px dashed;
+  z-index: 9 !important;
 }
 
 .handle {
