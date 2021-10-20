@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break 
 
+### Changed
+- the date picker component has been translated into Russian
+
 ### Fixed
 - redesign single value from design
 - problem with cancel changes when we dont want to save them
