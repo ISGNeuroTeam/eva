@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bug with template of single value
 - set higher z-index for active component on dashboard
 - multiline captions rotation on the x-axis
+- fixed the focus and tooltip of the activator buttons
 
 ## [1.70.0]
 ### Added
