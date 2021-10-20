@@ -61,7 +61,8 @@
                 hide-details  
                 :rows="rowsCount"
                 :style="{background: theme.$main_bg, color: `${theme.$main_text} !important`}" 
-                placeholder="Введите запрос" 
+                placeholder="Введите запрос"
+                @keyup.ctrl.\="addLineBreaks"
               />
               <router-link 
                 :to="{ path: '/reports'}" 
@@ -387,6 +388,11 @@ export default {
             },
           );
       }
+    },
+    addLineBreaks: function(event) {
+      this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replace('\n', '')
+      this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
     },
     setUsername: function(event) {
       this.search.parametrs.username = event;
