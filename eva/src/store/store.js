@@ -726,7 +726,7 @@ export default {
       // event.route.go();
       const options = state[event.idDash][event.id].options;
      
-      if (options?.openNewScreen === false) {
+      if (!options?.openNewScreen) {
         event.route.push(`/dashboards/${id}`);
       } else {
         window.open(`/dashboards/${id}`);
