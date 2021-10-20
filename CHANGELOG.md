@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed colors for metrics value
 - bug with update state for settings single value
 - bug with template of single value
+- set higher z-index for active component on dashboard
 
 ## [1.70.0]
 ### Added
@@ -35,7 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - unauthorized users weren't redirected to login page if they tried to open dashboard from
-- set higher z-index for active component on dashboard
 
 ## [1.69.0]
 ### Added
