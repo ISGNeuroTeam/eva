@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- ability to set a default value for a token if its value is not set.
+- ability to set a default value for a token if its value is not set
+- hot keys ctrl+/ to automatically line break 
 
 ### Fixed
 - redesign single value from design
