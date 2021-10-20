@@ -50,6 +50,41 @@
 .create-block
     padding: 20px 10px 10px 40px
 
+    .color-picker-wrapper
+        display: flex
+        gap: 10px
+        flex-wrap: wrap
+
+        .color-box
+            width: 24px
+            height: 24px
+            border-radius: 2px
+            display: flex
+            justify-content: center
+            align-items: center
+            cursor: pointer
+
+            &:nth-last-child(-n+2)
+                margin-right: 30px
+
+        .custom-color
+            border: 1px solid var(--main_border)
+            margin-right: 0 !important
+
+        .custom-color-block
+            display: flex
+            font-size: 16px
+            color: var(--main_border)
+
+            #edit-icon
+                margin-right: 4px
+                margin-left: 10px
+                cursor: pointer
+
+        .active
+          border: 1px solid var(--title)
+
+
 .profile-block
 
     .headline
@@ -104,13 +139,10 @@
 .create-modal-block-group
     position: relative
 
-    .zagolovok-field
+    .title-field
         font-size: 16px
-        opcity: 0.6 !important
         margin-top: 30px !important
-
-    .colorPicker
-        margin-top: 30px !important
+        margin-bottom: 10px
 
     .warn
         font-size: 1rem
