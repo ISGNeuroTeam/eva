@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- multiline barplot bars are now centered
+
 ### Fixed
 - redesign single value from design
 - problem with cancel changes when we dont want to save them

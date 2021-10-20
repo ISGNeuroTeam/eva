@@ -639,6 +639,8 @@ export default {
       const minMetricsValues = this.metricNames.map((item) => d3.min(this.dataRestFrom, (d) => d[item]))
       const maxMetricsValues = this.metricNames.map((item) => d3.max(this.dataRestFrom, (d) => d[item]))
 
+      const dataRest = [...this.dataRestFrom]
+
       if (this.isUnitedMode) {
         const minValue = d3.min(minMetricsValues)
         const maxValue = d3.max(maxMetricsValues)
@@ -718,7 +720,6 @@ export default {
           if (yAxesBinding.metricTypes[metricName] === 'barplot') {
             const thisMetrics = [...this.metrics]
             let allDotHover = []
-            const dataRest = [...this.dataRestFrom]
 
             this.svg
               .selectAll(`bar-${metricName}`)
@@ -766,8 +767,11 @@ export default {
 
                 return h
               })
-              .attr('visibility', (d, i) => {
-                return i === dataRest.length - 1 ? 'hidden' : 'visible'
+              .attr('transform', function (d, j) {
+                const w = this.width.baseVal.value
+                let translate = j === 0 ? 0 : w / 2
+                if (j === dataRest.length - 1) translate = w
+                return `translate(-${translate}, 0)`
               })
               .attr('fill', this.legendColors[metricIndex])
               .on('mouseenter', function (d) {
@@ -1588,6 +1592,12 @@ export default {
               return isNegative
                 ? Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
                 : startY[metricIndex + 1] - y[metricIndex](d[options.name])
+            })
+            .attr('transform', function (d, j) {
+              const w = this.width.baseVal.value
+              let translate = j === 0 ? 0 : w / 2
+              if (j === dataRest.length - 1) translate = w
+              return `translate(-${translate}, 0)`
             })
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[options.name] }, 'click'))
             .on('mouseenter', function (d) {
