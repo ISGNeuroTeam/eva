@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- ability to set a default value for a token if its value is not set
+- hot keys ctrl+/ to automatically line break
+
+### Changed
+- the date picker component has been translated into Russian
+
 ### Fixed
 - redesign single value from design
 - problem with cancel changes when we dont want to save them
@@ -17,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed colors for metrics value
 - bug with update state for settings single value
 - bug with template of single value
+- set higher z-index for active component on dashboard
 - multiline captions rotation on the x-axis
 
 ## [1.70.0]
