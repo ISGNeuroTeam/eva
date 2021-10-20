@@ -21,6 +21,15 @@
           class="options-block"
         >
           <div class="option-item">
+            <v-switch
+              v-model="openNewScreen"
+              class="switch"
+              :color="theme.$primary_button"
+              :style="{color:theme.$main_text}"
+              label="Открыть в новой вкладке"
+            />
+          </div>
+          <div class="option-item">
             <div
               class="name-option main item"
               :style="{color:theme.$title, borderBottom: `1px solid ${theme.$main_border}`}"
@@ -1564,6 +1573,7 @@ export default {
     return {
       tableTitles:[],
       element: '',
+      openNewScreen: true,
       options: {
       },
       optionsItems: [],
@@ -1740,7 +1750,7 @@ export default {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, openNewScreen: this.openNewScreen  }, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
