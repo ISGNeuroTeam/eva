@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- the date picker component has been translated into Russian
+
 ### Fixed
 - redesign single value from design
 - problem with cancel changes when we dont want to save them
