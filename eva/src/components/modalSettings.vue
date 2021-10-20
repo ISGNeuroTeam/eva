@@ -1573,7 +1573,7 @@ export default {
     return {
       tableTitles:[],
       element: '',
-      openNewScreen: true,
+      openNewScreen: false,
       options: {
       },
       optionsItems: [],
