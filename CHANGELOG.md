@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bug with update state for settings single value
 - bug with template of single value
 - set higher z-index for active component on dashboard
+- fixed the problem with renaming dashboards and groups
 
 ## [1.70.0]
 ### Added
