@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - unauthorized users weren't redirected to login page if they tried to open dashboard from
+- set higher z-index for active component on dashboard
 
 ## [1.69.0]
 ### Added
