@@ -382,7 +382,7 @@ export default {
           this.showwarning = false;
         }
 
-        const method = this.actionFrom === 'create' ? "POST" : "PUT"
+        const method = (this.actionFrom === false) ? "PUT" : "POST"
         this.createEssence(dataObj, method, essence);
       }
     },
