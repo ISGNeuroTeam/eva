@@ -7,6 +7,35 @@
       url("./fonts/ProximaNova.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
+
+@font-face {
+  font-family: "ProximaNovaReg";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url("./fonts/Proxima/ProximaNovaExCn-Reg.otf") format("otf");
+}
+
+
+
+@font-face {
+  font-family: "ProximaNovaLight";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url("./fonts/Proxima/ProximaNovaExCn-Light.otf") format("otf"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+@font-face {
+  font-family: "ProximaNovaBold";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url("./fonts/Proxima/ProximaNovaCond-Bold.otf") format("otf"),
+      url("./fonts/Proxima/ProximaNovaCond-Bold.otf") format("otf"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+
 @font-face {
   font-family: "ProximaNova";
   font-style: normal;

@@ -8,11 +8,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+<<<<<<< HEAD
 
 ### Changed
 
 ### Fixed 
 - fixed update textarea with full screen textarea
+=======
+- ability to set a default value for a token if its value is not set
+- hot keys ctrl+/ to automatically line break
+
+### Changed
+- the date picker component has been translated into Russian
+- multiline barplot bars are now centered
+
+### Fixed
+- redesign single value from design
+- problem with cancel changes when we dont want to save them
+- single value design bugs
+- single value fixed open fullscreen
+- fixed save and unsave settings for single value
+- fixed move elements for single value, updated move for burger icon
+- fixed colors for metrics value
+- bug with update state for settings single value
+- bug with template of single value
+- set higher z-index for active component on dashboard
+- multiline captions rotation on the x-axis
+
+## [1.70.0]
+### Added
+- piechart tooltips
+- select pie of piechart by legend
+- ability to add an additional yAxis for multiLine component
+- ability to bind metrics to the left or right yAxis for multiLine component
+- ability to add some barplots and linecharts for multiLine component
+
+### Changed
+- Assigning a value to a piechart token
+- DEV: added beforeEach hook in router to redirect unauthorized users
+
+### Fixed
+- unauthorized users weren't redirected to login page if they tried to open dashboard from
+>>>>>>> 59f25a3842f9325dd38a3f47ec3d74c43231bc72
 
 ## [1.69.0]
 ### Added

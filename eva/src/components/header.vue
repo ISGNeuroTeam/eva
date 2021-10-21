@@ -95,11 +95,7 @@
     mdiHomeVariantOutline,
     mdiScriptTextOutline,
   } from '@mdi/js';
-  import Vue from 'vue';
-  import VueJWT from 'vuejs-jwt';
   import EvaLogo from '../images/eva-logo.svg';
-
-  Vue.use(VueJWT, { storage: 'cookie', keyName: 'eva_token' });
 
   export default {
     components: {
@@ -206,8 +202,6 @@
           } else {
             this.exit();
           }
-        } else {
-          this.$router.push(`/`);
         }
       },
       exit: function () {

@@ -31,6 +31,7 @@
           rows="5"
           placeholder="Origin otl"
           label="Текст ИД"
+          @keyup.ctrl.\="addLineBreaks"
         />
         <div class="times-block">
           <div class="time-block">
@@ -301,6 +302,11 @@ export default {
           this.errorMsgShow = false
         }, 2000)
       }
+    },
+    addLineBreaks: function(event) {
+      this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replace('\n', '')
+      this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
     },
   },
 }
