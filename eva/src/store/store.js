@@ -1663,6 +1663,13 @@ export default {
                   }
                 });
               }
+
+              state[id].filters?.forEach(filter => {
+                if (filter.idDash !== id) {
+                  Vue.set(filter, 'idDash', id)
+                }
+              })
+
               if (state[id].searches) {
                 state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'));
               }
