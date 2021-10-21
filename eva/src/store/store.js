@@ -131,8 +131,13 @@ export default {
       });
       if (id !== -1) {
         // если токен нашелся
-
-        state[idDash].tockens[id].value = value;
+        
+        if (value) {
+          // если value задано, то присваиваем его токену, если нет, то присваиваем токену дефолтное значение
+          state[idDash].tockens[id].value = value;
+        } else {
+          state[idDash].tockens[id].value = state[idDash].tockens[id].defaultValue;
+        }
 
         let eventAll = []; // сюда будем заносить все события с нужным токеном
 
@@ -504,6 +509,7 @@ export default {
         state[tocken.idDash].tockens[j].prefix = tocken.tocken.prefix;
         state[tocken.idDash].tockens[j].sufix = tocken.tocken.sufix;
         state[tocken.idDash].tockens[j].delimetr = tocken.tocken.delimetr;
+        state[tocken.idDash].tockens[j].defaultValue = tocken.tocken.defaultValue;
       } else {
         // а елси нету
         state[tocken.idDash].tockens.push(
@@ -516,6 +522,7 @@ export default {
             prefix: tocken.tocken.prefix,
             sufix: tocken.tocken.sufix,
             delimetr: tocken.tocken.delimetr,
+            defaultValue: tocken.tocken.defaultValue,
             value: '',
           }
         );
