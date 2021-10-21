@@ -334,11 +334,11 @@ export default {
     },
     checkLoading(elem) {
       if (elem.search === -1) return false
-      return this.dataObject[elem.search].loading
+      return this.dataObject[elem.search]?.loading
     },
     getElementData(elem) {
       if (elem.search === -1) return []
-      return this.dataObject[elem.search].data
+      return this.dataObject[elem.search]?.data
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
