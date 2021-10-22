@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - set higher z-index for active component on dashboard
 - multiline captions rotation on the x-axis
 - fixed the focus and tooltip of the activator buttons
+- fixed the problem with renaming dashboards and groups
 
 ## [1.70.0]
 ### Added
