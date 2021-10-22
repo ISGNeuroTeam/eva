@@ -111,10 +111,11 @@ export default {
     dataRestFrom() {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(JSON.stringify(this.$store.getters.getOptions({ id, idDash })));
-      this.setVisual(this.providedSettings.metricOptions.length ? this.providedSettings.metricOptions : options.settings?.metricOptions)
+      this.setVisual(this.currentSettings.metricOptions.length ? this.currentSettings.metricOptions : options.settings?.metricOptions)
 
     },
     currentSettings() {
+      console.log('currentSettings')
       this.providedSettings = { ... this.currentSettings }
       this.init({ ... this.currentSettings })
     }
@@ -198,9 +199,9 @@ export default {
       const metricList = [];
       const metricOptions = [];
       let idCount = 1;
-
+      // console.log(metricOptionsCurrent, 'metricOptionsCurrent')
       for (const [index, data] of this.dataRestFrom.entries()) {
-        const { metric, value, order, metadata, _time } = data;
+        const { metric, value, order, metadata } = data;
         if (metric === '_title') {
           this.titleToken = String(value);
           continue;
@@ -213,10 +214,9 @@ export default {
           range = null;
         }
 
-        const startId = `${metric}_${_time}_${value}`
+        const startId = `${metric}_${idCount}`
 
         const metricCurrent = metricOptionsCurrent?.find(m => m.startId === startId);
-        
         const defaultMetricOption = {
           id: metricCurrent?.id || metricID,
           startId: metricCurrent?.startId || startId,
@@ -226,7 +226,7 @@ export default {
           icon: metricCurrent?.icon || 'no_icon',
           fontSize: metricCurrent?.fontSize || 54,
           fontWeight: metricCurrent?.fontWeight || 400,
-          listOrder: metricCurrent?.listOrder || order,
+          listOrder: metricCurrent?.listOrder === undefined ? order : metricCurrent?.listOrder,
           ...metricCurrent,
         };
         metricList.push({ value, ...defaultMetricOption });
