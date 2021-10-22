@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiline captions rotation on the x-axis
 - fixed the focus and tooltip of the activator buttons
 - fixed the problem with renaming dashboards and groups
+- fixed the position of the datepicker in the pop-up of the data source
 
 ## [1.70.0]
 ### Added
