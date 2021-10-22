@@ -1424,7 +1424,7 @@ export default {
       }
     },
     getPaperSearch: state => {
-      let key = state.papers.cursearch;
+      let key = state.papers?.cursearch || 0;
       if (key != 0) {
         return state.papers.searches[key];
       } else {
