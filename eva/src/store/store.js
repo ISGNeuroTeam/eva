@@ -483,7 +483,12 @@ export default {
         time: schedule.time,
         everyLast: schedule.everyLast,
         timeLast: schedule.timeLast,
+        schedulerID: schedule.schedulerID
       };
+    },
+    setSchedulerID: (state, payload) => {
+      const { idDash, search, schedulerID} = payload;
+      Vue.set(state[idDash].schedulers[search], 'schedulerID', schedulerID)
     },
     deleteSchedule: (state, schedule) => {
       // удаляет объект с планировщиком

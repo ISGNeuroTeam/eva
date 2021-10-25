@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break
+- default color for new group
 
 ### Changed
 - the date picker component has been translated into Russian
@@ -30,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the focus and tooltip of the activator buttons
 - fixed the problem with renaming dashboards and groups
 - fixed the position of the datepicker in the pop-up of the data source
+- problem with scheduler id loss after refreshing page
 
 ## [1.70.0]
 ### Added
