@@ -278,7 +278,7 @@ export default {
       test.$on("updatePipeDataSource", (e) => this.loadDataForPipe(e));
       test.$mount();
 
-      let element = document.getElementsByClassName(
+      let element = this.$refs.map.getElementsByClassName(
         "leaflet-control-container"
       );
       let container = element[0];
