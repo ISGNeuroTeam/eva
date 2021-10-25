@@ -914,7 +914,6 @@ export default {
               if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
 
               linesWithBreak.push(onelinesWithBreak)
-              alert('this.allLinesWithBreak.push')
               this.allLinesWithBreak.push(linesWithBreak)
 
               linesWithBreak.forEach((lineItself, lineIndex) => {
@@ -1303,7 +1302,6 @@ export default {
             if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
 
             linesWithBreak.push(onelinesWithBreak)
-            console.log('linesWithBreak.push')
             this.allLinesWithBreak[metricIndex] = linesWithBreak
 
             linesWithBreak.forEach((lineItself, lineIndex) => {
