@@ -326,7 +326,7 @@ export default {
       this.setGroupColor(color)
     },
     createBtn: function (name) {  // при нажатии на кнопку создать
-      let flag = false;
+      let hasSimilarModel = false;
       if (!name || name == '') {  //  если пользователь не ввел имя
         this.showwarning = true;  //  показываем предупреждение
         setTimeout( () => { this.showwarning = false;},3000); // а через три секунды убираем - чисто понты)
@@ -336,9 +336,8 @@ export default {
         let warnText = '';
         let essence = '';
         if (this.groupCheck) {
-          this.groups.forEach( item => {  // для этого просматриваем все дашборды на странице (но берем их из хранилища)
-            item.name.toLowerCase() == name.toLowerCase() ? flag = true: false
-          });
+          // для этого просматриваем все дашборды на странице (но берем их из хранилища)
+          hasSimilarModel = this.groups.some(item => item.name.toLowerCase() === name.toLowerCase())
           dataObj = {name: this.newGroup.name, color: this.newGroup.color, };
           if (Object.keys(this.changedData).length != 0) {
             let keys = this.changedData.group;
@@ -352,9 +351,8 @@ export default {
           essence = 'group';
           warnText = 'Такая группа уже существует. Хотите изменить её?'
         } else {
-          this.dashs.forEach( item => {  // для этого просматриваем все дашборды на странице (но берем их из хранилища)
-            item.name.toLowerCase() == name.toLowerCase() ? flag = true: false
-          });
+          // для этого просматриваем все дашборды на странице (но берем их из хранилища)
+          hasSimilarModel = this.dashs.some(item => item.name.toLowerCase() === name.toLowerCase())
           dataObj = {name: this.newDash.name,};
 
           if (this.newDash.id != '') {
@@ -371,26 +369,23 @@ export default {
           essence = 'dash';
           warnText = 'Такой дашборд уже существует. Хотите изменить его?'
         }
-        if (!flag) { // если такого дашборда еще нет
-          this.createEssence(dataObj,"POST",essence);
-          this.showwarning = false;  //  показываем предупреждение
-          this.nameBtn.create = 'Создать';
-          this.nameBtn.cancel = 'Отмена';
-          this.nameWarn = '';
-        } else {  // а иначе
-          if (this.nameBtn.create != 'Да') {
-            this.showwarning = true;  //  показываем предупреждение
-            this.nameBtn.create = 'Да';
-            this.nameBtn.cancel = 'Нет';
-            this.nameWarn = warnText;
-          } else {
-            this.createEssence(dataObj,"PUT",essence);
-            this.showwarning = false;  //  показываем предупреждение
-            this.nameBtn.create = 'Создать';
-            this.nameBtn.cancel = 'Отмена';
-            this.nameWarn = '';
-          }
+
+        if (hasSimilarModel && !this.showwarning) { // показываем предупреждение
+          this.nameBtn.create = 'Да';
+          this.nameBtn.cancel = 'Нет';
+          this.nameWarn = warnText;
+          this.showwarning = true;
+          return;
         }
+
+        if (this.showwarning) { // реакция ДА на предупреждение
+          this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+          this.nameBtn.cancel = 'Отмена';
+          this.showwarning = false;
+        }
+
+        const method = (this.actionFrom === false) ? "PUT" : "POST"
+        this.createEssence(dataObj, method, essence);
       }
     },
     cancelModal: function(btn) {  // есл инажали на отмену создания
@@ -399,7 +394,7 @@ export default {
         this.name = '';  // очищаем имя
       }
       this.showwarning = false;
-      this.nameBtn.create = 'Создать';
+      this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
       this.nameBtn.cancel = 'Отмена';
       this.nameWarn = 'Имя не может быть пустым';
     },
