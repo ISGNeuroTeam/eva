@@ -198,27 +198,24 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
-      let idCount = 1;
       // console.log(metricOptionsCurrent, 'metricOptionsCurrent')
       for (const [index, data] of this.dataRestFrom.entries()) {
-        const { metric, value, order, metadata } = data;
+        const { metric, value, id, metadata } = data;
         if (metric === '_title') {
           this.titleToken = String(value);
           continue;
         }
 
-        const metricID = idCount++;
         let range = metadata;
 
         if (!metadata || typeof metadata !== 'string') {
           range = null;
         }
-
-        const startId = `${metric}_${idCount}`
+        const startId = `${metric}_${id}`
 
         const metricCurrent = metricOptionsCurrent?.find(m => m.startId === startId);
         const defaultMetricOption = {
-          id: metricCurrent?.id || metricID,
+          id: metricCurrent?.id || id,
           startId: metricCurrent?.startId || startId,
           metadata: metadata,
           title: metric || data.phase,
@@ -226,12 +223,13 @@ export default {
           icon: metricCurrent?.icon || 'no_icon',
           fontSize: metricCurrent?.fontSize || 54,
           fontWeight: metricCurrent?.fontWeight || 400,
-          listOrder: metricCurrent?.listOrder === undefined ? order : metricCurrent?.listOrder,
+          listOrder: metricCurrent?.listOrder === undefined ? index : metricCurrent?.listOrder,
           ...metricCurrent,
         };
         metricList.push({ value, ...defaultMetricOption });
-        metricOptions.push({ order, range, expanded: false, ...defaultMetricOption });
+        metricOptions.push({ id, range, expanded: false, ...defaultMetricOption });
       }
+      console.log(metricOptions, 'metricOptions')
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
     },
