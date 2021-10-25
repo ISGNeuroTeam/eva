@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the focus and tooltip of the activator buttons
 - fixed the problem with renaming dashboards and groups
 - fixed the position of the datepicker in the pop-up of the data source
+- fixed font weights 100, 200, 400, 500, 800
+- fixed SingleValue font weights
 
 ## [1.70.0]
 ### Added
