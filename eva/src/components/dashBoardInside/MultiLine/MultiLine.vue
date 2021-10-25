@@ -1528,7 +1528,6 @@ export default {
             }
 
             if (brush.select(`.selection-${metricIndex}`).attr('width') > 5) {
-              alert('5')
               this.updateData(x, y, [brushObj.startX, brushObj.endX], metricIndex)
             }
 

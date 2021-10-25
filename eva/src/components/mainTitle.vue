@@ -300,9 +300,6 @@ export default {
     window.onresize = this.checkTabOverflow
   },
   methods: {
-    setRange (range, elem) {
-      this.dataObject[elem.search].data = this.dataObject[elem.search].data.filter(item => (item.day > range[0] && item.day < range[1]));
-    },
     exportDataCSV(searchName) {
       const searchData = this.dataObject[searchName].data
       let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
@@ -449,6 +446,9 @@ export default {
 
         }
       })
+    },
+    setRange (range, elem) {
+      this.dataObject[elem.search].data = this.dataObject[elem.search].data.filter(item => (item.day > range[0] && item.day < range[1]));
     },
   },
 }

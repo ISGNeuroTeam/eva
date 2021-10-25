@@ -562,9 +562,6 @@ export default {
     }
   },
   methods: {
-    setRange (range) {
-      this.$emit("SetRange", range);
-    },
     updateSettings(settings) {
       this.settings = JSON.parse(JSON.stringify(settings));
     },
@@ -1013,6 +1010,9 @@ export default {
         this.searchData = JSON.parse(JSON.stringify(this.props.dataRest));
       }
       link.remove(); // удаляем ссылку
+    },
+    setRange (range) {
+      this.$emit("SetRange", range);
     },
   },
 };
