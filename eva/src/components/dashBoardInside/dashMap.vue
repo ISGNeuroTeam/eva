@@ -90,7 +90,6 @@ export default {
     },
     mapStyleSize() {
       return {
-        width: `${Math.trunc(this.widthFrom)}px`,
         height: `${Math.trunc(this.heightFrom) - this.top / 2 - 45}px`,
       }
     },
@@ -821,8 +820,9 @@ export default {
 .mapContainer {
   position: relative;
   background: #191919;
-  left: -20px;
-  top: 0px;
+  margin-left: -20px;
+  margin-right: -20px;
+  top: 0;
 }
 .error-message {
   display: flex;

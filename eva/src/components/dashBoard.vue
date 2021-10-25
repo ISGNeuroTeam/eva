@@ -423,15 +423,11 @@ export default {
         tooltip: {},
         metricsMulti: [],
       },
+      fullScreenWidth: 0.8 * window.innerWidth,
+      fullScreenHeight: 0.8 * window.innerHeight,
     };
   },
   computed: {
-    fullScreenWidth() {
-      return 0.8 * window.innerWidth;
-    },
-    fullScreenHeight() {
-      return 0.8 * window.innerHeight;
-    },
     theme: function () {
       return this.$store.getters.getTheme;
     },
@@ -543,8 +539,15 @@ export default {
     } else {
       this.props.optionsBoxShadow = "transparent";
     }
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
   },
   methods: {
+    onResize() {
+      this.fullScreenWidth = window.innerWidth * 0.8;
+      this.fullScreenHeight = window.innerHeight * 0.8;
+    },
     updateSettings(settings) {
       this.settings = JSON.parse(JSON.stringify(settings));
     },
