@@ -373,8 +373,9 @@ export default {
             parseFloat(invertStart.toFixed(5)),
             parseFloat(invertEnd.toFixed(5))
           ]
-      this.setClick(range, 'select')
-      this.zoom(x, yValue, selectRange, id)
+      this.$emit("SetRange", range);
+      // this.setClick(range, 'select')
+      // this.zoom(x, yValue, selectRange, id)
     },
 
     zoom(x, yValue, selectRange = [], id) {
@@ -913,6 +914,7 @@ export default {
               if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
 
               linesWithBreak.push(onelinesWithBreak)
+              alert('this.allLinesWithBreak.push')
               this.allLinesWithBreak.push(linesWithBreak)
 
               linesWithBreak.forEach((lineItself, lineIndex) => {
@@ -1301,6 +1303,7 @@ export default {
             if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
 
             linesWithBreak.push(onelinesWithBreak)
+            console.log('linesWithBreak.push')
             this.allLinesWithBreak[metricIndex] = linesWithBreak
 
             linesWithBreak.forEach((lineItself, lineIndex) => {
@@ -1525,6 +1528,7 @@ export default {
             }
 
             if (brush.select(`.selection-${metricIndex}`).attr('width') > 5) {
+              alert('5')
               this.updateData(x, y, [brushObj.startX, brushObj.endX], metricIndex)
             }
 

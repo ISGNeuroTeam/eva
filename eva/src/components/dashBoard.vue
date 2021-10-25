@@ -319,6 +319,7 @@
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
+        @SetRange="setRange($event)"
       />
     </v-card>
   </div>
@@ -561,6 +562,9 @@ export default {
     }
   },
   methods: {
+    setRange (range) {
+      this.$emit("SetRange", range);
+    },
     updateSettings(settings) {
       this.settings = JSON.parse(JSON.stringify(settings));
     },

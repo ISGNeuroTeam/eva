@@ -27,6 +27,7 @@
       @SetLevel="props.zIndex = $event"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
+      @SetRange="setRange($event)"
     />
   </vue-draggable-resizable>
 </template>
@@ -116,6 +117,9 @@ export default {
     this.drawElement()
   },
   methods: {
+    setRange (range) {
+      this.$emit("SetRange", range);
+    },
     drawElement() {
       let pos = this.$store.getters.getPosDash({ idDash: this.idDash, id: this.id })
 
