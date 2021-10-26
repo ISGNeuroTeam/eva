@@ -845,4 +845,7 @@ export default {
 .leaftet-hover::before {
   margin-bottom: 0;
 }
+.leaflet-container.cursor-crosshair {
+  cursor: crosshair;
+}
 </style>
