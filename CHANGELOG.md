@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the problem with renaming dashboards and groups
 - fixed the position of the datepicker in the pop-up of the data source
 - problem with scheduler id loss after refreshing page
+- ability to zoom barplot
 
 ## [1.70.0]
 ### Added
