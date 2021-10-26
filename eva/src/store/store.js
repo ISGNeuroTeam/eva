@@ -483,7 +483,12 @@ export default {
         time: schedule.time,
         everyLast: schedule.everyLast,
         timeLast: schedule.timeLast,
+        schedulerID: schedule.schedulerID
       };
+    },
+    setSchedulerID: (state, payload) => {
+      const { idDash, search, schedulerID} = payload;
+      Vue.set(state[idDash].schedulers[search], 'schedulerID', schedulerID)
     },
     deleteSchedule: (state, schedule) => {
       // удаляет объект с планировщиком
@@ -1283,7 +1288,11 @@ export default {
             }
           });
         }
-
+        if (search.limit > 0 && !otl.includes('head')) {
+          // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
+          otl +='|head ' + search.limit
+        }
+        
         otl = otl.replace(/\r|\n/g, '');
 
         let formData = new FormData(); // формируем объект для передачи RESTу
@@ -1427,11 +1436,12 @@ export default {
             field_extraction: false,
             cache_ttl: 100,
           },
+          limit: 1000
         };
       }
     },
     getPaperSearch: state => {
-      let key = state.papers.cursearch;
+      let key = state.papers?.cursearch || 0;
       if (key != 0) {
         return state.papers.searches[key];
       } else {
