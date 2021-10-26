@@ -245,7 +245,9 @@ export default {
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
     fontWeightList: [
-      { value: 400, title: "Regular (200)" },
+      { value: 100, title: "Thin (100)" },
+      { value: 200, title: "Light (200)" },
+      { value: 400, title: "Regular (400)" },
       { value: 500, title: "Medium (500)" },
       { value: 800, title: "Bold (800)" },
     ],
