@@ -1,5 +1,5 @@
 <template>
-  <div class="multiline-container pa-0" :class="{ full: !dataModeFrom }">
+  <div class="multiline-container pa-0">
     <div v-if="isNodata" class="nodata-block" v-text="message" />
     <div ref="legendContainer" class="legend">
       <div v-for="item in legendList" :key="item.name" class="legend-item">
@@ -25,6 +25,7 @@ export default {
     heightFrom: Number,
     dataRestFrom: Array,
     dataModeFrom: Boolean,
+    isFullScreen: Boolean,
     /** Props from Reports page. */
     dataReport: Boolean,
     activeElemFrom: String,
@@ -58,6 +59,7 @@ export default {
     timeFormat: '',
     minX: 0,
     maxX: 0,
+    xAxisCaptionRotate: 0,
     allLinesWithBreak: [],
     unitedBars: []
   }),
@@ -171,6 +173,7 @@ export default {
       this.isTime = rowValue > 1000000000 && rowValue < 2000000000
       this.isUnitedMode = united
       this.timeFormat = timeFormat
+      this.xAxisCaptionRotate = xAxisCaptionRotate
 
       const metricOptions = metrics ? [...metrics] : []
 
@@ -178,7 +181,6 @@ export default {
         this.renderSVG(
           lastDot,
           isDataAlwaysShow,
-          xAxisCaptionRotate,
           barplotBarWidth,
           metricOptions,
           yAxesBinding
@@ -277,8 +279,8 @@ export default {
         .nodes()
         .forEach((item) => item.remove())
 
-      this.svg
-        .selectAll('g.xAxis g.tick')
+      this.xAxis
+        .selectAll('g.tick')
         .append('line')
         .attr('class', lineClass)
         .attr('x1', 0)
@@ -412,6 +414,8 @@ export default {
           .attr('visibility', 'hidden')
       })
 
+      this.setXAxisCaptionsRotate()
+
       this.svg.on('dblclick', () => {
         if (this.isTime) {
           x.domain(d3.extent(this.dataRestFrom, (d) => new Date(d[this.xMetric] * this.secondTransf)))
@@ -439,6 +443,7 @@ export default {
         })
 
         this.createVerticalGridLines()
+        this.setXAxisCaptionsRotate()
 
         this.metricNames.forEach((item, i) => this.changeZoom(x, yValue, 300, i))
       })
@@ -527,7 +532,40 @@ export default {
         })
     },
 
-    renderSVG(isLastDotShow, isDataAlwaysShow, xAxisCaptionRotate, barplotBarWidth, metricOptions, yAxesBinding) {
+    setXAxisCaptionsRotate() {
+      const captions = this.xAxis.selectAll('text')
+
+      switch (this.xAxisCaptionRotate) {
+        case 45:
+          captions
+            .style('text-anchor', 'start')
+            .attr('transform', `rotate(45)`)
+          break
+        case -45:
+          captions
+            .style('text-anchor', 'end')
+            .attr('transform', `rotate(-45)`)
+          break
+        case 90:
+          captions
+            .style('text-anchor', 'start')
+            .attr('transform', `rotate(90) translate(10, -12)`)
+          break
+        case -90:
+          captions
+            .style('text-anchor', 'end')
+            .attr('transform', `rotate(-90) translate(-10, -13)`)
+          break
+      }
+
+      const maxCaptionWidth = d3.max(
+        captions.nodes().map(node => node.getBBox().width)
+      )
+
+      return maxCaptionWidth
+    },
+
+    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding) {
       this.clearSvgContainer()
 
       const metricNamesCount = this.metricNames.length
@@ -573,10 +611,12 @@ export default {
         .append('g')
         .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
+      const clipPathID = this.isFullScreen ? `clip-${this.id}-full` : `clip-${this.id}`
+
       this.svg
         .append('defs')
         .append('clipPath')
-        .attr('id', `clip-${this.id}`)
+        .attr('id', clipPathID)
         .append('rect')
         .attr('x', 0)
         .attr('y', 0)
@@ -585,7 +625,7 @@ export default {
 
       this.xAxis = this.svg
         .append('g')
-        .attr('class', 'xAxis')
+        .attr('class', `${this.isFullScreen ? 'xAxis-full' : 'xAxis'}`)
         .attr('transform', `translate(0, ${this.height})`)
 
       if (this.isTime) {
@@ -600,13 +640,19 @@ export default {
         )
       } else this.xAxis.call(d3.axisBottom(x))
 
-      const xAxisCaptions = this.svg.selectAll('g.xAxis g.tick text')
+      const maxXAxisCaptionWidth = this.setXAxisCaptionsRotate()
 
-      if (xAxisCaptionRotate && xAxisCaptionRotate !== 0) {
-        xAxisCaptions.attr('transform', `rotate(${xAxisCaptionRotate})`)
+      if (this.xAxisCaptionRotate !== 0) {
+        if ([90, -90].includes(this.xAxisCaptionRotate)) {
+          this.height = this.height - maxXAxisCaptionWidth + 10
+        }
+        if ([45, -45].includes(this.xAxisCaptionRotate)) {
+          this.height = this.height - maxXAxisCaptionWidth + 40
+        }
+        this.xAxis.attr('transform', `translate(0, ${this.height})`)
       }
 
-      this.line = this.isUnitedMode ? this.svg.append('g').attr('clip-path', `url(#clip-${this.id})`) : []
+      this.line = this.isUnitedMode ? this.svg.append('g').attr('clip-path', `url(#${clipPathID})`) : []
 
       this.createVerticalGridLines()
 
@@ -638,6 +684,8 @@ export default {
       const dataRestLength = this.dataRestFrom.length
       const minMetricsValues = this.metricNames.map((item) => d3.min(this.dataRestFrom, (d) => d[item]))
       const maxMetricsValues = this.metricNames.map((item) => d3.max(this.dataRestFrom, (d) => d[item]))
+
+      const dataRest = [...this.dataRestFrom]
 
       if (this.isUnitedMode) {
         const minValue = d3.min(minMetricsValues)
@@ -718,17 +766,16 @@ export default {
           if (yAxesBinding.metricTypes[metricName] === 'barplot') {
             const thisMetrics = [...this.metrics]
             let allDotHover = []
-            const dataRest = [...this.dataRestFrom]
 
-            this.svg
+            const barPostfix = this.isFullScreen ? '-full' : ''
+            const getBarID = (i) => `bar--${metricName}--${i}--${barPostfix}`
+
+            this.line
               .selectAll(`bar-${metricName}`)
               .data(this.dataRestFrom)
               .enter()
               .append('rect')
-              .attr('id', (d, i) => {
-                const barID = `bar--${metricName}--${i}`
-                return barID
-              })
+              .attr('id', (d, i) => getBarID(i))
               .attr('x', (d) => x(d[xMetric] * this.secondTransf))
               .attr('y', (d) => yScale(d[metricName]))
               .attr('width', () => {
@@ -760,14 +807,15 @@ export default {
                 }
 
                 const h = height - yScale(d[metricName])
-
-                const barID = `bar--${metricName}--${j}`
-                bars.push({ id: barID, height: h })
+                bars.push({ id: getBarID(j), height: h })
 
                 return h
               })
-              .attr('visibility', (d, i) => {
-                return i === dataRest.length - 1 ? 'hidden' : 'visible'
+              .attr('transform', function (d, j) {
+                const w = this.width.baseVal.value
+                let translate = j === 0 ? 0 : w / 2
+                if (j === dataRest.length - 1) translate = w
+                return `translate(-${translate}, 0)`
               })
               .attr('fill', this.legendColors[metricIndex])
               .on('mouseenter', function (d) {
@@ -1054,7 +1102,7 @@ export default {
           .attr('x', 0)
           .attr('y', 20)
           .attr('width', this.width)
-          .attr('height', this.height)
+          .attr('height', this.height - 20)
           .attr('fill', 'none')
           .attr('pointer-events', 'all')
           .on('mouseup', () => brushObj.selectionUp())
@@ -1071,7 +1119,7 @@ export default {
             .attr('x', brushObj.startX)
             .attr('y', 20)
             .attr('width', 0)
-            .attr('height', this.height)
+            .attr('height', this.height - 20)
             .attr('fill', this.theme.$accent_ui_color)
             .style('opacity', 0.3)
             .on('mouseup', () => brushObj.selectionUp())
@@ -1219,7 +1267,7 @@ export default {
           node.style.transform = `translateY(${value}px)`
         })
 
-        this.line.push(this.svg.append('g').attr('clip-path', `url(#clip-${this.id})`))
+        this.line.push(this.svg.append('g').attr('clip-path', `url(#${clipPathID})`))
 
         if (optionsKeys.length === 0 || options.type === 'Line chart') {
           const mustSee = []
@@ -1588,6 +1636,12 @@ export default {
               return isNegative
                 ? Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
                 : startY[metricIndex + 1] - y[metricIndex](d[options.name])
+            })
+            .attr('transform', function (d, j) {
+              const w = this.width.baseVal.value
+              let translate = j === 0 ? 0 : w / 2
+              if (j === dataRest.length - 1) translate = w
+              return `translate(-${translate}, 0)`
             })
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[options.name] }, 'click'))
             .on('mouseenter', function (d) {
