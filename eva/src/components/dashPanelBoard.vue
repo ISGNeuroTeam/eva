@@ -824,6 +824,7 @@ export default {
       newSearch: {
         sid: null,
         original_otl: null,
+        limit: 1000,
         parametrs: {
           tws: 0,
           twf: 0,
@@ -1159,6 +1160,7 @@ export default {
       this.newSearch = {
         sid: null,
         original_otl: null,
+        limit: 1000,
         parametrs: {
           tws: 0,
           twf: 0,
