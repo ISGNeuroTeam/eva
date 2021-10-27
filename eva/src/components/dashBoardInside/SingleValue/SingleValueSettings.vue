@@ -24,12 +24,12 @@
             hide-details
             class="input-element"
           />
-          <v-checkbox
-            :input-value="true"
-            label="Отображение шапки компонента"
-            :style="{color:theme.$main_text}"
-            :value="true">
-          </v-checkbox>
+          <br />
+          <label class="checkbox-google">
+            <input type="checkbox" :checked="settings.showTitle || false" @change="handleChangeShowTitle">
+            <span class="checkbox-google-switch"></span> &nbsp;
+            Отображение шапки компонента
+          </label>
         </div>
 
         <div class="content-section offset">
@@ -76,7 +76,7 @@
             v-html="showAllTitle"
           />
         </div>
-        <draggable v-model="settings.metricOptions" @end="update()">
+        <draggable v-model="settings.metricOptions" handle=".burger" @end="update()">
           <div
             v-for="(metric, i) in settings.metricOptions"
             :key="`metric-${metric.id}`"
@@ -99,7 +99,7 @@
                   v-text="metric.expanded ? mdiChevronUp : mdiChevronDown"
                 />
               </span>
-              <v-icon size="16" :color="theme.$main_border" v-text="mdiMenu"/>
+              <v-icon size="16" class="burger" style="cursor: move" :color="theme.$main_border" v-text="mdiMenu"/>
             </div>
 
             <div class="content-section">
@@ -162,7 +162,7 @@
                 >
                   <template v-slot:selection="{ item }">{{ item.title }}</template>
                   <template v-slot:item="{ item }">
-                    <span :style="{ fontWeight: item.value }" v-text="item.title"/>
+                    <span :style="{ fontWeight: item.value, fontFamily: getFamily(item) }" v-text="item.title"/>
                   </template>
                 </v-select>
               </div>
@@ -174,11 +174,25 @@
                 <div
                   v-for="color in colorsList"
                   :key="color.name"
+                  
                   class="color-select"
                   :class="{ selected: metric.color === color.name }"
                   @click="metric.color = color.name"
-                  v-text="color.title"
-                />
+                >
+                  <div
+                    v-if="color.colorGrad"
+                    :class="{'gradient-style': color.colorGrad}"
+                    :style="{
+                      background: color.colorGrad
+                    }"
+                    v-text="color.title"
+                  ></div>
+                  <div
+                    v-else
+                    :style="{color: getColor(color.name)}"
+                    v-text="color.title"
+                  ></div>
+                </div>
               </div>
             </div>
           </div>
@@ -206,6 +220,7 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from "@mdi/js";
+import './sass/checkboxGoogle.css'
 
 export default {
   name: "SingleValueSettings",
@@ -230,7 +245,9 @@ export default {
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
     fontWeightList: [
-      { value: 200, title: "Regular (200)" },
+      { value: 100, title: "Thin (100)" },
+      { value: 200, title: "Light (200)" },
+      { value: 400, title: "Regular (400)" },
       { value: 500, title: "Medium (500)" },
       { value: 800, title: "Bold (800)" },
     ],
@@ -238,7 +255,7 @@ export default {
     colorsList: [
       { name: "main", title: "Основной" },
       { name: "secondary", title: "Дополнительный" },
-      { name: "range", title: "Диапазоны" },
+      { name: "range", title: "Диапазоны", colorGrad: 'linear-gradient(270.08deg, #FF5147 1.92%, #FFE065 53.99%, #5BD97A 99.93%)' },
     ],
     /**
      * The number of available templates for the selected number of metrics.
@@ -281,34 +298,54 @@ export default {
   },
   watch: {
     receivedSettings(newValue) {
-      this.settings = { ...newValue };
+      const newSettings = JSON.parse(JSON.stringify(newValue));
+      this.settings = {
+        ...newSettings,
+        metricOptions: newSettings.metricOptions.sort((a, b) => a.listOrder - b.listOrder),
+      };
     },
-    settings() {
-      if (this.updateCount) {
+    settings(old, newSet) {
+      if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
     }
   },
   methods: {
+    getFamily() {},
+    handleChangeShowTitle() {
+      if (this.settings) {
+        this.settings = {
+          ...JSON.parse(JSON.stringify(this.settings)),
+          showTitle: this.settings.showTitle ? false : true
+        }
+      }
+    },
+
+    getColor(name) {
+      return ({
+        secondary: this.theme.$secondary_text,
+        main: this.theme.$blue,
+      })[name]
+    },
+
     save() {
       this.$emit("save", { ...this.settings });
-      this.close();
+      this.close(true);
     },
 
     handleChangeCount(count) {
       this.settings.template = 1
-      this.settings = {
-        ...this.settings,
-        template: 1,
-        metricCount: count
-      }
+      this.settings.metricCount = count
     },
 
     update() {
-      this.$emit("save", { ...this.settings });
+      // this.$emit("save", { ...this.settings });
     },
 
-    close() {
+    close(save = false) {
+      if (!save || typeof save === 'object') {
+        this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
+      }
       this.toggleAllMetrics(false);
       this.$emit("close");
     },

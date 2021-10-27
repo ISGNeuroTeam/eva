@@ -7,6 +7,7 @@
     :x="left"
     :y="top"
     :draggable="dragRes"
+    :drag-cancel="'.dash-map'"
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
@@ -176,6 +177,7 @@ export default {
 .vdr.active.resizable {
   outline-color: inherit;
   outline: 2px dashed;
+  z-index: 9 !important;
 }
 
 .handle {
