@@ -22,6 +22,7 @@ import vuetify from "../../plugins/vuetify";
 import dashMapUserSettings from "./dashMapUserSettings.vue";
 import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
 import Vue from "vue";
+import isMarkerInsidePolygon from './checkMarketInsideMap.js';
 import * as turf from "@turf/turf";
 import * as utils from "leaflet-geometryutil";
 export default {
@@ -693,7 +694,10 @@ export default {
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-          line.setTooltipContent(newDiv);
+
+          if (isMarkerInsidePolygon()) {
+            line.setTooltipContent(newDiv);
+          }
         }
       }
     },
