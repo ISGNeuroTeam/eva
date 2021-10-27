@@ -128,7 +128,6 @@ export default {
     },
   },
   mounted() {
-    console.log('mounted')
     this.$emit('hideDS',this.id);
     this.textarea = this.$store.getters.getTextArea({idDash: this.idDash, id: this.id});
     this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
