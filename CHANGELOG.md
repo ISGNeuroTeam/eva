@@ -8,15 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-<<<<<<< HEAD
-
-### Changed
-
-### Fixed 
-- fixed update textarea with full screen textarea
-=======
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break
+- added logic for opent window on new window
+- maximum number of rows in a response is automatically limited
+- default color for new group
 
 ### Changed
 - the date picker component has been translated into Russian
@@ -33,7 +29,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - bug with update state for settings single value
 - bug with template of single value
 - set higher z-index for active component on dashboard
+- increased the height of request text in data source
 - multiline captions rotation on the x-axis
+- multiline incorrect drawing charts height in fullscreen mode
+- fixed the focus and tooltip of the activator buttons
+- fixed the problem with renaming dashboards and groups
+- fixed the position of the datepicker in the pop-up of the data source
+- problem with scheduler id loss after refreshing page
+- fixed font weights 100, 200, 400, 500, 800
+- fixed SingleValue font weights
+- fixed full-screen map mode
+- fixed update textarea with full screen textarea
 
 ## [1.70.0]
 ### Added
@@ -49,7 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - unauthorized users weren't redirected to login page if they tried to open dashboard from
->>>>>>> 59f25a3842f9325dd38a3f47ec3d74c43231bc72
 
 ## [1.69.0]
 ### Added

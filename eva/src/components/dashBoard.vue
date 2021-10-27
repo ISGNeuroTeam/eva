@@ -74,7 +74,7 @@
           <div class="settings-dash">
             <v-dialog v-model="fullScreenMode">
               <template v-slot:activator="{ on: onFullScreen }">
-                <v-tooltip bottom :color="theme.$accent_ui_color">
+                <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay" :disabled="disabledTooltip">
                   <template v-slot:activator="{ on: onTooltip }">
                     <v-icon
                       class="expand"
@@ -152,7 +152,7 @@
                     </div>
                     <div class="settings-dash-block">
                       <div class="settings-dash">
-                        <v-tooltip bottom :color="theme.$accent_ui_color">
+                        <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
                           <template v-slot:activator="{ on }">
                             <v-icon
                               class="expand"
@@ -184,8 +184,6 @@
                     :currentSettings="settings"
                     :updateSettings="updateSettings"
                     :widthFrom="fullScreenWidth"
-                    :defaultTextarea="textarea"
-                    :handleChangeTextarea="handleChangeTextarea"
                     :heightFrom="fullScreenHeight"
                     :titles="getSelectedTableTitles(idDash, element)"
                     :options="props.options"
@@ -204,7 +202,7 @@
             :class="{ settings_move: props.open_gear }"
             v-show="dataMode"
           >
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="datasource"
@@ -217,7 +215,7 @@
               </template>
               <span>Источник данных</span>
             </v-tooltip>
-            <v-tooltip v-if="props.edit_icon" bottom :color="theme.$accent_ui_color">
+            <v-tooltip v-if="props.edit_icon" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="pencil"
@@ -235,7 +233,7 @@
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip v-if="!props.edit_icon" bottom :color="theme.$accent_ui_color">
+            <v-tooltip v-if="!props.edit_icon" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="check"
@@ -248,7 +246,7 @@
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip bottom :color="theme.$accent_ui_color" :disabled="disabledTooltip" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="option"
@@ -261,7 +259,7 @@
               </template>
               <span>Настройки</span>
             </v-tooltip>
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="delete"
@@ -311,9 +309,7 @@
         :sizeTileFrom="props.sizeTile"
         :tooltipFrom="props.tooltip"
         :widthFrom="width"
-        :defaultTextarea="textarea"
         :heightFrom="height"
-        :handleChangeTextarea="handleChangeTextarea"
         :titles="getSelectedTableTitles(idDash, element)"
         :options="props.options"
         :currentSettings="settings"
@@ -363,14 +359,18 @@ export default {
     },
     searchData: Array,
     dataSourseTitle: null,
+    tooltipOpenDelay: {
+      type: Number,
+      default: 500,
+    },
   },
   data() {
     return {
       dataFromDB: true,
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
-      textarea: "",
       fullScreenMode: false,
+      disabledTooltip: false,
       settings: {
         showTitle: true
       },
@@ -428,14 +428,13 @@ export default {
         tooltip: {},
         metricsMulti: [],
       },
+      fullScreenWidth: 0.8 * window.innerWidth,
+      fullScreenHeight: 0.8 * window.innerHeight,
     };
   },
   computed: {
-    fullScreenWidth() {
-      return 0.8 * window.innerWidth;
-    },
-    fullScreenHeight() {
-      return 0.8 * window.innerHeight;
+    settingsIsOpened(){
+      return this.$store.getters.getModalSettings(this.idDash).status
     },
     theme: function () {
       return this.$store.getters.getTheme;
@@ -536,6 +535,14 @@ export default {
     },
     ...mapGetters(["getSelectedTableTitles", "getSelectedDataFormat"]),
   },
+  watch: {
+    fullScreenMode(to) {
+      setTimeout(() => this.disabledTooltip = to, to ? 0 : 600)
+    },
+    settingsIsOpened(to){
+      setTimeout(() => this.disabledTooltip = to, to ? 0 : 600)
+    }
+  },
   mounted() {
     this.props.icons = settings.icons;
     this.page = this.$parent.$el.getAttribute("data-page"); // понимаем какая страница перед нами
@@ -548,10 +555,14 @@ export default {
     } else {
       this.props.optionsBoxShadow = "transparent";
     }
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.onResize);
+    })
   },
   methods: {
-    handleChangeTextarea(textarea) {
-      this.textarea = textarea
+    onResize() {
+      this.fullScreenWidth = window.innerWidth * 0.8;
+      this.fullScreenHeight = window.innerHeight * 0.8;
     },
     updateSettings(settings) {
       this.settings = JSON.parse(JSON.stringify(settings));
@@ -1008,4 +1019,9 @@ export default {
 
 <style lang="scss">
 @import "../sass/dashBoard.sass";
+</style>
+<style lang="sass">
+  .settings-dash
+      .v-icon:focus::after
+          opacity: 0
 </style>

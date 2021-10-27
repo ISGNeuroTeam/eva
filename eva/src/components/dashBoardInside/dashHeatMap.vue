@@ -169,6 +169,7 @@ export default {
             item.value[0] = tokenValue;
             this.$store.commit("letEventGo", {
               event: item,
+              id: this.id,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,

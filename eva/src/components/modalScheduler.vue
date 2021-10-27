@@ -243,20 +243,25 @@ export default {
     let shedule = {};
     let curTime = {};
 
-    if (Object.keys(schedulers).length != 0) {  // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
-      Object.keys(schedulers).forEach( items => {   // пробегаемся по всем планировщикам
+    if (Object.keys(schedulers).length !== 0) {  // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
+      Object.keys(schedulers).forEach( scheduler => {   // пробегаемся по всем планировщикам
         shedule = {  // создаем объект на основе настроек планировщика
-          time: schedulers[items].time,
-          every: schedulers[items].every,
-          timeLast: schedulers[items].timeLast,
-          everyLast: schedulers[items].everyLast,
+          time: schedulers[scheduler].time,
+          every: schedulers[scheduler].every,
+          timeLast: schedulers[scheduler].timeLast,
+          everyLast: schedulers[scheduler].everyLast,
         };
-        curTime = this.countTime(shedule.time, shedule.every)*1000; // переводим в правильный формат время
-        this.executeSearch(searches,items,shedule);  // выоплняем серч один раз
-        this.timers[items] = setInterval( () => {  // и запускаем в цикле
-          this.executeSearch(searches,items,shedule);
-        },curTime)
 
+        if (schedulers[scheduler].schedulerID) {
+          clearInterval(schedulers[scheduler].schedulerID);
+        }
+
+        curTime = this.countTime(shedule.time, shedule.every)*1000; // переводим в правильный формат время
+        this.executeSearch(searches,scheduler,shedule);  // выоплняем серч один раз
+        this.timers[scheduler] = setInterval( () => {  // и запускаем в цикле
+          this.executeSearch(searches,scheduler,shedule);
+        },curTime)
+        this.$store.commit('setSchedulerID', { idDash: this.idDash, search: scheduler, schedulerID: this.timers[scheduler] })
       });
     }
 
@@ -335,13 +340,20 @@ export default {
       })
     },
     startSchedule() { // запускаем планировщик
-      let shedule = {
+      let schedule = {
         time: this.time,
         every: this.every,
         timeLast: this.timeLast,
         everyLast: this.everyLast,
       }
       let sid = this.sid
+
+      let searches = this.$store.getters.getSearches(this.idDash)
+      let curTime = this.countTime(schedule.time, schedule.every) * 1000
+      this.executeSearch(searches, sid, schedule) // сперва первый раз просто выполняем серч
+      const intervalID = this.timers[sid] = setInterval(() => {
+        this.executeSearch(searches, sid, schedule) // а затем уже выполняем его в цикле
+      }, curTime)
 
       this.$store.commit('setSchedule', {
         idDash: this.idDash,
@@ -350,13 +362,8 @@ export default {
         time: this.time,
         everyLast: this.everyLast,
         timeLast: this.timeLast,
+        schedulerID: intervalID,
       })
-      let searches = this.$store.getters.getSearches(this.idDash)
-      let curTime = this.countTime(shedule.time, shedule.every) * 1000
-      this.executeSearch(searches, sid, shedule) // сперва первый раз просто выполняем серч
-      this.timers[sid] = setInterval(() => {
-        this.executeSearch(searches, sid, shedule) // а затем уже выполняем его в цикле
-      }, curTime)
       this.cancel()
     },
     cancelSchedule: function() {  // отменить планировщик
