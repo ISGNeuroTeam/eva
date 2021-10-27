@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed font weights 100, 200, 400, 500, 800
 - fixed SingleValue font weights
 - fixed full-screen map mode
+- added check for length of array
 
 ## [1.70.0]
 ### Added
