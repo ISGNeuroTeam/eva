@@ -965,7 +965,7 @@ export default {
     sortFilterParts(state, { idDash }) {
       // idDash as property to case when sort not for focusedFilter (backward compatibility)
       state[idDash].focusedFilter.parts.sort(
-        (part1, part2) => part2.values.length - part1.values.length
+        (part1, part2) => part2.values?.length - part1.values?.length
       );
     },
     declineFilterChanges(state, idDash) {
