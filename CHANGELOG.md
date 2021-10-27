@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break
+- added logic for opent window on new window
 - maximum number of rows in a response is automatically limited
 - default color for new group
 
