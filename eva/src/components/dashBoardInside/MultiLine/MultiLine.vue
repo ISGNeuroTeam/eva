@@ -2,12 +2,12 @@
   <div class="multiline-container pa-0">
     <div v-if="isNodata" class="nodata-block" v-text="message" />
     <div ref="legendContainer" class="legend">
-      <div v-for="item in legendList" :key="item.name" class="legend-item">
+      <div v-show="!isNodata" v-for="item in legendList" :key="item.name" class="legend-item">
         <div class="circle" :style="{ backgroundColor: item.color }" />
         <div class="text" :style="{ color: theme.$main_text }" v-text="item.name" />
       </div>
     </div>
-    <div ref="svgContainer" class="svg-container" :data-status="change">
+    <div ref="svgContainer" v-show="!isNodata" class="svg-container" :data-status="change">
       <div class="graph-tooltip"/>
     </div>
   </div>
@@ -107,6 +107,8 @@ export default {
         if ((this.dataReport && this.id === this.activeElemFrom) || !this.dataReport) {
           this.getDataAsynchrony()
         } else this.clearSvgContainer()
+      } else {
+        this.setNoData(true)
       }
       return true
     },
