@@ -292,7 +292,7 @@ export default {
         this.chooseIcon = mdiCropSquare;
         this.elemDeep.true = [];
       }
-      this.$store.commit('setSelected', {element: 'elemDeep',value: this.elemDeep.true, idDash: this.idDash, id: this.id });
+      this.setTocken()
     },
     filterSelect: function(res,selected) {
       let data = [...[],...res];
