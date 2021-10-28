@@ -5,12 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.71.0]
 
 ### Added
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break
-- added logic for opent window on new window
+- added switch to enable/disable opening dashboard in new window in HeatMap component
 - maximum number of rows in a response is automatically limited
 - default color for new group
 
@@ -20,12 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - redesign single value from design
-- problem with cancel changes when we dont want to save them
+- problem with canceling changes in SingleValue component when we don't want to save them
 - single value design bugs
 - single value fixed open fullscreen
-- fixed save and unsave settings for single value
+- fixed save and unsaved settings for single value
 - fixed move elements for single value, updated move for burger icon
-- fixed colors for metrics value
+- fixed colors for metric values in SingleValue component
 - bug with update state for settings single value
 - bug with template of single value
 - set higher z-index for active component on dashboard
