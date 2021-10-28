@@ -10,12 +10,13 @@
               :key="index"
               class="text-center table-th"
               v-text="y"
+              @click="onClickTd(null, y)"
             />
           </tr>
         </thead>
         <tbody>
           <tr v-for="x in filteredX" :key="x">
-            <td class="text-left">
+            <td class="text-left" @click="onClickTd(x)">
               <span v-if="!((''+ x).includes('@'))">
                 {{ x }}
               </span>
@@ -36,7 +37,7 @@
               </v-menu>
             </td>
 
-            <td v-for="y in filteredY" :key="y" class="pa-0">
+            <td v-for="y in filteredY" :key="y" class="pa-0" @click="onClickTd(x, y)">
               <div
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"
                 class="td-inner"
@@ -89,6 +90,16 @@ export default {
     yFieldFormat: "Дата",
     yFieldSort: "По возрастанию",
     renderData: "metadata",
+    defaultActions: [
+      {
+        name: 'click',
+        capture: [
+            'x',
+            'y',
+            'value',
+        ]
+      },
+    ],
   }),
   computed: {
     id: function () {
@@ -132,6 +143,18 @@ export default {
       }
       return this.updateData && temp;
     },
+
+    actions() {
+      let fields = []
+      if (this.dataRestFrom) {
+        fields = Object.keys(this.dataRestFrom[0])
+      }
+      return this.defaultActions.map(action => {
+        const capture = action.capture;
+        capture.push(...fields)
+        return { ...action, capture }
+      })
+    }
   },
   watch: {
     dataRestFrom() {
@@ -155,7 +178,42 @@ export default {
       },
     },
   },
+
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+  },
+
   methods: {
+    onClickTd(x = null, y = null) {
+      let val = null;
+      let row = null;
+      if (x !== null && y !== null) {
+        val = this.filteredData[x][y]?.value
+        row = this.filteredData[x][y]?.row
+      }
+
+      this.$store.getters.getTockens(this.idDash).forEach((token, i) => {
+        if (token.elem === this.id && token.action === 'click') {
+          let value;
+          const capture = token.capture;
+          const captureIdx = ['x','y','value'].indexOf(capture);
+          if (captureIdx !== -1) {
+            value = ([x, y, val][captureIdx])
+          } else if (row && capture !== '') {
+            value = row[capture]
+          } else {
+            value = null
+          }
+          this.$store.commit('setTocken', {
+            tocken: token,
+            idDash: this.idDash,
+            value,
+          })
+        }
+      })
+
+
+    },
     setClick: function (tokenValue) {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
@@ -223,6 +281,7 @@ export default {
         this.data[xField][yField] = {
           value: obj[this.dataField],
           metadata: this.parseMetadata(obj.metadata),
+          row: obj,
         };
 
         this.x.add(xField);
