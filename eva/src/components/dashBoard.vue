@@ -600,7 +600,7 @@ export default {
         idDash: this.idDash,
         status: true,
         element: this.element,
-        titles: Object.keys(this.searchData[0]),
+        titles: this.searchData[0] ? Object.keys(this.searchData[0]) : null,
       });
     },
     setShadow: function () {

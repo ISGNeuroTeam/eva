@@ -114,6 +114,23 @@ export default {
       // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
     },
+    updateManualTokens(state, payload) {
+      const { idDash } = payload;
+      console.log(idDash)
+      state[idDash].searches.forEach(search => {
+        
+        state[idDash].tockens.forEach(tocken => {
+            if (tocken.onButton && search.original_otl.includes(`$${tocken.name}$`)) {
+              this.commit('updateSearchStatus', {
+                idDash,
+                sid: search.sid,
+                status: 'empty',
+              });
+            
+          }
+        
+      })});
+    },
     setTocken(state, payload) {
       const { tocken, idDash, value } = payload;
       // сохранение токена в хранилище
@@ -248,7 +265,8 @@ export default {
         }
 
         state[idDash].searches.forEach(search => {
-          if (search.original_otl.includes(`$${tocken.name}$`)) {
+          let tempTocken = state[idDash].tockens.find(el => el.name = tocken.name)
+          if (search.original_otl.includes(`$${tocken.name}$`) && !tempTocken.onButton) {
             this.commit('updateSearchStatus', {
               idDash,
               sid: search.sid,

@@ -421,6 +421,14 @@
                 outlined
                 hide-details
             />
+            <v-checkbox
+              v-model="tocken.onButton"
+              label="обновлять по кнопке"
+              class="tocken-on-button theme--dark"
+              :color="theme.$accent_ui_color"
+            >
+              
+            </v-checkbox>
           </div>
           <p
             class="tocken-view"
@@ -433,7 +441,7 @@
             class="row-check"
             :color="theme.$primary_button"
             :class="{ showIcon: lookTockens[i].show }"
-            @click="saveTocken()"
+            @click="saveTocken(i)"
           >
             {{ check }}
           </v-icon>
@@ -523,6 +531,13 @@
               outlined
               hide-details
           />
+          <v-checkbox
+              v-model="newTockenDop.onButton"
+              label="обновлять по кнопке"
+              class="tocken-on-button theme--dark"
+              :color="theme.$accent_ui_color"
+           />
+
           <v-icon class="row-check" :color="theme.$primary_button" @click="saveTocken()">
             {{ check }}
           </v-icon>
@@ -710,12 +725,11 @@ import {
   mdiCheckBold,
   mdiSwapVerticalBold,
   mdiFilter,
-} from '@mdi/js'
-import EvaLogo from '../images/eva-logo.svg'
+} from "@mdi/js";
+import EvaLogo from "../images/eva-logo.svg";
 
-
-import settings from '../js/componentsSettings.js'
-import DashFilterPanel from './dash-filter-panel/DashFilterPanel'
+import settings from "../js/componentsSettings.js";
+import DashFilterPanel from "./dash-filter-panel/DashFilterPanel";
 
 export default {
   components: {
@@ -725,11 +739,11 @@ export default {
   props: {
     idDashFrom: null,
     inside: null,
-    horizontalCell: null
+    horizontalCell: null,
   },
   data() {
     return {
-      login: '',
+      login: "",
       on: false,
       userEdit: mdiAccountEdit,
       search_elem: false,
@@ -761,7 +775,7 @@ export default {
       paper: mdiFileDocumentOutline,
       mdiAnimationPlay,
       help_elem: true,
-      help_coral: 'fill:teal',
+      help_coral: "fill:teal",
       opencode: false,
       openevent: false,
       openexin: false,
@@ -786,39 +800,40 @@ export default {
       mdiCompare: mdiCompare,
       tempTocken: {},
       change: {},
+      onButton: {},
       profileDropdownButtons: [
         {
           id: 1,
-          label: 'Редактировать',
+          label: "Редактировать",
           icon: mdiAccountEdit,
           onClick: this.edit,
           hide: this.inside,
         },
         {
           id: 2,
-          label: 'Тема',
+          label: "Тема",
           icon: mdiCompare,
           onClick: this.openThemeModal,
         },
         {
           id: 3,
-          label: 'Выйти',
+          label: "Выйти",
           icon: mdiDoor,
           onClick: this.exit,
         },
       ],
-      textarea: '',
+      textarea: "",
       showSign: true,
       newTockenName: null,
       opennewtocken: false,
       newTockenDop: {
-        defaultValue: '*'
+        defaultValue: "*",
       },
-      newElem: '',
-      newAction: '',
+      newElem: "",
+      newAction: "",
       tockensName: {},
-      msgWarn: '',
-      textarea_event: '',
+      msgWarn: "",
+      textarea_event: "",
       events: [],
       event: {},
       newSearch: {
@@ -827,7 +842,7 @@ export default {
         parametrs: {
           tws: 0,
           twf: 0,
-          username: 'admin',
+          username: "admin",
           timeout: 60,
           preview: false,
           field_extraction: false,
@@ -840,30 +855,30 @@ export default {
       scheduleSid: -1,
       loadings: {},
       dbOpen: null,
-      colorGear: '',
-      colorExim: '',
+      colorGear: "",
+      colorExim: "",
       fieldsets: null,
       otstupBottom: 550,
       errorSave: false,
-      msgErrorSave: '',
-      colorErrorSave: '',
-      createSearchBtn: '',
+      msgErrorSave: "",
+      colorErrorSave: "",
+      createSearchBtn: "",
       disabledDS: {},
-      modalPaperSid: '',
+      modalPaperSid: "",
       modalPaper: false,
       userPermissions: [],
-    }
+    };
   },
   computed: {
     idDash: function () {
-      return this.idDashFrom
+      return this.idDashFrom;
     },
 
     headerTop() {
-      return document.body.clientWidth <= 1400 ? 40 : 50
+      return document.body.clientWidth <= 1400 ? 40 : 50;
     },
     isAdmin() {
-      return this.userPermissions && this.userPermissions.includes('admin_all');
+      return this.userPermissions && this.userPermissions.includes("admin_all");
     },
     searches: function () {
       // массив со всеми ИС на странице
@@ -885,8 +900,8 @@ export default {
     },
     editPermission: function () {
       if (
-        this.userPermissions.includes('admin_all') ||
-        this.userPermissions.includes('editdash')
+        this.userPermissions.includes("admin_all") ||
+        this.userPermissions.includes("editdash")
       ) {
         return true;
       }
@@ -894,7 +909,7 @@ export default {
     },
     textareaEv: function () {
       let eventFull = this.$store.getters.getEventFull(this.idDash);
-      if (eventFull != '') {
+      if (eventFull != "") {
         this.textarea_event = eventFull;
       }
       return true;
@@ -903,7 +918,7 @@ export default {
       // получения всех токенов на страницы
       let tockens = this.$store.getters.getTockens(this.idDash);
 
-      tockens.forEach(item => {
+      tockens.forEach((item) => {
         this.tockensName[item.name] = item.name;
         this.lookTockens.push({ show: false, color: this.theme.controls });
       });
@@ -918,7 +933,7 @@ export default {
       return function (element) {
         let names = this.$store.getters
           .getActions({ elem: element, idDash: this.idDash })
-          .map(item => {
+          .map((item) => {
             return item.name;
           });
         return names;
@@ -940,13 +955,13 @@ export default {
     this.getCookie();
     this.tools = settings.tools;
 
-    document.onmouseup = event => {
+    document.onmouseup = (event) => {
       // а при отпускании кнопки при перетаскивании
       document.onmousemove = null; // мы бросаем элемент где он есть
-      let width = document.querySelector('#app').clientWidth;
+      let width = document.querySelector("#app").clientWidth;
 
       if (this.avatar) {
-        let height = document.querySelector('.opentool').clientHeight;
+        let height = document.querySelector(".opentool").clientHeight;
         if (event.x > width - 450 && event.y < height) {
           this.avatar.remove(); // удаляем аватар из дерева dom
           this.avatar = null; // и у нас тоже его очищаем
@@ -958,17 +973,17 @@ export default {
       }
     };
     let eventFull = this.$store.getters.getEventFull(this.idDash);
-    if (eventFull != '') {
+    if (eventFull != "") {
       this.textarea_event = eventFull;
     }
-    if (document.querySelector('.block-code')) {
-      document.querySelector('.block-code').style.maxHeight = `${
-        document.querySelector('#content').clientHeight - 100
+    if (document.querySelector(".block-code")) {
+      document.querySelector(".block-code").style.maxHeight = `${
+        document.querySelector("#content").clientHeight - 100
       }px`;
     }
 
-    this.colorGear = 'controls';
-    this.colorExim = 'controls';
+    this.colorGear = "controls";
+    this.colorExim = "controls";
     // this.fieldsets = document.querySelectorAll('fieldset');
     // this.changeColor();
   },
@@ -976,7 +991,7 @@ export default {
     exit: function () {
       document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
       document.cookie = `eva_token=''; max-age=0 ; path=/`;
-      this.$store.commit('clearState');
+      this.$store.commit("clearState");
       this.$router.push(`/`);
     },
     openThemeModal() {
@@ -984,7 +999,7 @@ export default {
     },
     openLogs: function () {
       this.modalActive = true;
-      this.$store.commit('setErrorLogs', false);
+      this.$store.commit("setErrorLogs", false);
     },
     toBackward: function () {
       this.$router.go(-1);
@@ -994,7 +1009,7 @@ export default {
     },
     setEditMode: function () {
       this.editMode = !this.editMode;
-      this.$emit('changeMode');
+      this.$emit("changeMode");
     },
     cancelModal: function () {
       this.activeModal = false;
@@ -1008,19 +1023,18 @@ export default {
       if (this.$jwt.hasToken()) {
         this.login = this.$jwt.decode().username;
 
-        let response = await fetch(`/api/user/permissions`).catch(error => {
+        let response = await fetch(`/api/user/permissions`).catch((error) => {
           console.log(error);
           return {
             status: 300,
-            result: 'Post не создался, возможно из-за неточностей в запросе',
+            result: "Post не создался, возможно из-за неточностей в запросе",
           };
         });
         if (response.status === 200) {
           // если получилось
-          await response.json().then(res => {
+          await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
             this.userPermissions = res.data;
-
           });
         } else {
           this.exit();
@@ -1035,18 +1049,18 @@ export default {
 
       if (!this.change[id]) {
         // я так понимаю если на странице есть созданные ИС
-        Object.keys(this.change).forEach(item => {
+        Object.keys(this.change).forEach((item) => {
           // то пробегаемся по всем ИС
           item == id ? (this.change[item] = true) : (this.change[item] = false); // если нашли выбронный ИС то меняем его статус
         });
-        let search = this.searches.filter(item => {
+        let search = this.searches.filter((item) => {
           // получаем только тот ИС который редактируется
           return item.sid == id;
         })[0];
         // отстутствие отступов сделано специально  чтобы красивее смотрелось на фронте
         this.newSearch = Object.assign({}, search);
         this.activeModal = true;
-        this.createSearchBtn = 'edit';
+        this.createSearchBtn = "edit";
       } else {
         // а если ИС нету
         this.openSearch(); //  то закрываем окно редактирования
@@ -1065,7 +1079,7 @@ export default {
       this.search_elem = false;
       this.code_elem = false;
       this.openevent = false;
-      this.$emit('openProfile', this.profile_elem);
+      this.$emit("openProfile", this.profile_elem);
     },
     openSave: function () {
       // дальше будут фукнции отвечающие за переключение между разными инструментами, суть проста, если один открыт закрываем все остальные
@@ -1150,7 +1164,7 @@ export default {
     openSearch: function () {
       // собственно функция которая показывает или нет окно с редактируемым ИД
       this.opensearch = !this.opensearch;
-      Object.keys(this.change).forEach(item => {
+      Object.keys(this.change).forEach((item) => {
         this.change[item] = false;
       });
     },
@@ -1162,14 +1176,14 @@ export default {
         parametrs: {
           tws: 0,
           twf: 0,
-          username: 'admin',
+          username: "admin",
           timeout: 60,
           preview: false,
           field_extraction: false,
           cache_ttl: 60,
         },
       };
-      this.createSearchBtn = 'create';
+      this.createSearchBtn = "create";
     },
     lookTocken: function (i) {
       if (!this.lookTockens[i].show) {
@@ -1180,41 +1194,64 @@ export default {
         this.lookTockens[i].color = this.theme.controls;
       }
     },
-    saveTocken: function () {
+    saveTocken: function (i) {
       // функция которая сохраняет токен в хранилище
 
       let parent = event.target.parentElement; // получаем предка элемнета на который нажали для сохранения
-      while (!parent.classList.contains('row-tocken')) {
+      while (!parent.classList.contains("row-tocken")) {
         parent = parent.parentElement; // то еще на уровень выше берем предка
       }
       this.tempTocken = {
         // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
-        name: parent.querySelector('.tocken-name').querySelector('input')
-          ? parent.querySelector('.tocken-name').querySelector('input').value
-          : '',
-        elem: parent.querySelector('.tocken-elem').querySelector('.v-select__selection')
-          ? parent.querySelector('.tocken-elem').querySelector('.v-select__selection').innerText
-          : '',
-        action: parent.querySelector('.tocken-action').querySelector('.v-select__selection')
-          ? parent.querySelector('.tocken-action').querySelector('.v-select__selection').innerText
-          : '',
-        capture: parent.querySelector('.tocken-capture').querySelector('.v-select__selection')
-          ? parent.querySelector('.tocken-capture').querySelector('.v-select__selection')
-              .innerText
-          : '',
-        prefix: parent.querySelector('.tocken-prefix').querySelector('input')
-          ? parent.querySelector('.tocken-prefix').querySelector('input').value
-          : '',
-        sufix: parent.querySelector('.tocken-sufix').querySelector('input')
-          ? parent.querySelector('.tocken-sufix').querySelector('input').value
-          : '',
-        delimetr: parent.querySelector('.tocken-delimetr').querySelector('input')
-          ? parent.querySelector('.tocken-delimetr').querySelector('input').value
-          : '',
-        defaultValue: parent.querySelector('.tocken-default-value').querySelector('input')
-            ? parent.querySelector('.tocken-default-value').querySelector('input').value
-            : '',
+        name: parent.querySelector(".tocken-name").querySelector("input")
+          ? parent.querySelector(".tocken-name").querySelector("input").value
+          : "",
+        elem: parent
+          .querySelector(".tocken-elem")
+          .querySelector(".v-select__selection")
+          ? parent
+              .querySelector(".tocken-elem")
+              .querySelector(".v-select__selection").innerText
+          : "",
+        action: parent
+          .querySelector(".tocken-action")
+          .querySelector(".v-select__selection")
+          ? parent
+              .querySelector(".tocken-action")
+              .querySelector(".v-select__selection").innerText
+          : "",
+        capture: parent
+          .querySelector(".tocken-capture")
+          .querySelector(".v-select__selection")
+          ? parent
+              .querySelector(".tocken-capture")
+              .querySelector(".v-select__selection").innerText
+          : "",
+        prefix: parent.querySelector(".tocken-prefix").querySelector("input")
+          ? parent.querySelector(".tocken-prefix").querySelector("input").value
+          : "",
+        sufix: parent.querySelector(".tocken-sufix").querySelector("input")
+          ? parent.querySelector(".tocken-sufix").querySelector("input").value
+          : "",
+        delimetr: parent
+          .querySelector(".tocken-delimetr")
+          .querySelector("input")
+          ? parent.querySelector(".tocken-delimetr").querySelector("input")
+              .value
+          : "",
+        defaultValue: parent
+          .querySelector(".tocken-default-value")
+          .querySelector("input")
+          ? parent.querySelector(".tocken-default-value").querySelector("input")
+              .value
+          : "",
         resetData: true, //сделать норм
+        onButton: parent
+          .querySelector(".tocken-on-button")
+          .querySelector("input")
+          ? parent.querySelector(".tocken-on-button").querySelector("input")
+              .checked
+          : "",
       };
 
       let j = -1;
@@ -1228,103 +1265,119 @@ export default {
       });
       if (j != -1) {
         // если токен уже есть
-        let height = this.$el.querySelector('.block-tocken').getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
-        this.$el.querySelector('.warning-block').classList.add('warning-block-show');
+        let height = this.$el
+          .querySelector(".block-tocken")
+          .getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
+        this.$el
+          .querySelector(".warning-block")
+          .classList.add("warning-block-show");
         //this.$el.querySelector('.warning-block').style.bottom = `-${height+55}px; !important`; // 45 это высота самого warning и padding сверху
         this.otstupBottom = height + 55;
-        this.msgWarn = 'Такой токен уже существует. Хотите обновить?';
+        this.msgWarn = "Такой токен уже существует. Хотите обновить?";
         this.$el
-          .querySelector('.warning-block')
-          .querySelector('.yes-btn')
-          .setAttribute('tool', 'tocken');
+          .querySelector(".warning-block")
+          .querySelector(".yes-btn")
+          .setAttribute("tool", "tocken");
       } else {
         // если нету то етсь он новый
-        this.$store.commit('createTockens', { idDash: this.idDash, tocken: this.tempTocken }); // то создаем токен в хранилище
+        this.$store.commit("createTockens", {
+          idDash: this.idDash,
+          tocken: this.tempTocken,
+        }); // то создаем токен в хранилище
         this.showSign = true; // визуально скрываем окно с созданием токена
         this.opennewtocken = false;
       }
     },
     deleteTocken: function (name) {
       // удаляем токен
-      this.$store.commit('setModalDelete', {
+      this.$store.commit("setModalDelete", {
         id: this.idDash,
         status: true,
-        elem: '',
+        elem: "",
         name: name,
-        page: 'tocken',
+        page: "tocken",
       }); // просто отправляем информацию об удаляемом токене в хранилище
     },
     deleteSearch: function (id) {
       // тоже саоме для удаления ИС
-      this.$store.commit('setModalDelete', {
+      this.$store.commit("setModalDelete", {
         id: this.idDash,
         status: true,
         elem: id,
         name: id,
-        page: 'search',
+        page: "search",
       });
     },
     runAllSearches() {
       this.searches.forEach((search) => {
-        this.$store.commit('updateSearchStatus', {
+        this.$store.commit("updateSearchStatus", {
           idDash: this.idDash,
           sid: search.sid,
-          status: 'empty',
-        })
-      })
+          status: "empty",
+        });
+      });
     },
     startSearch: async function (search) {
-      this.$store.commit('updateSearchStatus', {
+      this.$store.commit("updateSearchStatus", {
         idDash: this.idDash,
         sid: search.sid,
-        status: 'empty',
-      })
+        status: "empty",
+      });
     },
     yesSearch: function () {
       // кнопка согласия на обновления если ИС или токен уже существует
       let elem =
-        event.target.nodeName.toLowerCase() != 'button'
+        event.target.nodeName.toLowerCase() != "button"
           ? event.target.parentElement
           : event.target; // сперва берем родителя кнопки, и если не получилось поймать кнопку, то еще выше уровнеь берем
-      if (elem.getAttribute('tool') == 'search') {
+      if (elem.getAttribute("tool") == "search") {
         // если это окно ИС
-        this.$store.commit('setSearch', {
+        this.$store.commit("setSearch", {
           search: this.newSearch,
           idDash: this.idDash,
           reload: true,
         }); // то обновляем ИС
-        this.$el.querySelector('.warning-block').classList.remove('warning-block-show'); // убираем окно с предпреждением
+        this.$el
+          .querySelector(".warning-block")
+          .classList.remove("warning-block-show"); // убираем окно с предпреждением
         this.openSearch();
-      } else if (elem.getAttribute('tool') == 'tocken') {
+      } else if (elem.getAttribute("tool") == "tocken") {
         // если это токен - собственно тоже самое
-        this.$store.commit('createTockens', { idDash: this.idDash, tocken: this.tempTocken });
-        this.$el.querySelector('.warning-block').classList.remove('warning-block-show');
+        this.$store.commit("createTockens", {
+          idDash: this.idDash,
+          tocken: this.tempTocken,
+        });
+        this.$el
+          .querySelector(".warning-block")
+          .classList.remove("warning-block-show");
         this.showSign = true;
         this.opennewtocken = false;
       }
     },
     noSearch: function () {
       // если нажали на кнопку нет
-      this.$el.querySelector('.warning-block').classList.remove('warning-block-show'); // то просто убираем это окно
+      this.$el
+        .querySelector(".warning-block")
+        .classList.remove("warning-block-show"); // то просто убираем это окно
     },
     checkSid: function (sid) {
       let newSid = sid;
       if (sid.length > 5) {
         // если там больше 10 символов
-        newSid = sid.substring(0, 5) + '...'; // обрезаем и добовляем троеточие
+        newSid = sid.substring(0, 5) + "..."; // обрезаем и добовляем троеточие
       }
       return newSid;
     },
     openEditSearch: function (event, sid) {
       if (
-        event.target.classList.contains('search-id') ||
-        event.target.classList.contains('search-query')
+        event.target.classList.contains("search-id") ||
+        event.target.classList.contains("search-query")
       ) {
         this.openEdit(sid);
       }
     },
     exportSearch: function (sid) {
-      this.$emit('downloadData', sid)
+      this.$emit("downloadData", sid);
       // let db = null;
       //
       // let request = indexedDB.open('EVA', 1);
@@ -1398,12 +1451,12 @@ export default {
         // если пошло что-то не так
         return; // то прекращаем функцию
       }
-      let parent = '';
-      let elem = '';
-      if (event.target.nodeName != 'div') {
+      let parent = "";
+      let elem = "";
+      if (event.target.nodeName != "div") {
         // если мы ухватились не за div
         elem = event.target;
-        while (!elem.classList.contains('tool-one')) {
+        while (!elem.classList.contains("tool-one")) {
           // то ка кбы всплываем вверх пока не уткнемся в элемнет с классом tool-one
           elem = elem.parentElement;
         }
@@ -1418,17 +1471,17 @@ export default {
       let shiftY = event.pageY - (originCoord.top + pageYOffset);
       let avatar = parent.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
       document.body.appendChild(avatar); // и его уже добовляем в body
-      avatar.classList.add('avatar'); // даем ему класс
+      avatar.classList.add("avatar"); // даем ему класс
       avatar.style.zIndex = 3; // делаем его выше всех
-      avatar.style.position = 'absolute'; // и относительно позиионируем
+      avatar.style.position = "absolute"; // и относительно позиионируем
 
-      document.onmousemove = event => {
+      document.onmousemove = (event) => {
         // при движении мыши
-        avatar.style.left = event.pageX - shiftX + 'px'; // мы перемещаем на самом деле наш автар, а не сам объект
-        avatar.style.top = event.pageY - shiftY + 'px';
+        avatar.style.left = event.pageX - shiftX + "px"; // мы перемещаем на самом деле наш автар, а не сам объект
+        avatar.style.top = event.pageY - shiftY + "px";
         this.avatar = avatar; // и храним объект нашего  аватара
       };
-      document.onclick = event => {
+      document.onclick = (event) => {
         // при клике на элемент
         avatar.remove(); // удаляем аватар из дерева dom
       };
@@ -1437,10 +1490,10 @@ export default {
       // функция создания нового элемнета
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
-        const top = Number(this.avatar.style.top.replace('px', ''))
+        const top = Number(this.avatar.style.top.replace("px", ""));
 
         let coord = this.avatar.getBoundingClientRect(); // берем координаты аватара
-        let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
+        let type = this.avatar.getAttribute("data-type"); // и его тип (table, select and etc)
         this.avatar.remove(); // удаляем аватар из дерева dom
         this.avatar = null; // и у нас тоже его очищаем
 
@@ -1449,11 +1502,13 @@ export default {
         this.$set(this.newDashBoard, type, {});
         this.$set(
           this.newDashBoard[type],
-          'name_elem',
+          "name_elem",
           type[0].toUpperCase() + type.substring(1)
         );
 
-        let step = JSON.parse(JSON.stringify(this.$store.getters.getSizeGrid(this.idDash)));
+        let step = JSON.parse(
+          JSON.stringify(this.$store.getters.getSizeGrid(this.idDash))
+        );
         step.vert = Math.round(screen.width / Number(step.vert));
         step.hor = Math.round(screen.height / Number(step.hor));
 
@@ -1461,15 +1516,15 @@ export default {
           settings.size[type].height,
           settings.size[type].width,
           step,
-          'size'
+          "size"
         );
 
-        this.$set(this.newDashBoard[type], 'width', size.vert);
-        this.$set(this.newDashBoard[type], 'height', size.hor);
+        this.$set(this.newDashBoard[type], "width", size.vert);
+        this.$set(this.newDashBoard[type], "height", size.hor);
 
-        let pos = this.calcGrid(coord.top, coord.left, step, 'pos');
-        this.$set(this.newDashBoard[type], 'top', top / this.horizontalCell);
-        this.$set(this.newDashBoard[type], 'left', pos.vert);
+        let pos = this.calcGrid(coord.top, coord.left, step, "pos");
+        this.$set(this.newDashBoard[type], "top", top / this.horizontalCell);
+        this.$set(this.newDashBoard[type], "left", pos.vert);
 
         // this.$set(this.newDashBoard[type],'width',settings.size[type].width);
         // this.$set(this.newDashBoard[type],'height',settings.size[type].height);
@@ -1478,11 +1533,11 @@ export default {
         // this.$set(this.newDashBoard[type],'top',size.top+pageYOffset);
         // this.$set(this.newDashBoard[type],'left',size.left);
 
-        this.$set(this.newDashBoard[type], 'should', false);
-        this.$set(this.newDashBoard[type], 'search', -1);
-        this.$set(this.newDashBoard[type], 'switch', false);
-        this.$set(this.newDashBoard[type], 'actions', []);
-        this.$store.commit('createDashBoard', {
+        this.$set(this.newDashBoard[type], "should", false);
+        this.$set(this.newDashBoard[type], "search", -1);
+        this.$set(this.newDashBoard[type], "switch", false);
+        this.$set(this.newDashBoard[type], "actions", []);
+        this.$store.commit("createDashBoard", {
           idDash: this.idDash,
           dashboard: this.newDashBoard,
         }); // создаем новый элемнет
@@ -1494,7 +1549,7 @@ export default {
       let size = {},
         header;
       screen.width > 1400 ? (header = 50) : (header = 40);
-      action == 'size' ? (header = 0) : false;
+      action == "size" ? (header = 0) : false;
       size.vert = Math.round(left / step.vert);
       //size.vert = leftCoord*step.vert;
       size.hor = Math.round((top - header) / step.hor);
@@ -1506,7 +1561,7 @@ export default {
     // },
     checkPos: function (size) {
       let result = { top: 0, left: 0 };
-      let clientWidth = document.querySelector('#app').clientWidth;
+      let clientWidth = document.querySelector("#app").clientWidth;
       size.top < 50 ? (result.top = 70) : (result.top = size.top);
       size.left < 0 ? (result.left = 20) : (result.left = size.left);
       if (size.left + size.width > clientWidth) {
@@ -1520,190 +1575,214 @@ export default {
     },
     showModalExin: function (event) {
       // функция вызова модального окна импорта экспорта
-      this.$store.commit('setModalExin', { idDash: this.idDash, status: true, event: event });
+      this.$store.commit("setModalExin", {
+        idDash: this.idDash,
+        status: true,
+        event: event,
+      });
     },
     openSettings: function () {
-      this.$emit('openSettings');
+      this.$emit("openSettings");
 
-      if (this.colorGear == 'controlsActive') {
-        this.colorGear = 'controls';
+      if (this.colorGear == "controlsActive") {
+        this.colorGear = "controls";
       } else {
-        this.colorGear = 'controlsActive';
+        this.colorGear = "controlsActive";
       }
     },
     openExim: function () {
-      if (this.colorExim == 'controlsActive') {
-        this.colorExim = 'controls';
+      if (this.colorExim == "controlsActive") {
+        this.colorExim = "controls";
       } else {
-        this.colorExim = 'controlsActive';
+        this.colorExim = "controlsActive";
       }
       this.openexim = !this.openexim;
     },
     setEvents: function () {
-      if (this.textarea_event != null && this.textarea_event != '') {
-        let events = this.textarea_event.split('\n');
+      if (this.textarea_event != null && this.textarea_event != "") {
+        let events = this.textarea_event.split("\n");
         let reg, body, bodyArray, element, doing, originItem;
 
         if (events.length != 0) {
-          events.forEach(item => {
+          events.forEach((item) => {
             originItem = item;
-            item = item.replace(/\s/g, '');
-            if (item != '') {
-              reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
-              this.$set(this.event, 'event', reg.exec(item)[0].replace('(', ''));
-              reg = new RegExp(/\(.+\)/, 'g');
+            item = item.replace(/\s/g, "");
+            if (item != "") {
+              reg = new RegExp(/^[\s+]?[\w]+\(/, "g");
+              this.$set(
+                this.event,
+                "event",
+                reg.exec(item)[0].replace("(", "")
+              );
+              reg = new RegExp(/\(.+\)/, "g");
               body = reg.exec(item)[0];
               body = body.slice(1, body.length - 1);
-              bodyArray = body.split(',');
+              bodyArray = body.split(",");
               bodyArray.forEach((elem, i) => {
-                if (elem.indexOf('(') != -1) {
+                if (elem.indexOf("(") != -1) {
                   element = bodyArray.splice(0, i);
                 }
               });
 
-              if (this.event.event == 'OnDataCompare') {
-                if (element.length > 2 && element[1].indexOf('[') == -1) {
-                  this.$set(this.event, 'compare', element[0]);
-                  this.$set(this.event, 'column', element[1]);
-                  this.$set(this.event, 'row', element.splice(2, element.length - 1).join(','));
+              if (this.event.event == "OnDataCompare") {
+                if (element.length > 2 && element[1].indexOf("[") == -1) {
+                  this.$set(this.event, "compare", element[0]);
+                  this.$set(this.event, "column", element[1]);
+                  this.$set(
+                    this.event,
+                    "row",
+                    element.splice(2, element.length - 1).join(",")
+                  );
                 } else {
-                  this.$set(this.event, 'compare', element[0]);
-                  this.$set(this.event, 'sense', element.splice(1, element.length - 1).join(','));
+                  this.$set(this.event, "compare", element[0]);
+                  this.$set(
+                    this.event,
+                    "sense",
+                    element.splice(1, element.length - 1).join(",")
+                  );
                 }
-              } else if (this.event.event == 'OnTokenCompare') {
-                this.$set(this.event, 'compare', element[0]);
-                this.$set(this.event, 'token', element[1]);
+              } else if (this.event.event == "OnTokenCompare") {
+                this.$set(this.event, "compare", element[0]);
+                this.$set(this.event, "token", element[1]);
                 this.$set(
                   this.event,
-                  'tokenval',
-                  element.splice(2, element.length - 1).join(',')
+                  "tokenval",
+                  element.splice(2, element.length - 1).join(",")
                 );
-              } else if (this.event.event == 'onValueCompare') {
+              } else if (this.event.event == "onValueCompare") {
                 if (element.length == 2) {
-                  this.$set(this.event, 'treshold', element[0]);
-                  this.$set(this.event, 'color', element[1]);
+                  this.$set(this.event, "treshold", element[0]);
+                  this.$set(this.event, "color", element[1]);
                 } else {
                   for (let i = 0; i < element.length; i++) {
-                    if (element[i].indexOf(']') != -1) {
-                      this.$set(this.event, 'treshold', element.slice(0, i + 1).join(','));
+                    if (element[i].indexOf("]") != -1) {
                       this.$set(
                         this.event,
-                        'color',
-                        element.slice(i + 1, element.length).join(',')
+                        "treshold",
+                        element.slice(0, i + 1).join(",")
+                      );
+                      this.$set(
+                        this.event,
+                        "color",
+                        element.slice(i + 1, element.length).join(",")
                       );
                       break;
                     }
                   }
                 }
               } else {
-                this.$set(this.event, 'element', element[0]); //click
+                this.$set(this.event, "element", element[0]); //click
                 if (element[1]) {
-                  if (element[1].indexOf('[') != -1) {
+                  if (element[1].indexOf("[") != -1) {
                     let j = -1;
                     element.forEach((item, i) => {
-                      if (item.indexOf(']') != -1) {
+                      if (item.indexOf("]") != -1) {
                         j = i;
                       }
                     });
                     let partelement = element[1];
                     for (let i = 2; i < j + 1; i++) {
-                      partelement += ',' + element[i];
+                      partelement += "," + element[i];
                     }
-                    this.$set(this.event, 'partelement', partelement);
+                    this.$set(this.event, "partelement", partelement);
                   } else {
-                    this.$set(this.event, 'partelement', element[1]);
+                    this.$set(this.event, "partelement", element[1]);
                   }
                 } else {
-                  this.$set(this.event, 'partelement', 'empty');
+                  this.$set(this.event, "partelement", "empty");
                 }
               }
-              reg = new RegExp(/\w+\(.+\)/, 'g');
+              reg = new RegExp(/\w+\(.+\)/, "g");
               doing = reg.exec(body)[0];
-              doing = doing.split('(');
-              this.$set(this.event, 'action', doing[0]);
-              if (doing[0].toLowerCase() == 'set'.toLowerCase()) {
-                doing = doing[1].slice(0, doing[1].length - 1).split(',');
+              doing = doing.split("(");
+              this.$set(this.event, "action", doing[0]);
+              if (doing[0].toLowerCase() == "set".toLowerCase()) {
+                doing = doing[1].slice(0, doing[1].length - 1).split(",");
 
-                this.$set(this.event, 'target', doing[0]);
+                this.$set(this.event, "target", doing[0]);
                 doing.splice(0, 1);
-                doing = doing.join(',');
-                if (doing.indexOf('[') != -1 && doing.indexOf(']') != -1) {
+                doing = doing.join(",");
+                if (doing.indexOf("[") != -1 && doing.indexOf("]") != -1) {
                   doing = doing.match(/[^\[]+(?=\])/g);
                 } else {
-                  doing = doing.split(',');
+                  doing = doing.split(",");
                 }
 
                 if (doing == null) {
-                  this.$set(this.event, 'prop', ['']);
-                  this.$set(this.event, 'value', ['']);
+                  this.$set(this.event, "prop", [""]);
+                  this.$set(this.event, "value", [""]);
                 } else {
-                  this.$set(this.event, 'prop', doing[0].split(','));
+                  this.$set(this.event, "prop", doing[0].split(","));
                   if (doing[1]) {
-                    this.$set(this.event, 'value', doing[1].split(','));
+                    this.$set(this.event, "value", doing[1].split(","));
                   } else {
-                    this.$set(this.event, 'value', ['']);
+                    this.$set(this.event, "value", [""]);
                   }
                 }
-              } else if (doing[0].toLowerCase() == 'go'.toLowerCase()) {
+              } else if (doing[0].toLowerCase() == "go".toLowerCase()) {
                 ///go
-                doing = doing[1].slice(0, doing[1].length - 1).split(',');
-                this.$set(this.event, 'target', doing[0]);
+                doing = doing[1].slice(0, doing[1].length - 1).split(",");
+                this.$set(this.event, "target", doing[0]);
                 let prop, value;
-                if (doing[1].indexOf('[') != -1) {
+                if (doing[1].indexOf("[") != -1) {
                   doing.splice(0, 1);
-                  doing = doing.join(',');
+                  doing = doing.join(",");
                   doing = doing.match(/[^\[]+(?=\])/g);
-                  prop = doing[0].split(',');
-                  value = doing[1].split(',');
+                  prop = doing[0].split(",");
+                  value = doing[1].split(",");
                 } else {
                   prop = [doing[1]];
                   value = [doing[2]];
                 }
-                this.$set(this.event, 'prop', prop);
-                this.$set(this.event, 'value', value);
-              } else if (doing[0].toLowerCase() == 'open'.toLowerCase()) {
+                this.$set(this.event, "prop", prop);
+                this.$set(this.event, "value", value);
+              } else if (doing[0].toLowerCase() == "open".toLowerCase()) {
                 //open
-                doing = doing[1].slice(0, doing[1].length - 1).split(',');
+                doing = doing[1].slice(0, doing[1].length - 1).split(",");
 
-                this.$set(this.event, 'target', doing[0]);
-                this.$set(this.event, 'prop', [doing[1]]);
-                this.$set(this.event, 'value', [doing[2]]);
+                this.$set(this.event, "target", doing[0]);
+                this.$set(this.event, "prop", [doing[1]]);
+                this.$set(this.event, "value", [doing[2]]);
 
-                this.$set(this.event, 'widthPersent', doing[3]);
-                this.$set(this.event, 'heightPersent', doing[4]);
+                this.$set(this.event, "widthPersent", doing[3]);
+                this.$set(this.event, "heightPersent", doing[4]);
 
-                this.$set(this.event, 'header', doing[5]);
-              } else if (doing[0].toLowerCase() == 'changeReport'.toLowerCase()) {
+                this.$set(this.event, "header", doing[5]);
+              } else if (
+                doing[0].toLowerCase() == "changeReport".toLowerCase()
+              ) {
                 // changeReport
 
                 doing = originItem.split(doing[0])[1];
-                doing = doing.replace(/\(/g, '').replace(/\)/g, '').split(',');
-                this.$set(this.event, 'sid', doing[0]);
-                if (doing[1].indexOf('[') != -1) {
+                doing = doing.replace(/\(/g, "").replace(/\)/g, "").split(",");
+                this.$set(this.event, "sid", doing[0]);
+                if (doing[1].indexOf("[") != -1) {
                   doing.splice(0, 1);
-                  let files = doing.map(item => {
-                    return item.replace('[', '').replace(']', '');
+                  let files = doing.map((item) => {
+                    return item.replace("[", "").replace("]", "");
                   });
-                  this.$set(this.event, 'file', files);
+                  this.$set(this.event, "file", files);
                 } else {
-                  this.$set(this.event, 'file', [doing[1]]);
+                  this.$set(this.event, "file", [doing[1]]);
                 }
-              } else if (doing[0].toLowerCase() == 'exportSearch'.toLowerCase()) {
+              } else if (
+                doing[0].toLowerCase() == "exportSearch".toLowerCase()
+              ) {
                 // changeReport
 
                 doing = doing[1]
-                  .replace(/\)/g, '')
-                  .replace(/\[/g, '')
-                  .replace(/\]/g, '')
-                  .split(',');
-                this.$set(this.event, 'searches', doing);
+                  .replace(/\)/g, "")
+                  .replace(/\[/g, "")
+                  .replace(/\]/g, "")
+                  .split(",");
+                this.$set(this.event, "searches", doing);
               }
               this.events.push(this.event);
               this.event = {};
             }
           });
 
-          this.$store.commit('setEvents', {
+          this.$store.commit("setEvents", {
             event: this.events,
             eventFull: this.textarea_event,
             idDash: this.idDash,
@@ -1714,7 +1793,11 @@ export default {
           this.openEventCode();
         }
       } else {
-        this.$store.commit('setEvents', { event: null, eventFull: null, idDash: this.idDash });
+        this.$store.commit("setEvents", {
+          event: null,
+          eventFull: null,
+          idDash: this.idDash,
+        });
 
         this.events = [];
 
@@ -1723,8 +1806,8 @@ export default {
     },
 
     changeColor: function () {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
-        document.querySelectorAll('.v-menu__content').forEach(item => {
+      if (document.querySelectorAll(".v-menu__content").length != 0) {
+        document.querySelectorAll(".v-menu__content").forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
           item.style.background = this.theme.back;
           item.style.color = this.theme.text;
@@ -1738,19 +1821,21 @@ export default {
         id: this.idDash,
         body: JSON.stringify(dash),
       });
-      response.then(res => {
+      response.then((res) => {
         this.errorSave = true;
         if (res.status == 200) {
           this.colorErrorSave = this.theme.controls;
-          this.msgErrorSave = 'Дашборд сохранен';
+          this.msgErrorSave = "Дашборд сохранен";
           this.$store.auth.getters.putLog(
-            `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${res.data.id}`
+            `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
+              res.data.id
+            }`
           );
           // console.log(res.data)
           this.updateDash({ data: res.data, dash: dash });
         } else {
           this.colorErrorSave = this.theme.controlsActive;
-          this.msgErrorSave = 'Не получилось. Попробуйте еще раз.';
+          this.msgErrorSave = "Не получилось. Попробуйте еще раз.";
         }
         setTimeout(() => {
           this.save_elem = false;
@@ -1759,12 +1844,14 @@ export default {
       });
     },
     updateDash: function (dash) {
-      this.$store.commit('updateDash', {
+      this.$store.commit("updateDash", {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
       this.$store.auth.getters.putLog(
-        `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${this.idDash}`
+        `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
+          this.idDash
+        }`
       );
     },
     toHichName: function (name) {
@@ -1778,7 +1865,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../sass/dashPanelBoard.sass';
+@import "../sass/dashPanelBoard.sass";
 </style>
 
 <style>

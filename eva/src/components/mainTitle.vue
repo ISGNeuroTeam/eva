@@ -243,6 +243,9 @@ export default {
     searches() {
       return this.loadingDash ? [] : this.$store.getters.getSearches(this.idDash)
     },
+    tokens() {
+      return this.loadingDash ? [] : this.$store.getters.getTockens(this.idDash)
+    },
   },
   watch: {
     getSizeGrid() {
@@ -257,7 +260,12 @@ export default {
     },
     searches: {
       deep: true,
-      handler(searches) {
+      handler(searches, oldSearches) {
+        function findOnButtonTokens(tokens) {
+          return tokens.filter((el) => el.onButton);
+        }
+        let onButton = findOnButtonTokens(this.tokens);
+        console.log(onButton)
         if (this.firstLoad) {
           searches.forEach((search) =>
             this.$set(this.dataObject, search.sid, { data: [], loading: true })
