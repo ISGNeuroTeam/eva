@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- fixed update textarea with full screen textarea
+
 ## [1.71.0]
 
 ### Added
@@ -39,7 +44,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed font weights 100, 200, 400, 500, 800
 - fixed SingleValue font weights
 - fixed full-screen map mode
-- fixed update textarea with full screen textarea
 
 ## [1.70.0]
 ### Added
