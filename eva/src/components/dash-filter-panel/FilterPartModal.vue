@@ -30,7 +30,12 @@
       </v-item-group>
     </v-card-subtitle>
     <v-card-text>
-      <component :is="typeMap[currentTab].componentName" :idDash="idDash" :temp="temp" :edit-mode="editMode"></component>
+      <component
+        :is="typeMap[currentTab].componentName"
+        :idDash="idDash"
+        :temp="temp"
+        :edit-mode="editMode"
+      ></component>
       <v-switch :color="theme.$primary_button" v-model="temp.invertMatches"
         ><h5 slot="label" :style="{ color: theme.$secondary_text }">Вычитать значения</h5></v-switch
       >
@@ -58,68 +63,78 @@
 </template>
 
 <script>
-  import ManualTypeModal from './ManualTypeModal';
-  import TokenTypeModal from './TokenTypeModal';
-  import { mdiSettings } from '@mdi/js';
+import ManualTypeModal from './ManualTypeModal';
+import TokenTypeModal from './TokenTypeModal';
+import { mdiSettings } from '@mdi/js';
 
-  export default {
-    name: 'FilterPartModal',
-    props: ['idDash', 'filterPart', 'filterPartIndex', 'editPermission', 'editMode'],
-    components: {
-      ManualTypeModal,
-      TokenTypeModal,
+export default {
+  name: 'FilterPartModal',
+  props: ['idDash', 'filterPart', 'filterPartIndex', 'editPermission', 'editMode'],
+  components: {
+    ManualTypeModal,
+    TokenTypeModal,
+  },
+  data() {
+    return {
+      currentTab: 0,
+      temp: {},
+      settingsIcon: mdiSettings,
+    };
+  },
+  computed: {
+    typeMap() {
+      let mapOfTypes = [
+        { title: 'Токен', componentName: 'TokenTypeModal', type: 'token' },
+        { title: 'Ручной ввод', componentName: 'ManualTypeModal', type: 'manual' },
+      ];
+      return this.editPermission ? mapOfTypes : mapOfTypes.slice(1);
     },
-    data() {
-      return {
-        currentTab: 0,
-        temp: {},
-        settingsIcon: mdiSettings,
-      };
+    theme() {
+      return this.$store.getters.getTheme;
     },
-    computed: {
-      typeMap() {
-        let mapOfTypes = [
-          { title: 'Токен', componentName: 'TokenTypeModal', type: 'token' },
-          { title: 'Ручной ввод', componentName: 'ManualTypeModal', type: 'manual' },
-        ];
-        return this.editPermission ? mapOfTypes : mapOfTypes.slice(1);
-      },
-      theme() {
-        return this.$store.getters.getTheme;
-      },
+  },
+  watch: {
+    currentTab(val) {
+      this.temp.filterPartType = this.typeMap[val].type;
     },
-    watch: {
-      currentTab(val) {
-        this.temp.filterPartType = this.typeMap[val].type;
-      },
-      filterPart: {
-        immediate: true,
-        handler(filterPart) {
-          if (filterPart) {
-            let itemIndex = this.typeMap.findIndex(item => item.type === filterPart.filterPartType);
-            if (itemIndex !== -1) {
-              this.currentTab = itemIndex;
-              this.temp = filterPart;
-            } else {
-              throw new Error(
-                `Type "${filterPart.filterPartType}" of filter part does not recognized`
-              );
-            }
+    filterPart: {
+      immediate: true,
+      handler(filterPart) {
+        if (filterPart) {
+          let itemIndex = this.typeMap.findIndex(
+            itemTypeMap => itemTypeMap.type === filterPart.filterPartType
+          );
+          if (itemIndex !== -1) {
+            this.currentTab = itemIndex;
+            this.temp = Object.assign({}, filterPart);
+            this.temp.token = filterPart?.token?.name;
+          } else {
+            throw new Error(
+              `Type "${filterPart.filterPartType}" of filter part does not recognized`
+            );
           }
-        },
+        }
       },
     },
-    methods: {
-      saveFilterPartModal() {
-        if (this.temp.filterPartType === 'token' && !this.temp.token)
-          return;
-        this.$emit('saveFilterPart', this.temp, this.filterPartIndex);
-      },
-      closeFilterPartModal() {
-        this.$emit('closeFilterPartModal');
-      },
+  },
+  methods: {
+    saveFilterPartModal() {
+      if (this.temp.filterPartType === 'token') {
+        const originToken = this.$store.getters
+          .getTockens(this.idDash)
+          .find(tkn => tkn.name === this.temp.token);
+        if (originToken) {
+          this.temp.token = originToken;
+          this.temp.fieldName = originToken.capture;
+        } else return;
+      }
+      this.$emit('saveFilterPart', this.temp, this.filterPartIndex);
     },
-  };
+    closeFilterPartModal() {
+      this.$emit('closeFilterPartModal');
+    },
+  },
+};
 </script>
 
 <style lang="sass" scoped></style>
