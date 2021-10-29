@@ -1,3 +1,44 @@
+# [1.71.0] - Default token values. Search rows limitation, shortcut for line break. New font in SingeValue. A lot of bugfixes.
+### New
+- Ability to set a default token value for if its value isn't set.
+- Ctrl+/ hot keys to automatically line break in dashboard data sources and "Searching and Reporting".
+- Added switch to enable/disable opening dashboard in new window in HeatMap component.
+- Maximum number of rows in response data is automatically limited to 1000 in "Searching and Reporting" and can be limited in dashboard searches too.
+- DatePicker component has been translated into russian.
+- Multiline barplot bars are now centered.
+- Redesigned single value from design template.
+- Added font weights 100, 200, 400, 500, 800 for SingeValues component.
+
+### Bugfix
+- Set default color for a new dashboard group.
+- Problem with canceling changes in SingleValue component when we don't want to save them.
+- Fullscreen mode of SingleValue component.
+- Issue with movable elements in SingeValue settings, updated move for burger icon.
+- Fixed colors for metric values in SingleValue component.
+- Bug with template selection in SingleValue component settings.
+- Active component on dashboard now has higher z-index.
+- Increased the height of request text in data source modal windows.
+- Multiline captions rotation on the x-axis.
+- Multiline incorrect drawing charts height in fullscreen mode.
+- Problem with tooltips not disappearing after clicking buttons.
+- Problem with renaming dashboards and groups.
+- Problem with position of the datepicker in the pop-up of the data source.
+- Problem with scheduler id loss after refreshing page.
+- Fullscreen mode of Map component.
+
+# [1.70.0] - PieChart tooltips, new MultiLine settings including bar appearance for lines
+
+### New
+- Tooltips for PieChart visualization.
+- Ability to select pies in PieChart by clicking legend.
+- Ability to add additional yAxis for MultiLine component.
+- Ability to bind metrics to the left or right yAxis for MultiLine component.
+- Ability to change line appearance to BarPlot on MultiLine.
+- Assigning a value to a PieChart token.
+
+### Bugfix
+- Unauthorized users weren't redirected to login page if they tried to open dashboard url.
+
 # [1.69.0] - New multiline settings and tooltip changes, color picker for groups and bugfixes
 ### New
 - Added new settings to multiLine component: 'isDataAlwaysShow', 'xAxisCaptionRotate' and 'barplotBarWidth'.

@@ -21,6 +21,15 @@
           class="options-block"
         >
           <div class="option-item">
+            <v-switch
+              v-model="openNewScreen"
+              class="switch"
+              :color="theme.$primary_button"
+              :style="{color:theme.$main_text}"
+              label="Открыть в новой вкладке"
+            />
+          </div>
+          <div class="option-item">
             <div
               class="name-option main item"
               :style="{color:theme.$title, borderBottom: `1px solid ${theme.$main_border}`}"
@@ -789,43 +798,45 @@
               Градус наклона подписей на оси X
             </div>
             <div class="status-option item">
-              <v-radio-group v-model="options.xAxisCaptionRotate">
-                <div class="d-flex align-center">
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    label="0"
-                    :value="0"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="45"
-                    :value="45"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="-45"
-                    :value="-45"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="90"
-                    :value="90"
-                  />
-                  <v-radio
-                    :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
-                    class="ml-2"
-                    label="-90"
-                    :value="-90"
-                  />
-                </div>
+              <v-radio-group
+                v-model="options.xAxisCaptionRotate"
+                :column="false"
+
+              >
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="0"
+                  :value="0"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="45"
+                  :value="45"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="-45"
+                  :value="-45"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="90"
+                  :value="90"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  class="ml-2"
+                  label="-90"
+                  :value="-90"
+                />
               </v-radio-group>
             </div>
           </div>
@@ -913,6 +924,133 @@
                 class="subnumber"
                 hide-details
               />
+            </div>
+          </div>
+
+          <v-card-text
+            v-if="options.united && checkOptions('united')"
+            class="headline pa-0"
+          >
+            <div
+              class="settings-title"
+              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+            >
+              Выбор типа графика
+            </div>
+          </v-card-text>
+
+          <div
+            v-if="options.united && checkOptions('united')"
+            class="options-block united-block pa-0"
+          >
+            <div class="multiline-custom-opts">
+              <div style="margin-left: 350px">
+                <div
+                  v-for="(metric, i) in Object.keys(multilineYAxesBinding.metricTypes)"
+                  :key="`metric-${i}`"
+                  class="d-flex pb-3"
+                >
+                  <span :style="{ color: theme.$main_text }">
+                    Тип графика
+                    <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
+                  </span>
+                  <v-radio-group
+                    v-model="multilineYAxesBinding.metricTypes[metric]"
+                    hide-details
+                    :column="false"
+                    class="ma-0 ml-5"
+                  >
+                    <v-radio
+                      :color="theme.$primary_button"
+                      :style="{ color:theme.$main_text }"
+                      label="Линейный"
+                      :value="'linechart'"
+                    />
+                    <v-radio
+                      :color="theme.$primary_button"
+                      :style="{ color:theme.$main_text }"
+                      class="ml-2"
+                      label="Столбчатый"
+                      :value="'barplot'"
+                    />
+                  </v-radio-group>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <v-card-text
+            v-if="options.united && checkOptions('united')"
+            class="headline pa-0"
+          >
+            <div
+              class="settings-title"
+              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+            >
+              Привязка осей
+            </div>
+          </v-card-text>
+
+          <div
+            v-if="options.united && checkOptions('united')"
+            class="options-block united-block pa-0"
+          >
+            <div class="d-flex multiline-custom-opts">
+              <v-radio-group
+                v-model="multilineYAxesBinding.axesCount"
+                style="margin-left: 350px; margin-top: 0;"
+              >
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="Одна ось"
+                  :value="1"
+                />
+                <v-radio
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  label="Две оси"
+                  :value="2"
+                />
+              </v-radio-group>
+
+              <div
+                v-if="multilineYAxesBinding.axesCount === 2"
+                style="margin-left: 50px"
+              >
+                <div
+                  v-for="(metric, i) in Object.keys(multilineYAxesBinding.metrics)"
+                  :key="`metric-${i}`"
+                  class="pb-3"
+                >
+                  <div class="d-flex align-center">
+                    <span :style="{ color: theme.$main_text }">
+                      Привязка
+                      <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
+                    </span>
+                    <v-radio-group
+                      v-model="multilineYAxesBinding.metrics[metric]"
+                      hide-details
+                      :column="false"
+                      class="ma-0 ml-5"
+                    >
+                      <v-radio
+                        :color="theme.$primary_button"
+                        :style="{ color:theme.$main_text }"
+                        label="Слева"
+                        :value="'left'"
+                      />
+                      <v-radio
+                        :color="theme.$primary_button"
+                        :style="{ color:theme.$main_text }"
+                        class="ml-2"
+                        label="Справа"
+                        :value="'right'"
+                      />
+                    </v-radio-group>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1151,16 +1289,16 @@
               class="options-item-tooltip"
             >
               <v-select
-                v-for="i in metricsRelation.metrics.length"
+                v-for="(label, i) in metricsRelation.namesMetric"
                 :key="i+'metric'"
-                v-model="metricsRelation.relations[i-1]"
+                v-model="metricsRelation.relations[i]"
                 :items="metricsRelation.metrics"
+                :label="metricsRelation.namesMetric[i]"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"
                 hide-details
                 outlined
                 class="item-metric"
-                :label="metricsRelation.namesMetric[i-1]"
                 @click="changeColor"
               />
             </div>
@@ -1435,6 +1573,7 @@ export default {
     return {
       tableTitles:[],
       element: '',
+      openNewScreen: false,
       options: {
       },
       optionsItems: [],
@@ -1449,7 +1588,7 @@ export default {
       metricsRelation: {
         metrics: [],
         relations: [],
-        namesMetric: ['Категория','Процентное соотношение','Выбрано']
+        namesMetric: ['Категория','Процентное соотношение']
       },
       colorsPie: {
         theme: 'neitral',
@@ -1461,6 +1600,8 @@ export default {
       metrics: [],
       types: ['Line chart', 'Bar chart'],
       metricsName: [],
+      multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
+      multilineYAxesTypes: {},
       x: '',
       y: '',
       metadata: '',
@@ -1493,8 +1634,23 @@ export default {
         this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
+          const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
+
+          if (opt.yAxesBinding) {
+            this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount
+          } else {
+            this.multilineYAxesBinding.axesCount = 1
+          }
+
           this.metricsName.forEach(metric => {
             this.metricUnits[metric.name] = metric.units;
+            if (opt.yAxesBinding && opt.yAxesBinding.metrics && opt.yAxesBinding.metricTypes) {
+              this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name]
+              this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name]
+            } else {
+              this.multilineYAxesBinding.metrics[metric.name] = 'left'
+              this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart'
+            }
           })
         }
         let test = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
@@ -1592,8 +1748,9 @@ export default {
       }
       if (this.element.startsWith("multiLine")) {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
+        this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, openNewScreen: this.openNewScreen  }, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1663,7 +1820,7 @@ export default {
             this.metricsRelation = {};
             this.$set(this.metricsRelation,'metrics', [...[],...options[item].metrics]);
             this.$set(this.metricsRelation,'relations', [...[],...options[item].relations]);
-            this.$set(this.metricsRelation,'namesMetric', ['Категория','Процентное соотношение','Выбрано']);
+            this.$set(this.metricsRelation,'namesMetric', ['Категория','Процентное соотношение']);
           } else if (item == 'colorsPie') {
             this.colorsPie = {};
             this.$set(this.colorsPie,'theme', options[item].theme);

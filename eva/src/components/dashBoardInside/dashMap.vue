@@ -5,12 +5,9 @@
     </div>
     <div
       v-if="!error"
-      id="mapContainer"
       ref="map"
-      :style="{
-        width: `${Math.trunc(widthFrom)}px`,
-        height: `${Math.trunc(heightFrom) - top / 2 - 45}px`,
-      }"
+      class="mapContainer"
+      :style="mapStyleSize"
     />
   </div>
 </template>
@@ -91,8 +88,16 @@ export default {
         return 60;
       }
     },
+    mapStyleSize() {
+      return {
+        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 45}px`,
+      }
+    },
   },
   watch: {
+    mapStyleSize() {
+      this.map._onResize()
+    },
     dataRestFrom(_dataRest) {
       //при обновлении данных перерисовать
       this.reDrawMap(_dataRest);
@@ -104,11 +109,6 @@ export default {
     maptheme() {
       this.createMap();
     },
-    options: {
-      deep: true,
-      handler(val, oldVal) {
-      },
-    },
   },
   async mounted() {
     this.initMap();
@@ -116,7 +116,7 @@ export default {
     this.initClusterTextCount();
     this.initClusterPosition();
     this.initClusterDelimiter();
-    const unsubscribe = store.subscribe((mutation, state) => {
+    store.subscribe((mutation, state) => {
       if (mutation.type == "updateOptions") {
         if (this.options.initialPoint) {
           this.map.setView(
@@ -142,7 +142,7 @@ export default {
       idDash: this.idDash,
       id: this.element,
     });
-    await this.loadDataForPipe();
+    await this.loadDataForPipe(this.$store.getters.getPaperSearch);
   },
   methods: {
     getDataFromRest: async function (event) {
@@ -277,7 +277,7 @@ export default {
       test.$on("updatePipeDataSource", (e) => this.loadDataForPipe(e));
       test.$mount();
 
-      let element = document.getElementsByClassName(
+      let element = this.$refs.map.getElementsByClassName(
         "leaflet-control-container"
       );
       let container = element[0];
@@ -471,6 +471,7 @@ export default {
         zoomSnap: 0,
         zoom: 10,
         maxZoom: 25,
+        center: [0, 0],
       });
       this.map.on("moveend", () => {
         [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
@@ -483,6 +484,9 @@ export default {
           x.style.height = (x.naturalHeight / 10) * this.map.getZoom() + "px";
         }
       });
+      this.$nextTick(() => {
+        this.map._onResize();
+      })
     },
 
     drawObjects(dataRest) {
@@ -722,7 +726,7 @@ export default {
     },
     sortForTooltip(dataRest) {
       let _sortDataRest = [];
-      this.clusterPosition.forEach((position) => {
+      this.clusterPosition?.forEach((position) => {
         dataRest.forEach((dr) => {
           if (position === dr.type) {
             _sortDataRest.push(dr);
@@ -810,11 +814,15 @@ export default {
 };
 </script>
 <style>
-#mapContainer {
+.dash-map {
+  padding: 0 20px !important;
+}
+.mapContainer {
   position: relative;
   background: #191919;
-  left: -20px;
-  top: 0px;
+  margin-left: -20px;
+  margin-right: -20px;
+  top: 0;
 }
 .error-message {
   display: flex;
