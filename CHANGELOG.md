@@ -6,12 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- fixed default token
 
 ### Added
 - added the slider component
 
 ## [1.71.0]
-
 ### Added
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break
