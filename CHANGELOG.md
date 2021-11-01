@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- bug with update data search
+
 ## [1.71.0]
 
 ### Added
@@ -28,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed colors for metric values in SingleValue component
 - bug with update state for settings single value
 - bug with template of single value
-- bug with update data search
 - set higher z-index for active component on dashboard
 - increased the height of request text in data source
 - multiline captions rotation on the x-axis
