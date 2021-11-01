@@ -11,6 +11,5 @@ export default function isMarkerInsidePolygon(marker, poly) {
             && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
         if (intersect) inside = !inside;
     }
-
     return inside;
 };

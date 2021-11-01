@@ -627,7 +627,7 @@ export default {
       line
         .addTo(this.map)
         .bindTooltip(tooltip)
-        .on("mouseover", highlightFeature)
+        .on("mouseover", (e) => highlightFeature(e, line))
         .on("mouseout", resetHighlight);
       line.setTooltipContent(element.label);
       let previousPoint = 0;
@@ -661,6 +661,7 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
+        console.log(pipelineDataDictionary, element)
         if (!pipelineDataDictionary[element.ID]) return;
         const closest = (arr, num) => {
           return (
@@ -695,7 +696,8 @@ export default {
           <p>L ${pipelineInfo.L}</p>
           </div>`;
 
-          if (isMarkerInsidePolygon()) {
+          console.log(isMarkerInsidePolygon(this.map.getBounds()), 'closee')
+          if (isMarkerInsidePolygon(this.map.getBounds())) {
             line.setTooltipContent(newDiv);
           }
         }
