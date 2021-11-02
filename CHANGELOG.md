@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - fixed default token
+- ability to zoom barplot
+- labeles on OX axis
 
 ## [1.71.0]
 
@@ -17,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added switch to enable/disable opening dashboard in new window in HeatMap component
 - maximum number of rows in a response is automatically limited
 - default color for new group
+- multiline zoom as data filter
 
 ### Changed
 - the date picker component has been translated into Russian

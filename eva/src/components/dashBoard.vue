@@ -319,6 +319,7 @@
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
+        @SetRange="setRange($event)"
       />
     </v-card>
   </div>
@@ -1012,6 +1013,9 @@ export default {
         this.searchData = JSON.parse(JSON.stringify(this.props.dataRest));
       }
       link.remove(); // удаляем ссылку
+    },
+    setRange (range) {
+      this.$emit("SetRange", range);
     },
   },
 };
