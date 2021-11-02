@@ -221,6 +221,8 @@ export default {
             end: point[1],
           }
           const value = values[capture]
+          
+          tocken.filterParam = Object.keys(this.dataRestFrom[0])[0]
           this.$store.commit('setTocken', { tocken, value, idDash, store })
         }
       }
