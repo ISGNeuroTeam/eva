@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Fixed
+- fixed grid show checkbox
+
+## [Unreleased]
+### Fixed
 - fixed default token
 
 ## [1.71.0]
