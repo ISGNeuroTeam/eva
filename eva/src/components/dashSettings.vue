@@ -133,7 +133,6 @@ export default {
         false: 'нет'
       },
       dragresable: true,
-      gridShow: true,
       showTabs: false,
     } 
   },
@@ -145,14 +144,20 @@ export default {
       if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
         // this.mode = false;
         this.dragresable = false;
-        this.gridShow = false;   
       } else {
         // this.mode = true;
-        this.dragresable = true;
-        this.gridShow = true;  
+        this.dragresable = true;  
       }
       return true
-    } 
+    },
+    gridShow: {
+      get() {
+        return this.$store.getters.getGridShow(this.idDashFrom) === 'true';
+      },
+      set(value) {
+        this.$store.commit('setGridShow', { id: this.idDashFrom, item: String(value) });
+      }
+    }
   },  
   watch: {
     gearFrom: function (gear) {
@@ -163,9 +168,6 @@ export default {
     },
     dragresable: function() {
       this.$store.commit('setDragResize', {id: this.idDashFrom,item: String(this.dragresable)});
-    },
-    gridShow: function() {
-      this.$store.commit('setGridShow', {id: this.idDashFrom,item: String(this.gridShow)});
     },
     showTabs () {
       this.$store.commit('setTabMode', {idDash: this.idDashFrom, mode: this.showTabs});

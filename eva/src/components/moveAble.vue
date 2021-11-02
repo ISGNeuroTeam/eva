@@ -28,6 +28,7 @@
       @SetLevel="props.zIndex = $event"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
+      @SetRange="setRange($event)"
     />
   </vue-draggable-resizable>
 </template>
@@ -160,6 +161,9 @@ export default {
     },
     createGrid() {
       this.props.grid = [this.verticalCell, this.horizontalCell]
+    },
+    setRange (range) {
+      this.$emit("SetRange", range);
     },
   }
 }

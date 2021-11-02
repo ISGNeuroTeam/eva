@@ -17,17 +17,9 @@
           label="Режим"
           multiple
           @change="updatePipeDataSource($event)"
-          ><template v-slot:selection="{ item, index }">
-            <v-chip v-if="index === 0">
-              <span>{{ item }}</span>
-            </v-chip>
-            <span v-if="index === 1" class="grey--text text-caption">
-              (+{{ value.length - 1 }} others)
-            </span>
-          </template>
-        </v-select>
-        <v-spacer />
-        <v-dialog v-model="dialog" max-width="290">
+        />
+        <v-spacer/>
+        <v-dialog v-model="dialog" max-width="390">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               rounded
@@ -133,6 +125,9 @@
                       <v-button>Y:</v-button>
                     </template>
                   </v-text-field>
+                </v-col>
+                <v-col class="flex-grow-0">
+                  <v-btn small color="primary" class="mt-3" @click="onClickChoosingCoordinates">Указать на карте</v-btn>
                 </v-col>
               </v-row>
 
@@ -394,6 +389,19 @@ export default {
     this.searches = this.loadDataForPipe();
   },
   methods: {
+    onClickChoosingCoordinates(e) {
+      const cursorCssClass = 'cursor-crosshair';
+      this.dialog = false;
+      L.DomUtil.addClass(this.map._container, cursorCssClass);
+      const clickEvent = event => {
+        this.dialog = true;
+        L.DomUtil.removeClass(this.map._container, cursorCssClass);
+        this.options.initialPoint.x = event.latlng.lat;
+        this.options.initialPoint.y = event.latlng.lng;
+        this.map.off('click', clickEvent)
+      }
+      this.map.on('click', clickEvent);
+    },
     updatePipeDataSource(e) {
       let set = new Set(e);
       set.delete(this.options.mode[0]);
