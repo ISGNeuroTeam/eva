@@ -1,5 +1,5 @@
 <template>
-  <div class="multiline-container pa-0" :class="{ full: !dataModeFrom }">
+  <div class="multiline-container pa-0">
     <div v-if="isNodata" class="nodata-block" v-text="message" />
     <div ref="legendContainer" class="legend">
       <div v-for="item in legendList" :key="item.name" class="legend-item">
@@ -25,6 +25,7 @@ export default {
     heightFrom: Number,
     dataRestFrom: Array,
     dataModeFrom: Boolean,
+    isFullScreen: Boolean,
     /** Props from Reports page. */
     dataReport: Boolean,
     activeElemFrom: String,
@@ -278,8 +279,8 @@ export default {
         .nodes()
         .forEach((item) => item.remove())
 
-      this.svg
-        .selectAll('g.xAxis g.tick')
+      this.xAxis
+        .selectAll('g.tick')
         .append('line')
         .attr('class', lineClass)
         .attr('x1', 0)
@@ -611,10 +612,12 @@ export default {
         .append('g')
         .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
+      const clipPathID = this.isFullScreen ? `clip-${this.id}-full` : `clip-${this.id}`
+
       this.svg
         .append('defs')
         .append('clipPath')
-        .attr('id', `clip-${this.id}`)
+        .attr('id', clipPathID)
         .append('rect')
         .attr('x', 0)
         .attr('y', 0)
@@ -623,7 +626,7 @@ export default {
 
       this.xAxis = this.svg
         .append('g')
-        .attr('class', 'xAxis')
+        .attr('class', `${this.isFullScreen ? 'xAxis-full' : 'xAxis'}`)
         .attr('transform', `translate(0, ${this.height})`)
 
       if (this.isTime) {
@@ -650,7 +653,7 @@ export default {
         this.xAxis.attr('transform', `translate(0, ${this.height})`)
       }
 
-      this.line = this.isUnitedMode ? this.svg.append('g').attr('clip-path', `url(#clip-${this.id})`) : []
+      this.line = this.isUnitedMode ? this.svg.append('g').attr('clip-path', `url(#${clipPathID})`) : []
 
       this.createVerticalGridLines()
 
@@ -765,15 +768,15 @@ export default {
             const thisMetrics = [...this.metrics]
             let allDotHover = []
 
-            this.svg
+            const barPostfix = this.isFullScreen ? '-full' : ''
+            const getBarID = (i) => `bar--${metricName}--${i}--${barPostfix}`
+
+            this.line
               .selectAll(`bar-${metricName}`)
               .data(this.dataRestFrom)
               .enter()
               .append('rect')
-              .attr('id', (d, i) => {
-                const barID = `bar--${metricName}--${i}`
-                return barID
-              })
+              .attr('id', (d, i) => getBarID(i))
               .attr('x', (d) => x(d[xMetric] * this.secondTransf))
               .attr('y', (d) => yScale(d[metricName]))
               .attr('width', () => {
@@ -805,9 +808,7 @@ export default {
                 }
 
                 const h = height - yScale(d[metricName])
-
-                const barID = `bar--${metricName}--${j}`
-                bars.push({ id: barID, height: h })
+                bars.push({ id: getBarID(j), height: h })
 
                 return h
               })
@@ -1267,7 +1268,7 @@ export default {
           node.style.transform = `translateY(${value}px)`
         })
 
-        this.line.push(this.svg.append('g').attr('clip-path', `url(#clip-${this.id})`))
+        this.line.push(this.svg.append('g').attr('clip-path', `url(#${clipPathID})`))
 
         // if (optionsKeys.length === 0 || options.type === 'Line chart') {
           const mustSee = []

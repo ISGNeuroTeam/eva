@@ -604,6 +604,7 @@ export default {
     },
     letEventGo: async (state, event) => {
       //load dash
+      console.log('alert 11')
       let loader = (id, first) => {
         return new Promise(resolve => {
           let result = rest.getState(id, restAuth);
@@ -728,7 +729,13 @@ export default {
 
       //event.route.push(`/dashboards/${id}`);
       // event.route.go();
-      event.route.push(`/dashboards/${id}`);
+      const options = state[event.idDash][event.id].options;
+     
+      if (!options?.openNewScreen) {
+        event.route.push(`/dashboards/${id}`);
+      } else {
+        window.open(`/dashboards/${id}`);
+      }
       let searches = state[id].searches;
 
       let response = {};
@@ -1242,7 +1249,11 @@ export default {
             //let reg = `\\$${state[idDash].tockens[item].name}`;
             reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
             if (otl.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
-              otl = otl.replace(reg, state[idDash].tockens[item].value);
+              if(state[idDash].tockens[item].value) {
+                otl = otl.replace(reg, state[idDash].tockens[item].value);
+              } else {
+                otl = otl.replace(reg, state[idDash].tockens[item].defaultValue);
+              }
             }
 
             if (
@@ -1281,7 +1292,11 @@ export default {
             }
           });
         }
-
+        if (search.limit > 0 && !otl.includes('head')) {
+          // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
+          otl +='|head ' + search.limit
+        }
+        
         otl = otl.replace(/\r|\n/g, '');
 
         let formData = new FormData(); // формируем объект для передачи RESTу
@@ -1425,11 +1440,12 @@ export default {
             field_extraction: false,
             cache_ttl: 100,
           },
+          limit: 1000
         };
       }
     },
     getPaperSearch: state => {
-      let key = state.papers.cursearch;
+      let key = state.papers?.cursearch || 0;
       if (key != 0) {
         return state.papers.searches[key];
       } else {

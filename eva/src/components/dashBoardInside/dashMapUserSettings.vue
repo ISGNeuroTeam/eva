@@ -156,18 +156,7 @@
                     </defs>
                   </svg>
 
-                  <span
-                    style="
-                  margin-left: 10px;
-                  font-family: Proxima Nova;
-                  font-size: 18px;
-                  font-style: normal;
-                  font-weight: 600;F
-                  line-height: 22px;
-                  letter-spacing: 0em;
-                  text-align: left;
-                "
-                  >
+                  <span class="ml-2 legend-title">
                     Легенда
                   </span>
                   <v-spacer />
@@ -339,7 +328,7 @@ export default {
       },
     },
   },
-  mounted() {    
+  mounted() {
     let options = this.$store.getters.getOptions({
       idDash: this.idDashFrom,
       id: this.idElement,
@@ -483,6 +472,11 @@ export default {
 </script>
 
 <style lang="sass" >
+.legend-title
+  font-size: 18px
+  font-weight: 600
+  line-height: 22px
+
 .menuable__content__active 
   width: 300px
   
@@ -491,7 +485,7 @@ export default {
   height: 100%
   position: absolute
   /* left: 0px; */
-  right: 0px
+  right: 0
   z-index: 1000000
 
 .theme--light.v-input input, .theme--light.v-input textarea 

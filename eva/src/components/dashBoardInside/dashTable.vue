@@ -7,7 +7,7 @@
         ref="table"
         v-model="props.input"
         :headers="props.titles"
-        :items.sync="props.itemsForTable"
+        :items.sync="filteredTableData"
         :data-id="id"
         item-key="none"
         :hide-default-footer="props.hideFooter"
@@ -17,7 +17,51 @@
         :height="height"
         fixed-header
         :style="{ borderColor: theme.$secondary_border }"
-      />
+      >
+        <template
+          v-for="title in numericTitles"
+          v-slot:[`header.${title}`]="{ header }"
+        >
+          <v-menu offset-y :key="title">
+            <template  v-slot:activator="{ on, attrs }">
+              <v-menu z-index="100000" offset-y :close-on-content-click="false">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                    large
+                    class="icon"
+                    :color="theme.$main_border"
+                    >{{ mdiMagnify }}</v-icon
+                  >
+                </template>
+                <v-row>
+                  <v-col cols="6">
+                    <v-select
+                      :items="compare"
+                      label="Знак"
+                      @change="filterData(title, $event, 'compare')"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-menu>
+            </template>
+            <v-list>
+              <v-list-item v-for="(item, index) in items" :key="index">
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <v-tooltip bottom :key="header.value">
+            <template v-slot:activator="{ on }">
+              <span v-on="on">{{ header.text }}</span>
+            </template>
+          </v-tooltip>
+        </template>
+      </v-data-table>
     </div>
     <div v-show="props.nodata" class="no-data-table">
       {{ props.message }}
@@ -26,6 +70,7 @@
 </template>
 
 <script>
+import { mdiMagnify } from "@mdi/js";
 export default {
   props: {
     dataRestFrom: null,
@@ -41,6 +86,8 @@ export default {
   },
   data() {
     return {
+      compare: ['>', '<', '='],
+      mdiMagnify: mdiMagnify,
       eventRows: [],
       props: {
         titles: [],
@@ -54,18 +101,33 @@ export default {
         justCreate: true,
         hideFooter: false,
         itemsForTable: [],
-        
       },
+      numericTitles: [],
+      filters: {},
     };
   },
   computed: {
+    filteredTableData() {
+      let temp = this.props.itemsForTable
+      console.log(temp)
+      for (let [key, val] of Object.entries(this.filters)) {
+        console.log(key, val);
+        if (val.compare === '>')
+          temp = temp.filter(x => x[key] > +val.value)
+        if (val.compare === '<')
+          temp = temp.filter(x => x[key] < +val.value)
+        if (val.compare === '=')
+          temp = temp.filter(x => x[key] == +val.value)
+      }
+      return temp
+    },
     events() {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: "OnDataCompare",
         element: this.id,
       });
-      return events
+      return events;
     },
     id: function () {
       return this.idFrom;
@@ -114,12 +176,17 @@ export default {
     titles(newValue) {
       if (newValue) this.createTitles(newValue);
     },
-    dataRestFrom() {
-      this.setEventColor();
+    dataRestFrom: {
+      deep: true,
+      handler(oldVal) {
+        console.log(JSON.parse(JSON.stringify(oldVal)));
+        this.checkForNumeric(oldVal[0]);
+        this.setEventColor();
+      },
     },
     events() {
       this.setEventColor();
-    }
+    },
   },
   mounted() {
     this.$store.commit("setActions", {
@@ -130,6 +197,28 @@ export default {
     this.setEventColor();
   },
   methods: {
+    filterData(title, event, compare) {
+      if (!this.filters[title])
+        this.filters[title] = {}
+      if (compare === "compare") {
+        this.filters[title].compare = event
+      }
+      else {
+        this.filters[title].value = event
+      }
+      this.filters = {...this.filters}
+    },
+    checkForNumeric(val) {
+      function isNumber(n) {
+        return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
+      }
+      for (let [key, val] of Object.entries(val)) {
+        console.log(key, val, typeof val);
+        if (isNumber(val)) {
+          this.numericTitles.push(key);
+        }
+      }
+    },
     getDataAsynchrony: function (data) {
       let prom = new Promise((resolve) => {
         if (data.error) {
@@ -188,10 +277,10 @@ export default {
       if (this.eventRows.length > 0) {
         for (let x of this.eventRows) {
           x.style.background = "";
-          x.classList.remove('event');
+          x.classList.remove("event");
         }
       }
-      this.eventRows = []
+      this.eventRows = [];
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: "OnDataCompare",
@@ -200,7 +289,6 @@ export default {
       let table, column;
       let eventObj = {};
       events.forEach((item, index) => {
-        
         eventObj[index] = {};
         eventObj[index]["compare"] = item.compare;
         eventObj[index]["column"] = item.column;
@@ -214,10 +302,10 @@ export default {
           eventObj[index]["prop"] == "columncolor" ||
           eventObj[index]["prop"] == "cellcolor"
         ) {
-          
           let readyTh = setTimeout(
             function tick() {
-              table.querySelectorAll("thead th").style ="background-color: red";
+              table.querySelectorAll("thead th").style =
+                "background-color: red";
               if (table.querySelectorAll("thead th").length != 0) {
                 clearTimeout(readyTh);
                 let sp = 0;
@@ -229,13 +317,10 @@ export default {
                     sp++;
                   }
                 });
-                
+
                 table.querySelectorAll("tbody tr").forEach((itemRow) => {
                   itemRow.querySelectorAll("td").forEach((itemTd, i) => {
-                    
-                    
                     if (i == column) {
-                      
                       // itemRow.style.backgroundColor = 'yellow';
                       let needItem = null,
                         row,
@@ -291,7 +376,7 @@ export default {
                     }
                   });
                 });
-                
+
                 if (table.querySelectorAll(".event").length > 0) {
                   if (item.prop[0] == "rowcolor") {
                     let rows = table.querySelectorAll(".event");
@@ -339,23 +424,31 @@ export default {
               event.target.parentElement.classList.add("selected");
             }
 
-            let headers = Array.from(this.$refs.table.$el.querySelector('thead tr').childNodes).map(item=>item.textContent)
+            let headers = Array.from(
+              this.$refs.table.$el.querySelector("thead tr").childNodes
+            ).map((item) => item.textContent);
 
-            let cellRowIndex = Array.from(event.target.parentElement.childNodes).findIndex(item => item==event.target);
+            let cellRowIndex = Array.from(
+              event.target.parentElement.childNodes
+            ).findIndex((item) => item == event.target);
 
             let tokens = this.$store.getters.getTockens(this.idDash);
 
-            tokens.forEach(token => {
-                if (token.elem == this.id && token.action == 'click' && headers[cellRowIndex]===token.capture) {
-                  let value = event.target.textContent
-                  this.$store.commit('setTocken', {
-                    tocken: token,
-                    idDash: this.idDash,
-                    store: this.$store,
-                    value,
-                  });
-                };
-              });
+            tokens.forEach((token) => {
+              if (
+                token.elem == this.id &&
+                token.action == "click" &&
+                headers[cellRowIndex] === token.capture
+              ) {
+                let value = event.target.textContent;
+                this.$store.commit("setTocken", {
+                  tocken: token,
+                  idDash: this.idDash,
+                  store: this.$store,
+                  value,
+                });
+              }
+            });
 
             let events = this.$store.getters.getEvents({
               idDash: this.idDash,

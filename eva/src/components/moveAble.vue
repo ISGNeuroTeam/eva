@@ -7,6 +7,7 @@
     :x="left"
     :y="top"
     :draggable="dragRes"
+    :drag-cancel="'.dash-map'"
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"

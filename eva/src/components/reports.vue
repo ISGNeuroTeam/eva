@@ -245,6 +245,7 @@ export default {
       search: {
         parametrs: {}
       },
+      limit: 1000,
       play: mdiPlay,
       plus: mdiPlus,
       gear: mdiSettings,
