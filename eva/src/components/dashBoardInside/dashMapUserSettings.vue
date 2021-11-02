@@ -171,7 +171,7 @@
           style="max-height: 466px"
           max-width="280"
           class="px-5 pb-5"
-          color="#191919"
+          :color="theme.$main_bg"
         >
           <v-subheader style="color: white" class="px-0">
             <v-row class="ma-0 fill-height">
@@ -221,8 +221,8 @@
             style="margin-bottom: 10px; border: 1px solid #555454"
           ></v-divider>
 
-          <v-card width="240" outlined color="white">
-            <v-list style="max-height: 382px" class="overflow-y-auto">
+          <v-card width="240" outlined >
+            <v-list :style="`color: ${theme.$main_text} !important; max-height: 382px`" class="overflow-y-auto" :color="theme.$secondary_bg" >
               <v-list-item v-for="item in library.objects" :key="item.name">
                 <template v-if="item.image">
                   <v-list-item-avatar size="20px" style="align-self: center">
@@ -230,7 +230,8 @@
                   </v-list-item-avatar>
 
                   <v-list-item-title
-                    style="text-align: left"
+                    :style="`color: ${theme.$main_text} !important; text-align: left`"
+                
                     v-text="item.name"
                   ></v-list-item-title>
                 </template>
@@ -243,7 +244,7 @@
                   />
 
                   <v-list-item-title
-                    style="text-align: left"
+                    :style="`color: ${theme.$main_text} !important; text-align: left`"
                     v-text="item.name"
                   />
                 </template>
@@ -265,7 +266,7 @@
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title
-                      style="text-align: left"
+                      :style="`color: ${theme.$main_text} !important; text-align: left`"
                       v-text="item.name"
                     />
                   </v-list-item-content>
