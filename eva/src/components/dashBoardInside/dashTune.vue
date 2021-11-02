@@ -104,7 +104,7 @@ export default {
       ],
       sliderValue: 0,
       dataField: null,
-      value: null,
+      value: 0,
     }
   },
   computed: {
@@ -116,7 +116,7 @@ export default {
     },
     values(){ // значения слайдера
       const list = this.dataRestFrom
-        .map(row => row[this.dataField])
+        .map(row => Number.parseFloat(row[this.dataField]))
         .sort();
       return list.filter((item, pos) => list.indexOf(item) === pos) // filter duplicates
     },
@@ -163,6 +163,9 @@ export default {
         }
       })
       this.sliderValue = rowNumber;
+      if (this.value === '' && list.length) {
+        this.value = list[rowNumber]
+      }
     },
     sliderValue(value) {
       if (!this.loading && this.values.length > 0) {
@@ -170,7 +173,7 @@ export default {
       }
     },
     dataField(value) {
-      this.$store.commit('setSelected', {
+      value !== '' && this.$store.commit('setSelected', {
         element: 'elem',
         idDash: this.idDashFrom,
         id: this.idFrom,
