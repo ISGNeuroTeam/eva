@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added the choice of coordinates by clicking on the map
+- added the ability to use tokens in panel names
 
 ## [1.71.0]
 ### Added
