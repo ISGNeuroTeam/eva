@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed default token
 - ability to zoom barplot
 - labeles on OX axis
+- fixed hiding graphics when loading data
 
 ### Added
 - added the choice of coordinates by clicking on the map
@@ -49,7 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed font weights 100, 200, 400, 500, 800
 - fixed SingleValue font weights
 - fixed full-screen map mode
-- fixed hiding graphics when loading data
 
 ## [1.70.0]
 ### Added
