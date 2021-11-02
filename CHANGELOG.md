@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed default token
 
+### Added
+- ability to use multiline select as filter for other datasourses
+
 ## [1.71.0]
 
 ### Added
