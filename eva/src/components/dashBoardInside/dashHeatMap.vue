@@ -85,6 +85,7 @@ export default {
     xField: "x",
     yField: "y",
     dataField: "metric",
+    detailValue: null,
     xFieldFormat: "Строка",
     xFieldSort: "По возрастанию",
     yFieldFormat: "Дата",
@@ -99,7 +100,7 @@ export default {
             'value',
         ]
       },
-    ],
+    ]
   }),
   computed: {
     id: function () {
@@ -158,6 +159,15 @@ export default {
   },
   watch: {
     dataRestFrom() {
+      if (this.dataRestFrom) {
+        let fields = Object.keys(this.dataRestFrom[0])
+        this.$store.commit('setOptions', {
+          id: this.idFrom,
+          idDash: this.idDashFrom,
+          options: {},
+          titles: fields,
+        });
+      }
       this.render();
     },
 
@@ -169,6 +179,7 @@ export default {
         if (newVal.y) this.yField = newVal.y;
         if (newVal.data) this.dataField = newVal.data;
         if (newVal.x) this.renderData = newVal.metadata;
+        if (newVal.detailValue) this.detailValue = newVal.detailValue;
         if (newVal.ySort) this.yFieldSort = newVal.ySort;
         if (newVal.ySort) this.xFieldSort = newVal.xSort;
         if (newVal.ySort) this.yFieldFormat = newVal.yFormat;
@@ -215,6 +226,10 @@ export default {
 
     },
     setClick: function (tokenValue) {
+      if (this.detailValue) {
+        let [first] = Object.keys(this.filteredData[tokenValue])
+        tokenValue = this.filteredData[tokenValue][first].row[this.detailValue]
+      }
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: "onclick",
