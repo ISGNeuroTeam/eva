@@ -8,14 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - fixed grid show checkbox
-
-### Fixed
 - fixed default token
 - ability to zoom barplot
 - labeles on OX axis
 
-## [1.71.0]
+### Added
+- added the choice of coordinates by clicking on the map
 
+## [1.71.0]
 ### Added
 - ability to set a default value for a token if its value is not set
 - hot keys ctrl+/ to automatically line break
