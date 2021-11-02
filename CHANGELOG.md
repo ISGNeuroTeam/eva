@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - labeles on OX axis
 - fixed hiding graphics when loading data
 - hide the progress bar on the heatmap if the value is empty
+- fixed styles for user settings in dashMap
 
 ### Added
 - added the choice of coordinates by clicking on the map
