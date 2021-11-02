@@ -17,7 +17,15 @@
           label="Режим"
           multiple
           @change="updatePipeDataSource($event)"
-        />
+          ><template v-slot:selection="{ item, index }">
+            <v-chip v-if="index === 0">
+              <span>{{ item }}</span>
+            </v-chip>
+            <span v-if="index === 1" class="grey--text text-caption">
+              (+{{ value.length - 1 }} others)
+            </span>
+          </template>
+        </v-select>
         <v-spacer />
         <v-dialog v-model="dialog" max-width="290">
           <template v-slot:activator="{ on, attrs }">
@@ -39,15 +47,17 @@
             <v-card-text :style="`color: ${theme.$main_text} !important`">
               <p>Подложка</p>
               <v-select
+                outlined
                 v-model="options.selectedLayer"
                 return-object
                 :items="tileLayers"
                 light
                 item-text="name"
                 item-value="tile[0]"
+                :dark="theme.$main_text == '#F4F4FA'"
+                :style="{ color: theme.$main_text }"
                 @change="updateTileLayer($event)"
               />
-
               <p>Начальный зум</p>
               <v-slider
                 v-model="options.zoomLevel"
@@ -58,6 +68,9 @@
               >
                 <template v-slot:label>
                   <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
                     v-model="options.zoomLevel"
                     class="mt-0 pt-0"
                     hide-details
@@ -78,6 +91,9 @@
               >
                 <template v-slot:label>
                   <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
                     v-model="options.zoomStep"
                     class="mt-0 pt-0"
                     hide-details
@@ -92,33 +108,29 @@
               <v-row>
                 <v-col col="6">
                   <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
                     v-model="options.initialPoint.x"
                   >
                     <template v-slot:prepend>
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                          <v-button v-on="on">Y:</v-button>
-                        </template>
-                        I'm a tooltip
-                      </v-tooltip>
+                      <v-button>X:</v-button>
                     </template>
                   </v-text-field>
                 </v-col>
                 <v-col col="6">
                   <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
                     v-model="options.initialPoint.y"
                   >
                     <template v-slot:prepend>
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                          <v-button v-on="on">Y:</v-button>
-                        </template>
-                        I'm a tooltip
-                      </v-tooltip>
+                      <v-button>Y:</v-button>
                     </template>
                   </v-text-field>
                 </v-col>
@@ -135,6 +147,8 @@
 
               <p>ИД для режима мониторинга</p>
               <v-select
+                outlined
+                :dark="theme.$main_text == '#F4F4FA'"
                 v-model="options.search"
                 item-text="sid"
                 :items="searches"
@@ -495,7 +509,6 @@ export default {
 </script>
 
 <style lang="sass" >
-
 .theme--light.v-select .v-select__selections
   color: var(--main_text) !important
 
