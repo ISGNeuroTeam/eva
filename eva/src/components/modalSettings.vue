@@ -2,8 +2,8 @@
   <v-dialog
     v-model="active"
     width="1140"
-    persistent
     @keydown="checkEsc($event)"
+    @click:outside="cancelModal"
   >
     <div class="settings-modal-block">
       <v-card :style="{background:theme.$main_bg}">
@@ -1250,13 +1250,35 @@
                 Библиотека примитивов отображения
               </div>
             </v-card-text>
+              <v-btn
+                plain link small
+                class="mb-3 text-lowercase"
+                :color="theme.$main_text"
+                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
               <v-textarea
                 v-model="options.primitivesLibrary"
                 name="input-7-1"
                 filled
+                rows="6"
                 label="JSON c примитивами"
-                auto-grow
+                :auto-grow="primitivesLibraryAutoGrow"
+                class="textarea-event"
+                spellcheck="false"
+                :color="theme.$main_text"
+                :style="{ color: theme.$main_text }"
+                outlined
+                hide-details
               ></v-textarea>
+              <v-btn
+                  v-if="primitivesLibraryAutoGrow"
+                  plain link small
+                  class="text-lowercase"
+                  :color="theme.$main_text"
+                  @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
             </v-container>
           </div>
           <v-card-text
@@ -1574,6 +1596,7 @@ export default {
       tableTitles:[],
       element: '',
       openNewScreen: false,
+      primitivesLibraryAutoGrow: false,
       options: {
       },
       optionsItems: [],
@@ -1671,6 +1694,9 @@ export default {
     },
     selectedTitles() {
       return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
+    },
+    primitivesLibraryAutoGrowLinkText() {
+      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
     },
 
     ...mapGetters([

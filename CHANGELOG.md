@@ -13,10 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - labeles on OX axis
 - fixed hiding graphics when loading data
 - hide the progress bar on the heatmap if the value is empty
+- the json primitives text area has theme
 
 ### Added
 - added the choice of coordinates by clicking on the map
 - added the ability to use tokens in panel names
+- closing the settings popup by clicking outside the popup
 
 ## [1.71.0]
 ### Added
