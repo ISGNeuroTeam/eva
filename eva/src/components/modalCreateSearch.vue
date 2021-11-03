@@ -238,7 +238,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.dataSearchFrom)
     this.currentSid = this.dataSearchFrom?.sid
   },
   watch: {
