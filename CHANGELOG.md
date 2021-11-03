@@ -9,11 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed grid show checkbox
 - fixed open settings for Picker component, added default titles for this
+- fixed update textarea with full screen textarea
 - fixed default token
 - ability to zoom barplot
 - labeles on OX axis
 - fixed hiding graphics when loading data
+- bug with update data search
 - hide the progress bar on the heatmap if the value is empty
+- render metrics when chenched data for dashboards(single value)
 
 ### Added
 - added the choice of coordinates by clicking on the map
