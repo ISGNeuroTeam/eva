@@ -187,6 +187,7 @@ export default {
   },
   data() {
     return {
+      currentSid: null,
       search: {
         sid: null,
         original_otl: null,
@@ -216,6 +217,7 @@ export default {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
         this.search = this.dataSearch
+
         if (this.createBtnFrom === 'edit') {
           this.createBtn = 'Редактировать'
         } else {
@@ -235,7 +237,13 @@ export default {
       return this.$store.getters.getTheme
     },
   },
+  mounted() {
+    this.currentSid = this.dataSearchFrom?.sid
+  },
   watch: {
+    dataSearchFrom() {
+      this.currentSid = this.dataSearchFrom?.sid
+    },
     tws: function () {
       this.search.parametrs.tws = this.tws
     },
@@ -274,12 +282,13 @@ export default {
 
         let searches = this.$store.getters.getSearches(this.idDash) // получаем все ИС
         let j = -1
-
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
-          if (item.sid === this.search.sid) {
+          if (item.sid === this.currentSid) {
             // и если ИС с таким id уже есть
             j = i // меняем переменную
+          } else if (item.sid === this.search.sid) {
+            j = -100
           }
         })
 
@@ -292,10 +301,10 @@ export default {
             this.errorMsgShow = true
           } else {
             this.$store.commit('setSearch', {
-              search: this.search,
+              search: { ...this.search, currentSid: j === -100 ? null : this.currentSid },
               idDash: this.idDash,
               reload: true,
-            }) // отправляем в хранилище для создания
+            })
             this.cancelBtn = 'Отмена'
             this.errorMsgShow = false
             this.$emit('cancelModal') // и скрываем окно редактирования ИД
