@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ability to zoom barplot
 - labeles on OX axis
 - fixed hiding graphics when loading data
+- bug with update data search
 - hide the progress bar on the heatmap if the value is empty
 - render metrics when chenched data for dashboards(single value)
 
