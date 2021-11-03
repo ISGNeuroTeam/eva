@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - fixed grid show checkbox
+- fixed open settings for Picker component, added default titles for this
 - fixed update textarea with full screen textarea
 - fixed default token
 - ability to zoom barplot
