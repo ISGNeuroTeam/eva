@@ -283,7 +283,6 @@ export default {
 
         let searches = this.$store.getters.getSearches(this.idDash) // получаем все ИС
         let j = -1
-        console.log(searches, this.currentSid, this.dataSearch)
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
           if (item.sid === this.currentSid) {
