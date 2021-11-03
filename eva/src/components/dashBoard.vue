@@ -34,7 +34,7 @@
               class="dash-title"
               :style="{ color: theme.$main_text }"
             >
-              {{ props.name }}
+              {{ boardTitle }}
             </div>
             <div
               v-if="props.edit"
@@ -114,7 +114,7 @@
                           class="dash-title"
                           :style="{ color: theme.$main_text }"
                         >
-                          {{ props.name }}
+                          {{ boardTitle }}
                         </div>
                         <div
                           v-if="props.edit"
@@ -319,6 +319,7 @@
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
+        @SetRange="setRange($event)"
       />
     </v-card>
   </div>
@@ -433,6 +434,22 @@ export default {
     };
   },
   computed: {
+    ...mapGetters([
+      'getTockens'
+    ]),
+    getSelfTockens() {
+      return this.getTockens(this.idDash)
+    },
+    boardTitle() {
+      if (!this.props) {
+        return 'Заголовок'
+      }
+      let name = this.props.name;
+      this.getSelfTockens.forEach(token => {
+        name = name.replaceAll(`$${token.name}$`, token.value)
+      })
+      return name
+    },
     settingsIsOpened(){
       return this.$store.getters.getModalSettings(this.idDash).status
     },
@@ -1012,6 +1029,9 @@ export default {
         this.searchData = JSON.parse(JSON.stringify(this.props.dataRest));
       }
       link.remove(); // удаляем ссылку
+    },
+    setRange (range) {
+      this.$emit("SetRange", range);
     },
   },
 };
