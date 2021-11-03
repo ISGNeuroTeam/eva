@@ -115,7 +115,6 @@ export default {
 
     },
     currentSettings() {
-      console.log('currentSettings')
       this.providedSettings = { ... this.currentSettings }
       this.init({ ... this.currentSettings })
     }
@@ -198,7 +197,6 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
-      // console.log(metricOptionsCurrent, 'metricOptionsCurrent')
       for (const [index, data] of this.dataRestFrom.entries()) {
         const { metric, value, id, metadata } = data;
         if (metric === '_title') {
@@ -229,7 +227,6 @@ export default {
         metricList.push({ value, ...defaultMetricOption });
         metricOptions.push({ id, range, expanded: false, ...defaultMetricOption });
       }
-      console.log(metricOptions, 'metricOptions')
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
     },
