@@ -1250,7 +1250,11 @@ export default {
             //let reg = `\\$${state[idDash].tockens[item].name}`;
             reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
             if (otl.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
-              otl = otl.replace(reg, state[idDash].tockens[item].value);
+              if(state[idDash].tockens[item].value) {
+                otl = otl.replace(reg, state[idDash].tockens[item].value);
+              } else {
+                otl = otl.replace(reg, state[idDash].tockens[item].defaultValue);
+              }
             }
 
             if (
