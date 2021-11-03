@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - labeles on OX axis
 - fixed hiding graphics when loading data
 - hide the progress bar on the heatmap if the value is empty
+- render metrics when chenched data for dashboards(single value)
 
 ### Added
 - added the choice of coordinates by clicking on the map
@@ -44,7 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - set higher z-index for active component on dashboard
 - increased the height of request text in data source
 - multiline captions rotation on the x-axis
-- render metrics when chenched data for dashboards(single value)
 - multiline incorrect drawing charts height in fullscreen mode
 - fixed the focus and tooltip of the activator buttons
 - fixed the problem with renaming dashboards and groups
