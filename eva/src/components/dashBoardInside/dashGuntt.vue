@@ -1,8 +1,9 @@
 <template>
   <div class="dash-guntt" :class="idDashClass()">
     <div class="legend-block">
-      <div 
-        v-for="i in legends.length" 
+      <div
+        v-show="!noMsg"
+        v-for="i in legends.length"
         :key="i"
         class="legends-itself"
       >
@@ -15,7 +16,8 @@
         </div>
       </div>
     </div>
-    <div 
+    <div
+      v-show="!noMsg"
       class="guntt-block"
       :data-change="change"
     />
@@ -25,12 +27,12 @@
       :style="{backgroundColor:colorFrom.backElement, border: `1px solid ${colorFrom.text}`}" 
     />
     <div
-      v-show="noMsg" 
-      class="errormsg"
+      v-show="noMsg"
+      class="mt-4"
     >
       {{ msgText }}
     </div>
-  </div> 
+  </div>
 </template>
 
 

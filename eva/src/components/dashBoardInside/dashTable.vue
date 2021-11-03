@@ -23,8 +23,8 @@
           v-slot:[`header.${title}`]="{ header }"
         >
           <v-menu offset-y :key="title">
-            <template v-slot:activator="{ on, attrs }">
-              <v-menu offset-y :close-on-content-click="false">
+            <template  v-slot:activator="{ on, attrs }">
+              <v-menu z-index="100000" offset-y :close-on-content-click="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
                     v-bind="attrs"
@@ -39,12 +39,12 @@
                   <v-col cols="6">
                     <v-select
                       :items="compare"
-                      label="Standard"
+                      label="Знак"
                       @change="filterData(title, $event, 'compare')"
                     ></v-select>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field label="Regular" @change="filterData(title, $event)"></v-text-field>
+                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
                   </v-col>
                 </v-row>
               </v-menu>

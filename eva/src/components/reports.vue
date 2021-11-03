@@ -183,7 +183,8 @@
                 :tooltipFrom="tooltipSvg"
                 :shouldGet="shouldGet"    
                 :dataReport="true" 
-                :dataRestFrom="data" 
+                :dataRestFrom="data"
+                @SetRange="setRange($event)"
               />
               <v-tooltip 
                 bottom 
@@ -538,6 +539,9 @@ export default {
       let size = this.$refs.vis.$el.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
+    },
+    setRange (range) {
+      this.data = this.data.filter(item => (item.day > range[0] && item.day < range[1]));
     },
   },
   mounted() {

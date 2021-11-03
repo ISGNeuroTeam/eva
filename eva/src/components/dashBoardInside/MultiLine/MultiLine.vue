@@ -2,12 +2,12 @@
   <div class="multiline-container pa-0">
     <div v-if="isNodata" class="nodata-block" v-text="message" />
     <div ref="legendContainer" class="legend">
-      <div v-for="item in legendList" :key="item.name" class="legend-item">
+      <div v-show="!isNodata" v-for="item in legendList" :key="item.name" class="legend-item">
         <div class="circle" :style="{ backgroundColor: item.color }" />
         <div class="text" :style="{ color: theme.$main_text }" v-text="item.name" />
       </div>
     </div>
-    <div ref="svgContainer" class="svg-container" :data-status="change">
+    <div ref="svgContainer" v-show="!isNodata" class="svg-container" :data-status="change">
       <div class="graph-tooltip"/>
     </div>
   </div>
@@ -107,6 +107,8 @@ export default {
         if ((this.dataReport && this.id === this.activeElemFrom) || !this.dataReport) {
           this.getDataAsynchrony()
         } else this.clearSvgContainer()
+      } else {
+        this.setNoData(true)
       }
       return true
     },
@@ -374,8 +376,9 @@ export default {
             parseFloat(invertStart.toFixed(5)),
             parseFloat(invertEnd.toFixed(5))
           ]
-      this.setClick(range, 'select')
-      this.zoom(x, yValue, selectRange, id)
+      this.$emit("SetRange", range);
+      // this.setClick(range, 'select')
+      // this.zoom(x, yValue, selectRange, id)
     },
 
     zoom(x, yValue, selectRange = [], id) {
@@ -1269,7 +1272,7 @@ export default {
 
         this.line.push(this.svg.append('g').attr('clip-path', `url(#${clipPathID})`))
 
-        if (optionsKeys.length === 0 || options.type === 'Line chart') {
+        // if (optionsKeys.length === 0 || options.type === 'Line chart') {
           const mustSee = []
           let dotDate = null
           let onelinesWithBreak = []
@@ -1289,48 +1292,48 @@ export default {
           if (nullValue !== -1) {
             dotDate = [extraDot[nullValue]]
           } else {
-            cutData.forEach((line) => {
-              if (!Number(line[metric]) && line[metric] !== 0) {
-                if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
-                linesWithBreak.push(onelinesWithBreak)
-                onelinesWithBreak = []
-              } else {
-                onelinesWithBreak.push(line)
+            if (optionsKeys.length === 0 || options.type === 'Line chart') {
+              cutData.forEach((line) => {
+                if (!Number(line[metric]) && line[metric] !== 0) {
+                  if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
+                  linesWithBreak.push(onelinesWithBreak)
+                  onelinesWithBreak = []
+                } else {
+                  onelinesWithBreak.push(line)
+                }
+              })
+
+              if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
+
+              linesWithBreak.push(onelinesWithBreak)
+              this.allLinesWithBreak[metricIndex] = linesWithBreak
+              linesWithBreak.forEach((lineItself, lineIndex) => {
+                this.line[metricIndex]
+                    .append('path')
+                    .datum(lineItself)
+                    .attr('class', `line-${metricIndex}-${lineIndex}`)
+                    .attr('fill', 'none')
+                    .attr('stroke', this.legendColors[metricIndex])
+                    .attr('stroke-width', this.strokeWidth)
+                    .attr(
+                        'd',
+                        d3.line()
+                            .x((d) => x(d[xMetric] * this.secondTransf))
+                            .y((d) => y[metricIndex](d[metric]))
+                    )
+              })
+              if (minY < 0) {
+                this.line[metricIndex]
+                  .append('line')
+                  .attr('class', `zero-line-${metricIndex}`)
+                  .attr('x1', 0)
+                  .attr('y1', y[metricIndex](0))
+                  .attr('x2', this.width)
+                  .attr('y2', y[metricIndex](0))
+                  .attr('opacity', '.3')
+                  .attr('stroke', this.theme.$main_text)
+                  .attr('stroke-dasharray', '3 3')
               }
-            })
-
-            if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
-
-            linesWithBreak.push(onelinesWithBreak)
-            this.allLinesWithBreak[metricIndex] = linesWithBreak
-
-            linesWithBreak.forEach((lineItself, lineIndex) => {
-              this.line[metricIndex]
-                .append('path')
-                .datum(lineItself)
-                .attr('class', `line-${metricIndex}-${lineIndex}`)
-                .attr('fill', 'none')
-                .attr('stroke', this.legendColors[metricIndex])
-                .attr('stroke-width', this.strokeWidth)
-                .attr(
-                  'd',
-                  d3.line()
-                    .x((d) => x(d[xMetric] * this.secondTransf))
-                    .y((d) => y[metricIndex](d[metric]))
-                )
-            })
-
-            if (minY < 0) {
-              this.line[metricIndex]
-                .append('line')
-                .attr('class', `zero-line-${metricIndex}`)
-                .attr('x1', 0)
-                .attr('y1', y[metricIndex](0))
-                .attr('x2', this.width)
-                .attr('y2', y[metricIndex](0))
-                .attr('opacity', '.3')
-                .attr('stroke', this.theme.$main_text)
-                .attr('stroke-dasharray', '3 3')
             }
 
             dotDate = cutData
@@ -1559,7 +1562,8 @@ export default {
             brushObj.selections = brush.selectAll(`.selection-${metricIndex}`).nodes()
             brushObj.selections.forEach((sel) => sel.remove())
           }
-        }
+
+        // }
 
         if (optionsKeys.length > 0 || options.type === 'Bar chart') {
           let allDotHover = []

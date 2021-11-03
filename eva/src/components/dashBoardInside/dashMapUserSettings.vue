@@ -20,7 +20,7 @@
           @change="updatePipeDataSource($event)"
         />
         <v-spacer/>
-        <v-dialog v-model="dialog" max-width="290">
+        <v-dialog v-model="dialog" max-width="390">
           <template v-slot:activator="{ on, attrs }">
             <v-btn rounded :style="`background: ${theme.$secondary_bg}`" v-bind="attrs" v-on="on">
               <v-icon :style="{ color: theme.$main_text }">
@@ -84,11 +84,14 @@
 
               <p>Начальная точка</p>
               <v-row>
-                <v-col col="6">
+                <v-col>
                   <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
                 </v-col>
-                <v-col col="6">
+                <v-col>
                   <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
+                </v-col>
+                <v-col class="flex-grow-0">
+                  <v-btn small color="primary" class="mt-3" @click="onClickChoosingCoordinates">Указать на карте</v-btn>
                 </v-col>
               </v-row>
 
@@ -355,6 +358,19 @@ export default {
     this.searches = this.loadDataForPipe();
   },
   methods: {
+    onClickChoosingCoordinates(e) {
+      const cursorCssClass = 'cursor-crosshair';
+      this.dialog = false;
+      L.DomUtil.addClass(this.map._container, cursorCssClass);
+      const clickEvent = event => {
+        this.dialog = true;
+        L.DomUtil.removeClass(this.map._container, cursorCssClass);
+        this.options.initialPoint.x = event.latlng.lat;
+        this.options.initialPoint.y = event.latlng.lng;
+        this.map.off('click', clickEvent)
+      }
+      this.map.on('click', clickEvent);
+    },
     updatePipeDataSource(e) {
       let set = new Set(e);
       set.delete(this.options.mode[0])

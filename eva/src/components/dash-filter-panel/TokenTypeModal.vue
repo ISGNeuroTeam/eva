@@ -5,7 +5,7 @@
   >
     Токен
     <v-select
-      v-model="currentTokenName"
+      :value.sync="currentToken"
       :items="tokenNameList"
       :disabled="!editMode"
       @change="changeToken"
@@ -28,67 +28,54 @@
   </div>
 </template>
 <script>
-  export default {
-    name: 'TokenTypeModal',
-    props: ['temp', 'idDash', "editMode"],
-    data() {
-      return {
-        currentToken:null,
-        currentTokenName:"",
-        operations: ['OR', 'AND', 'REPLACE'],
-      };
-    },
-    computed: {
-      tokenNameList() {
-        return this.$store.getters.getTockens(this.idDash).map(tkn=>tkn.name);
-      },
-      theme() {
-        return this.$store.getters.getTheme;
+export default {
+  name: 'TokenTypeModal',
+  props: ['temp', 'idDash', 'editMode'],
+  data() {
+    return {
+      currentToken: '',
+      operations: ['OR', 'AND', 'REPLACE'],
+    };
+  },
+  watch: {
+    temp: {
+      immediate: true,
+      handler(newVal) {
+        this.currentToken = newVal.token;
       },
     },
-    watch: {
-      currentTokenName(tknName){
-        this.temp.token = this.$store.getters.getTockens(this.idDash).find(tkn=>tkn.name===tknName)
-        this.temp.fieldName = this.temp.token.capture;
-      }
+  },
+  computed: {
+    tokenNameList() {
+      return this.$store.getters.getTockens(this.idDash).map(tkn => tkn.name);
     },
-    methods: {
-      changeToken(){
-        this.temp.values = []
-      }
+    theme() {
+      return this.$store.getters.getTheme;
     },
-    mounted() {
-      if(this.temp.token) {
-        this.currentTokenName = this.temp.token.name
-        this.$set(this.temp, 'token', this.temp.token);
-        this.$watch(
-          'temp.token',
-          newVal => {
-            if (newVal) {
-              this.currentTokenName = newVal.name
-            }
-          },
-          { immediate: true }
-        );
-      }
+  },
+  methods: {
+    changeToken(newTokenName) {
+      this.temp.token = newTokenName
+      this.temp.values = [];
     },
-  };
+  },
+};
 </script>
 
 <style lang="sass">
-  .token-type-filter-modal
-    .v-input__slot
-      min-height: auto !important
+.token-type-filter-modal
+  .v-input__slot
+    min-height: auto !important
 
-    .v-input__slot fieldset
+  .v-input__slot fieldset
+    color: var(--main_text) !important
+
+  .v-input__control
+    .v-icon
       color: var(--main_text) !important
 
-    .v-input__control
-      .v-icon
-        color: var(--main_text) !important
-
-    .v-select__selections
-      color: var(--main_text) !important
-    .v-input input
-      min-height: auto !important
+  .v-select__selections
+    color: var(--main_text) !important
+  .v-input input
+    min-height: auto !important
 </style>
