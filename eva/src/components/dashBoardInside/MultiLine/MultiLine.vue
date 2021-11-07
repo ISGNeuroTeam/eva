@@ -1489,79 +1489,82 @@ export default {
 
           const brush = this.line[metricIndex].append('g').attr('class', `brush-${metricIndex}`)
 
-          brush
-            .append('rect')
-            .attr('class', `overlay-${metricIndex}`)
-            .attr('x', 0)
-            .attr('y', startY[metricIndex])
-            .attr('width', this.width)
-            .attr('height', parseFloat(step * (metricIndex + 1)) + 20)
-            .attr('fill', 'none')
-            .attr('pointer-events', 'all')
-            .on('mouseup', () => brushObj.selectionUp())
-            .on('mousedown', () => brushObj.selectionDown())
-            .on('mousemove', () => brushObj.selectionMove())
-
-          brushObj.selectionDown = () => {
-            brushObj.mouseDown = true
-            brushObj.clearBrush()
-            brushObj.startX = d3.event.offsetX - Math.ceil(maxLength)
+          if (metricIndex === 0) {
             brush
-              .append('rect')
-              .attr('class', `selection-${metricIndex}`)
-              .attr('x', brushObj.startX)
-              .attr('y', startY[metricIndex])
-              .attr('width', 0)
-              .attr('height', parseFloat(step))
-              .attr('fill', this.theme.$accent_ui_color)
-              .style('opacity', 0.3)
-              .on('mouseup', () => brushObj.selectionUp())
-              .on('mousemove', () => brushObj.selectionMove())
-          }
+                .append('rect')
+                .attr('class', `overlay-${metricIndex}`)
+                .attr('x', 0)
+                .attr('y', startY[metricIndex])
+                .attr('width', this.width)
+                .attr('height', this.height)
+                .attr('fill', 'none')
+                .attr('pointer-events', 'all')
+                .on('mouseup', () => brushObj.selectionUp())
+                .on('mousedown', () => brushObj.selectionDown())
+                .on('mousemove', () => brushObj.selectionMove())
 
-          brushObj.selectionUp = () => {
-            brushObj.mouseDown = false
+            brushObj.selectionDown = () => {
+              brushObj.mouseDown = true
+              brushObj.clearBrush()
+              brushObj.startX = d3.event.offsetX - Math.ceil(maxLength)
+              brush
+                  .append('rect')
+                  .attr('class', `selection-${metricIndex}`)
+                  .attr('x', brushObj.startX)
+                  .attr('y', startY[metricIndex])
+                  .attr('width', 0)
+                  .attr('height', this.height)
+                  .attr('fill', this.theme.$accent_ui_color)
+                  .style('opacity', 0.3)
+                  .on('mouseup', () => brushObj.selectionUp())
+                  .on('mousemove', () => brushObj.selectionMove())
+            }
+            brushObj.selectionUp = () => {
+              brushObj.mouseDown = false
 
-            if (brushObj.direction === 'left') {
-              const change = brushObj.startX
-              brushObj.startX = brushObj.endX
-              brushObj.endX = change
+              if (brushObj.direction === 'left') {
+                const change = brushObj.startX
+                brushObj.startX = brushObj.endX
+                brushObj.endX = change
+              }
+
+              if (brush.select(`.selection-${metricIndex}`).attr('width') > 5) {
+                this.updateData(x, y, [brushObj.startX, brushObj.endX], metricIndex)
+              }
+
+              brushObj.clearBrush()
             }
 
-            if (brush.select(`.selection-${metricIndex}`).attr('width') > 5) {
-              this.updateData(x, y, [brushObj.startX, brushObj.endX], metricIndex)
-            }
+            brushObj.selectionMove = () => {
+              if (brushObj.mouseDown) {
+                const startX = brushObj.startX
+                const offsetX = d3.event.offsetX - Math.ceil(maxLength)
+                const selectWidth = offsetX - startX
+                const isWidthPositive = selectWidth > 0
 
-            brushObj.clearBrush()
-          }
+                brushObj.direction = isWidthPositive ? 'right' : 'left'
+                brushObj.endX = isWidthPositive ? offsetX : startX + selectWidth
 
-          brushObj.selectionMove = () => {
-            if (brushObj.mouseDown) {
-              const startX = brushObj.startX
-              const offsetX = d3.event.offsetX - Math.ceil(maxLength)
-              const selectWidth = offsetX - startX
-              const isWidthPositive = selectWidth > 0
-
-              brushObj.direction = isWidthPositive ? 'right' : 'left'
-              brushObj.endX = isWidthPositive ? offsetX : startX + selectWidth
-
-              if (selectWidth > 0) {
-                brush
-                  .select(`.selection-${metricIndex}`)
-                  .attr('width', selectWidth)
-              } else {
-                brush
-                  .select(`.selection-${metricIndex}`)
-                  .attr('x', startX + selectWidth)
-                  .attr('width', -selectWidth)
+                if (selectWidth > 0) {
+                  brush
+                      .select(`.selection-${metricIndex}`)
+                      .attr('width', selectWidth)
+                } else {
+                  brush
+                      .select(`.selection-${metricIndex}`)
+                      .attr('x', startX + selectWidth)
+                      .attr('width', -selectWidth)
+                }
               }
             }
+
+            brushObj.clearBrush = () => {
+              brushObj.selections = brush.selectAll(`.selection-${metricIndex}`).nodes()
+              brushObj.selections.forEach((sel) => sel.remove())
+            }
           }
 
-          brushObj.clearBrush = () => {
-            brushObj.selections = brush.selectAll(`.selection-${metricIndex}`).nodes()
-            brushObj.selections.forEach((sel) => sel.remove())
-          }
+
 
         // }
 
