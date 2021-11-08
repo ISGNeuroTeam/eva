@@ -278,13 +278,15 @@ export default {
       for (const [index, updatedMetric] of metricOptions.entries()) {
         const { icon, title, color, fontSize, fontWeight } = updatedMetric;
         const metric = this.metricList.find(m => m.id === updatedMetric.id);
-        metric.icon = icon;
-        metric.title = title;
-        metric.color = color;
-        metric.fontSize = fontSize;
-        metric.fontWeight = fontWeight;
-        metric.listOrder = index;
-        newMetricList[index] = metric
+        if (metric) {
+          metric.icon = icon;
+          metric.title = title;
+          metric.color = color;
+          metric.fontSize = fontSize;
+          metric.fontWeight = fontWeight;
+          metric.listOrder = index;
+          newMetricList[index] = metric
+        }
       }
       this.metricList = [...newMetricList]
       this.providedSettings = { ...newSettings };
