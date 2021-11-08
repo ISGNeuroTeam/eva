@@ -272,7 +272,7 @@ export default {
       const newMetricList = [];
       for (const [index, updatedMetric] of metricOptions.entries()) {
         const { icon, title, color, fontSize, fontWeight } = updatedMetric;
-        const metric = this.metricList.find(m => m.id === updatedMetric.id);
+        const metric = this.metricList.find(m => m.id === updatedMetric.id) || {};
         metric.icon = icon;
         metric.title = title;
         metric.color = color;

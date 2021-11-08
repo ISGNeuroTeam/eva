@@ -94,11 +94,7 @@ export default {
     defaultActions: [
       {
         name: 'click',
-        capture: [
-            'x',
-            'y',
-            'value',
-        ]
+        capture: []
       },
     ]
   }),
@@ -146,20 +142,21 @@ export default {
     },
 
     actions() {
-      let fields = []
-      if (this.dataRestFrom) {
-        fields = Object.keys(this.dataRestFrom[0])
+      let capture = []
+      if (this.dataRestFrom && this.dataRestFrom[0]) {
+        capture = Object.keys(this.dataRestFrom[0])
       }
       return this.defaultActions.map(action => {
-        const capture = action.capture;
-        capture.push(...fields)
         return { ...action, capture }
       })
     }
   },
   watch: {
+    actions(actions) {
+      this.$store.commit('setActions', {actions, idDash: this.idDash, id: this.id });
+    },
     dataRestFrom() {
-      if (this.dataRestFrom) {
+      if (this.dataRestFrom && this.dataRestFrom[0]) {
         let fields = Object.keys(this.dataRestFrom[0])
         this.$store.commit('setOptions', {
           id: this.idFrom,
