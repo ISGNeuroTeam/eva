@@ -682,7 +682,7 @@ export default {
       let changed = [];
 
       item.value.forEach((itemValue, k) => {
-        if (itemValue.indexOf('$') != -1) {
+        if (typeof itemValue === 'string' && itemValue.indexOf('$') !== -1) {
           itemValue = itemValue.replace(/\$/g, '');
 
           tockens.forEach((tockenDeep, l) => {
