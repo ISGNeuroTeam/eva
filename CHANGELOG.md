@@ -5,18 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-### Fixed
-- fixed grid show checkbox
-- fixed default token
-- ability to zoom barplot
-- labeles on OX axis
-- fixed hiding graphics when loading data
-- hide the progress bar on the heatmap if the value is empty
-
+## [1.72.0]
 ### Added
 - added the choice of coordinates by clicking on the map
 - added the ability to use tokens in panel names
+- added a click token to the heatmap
+
+### Fixed
+- fixed grid show checkbox
+- fixed open settings for Picker component, added default titles for this
+- fixed update textarea with full screen textarea
+- fixed default token
+- ability to zoom barplot
+- labels on OX axis
+- fixed hiding graphics when loading data
+- bug with update data search
+- hide the progress bar on the heatmap if the value is empty
+- render metrics when changed data for dashboards(single value)
 
 ## [1.71.0]
 ### Added

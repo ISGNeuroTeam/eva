@@ -540,6 +540,7 @@
               </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="data" label="data:" :items="tableTitles" /> </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="metadata" label="metadata:" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select v-model="detailValue" label="Поле для ссылки Детали:" :items="tableTitles" /> </v-row>
             </v-container>
 
           </div>
@@ -1605,6 +1606,7 @@ export default {
       x: '',
       y: '',
       metadata: '',
+      detailValue: '',
       data: '',
       xFormat: 'Строка',
       yFormat: 'Дата',
@@ -1659,6 +1661,7 @@ export default {
           this.y = test.y
           this.data = test.data
           this.metadata = test.metadata
+          this.detailValue = test.detailValue
         }
       }
       return this.$store.getters.getModalSettings(this.idDash).status;
@@ -1741,6 +1744,7 @@ export default {
         this.options.y = this.y;
         this.options.data = this.data;
         this.options.metadata = this.metadata;
+        this.options.detailValue = this.detailValue;
         this.options.yFormat = this.yFormat;
         this.options.ySort = this.ySort;
         this.options.xFormat = this.xFormat;
