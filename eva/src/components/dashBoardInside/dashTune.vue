@@ -18,7 +18,7 @@
       class="flex flex-grow-1 justify-center align-center mt-6"
       :class="{row: vertical}"
     >
-      <div class="flex-grow-0 px-4">
+      <div class="flex-grow-0">
         <v-slider
             :class="{'slider-vertical': vertical}"
             :dark="isDarkTheme"
@@ -27,14 +27,13 @@
             :min="0"
             :max="values.length -1"
             :vertical="vertical"
-            :tick-labels="values"
             :color="theme.$primary_button"
             ticks="always"
             @change="onChangeSlider"
         >
         </v-slider>
       </div>
-      <div>
+      <div class="pt-4">
         <v-progress-circular
             :rotate="360"
             :size="circularSize"
@@ -43,8 +42,7 @@
             :color="loading ? theme.$secondary_border : theme.$primary_button"
         >
           <div v-if="!loading">
-            <span class="text-h4">{{ percentValueStr }}</span>
-            <br> val: {{ value }}
+            <span class="text-h4">{{ value }}%</span>
           </div>
         </v-progress-circular>
         <div class="pa-4">
@@ -115,6 +113,12 @@ export default {
       return this.colorFrom
     },
     values(){ // значения слайдера
+      if (!this.dataField && this.dataRestFrom.length) {
+        const keys = Object.keys(this.dataRestFrom[0]).filter(key => key[0] !== '_');
+        if (keys.length === 1) {
+          this.dataField = keys[0];
+        }
+      }
       const list = this.dataRestFrom
         .map(row => Number.parseFloat(row[this.dataField]))
         .sort();
@@ -131,12 +135,6 @@ export default {
     },
     percentValue() {
       return this.fractionalValue *100
-    },
-    percentValueStr() {
-      return this.fractionalValue.toLocaleString("en", {
-        style: "percent",
-        maximumFractionDigits: 2
-      })
     },
     isMinimumValue() {
       return this.sliderValue <= 0
