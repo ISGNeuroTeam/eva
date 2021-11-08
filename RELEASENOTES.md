@@ -1,4 +1,50 @@
+# [1.72.0] - Tokens in visualization titles, coordination choice in map component and bugfixes.
+### New
+- Choice of coordinates by clicking on the map.
+- Tokens can be used in visualization titles.
+
+### Bugfix
+- Grid show checkbox on dashboard.
+- Fixed open settings for Picker component, added default titles.
+- Full screen textarea.
+- Default token value.
+- Ability to zoom barplot.
+- Labels on OX axis.
+- Fixed hiding graphics when loading data.
+- Bug with update data search.
+- Hide the progress bar on the heatmap if the value is empty.
+- SingleValue render metrics when changed data for dashboards.
+
+# [1.71.0] - Default token values. Search rows limitation, shortcut for line break. New font in SingeValue. A lot of bugfixes.
+### New
+- Ability to set a default token value for if its value isn't set.
+- Ctrl+/ hot keys to automatically line break in dashboard data sources and "Searching and Reporting".
+- Added switch to enable/disable opening dashboard in new window in HeatMap component.
+- Maximum number of rows in response data is automatically limited to 1000 in "Searching and Reporting" and can be limited in dashboard searches too.
+- DatePicker component has been translated into russian.
+- Multiline barplot bars are now centered.
+- Redesigned single value from design template.
+- Added font weights 100, 200, 400, 500, 800 for SingeValues component.
+
+### Bugfix
+- Set default color for a new dashboard group.
+- Problem with canceling changes in SingleValue component when we don't want to save them.
+- Fullscreen mode of SingleValue component.
+- Issue with movable elements in SingeValue settings, updated move for burger icon.
+- Fixed colors for metric values in SingleValue component.
+- Bug with template selection in SingleValue component settings.
+- Active component on dashboard now has higher z-index.
+- Increased the height of request text in data source modal windows.
+- Multiline captions rotation on the x-axis.
+- Multiline incorrect drawing charts height in fullscreen mode.
+- Problem with tooltips not disappearing after clicking buttons.
+- Problem with renaming dashboards and groups.
+- Problem with position of the datepicker in the pop-up of the data source.
+- Problem with scheduler id loss after refreshing page.
+- Fullscreen mode of Map component.
+
 # [1.70.0] - PieChart tooltips, new MultiLine settings including bar appearance for lines
+
 ### New
 - Tooltips for PieChart visualization.
 - Ability to select pies in PieChart by clicking legend.

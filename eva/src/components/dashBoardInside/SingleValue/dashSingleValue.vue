@@ -111,7 +111,7 @@ export default {
     dataRestFrom() {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(JSON.stringify(this.$store.getters.getOptions({ id, idDash })));
-      this.setVisual(this.providedSettings.metricOptions.length ? this.providedSettings.metricOptions : options.settings?.metricOptions)
+      this.setVisual(this.currentSettings.metricOptions.length ? this.currentSettings.metricOptions : options.settings?.metricOptions)
 
     },
     currentSettings() {
@@ -197,28 +197,23 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
-      let idCount = 1;
-
       for (const [index, data] of this.dataRestFrom.entries()) {
-        const { metric, value, order, metadata, _time } = data;
+        const { metric, value, id, metadata } = data;
         if (metric === '_title') {
           this.titleToken = String(value);
           continue;
         }
 
-        const metricID = idCount++;
         let range = metadata;
 
         if (!metadata || typeof metadata !== 'string') {
           range = null;
         }
-
-        const startId = `${metric}_${_time}_${value}`
+        const startId = `${metric}_${id}`
 
         const metricCurrent = metricOptionsCurrent?.find(m => m.startId === startId);
-        
         const defaultMetricOption = {
-          id: metricCurrent?.id || metricID,
+          id: metricCurrent?.id || id,
           startId: metricCurrent?.startId || startId,
           metadata: metadata,
           title: metric || data.phase,
@@ -226,11 +221,11 @@ export default {
           icon: metricCurrent?.icon || 'no_icon',
           fontSize: metricCurrent?.fontSize || 54,
           fontWeight: metricCurrent?.fontWeight || 400,
-          listOrder: metricCurrent?.listOrder || order,
+          listOrder: metricCurrent?.listOrder === undefined ? index : metricCurrent?.listOrder,
           ...metricCurrent,
         };
         metricList.push({ value, ...defaultMetricOption });
-        metricOptions.push({ order, range, expanded: false, ...defaultMetricOption });
+        metricOptions.push({ id, range, expanded: false, ...defaultMetricOption });
       }
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
@@ -277,7 +272,7 @@ export default {
       const newMetricList = [];
       for (const [index, updatedMetric] of metricOptions.entries()) {
         const { icon, title, color, fontSize, fontWeight } = updatedMetric;
-        const metric = this.metricList.find(m => m.id === updatedMetric.id);
+        const metric = this.metricList.find(m => m.id === updatedMetric.id) || {};
         metric.icon = icon;
         metric.title = title;
         metric.color = color;

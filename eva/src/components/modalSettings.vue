@@ -21,6 +21,15 @@
           class="options-block"
         >
           <div class="option-item">
+            <v-switch
+              v-model="openNewScreen"
+              class="switch"
+              :color="theme.$primary_button"
+              :style="{color:theme.$main_text}"
+              label="Открыть в новой вкладке"
+            />
+          </div>
+          <div class="option-item">
             <div
               class="name-option main item"
               :style="{color:theme.$title, borderBottom: `1px solid ${theme.$main_border}`}"
@@ -531,6 +540,7 @@
               </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="data" label="data:" :items="tableTitles" /> </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="metadata" label="metadata:" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select v-model="detailValue" label="Поле для ссылки Детали:" :items="tableTitles" /> </v-row>
             </v-container>
 
           </div>
@@ -1564,6 +1574,7 @@ export default {
     return {
       tableTitles:[],
       element: '',
+      openNewScreen: false,
       options: {
       },
       optionsItems: [],
@@ -1595,6 +1606,7 @@ export default {
       x: '',
       y: '',
       metadata: '',
+      detailValue: '',
       data: '',
       xFormat: 'Строка',
       yFormat: 'Дата',
@@ -1649,6 +1661,7 @@ export default {
           this.y = test.y
           this.data = test.data
           this.metadata = test.metadata
+          this.detailValue = test.detailValue
         }
       }
       return this.$store.getters.getModalSettings(this.idDash).status;
@@ -1731,6 +1744,7 @@ export default {
         this.options.y = this.y;
         this.options.data = this.data;
         this.options.metadata = this.metadata;
+        this.options.detailValue = this.detailValue;
         this.options.yFormat = this.yFormat;
         this.options.ySort = this.ySort;
         this.options.xFormat = this.xFormat;
@@ -1740,7 +1754,7 @@ export default {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, openNewScreen: this.openNewScreen  }, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания

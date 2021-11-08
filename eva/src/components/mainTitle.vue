@@ -68,6 +68,7 @@
             :dataSourseTitle="elem.search"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
+            @SetRange="setRange($event, elem)"
           />
           <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
@@ -334,11 +335,11 @@ export default {
     },
     checkLoading(elem) {
       if (elem.search === -1) return false
-      return this.dataObject[elem.search].loading
+      return this.dataObject[elem.search]?.loading
     },
     getElementData(elem) {
       if (elem.search === -1) return []
-      return this.dataObject[elem.search].data
+      return this.dataObject[elem.search]?.data
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
@@ -445,6 +446,9 @@ export default {
 
         }
       })
+    },
+    setRange (range, elem) {
+      this.dataObject[elem.search].data = this.dataObject[elem.search].data.filter(item => (item.day > range[0] && item.day < range[1]));
     },
   },
 }
