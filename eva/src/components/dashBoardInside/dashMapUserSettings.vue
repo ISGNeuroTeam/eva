@@ -18,7 +18,7 @@
           multiple
           @change="updatePipeDataSource($event)"
         />
-        <v-spacer/>
+        <v-spacer />
         <v-dialog v-model="dialog" max-width="390">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -35,8 +35,30 @@
           <v-card
             :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text} !important`"
           >
-            <v-card-title class="text-h5"> Настройки </v-card-title>
-            <v-card-text :style="`color: ${theme.$main_text} !important`">
+            <v-card-title
+              class="text-h5"
+              :style="`background: ${theme.$main_bg} !important`"
+            >
+              Настройки
+              <v-spacer />
+              <a style="align-self: center" @click="dialog = false">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665 5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984 11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
+                    fill="#DADADA"
+                  />
+                </svg>
+              </a>
+            </v-card-title>
+            <v-card-text
+              :style="`color: ${theme.$main_text} !important; margin-top: 20px`"
+            >
               <p>Подложка</p>
               <v-select
                 outlined
@@ -127,7 +149,13 @@
                   </v-text-field>
                 </v-col>
                 <v-col class="flex-grow-0">
-                  <v-btn small color="primary" class="mt-3" @click="onClickChoosingCoordinates">Указать на карте</v-btn>
+                  <v-btn
+                    small
+                    color="primary"
+                    class="mt-3"
+                    @click="onClickChoosingCoordinates"
+                    >Указать на карте</v-btn
+                  >
                 </v-col>
               </v-row>
 
@@ -192,7 +220,12 @@
                     </defs>
                   </svg>
 
-                  <span class="ml-2 legend-title"> Легенда </span>
+                  <span
+                    class="ml-2 legend-title"
+                    :style="`color: ${theme.$main_text} !important;`"
+                  >
+                    Легенда
+                  </span>
                   <v-spacer />
                   <a style="align-self: center" @click="closeLegend">
                     <svg
@@ -216,8 +249,12 @@
             style="margin-bottom: 10px; border: 1px solid #555454"
           ></v-divider>
 
-          <v-card width="240" outlined >
-            <v-list :style="`color: ${theme.$main_text} !important; max-height: 382px`" class="overflow-y-auto" :color="theme.$secondary_bg" >
+          <v-card width="240" outlined>
+            <v-list
+              :style="`color: ${theme.$main_text} !important; max-height: 382px`"
+              class="overflow-y-auto"
+              :color="theme.$secondary_bg"
+            >
               <v-list-item v-for="item in library.objects" :key="item.name">
                 <template v-if="item.image">
                   <v-list-item-avatar size="20px" style="align-self: center">
@@ -226,7 +263,6 @@
 
                   <v-list-item-title
                     :style="`color: ${theme.$main_text} !important; text-align: left`"
-                
                     v-text="item.name"
                   ></v-list-item-title>
                 </template>
@@ -390,17 +426,17 @@ export default {
   },
   methods: {
     onClickChoosingCoordinates(e) {
-      const cursorCssClass = 'cursor-crosshair';
+      const cursorCssClass = "cursor-crosshair";
       this.dialog = false;
       L.DomUtil.addClass(this.map._container, cursorCssClass);
-      const clickEvent = event => {
+      const clickEvent = (event) => {
         this.dialog = true;
         L.DomUtil.removeClass(this.map._container, cursorCssClass);
         this.options.initialPoint.x = event.latlng.lat;
         this.options.initialPoint.y = event.latlng.lng;
-        this.map.off('click', clickEvent)
-      }
-      this.map.on('click', clickEvent);
+        this.map.off("click", clickEvent);
+      };
+      this.map.on("click", clickEvent);
     },
     updatePipeDataSource(e) {
       let set = new Set(e);
