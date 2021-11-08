@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- added a click token to the heatmap
+
 ### Fixed
 - fixed the datepicker in the dataset popup
-
 
 ## [1.72.0]
 ### Added
