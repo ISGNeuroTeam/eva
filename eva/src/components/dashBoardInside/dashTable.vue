@@ -103,6 +103,8 @@ export default {
         itemsForTable: [],
       },
       numericTitles: [],
+      dataTitles:[],
+      stringTitles: [],
       filters: {},
     };
   },
@@ -111,7 +113,7 @@ export default {
       let temp = this.props.itemsForTable
       console.log(temp)
       for (let [key, val] of Object.entries(this.filters)) {
-        console.log(key, val);
+        
         if (val.compare === '>')
           temp = temp.filter(x => x[key] > +val.value)
         if (val.compare === '<')
@@ -121,6 +123,7 @@ export default {
       }
       return temp
     },
+    
     events() {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
@@ -181,6 +184,8 @@ export default {
       handler(oldVal) {
         console.log(JSON.parse(JSON.stringify(oldVal)));
         this.checkForNumeric(oldVal[0]);
+        this.checkForString(oldVal[0]);
+        this.checkForDate(oldVal[0]);
         this.setEventColor();
       },
     },
@@ -197,6 +202,45 @@ export default {
     this.setEventColor();
   },
   methods: {
+    chooseSort(dataFormat, sortType) {
+      if (dataFormat === "Дата") {
+        let up = (a, b) => {
+          return new Date(a) - new Date(b);
+        };
+        let down = (a, b) => {
+          return new Date(b) - new Date(a);
+        };
+
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      } else if (dataFormat === "Число") {
+        let up = (a, b) => {
+          return a - b;
+        };
+        let down = (a, b) => {
+          return b - a;
+        };
+
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      } else if (dataFormat === "строка") {
+        let up = (a, b) => {
+          return a - b;
+        };
+        let down = (a, b) => {
+          return b - a;
+        };
+
+        let sort;
+        if (sortType === "По возрастанию") sort = up;
+        else sort = down;
+        return sort;
+      }
+    },
     filterData(title, event, compare) {
       if (!this.filters[title])
         this.filters[title] = {}
@@ -213,7 +257,26 @@ export default {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
       for (let [key, val] of Object.entries(val)) {
-        console.log(key, val, typeof val);
+        if (isNumber(val)) {
+          this.numericTitles.push(key);
+        }
+      }
+    },
+    checkForString(val) {
+      function isNumber(n) {
+        return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
+      }
+      for (let [key, val] of Object.entries(val)) {
+        if (isNumber(val)) {
+          this.numericTitles.push(key);
+        }
+      }
+    },
+    checkForDate(val) {
+      function isNumber(n) {
+        return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
+      }
+      for (let [key, val] of Object.entries(val)) {
         if (isNumber(val)) {
           this.numericTitles.push(key);
         }
