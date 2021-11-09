@@ -61,6 +61,95 @@
             </template>
           </v-tooltip>
         </template>
+
+        <template
+          v-for="title in dataTitles"
+          v-slot:[`header.${title}`]="{ header }"
+        >
+          <v-menu offset-y :key="title">
+            <template  v-slot:activator="{ on, attrs }">
+              <v-menu z-index="100000" offset-y :close-on-content-click="false">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                    large
+                    class="icon"
+                    :color="theme.$main_border"
+                    >{{ mdiMagnify }}</v-icon
+                  >
+                </template>
+                <v-row>
+                  <v-col cols="6">
+                    <v-select
+                      :items="compare"
+                      label="Знак"
+                      @change="filterData(title, $event, 'compare')"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-menu>
+            </template>
+            <v-list>
+              <v-list-item v-for="(item, index) in items" :key="index">
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <v-tooltip bottom :key="header.value">
+            <template v-slot:activator="{ on }">
+              <span v-on="on">{{ header.text }}</span>
+            </template>
+          </v-tooltip>
+        </template>
+
+        <template
+          v-for="title in stringTitles"
+          v-slot:[`header.${title}`]="{ header }"
+        >
+          <v-menu offset-y :key="title">
+            <template  v-slot:activator="{ on, attrs }">
+              <v-menu z-index="100000" offset-y :close-on-content-click="false">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    v-on="on"
+                    large
+                    class="icon"
+                    :color="theme.$main_border"
+                    >{{ mdiMagnify }}</v-icon
+                  >
+                </template>
+                <v-row>
+                  <v-col cols="6">
+                    <v-select
+                      :items="compare"
+                      label="Знак"
+                      @change="filterData(title, $event, 'compare')"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-menu>
+            </template>
+            <v-list>
+              <v-list-item v-for="(item, index) in items" :key="index">
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <v-tooltip bottom :key="header.value">
+            <template v-slot:activator="{ on }">
+              <span v-on="on">{{ header.text }}</span>
+            </template>
+          </v-tooltip>
+        </template>
+
       </v-data-table>
     </div>
     <div v-show="props.nodata" class="no-data-table">
@@ -183,9 +272,7 @@ export default {
       deep: true,
       handler(oldVal) {
         console.log(JSON.parse(JSON.stringify(oldVal)));
-        this.checkForNumeric(oldVal[0]);
-        this.checkForString(oldVal[0]);
-        this.checkForDate(oldVal[0]);
+        this.indexTitles(oldVal);
         this.setEventColor();
       },
     },
@@ -202,44 +289,10 @@ export default {
     this.setEventColor();
   },
   methods: {
-    chooseSort(dataFormat, sortType) {
-      if (dataFormat === "Дата") {
-        let up = (a, b) => {
-          return new Date(a) - new Date(b);
-        };
-        let down = (a, b) => {
-          return new Date(b) - new Date(a);
-        };
-
-        let sort;
-        if (sortType === "По возрастанию") sort = up;
-        else sort = down;
-        return sort;
-      } else if (dataFormat === "Число") {
-        let up = (a, b) => {
-          return a - b;
-        };
-        let down = (a, b) => {
-          return b - a;
-        };
-
-        let sort;
-        if (sortType === "По возрастанию") sort = up;
-        else sort = down;
-        return sort;
-      } else if (dataFormat === "строка") {
-        let up = (a, b) => {
-          return a - b;
-        };
-        let down = (a, b) => {
-          return b - a;
-        };
-
-        let sort;
-        if (sortType === "По возрастанию") sort = up;
-        else sort = down;
-        return sort;
-      }
+    indexTitles(oldVal){
+      if(this.checkForNumeric(oldVal[0]));
+      this.checkForDate(oldVal[0]);
+      this.checkForString(oldVal[0]);
     },
     filterData(title, event, compare) {
       if (!this.filters[title])
