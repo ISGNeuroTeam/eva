@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed the datepicker in the dataset popup
+- fixed the textarea in full screen mode, changed get current value
 
 ## [1.72.0]
 ### Added
