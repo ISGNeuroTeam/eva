@@ -577,8 +577,6 @@ export default {
     },
 
     renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding) {
-      // alert('renderSVG')
-      // alert('stringOX: ' + this.stringOX + ' isTime: ' + this.isTime )
       this.clearSvgContainer()
 
       const metricNamesCount = this.metricNames.length
@@ -802,16 +800,15 @@ export default {
               .enter()
               .append('rect')
               .attr('id', (d, i) => getBarID(i))
-              .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('x', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
               .attr('y', (d) => yScale(d[metricName]))
               .attr('width', () => {
                 if (!barplotBarWidth || barplotBarWidth <= 0) {
-                  return this.isTime
-                    ? d3.scaleBand()
+                  return d3.scaleBand()
                         .range([0, this.width])
-                        .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                        .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                         .bandwidth()
-                    : x.bandwidth()
+                    // : x.bandwidth()
                   // return d3.scalePoint()
                   //     .range([0, this.width])
                   //     .domain(this.dataRestFrom.map(function(d) { return d.day; }));
@@ -958,7 +955,7 @@ export default {
                   .attr(
                     'd',
                     d3.line()
-                      .x((d) => x(d[xMetric] * this.secondTransf))
+                      .x((d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
                       .y((d) => yScale(d[metricName]))
                   )
               })
@@ -973,7 +970,7 @@ export default {
               .enter()
               .append('circle')
               .attr('class', `dot dot-${metricIndex}`)
-              .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('cx', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
               .attr('cy', (d) => yScale(d[metricName]))
               .attr('r', 5)
               .attr('metric', metricName)
@@ -1346,7 +1343,7 @@ export default {
                     .attr(
                         'd',
                         d3.line()
-                            .x((d) => x(d[xMetric] * this.secondTransf))
+                            .x((d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
                             .y((d) => y[metricIndex](d[metric]))
                     )
               })
@@ -1376,7 +1373,7 @@ export default {
             .enter()
             .append('circle')
             .attr('class', `dot dot-${metricIndex}`)
-            .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+            .attr('cx', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
             .attr('cy', (d) => y[metricIndex](d[metric]))
             .attr('r', 5)
             .attr('metric', metric)
@@ -1602,7 +1599,7 @@ export default {
                 .domain(d3.extent(this.dataRestFrom, (d) => new Date(d[xMetric] * this.secondTransf)))
             : d3.scaleBand()
                 .range([0, this.width])
-                .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
 
           this.svg
             .append('g')
@@ -1622,7 +1619,7 @@ export default {
             .data(cutData)
             .enter()
             .append('rect')
-            .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+            .attr('x', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
             .attr('y', (d) => {
               if (isNegative) {
                 const abs = Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
@@ -1633,12 +1630,10 @@ export default {
             .attr('fill', this.legendColors[metricIndex])
             .attr('width', () => {
               if (!barplotBarWidth || barplotBarWidth <= 0) {
-                return this.isTime
-                  ? d3.scaleBand()
+                return d3.scaleBand()
                       .range([0, this.width])
-                      .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                      .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                       .bandwidth()
-                  : x.bandwidth()
               }
               return barplotBarWidth
             })
