@@ -173,8 +173,7 @@ export default {
         timeFormat,
         yAxesBinding = { axesCount: 1, metrics: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
-// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-//       this.isTime = false
+      
       this.stringOX = stringOX
       if (this.stringOX) {
         this.isTime = false
@@ -618,12 +617,6 @@ export default {
             : d3.scaleLinear().range([0, this.width]).domain(extentForX)
       }
       
-// \\\\\\\\\\\\\\\\\\\
-//       let x = d3.scalePoint()
-//           .range([0, this.width])
-//           .domain(this.dataRestFrom.map(function(d) { return d.day; }));
-//       console.log(x)
-// \\\\\\\\\\\\\
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
 
@@ -808,13 +801,7 @@ export default {
                         .range([0, this.width])
                         .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                         .bandwidth()
-                    // : x.bandwidth()
-                  // return d3.scalePoint()
-                  //     .range([0, this.width])
-                  //     .domain(this.dataRestFrom.map(function(d) { return d.day; }));
-                  // return x.bandwidth()
                 }
-// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
                 return barplotBarWidth
               })
               .attr('height', function (d, j) {
