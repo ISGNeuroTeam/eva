@@ -10,12 +10,13 @@
               :key="index"
               class="text-center table-th"
               v-text="y"
+              @click="onClickTd(null, y)"
             />
           </tr>
         </thead>
         <tbody>
           <tr v-for="x in filteredX" :key="x">
-            <td class="text-left">
+            <td class="text-left" @click="onClickTd(x)">
               <span v-if="!((''+ x).includes('@'))">
                 {{ x }}
               </span>
@@ -36,7 +37,7 @@
               </v-menu>
             </td>
 
-            <td v-for="y in filteredY" :key="y" class="pa-0">
+            <td v-for="y in filteredY" :key="y" class="pa-0" @click="onClickTd(x, y)">
               <div
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"
                 class="td-inner"
@@ -84,11 +85,18 @@ export default {
     xField: "x",
     yField: "y",
     dataField: "metric",
+    detailValue: null,
     xFieldFormat: "Строка",
     xFieldSort: "По возрастанию",
     yFieldFormat: "Дата",
     yFieldSort: "По возрастанию",
     renderData: "metadata",
+    defaultActions: [
+      {
+        name: 'click',
+        capture: []
+      },
+    ]
   }),
   computed: {
     id: function () {
@@ -132,9 +140,31 @@ export default {
       }
       return this.updateData && temp;
     },
+
+    actions() {
+      let capture = []
+      if (this.dataRestFrom && this.dataRestFrom[0]) {
+        capture = Object.keys(this.dataRestFrom[0])
+      }
+      return this.defaultActions.map(action => {
+        return { ...action, capture }
+      })
+    }
   },
   watch: {
+    actions(actions) {
+      this.$store.commit('setActions', {actions, idDash: this.idDash, id: this.id });
+    },
     dataRestFrom() {
+      if (this.dataRestFrom && this.dataRestFrom[0]) {
+        let fields = Object.keys(this.dataRestFrom[0])
+        this.$store.commit('setOptions', {
+          id: this.idFrom,
+          idDash: this.idDashFrom,
+          options: {},
+          titles: fields,
+        });
+      }
       this.render();
     },
 
@@ -146,6 +176,7 @@ export default {
         if (newVal.y) this.yField = newVal.y;
         if (newVal.data) this.dataField = newVal.data;
         if (newVal.x) this.renderData = newVal.metadata;
+        if (newVal.detailValue) this.detailValue = newVal.detailValue;
         if (newVal.ySort) this.yFieldSort = newVal.ySort;
         if (newVal.ySort) this.xFieldSort = newVal.xSort;
         if (newVal.ySort) this.yFieldFormat = newVal.yFormat;
@@ -155,8 +186,47 @@ export default {
       },
     },
   },
+
+  mounted() {
+    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+  },
+
   methods: {
+    onClickTd(x = null, y = null) {
+      let val = null;
+      let row = null;
+      if (x !== null && y !== null) {
+        val = this.filteredData[x][y]?.value
+        row = this.filteredData[x][y]?.row
+      }
+
+      this.$store.getters.getTockens(this.idDash).forEach((token, i) => {
+        if (token.elem === this.id && token.action === 'click') {
+          let value;
+          const capture = token.capture;
+          const captureIdx = ['x','y','value'].indexOf(capture);
+          if (captureIdx !== -1) {
+            value = ([x, y, val][captureIdx])
+          } else if (row && capture !== '') {
+            value = row[capture]
+          } else {
+            value = null
+          }
+          this.$store.commit('setTocken', {
+            tocken: token,
+            idDash: this.idDash,
+            value,
+          })
+        }
+      })
+
+
+    },
     setClick: function (tokenValue) {
+      if (this.detailValue) {
+        let [first] = Object.keys(this.filteredData[tokenValue])
+        tokenValue = this.filteredData[tokenValue][first].row[this.detailValue]
+      }
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: "onclick",
@@ -223,6 +293,7 @@ export default {
         this.data[xField][yField] = {
           value: obj[this.dataField],
           metadata: this.parseMetadata(obj.metadata),
+          row: obj,
         };
 
         this.x.add(xField);
