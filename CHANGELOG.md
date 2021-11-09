@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added a click token to the heatmap
-- closing the settings popup by clicking outside the popup
+- multiline refresh zoom
 
 ### Fixed
 - fixed the datepicker in the dataset popup
+- fixed filter range for points and zoom multiline
+- closing the settings popup by clicking outside the popup
 - the json primitives text area has theme
 
 ## [1.72.0]

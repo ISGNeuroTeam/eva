@@ -316,7 +316,7 @@ export default {
       if (this.settings) {
         this.settings = {
           ...JSON.parse(JSON.stringify(this.settings)),
-          showTitle: this.settings.showTitle ? false : true
+          showTitle: !this.settings.showTitle
         }
       }
     },
