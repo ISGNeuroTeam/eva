@@ -447,8 +447,26 @@ export default {
         }
       })
     },
+    sliceRange(arr, range) {
+      return arr.filter((item, idx) => {
+        if (
+          (item.day >= range[0] && item.day <= range[1]) ||
+          (arr[idx - 1]?.day >= range[0] && arr[idx - 1]?.day <= range[1]) ||
+          (arr[idx + 1]?.day >= range[0] && arr[idx + 1]?.day <= range[1])
+        ) {
+          return true;
+        }
+
+        if (
+          (item.day <= range[0] && arr[idx + 1]?.day >= range[1]) ||
+          (item.day >= range[1] && arr[idx - 1]?.day <= range[0])
+        ) {
+          return true;
+        }
+      });
+    },
     setRange (range, elem) {
-      this.dataObject[elem.search].data = this.dataObject[elem.search].data.filter(item => (item.day > range[0] && item.day < range[1]));
+      this.dataObject[elem.search].data = this.sliceRange(this.dataObject[elem.search].data, range);
     },
   },
 }
