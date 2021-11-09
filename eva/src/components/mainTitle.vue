@@ -69,6 +69,7 @@
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
+            @ResetRange="resetRange()"
           />
           <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
@@ -467,6 +468,20 @@ export default {
     },
     setRange (range, elem) {
       this.dataObject[elem.search].data = this.sliceRange(this.dataObject[elem.search].data, range);
+    },
+    resetRange () {
+      this.searches.map((search) => {
+        this.$store.getters.getDataApi({ search, idDash: this.idDash }).then((res) => {
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            status: 'downloaded',
+          })
+          console.log(res)
+          this.$set(this.dataObject[search.sid], 'data', res)
+          this.$set(this.dataObject[search.sid], 'loading', false)
+        })
+      })
     },
   },
 }
