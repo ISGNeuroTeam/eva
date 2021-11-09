@@ -54,6 +54,7 @@ export default {
     xAxis: null,
     xMetric: '',
     isTime: false,
+    stringOX: false,
     isUnitedMode: false,
     secondTransf: 1,
     timeFormat: '',
@@ -164,6 +165,7 @@ export default {
       const {
         metrics,
         united = false,
+        stringOX = false,
         lastDot = false,
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
@@ -171,8 +173,14 @@ export default {
         timeFormat,
         yAxesBinding = { axesCount: 1, metrics: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
-
-      this.isTime = rowValue > 1000000000 && rowValue < 2000000000
+// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+//       this.isTime = false
+      this.stringOX = stringOX
+      if (this.stringOX) {
+        this.isTime = false
+      } else {
+        this.isTime = rowValue > 1000000000 && rowValue < 2000000000
+      }
       this.isUnitedMode = united
       this.timeFormat = timeFormat
       this.xAxisCaptionRotate = xAxisCaptionRotate
@@ -569,6 +577,8 @@ export default {
     },
 
     renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding) {
+      // alert('renderSVG')
+      // alert('stringOX: ' + this.stringOX + ' isTime: ' + this.isTime )
       this.clearSvgContainer()
 
       const metricNamesCount = this.metricNames.length
@@ -599,10 +609,23 @@ export default {
       this.minX = this.isTime ? 0 : extentForX[0]
       this.maxX = this.isTime ? 0 : extentForX[1]
 
-      let x = this.isTime
-        ? d3.scaleTime().range([0, this.width]).domain(extentForX)
-        : d3.scaleLinear().range([0, this.width]).domain(extentForX)
-
+      let x;
+      if (this.stringOX) {
+        x = d3.scalePoint()
+          .range([0, this.width])
+          .domain(this.dataRestFrom.map(function(d) { return d.day; }));
+      } else {
+        x = this.isTime
+            ? d3.scaleTime().range([0, this.width]).domain(extentForX)
+            : d3.scaleLinear().range([0, this.width]).domain(extentForX)
+      }
+      
+// \\\\\\\\\\\\\\\\\\\
+//       let x = d3.scalePoint()
+//           .range([0, this.width])
+//           .domain(this.dataRestFrom.map(function(d) { return d.day; }));
+//       console.log(x)
+// \\\\\\\\\\\\\
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
 
@@ -789,7 +812,12 @@ export default {
                         .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
                         .bandwidth()
                     : x.bandwidth()
+                  // return d3.scalePoint()
+                  //     .range([0, this.width])
+                  //     .domain(this.dataRestFrom.map(function(d) { return d.day; }));
+                  // return x.bandwidth()
                 }
+// \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
                 return barplotBarWidth
               })
               .attr('height', function (d, j) {

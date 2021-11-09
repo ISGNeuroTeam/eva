@@ -116,6 +116,7 @@ export default {
       'visible',
       'level',
       'boxShadow',
+      'stringOX',
       'united',
       'lastDot',
       'metrics',
