@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added a click token to the heatmap
+- closing the settings popup by clicking outside the popup
 
 ### Fixed
 - fixed the datepicker in the dataset popup
+- the json primitives text area has theme
 
 ## [1.72.0]
 ### Added
