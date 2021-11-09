@@ -1,3 +1,20 @@
+# [1.72.0] - Tokens in visualization titles, coordination choice in map component and bugfixes.
+### New
+- Choice of coordinates by clicking on the map.
+- Tokens can be used in visualization titles.
+
+### Bugfix
+- Grid show checkbox on dashboard.
+- Fixed open settings for Picker component, added default titles.
+- Full screen textarea.
+- Default token value.
+- Ability to zoom barplot.
+- Labels on OX axis.
+- Fixed hiding graphics when loading data.
+- Bug with update data search.
+- Hide the progress bar on the heatmap if the value is empty.
+- SingleValue render metrics when changed data for dashboards.
+
 # [1.71.0] - Default token values. Search rows limitation, shortcut for line break. New font in SingeValue. A lot of bugfixes.
 ### New
 - Ability to set a default token value for if its value isn't set.

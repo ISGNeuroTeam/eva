@@ -30,10 +30,11 @@ export default {
     },
     setSearch: (state, payload) => {
       const { idDash, reload, search } = payload;
+      const checkId = search.currentSid || search.sid
       search.status = 'empty';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
-          if (search.sid === item.sid) {
+          if (checkId === item.sid) {
             Vue.set(state[idDash].searches, i, search);
           }
         });
@@ -681,7 +682,7 @@ export default {
       let changed = [];
 
       item.value.forEach((itemValue, k) => {
-        if (itemValue.indexOf('$') != -1) {
+        if (typeof itemValue === 'string' && itemValue.indexOf('$') !== -1) {
           itemValue = itemValue.replace(/\$/g, '');
 
           tockens.forEach((tockenDeep, l) => {
