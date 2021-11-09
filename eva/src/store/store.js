@@ -682,7 +682,7 @@ export default {
       let changed = [];
 
       item.value.forEach((itemValue, k) => {
-        if (itemValue.indexOf('$') != -1) {
+        if (typeof itemValue === 'string' && itemValue.indexOf('$') !== -1) {
           itemValue = itemValue.replace(/\$/g, '');
 
           tockens.forEach((tockenDeep, l) => {
@@ -973,7 +973,7 @@ export default {
     sortFilterParts(state, { idDash }) {
       // idDash as property to case when sort not for focusedFilter (backward compatibility)
       state[idDash].focusedFilter.parts.sort(
-        (part1, part2) => part2.values.length - part1.values.length
+        (part1, part2) => part2.values?.length - part1.values?.length
       );
     },
     declineFilterChanges(state, idDash) {
