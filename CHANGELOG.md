@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed filter range for points and zoom multiline
 - closing the settings popup by clicking outside the popup
 - the json primitives text area has theme
+- added check for length of array metrics in manual filter and fixed save filters and use in other components
 
 ## [1.72.0]
 ### Added
