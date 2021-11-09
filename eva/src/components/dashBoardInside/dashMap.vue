@@ -817,6 +817,12 @@ export default {
 .dash-map {
   padding: 0 20px !important;
 }
+.leaflet-tooltip-top:before, 
+.leaflet-tooltip-bottom:before, 
+.leaflet-tooltip-left:before, 
+.leaflet-tooltip-right:before {
+    border: none !important;
+}
 .mapContainer {
   position: relative;
   background: #191919;
