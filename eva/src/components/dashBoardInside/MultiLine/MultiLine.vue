@@ -376,7 +376,7 @@ export default {
             parseFloat(invertStart.toFixed(5)),
             parseFloat(invertEnd.toFixed(5))
           ]
-      this.$emit("SetRange", range);
+      this.$emit("SetRange", {'range': range, 'xMetric': this.xMetric});
       this.setClick(range, 'select')
       // this.zoom(x, yValue, selectRange, id)
     },
