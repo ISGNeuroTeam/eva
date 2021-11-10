@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- added the ability to use tokens in filters
+
 ### Fixed
 - optimized graph component
 
