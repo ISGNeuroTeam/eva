@@ -605,7 +605,6 @@ export default {
     },
     letEventGo: async (state, event) => {
       //load dash
-      console.log('alert 11')
       let loader = (id, first) => {
         return new Promise(resolve => {
           let result = rest.getState(id, restAuth);
@@ -732,10 +731,12 @@ export default {
       // event.route.go();
       const options = state[event.idDash][event.id].options;
      
+      const currentTab = state[id]?.currentTab
+
       if (!options?.openNewScreen) {
-        event.route.push(`/dashboards/${id}`);
+        event.route.push(`/dashboards/${id}/${currentTab || ''}`);
       } else {
-        window.open(`/dashboards/${id}`);
+        window.open(`/dashboards/${id}/${currentTab || ''}`);
       }
       let searches = state[id].searches;
 

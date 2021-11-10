@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed filter range for points and zoom multiline
 - closing the settings popup by clicking outside the popup
 - the json primitives text area has theme
+- added redirect to dashboard with information about tabs from dash heatmap
 
 ## [1.72.0]
 ### Added
