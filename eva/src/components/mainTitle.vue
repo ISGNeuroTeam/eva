@@ -457,10 +457,13 @@ export default {
         ) {
           return true;
         }
+
+        const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
+        const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
         
         if (
-          (item[range.xMetric] <= range.range[0] && arr[idx + 1]?.[range.xMetric] >= range.range[1]) ||
-          (item[range.xMetric] >= range.range[1] && arr[idx - 1]?.[range.xMetric] <= range.range[0])
+          (item[range.xMetric] <= range.range[0] && arr[idxArrFirst]?.[range.xMetric] >= range.range[1]) ||
+          (item[range.xMetric] >= range.range[1] && arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
         ) {
           return true;
         }
