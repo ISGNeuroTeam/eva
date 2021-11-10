@@ -121,7 +121,7 @@ export default {
       }
       const list = this.dataRestFrom
         .map(row => Number.parseFloat(row[this.dataField]))
-        .sort();
+        .sort((a, b) => a - b);
       return list.filter((item, pos) => list.indexOf(item) === pos) // filter duplicates
     },
     minValue(){
