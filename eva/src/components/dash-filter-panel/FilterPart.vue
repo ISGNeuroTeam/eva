@@ -132,7 +132,7 @@
       },
       elemName() {
         let name = this.elemRawName;
-        this.getDashTokens.forEach(token => {
+        name && this.getDashTokens.forEach(token => {
           name = name.replaceAll(`$${token.name}$`, token.value)
         })
         return name
