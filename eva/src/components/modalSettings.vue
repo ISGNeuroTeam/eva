@@ -275,6 +275,7 @@
               />
             </div>
           </div>
+
           <!--end thememultiline-->
           <div
             v-if="checkOptions('subnumber')"
@@ -1082,6 +1083,7 @@
               v-for="i in metrics.length"
               :key="i"
               class="options-item-tooltip"
+              style="flex-wrap: wrap;"
             >
               <v-select
                 v-model="metrics[i-1].name"
@@ -1129,6 +1131,67 @@
                 class="item-metric border"
                 hide-details
               />
+              <br />
+              <div class="item-metric">
+                <div
+                  class="discribe-option item"
+                  :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+                >
+                  Цвет
+                </div>
+                <div class="status-option item">
+                  <input :value="color[metrics[i-1].name]" @change="(e) => handleChangeColor(e, i-1)" style="width: 100px; cursor: pointer;" type="color" name="multiline-color">
+                </div>
+              </div>
+              <div>
+                <div class="status-option item">
+                  <v-text-field
+                    :value="conclusion_count[metrics[i-1].name]"
+                    clearable
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
+                    style="min-width: 100px"
+                    outlined
+                    @input="e => handleChangeConlusionCount(e, i - 1)"
+                    class="item-metric"
+                    label="Вывод значений"
+                    type="number"
+                    hide-details
+                  />
+                </div>
+              </div>
+              <div>
+                <div class="status-option item">
+                  <v-select
+                    :value="type_line[metrics[i-1].name]"
+                    label="Тип линии"
+                    class="item-metric"
+                    :items="[
+                      {
+                        text: '━━━━━━',
+                        value: 'solid'
+                      },
+                      {
+                        text: '-------------------',
+                        value: 'dashed'
+                      },
+                      {
+                        text: '.........................',
+                        value: 'dotted'
+                      },
+                      {
+                        text: '﹎﹎﹎﹎﹎﹎',
+                        value: 'double'
+                      },
+                    ]"
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text, fill: theme.$main_text}"
+                    hide-details
+                    outlined
+                    @change="e => handleChangeTypeLine(e, i-1)"
+                  />
+                </div>
+              </div>
               <v-checkbox
                 v-model="metrics[i-1].manual"
                 :color="theme.$primary_button"
@@ -1598,8 +1661,11 @@ export default {
       element: '',
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
+      conclusion_count: {},
       options: {
       },
+      type_line: 'solid',
+      color: {},
       optionsItems: [],
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
@@ -1660,11 +1726,24 @@ export default {
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
           const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
+          
+          if (opt.conclusion_count) {
+            this.conclusion_count = opt.conclusion_count
+          }
 
           if (opt.yAxesBinding) {
             this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount
           } else {
             this.multilineYAxesBinding.axesCount = 1
+          }
+
+          
+          if (opt.type_line) {
+            this.type_line = opt.type_line;
+          }
+
+          if (opt.color) {
+            this.color = opt.color;
           }
 
           this.metricsName.forEach(metric => {
@@ -1720,6 +1799,16 @@ export default {
     // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );
   },
   methods: {
+    handleChangeColor(e, i) {
+      this.color = { ...this.color, [this.metrics[i].name]: e.target.value };
+    },
+    handleChangeTypeLine(e, i) {
+      this.type_line = { ...this.type_line, [this.metrics[i].name]: e }
+    },
+
+    handleChangeConlusionCount(e, i) {
+      this.conclusion_count = { ...this.conclusion_count, [this.metrics[i].name]: Number(e) }
+    },
     titleHandler(val) {
       let temp = []
       let orderArray = this.getAvailableTableTitles(this.idDash, this.element);
@@ -1780,7 +1869,7 @@ export default {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, openNewScreen: this.openNewScreen  }, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, conclusion_count: this.conclusion_count, openNewScreen: this.openNewScreen, type_line: this.type_line, color: this.color  }, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1834,6 +1923,19 @@ export default {
     prepareOptions() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
+
+      if (options.color) {
+        this.color = options.color;
+      }
+
+      if (options.type_line) {
+        this.type_line = options.type_line;
+      }
+
+      if (options.conclusion_count) {
+        this.conclusion_count = options.conclusion_count
+      }
+
       this.options = {};
       this.optionsItems = settings.options[elem];
       this.optionsItems.forEach( item => {

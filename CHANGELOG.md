@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - added the slider component
 - added the ability to use tokens in filters
+- added field for choose interval tooltips for points multiline, created settings for change color lines and choose style line
 
 ### Fixed
 - optimized graph component

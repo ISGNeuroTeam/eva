@@ -168,7 +168,10 @@ export default {
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
         barplotBarWidth = 0,
+        type_line,
         timeFormat,
+        color,
+        conclusion_count,
         yAxesBinding = { axesCount: 1, metrics: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
 
@@ -185,7 +188,10 @@ export default {
           isDataAlwaysShow,
           barplotBarWidth,
           metricOptions,
-          yAxesBinding
+          yAxesBinding,
+          type_line,
+          color,
+          conclusion_count,
         )
       }
 
@@ -568,8 +574,22 @@ export default {
       return maxCaptionWidth
     },
 
-    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding) {
+    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding, type_line, color = {}, conclusion_count = {}) {
       this.clearSvgContainer()
+
+      const getStyleLine = (type) => {
+        if (type === 'dashed') {
+          return '5,5';
+        }
+
+        if (type === 'dotted') {
+          return '1,3';
+        }
+
+        if (type === 'double') {
+          return '1, 3, 6, 3';
+        }
+      }
 
       const metricNamesCount = this.metricNames.length
 
@@ -925,8 +945,9 @@ export default {
                   .datum(lineItself)
                   .attr('class', `line-${metricIndex}-${lineIndex}`)
                   .attr('fill', 'none')
-                  .attr('stroke', this.legendColors[metricIndex])
+                  .attr('stroke', color[metricName] || this.legendColors[metricIndex])
                   .attr('stroke-width', this.strokeWidth)
+                  .style("stroke-dasharray",getStyleLine(type_line[metricName]))
                   .attr(
                     'd',
                     d3.line()
@@ -996,7 +1017,20 @@ export default {
               .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
               .on('mouseup', () => brushObj.selectionUp())
               .on('mousedown', () => brushObj.selectionDown())
-              .on('mouseenter', function (d) {
+              .on('mouseenter', function (d, i) {
+                const count = Number(conclusion_count[metricName])
+                let hasTooltip = true;
+                const isNumber = typeof count === 'number';
+                if (isNumber && count > 1) {
+                  hasTooltip = i % count === 0;
+                }
+                if (isNumber && count <= 0) {
+                  hasTooltip = false;
+                }
+                if (hasTooltip === false) {
+                  return;
+                }
+
                 const date = new Date(d[xMetric] * secondTransf)
                 const day = date.getDate()
                 const month = date.getMonth()
@@ -1199,7 +1233,8 @@ export default {
             .attr('x2', this.width)
             .attr('y2', step * metricIndex + 20)
             .attr('opacity', 0.3)
-            .attr('stroke', this.theme.$main_text)
+            .attr('stroke', color[metric] || this.theme.$main_text)
+            .style("stroke-dasharray",getStyleLine(type_line[metric]))
         }
 
         const foundOptions = metricOptions.find(o => o.name === metric)
@@ -1313,8 +1348,9 @@ export default {
                     .datum(lineItself)
                     .attr('class', `line-${metricIndex}-${lineIndex}`)
                     .attr('fill', 'none')
-                    .attr('stroke', this.legendColors[metricIndex])
+                    .attr('stroke', color[metric] || this.legendColors[metricIndex])
                     .attr('stroke-width', this.strokeWidth)
+                    .style("stroke-dasharray",getStyleLine(type_line[metric]))
                     .attr(
                         'd',
                         d3.line()
@@ -1331,8 +1367,9 @@ export default {
                   .attr('x2', this.width)
                   .attr('y2', y[metricIndex](0))
                   .attr('opacity', '.3')
-                  .attr('stroke', this.theme.$main_text)
+                  .attr('stroke', color[metric] || this.theme.$main_text)
                   .attr('stroke-dasharray', '3 3')
+                  .style("stroke-dasharray",getStyleLine(type_line[metric]))
               }
             }
 
@@ -1352,7 +1389,8 @@ export default {
             .attr('cy', (d) => y[metricIndex](d[metric]))
             .attr('r', 5)
             .attr('metric', metric)
-            .attr('fill', this.legendColors[metricIndex])
+            .attr('fill', color[metric] || this.legendColors[metricIndex])
+            .style("stroke-dasharray",getStyleLine(type_line[metric]))
             .style('opacity', function (d, j) {
               let opacity = nullValue !== -1 ? 1 : 0
 
@@ -1393,7 +1431,20 @@ export default {
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metric] }, 'click'))
             .on('mouseup', () => brushObj.selectionUp())
             .on('mousedown', () => brushObj.selectionDown())
-            .on('mouseenter', function (d) {
+            .on('mouseenter', function (d, i) {
+              const count = Number(conclusion_count[metric])
+              let hasTooltip = true;
+              const isNumber = typeof count === 'number';
+              if (isNumber && count > 1) {
+                hasTooltip = i % count === 0;
+              }
+              if (isNumber && count <= 0) {
+                hasTooltip = false;
+              }
+              if (hasTooltip === false) {
+                return;
+              }
+
               const xVal = isTime
                 ? (() => {
                   const date = new Date(d[xMetric] * secondTransf)
