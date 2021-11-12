@@ -180,7 +180,9 @@ export default {
       deep: true,
       handler(oldVal) {
         console.log(JSON.parse(JSON.stringify(oldVal)));
-        this.checkForNumeric(oldVal[0]);
+        if (typeof oldVal === 'array' && oldVal.length) {
+          this.checkForNumeric(oldVal[0]);
+        }
         this.setEventColor();
       },
     },
