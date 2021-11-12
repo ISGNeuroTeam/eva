@@ -454,16 +454,16 @@ export default {
     sliceRange(arr, range) {
       return arr.filter((item, idx) => {
         if (
-          (item.day >= range[0] && item.day <= range[1]) ||
-          (arr[idx - 1]?.day >= range[0] && arr[idx - 1]?.day <= range[1]) ||
-          (arr[idx + 1]?.day >= range[0] && arr[idx + 1]?.day <= range[1])
+          (item[range.xMetric] >= range.range[0] && item[range.xMetric] <= range.range[1]) ||
+          (arr[idx - 1]?.[range.xMetric] >= range.range[0] && (arr[idx - 1]?.[range.xMetric] <= range.range[1])) ||
+          (arr[idx + 1]?.[range.xMetric] >= range.range[0] && arr[idx + 1]?.[range.xMetric] <= range.range[1])
         ) {
           return true;
         }
-
+        
         if (
-          (item.day <= range[0] && arr[idx + 1]?.day >= range[1]) ||
-          (item.day >= range[1] && arr[idx - 1]?.day <= range[0])
+          (item[range.xMetric] <= range.range[0] && arr[idx + 1]?.[range.xMetric] >= range.range[1]) ||
+          (item[range.xMetric] >= range.range[1] && arr[idx - 1]?.[range.xMetric] <= range.range[0])
         ) {
           return true;
         }

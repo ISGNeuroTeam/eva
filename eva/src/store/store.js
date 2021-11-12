@@ -730,8 +730,7 @@ export default {
       //event.route.push(`/dashboards/${id}`);
       // event.route.go();
       const options = state[event.idDash][event.id].options;
-     
-      const currentTab = state[id]?.currentTab
+      const currentTab = event.event.tab || state[id]?.currentTab
 
       if (!options?.openNewScreen) {
         event.route.push(`/dashboards/${id}/${currentTab || ''}`);
@@ -974,7 +973,7 @@ export default {
     sortFilterParts(state, { idDash }) {
       // idDash as property to case when sort not for focusedFilter (backward compatibility)
       state[idDash].focusedFilter.parts.sort(
-        (part1, part2) => part2.values.length - part1.values.length
+        (part1, part2) => part2.values?.length - part1.values?.length
       );
     },
     declineFilterChanges(state, idDash) {

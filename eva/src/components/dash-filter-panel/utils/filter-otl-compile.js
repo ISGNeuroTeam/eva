@@ -7,7 +7,7 @@ export function filterCompile(filter) {
     for (let idxPart in filter.parts) {
       const part = filter.parts[idxPart];
 
-      if (part.values.length > 0 || part.filterPartType === 'manual') {
+      if (part.values?.length > 0 || part.filterPartType === 'manual') {
         if (idxPart == firstPartWithValuesIndex) {
           filterOtlText += 'search ';
 

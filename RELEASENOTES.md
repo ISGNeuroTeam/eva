@@ -1,3 +1,16 @@
+# [1.73.0] - Click token for heatmap component, multiline zoom refresh and bugfixes.
+
+### New
+- Click token for heatmap component.
+- Multiline zoom refresh.
+- Closing the settings popup by clicking outside the popup.
+
+### Bugfix
+- Fixed the datepicker in the dataset popup.
+- Fixed filter range for points and zoom multiline.
+- Theme in json primitives text area.
+- Added check for length of array metrics in manual filter and fixed save filters and use in other components.
+
 # [1.72.0] - Tokens in visualization titles, coordination choice in map component and bugfixes.
 ### New
 - Choice of coordinates by clicking on the map.
