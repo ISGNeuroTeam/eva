@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - optimized graph component
 - one zoom for all graphs in not united mode
+- fixed hiding columns in tables
 
 ## [1.73.0]
 
