@@ -86,7 +86,7 @@ export default {
       return options.searchBtn;
     },
     textAreaValue() {
-      return this.$store.state.store[this.idDash][this.id].textarea;
+      return this.$store.getters.getTextArea({idDash: this.idDash, id: this.id});
     }
   },  
   watch: {
