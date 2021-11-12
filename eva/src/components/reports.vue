@@ -185,6 +185,7 @@
                 :dataReport="true" 
                 :dataRestFrom="data"
                 @SetRange="setRange($event)"
+                @ResetRange="resetRange($event)"
               />
               <v-tooltip 
                 bottom 
@@ -542,6 +543,9 @@ export default {
     },
     setRange (range) {
       this.data = this.data.filter(item => (item.day > range[0] && item.day < range[1]));
+    },
+    ResetRange () {
+      console.log('resetRange')
     },
   },
   mounted() {

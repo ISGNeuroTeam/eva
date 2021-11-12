@@ -1,6 +1,23 @@
 
-import {  mdiGraph, mdiGestureTap, mdiBrush, mdiViewGrid,
-  mdiCardTextOutline, mdiChartGantt, mdiMapMarker, mdiChartMultiline,  mdiNumeric,  mdiTableLarge, mdiChartPie,  mdiFormatListBulleted,  mdiCalendarMonth, mdiGraphql, mdiChartScatterPlot, mdiGrid } from '@mdi/js'
+import {
+  mdiGraph,
+  mdiGestureTap,
+  mdiBrush,
+  mdiViewGrid,
+  mdiCardTextOutline,
+  mdiChartGantt,
+  mdiMapMarker,
+  mdiChartMultiline,
+  mdiNumeric,
+  mdiTableLarge,
+  mdiChartPie,
+  mdiFormatListBulleted,
+  mdiCalendarMonth,
+  mdiGraphql,
+  mdiChartScatterPlot,
+  mdiGrid,
+  mdiTuneVertical,
+} from '@mdi/js'
 
 export default {
   tools: [
@@ -21,6 +38,7 @@ export default {
     {name: 'Граф_old', img: mdiGraph , type: 'graph'},
     {name: 'Тепловая карта', img: mdiGrid , type: 'heatmap'},
     {name: 'Single Value', img: mdiNumeric, type: 'singleValue'},
+    {name: 'Ползунок', img: mdiTuneVertical, type: 'tune'},
   ],
   size: {
     picker: {
@@ -91,6 +109,10 @@ export default {
       width: 500,
       height: 300,
     },
+    tune: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -110,6 +132,7 @@ export default {
     map: mdiMapMarker,
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
+    tune: mdiTuneVertical,
   },
   options: {
     multiLine: [
@@ -144,6 +167,7 @@ export default {
     map: ['visible','level', 'osmserver', 'primitivesLibrary', 'pinned'],
     heatmap: ['visible','level', 'dataFormat', 'pinned'],
     singleValue: ['visible', 'level', 'pinned'],
+    tune: ['visible', 'level', 'pinned'],
   },
   reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
   reports: {
@@ -193,6 +217,10 @@ export default {
     },
     singleValue: {
       tooltip: 'Single Value',
+      icon: mdiNumeric
+    },
+    tune: {
+      tooltip: 'Ползунок',
       icon: mdiNumeric
     },
   }

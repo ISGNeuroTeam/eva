@@ -81,6 +81,7 @@
 
 <script>
   import { mdiCloseCircleOutline, mdiRefresh, mdiPencil, mdiChevronDown } from '@mdi/js';
+  import {mapGetters} from "vuex";
 
   export default {
     name: 'FilterPart',
@@ -113,15 +114,28 @@
       };
     },
     computed: {
+      ...mapGetters([
+        'getTockens'
+      ]),
+      getDashTokens() {
+        return this.getTockens(this.idDash)
+      },
       theme() {
         return this.$store.getters.getTheme;
       },
-      elemName() {
+      elemRawName() {
         if (this.filterPart.token)
           return this.$store.state.store[this.idDash][this.filterPart.token.elem].name_elem;
         else {
           return 'Ручной фильтр';
         }
+      },
+      elemName() {
+        let name = this.elemRawName;
+        name && this.getDashTokens.forEach(token => {
+          name = name.replaceAll(`$${token.name}$`, token.value)
+        })
+        return name
       },
       operationManualTitle() {
         return this.filterPart.operationManual

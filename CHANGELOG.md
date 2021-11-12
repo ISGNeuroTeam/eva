@@ -8,11 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- added the slider component
+- added the ability to use tokens in filters
+
+### Fixed
+- optimized graph component
+- one zoom for all graphs in not united mode
+- fixed the textarea in full screen mode, changed get current value
+
+## [1.73.0]
+
+### Added
 - added a click token to the heatmap
+- multiline refresh zoom
 
 ### Fixed
 - fixed the datepicker in the dataset popup
-- fixed the textarea in full screen mode, changed get current value
+- fixed filter range for points and zoom multiline
+- closing the settings popup by clicking outside the popup
+- the json primitives text area has theme
+- added check for length of array metrics in manual filter and fixed save filters and use in other components
 
 ## [1.72.0]
 ### Added

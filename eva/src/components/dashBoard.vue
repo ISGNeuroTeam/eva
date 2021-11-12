@@ -202,6 +202,19 @@
             :class="{ settings_move: props.open_gear }"
             v-show="dataMode"
           >
+            <v-tooltip v-if="element==='multiLine'" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+              <template v-slot:activator="{ on }">
+                <v-icon
+                    class="datasource"
+                    :color="theme.$main_border"
+                    v-on="on"
+                    @click="resetRange()"
+                >
+                  {{ props.mdiMagnifyMinusOutline }}
+                </v-icon>
+              </template>
+              <span>Сбросить зум</span>
+            </v-tooltip>
             <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
@@ -334,6 +347,7 @@ import {
   mdiArrowExpandAll,
   mdiCodeTags,
   mdiTrashCanOutline,
+  mdiMagnifyMinusOutline,
   mdiDatabase,
   mdiSettings,
   mdiChevronDown,
@@ -385,6 +399,7 @@ export default {
         mdiArrowExpandAll: mdiArrowExpandAll,
         mdiCodeTags: mdiCodeTags,
         mdiTrashCanOutline: mdiTrashCanOutline,
+        mdiMagnifyMinusOutline : mdiMagnifyMinusOutline ,
         mdiDatabase: mdiDatabase,
         mdiSettings: mdiSettings,
         mdiChevronUp: mdiChevronUp,
@@ -445,7 +460,7 @@ export default {
         return 'Заголовок'
       }
       let name = this.props.name;
-      this.getSelfTockens.forEach(token => {
+      name && this.getSelfTockens.forEach(token => {
         name = name.replaceAll(`$${token.name}$`, token.value)
       })
       return name
@@ -1032,6 +1047,9 @@ export default {
     },
     setRange (range) {
       this.$emit("SetRange", range);
+    },
+    resetRange () {
+      this.$emit("ResetRange");
     },
   },
 };
