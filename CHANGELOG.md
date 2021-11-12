@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - one zoom for all graphs in not united mode
 - add details menu for not email fields
 - fixed the textarea in full screen mode, changed get current value
+- fixed hiding columns in tables
 
 ## [1.73.0]
 
