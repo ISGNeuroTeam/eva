@@ -156,10 +156,6 @@ export default {
       const firstDataRowKeys = Object.keys(firstDataRow)
       const rowValue = firstDataRow[firstDataRowKeys[0]]
 
-      if (typeof rowValue !== 'number') {
-        return this.showErrorMessage('К сожалению, данные не подходят к линейному графику')
-      }
-
       this.setNoData(false)
 
       const {
@@ -175,6 +171,10 @@ export default {
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
       
       this.stringOX = stringOX
+      
+      if (!this.stringOX && (typeof rowValue !== 'number')) {
+        return this.showErrorMessage('К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.')
+      }
       if (this.stringOX) {
         this.isTime = false
       } else {
