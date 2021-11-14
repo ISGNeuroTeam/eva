@@ -309,7 +309,7 @@ export default {
   watch: {
     focusedRow(rowNumber) {
       if (!Number.isFinite(rowNumber)) {
-        this.$store.commit('clearFocusedFilter', this.idDashFrom)
+        // this.$store.commit('clearFocusedFilter', this.idDashFrom)
       } else {
         this.$store.commit('setFocusedFilter', this.filters[rowNumber])
       }
@@ -353,7 +353,7 @@ export default {
     },
     applyTempParts() {
       this.$store.commit('sortFilterParts', { idDash: this.idDashFrom })
-      this.$store.commit('clearFocusedFilter', this.idDashFrom)
+      // this.$store.commit('clearFocusedFilter', this.idDashFrom)
       this.$store.commit('restartSearches', {
         idDash: this.idDashFrom,
         filter: this.filters[this.focusedRow].id,

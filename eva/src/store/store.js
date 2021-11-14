@@ -968,7 +968,13 @@ export default {
       let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
       for (let part of focusedFilterParts) {
         if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
-          if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
+          if (part.values.indexOf(tocken.value) === -1) {
+            part.token.value = tocken.value
+            if (part.token.elem.includes('multiLine')) {
+              part.values = []
+            }
+            part.values.push(tocken.value);
+          }
         }
       }
       this.commit('sortFilterParts', { idDash: tocken.idDash });
