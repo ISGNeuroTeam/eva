@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed hiding columns in tables
 - multiline full screen zoom
 - fixed a bug with updating the values of a newly created sub filter
+- fixed the display of the slider component after the update
 
 ## [1.73.0]
 

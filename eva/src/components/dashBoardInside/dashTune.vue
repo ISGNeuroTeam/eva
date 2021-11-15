@@ -120,7 +120,10 @@ export default {
         }
       }
       const list = this.dataRestFrom
-        .map(row => Number.parseFloat(row[this.dataField]))
+        .map(row => {
+          const num = Number.parseFloat(row[this.dataField]);
+          return isNaN(num) ? 0 : num
+        })
         .sort((a, b) => a - b);
       return list.filter((item, pos) => list.indexOf(item) === pos) // filter duplicates
     },
@@ -154,16 +157,7 @@ export default {
   },
   watch: {
     values(list) {
-      let rowNumber = 0
-      list.forEach(item => {
-        if (item < this.value) {
-          rowNumber++
-        }
-      })
-      this.sliderValue = rowNumber;
-      if (this.value === '' && list.length) {
-        this.value = list[rowNumber]
-      }
+      this.detectSliderValue(list)
     },
     sliderValue(value) {
       if (!this.loading && this.values.length > 0) {
@@ -185,7 +179,9 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom
     });
-    this.loadSelectedValue()
+    this.$nextTick(() => {
+      this.loadSelectedValue()
+    })
   },
   methods: {
     addValue(val) { // +/- buttons
@@ -231,6 +227,22 @@ export default {
       });
       this.dataField = selected.elem
       this.value = selected.elemDeep
+      this.detectSliderValue()
+    },
+    detectSliderValue(list) {
+      if (list === undefined) {
+        list = this.values
+      }
+      let rowNumber = 0
+      list.forEach(item => {
+        if (item < this.value) {
+          rowNumber++
+        }
+      })
+      this.sliderValue = rowNumber;
+      if (this.value === '' && list.length) {
+        this.value = list[rowNumber]
+      }
     }
   },
 }
