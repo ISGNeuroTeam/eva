@@ -14,6 +14,7 @@
     :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color, backgroundColor: theme.$accent_ui_color, }"
     @resizestop="sendSize"
     @dragstop="sendMove"
+    @activated="onActivated"
   >
     <dash-board
       :data-mode-from="dataModeFrom"
@@ -133,6 +134,10 @@ export default {
       this.width = width
       this.height = height
     },
+    onActivated() {
+      this.props.zIndex = 9
+      // alert('onActivated')
+    },
     sendMove(x, y) {
       let top = Math.round((y - this.headerTop) / this.horizontalCell)
       if (top < 0) top = 0
@@ -185,7 +190,7 @@ export default {
 .vdr.active.resizable {
   outline-color: inherit;
   outline: 2px dashed;
-  z-index: 9 !important;
+  /*z-index: 9 !important;*/
 }
 
 .handle {
