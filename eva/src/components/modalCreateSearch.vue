@@ -330,6 +330,8 @@ export default {
       this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
       this.search.original_otl = this.search.original_otl.replace('\n', '')
       this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replaceAll('|' + '\n', '| ')
+      this.search.original_otl = this.search.original_otl.replaceAll('| ' + '\n', '| ')
     },
   },
 }
