@@ -761,6 +761,58 @@ export default {
               .attr('class', yAxisClass)
               .call(d3.axisLeft(yScale).ticks(yScale.ticks().length / 2))
           }
+          // let array = d3.range(100,200,25);
+          // alert(minVal)
+          // alert(maxVal)
+          // this.xAxis.call(
+          //     d3.axisLeft(yScale)
+          //         .tickValues(d3.range(minVal,4000, 457))
+          //         .tickFormat(d3.format(".2f"))
+          // )
+      
+          // let xScale = d3.scaleLinear()
+          //     .domain([-30, 50])
+          //     .range([0, 1000]);
+          // this.svg.append('g').call(d3.axisBottom(xScale).ticks(5, ".2f"));
+          
+// // Y Scale
+//           var yScal = d3.scaleLinear()
+//               .domain([0, 500])
+//               .range([30, 170]);
+//
+//
+// // Left axis
+//           this.svg.append('g')
+//               .attr('transform', 'translate(0, 0)')
+//               .call(d3.axisLeft(yScal).ticks(5));
+//           this.svg
+//               .append('g')
+//               .attr('class', yAxisClass)
+//               .call(d3.axisLeft(yScale).ticks(2, 100, 4))
+          // d3.scaleLinear()
+          //     .ticks()
+
+          // let margin = {top: 100, right: 100, bottom: 100, left: 100}
+          // let width = 960 - margin.left - margin.right
+          // let height = 500 - margin.top - margin.bottom
+          //
+          // let x = d3.scale.ordinal()
+          //     .domain(["apple", "orange", "banana", "grapefruit"])
+          //     .rangePoints([0, width]);
+          //
+          // let xAxis = d3.svg.axis()
+          //     .scale(x)
+          //     .orient("bottom");
+          //
+          // let svg = d3.select("body").append("svg")
+          //     .attr("width", width + margin.left + margin.right)
+          //     .attr("height", height + margin.top + margin.bottom)
+          //     .append("g")
+          //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          // this.svg.append("g")
+          //     .attr("class", "x axis")
+          //     .call(xAxis);
+//////////////////////////////////////////////////////////////
 
           this.svg
             .selectAll(`g.${yAxisClass} g.tick text`)
