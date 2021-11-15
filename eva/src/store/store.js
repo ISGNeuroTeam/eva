@@ -555,7 +555,7 @@ export default {
     saveFilterPart(state, { idDash, filterPart, filterPartIndex }) {
       if (Number.isFinite(filterPartIndex))
         state[idDash].focusedFilter.parts[filterPartIndex] = filterPart;
-      else state[idDash].focusedFilter.parts.push(filterPart);
+      else state[idDash].focusedFilter.parts.push({ ...filterPart });
     },
     setLibrary: (state, options) => {
       Vue.set(state[options.idDash][options.id].options, 'library', options.library);

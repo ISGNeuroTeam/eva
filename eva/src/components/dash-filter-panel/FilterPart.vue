@@ -145,6 +145,7 @@
       filterPartValues(){
         if (this.filterPart.token)
           return this.$store.state.store[this.idDash].filters[this.filterIndex].parts[this.filterPartIndex].values;
+        return []
       }
     },
     methods: {
