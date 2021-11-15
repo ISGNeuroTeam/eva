@@ -281,8 +281,11 @@ export default {
       min-height: 220px
 
   &.full-screen
+    min-width: 690px
+
     .v-slider--vertical
       min-height: 480px
+
     .text-h4
       font-size: 4rem !important
 </style>
