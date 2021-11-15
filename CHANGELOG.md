@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the textarea in full screen mode, changed get current value
 - fixed hiding columns in tables
 - fixed a bug with updating the values of a newly created sub filter
+- fixed the display of the slider component after the update
 
 ## [1.73.0]
 
