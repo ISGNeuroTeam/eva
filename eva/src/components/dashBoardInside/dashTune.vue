@@ -1,6 +1,7 @@
 <template>
   <div
       class="dash-map"
+      :class="{'full-screen': isFullScreen}"
       ref="container"
   >
     <div v-if="needSetField">
@@ -36,8 +37,8 @@
       <div class="pt-4">
         <v-progress-circular
             :rotate="360"
-            :size="circularSize"
-            :width="15"
+            :size="circularSize[isFullScreen?1:0]"
+            :width="circularWidth[isFullScreen?1:0]"
             :value="percentValue"
             :color="loading ? theme.$secondary_border : theme.$primary_button"
         >
@@ -51,7 +52,7 @@
                 :dark="isDarkTheme"
                 :color="theme.$primary_button"
                 color="primary"
-                small
+                :small="!isFullScreen"
                 :disabled="isMinimumValue"
                 @click="addValue(-1)">
               <v-icon>{{ icons.minus }}</v-icon>
@@ -60,7 +61,7 @@
                 :dark="isDarkTheme"
                 :color="theme.$primary_button"
                 color="primary"
-                small
+                :small="!isFullScreen"
                 class="ml-2"
                 :disabled="isMaximumValue"
                 @click="addValue(1)">
@@ -89,7 +90,8 @@ export default {
   data() {
     return {
       vertical: true,
-      circularSize: 200,
+      circularSize: [200, 460], // [small, big]
+      circularWidth: [15, 32],
       icons: {
         plus: mdiPlus,
         minus: mdiMinus,
@@ -106,6 +108,16 @@ export default {
     }
   },
   computed: {
+    isFullScreen() {
+      return this.$attrs['is-full-screen'];
+    },
+    storedValue(){
+      let selected = this.$store.getters.getSelected({
+        idDash: this.idDashFrom,
+        id: this.idFrom
+      });
+      return selected.elemDeep
+    },
     needSetField() {
       return !this.dataField && !this.loading
     },
@@ -153,17 +165,13 @@ export default {
     }
   },
   watch: {
-    values(list) {
-      let rowNumber = 0
-      list.forEach(item => {
-        if (item < this.value) {
-          rowNumber++
-        }
-      })
-      this.sliderValue = rowNumber;
-      if (this.value === '' && list.length) {
-        this.value = list[rowNumber]
+    storedValue(value) {
+      if (this.value !== value) {
+        this.loadSelectedValue()
       }
+    },
+    values(list) {
+      this.detectSliderValue(list)
     },
     sliderValue(value) {
       if (!this.loading && this.values.length > 0) {
@@ -185,7 +193,9 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom
     });
-    this.loadSelectedValue()
+    this.$nextTick(() => {
+      this.loadSelectedValue()
+    })
   },
   methods: {
     addValue(val) { // +/- buttons
@@ -231,6 +241,22 @@ export default {
       });
       this.dataField = selected.elem
       this.value = selected.elemDeep
+      this.detectSliderValue()
+    },
+    detectSliderValue(list) {
+      if (list === undefined) {
+        list = this.values
+      }
+      let rowNumber = 0
+      list.forEach(item => {
+        if (item < this.value) {
+          rowNumber++
+        }
+      })
+      this.sliderValue = rowNumber;
+      if (this.value === '' && list.length) {
+        this.value = list[rowNumber]
+      }
     }
   },
 }
@@ -239,6 +265,7 @@ export default {
 <style lang="sass">
 .dash-map
   color: var(--main_text) !important
+  min-width: 360px
 
   .v-input__append-inner
     margin-top: 16px
@@ -249,4 +276,10 @@ export default {
 
     .v-slider--vertical
       min-height: 220px
+
+  &.full-screen
+    .v-slider--vertical
+      min-height: 480px
+    .text-h4
+      font-size: 4rem !important
 </style>
