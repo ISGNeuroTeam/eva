@@ -132,7 +132,10 @@ export default {
         }
       }
       const list = this.dataRestFrom
-        .map(row => Number.parseFloat(row[this.dataField]))
+        .map(row => {
+          const num = Number.parseFloat(row[this.dataField]);
+          return isNaN(num) ? 0 : num
+        })
         .sort((a, b) => a - b);
       return list.filter((item, pos) => list.indexOf(item) === pos) // filter duplicates
     },
