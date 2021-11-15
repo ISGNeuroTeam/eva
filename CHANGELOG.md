@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add details menu for not email fields
 - fixed the textarea in full screen mode, changed get current value
 - fixed hiding columns in tables
+- multiline full screen zoom
 - fixed a bug with updating the values of a newly created sub filter
 
 ## [1.73.0]
