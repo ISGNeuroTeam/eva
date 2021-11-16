@@ -796,13 +796,11 @@ export default {
           // let width = 960 - margin.left - margin.right
           // let height = 500 - margin.top - margin.bottom
           //
-          // let x = d3.scale.ordinal()
+          // let x = d3.scalePoint()
           //     .domain(["apple", "orange", "banana", "grapefruit"])
-          //     .rangePoints([0, width]);
+          //     .range([0, 500]);
           //
-          // let xAxis = d3.svg.axis()
-          //     .scale(x)
-          //     .orient("bottom");
+          // let xAx = d3.axisLeft(x)
           //
           // let svg = d3.select("body").append("svg")
           //     .attr("width", width + margin.left + margin.right)
@@ -811,7 +809,7 @@ export default {
           //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
           // this.svg.append("g")
           //     .attr("class", "x axis")
-          //     .call(xAxis);
+          //     .call(xAx);
 //////////////////////////////////////////////////////////////
 
           this.svg
