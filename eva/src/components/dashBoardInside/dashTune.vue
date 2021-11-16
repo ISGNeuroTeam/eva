@@ -2,6 +2,7 @@
   <div
       class="dash-map"
       :class="{'full-screen': isFullScreen}"
+      :style="{'zoom': htmlZoom}"
       ref="container"
   >
     <div v-if="needSetField">
@@ -37,8 +38,8 @@
       <div class="pt-4">
         <v-progress-circular
             :rotate="360"
-            :size="circularSize[isFullScreen?1:0]"
-            :width="circularWidth[isFullScreen?1:0]"
+            :size="circularSize"
+            :width="circularWidth"
             :value="percentValue"
             :color="loading ? theme.$secondary_border : theme.$primary_button"
         >
@@ -52,7 +53,6 @@
                 :dark="isDarkTheme"
                 :color="theme.$primary_button"
                 color="primary"
-                :small="!isFullScreen"
                 :disabled="isMinimumValue"
                 @click="addValue(-1)">
               <v-icon>{{ icons.minus }}</v-icon>
@@ -61,7 +61,6 @@
                 :dark="isDarkTheme"
                 :color="theme.$primary_button"
                 color="primary"
-                :small="!isFullScreen"
                 class="ml-2"
                 :disabled="isMaximumValue"
                 @click="addValue(1)">
@@ -90,8 +89,8 @@ export default {
   data() {
     return {
       vertical: true,
-      circularSize: [200, 460], // [small, big]
-      circularWidth: [15, 32],
+      circularSize: 190,
+      circularWidth: 20,
       icons: {
         plus: mdiPlus,
         minus: mdiMinus,
@@ -108,6 +107,12 @@ export default {
     }
   },
   computed: {
+    htmlZoom() {
+      const size = this.$attrs.heightFrom < this.$attrs.widthFrom
+          ? this.$attrs.heightFrom
+          : this.$attrs.widthFrom
+      return size / 370;
+    },
     isFullScreen() {
       return this.$attrs['is-full-screen'];
     },
@@ -282,10 +287,4 @@ export default {
 
   &.full-screen
     min-width: 690px
-
-    .v-slider--vertical
-      min-height: 480px
-
-    .text-h4
-      font-size: 4rem !important
 </style>
