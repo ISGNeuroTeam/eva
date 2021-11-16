@@ -138,11 +138,11 @@ export default {
       let testElements = document.getElementsByClassName('draggable resizable vdr');
       let maxZIndex = 1
       for (let i = 0; i < testElements.length; i++) {
-        if(testElements[i].style.zIndex > maxZIndex) {
-          maxZIndex = testElements[i].style.zIndex
+        if(Number(testElements[i].style.zIndex) > maxZIndex) {
+          maxZIndex = Number(testElements[i].style.zIndex)
         }
       }
-      this.props.zIndex = Number(maxZIndex) + 1
+      this.props.zIndex = maxZIndex + 1
     },
     sendMove(x, y) {
       let top = Math.round((y - this.headerTop) / this.horizontalCell)
