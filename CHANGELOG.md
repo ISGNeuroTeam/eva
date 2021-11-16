@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the slider component
 - added the ability to use tokens in filters
 - the ability to use a token in the name of a part of the filter
+- additional properties for hotkey ctrl+\
 
 ### Fixed
 - optimized graph component
