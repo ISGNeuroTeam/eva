@@ -54,6 +54,7 @@ export default {
     xAxis: null,
     xMetric: '',
     isTime: false,
+    stringOX: false,
     isUnitedMode: false,
     secondTransf: 1,
     timeFormat: '',
@@ -155,15 +156,12 @@ export default {
       const firstDataRowKeys = Object.keys(firstDataRow)
       const rowValue = firstDataRow[firstDataRowKeys[0]]
 
-      if (typeof rowValue !== 'number') {
-        return this.showErrorMessage('К сожалению, данные не подходят к линейному графику')
-      }
-
       this.setNoData(false)
 
       const {
         metrics,
         united = false,
+        stringOX = false,
         lastDot = false,
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
@@ -171,8 +169,17 @@ export default {
         timeFormat,
         yAxesBinding = { axesCount: 1, metrics: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
-
-      this.isTime = rowValue > 1000000000 && rowValue < 2000000000
+      
+      this.stringOX = stringOX
+      
+      if (!this.stringOX && (typeof rowValue !== 'number')) {
+        return this.showErrorMessage('К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.')
+      }
+      if (this.stringOX) {
+        this.isTime = false
+      } else {
+        this.isTime = rowValue > 1000000000 && rowValue < 2000000000
+      }
       this.isUnitedMode = united
       this.timeFormat = timeFormat
       this.xAxisCaptionRotate = xAxisCaptionRotate
@@ -599,10 +606,17 @@ export default {
       this.minX = this.isTime ? 0 : extentForX[0]
       this.maxX = this.isTime ? 0 : extentForX[1]
 
-      let x = this.isTime
-        ? d3.scaleTime().range([0, this.width]).domain(extentForX)
-        : d3.scaleLinear().range([0, this.width]).domain(extentForX)
-
+      let x;
+      if (this.stringOX) {
+        x = d3.scalePoint()
+          .range([0, this.width])
+          .domain(this.dataRestFrom.map(function(d) { return d.day; }));
+      } else {
+        x = this.isTime
+            ? d3.scaleTime().range([0, this.width]).domain(extentForX)
+            : d3.scaleLinear().range([0, this.width]).domain(extentForX)
+      }
+      
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
 
@@ -779,16 +793,14 @@ export default {
               .enter()
               .append('rect')
               .attr('id', (d, i) => getBarID(i))
-              .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('x', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
               .attr('y', (d) => yScale(d[metricName]))
               .attr('width', () => {
                 if (!barplotBarWidth || barplotBarWidth <= 0) {
-                  return this.isTime
-                    ? d3.scaleBand()
+                  return d3.scaleBand()
                         .range([0, this.width])
-                        .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                        .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                         .bandwidth()
-                    : x.bandwidth()
                 }
                 return barplotBarWidth
               })
@@ -930,7 +942,7 @@ export default {
                   .attr(
                     'd',
                     d3.line()
-                      .x((d) => x(d[xMetric] * this.secondTransf))
+                      .x((d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
                       .y((d) => yScale(d[metricName]))
                   )
               })
@@ -945,7 +957,7 @@ export default {
               .enter()
               .append('circle')
               .attr('class', `dot dot-${metricIndex}`)
-              .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('cx', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
               .attr('cy', (d) => yScale(d[metricName]))
               .attr('r', 5)
               .attr('metric', metricName)
@@ -1318,7 +1330,7 @@ export default {
                     .attr(
                         'd',
                         d3.line()
-                            .x((d) => x(d[xMetric] * this.secondTransf))
+                            .x((d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
                             .y((d) => y[metricIndex](d[metric]))
                     )
               })
@@ -1348,7 +1360,7 @@ export default {
             .enter()
             .append('circle')
             .attr('class', `dot dot-${metricIndex}`)
-            .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+            .attr('cx', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
             .attr('cy', (d) => y[metricIndex](d[metric]))
             .attr('r', 5)
             .attr('metric', metric)
@@ -1577,7 +1589,7 @@ export default {
                 .domain(d3.extent(this.dataRestFrom, (d) => new Date(d[xMetric] * this.secondTransf)))
             : d3.scaleBand()
                 .range([0, this.width])
-                .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
 
           this.svg
             .append('g')
@@ -1597,7 +1609,7 @@ export default {
             .data(cutData)
             .enter()
             .append('rect')
-            .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+            .attr('x', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
             .attr('y', (d) => {
               if (isNegative) {
                 const abs = Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
@@ -1608,12 +1620,10 @@ export default {
             .attr('fill', this.legendColors[metricIndex])
             .attr('width', () => {
               if (!barplotBarWidth || barplotBarWidth <= 0) {
-                return this.isTime
-                  ? d3.scaleBand()
+                return d3.scaleBand()
                       .range([0, this.width])
-                      .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                      .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                       .bandwidth()
-                  : x.bandwidth()
               }
               return barplotBarWidth
             })
