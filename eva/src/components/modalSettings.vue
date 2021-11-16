@@ -2,8 +2,8 @@
   <v-dialog
     v-model="active"
     width="1140"
-    persistent
     @keydown="checkEsc($event)"
+    @click:outside="cancelModal"
   >
     <div class="settings-modal-block">
       <v-card :style="{background:theme.$main_bg}">
@@ -540,6 +540,7 @@
               </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="data" label="data:" :items="tableTitles" /> </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="metadata" label="metadata:" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select v-model="detailValue" label="Поле для ссылки Детали:" :items="tableTitles" /> </v-row>
             </v-container>
 
           </div>
@@ -1276,13 +1277,35 @@
                 Библиотека примитивов отображения
               </div>
             </v-card-text>
+              <v-btn
+                plain link small
+                class="mb-3 text-lowercase"
+                :color="theme.$main_text"
+                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
               <v-textarea
                 v-model="options.primitivesLibrary"
                 name="input-7-1"
                 filled
+                rows="6"
                 label="JSON c примитивами"
-                auto-grow
+                :auto-grow="primitivesLibraryAutoGrow"
+                class="textarea-event"
+                spellcheck="false"
+                :color="theme.$main_text"
+                :style="{ color: theme.$main_text }"
+                outlined
+                hide-details
               ></v-textarea>
+              <v-btn
+                  v-if="primitivesLibraryAutoGrow"
+                  plain link small
+                  class="text-lowercase"
+                  :color="theme.$main_text"
+                  @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
             </v-container>
           </div>
           <v-card-text
@@ -1600,6 +1623,7 @@ export default {
       tableTitles:[],
       element: '',
       openNewScreen: false,
+      primitivesLibraryAutoGrow: false,
       options: {
       },
       optionsItems: [],
@@ -1631,6 +1655,7 @@ export default {
       x: '',
       y: '',
       metadata: '',
+      detailValue: '',
       data: '',
       xFormat: 'Строка',
       yFormat: 'Дата',
@@ -1685,6 +1710,7 @@ export default {
           this.y = test.y
           this.data = test.data
           this.metadata = test.metadata
+          this.detailValue = test.detailValue
         }
       }
       return this.$store.getters.getModalSettings(this.idDash).status;
@@ -1697,6 +1723,9 @@ export default {
     },
     selectedTitles() {
       return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
+    },
+    primitivesLibraryAutoGrowLinkText() {
+      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
     },
 
     ...mapGetters([
@@ -1767,6 +1796,7 @@ export default {
         this.options.y = this.y;
         this.options.data = this.data;
         this.options.metadata = this.metadata;
+        this.options.detailValue = this.detailValue;
         this.options.yFormat = this.yFormat;
         this.options.ySort = this.ySort;
         this.options.xFormat = this.xFormat;

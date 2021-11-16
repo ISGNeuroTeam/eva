@@ -5,11 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- added the slider component
+- added the ability to use tokens in filters
+- the ability to use a token in the name of a part of the filter
+- additional properties for hotkey ctrl+\
+- ability to select strings in X-axis label
+
+### Fixed
+- optimized graph component
+- one zoom for all graphs in not united mode
+- add details menu for not email fields
+- fixed the textarea in full screen mode, changed get current value
+- fixed hiding columns in tables
+- multiline full screen zoom
+- fixed a bug with updating the values of a newly created sub filter
+- fixed the display of the slider component after the update
+- fixed fullscreen mode for slider component
+
+## [1.73.0]
+
+### Added
+- added a click token to the heatmap
+- multiline refresh zoom
+
+### Fixed
+- fixed the datepicker in the dataset popup
+- fixed filter range for points and zoom multiline
+- closing the settings popup by clicking outside the popup
+- the json primitives text area has theme
+- added check for length of array metrics in manual filter and fixed save filters and use in other components
+
 ## [1.72.0]
 ### Added
 - added the choice of coordinates by clicking on the map
 - added the ability to use tokens in panel names
-- ability to select strings in X-axis label
+- added a click token to the heatmap
 
 ### Fixed
 - fixed grid show checkbox

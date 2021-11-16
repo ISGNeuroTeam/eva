@@ -7,7 +7,7 @@
     :x="left"
     :y="top"
     :draggable="dragRes"
-    :drag-cancel="'.dash-map'"
+    :drag-cancel="'.dash-map, .ygraph-component-container'"
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
@@ -29,6 +29,7 @@
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
+      @ResetRange="resetRange()"
     />
   </vue-draggable-resizable>
 </template>
@@ -164,6 +165,9 @@ export default {
     },
     setRange (range) {
       this.$emit("SetRange", range);
+    },
+    resetRange () {
+      this.$emit("ResetRange");
     },
   }
 }

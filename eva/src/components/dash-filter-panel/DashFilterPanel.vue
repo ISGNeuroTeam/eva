@@ -311,6 +311,9 @@ export default {
       if (!Number.isFinite(rowNumber)) {
         this.$store.commit('clearFocusedFilter', this.idDashFrom)
       } else {
+        if (this.filters[rowNumber].idDash !== this.idDashFrom) {
+          this.filters[rowNumber].idDash = this.idDashFrom;
+        }
         this.$store.commit('setFocusedFilter', this.filters[rowNumber])
       }
     },
