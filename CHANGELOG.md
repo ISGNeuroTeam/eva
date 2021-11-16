@@ -56,6 +56,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - hide the progress bar on the heatmap if the value is empty
 - render metrics when changed data for dashboards(single value)
 
+### Added
+- ability to use multiline select as filter for other datasourses
+
 ## [1.71.0]
 ### Added
 - ability to set a default value for a token if its value is not set
