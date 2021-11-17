@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed a bug with updating the values of a newly created sub filter
 - fixed the display of the slider component after the update
 - fixed fullscreen mode for slider component
+- fixed scrolling in the components, data, markers menu
 
 ## [1.73.0]
 
