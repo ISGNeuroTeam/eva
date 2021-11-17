@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the display of the slider component after the update
 - fixed fullscreen mode for slider component
 - fixed a problem with selecting/deselecting all items in the multiselect component
+- fixed default names for filters and tables
 
 ## [1.73.0]
 
