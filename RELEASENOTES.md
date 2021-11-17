@@ -3,7 +3,7 @@
 ### New
 
 - Brand new slider vizualization.
-- Bbility to use a token in the name of filter part.
+- Ability to use a token in the name of filter part.
 - Additional properties for hotkey ctrl+\ .
 - Ability to select strings in X-axis label.
 - Ability to use multiline select as filter for other datasourses.
