@@ -393,8 +393,12 @@ export default {
     },
     addLineBreaks: function(event) {
       this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
-      this.search.original_otl = this.search.original_otl.replace('\n', '')
+      if (this.search.original_otl[0] === '\n') {
+        this.search.original_otl = this.search.original_otl.substring(1)
+      }
       this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replaceAll('|' + '\n', '| ')
+      this.search.original_otl = this.search.original_otl.replaceAll('| ' + '\n', '| ')
     },
     setUsername: function(event) {
       this.search.parametrs.username = event;
