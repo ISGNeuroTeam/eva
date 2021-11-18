@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed default names for filters and tables
+- fixed the ability to drag the slider component
 
 
 ## [1.74.0]
