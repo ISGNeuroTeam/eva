@@ -6,7 +6,7 @@
           <svg v-if="filterPart.invertMatches" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5.99998 13.3334L2.66665 10.6667L5.99998 8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998 8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z" :fill="theme.$main_text"/>
           </svg>
-          {{ elemName }}
+          <span :title="elemName">{{ elemName }}</span>
         </div>
         <div class="part-subtitle">
           <span>{{ filterPart.fieldName }} ({{ filterPartValues.length }})</span>
@@ -145,6 +145,7 @@
       filterPartValues(){
         if (this.filterPart.token)
           return this.$store.state.store[this.idDash].filters[this.filterIndex].parts[this.filterPartIndex].values;
+        return []
       }
     },
     methods: {
@@ -180,9 +181,13 @@
       max-width: 300px
       white-space: nowrap
       overflow: hidden
-      text-overflow: ellipsis
       display: flex
       align-items: center
+
+      > span
+        overflow: hidden
+        text-overflow: ellipsis
+
 
     .part-subtitle
       display: flex

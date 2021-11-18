@@ -872,6 +872,32 @@
             </div>
           </div>
           <div
+              v-if="checkOptions('stringOX')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              stringOX
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Ось X - строки
+            </div>
+            <div class="status-option item">
+              <v-switch
+                  v-model="options.stringOX"
+                  class="switch"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  :label="String(options.stringOX)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('united')"
             class="option-item"
           >
@@ -1083,7 +1109,7 @@
               v-for="i in metrics.length"
               :key="i"
               class="options-item-tooltip"
-              style="flex-wrap: wrap;"
+              style="flex-wrap: wrap; margin-bottom: 40px"
             >
               <v-select
                 v-model="metrics[i-1].name"
@@ -1164,6 +1190,7 @@
                 <div class="status-option item">
                   <v-select
                     :value="type_line[metrics[i-1].name]"
+                    :disabled="metrics[i-1].type === 'Bar chart'"
                     label="Тип линии"
                     class="item-metric"
                     :items="[
@@ -1966,6 +1993,9 @@ export default {
           }
         } else {
           this.$set(this.options,item,null);
+          if (item == 'stringOX') {
+            this.$set(this.options,item,false);
+          }
           if (item == 'united') {
             this.$set(this.options,item,false);
           }

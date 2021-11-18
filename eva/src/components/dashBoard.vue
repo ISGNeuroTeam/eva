@@ -192,6 +192,7 @@
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
+                    @SetRange="setRange($event)"
                   />
                 </v-card>
               </div>
