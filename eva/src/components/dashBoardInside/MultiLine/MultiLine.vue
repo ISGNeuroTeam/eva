@@ -988,6 +988,16 @@ export default {
               .style('opacity', function (d, j) {
                 let opacity = nullValue !== -1 ? 1 : 0
 
+                const count = Number(conclusion_count[metricName])
+                let hasTooltip = true;
+                const isNumber = typeof count === 'number';
+                if (isNumber && count > 1) {
+                  hasTooltip = j % count === 0;
+                }
+                if (isNumber && count <= 0) {
+                  hasTooltip = false;
+                }
+
                 mustSee.forEach((item) => {
                   if (item[metricName] == d[metricName]) opacity = 1
                 })
@@ -1005,12 +1015,12 @@ export default {
                   )
                 }
 
-                if (isDataAlwaysShow && isDataAlwaysShow === 'data') {
+                if (isDataAlwaysShow && isDataAlwaysShow === 'data' && hasTooltip) {
                   opacity = 1
                   setLabel('data-always-dot', `data-always-dot-text-${metricName}`, metricName)
                 }
 
-                if (isDataAlwaysShow && isDataAlwaysShow === 'caption') {
+                if (isDataAlwaysShow && isDataAlwaysShow === 'caption' && hasTooltip) {
                   opacity = 1
                   setLabel('data-always-dot', `data-always-dot-text-${metricName}`, `_${metricName}_caption`)
                 }
@@ -1341,7 +1351,7 @@ export default {
           if (nullValue !== -1) {
             dotDate = [extraDot[nullValue]]
           } else {
-            if (optionsKeys.length === 0 || options.type === 'Line chart') {
+            if (options.type === 'Line chart') {
               cutData.forEach((line) => {
                 if (!Number(line[metric]) && line[metric] !== 0) {
                   if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
@@ -1408,6 +1418,16 @@ export default {
             .style('opacity', function (d, j) {
               let opacity = nullValue !== -1 ? 1 : 0
 
+              const count = Number(conclusion_count[metric])
+              let hasTooltip = true;
+              const isNumber = typeof count === 'number';
+              if (isNumber && count > 1) {
+                hasTooltip = j % count === 0;
+              }
+              if (isNumber && count <= 0) {
+                hasTooltip = false;
+              }
+
               mustSee.forEach((item) => {
                 if (item[metric] === d[metric]) opacity = 1
               })
@@ -1425,17 +1445,17 @@ export default {
                 )
               }
 
-              if (isDataAlwaysShow && isDataAlwaysShow === 'data') {
+              if (isDataAlwaysShow && isDataAlwaysShow === 'data' && hasTooltip) {
                 opacity = 1
                 setLabel('data-always-dot', `data-always-dot-text-${metric}`, metric)
               }
 
-              if (isDataAlwaysShow && isDataAlwaysShow === 'caption') {
+              if (isDataAlwaysShow && isDataAlwaysShow === 'caption' && hasTooltip) {
                 opacity = 1
                 setLabel('data-always-dot', `data-always-dot-text-${metric}`, `_${metric}_caption`)
               }
 
-              if (isLastDotShow && j === dataRestLength - 1) {
+              if (isLastDotShow && j === dataRestLength - 1 && hasTooltip) {
                 opacity = 1
                 setLabel('data-last-dot', `last-dot-text-${metric}`, metric)
               }
@@ -1632,7 +1652,7 @@ export default {
 
 
         // }
-        if (optionsKeys.length > 0 || options.type === 'Bar chart') {
+        if (optionsKeys.length > 0 && options.type === 'Bar chart') {
           let allDotHover = []
 
           x = this.isTime

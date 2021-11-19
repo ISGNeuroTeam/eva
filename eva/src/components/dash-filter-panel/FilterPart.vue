@@ -135,7 +135,7 @@
         name && this.getDashTokens.forEach(token => {
           name = name.replaceAll(`$${token.name}$`, token.value)
         })
-        return name
+        return name || this.filterPart?.token?.name || 'Unknown'
       },
       operationManualTitle() {
         return this.filterPart.operationManual
