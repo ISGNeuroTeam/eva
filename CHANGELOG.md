@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiline full screen zoom
 - fixed a bug with updating the values of a newly created sub filter
 - fixed the display of the slider component after the update
+- settings are always above visualisations
 
 ## [1.73.0]
 
