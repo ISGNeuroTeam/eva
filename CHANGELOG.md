@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed data column selection in slider component
 - fixed scrolling in the components, data, markers menu
 - fixed broken line charts
+- fixed a problem with changing the settings of single value component
 
 
 ## [1.74.0]
