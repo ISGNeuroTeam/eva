@@ -1,6 +1,8 @@
 <template>
   <div
       class="dash-map"
+      :class="{'full-screen': isFullScreen}"
+      :style="{'zoom': htmlZoom}"
       ref="container"
   >
     <div v-if="needSetField">
@@ -37,7 +39,7 @@
         <v-progress-circular
             :rotate="360"
             :size="circularSize"
-            :width="15"
+            :width="circularWidth"
             :value="percentValue"
             :color="loading ? theme.$secondary_border : theme.$primary_button"
         >
@@ -51,7 +53,6 @@
                 :dark="isDarkTheme"
                 :color="theme.$primary_button"
                 color="primary"
-                small
                 :disabled="isMinimumValue"
                 @click="addValue(-1)">
               <v-icon>{{ icons.minus }}</v-icon>
@@ -60,7 +61,6 @@
                 :dark="isDarkTheme"
                 :color="theme.$primary_button"
                 color="primary"
-                small
                 class="ml-2"
                 :disabled="isMaximumValue"
                 @click="addValue(1)">
@@ -89,7 +89,8 @@ export default {
   data() {
     return {
       vertical: true,
-      circularSize: 200,
+      circularSize: 190,
+      circularWidth: 20,
       icons: {
         plus: mdiPlus,
         minus: mdiMinus,
@@ -106,6 +107,22 @@ export default {
     }
   },
   computed: {
+    htmlZoom() {
+      const size = this.$attrs.heightFrom < this.$attrs.widthFrom
+          ? this.$attrs.heightFrom
+          : this.$attrs.widthFrom
+      return size / 370;
+    },
+    isFullScreen() {
+      return this.$attrs['is-full-screen'];
+    },
+    storedValue(){
+      let selected = this.$store.getters.getSelected({
+        idDash: this.idDashFrom,
+        id: this.idFrom
+      });
+      return selected.elemDeep
+    },
     needSetField() {
       return !this.dataField && !this.loading
     },
@@ -156,6 +173,11 @@ export default {
     }
   },
   watch: {
+    storedValue(value) {
+      if (this.value !== value) {
+        this.loadSelectedValue()
+      }
+    },
     values(list) {
       this.detectSliderValue(list)
     },
@@ -251,6 +273,7 @@ export default {
 <style lang="sass">
 .dash-map
   color: var(--main_text) !important
+  min-width: 360px
 
   .v-input__append-inner
     margin-top: 16px
@@ -261,4 +284,7 @@ export default {
 
     .v-slider--vertical
       min-height: 220px
+
+  &.full-screen
+    min-width: 690px
 </style>
