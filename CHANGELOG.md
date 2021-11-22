@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed default names for filters and tables
 - fixed the ability to drag the slider component
 - settings are always above visualisations
+- fixed data column selection in slider component
 
 
 ## [1.74.0]
@@ -36,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the display of the slider component after the update
 - fixed fullscreen mode for slider component
 - fixed a problem with selecting/deselecting all items in the multiselect component
-- fixed data column selection in slider component
 
 ## [1.73.0]
 
