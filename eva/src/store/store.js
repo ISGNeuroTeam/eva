@@ -258,6 +258,12 @@ export default {
           }
         });
       }
+      // Add filterParam(for multiLine)
+      state[idDash].tockens.forEach(tocken => {
+        if (tocken.name === payload.tocken.name) {
+          tocken.filterParam = payload.tocken.filterParam
+        }
+      });
       // Add value to temp values of filter
       if (state[idDash].focusedFilter) {
         this.commit('addTokenToFilterParts', payload);
@@ -555,7 +561,7 @@ export default {
     saveFilterPart(state, { idDash, filterPart, filterPartIndex }) {
       if (Number.isFinite(filterPartIndex))
         state[idDash].focusedFilter.parts[filterPartIndex] = filterPart;
-      else state[idDash].focusedFilter.parts.push(filterPart);
+      else state[idDash].focusedFilter.parts.push({ ...filterPart });
     },
     setLibrary: (state, options) => {
       Vue.set(state[options.idDash][options.id].options, 'library', options.library);
@@ -664,7 +670,6 @@ export default {
       let id = -1;
       if (Number.isInteger(+item.target)) {
         id = item.target;
-        console.log('id', id);
       }
       if (id) await loader(id);
 
@@ -965,7 +970,13 @@ export default {
       let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
       for (let part of focusedFilterParts) {
         if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
-          if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
+          if (part.values.indexOf(tocken.value) === -1) {
+            part.token.value = tocken.value
+            if (part.token.elem.includes('multiLine')) {
+              part.values = []
+            }
+            part.values.push(tocken.value);
+          }
         }
       }
       this.commit('sortFilterParts', { idDash: tocken.idDash });
@@ -1233,7 +1244,6 @@ export default {
         let tws = search.parametrs.tws;
         let twf = search.parametrs.twf;
         let reg = null;
-
         if (state[idDash].filters) {
           Object.values(state[idDash].filters).forEach(filter => {
             reg = new RegExp(`\\$${filter.id}\\$`, 'g');
