@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the ability to drag the slider component
 - settings are always above visualisations
 - fixed data column selection in slider component
+- fixed scrolling in the components, data, markers menu
 
 
 ## [1.74.0]
