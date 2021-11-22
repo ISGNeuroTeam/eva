@@ -167,11 +167,11 @@ export default {
         xAxisCaptionRotate = 0,
         barplotBarWidth = 0,
         timeFormat,
-        yAxesBinding = { axesCount: 1, metrics: {} },
+        yAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
       
       this.stringOX = stringOX
-      
+
       if (!this.stringOX && (typeof rowValue !== 'number')) {
         return this.showErrorMessage('К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.')
       }
@@ -181,7 +181,7 @@ export default {
         this.isTime = rowValue > 1000000000 && rowValue < 2000000000
       }
       this.isUnitedMode = united
-      this.timeFormat = timeFormat
+      this.timeFormat = timeFormat || '%Y-%m-%d %H:%M:%S'
       this.xAxisCaptionRotate = xAxisCaptionRotate
 
       const metricOptions = metrics ? [...metrics] : []
@@ -904,7 +904,7 @@ export default {
               })
           }
 
-          if (yAxesBinding.metricTypes[metricName] === 'linechart') {
+          if (yAxesBinding.metricTypes[metricName] === 'linechart' || yAxesBinding.metricTypes[metricName] === undefined) {
             const linesWithBreak = []
             let dotDate = null
             let nullValue = -1
@@ -1306,7 +1306,7 @@ export default {
           if (nullValue !== -1) {
             dotDate = [extraDot[nullValue]]
           } else {
-            if (optionsKeys.length === 0 || options.type === 'Line chart') {
+            if (optionsKeys.length === 0 || options.type === 'Line chart' || !options.type) {
               cutData.forEach((line) => {
                 if (!Number(line[metric]) && line[metric] !== 0) {
                   if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
@@ -1582,7 +1582,7 @@ export default {
 
         // }
 
-        if (optionsKeys.length > 0 || options.type === 'Bar chart') {
+        if (options.type === 'Bar chart') {
           let allDotHover = []
 
           x = this.isTime
