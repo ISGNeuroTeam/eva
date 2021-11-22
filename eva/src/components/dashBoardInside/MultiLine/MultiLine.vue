@@ -726,7 +726,9 @@ export default {
         const brushObj = { ...this.defaultBrushObj }
 
         const bars = []
-
+        
+        let numberLeft = 0
+        let numberRight = 0
         this.metricNames.forEach((metricName, metricIndex) => {
           const minVal = minMetricsValues[metricIndex]
           const maxVal = maxMetricsValues[metricIndex]
@@ -737,11 +739,56 @@ export default {
             .scaleLinear()
             .range([this.height, 20])
             .domain([minVal - extra(minVal), maxVal + extra(maxVal)])
-
+          
           yScales.push(yScale)
 
           const yAxisClass = `yAxis-${metricName}`
 
+
+          let yDomainArr = [
+            Math.round(minVal - extra(minVal)),
+            Math.round((maxVal - minVal + 2*extra(maxVal))/3 + minVal - extra(minVal)),
+            Math.round((maxVal - minVal + 2*extra(maxVal))/3*2 + minVal - extra(minVal)),
+            Math.round(maxVal + extra(maxVal))
+          ]
+          let yRangeArr = [this.height, (this.height-20)/3*2+20, (this.height-20)/3+20, 20]
+
+          let yScal = d3.scaleOrdinal()
+              .domain(yDomainArr)
+              .range(yRangeArr);
+          
+
+          if (yAxesBinding.axesCount === 1 || yAxesBinding.metrics[metricName] === 'left') {
+            numberLeft++
+            alert(numberLeft)
+            let translateY
+            if (numberLeft === 0) {
+              translateY = 0
+            } else if (numberLeft % 2 !== 0) {
+              translateY = (numberLeft)*5
+            } else {
+              translateY = -(numberLeft-1)*5
+            }
+            this.svg.append('g')
+                .attr('transform', 'translate(-40, ' + translateY + ')')
+                .attr('class', yAxisClass)
+                .call(d3.axisLeft(yScal));
+          } else {
+            numberRight++
+            let translateY
+            if (numberRight === 0) {
+              translateY = 0
+            } else if (numberRight % 2 !== 0) {
+              translateY = (numberRight)*5
+            } else {
+              translateY = -(numberRight-1)*5
+            }
+            this.svg.append('g')
+                .attr('transform', `translate( ${this.width}, ${translateY})`)
+                .attr('class', yAxisClass)
+                .call(d3.axisRight(yScal));
+          }
+          
           if (yAxesBinding.axesCount === 2) {
             if (yAxesBinding.metrics[metricName] === 'right') {
               this.svg
@@ -761,57 +808,7 @@ export default {
               .attr('class', yAxisClass)
               .call(d3.axisLeft(yScale).ticks(yScale.ticks().length / 2))
           }
-          // let array = d3.range(100,200,25);
-          // alert(minVal)
-          // alert(maxVal)
-          // this.xAxis.call(
-          //     d3.axisLeft(yScale)
-          //         .tickValues(d3.range(minVal,4000, 457))
-          //         .tickFormat(d3.format(".2f"))
-          // )
-      
-          // let xScale = d3.scaleLinear()
-          //     .domain([-30, 50])
-          //     .range([0, 1000]);
-          // this.svg.append('g').call(d3.axisBottom(xScale).ticks(5, ".2f"));
-          
-// // Y Scale
-//           var yScal = d3.scaleLinear()
-//               .domain([0, 500])
-//               .range([30, 170]);
-//
-//
-// // Left axis
-//           this.svg.append('g')
-//               .attr('transform', 'translate(0, 0)')
-//               .call(d3.axisLeft(yScal).ticks(5));
-//           this.svg
-//               .append('g')
-//               .attr('class', yAxisClass)
-//               .call(d3.axisLeft(yScale).ticks(2, 100, 4))
-          // d3.scaleLinear()
-          //     .ticks()
-
-          // let margin = {top: 100, right: 100, bottom: 100, left: 100}
-          // let width = 960 - margin.left - margin.right
-          // let height = 500 - margin.top - margin.bottom
-          //
-          // let x = d3.scalePoint()
-          //     .domain(["apple", "orange", "banana", "grapefruit"])
-          //     .range([0, 500]);
-          //
-          // let xAx = d3.axisLeft(x)
-          //
-          // let svg = d3.select("body").append("svg")
-          //     .attr("width", width + margin.left + margin.right)
-          //     .attr("height", height + margin.top + margin.bottom)
-          //     .append("g")
-          //     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-          // this.svg.append("g")
-          //     .attr("class", "x axis")
-          //     .call(xAx);
-//////////////////////////////////////////////////////////////
-
+                    
           this.svg
             .selectAll(`g.${yAxisClass} g.tick text`)
             .attr('fill', this.legendColors[metricIndex])
