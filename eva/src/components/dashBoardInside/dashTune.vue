@@ -2,7 +2,7 @@
   <div
       class="dash-map"
       :class="{'full-screen': isFullScreen}"
-      :style="{'zoom': htmlZoom}"
+      :style="{'zoom': needSetField ? 1 : htmlZoom}"
       ref="container"
   >
     <div v-if="needSetField">
