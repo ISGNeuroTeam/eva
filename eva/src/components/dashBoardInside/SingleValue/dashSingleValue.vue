@@ -111,12 +111,15 @@ export default {
     dataRestFrom() {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(JSON.stringify(this.$store.getters.getOptions({ id, idDash })));
-      this.setVisual(this.currentSettings.metricOptions.length ? this.currentSettings.metricOptions : options.settings?.metricOptions)
+      this.setVisual(this.currentSettings.metricOptions?.length ? this.currentSettings.metricOptions : options.settings?.metricOptions)
 
     },
     currentSettings() {
-      this.providedSettings = { ... this.currentSettings }
-      this.init({ ... this.currentSettings })
+      let currentSettings = Object.assign({
+        metricOptions: []
+      }, this.currentSettings);
+      this.providedSettings = currentSettings
+      this.init(currentSettings)
     }
   },
   mounted() {
@@ -185,7 +188,7 @@ export default {
       const options = { ...this.$store.getters.getOptions({ id, idDash }) };
       this.metricCount = count;
 
-      const newSettings = options.settings ? { ...options.settings, metricCount: count } : { metricCount: count }
+      const newSettings = Object.assign({options: {}, metricCount: count}, options.settings)
 
       this.$store.commit('setOptions', newSettings)
       if (this.updateSettings) {
@@ -231,7 +234,7 @@ export default {
       this.options.settings.metricOptions = metricOptions;
     },
     updateVisual(settings) {
-      this.metricList = settings.metricOptions.map((item, idx) => ({
+      this.metricList = settings.metricOptions?.map((item, idx) => ({
         ...item,
         listOrder: idx,
         title: item.name || item.title,
