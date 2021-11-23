@@ -1005,7 +1005,6 @@ export default {
                 }
 
                 annotationList.forEach((annotation, i) => {
-                  alert('annotationList')
                   if (d[annotation]) {
                     createAnnotation(d, annotation, metricNamesCount + 1 + i, tooltip)
                   }
