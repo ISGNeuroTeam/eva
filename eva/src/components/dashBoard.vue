@@ -192,6 +192,7 @@
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
+                    @SetRange="setRange($event)"
                   />
                 </v-card>
               </div>
@@ -456,11 +457,11 @@ export default {
       return this.getTockens(this.idDash)
     },
     boardTitle() {
-      if (!this.props) {
-        return 'Заголовок'
+      if (!this.props || !this.props.name) {
+        return this.element
       }
       let name = this.props.name;
-      this.getSelfTockens.forEach(token => {
+      name && this.getSelfTockens.forEach(token => {
         name = name.replaceAll(`$${token.name}$`, token.value)
       })
       return name

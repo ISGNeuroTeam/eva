@@ -52,6 +52,9 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    // currentElem() {
+    //   return this.$store.getters.getTockens(this.idDash).find(token => token.name === this.currentToken).elem
+    // }
   },
   methods: {
     changeToken(newTokenName) {

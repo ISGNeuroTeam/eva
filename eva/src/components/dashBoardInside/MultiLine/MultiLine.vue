@@ -54,6 +54,7 @@ export default {
     xAxis: null,
     xMetric: '',
     isTime: false,
+    stringOX: false,
     isUnitedMode: false,
     secondTransf: 1,
     timeFormat: '',
@@ -155,26 +156,32 @@ export default {
       const firstDataRowKeys = Object.keys(firstDataRow)
       const rowValue = firstDataRow[firstDataRowKeys[0]]
 
-      if (typeof rowValue !== 'number') {
-        return this.showErrorMessage('К сожалению, данные не подходят к линейному графику')
-      }
-
       this.setNoData(false)
 
       const {
         metrics,
         united = false,
+        stringOX = false,
         lastDot = false,
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
         barplotBarWidth = 0,
         timeFormat,
-        yAxesBinding = { axesCount: 1, metrics: {} },
+        yAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
+      
+      this.stringOX = stringOX
 
-      this.isTime = rowValue > 1000000000 && rowValue < 2000000000
+      if (!this.stringOX && (typeof rowValue !== 'number')) {
+        return this.showErrorMessage('К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.')
+      }
+      if (this.stringOX) {
+        this.isTime = false
+      } else {
+        this.isTime = rowValue > 1000000000 && rowValue < 2000000000
+      }
       this.isUnitedMode = united
-      this.timeFormat = timeFormat
+      this.timeFormat = timeFormat || '%Y-%m-%d %H:%M:%S'
       this.xAxisCaptionRotate = xAxisCaptionRotate
 
       const metricOptions = metrics ? [...metrics] : []
@@ -223,6 +230,8 @@ export default {
             end: point[1],
           }
           const value = values[capture]
+          
+          tocken.filterParam = Object.keys(this.dataRestFrom[0])[0]
           this.$store.commit('setTocken', { tocken, value, idDash, store })
         }
       }
@@ -599,10 +608,17 @@ export default {
       this.minX = this.isTime ? 0 : extentForX[0]
       this.maxX = this.isTime ? 0 : extentForX[1]
 
-      let x = this.isTime
-        ? d3.scaleTime().range([0, this.width]).domain(extentForX)
-        : d3.scaleLinear().range([0, this.width]).domain(extentForX)
-
+      let x;
+      if (this.stringOX) {
+        x = d3.scalePoint()
+          .range([0, this.width])
+          .domain(this.dataRestFrom.map(function(d) { return d.day; }));
+      } else {
+        x = this.isTime
+            ? d3.scaleTime().range([0, this.width]).domain(extentForX)
+            : d3.scaleLinear().range([0, this.width]).domain(extentForX)
+      }
+      
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
 
@@ -779,16 +795,14 @@ export default {
               .enter()
               .append('rect')
               .attr('id', (d, i) => getBarID(i))
-              .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('x', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
               .attr('y', (d) => yScale(d[metricName]))
               .attr('width', () => {
                 if (!barplotBarWidth || barplotBarWidth <= 0) {
-                  return this.isTime
-                    ? d3.scaleBand()
+                  return d3.scaleBand()
                         .range([0, this.width])
-                        .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                        .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                         .bandwidth()
-                    : x.bandwidth()
                 }
                 return barplotBarWidth
               })
@@ -890,7 +904,7 @@ export default {
               })
           }
 
-          if (yAxesBinding.metricTypes[metricName] === 'linechart') {
+          if (yAxesBinding.metricTypes[metricName] === 'linechart' || yAxesBinding.metricTypes[metricName] === undefined) {
             const linesWithBreak = []
             let dotDate = null
             let nullValue = -1
@@ -930,7 +944,7 @@ export default {
                   .attr(
                     'd',
                     d3.line()
-                      .x((d) => x(d[xMetric] * this.secondTransf))
+                      .x((d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
                       .y((d) => yScale(d[metricName]))
                   )
               })
@@ -945,7 +959,7 @@ export default {
               .enter()
               .append('circle')
               .attr('class', `dot dot-${metricIndex}`)
-              .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+              .attr('cx', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
               .attr('cy', (d) => yScale(d[metricName]))
               .attr('r', 5)
               .attr('metric', metricName)
@@ -1292,7 +1306,7 @@ export default {
           if (nullValue !== -1) {
             dotDate = [extraDot[nullValue]]
           } else {
-            if (optionsKeys.length === 0 || options.type === 'Line chart') {
+            if (optionsKeys.length === 0 || options.type === 'Line chart' || !options.type) {
               cutData.forEach((line) => {
                 if (!Number(line[metric]) && line[metric] !== 0) {
                   if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
@@ -1318,7 +1332,7 @@ export default {
                     .attr(
                         'd',
                         d3.line()
-                            .x((d) => x(d[xMetric] * this.secondTransf))
+                            .x((d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
                             .y((d) => y[metricIndex](d[metric]))
                     )
               })
@@ -1348,7 +1362,7 @@ export default {
             .enter()
             .append('circle')
             .attr('class', `dot dot-${metricIndex}`)
-            .attr('cx', (d) => x(d[xMetric] * this.secondTransf))
+            .attr('cx', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
             .attr('cy', (d) => y[metricIndex](d[metric]))
             .attr('r', 5)
             .attr('metric', metric)
@@ -1568,7 +1582,7 @@ export default {
 
         // }
 
-        if (optionsKeys.length > 0 || options.type === 'Bar chart') {
+        if (options.type === 'Bar chart') {
           let allDotHover = []
 
           x = this.isTime
@@ -1577,7 +1591,7 @@ export default {
                 .domain(d3.extent(this.dataRestFrom, (d) => new Date(d[xMetric] * this.secondTransf)))
             : d3.scaleBand()
                 .range([0, this.width])
-                .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
 
           this.svg
             .append('g')
@@ -1597,7 +1611,7 @@ export default {
             .data(cutData)
             .enter()
             .append('rect')
-            .attr('x', (d) => x(d[xMetric] * this.secondTransf))
+            .attr('x', (d) => this.isTime? x(d[xMetric] * this.secondTransf) : x(d[xMetric]))
             .attr('y', (d) => {
               if (isNegative) {
                 const abs = Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
@@ -1608,12 +1622,10 @@ export default {
             .attr('fill', this.legendColors[metricIndex])
             .attr('width', () => {
               if (!barplotBarWidth || barplotBarWidth <= 0) {
-                return this.isTime
-                  ? d3.scaleBand()
+                return d3.scaleBand()
                       .range([0, this.width])
-                      .domain(this.dataRestFrom.map((d) => d[xMetric] * this.secondTransf))
+                      .domain(this.dataRestFrom.map((d) => this.isTime? d[xMetric] * this.secondTransf : d[xMetric]))
                       .bandwidth()
-                  : x.bandwidth()
               }
               return barplotBarWidth
             })
