@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed scrolling in the components, data, markers menu
 - fixed broken line charts
 - fixed a problem with changing the settings of single value component
+- zoom reset btn for all multilines
+- zoom reset on fullscreen
+- reduced reset zoom time
 
 
 ## [1.74.0]
