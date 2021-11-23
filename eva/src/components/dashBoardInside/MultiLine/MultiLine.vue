@@ -837,11 +837,16 @@ export default {
               .attr('fill', this.legendColors[metricIndex])
               .on('mouseenter', function (d) {
                 const date = new Date(d[xMetric] * secondTransf)
-
+                let day = date.getDate()
+                let month = date.getMonth()+1
+                const year = date.getFullYear()
+                if (day < 10) day = '0' + day;
+                if (month < 10) month = '0' + month;
+                
                 const xVal = !isTime
                   ? d[xMetric]
-                  : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
-
+                  : `${day}-${month}-${year}`
+                
                 tooltip.html(
                   thisMetrics.reduce((prev, cur) => {
                     const value = cur === xMetric ? xVal : d[cur]
@@ -1000,6 +1005,7 @@ export default {
                 }
 
                 annotationList.forEach((annotation, i) => {
+                  alert('annotationList')
                   if (d[annotation]) {
                     createAnnotation(d, annotation, metricNamesCount + 1 + i, tooltip)
                   }
@@ -1012,18 +1018,21 @@ export default {
               .on('mousedown', () => brushObj.selectionDown())
               .on('mouseenter', function (d) {
                 const date = new Date(d[xMetric] * secondTransf)
-                const day = date.getDate()
-                const month = date.getMonth()
+                let day = date.getDate()
+                let month = date.getMonth()+1
                 const year = date.getFullYear()
+                if (day < 10) day = '0' + day;
+                if (month < 10) month = '0' + month;
 
-                const xVal = isTime ? `${day}-${month + 1}-${year}` : d[xMetric]
-
+                const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric]
                 tooltip.html(
                   Object.keys(d).reduce((prev, cur) => {
+                    console.log(cur)
+                    console.log(d)
                     let value = ''
                     if (cur === xMetric) value = xVal
                     else if (cur.indexOf('annotation') === -1) value = d[cur]
-                    return prev + `<p><span>${cur}</span>: ${value}</p>`
+                    return prev + `<p><span>${cur}</span>:: ${value}</p>`
                   }, '')
                 )
 
@@ -1411,13 +1420,12 @@ export default {
               const xVal = isTime
                 ? (() => {
                   const date = new Date(d[xMetric] * secondTransf)
-                  const day = date.getDate()
-                  const month = date.getMonth()
+                  let day = date.getDate()
+                  if (day < 10) day = '0' + day;
+                  let month = date.getMonth()+1
+                  if (month < 10) month = '0' + month;
                   const year = date.getFullYear()
-                  const hours = ('0' + date.getHours()).substr(-2)
-                  const minutes = ('0' + date.getMinutes()).substr(-2)
-                  const seconds = ('0' + date.getSeconds()).substr(-2)
-                  return `${day}-${month + 1}-${year} ${hours}:${minutes}:${seconds}`
+                  return `${day}-${month}-${year}`
                 })()
                 : d[xMetric]
 
@@ -1665,10 +1673,15 @@ export default {
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[options.name] }, 'click'))
             .on('mouseenter', function (d) {
               const date = new Date(d[xMetric] * secondTransf)
+              let day = date.getDate()
+              if (day < 10) day = '0' + day;
+              let month = date.getMonth()+1
+              if (month < 10) month = '0' + month;
+              const year = date.getFullYear()
 
               const xVal = !isTime
                 ? d[xMetric]
-                : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+                : `${day}-${month}-${year}`
 
               tooltip.html(
                 thisMetrics.reduce((prev, cur) => {
