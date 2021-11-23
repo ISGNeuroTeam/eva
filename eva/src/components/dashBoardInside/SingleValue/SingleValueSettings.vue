@@ -3,7 +3,7 @@
     v-model="isOpen"
     persistent
     scrollable
-    max-width="550"
+    width="560"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
