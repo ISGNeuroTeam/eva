@@ -1050,7 +1050,7 @@ export default {
       this.$emit("SetRange", range);
     },
     resetRange () {
-      this.$emit("ResetRange");
+      this.$emit("ResetRange", this.dataSourseTitle);
     },
   },
 };
