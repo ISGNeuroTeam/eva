@@ -40,17 +40,25 @@ export function filterCompile(filter) {
             }
             break;
           case 'token':
-            for (let idxVal in part.values) {
-              let value = part.values[idxVal];
-
-              if (idxVal == part.values.length - 1) {
-                if (part.values.length > 1) filterOtlText += ` ${part.operationToken} `;
-                filterOtlText += `${part.fieldName}="${value}")`;
-              } else if (idxVal == 0) {
-                filterOtlText += `${part.fieldName}="${value}"`;
-                if (part.values.length == 0) filterOtlText += ')';
+            if (part.token.elem === 'multiLine') {
+              if(part.token.capture === 'start') {
+                part.operationToken = '>'
               } else {
-                filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value}"`;
+                part.operationToken = '<'
+              }
+              filterOtlText += `${part.token.filterParam}${part.operationToken}${part.token.value})`;
+            } else {
+              for (let idxVal in part.values) {
+                let value = part.values[idxVal];
+                if (idxVal == part.values.length - 1) {
+                  if (part.values.length > 1) filterOtlText += ` ${part.operationToken} `;
+                  filterOtlText += `${part.fieldName}="${value}")`;
+                } else if (idxVal == 0) {
+                  filterOtlText += `${part.fieldName}="${value}"`;
+                  if (part.values.length == 0) filterOtlText += ')';
+                } else {
+                  filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value}"`;
+                }
               }
             }
             break;
