@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- сombining ticks of several Y-axes
+
 ### Fixed
 - fixed default names for filters and tables
 - fixed the ability to drag the slider component

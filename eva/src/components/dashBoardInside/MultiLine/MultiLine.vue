@@ -707,42 +707,14 @@ export default {
       const dataRest = [...this.dataRestFrom]
 
       if (this.isUnitedMode) {
-        const minValue = d3.min(minMetricsValues)
-        const maxValue = d3.max(maxMetricsValues)
-        const minExtra = Math.abs(10 * minValue / 100)
-        const maxExtra = Math.abs(10 * maxValue / 100)
-
-        const y = d3
-          .scaleLinear()
-          .range([this.height, 20])
-          .domain([minValue - minExtra, maxValue + maxExtra])
-
-        this.svg
-          .append('g')
-          .attr('class', 'yAxis')
-          .call(d3.axisLeft(y).ticks(y.ticks().length / 2))
-
-        this.svg
-          .selectAll('g.yAxis g.tick')
-          .append('line')
-          .attr('class', 'grid-line-y')
-          .attr('x1', 0)
-          .attr('y1', 0)
-          .attr('x2', this.width)
-          .attr('y2', 0)
-          .attr('stroke', this.theme.$main_text)
-          .style('opacity', 0.3)
-
-        this.svg.selectAll(`g.yAxis g.tick text`).style('visibility', 'hidden')
-        this.svg.selectAll(`g.yAxis g.tick line:not([class])`).style('visibility', 'hidden')
-        this.svg.selectAll(`g.yAxis .domain`).style('visibility', 'hidden')
-
         const yScales = []
         const mustSee = []
         const brushObj = { ...this.defaultBrushObj }
 
         const bars = []
-
+        
+        let numberLeft = 0
+        let numberRight = 0
         this.metricNames.forEach((metricName, metricIndex) => {
           const minVal = minMetricsValues[metricIndex]
           const maxVal = maxMetricsValues[metricIndex]
@@ -753,29 +725,87 @@ export default {
             .scaleLinear()
             .range([this.height, 20])
             .domain([minVal - extra(minVal), maxVal + extra(maxVal)])
-
+          
           yScales.push(yScale)
 
           const yAxisClass = `yAxis-${metricName}`
 
-          if (yAxesBinding.axesCount === 2) {
-            if (yAxesBinding.metrics[metricName] === 'right') {
-              this.svg
-                .append('g')
-                .attr('class', yAxisClass)
-                .attr('transform', `translate(${this.width}, 0)`)
-                .call(d3.axisRight(yScale).ticks(yScale.ticks().length / 2))
-            } else if (yAxesBinding.metrics[metricName] === 'left') {
-              this.svg
-                .append('g')
-                .attr('class', yAxisClass)
-                .call(d3.axisLeft(yScale).ticks(yScale.ticks().length / 2))
+
+          let yDomainArr = [
+            Math.round(minVal - extra(minVal)),
+            Math.round((maxVal - minVal + 2*extra(maxVal))/3 + minVal - extra(minVal)),
+            Math.round((maxVal - minVal + 2*extra(maxVal))/3*2 + minVal - extra(minVal)),
+            Math.round(maxVal + extra(maxVal))
+          ]
+          let yRangeArr = [this.height, (this.height-20)/3*2+20, (this.height-20)/3+20, 20]
+
+          let yScal = d3.scaleOrdinal()
+              .domain(yDomainArr)
+              .range(yRangeArr);
+          
+
+          if (yAxesBinding.axesCount === 1 || yAxesBinding.metrics[metricName] === 'left') {
+            let translateY
+            if (numberLeft === 0) {
+              translateY = 0
+            } else if (numberLeft % 2 !== 0) {
+              translateY = ((numberLeft+1)/2)*10
+            } else {
+              translateY = -(numberLeft/2)*10
             }
+            this.svg.append('g')
+                .attr('transform', 'translate(0, ' + translateY + ')')
+                .attr('class', yAxisClass)
+                .call(d3.axisLeft(yScal));
+            if (numberLeft !== 0) {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick line`)
+                  .style('visibility', 'hidden')
+              this.svg.selectAll(`g.${yAxisClass} .domain`).style('visibility', 'hidden')
+            } else {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick`)
+                  .append('line')
+                  .attr('class', 'grid-line-y')
+                  .attr('x1', 0)
+                  .attr('y1', 0)
+                  .attr('x2', this.width)
+                  .attr('y2', 0)
+                  .attr('stroke', this.theme.$main_text)
+                  .style('opacity', 0.3)
+            }
+            numberLeft++
           } else {
-            this.svg
-              .append('g')
-              .attr('class', yAxisClass)
-              .call(d3.axisLeft(yScale).ticks(yScale.ticks().length / 2))
+            let translateY
+            if (numberRight === 0) {
+              translateY = 0
+            } else if (numberRight % 2 !== 0) {
+              translateY = ((numberRight+1)/2)*10
+            } else {
+              translateY = -(numberRight/2)*10
+            }
+            this.svg.append('g')
+                .attr('transform', `translate( ${this.width}, ${translateY})`)
+                .attr('class', yAxisClass)
+                .call(d3.axisRight(yScal));
+            if (numberRight !== 0) {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick line`)
+                  .style('visibility', 'hidden')
+              this.svg.selectAll(`g.${yAxisClass} .domain`).style('visibility', 'hidden')
+            } else {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick`)
+                  .append('line')
+                  .attr('class', 'grid-line-y')
+                  .attr('x1', 0)
+                  .attr('y1', 0)
+                  .attr('x2', -this.width)
+                  .attr('y2', 0)
+                  .attr('stroke', this.theme.$main_text)
+                  .style('opacity', 0.3)
+            }
+            numberRight++
           }
 
           this.svg
