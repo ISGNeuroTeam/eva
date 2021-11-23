@@ -152,6 +152,19 @@
                     </div>
                     <div class="settings-dash-block">
                       <div class="settings-dash">
+                        <v-tooltip v-if="boardTitle==='MultiLine'" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                                class="datasource"
+                                :color="theme.$main_border"
+                                v-on="on"
+                                @click="resetRange()"
+                            >
+                              {{ props.mdiMagnifyMinusOutline }}
+                            </v-icon>
+                          </template>
+                          <span>Сбросить зум</span>
+                        </v-tooltip>
                         <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
                           <template v-slot:activator="{ on }">
                             <v-icon
