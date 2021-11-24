@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - zoom reset btn for all multilines
 - zoom reset on fullscreen
 - reduced reset zoom time
+- fixed filter range for points and zoom multiline
 
 
 ## [1.74.0]
@@ -58,7 +59,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - fixed the datepicker in the dataset popup
-- fixed filter range for points and zoom multiline
 - closing the settings popup by clicking outside the popup
 - the json primitives text area has theme
 - added check for length of array metrics in manual filter and fixed save filters and use in other components
