@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added redirect to dashboard with information about tabs from dash heatmap
+- сombining ticks of several Y-axes
 
 ### Fixed
 - fixed default names for filters and tables
@@ -16,6 +17,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - settings are always above visualisations
 - fixed data column selection in slider component
 - fixed scrolling in the components, data, markers menu
+- fixed broken line charts
+- fixed a problem with changing the settings of single value component
+- zoom reset btn for all multilines
+- zoom reset on fullscreen
+- reduced reset zoom time
 
 
 ## [1.74.0]

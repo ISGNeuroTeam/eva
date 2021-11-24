@@ -30,7 +30,7 @@
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
-      @ResetRange="resetRange()"
+      @ResetRange="resetRange($event)"
     />
   </vue-draggable-resizable>
 </template>
@@ -177,8 +177,8 @@ export default {
     setRange (range) {
       this.$emit("SetRange", range);
     },
-    resetRange () {
-      this.$emit("ResetRange");
+    resetRange (dataSourseTitle) {
+      this.$emit("ResetRange", dataSourseTitle);
     },
   }
 }
