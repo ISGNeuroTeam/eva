@@ -1,4 +1,4 @@
-# [1.75.0] - Redirect to a specific dashboard tab on from heatmap, ticks of several Y-axes are combined on multiline and bugfixes.
+# [1.75.0] - Redirect to a specific dashboard tab from heatmap, ticks of several Y-axes are combined on multiline and bugfixes.
 
 ### New
 
