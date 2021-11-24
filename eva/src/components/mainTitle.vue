@@ -297,6 +297,9 @@ export default {
     await this.checkAlreadyDash()
     this.loadingDash = false
     document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
+    if (this.$route.params.tabId) {
+      this.clickTab(Number(this.$route.params.tabId))
+    }
     this.createStartClient()
     this.calcSizeCell()
     this.addScrollListener()

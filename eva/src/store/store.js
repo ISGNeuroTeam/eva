@@ -735,11 +735,12 @@ export default {
       //event.route.push(`/dashboards/${id}`);
       // event.route.go();
       const options = state[event.idDash][event.id].options;
-     
+      const currentTab = event.event.tab || state[id]?.currentTab
+
       if (!options?.openNewScreen) {
-        event.route.push(`/dashboards/${id}`);
+        event.route.push(`/dashboards/${id}/${currentTab || ''}`);
       } else {
-        window.open(`/dashboards/${id}`);
+        window.open(`/dashboards/${id}/${currentTab || ''}`);
       }
       let searches = state[id].searches;
 

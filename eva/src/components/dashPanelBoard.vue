@@ -1663,6 +1663,7 @@ export default {
                 ///go
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
                 this.$set(this.event, 'target', doing[0]);
+
                 let prop, value;
                 if (doing[1].indexOf('[') != -1) {
                   doing.splice(0, 1);
@@ -1675,6 +1676,7 @@ export default {
                   value = [doing[2]];
                 }
                 this.$set(this.event, 'prop', prop);
+                this.$set(this.event, 'tab', doing[2]);
                 this.$set(this.event, 'value', value);
               } else if (doing[0].toLowerCase() == 'open'.toLowerCase()) {
                 //open
