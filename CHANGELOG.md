@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - zoom reset btn for all multilines
 - zoom reset on fullscreen
 - reduced reset zoom time
+- slider component fixed syncing with fullscreen
 
 
 ## [1.74.0]
