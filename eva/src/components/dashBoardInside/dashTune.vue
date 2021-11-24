@@ -104,7 +104,7 @@ export default {
       ],
       sliderValue: 0,
       dataField: null, // поле с данными
-      value: 0,
+      value: '',
     }
   },
   computed: {
@@ -141,6 +141,9 @@ export default {
         if (keys.length === 1) {
           this.dataField = keys[0];
         }
+      }
+      if (!this.dataField) {
+        return [];
       }
       const list = this.dataRestFrom
         .map(row => {
@@ -195,6 +198,13 @@ export default {
     },
     changedInputData(val) {
       this.dataField = null;
+      this.value = '';
+      this.$store.commit('setSelected', {
+        element: 'elemDeep',
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+        value: '',
+      });
     },
     values(list) {
       this.detectSliderValue(list)
@@ -279,19 +289,24 @@ export default {
       });
     },
     detectSliderValue(list) {
+      let rowNumber = 0
       if (list === undefined) {
         list = this.values
+      } else {
+        list.forEach(item => {
+          if (this.value === '' && this.minValue !== undefined) {
+            this.value = this.minValue;
+          }
+          if (item < this.value) {
+            rowNumber++
+          }
+        })
       }
-      let rowNumber = 0
-      list.forEach(item => {
-        if (item < this.value) {
-          rowNumber++
-        }
-      })
       this.sliderValue = rowNumber;
-      if (this.value === '' && list.length) {
+      if ((this.value === '' || this.value === null) && list.length) {
         this.value = list[rowNumber]
       }
+      this.changeValue()
     }
   },
 }
