@@ -871,6 +871,32 @@
             </div>
           </div>
           <div
+              v-if="checkOptions('stringOX')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              stringOX
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Ось X - строки
+            </div>
+            <div class="status-option item">
+              <v-switch
+                  v-model="options.stringOX"
+                  class="switch"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  :label="String(options.stringOX)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('united')"
             class="option-item"
           >
@@ -1864,6 +1890,9 @@ export default {
           }
         } else {
           this.$set(this.options,item,null);
+          if (item == 'stringOX') {
+            this.$set(this.options,item,false);
+          }
           if (item == 'united') {
             this.$set(this.options,item,false);
           }
