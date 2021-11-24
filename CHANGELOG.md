@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.75.0]
+
+### Added
+
+- added redirect to dashboard with information about tabs from dash heatmap
+- сombining ticks of several Y-axes
+
+### Fixed
+
+- fixed default names for filters and tables
+- fixed the ability to drag the slider component
+- settings are always above visualisations
+- fixed data column selection in slider component
+- fixed scrolling in the components, data, markers menu
+- fixed broken line charts
+- fixed a problem with changing the settings of single value component
+- zoom reset btn for all multilines
+- zoom reset on fullscreen
+- reduced reset zoom time
+- fixed filter range for points and zoom multiline
+
 ## [1.74.0]
 
 ### Added
@@ -39,7 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - fixed the datepicker in the dataset popup
-- fixed filter range for points and zoom multiline
 - closing the settings popup by clicking outside the popup
 - the json primitives text area has theme
 - added check for length of array metrics in manual filter and fixed save filters and use in other components

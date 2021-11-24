@@ -69,7 +69,7 @@
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
-            @ResetRange="resetRange()"
+            @ResetRange="resetRange($event)"
           />
           <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
@@ -202,6 +202,7 @@ export default {
       hoveredTabID: 0,
       loadingDash: true,
       dataObject: {},
+      dataObjectConst: {},
       firstLoad: true,
       leftDots: true,
       rightDots: true,
@@ -261,14 +262,16 @@ export default {
       deep: true,
       handler(searches) {
         if (this.firstLoad) {
-          searches.forEach((search) =>
-            this.$set(this.dataObject, search.sid, { data: [], loading: true })
-          )
+          searches.forEach((search) => {
+              this.$set(this.dataObject, search.sid, { data: [], loading: true })
+              this.$set(this.dataObjectConst, search.sid, { data: [], loading: true })
+          })
           this.firstLoad = false
         }
         searches.map((search) => {
           if (search.status === 'empty') {
             this.$set(this.dataObject, search.sid, { data: [], loading: true })
+            this.$set(this.dataObjectConst, search.sid, { data: [], loading: true })
             this.$store.commit('updateSearchStatus', {
               idDash: this.idDash,
               sid: search.sid,
@@ -282,6 +285,8 @@ export default {
               })
               this.$set(this.dataObject[search.sid], 'data', res)
               this.$set(this.dataObject[search.sid], 'loading', false)
+              this.$set(this.dataObjectConst[search.sid], 'data', res)
+              this.$set(this.dataObjectConst[search.sid], 'loading', false)
             })
           }
         })
@@ -292,6 +297,9 @@ export default {
     await this.checkAlreadyDash()
     this.loadingDash = false
     document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
+    if (this.$route.params.tabId) {
+      this.clickTab(Number(this.$route.params.tabId))
+    }
     this.createStartClient()
     this.calcSizeCell()
     this.addScrollListener()
@@ -457,10 +465,13 @@ export default {
         ) {
           return true;
         }
+
+        const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
+        const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
         
         if (
-          (item[range.xMetric] <= range.range[0] && arr[idx + 1]?.[range.xMetric] >= range.range[1]) ||
-          (item[range.xMetric] >= range.range[1] && arr[idx - 1]?.[range.xMetric] <= range.range[0])
+          (item[range.xMetric] <= range.range[0] && arr[idxArrFirst]?.[range.xMetric] >= range.range[1]) ||
+          (item[range.xMetric] >= range.range[1] && arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
         ) {
           return true;
         }
@@ -469,19 +480,8 @@ export default {
     setRange (range, elem) {
       this.dataObject[elem.search].data = this.sliceRange(this.dataObject[elem.search].data, range);
     },
-    resetRange () {
-      this.searches.map((search) => {
-        this.$store.getters.getDataApi({ search, idDash: this.idDash }).then((res) => {
-          this.$store.commit('updateSearchStatus', {
-            idDash: this.idDash,
-            sid: search.sid,
-            status: 'downloaded',
-          })
-          console.log(res)
-          this.$set(this.dataObject[search.sid], 'data', res)
-          this.$set(this.dataObject[search.sid], 'loading', false)
-        })
-      })
+    resetRange (dataSourseTitle) {
+      this.dataObject[dataSourseTitle].data = this.dataObjectConst[dataSourseTitle].data
     },
   },
 }
