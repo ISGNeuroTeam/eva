@@ -1,3 +1,24 @@
+# [1.75.0] - Redirect to a specific dashboard tab on from heatmap, ticks of several Y-axes are combined on multiline and bugfixes.
+
+### New
+
+- Redirect to a specific dashboard tab from heatmap.
+- Combining ticks of several Y-axes.
+
+### Bugfix
+
+- Fixed default names for filters and tables.
+- Fixed the ability to drag the slider component.
+- Settings are always above visualisations.
+- Fixed data column selection in slider component.
+- Fixed scrolling in the components, data, markers menu.
+- Fixed broken line charts.
+- Fixed a problem with changing the settings of single value component.
+- Zoom reset btn for all multilines.
+- Zoom reset on fullscreen.
+- Reduced reset zoom time.
+- Fixed filter range for points and zoom multiline.
+
 # [1.74.0] - New slider vizualization, tokens in filters and bugfixes.
 
 ### New

@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.75.0]
 
 ### Added
+
 - added redirect to dashboard with information about tabs from dash heatmap
 - сombining ticks of several Y-axes
 
 ### Fixed
+
 - fixed default names for filters and tables
 - fixed the ability to drag the slider component
 - settings are always above visualisations
@@ -23,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - zoom reset on fullscreen
 - reduced reset zoom time
 - fixed filter range for points and zoom multiline
-
 
 ## [1.74.0]
 
