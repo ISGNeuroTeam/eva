@@ -7,13 +7,14 @@
     :x="left"
     :y="top"
     :draggable="dragRes"
-    :drag-cancel="'.dash-map'"
+    :drag-cancel="'.v-slider, .ygraph-component-container'"
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
     :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color, backgroundColor: theme.$accent_ui_color, }"
     @resizestop="sendSize"
     @dragstop="sendMove"
+    @activated="onActivated"
   >
     <dash-board
       :data-mode-from="dataModeFrom"
@@ -29,6 +30,7 @@
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
+      @ResetRange="resetRange($event)"
     />
   </vue-draggable-resizable>
 </template>
@@ -132,6 +134,16 @@ export default {
       this.width = width
       this.height = height
     },
+    onActivated() {
+      let testElements = document.getElementsByClassName('draggable resizable vdr');
+      let maxZIndex = 1
+      for (let i = 0; i < testElements.length; i++) {
+        if(Number(testElements[i].style.zIndex) > maxZIndex) {
+          maxZIndex = Number(testElements[i].style.zIndex)
+        }
+      }
+      this.props.zIndex = maxZIndex + 1
+    },
     sendMove(x, y) {
       let top = Math.round((y - this.headerTop) / this.horizontalCell)
       if (top < 0) top = 0
@@ -165,6 +177,9 @@ export default {
     setRange (range) {
       this.$emit("SetRange", range);
     },
+    resetRange (dataSourseTitle) {
+      this.$emit("ResetRange", dataSourseTitle);
+    },
   }
 }
 </script>
@@ -181,7 +196,6 @@ export default {
 .vdr.active.resizable {
   outline-color: inherit;
   outline: 2px dashed;
-  z-index: 9 !important;
 }
 
 .handle {

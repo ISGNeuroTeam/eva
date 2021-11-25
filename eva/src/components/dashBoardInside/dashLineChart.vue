@@ -162,10 +162,13 @@ export default {
     createLineChart: function (props,that,sizeLine,time,lastDot) {  // создает график
 
 
-      let colors = [this.color.controls,this.color.text,this.color.controlsActive,
+      let colors = [
+        this.colorFrom.controls || this.colorFrom.$accent_ui_color,
+        this.colorFrom.text || this.colorFrom.$blue,
+        this.colorFrom.controlsActive || this.colorFrom.$primary_button_hover,
         '#660099','#3366FF','#e5194a','#fbbe18','#26295a','#228B22',
       ]; // основные используемые цвета
-  
+
       let otstupBottom = 60;
       if (screen.width <= 1600) {
         otstupBottom = 40;

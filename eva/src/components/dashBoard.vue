@@ -152,6 +152,19 @@
                     </div>
                     <div class="settings-dash-block">
                       <div class="settings-dash">
+                        <v-tooltip v-if="boardTitle==='MultiLine'" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                                class="datasource"
+                                :color="theme.$main_border"
+                                v-on="on"
+                                @click="resetRange()"
+                            >
+                              {{ props.mdiMagnifyMinusOutline }}
+                            </v-icon>
+                          </template>
+                          <span>Сбросить зум</span>
+                        </v-tooltip>
                         <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
                           <template v-slot:activator="{ on }">
                             <v-icon
@@ -192,6 +205,7 @@
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
+                    @SetRange="setRange($event)"
                   />
                 </v-card>
               </div>
@@ -202,6 +216,19 @@
             :class="{ settings_move: props.open_gear }"
             v-show="dataMode"
           >
+            <v-tooltip v-if="boardTitle==='MultiLine'" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+              <template v-slot:activator="{ on }">
+                <v-icon
+                    class="datasource"
+                    :color="theme.$main_border"
+                    v-on="on"
+                    @click="resetRange()"
+                >
+                  {{ props.mdiMagnifyMinusOutline }}
+                </v-icon>
+              </template>
+              <span>Сбросить зум</span>
+            </v-tooltip>
             <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
@@ -334,6 +361,7 @@ import {
   mdiArrowExpandAll,
   mdiCodeTags,
   mdiTrashCanOutline,
+  mdiMagnifyMinusOutline,
   mdiDatabase,
   mdiSettings,
   mdiChevronDown,
@@ -385,6 +413,7 @@ export default {
         mdiArrowExpandAll: mdiArrowExpandAll,
         mdiCodeTags: mdiCodeTags,
         mdiTrashCanOutline: mdiTrashCanOutline,
+        mdiMagnifyMinusOutline : mdiMagnifyMinusOutline ,
         mdiDatabase: mdiDatabase,
         mdiSettings: mdiSettings,
         mdiChevronUp: mdiChevronUp,
@@ -441,11 +470,11 @@ export default {
       return this.getTockens(this.idDash)
     },
     boardTitle() {
-      if (!this.props) {
-        return 'Заголовок'
+      if (!this.props || !this.props.name) {
+        return this.element
       }
       let name = this.props.name;
-      this.getSelfTockens.forEach(token => {
+      name && this.getSelfTockens.forEach(token => {
         name = name.replaceAll(`$${token.name}$`, token.value)
       })
       return name
@@ -1032,6 +1061,9 @@ export default {
     },
     setRange (range) {
       this.$emit("SetRange", range);
+    },
+    resetRange () {
+      this.$emit("ResetRange", this.dataSourseTitle);
     },
   },
 };

@@ -17,12 +17,9 @@
         <tbody>
           <tr v-for="x in filteredX" :key="x">
             <td class="text-left" @click="onClickTd(x)">
-              <span v-if="!((''+ x).includes('@'))">
-                {{ x }}
-              </span>
-              <v-menu v-else open-on-hover top offset-y>
+              <v-menu open-on-hover top offset-y>
                 <template v-slot:activator="{ on, attrs }">
-                  <span dark v-bind="attrs" v-on="on">
+                  <span v-bind="attrs" v-on="on">
                     {{ x }}
                   </span>
                 </template>
