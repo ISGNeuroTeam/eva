@@ -19,11 +19,13 @@
         :style="{ borderColor: theme.$secondary_border }"
       >
         <template
-          v-for="title in numericTitles"
+          v-for="(value, title) in typedTitles"
           v-slot:[`header.${title}`]="{ header }"
         >
+        {{title}}
+        test
           <v-menu offset-y :key="title">
-            <template  v-slot:activator="{ on, attrs }">
+            <template v-slot:activator="{ on, attrs }">
               <v-menu z-index="100000" offset-y :close-on-content-click="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
@@ -44,7 +46,10 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
+                    <v-text-field
+                      label="значение"
+                      @change="filterData(title, $event)"
+                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-menu>
@@ -67,7 +72,7 @@
           v-slot:[`header.${title}`]="{ header }"
         >
           <v-menu offset-y :key="title">
-            <template  v-slot:activator="{ on, attrs }">
+            <template v-slot:activator="{ on, attrs }">
               <v-menu z-index="100000" offset-y :close-on-content-click="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
@@ -88,7 +93,10 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
+                    <v-text-field
+                      label="значение"
+                      @change="filterData(title, $event)"
+                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-menu>
@@ -111,7 +119,7 @@
           v-slot:[`header.${title}`]="{ header }"
         >
           <v-menu offset-y :key="title">
-            <template  v-slot:activator="{ on, attrs }">
+            <template v-slot:activator="{ on, attrs }">
               <v-menu z-index="100000" offset-y :close-on-content-click="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
@@ -132,7 +140,10 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="6">
-                    <v-text-field label="значение" @change="filterData(title, $event)"></v-text-field>
+                    <v-text-field
+                      label="значение"
+                      @change="filterData(title, $event)"
+                    ></v-text-field>
                   </v-col>
                 </v-row>
               </v-menu>
@@ -149,7 +160,6 @@
             </template>
           </v-tooltip>
         </template>
-
       </v-data-table>
     </div>
     <div v-show="props.nodata" class="no-data-table">
@@ -175,7 +185,7 @@ export default {
   },
   data() {
     return {
-      compare: ['>', '<', '='],
+      compare: [">", "<", "="],
       mdiMagnify: mdiMagnify,
       eventRows: [],
       props: {
@@ -192,27 +202,27 @@ export default {
         itemsForTable: [],
       },
       numericTitles: [],
-      dataTitles:[],
+      typedTitles: {},
+      filtersForTypedTitles: {},
+      dataTitles: [],
       stringTitles: [],
       filters: {},
     };
   },
   computed: {
     filteredTableData() {
-      let temp = this.props.itemsForTable
-      console.log(temp)
+      let temp = this.dataRestFrom;
+      console.log('filter', temp);
       for (let [key, val] of Object.entries(this.filters)) {
-        
-        if (val.compare === '>')
-          temp = temp.filter(x => x[key] > +val.value)
-        if (val.compare === '<')
-          temp = temp.filter(x => x[key] < +val.value)
-        if (val.compare === '=')
-          temp = temp.filter(x => x[key] == +val.value)
+        if (val.compare === ">") temp = temp.filter((x) => x[key] > +val.value);
+        if (val.compare === "<") temp = temp.filter((x) => x[key] < +val.value);
+        if (val.compare === "=")
+          temp = temp.filter((x) => x[key] == +val.value);
       }
-      return temp
+
+      return temp;
     },
-    
+
     events() {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
@@ -271,7 +281,7 @@ export default {
     dataRestFrom: {
       deep: true,
       handler(oldVal) {
-        console.log(JSON.parse(JSON.stringify(oldVal)));
+        console.log("dataRest");
         this.indexTitles(oldVal);
         this.setEventColor();
       },
@@ -289,51 +299,58 @@ export default {
     this.setEventColor();
   },
   methods: {
-    indexTitles(oldVal){
-      if(this.checkForNumeric(oldVal[0]));
+    indexTitles(oldVal) {
+      let type = "no";
+      for (let [key, val] of Object.entries(oldVal[0])) {
+        if (this.checkForNumeric(val)) type = "number";
+        else if (this.checkForDate(val)) type = "date";
+        else if (this.checkForString(val)) type = "string";
+        else type = "none";
+        this.typedTitles[key] = type
+        this.filtersForTypedTitles[key] = {action: '', value: ''}
+      }
+      this.typedTitles = {...this.typedTitles}
+      //make filter objects
+
+      //make title: type object
+      if (this.checkForNumeric(oldVal[0]));
       this.checkForDate(oldVal[0]);
       this.checkForString(oldVal[0]);
     },
+    getType(val) {},
+
     filterData(title, event, compare) {
-      if (!this.filters[title])
-        this.filters[title] = {}
+      if (!this.filters[title]) this.filters[title] = {};
       if (compare === "compare") {
-        this.filters[title].compare = event
+        this.filters[title].compare = event;
+      } else {
+        this.filters[title].value = event;
       }
-      else {
-        this.filters[title].value = event
-      }
-      this.filters = {...this.filters}
+      this.filters = { ...this.filters };
     },
     checkForNumeric(val) {
       function isNumber(n) {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
-      for (let [key, val] of Object.entries(val)) {
-        if (isNumber(val)) {
-          this.numericTitles.push(key);
-        }
-      }
+
+      if (isNumber(val)) return true;
+      return false;
     },
     checkForString(val) {
       function isNumber(n) {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
-      for (let [key, val] of Object.entries(val)) {
-        if (isNumber(val)) {
-          this.numericTitles.push(key);
-        }
-      }
+
+      if (isNumber(val)) return true;
+      return false;
     },
     checkForDate(val) {
       function isNumber(n) {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
-      for (let [key, val] of Object.entries(val)) {
-        if (isNumber(val)) {
-          this.numericTitles.push(key);
-        }
-      }
+
+      if (isNumber(val)) return true;
+      return false;
     },
     getDataAsynchrony: function (data) {
       let prom = new Promise((resolve) => {
