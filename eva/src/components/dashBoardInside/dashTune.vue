@@ -124,10 +124,7 @@ export default {
     storedElement(){
       this.isFullScreen; // << dont remove
       let {idDashFrom, idFrom} = this;
-      return this.getElement({
-        idDash: idDashFrom,
-        id: idFrom
-      });
+      return this.$store.getters.getElement(idDashFrom, idFrom);
     },
     needSetField() {
       return !this.dataField && !this.loading
@@ -185,13 +182,10 @@ export default {
     },
   },
   watch: {
-    storedElement: {
-      handler(element){
-        if (element?.selected !== undefined && this.value !== element.selected.elemDeep) {
-          this.loadSelectedValue()
-        }
-      },
-      deep: true
+    storedElement(element) {
+      if (element?.selected !== undefined && this.value !== element.selected.elemDeep) {
+        this.loadSelectedValue()
+      }
     },
     getElementSelected(selected) {
       this.value = selected.elemDeep
@@ -215,12 +209,15 @@ export default {
       }
     },
     dataField(value) {
-      value !== '' && this.$store.commit('setSelected', {
-        element: 'elem',
-        idDash: this.idDashFrom,
-        id: this.idFrom,
-        value,
-      });
+      this.$nextTick(() => {
+        /*value !== '' && */this.$store.commit('setSelected', {
+          element: 'elem',
+          idDash: this.idDashFrom,
+          id: this.idFrom,
+          value,
+        });
+        this.changeValue()
+      })
     }
   },
   mounted() {
@@ -288,25 +285,11 @@ export default {
         this.detectSliderValue()
       });
     },
-    detectSliderValue(list) {
-      let rowNumber = 0
-      if (list === undefined) {
-        list = this.values
-      } else {
-        list.forEach(item => {
-          if (this.value === '' && this.minValue !== undefined) {
-            this.value = this.minValue;
-          }
-          if (item < this.value) {
-            rowNumber++
-          }
-        })
+    detectSliderValue(values = this.values) {
+      this.sliderValue = values.findIndex(item => (item === this.value))
+      if (this.value === '' && values.length) {
+        this.value = values[this.sliderValue]
       }
-      this.sliderValue = rowNumber;
-      if ((this.value === '' || this.value === null) && list.length) {
-        this.value = list[rowNumber]
-      }
-      this.changeValue()
     }
   },
 }

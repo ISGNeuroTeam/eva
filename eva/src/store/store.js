@@ -1260,8 +1260,8 @@ export default {
     getElementSelected: state => elem => {
       return state[elem.idDash][elem.id]?.selected;
     },
-    getElement: state => elem => {
-      return state[elem.idDash][elem.id];
+    getElement: state => (idDash, id) => {
+      return state[idDash][id];
     },
     getDataApi(state) {
       // метод получающий данные из rest
