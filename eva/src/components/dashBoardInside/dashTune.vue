@@ -75,6 +75,7 @@
 
 <script>
 import {mdiMinus, mdiPlus} from "@mdi/js";
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   props: {
@@ -102,11 +103,15 @@ export default {
         },
       ],
       sliderValue: 0,
-      dataField: null,
-      value: 0,
+      dataField: null, // поле с данными
+      value: '',
     }
   },
   computed: {
+    ...mapGetters([
+        'getElementSelected',
+        'getElement',
+    ]),
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
           ? this.$attrs.heightFrom
@@ -116,12 +121,13 @@ export default {
     isFullScreen() {
       return this.$attrs['is-full-screen'];
     },
-    storedValue(){
-      let selected = this.$store.getters.getSelected({
-        idDash: this.idDashFrom,
-        id: this.idFrom
+    storedElement(){
+      this.isFullScreen; // << dont remove
+      let {idDashFrom, idFrom} = this;
+      return this.getElement({
+        idDash: idDashFrom,
+        id: idFrom
       });
-      return selected.elemDeep
     },
     needSetField() {
       return !this.dataField && !this.loading
@@ -135,6 +141,9 @@ export default {
         if (keys.length === 1) {
           this.dataField = keys[0];
         }
+      }
+      if (!this.dataField) {
+        return [];
       }
       const list = this.dataRestFrom
         .map(row => {
@@ -169,14 +178,33 @@ export default {
       if (!this.dataRestFrom.length) {
         return []
       }
-      return Object.keys(this.dataRestFrom[0])
-    }
+      return Object.keys(this.dataRestFrom[0]).filter(key => key[0] !== '_');
+    },
+    changedInputData() {
+      return this.$store.state.store[this.idDashFrom][this.idFrom]?.switch;
+    },
   },
   watch: {
-    storedValue(value) {
-      if (this.value !== value) {
-        this.loadSelectedValue()
-      }
+    storedElement: {
+      handler(element){
+        if (element?.selected !== undefined && this.value !== element.selected.elemDeep) {
+          this.loadSelectedValue()
+        }
+      },
+      deep: true
+    },
+    getElementSelected(selected) {
+      this.value = selected.elemDeep
+    },
+    changedInputData(val) {
+      this.dataField = null;
+      this.value = '';
+      this.$store.commit('setSelected', {
+        element: 'elemDeep',
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+        value: '',
+      });
     },
     values(list) {
       this.detectSliderValue(list)
@@ -206,6 +234,12 @@ export default {
     })
   },
   methods: {
+    ...mapActions([
+        'actionGetElementSelected',
+    ]),
+    ...mapMutations([
+        'setElementSelected',
+    ]),
     addValue(val) { // +/- buttons
       this.sliderValue += val
       this.changeValue()
@@ -220,7 +254,7 @@ export default {
       })
     },
     storeValue() {
-      this.$store.commit('setSelected', {
+      this.setElementSelected({
         element: 'elemDeep',
         idDash: this.idDashFrom,
         id: this.idFrom,
@@ -243,28 +277,36 @@ export default {
       })
     },
     loadSelectedValue() {
-      let selected = this.$store.getters.getSelected({
+      this.actionGetElementSelected({
         idDash: this.idDashFrom,
         id: this.idFrom
+      }).then(selected => {
+        if (selected) {
+          this.dataField = selected.elem
+          this.value = selected.elemDeep
+        }
+        this.detectSliderValue()
       });
-      this.dataField = selected.elem
-      this.value = selected.elemDeep
-      this.detectSliderValue()
     },
     detectSliderValue(list) {
+      let rowNumber = 0
       if (list === undefined) {
         list = this.values
+      } else {
+        list.forEach(item => {
+          if (this.value === '' && this.minValue !== undefined) {
+            this.value = this.minValue;
+          }
+          if (item < this.value) {
+            rowNumber++
+          }
+        })
       }
-      let rowNumber = 0
-      list.forEach(item => {
-        if (item < this.value) {
-          rowNumber++
-        }
-      })
       this.sliderValue = rowNumber;
-      if (this.value === '' && list.length) {
+      if ((this.value === '' || this.value === null) && list.length) {
         this.value = list[rowNumber]
       }
+      this.changeValue()
     }
   },
 }
