@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - slider component fixed syncing with fullscreen
 
+### Added
+
+- added selection property in events of select component
+
 ## [1.75.0]
 
 ### Added
