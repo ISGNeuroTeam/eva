@@ -185,6 +185,7 @@
                 :dataReport="true" 
                 :dataRestFrom="data"
                 @SetRange="setRange($event)"
+                @ResetRange="resetRange($event)"
               />
               <v-tooltip 
                 bottom 
@@ -392,8 +393,12 @@ export default {
     },
     addLineBreaks: function(event) {
       this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
-      this.search.original_otl = this.search.original_otl.replace('\n', '')
+      if (this.search.original_otl[0] === '\n') {
+        this.search.original_otl = this.search.original_otl.substring(1)
+      }
       this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replaceAll('|' + '\n', '| ')
+      this.search.original_otl = this.search.original_otl.replaceAll('| ' + '\n', '| ')
     },
     setUsername: function(event) {
       this.search.parametrs.username = event;
@@ -542,6 +547,9 @@ export default {
     },
     setRange (range) {
       this.data = this.data.filter(item => (item.day > range[0] && item.day < range[1]));
+    },
+    ResetRange () {
+      console.log('resetRange')
     },
   },
   mounted() {
