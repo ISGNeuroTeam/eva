@@ -855,9 +855,10 @@ export default {
   text-align: left;
   background-color: #191919;
   color: white;
+  padding-top: 0;
 }
 .leaftet-hover::before {
-  margin-bottom: 0;
+  margin-bottom: -6px;
 }
 .leaflet-container.cursor-crosshair {
   cursor: crosshair;
