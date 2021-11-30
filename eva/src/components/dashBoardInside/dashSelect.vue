@@ -200,6 +200,9 @@ export default {
           } 
         }
         this.dataFromRest = data;
+        for (let action of this.actions) {
+          action.capture = data
+        }
       }
 
       return data
@@ -332,12 +335,14 @@ export default {
       })
       let tockens = this.$store.getters.getTockens(this.idDash)
       let name = ''
+      let capture = ''
       let curTocken = {}
       let data = this.dataReady
       Object.keys(tockens).forEach((i) => {
         if (tockens[i].elem === this.id && tockens[i].action === 'change') {
           curTocken = tockens[i]
           name = tockens[i].name
+          capture = tockens[i].capture
         }
       })
       let value = null
@@ -377,7 +382,7 @@ export default {
       let tocken = {
         name: name,
         action: 'change',
-        capture: '',
+        capture: capture,
       }
       if (name !== '') {
         this.$store.commit('setTocken', {
