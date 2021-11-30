@@ -272,7 +272,9 @@ export default {
       deep: true,
       handler(oldVal) {
         console.log(JSON.parse(JSON.stringify(oldVal)));
-        this.indexTitles(oldVal);
+        if (oldVal && oldVal.length) {
+          this.checkForNumeric(oldVal[0]);
+        }
         this.setEventColor();
       },
     },
@@ -360,9 +362,6 @@ export default {
       });
     },
     createTitles: function (result) {
-      let titlesParsed = Object.keys(result[0]).map((item) => {
-        return { text: item, value: item, sortable: true };
-      });
       if (this.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
         let temp = [];
@@ -375,7 +374,11 @@ export default {
         }
         this.props.titles = temp;
       } else {
-        this.props.titles = titlesParsed;
+        if (result && result.length) {
+          this.props.titles = Object.keys(result[0]).map((item) => {
+            return { text: item, value: item, sortable: true };
+          });
+        }
       }
     },
     createTockens: function (result) {

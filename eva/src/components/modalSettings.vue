@@ -2,8 +2,8 @@
   <v-dialog
     v-model="active"
     width="1140"
-    persistent
     @keydown="checkEsc($event)"
+    @click:outside="cancelModal"
   >
     <div class="settings-modal-block">
       <v-card :style="{background:theme.$main_bg}">
@@ -871,6 +871,32 @@
             </div>
           </div>
           <div
+              v-if="checkOptions('stringOX')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              stringOX
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Ось X - строки
+            </div>
+            <div class="status-option item">
+              <v-switch
+                  v-model="options.stringOX"
+                  class="switch"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  :label="String(options.stringOX)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('united')"
             class="option-item"
           >
@@ -1251,13 +1277,35 @@
                 Библиотека примитивов отображения
               </div>
             </v-card-text>
+              <v-btn
+                plain link small
+                class="mb-3 text-lowercase"
+                :color="theme.$main_text"
+                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
               <v-textarea
                 v-model="options.primitivesLibrary"
                 name="input-7-1"
                 filled
+                rows="6"
                 label="JSON c примитивами"
-                auto-grow
+                :auto-grow="primitivesLibraryAutoGrow"
+                class="textarea-event"
+                spellcheck="false"
+                :color="theme.$main_text"
+                :style="{ color: theme.$main_text }"
+                outlined
+                hide-details
               ></v-textarea>
+              <v-btn
+                  v-if="primitivesLibraryAutoGrow"
+                  plain link small
+                  class="text-lowercase"
+                  :color="theme.$main_text"
+                  @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
             </v-container>
           </div>
           <v-card-text
@@ -1575,6 +1623,7 @@ export default {
       tableTitles:[],
       element: '',
       openNewScreen: false,
+      primitivesLibraryAutoGrow: false,
       options: {
       },
       optionsItems: [],
@@ -1674,6 +1723,9 @@ export default {
     },
     selectedTitles() {
       return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
+    },
+    primitivesLibraryAutoGrowLinkText() {
+      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
     },
 
     ...mapGetters([
@@ -1838,6 +1890,9 @@ export default {
           }
         } else {
           this.$set(this.options,item,null);
+          if (item == 'stringOX') {
+            this.$set(this.options,item,false);
+          }
           if (item == 'united') {
             this.$set(this.options,item,false);
           }

@@ -177,7 +177,7 @@
         ref="blockCode"
         class="block-code"
         :class="{ opencode: opencode }"
-        :style="{ background: theme.$main_bg, color: theme.$main_text }"
+        :style="blockToolStyle"
       >
         <div class="iconsNavigations">
           <v-icon :color="theme.$primary_button" @click="runAllSearches">
@@ -307,7 +307,7 @@
       <div
         class="block-tool"
         :class="{ opentool: opentool }"
-        :style="{ background: theme.$main_bg, color: theme.$main_text }"
+        :style="blockToolStyle"
       >
         <div
           v-for="tool in tools"
@@ -342,7 +342,7 @@
       <div
         class="block-tocken"
         :class="{ opentocken: opentocken }"
-        :style="{ background: theme.$main_bg, color: theme.$main_text }"
+        :style="blockToolStyle"
       >
         <div
           v-for="(tocken, i) in tockens"
@@ -853,6 +853,7 @@ export default {
       modalPaperSid: '',
       modalPaper: false,
       userPermissions: [],
+      screenHeight: this.getScreenHeight(),
     }
   },
   computed: {
@@ -936,6 +937,13 @@ export default {
         return capture;
       };
     },
+    blockToolStyle() {
+      return {
+        background: this.theme.$main_bg,
+        color: this.theme.$main_text,
+        'max-height': this.screenHeight + 'px'
+      }
+    },
   },
   mounted() {
     this.getCookie();
@@ -972,6 +980,11 @@ export default {
     this.colorExim = 'controls';
     // this.fieldsets = document.querySelectorAll('fieldset');
     // this.changeColor();
+
+    window.addEventListener('resize', this.updateScreenHeight);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.updateScreenHeight);
   },
   methods: {
     exit: function () {
@@ -1650,6 +1663,7 @@ export default {
                 ///go
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
                 this.$set(this.event, 'target', doing[0]);
+
                 let prop, value;
                 if (doing[1].indexOf('[') != -1) {
                   doing.splice(0, 1);
@@ -1662,6 +1676,7 @@ export default {
                   value = [doing[2]];
                 }
                 this.$set(this.event, 'prop', prop);
+                this.$set(this.event, 'tab', doing[2]);
                 this.$set(this.event, 'value', value);
               } else if (doing[0].toLowerCase() == 'open'.toLowerCase()) {
                 //open
@@ -1775,6 +1790,12 @@ export default {
     toHome: function () {
       this.$router.push(`/main`);
     },
+    getScreenHeight() {
+      return 0.9 * window.innerHeight;
+    },
+    updateScreenHeight() {
+      this.screenHeight = this.getScreenHeight()
+    }
   },
 };
 </script>
