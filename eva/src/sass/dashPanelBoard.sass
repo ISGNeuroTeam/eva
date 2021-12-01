@@ -56,7 +56,7 @@
     top: 0
     left: 0
     width: 100%
-    z-index: 5
+    z-index: 999
     transition: all 0.4s ease
 
     .dropdown-profile
@@ -241,7 +241,7 @@
 
     .block-tocken
         position: absolute
-        width: 1215px
+        width: 1225px
         height: auto
         overflow-y: auto
         top: 55px
@@ -331,16 +331,19 @@
                 width: 120px
                 margin-right: 15px
                 color: inherit
-
+                z-index: 1000
+                
             .tocken-action
                 width: 120px
                 margin-right: 15px
                 color: inherit
+                z-index: 1000
 
             .tocken-capture
                 width: 120px
                 margin-right: 15px
                 color: inherit
+                z-index: 1000
 
             .tocken-prefix
                 width: 120px
@@ -426,6 +429,9 @@
         .opennewtocken
             height: 80px
             opacity: 1
+            overflow: visible
+            padding-top: 20px
+            padding-bottom: 20px
 
         .row-plus
             margin: 10px auto
@@ -747,4 +753,4 @@
         visibility: visible
         position: relative
         transform: translateY(0)
-        z-index: 3
+        z-index: 998

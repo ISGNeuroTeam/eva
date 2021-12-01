@@ -170,11 +170,12 @@ export default {
         timeFormat,
         color,
         conclusion_count,
-        yAxesBinding = { axesCount: 1, metrics: {} },
+        replace_count,
+        yAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
       
       this.stringOX = stringOX
-      
+
       if (!this.stringOX && (typeof rowValue !== 'number')) {
         return this.showErrorMessage('К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.')
       }
@@ -184,7 +185,7 @@ export default {
         this.isTime = rowValue > 1000000000 && rowValue < 2000000000
       }
       this.isUnitedMode = united
-      this.timeFormat = timeFormat
+      this.timeFormat = timeFormat || '%Y-%m-%d %H:%M:%S'
       this.xAxisCaptionRotate = xAxisCaptionRotate
 
       const metricOptions = metrics ? [...metrics] : []
@@ -199,6 +200,7 @@ export default {
           type_line,
           color,
           conclusion_count,
+          replace_count,
         )
       }
 
@@ -308,12 +310,14 @@ export default {
         .style('opacity', 0.3)
     },
 
-    putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj) {
+    putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj, replaceCount) {
       dot.setAttribute(attr, 'true')
+      console.log(replaceCount)
+      const label = replaceCount === undefined ? d[metricName] : Number(d[metricName]).toFixed(replaceCount)
 
       const text = this.svg
         .append('text')
-        .text(d[metricName])
+        .text(label)
         .attr('class', className)
         .attr('transform', `translate(${x(d[this.xMetric] * this.secondTransf) - 5}, ${y})`)
         .attr('font-size', '11')
@@ -583,7 +587,7 @@ export default {
       return maxCaptionWidth
     },
 
-    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding, type_line, color = {}, conclusion_count = {}) {
+    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding, type_line, color = {}, conclusion_count = {}, replace_count = {}) {
       this.clearSvgContainer()
 
       const getStyleLine = (type) => {
@@ -727,42 +731,14 @@ export default {
       const dataRest = [...this.dataRestFrom]
 
       if (this.isUnitedMode) {
-        const minValue = d3.min(minMetricsValues)
-        const maxValue = d3.max(maxMetricsValues)
-        const minExtra = Math.abs(10 * minValue / 100)
-        const maxExtra = Math.abs(10 * maxValue / 100)
-
-        const y = d3
-          .scaleLinear()
-          .range([this.height, 20])
-          .domain([minValue - minExtra, maxValue + maxExtra])
-
-        this.svg
-          .append('g')
-          .attr('class', 'yAxis')
-          .call(d3.axisLeft(y).ticks(y.ticks().length / 2))
-
-        this.svg
-          .selectAll('g.yAxis g.tick')
-          .append('line')
-          .attr('class', 'grid-line-y')
-          .attr('x1', 0)
-          .attr('y1', 0)
-          .attr('x2', this.width)
-          .attr('y2', 0)
-          .attr('stroke', this.theme.$main_text)
-          .style('opacity', 0.3)
-
-        this.svg.selectAll(`g.yAxis g.tick text`).style('visibility', 'hidden')
-        this.svg.selectAll(`g.yAxis g.tick line:not([class])`).style('visibility', 'hidden')
-        this.svg.selectAll(`g.yAxis .domain`).style('visibility', 'hidden')
-
         const yScales = []
         const mustSee = []
         const brushObj = { ...this.defaultBrushObj }
 
         const bars = []
-
+        
+        let numberLeft = 0
+        let numberRight = 0
         this.metricNames.forEach((metricName, metricIndex) => {
           const minVal = minMetricsValues[metricIndex]
           const maxVal = maxMetricsValues[metricIndex]
@@ -773,29 +749,87 @@ export default {
             .scaleLinear()
             .range([this.height, 20])
             .domain([minVal - extra(minVal), maxVal + extra(maxVal)])
-
+          
           yScales.push(yScale)
 
           const yAxisClass = `yAxis-${metricName}`
 
-          if (yAxesBinding.axesCount === 2) {
-            if (yAxesBinding.metrics[metricName] === 'right') {
-              this.svg
-                .append('g')
-                .attr('class', yAxisClass)
-                .attr('transform', `translate(${this.width}, 0)`)
-                .call(d3.axisRight(yScale).ticks(yScale.ticks().length / 2))
-            } else if (yAxesBinding.metrics[metricName] === 'left') {
-              this.svg
-                .append('g')
-                .attr('class', yAxisClass)
-                .call(d3.axisLeft(yScale).ticks(yScale.ticks().length / 2))
+
+          let yDomainArr = [
+            Math.round(minVal - extra(minVal)),
+            Math.round((maxVal - minVal + 2*extra(maxVal))/3 + minVal - extra(minVal)),
+            Math.round((maxVal - minVal + 2*extra(maxVal))/3*2 + minVal - extra(minVal)),
+            Math.round(maxVal + extra(maxVal))
+          ]
+          let yRangeArr = [this.height, (this.height-20)/3*2+20, (this.height-20)/3+20, 20]
+
+          let yScal = d3.scaleOrdinal()
+              .domain(yDomainArr)
+              .range(yRangeArr);
+          
+
+          if (yAxesBinding.axesCount === 1 || yAxesBinding.metrics[metricName] === 'left') {
+            let translateY
+            if (numberLeft === 0) {
+              translateY = 0
+            } else if (numberLeft % 2 !== 0) {
+              translateY = ((numberLeft+1)/2)*10
+            } else {
+              translateY = -(numberLeft/2)*10
             }
+            this.svg.append('g')
+                .attr('transform', 'translate(0, ' + translateY + ')')
+                .attr('class', yAxisClass)
+                .call(d3.axisLeft(yScal));
+            if (numberLeft !== 0) {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick line`)
+                  .style('visibility', 'hidden')
+              this.svg.selectAll(`g.${yAxisClass} .domain`).style('visibility', 'hidden')
+            } else {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick`)
+                  .append('line')
+                  .attr('class', 'grid-line-y')
+                  .attr('x1', 0)
+                  .attr('y1', 0)
+                  .attr('x2', this.width)
+                  .attr('y2', 0)
+                  .attr('stroke', this.theme.$main_text)
+                  .style('opacity', 0.3)
+            }
+            numberLeft++
           } else {
-            this.svg
-              .append('g')
-              .attr('class', yAxisClass)
-              .call(d3.axisLeft(yScale).ticks(yScale.ticks().length / 2))
+            let translateY
+            if (numberRight === 0) {
+              translateY = 0
+            } else if (numberRight % 2 !== 0) {
+              translateY = ((numberRight+1)/2)*10
+            } else {
+              translateY = -(numberRight/2)*10
+            }
+            this.svg.append('g')
+                .attr('transform', `translate( ${this.width}, ${translateY})`)
+                .attr('class', yAxisClass)
+                .call(d3.axisRight(yScal));
+            if (numberRight !== 0) {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick line`)
+                  .style('visibility', 'hidden')
+              this.svg.selectAll(`g.${yAxisClass} .domain`).style('visibility', 'hidden')
+            } else {
+              this.svg
+                  .selectAll(`g.${yAxisClass} g.tick`)
+                  .append('line')
+                  .attr('class', 'grid-line-y')
+                  .attr('x1', 0)
+                  .attr('y1', 0)
+                  .attr('x2', -this.width)
+                  .attr('y2', 0)
+                  .attr('stroke', this.theme.$main_text)
+                  .style('opacity', 0.3)
+            }
+            numberRight++
           }
 
           this.svg
@@ -807,7 +841,7 @@ export default {
             let allDotHover = []
 
             const barPostfix = this.isFullScreen ? '-full' : ''
-            const getBarID = (i) => `bar--${metricName}--${i}--${barPostfix}`
+            const getBarID = (i) => `bar--${this.id}--${metricName}--${i}--${barPostfix}`
 
             this.line
               .selectAll(`bar-${metricName}`)
@@ -924,7 +958,7 @@ export default {
               })
           }
 
-          if (yAxesBinding.metricTypes[metricName] === 'linechart') {
+          if (yAxesBinding.metricTypes[metricName] === 'linechart' || yAxesBinding.metricTypes[metricName] === undefined) {
             const linesWithBreak = []
             let dotDate = null
             let nullValue = -1
@@ -989,6 +1023,8 @@ export default {
                 let opacity = nullValue !== -1 ? 1 : 0
 
                 const count = Number(conclusion_count[metricName])
+                const replaceCount = Number(replace_count[metricName]);
+
                 let hasTooltip = true;
                 const isNumber = typeof count === 'number';
                 if (isNumber && count > 1) {
@@ -1011,7 +1047,8 @@ export default {
                     metricText,
                     this,
                     'line',
-                    brushObj
+                    brushObj,
+                    replaceCount
                   )
                 }
 
@@ -1351,7 +1388,7 @@ export default {
           if (nullValue !== -1) {
             dotDate = [extraDot[nullValue]]
           } else {
-            if (options.type === 'Line chart') {
+            if (options.type === 'Line chart' || !options.type) {
               cutData.forEach((line) => {
                 if (!Number(line[metric]) && line[metric] !== 0) {
                   if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
@@ -1419,6 +1456,8 @@ export default {
               let opacity = nullValue !== -1 ? 1 : 0
 
               const count = Number(conclusion_count[metric])
+              const replaceCount = Number(replace_count[metric]);
+
               let hasTooltip = true;
               const isNumber = typeof count === 'number';
               if (isNumber && count > 1) {
@@ -1441,7 +1480,8 @@ export default {
                   metricText,
                   this,
                   'line',
-                  brushObj
+                  brushObj,
+                  replaceCount
                 )
               }
 

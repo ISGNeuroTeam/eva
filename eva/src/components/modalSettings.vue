@@ -1188,6 +1188,23 @@
               </div>
               <div>
                 <div class="status-option item">
+                  <v-text-field
+                    :value="replace_count[metrics[i-1].name]"
+                    clearable
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
+                    style="min-width: 100px"
+                    outlined
+                    @input="e => handleChangeReplaceCount(e, i - 1)"
+                    class="item-metric"
+                    label="Значения после запятой"
+                    type="number"
+                    hide-details
+                  />
+                </div>
+              </div>
+              <div>
+                <div class="status-option item">
                   <v-select
                     :value="type_line[metrics[i-1].name]"
                     :disabled="metrics[i-1].type === 'Bar chart'"
@@ -1689,6 +1706,7 @@ export default {
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
       conclusion_count: {},
+      replace_count: {},
       options: {
       },
       type_line: 'solid',
@@ -1836,6 +1854,10 @@ export default {
     handleChangeConlusionCount(e, i) {
       this.conclusion_count = { ...this.conclusion_count, [this.metrics[i].name]: Number(e) }
     },
+
+    handleChangeReplaceCount(e, i) {
+      this.replace_count = { ...this.replace_count, [this.metrics[i].name]: Number(e) }
+    },
     titleHandler(val) {
       let temp = []
       let orderArray = this.getAvailableTableTitles(this.idDash, this.element);
@@ -1896,7 +1918,7 @@ export default {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, conclusion_count: this.conclusion_count, openNewScreen: this.openNewScreen, type_line: this.type_line, color: this.color  }, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, conclusion_count: this.conclusion_count, replace_count: this.replace_count, openNewScreen: this.openNewScreen, type_line: this.type_line, color: this.color  }, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1961,6 +1983,10 @@ export default {
 
       if (options.conclusion_count) {
         this.conclusion_count = options.conclusion_count
+      }
+
+      if (options.replace_count) {
+        this.replace_count = options.replace_count
       }
 
       this.options = {};
