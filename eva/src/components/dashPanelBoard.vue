@@ -67,7 +67,7 @@
                 {{ search_icon }}
               </v-icon>
             </template>
-            <span>Источники даных</span>
+            <span>Источники данных</span>
           </v-tooltip>
           <v-tooltip bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on }">

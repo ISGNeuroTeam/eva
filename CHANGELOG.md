@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - slider component fixed syncing with fullscreen
 - fixed multiline barplot id
+- fix bugst with order settings, correct problems with some texts
 
 ### Added
 

@@ -76,6 +76,31 @@
             </div>
           </div>
           <div
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              pinned
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Закрепить на всех вкладках
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.pinned"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.pinned)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('level')"
             class="option-item"
           >
@@ -484,7 +509,7 @@
                 class="settings-title"
                 :style="{color:theme.$main_text,borderColor:theme.$main_border}"
               >
-                Столбцы для отображение
+                Столбы для отображение
               </div>
             </v-card-text>
               <v-checkbox
@@ -710,31 +735,6 @@
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text}"
                 :label="String(options.lastDot)"
-              />
-            </div>
-          </div>
-          <div
-            class="option-item"
-          >
-            <div
-              class="name-option item"
-              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-            >
-              pinned
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-            >
-              Закрепить на всех вкладках
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.pinned"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{color:theme.$main_text}"
-                :label="String(options.pinned)"
               />
             </div>
           </div>
