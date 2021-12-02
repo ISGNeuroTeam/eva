@@ -13,6 +13,22 @@ export default {
       settings: themes['dark'],
     },
   },
+  actions: {
+    async actionGetElementSelected({ commit, state, getters }, element){
+      const selected = getters.getElementSelected({
+        idDash: element.idDash,
+        id: element.id
+      });
+      if (!selected) {
+        commit('createElementSelected', {...element});
+      }
+      commit('setElementSelected', {...element});
+      return await getters.getElementSelected({
+        idDash: element.idDash,
+        id: element.id
+      });
+    }
+  },
   mutations: {
     setNameDash: (state, newName) => {
       // изменения имени самого элемента
@@ -302,6 +318,16 @@ export default {
           elemDeep: '',
         };
       }
+      state[select.idDash][select.id].selected[select.element] = select.value;
+    },
+    createElementSelected: (state, select) => {
+      state[select.idDash][select.id].selected = {
+        elem: '',
+        elemlink: '',
+        elemDeep: '',
+      };
+    },
+    setElementSelected: (state, select) => {
       state[select.idDash][select.id].selected[select.element] = select.value;
     },
     setDash: (state, dash) => {
@@ -1231,6 +1257,12 @@ export default {
 
         return state[elem.idDash][elem.id].selected;
       };
+    },
+    getElementSelected: state => elem => {
+      return state[elem.idDash][elem.id]?.selected;
+    },
+    getElement: state => (idDash, id) => {
+      return state[idDash][id];
     },
     getDataApi(state) {
       // метод получающий данные из rest

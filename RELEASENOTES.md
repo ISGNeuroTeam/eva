@@ -1,3 +1,15 @@
+# [1.76.0] - Filters for YGraph componnet, selection property in events of select component and bugfixes.
+
+### New
+
+- Filters for YGraph with save settings in storage.
+- Selection property in events of select component.
+
+### Bugfix
+
+- Slider component fixed syncing with fullscreen.
+- Fixed multiline barplot id.
+
 # [1.75.0] - Redirect to a specific dashboard tab from heatmap, ticks of several Y-axes are combined on multiline and bugfixes.
 
 ### New
