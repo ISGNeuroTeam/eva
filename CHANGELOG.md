@@ -5,17 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.76.0]
+
+### Added
+
+- added filters for YGraph with save settings in storage
+- added selection property in events of select component
 
 ### Fixed
 
 - slider component fixed syncing with fullscreen
 - fixed multiline barplot id
 - fix bugst with order settings, correct problems with some texts
-
-### Added
-
-- added selection property in events of select component
 
 ## [1.75.0]
 
