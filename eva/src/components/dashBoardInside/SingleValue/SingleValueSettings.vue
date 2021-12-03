@@ -4,6 +4,7 @@
     persistent
     scrollable
     width="560"
+    @click:outside="close"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
