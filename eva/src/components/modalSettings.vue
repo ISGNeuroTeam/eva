@@ -509,7 +509,7 @@
                 class="settings-title"
                 :style="{color:theme.$main_text,borderColor:theme.$main_border}"
               >
-                Столбы для отображение
+                Столбцы для отображения
               </div>
             </v-card-text>
               <v-checkbox
