@@ -457,7 +457,7 @@ $filter-container-height: 60px
 
 .dash-filter-panel
   width: 100%
-  max-height: calc((#{$filter-container-height} * 3) + 18px)
+  //max-height: calc((#{$filter-container-height} * 3) + 18px)
   overflow-y: auto
 
   &::-webkit-scrollbar
