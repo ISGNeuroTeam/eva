@@ -152,7 +152,7 @@
                     </div>
                     <div class="settings-dash-block">
                       <div class="settings-dash">
-                        <v-tooltip v-if="boardTitle==='MultiLine'" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+                        <v-tooltip v-if="isMultiline" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
                           <template v-slot:activator="{ on }">
                             <v-icon
                                 class="datasource"
@@ -216,7 +216,7 @@
             :class="{ settings_move: props.open_gear }"
             v-show="dataMode"
           >
-            <v-tooltip v-if="boardTitle==='MultiLine'" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+            <v-tooltip v-if="isMultiline" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
               <template v-slot:activator="{ on }">
                 <v-icon
                     class="datasource"
@@ -466,6 +466,9 @@ export default {
     ...mapGetters([
       'getTockens'
     ]),
+    isMultiline() {
+      return !!this.element?.includes('multiLine')
+    },
     getSelfTockens() {
       return this.getTockens(this.idDash)
     },
