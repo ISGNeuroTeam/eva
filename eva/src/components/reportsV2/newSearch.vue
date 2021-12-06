@@ -51,49 +51,6 @@
           <v-icon>{{ mdiMagnify }}</v-icon>
         </v-btn>
       </div>
-      <v-tooltip
-          bottom
-          :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn
-              :color="theme.$primary_button"
-              fab
-              dark
-              small
-              absolute
-              class="play-btn"
-              top
-              right
-              v-on="on"
-              @click="launchSearch"
-          >
-            <v-icon>{{ play }}</v-icon>
-          </v-btn>
-        </template>
-        <span>Запустить</span>
-      </v-tooltip>
-      <v-tooltip
-          bottom
-          :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn
-              :color="theme.$primary_button"
-              fab
-              dark
-              small
-              absolute
-              top
-              right
-              v-on="on"
-              @click="openSettings"
-          >
-            <v-icon>{{ gear }}</v-icon>
-          </v-btn>
-        </template>
-        <span>Настройки</span>
-      </v-tooltip>
     </div>
   </div>
 </template>
@@ -106,9 +63,7 @@ export default {
 
   data () {
     return {
-      search: {
-        parametrs: {}
-      },
+      search: {},
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
     }
@@ -132,35 +87,36 @@ export default {
       this.search.original_otl = ''
     },
     launchSearch: async function() {
-
-      this.search.sid = this.hashCode(this.search.original_otl);
-
-      this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
-
-      this.loading = true;
-      console.log('launch search')
-      let response = await this.$store.getters.getDataApi({search: this.search, idDash: 'reports'});
-      // вызывая метод в хранилище  
-      // console.log(response)
-
-      if (!response.data || response.data.length == 0) {  // если что-то пошло не так 
-        this.loading = false;
-        this.$store.commit('setErrorLogs',true);
-        this.data = [];
-        this.rows = [];
-      } else {  // если все нормально
-        console.log('data ready')
-
-        let responseDB = this.$store.getters.putIntoDB(response, this.search.sid, 'reports');
-        responseDB
-            .then(
-                result => {
-                  let refresh =  this.$store.getters.refreshElements('reports', this.search.sid, );
-                  this.loading = false;
-                  this.$store.commit('setReportSearch',this.search);
-                },
-            );
-      }
+      this.$emit("launchSearch", this.search.original_otl);
+      
+      // this.search.sid = this.hashCode(this.search.original_otl);
+      //
+      // this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
+      //
+      // this.loading = true;
+      // console.log('launch search')
+      // let response = await this.$store.getters.getDataApi({search: this.search, idDash: 'reports'});
+      // // вызывая метод в хранилище  
+      // // console.log(response)
+      //
+      // if (!response.data || response.data.length == 0) {  // если что-то пошло не так 
+      //   this.loading = false;
+      //   this.$store.commit('setErrorLogs',true);
+      //   this.data = [];
+      //   this.rows = [];
+      // } else {  // если все нормально
+      //   console.log('data ready')
+      //
+      //   let responseDB = this.$store.getters.putIntoDB(response, this.search.sid, 'reports');
+      //   responseDB
+      //       .then(
+      //           result => {
+      //             let refresh =  this.$store.getters.refreshElements('reports', this.search.sid, );
+      //             this.loading = false;
+      //             this.$store.commit('setReportSearch',this.search);
+      //           },
+      //       );
+      // }
     },
     hashCode: function(otl) {
       return otl.split('').reduce((prevHash, currVal) =>
@@ -173,7 +129,7 @@ export default {
     if (this.search.original_otl != '') {
       this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: true});
     }
-    this.calcSize();
+    // this.calcSize();
     this.$refs.search.$el.addEventListener ("keypress", event =>{
       if (event.ctrlKey && event.keyCode == 13) {
         this.launchSearch();

@@ -10,218 +10,8 @@
             ref="report"
             class="report-block"
         >
-          <newSearch class="new-search"></newSearch>
-<!--          <v-card-->
-<!--              class="static-block"-->
-<!--              :style="{background: theme.$main_bg, color: theme.$main_text}"-->
-<!--          >-->
-<!--            <v-card-title class="static-title">-->
-<!--              <p>Статистика</p>-->
-<!--              <div-->
-<!--                  class="static-divider"-->
-<!--                  :style="{background:theme.$main_text}"-->
-<!--              />-->
-<!--            </v-card-title>-->
-<!--            <v-card-text-->
-<!--                class="static-overflow-block"-->
-<!--                :style="{color:theme.$main_text}"-->
-<!--            >-->
-<!--              <div-->
-<!--                  v-for="item in rows"-->
-<!--                  :key="item.id"-->
-<!--                  class="static-row"-->
-<!--                  @click="openStatistic(item)"-->
-<!--                  v-html="item.text"-->
-<!--              />-->
-<!--            </v-card-text>-->
-<!--          </v-card>-->
-<!--          <v-card-->
-<!--              class="search-block"-->
-<!--              :style="{background: theme.$main_bg, color: theme.$main_text}"-->
-<!--          >-->
-<!--            <v-card-text-->
-<!--                class="search-card-block"-->
-<!--                :style="{background: theme.$main_bg, color: theme.$main_text}"-->
-<!--            >-->
-<!--              <div-->
-<!--                  class="loading-divider"-->
-<!--                  :class="{loading:loading}"-->
-<!--              >-->
-<!--                <div-->
-<!--                    class="loading-bar "-->
-<!--                    :style="{background: theme.$primary_button}"-->
-<!--                />-->
-<!--              </div>-->
-<!--              <v-textarea-->
-<!--                  ref="search"-->
-<!--                  v-model="search.original_otl"-->
-<!--                  solo-->
-<!--                  spellcheck="false"-->
-<!--                  flat-->
-<!--                  no-resize-->
-<!--                  hide-details-->
-<!--                  :rows="rowsCount"-->
-<!--                  :style="{background: theme.$main_bg, color: `${theme.$main_text} !important`}"-->
-<!--                  placeholder="Введите запрос"-->
-<!--                  @keyup.ctrl.\="addLineBreaks"-->
-<!--              />-->
-<!--              <router-link-->
-<!--                  :to="{ path: '/reports'}"-->
-<!--                  target="_blank"-->
-<!--              >-->
-<!--                <v-tooltip-->
-<!--                    bottom-->
-<!--                    :color="theme.$accent_ui_color"-->
-<!--                >-->
-<!--                  <template v-slot:activator="{ on }">-->
-<!--                    <v-btn-->
-<!--                        :color="theme.$primary_button"-->
-<!--                        fab-->
-<!--                        dark-->
-<!--                        small-->
-<!--                        absolute-->
-<!--                        class="new-btn"-->
-<!--                        top-->
-<!--                        right-->
-<!--                        v-on="on"-->
-<!--                    >-->
-<!--                      <v-icon>{{ plus }}</v-icon>-->
-<!--                    </v-btn>-->
-<!--                  </template>-->
-<!--                  <span>Открыть новое Исследование данных</span>-->
-<!--                </v-tooltip>-->
-<!--              </router-link>-->
-<!--              <v-tooltip-->
-<!--                  bottom-->
-<!--                  :color="theme.$accent_ui_color"-->
-<!--              >-->
-<!--                <template v-slot:activator="{ on }">-->
-<!--                  <v-btn-->
-<!--                      :color="theme.$primary_button"-->
-<!--                      fab-->
-<!--                      dark-->
-<!--                      small-->
-<!--                      absolute-->
-<!--                      class="play-btn"-->
-<!--                      top-->
-<!--                      right-->
-<!--                      v-on="on"-->
-<!--                      @click="launchSearch"-->
-<!--                  >-->
-<!--                    <v-icon>{{ play }}</v-icon>-->
-<!--                  </v-btn>-->
-<!--                </template>-->
-<!--                <span>Запустить</span>-->
-<!--              </v-tooltip>-->
-<!--              <v-tooltip-->
-<!--                  bottom-->
-<!--                  :color="theme.$accent_ui_color"-->
-<!--              >-->
-<!--                <template v-slot:activator="{ on }">-->
-<!--                  <v-btn-->
-<!--                      :color="theme.$primary_button"-->
-<!--                      fab-->
-<!--                      dark-->
-<!--                      small-->
-<!--                      absolute-->
-<!--                      top-->
-<!--                      right-->
-<!--                      v-on="on"-->
-<!--                      @click="openSettings"-->
-<!--                  >-->
-<!--                    <v-icon>{{ gear }}</v-icon>-->
-<!--                  </v-btn>-->
-<!--                </template>-->
-<!--                <span>Настройки</span>-->
-<!--              </v-tooltip>-->
-<!--            </v-card-text>-->
-<!--          </v-card>-->
-<!--          <v-card-->
-<!--              ref="vis"-->
-<!--              class="static-vis"-->
-<!--              :style="{background: theme.$main_bg, color: theme.$main_text}"-->
-<!--          >-->
-<!--            <v-card-text :style="{color: theme.$main_text}">-->
-<!--              <v-card-title class="title-vis">-->
-<!--                <v-tooltip-->
-<!--                    v-for="i in elements"-->
-<!--                    :key="aboutElem[i].key"-->
-<!--                    bottom-->
-<!--                    :color="theme.$accent_ui_color"-->
-<!--                    @click="changeTab(i)"-->
-<!--                >-->
-<!--                  <template v-slot:activator="{ on }">-->
-<!--                    <v-icon-->
-<!--                        class="title-icon"-->
-<!--                        :color="aboutElem[i].color"-->
-<!--                        v-on="on"-->
-<!--                        @click="changeTab(i)"-->
-<!--                    >-->
-<!--                      {{ aboutElem[i].icon }}-->
-<!--                    </v-icon>-->
-<!--                  </template>-->
-<!--                  <span>{{ aboutElem[i].tooltip }}</span>-->
-<!--                </v-tooltip>-->
-<!--                <div-->
-<!--                    class="divider-tab"-->
-<!--                    :style="{background: theme.$primary_button}"-->
-<!--                />-->
-<!--              </v-card-title>-->
-<!--              <v-card-text-->
-<!--                  :is="`dash-${i}`"-->
-<!--                  v-for="i in elements"-->
-<!--                  v-show="aboutElem[i].show"-->
-<!--                  :key="i"-->
-<!--                  :idFrom="i"-->
-<!--                  :colorFrom="theme"-->
-<!--                  :activeElemFrom="activeElem"-->
-<!--                  idDashFrom="reports"-->
-<!--                  :widthFrom="size.width"-->
-<!--                  :heightFrom="size.height"-->
-<!--                  :timeFormatFrom="''"-->
-<!--                  :sizeTileFrom="{width: '', height: ''}"-->
-<!--                  :searchRep="true"-->
-<!--                  :tooltipFrom="tooltipSvg"-->
-<!--                  :shouldGet="shouldGet"-->
-<!--                  :dataReport="true"-->
-<!--                  :dataRestFrom="data"-->
-<!--                  @SetRange="setRange($event)"-->
-<!--                  @ResetRange="resetRange($event)"-->
-<!--              />-->
-<!--              <v-tooltip-->
-<!--                  bottom-->
-<!--                  :color="theme.$accent_ui_color"-->
-<!--              >-->
-<!--                <template v-slot:activator="{ on }">-->
-<!--                  <v-icon-->
-<!--                      v-show="unitedShow"-->
-<!--                      class="title-icon merge"-->
-<!--                      :color="unitedData.color"-->
-<!--                      v-on="on"-->
-<!--                      @click="changeUnited"-->
-<!--                  >-->
-<!--                    {{ merge }}-->
-<!--                  </v-icon>-->
-<!--                </template>-->
-<!--                <span>Режим отображения</span>-->
-<!--              </v-tooltip>-->
-<!--            </v-card-text>-->
-<!--          </v-card>-->
-<!--          <v-card-->
-<!--              class="statistic-block"-->
-<!--              :style="{backgroundColor:theme.$secondary_bg, border: `1px solid ${theme.$main_border}`}"-->
-<!--              :class="{showStatistic:showStatistic}"-->
-<!--          >-->
-<!--            <v-card-text>-->
-<!--              <v-data-table-->
-<!--                  :style="{backgroundColor:theme.$secondary_bg, color: theme.$main_text}"-->
-<!--                  disable-pagination-->
-<!--                  hide-default-footer-->
-<!--                  :headers="[{ text: 'value', value: 'value' },{ text: 'count', value: 'count' },{ text: '%', value: '%' }]"-->
-<!--                  :items="statistic"-->
-<!--              />-->
-<!--            </v-card-text>-->
-<!--          </v-card>-->
+          <newSearch class="new-search" @launchSearch="launchSearch($event)"></newSearch>
+          <timeline class="timeline" :data="data" @launchSearch="launchSearch($event)"></timeline>
         </div>
       </div>
     </v-content>
@@ -241,10 +31,12 @@ import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus } from '@mdi/js'
 import  settings  from '../../js/componentsSettings.js';
 import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
+import  timeline  from './timeline.vue';
+
 
 export default {
 
-  components: { newSearch },
+  components: { newSearch, timeline },
   data () {
     return {
       search: {
@@ -328,7 +120,7 @@ export default {
   },
   methods: {
     getData: function() {
-
+      console.log('getData')
       let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], { type: "text/javascript" }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
       let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
@@ -365,8 +157,8 @@ export default {
 
 
     },
-    launchSearch: async function() {
-
+    launchSearch: async function(original_otl) {
+      this.search.original_otl = original_otl
       this.search.sid = this.hashCode(this.search.original_otl);
 
       this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
@@ -376,6 +168,7 @@ export default {
       let response = await this.$store.getters.getDataApi({search: this.search, idDash: 'reports'});
       // вызывая метод в хранилище  
 
+      console.log(response)
       if (!response.data || response.data.length == 0) {  // если что-то пошло не так 
         this.loading = false;
         this.$store.commit('setErrorLogs',true);
@@ -491,6 +284,7 @@ export default {
       })
     },
     changeUnited: function() {
+      console.log('changeUnited')
       if (!this.unitedData.united) {
         this.unitedData.united = true;
         this.unitedData.color = this.theme.controlsActive;
