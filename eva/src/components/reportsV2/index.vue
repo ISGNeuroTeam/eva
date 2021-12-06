@@ -11,7 +11,8 @@
             class="report-block"
         >
           <newSearch class="new-search" @launchSearch="launchSearch($event)"></newSearch>
-          <timeline class="timeline" :data="data" @launchSearch="launchSearch($event)"></timeline>
+          <timeline class="timeline" :data="data"></timeline>
+          <statistic class="statistic" :data="data" :size="size"></statistic>
         </div>
       </div>
     </v-content>
@@ -32,11 +33,12 @@ import  settings  from '../../js/componentsSettings.js';
 import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
 import  timeline  from './timeline.vue';
+import  statistic  from './statistic.vue';
 
 
 export default {
 
-  components: { newSearch, timeline },
+  components: { newSearch, timeline, statistic },
   data () {
     return {
       search: {

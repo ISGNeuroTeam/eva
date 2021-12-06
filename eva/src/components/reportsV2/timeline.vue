@@ -17,8 +17,6 @@
         ></v-select>
       </div>
       <svg ref="chart" class="chart1" height="50" style="width: 100%"></svg>
-      {{ select }}
-      {{ data }}
       {{dataset}}
     </div>
 </template>
@@ -136,7 +134,7 @@ export default {
       if (dataset.length > 0) {
         this.clearSVG(dataset)
       }
-      return dataset
+      return null
     },
   },
   methods: {
