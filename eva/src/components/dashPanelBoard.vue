@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app-header">
     <div class="dash-main" :style="{ background: theme.$main_bg }">
       <div class="main-title">
         <div class="logo-block">

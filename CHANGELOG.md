@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - added barplot display styles of multiline
+- updated sticky header and filter
 
 ### Fixed
 

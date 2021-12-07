@@ -49,8 +49,6 @@
             class="overlay-grid"
             :data-grid="true"
             :style="{
-              height: `calc(100% - ${headerTop}px`,
-              top: `${headerTop}px`,
               background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
             }"
@@ -218,6 +216,7 @@ export default {
       return this.loadingDash ? [] : this.$store.getters.getElementsWithSearches(this.idDash)
     },
     headerTop() {
+      return 0;
       return document.body.clientWidth <= 1400 ? 40 : 50
     },
     theme() {
