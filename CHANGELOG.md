@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added barplot display styles of multiline
 
+### Fixed
+
+- fixed the fullscreen dash mode size
+
 ## [1.76.0]
 
 ### Added
