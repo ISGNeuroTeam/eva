@@ -72,7 +72,7 @@
         </div>
         <div class="settings-dash-block">
           <div class="settings-dash">
-            <v-dialog v-model="fullScreenMode">
+            <v-dialog v-model="fullScreenMode" width="100%">
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay" :disabled="disabledTooltip">
                   <template v-slot:activator="{ on: onTooltip }">
