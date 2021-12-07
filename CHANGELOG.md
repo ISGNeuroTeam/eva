@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- added barplot display styles of multiline
+
+## [1.76.0]
+
+### Added
+
+- added filters for YGraph with save settings in storage
+- added selection property in events of select component
+
 ### Fixed
 
 - slider component fixed syncing with fullscreen

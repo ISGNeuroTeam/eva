@@ -151,6 +151,7 @@ export default {
       'isDataAlwaysShow',
       'xAxisCaptionRotate',
       'barplotBarWidth',
+      'barplotstyle',
     ],
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes', 'pinned', 'piechartSettings'],
     table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult', 'titles', 'pinned'],

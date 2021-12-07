@@ -922,6 +922,36 @@
               />
             </div>
           </div>
+
+          <div
+              v-if="options.united && checkOptions('united')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              barplotstyle
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Стиль столбцов
+            </div>
+            <div class="status-option item">
+              <v-select
+                  v-model="options.barplotstyle"
+                  :items="barplotstyleOptions"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text, fill: theme.$main_text}"
+                  hide-details
+                  outlined
+                  class="subnumber"
+              />
+            </div>
+          </div>
+
           <div
             v-if="!options.united"
             v-for="metric in metricsName"
@@ -955,7 +985,7 @@
           </div>
 
           <v-card-text
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
           >
             <div
@@ -967,7 +997,7 @@
           </v-card-text>
 
           <div
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
           >
             <div class="multiline-custom-opts">
@@ -1007,7 +1037,7 @@
           </div>
 
           <v-card-text
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
           >
             <div
@@ -1019,7 +1049,7 @@
           </v-card-text>
 
           <div
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
           >
             <div class="d-flex multiline-custom-opts">
@@ -1670,7 +1700,12 @@ export default {
         "По возрастанию",
         "По убыванию"
       ],
-      metricUnits: {}
+      metricUnits: {},
+      barplotstyleOptions: [
+        {text:'разделенный', value:'divided'},
+        {text:'наложенный', value:'overlay'},
+        {text:'с накоплением', value:'accumulation'},
+      ]
     }
   },
   computed: {
@@ -1895,6 +1930,9 @@ export default {
           }
           if (item == 'united') {
             this.$set(this.options,item,false);
+          }
+          if (item == 'barplotstyle') {
+            this.$set(this.options,item,'divided');
           }
           if (item === 'isDataAlwaysShow') {
             this.$set(this.options, item, false);
