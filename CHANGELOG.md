@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - fixed the fullscreen dash mode size
+- fixed the position of the top menu, it was non-clickable
 
 ## [1.76.0]
 
