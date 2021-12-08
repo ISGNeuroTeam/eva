@@ -573,7 +573,7 @@ export default {
         this.$set(this.props.tooltip, "buttons", []);
       }
 
-      this.$emit("SetLevel", this.props.options.level);
+      //this.$emit("SetLevel", this.props.options.level);
 
       this.setShadow();
 

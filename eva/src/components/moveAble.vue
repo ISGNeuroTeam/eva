@@ -26,7 +26,7 @@
       :loading="loading"
       :searchData="searchData"
       :dataSourseTitle="dataSourseTitle"
-      @SetLevel="props.zIndex = $event"
+      @SetLevel="props.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
