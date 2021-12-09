@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the fullscreen dash mode size
 - fixed the position of the top menu, it was non-clickable
 - fixed the z level on the boards
+- fixed the zoom-out button in multiline dash
 
 ## [1.76.0]
 
