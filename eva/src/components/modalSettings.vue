@@ -1396,7 +1396,7 @@
             >
               <v-select
                 v-model="colorsPie.theme"
-                :items="themesArr"
+                :items="Object.keys(themes)"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"
                 hide-details
@@ -1404,13 +1404,16 @@
                 class="item-metric"
                 label="Выберите схему"
                 @click="changeColor"
+                @change="() => {
+                  colorsPie.nametheme=colorsPie.theme === 'custom'?'':colorsPie.theme;
+                  colorsPie.colors = themes[colorsPie.theme].join(',')
+                }"
               />
               <v-text-field
-                v-show="colorsPie.theme == 'custom'"
+                v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.nametheme"
-                clearable
                 placeholder="green"
-                label="Имя новой схема"
+                label="Имя схемы"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined
@@ -1418,17 +1421,24 @@
                 hide-details
               />
               <v-text-field
-                v-show="colorsPie.theme == 'custom'"
+                v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.colors"
-                clearable
+                :disabled="!colorsPie.nametheme"
                 placeholder="red,#5F27FF,rgb(95, 39, 255)"
-                label="Новая схема"
+                label="Набор цветов"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined
                 class="item-metric"
+                :class="{'disabled': !colorsPie.nametheme}"
                 hide-details
               />
+              <v-btn
+                v-if="!defaultThemes.includes(colorsPie.theme) && colorsPie.theme !== 'custom'"
+                :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+                :color="theme.$primary_button"
+                @click="onClickDeleteTheme(colorsPie.theme)"
+              >Удалить</v-btn>
             </div>
           </div>
         </div>
@@ -1675,6 +1685,7 @@ export default {
         colors: '',
         nametheme: ''
       },
+      defaultThemes: ['neitral', 'indicted'],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1812,12 +1823,17 @@ export default {
       }
       if (this.element.indexOf('piechart') != -1) {
         this.options.metricsRelation = JSON.parse(JSON.stringify(this.metricsRelation));
-        this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme == 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
-          this.colorsPie.theme = this.colorsPie.nametheme;
+        if (this.colorsPie.nametheme) {
+          this.options.colorsPie = this.colorsPie;
+          if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
+            if (this.colorsPie.theme !== 'custom' && this.colorsPie.theme !== this.colorsPie.nametheme) {
+              delete this.themes[this.colorsPie.theme]
+            }
+            this.colorsPie.theme = this.colorsPie.nametheme;
+          }
+          this.options.themes = this.themes;
         }
-        this.options.themes = this.themes;
 
       }
       if (this.element.indexOf('multiLine') != -1) {
@@ -1975,6 +1991,15 @@ export default {
       if (!this.options.change) {
         this.$set(this.options,'change',false);
       }
+    },
+    onClickDeleteTheme(theme) {
+      const nextTheme = this.defaultThemes[0]
+      this.colorsPie.theme = nextTheme;
+      this.colorsPie.nametheme = nextTheme;
+      this.colorsPie.colors = this.themes[nextTheme].join(',');
+      this.options.colorsPie = this.colorsPie;
+      this.options.themes = this.themes;
+      delete this.themes[theme]
     }
   },
 }
