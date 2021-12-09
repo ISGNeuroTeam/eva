@@ -1,4 +1,20 @@
-# [1.76.0] - Filters for YGraph componnet, selection property in events of select component and bugfixes.
+# [1.77.0] - Barplot display styles of multiline, sticky header and bugfixes.
+
+### New
+
+- Added barplot display styles of multiline.
+- Updated sticky header and filter.
+
+### Bugfix
+
+- Fullscreen dash mode size.
+- Position of the top menu, it was non-clickable.
+- z-index on the boards.
+- Zoom-out button in multiline dash.
+- Reordered visualization settings.
+- Corrected mistakes in texts.
+
+# [1.76.0] - Filters for YGraph componet, selection property in events of select component and bugfixes.
 
 ### New
 
