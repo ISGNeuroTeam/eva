@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 ### Fixed
-- fix bugst with order settings, correct problems with some texts
+
+- fixed bug with settings order, correct mistakes in text
 
 ## [1.76.0]
 
