@@ -65,6 +65,7 @@
         @click.stop.prevent="
           $store.commit('refreshFilterPart', { idDash, filterIndex, filterPartIndex })
         "
+        v-blur="140"
         v-text="refreshIcon"
       />
       <v-icon
