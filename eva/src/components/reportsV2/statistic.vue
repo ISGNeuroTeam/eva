@@ -44,6 +44,18 @@ export default {
       return this.$store.getters.getTheme
     },
   },
+  mounted() {
+    // this.calcSize();
+  },
+  methods: {
+    calcSize: function() {
+      alert('calcSize')
+      let size = this.$refs.vis.getBoundingClientRect();
+      this.size.width = Math.round(size.width) - 16;
+      this.size.height = Math.round(size.height) - 66;
+      console.log(size)
+    },
+  },
 }
 
 

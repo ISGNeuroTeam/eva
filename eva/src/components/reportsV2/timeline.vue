@@ -266,23 +266,22 @@ export default {
 
 </script>
 
-<style lang="scss" >
-
+<style lang="sass" >
+@import './../../sass/_colors'
 //@import '../../sass/reportsV2/newSearch.sass'
-.timeline {
-  padding: 0 30px;
-}
-
-.select-wrap {
-  display: flex;
-  flex-direction: row-reverse;
-  .select {
-    max-width: 180px;
-    .v-input__append-inner {
-      margin-bottom: 5px;
-    }
-  }
-}
+.timeline
+  padding: 0 30px
+.select-wrap 
+  display: flex
+  flex-direction: row-reverse
+  .select
+    max-width: 180px
+    .v-select__selection
+      color: $main_text
+    .v-input__slot:before
+      border-color: $main_text
+    .v-input__append-inner
+      margin-bottom: 5px
 
 //.chart div {
 //  font: 10px sans-serif;
@@ -292,14 +291,12 @@ export default {
 //  margin: 1px;
 //  color: white;
 //}
-.container-chart {
+.container-chart
   /*width: 50%;*/
-  margin: auto;
-}
-.block-tooltip {
-  padding: 6px;
-  background: #FFFFFF;
-  box-shadow: 0px 4px 6px rgba(142, 141, 158, 0.25), 0px 1px 2px rgba(142, 141, 158, 0.4);
-  border-radius: 6px;
-}
+  margin: auto
+.block-tooltip
+  padding: 6px
+  background: #FFFFFF
+  box-shadow: 0px 4px 6px rgba(142, 141, 158, 0.25), 0px 1px 2px rgba(142, 141, 158, 0.4)
+  border-radius: 6px
 </style>

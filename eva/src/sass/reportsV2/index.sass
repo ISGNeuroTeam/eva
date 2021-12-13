@@ -1,9 +1,13 @@
+@import ./../_colors
+
 .reports-v2-app-main
   //.container-report
   .report-block
     margin-top: 53px
-    .new-search
+    .component-block
       margin: 2px
+      //padding: 20px 20px 10px 20px
+    .new-search
       padding: 20px 20px 10px 20px
       .search-block-header
         display: flex
@@ -28,3 +32,22 @@
       .search-block-footer
         display: flex
         justify-content: space-between
+    .tabs
+      padding: 10px 20px 10px 20px
+      .v-tabs-bar__content
+        height: 17px
+        background-color: $main_bg
+        .v-tab
+          padding-left: 0
+          padding-right: 0
+          margin-left: 8px
+          margin-right: 8px
+          min-width: 0
+          height: 17px
+          font-size: 12px
+          line-height: 15px
+          text-transform: capitalize
+      .v-tabs-bar
+        height: 17px
+        .v-slide-group__wrapper
+          height: 17px

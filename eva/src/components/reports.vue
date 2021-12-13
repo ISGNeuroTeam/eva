@@ -166,6 +166,9 @@
                   :style="{background: theme.$primary_button}" 
                 />
               </v-card-title>
+              {{ activeElem }}
+              {{ elements }}
+              {{ aboutElem }}
               <v-card-text 
                 :is="`dash-${i}`" 
                 v-for="i in elements"
@@ -304,7 +307,6 @@ export default {
       return this.$store.getters.getShouldGet({id: 'table', idDash: 'reports'})
     },
     elements: function() {
-           
       this.$store.getters.getReportElement.forEach( (item,i) => {
         this.$set(this.aboutElem,item,{});
         if (i == 0) {

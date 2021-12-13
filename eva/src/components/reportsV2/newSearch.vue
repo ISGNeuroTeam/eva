@@ -24,8 +24,10 @@
           Новый поиск
         </div>
         <v-btn text @click="refreshInput">
-          <span class="refresh-btn-text">Сбросить</span> 
-          <v-icon>{{ mdiRefresh }}</v-icon>
+          <span class="refresh-btn-text" :style="{color: theme.$main_text}">
+            Сбросить
+          </span> 
+          <v-icon :style="{color: theme.$main_text}">{{ mdiRefresh }}</v-icon>
         </v-btn>
       </div>
       <v-textarea

@@ -10,9 +10,21 @@
             ref="report"
             class="report-block"
         >
-          <newSearch class="new-search" @launchSearch="launchSearch($event)"></newSearch>
-          <timeline class="timeline" :data="data"></timeline>
-          <statistic class="statistic" :data="data" :size="size"></statistic>
+          <newSearch class="new-search component-block" @launchSearch="launchSearch($event)"></newSearch>
+          <timeline class="timeline component-block" :data="data"></timeline>
+          <v-tabs 
+              v-model="tab" class="tabs component-block"
+              :style="{background: theme.$main_bg, color: theme.$main_text}"
+          >
+            <v-tab
+                :style="{background: theme.$main_bg, color: theme.$main_text}">События</v-tab>
+            <v-tab
+                :style="{background: theme.$main_bg, color: theme.$main_text}">Статистика</v-tab>
+            <v-tab
+                :style="{background: theme.$main_bg, color: theme.$main_text}">Визуализация</v-tab>
+          </v-tabs>
+          <statistic v-if="tab===1" class="visualisation component-block" :data="data" :size="size"></statistic>
+          <visualisation v-if="tab===2" class="statistic component-block" :data="data" :shouldGet="shouldGet"></visualisation>
         </div>
       </div>
     </v-content>
@@ -34,13 +46,15 @@ import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
 import  timeline  from './timeline.vue';
 import  statistic  from './statistic.vue';
+import visualisation from "./visualisation";
 
 
 export default {
 
-  components: { newSearch, timeline, statistic },
+  components: { newSearch, timeline, statistic, visualisation },
   data () {
     return {
+      tab: 1,
       search: {
         parametrs: {}
       },
@@ -102,7 +116,6 @@ export default {
       return this.$store.getters.getShouldGet({id: 'table', idDash: 'reports'})
     },
     elements: function() {
-
       this.$store.getters.getReportElement.forEach( (item,i) => {
         this.$set(this.aboutElem,item,{});
         if (i == 0) {
@@ -341,9 +354,12 @@ export default {
       }
     },
     calcSize: function() {
+      // console.log('calcSize')
+      // console.log(this.$refs)
       let size = this.$refs.vis.$el.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
+      // console.log(size)
     },
     setRange (range) {
       this.data = this.data.filter(item => (item.day > range[0] && item.day < range[1]));
