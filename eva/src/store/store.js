@@ -1285,7 +1285,11 @@ export default {
             }
           });
         }
-
+        if (otl.indexOf(`$evaTknLogin$`) != -1) {
+          if (Vue.$jwt.hasToken()) {
+            otl = otl.replaceAll("$evaTknLogin$", Vue.$jwt.decode().username);
+          }
+        }
         if (state[idDash].tockens) {
           Object.keys(state[idDash].tockens).forEach(item => {
             // если есть токены в запросе то меняем временные метки в зависимости от значения токена

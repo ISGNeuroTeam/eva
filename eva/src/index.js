@@ -93,6 +93,13 @@ Vue.component(
 Vue.component('modal-log', require('./components/autorization/modalLog.vue').default); // модалка для вывода лога
 Vue.component('data-profile', require('./components/autorization/dataForProfile.vue').default); //  компонент для получения данных для пользователя
 
+// убирает фокус с элемена сразу либо через переданное ms v-blur="140"
+Vue.directive('blur', {
+  inserted: function (el, binding) {
+    el.onfocus = (ev) => setTimeout(() =>  ev.target.blur(), binding.value || 0)
+  }
+});
+
 store.form = storeForm;
 store.auth = storeAuth;
 import App from './App.vue';
