@@ -10,8 +10,8 @@
             ref="report"
             class="report-block"
         >
-          <newSearch class="new-search component-block" @launchSearch="launchSearch($event)"></newSearch>
-          <timeline class="timeline component-block" :data="data"></timeline>
+          <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data"></newSearch>
+          <timeline v-if="data" class="timeline component-block" :data="data"></timeline>
           <v-tabs 
               v-model="tab" class="tabs component-block"
               :style="{background: theme.$main_bg, color: theme.$main_text}"
@@ -172,14 +172,17 @@ export default {
 
 
     },
-    launchSearch: async function(original_otl) {
-      this.search.original_otl = original_otl
+    launchSearch: async function(search) {
+      this.search.original_otl = search.original_otl
+      this.search.parametrs.tws = search.tws
+      this.search.parametrs.twf = search.twf
       this.search.sid = this.hashCode(this.search.original_otl);
 
       this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search')
+      console.log(this.search)
       let response = await this.$store.getters.getDataApi({search: this.search, idDash: 'reports'});
       // вызывая метод в хранилище  
 

@@ -47,7 +47,11 @@
             class="search-block-title"
             :style="{color: theme.$title}"
         >
-          sdfsfdsdf
+          <div v-if="data.length > 0" :color="theme.$secondary_text">
+            <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
+            {{ data.length }} результатов 
+            <span v-if="dates.length>0">(c {{ dates[0] }} {{ timeStart }} по  {{dates[1]}} {{ timeFinish }})</span>
+          </div>
         </div>
         <div class="d-flex">
           <div class="time-picker mt-1">
@@ -110,8 +114,8 @@
                           range
                       ></v-date-picker>
                       <div class="d-flex justify-space-around p-3">
-                        <div>c</div>
-                        <div>по</div>
+                        <div>c {{dates[0]}}</div>
+                        <div>по {{dates[1]}}</div>
                       </div>
                       <div class="d-flex justify-space-around p-3">
                         <input v-model="timeStart" type="time">
@@ -148,9 +152,12 @@
 
 
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiCalendarMonthOutline  } from '@mdi/js'
+import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiCalendarMonthOutline, mdiCheck  } from '@mdi/js'
 
 export default {
+  props: {
+    data: [],
+  },
   data () {
     return {
       twf: '',
@@ -158,6 +165,7 @@ export default {
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
       mdiChevronDown: mdiChevronDown,
+      mdiCheck: mdiCheck,
       mdiCalendarMonthOutline: mdiCalendarMonthOutline,
       timeRangeValue: 'За все время',
       menuCalendar: false,
@@ -196,7 +204,7 @@ export default {
       this.search.original_otl = ''
     },
     launchSearch: async function() {
-      this.$emit("launchSearch", this.search.original_otl);
+      this.$emit("launchSearch", this.search);
     },
     hashCode: function(otl) {
       return otl.split('').reduce((prevHash, currVal) =>
@@ -210,7 +218,7 @@ export default {
         tws = 0
       } else {
         twf = Math.round(Date.now()/1000);
-        tws = twf - range*3600
+        tws = twf - range.timeHours*3600
       }
       this.timeRangeValue = range.text
       this.setTwsTwf(tws, twf)
@@ -220,8 +228,8 @@ export default {
       let timeStartArr = timeStart.split(':')
       twsArr = twsArr.concat(timeStartArr)
       let tws = new Date(twsArr[0], twsArr[1], twsArr[2], twsArr[3], twsArr[4]).getTime()/1000
-      let twfArr = dates[0].split('-')
-      let timeFinishArr = timeStart.split(':')
+      let twfArr = dates[1].split('-')
+      let timeFinishArr = timeFinish.split(':')
       twfArr = twfArr.concat(timeFinishArr)
       let twf = new Date(twfArr[0], twfArr[1], twfArr[2], twfArr[3], twfArr[4]).getTime()/1000
       this.timeRangeValue = 'c ' + dates[0] + ' по ' + dates[1]
