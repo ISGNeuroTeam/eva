@@ -433,7 +433,7 @@
             class="row-check"
             :color="theme.$primary_button"
             :class="{ showIcon: lookTockens[i].show }"
-            @click="saveTocken()"
+            @click="saveTocken(i)"
           >
             {{ check }}
           </v-icon>
@@ -444,7 +444,7 @@
             class="row-trash"
             :color="theme.$primary_button"
             :class="{ showIcon: lookTockens[i].show }"
-            @click="deleteTocken(tocken.name)"
+            @click="deleteTocken(tocken.name, i)"
           >
             {{ trash }}
           </v-icon>
@@ -729,6 +729,7 @@ export default {
   },
   data() {
     return {
+      index: '',
       login: '',
       on: false,
       userEdit: mdiAccountEdit,
@@ -1195,7 +1196,7 @@ export default {
         this.lookTockens[i].color = this.theme.controls;
       }
     },
-    saveTocken: function () {
+    saveTocken: function (index) {
       // функция которая сохраняет токен в хранилище
 
       let parent = event.target.parentElement; // получаем предка элемнета на который нажали для сохранения
@@ -1241,7 +1242,7 @@ export default {
           j = i;
         }
       });
-      if (j != -1) {
+      if (j != -1 || Number.isInteger(index)) {
         // если токен уже есть
         let height = this.$el.querySelector('.block-tocken').getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
         this.$el.querySelector('.warning-block').classList.add('warning-block-show');
@@ -1251,7 +1252,8 @@ export default {
         this.$el
           .querySelector('.warning-block')
           .querySelector('.yes-btn')
-          .setAttribute('tool', 'tocken');
+          .setAttribute('tool', 'tocken')
+          this.index = index;
       } else {
         // если нету то етсь он новый
         this.$store.commit('createTockens', { idDash: this.idDash, tocken: this.tempTocken }); // то создаем токен в хранилище
@@ -1312,7 +1314,11 @@ export default {
         this.openSearch();
       } else if (elem.getAttribute('tool') == 'tocken') {
         // если это токен - собственно тоже самое
+        const id = this.index
+        const newName = this.tempTocken.name;
+        this.tempTocken.name = this.tockens[id].name
         this.$store.commit('createTockens', { idDash: this.idDash, tocken: this.tempTocken });
+        this.$store.commit('changeTokenName', { idDash: this.idDash, tocken: this.tempTocken, value: newName });
         this.$el.querySelector('.warning-block').classList.remove('warning-block-show');
         this.showSign = true;
         this.opennewtocken = false;
