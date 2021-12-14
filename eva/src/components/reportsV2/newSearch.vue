@@ -50,7 +50,7 @@
           <div v-if="data.length > 0" :color="theme.$secondary_text">
             <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
             {{ data.length }} результатов 
-            <span v-if="dates.length>0">(c {{ dates[0] }} {{ timeStart }} по  {{dates[1]}} {{ timeFinish }})</span>
+<!--            <span v-if="dates.length>0">(c {{ dates[0] }} {{ timeStart }} по  {{dates[1]}} {{ timeFinish }})</span>-->
           </div>
         </div>
         <div class="d-flex">

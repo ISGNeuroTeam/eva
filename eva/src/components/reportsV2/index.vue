@@ -12,17 +12,27 @@
         >
           <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data"></newSearch>
           <timeline v-if="data" class="timeline component-block" :data="data"></timeline>
-          <v-tabs 
-              v-model="tab" class="tabs component-block"
-              :style="{background: theme.$main_bg, color: theme.$main_text}"
-          >
-            <v-tab
-                :style="{background: theme.$main_bg, color: theme.$main_text}">События</v-tab>
-            <v-tab
-                :style="{background: theme.$main_bg, color: theme.$main_text}">Статистика</v-tab>
-            <v-tab
-                :style="{background: theme.$main_bg, color: theme.$main_text}">Визуализация</v-tab>
-          </v-tabs>
+          <div class="tab-block component-block d-flex justify-content-between">
+            <v-tabs
+                v-model="tab" class="tabs"
+                :style="{background: theme.$main_bg, color: theme.$main_text}"
+            >
+              <v-tab
+                  :style="{background: theme.$main_bg, color: theme.$main_text}">События</v-tab>
+              <v-tab
+                  :style="{background: theme.$main_bg, color: theme.$main_text}">Статистика</v-tab>
+              <v-tab
+                  :style="{background: theme.$main_bg, color: theme.$main_text}">Визуализация</v-tab>
+            </v-tabs>
+            <div>
+              <v-btn small text @click="exportDataCSV()">
+                <v-icon :style="{color: theme.$main_text}" class="download-icon">{{ mdiDownload  }}</v-icon>
+                <span class="download-btn-text" :style="{color: theme.$main_text}">
+                  Скачать
+                </span>
+              </v-btn>
+            </div>
+          </div>
           <statistic v-if="tab===1" class="visualisation component-block" :data="data" :size="size"></statistic>
           <visualisation v-if="tab===2" class="statistic component-block" :data="data" :shouldGet="shouldGet"></visualisation>
         </div>
@@ -40,7 +50,7 @@
 
 
 <script>
-import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus } from '@mdi/js'
+import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus, mdiDownload  } from '@mdi/js'
 import  settings  from '../../js/componentsSettings.js';
 import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
@@ -51,7 +61,7 @@ import visualisation from "./visualisation";
 
 export default {
 
-  components: { newSearch, timeline, statistic, visualisation },
+  components: { newSearch, timeline, statistic, visualisation, mdiDownload  },
   data () {
     return {
       tab: 1,
@@ -63,6 +73,7 @@ export default {
       plus: mdiPlus,
       gear: mdiSettings,
       merge: mdiMerge,
+      mdiDownload: mdiDownload,
       modal: false,
       loading: false,
       rows: [],
@@ -169,8 +180,6 @@ export default {
       }.bind(this);
 
       worker.postMessage(`reports-${this.search.sid}`);   // запускаем воркер на выполнение
-
-
     },
     launchSearch: async function(search) {
       this.search.original_otl = search.original_otl
@@ -369,6 +378,22 @@ export default {
     },
     ResetRange () {
       console.log('resetRange')
+    },
+    exportDataCSV() {
+      const searchData = this.data
+      // const searchData = this.dataObject[searchName].data
+      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
+      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
+      csvContent += encodeURIComponent(
+          searchData.map((item) => Object.values(item).join(',')).join('\n')
+      )
+
+      const link = document.createElement('a') // создаем ссылку
+      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('download', 'report.csv') // указываем имя файла
+      link.click() // жмем на скачку
+      link.remove() // удаляем ссылку
     },
   },
   mounted() {

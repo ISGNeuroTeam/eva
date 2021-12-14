@@ -6,7 +6,6 @@
     margin-top: 53px
     .component-block
       margin: 2px
-      //padding: 20px 20px 10px 20px
     .new-search
       padding: 20px 20px 10px 20px
       .search-block-header
@@ -32,22 +31,35 @@
       .search-block-footer
         display: flex
         justify-content: space-between
-    .tabs
+    .tab-block
       padding: 10px 20px 10px 20px
-      .v-tabs-bar__content
-        height: 17px
-        background-color: $main_bg
-        .v-tab
-          padding-left: 0
-          padding-right: 0
-          margin-left: 8px
-          margin-right: 8px
-          min-width: 0
+      background-color: $main_bg
+      width: 100%
+      display: flex
+      justify-content: space-between
+      .v-tabs
+        width: 600px !important
+        .v-tabs-bar__content
           height: 17px
-          font-size: 12px
-          line-height: 15px
-          text-transform: capitalize
-      .v-tabs-bar
-        height: 17px
-        .v-slide-group__wrapper
+          background-color: $main_bg
+          .v-tab
+            padding-left: 0
+            padding-right: 0
+            margin-left: 8px
+            margin-right: 8px
+            min-width: 0
+            height: 17px
+            font-size: 12px
+            line-height: 15px
+            text-transform: capitalize
+        .v-tabs-bar
+          height: 17px
+          .v-slide-group__wrapper
+            height: 17px
+      .download-btn-text
+        text-transform: capitalize
+        //margin-left: 3px
+        font-size: 12px
+      .download-icon
+        svg
           height: 17px
