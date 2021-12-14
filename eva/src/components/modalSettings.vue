@@ -2,8 +2,8 @@
   <v-dialog
     v-model="active"
     width="1140"
-    persistent
     @keydown="checkEsc($event)"
+    @click:outside="cancelModal"
   >
     <div class="settings-modal-block">
       <v-card :style="{background:theme.$main_bg}">
@@ -20,6 +20,15 @@
           ref="options"
           class="options-block"
         >
+          <div class="option-item">
+            <v-switch
+              v-model="openNewScreen"
+              class="switch"
+              :color="theme.$primary_button"
+              :style="{color:theme.$main_text}"
+              label="Открыть в новой вкладке"
+            />
+          </div>
           <div class="option-item">
             <div
               class="name-option main item"
@@ -63,6 +72,31 @@
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text}"
                 :label="String(options.visible)"
+              />
+            </div>
+          </div>
+          <div
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              pinned
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Закрепить на всех вкладках
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.pinned"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.pinned)"
               />
             </div>
           </div>
@@ -475,7 +509,7 @@
                 class="settings-title"
                 :style="{color:theme.$main_text,borderColor:theme.$main_border}"
               >
-                Столбцы для отображение
+                Столбцы для отображения
               </div>
             </v-card-text>
               <v-checkbox
@@ -531,6 +565,7 @@
               </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="data" label="data:" :items="tableTitles" /> </v-row>
               <v-row :style="{color:theme.$main_text}" ><v-select v-model="metadata" label="metadata:" :items="tableTitles" /> </v-row>
+              <v-row :style="{color:theme.$main_text}" ><v-select v-model="detailValue" label="Поле для ссылки Детали:" :items="tableTitles" /> </v-row>
             </v-container>
 
           </div>
@@ -887,6 +922,32 @@
             </div>
           </div>
           <div
+              v-if="checkOptions('stringOX')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              stringOX
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Ось X - строки
+            </div>
+            <div class="status-option item">
+              <v-switch
+                  v-model="options.stringOX"
+                  class="switch"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text}"
+                  :label="String(options.stringOX)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('united')"
             class="option-item"
           >
@@ -912,6 +973,36 @@
               />
             </div>
           </div>
+
+          <div
+              v-if="options.united && checkOptions('united')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              barplotstyle
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Стиль столбцов
+            </div>
+            <div class="status-option item">
+              <v-select
+                  v-model="options.barplotstyle"
+                  :items="barplotstyleOptions"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text, fill: theme.$main_text}"
+                  hide-details
+                  outlined
+                  class="subnumber"
+              />
+            </div>
+          </div>
+
           <div
             v-if="!options.united"
             v-for="metric in metricsName"
@@ -945,7 +1036,7 @@
           </div>
 
           <v-card-text
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
           >
             <div
@@ -957,7 +1048,7 @@
           </v-card-text>
 
           <div
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
           >
             <div class="multiline-custom-opts">
@@ -997,7 +1088,7 @@
           </div>
 
           <v-card-text
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
           >
             <div
@@ -1009,7 +1100,7 @@
           </v-card-text>
 
           <div
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
           >
             <div class="d-flex multiline-custom-opts">
@@ -1267,13 +1358,35 @@
                 Библиотека примитивов отображения
               </div>
             </v-card-text>
+              <v-btn
+                plain link small
+                class="mb-3 text-lowercase"
+                :color="theme.$main_text"
+                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
               <v-textarea
                 v-model="options.primitivesLibrary"
                 name="input-7-1"
                 filled
+                rows="6"
                 label="JSON c примитивами"
-                auto-grow
+                :auto-grow="primitivesLibraryAutoGrow"
+                class="textarea-event"
+                spellcheck="false"
+                :color="theme.$main_text"
+                :style="{ color: theme.$main_text }"
+                outlined
+                hide-details
               ></v-textarea>
+              <v-btn
+                  v-if="primitivesLibraryAutoGrow"
+                  plain link small
+                  class="text-lowercase"
+                  :color="theme.$main_text"
+                  @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow">
+                {{ primitivesLibraryAutoGrowLinkText }}
+              </v-btn>
             </v-container>
           </div>
           <v-card-text
@@ -1334,7 +1447,7 @@
             >
               <v-select
                 v-model="colorsPie.theme"
-                :items="themesArr"
+                :items="Object.keys(themes)"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"
                 hide-details
@@ -1342,13 +1455,16 @@
                 class="item-metric"
                 label="Выберите схему"
                 @click="changeColor"
+                @change="() => {
+                  colorsPie.nametheme=colorsPie.theme === 'custom'?'':colorsPie.theme;
+                  colorsPie.colors = themes[colorsPie.theme].join(',')
+                }"
               />
               <v-text-field
-                v-show="colorsPie.theme == 'custom'"
+                v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.nametheme"
-                clearable
                 placeholder="green"
-                label="Имя новой схема"
+                label="Имя схемы"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined
@@ -1356,17 +1472,24 @@
                 hide-details
               />
               <v-text-field
-                v-show="colorsPie.theme == 'custom'"
+                v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.colors"
-                clearable
+                :disabled="!colorsPie.nametheme"
                 placeholder="red,#5F27FF,rgb(95, 39, 255)"
-                label="Новая схема"
+                label="Набор цветов"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined
                 class="item-metric"
+                :class="{'disabled': !colorsPie.nametheme}"
                 hide-details
               />
+              <v-btn
+                v-if="!defaultThemes.includes(colorsPie.theme) && colorsPie.theme !== 'custom'"
+                :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+                :color="theme.$primary_button"
+                @click="onClickDeleteTheme(colorsPie.theme)"
+              >Удалить</v-btn>
             </div>
           </div>
         </div>
@@ -1590,6 +1713,8 @@ export default {
     return {
       tableTitles:[],
       element: '',
+      openNewScreen: false,
+      primitivesLibraryAutoGrow: false,
       options: {
       },
       optionsItems: [],
@@ -1611,6 +1736,7 @@ export default {
         colors: '',
         nametheme: ''
       },
+      defaultThemes: ['neitral', 'indicted'],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1621,6 +1747,7 @@ export default {
       x: '',
       y: '',
       metadata: '',
+      detailValue: '',
       data: '',
       xFormat: 'Строка',
       yFormat: 'Дата',
@@ -1635,7 +1762,12 @@ export default {
         "По возрастанию",
         "По убыванию"
       ],
-      metricUnits: {}
+      metricUnits: {},
+      barplotstyleOptions: [
+        {text:'разделенный', value:'divided'},
+        {text:'наложенный', value:'overlay'},
+        {text:'с накоплением', value:'accumulation'},
+      ]
     }
   },
   computed: {
@@ -1675,6 +1807,7 @@ export default {
           this.y = test.y
           this.data = test.data
           this.metadata = test.metadata
+          this.detailValue = test.detailValue
         }
       }
       return this.$store.getters.getModalSettings(this.idDash).status;
@@ -1687,6 +1820,9 @@ export default {
     },
     selectedTitles() {
       return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
+    },
+    primitivesLibraryAutoGrowLinkText() {
+      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
     },
 
     ...mapGetters([
@@ -1738,12 +1874,17 @@ export default {
       }
       if (this.element.indexOf('piechart') != -1) {
         this.options.metricsRelation = JSON.parse(JSON.stringify(this.metricsRelation));
-        this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme == 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
-          this.colorsPie.theme = this.colorsPie.nametheme;
+        if (this.colorsPie.nametheme) {
+          this.options.colorsPie = this.colorsPie;
+          if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
+            if (this.colorsPie.theme !== 'custom' && this.colorsPie.theme !== this.colorsPie.nametheme) {
+              delete this.themes[this.colorsPie.theme]
+            }
+            this.colorsPie.theme = this.colorsPie.nametheme;
+          }
+          this.options.themes = this.themes;
         }
-        this.options.themes = this.themes;
 
       }
       if (this.element.indexOf('multiLine') != -1) {
@@ -1757,6 +1898,7 @@ export default {
         this.options.y = this.y;
         this.options.data = this.data;
         this.options.metadata = this.metadata;
+        this.options.detailValue = this.detailValue;
         this.options.yFormat = this.yFormat;
         this.options.ySort = this.ySort;
         this.options.xFormat = this.xFormat;
@@ -1766,7 +1908,7 @@ export default {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: this.options, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, openNewScreen: this.openNewScreen  }, titles: this.tableTitles});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1850,8 +1992,14 @@ export default {
           }
         } else {
           this.$set(this.options,item,null);
+          if (item == 'stringOX') {
+            this.$set(this.options,item,false);
+          }
           if (item == 'united') {
             this.$set(this.options,item,false);
+          }
+          if (item == 'barplotstyle') {
+            this.$set(this.options,item,'divided');
           }
           if (item === 'isDataAlwaysShow') {
             this.$set(this.options, item, false);
@@ -1897,6 +2045,15 @@ export default {
       if (!this.options.change) {
         this.$set(this.options,'change',false);
       }
+    },
+    onClickDeleteTheme(theme) {
+      const nextTheme = this.defaultThemes[0]
+      this.colorsPie.theme = nextTheme;
+      this.colorsPie.nametheme = nextTheme;
+      this.colorsPie.colors = this.themes[nextTheme].join(',');
+      this.options.colorsPie = this.colorsPie;
+      this.options.themes = this.themes;
+      delete this.themes[theme]
     }
   },
 }

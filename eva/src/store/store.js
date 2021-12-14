@@ -13,6 +13,22 @@ export default {
       settings: themes['dark'],
     },
   },
+  actions: {
+    async actionGetElementSelected({ commit, state, getters }, element){
+      const selected = getters.getElementSelected({
+        idDash: element.idDash,
+        id: element.id
+      });
+      if (!selected) {
+        commit('createElementSelected', {...element});
+      }
+      commit('setElementSelected', {...element});
+      return await getters.getElementSelected({
+        idDash: element.idDash,
+        id: element.id
+      });
+    }
+  },
   mutations: {
     setNameDash: (state, newName) => {
       // изменения имени самого элемента
@@ -30,10 +46,11 @@ export default {
     },
     setSearch: (state, payload) => {
       const { idDash, reload, search } = payload;
+      const checkId = search.currentSid || search.sid
       search.status = 'empty';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
-          if (search.sid === item.sid) {
+          if (checkId === item.sid) {
             Vue.set(state[idDash].searches, i, search);
           }
         });
@@ -275,6 +292,12 @@ export default {
           }
         });
       }
+      // Add filterParam(for multiLine)
+      state[idDash].tockens.forEach(tocken => {
+        if (tocken.name === payload.tocken.name) {
+          tocken.filterParam = payload.tocken.filterParam
+        }
+      });
       // Add value to temp values of filter
       if (state[idDash].focusedFilter) {
         this.commit('addTokenToFilterParts', payload);
@@ -313,6 +336,16 @@ export default {
           elemDeep: '',
         };
       }
+      state[select.idDash][select.id].selected[select.element] = select.value;
+    },
+    createElementSelected: (state, select) => {
+      state[select.idDash][select.id].selected = {
+        elem: '',
+        elemlink: '',
+        elemDeep: '',
+      };
+    },
+    setElementSelected: (state, select) => {
       state[select.idDash][select.id].selected[select.element] = select.value;
     },
     setDash: (state, dash) => {
@@ -572,7 +605,7 @@ export default {
     saveFilterPart(state, { idDash, filterPart, filterPartIndex }) {
       if (Number.isFinite(filterPartIndex))
         state[idDash].focusedFilter.parts[filterPartIndex] = filterPart;
-      else state[idDash].focusedFilter.parts.push(filterPart);
+      else state[idDash].focusedFilter.parts.push({ ...filterPart });
     },
     setLibrary: (state, options) => {
       Vue.set(state[options.idDash][options.id].options, 'library', options.library);
@@ -681,7 +714,6 @@ export default {
       let id = -1;
       if (Number.isInteger(+item.target)) {
         id = item.target;
-        console.log('id', id);
       }
       if (id) await loader(id);
 
@@ -698,7 +730,7 @@ export default {
       let changed = [];
 
       item.value.forEach((itemValue, k) => {
-        if (itemValue.indexOf('$') != -1) {
+        if (typeof itemValue === 'string' && itemValue.indexOf('$') !== -1) {
           itemValue = itemValue.replace(/\$/g, '');
 
           tockens.forEach((tockenDeep, l) => {
@@ -746,7 +778,14 @@ export default {
 
       //event.route.push(`/dashboards/${id}`);
       // event.route.go();
-      event.route.push(`/dashboards/${id}`);
+      const options = state[event.idDash][event.id].options;
+      const currentTab = event.event.tab || state[id]?.currentTab
+
+      if (!options?.openNewScreen) {
+        event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+      } else {
+        window.open(`/dashboards/${id}/${currentTab || ''}`);
+      }
       let searches = state[id].searches;
 
       let response = {};
@@ -975,7 +1014,13 @@ export default {
       let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
       for (let part of focusedFilterParts) {
         if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
-          if (part.values.indexOf(tocken.value) === -1) part.values.push(tocken.value);
+          if (part.values.indexOf(tocken.value) === -1) {
+            part.token.value = tocken.value
+            if (part.token.elem.includes('multiLine')) {
+              part.values = []
+            }
+            part.values.push(tocken.value);
+          }
         }
       }
       this.commit('sortFilterParts', { idDash: tocken.idDash });
@@ -983,7 +1028,7 @@ export default {
     sortFilterParts(state, { idDash }) {
       // idDash as property to case when sort not for focusedFilter (backward compatibility)
       state[idDash].focusedFilter.parts.sort(
-        (part1, part2) => part2.values.length - part1.values.length
+        (part1, part2) => part2.values?.length - part1.values?.length
       );
     },
     declineFilterChanges(state, idDash) {
@@ -1231,6 +1276,12 @@ export default {
         return state[elem.idDash][elem.id].selected;
       };
     },
+    getElementSelected: state => elem => {
+      return state[elem.idDash][elem.id]?.selected;
+    },
+    getElement: state => (idDash, id) => {
+      return state[idDash][id];
+    },
     getDataApi(state) {
       // метод получающий данные из rest
       return searchFrom => {
@@ -1243,7 +1294,6 @@ export default {
         let tws = search.parametrs.tws;
         let twf = search.parametrs.twf;
         let reg = null;
-
         if (state[idDash].filters) {
           Object.values(state[idDash].filters).forEach(filter => {
             reg = new RegExp(`\\$${filter.id}\\$`, 'g');
@@ -1260,7 +1310,11 @@ export default {
             //let reg = `\\$${state[idDash].tockens[item].name}`;
             reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
             if (otl.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
-              otl = otl.replace(reg, state[idDash].tockens[item].value);
+              if(state[idDash].tockens[item].value) {
+                otl = otl.replace(reg, state[idDash].tockens[item].value);
+              } else {
+                otl = otl.replace(reg, state[idDash].tockens[item].defaultValue);
+              }
             }
 
             if (
@@ -1299,7 +1353,11 @@ export default {
             }
           });
         }
-
+        if (search.limit > 0 && !otl.includes('head')) {
+          // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
+          otl +='|head ' + search.limit
+        }
+        
         otl = otl.replace(/\r|\n/g, '');
 
         let formData = new FormData(); // формируем объект для передачи RESTу
@@ -1443,6 +1501,7 @@ export default {
             field_extraction: false,
             cache_ttl: 100,
           },
+          limit: 1000
         };
       }
     },

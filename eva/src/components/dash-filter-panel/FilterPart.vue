@@ -6,13 +6,15 @@
           <svg v-if="filterPart.invertMatches" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M5.99998 13.3334L2.66665 10.6667L5.99998 8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998 8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z" :fill="theme.$main_text"/>
           </svg>
-          {{ elemName }}
+          <span :title="elemName">{{ elemName }}</span>
         </div>
         <div class="part-subtitle">
           <span>{{ filterPart.fieldName }} ({{ filterPartValues.length }})</span>
           <v-menu
             v-if="filterPartValues.length > 0"
             offset-y
+            z-index="99"
+            attach
             max-height="300"
             :close-on-content-click="false"
           >
@@ -63,6 +65,7 @@
         @click.stop.prevent="
           $store.commit('refreshFilterPart', { idDash, filterIndex, filterPartIndex })
         "
+        v-blur="140"
         v-text="refreshIcon"
       />
       <v-icon
@@ -81,6 +84,7 @@
 
 <script>
   import { mdiCloseCircleOutline, mdiRefresh, mdiPencil, mdiChevronDown } from '@mdi/js';
+  import {mapGetters} from "vuex";
 
   export default {
     name: 'FilterPart',
@@ -113,15 +117,28 @@
       };
     },
     computed: {
+      ...mapGetters([
+        'getTockens'
+      ]),
+      getDashTokens() {
+        return this.getTockens(this.idDash)
+      },
       theme() {
         return this.$store.getters.getTheme;
       },
-      elemName() {
+      elemRawName() {
         if (this.filterPart.token)
           return this.$store.state.store[this.idDash][this.filterPart.token.elem].name_elem;
         else {
           return 'Ручной фильтр';
         }
+      },
+      elemName() {
+        let name = this.elemRawName;
+        name && this.getDashTokens.forEach(token => {
+          name = name.replaceAll(`$${token.name}$`, token.value)
+        })
+        return name || this.filterPart?.token?.name || 'Unknown'
       },
       operationManualTitle() {
         return this.filterPart.operationManual
@@ -131,6 +148,7 @@
       filterPartValues(){
         if (this.filterPart.token)
           return this.$store.state.store[this.idDash].filters[this.filterIndex].parts[this.filterPartIndex].values;
+        return []
       }
     },
     methods: {
@@ -166,9 +184,13 @@
       max-width: 300px
       white-space: nowrap
       overflow: hidden
-      text-overflow: ellipsis
       display: flex
       align-items: center
+
+      > span
+        overflow: hidden
+        text-overflow: ellipsis
+
 
     .part-subtitle
       display: flex

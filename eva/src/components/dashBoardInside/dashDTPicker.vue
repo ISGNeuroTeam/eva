@@ -94,7 +94,7 @@
           class="name-of-picker" 
           :style="{color:theme.$title}"
         > 
-          Диапазон даты
+          Диапазон дат
         </div>
         <DTPicker 
           v-model="range" 

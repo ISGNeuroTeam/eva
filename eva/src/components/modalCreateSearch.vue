@@ -12,7 +12,7 @@
           v-model="search.sid"
           :color="theme.$primary_button"
           :style="{ color: theme.$main_text }"
-          class="textarea-item"
+          class="textarea-item textarea-item-name"
           outlined
           label="Имя ИД"
           placeholder="Sid"
@@ -93,55 +93,68 @@
             </DTPicker>
           </div>
         </div>
-        <v-expansion-panels class="expansion-panels">
-          <v-expansion-panel
-            :style="{
+        <div class="d-flex">
+          <v-expansion-panels class="expansion-panels">
+            <v-expansion-panel
+                :style="{
               backgroundColor: theme.$main_bg,
               color: theme.$main_text,
               border: `1px solid ${theme.$main_border}`,
             }"
-          >
-            <v-expansion-panel-header>Дополнительные параметры</v-expansion-panel-header>
-            <v-expansion-panel-content class="order-expansion">
-              <v-text-field
-                v-model="search.parametrs.timeout"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
+            >
+              <v-expansion-panel-header>Дополнительные параметры</v-expansion-panel-header>
+              <v-expansion-panel-content class="order-expansion">
+                <v-text-field
+                    v-model="search.parametrs.timeout"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text }"
+                    class="textarea-item"
+                    outlined
+                    label="Timeout"
+                    hide-details
+                />
+                <v-text-field
+                    v-model="search.parametrs.cache_ttl"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text }"
+                    class="textarea-item"
+                    outlined
+                    label="Cache_ttl"
+                    hide-details
+                />
+                <v-text-field
+                    v-model="search.parametrs.field_extraction"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text }"
+                    class="textarea-item"
+                    outlined
+                    label="Field_extraction"
+                    hide-details
+                />
+                <v-text-field
+                    v-model="search.parametrs.preview"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text }"
+                    class="textarea-item"
+                    outlined
+                    label="Preview"
+                    hide-details
+                />
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+          <div class="limit-block">
+            <v-text-field
+                v-model="search.limit"
+                :color="theme.$accent_ui_color"
+                :style="{color: theme.$main_text}"
                 class="textarea-item"
                 outlined
-                label="Timeout"
+                label="Максимальное кол-во строк"
                 hide-details
-              />
-              <v-text-field
-                v-model="search.parametrs.cache_ttl"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                class="textarea-item"
-                outlined
-                label="Cache_ttl"
-                hide-details
-              />
-              <v-text-field
-                v-model="search.parametrs.field_extraction"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                class="textarea-item"
-                outlined
-                label="Field_extraction"
-                hide-details
-              />
-              <v-text-field
-                v-model="search.parametrs.preview"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                class="textarea-item"
-                outlined
-                label="Preview"
-                hide-details
-              />
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
+            />
+          </div>
+        </div>
       </div>
       <v-card-actions class="searchBtn">
         <div
@@ -174,9 +187,11 @@ export default {
   },
   data() {
     return {
+      currentSid: null,
       search: {
         sid: null,
         original_otl: null,
+        limit: 1000,
         parametrs: {
           tws: 0,
           twf: 0,
@@ -202,6 +217,7 @@ export default {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
         this.search = this.dataSearch
+
         if (this.createBtnFrom === 'edit') {
           this.createBtn = 'Редактировать'
         } else {
@@ -221,7 +237,13 @@ export default {
       return this.$store.getters.getTheme
     },
   },
+  mounted() {
+    this.currentSid = this.dataSearchFrom?.sid
+  },
   watch: {
+    dataSearchFrom() {
+      this.currentSid = this.dataSearchFrom?.sid
+    },
     tws: function () {
       this.search.parametrs.tws = this.tws
     },
@@ -260,12 +282,13 @@ export default {
 
         let searches = this.$store.getters.getSearches(this.idDash) // получаем все ИС
         let j = -1
-
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
-          if (item.sid === this.search.sid) {
+          if (item.sid === this.currentSid) {
             // и если ИС с таким id уже есть
             j = i // меняем переменную
+          } else if (item.sid === this.search.sid) {
+            j = -100
           }
         })
 
@@ -278,10 +301,10 @@ export default {
             this.errorMsgShow = true
           } else {
             this.$store.commit('setSearch', {
-              search: this.search,
+              search: { ...this.search, currentSid: j === -100 ? null : this.currentSid },
               idDash: this.idDash,
               reload: true,
-            }) // отправляем в хранилище для создания
+            })
             this.cancelBtn = 'Отмена'
             this.errorMsgShow = false
             this.$emit('cancelModal') // и скрываем окно редактирования ИД
@@ -305,8 +328,12 @@ export default {
     },
     addLineBreaks: function(event) {
       this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
-      this.search.original_otl = this.search.original_otl.replace('\n', '')
+      if (this.search.original_otl[0] === '\n') {
+        this.search.original_otl = this.search.original_otl.substring(1)
+      }
       this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replaceAll('|' + '\n', '| ')
+      this.search.original_otl = this.search.original_otl.replaceAll('| ' + '\n', '| ')
     },
   },
 }

@@ -84,8 +84,16 @@ export default {
         id: this.id,
       });
       return options.searchBtn;
+    },
+    textAreaValue() {
+      return this.$store.getters.getTextArea({idDash: this.idDash, id: this.id});
     }
   },  
+  watch: {
+    textAreaValue(val) {
+      this.textarea = val;
+    }
+  },
   methods: {
     setTockenBlur(event){
       event.preventDefault();

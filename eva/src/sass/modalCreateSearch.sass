@@ -16,29 +16,32 @@
             .time-block
                 position: relative
                 width: 300px
+                margin: 20px 0
 
                 .dtpicker-search
                     position: absolute
-                    top: 30px
+                    top: 10px
                     width: 24px
                     right: 10px
                     cursor: pointer
 
                     .datepicker
-                        top: -225px !important
+                        top: -270px !important
                         left: -160px !important
+                        bottom: auto !important
 
                 &:nth-child(2)
                     margin-left: 20px
 
                     .datepicker
-                        top: -225px !important
+                        bottom: auto !important
+                        top: -270px !important
                         left: -480px !important
                         // right: 85px !important
-                
 
+        .limit-block
+            width: 200px
         .textarea-item
-            margin: 20px 0
             width: 300px
 
             .v-input__slot
@@ -73,12 +76,16 @@
                         input
                             color: inherit
 
-        
+        .textarea-item-name
+            margin: 20px 0
         .expansion-panels
             width: 400px
+            height: 38px
+            margin-right: 20px
 
             .v-expansion-panel-header
-                min-height: 50px
+                min-height: 38px
+                padding: 8px 12px
 
                 .v-icon
                     color: inherit !important
@@ -90,7 +97,7 @@
                     flex-flow: row wrap
                     justify-content: flex-start
                     align-items: center
-                    padding: 0 24px 10px
+                    padding: 0 20px 10px
 
                     .textarea-item
                         width: 150px
@@ -121,7 +128,7 @@
         .code-search
 
             .v-input__slot
-                height: 150px !important
+                height: 216px !important
 
                 .v-label
                     color: inherit

@@ -16,16 +16,11 @@
       Наведите курсор на график
     </div>
 
-    <div v-show="dataLoading" class="loading">
-      <div class="preloader">
-        <div class="stable" />
-        <div class="dynamic" />
-      </div>
-      <p>Загружаю данные...</p>
+    <div v-show="dataLoading" class="mt-4">
+      <p>Нет данных для отображения</p>
     </div>
-    <div class="piechart-legend-block" :style="{ flexFlow: positionLegends }">
+    <div v-show="!dataLoading" class="piechart-legend-block" :style="{ flexFlow: positionLegends }">
       <div
-        v-show="!dataLoading"
         ref="piechartItself"
         :class="`dash-piechart ${this.idFrom}`"
         :data-change="change"
@@ -152,6 +147,8 @@ export default {
         } else {
           this.createPieChartDash();
         }
+      } else {
+        this.dataLoadingFrom = true
       }
       return true;
     },
@@ -316,9 +313,10 @@ export default {
     createLegend: function(data, metrics, showlegend, colorsPie) {
       this.legends = [];
       if (showlegend) {
+        const colors = this.dashOptions.themes[colorsPie.theme]
         data.forEach((item, i) => {
           this.legends.push({
-            color: this.colors[colorsPie.theme][i],
+            color: colors[i % colors.length],
             label: `${item[metrics[0]]} - ${item[metrics[1]]}`,
           });
         });
@@ -377,7 +375,7 @@ export default {
       let color = d3
         .scaleOrdinal() // устанавливаем цветовую схему для pie chart
         .domain(data)
-        .range(this.colors[colorsPie.theme]);
+        .range(this.dashOptions.themes[colorsPie.theme]);
 
       let pie = d3.pie().value(d => d.value);
       let data_ready = pie(d3.entries(data));

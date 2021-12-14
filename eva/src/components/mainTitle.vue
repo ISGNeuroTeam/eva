@@ -49,8 +49,6 @@
             class="overlay-grid"
             :data-grid="true"
             :style="{
-              height: `calc(100% - ${headerTop}px`,
-              top: `${headerTop}px`,
               background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
             }"
@@ -68,6 +66,8 @@
             :dataSourseTitle="elem.search"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
+            @SetRange="setRange($event, elem)"
+            @ResetRange="resetRange($event)"
           />
           <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
@@ -200,6 +200,7 @@ export default {
       hoveredTabID: 0,
       loadingDash: true,
       dataObject: {},
+      dataObjectConst: {},
       firstLoad: true,
       leftDots: true,
       rightDots: true,
@@ -215,6 +216,7 @@ export default {
       return this.loadingDash ? [] : this.$store.getters.getElementsWithSearches(this.idDash)
     },
     headerTop() {
+      return 0;
       return document.body.clientWidth <= 1400 ? 40 : 50
     },
     theme() {
@@ -267,14 +269,16 @@ export default {
         let onButton = findOnButtonTokens(this.tokens);
         console.log(onButton)
         if (this.firstLoad) {
-          searches.forEach((search) =>
-            this.$set(this.dataObject, search.sid, { data: [], loading: true })
-          )
+          searches.forEach((search) => {
+              this.$set(this.dataObject, search.sid, { data: [], loading: true })
+              this.$set(this.dataObjectConst, search.sid, { data: [], loading: true })
+          })
           this.firstLoad = false
         }
         searches.map((search) => {
           if (search.status === 'empty') {
             this.$set(this.dataObject, search.sid, { data: [], loading: true })
+            this.$set(this.dataObjectConst, search.sid, { data: [], loading: true })
             this.$store.commit('updateSearchStatus', {
               idDash: this.idDash,
               sid: search.sid,
@@ -288,6 +292,8 @@ export default {
               })
               this.$set(this.dataObject[search.sid], 'data', res)
               this.$set(this.dataObject[search.sid], 'loading', false)
+              this.$set(this.dataObjectConst[search.sid], 'data', res)
+              this.$set(this.dataObjectConst[search.sid], 'loading', false)
             })
           }
         })
@@ -298,6 +304,9 @@ export default {
     await this.checkAlreadyDash()
     this.loadingDash = false
     document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
+    if (this.$route.params.tabId) {
+      this.clickTab(Number(this.$route.params.tabId))
+    }
     this.createStartClient()
     this.calcSizeCell()
     this.addScrollListener()
@@ -342,11 +351,11 @@ export default {
     },
     checkLoading(elem) {
       if (elem.search === -1) return false
-      return this.dataObject[elem.search].loading
+      return this.dataObject[elem.search]?.loading
     },
     getElementData(elem) {
       if (elem.search === -1) return []
-      return this.dataObject[elem.search].data
+      return this.dataObject[elem.search]?.data
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
@@ -453,6 +462,33 @@ export default {
 
         }
       })
+    },
+    sliceRange(arr, range) {
+      return arr.filter((item, idx) => {
+        if (
+          (item[range.xMetric] >= range.range[0] && item[range.xMetric] <= range.range[1]) ||
+          (arr[idx - 1]?.[range.xMetric] >= range.range[0] && (arr[idx - 1]?.[range.xMetric] <= range.range[1])) ||
+          (arr[idx + 1]?.[range.xMetric] >= range.range[0] && arr[idx + 1]?.[range.xMetric] <= range.range[1])
+        ) {
+          return true;
+        }
+
+        const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
+        const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
+        
+        if (
+          (item[range.xMetric] <= range.range[0] && arr[idxArrFirst]?.[range.xMetric] >= range.range[1]) ||
+          (item[range.xMetric] >= range.range[1] && arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
+        ) {
+          return true;
+        }
+      });
+    },
+    setRange (range, elem) {
+      this.dataObject[elem.search].data = this.sliceRange(this.dataObject[elem.search].data, range);
+    },
+    resetRange (dataSourseTitle) {
+      this.dataObject[dataSourseTitle].data = this.dataObjectConst[dataSourseTitle].data
     },
   },
 }
