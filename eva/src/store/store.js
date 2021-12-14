@@ -282,7 +282,7 @@ export default {
         }
 
         state[idDash].searches.forEach(search => {
-          let tempTocken = state[idDash].tockens.find(el => el.name = tocken.name)
+          let tempTocken = state[idDash].tockens.find(el => el.name == tocken.name)
           if (search.original_otl.includes(`$${tocken.name}$`) && !tempTocken.onButton) {
             this.commit('updateSearchStatus', {
               idDash,
