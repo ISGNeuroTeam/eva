@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.77.0]
 
 ### Added
+- added field for choose interval tooltips for points multiline, created settings for change color lines and choose style line
 
 - added barplot display styles of multiline
 - updated sticky header and filter
