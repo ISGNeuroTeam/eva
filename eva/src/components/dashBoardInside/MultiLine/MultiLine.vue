@@ -622,6 +622,9 @@ export default {
     },
 
     renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding, type_line, color = {}, conclusion_count = {}, replace_count = {}) {
+      if (type_line === undefined) {
+        type_line = {}
+      }
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
 
