@@ -1,3 +1,31 @@
+# [1.77.0] - Barplot display styles of multiline, sticky header and bugfixes.
+
+### New
+
+- Added barplot display styles of multiline.
+- Updated sticky header and filter.
+
+### Bugfix
+
+- Fullscreen dash mode size.
+- Position of the top menu, it was non-clickable.
+- z-index on the boards.
+- Zoom-out button in multiline dash.
+- Reordered visualization settings.
+- Corrected mistakes in texts.
+
+# [1.76.0] - Filters for YGraph componet, selection property in events of select component and bugfixes.
+
+### New
+
+- Filters for YGraph with save settings in storage.
+- Selection property in events of select component.
+
+### Bugfix
+
+- Slider component fixed syncing with fullscreen.
+- Fixed multiline barplot id.
+
 # [1.75.0] - Redirect to a specific dashboard tab from heatmap, ticks of several Y-axes are combined on multiline and bugfixes.
 
 ### New

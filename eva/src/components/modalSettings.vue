@@ -76,6 +76,31 @@
             </div>
           </div>
           <div
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              pinned
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Закрепить на всех вкладках
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.pinned"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.pinned)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('level')"
             class="option-item"
           >
@@ -485,7 +510,7 @@
                 class="settings-title"
                 :style="{color:theme.$main_text,borderColor:theme.$main_border}"
               >
-                Столбцы для отображение
+                Столбцы для отображения
               </div>
             </v-card-text>
               <v-checkbox
@@ -715,31 +740,6 @@
             </div>
           </div>
           <div
-            class="option-item"
-          >
-            <div
-              class="name-option item"
-              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-            >
-              pinned
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-            >
-              Закрепить на всех вкладках
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.pinned"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{color:theme.$main_text}"
-                :label="String(options.pinned)"
-              />
-            </div>
-          </div>
-          <div
             v-if="checkOptions('isDataAlwaysShow')"
             class="option-item"
           >
@@ -923,6 +923,36 @@
               />
             </div>
           </div>
+
+          <div
+              v-if="options.united && checkOptions('united')"
+              class="option-item"
+          >
+            <div
+                class="name-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              barplotstyle
+            </div>
+            <div
+                class="discribe-option item"
+                :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Стиль столбцов
+            </div>
+            <div class="status-option item">
+              <v-select
+                  v-model="options.barplotstyle"
+                  :items="barplotstyleOptions"
+                  :color="theme.$primary_button"
+                  :style="{color:theme.$main_text, fill: theme.$main_text}"
+                  hide-details
+                  outlined
+                  class="subnumber"
+              />
+            </div>
+          </div>
+
           <div
             v-if="!options.united"
             v-for="metric in metricsName"
@@ -956,7 +986,7 @@
           </div>
 
           <v-card-text
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
           >
             <div
@@ -968,7 +998,7 @@
           </v-card-text>
 
           <div
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
           >
             <div class="multiline-custom-opts">
@@ -1008,7 +1038,7 @@
           </div>
 
           <v-card-text
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
           >
             <div
@@ -1020,7 +1050,7 @@
           </v-card-text>
 
           <div
-            v-if="options.united && checkOptions('united')"
+            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
           >
             <div class="d-flex multiline-custom-opts">
@@ -1447,7 +1477,7 @@
             >
               <v-select
                 v-model="colorsPie.theme"
-                :items="themesArr"
+                :items="Object.keys(themes)"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"
                 hide-details
@@ -1455,13 +1485,16 @@
                 class="item-metric"
                 label="Выберите схему"
                 @click="changeColor"
+                @change="() => {
+                  colorsPie.nametheme=colorsPie.theme === 'custom'?'':colorsPie.theme;
+                  colorsPie.colors = themes[colorsPie.theme].join(',')
+                }"
               />
               <v-text-field
-                v-show="colorsPie.theme == 'custom'"
+                v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.nametheme"
-                clearable
                 placeholder="green"
-                label="Имя новой схема"
+                label="Имя схемы"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined
@@ -1469,17 +1502,24 @@
                 hide-details
               />
               <v-text-field
-                v-show="colorsPie.theme == 'custom'"
+                v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.colors"
-                clearable
+                :disabled="!colorsPie.nametheme"
                 placeholder="red,#5F27FF,rgb(95, 39, 255)"
-                label="Новая схема"
+                label="Набор цветов"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
                 outlined
                 class="item-metric"
+                :class="{'disabled': !colorsPie.nametheme}"
                 hide-details
               />
+              <v-btn
+                v-if="!defaultThemes.includes(colorsPie.theme) && colorsPie.theme !== 'custom'"
+                :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+                :color="theme.$primary_button"
+                @click="onClickDeleteTheme(colorsPie.theme)"
+              >Удалить</v-btn>
             </div>
           </div>
         </div>
@@ -1730,6 +1770,7 @@ export default {
         colors: '',
         nametheme: ''
       },
+      defaultThemes: ['neitral', 'indicted'],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1755,7 +1796,12 @@ export default {
         "По возрастанию",
         "По убыванию"
       ],
-      metricUnits: {}
+      metricUnits: {},
+      barplotstyleOptions: [
+        {text:'разделенный', value:'divided'},
+        {text:'наложенный', value:'overlay'},
+        {text:'с накоплением', value:'accumulation'},
+      ]
     }
   },
   computed: {
@@ -1889,12 +1935,17 @@ export default {
       }
       if (this.element.indexOf('piechart') != -1) {
         this.options.metricsRelation = JSON.parse(JSON.stringify(this.metricsRelation));
-        this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme == 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
-          this.colorsPie.theme = this.colorsPie.nametheme;
+        if (this.colorsPie.nametheme) {
+          this.options.colorsPie = this.colorsPie;
+          if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',')
+            if (this.colorsPie.theme !== 'custom' && this.colorsPie.theme !== this.colorsPie.nametheme) {
+              delete this.themes[this.colorsPie.theme]
+            }
+            this.colorsPie.theme = this.colorsPie.nametheme;
+          }
+          this.options.themes = this.themes;
         }
-        this.options.themes = this.themes;
 
       }
       if (this.element.indexOf('multiLine') != -1) {
@@ -2025,6 +2076,9 @@ export default {
           if (item == 'united') {
             this.$set(this.options,item,false);
           }
+          if (item == 'barplotstyle') {
+            this.$set(this.options,item,'divided');
+          }
           if (item === 'isDataAlwaysShow') {
             this.$set(this.options, item, false);
           }
@@ -2066,6 +2120,15 @@ export default {
       if (!this.options.change) {
         this.$set(this.options,'change',false);
       }
+    },
+    onClickDeleteTheme(theme) {
+      const nextTheme = this.defaultThemes[0]
+      this.colorsPie.theme = nextTheme;
+      this.colorsPie.nametheme = nextTheme;
+      this.colorsPie.colors = this.themes[nextTheme].join(',');
+      this.options.colorsPie = this.colorsPie;
+      this.options.themes = this.themes;
+      delete this.themes[theme]
     }
   },
 }

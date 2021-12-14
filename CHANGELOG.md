@@ -9,12 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- slider component fixed syncing with fullscreen
-- fixed multiline barplot id
+- fixed the management of custom colors of the pie component
+- fixed focusing on the reset button of the filter part
+- fixed the bug of dragging the graph component
+
+## [1.77.0]
 
 ### Added
 - added field for choose interval tooltips for points multiline, created settings for change color lines and choose style line
+
+- added barplot display styles of multiline
+- updated sticky header and filter
+
+### Fixed
+
+- fixed the fullscreen dash mode size
+- fixed the position of the top menu, it was non-clickable
+- fixed the z level on the boards
+- fixed the zoom-out button in multiline dash
+- fixed bug with settings order, correct mistakes in text
+
+## [1.76.0]
+
+### Added
+
+- added filters for YGraph with save settings in storage
 - added selection property in events of select component
+
+### Fixed
+
+- slider component fixed syncing with fullscreen
+- fixed multiline barplot id
 
 ## [1.75.0]
 
@@ -60,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the display of the slider component after the update
 - fixed fullscreen mode for slider component
 - fixed a problem with selecting/deselecting all items in the multiselect component
+- fixed style icons for points in a map component
 
 ## [1.73.0]
 
