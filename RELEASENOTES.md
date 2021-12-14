@@ -1,3 +1,15 @@
+# [1.78.0] - Default token "evaTknLogin" for username in searches and bugfixes.
+
+### New
+
+- Default token "evaTknLogin" that will be replaced by current username.
+
+### Bugfix
+
+- Fixed the management of custom colors of the pie component.
+- Fixed focusing on the reset button of the filter part.
+- Fixed the bug of dragging the graph component.
+
 # [1.77.0] - Barplot display styles of multiline, sticky header and bugfixes.
 
 ### New
