@@ -166,9 +166,6 @@
                   :style="{background: theme.$primary_button}" 
                 />
               </v-card-title>
-              {{ activeElem }}
-              {{ elements }}
-              {{ aboutElem }}
               <v-card-text 
                 :is="`dash-${i}`" 
                 v-for="i in elements"

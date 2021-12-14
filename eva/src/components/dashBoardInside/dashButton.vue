@@ -3,7 +3,7 @@
     ref="buttonEl"
     class="dash-button" 
     :options="options" 
-    style="padding: 0" 
+    style="padding: 0"
     @click="setClick"
   >
     <div 
