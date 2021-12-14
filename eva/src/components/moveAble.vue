@@ -7,7 +7,7 @@
     :x="left"
     :y="top"
     :draggable="dragRes"
-    :drag-cancel="'.v-slider, .ygraph-component-container'"
+    :drag-cancel="'.v-slider'"
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
