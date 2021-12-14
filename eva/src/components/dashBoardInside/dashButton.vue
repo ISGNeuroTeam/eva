@@ -5,7 +5,7 @@
       :class="{textDecoration:underline}"
       :style="{color:optionsData.colorText,height:`${height}px`,fontSize:`${fontSize}px`,lineHeight:`${height-dataMode}px`,background:optionsData.background}"
       @click="updateSearches">
-        Обновить серчи
+        Подтвердить
     </div>
   </div>
   <div v-else
@@ -83,7 +83,6 @@ export default {
     },
     options: function() {
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.id});
-      console.log(options)
       if (options.color) {
         this.optionsData.colorText = options.color;
       } else {

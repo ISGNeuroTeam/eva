@@ -711,7 +711,7 @@
               class="name-option item"
               :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
-              restart
+              Submit
             </div>
             <div
               class="discribe-option item"
