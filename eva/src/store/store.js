@@ -1287,7 +1287,7 @@ export default {
         }
         if (otl.indexOf(`$evaTknLogin$`) != -1) {
           if (Vue.$jwt.hasToken()) {
-            otl = otl.replace("$evaTknLogin$", Vue.$jwt.decode().username);
+            otl = otl.replaceAll("$evaTknLogin$", Vue.$jwt.decode().username);
           }
         }
         if (state[idDash].tockens) {

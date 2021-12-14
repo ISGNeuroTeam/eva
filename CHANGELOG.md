@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- add default token "evaTknLogin" that will be replaced by current username
+
 ### Fixed
 
 - fixed the management of custom colors of the pie component
