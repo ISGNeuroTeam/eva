@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - fixed the management of custom colors of the pie component
 - fixed focusing on the reset button of the filter part
+- fixed the data download button in the data source 
 
 ## [1.77.0]
 
