@@ -161,7 +161,12 @@ export default {
   data () {
     return {
       twf: '',
-      search: {},
+      search: {
+        parameters: {
+          tws: 0,
+          twf: 0,
+        }
+      },
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
       mdiChevronDown: mdiChevronDown,
@@ -236,8 +241,8 @@ export default {
       this.setTwsTwf(tws, twf)
     },
     setTwsTwf (tws, twf) {
-      this.search.tws = tws
-      this.search.twf = twf
+      this.search.parametrs.tws = tws
+      this.search.parametrs.twf = twf
       this.menuCalendar = false
       this.menuDropdown = false
     },

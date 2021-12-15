@@ -183,8 +183,8 @@ export default {
     },
     launchSearch: async function(search) {
       this.search.original_otl = search.original_otl
-      this.search.parametrs.tws = search.tws
-      this.search.parametrs.twf = search.twf
+      this.search.parametrs.tws = search.parametrs.tws
+      this.search.parametrs.twf = search.parametrs.twf
       this.search.sid = this.hashCode(this.search.original_otl);
 
       this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
@@ -395,6 +395,9 @@ export default {
       link.click() // жмем на скачку
       link.remove() // удаляем ссылку
     },
+  },
+  created() {
+    this.$store.commit('createReportSearch');
   },
   mounted() {
     document.title="EVA | Исследование данных"
