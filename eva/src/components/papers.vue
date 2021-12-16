@@ -21,7 +21,8 @@
               <v-btn 
                 small 
                 :color="color.controls" 
-                class="file-btn" 
+                class="file-btn"
+                dark 
                 @click="fileBlock=2;uploadFile=''"
               >
                 Загрузить отчет
@@ -29,7 +30,8 @@
               <v-btn 
                 small 
                 :color="color.controls" 
-                class="file-btn" 
+                class="file-btn"
+                dark 
                 @click="getAllPapers"
               >
                 Выбрать отчет
