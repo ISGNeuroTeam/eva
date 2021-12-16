@@ -107,8 +107,6 @@ export default {
               newItemTime += deltaTime;
               newDate = new Date(newItemTime*1000);
               periodMarker = this.getTimePart(newDate)
-              console.log(periodMarker)
-              console.log(currentPeriod)
               datasetItem = { time: newDate.toLocaleString("ru", options), value: 0 }
             }
           }
@@ -152,11 +150,9 @@ export default {
       return period
     },
     clearSVG (dataset) {
-      console.log(d3.select('.chart1').nodes())
       d3.selectAll('rect')
           .nodes()
           .forEach((item) => {
-            console.log(item)
             item.remove()
           })
       this.renderSVG(dataset)
