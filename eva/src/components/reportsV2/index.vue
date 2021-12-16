@@ -33,8 +33,16 @@
               </v-btn>
             </div>
           </div>
-          <statistic v-if="tab===1" class="visualisation component-block" :data="data" :size="size"></statistic>
-          <visualisation v-if="tab===2" class="statistic component-block" :data="data" :shouldGet="shouldGet"></visualisation>
+          <v-row>
+            <v-col cols="2" class="pr-0">
+              <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
+            </v-col>
+            <v-col cols="10" class="pl-0">
+              <events v-if="tab===0" class="events component-block" :data="data"></events>
+            </v-col>
+          </v-row>
+          <statistic v-if="tab===1" class="statistic component-block" :data="data" :size="size"></statistic>
+          <visualisation v-if="tab===2" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
         </div>
       </div>
     </v-content>
@@ -55,16 +63,18 @@ import  settings  from '../../js/componentsSettings.js';
 import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
 import  timeline  from './timeline.vue';
+import  events  from './events.vue';
 import  statistic  from './statistic.vue';
 import visualisation from "./visualisation";
+import intresting from "./intresting";
 
 
 export default {
 
-  components: { newSearch, timeline, statistic, visualisation, mdiDownload  },
+  components: { newSearch, intresting, events, timeline, statistic, visualisation },
   data () {
     return {
-      tab: 1,
+      tab: 0,
       search: {
         parametrs: {}
       },
@@ -167,9 +177,13 @@ export default {
           Object.keys(this.shema).forEach( (item,i) => {
 
             statistic = this.createStatistic(item,event.data.data);
-
-            text = `${item}&nbsp;&nbsp;&nbsp;[${this.shema[item]}]`;
-            this.rows.push({'id': i,'text': text,'static': statistic});
+            let count = 0
+            event.data.data.forEach( element => {
+              if (element[item]) {
+                count++
+              }
+            })
+            this.rows.push({ 'id': i,'text': item,'static': statistic, 'totalCount': count });
 
 
           })
@@ -351,20 +365,20 @@ export default {
       this.search = Object.assign({},search);
       this.modal = false;
     },
-    openStatistic: function(statistic) {
-      if (this.showStatistic) {
-        if (this.statisticKey == statistic.text) {
-          this.showStatistic = false;
-        } else {
-          this.statisticKey = statistic.text;
-          this.statistic = statistic.static;
-        }
-      } else {
-        this.showStatistic = true;
-        this.statisticKey = statistic.text;
-        this.statistic = statistic.static;
-      }
-    },
+    // openStatistic: function(statistic) {
+    //   if (this.showStatistic) {
+    //     if (this.statisticKey == statistic.text) {
+    //       this.showStatistic = false;
+    //     } else {
+    //       this.statisticKey = statistic.text;
+    //       this.statistic = statistic.static;
+    //     }
+    //   } else {
+    //     this.showStatistic = true;
+    //     this.statisticKey = statistic.text;
+    //     this.statistic = statistic.static;
+    //   }
+    // },
     calcSize: function() {
       // console.log('calcSize')
       // console.log(this.$refs)
