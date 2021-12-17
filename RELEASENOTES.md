@@ -1,3 +1,64 @@
+# [1.78.0] - Default token "evaTknLogin" for username in searches and bugfixes.
+
+### New
+
+- Default token "evaTknLogin" that will be replaced by current username.
+
+### Bugfix
+
+- Fixed the management of custom colors of the pie component.
+- Fixed focusing on the reset button of the filter part.
+- Fixed the bug of dragging the graph component.
+
+# [1.77.0] - Barplot display styles of multiline, sticky header and bugfixes.
+
+### New
+
+- Added barplot display styles of multiline.
+- Updated sticky header and filter.
+
+### Bugfix
+
+- Fullscreen dash mode size.
+- Position of the top menu, it was non-clickable.
+- z-index on the boards.
+- Zoom-out button in multiline dash.
+- Reordered visualization settings.
+- Corrected mistakes in texts.
+
+# [1.76.0] - Filters for YGraph componet, selection property in events of select component and bugfixes.
+
+### New
+
+- Filters for YGraph with save settings in storage.
+- Selection property in events of select component.
+
+### Bugfix
+
+- Slider component fixed syncing with fullscreen.
+- Fixed multiline barplot id.
+
+# [1.75.0] - Redirect to a specific dashboard tab from heatmap, ticks of several Y-axes are combined on multiline and bugfixes.
+
+### New
+
+- Redirect to a specific dashboard tab from heatmap.
+- Combining ticks of several Y-axes.
+
+### Bugfix
+
+- Fixed default names for filters and tables.
+- Fixed the ability to drag the slider component.
+- Settings are always above visualisations.
+- Fixed data column selection in slider component.
+- Fixed scrolling in the components, data, markers menu.
+- Fixed broken line charts.
+- Fixed a problem with changing the settings of single value component.
+- Zoom reset btn for all multilines.
+- Zoom reset on fullscreen.
+- Reduced reset zoom time.
+- Fixed filter range for points and zoom multiline.
+
 # [1.74.0] - New slider vizualization, tokens in filters and bugfixes.
 
 ### New

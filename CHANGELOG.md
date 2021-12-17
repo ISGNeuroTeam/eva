@@ -8,6 +8,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+
+- multiline graphs are not rendered without resaving the settings
+- fixed the data download button in the data source
+- date is displayed with zeros on the multiline
+
+
+## [1.78.0]
+
+### Added
+
+- default token "evaTknLogin" that will be replaced by current username
+
+### Fixed
+
+- fixed the management of custom colors of the pie component
+- fixed focusing on the reset button of the filter part
+- fixed the bug of dragging the graph component
+
+## [1.77.0]
+
+### Added
+
+- added field for choose interval tooltips for points multiline, created settings for change color lines and choose style line
+
+- added barplot display styles of multiline
+- updated sticky header and filter
+
+### Fixed
+
+- fixed the fullscreen dash mode size
+- fixed the position of the top menu, it was non-clickable
+- fixed the z level on the boards
+- fixed the zoom-out button in multiline dash
+- fixed bug with settings order, correct mistakes in text
+
+## [1.76.0]
+
+### Added
+
+- added filters for YGraph with save settings in storage
+- added selection property in events of select component
+
+### Fixed
+
+- slider component fixed syncing with fullscreen
+- fixed multiline barplot id
+
+## [1.75.0]
+
+### Added
+
+- added redirect to dashboard with information about tabs from dash heatmap
+- сombining ticks of several Y-axes
+
+### Fixed
+
 - fixed default names for filters and tables
 - fixed the ability to drag the slider component
 - settings are always above visualisations
@@ -15,8 +71,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed scrolling in the components, data, markers menu
 - fixed broken line charts
 - fixed a problem with changing the settings of single value component
-- date is displayed with zeros on the multiline
-
+- zoom reset btn for all multilines
+- zoom reset on fullscreen
+- reduced reset zoom time
+- fixed filter range for points and zoom multiline
 
 ## [1.74.0]
 
@@ -41,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the display of the slider component after the update
 - fixed fullscreen mode for slider component
 - fixed a problem with selecting/deselecting all items in the multiselect component
+- fixed style icons for points in a map component
 
 ## [1.73.0]
 
@@ -52,7 +111,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - fixed the datepicker in the dataset popup
-- fixed filter range for points and zoom multiline
 - closing the settings popup by clicking outside the popup
 - the json primitives text area has theme
 - added check for length of array metrics in manual filter and fixed save filters and use in other components

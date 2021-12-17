@@ -130,6 +130,7 @@ export default {
   },
   watch: {
     dataRestFrom(val) {
+
       setTimeout(() => {
         this.generateNodesEdges(val)
         this.applyGraphBuilder()
@@ -172,6 +173,7 @@ export default {
     },
     changeInputMode(){ // меняем режим графика
       if(this.isEditor){
+        
         this.$graphComponent.inputMode = null
       } else {
         this.$graphComponent.inputMode = new yfile.GraphViewerInputMode()
@@ -216,18 +218,18 @@ export default {
     colorNodes(){
       const nodes = this.$graphComponent.graph.nodes
       nodes.forEach(node=>{
-         if(typeof node.tag === 'string' && (node.tag.toLowerCase() === 'start' || node.tag.toLowerCase() === 'finish')){
+         if(typeof node.tag.node_color === 'string' && (node.tag.node_color.toLowerCase() === 'start' || node.tag.node_color.toLowerCase() === 'finish')){
            this.$graphComponent.graph.setStyle(node,
             this.nodeStyle(this.startColor)
            )
          }
-         else if(node.tag === '-1'){
+         else if(node.tag.node_color === '-1'){
             this.$graphComponent.graph.setStyle(node,
               this.nodeStyle(this.errorColor)
             )
          } else {
             this.$graphComponent.graph.setStyle(node,
-              this.nodeStyle(this.colors[node.tag-1])
+              this.nodeStyle(this.colors[node.tag.node_color-1])
             )
          }
        })
@@ -287,9 +289,10 @@ export default {
         data: this.nodesSource,//.slice(0,10),
         id: 'id',
         tag: item => {
-          return item.name.toLowerCase()==='start'|| item.name.toLowerCase()==='finish' ?
-          item.name :
-          item.color
+          return item
+          // return item.name.toLowerCase()==='start'|| item.name.toLowerCase()==='finish' ?
+          // item.name :
+          // item.color
         }
       })
 
@@ -310,7 +313,7 @@ export default {
         data: this.edgesSource,//.slice(0,10),
         sourceId: 'fromNode',
         targetId: 'toNode',
-        tag: item => item.color
+        tag: item => item.color,
       })
 
       const edgeLabelCreator = this.$edgesSource.edgeCreator.createLabelBinding(edgeDataItem =>{
@@ -341,12 +344,72 @@ export default {
       console.log((Date.now() - startedAt)/1000 + 's. time spent for graph.applyLayout(...)' )
       this.$graphComponent.fitGraphBounds()
     },
+    createTockens: function (result) {
+      let captures = Object.keys(result[0]);
+      this.actions.forEach((item, i) => {
+        this.$set(this.actions[i], "capture", captures);
+      });
+      this.$store.commit("setActions", {
+        actions: JSON.parse(JSON.stringify(this.actions)),
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
+    },
     createGraph() {
 
       this.labelStyleList = {}; // варианты labelStyle
       this.edgeStyleList = {};
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph)
-      this.$graphComponent.inputMode = null
+      const mode = new yfile.GraphEditorInputMode({
+        allowGroupingOperations: false,
+        allowAddLabel: false,
+        allowCreateNode: false,
+        allowCreateEdge: false,
+      })
+        mode.addItemClickedListener((sender, args) => {
+          if (args.item instanceof yfile.INode) {
+            let tokens = this.$store.getters.getTockens(this.idDashFrom);
+            tokens.forEach((token) => {
+              if (
+                token.elem == this.idFrom &&
+                token.action == "click"
+              ) {
+                let value = args.item.tag[token.capture];
+                this.$store.commit("setTocken", {
+                  tocken: token,
+                  idDash: this.idDashFrom,
+                  store: this.$store,
+                  value,
+                });
+              }
+            });
+
+            let events = this.$store.getters.getEvents({
+              idDash: this.idDashFrom,
+              event: "onclick",
+              element: this.idFrom,
+            });
+
+            if (events.length != 0) {
+              events.forEach((item) => {
+                if (item.action == "set") {
+                  this.$store.commit("letEventSet", {
+                    events: events,
+                    idDash: this.idDashFrom,
+                  });
+                } else if (item.action == "go") {
+                  this.$store.commit("letEventGo", {
+                    event: item,
+                    idDash: this.idDashFrom,
+                    route: this.$router,
+                    store: this.$store,
+                  });
+                }
+              });
+            }
+          }
+        })
+      this.$graphComponent.inputMode = mode
 
       this.initializeDefaultStyles()
 
@@ -361,12 +424,12 @@ export default {
       let _allEdges = []
 
       dataRest.forEach(dataRestItem => {
-        _allNodes.push({
-          id:dataRestItem.id,
-          name:dataRestItem.node,
-          label:dataRestItem.node_description,
-          color:dataRestItem.node_color
-        })
+        // _allNodes.push({
+        //   id:dataRestItem.id,
+        //   name:dataRestItem.node,
+        //   label:dataRestItem.node_description,
+        //   color:dataRestItem.node_color
+        // })
 
         if(dataRestItem.relation_id){
           _allEdges.push({
@@ -376,12 +439,15 @@ export default {
             color:dataRestItem.edge_color
           })
         }
+
+        _allNodes.push(dataRestItem)
       });
 
-      let _nodesSource = {}
-      _allNodes.map((item)=> _nodesSource[item.id] = item)
+      let _nodesSource = Object.values(_allNodes.reduce((obj, item) => ({ ...obj, [item.id]: item }), {}))
 
-      this.nodesSource = Object.values(_nodesSource)
+      this.createTockens(_nodesSource);
+
+      this.nodesSource = _nodesSource
       this.edgesSource = _allEdges
     },
   }

@@ -13,6 +13,8 @@
           <v-menu
             v-if="filterPartValues.length > 0"
             offset-y
+            z-index="99"
+            attach
             max-height="300"
             :close-on-content-click="false"
           >
@@ -63,6 +65,7 @@
         @click.stop.prevent="
           $store.commit('refreshFilterPart', { idDash, filterIndex, filterPartIndex })
         "
+        v-blur="140"
         v-text="refreshIcon"
       />
       <v-icon

@@ -13,6 +13,22 @@ export default {
       settings: themes['dark'],
     },
   },
+  actions: {
+    async actionGetElementSelected({ commit, state, getters }, element){
+      const selected = getters.getElementSelected({
+        idDash: element.idDash,
+        id: element.id
+      });
+      if (!selected) {
+        commit('createElementSelected', {...element});
+      }
+      commit('setElementSelected', {...element});
+      return await getters.getElementSelected({
+        idDash: element.idDash,
+        id: element.id
+      });
+    }
+  },
   mutations: {
     setNameDash: (state, newName) => {
       // изменения имени самого элемента
@@ -302,6 +318,16 @@ export default {
           elemDeep: '',
         };
       }
+      state[select.idDash][select.id].selected[select.element] = select.value;
+    },
+    createElementSelected: (state, select) => {
+      state[select.idDash][select.id].selected = {
+        elem: '',
+        elemlink: '',
+        elemDeep: '',
+      };
+    },
+    setElementSelected: (state, select) => {
       state[select.idDash][select.id].selected[select.element] = select.value;
     },
     setDash: (state, dash) => {
@@ -735,11 +761,12 @@ export default {
       //event.route.push(`/dashboards/${id}`);
       // event.route.go();
       const options = state[event.idDash][event.id].options;
-     
+      const currentTab = event.event.tab || state[id]?.currentTab
+
       if (!options?.openNewScreen) {
-        event.route.push(`/dashboards/${id}`);
+        event.route.push(`/dashboards/${id}/${currentTab || ''}`);
       } else {
-        window.open(`/dashboards/${id}`);
+        window.open(`/dashboards/${id}/${currentTab || ''}`);
       }
       let searches = state[id].searches;
 
@@ -1231,6 +1258,12 @@ export default {
         return state[elem.idDash][elem.id].selected;
       };
     },
+    getElementSelected: state => elem => {
+      return state[elem.idDash][elem.id]?.selected;
+    },
+    getElement: state => (idDash, id) => {
+      return state[idDash][id];
+    },
     getDataApi(state) {
       // метод получающий данные из rest
       return searchFrom => {
@@ -1252,7 +1285,11 @@ export default {
             }
           });
         }
-
+        if (otl.indexOf(`$evaTknLogin$`) != -1) {
+          if (Vue.$jwt.hasToken()) {
+            otl = otl.replaceAll("$evaTknLogin$", Vue.$jwt.decode().username);
+          }
+        }
         if (state[idDash].tockens) {
           Object.keys(state[idDash].tockens).forEach(item => {
             // если есть токены в запросе то меняем временные метки в зависимости от значения токена
