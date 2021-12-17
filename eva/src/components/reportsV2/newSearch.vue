@@ -140,7 +140,14 @@
               </div>
             </v-menu>
           </div>
-          <v-btn dark depressed small :color="theme.$ok_color" @click="launchSearch">
+          <v-btn 
+              dark
+              depressed 
+              small 
+              :color="theme.$ok_color"
+              :loading="loading"
+              @click="launchSearch"
+          >
             <span class="refresh-btn-text">Поиск</span>
             <v-icon>{{ mdiMagnify }}</v-icon>
           </v-btn>
@@ -157,6 +164,7 @@ import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiCalendarMonthOutline, mdiChe
 export default {
   props: {
     data: [],
+    loading: false,
   },
   data () {
     return {

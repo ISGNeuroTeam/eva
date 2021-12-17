@@ -4,17 +4,32 @@
         :style="{background: theme.$main_bg, color: theme.$main_text}"
     >
       <div class="select-wrap p-5">
-        <v-select
-            v-model="select"
-            :items="periodItemsSelect"
+        <v-menu
+            v-model="menuDropdown"
+            offset-y
+            max-width="180"
             class="select"
-            item-text="text"
-            item-value="value"
-            label="Select"
-            persistent-hint
-            return-object
-            single-line
-        ></v-select>
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <div
+                v-bind="attrs"
+                v-on="on"
+            >
+              {{ select.text }}
+              <v-icon>{{ mdiChevronDown }}</v-icon>
+            </div>
+          </template>
+          <v-list>
+            <v-list-item
+                v-for="item in periodItemsSelect"
+                :key="item"
+                link
+                @click="setTimePeriod(item)"
+            >
+              <v-list-item-title v-text="item.text"></v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </div>
       <svg ref="chart" class="chart1" height="50" style="width: 100%"></svg>
       {{dataset}}
@@ -24,7 +39,7 @@
 
 <script>
 import * as d3 from "d3";
-import { mdiRefresh, mdiMagnify } from '@mdi/js'
+import { mdiRefresh, mdiMagnify, mdiChevronDown } from '@mdi/js'
 
 export default {
   props: {
@@ -35,6 +50,7 @@ export default {
       search: {
         parametrs: {}
       },
+      menuDropdown: false,
       select: { text: 'Колонка (1 мин.)', value: 'min' },
       periodItemsSelect: [
         { text: 'Колонка (1 мин.)', value: 'min' },
@@ -44,6 +60,7 @@ export default {
       ],
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
+      mdiChevronDown: mdiChevronDown,
     }
   },
   computed: {
@@ -136,6 +153,9 @@ export default {
     },
   },
   methods: {
+    setTimePeriod(item) {
+      this.select = item
+    },
     getTimePart(date) {
       let period
       if (this.select.value === 'min') {
@@ -181,8 +201,7 @@ export default {
           maxY = element.value
         }
       });
-
-      // x , y 方向绘制坐标轴
+      
       let xScale = d3.scaleBand()
           .domain(d3.range(dataset.length))
           .rangeRound([0, width - marge.left - marge.right])
@@ -206,14 +225,10 @@ export default {
             .attr('y2', (height - marge.top - marge.bottom)/5*i)
             .attr('stroke', this.theme.$secondary_border)
       }
-
-
-      // 给矩形和对应文字创建分组
       let gs = g.selectAll('.rect')
           .data(dataset)
           .enter()
           .append('g')
-      // 绘制矩形
       let rectPadding = 10
 
       let tooltip = d3.select("body")
@@ -270,6 +285,8 @@ export default {
 .select-wrap 
   display: flex
   flex-direction: row-reverse
+  padding-top: 10px
+  padding-bottom: 10px
   .select
     max-width: 180px
     .v-select__selection

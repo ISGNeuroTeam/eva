@@ -10,8 +10,8 @@
             ref="report"
             class="report-block"
         >
-          <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data"></newSearch>
-          <timeline v-if="data" class="timeline component-block" :data="data"></timeline>
+          <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data" :loading="loading"></newSearch>
+          <timeline class="timeline component-block" :data="data"></timeline>
           <div class="tab-block component-block d-flex justify-content-between">
             <v-tabs
                 v-model="tab" class="tabs"
@@ -33,7 +33,7 @@
               </v-btn>
             </div>
           </div>
-          <v-row>
+          <v-row v-if="data.length > 0">
             <v-col cols="2" class="pr-0">
               <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
             </v-col>
@@ -42,7 +42,7 @@
             </v-col>
           </v-row>
           <statistic v-if="tab===1" class="statistic component-block" :data="data" :size="size"></statistic>
-          <visualisation v-if="tab===2" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
+          <visualisation v-if="tab===2 && data.length > 0" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
         </div>
       </div>
     </v-content>
@@ -114,8 +114,9 @@ export default {
   },
   asyncComputed: {
     async static_rows() {
+      console.log(this.shouldGet)
       if (this.shouldGet) {
-
+        console.log('this.shouldGet === true')
         this.getData();
       }
       this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: false});
@@ -169,7 +170,7 @@ export default {
         let statistic = '';
         this.rows = [];
         if (event.data.data.length != 0) {
-
+          console.log('event.data.data.length != 0')
           this.shema = event.data.shema;
           this.data = event.data.data;
 
@@ -410,7 +411,7 @@ export default {
       link.remove() // удаляем ссылку
     },
   },
-  created() {
+  beforeCreate() {
     this.$store.commit('createReportSearch');
   },
   mounted() {

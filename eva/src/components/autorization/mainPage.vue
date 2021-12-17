@@ -39,6 +39,22 @@
               />
             </v-card-text>
           </v-card>
+          <v-card
+              class="product-block-itself"
+              :style="{backgroundColor:theme.$main_bg}"
+              @click="openDataResearch"
+          >
+            <v-card-text
+                class="product-text"
+                :style="{color:theme.$title}"
+            >
+              Исследование <br> данных 2.0
+              <p
+                  class="delimetr"
+                  :style="{backgroundColor:theme.$title}"
+              />
+            </v-card-text>
+          </v-card>
           <v-card  
             class="product-block-itself" 
             :style="{backgroundColor:theme.$main_bg}"
@@ -100,6 +116,9 @@ export default {
     openReport: function() {
       this.$store.commit('createReportSearch'); 
       this.$router.push(`/reports`); 
+    },
+    openDataResearch: function() {
+      this.$router.push(`/data-research`);
     },
     openPaper: function() {
       this.$store.commit('createPaperSearch'); 

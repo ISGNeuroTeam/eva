@@ -37,7 +37,7 @@
                 </div>
                 <div>
                   <v-data-table
-                      :style="{backgroundColor:theme.$main_bg, color: theme.$main_text}"
+                      :style="{backgroundColor:theme.$main_bg, color: theme.$main_text, 'max-height': '500px'}"
                       disable-pagination
                       hide-default-footer
                       :headers="[{ text: 'value', value: 'value' },{ text: 'count', value: 'count' },{ text: '%', value: '%' }]"

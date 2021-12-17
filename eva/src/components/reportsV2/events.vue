@@ -4,14 +4,15 @@
         :style="{background: theme.$main_bg, color: theme.$main_text}"
     >
         <v-data-table
+            dense
             :headers="headers"
             :items="dataset"
-            class="elevation-1"
             item-key="time"
             hide-default-footer
+            fixed-header
             :expanded.sync="expanded"
-            :single-expand="singleExpand"
-            :style="{background: theme.$main_bg, color: theme.$main_text}"
+            :single-expand="false"
+            :style="{background: theme.$main_bg, color: theme.$main_text, borderColor: theme.$secondary_border}"
         >
           <template v-slot:item="{ item, expand, isExpanded }">
             <tr>
@@ -61,7 +62,6 @@ export default {
       mdiChevronRight: mdiChevronRight,
       mdiChevronDown: mdiChevronDown,
       expanded: [],
-      singleExpand: true,
       headers: [
         { text: 'Инфо',  align: 'left', sortable: false, value: 'info', width: '80px' },
         { text: 'Время', sortable: false, value: 'time', width: '120px' },
@@ -98,8 +98,16 @@ export default {
 
 </script>
 
-<style lang="sass" >
+<style lang="sass">
 @import './../../sass/_colors'
-.collapse-row 
-  border-bottom: 1px solid $main-border
+.events
+  .collapse-row 
+    border-bottom: 1px solid $main-border
+  .v-data-footer
+    border-top: none !important
+  .v-data-table-header
+    th
+      background-color: $secondary_border !important
+  td
+    font-size: 13px !important
 </style>

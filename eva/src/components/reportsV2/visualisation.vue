@@ -4,26 +4,44 @@
         class="visualisation"
         :style="{background: theme.$main_bg, color: theme.$main_text}"
     >
+      <v-menu
+          v-model="menuDropdown"
+          offset-y
+          max-width="160"
+          class="select"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <div
+              v-bind="attrs"
+              v-on="on"
+          >
+            {{ aboutElem[activeElem].tooltip }}
+            <v-icon>{{ mdiChevronDown }}</v-icon>
+          </div>
+        </template>
+        <div style="min-height: 40px">
+          <v-tooltip
+              v-for="i in elements"
+              :key="aboutElem[i].key"
+              bottom
+              :color="theme.$accent_ui_color"
+              @click="changeTab(i)"
+          >
+            <template v-slot:activator="{ on }" class="p-5">
+              <v-icon
+                  class="title-icon"
+                  :color="aboutElem[i].color"
+                  v-on="on"
+                  @click="changeTab(i)"
+              >
+                {{ aboutElem[i].icon }}
+              </v-icon>
+            </template>
+            <span>{{ aboutElem[i].tooltip }}</span>
+          </v-tooltip>
+        </div>
+      </v-menu>
       <v-card-title class="title-vis">
-        <v-tooltip
-            v-for="i in elements"
-            :key="aboutElem[i].key"
-            bottom
-            :color="theme.$accent_ui_color"
-            @click="changeTab(i)"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon
-                class="title-icon"
-                :color="aboutElem[i].color"
-                v-on="on"
-                @click="changeTab(i)"
-            >
-              {{ aboutElem[i].icon }}
-            </v-icon>
-          </template>
-          <span>{{ aboutElem[i].tooltip }}</span>
-        </v-tooltip>
         <div
             class="divider-tab"
             :style="{background: theme.$primary_button}"
@@ -54,7 +72,7 @@
 
 
 <script>
-import { mdiRefresh, mdiMagnify } from '@mdi/js'
+import { mdiRefresh, mdiMagnify, mdiChevronDown } from '@mdi/js'
 import settings from "../../js/componentsSettings";
 
 export default {
@@ -70,6 +88,7 @@ export default {
       tooltipSvg:  { "texts": [], "links": [], "buttons": [] },
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
+      mdiChevronDown: mdiChevronDown,
       size: {},
     }
   },
