@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - multiline graphs are not rendered without resaving the settings
 - fixed the data download button in the data source
+- date is displayed with zeros on the multiline
 
 
 ## [1.78.0]
