@@ -14,15 +14,15 @@ export default {
     },
   },
   actions: {
-    async actionGetElementSelected({ commit, state, getters }, element){
+    async actionGetElementSelected({ commit, state, getters }, element) {
       const selected = getters.getElementSelected({
         idDash: element.idDash,
         id: element.id
       });
       if (!selected) {
-        commit('createElementSelected', {...element});
+        commit('createElementSelected', { ...element });
       }
-      commit('setElementSelected', {...element});
+      commit('setElementSelected', { ...element });
       return await getters.getElementSelected({
         idDash: element.idDash,
         id: element.id
@@ -119,6 +119,7 @@ export default {
         }
       }
     },
+    // TODO fix table
     setSwitch: (state, status) => {
       // отдельно можно переключать отображения вариантов элемента между выбором ИС и результатами
       state[status.idDash][status.id].switch = status.status;
@@ -131,6 +132,7 @@ export default {
       // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
     },
+    //TODO refactor
     setTocken(state, payload) {
       const { tocken, idDash, value } = payload;
       // сохранение токена в хранилище
@@ -175,7 +177,7 @@ export default {
             // пробегаемся по всем событиям
 
             switch (
-              state[idDash].events[item].compare // проверяем какое именно событие должно произойти
+            state[idDash].events[item].compare // проверяем какое именно событие должно произойти
             ) {
               case 'equals':
                 let value = state[idDash].tockens[id].value.replace(/\s/g, ''); // в случаях когда нужно сравнить значения токена по равенству,
@@ -297,13 +299,6 @@ export default {
       Vue.set(state.papers.searches, search.sid, search);
       Vue.set(state.papers, 'cursearch', search.sid);
     },
-    setSearchStatus: (state, status) => {
-      // отдельно можно проверить если ИС прикреплен то переключить и обновить
-      if (state[status.idDash][status.id].search != -1) {
-        state[status.idDash][status.id].switch = true;
-        state[status.idDash][status.id].should = true;
-      }
-    },
     setPickerDate: (state, date) => {
       // отдельно можно проверить если ИС прикреплен то переключить и обновить
       state[date.idDash][date.id].date = date.date;
@@ -364,7 +359,8 @@ export default {
     setErrorLogs: (state, error) => {
       Vue.set(state, 'logError', error);
     },
-    createDashBoard: (state, dashboard) => {
+    //TODO rename method
+    createDashboardVisualization: (state, dashboard) => {
       // создаем новый элемент
       let dash = dashboard.dashboard;
       let id = Object.keys(dash)[0];
@@ -403,7 +399,7 @@ export default {
       state[dashboard.idDash][id].tab = state[dashboard.idDash].currentTab;
       state[dashboard.idDash].elements.push(id);
     },
-    deleteDashBoard: (state, dashboard) => {
+    deleteDashboardVisualization: (state, dashboard) => {
       // удаляем элемент с помощью модального окна
 
       let id = -1;
@@ -435,36 +431,6 @@ export default {
         });
         state[dashboard.idDash].searches.splice(id, 1);
       }
-    },
-    createlayout: (state, layout) => {
-      // создание дашборда
-
-      state[layout.name] = layout.layout[layout.name]; // добовляем/обновляем дашборд в хранилище
-      let flag = false;
-      state.layouts.forEach(item => {
-        // перед тем как добавить его в массив дашбордов, нужно проверить не находиться ли он уже там
-        item == layout.name ? (flag = true) : false;
-      });
-      if (!flag) {
-        // если его еще нет (т.е. новый дашборд а не обновление существующего)
-        state.layouts.push(layout.name); // то добвляем его в массив элементов
-      }
-    },
-    editlayout: (state, layout) => {
-      // поменять имя дашборда
-
-      state[layout.name] = state[layout.old_name]; // делаем копию дашборда
-      state[layout.name].name = layout.name[0].toUpperCase() + layout.name.substring(1); // но меняем в нем имя с большой буквы для красоты
-      delete state[layout.old_name]; // удаляем старый дашборд с которого скопировали
-      let layouts = state.layouts.map(item => {
-        // пробегаем массив дашбордов и в нем заменяем имя старого дашборда на новый
-        if (item == layout.old_name) {
-          return layout.name;
-        } else {
-          return item;
-        }
-      });
-      state.layouts = layouts;
     },
     setModalDelete: (state, modalsetting) => {
       // добовляем данные об удаляемом объекте в   модальное окно
@@ -520,13 +486,14 @@ export default {
       };
     },
     setSchedulerID: (state, payload) => {
-      const { idDash, search, schedulerID} = payload;
+      const { idDash, search, schedulerID } = payload;
       Vue.set(state[idDash].schedulers[search], 'schedulerID', schedulerID)
     },
     deleteSchedule: (state, schedule) => {
       // удаляет объект с планировщиком
       delete state[schedule.idDash].schedulers[schedule.sid];
     },
+    //TODO createTockens vs setTocken
     createTockens: (state, tocken) => {
       // создаем токен
 
@@ -635,6 +602,7 @@ export default {
         Vue.set(state[events.idDash][item.target].options, item.prop, item.value);
       });
     },
+    //TODO refactor checkalreadydash
     letEventGo: async (state, event) => {
       //load dash
       let loader = (id, first) => {
@@ -1296,7 +1264,7 @@ export default {
             //let reg = `\\$${state[idDash].tockens[item].name}`;
             reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
             if (otl.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
-              if(state[idDash].tockens[item].value) {
+              if (state[idDash].tockens[item].value) {
                 otl = otl.replace(reg, state[idDash].tockens[item].value);
               } else {
                 otl = otl.replace(reg, state[idDash].tockens[item].defaultValue);
@@ -1341,9 +1309,9 @@ export default {
         }
         if (search.limit > 0 && !otl.includes('head')) {
           // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
-          otl +='|head ' + search.limit
+          otl += '|head ' + search.limit
         }
-        
+
         otl = otl.replace(/\r|\n/g, '');
 
         let formData = new FormData(); // формируем объект для передачи RESTу
@@ -1377,7 +1345,7 @@ export default {
 
           let request = indexedDB.open('EVA', 1);
 
-          request.onerror = function(event) {
+          request.onerror = function (event) {
             console.log('error:', event);
           };
 
@@ -1413,13 +1381,13 @@ export default {
 
             let query = searches.put(search, key); // (3)
 
-            query.onsuccess = function() {
+            query.onsuccess = function () {
               // (4)
               resolve('result');
               restAuth.putLog(`Добавлен запрос ${query.result}`);
             };
 
-            query.onerror = function() {
+            query.onerror = function () {
               console.log('Ошибка', query.error);
             };
           }
@@ -1453,7 +1421,7 @@ export default {
 
         let request = indexedDB.open('EVA', 1);
 
-        request.onerror = function(event) {
+        request.onerror = function (event) {
           console.log('error: ');
         };
 
@@ -1750,7 +1718,7 @@ export default {
 
           let request = indexedDB.open('EVA', 1);
 
-          request.onerror = function(event) {
+          request.onerror = function (event) {
             console.log('error:', event);
           };
 
@@ -1795,7 +1763,7 @@ export default {
               }
             };
 
-            query.onerror = function() {
+            query.onerror = function () {
               console.log('Ошибка', query.error);
             };
           }
