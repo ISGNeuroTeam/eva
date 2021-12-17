@@ -62,6 +62,15 @@ const routes =  [
     },
   },
   {
+    name: 'Дашборд',
+    path: '/dashboards/:id/:tabId',  // если страница дашборда
+    component: require('../components/mainTitle.vue').default,
+    props: true,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     name: 'Формы',
     path: '/forms/',  // если страница форм
     component: require('../components/forms/formMain.vue').default,
