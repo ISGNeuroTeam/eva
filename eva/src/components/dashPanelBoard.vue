@@ -1497,7 +1497,7 @@ export default {
         this.$set(this.newDashBoard[type], 'search', -1);
         this.$set(this.newDashBoard[type], 'switch', false);
         this.$set(this.newDashBoard[type], 'actions', []);
-        this.$store.commit('createDashBoard', {
+        this.$store.commit('createDashboardVisualization', {
           idDash: this.idDash,
           dashboard: this.newDashBoard,
         }); // создаем новый элемнет
