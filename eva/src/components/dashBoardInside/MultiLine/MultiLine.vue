@@ -1026,8 +1026,6 @@ export default {
                 const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric]
                 tooltip.html(
                   Object.keys(d).reduce((prev, cur) => {
-                    console.log(cur)
-                    console.log(d)
                     let value = ''
                     if (cur === xMetric) value = xVal
                     else if (cur.indexOf('annotation') === -1) value = d[cur]
