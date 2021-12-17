@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- added a tooltip with information when hovering over an edge in a ygraph component
+
 ### Fixed
 
 - multiline graphs are not rendered without resaving the settings

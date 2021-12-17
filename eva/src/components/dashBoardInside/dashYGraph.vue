@@ -80,6 +80,23 @@
 import * as yfile from 'yfiles'
 import licenseData from './license.json'
 import { mdiArrowAll, mdiMagnifyPlus, mdiFitToPageOutline, mdiMagnifyMinus } from '@mdi/js'
+import {
+  GraphItemTypes,
+  INode,
+  IEdge,
+  NodeStyleDecorationInstaller,
+  ShapeNodeStyle,
+  ShapeNodeShape,
+  Point,
+  Stroke,
+  Color,
+  ArrowType,
+  Arrow,
+  PolylineEdgeStyle,
+  EdgeStyleDecorationInstaller,
+  StyleDecorationZoomPolicy,
+  BezierEdgeStyle, TimeSpan, IPort, ILabel
+} from "yfiles";
 yfile.License.value = licenseData//проверка лицензии
 
 const labelFont = new yfile.Font({fontSize: 70, fontFamily: 'sefif'})
@@ -279,6 +296,99 @@ export default {
 
       this.$graphComponent.graph.edgeDefaults.style = this.edgeStyle('#0AB3FF')
       this.$graphComponent.graph.edgeDefaults.labels.style.minimumSize = new yfile.Size(70*3, 0)
+
+      const orangeRed = Color.ORANGE_RED
+      const orangeStroke = new Stroke(orangeRed.r, orangeRed.g, orangeRed.b, 255, 3)
+      // freeze it for slightly improved performance
+      orangeStroke.freeze()
+
+      // now decorate the nodes and edges with custom hover highlight styles
+      const decorator = this.$graphComponent.graph.decorator
+
+      // a similar style for the edges, however cropped by the highlight's insets
+      const dummyCroppingArrow = new Arrow({
+        type: ArrowType.NONE,
+        cropLength: 5
+      })
+
+      const edgeStyle = new PolylineEdgeStyle({
+        stroke: orangeStroke, // `6px red`
+        targetArrow: dummyCroppingArrow,
+        sourceArrow: dummyCroppingArrow
+      })
+      const edgeStyleHighlight = new EdgeStyleDecorationInstaller({
+        edgeStyle,
+        zoomPolicy: StyleDecorationZoomPolicy.VIEW_COORDINATES
+      })
+
+      const bezierEdgeStyle = new BezierEdgeStyle({
+        stroke: orangeStroke,
+        targetArrow: dummyCroppingArrow,
+        sourceArrow: dummyCroppingArrow
+      })
+      const bezierEdgeStyleHighlight = new EdgeStyleDecorationInstaller({
+        edgeStyle: bezierEdgeStyle,
+        zoomPolicy: StyleDecorationZoomPolicy.VIEW_COORDINATES
+      })
+
+      decorator.edgeDecorator.highlightDecorator.setFactory(edge =>
+          edge.style instanceof BezierEdgeStyle ? bezierEdgeStyleHighlight : edgeStyleHighlight
+      )
+    },
+    initializeTooltips() {
+      const inputMode = this.$graphComponent.inputMode
+      // Customize the tooltip's behavior to our liking.
+      const mouseHoverInputMode = inputMode.mouseHoverInputMode
+      mouseHoverInputMode.toolTipLocationOffset = new Point(15, 15)
+      mouseHoverInputMode.delay = TimeSpan.fromMilliseconds(500)
+      mouseHoverInputMode.duration = TimeSpan.fromSeconds(5)
+
+      // Register a listener for when a tooltip should be shown.
+      inputMode.addQueryItemToolTipListener((src, eventArgs) => {
+        if (eventArgs.handled) {
+          // Tooltip content has already been assigned -> nothing to do.
+          return
+        }
+
+        // Use a rich HTML element as tooltip content. Alternatively, a plain string would do as well.
+        eventArgs.toolTip = this.createTooltipContent(eventArgs.item)
+
+        // Indicate that the tooltip content has been set.
+        eventArgs.handled = true
+      })
+    },
+    createTooltipContent(item) {
+      if (!IEdge.isInstance(item)) { // not IPort, ILabel, INode
+        return null;
+      }
+      // build the tooltip container
+      const tooltip = document.createElement('div')
+
+      let labelFrom = ''
+      let labelTo = ''
+      if (item.sourceNode.labels.size > 0) {
+        labelFrom = item.sourceNode.labels.last().text
+      }
+      if (item.targetNode.labels.size > 0) {
+        labelTo = item.targetNode.labels.last().text
+      }
+
+      if (!!labelFrom || !!labelTo) {
+        const title = document.createElement('h4')
+        title.innerHTML = `${labelFrom} -> ${labelTo}`
+        tooltip.appendChild(title)
+      }
+
+      // extract the first label from the item
+      let label = ''
+      if (item.labels.size > 0) {
+        label = item.labels.first().text
+      }
+      const text = document.createElement('p')
+      text.innerHTML = label
+      tooltip.appendChild(text)
+
+      return tooltip
     },
     applyGraphBuilder() {
       this.$graphComponent.graph.clear()
@@ -301,7 +411,7 @@ export default {
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST
 
       //label label для nodes
-      const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem =>{
+      const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(nodeDataItem => {
          if( nodeDataItem.label !== "-"){
            return nodeDataItem.label
          }
@@ -409,9 +519,36 @@ export default {
             }
           }
         })
+
+      mode.itemHoverInputMode.enabled = true
+      mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE | GraphItemTypes.NODE
+      mode.itemHoverInputMode.discardInvalidItems = false
+      mode.itemHoverInputMode.addHoveredItemChangedListener((sender, e) => {
+        const manager = this.$graphComponent.highlightIndicatorManager
+        // first remove previous highlights
+        manager.clearHighlights()
+
+        if (e.item) {
+          const newItem = e.item
+
+          manager.addHighlight(newItem)
+          if (newItem instanceof INode) {
+            // and if it's a node, we highlight all adjacent edges, too
+            for (const edge of this.$graphComponent.graph.edgesAt(newItem)) {
+              manager.addHighlight(edge)
+            }
+          } else if (newItem instanceof IEdge) {
+            // if it's an edge - we highlight the adjacent nodes
+            manager.addHighlight(newItem.sourceNode)
+            manager.addHighlight(newItem.targetNode)
+          }
+        }
+      })
+
       this.$graphComponent.inputMode = mode
 
       this.initializeDefaultStyles()
+      this.initializeTooltips()
 
       //убираем надпись о license
       // document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
