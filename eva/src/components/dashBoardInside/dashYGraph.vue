@@ -134,7 +134,6 @@ import {
   ModifierKeys,
   SimpleLabel, Size, Rect
 } from "yfiles";
-import formEdit from "../forms/formEdit";
 yfile.License.value = licenseData//проверка лицензии
 
 const labelFont = new yfile.Font({fontSize: 70, fontFamily: 'sefif'})
@@ -702,8 +701,8 @@ export default {
           // if div has a 'data-id' attribute, get content from the business data
           let id = div.getAttribute('data-id')
           let data = target[id];
-          let label = data.node || data.label;
           if (data) {
+            let label = data.node || data.label;
             div.textContent = `Node: ${label}`
           }
         }
@@ -747,95 +746,6 @@ export default {
       this.nodesSource = _nodesSource
       this.edgesSource = _allEdges
     }
-  }
-}
-
-// @todo: temporary
-class Subtree {
-  /**
-   * Initializes a subtree with the given root node.
-   * @param {!IGraph} graph The graph in which the subtree lives
-   * @param {!INode} root The root of the subtree
-   */
-  constructor(graph, root) {
-    this.graph = graph
-    this.root = root
-    this.nodes = new Set()
-    this.edges = new Set()
-    this.initializeSubtree(root)
-    this.$newParent = this.parent
-  }
-
-  /**
-   * Returns the edge connecting the parent and the root.
-   * @type {?IEdge}
-   */
-  get parentToRootEdge() {
-    return this.graph.inEdgesAt(this.root).firstOrDefault()
-  }
-
-  /**
-   * Returns the parent node of the subtree.
-   * @type {?INode}
-   */
-  get parent() {
-    return this.parentToRootEdge ? this.parentToRootEdge.sourceNode : null
-  }
-
-  /**
-   * Sets the parent node of the subtree.
-   * @param parent The parent node of the subtree
-   * @type {?INode}
-   */
-  set parent(parent) {
-    if (parent && this.parentToRootEdge) {
-      this.graph.setEdgePorts(
-          this.parentToRootEdge,
-          parent.ports.first(),
-          this.parentToRootEdge.targetPort
-      )
-      this.graph.clearBends(this.parentToRootEdge)
-    }
-  }
-
-  /**
-   * Returns the new parent of the subtree.
-   * @type {?INode}
-   */
-  get newParent() {
-    return this.$newParent
-  }
-
-  /**
-   * Sets the new parent of the subtree.
-   * @type {?INode}
-   */
-  set newParent(newParent) {
-    this.$newParent = newParent
-  }
-
-  /**
-   * Returns the bounds including the nodes of the subtree.
-   * @type {!Rect}
-   */
-  get bounds() {
-    let subtreeBounds = Rect.EMPTY
-    this.nodes.forEach(node => {
-      subtreeBounds = Rect.add(subtreeBounds, node.layout.toRect())
-    })
-    return subtreeBounds
-  }
-
-  /**
-   * Determines the nodes and edges of a subtree of a given root.
-   * @param {!INode} root The root node of the subtree
-   */
-  initializeSubtree(root) {
-    this.graph.outEdgesAt(root).forEach(outEdge => {
-      this.edges.add(outEdge)
-      this.initializeSubtree(outEdge.targetNode)
-    })
-    this.nodes.add(root)
   }
 }
 
