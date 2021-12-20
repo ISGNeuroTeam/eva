@@ -1883,6 +1883,12 @@ export default {
   watch: {
     selectedTitles(newValue) {
       this.tableTitles = newValue;
+    },
+    active(status){
+      if (!status) {
+        // set default empty value
+        this.multilineYAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} }
+      }
     }
   },
   mounted() {
