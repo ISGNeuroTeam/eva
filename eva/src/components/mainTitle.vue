@@ -180,7 +180,7 @@ export default {
   data() {
     return {
       page: 'dash',
-      mode: true,
+      mode: (process.env.VUE_APP_DASHBOARD_EDITING_MODE == true) ?? true,
       showSetting: false,
       rotate: '',
       openProfile: false,

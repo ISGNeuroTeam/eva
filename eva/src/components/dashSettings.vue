@@ -123,7 +123,7 @@ export default {
     return {
       gearShow: false,
       settings: {},
-      mode: true,
+      mode: (process.env.VUE_APP_DASHBOARD_EDITING_MODE == true) ?? true,
       sizeGrid: {
         vert: '32',
         hor: '18'

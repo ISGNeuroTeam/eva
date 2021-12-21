@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - added a tooltip with information when hovering over an edge in a ygraph component
+- add env files
 
 ### Fixed
 
@@ -16,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the data download button in the data source
 - date is displayed with zeros on the multiline
 - fixed merging of multiple multiline settings
-
 
 ## [1.78.0]
 
