@@ -774,7 +774,7 @@ export default {
       )
 
       const dataRestLength = this.dataRestFrom.length
-      const minMetricsValues = this.metricNames.map((item) => d3.min(this.dataRestFrom, (d) => d[item]))
+      const minMetricsValues = this.metricNames.map((item) => 0)
       const maxMetricsValues = this.metricNames.map((item) => d3.max(this.dataRestFrom, (d) => d[item]))
 
       const dataRest = [...this.dataRestFrom]
@@ -789,12 +789,16 @@ export default {
         let numberLeft = 0
         let numberRight = 0
 
+        let maxAllY = Math.max(...maxMetricsValues)
+        let barplotMetrics = Object.keys(yAxesBinding.metricTypes)
+          .filter(name => yAxesBinding.metricTypes[name] === 'barplot')
+
         if (this.isAccumulationBarplot) {
           this.renderAccumulationBarplot(x, barplotBarWidth);
         } else
         this.metricNames.forEach((metricName, metricIndex) => {
-          const minVal = minMetricsValues[metricIndex]
-          const maxVal = maxMetricsValues[metricIndex]
+          const minVal = 0
+          const maxVal = maxAllY
 
           const extra = (val) => Math.abs(val * 10 / 100)
 
@@ -903,8 +907,8 @@ export default {
 
             let dividedBarplotPos = 0;
             if (this.isDividedBarplot && this.metricNames.length) {
-              barWidth /= this.metricNames.length
-              dividedBarplotPos = this.metricNames.indexOf(metricName) * barWidth - ((this.metricNames.length-1)/2*barWidth)
+              barWidth /= barplotMetrics.length
+              dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth - ((barplotMetrics.length-1)/2*barWidth)
             }
 
             this.line
