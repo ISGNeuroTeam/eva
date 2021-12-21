@@ -17,7 +17,7 @@ export default {
     async actionGetElementSelected({ commit, state, getters }, element) {
       const selected = getters.getElementSelected({
         idDash: element.idDash,
-        id: element.id
+        id: element.id,
       });
       if (!selected) {
         commit('createElementSelected', { ...element });
@@ -25,9 +25,9 @@ export default {
       commit('setElementSelected', { ...element });
       return await getters.getElementSelected({
         idDash: element.idDash,
-        id: element.id
+        id: element.id,
       });
-    }
+    },
   },
   mutations: {
     setNameDash: (state, newName) => {
@@ -46,7 +46,7 @@ export default {
     },
     setSearch: (state, payload) => {
       const { idDash, reload, search } = payload;
-      const checkId = search.currentSid || search.sid
+      const checkId = search.currentSid || search.sid;
       search.status = 'empty';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
@@ -62,7 +62,7 @@ export default {
       // удаление источника данных
       if (search) {
         // если нужный ИС передан
-        let newSearches = state[search.idDash].searches.filter(item => {
+        let newSearches = state[search.idDash].searches.filter((item) => {
           // то ищем его среди всех ИС фильтруя массив и отбрасывая его из массива
           return item.sid != search.sid;
         });
@@ -104,7 +104,7 @@ export default {
       state[datasource.id][elem].search = datasource.searchid; // задаем id ИС
       state[datasource.id][elem].should = true; // сообщаем что нужно обновить
       state[datasource.id][elem].switch = true; // и перключить на вкладку с результатами
-      state[datasource.id].tockens.forEach(item => {
+      state[datasource.id].tockens.forEach((item) => {
         if (item.elem == elem) {
           item.value = '';
         }
@@ -132,12 +132,30 @@ export default {
       // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
     },
+    updateManualTokens(state, payload) {
+      const { idDash } = payload;
+      console.log(idDash);
+      state[idDash].searches.forEach((search) => {
+        state[idDash].tockens.forEach((tocken) => {
+          if (
+            tocken.onButton &&
+            search.original_otl.includes(`$${tocken.name}$`)
+          ) {
+            this.commit('updateSearchStatus', {
+              idDash,
+              sid: search.sid,
+              status: 'empty',
+            });
+          }
+        });
+      });
+    },
     //TODO refactor
     setTocken(state, payload) {
       const { tocken, idDash, value } = payload;
       // сохранение токена в хранилище
       let id = -1;
-      Object.keys(state[idDash].tockens).forEach(item => {
+      Object.keys(state[idDash].tockens).forEach((item) => {
         // ищем пришедший токен среди всех токенов
         if (
           state[idDash].tockens[item].name === tocken.name &&
@@ -149,12 +167,13 @@ export default {
       });
       if (id !== -1) {
         // если токен нашелся
-        
+
         if (value) {
           // если value задано, то присваиваем его токену, если нет, то присваиваем токену дефолтное значение
           state[idDash].tockens[id].value = value;
         } else {
-          state[idDash].tockens[id].value = state[idDash].tockens[id].defaultValue;
+          state[idDash].tockens[id].value =
+            state[idDash].tockens[id].defaultValue;
         }
 
         let eventAll = []; // сюда будем заносить все события с нужным токеном
@@ -173,11 +192,11 @@ export default {
         if (eventAll.length !== 0) {
           // если список события с токеном внутри есть
           let data = null;
-          eventAll.forEach(item => {
+          eventAll.forEach((item) => {
             // пробегаемся по всем событиям
 
             switch (
-            state[idDash].events[item].compare // проверяем какое именно событие должно произойти
+              state[idDash].events[item].compare // проверяем какое именно событие должно произойти
             ) {
               case 'equals':
                 let value = state[idDash].tockens[id].value.replace(/\s/g, ''); // в случаях когда нужно сравнить значения токена по равенству,
@@ -192,7 +211,10 @@ export default {
                 }
                 break;
               case 'over': // все тоже самое для других событий
-                if (state[idDash].tockens[id].value > state[idDash].events[item].tokenval) {
+                if (
+                  state[idDash].tockens[id].value >
+                  state[idDash].events[item].tokenval
+                ) {
                   this.commit('letEventSet', {
                     events: [state[idDash].events[item]],
                     idDash,
@@ -200,7 +222,10 @@ export default {
                 }
                 break;
               case 'less':
-                if (state[idDash].tockens[id].value < state[idDash].events[item].tokenval) {
+                if (
+                  state[idDash].tockens[id].value <
+                  state[idDash].events[item].tokenval
+                ) {
                   this.commit('letEventSet', {
                     events: [state[idDash].events[item]],
                     idDash,
@@ -208,13 +233,20 @@ export default {
                 }
                 break;
               case 'in': // для события вхождения значеия в массив
-                data = state[idDash].events[item].tokenval.replace(/\[|\]/g, '').split(','); // отбрасываем скобки массива и разбиваем на масив элемнетов по запятой
+                data = state[idDash].events[item].tokenval
+                  .replace(/\[|\]/g, '')
+                  .split(','); // отбрасываем скобки массива и разбиваем на масив элемнетов по запятой
                 let k = -1;
-                data.forEach(item => {
+                data.forEach((item) => {
                   // каждое значнеие нужно сравнить со значением в событии
-                  if (!Number(item) && Number(state[idDash].tockens[id].value)) {
+                  if (
+                    !Number(item) &&
+                    Number(state[idDash].tockens[id].value)
+                  ) {
                     // нам нужно проверить что это цифры сравниваются
-                    if (Number(item) === Number(state[idDash].tockens[id].value)) {
+                    if (
+                      Number(item) === Number(state[idDash].tockens[id].value)
+                    ) {
                       // и если число вошло в массив чисел
                       k = 0; // то меняем переменную
                     }
@@ -234,12 +266,19 @@ export default {
                 }
                 break;
               case 'between': // тоже самое для условия что токен внутри рамок массива
-                data = state[idDash].events[item].tokenval.replace(/\[|\]/g, '').split(',');
+                data = state[idDash].events[item].tokenval
+                  .replace(/\[|\]/g, '')
+                  .split(',');
 
-                if (Number(data[0]) && Number(data[1]) && Number(state[idDash].tockens[id].value)) {
+                if (
+                  Number(data[0]) &&
+                  Number(data[1]) &&
+                  Number(state[idDash].tockens[id].value)
+                ) {
                   // нам нужно проверить что это цифры сравниваются
                   if (
-                    Number(state[idDash].tockens[id].value) >= Number(data[0]) &&
+                    Number(state[idDash].tockens[id].value) >=
+                      Number(data[0]) &&
                     Number(state[idDash].tockens[id].value) <= Number(data[1])
                   ) {
                     // и если число вошло в массив чисел
@@ -266,8 +305,14 @@ export default {
           });
         }
 
-        state[idDash].searches.forEach(search => {
-          if (search.original_otl.includes(`$${tocken.name}$`)) {
+        state[idDash].searches.forEach((search) => {
+          let tempTocken = state[idDash].tockens.find(
+            (el) => el.name == tocken.name
+          );
+          if (
+            search.original_otl.includes(`$${tocken.name}$`) &&
+            !tempTocken.onButton
+          ) {
             this.commit('updateSearchStatus', {
               idDash,
               sid: search.sid,
@@ -277,9 +322,9 @@ export default {
         });
       }
       // Add filterParam(for multiLine)
-      state[idDash].tockens.forEach(tocken => {
+      state[idDash].tockens.forEach((tocken) => {
         if (tocken.name === payload.tocken.name) {
-          tocken.filterParam = payload.tocken.filterParam
+          tocken.filterParam = payload.tocken.filterParam;
         }
       });
       // Add value to temp values of filter
@@ -302,7 +347,8 @@ export default {
     setPickerDate: (state, date) => {
       // отдельно можно проверить если ИС прикреплен то переключить и обновить
       state[date.idDash][date.id].date = date.date;
-      state[date.idDash][date.id].changeDate = !state[date.idDash][date.id].changeDate;
+      state[date.idDash][date.id].changeDate =
+        !state[date.idDash][date.id].changeDate;
     },
     setSelected: (state, select) => {
       // храним выбранные пользователем данные
@@ -338,14 +384,17 @@ export default {
     },
     updateDash: (state, dash) => {
       if (dash.dash.body != '') {
-        state[dash.dash.id] = { ...state[dash.dash.id], ...JSON.parse(dash.dash.body) };
+        state[dash.dash.id] = {
+          ...state[dash.dash.id],
+          ...JSON.parse(dash.dash.body),
+        };
       }
       if (dash.modified != '') {
         state[dash.dash.id].modified = dash.modified;
       }
     },
     setLoading: (state, load) => {
-      state[load.idDash].elements.forEach(item => {
+      state[load.idDash].elements.forEach((item) => {
         if (state[load.idDash][item].search == load.search) {
           if (!state[load.idDash][item].loading) {
             state[load.idDash][item].loading = '';
@@ -366,7 +415,7 @@ export default {
       let id = Object.keys(dash)[0];
       let data = dash[id];
       let stateElements = state[dashboard.idDash].elements;
-      let elements = stateElements.filter(item => {
+      let elements = stateElements.filter((item) => {
         // тут проверяем нет ли такого элемнета уже
         if (item.indexOf(id) != -1) {
           return item;
@@ -482,12 +531,12 @@ export default {
         time: schedule.time,
         everyLast: schedule.everyLast,
         timeLast: schedule.timeLast,
-        schedulerID: schedule.schedulerID
+        schedulerID: schedule.schedulerID,
       };
     },
     setSchedulerID: (state, payload) => {
       const { idDash, search, schedulerID } = payload;
-      Vue.set(state[idDash].schedulers[search], 'schedulerID', schedulerID)
+      Vue.set(state[idDash].schedulers[search], 'schedulerID', schedulerID);
     },
     deleteSchedule: (state, schedule) => {
       // удаляет объект с планировщиком
@@ -513,7 +562,8 @@ export default {
         state[tocken.idDash].tockens[j].prefix = tocken.tocken.prefix;
         state[tocken.idDash].tockens[j].sufix = tocken.tocken.sufix;
         state[tocken.idDash].tockens[j].delimetr = tocken.tocken.delimetr;
-        state[tocken.idDash].tockens[j].defaultValue = tocken.tocken.defaultValue;
+        state[tocken.idDash].tockens[j].defaultValue =
+          tocken.tocken.defaultValue;
       } else {
         // а елси нету
         state[tocken.idDash].tockens.push(
@@ -537,7 +587,11 @@ export default {
         Vue.set(state[filter.idDash], 'filters', []);
       }
 
-      if (state[filter.idDash].filters.find(filterInState => filterInState.id === filter.id)) {
+      if (
+        state[filter.idDash].filters.find(
+          (filterInState) => filterInState.id === filter.id
+        )
+      ) {
         alert('Фильтр с таким именем уже существует');
       } else {
         state[filter.idDash].filters.splice(index + 1, 0, filter);
@@ -557,25 +611,33 @@ export default {
       else state[idDash].focusedFilter.parts.push({ ...filterPart });
     },
     setLibrary: (state, options) => {
-      Vue.set(state[options.idDash][options.id].options, 'library', options.library);
+      Vue.set(
+        state[options.idDash][options.id].options,
+        'library',
+        options.library
+      );
     },
 
     setOptions: (state, options) => {
       // добовляем данные о скриншоте
-      Object.keys(options.options).forEach(item => {
+      Object.keys(options.options).forEach((item) => {
         // пробегаемся по всем настройкам, что к нам пришли
         if (item == 'change') {
           // если это натсройка change
 
-          state[options.idDash][options.id].options.change = !state[options.idDash][options.id]
-            .options.change; // то ее всегда меняем на противоположную, давая понять, что натсройки обновились
+          state[options.idDash][options.id].options.change =
+            !state[options.idDash][options.id].options.change; // то ее всегда меняем на противоположную, давая понять, что натсройки обновились
         } else {
           // для любой другой настройки
           // if (item == 'metrics') {
           //   console.log(state[options.idDash][options.id].options[item])
           // }
 
-          Vue.set(state[options.idDash][options.id].options, item, options.options[item]); // просто обновляем ее значение на новое
+          Vue.set(
+            state[options.idDash][options.id].options,
+            item,
+            options.options[item]
+          ); // просто обновляем ее значение на новое
         }
       });
       if (options.titles) {
@@ -589,7 +651,7 @@ export default {
 
     letEventSet: (state, events) => {
       // метод который обновляет какое-либо свойство у элемнета
-      events.events.forEach(item => {
+      events.events.forEach((item) => {
         if (!state[events.idDash][item.target].options) {
           // если опций еще нет
           state[events.idDash][item.target].options = {
@@ -599,16 +661,20 @@ export default {
         }
         item.value == 'true' ? (item.value = true) : false; // переводи строковое значение в bolean
         item.value == 'false' ? (item.value = false) : false;
-        Vue.set(state[events.idDash][item.target].options, item.prop, item.value);
+        Vue.set(
+          state[events.idDash][item.target].options,
+          item.prop,
+          item.value
+        );
       });
     },
     //TODO refactor checkalreadydash
     letEventGo: async (state, event) => {
       //load dash
       let loader = (id, first) => {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           let result = rest.getState(id, restAuth);
-          result.then(stateFrom => {
+          result.then((stateFrom) => {
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
@@ -637,14 +703,16 @@ export default {
                 }
               }
               if (state[id].elements) {
-                state[id].elements.forEach(elem => {
+                state[id].elements.forEach((elem) => {
                   if (!state[id][elem].tab) {
                     Vue.set(state[id][elem], 'tab', 1);
                   }
                 });
               }
               if (state[id].searches) {
-                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'));
+                state[id].searches.forEach((search) =>
+                  Vue.set(search, 'status', 'empty')
+                );
               }
               resolve({ status: 'finish' });
               // }
@@ -668,7 +736,7 @@ export default {
       if (id) await loader(id);
 
       let tockensTarget = [];
-      Object.keys(state).forEach(key => {
+      Object.keys(state).forEach((key) => {
         if (state[key].name) {
           if (state[key].name.toLowerCase() == item.target.toLowerCase()) {
             id = key;
@@ -729,7 +797,7 @@ export default {
       //event.route.push(`/dashboards/${id}`);
       // event.route.go();
       const options = state[event.idDash][event.id].options;
-      const currentTab = event.event.tab || state[id]?.currentTab
+      const currentTab = event.event.tab || state[id]?.currentTab;
 
       if (!options?.openNewScreen) {
         event.route.push(`/dashboards/${id}/${currentTab || ''}`);
@@ -741,10 +809,10 @@ export default {
       let response = {};
 
       if (searches) {
-        searches.forEach(async item => {
+        searches.forEach(async (item) => {
           // также при обновлении токена нужно заново запускать серч и обновлять информацию
 
-          changed.forEach(async itemTok => {
+          changed.forEach(async (itemTok) => {
             if (item.original_otl.indexOf(`$${itemTok}$`) != -1) {
               // если в тексте запроса есть наш токен
 
@@ -755,11 +823,21 @@ export default {
                 error: false,
               });
 
-              response = await event.store.getters.getDataApi({ search: item, idDash: id });
+              response = await event.store.getters.getDataApi({
+                search: item,
+                idDash: id,
+              });
               if (response.length != 0) {
-                let responseDB = event.store.getters.putIntoDB(response, item.sid, id);
-                responseDB.then(result => {
-                  let refresh = event.store.getters.refreshElements(id, item.sid);
+                let responseDB = event.store.getters.putIntoDB(
+                  response,
+                  item.sid,
+                  id
+                );
+                responseDB.then((result) => {
+                  let refresh = event.store.getters.refreshElements(
+                    id,
+                    item.sid
+                  );
                   event.store.commit('setLoading', {
                     search: item.sid,
                     idDash: id,
@@ -792,9 +870,14 @@ export default {
       state[settings.idDash].modalSettings.element = settings.element;
       if (
         settings.element &&
-        (settings.element.includes('table') || settings.element.includes('heatmap'))
+        (settings.element.includes('table') ||
+          settings.element.includes('heatmap'))
       ) {
-        Vue.set(state[settings.idDash][settings.element], 'availableTableTitles', settings?.titles);
+        Vue.set(
+          state[settings.idDash][settings.element],
+          'availableTableTitles',
+          settings?.titles
+        );
         if (!state[settings.idDash][settings.element].selectedTableTitles) {
           Vue.set(
             state[settings.idDash][settings.element],
@@ -829,19 +912,19 @@ export default {
       }
       state[textarea.idDash][textarea.id].textarea = textarea.textarea;
     },
-    createReportSearch: state => {
+    createReportSearch: (state) => {
       if (!state.reports) {
         Vue.set(state, 'reports', {});
         Vue.set(state.reports, 'elements', settings.reporstElements);
         Vue.set(state.reports, 'searches', {});
-        settings.reporstElements.forEach(item => {
+        settings.reporstElements.forEach((item) => {
           Vue.set(state.reports, item, {});
           Vue.set(state.reports[item], 'search', '');
           Vue.set(state.reports[item], 'should', false);
         });
       }
     },
-    createPaperSearch: state => {
+    createPaperSearch: (state) => {
       if (!state.papers) {
         Vue.set(state, 'papers', {});
         Vue.set(state.papers, 'searches', {});
@@ -853,21 +936,23 @@ export default {
       let name = dash.name[0].toUpperCase() + dash.name.slice(1);
       restAuth.putLog(`Удален дашборд ${name} с id ${dash.id}`);
     },
-    clearState: state => {
-      Object.keys(state).forEach(key => {
+    clearState: (state) => {
+      Object.keys(state).forEach((key) => {
         if (key !== 'theme') {
           delete state[key];
         }
       });
     },
     setMetricsMulti: (state, dash) => {
-      let metrics = dash.metrics.map(metric => ({ name: metric, units: '' }));
+      let metrics = dash.metrics.map((metric) => ({ name: metric, units: '' }));
       metrics.splice(0, 1);
       if (!state[dash.idDash][dash.id].metrics) {
         Vue.set(state[dash.idDash][dash.id], 'metrics', []);
       } else {
-        metrics.forEach(metric => {
-          const temp = state[dash.idDash][dash.id].metrics.find(m => m.name === metric.name);
+        metrics.forEach((metric) => {
+          const temp = state[dash.idDash][dash.id].metrics.find(
+            (m) => m.name === metric.name
+          );
           if (temp) {
             metric.units = temp.units;
           }
@@ -877,7 +962,7 @@ export default {
     },
     setMultilineMetricUnits: (state, payload) => {
       const { idDash, elem, units } = payload;
-      state[idDash][elem].metrics.forEach(metric => {
+      state[idDash][elem].metrics.forEach((metric) => {
         metric.units = units[metric.name] ? units[metric.name] : '';
       });
     },
@@ -885,7 +970,8 @@ export default {
       let metrics = [...[], ...dash.metrics];
       if (!state[dash.idDash][dash.id].options.metricsRelation) {
         state[dash.idDash][dash.id].options.metricsRelation = {};
-        state[dash.idDash][dash.id].options.metricsRelation['relations'] = metrics;
+        state[dash.idDash][dash.id].options.metricsRelation['relations'] =
+          metrics;
         state[dash.idDash][dash.id].options.metricsRelation['namesMetric'] = [
           'Категория',
           'Процентное соотношение',
@@ -918,7 +1004,10 @@ export default {
       state[gridShow.id].gridShow = gridShow.item;
     },
     addNewTab: (state, payload) => {
-      state[payload.idDash].tabList.push({ id: payload.tabID, name: payload.tabName });
+      state[payload.idDash].tabList.push({
+        id: payload.tabID,
+        name: payload.tabName,
+      });
     },
     changeCurrentTab: (state, payload) => {
       state[payload.idDash].currentTab = payload.tab;
@@ -926,15 +1015,19 @@ export default {
     deleteDashTab: (state, payload) => {
       const { idDash, tabID } = payload;
       const tempArr = [];
-      state[idDash].elements.forEach(elem => {
+      state[idDash].elements.forEach((elem) => {
         if (state[idDash][elem].tab === tabID) {
           delete state[idDash][elem];
           tempArr.push(elem);
         }
       });
-      state[idDash].elements = state[idDash].elements.filter(elem => !tempArr.includes(elem));
+      state[idDash].elements = state[idDash].elements.filter(
+        (elem) => !tempArr.includes(elem)
+      );
 
-      state[idDash].tabList = state[idDash].tabList.filter(tab => tab.id !== tabID);
+      state[idDash].tabList = state[idDash].tabList.filter(
+        (tab) => tab.id !== tabID
+      );
       if (state[idDash].currentTab === tabID) {
         Vue.set(state[idDash], 'currentTab', state[idDash].tabList[0].id);
       }
@@ -944,7 +1037,7 @@ export default {
     },
     editTabName: (state, payload) => {
       const { idDash, tabID, newName } = payload;
-      const tab = state[idDash].tabList.find(tab => tab.id === tabID);
+      const tab = state[idDash].tabList.find((tab) => tab.id === tabID);
       if (tab) {
         tab.name = newName;
       }
@@ -957,17 +1050,23 @@ export default {
       state[filter.idDash].focusedFilter = filter;
       state[filter.idDash].stashedFilterParts = [];
       for (let part of filter.parts) {
-        state[filter.idDash].stashedFilterParts.push({ ...part, values: [...part.values] });
+        state[filter.idDash].stashedFilterParts.push({
+          ...part,
+          values: [...part.values],
+        });
       }
     },
     addTokenToFilterParts(state, tocken) {
       let focusedFilterParts = state[tocken.idDash].focusedFilter.parts;
       for (let part of focusedFilterParts) {
-        if (part.filterPartType === 'token' && part.token.name === tocken.tocken.name) {
+        if (
+          part.filterPartType === 'token' &&
+          part.token.name === tocken.tocken.name
+        ) {
           if (part.values.indexOf(tocken.value) === -1) {
-            part.token.value = tocken.value
+            part.token.value = tocken.value;
             if (part.token.elem.includes('multiLine')) {
-              part.values = []
+              part.values = [];
             }
             part.values.push(tocken.value);
           }
@@ -985,22 +1084,34 @@ export default {
       state[idDash].focusedFilter.parts = state[idDash].stashedFilterParts;
     },
     refreshFilter(state, filter) {
-      let foundFilter = state[filter.idDash].filters.find(val => filter.id === val.id);
-      foundFilter.parts.forEach(part => (part.values = []));
+      let foundFilter = state[filter.idDash].filters.find(
+        (val) => filter.id === val.id
+      );
+      foundFilter.parts.forEach((part) => (part.values = []));
     },
     deleteFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
       state[idDash].filters[filterIndex].parts.splice(filterPartIndex, 1);
     },
-    removeFilterPartValue(state, { idDash, filterIndex, filterPartIndex, valueIndex }) {
-      state[idDash].filters[filterIndex].parts[filterPartIndex].values.splice(valueIndex, 1);
+    removeFilterPartValue(
+      state,
+      { idDash, filterIndex, filterPartIndex, valueIndex }
+    ) {
+      state[idDash].filters[filterIndex].parts[filterPartIndex].values.splice(
+        valueIndex,
+        1
+      );
     },
     refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
-      Vue.set(state[idDash].filters[filterIndex].parts[filterPartIndex], 'values', []);
+      Vue.set(
+        state[idDash].filters[filterIndex].parts[filterPartIndex],
+        'values',
+        []
+      );
     },
     restartSearches(state, payload) {
       const { idDash, filter } = payload;
       const searches = state[idDash].searches;
-      searches.forEach(search => {
+      searches.forEach((search) => {
         if (search.original_otl.includes(`$${filter}$`)) {
           this.commit('updateSearchStatus', {
             idDash,
@@ -1012,24 +1123,26 @@ export default {
     },
     updateSearchStatus: (state, payload) => {
       const { idDash, sid, status } = payload;
-      const search = state[idDash].searches.find(search => search.sid === sid);
+      const search = state[idDash].searches.find(
+        (search) => search.sid === sid
+      );
       Vue.set(search, 'status', status);
     },
   },
   getters: {
-    getDashTabs: state => id => {
+    getDashTabs: (state) => (id) => {
       if (!state[id].tabList) {
         Vue.set(state[id], 'tabList', [{ id: 1, name: 'Без названия' }]);
       }
       return state[id].tabList;
     },
-    getCurrentDashTab: state => id => {
+    getCurrentDashTab: (state) => (id) => {
       if (!state[id].currentTab) {
         Vue.set(state[id], 'currentTab', 1);
       }
       return state[id].currentTab;
     },
-    getShowTabs: state => idDash => {
+    getShowTabs: (state) => (idDash) => {
       if (!state[idDash].tabs) {
         Vue.set(state[idDash], 'tabs', false);
       }
@@ -1037,26 +1150,30 @@ export default {
     },
     getName(state) {
       // получаем имя дашборда
-      return id => {
+      return (id) => {
         return state[id].name;
       };
     },
-    getElements: state => id => {
+    getElements: (state) => (id) => {
       if (!state[id].elements) {
         Vue.set(state[id], 'elements', []);
       }
       return state[id].elements.filter(
-        elem => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
+        (elem) =>
+          state[id][elem].tab === state[id].currentTab ||
+          state[id][elem].options.pinned
       );
     },
-    getElementsWithSearches: state => id => {
+    getElementsWithSearches: (state) => (id) => {
       return state[id].elements
         .filter(
-          elem => state[id][elem].tab === state[id].currentTab || state[id][elem].options.pinned
+          (elem) =>
+            state[id][elem].tab === state[id].currentTab ||
+            state[id][elem].options.pinned
         )
-        .map(elem => ({ elem, search: state[id][elem].search }));
+        .map((elem) => ({ elem, search: state[id][elem].search }));
     },
-    getAllElements: state => id => {
+    getAllElements: (state) => (id) => {
       if (!state[id].elements) {
         Vue.set(state[id], 'elements', []);
       }
@@ -1065,25 +1182,31 @@ export default {
 
     getNameDash(state) {
       // получаем имя самого элемента
-      return ids => {
+      return (ids) => {
         return state[ids.idDash][ids.id].name_elem;
       };
     },
     getPosDash(state) {
       // получаем позицию элемнета
-      return ids => {
-        return { top: state[ids.idDash][ids.id].top, left: state[ids.idDash][ids.id].left };
+      return (ids) => {
+        return {
+          top: state[ids.idDash][ids.id].top,
+          left: state[ids.idDash][ids.id].left,
+        };
       };
     },
     getSizeDash(state) {
       // получаем размер элемента
-      return ids => {
-        return { width: state[ids.idDash][ids.id].width, height: state[ids.idDash][ids.id].height };
+      return (ids) => {
+        return {
+          width: state[ids.idDash][ids.id].width,
+          height: state[ids.idDash][ids.id].height,
+        };
       };
     },
     getSearches(state) {
       // получаем все ИС
-      return id => {
+      return (id) => {
         if (!state[id].searches) {
           Vue.set(state[id], 'searches', []);
         }
@@ -1092,7 +1215,7 @@ export default {
     },
     getModalSearch(state) {
       // получаем статус модального окна, чтобы знать открыто оно или нет
-      return id => {
+      return (id) => {
         if (!state[id].modalSearch) {
           Vue.set(state[id], 'modalSearch', {});
           Vue.set(state[id].modalDelete, 'elem', '');
@@ -1103,9 +1226,9 @@ export default {
     },
     getSearch(state) {
       // получаем определенный ИС по переданному id
-      return ids => {
+      return (ids) => {
         let id = state[ids.idDash][ids.id].search;
-        let search = state[ids.idDash].searches.filter(item => {
+        let search = state[ids.idDash].searches.filter((item) => {
           return item.sid == id;
         })[0];
         return search;
@@ -1113,25 +1236,25 @@ export default {
     },
     getShouldGet(state) {
       // получаем статус должен ли элемнет запрашивать данные
-      return ids => {
+      return (ids) => {
         return state[ids.idDash][ids.id].should;
       };
     },
     getSearchID(state) {
       // получаем статус должен ли элемнет запрашивать данные
-      return ids => {
+      return (ids) => {
         return state[ids.idDash][ids.id].search;
       };
     },
     getSwitch(state) {
       // получаем статус какой режим сейчас выбран у элемента
-      return ids => {
+      return (ids) => {
         return state[ids.idDash][ids.id].switch;
       };
     },
     getTockens(state) {
       // получаем массив с токенами
-      return id => {
+      return (id) => {
         if (!state[id].tockens) {
           Vue.set(state[id], 'tockens', []);
         }
@@ -1140,7 +1263,7 @@ export default {
     },
     getActions(state) {
       // получаем массив с событиями элемента
-      return elem => {
+      return (elem) => {
         if (state[elem.idDash][elem.elem]) {
           return state[elem.idDash][elem.elem].actions;
         } else {
@@ -1150,11 +1273,13 @@ export default {
     },
     getCapture(state) {
       // получаем массив с событиями элемента
-      return elem => {
+      return (elem) => {
         if (state[elem.idDash][elem.elem]) {
           let j = -1;
-          Object.keys(state[elem.idDash][elem.elem].actions).forEach(item => {
-            if (state[elem.idDash][elem.elem].actions[item].name == elem.action) {
+          Object.keys(state[elem.idDash][elem.elem].actions).forEach((item) => {
+            if (
+              state[elem.idDash][elem.elem].actions[item].name == elem.action
+            ) {
               j = item;
             }
           });
@@ -1169,9 +1294,9 @@ export default {
         }
       };
     },
-    getGraphTree: state => {
+    getGraphTree: (state) => {
       // получаем структуру и позицию графа
-      return tree => {
+      return (tree) => {
         if (
           state[tree.idDash][tree.id].tree &&
           state[tree.idDash][tree.id].direct &&
@@ -1197,7 +1322,7 @@ export default {
     },
     getPickerDate(state) {
       // получаем объект с выбором даты
-      return elem => {
+      return (elem) => {
         if (!state[elem.idDash][elem.id].date) {
           // если его нет то создаем пустой шаблон
           state[elem.idDash][elem.id].date = {
@@ -1214,7 +1339,7 @@ export default {
     },
     getSelected(state) {
       // получаем объект в котором храниться информация для элемнета select
-      return elem => {
+      return (elem) => {
         if (!state[elem.idDash][elem.id].selected) {
           state[elem.idDash][elem.id].selected = {
             elem: '',
@@ -1226,15 +1351,15 @@ export default {
         return state[elem.idDash][elem.id].selected;
       };
     },
-    getElementSelected: state => elem => {
+    getElementSelected: (state) => (elem) => {
       return state[elem.idDash][elem.id]?.selected;
     },
-    getElement: state => (idDash, id) => {
+    getElement: (state) => (idDash, id) => {
       return state[idDash][id];
     },
     getDataApi(state) {
       // метод получающий данные из rest
-      return searchFrom => {
+      return (searchFrom) => {
         let hash = Math.floor(Math.random() * 1000); // создаем произвольный хэш чтобы наши запросы не повторялись
 
         // let search = getters.getSearch(searchOut);  // получаем нужный ИС на основе полученных при вызове настроек
@@ -1245,7 +1370,7 @@ export default {
         let twf = search.parametrs.twf;
         let reg = null;
         if (state[idDash].filters) {
-          Object.values(state[idDash].filters).forEach(filter => {
+          Object.values(state[idDash].filters).forEach((filter) => {
             reg = new RegExp(`\\$${filter.id}\\$`, 'g');
             if (otl.indexOf(`$${filter.id}$`) != -1) {
               let filterOtlText = filterCompile(filter);
@@ -1255,11 +1380,11 @@ export default {
         }
         if (otl.indexOf(`$evaTknLogin$`) != -1) {
           if (Vue.$jwt.hasToken()) {
-            otl = otl.replaceAll("$evaTknLogin$", Vue.$jwt.decode().username);
+            otl = otl.replaceAll('$evaTknLogin$', Vue.$jwt.decode().username);
           }
         }
         if (state[idDash].tockens) {
-          Object.keys(state[idDash].tockens).forEach(item => {
+          Object.keys(state[idDash].tockens).forEach((item) => {
             // если есть токены в запросе то меняем временные метки в зависимости от значения токена
             //let reg = `\\$${state[idDash].tockens[item].name}`;
             reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
@@ -1267,7 +1392,10 @@ export default {
               if (state[idDash].tockens[item].value) {
                 otl = otl.replace(reg, state[idDash].tockens[item].value);
               } else {
-                otl = otl.replace(reg, state[idDash].tockens[item].defaultValue);
+                otl = otl.replace(
+                  reg,
+                  state[idDash].tockens[item].defaultValue
+                );
               }
             }
 
@@ -1290,7 +1418,11 @@ export default {
               state[idDash].tockens[item].capture == 'start'
             ) {
               if (typeof search.parametrs.tws != 'number') {
-                if (search.parametrs.tws.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
+                if (
+                  search.parametrs.tws.indexOf(
+                    `$${state[idDash].tockens[item].name}$`
+                  ) != -1
+                ) {
                   tws = state[idDash].tockens[item].value;
                 }
               }
@@ -1300,7 +1432,11 @@ export default {
               state[idDash].tockens[item].capture == 'end'
             ) {
               if (typeof search.parametrs.twf != 'number') {
-                if (search.parametrs.twf.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
+                if (
+                  search.parametrs.twf.indexOf(
+                    `$${state[idDash].tockens[item].name}$`
+                  ) != -1
+                ) {
                   twf = state[idDash].tockens[item].value;
                 }
               }
@@ -1309,7 +1445,7 @@ export default {
         }
         if (search.limit > 0 && !otl.includes('head')) {
           // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
-          otl += '|head ' + search.limit
+          otl += '|head ' + search.limit;
         }
 
         otl = otl.replace(/\r|\n/g, '');
@@ -1349,7 +1485,7 @@ export default {
             console.log('error:', event);
           };
 
-          request.onupgradeneeded = event => {
+          request.onupgradeneeded = (event) => {
             console.log('create');
             db = event.target.result;
             if (!db.objectStoreNames.contains('searches')) {
@@ -1357,7 +1493,7 @@ export default {
               db.createObjectStore('searches'); // create it
             }
 
-            request.onsuccess = event => {
+            request.onsuccess = (event) => {
               db = request.result;
               console.log('success: ' + db);
 
@@ -1365,7 +1501,7 @@ export default {
             };
           };
 
-          request.onsuccess = event => {
+          request.onsuccess = (event) => {
             db = request.result;
 
             setTransaction(db, result, key, idDash);
@@ -1399,7 +1535,7 @@ export default {
         if (idDash == 'reports') {
           state[idDash].table.should = true;
         } else {
-          state[idDash].elements.forEach(item => {
+          state[idDash].elements.forEach((item) => {
             // пробегаемся по всем элементам
             if (state[idDash][item].search == key) {
               // то смотрим если наш элемент завязан на search который поменялся
@@ -1415,7 +1551,7 @@ export default {
         let db = null;
         let nameDash = idDash;
         let searchName = [];
-        ids.forEach(id => {
+        ids.forEach((id) => {
           searchName.push(`${nameDash}-${id}`);
         });
 
@@ -1425,7 +1561,7 @@ export default {
           console.log('error: ');
         };
 
-        request.onsuccess = event => {
+        request.onsuccess = (event) => {
           db = request.result;
 
           let transaction = db.transaction('searches', 'readwrite'); // (1)
@@ -1433,13 +1569,13 @@ export default {
           // получить хранилище объектов для работы с ним
           let searches = transaction.objectStore('searches'); // (2)
 
-          searchName.forEach(item => {
+          searchName.forEach((item) => {
             searches.delete(String(item)); // (3) return store.get('Ire Aderinokun');
           });
         };
       };
     },
-    getReportSearch: state => {
+    getReportSearch: (state) => {
       let key = state.reports.table.search;
       if (key != '') {
         return state.reports.searches[key];
@@ -1455,11 +1591,11 @@ export default {
             field_extraction: false,
             cache_ttl: 100,
           },
-          limit: 1000
+          limit: 1000,
         };
       }
     },
-    getPaperSearch: state => {
+    getPaperSearch: (state) => {
       let key = state.papers?.cursearch || 0;
       if (key != 0) {
         return state.papers.searches[key];
@@ -1478,7 +1614,7 @@ export default {
         };
       }
     },
-    getReportElement: state => {
+    getReportElement: (state) => {
       return state.reports.elements;
     },
     getGroups() {
@@ -1488,13 +1624,13 @@ export default {
     },
     getDashs: () => {
       // получения списка дашбордов
-      return id => {
+      return (id) => {
         return rest.getDashs(id, restAuth);
       };
     },
     getModalDelete(state) {
       // получаем объект модального окна в котором храним тот элемнет что хотим удалить
-      return ids => {
+      return (ids) => {
         if (!state[ids.id].modalDelete) {
           Vue.set(state[ids.id], 'modalDelete', {});
           Vue.set(state[ids.id].modalDelete, 'active', false);
@@ -1506,7 +1642,7 @@ export default {
     },
     getModalExin(state) {
       // получаем объект модального окна в котором храним тот элемнет что хотим удалить
-      return ids => {
+      return (ids) => {
         if (ids.page == 'dash') {
           return state[ids.id].modalExin;
         } else if (ids.page == 'layout') {
@@ -1516,13 +1652,13 @@ export default {
     },
     getScreenShot(state) {
       // получаем скриншот страницы
-      return id => {
+      return (id) => {
         return state[id].screenshot;
       };
     },
     getDashboard(state) {
       // получаем скриншот страницы
-      return id => {
+      return (id) => {
         return state[id];
       };
     },
@@ -1537,7 +1673,7 @@ export default {
     },
     getOptions(state) {
       // получаем скриншот страницы
-      return id => {
+      return (id) => {
         if (!state[id.idDash][id.id].options) {
           Vue.set(state[id.idDash][id.id], 'options', {});
           Vue.set(state[id.idDash][id.id].options, 'change', false);
@@ -1556,7 +1692,7 @@ export default {
     getEventFull(state) {
       // получаем скриншот страницы
 
-      return id => {
+      return (id) => {
         if (state[id].eventFull) {
           return state[id].eventFull;
         } else {
@@ -1565,21 +1701,21 @@ export default {
       };
     },
     getDragRes(state) {
-      return id => {
+      return (id) => {
         return state[id.idDash].dragRes;
       };
     },
 
     getEvents(state) {
       // получаем скриншот страницы
-      return event => {
+      return (event) => {
         let result = [];
         if (!state[event.idDash].events) {
           state[event.idDash].events = [];
           return [];
         } else {
           if (event.partelement) {
-            result = state[event.idDash].events.filter(item => {
+            result = state[event.idDash].events.filter((item) => {
               return (
                 item.event == event.event &&
                 item.element == event.element &&
@@ -1587,7 +1723,7 @@ export default {
               );
             });
           } else {
-            result = state[event.idDash].events.filter(item => {
+            result = state[event.idDash].events.filter((item) => {
               return item.event == event.event && item.target == event.element;
             });
           }
@@ -1597,13 +1733,13 @@ export default {
     },
     getChangeDate(state) {
       // получаем скриншот страницы
-      return date => {
+      return (date) => {
         return state[date.idDash][date.id].changeDate;
       };
     },
     getSchedulers(state) {
       // получаем все планировщики что были созданы
-      return id => {
+      return (id) => {
         if (!state[id].schedulers) {
           state[id].schedulers = {};
         }
@@ -1623,7 +1759,7 @@ export default {
     },
     getModalSettings(state) {
       // получаем объект с настройками моадлки натсроек
-      return idDash => {
+      return (idDash) => {
         if (!state[idDash].modalSettings) {
           Vue.set(state[idDash], 'modalSettings', {});
           Vue.set(state[idDash].modalSettings, 'element', '');
@@ -1633,7 +1769,7 @@ export default {
       };
     },
     getTextArea(state) {
-      return textarea => {
+      return (textarea) => {
         if (!state[textarea.idDash][textarea.id].textarea) {
           return '';
         }
@@ -1641,16 +1777,16 @@ export default {
       };
     },
     saveDashboard: () => {
-      return dash => {
+      return (dash) => {
         return new Promise((resolve, reject) => {
           let response = restAuth.setEssence({
             formData: JSON.stringify(dash),
             essence: 'dash',
             method: 'PUT',
           });
-          response.then(res => {
+          response.then((res) => {
             if (res.status == 200) {
-              res.json().then(data => {
+              res.json().then((data) => {
                 resolve({ status: 200, data: data });
               });
             } else if (res.status == 409) {
@@ -1660,11 +1796,11 @@ export default {
         });
       };
     },
-    checkAlreadyDash: state => {
+    checkAlreadyDash: (state) => {
       return (id, first) => {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           let result = rest.getState(id, restAuth);
-          result.then(stateFrom => {
+          result.then((stateFrom) => {
             if (stateFrom) {
               if (!state[id]) {
                 Vue.set(state, id, {});
@@ -1693,14 +1829,16 @@ export default {
                 }
               }
               if (state[id].elements) {
-                state[id].elements.forEach(elem => {
+                state[id].elements.forEach((elem) => {
                   if (!state[id][elem].tab) {
                     Vue.set(state[id][elem], 'tab', 1);
                   }
                 });
               }
               if (state[id].searches) {
-                state[id].searches.forEach(search => Vue.set(search, 'status', 'empty'));
+                state[id].searches.forEach((search) =>
+                  Vue.set(search, 'status', 'empty')
+                );
               }
               resolve({ status: 'finish' });
               // }
@@ -1712,7 +1850,7 @@ export default {
       };
     },
     checkDataSearch: () => {
-      return sid => {
+      return (sid) => {
         return new Promise((resolve, reject) => {
           let db = null;
 
@@ -1722,7 +1860,7 @@ export default {
             console.log('error:', event);
           };
 
-          request.onupgradeneeded = event => {
+          request.onupgradeneeded = (event) => {
             console.log('create');
             db = event.target.result;
             if (!db.objectStoreNames.contains('searches')) {
@@ -1730,7 +1868,7 @@ export default {
               db.createObjectStore('searches'); // create it
             }
 
-            request.onsuccess = event => {
+            request.onsuccess = (event) => {
               db = request.result;
               // this.alreadyDB = request.result;
               console.log('success: ' + db);
@@ -1739,7 +1877,7 @@ export default {
             };
           };
 
-          request.onsuccess = event => {
+          request.onsuccess = (event) => {
             db = request.result;
 
             setTransaction(db);
@@ -1753,7 +1891,7 @@ export default {
 
             let query = searches.get(sid); // (3) return store.get('Ire Aderinokun');
 
-            query.onsuccess = event => {
+            query.onsuccess = (event) => {
               // (4)
 
               if (query.result) {
@@ -1770,42 +1908,42 @@ export default {
         });
       };
     },
-    getColorError: state => {
+    getColorError: (state) => {
       if (!state.logError) {
         Vue.set(state, 'logError', false);
       }
       return state.logError;
     },
     getSvg: () => {
-      return svg => {
+      return (svg) => {
         return rest.getSvg(svg, restAuth); // отправляем в файл storeRest.js
       };
     },
     setSvg: () => {
-      return svg => {
+      return (svg) => {
         return rest.setSvg(svg, restAuth); // отправляем в файл storeRest.js
       };
     },
     exportDash: () => {
-      return dash => {
+      return (dash) => {
         return rest.exportDash(dash, restAuth); // отправляем в файл storeRest.js
       };
     },
     importDash: () => {
-      return dash => {
+      return (dash) => {
         return rest.importDash(dash, restAuth); // отправляем в файл storeRest.js
       };
     },
-    getMetricsMulti: state => {
-      return dash => {
+    getMetricsMulti: (state) => {
+      return (dash) => {
         if (!state[dash.idDash][dash.id].metrics) {
           Vue.set(state[dash.idDash][dash.id], 'metrics', []);
         }
         return state[dash.idDash][dash.id].metrics;
       };
     },
-    getSizeGrid: state => {
-      return id => {
+    getSizeGrid: (state) => {
+      return (id) => {
         if (!state[id]?.grid) {
           Vue.set(state[id], 'grid', {});
           Vue.set(state[id]?.grid, 'vert', '32');
@@ -1814,16 +1952,16 @@ export default {
         return state[id]?.grid;
       };
     },
-    getDragResize: state => {
-      return id => {
+    getDragResize: (state) => {
+      return (id) => {
         if (!state[id].dragRes) {
           Vue.set(state[id], 'dragRes', 'true');
         }
         return state[id].dragRes;
       };
     },
-    getGridShow: state => {
-      return id => {
+    getGridShow: (state) => {
+      return (id) => {
         if (!state[id].gridShow) {
           Vue.set(state[id], 'gridShow', 'true');
         }
@@ -1831,7 +1969,7 @@ export default {
       };
     },
     loadPaper: () => {
-      return paper => {
+      return (paper) => {
         return rest.loadPaper(paper, restAuth);
       };
     },
@@ -1841,47 +1979,47 @@ export default {
       };
     },
     getPaper: () => {
-      return fileData => {
+      return (fileData) => {
         return rest.getPaper(restAuth, fileData);
       };
     },
     getPaperVis: () => {
-      return url => {
+      return (url) => {
         return rest.getPaperVis(restAuth, url);
       };
     },
-    getSelectedTableTitles: state => {
+    getSelectedTableTitles: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.selectedTableTitles;
       };
     },
-    getAvailableTableTitles: state => {
+    getAvailableTableTitles: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.availableTableTitles;
       };
     },
-    getSelectedDataFormat: state => {
+    getSelectedDataFormat: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.selectedDataFormat;
       };
     },
-    getAvailableDataFormat: state => {
+    getAvailableDataFormat: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.availableDataFormat;
       };
     },
-    getLibrary: state => {
+    getLibrary: (state) => {
       return (dashId, elementId) => {
         return state[dashId][elementId]?.options?.library;
       };
     },
-    getFilters: state => {
-      return dashId => {
+    getFilters: (state) => {
+      return (dashId) => {
         return state[dashId].filters ? state[dashId].filters : [];
       };
     },
     getFocusedFilter(state) {
-      return dashId => {
+      return (dashId) => {
         return state[dashId].focusedFilter;
       };
     },

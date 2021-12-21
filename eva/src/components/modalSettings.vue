@@ -740,6 +740,57 @@
             </div>
           </div>
           <div
+            v-if="checkOptions('onButton')"
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Submit
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Перезапускать серчи по кнопке
+            </div>
+            <div class="status-option item">
+              <v-checkbox
+                v-model="options.onButton"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.onButton)"
+              />
+            </div>
+          </div>
+          <div
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              pinned
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Закрепить на всех вкладках
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.pinned"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.pinned)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('isDataAlwaysShow')"
             class="option-item"
           >
@@ -2116,6 +2167,9 @@ export default {
             this.$set(this.options,item,false);
           }
           if (item == 'underline') {
+            this.$set(this.options,item,false);
+          }
+          if (item == 'onButton') {
             this.$set(this.options,item,false);
           }
           if (item == 'pinned') {
