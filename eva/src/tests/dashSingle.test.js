@@ -32,7 +32,7 @@ describe('Компонент dashSingle.vue', () => {  // тест самого 
   store.getters.getElements(16)
 
 
-  store.commit('createDashBoard', { idDash: 16, dashboard: {
+  store.commit('createDashboardVisualization', { idDash: 16, dashboard: {
     single: {
       actions: [],
       height: 0,

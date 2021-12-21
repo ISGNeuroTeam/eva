@@ -177,7 +177,11 @@ export default {
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
         barplotBarWidth = 0,
+        type_line,
         timeFormat,
+        color,
+        conclusion_count,
+        replace_count,
         barplotstyle,
         yAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} },
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
@@ -205,7 +209,11 @@ export default {
           isDataAlwaysShow,
           barplotBarWidth,
           metricOptions,
-          yAxesBinding
+          yAxesBinding,
+          type_line,
+          color,
+          conclusion_count,
+          replace_count,
         )
       }
 
@@ -315,12 +323,14 @@ export default {
         .style('opacity', 0.3)
     },
 
-    putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj) {
+    putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj, replaceCount) {
       dot.setAttribute(attr, 'true')
+      console.log(replaceCount)
+      const label = replaceCount === undefined ? d[metricName] : Number(d[metricName]).toFixed(replaceCount)
 
       const text = this.svg
         .append('text')
-        .text(d[metricName])
+        .text(label)
         .attr('class', className)
         .attr('transform', `translate(${x(d[this.xMetric] * this.secondTransf) - 5}, ${y})`)
         .attr('font-size', '11')
@@ -611,9 +621,26 @@ export default {
       return maxCaptionWidth
     },
 
-    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding) {
+    renderSVG(isLastDotShow, isDataAlwaysShow, barplotBarWidth, metricOptions, yAxesBinding, type_line, color = {}, conclusion_count = {}, replace_count = {}) {
+      if (type_line === undefined) {
+        type_line = {}
+      }
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
+
+      const getStyleLine = (type) => {
+        if (type === 'dashed') {
+          return '5,5';
+        }
+
+        if (type === 'dotted') {
+          return '1,3';
+        }
+
+        if (type === 'double') {
+          return '1, 3, 6, 3';
+        }
+      }
 
       const metricNamesCount = this.metricNames.length
 
@@ -920,11 +947,16 @@ export default {
               .attr('fill', this.legendColors[metricIndex])
               .on('mouseenter', function (d) {
                 const date = new Date(d[xMetric] * secondTransf)
-
+                let day = date.getDate()
+                let month = date.getMonth()+1
+                const year = date.getFullYear()
+                if (day < 10) day = '0' + day;
+                if (month < 10) month = '0' + month;
+                
                 const xVal = !isTime
                   ? d[xMetric]
-                  : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
-
+                  : `${day}-${month}-${year}`
+                
                 tooltip.html(
                   thisMetrics.reduce((prev, cur) => {
                     const value = cur === xMetric ? xVal : d[cur]
@@ -1021,9 +1053,10 @@ export default {
                   .append('path')
                   .datum(lineItself)
                   .attr('class', `line-${metricIndex}-${lineIndex}`)
-                  .attr('fill', 'none')
-                  .attr('stroke', this.legendColors[metricIndex])
+                  .attr('fill', color[metricName] || 'none')
+                  .attr('stroke', color[metricName] || this.legendColors[metricIndex])
                   .attr('stroke-width', this.strokeWidth)
+                  .style("stroke-dasharray",getStyleLine(type_line[metricName]))
                   .attr(
                     'd',
                     d3.line()
@@ -1050,6 +1083,18 @@ export default {
               .style('opacity', function (d, j) {
                 let opacity = nullValue !== -1 ? 1 : 0
 
+                const count = Number(conclusion_count[metricName])
+                const replaceCount = Number(replace_count[metricName]);
+
+                let hasTooltip = true;
+                const isNumber = typeof count === 'number';
+                if (isNumber && count > 1) {
+                  hasTooltip = j % count === 0;
+                }
+                if (isNumber && count <= 0) {
+                  hasTooltip = false;
+                }
+
                 mustSee.forEach((item) => {
                   if (item[metricName] == d[metricName]) opacity = 1
                 })
@@ -1063,16 +1108,17 @@ export default {
                     metricText,
                     this,
                     'line',
-                    brushObj
+                    brushObj,
+                    replaceCount
                   )
                 }
 
-                if (isDataAlwaysShow && isDataAlwaysShow === 'data') {
+                if (isDataAlwaysShow && isDataAlwaysShow === 'data' && hasTooltip) {
                   opacity = 1
                   setLabel('data-always-dot', `data-always-dot-text-${metricName}`, metricName)
                 }
 
-                if (isDataAlwaysShow && isDataAlwaysShow === 'caption') {
+                if (isDataAlwaysShow && isDataAlwaysShow === 'caption' && hasTooltip) {
                   opacity = 1
                   setLabel('data-always-dot', `data-always-dot-text-${metricName}`, `_${metricName}_caption`)
                 }
@@ -1093,20 +1139,34 @@ export default {
               .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
               .on('mouseup', () => brushObj.selectionUp())
               .on('mousedown', () => brushObj.selectionDown())
-              .on('mouseenter', function (d) {
+              .on('mouseenter', function (d, i) {
+                // const count = Number(conclusion_count[metricName])
+                // let hasTooltip = true;
+                // const isNumber = typeof count === 'number';
+                // if (isNumber && count > 1) {
+                //   hasTooltip = i % count === 0;
+                // }
+                // if (isNumber && count <= 0) {
+                //   hasTooltip = false;
+                // }
+                // if (hasTooltip === false) {
+                //   return;
+                // }
+
                 const date = new Date(d[xMetric] * secondTransf)
-                const day = date.getDate()
-                const month = date.getMonth()
+                let day = date.getDate()
+                let month = date.getMonth()+1
                 const year = date.getFullYear()
+                if (day < 10) day = '0' + day;
+                if (month < 10) month = '0' + month;
 
-                const xVal = isTime ? `${day}-${month + 1}-${year}` : d[xMetric]
-
+                const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric]
                 tooltip.html(
                   Object.keys(d).reduce((prev, cur) => {
                     let value = ''
                     if (cur === xMetric) value = xVal
                     else if (cur.indexOf('annotation') === -1) value = d[cur]
-                    return prev + `<p><span>${cur}</span>: ${value}</p>`
+                    return prev + `<p><span>${cur}</span>:: ${value}</p>`
                   }, '')
                 )
 
@@ -1296,7 +1356,8 @@ export default {
             .attr('x2', this.width)
             .attr('y2', step * metricIndex + 20)
             .attr('opacity', 0.3)
-            .attr('stroke', this.theme.$main_text)
+            .attr('stroke', color[metric] || this.theme.$main_text)
+            .style("stroke-dasharray",getStyleLine(type_line[metric]))
         }
 
         const foundOptions = metricOptions.find(o => o.name === metric)
@@ -1389,7 +1450,7 @@ export default {
           if (nullValue !== -1) {
             dotDate = [extraDot[nullValue]]
           } else {
-            if (optionsKeys.length === 0 || options.type === 'Line chart' || !options.type) {
+            if (options.type === 'Line chart' || !options.type) {
               cutData.forEach((line) => {
                 if (!Number(line[metric]) && line[metric] !== 0) {
                   if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0])
@@ -1409,9 +1470,10 @@ export default {
                     .append('path')
                     .datum(lineItself)
                     .attr('class', `line-${metricIndex}-${lineIndex}`)
-                    .attr('fill', 'none')
-                    .attr('stroke', this.legendColors[metricIndex])
+                    .attr('fill', color[metric] || 'none')
+                    .attr('stroke', color[metric] || this.legendColors[metricIndex])
                     .attr('stroke-width', this.strokeWidth)
+                    .style("stroke-dasharray",getStyleLine(type_line[metric]))
                     .attr(
                         'd',
                         d3.line()
@@ -1428,8 +1490,9 @@ export default {
                   .attr('x2', this.width)
                   .attr('y2', y[metricIndex](0))
                   .attr('opacity', '.3')
-                  .attr('stroke', this.theme.$main_text)
+                  .attr('stroke', color[metric] || this.theme.$main_text)
                   .attr('stroke-dasharray', '3 3')
+                  .style("stroke-dasharray",getStyleLine(type_line[metric]))
               }
             }
 
@@ -1449,9 +1512,22 @@ export default {
             .attr('cy', (d) => y[metricIndex](d[metric]))
             .attr('r', 5)
             .attr('metric', metric)
-            .attr('fill', this.legendColors[metricIndex])
+            .attr('fill', color[metric] || this.legendColors[metricIndex])
+            .style("stroke-dasharray",getStyleLine(type_line[metric]))
             .style('opacity', function (d, j) {
               let opacity = nullValue !== -1 ? 1 : 0
+
+              const count = Number(conclusion_count[metric])
+              const replaceCount = Number(replace_count[metric]);
+
+              let hasTooltip = true;
+              const isNumber = typeof count === 'number';
+              if (isNumber && count > 1) {
+                hasTooltip = j % count === 0;
+              }
+              if (isNumber && count <= 0) {
+                hasTooltip = false;
+              }
 
               mustSee.forEach((item) => {
                 if (item[metric] === d[metric]) opacity = 1
@@ -1466,21 +1542,22 @@ export default {
                   metricText,
                   this,
                   'line',
-                  brushObj
+                  brushObj,
+                  replaceCount
                 )
               }
 
-              if (isDataAlwaysShow && isDataAlwaysShow === 'data') {
+              if (isDataAlwaysShow && isDataAlwaysShow === 'data' && hasTooltip) {
                 opacity = 1
                 setLabel('data-always-dot', `data-always-dot-text-${metric}`, metric)
               }
 
-              if (isDataAlwaysShow && isDataAlwaysShow === 'caption') {
+              if (isDataAlwaysShow && isDataAlwaysShow === 'caption' && hasTooltip) {
                 opacity = 1
                 setLabel('data-always-dot', `data-always-dot-text-${metric}`, `_${metric}_caption`)
               }
 
-              if (isLastDotShow && j === dataRestLength - 1) {
+              if (isLastDotShow && j === dataRestLength - 1 && hasTooltip) {
                 opacity = 1
                 setLabel('data-last-dot', `last-dot-text-${metric}`, metric)
               }
@@ -1490,17 +1567,29 @@ export default {
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metric] }, 'click'))
             .on('mouseup', () => brushObj.selectionUp())
             .on('mousedown', () => brushObj.selectionDown())
-            .on('mouseenter', function (d) {
+            .on('mouseenter', function (d, i) {
+              // const count = Number(conclusion_count[metric])
+              // let hasTooltip = true;
+              // const isNumber = typeof count === 'number';
+              // if (isNumber && count > 1) {
+              //   hasTooltip = i % count === 0;
+              // }
+              // if (isNumber && count <= 0) {
+              //   hasTooltip = false;
+              // }
+              // if (hasTooltip === false) {
+              //   return;
+              // }
+
               const xVal = isTime
                 ? (() => {
                   const date = new Date(d[xMetric] * secondTransf)
-                  const day = date.getDate()
-                  const month = date.getMonth()
+                  let day = date.getDate()
+                  if (day < 10) day = '0' + day;
+                  let month = date.getMonth()+1
+                  if (month < 10) month = '0' + month;
                   const year = date.getFullYear()
-                  const hours = ('0' + date.getHours()).substr(-2)
-                  const minutes = ('0' + date.getMinutes()).substr(-2)
-                  const seconds = ('0' + date.getSeconds()).substr(-2)
-                  return `${day}-${month + 1}-${year} ${hours}:${minutes}:${seconds}`
+                  return `${day}-${month}-${year}`
                 })()
                 : d[xMetric]
 
@@ -1664,8 +1753,7 @@ export default {
 
 
         // }
-
-        if (options.type === 'Bar chart') {
+        if (optionsKeys.length > 0 && options.type === 'Bar chart') {
           let allDotHover = []
 
           x = this.isTime
@@ -1702,7 +1790,7 @@ export default {
               }
               return y[metricIndex](d[options.name])
             })
-            .attr('fill', this.legendColors[metricIndex])
+            .attr('fill', color[metric] || this.legendColors[metricIndex])
             .attr('width', () => {
               if (!barplotBarWidth || barplotBarWidth <= 0) {
                 return d3.scaleBand()
@@ -1748,10 +1836,15 @@ export default {
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[options.name] }, 'click'))
             .on('mouseenter', function (d) {
               const date = new Date(d[xMetric] * secondTransf)
+              let day = date.getDate()
+              if (day < 10) day = '0' + day;
+              let month = date.getMonth()+1
+              if (month < 10) month = '0' + month;
+              const year = date.getFullYear()
 
               const xVal = !isTime
                 ? d[xMetric]
-                : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`
+                : `${day}-${month}-${year}`
 
               tooltip.html(
                 thisMetrics.reduce((prev, cur) => {
