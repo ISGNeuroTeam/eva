@@ -180,7 +180,7 @@ export default {
   data() {
     return {
       page: 'dash',
-      mode: true,
+      mode: (process.env.VUE_APP_DASHBOARD_EDITING_MODE == true) ?? true,
       showSetting: false,
       rotate: '',
       openProfile: false,
@@ -245,6 +245,9 @@ export default {
     searches() {
       return this.loadingDash ? [] : this.$store.getters.getSearches(this.idDash)
     },
+    tokens() {
+      return this.loadingDash ? [] : this.$store.getters.getTockens(this.idDash)
+    },
   },
   watch: {
     getSizeGrid() {
@@ -259,7 +262,12 @@ export default {
     },
     searches: {
       deep: true,
-      handler(searches) {
+      handler(searches, oldSearches) {
+        function findOnButtonTokens(tokens) {
+          return tokens.filter((el) => el.onButton);
+        }
+        let onButton = findOnButtonTokens(this.tokens);
+        console.log(onButton)
         if (this.firstLoad) {
           searches.forEach((search) => {
               this.$set(this.dataObject, search.sid, { data: [], loading: true })
@@ -280,7 +288,7 @@ export default {
               this.$store.commit('updateSearchStatus', {
                 idDash: this.idDash,
                 sid: search.sid,
-                status: 'downloaded',
+                status: res.length ? 'downloaded' : 'nodata',
               })
               this.$set(this.dataObject[search.sid], 'data', res)
               this.$set(this.dataObject[search.sid], 'loading', false)
@@ -311,8 +319,11 @@ export default {
     exportDataCSV(searchName) {
       const searchData = this.dataObject[searchName].data
       let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
-      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
+
+      if (searchData.length) {
+        let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
+        csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
+      }
       csvContent += encodeURIComponent(
         searchData.map((item) => Object.values(item).join(',')).join('\n')
       )

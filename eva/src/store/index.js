@@ -11,7 +11,7 @@ import store from './store.js'
 
 
 export default new Vuex.Store({
-  strict: true,
+  strict: process.env.NODE_ENV !== 'production',
   modules: {
     store
   },

@@ -159,7 +159,7 @@ export default {
     picker: ['visible','level', 'pinned'],
     graph: ['visible','level','boxShadow', 'pinned'],
     single: ['visible','level','subnumber','color','boxShadow','fontSize', 'lastResult', 'pinned'],
-    button: ['visible','level','color','backgroundcolor','name','fontSize','underline', 'pinned'],
+    button: ['visible','level','color','backgroundcolor','name','fontSize','underline', 'pinned', 'onButton'],
     textarea: ['visible','level', 'searchBtn', 'pinned'],
     guntt: ['visible','level','timeFormat', 'pinned'],
     tile: ['visible','level','widthTile','heightTile', 'pinned'],
