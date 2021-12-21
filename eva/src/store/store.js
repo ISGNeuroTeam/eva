@@ -132,6 +132,21 @@ export default {
       // отдельно можно дать понять стоит ли обновлять данные, например при загрузки страницы.
       state[status.idDash][status.id].should = status.status;
     },
+    changeTokenName(state, payload) {
+      const { tocken, idDash, value } = payload;
+      let j;
+      // сохранение токена в хранилище
+      state[idDash].tockens.forEach((item, i) => {
+        //  проверяем есть ли такой токен уже
+        if (item.name == tocken.name) {
+          j = i;
+        }
+      });
+      if (j != -1) {
+        state[idDash].tockens[j].name = value;
+      }
+    },
+
     updateManualTokens(state, payload) {
       const { idDash } = payload;
       console.log(idDash);
