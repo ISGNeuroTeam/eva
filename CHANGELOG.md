@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the data download button in the data source
 - date is displayed with zeros on the multiline
 - fixed merging of multiple multiline settings
+- use the width of the bar chart only if there are bar charts
 
 
 ## [1.78.0]

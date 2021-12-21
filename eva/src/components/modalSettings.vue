@@ -868,6 +868,7 @@
                 min="0"
                 outlined
                 hide-details
+                @change="val => {if (val < 1) options.barplotBarWidth = 0}"
               />
             </div>
           </div>
