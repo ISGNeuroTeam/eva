@@ -671,17 +671,18 @@ export default {
 
       let x;
       let xStartRange = this.isDividedBarplot ? barWidth/2 : 0;
-      if (this.stringOX) {
-        x = d3.scalePoint()
-          .range([xStartRange, this.width]).padding(0.5)
-          .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }));
+
+      if (this.isAccumulationBarplot) {
+        let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys()
+        x = d3.scaleBand()
+            .range([xStartRange, this.width])
+            .padding([0.2])
+            .domain(groups)
       } else {
-        if (this.isAccumulationBarplot) {
-          let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys()
-          x = d3.scaleBand()
-              .range([xStartRange, this.width])
-              .padding([0.2])
-              .domain(groups)
+        if (this.stringOX) {
+          x = d3.scalePoint()
+              .range([xStartRange, this.width]).padding(0.5)
+              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }));
         } else {
           let barWidth = parseInt(barplotBarWidth) || 0
           let barOffset = barWidth/2 *1.5;
@@ -690,7 +691,7 @@ export default {
               : d3.scaleLinear().range([barOffset, this.width-barOffset]).domain(extentForX)
         }
       }
-      
+
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
 
@@ -955,7 +956,7 @@ export default {
                 
                 const xVal = !isTime
                   ? d[xMetric]
-                  : `${day}-${month}-${year}`
+                  : `${day}-${month}-${year} ` + date.toLocaleTimeString()
                 
                 tooltip.html(
                   thisMetrics.reduce((prev, cur) => {
