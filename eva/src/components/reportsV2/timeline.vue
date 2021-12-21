@@ -22,7 +22,7 @@
           <v-list>
             <v-list-item
                 v-for="item in periodItemsSelect"
-                :key="item"
+                :key="item.value"
                 link
                 @click="setTimePeriod(item)"
             >
@@ -51,7 +51,7 @@ export default {
         parametrs: {}
       },
       menuDropdown: false,
-      select: { text: 'Колонка (1 мин.)', value: 'min' },
+      select: { text: 'Колонка (1 день)', value: 'day' },
       periodItemsSelect: [
         { text: 'Колонка (1 мин.)', value: 'min' },
         { text: 'Колонка (1 час)', value: 'hour' },
@@ -68,13 +68,27 @@ export default {
       return this.$store.getters.getTheme
     },
     dataset () {
-      let periodMarker = 9999
-      let datasetItem
-      let dataset = []
-      let currentPeriod
-      let options = {};
+      let minTime = this.data[0]?._time
+      let maxTime = this.data[0]?._time
+      this.data.forEach(item => {
+        if (item._time < minTime) {
+          minTime = item._time
+        }
+        if (item._time > maxTime) {
+          maxTime = item._time
+        }
+      })
+
+      let barTime = minTime
+      let dataset = {}
+      let dataKey = ''
+      let newDate
+      let datasetItemString
       let deltaTime
+      let options
+      let getActualLongData
       if (this.select.value === 'min') {
+        getActualLongData = this.getUntilMin
         options = {
           hour12: 'true',
           hour: 'numeric',
@@ -85,6 +99,7 @@ export default {
         };
         deltaTime = 60
       } else if (this.select.value === 'hour') {
+        getActualLongData = this.getUntilHours
         options = {
           hour12: 'true',
           hour: 'numeric',
@@ -94,6 +109,7 @@ export default {
         };
         deltaTime = 3600
       } else if (this.select.value === 'day') {
+        getActualLongData = this.getUntilDay
         options = {
           day: '2-digit',
           month: 'long',
@@ -101,52 +117,49 @@ export default {
         }
         deltaTime = 86400
       } else {
+        getActualLongData = this.getUntilMonth
         options = {
           month: 'long',
           year: 'numeric'
         }
         deltaTime = 2592000
       }
-      let date
-      let newDate
-      let newItemTime
-      let firstMarker = 0
-      
+      options = {
+        hour12: 'false',
+        hour: 'numeric',
+        minute: 'numeric',
+        day: '2-digit',
+        month: 'numeric',
+        year: 'numeric'
+      };
+      while (barTime<maxTime) {
+        newDate = new Date(barTime*1000);
+
+        if (this.select.value === 'month') {
+          let newDateMonth = newDate.getMonth()
+          if (newDateMonth === 3 || newDateMonth === 5 || newDateMonth === 8 || newDateMonth === 10) {
+            deltaTime = 2592000
+          } if (newDateMonth === 1 && newDate.getFullYear()%4 === 0) {
+            deltaTime = 2505600
+          } if (newDateMonth === 1 && newDate.getFullYear()%4 !== 0) {
+            deltaTime = 2419200
+          } else {
+            deltaTime = 2678400
+          }
+        }
+        datasetItemString = getActualLongData(newDate)
+        dataset[datasetItemString] = 0
+        barTime += deltaTime
+      }
       this.data.forEach(item => {
         
-        date = new Date(item._time*1000);
-        currentPeriod = this.getTimePart(date)
-        
-        if (periodMarker !== currentPeriod) {
-          if (firstMarker === 1) {
-            while (periodMarker !== currentPeriod) {
-              dataset.push(datasetItem)
-              newItemTime += deltaTime;
-              newDate = new Date(newItemTime*1000);
-              periodMarker = this.getTimePart(newDate)
-              datasetItem = { time: newDate.toLocaleString("ru", options), value: 0 }
-            }
-          }
-          
-          if (firstMarker === 0) {
-            firstMarker = 1
-            dataset.push(datasetItem)
-          }
-          
-          periodMarker = currentPeriod
-          datasetItem = { time: date.toLocaleString("ru", options), value: 1 }
+        if (dataset[getActualLongData(item._time*1000)] === undefined) {
+          dataset[getActualLongData(item._time*1000)] = 1
         } else {
-          datasetItem.value++
+          dataset[getActualLongData(item._time*1000)] ++
         }
-        newDate = date
-        periodMarker = currentPeriod
-        newItemTime = item._time
       })
-      
-      dataset.push(datasetItem)
-      dataset.shift()
-      dataset = dataset.slice(dataset.length - 50)
-      if (dataset.length > 0) {
+      if (Object.keys(dataset).length > 0) {
         this.clearSVG(dataset)
       }
       return null
@@ -168,6 +181,18 @@ export default {
         period = date.getMonth()
       }
       return period
+    },
+    getUntilMin (data) {
+      return new Date(data).toISOString().slice(0, 16)
+    },
+    getUntilHours (data) {
+      return new Date(data).toISOString().slice(0, 13)
+    },
+    getUntilDay (data) {
+      return new Date(data).toISOString().slice(0, 10)
+    },
+    getUntilMonth (data) {
+      return new Date(data).toISOString().slice(0, 7)
     },
     clearSVG (dataset) {
       d3.selectAll('rect')
@@ -195,15 +220,21 @@ export default {
       //   { time: '9.12', value: 23 },
       //   { time: '10.12', value: 43 },
       // ]
-      let maxY = dataset[0].value
-      dataset.forEach(element => {
+      // let datase = { '3.12': 12, '4.12': 13, '5.12': 15, '6.12': 2, '7.12': 22, '8.12': 5 }
+      let dataForSvg = []
+      for (let dataItem in dataset) {
+        dataForSvg.push({time: dataItem, value: dataset[dataItem] })
+      }
+      dataForSvg = dataForSvg.slice(dataForSvg.length - 50)
+      let maxY = dataForSvg[0].value
+      dataForSvg.forEach(element => {
         if (element.value > maxY) {
           maxY = element.value
         }
       });
-      
+
       let xScale = d3.scaleBand()
-          .domain(d3.range(dataset.length))
+          .domain(d3.range(dataForSvg.length))
           .rangeRound([0, width - marge.left - marge.right])
       let xAxis = d3.axisBottom(xScale)
 
@@ -226,7 +257,7 @@ export default {
             .attr('stroke', this.theme.$secondary_border)
       }
       let gs = g.selectAll('.rect')
-          .data(dataset)
+          .data(dataForSvg)
           .enter()
           .append('g')
       let rectPadding = 10
@@ -244,6 +275,7 @@ export default {
             return xScale(i) + rectPadding / 2
           })
           .attr('y', function (d) {
+            // console.log(d.value)
             return yScale(d.value)
           })
           .attr('width', function () {
@@ -279,7 +311,6 @@ export default {
 
 <style lang="sass" >
 @import './../../sass/_colors'
-//@import '../../sass/reportsV2/newSearch.sass'
 .timeline
   padding: 0 30px
 .select-wrap 
