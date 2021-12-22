@@ -625,6 +625,21 @@ export default {
       if (type_line === undefined) {
         type_line = {}
       }
+
+      let hasBarplots = false
+      if (!this.isUnitedMode) {
+        barplotBarWidth = 0
+      } else {
+        Object.keys(yAxesBinding.metricTypes).forEach(key => {
+          if (!hasBarplots && yAxesBinding.metricTypes[key] === 'barplot') {
+            hasBarplots = true
+          }
+        })
+        if (!hasBarplots){
+          barplotBarWidth = 0
+        }
+      }
+
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
 
