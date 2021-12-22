@@ -628,6 +628,20 @@ export default {
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
 
+      let hasBarplots = false
+      if (!this.isUnitedMode) {
+        barplotBarWidth = 0
+      } else {
+        Object.keys(yAxesBinding.metricTypes).forEach(key => {
+          if (!hasBarplots && yAxesBinding.metricTypes[key] === 'barplot') {
+            hasBarplots = true
+          }
+        })
+        if (!hasBarplots){
+          barplotBarWidth = 0
+        }
+      }
+
       const getStyleLine = (type) => {
         if (type === 'dashed') {
           return '5,5';
@@ -677,20 +691,29 @@ export default {
         x = d3.scaleBand()
             .range([xStartRange, this.width])
             .padding([0.2])
-            .domain(groups)
+            .domain(groups.sort())
       } else {
         if (this.stringOX) {
           x = d3.scalePoint()
               .range([xStartRange, this.width]).padding(0.5)
-              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }));
+              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }).sort());
         } else {
           let barWidth = parseInt(barplotBarWidth) || 0
           let barOffset = barWidth/2 *1.5;
-          x = this.isTime
-              ? d3.scaleTime().range([xStartRange+barOffset, this.width-barOffset]).domain(extentForX)
-              : d3.scaleLinear().range([barOffset, this.width-barOffset]).domain(extentForX)
+
+          if (hasBarplots) {
+            x = d3.scalePoint()
+                .range([xStartRange, this.width]).padding(0.5)
+                .domain(this.dataRestFrom.map(d => this.isTime ? (d[xMetric]*this.secondTransf) : d[xMetric]).sort());
+          } else {
+            x = this.isTime && false
+                ? d3.scaleTime().range([xStartRange+barOffset, this.width-barOffset]).domain(extentForX)
+                : d3.scaleLinear().range([barOffset, this.width-barOffset]).domain(extentForX)
+          }
+
         }
       }
+      //console.log(x.ticks())
 
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
@@ -836,6 +859,7 @@ export default {
                 .attr('transform', 'translate(0, ' + translateY + ')')
                 .attr('class', yAxisClass)
                 .call(d3.axisLeft(yScal));
+
             if (numberLeft !== 0) {
               this.svg
                   .selectAll(`g.${yAxisClass} g.tick line`)
