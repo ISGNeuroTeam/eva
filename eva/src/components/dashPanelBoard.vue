@@ -828,7 +828,7 @@ export default {
       tocken_elem: false,
       profile_elem: false,
       save_elem: false,
-      editMode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == true ?? true,
+      editMode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
       code_elem: false,
       check: mdiCheckBold,
       look: mdiEye,
