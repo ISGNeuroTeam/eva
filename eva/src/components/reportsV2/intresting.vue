@@ -130,7 +130,20 @@ export default {
     font-size: 12px
     line-height: 15px
     color: $main_text
+
 .action-popup
-  padding: 10px 10px 10px 10px
+  padding: 0 0 0 0 !important
   border-radius: 5px
+  background-color: $main_bg !important
+  .action-popup-title
+    padding: 10px 10px 0 10px
+    background-color: $main_bg
+    color: $main_text
+    font-weight: bold
+  .v-data-table-header
+    th
+      color: $main_text !important
+  tr:hover
+    color: $main_bg
+    background-color: $accent_ui_color !important
 </style>

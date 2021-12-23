@@ -67,7 +67,7 @@
                   v-on="on"
                 >
                   {{ timeRangeValue }}
-                  <v-icon>{{ mdiChevronDown }}</v-icon>
+                  <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
                 </div>
               </template>
               <div class="dropdown-range">

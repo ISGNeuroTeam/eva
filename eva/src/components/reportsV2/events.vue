@@ -17,7 +17,7 @@
           <template v-slot:item="{ item, expand, isExpanded }">
             <tr>
               <td>
-                <v-icon @click="expand(!isExpanded)">{{ isExpanded ? mdiChevronDown : mdiChevronRight}}</v-icon>
+                <v-icon :color="theme.$main_text" @click="expand(!isExpanded)">{{ isExpanded ? mdiChevronDown : mdiChevronRight}}</v-icon>
               </td>
               <td class="d-block d-sm-table-cell" v-for="field in Object.keys(item)">
                 {{item[field]}}
@@ -38,6 +38,7 @@
 
           <template v-slot:top="{ pagination, options, updateOptions }">
             <v-data-footer
+                :style="{color: theme.$main_text}"
                 :pagination="pagination"
                 :options="options"
                 @update:options="updateOptions"
@@ -65,7 +66,7 @@ export default {
       headers: [
         { text: 'Инфо',  align: 'left', sortable: false, value: 'info', width: '80px' },
         { text: 'Время', sortable: false, value: 'time', width: '120px' },
-        { text: 'Input count', sortable: false, value: 'inputCount' },
+        { text: 'Данные', sortable: false, value: 'inputCount' },
       ],
     }
   },
@@ -104,10 +105,20 @@ export default {
   .collapse-row 
     border-bottom: 1px solid $main-border
   .v-data-footer
-    border-top: none !important
+    border-top: none
+    .v-icon
+      color: $main_text
+    .v-select__selections
+      color: $main_text
+    .v-input__slot:before
+      border-color: $main_text !important
   .v-data-table-header
     th
       background-color: $secondary_border !important
+      color: $main_text !important
   td
     font-size: 13px !important
+  tr:hover
+    color: $main_bg
+    background-color: $accent_ui_color !important
 </style>

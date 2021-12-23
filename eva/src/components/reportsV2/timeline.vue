@@ -16,7 +16,7 @@
                 v-on="on"
             >
               {{ select.text }}
-              <v-icon>{{ mdiChevronDown }}</v-icon>
+              <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
             </div>
           </template>
           <v-list>
@@ -296,7 +296,7 @@ export default {
 
 </script>
 
-<style lang="sass" >
+<style lang="sass">
 @import './../../sass/_colors'
 .timeline
   padding: 0 30px
@@ -305,6 +305,7 @@ export default {
   flex-direction: row-reverse
   padding-top: 10px
   padding-bottom: 10px
+  background-color: $main_bg !important
   .select
     max-width: 180px
     .v-select__selection
@@ -313,7 +314,10 @@ export default {
       border-color: $main_text
     .v-input__append-inner
       margin-bottom: 5px
-
+.v-list
+  background-color: $main_bg !important
+  .v-list-item
+    background-color: $main_bg
 //.chart div {
 //  font: 10px sans-serif;
 //  background-color: steelblue;
