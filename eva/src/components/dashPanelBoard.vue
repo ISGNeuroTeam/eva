@@ -10,7 +10,12 @@
         </div>
         <v-tooltip bottom :color="theme.$accent_ui_color">
           <template v-slot:activator="{ on }">
-            <v-icon class="home" :color="theme.$secondary_text" v-on="on" @click="toHome">
+            <v-icon
+              class="home"
+              :color="theme.$secondary_text"
+              v-on="on"
+              @click="toHome"
+            >
               {{ home }}
             </v-icon>
           </template>
@@ -18,7 +23,12 @@
         </v-tooltip>
         <v-tooltip bottom :color="theme.$accent_ui_color">
           <template v-slot:activator="{ on }">
-            <v-icon class="undo" :color="theme.$secondary_text" v-on="on" @click="toBackward">
+            <v-icon
+              class="undo"
+              :color="theme.$secondary_text"
+              v-on="on"
+              @click="toBackward"
+            >
               {{ undo }}
             </v-icon>
           </template>
@@ -98,7 +108,11 @@
             </template>
             <span>Открыть настройки фильтров</span>
           </v-tooltip>
-          <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            v-if="editPermission"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button edit-icon theme--dark"
@@ -111,7 +125,11 @@
             </template>
             <span>Открыть настройки дашборда</span>
           </v-tooltip>
-          <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            v-if="editPermission"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -129,7 +147,9 @@
               <v-icon
                 class="control-button theme--dark"
                 :color="
-                  $store.getters.getColorError ? theme.$primary_button : theme.$secondary_text
+                  $store.getters.getColorError
+                    ? theme.$primary_button
+                    : theme.$secondary_text
                 "
                 v-on="on"
                 @click="openLogs"
@@ -144,11 +164,20 @@
           <template v-slot:activator="{ on: onMenu }">
             <v-tooltip bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on: onTooltip }">
-                <div class="dropdown-profile" v-on="{ ...onMenu, ...onTooltip }">
-                  <v-icon :style="{ color: theme.$secondary_text }" class="profile theme--dark">
+                <div
+                  class="dropdown-profile"
+                  v-on="{ ...onMenu, ...onTooltip }"
+                >
+                  <v-icon
+                    :style="{ color: theme.$secondary_text }"
+                    class="profile theme--dark"
+                  >
                     {{ profile_icon }}
                   </v-icon>
-                  <div class="id-user profile-login" :style="{ color: theme.$secondary_text }">
+                  <div
+                    class="id-user profile-login"
+                    :style="{ color: theme.$secondary_text }"
+                  >
                     {{ login }}
                   </div>
                 </div>
@@ -158,11 +187,18 @@
           </template>
           <v-list class="profile-dropdown--list">
             <v-list-item>
-              <v-list-item-title class="profile-dropdown--title">Профиль</v-list-item-title>
+              <v-list-item-title class="profile-dropdown--title"
+                >Профиль</v-list-item-title
+              >
             </v-list-item>
             <div v-for="item in profileDropdownButtons" :key="item.id">
               <v-list-item v-if="!item.hide">
-                <v-btn class="profile-dropdown--button" icon v-on="on" @click="item.onClick">
+                <v-btn
+                  class="profile-dropdown--button"
+                  icon
+                  v-on="on"
+                  @click="item.onClick"
+                >
                   <v-icon class="edit icon-aut" :color="theme.$secondary_text">
                     {{ item.icon }}
                   </v-icon>
@@ -200,7 +236,7 @@
               background: theme.$accent_ui_color,
               color: '#fff',
               border: `1px solid ${theme.$accent_ui_color}`,
-              width: '65px'
+              width: '65px',
             }"
           >
             {{ checkSid(search.sid) }}
@@ -300,7 +336,12 @@
             <span>Удалить ИД</span>
           </v-tooltip>
         </div>
-        <v-btn small class="create-search" :color="theme.$primary_button" @click="openModal">
+        <v-btn
+          small
+          class="create-search"
+          :color="theme.$primary_button"
+          @click="openModal"
+        >
           Создать
         </v-btn>
       </div>
@@ -350,7 +391,10 @@
           class="row-tocken"
           :style="{ color: theme.$main_text }"
         >
-          <div class="row-data row-itself" :class="{ showTocken: !lookTockens[i].show }">
+          <div
+            class="row-data row-itself"
+            :class="{ showTocken: !lookTockens[i].show }"
+          >
             <v-text-field
               v-model="tockensName[tocken.name]"
               class="tocken-name theme--dark"
@@ -414,13 +458,20 @@
               hide-details
             />
             <v-text-field
-                v-model="tocken.defaultValue"
-                class="tocken-default-value theme--dark"
-                :color="theme.$accent_ui_color"
-                label="По умолчанию"
-                outlined
-                hide-details
+              v-model="tocken.defaultValue"
+              class="tocken-default-value theme--dark"
+              :color="theme.$accent_ui_color"
+              label="По умолчанию"
+              outlined
+              hide-details
             />
+            <v-checkbox
+              v-model="tocken.onButton"
+              label="обновлять по кнопке"
+              class="tocken-on-button theme--dark"
+              :color="theme.$accent_ui_color"
+            >
+            </v-checkbox>
           </div>
           <p
             class="tocken-view"
@@ -433,18 +484,22 @@
             class="row-check"
             :color="theme.$primary_button"
             :class="{ showIcon: lookTockens[i].show }"
-            @click="saveTocken()"
+            @click="saveTocken(i)"
           >
             {{ check }}
           </v-icon>
-          <v-icon class="row-look" :color="theme.$primary_button" @click="lookTocken(i)">
+          <v-icon
+            class="row-look"
+            :color="theme.$primary_button"
+            @click="lookTocken(i)"
+          >
             {{ look }}
           </v-icon>
           <v-icon
             class="row-trash"
             :color="theme.$primary_button"
             :class="{ showIcon: lookTockens[i].show }"
-            @click="deleteTocken(tocken.name)"
+            @click="deleteTocken(tocken.name, i)"
           >
             {{ trash }}
           </v-icon>
@@ -516,14 +571,25 @@
             hide-details
           />
           <v-text-field
-              v-model="newTockenDop.defaultValue"
-              class="tocken-default-value theme--dark"
-              :color="theme.$accent_ui_color"
-              label="По умолчанию"
-              outlined
-              hide-details
+            v-model="newTockenDop.defaultValue"
+            class="tocken-default-value theme--dark"
+            :color="theme.$accent_ui_color"
+            label="По умолчанию"
+            outlined
+            hide-details
           />
-          <v-icon class="row-check" :color="theme.$primary_button" @click="saveTocken()">
+          <v-checkbox
+            v-model="newTockenDop.onButton"
+            label="обновлять по кнопке"
+            class="tocken-on-button theme--dark"
+            :color="theme.$accent_ui_color"
+          />
+
+          <v-icon
+            class="row-check"
+            :color="theme.$primary_button"
+            @click="saveTocken()"
+          >
             {{ check }}
           </v-icon>
         </div>
@@ -572,7 +638,11 @@
           hide-details
           clearable
         />
-        <v-btn class="event-btn" :color="theme.$primary_button" @click="setEvents">
+        <v-btn
+          class="event-btn"
+          :color="theme.$primary_button"
+          @click="setEvents"
+        >
           Подтвердить
         </v-btn>
       </div>
@@ -590,7 +660,12 @@
             ?
           </div>
           <div class="buttons-save">
-            <v-btn class="save-btn" small :color="theme.$primary_button" @click="saveDash">
+            <v-btn
+              class="save-btn"
+              small
+              :color="theme.$primary_button"
+              @click="saveDash"
+            >
               Да
             </v-btn>
             <v-btn
@@ -633,7 +708,12 @@
           >
             Да
           </v-btn>
-          <v-btn small :color="theme.$primary_button" class="warning-btn" @click="noSearch">
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            class="warning-btn"
+            @click="noSearch"
+          >
             Нет
           </v-btn>
         </div>
@@ -645,7 +725,11 @@
         :dataSearchFrom="newSearch"
         @cancelModal="cancelModal"
       />
-      <modal-themes :show="paleteShow" :admin="isAdmin" @closeModal="paleteShow = false" />
+      <modal-themes
+        :show="paleteShow"
+        :admin="isAdmin"
+        @closeModal="paleteShow = false"
+      />
       <modal-schedule
         :idDashFrom="idDash"
         :colorFrom="theme"
@@ -653,7 +737,10 @@
         :dataSidFrom="scheduleSid"
         @cancel="activeSchedule = false"
       />
-      <modal-log :modal-active="modalActive" @cancelModal="modalActive = false" />
+      <modal-log
+        :modal-active="modalActive"
+        @cancelModal="modalActive = false"
+      />
       <dash-settings
         :gear-from="gearShow"
         :permissions-from="userPermissions"
@@ -710,12 +797,11 @@ import {
   mdiCheckBold,
   mdiSwapVerticalBold,
   mdiFilter,
-} from '@mdi/js'
-import EvaLogo from '../images/eva-logo.svg'
+} from '@mdi/js';
+import EvaLogo from '../images/eva-logo.svg';
 
-
-import settings from '../js/componentsSettings.js'
-import DashFilterPanel from './dash-filter-panel/DashFilterPanel'
+import settings from '../js/componentsSettings.js';
+import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
 
 export default {
   components: {
@@ -725,10 +811,11 @@ export default {
   props: {
     idDashFrom: null,
     inside: null,
-    horizontalCell: null
+    horizontalCell: null,
   },
   data() {
     return {
+      index: '',
       login: '',
       on: false,
       userEdit: mdiAccountEdit,
@@ -741,7 +828,7 @@ export default {
       tocken_elem: false,
       profile_elem: false,
       save_elem: false,
-      editMode: true,
+      editMode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
       code_elem: false,
       check: mdiCheckBold,
       look: mdiEye,
@@ -786,6 +873,7 @@ export default {
       mdiCompare: mdiCompare,
       tempTocken: {},
       change: {},
+      onButton: {},
       profileDropdownButtons: [
         {
           id: 1,
@@ -812,7 +900,7 @@ export default {
       newTockenName: null,
       opennewtocken: false,
       newTockenDop: {
-        defaultValue: '*'
+        defaultValue: '*',
       },
       newElem: '',
       newAction: '',
@@ -854,15 +942,15 @@ export default {
       modalPaper: false,
       userPermissions: [],
       screenHeight: this.getScreenHeight(),
-    }
+    };
   },
   computed: {
     idDash: function () {
-      return this.idDashFrom
+      return this.idDashFrom;
     },
 
     headerTop() {
-      return document.body.clientWidth <= 1400 ? 40 : 50
+      return document.body.clientWidth <= 1400 ? 40 : 50;
     },
     isAdmin() {
       return this.userPermissions && this.userPermissions.includes('admin_all');
@@ -905,7 +993,7 @@ export default {
       // получения всех токенов на страницы
       let tockens = this.$store.getters.getTockens(this.idDash);
 
-      tockens.forEach(item => {
+      tockens.forEach((item) => {
         this.tockensName[item.name] = item.name;
         this.lookTockens.push({ show: false, color: this.theme.controls });
       });
@@ -920,7 +1008,7 @@ export default {
       return function (element) {
         let names = this.$store.getters
           .getActions({ elem: element, idDash: this.idDash })
-          .map(item => {
+          .map((item) => {
             return item.name;
           });
         return names;
@@ -941,15 +1029,15 @@ export default {
       return {
         background: this.theme.$main_bg,
         color: this.theme.$main_text,
-        'max-height': this.screenHeight + 'px'
-      }
+        'max-height': this.screenHeight + 'px',
+      };
     },
   },
   mounted() {
     this.getCookie();
     this.tools = settings.tools;
 
-    document.onmouseup = event => {
+    document.onmouseup = (event) => {
       // а при отпускании кнопки при перетаскивании
       document.onmousemove = null; // мы бросаем элемент где он есть
       let width = document.querySelector('#app').clientWidth;
@@ -1022,7 +1110,7 @@ export default {
       if (this.$jwt.hasToken()) {
         this.login = this.$jwt.decode().username;
 
-        let response = await fetch(`/api/user/permissions`).catch(error => {
+        let response = await fetch(`/api/user/permissions`).catch((error) => {
           console.log(error);
           return {
             status: 300,
@@ -1031,10 +1119,9 @@ export default {
         });
         if (response.status === 200) {
           // если получилось
-          await response.json().then(res => {
+          await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
             this.userPermissions = res.data;
-
           });
         } else {
           this.exit();
@@ -1049,11 +1136,11 @@ export default {
 
       if (!this.change[id]) {
         // я так понимаю если на странице есть созданные ИС
-        Object.keys(this.change).forEach(item => {
+        Object.keys(this.change).forEach((item) => {
           // то пробегаемся по всем ИС
           item == id ? (this.change[item] = true) : (this.change[item] = false); // если нашли выбронный ИС то меняем его статус
         });
-        let search = this.searches.filter(item => {
+        let search = this.searches.filter((item) => {
           // получаем только тот ИС который редактируется
           return item.sid == id;
         })[0];
@@ -1164,7 +1251,7 @@ export default {
     openSearch: function () {
       // собственно функция которая показывает или нет окно с редактируемым ИД
       this.opensearch = !this.opensearch;
-      Object.keys(this.change).forEach(item => {
+      Object.keys(this.change).forEach((item) => {
         this.change[item] = false;
       });
     },
@@ -1195,7 +1282,7 @@ export default {
         this.lookTockens[i].color = this.theme.controls;
       }
     },
-    saveTocken: function () {
+    saveTocken: function (index) {
       // функция которая сохраняет токен в хранилище
 
       let parent = event.target.parentElement; // получаем предка элемнета на который нажали для сохранения
@@ -1207,15 +1294,26 @@ export default {
         name: parent.querySelector('.tocken-name').querySelector('input')
           ? parent.querySelector('.tocken-name').querySelector('input').value
           : '',
-        elem: parent.querySelector('.tocken-elem').querySelector('.v-select__selection')
-          ? parent.querySelector('.tocken-elem').querySelector('.v-select__selection').innerText
+        elem: parent
+          .querySelector('.tocken-elem')
+          .querySelector('.v-select__selection')
+          ? parent
+              .querySelector('.tocken-elem')
+              .querySelector('.v-select__selection').innerText
           : '',
-        action: parent.querySelector('.tocken-action').querySelector('.v-select__selection')
-          ? parent.querySelector('.tocken-action').querySelector('.v-select__selection').innerText
+        action: parent
+          .querySelector('.tocken-action')
+          .querySelector('.v-select__selection')
+          ? parent
+              .querySelector('.tocken-action')
+              .querySelector('.v-select__selection').innerText
           : '',
-        capture: parent.querySelector('.tocken-capture').querySelector('.v-select__selection')
-          ? parent.querySelector('.tocken-capture').querySelector('.v-select__selection')
-              .innerText
+        capture: parent
+          .querySelector('.tocken-capture')
+          .querySelector('.v-select__selection')
+          ? parent
+              .querySelector('.tocken-capture')
+              .querySelector('.v-select__selection').innerText
           : '',
         prefix: parent.querySelector('.tocken-prefix').querySelector('input')
           ? parent.querySelector('.tocken-prefix').querySelector('input').value
@@ -1223,13 +1321,25 @@ export default {
         sufix: parent.querySelector('.tocken-sufix').querySelector('input')
           ? parent.querySelector('.tocken-sufix').querySelector('input').value
           : '',
-        delimetr: parent.querySelector('.tocken-delimetr').querySelector('input')
-          ? parent.querySelector('.tocken-delimetr').querySelector('input').value
+        delimetr: parent
+          .querySelector('.tocken-delimetr')
+          .querySelector('input')
+          ? parent.querySelector('.tocken-delimetr').querySelector('input')
+              .value
           : '',
-        defaultValue: parent.querySelector('.tocken-default-value').querySelector('input')
-            ? parent.querySelector('.tocken-default-value').querySelector('input').value
-            : '',
+        defaultValue: parent
+          .querySelector('.tocken-default-value')
+          .querySelector('input')
+          ? parent.querySelector('.tocken-default-value').querySelector('input')
+              .value
+          : '',
         resetData: true, //сделать норм
+        onButton: parent
+          .querySelector('.tocken-on-button')
+          .querySelector('input')
+          ? parent.querySelector('.tocken-on-button').querySelector('input')
+              .checked
+          : '',
       };
 
       let j = -1;
@@ -1241,10 +1351,14 @@ export default {
           j = i;
         }
       });
-      if (j != -1) {
+      if (j != -1 || Number.isInteger(index)) {
         // если токен уже есть
-        let height = this.$el.querySelector('.block-tocken').getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
-        this.$el.querySelector('.warning-block').classList.add('warning-block-show');
+        let height = this.$el
+          .querySelector('.block-tocken')
+          .getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
+        this.$el
+          .querySelector('.warning-block')
+          .classList.add('warning-block-show');
         //this.$el.querySelector('.warning-block').style.bottom = `-${height+55}px; !important`; // 45 это высота самого warning и padding сверху
         this.otstupBottom = height + 55;
         this.msgWarn = 'Такой токен уже существует. Хотите обновить?';
@@ -1252,9 +1366,13 @@ export default {
           .querySelector('.warning-block')
           .querySelector('.yes-btn')
           .setAttribute('tool', 'tocken');
+        this.index = index;
       } else {
         // если нету то етсь он новый
-        this.$store.commit('createTockens', { idDash: this.idDash, tocken: this.tempTocken }); // то создаем токен в хранилище
+        this.$store.commit('createTockens', {
+          idDash: this.idDash,
+          tocken: this.tempTocken,
+        }); // то создаем токен в хранилище
         this.showSign = true; // визуально скрываем окно с созданием токена
         this.opennewtocken = false;
       }
@@ -1285,15 +1403,15 @@ export default {
           idDash: this.idDash,
           sid: search.sid,
           status: 'empty',
-        })
-      })
+        });
+      });
     },
     startSearch: async function (search) {
       this.$store.commit('updateSearchStatus', {
         idDash: this.idDash,
         sid: search.sid,
         status: 'empty',
-      })
+      });
     },
     yesSearch: function () {
       // кнопка согласия на обновления если ИС или токен уже существует
@@ -1308,19 +1426,36 @@ export default {
           idDash: this.idDash,
           reload: true,
         }); // то обновляем ИС
-        this.$el.querySelector('.warning-block').classList.remove('warning-block-show'); // убираем окно с предпреждением
+        this.$el
+          .querySelector('.warning-block')
+          .classList.remove('warning-block-show'); // убираем окно с предпреждением
         this.openSearch();
       } else if (elem.getAttribute('tool') == 'tocken') {
         // если это токен - собственно тоже самое
-        this.$store.commit('createTockens', { idDash: this.idDash, tocken: this.tempTocken });
-        this.$el.querySelector('.warning-block').classList.remove('warning-block-show');
+        const id = this.index;
+        const newName = this.tempTocken.name;
+        this.tempTocken.name = this.tockens[id].name;
+        this.$store.commit('createTockens', {
+          idDash: this.idDash,
+          tocken: this.tempTocken,
+        });
+        this.$store.commit('changeTokenName', {
+          idDash: this.idDash,
+          tocken: this.tempTocken,
+          value: newName,
+        });
+        this.$el
+          .querySelector('.warning-block')
+          .classList.remove('warning-block-show');
         this.showSign = true;
         this.opennewtocken = false;
       }
     },
     noSearch: function () {
       // если нажали на кнопку нет
-      this.$el.querySelector('.warning-block').classList.remove('warning-block-show'); // то просто убираем это окно
+      this.$el
+        .querySelector('.warning-block')
+        .classList.remove('warning-block-show'); // то просто убираем это окно
     },
     checkSid: function (sid) {
       let newSid = sid;
@@ -1339,7 +1474,7 @@ export default {
       }
     },
     exportSearch: function (sid) {
-      this.$emit('downloadData', sid)
+      this.$emit('downloadData', sid);
       // let db = null;
       //
       // let request = indexedDB.open('EVA', 1);
@@ -1437,13 +1572,13 @@ export default {
       avatar.style.zIndex = 3; // делаем его выше всех
       avatar.style.position = 'absolute'; // и относительно позиионируем
 
-      document.onmousemove = event => {
+      document.onmousemove = (event) => {
         // при движении мыши
         avatar.style.left = event.pageX - shiftX + 'px'; // мы перемещаем на самом деле наш автар, а не сам объект
         avatar.style.top = event.pageY - shiftY + 'px';
         this.avatar = avatar; // и храним объект нашего  аватара
       };
-      document.onclick = event => {
+      document.onclick = (event) => {
         // при клике на элемент
         avatar.remove(); // удаляем аватар из дерева dom
       };
@@ -1452,7 +1587,7 @@ export default {
       // функция создания нового элемнета
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
-        const top = Number(this.avatar.style.top.replace('px', ''))
+        const top = Number(this.avatar.style.top.replace('px', ''));
 
         let coord = this.avatar.getBoundingClientRect(); // берем координаты аватара
         let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
@@ -1468,7 +1603,9 @@ export default {
           type[0].toUpperCase() + type.substring(1)
         );
 
-        let step = JSON.parse(JSON.stringify(this.$store.getters.getSizeGrid(this.idDash)));
+        let step = JSON.parse(
+          JSON.stringify(this.$store.getters.getSizeGrid(this.idDash))
+        );
         step.vert = Math.round(screen.width / Number(step.vert));
         step.hor = Math.round(screen.height / Number(step.hor));
 
@@ -1497,7 +1634,7 @@ export default {
         this.$set(this.newDashBoard[type], 'search', -1);
         this.$set(this.newDashBoard[type], 'switch', false);
         this.$set(this.newDashBoard[type], 'actions', []);
-        this.$store.commit('createDashBoard', {
+        this.$store.commit('createDashboardVisualization', {
           idDash: this.idDash,
           dashboard: this.newDashBoard,
         }); // создаем новый элемнет
@@ -1535,7 +1672,11 @@ export default {
     },
     showModalExin: function (event) {
       // функция вызова модального окна импорта экспорта
-      this.$store.commit('setModalExin', { idDash: this.idDash, status: true, event: event });
+      this.$store.commit('setModalExin', {
+        idDash: this.idDash,
+        status: true,
+        event: event,
+      });
     },
     openSettings: function () {
       this.$emit('openSettings');
@@ -1560,12 +1701,16 @@ export default {
         let reg, body, bodyArray, element, doing, originItem;
 
         if (events.length != 0) {
-          events.forEach(item => {
+          events.forEach((item) => {
             originItem = item;
             item = item.replace(/\s/g, '');
             if (item != '') {
               reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
-              this.$set(this.event, 'event', reg.exec(item)[0].replace('(', ''));
+              this.$set(
+                this.event,
+                'event',
+                reg.exec(item)[0].replace('(', '')
+              );
               reg = new RegExp(/\(.+\)/, 'g');
               body = reg.exec(item)[0];
               body = body.slice(1, body.length - 1);
@@ -1580,10 +1725,18 @@ export default {
                 if (element.length > 2 && element[1].indexOf('[') == -1) {
                   this.$set(this.event, 'compare', element[0]);
                   this.$set(this.event, 'column', element[1]);
-                  this.$set(this.event, 'row', element.splice(2, element.length - 1).join(','));
+                  this.$set(
+                    this.event,
+                    'row',
+                    element.splice(2, element.length - 1).join(',')
+                  );
                 } else {
                   this.$set(this.event, 'compare', element[0]);
-                  this.$set(this.event, 'sense', element.splice(1, element.length - 1).join(','));
+                  this.$set(
+                    this.event,
+                    'sense',
+                    element.splice(1, element.length - 1).join(',')
+                  );
                 }
               } else if (this.event.event == 'OnTokenCompare') {
                 this.$set(this.event, 'compare', element[0]);
@@ -1600,7 +1753,11 @@ export default {
                 } else {
                   for (let i = 0; i < element.length; i++) {
                     if (element[i].indexOf(']') != -1) {
-                      this.$set(this.event, 'treshold', element.slice(0, i + 1).join(','));
+                      this.$set(
+                        this.event,
+                        'treshold',
+                        element.slice(0, i + 1).join(',')
+                      );
                       this.$set(
                         this.event,
                         'color',
@@ -1690,7 +1847,9 @@ export default {
                 this.$set(this.event, 'heightPersent', doing[4]);
 
                 this.$set(this.event, 'header', doing[5]);
-              } else if (doing[0].toLowerCase() == 'changeReport'.toLowerCase()) {
+              } else if (
+                doing[0].toLowerCase() == 'changeReport'.toLowerCase()
+              ) {
                 // changeReport
 
                 doing = originItem.split(doing[0])[1];
@@ -1698,14 +1857,16 @@ export default {
                 this.$set(this.event, 'sid', doing[0]);
                 if (doing[1].indexOf('[') != -1) {
                   doing.splice(0, 1);
-                  let files = doing.map(item => {
+                  let files = doing.map((item) => {
                     return item.replace('[', '').replace(']', '');
                   });
                   this.$set(this.event, 'file', files);
                 } else {
                   this.$set(this.event, 'file', [doing[1]]);
                 }
-              } else if (doing[0].toLowerCase() == 'exportSearch'.toLowerCase()) {
+              } else if (
+                doing[0].toLowerCase() == 'exportSearch'.toLowerCase()
+              ) {
                 // changeReport
 
                 doing = doing[1]
@@ -1731,7 +1892,11 @@ export default {
           this.openEventCode();
         }
       } else {
-        this.$store.commit('setEvents', { event: null, eventFull: null, idDash: this.idDash });
+        this.$store.commit('setEvents', {
+          event: null,
+          eventFull: null,
+          idDash: this.idDash,
+        });
 
         this.events = [];
 
@@ -1741,7 +1906,7 @@ export default {
 
     changeColor: function () {
       if (document.querySelectorAll('.v-menu__content').length != 0) {
-        document.querySelectorAll('.v-menu__content').forEach(item => {
+        document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
           item.style.background = this.theme.back;
           item.style.color = this.theme.text;
@@ -1755,13 +1920,15 @@ export default {
         id: this.idDash,
         body: JSON.stringify(dash),
       });
-      response.then(res => {
+      response.then((res) => {
         this.errorSave = true;
         if (res.status == 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
           this.$store.auth.getters.putLog(
-            `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${res.data.id}`
+            `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
+              res.data.id
+            }`
           );
           // console.log(res.data)
           this.updateDash({ data: res.data, dash: dash });
@@ -1781,7 +1948,9 @@ export default {
         modified: dash.data.modified,
       });
       this.$store.auth.getters.putLog(
-        `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${this.idDash}`
+        `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
+          this.idDash
+        }`
       );
     },
     toHichName: function (name) {
@@ -1794,8 +1963,8 @@ export default {
       return 0.9 * window.innerHeight;
     },
     updateScreenHeight() {
-      this.screenHeight = this.getScreenHeight()
-    }
+      this.screenHeight = this.getScreenHeight();
+    },
   },
 };
 </script>

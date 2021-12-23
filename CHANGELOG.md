@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.79.0]
+
+### Added
+
+- added a tooltip with information when hovering over an edge in a ygraph component
+- added pop-up information about a node or edge in the graph component
+- add env files
+
+### Fixed
+
+- multiline graphs are not rendered without resaving the settings
+- fixed the data download button in the data source
+- date is displayed with zeros on the multiline
+- fixed merging of multiple multiline settings
+- use the width of the bar chart only if there are bar charts
+
 ## [1.78.0]
 
 ### Added
@@ -52,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added redirect to dashboard with information about tabs from dash heatmap
 - сombining ticks of several Y-axes
+- searching research v.2.0
 
 ### Fixed
 

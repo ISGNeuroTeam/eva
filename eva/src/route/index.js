@@ -37,6 +37,14 @@ const routes =  [
     },
   },
   {
+    name: 'Исследование данных',
+    path: '/data-research',  // если главная страница
+    component: require('../components/reportsV2/index.vue').default,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     name: 'Документы',
     path: '/papers',  // если главная страница
     component: require('../components/papers.vue').default,

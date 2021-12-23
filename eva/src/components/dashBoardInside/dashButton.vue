@@ -1,9 +1,18 @@
 <template>
-  <div 
+  <div v-if="optionsData.onButton">
+    <div 
+      class="name" 
+      :class="{textDecoration:underline}"
+      :style="{color:optionsData.colorText,height:`${height}px`,fontSize:`${fontSize}px`,lineHeight:`${height-dataMode}px`,background:optionsData.background}"
+      @click="updateSearches">
+        Подтвердить
+    </div>
+  </div>
+  <div v-else
     ref="buttonEl"
     class="dash-button" 
     :options="options" 
-    style="padding: 0" 
+    style="padding: 0"
     @click="setClick"
   >
     <div 
@@ -46,7 +55,8 @@ export default {
       optionsData: {
         'name': '',
         'background': '',
-        'colorText': ''
+        'colorText': '',
+        'onButton': false
       }, 
       underline: false,
     } 
@@ -89,6 +99,7 @@ export default {
         this.optionsData.name = '';
       }
       this.underline = options.underline;
+      this.optionsData.onButton = options?.onButton
       return true
     },
     fontSize: function() {
@@ -114,6 +125,9 @@ export default {
     },
   },  
   methods: {
+    updateSearches() {
+      this.$store.commit("updateManualTokens", {idDash: this.idDash});
+    },
     actionOpen: function(targetLink, header ,widthPersent, heightPersent) {
       //размер нового окна
       let _width = screen.width*widthPersent;

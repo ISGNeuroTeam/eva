@@ -114,7 +114,7 @@ export default {
     deleteBtn: function () {  // кнопка удаления 
       let id = this.deleteId.replace(/\[|\]|\s/g, ""); // получаем id и отсеиваем все лишние знаки
         
-      this.$store.commit('deleteDashBoard',  { idDash: this.idDash,  id: id,  page: this.page, name: this.deleteName } );  // отправляем информацию про удаляемый объект в хранилище
+      this.$store.commit('deleteDashboardVisualization',  { idDash: this.idDash,  id: id,  page: this.page, name: this.deleteName } );  // отправляем информацию про удаляемый объект в хранилище
       if (this.page == 'search' ) {
         let searchesId = [];
         searchesId.push(this.deleteName);

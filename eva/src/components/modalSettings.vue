@@ -740,6 +740,57 @@
             </div>
           </div>
           <div
+            v-if="checkOptions('onButton')"
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Submit
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Перезапускать серчи по кнопке
+            </div>
+            <div class="status-option item">
+              <v-checkbox
+                v-model="options.onButton"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.onButton)"
+              />
+            </div>
+          </div>
+          <div
+            class="option-item"
+          >
+            <div
+              class="name-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              pinned
+            </div>
+            <div
+              class="discribe-option item"
+              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+            >
+              Закрепить на всех вкладках
+            </div>
+            <div class="status-option item">
+              <v-switch
+                v-model="options.pinned"
+                class="switch"
+                :color="theme.$primary_button"
+                :style="{color:theme.$main_text}"
+                :label="String(options.pinned)"
+              />
+            </div>
+          </div>
+          <div
             v-if="checkOptions('isDataAlwaysShow')"
             class="option-item"
           >
@@ -868,6 +919,7 @@
                 min="0"
                 outlined
                 hide-details
+                @change="val => {if (val < 1) options.barplotBarWidth = 0}"
               />
             </div>
           </div>
@@ -1883,6 +1935,12 @@ export default {
   watch: {
     selectedTitles(newValue) {
       this.tableTitles = newValue;
+    },
+    active(status){
+      if (!status) {
+        // set default empty value
+        this.multilineYAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} }
+      }
     }
   },
   mounted() {
@@ -2110,6 +2168,9 @@ export default {
             this.$set(this.options,item,false);
           }
           if (item == 'underline') {
+            this.$set(this.options,item,false);
+          }
+          if (item == 'onButton') {
             this.$set(this.options,item,false);
           }
           if (item == 'pinned') {

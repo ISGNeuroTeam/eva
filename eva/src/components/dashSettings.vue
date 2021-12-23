@@ -6,52 +6,58 @@
     left
     class="left-dash-setting"
     :color="theme.$main_text"
-    :style="{background: theme.$main_bg, borderTop:`2px solid ${theme.$main_border}`,borderBottom:`2px solid ${theme.$main_border}`}"
+    :style="{
+      background: theme.$main_bg,
+      borderTop: `2px solid ${theme.$main_border}`,
+      borderBottom: `2px solid ${theme.$main_border}`,
+    }"
     :permissions="permissions"
   >
-    <div
-      class="line-setting"
-      :style="{background: theme.$main_bg}"
-    />
+    <div class="line-setting" :style="{ background: theme.$main_bg }" />
     <div class="setting">
-      <div class="labelSetting" :style="{color: theme.$main_text}">
+      <div class="labelSetting" :style="{ color: theme.$main_text }">
         Режим редактирования
       </div>
-      <v-switch  
-        v-model="mode" 
-        class="switch" 
-        :color="theme.$primary_button" 
-        :style="{color:theme.$main_text}" 
+      <v-switch
+        v-model="mode"
+        class="switch"
+        :color="theme.$primary_button"
+        :style="{ color: theme.$main_text }"
         :label="labels[mode]"
       />
-      <div 
-        class="divider-setting" 
-        :style="{background: theme.$title}"
-      />
+      <div class="divider-setting" :style="{ background: theme.$title }" />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{color: theme.$main_text}">
+      <div class="labelSetting" :style="{ color: theme.$main_text }">
         Размер сетки
       </div>
       <div class="sizeGrid">
-        <v-text-field 
-          v-model="sizeGrid.vert" 
-          placeholder="24"  
+        <v-text-field
+          v-model="sizeGrid.vert"
+          placeholder="24"
           label="Вертикально"
-          :color="theme.$accent_ui_color" 
-          :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
-          outlined 
-          class="sizeGridItem"  
+          :color="theme.$accent_ui_color"
+          :style="{
+            color: theme.$main_text,
+            background: 'transparent',
+            borderColor: theme.$main_border,
+          }"
+          outlined
+          class="sizeGridItem"
           hide-details
           @blur="sendSizeGrid"
           @keyup.enter="sendSizeGrid"
         />
-        <v-text-field 
-          v-model="sizeGrid.hor" 
-          placeholder="24"  
+        <v-text-field
+          v-model="sizeGrid.hor"
+          placeholder="24"
           label="Горизонтально"
-          :color="theme.$accent_ui_color" 
-          :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}" 
+          :color="theme.$accent_ui_color"
+          :style="{
+            color: theme.$main_text,
+            background: 'transparent',
+            borderColor: theme.$main_border,
+          }"
           outlined
           class="sizeGridItem"
           hide-details
@@ -59,53 +65,44 @@
           @keyup.enter="sendSizeGrid"
         />
       </div>
-      <div
-        class="divider-setting"
-        :style="{background: theme.$title}"
-      />
+      <div class="divider-setting" :style="{ background: theme.$title }" />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{color: theme.$main_text}">
+      <div class="labelSetting" :style="{ color: theme.$main_text }">
         Перемещать/ изменять размер компонента
       </div>
-      <v-switch  
-        v-model="dragresable" 
-        class="switch" 
-        :color="theme.$primary_button" 
-        :style="{color:theme.$main_text,}" 
+      <v-switch
+        v-model="dragresable"
+        class="switch"
+        :color="theme.$primary_button"
+        :style="{ color: theme.$main_text }"
         :label="labels[dragresable]"
       />
-      <div 
-        class="divider-setting" 
-        :style="{background: theme.$title}"
-      />
+      <div class="divider-setting" :style="{ background: theme.$title }" />
     </div>
-    
+
     <div class="setting">
-      <div class="labelSetting" :style="{color: theme.$main_text}">
+      <div class="labelSetting" :style="{ color: theme.$main_text }">
         Показывать сетку
       </div>
-      <v-switch  
-        v-model="gridShow" 
-        class="switch" 
-        :color="theme.$primary_button" 
-        :style="{color:theme.$main_text,}" 
+      <v-switch
+        v-model="gridShow"
+        class="switch"
+        :color="theme.$primary_button"
+        :style="{ color: theme.$main_text }"
         :label="labels[gridShow]"
       />
-      <div
-        class="divider-setting"
-        :style="{background: theme.$title}"
-      />
+      <div class="divider-setting" :style="{ background: theme.$title }" />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{color: theme.$main_text}">
+      <div class="labelSetting" :style="{ color: theme.$main_text }">
         Вкладки
       </div>
       <v-switch
         v-model="showTabs"
         class="switch"
         :color="theme.$primary_button"
-        :style="{color:theme.$main_text,}"
+        :style="{ color: theme.$main_text }"
         :label="labels[showTabs]"
       />
     </div>
@@ -117,86 +114,101 @@ export default {
   props: {
     gearFrom: Boolean,
     idDashFrom: null,
-    permissionsFrom: null
+    permissionsFrom: null,
   },
-  data () {
+  data() {
     return {
       gearShow: false,
       settings: {},
-      mode: true,
+      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
       sizeGrid: {
         vert: '32',
-        hor: '18'
+        hor: '18',
       },
       labels: {
         true: 'да',
-        false: 'нет'
+        false: 'нет',
       },
       dragresable: true,
       showTabs: false,
-    } 
+    };
   },
   computed: {
-    theme: function() {
-      return this.$store.getters.getTheme
+    theme: function () {
+      return this.$store.getters.getTheme;
     },
-    permissions: function() {
-      if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
+    permissions: function () {
+      if (
+        !this.permissionsFrom.includes('admin_all') &&
+        !this.permissionsFrom.includes('editdash')
+      ) {
         // this.mode = false;
         this.dragresable = false;
       } else {
         // this.mode = true;
-        this.dragresable = true;  
+        this.dragresable = true;
       }
-      return true
+      return true;
     },
     gridShow: {
       get() {
         return this.$store.getters.getGridShow(this.idDashFrom) === 'true';
       },
       set(value) {
-        this.$store.commit('setGridShow', { id: this.idDashFrom, item: String(value) });
-      }
-    }
-  },  
+        this.$store.commit('setGridShow', {
+          id: this.idDashFrom,
+          item: String(value),
+        });
+      },
+    },
+  },
   watch: {
     gearFrom: function (gear) {
-      gear ? this.gearShow = true : this.gearShow = false;
+      gear ? (this.gearShow = true) : (this.gearShow = false);
     },
-    mode: function() {
-      this.$emit("changeMode");
+    mode: function () {
+      this.$emit('changeMode');
     },
-    dragresable: function() {
-      this.$store.commit('setDragResize', {id: this.idDashFrom,item: String(this.dragresable)});
+    dragresable: function () {
+      this.$store.commit('setDragResize', {
+        id: this.idDashFrom,
+        item: String(this.dragresable),
+      });
     },
-    showTabs () {
-      this.$store.commit('setTabMode', {idDash: this.idDashFrom, mode: this.showTabs});
-    }
+    showTabs() {
+      this.$store.commit('setTabMode', {
+        idDash: this.idDashFrom,
+        mode: this.showTabs,
+      });
+    },
   },
   mounted() {
     let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
-    if (!this.permissionsFrom.includes('admin_all') && !this.permissionsFrom.includes('editdash')) {
+    if (
+      !this.permissionsFrom.includes('admin_all') &&
+      !this.permissionsFrom.includes('editdash')
+    ) {
       this.dragresable = false;
     } else {
       let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
-      dragRes === 'true' ? dragRes = true : dragRes = false;
-      this.dragresable =  dragRes;
+      dragRes === 'true' ? (dragRes = true) : (dragRes = false);
+      this.dragresable = dragRes;
     }
     this.showTabs = this.$store.getters.getShowTabs(this.idDashFrom);
   },
   methods: {
-    sendSizeGrid: function() {
-      this.$store.commit('setSizeGrid', {id: this.idDashFrom,grid: JSON.parse(JSON.stringify(this.sizeGrid))});
+    sendSizeGrid: function () {
+      this.$store.commit('setSizeGrid', {
+        id: this.idDashFrom,
+        grid: JSON.parse(JSON.stringify(this.sizeGrid)),
+      });
     },
-  } 
-}
-
+  },
+};
 </script>
 
-<style lang="scss" > 
-  
+<style lang="scss">
 @import '../sass/dashSettings.sass';
-   
 </style>
