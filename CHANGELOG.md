@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added close modal single value for click outside
 
+## Fixed
+
+- fixed render a lot of tooltips for dashMap component
+
 ## [1.79.0]
 
 ### Added
@@ -188,6 +192,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed font weights 100, 200, 400, 500, 800
 - fixed SingleValue font weights
 - fixed full-screen map mode
+- problem with export / import filter on dashboard
 
 ## [1.70.0]
 
