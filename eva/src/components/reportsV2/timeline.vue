@@ -209,18 +209,6 @@ export default {
       let height = this.$refs.chart.clientHeight
       let g = svg.append('g')
           .attr('transform', 'translate(' + marge.top + ',' + marge.left + ')')
-      // console.log(g)
-      // let dataset = [
-      //   { time: '3.12', value: 12 },
-      //   { time: '4.12', value: 22 },
-      //   { time: '5.12', value: 34 },
-      //   { time: '6.12', value: 41 },
-      //   { time: '7.12', value: 56 },
-      //   { time: '8.12', value: 34 },
-      //   { time: '9.12', value: 23 },
-      //   { time: '10.12', value: 43 },
-      // ]
-      // let datase = { '3.12': 12, '4.12': 13, '5.12': 15, '6.12': 2, '7.12': 22, '8.12': 5 }
       let dataForSvg = []
       for (let dataItem in dataset) {
         dataForSvg.push({time: dataItem, value: dataset[dataItem] })
@@ -275,7 +263,6 @@ export default {
             return xScale(i) + rectPadding / 2
           })
           .attr('y', function (d) {
-            // console.log(d.value)
             return yScale(d.value)
           })
           .attr('width', function () {

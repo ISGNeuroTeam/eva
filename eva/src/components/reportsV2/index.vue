@@ -11,7 +11,7 @@
             class="report-block"
         >
           <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data" :loading="loading"></newSearch>
-          <timeline class="timeline component-block" :data="data"></timeline>
+          <timeline v-show="data.length > 0" class="timeline component-block" :data="data">111</timeline>
           <div class="tab-block component-block d-flex justify-content-between">
             <v-tabs
                 v-model="tab" class="tabs"
