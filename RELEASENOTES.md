@@ -1,4 +1,47 @@
-# [1.76.0] - Filters for YGraph componnet, selection property in events of select component and bugfixes.
+# [1.79.0] - Pop-ups and tooltips in graph component and bugfixes.
+
+### New
+
+- Tooltip with information when hovering over an edge in a ygraph component.
+- Pop-up information about a node or edge in the graph component.
+
+### Bugfix
+
+- Multiline graphs are not rendered without resaving the settings.
+- Fixed the data download button in the data source.
+- Date is displayed with zeros on the multiline.
+- Fixed merging of multiple multiline settings.
+- Use the width of the bar chart only if there are bar charts.
+
+# [1.78.0] - Default token "evaTknLogin" for username in searches and bugfixes.
+
+### New
+
+- Default token "evaTknLogin" that will be replaced by current username.
+
+### Bugfix
+
+- Fixed the management of custom colors of the pie component.
+- Fixed focusing on the reset button of the filter part.
+- Fixed the bug of dragging the graph component.
+
+# [1.77.0] - Barplot display styles of multiline, sticky header and bugfixes.
+
+### New
+
+- Added barplot display styles of multiline.
+- Updated sticky header and filter.
+
+### Bugfix
+
+- Fullscreen dash mode size.
+- Position of the top menu, it was non-clickable.
+- z-index on the boards.
+- Zoom-out button in multiline dash.
+- Reordered visualization settings.
+- Corrected mistakes in texts.
+
+# [1.76.0] - Filters for YGraph componet, selection property in events of select component and bugfixes.
 
 ### New
 

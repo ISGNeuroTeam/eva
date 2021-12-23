@@ -8,7 +8,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 ## Added
+
 - added close modal single value for click outside
+
+## [1.79.0]
+
+### Added
+
+- added a tooltip with information when hovering over an edge in a ygraph component
+- added pop-up information about a node or edge in the graph component
+- add env files
+- searching research v.2.0
+
+### Fixed
+
+- multiline graphs are not rendered without resaving the settings
+- fixed the data download button in the data source
+- date is displayed with zeros on the multiline
+- fixed merging of multiple multiline settings
+- use the width of the bar chart only if there are bar charts
+
+## [1.78.0]
+
+### Added
+
+- default token "evaTknLogin" that will be replaced by current username
+
+### Fixed
+
+- fixed the management of custom colors of the pie component
+- fixed focusing on the reset button of the filter part
+- fixed the bug of dragging the graph component
+
+## [1.77.0]
+
+### Added
+
+- added field for choose interval tooltips for points multiline, created settings for change color lines and choose style line
+
+- added barplot display styles of multiline
+- updated sticky header and filter
+
+### Fixed
+
+- fixed the fullscreen dash mode size
+- fixed the position of the top menu, it was non-clickable
+- fixed the z level on the boards
+- fixed the zoom-out button in multiline dash
+- fixed bug with settings order, correct mistakes in text
 
 ## [1.76.0]
 
@@ -66,6 +113,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the display of the slider component after the update
 - fixed fullscreen mode for slider component
 - fixed a problem with selecting/deselecting all items in the multiselect component
+- fixed style icons for points in a map component
 
 ## [1.73.0]
 

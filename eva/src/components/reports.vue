@@ -304,7 +304,6 @@ export default {
       return this.$store.getters.getShouldGet({id: 'table', idDash: 'reports'})
     },
     elements: function() {
-           
       this.$store.getters.getReportElement.forEach( (item,i) => {
         this.$set(this.aboutElem,item,{});
         if (i == 0) {

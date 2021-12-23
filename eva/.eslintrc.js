@@ -3,7 +3,12 @@ module.exports = {
   env: {
     node: true,
   },
-  extends: ['plugin:vue/essential', 'eslint:recommended'],
+  extends: [
+    'plugin:vue/essential',
+    'plugin:prettier/recommended',
+    'eslint:recommended',
+    '@vue/prettier',
+  ],
   parserOptions: {
     parser: 'babel-eslint',
   },
@@ -21,21 +26,13 @@ module.exports = {
     'vue/attributes-order': 'warn',
     'vue/no-confusing-v-for-v-if': 'warn',
     'vue/order-in-components': 'warn',
-    'prettier-vue/prettier': [
-      'error',
-      {
-        // Override all options of `prettier` here
-        // @see https://prettier.io/docs/en/options.html
-        printWidth: 100,
-        singleQuote: true,
-        semi: false,
-        trailingComma: 'es5',
-      },
-    ],
   },
   overrides: [
     {
-      files: ['**/__tests__/*.{j,t}s?(x)', '**/tests/unit/**/*.spec.{j,t}s?(x)'],
+      files: [
+        '**/__tests__/*.{j,t}s?(x)',
+        '**/tests/unit/**/*.spec.{j,t}s?(x)',
+      ],
       env: {
         mocha: true,
       },
