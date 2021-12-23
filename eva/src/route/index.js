@@ -37,6 +37,14 @@ const routes =  [
     },
   },
   {
+    name: 'Исследование данных',
+    path: '/data-research',  // если главная страница
+    component: require('../components/reportsV2/index.vue').default,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
     name: 'Документы',
     path: '/papers',  // если главная страница
     component: require('../components/papers.vue').default,
@@ -55,6 +63,15 @@ const routes =  [
   {
     name: 'Дашборд',
     path: '/dashboards/:id',  // если страница дашборда
+    component: require('../components/mainTitle.vue').default,
+    props: true,
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    name: 'Дашборд',
+    path: '/dashboards/:id/:tabId',  // если страница дашборда
     component: require('../components/mainTitle.vue').default,
     props: true,
     meta: {

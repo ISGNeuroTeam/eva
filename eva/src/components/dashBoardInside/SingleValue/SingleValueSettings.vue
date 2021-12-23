@@ -3,7 +3,8 @@
     v-model="isOpen"
     persistent
     scrollable
-    max-width="560"
+    width="560"
+    @click:outside="close"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
@@ -316,7 +317,7 @@ export default {
       if (this.settings) {
         this.settings = {
           ...JSON.parse(JSON.stringify(this.settings)),
-          showTitle: this.settings.showTitle ? false : true
+          showTitle: !this.settings.showTitle
         }
       }
     },
