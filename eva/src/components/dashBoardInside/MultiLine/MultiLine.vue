@@ -399,35 +399,19 @@ export default {
     updateData(x, yValue, selectRange, id = -1) {
       let [invertStart, invertEnd] = selectRange
 
-      let range = []
-      if (this.isAccumulationBarplot) {
-        range = [
-          this.dataRestFrom[0][this.xMetric],
-          this.dataRestFrom[this.dataRestFrom.length-1][this.xMetric],
-        ];
-        let barsWidth = this.width / this.dataRestFrom.length
-        this.dataRestFrom.forEach((item, i) => {
-          let xVal = item[this.xMetric];
-          if (i * barsWidth <= invertStart) {
-            range[0] = xVal
-          }
-          if (i > 0 && (i-1) * barsWidth < (invertEnd - barsWidth)) {
-            range[1] = xVal
-          }
-        })
-      } else {
-        invertStart = x.invert(invertStart)
-        invertEnd = x.invert(invertEnd)
-        range = this.isTime && !this.isAccumulationBarplot
-            ? [
-              parseInt(new Date(invertStart).getTime() / 1000),
-              parseInt(new Date(invertEnd).getTime() / 1000),
-            ]
-            : [
-              parseFloat(invertStart.toFixed(5)),
-              parseFloat(invertEnd.toFixed(5))
-            ]
-      }
+      let range = [
+        this.dataRestFrom[0][this.xMetric],
+        this.dataRestFrom[this.dataRestFrom.length-1][this.xMetric],
+      ];
+      let barsWidth = this.width / this.dataRestFrom.length
+      this.dataRestFrom.map(d => d[this.xMetric]).sort().forEach((xVal, i) => {
+        if (i * barsWidth <= invertStart) {
+          range[0] = xVal
+        }
+        if (i > 0 && (i-1) * barsWidth < (invertEnd - barsWidth)) {
+          range[1] = xVal
+        }
+      })
 
       this.$emit("SetRange", {'range': range, 'xMetric': this.xMetric});
       this.setClick(range, 'select')
@@ -820,8 +804,8 @@ export default {
           this.renderAccumulationBarplot(x, barplotBarWidth);
         } else
         this.metricNames.forEach((metricName, metricIndex) => {
-          const minVal = 0
-          const maxVal = maxAllY
+          const minVal = barplotMetrics.length ? 0 : minMetricsValues[metricIndex]
+          const maxVal = barplotMetrics.length ? maxAllY : maxMetricsValues[metricIndex]
 
           const extra = (val) => Math.abs(val * 10 / 100)
 
