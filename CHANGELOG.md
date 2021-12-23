@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added redirect to dashboard with information about tabs from dash heatmap
 - сombining ticks of several Y-axes
+- searching research v.2.0
 
 ### Fixed
 
