@@ -1,13 +1,13 @@
 <template>
   <v-app class="application" :style="{ background: theme.$secondary_bg }">
     <dash-panel-bord
-      :horizontal-cell="horizontalCell"
       v-if="prepared"
+      :horizontal-cell="horizontalCell"
       :id-dash-from="idDash"
       @changeMode="changeMode"
       @openProfile="
         (event) => {
-          openProfile = event
+          openProfile = event;
         }
       "
       @openSettings="openSettings"
@@ -19,9 +19,16 @@
         class="already-block"
         :style="{ color: theme.$main_text, background: theme.$main_bg }"
       >
-        <div class="text-already">Существует более новая версия дашборда. Хотите обновить?</div>
+        <div class="text-already">
+          Существует более новая версия дашборда. Хотите обновить?
+        </div>
         <div class="btn-already">
-          <v-btn small :color="theme.$primary_button" class="create-btn" @click="updateDash">
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            class="create-btn"
+            @click="updateDash"
+          >
             Да
           </v-btn>
           <v-btn
@@ -49,8 +56,6 @@
             class="overlay-grid"
             :data-grid="true"
             :style="{
-              height: `calc(100% - ${headerTop}px`,
-              top: `${headerTop}px`,
               background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
             rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
             }"
@@ -69,8 +74,13 @@
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
+            @ResetRange="resetRange($event)"
           />
-          <modal-delete :color-from="theme" :id-dash-from="idDash" :data-page-from="page" />
+          <modal-delete
+            :color-from="theme"
+            :id-dash-from="idDash"
+            :data-page-from="page"
+          />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
           <modal-settings :color-from="theme" :id-dash-from="idDash" />
         </v-container>
@@ -79,7 +89,9 @@
     <div v-show="showTabs" class="tab-panel-wrapper">
       <v-tooltip top :color="theme.$accent_ui_color">
         <template v-slot:activator="{ on }">
-          <div v-show="leftDots" class="dots" v-on="on" @click="moveScroll(0)">...</div>
+          <div v-show="leftDots" class="dots" v-on="on" @click="moveScroll(0)">
+            ...
+          </div>
         </template>
         <span>В начало</span>
       </v-tooltip>
@@ -155,7 +167,12 @@
       </div>
       <v-tooltip top :color="theme.$accent_ui_color">
         <template v-slot:activator="{ on }">
-          <div v-show="rightDots" class="dots" v-on="on" @click="moveScroll($refs['tab-panel'].scrollWidth)">
+          <div
+            v-show="rightDots"
+            class="dots"
+            v-on="on"
+            @click="moveScroll($refs['tab-panel'].scrollWidth)"
+          >
             ...
           </div>
         </template>
@@ -169,7 +186,10 @@
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z" :fill="theme.$main_border" />
+          <path
+            d="M8 8V14H6V8H0V6H6V0H8V6H14V8H8Z"
+            :fill="theme.$main_border"
+          />
         </svg>
       </div>
     </div>
@@ -181,7 +201,7 @@ export default {
   data() {
     return {
       page: 'dash',
-      mode: true,
+      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
       showSetting: false,
       rotate: '',
       openProfile: false,
@@ -201,171 +221,224 @@ export default {
       hoveredTabID: 0,
       loadingDash: true,
       dataObject: {},
+      dataObjectConst: {},
       firstLoad: true,
       leftDots: true,
       rightDots: true,
-    }
+    };
   },
   computed: {
     idDash: function () {
       // получаем id страницы от родителя
-      return this.$route.params.id
+      return this.$route.params.id;
     },
     elements: function () {
       // получаем название элемента  от родителя
-      return this.loadingDash ? [] : this.$store.getters.getElementsWithSearches(this.idDash)
+      return this.loadingDash
+        ? []
+        : this.$store.getters.getElementsWithSearches(this.idDash);
     },
     headerTop() {
-      return document.body.clientWidth <= 1400 ? 40 : 50
+      return 0;
+      return document.body.clientWidth <= 1400 ? 40 : 50;
     },
     theme() {
-      return this.$store.getters.getTheme
+      return this.$store.getters.getTheme;
     },
     gridShow() {
-      return this.loadingDash ? false : this.$store.getters.getGridShow(this.idDash) === 'true'
+      return this.loadingDash
+        ? false
+        : this.$store.getters.getGridShow(this.idDash) === 'true';
     },
     getSizeGrid() {
       return this.loadingDash
         ? { hor: '18', vert: '32' }
-        : this.$store.getters.getSizeGrid(this.idDash)
+        : this.$store.getters.getSizeGrid(this.idDash);
     },
     tabs() {
-      return this.loadingDash ? [] : this.$store.getters.getDashTabs(this.idDash)
+      return this.loadingDash
+        ? []
+        : this.$store.getters.getDashTabs(this.idDash);
     },
     tabsMoreOne() {
-      return this.tabs.length > 1
+      return this.tabs.length > 1;
     },
     showTabs() {
-      return this.loadingDash ? false : this.$store.getters.getShowTabs(this.idDash)
+      return this.loadingDash
+        ? false
+        : this.$store.getters.getShowTabs(this.idDash);
     },
     currentTab() {
-      return this.loadingDash ? 0 : this.$store.getters.getCurrentDashTab(this.idDash)
+      return this.loadingDash
+        ? 0
+        : this.$store.getters.getCurrentDashTab(this.idDash);
     },
     searches() {
-      return this.loadingDash ? [] : this.$store.getters.getSearches(this.idDash)
+      return this.loadingDash
+        ? []
+        : this.$store.getters.getSearches(this.idDash);
+    },
+    tokens() {
+      return this.loadingDash
+        ? []
+        : this.$store.getters.getTockens(this.idDash);
     },
   },
   watch: {
     getSizeGrid() {
-      this.calcSizeCell()
+      this.calcSizeCell();
     },
     mode() {
       if (!this.mode) {
-        this.editableTabID = 0
-        this.tempName = ''
-        this.tabEditMode = false
+        this.editableTabID = 0;
+        this.tempName = '';
+        this.tabEditMode = false;
       }
     },
     searches: {
       deep: true,
-      handler(searches) {
+      handler(searches, oldSearches) {
+        function findOnButtonTokens(tokens) {
+          return tokens.filter((el) => el.onButton);
+        }
+        let onButton = findOnButtonTokens(this.tokens);
+        console.log(onButton);
         if (this.firstLoad) {
-          searches.forEach((search) =>
-            this.$set(this.dataObject, search.sid, { data: [], loading: true })
-          )
-          this.firstLoad = false
+          searches.forEach((search) => {
+            this.$set(this.dataObject, search.sid, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.sid, {
+              data: [],
+              loading: true,
+            });
+          });
+          this.firstLoad = false;
         }
         searches.map((search) => {
           if (search.status === 'empty') {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true })
+            this.$set(this.dataObject, search.sid, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.sid, {
+              data: [],
+              loading: true,
+            });
             this.$store.commit('updateSearchStatus', {
               idDash: this.idDash,
               sid: search.sid,
               status: 'pending',
-            })
-            this.$store.getters.getDataApi({ search, idDash: this.idDash }).then((res) => {
-              this.$store.commit('updateSearchStatus', {
-                idDash: this.idDash,
-                sid: search.sid,
-                status: 'downloaded',
-              })
-              this.$set(this.dataObject[search.sid], 'data', res)
-              this.$set(this.dataObject[search.sid], 'loading', false)
-            })
+            });
+            this.$store.getters
+              .getDataApi({ search, idDash: this.idDash })
+              .then((res) => {
+                this.$store.commit('updateSearchStatus', {
+                  idDash: this.idDash,
+                  sid: search.sid,
+                  status: res.length ? 'downloaded' : 'nodata',
+                });
+                this.$set(this.dataObject[search.sid], 'data', res);
+                this.$set(this.dataObject[search.sid], 'loading', false);
+                this.$set(this.dataObjectConst[search.sid], 'data', res);
+                this.$set(this.dataObjectConst[search.sid], 'loading', false);
+              });
           }
-        })
+        });
       },
     },
   },
   async mounted() {
-    await this.checkAlreadyDash()
-    this.loadingDash = false
-    document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`
-    this.createStartClient()
-    this.calcSizeCell()
-    this.addScrollListener()
+    await this.checkAlreadyDash();
+    this.loadingDash = false;
+    document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`;
+    if (this.$route.params.tabId) {
+      this.clickTab(Number(this.$route.params.tabId));
+    }
+    this.createStartClient();
+    this.calcSizeCell();
+    this.addScrollListener();
 
-    this.$refs['tab-panel'].onwheel = this.scroll
-    this.checkTabOverflow()
-    window.onresize = this.checkTabOverflow
+    this.$refs['tab-panel'].onwheel = this.scroll;
+    this.checkTabOverflow();
+    window.onresize = this.checkTabOverflow;
   },
   methods: {
     exportDataCSV(searchName) {
-      const searchData = this.dataObject[searchName].data
-      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
-      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
+      const searchData = this.dataObject[searchName].data;
+      let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
+
+      if (searchData.length) {
+        let keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
+        csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
+      }
       csvContent += encodeURIComponent(
         searchData.map((item) => Object.values(item).join(',')).join('\n')
-      )
+      );
 
-      const link = document.createElement('a') // создаем ссылку
-      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', `${this.idDash}-${searchName}.csv`) // указываем имя файла
-      link.click() // жмем на скачку
-      link.remove() // удаляем ссылку
+      const link = document.createElement('a'); // создаем ссылку
+      link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('download', `${this.idDash}-${searchName}.csv`); // указываем имя файла
+      link.click(); // жмем на скачку
+      link.remove(); // удаляем ссылку
     },
     scroll(event) {
-      event.preventDefault()
-      this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY
-      this.checkTabOverflow()
+      event.preventDefault();
+      this.$refs['tab-panel'].scrollLeft =
+        this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY;
+      this.checkTabOverflow();
     },
     moveScroll(value) {
-      this.$refs['tab-panel'].scrollLeft = value
-      this.checkTabOverflow()
+      this.$refs['tab-panel'].scrollLeft = value;
+      this.checkTabOverflow();
     },
     checkTabOverflow() {
       setTimeout(() => {
-        const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel']
-        scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false)
+        const { clientWidth, scrollWidth, scrollLeft } =
+          this.$refs['tab-panel'];
+        scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false);
         if (clientWidth < scrollWidth) {
-          this.rightDots = clientWidth + scrollLeft < scrollWidth + 5 && clientWidth + scrollLeft < scrollWidth - 5
-        } else this.rightDots = false
-      }, 0)
+          this.rightDots =
+            clientWidth + scrollLeft < scrollWidth + 5 &&
+            clientWidth + scrollLeft < scrollWidth - 5;
+        } else this.rightDots = false;
+      }, 0);
     },
     checkLoading(elem) {
-      if (elem.search === -1) return false
-      return this.dataObject[elem.search].loading
+      if (elem.search === -1) return false;
+      return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
-      if (elem.search === -1) return []
-      return this.dataObject[elem.search].data
+      if (elem.search === -1) return [];
+      return this.dataObject[elem.search]?.data;
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
-        this.$store.commit('changeCurrentTab', { idDash: this.idDash, tab: tabID })
+        this.$store.commit('changeCurrentTab', {
+          idDash: this.idDash,
+          tab: tabID,
+        });
       }
     },
     addNewTab() {
       if (!this.tabEditMode) {
-        let tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1
-        this.$store.commit('addNewTab', { idDash: this.idDash, tabID, tabName: 'Без названия' })
+        let tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
+        this.$store.commit('addNewTab', {
+          idDash: this.idDash,
+          tabID,
+          tabName: 'Без названия',
+        });
       }
-      this.checkTabOverflow()
+      this.checkTabOverflow();
     },
     deleteTab(tabID) {
       if (this.tabsMoreOne && !this.tabEditMode) {
-        this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID })
+        this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID });
       }
-      this.checkTabOverflow()
+      this.checkTabOverflow();
     },
     enterEditMode(tab) {
       if (!this.tabEditMode && !this.editableTabID) {
-        this.tabEditMode = true
-        this.editableTabID = tab.id
-        this.tempName = tab.name
+        this.tabEditMode = true;
+        this.editableTabID = tab.id;
+        this.tempName = tab.name;
       }
-      this.checkTabOverflow()
+      this.checkTabOverflow();
     },
     editTabName() {
       if (this.tempName) {
@@ -373,85 +446,126 @@ export default {
           idDash: this.idDash,
           tabID: this.editableTabID,
           newName: this.tempName,
-        })
-        this.tabEditMode = false
-        this.editableTabID = 0
-        this.tempName = ''
+        });
+        this.tabEditMode = false;
+        this.editableTabID = 0;
+        this.tempName = '';
       }
     },
     tabOver(tabID) {
-      this.hoveredTabID = tabID
+      this.hoveredTabID = tabID;
     },
     tabLeave() {
-      this.hoveredTabID = 0
+      this.hoveredTabID = 0;
     },
     hash: function (elem) {
-      return `${elem}#${this.idDash}`
+      return `${elem}#${this.idDash}`;
     },
     changeMode: function () {
-      this.mode = !this.mode
+      this.mode = !this.mode;
     },
     openSettings: function () {
-      this.showSetting = !this.showSetting
+      this.showSetting = !this.showSetting;
     },
     updateDash: function () {
       this.$store.commit('updateDash', {
         dash: this.alreadyDash,
         modified: this.alreadyDash.modified,
-      })
+      });
       this.$store.auth.getters.putLog(
-        `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${this.alreadyDash.id}`
-      )
-      this.alreadyShow = false
+        `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${
+          this.alreadyDash.id
+        }`
+      );
+      this.alreadyShow = false;
     },
     toHichName: function (name) {
-      return name[0].toUpperCase() + name.slice(1)
+      return name[0].toUpperCase() + name.slice(1);
     },
     checkAlreadyDash: async function () {
-      let response = await this.$store.getters.checkAlreadyDash(this.$route.params.id)
+      let response = await this.$store.getters.checkAlreadyDash(
+        this.$route.params.id
+      );
       if (response.status === 'exist') {
-        this.alreadyShow = true
-        this.alreadyDash = response
+        this.alreadyShow = true;
+        this.alreadyDash = response;
       }
-      this.prepared = true
+      this.prepared = true;
     },
     createStartClient: function () {
       //первоначальные значения высоты и ширины
-      this.startClientHeight = document.body.clientHeight - this.headerTop
-      this.startClientWidth = document.body.clientWidth
+      this.startClientHeight = document.body.clientHeight - this.headerTop;
+      this.startClientWidth = document.body.clientWidth;
     },
     calcSizeCell: function () {
       //размер ячейки
-      let grid = this.$store.getters.getSizeGrid(this.idDash)
-      this.verticalCell = Number((this.startClientWidth / grid.vert).toFixed(1))
-      this.horizontalCell = Number((this.startClientHeight / grid.hor).toFixed(1))
+      let grid = this.$store.getters.getSizeGrid(this.idDash);
+      this.verticalCell = Number(
+        (this.startClientWidth / grid.vert).toFixed(1)
+      );
+      this.horizontalCell = Number(
+        (this.startClientHeight / grid.hor).toFixed(1)
+      );
     },
     addScrollListener: function () {
-      let offset = 0
+      let offset = 0;
       window.addEventListener('scroll', () => {
         // при увеличении экрана в высоту (вообще коненчо срабатывает при скролле страницы)
         if (document.querySelector('.application')) {
           if (document.body.scrollHeight > document.body.clientHeight) {
             // если высота скролируемого экрана больше чем клиентского
             //добавляем размер
-            offset = this.horizontalCell
+            offset = this.horizontalCell;
           } else {
-            offset = 0
+            offset = 0;
             //просто сработало событие
           }
 
           document.querySelector('.application').style.height = `${
             document.body.scrollHeight + offset
-          }px` // в любом случае расширяем контейнер до размеров экрана
-
+          }px`; // в любом случае расширяем контейнер до размеров экрана
         }
-      })
+      });
     },
-    setRange (range, elem) {
-      this.dataObject[elem.search].data = this.dataObject[elem.search].data.filter(item => (item.day > range[0] && item.day < range[1]));
+    sliceRange(arr, range) {
+      return arr.filter((item, idx) => {
+        if (
+          (item[range.xMetric] >= range.range[0] &&
+            item[range.xMetric] <= range.range[1]) ||
+          (arr[idx - 1]?.[range.xMetric] >= range.range[0] &&
+            arr[idx - 1]?.[range.xMetric] <= range.range[1]) ||
+          (arr[idx + 1]?.[range.xMetric] >= range.range[0] &&
+            arr[idx + 1]?.[range.xMetric] <= range.range[1])
+        ) {
+          return true;
+        }
+
+        const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
+        const idxArrSecond =
+          range.range[0] > range.range[1] ? idx - 1 : idx + 1;
+
+        if (
+          (item[range.xMetric] <= range.range[0] &&
+            arr[idxArrFirst]?.[range.xMetric] >= range.range[1]) ||
+          (item[range.xMetric] >= range.range[1] &&
+            arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
+        ) {
+          return true;
+        }
+      });
+    },
+    setRange(range, elem) {
+      this.dataObject[elem.search].data = this.sliceRange(
+        this.dataObject[elem.search].data,
+        range
+      );
+    },
+    resetRange(dataSourseTitle) {
+      this.dataObject[dataSourseTitle].data =
+        this.dataObjectConst[dataSourseTitle].data;
     },
   },
-}
+};
 </script>
 
 <style lang="scss">

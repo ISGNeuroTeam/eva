@@ -67,6 +67,7 @@ Vue.component('dash-ygraph', require('./components/dashBoardInside/dashYGraph.vu
 Vue.component('dash-bush', require('./components/dashBoardInside/dashBush.vue').default); // компонент куст. на yfiles
 Vue.component('dash-map', require('./components/dashBoardInside/dashMap.vue').default); // компонент карта
 Vue.component('dash-heatmap', require('./components/dashBoardInside/dashHeatMap.vue').default); // компонент тепловая карта
+Vue.component('dash-tune', require('./components/dashBoardInside/dashTune.vue').default); // компонент ползунок
 Vue.component(
   'dash-singleValue',
   require('./components/dashBoardInside/SingleValue/dashSingleValue.vue').default
@@ -91,6 +92,13 @@ Vue.component(
 ); // модалка для удаления сущностей пользователей
 Vue.component('modal-log', require('./components/autorization/modalLog.vue').default); // модалка для вывода лога
 Vue.component('data-profile', require('./components/autorization/dataForProfile.vue').default); //  компонент для получения данных для пользователя
+
+// убирает фокус с элемена сразу либо через переданное ms v-blur="140"
+Vue.directive('blur', {
+  inserted: function (el, binding) {
+    el.onfocus = (ev) => setTimeout(() =>  ev.target.blur(), binding.value || 0)
+  }
+});
 
 store.form = storeForm;
 store.auth = storeAuth;

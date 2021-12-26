@@ -309,8 +309,11 @@ export default {
   watch: {
     focusedRow(rowNumber) {
       if (!Number.isFinite(rowNumber)) {
-        this.$store.commit('clearFocusedFilter', this.idDashFrom)
+        // this.$store.commit('clearFocusedFilter', this.idDashFrom)
       } else {
+        if (this.filters[rowNumber].idDash !== this.idDashFrom) {
+          this.filters[rowNumber].idDash = this.idDashFrom;
+        }
         this.$store.commit('setFocusedFilter', this.filters[rowNumber])
       }
     },
@@ -353,7 +356,7 @@ export default {
     },
     applyTempParts() {
       this.$store.commit('sortFilterParts', { idDash: this.idDashFrom })
-      this.$store.commit('clearFocusedFilter', this.idDashFrom)
+      // this.$store.commit('clearFocusedFilter', this.idDashFrom)
       this.$store.commit('restartSearches', {
         idDash: this.idDashFrom,
         filter: this.filters[this.focusedRow].id,
@@ -454,7 +457,7 @@ $filter-container-height: 60px
 
 .dash-filter-panel
   width: 100%
-  max-height: calc((#{$filter-container-height} * 3) + 18px)
+  //max-height: calc((#{$filter-container-height} * 3) + 18px)
   overflow-y: auto
 
   &::-webkit-scrollbar

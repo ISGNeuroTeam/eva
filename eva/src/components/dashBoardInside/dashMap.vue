@@ -22,6 +22,7 @@ import vuetify from "../../plugins/vuetify";
 import dashMapUserSettings from "./dashMapUserSettings.vue";
 import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
 import Vue from "vue";
+import isMarkerInsidePolygon from './checkMarketInsideMap.js';
 import * as turf from "@turf/turf";
 import * as utils from "leaflet-geometryutil";
 export default {
@@ -626,7 +627,7 @@ export default {
       line
         .addTo(this.map)
         .bindTooltip(tooltip)
-        .on("mouseover", highlightFeature)
+        .on("mouseover", (e) => highlightFeature(e, line))
         .on("mouseout", resetHighlight);
       line.setTooltipContent(element.label);
       let previousPoint = 0;
@@ -660,6 +661,7 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
+        console.log(pipelineDataDictionary, element)
         if (!pipelineDataDictionary[element.ID]) return;
         const closest = (arr, num) => {
           return (
@@ -693,7 +695,11 @@ export default {
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-          line.setTooltipContent(newDiv);
+
+          console.log(isMarkerInsidePolygon(this.map.getBounds()), 'closee')
+          if (isMarkerInsidePolygon(this.map.getBounds())) {
+            line.setTooltipContent(newDiv);
+          }
         }
       }
     },
@@ -817,6 +823,12 @@ export default {
 .dash-map {
   padding: 0 20px !important;
 }
+.leaflet-tooltip-top:before, 
+.leaflet-tooltip-bottom:before, 
+.leaflet-tooltip-left:before, 
+.leaflet-tooltip-right:before {
+    border: none !important;
+}
 .mapContainer {
   position: relative;
   background: #191919;
@@ -849,9 +861,10 @@ export default {
   text-align: left;
   background-color: #191919;
   color: white;
+  padding-top: 0;
 }
 .leaftet-hover::before {
-  margin-bottom: 0;
+  margin-bottom: -6px;
 }
 .leaflet-container.cursor-crosshair {
   cursor: crosshair;
