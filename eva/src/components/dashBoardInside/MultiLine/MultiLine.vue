@@ -404,7 +404,7 @@ export default {
         this.dataRestFrom[this.dataRestFrom.length-1][this.xMetric],
       ];
       let barsWidth = this.width / this.dataRestFrom.length
-      this.dataRestFrom.map(d => d[this.xMetric]).sort().forEach((xVal, i) => {
+      this.dataRestFrom.map(d => d[this.xMetric]).forEach((xVal, i) => {
         if (i * barsWidth <= invertStart) {
           range[0] = xVal
         }
@@ -670,22 +670,22 @@ export default {
       let x;
       let xStartRange = this.isDividedBarplot ? barWidth/2 : 0;
 
-      if (this.isAccumulationBarplot) {
+      if (this.isAccumulationBarplot && this.isUnitedMode) {
         let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys()
         x = d3.scaleBand()
             .range([xStartRange, this.width])
             .padding([.1])
-            .domain(groups.sort())
+            .domain(groups)
 
         if (parseInt(barplotBarWidth)) {
           x.padding([(x.bandwidth() - barplotBarWidth) / x.bandwidth()])
-              .domain(groups.sort())
+              .domain(groups)
         }
       } else {
         if (this.stringOX) {
           x = d3.scalePoint()
               .range([xStartRange, this.width]).padding(0.5)
-              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }).sort());
+              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }));
         } else {
           let barWidth = parseInt(barplotBarWidth) || 0
           let barOffset = barWidth/2 *1.5;
@@ -693,7 +693,7 @@ export default {
           if (hasBarplots) {
             x = d3.scalePoint()
                 .range([xStartRange, this.width]).padding(0.5)
-                .domain(this.dataRestFrom.map(d => this.isTime ? (d[xMetric]*this.secondTransf) : d[xMetric]).sort());
+                .domain(this.dataRestFrom.map(d => this.isTime ? (d[xMetric]*this.secondTransf) : d[xMetric]));
           } else {
             x = this.isTime && false
                 ? d3.scaleTime().range([xStartRange+barOffset, this.width-barOffset]).domain(extentForX)
@@ -786,7 +786,7 @@ export default {
       )
 
       const dataRestLength = this.dataRestFrom.length
-      const minMetricsValues = this.metricNames.map((item) => 0)
+      const minMetricsValues = this.metricNames.map((item) => d3.min(this.dataRestFrom, (d) => d[item]))
       const maxMetricsValues = this.metricNames.map((item) => d3.max(this.dataRestFrom, (d) => d[item]))
 
       const dataRest = [...this.dataRestFrom]
@@ -809,7 +809,8 @@ export default {
           this.renderAccumulationBarplot(x, barplotBarWidth);
         } else
         this.metricNames.forEach((metricName, metricIndex) => {
-          const minVal = barplotMetrics.length ? 0 : minMetricsValues[metricIndex]
+          const isBarplotMetric = yAxesBinding.metricTypes[metricName] === 'barplot'
+          const minVal = isBarplotMetric ? 0 : minMetricsValues[metricIndex]
           const maxVal = barplotMetrics.length ? maxAllY : maxMetricsValues[metricIndex]
 
           const extra = (val) => Math.abs(val * 10 / 100)
