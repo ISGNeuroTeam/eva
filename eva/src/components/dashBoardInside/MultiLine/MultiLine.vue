@@ -677,7 +677,7 @@ export default {
             .padding([.1])
             .domain(groups.sort())
 
-        if (barplotBarWidth) {
+        if (parseInt(barplotBarWidth)) {
           x.padding([(x.bandwidth() - barplotBarWidth) / x.bandwidth()])
               .domain(groups.sort())
         }
