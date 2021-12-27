@@ -612,7 +612,7 @@ export default {
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
 
-      let hasBarplots = false
+      let hasBarplots = this.isAccumulationBarplot
       if (!this.isUnitedMode) {
         barplotBarWidth = 0
       } else {
@@ -674,8 +674,13 @@ export default {
         let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys()
         x = d3.scaleBand()
             .range([xStartRange, this.width])
-            .padding([0.2])
+            .padding([.1])
             .domain(groups.sort())
+
+        if (barplotBarWidth) {
+          x.padding([(x.bandwidth() - barplotBarWidth) / x.bandwidth()])
+              .domain(groups.sort())
+        }
       } else {
         if (this.stringOX) {
           x = d3.scalePoint()
