@@ -810,15 +810,18 @@ export default {
         });
       });
 
-      //event.route.push(`/dashboards/${id}`);
-      // event.route.go();
       const options = state[event.idDash][event.id].options;
       const currentTab = event.event.tab || state[id]?.currentTab;
-
+      const isTabMode = state[id]?.tabs;
+      const isGoToTabExsits = state[id]?.tabList[event.event.tab];
+      debugger;
       if (!options?.openNewScreen) {
-        event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+        if (!isTabMode || !isGoToTabExsits)
+          event.route.push(`/dashboards/${id}/1`);
+        else event.route.push(`/dashboards/${id}/${currentTab || ''}`);
       } else {
-        window.open(`/dashboards/${id}/${currentTab || ''}`);
+        if (!isTabMode || !isGoToTabExsits) window.open(`/dashboards/${id}/1`);
+        else window.open(`/dashboards/${id}/${currentTab || ''}`);
       }
       let searches = state[id].searches;
 
@@ -1852,11 +1855,11 @@ export default {
                 });
               }
 
-              state[id].filters?.forEach(filter => {
+              state[id].filters?.forEach((filter) => {
                 if (filter.idDash !== id) {
-                  Vue.set(filter, 'idDash', id)
+                  Vue.set(filter, 'idDash', id);
                 }
-              })
+              });
 
               if (state[id].searches) {
                 state[id].searches.forEach((search) =>
