@@ -813,16 +813,27 @@ export default {
       const options = state[event.idDash][event.id].options;
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
-      const isGoToTabExsits = state[id]?.tabList.find(
-        (el) => el.id == event.event.tab
-      );
+      let lastEl;
+      const isGoToTabExsits = state[id]?.tabList.find((el) => {
+        lastEl = el;
+        return el.id == event.event.tab;
+      });
       if (!options?.openNewScreen) {
-        if (!isTabMode || !isGoToTabExsits)
+        if (!isTabMode) {
           event.route.push(`/dashboards/${id}/1`);
-        else event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+        } else {
+          if (!event.event.tab)
+            event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+          else event.route.push(`/dashboards/${id}/${lastEl.id}`);
+        }
       } else {
-        if (!isTabMode || !isGoToTabExsits) window.open(`/dashboards/${id}/1`);
-        else window.open(`/dashboards/${id}/${currentTab || ''}`);
+        if (!isTabMode) {
+          window.open(`/dashboards/${id}/1`);
+        } else {
+          if (!event.event.tab)
+            window.open(`/dashboards/${id}/${currentTab || ''}`);
+          else window.open(`/dashboards/${id}/${lastEl.id}`);
+        }
       }
       let searches = state[id].searches;
 
