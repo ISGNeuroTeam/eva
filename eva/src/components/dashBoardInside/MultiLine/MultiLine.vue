@@ -399,35 +399,19 @@ export default {
     updateData(x, yValue, selectRange, id = -1) {
       let [invertStart, invertEnd] = selectRange
 
-      let range = []
-      if (this.isAccumulationBarplot) {
-        range = [
-          this.dataRestFrom[0][this.xMetric],
-          this.dataRestFrom[this.dataRestFrom.length-1][this.xMetric],
-        ];
-        let barsWidth = this.width / this.dataRestFrom.length
-        this.dataRestFrom.forEach((item, i) => {
-          let xVal = item[this.xMetric];
-          if (i * barsWidth <= invertStart) {
-            range[0] = xVal
-          }
-          if (i > 0 && (i-1) * barsWidth < (invertEnd - barsWidth)) {
-            range[1] = xVal
-          }
-        })
-      } else {
-        invertStart = x.invert(invertStart)
-        invertEnd = x.invert(invertEnd)
-        range = this.isTime && !this.isAccumulationBarplot
-            ? [
-              parseInt(new Date(invertStart).getTime() / 1000),
-              parseInt(new Date(invertEnd).getTime() / 1000),
-            ]
-            : [
-              parseFloat(invertStart.toFixed(5)),
-              parseFloat(invertEnd.toFixed(5))
-            ]
-      }
+      let range = [
+        this.dataRestFrom[0][this.xMetric],
+        this.dataRestFrom[this.dataRestFrom.length-1][this.xMetric],
+      ];
+      let barsWidth = this.width / this.dataRestFrom.length
+      this.dataRestFrom.map(d => d[this.xMetric]).sort().forEach((xVal, i) => {
+        if (i * barsWidth <= invertStart) {
+          range[0] = xVal
+        }
+        if (i > 0 && (i-1) * barsWidth < (invertEnd - barsWidth)) {
+          range[1] = xVal
+        }
+      })
 
       this.$emit("SetRange", {'range': range, 'xMetric': this.xMetric});
       this.setClick(range, 'select')
@@ -643,6 +627,20 @@ export default {
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
 
+      let hasBarplots = this.isAccumulationBarplot
+      if (!this.isUnitedMode) {
+        barplotBarWidth = 0
+      } else {
+        Object.keys(yAxesBinding.metricTypes).forEach(key => {
+          if (!hasBarplots && yAxesBinding.metricTypes[key] === 'barplot') {
+            hasBarplots = true
+          }
+        })
+        if (!hasBarplots){
+          barplotBarWidth = 0
+        }
+      }
+
       const getStyleLine = (type) => {
         if (type === 'dashed') {
           return '5,5';
@@ -686,26 +684,41 @@ export default {
 
       let x;
       let xStartRange = this.isDividedBarplot ? barWidth/2 : 0;
-      if (this.stringOX) {
-        x = d3.scalePoint()
-          .range([xStartRange, this.width]).padding(0.5)
-          .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }));
-      } else {
-        if (this.isAccumulationBarplot) {
-          let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys()
-          x = d3.scaleBand()
-              .range([xStartRange, this.width])
-              .padding([0.2])
+
+      if (this.isAccumulationBarplot && this.isUnitedMode) {
+        let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys().sort()
+        x = d3.scaleBand()
+            .range([xStartRange, this.width])
+            .padding([.1])
+            .domain(groups)
+
+        if (parseInt(barplotBarWidth)) {
+          x.padding([(x.bandwidth() - barplotBarWidth) / x.bandwidth()])
               .domain(groups)
+        }
+      } else {
+        if (this.stringOX) {
+          x = d3.scalePoint()
+              .range([xStartRange, this.width]).padding(0.5)
+              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }).sort());
         } else {
           let barWidth = parseInt(barplotBarWidth) || 0
           let barOffset = barWidth/2 *1.5;
-          x = this.isTime
-              ? d3.scaleTime().range([xStartRange+barOffset, this.width-barOffset]).domain(extentForX)
-              : d3.scaleLinear().range([barOffset, this.width-barOffset]).domain(extentForX)
+
+          if (hasBarplots) {
+            x = d3.scalePoint()
+                .range([xStartRange, this.width]).padding(0.5)
+                .domain(this.dataRestFrom.map(d => this.isTime ? (d[xMetric]*this.secondTransf) : d[xMetric]).sort());
+          } else {
+            x = this.isTime && false
+                ? d3.scaleTime().range([xStartRange+barOffset, this.width-barOffset]).domain(extentForX)
+                : d3.scaleLinear().range([barOffset, this.width-barOffset]).domain(extentForX)
+          }
+
         }
       }
-      
+      //console.log(x.ticks())
+
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10
 
@@ -803,12 +816,17 @@ export default {
         let numberLeft = 0
         let numberRight = 0
 
+        let maxAllY = Math.max(...maxMetricsValues)
+        let barplotMetrics = Object.keys(yAxesBinding.metricTypes)
+          .filter(name => yAxesBinding.metricTypes[name] === 'barplot')
+
         if (this.isAccumulationBarplot) {
           this.renderAccumulationBarplot(x, barplotBarWidth);
         } else
         this.metricNames.forEach((metricName, metricIndex) => {
-          const minVal = minMetricsValues[metricIndex]
-          const maxVal = maxMetricsValues[metricIndex]
+          const isBarplotMetric = yAxesBinding.metricTypes[metricName] === 'barplot'
+          const minVal = isBarplotMetric ? 0 : minMetricsValues[metricIndex]
+          const maxVal = barplotMetrics.length ? maxAllY : maxMetricsValues[metricIndex]
 
           const extra = (val) => Math.abs(val * 10 / 100)
 
@@ -846,6 +864,7 @@ export default {
                 .attr('transform', 'translate(0, ' + translateY + ')')
                 .attr('class', yAxisClass)
                 .call(d3.axisLeft(yScal));
+
             if (numberLeft !== 0) {
               this.svg
                   .selectAll(`g.${yAxisClass} g.tick line`)
@@ -917,8 +936,8 @@ export default {
 
             let dividedBarplotPos = 0;
             if (this.isDividedBarplot && this.metricNames.length) {
-              barWidth /= this.metricNames.length
-              dividedBarplotPos = this.metricNames.indexOf(metricName) * barWidth - ((this.metricNames.length-1)/2*barWidth)
+              barWidth /= barplotMetrics.length
+              dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth - ((barplotMetrics.length-1)/2*barWidth)
             }
 
             this.line
@@ -970,7 +989,7 @@ export default {
                 
                 const xVal = !isTime
                   ? d[xMetric]
-                  : `${day}-${month}-${year}`
+                  : `${day}-${month}-${year} ` + date.toLocaleTimeString()
                 
                 tooltip.html(
                   thisMetrics.reduce((prev, cur) => {
