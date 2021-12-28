@@ -2,10 +2,10 @@
   <div class="table-block" :data-change="change">
     <div class="v-data-table--container">
       <v-data-table
-        class="dash-table report-table"
         v-show="!props.nodata"
         ref="table"
         v-model="props.input"
+        class="dash-table report-table"
         :headers="props.titles"
         :items.sync="filteredTableData"
         :data-id="id"
@@ -24,16 +24,15 @@
           v-slot:[`header.${title}`]="{ header }"
         >
           <v-menu :key="`${title + value}`" offset-y>
-            
             <template v-slot:activator="{ on, attrs }">
               <v-menu z-index="100000" offset-y :close-on-content-click="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
                     v-bind="attrs"
-                    v-on="on"
                     large
                     class="icon"
                     :color="theme.$main_border"
+                    v-on="on"
                     >{{ mdiMagnify }}</v-icon
                   >
                 </template>
@@ -57,15 +56,17 @@
                   <v-col cols="12">
                     <v-text-field
                       label="значение"
-                      @change="setFilterData(title, '=', 'compare');setFilterData(title, $event)"
+                      @change="
+                        setFilterData(title, '=', 'compare');
+                        setFilterData(title, $event);
+                      "
                     ></v-text-field>
                   </v-col>
                 </v-row>
-
               </v-menu>
             </template>
           </v-menu>
-          <v-tooltip bottom :key="header.value">
+          <v-tooltip :key="header.value" bottom>
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
@@ -80,7 +81,7 @@
 </template>
 
 <script>
-import { mdiMagnify } from "@mdi/js";
+import { mdiMagnify } from '@mdi/js';
 export default {
   props: {
     dataRestFrom: null,
@@ -96,16 +97,16 @@ export default {
   },
   data() {
     return {
-      compare: [">", "<", "="],
+      compare: ['>', '<', '='],
       mdiMagnify: mdiMagnify,
       eventRows: [],
       props: {
         titles: [],
         nodata: true,
-        message: "Нет данных для отображения",
+        message: 'Нет данных для отображения',
         actions: [
-          { name: "click", capture: [] },
-          { name: "mouseover", capture: [] },
+          { name: 'click', capture: [] },
+          { name: 'mouseover', capture: [] },
         ],
         selected: {},
         justCreate: true,
@@ -123,62 +124,62 @@ export default {
   computed: {
     filteredTableData() {
       let chooseSort = function (dataFormat, sortType, value) {
-        if (dataFormat === "date") {
+        if (dataFormat === 'date') {
           let sort;
-          let parseDate = function(val) {
-            let parts = val.split(".");
+          let parseDate = function (val) {
+            let parts = val.split('.');
             let date = new Date(
-              Number(parts[2]),
+              Number(parts[0]),
               Number(parts[1]) - 1,
-              Number(parts[0])
+              Number(parts[2])
             );
             return date;
-          }
-          if (sortType == ">")
+          };
+          if (sortType == '>')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate < elDate;
             };
-          else if (sortType == "<")
+          else if (sortType == '<')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate > elDate;
             };
-          else if (sortType == "=")
+          else if (sortType == '=')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate.getTime() == elDate.getTime();
             };
           return sort;
-        } else if (dataFormat === "number") {
+        } else if (dataFormat === 'number') {
           let sort;
-          if (sortType == ">")
+          if (sortType == '>')
             sort = (el) => {
               return +el > +value;
             };
-          else if (sortType == "<")
+          else if (sortType == '<')
             sort = (el) => {
               return +el < +value;
             };
-          else if (sortType == "=")
+          else if (sortType == '=')
             sort = (el) => {
               return +value == +el;
             };
           return sort;
-        } else if (dataFormat === "string") {
+        } else if (dataFormat === 'string') {
           let sort;
-          if (sortType == ">")
+          if (sortType == '>')
             sort = (el) => {
               return el > value;
             };
-          else if (sortType == "<")
+          else if (sortType == '<')
             sort = (el) => {
               return el < value;
             };
-          else if (sortType == "=")
+          else if (sortType == '=')
             sort = (el) => {
               return value == el;
             };
@@ -201,7 +202,7 @@ export default {
     events() {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "OnDataCompare",
+        event: 'OnDataCompare',
         element: this.id,
       });
       return events;
@@ -267,7 +268,7 @@ export default {
     },
   },
   mounted() {
-    this.$store.commit("setActions", {
+    this.$store.commit('setActions', {
       actions: JSON.parse(JSON.stringify(this.props.actions)),
       idDash: this.idDash,
       id: this.id,
@@ -276,14 +277,14 @@ export default {
   },
   methods: {
     indexTitles(oldVal) {
-      let type = "no";
+      let type = 'no';
       for (let [key, val] of Object.entries(oldVal[0])) {
-        if (this.checkForDate(val)) type = "date";
-        else if (this.checkForNumeric(val)) type = "number";
-        else if (this.checkForString(val)) type = "string";
-        else type = "none";
+        if (this.checkForDate(val)) type = 'date';
+        else if (this.checkForNumeric(val)) type = 'number';
+        else if (this.checkForString(val)) type = 'string';
+        else type = 'none';
         this.typedTitles[key] = type;
-        this.filtersForTypedTitles[key] = { action: "", value: "" };
+        this.filtersForTypedTitles[key] = { action: '', value: '' };
       }
       this.typedTitles = { ...this.typedTitles };
       this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
@@ -297,7 +298,7 @@ export default {
 
     setFilterData(title, event, compare) {
       if (!this.filters[title]) this.filters[title] = {};
-      if (compare === "compare") {
+      if (compare === 'compare') {
         this.filters[title].compare = event;
       } else {
         this.filters[title].value = event;
@@ -312,11 +313,11 @@ export default {
       return false;
     },
     checkForString(val) {
-      return Object.prototype.toString.call(val) === "[object String]";
+      return Object.prototype.toString.call(val) === '[object String]';
     },
     checkForDate(val) {
-      if (typeof val != "string") return false;
-      let parts = val.split(".");
+      if (typeof val != 'string') return false;
+      let parts = val.split('.');
       if (parts.length < 3) return false;
       let result;
       let mydate = new Date(parts[2], parts[1] - 1, parts[0]);
@@ -363,7 +364,7 @@ export default {
           if (this.titles.includes(x)) {
             temp.push({ text: x, value: x, sortable: true });
           } else {
-            temp.push({ text: x, value: x, sortable: true, align: " d-none" });
+            temp.push({ text: x, value: x, sortable: true, align: ' d-none' });
           }
         }
         this.props.titles = temp;
@@ -378,9 +379,9 @@ export default {
     createTockens: function (result) {
       let captures = Object.keys(result[0]);
       this.props.actions.forEach((item, i) => {
-        this.$set(this.props.actions[i], "capture", captures);
+        this.$set(this.props.actions[i], 'capture', captures);
       });
-      this.$store.commit("setActions", {
+      this.$store.commit('setActions', {
         actions: JSON.parse(JSON.stringify(this.props.actions)),
         idDash: this.idDash,
         id: this.id,
@@ -389,77 +390,77 @@ export default {
     setEventColor: function () {
       if (this.eventRows.length > 0) {
         for (let x of this.eventRows) {
-          x.style.background = "";
-          x.classList.remove("event");
+          x.style.background = '';
+          x.classList.remove('event');
         }
       }
       this.eventRows = [];
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "OnDataCompare",
+        event: 'OnDataCompare',
         element: this.id,
       });
       let table, column;
       let eventObj = {};
       events.forEach((item, index) => {
         eventObj[index] = {};
-        eventObj[index]["compare"] = item.compare;
-        eventObj[index]["column"] = item.column;
-        eventObj[index]["row"] = item.row;
-        eventObj[index]["color"] = item.value[0];
-        eventObj[index]["prop"] = item.prop[0];
+        eventObj[index]['compare'] = item.compare;
+        eventObj[index]['column'] = item.column;
+        eventObj[index]['row'] = item.row;
+        eventObj[index]['color'] = item.value[0];
+        eventObj[index]['prop'] = item.prop[0];
         table = this.$refs.table.$el;
 
         if (
-          eventObj[index]["prop"] == "rowcolor" ||
-          eventObj[index]["prop"] == "columncolor" ||
-          eventObj[index]["prop"] == "cellcolor"
+          eventObj[index]['prop'] == 'rowcolor' ||
+          eventObj[index]['prop'] == 'columncolor' ||
+          eventObj[index]['prop'] == 'cellcolor'
         ) {
           let readyTh = setTimeout(
             function tick() {
-              table.querySelectorAll("thead th").style =
-                "background-color: red";
-              if (table.querySelectorAll("thead th").length != 0) {
+              table.querySelectorAll('thead th').style =
+                'background-color: red';
+              if (table.querySelectorAll('thead th').length != 0) {
                 clearTimeout(readyTh);
                 let sp = 0;
-                table.querySelectorAll("thead span").forEach((itemSpan) => {
+                table.querySelectorAll('thead span').forEach((itemSpan) => {
                   if (itemSpan.innerText != 0) {
-                    if (itemSpan.innerText == eventObj[index]["column"]) {
+                    if (itemSpan.innerText == eventObj[index]['column']) {
                       column = sp;
                     }
                     sp++;
                   }
                 });
 
-                table.querySelectorAll("tbody tr").forEach((itemRow) => {
-                  itemRow.querySelectorAll("td").forEach((itemTd, i) => {
+                table.querySelectorAll('tbody tr').forEach((itemRow) => {
+                  itemRow.querySelectorAll('td').forEach((itemTd, i) => {
                     if (i == column) {
                       // itemRow.style.backgroundColor = 'yellow';
                       let needItem = null,
                         row,
                         k = -1;
 
-                      switch (eventObj[index]["compare"]) {
-                        case "equals":
-                          if (itemTd.innerText == eventObj[index]["row"]) {
+                      switch (eventObj[index]['compare']) {
+                        case 'equals':
+                          if (itemTd.innerText == eventObj[index]['row']) {
                             needItem = itemRow;
                           }
 
                           break;
-                        case "over":
-                          if (itemTd.innerText > eventObj[index]["row"]) {
+                        case 'over':
+                          if (itemTd.innerText > eventObj[index]['row']) {
                             needItem = itemRow;
                           }
                           break;
-                        case "less":
-                          if (itemTd.innerText < eventObj[index]["row"]) {
+                        case 'less':
+                          if (itemTd.innerText < eventObj[index]['row']) {
                             needItem = itemRow;
                           }
                           break;
-                        case "in":
-                          row = eventObj[index]["row"]
-                            .replace(/\[|\]/g, "")
-                            .split(",");
+                        case 'in':
+                          row = eventObj[index]['row']
+                            .replace(/\[|\]/g, '')
+                            .split(',');
                           k = -1;
                           row.forEach((rowValue) => {
                             if (itemTd.innerText == rowValue) {
@@ -470,10 +471,10 @@ export default {
                             needItem = itemRow;
                           }
                           break;
-                        case "between":
-                          row = eventObj[index]["row"]
-                            .replace(/\[|\]/g, "")
-                            .split(",");
+                        case 'between':
+                          row = eventObj[index]['row']
+                            .replace(/\[|\]/g, '')
+                            .split(',');
                           if (
                             itemTd.innerText > row[0] &&
                             itemTd.innerText < row[1]
@@ -483,30 +484,30 @@ export default {
                           break;
                       }
                       if (needItem != null) {
-                        needItem.classList.add("event");
+                        needItem.classList.add('event');
                         this.eventRows.push(needItem);
                       }
                     }
                   });
                 });
 
-                if (table.querySelectorAll(".event").length > 0) {
-                  if (item.prop[0] == "rowcolor") {
-                    let rows = table.querySelectorAll(".event");
+                if (table.querySelectorAll('.event').length > 0) {
+                  if (item.prop[0] == 'rowcolor') {
+                    let rows = table.querySelectorAll('.event');
                     rows.forEach((res) => {
-                      res.style.background = eventObj[index]["color"];
+                      res.style.background = eventObj[index]['color'];
                       //res.style.color = this.color.back;
                     });
-                  } else if (item.prop[0] == "cellcolor") {
-                    table.querySelectorAll(".event").forEach((res) => {
+                  } else if (item.prop[0] == 'cellcolor') {
+                    table.querySelectorAll('.event').forEach((res) => {
                       res.children[column].style.background =
-                        eventObj[index]["color"];
+                        eventObj[index]['color'];
                       //res.children[column].style.color = this.color.back;
                     });
-                  } else if (item.prop[0] == "columncolor") {
-                    table.querySelectorAll("tbody tr").forEach((itemRow) => {
+                  } else if (item.prop[0] == 'columncolor') {
+                    table.querySelectorAll('tbody tr').forEach((itemRow) => {
                       itemRow.children[column].style.background =
-                        eventObj[index]["color"];
+                        eventObj[index]['color'];
                       //itemRow.children[column].style.color = this.color.back;
                     });
                   }
@@ -523,22 +524,22 @@ export default {
     selectRow: function () {
       document
         .querySelector(`[data-id=${this.id}]`)
-        .addEventListener("click", (event) => {
-          if (event.target.tagName.toLowerCase() == "td") {
-            if (event.target.parentElement.classList.contains("selected")) {
-              event.target.parentElement.classList.remove("selected");
+        .addEventListener('click', (event) => {
+          if (event.target.tagName.toLowerCase() == 'td') {
+            if (event.target.parentElement.classList.contains('selected')) {
+              event.target.parentElement.classList.remove('selected');
             } else {
               event.target.parentElement.parentElement
-                .querySelectorAll(".selected")
+                .querySelectorAll('.selected')
                 .forEach((item) => {
-                  item.classList.remove("selected");
+                  item.classList.remove('selected');
                   // item.style = `background: transparent !important`;
                 });
-              event.target.parentElement.classList.add("selected");
+              event.target.parentElement.classList.add('selected');
             }
 
             let headers = Array.from(
-              this.$refs.table.$el.querySelector("thead tr").childNodes
+              this.$refs.table.$el.querySelector('thead tr').childNodes
             ).map((item) => item.textContent);
 
             let cellRowIndex = Array.from(
@@ -550,11 +551,11 @@ export default {
             tokens.forEach((token) => {
               if (
                 token.elem == this.id &&
-                token.action == "click" &&
+                token.action == 'click' &&
                 headers[cellRowIndex] === token.capture
               ) {
                 let value = event.target.textContent;
-                this.$store.commit("setTocken", {
+                this.$store.commit('setTocken', {
                   tocken: token,
                   idDash: this.idDash,
                   store: this.$store,
@@ -565,20 +566,20 @@ export default {
 
             let events = this.$store.getters.getEvents({
               idDash: this.idDash,
-              event: "onclick",
+              event: 'onclick',
               element: this.id,
-              partelement: "row",
+              partelement: 'row',
             });
 
             if (events.length != 0) {
               events.forEach((item) => {
-                if (item.action == "set") {
-                  this.$store.commit("letEventSet", {
+                if (item.action == 'set') {
+                  this.$store.commit('letEventSet', {
                     events: events,
                     idDash: this.idDash,
                   });
-                } else if (item.action == "go") {
-                  this.$store.commit("letEventGo", {
+                } else if (item.action == 'go') {
+                  this.$store.commit('letEventGo', {
                     event: item,
                     idDash: this.idDash,
                     route: this.$router,
@@ -595,5 +596,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../sass/dashTable.sass";
+@import '../../sass/dashTable.sass';
 </style>
