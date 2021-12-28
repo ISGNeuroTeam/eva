@@ -191,7 +191,7 @@ export default {
       for (let [key, val] of Object.entries(this.filters)) {
         let sort;
         let type = this.getType(key);
-        if (val.value) {
+        if (val.value && val.compare) {
           sort = chooseSort(type, val.compare, val.value);
           temp = temp.filter((el) => sort(el[key]));
         }
