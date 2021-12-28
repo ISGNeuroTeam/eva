@@ -814,7 +814,6 @@ export default {
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
       const isGoToTabExsits = state[id]?.tabList[event.event.tab];
-      debugger;
       if (!options?.openNewScreen) {
         if (!isTabMode || !isGoToTabExsits)
           event.route.push(`/dashboards/${id}/1`);
