@@ -404,7 +404,7 @@ export default {
         this.dataRestFrom[this.dataRestFrom.length-1][this.xMetric],
       ];
       let barsWidth = this.width / this.dataRestFrom.length
-      this.dataRestFrom.map(d => d[this.xMetric]).forEach((xVal, i) => {
+      this.dataRestFrom.map(d => d[this.xMetric]).sort().forEach((xVal, i) => {
         if (i * barsWidth <= invertStart) {
           range[0] = xVal
         }
@@ -671,7 +671,7 @@ export default {
       let xStartRange = this.isDividedBarplot ? barWidth/2 : 0;
 
       if (this.isAccumulationBarplot && this.isUnitedMode) {
-        let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys()
+        let groups = d3.map(this.dataRestFrom, (d) => (this.isTime?(d[xMetric]*1000):d[xMetric])).keys().sort()
         x = d3.scaleBand()
             .range([xStartRange, this.width])
             .padding([.1])
@@ -685,7 +685,7 @@ export default {
         if (this.stringOX) {
           x = d3.scalePoint()
               .range([xStartRange, this.width]).padding(0.5)
-              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }));
+              .domain(this.dataRestFrom.map(function(d) { return d[xMetric]; }).sort());
         } else {
           let barWidth = parseInt(barplotBarWidth) || 0
           let barOffset = barWidth/2 *1.5;
@@ -693,7 +693,7 @@ export default {
           if (hasBarplots) {
             x = d3.scalePoint()
                 .range([xStartRange, this.width]).padding(0.5)
-                .domain(this.dataRestFrom.map(d => this.isTime ? (d[xMetric]*this.secondTransf) : d[xMetric]));
+                .domain(this.dataRestFrom.map(d => this.isTime ? (d[xMetric]*this.secondTransf) : d[xMetric]).sort());
           } else {
             x = this.isTime && false
                 ? d3.scaleTime().range([xStartRange+barOffset, this.width-barOffset]).domain(extentForX)
