@@ -1,30 +1,24 @@
 <template>
-  <div class="dash-map" ref="container">
+  <div ref="container" class="dash-map">
     <div v-if="error" class="error-message">
       {{ error }}
     </div>
-    <div
-      v-if="!error"
-      ref="map"
-      class="mapContainer"
-      :style="mapStyleSize"
-    />
+    <div v-if="!error" ref="map" class="mapContainer" :style="mapStyleSize" />
   </div>
 </template>
 
-
 <script>
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet.tilelayer.colorfilter";
-import "leaflet.markercluster";
-import vuetify from "../../plugins/vuetify";
-import dashMapUserSettings from "./dashMapUserSettings.vue";
-import store from "../../store/index.js"; // подключаем файл с настройками хранилища Vuex
-import Vue from "vue";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.tilelayer.colorfilter';
+import 'leaflet.markercluster';
+import vuetify from '../../plugins/vuetify';
+import dashMapUserSettings from './dashMapUserSettings.vue';
+import store from '../../store/index.js'; // подключаем файл с настройками хранилища Vuex
+import Vue from 'vue';
 import isMarkerInsidePolygon from './checkMarketInsideMap.js';
-import * as turf from "@turf/turf";
-import * as utils from "leaflet-geometryutil";
+import * as turf from '@turf/turf';
+import * as utils from 'leaflet-geometryutil';
 export default {
   props: {
     // переменные полученные от родителя
@@ -39,8 +33,8 @@ export default {
   data() {
     return {
       actions: [
-        { name: "refresh", capture: [] },
-        { name: "button", capture: [] },
+        { name: 'refresh', capture: [] },
+        { name: 'button', capture: [] },
       ],
       showLegend: false,
       osmserver: null,
@@ -60,6 +54,7 @@ export default {
       leftBottom: 0,
       rightTop: 0,
       pipelineData: [],
+      pipelineDataDictionary: {},
     };
   },
   computed: {
@@ -92,12 +87,12 @@ export default {
     mapStyleSize() {
       return {
         height: `${Math.trunc(this.heightFrom) - this.top / 2 - 45}px`,
-      }
+      };
     },
   },
   watch: {
     mapStyleSize() {
-      this.map._onResize()
+      this.map._onResize();
     },
     dataRestFrom(_dataRest) {
       //при обновлении данных перерисовать
@@ -118,7 +113,7 @@ export default {
     this.initClusterPosition();
     this.initClusterDelimiter();
     store.subscribe((mutation, state) => {
-      if (mutation.type == "updateOptions") {
+      if (mutation.type == 'updateOptions') {
         if (this.options.initialPoint) {
           this.map.setView(
             [this.options.initialPoint.x, this.options.initialPoint.y],
@@ -138,7 +133,7 @@ export default {
       }
     });
     this.createTokens();
-    this.$store.commit("setActions", {
+    this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
       id: this.element,
@@ -148,7 +143,7 @@ export default {
   methods: {
     getDataFromRest: async function (event) {
       // this.$set(this.loadings,event.sid,true);
-      this.$store.commit("setLoading", {
+      this.$store.commit('setLoading', {
         search: event.sid,
         idDash: this.idDash,
         should: true,
@@ -163,7 +158,7 @@ export default {
       // вызывая метод в хранилище
       if (response.length == 0) {
         // если что-то пошло не так
-        this.$store.commit("setLoading", {
+        this.$store.commit('setLoading', {
           search: event.sid,
           idDash: this.idDash,
           should: false,
@@ -178,7 +173,7 @@ export default {
           this.idDash
         );
         responseDB.then((result) => {
-          this.$store.commit("setLoading", {
+          this.$store.commit('setLoading', {
             search: event.sid,
             idDash: this.idDash,
             should: false,
@@ -192,6 +187,14 @@ export default {
     async loadDataForPipe(search) {
       let test = await this.getDataFromRest(search);
       this.pipelineData = test;
+      let allPipes = {};
+      for (let x of test) {
+        if (!allPipes[x.ID]) {
+          allPipes[x.ID] = [];
+        }
+        allPipes[x.ID].push(x);
+      }
+      this.pipelineDataDictionary = allPipes;
       this.reDrawMap(this.dataRestFrom);
     },
     updateToken(value, test) {
@@ -199,10 +202,10 @@ export default {
       Object.keys(tokens).forEach((i) => {
         if (
           tokens[i].elem == this.element &&
-          tokens[i].action == "button" &&
-          tokens[i].capture == "zoom_level"
+          tokens[i].action == 'button' &&
+          tokens[i].capture == 'zoom_level'
         ) {
-          this.$store.commit("setTocken", {
+          this.$store.commit('setTocken', {
             tocken: tokens[i],
             idDash: this.idDash,
             value: value,
@@ -210,10 +213,10 @@ export default {
           });
         } else if (
           tokens[i].elem == this.element &&
-          tokens[i].action == "button" &&
-          tokens[i].capture == "top_left_point"
+          tokens[i].action == 'button' &&
+          tokens[i].capture == 'top_left_point'
         ) {
-          this.$store.commit("setTocken", {
+          this.$store.commit('setTocken', {
             tocken: tokens[i],
             idDash: this.idDash,
             value: this.leftBottom[1],
@@ -221,10 +224,10 @@ export default {
           });
         } else if (
           tokens[i].elem == this.element &&
-          tokens[i].action == "button" &&
-          tokens[i].capture == "bottom_right_point"
+          tokens[i].action == 'button' &&
+          tokens[i].capture == 'bottom_right_point'
         ) {
-          this.$store.commit("setTocken", {
+          this.$store.commit('setTocken', {
             tocken: tokens[i],
             idDash: this.idDash,
             value: this.rightTop[1],
@@ -234,9 +237,9 @@ export default {
       });
     },
     createTokens: function (result) {
-      let captures = ["top_left_point", "bottom_right_point", "zoom_level"];
+      let captures = ['top_left_point', 'bottom_right_point', 'zoom_level'];
       this.actions.forEach((item, i) => {
-        this.$set(this.actions[i], "capture", captures);
+        this.$set(this.actions[i], 'capture', captures);
       });
     },
     reDrawMap(dataRest) {
@@ -275,11 +278,11 @@ export default {
         vuetify,
         store,
       });
-      test.$on("updatePipeDataSource", (e) => this.loadDataForPipe(e));
+      test.$on('updatePipeDataSource', (e) => this.loadDataForPipe(e));
       test.$mount();
 
       let element = this.$refs.map.getElementsByClassName(
-        "leaflet-control-container"
+        'leaflet-control-container'
       );
       let container = element[0];
       container.appendChild(test.$el);
@@ -294,7 +297,7 @@ export default {
       if (options.maptheme) {
         this.maptheme = options.maptheme;
       } else {
-        this.maptheme = "default";
+        this.maptheme = 'default';
       }
     },
     changeMapTheme(val) {
@@ -323,7 +326,7 @@ export default {
       if (options.clusterDelimiter) {
         this.clusterDelimiter = options.clusterDelimiter;
       } else {
-        this.clusterDelimiter = ";";
+        this.clusterDelimiter = ';';
       }
     },
     initClusterPosition() {
@@ -382,7 +385,7 @@ export default {
       } else if (options.osmserver) {
         this.osmserver = options.osmserver;
       } else {
-        this.error = "Введите osm server";
+        this.error = 'Введите osm server';
       }
     },
     generateLibrary(dataRest, options) {
@@ -393,13 +396,13 @@ export default {
         } else {
           this.library = JSON.parse(_tmp);
         }
-        this.$store.commit("setLibrary", {
+        this.$store.commit('setLibrary', {
           library: this.library,
           id: this.idFrom, // id элемнета (table, graph-2)
           idDash: this.idDashFrom,
         });
       } catch {
-        this.error = "Ошибка формата входных данных";
+        this.error = 'Ошибка формата входных данных';
         this.map.remove();
         this.map = null;
       }
@@ -410,13 +413,13 @@ export default {
     },
 
     createLegend() {
-      let generatedListHTML = "";
+      let generatedListHTML = '';
       for (let x of Object.values(this.library.objects)) {
         generatedListHTML += `<li>${x.name}</li>`;
       }
       L.Control.Legend = L.Control.extend({
         onAdd: function (map) {
-          var img = L.DomUtil.create("div");
+          var img = L.DomUtil.create('div');
           img.innerHTML = `
               <div>
                 <p>Легенда</p>
@@ -426,7 +429,7 @@ export default {
               </div>`;
           img.style.width = `280px`;
           img.style.maxHeight = `466px`;
-          img.style.background = "black";
+          img.style.background = 'black';
           return img;
         },
 
@@ -439,7 +442,7 @@ export default {
         return new L.Control.Legend(opts);
       };
 
-      L.control.legend({ position: "bottomright" }).addTo(this.map);
+      L.control.legend({ position: 'bottomright' }).addTo(this.map);
       this.isLegendGenerated = true;
     },
 
@@ -474,20 +477,20 @@ export default {
         maxZoom: 25,
         center: [0, 0],
       });
-      this.map.on("moveend", () => {
+      this.map.on('moveend', () => {
         [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
         this.updateToken(this.map.getZoom());
       });
-      this.map.on("zoomend", () => {
-        let layers = document.getElementsByClassName("leaflet-marker-icon");
+      this.map.on('zoomend', () => {
+        let layers = document.getElementsByClassName('leaflet-marker-icon');
         for (let x of layers) {
-          x.style.width = (x.naturalWidth / 10) * this.map.getZoom() + "px";
-          x.style.height = (x.naturalHeight / 10) * this.map.getZoom() + "px";
+          x.style.width = (x.naturalWidth / 10) * this.map.getZoom() + 'px';
+          x.style.height = (x.naturalHeight / 10) * this.map.getZoom() + 'px';
         }
       });
       this.$nextTick(() => {
         this.map._onResize();
-      })
+      });
     },
 
     drawObjects(dataRest) {
@@ -497,15 +500,15 @@ export default {
           // if no lib for drawing object - just skip
           continue;
         }
-        if (dataRest[i].ID === "1") {
-          const _point = dataRest[i].coordinates.split(":");
-          const _coord = _point[1].split(",");
+        if (dataRest[i].ID === '1') {
+          const _point = dataRest[i].coordinates.split(':');
+          const _coord = _point[1].split(',');
           this.startingPoint = [_coord[0], _coord[1]];
         }
-        if (dataRest[i].geometry_type?.toLowerCase() === "point") {
-          this.addMarker(dataRest[i], dataRest[i].ID === "1", lib);
+        if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
+          this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
         }
-        if (dataRest[i].geometry_type?.toLowerCase() === "line") {
+        if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
           this.addLine(dataRest[i], lib);
         }
       }
@@ -513,7 +516,7 @@ export default {
 
     addMarker(element, isCenter, lib) {
       let type = this.getElementDrawType(lib);
-      if (type === "SVG") {
+      if (type === 'SVG') {
         this.drawMarkerSVG(lib, element, isCenter);
       } else {
         this.drawMarkerHTML({ lib, element, isCenter });
@@ -521,10 +524,10 @@ export default {
     },
 
     getElementDrawType(lib) {
-      if (lib.view_type == "html") {
-        return "HTML";
+      if (lib.view_type == 'html') {
+        return 'HTML';
       }
-      return "SVG";
+      return 'SVG';
     },
 
     drawMarkerSVG(lib, element, isCenter) {
@@ -533,8 +536,8 @@ export default {
         iconSize: [lib.width, lib.height],
       });
 
-      const _point = element.coordinates.split(":");
-      const _coord = _point[1].split(",");
+      const _point = element.coordinates.split(':');
+      const _coord = _point[1].split(',');
       this.startingPoint = [_coord[0], _coord[1]];
       let marker = L.marker([_coord[0], _coord[1]], {
         icon: icon,
@@ -544,25 +547,25 @@ export default {
         .addTo(this.map)
         .bindTooltip(element.label, {
           permanent: false,
-          direction: "top",
-          className: "leaftet-hover",
+          direction: 'top',
+          className: 'leaftet-hover',
         });
-      L.DomUtil.addClass(marker._icon, "className");
+      L.DomUtil.addClass(marker._icon, 'className');
     },
 
     drawMarkerHTML({ lib, element, isCenter }) {
       let {
-        text_color: textColor = "#FFFFFF",
-        background_color: color = "65, 62, 218",
+        text_color: textColor = '#FFFFFF',
+        background_color: color = '65, 62, 218',
         opacity = 0.6,
-        label_field: text = "КП-240",
-        border_radius: borderRadius = "2px",
-        border = "none",
+        label_field: text = 'КП-240',
+        border_radius: borderRadius = '2px',
+        border = 'none',
         width,
         height,
       } = lib;
       let icon = L.divIcon({
-        className: "location-pin",
+        className: 'location-pin',
         riseOnHover: true,
         html: `<div class="leaflet-div-icon" 
           style="
@@ -580,8 +583,8 @@ export default {
         </div>`,
         iconSize: [width, height],
       });
-      const _point = element.coordinates.split(":");
-      const _coord = _point[1].split(",");
+      const _point = element.coordinates.split(':');
+      const _coord = _point[1].split(',');
       L.marker([_coord[0], _coord[1]], {
         icon: icon,
         zIndexOffset: -1000,
@@ -590,27 +593,22 @@ export default {
         .addTo(this.map)
         .bindTooltip(element.label, {
           permanent: false,
-          direction: "top",
-          className: "leaftet-hover",
+          direction: 'top',
+          className: 'leaftet-hover',
           interactive: true,
         });
     },
 
     addLine(element, lib) {
       let option = this.option;
-      let pipelineDataDictionary = {};
-      for (let x of this.pipelineData) {
-        if (!pipelineDataDictionary[x.ID]) pipelineDataDictionary[x.ID] = [];
-        pipelineDataDictionary[x.ID].push(x);
-      }
 
-      let pipelineData = pipelineDataDictionary[element.ID];
+      let pipelineData = this.pipelineDataDictionary[element.ID];
+      let map = this.map;
 
-      
       let latlngs = [];
-      element.coordinates.split(";").forEach((point) => {
-        let p = point.split(":");
-        latlngs[p[0] - 1] = p[1].split(",");
+      element.coordinates.split(';').forEach((point) => {
+        let p = point.split(':');
+        latlngs[p[0] - 1] = p[1].split(',');
       });
       let line = L.polyline(latlngs, {
         color: lib.color,
@@ -619,16 +617,16 @@ export default {
       });
       let tooltip = L.tooltip({
         permanent: false,
-        direction: "top",
-        className: "leaftet-hover",
+        direction: 'top',
+        className: 'leaftet-hover',
         sticky: true,
       });
 
       line
         .addTo(this.map)
         .bindTooltip(tooltip)
-        .on("mouseover", (e) => highlightFeature(e, line))
-        .on("mouseout", resetHighlight);
+        .on('mouseover', (e) => highlightFeature(e, line))
+        .on('mouseout', resetHighlight);
       line.setTooltipContent(element.label);
       let previousPoint = 0;
       let route = line.getLatLngs().map((el) => {
@@ -661,8 +659,7 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
-        console.log(pipelineDataDictionary, element)
-        if (!pipelineDataDictionary[element.ID]) return;
+        if (!pipelineData) return;
         const closest = (arr, num) => {
           return (
             arr.reduce((acc, val) => {
@@ -674,7 +671,7 @@ export default {
             }, Infinity) + num
           );
         };
-        if (option?.mode[0] == "Мониторинг") {
+        if (option?.mode[0] == 'Мониторинг') {
           let newLine = turf.lineSlice(
             route[0],
             [e.latlng.lat, e.latlng.lng],
@@ -685,21 +682,21 @@ export default {
           let sum = distances[distances.length - 1];
 
           let closestData = closest(pipelineData, sum);
-          let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
 
+          let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
           // div for tooltip
-          var newDiv = document.createElement("div");
+          var newDiv = document.createElement('div');
           newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
           <p>${pipelineInfo.label}</p>
           <p>P ${pipelineInfo.P}</p>
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-
-          console.log(isMarkerInsidePolygon(this.map.getBounds()), 'closee')
-          if (isMarkerInsidePolygon(this.map.getBounds())) {
-            line.setTooltipContent(newDiv);
-          }
+          line.setTooltipContent(newDiv);
+          // console.log(isMarkerInsidePolygon(map.getBounds()), 'closee');
+          // if (isMarkerInsidePolygon(map.getBounds())) {
+          //   line.setTooltipContent(newDiv);
+          // }
         }
       }
     },
@@ -713,7 +710,7 @@ export default {
             let _html =
               "<div class='leaflet-tooltip'>" +
               this.generateHtml(markers) +
-              "</div>";
+              '</div>';
             return L.divIcon({
               iconSize: [0, 0],
               html: _html,
@@ -750,7 +747,7 @@ export default {
         i < markers.length - 1 && _count < this.clusterTextCount;
         i++
       ) {
-        _html = _html + "<div>" + markers[i].getTooltip()._content + "</div>";
+        _html = _html + '<div>' + markers[i].getTooltip()._content + '</div>';
         _html = _html + `<div> ${this.clusterDelimiter} </div>`;
         _count++;
       }
@@ -760,7 +757,7 @@ export default {
         _html.length - `<div> ${this.clusterDelimiter} </div>`.length
       );
       //закрываем leaftet-flex
-      _html = _html + "</div>";
+      _html = _html + '</div>';
       if (i !== markers.length - 1) {
         _html = _html + "<div class ='leaftet-flex'>...</div>";
       }
@@ -776,13 +773,13 @@ export default {
       const icon = L.divIcon({
         iconSize: [0, 0],
       });
-      const _point = element.coordinates.split(":");
-      const _coord = _point[1].split(",");
+      const _point = element.coordinates.split(':');
+      const _coord = _point[1].split(',');
       const marker = L.marker([_coord[0], _coord[1]], {
         icon: icon,
       }).bindTooltip(element.label, {
         permanent: true,
-        direction: "bottom",
+        direction: 'bottom',
         offset: [0, lib.height / 2],
       });
 
@@ -792,10 +789,10 @@ export default {
     createMap() {
       let tileLayer;
       if (!this.osmserver) return;
-      if (typeof this.osmserver === "string") {
-        if (this.maptheme === "black") {
+      if (typeof this.osmserver === 'string') {
+        if (this.maptheme === 'black') {
           tileLayer = L.tileLayer.colorFilter(this.osmserver, {
-            filter: ["grayscale:100%", "invert:100%"],
+            filter: ['grayscale:100%', 'invert:100%'],
           });
         } else {
           tileLayer = L.tileLayer.colorFilter(this.osmserver);
@@ -804,11 +801,11 @@ export default {
         if (!this.osmserver.tile) return;
 
         let temp = this.osmserver.tile;
-        if (typeof this.osmserver.tile === "string") {
+        if (typeof this.osmserver.tile === 'string') {
           temp = [this.osmserver.tile];
         }
-        if (this.maptheme === "black") {
-          temp[1].filter = ["grayscale:100%", "invert:100%"];
+        if (this.maptheme === 'black') {
+          temp[1].filter = ['grayscale:100%', 'invert:100%'];
           tileLayer = L.tileLayer.colorFilter(...temp);
         } else {
           tileLayer = L.tileLayer(...temp);
@@ -823,11 +820,11 @@ export default {
 .dash-map {
   padding: 0 20px !important;
 }
-.leaflet-tooltip-top:before, 
-.leaflet-tooltip-bottom:before, 
-.leaflet-tooltip-left:before, 
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
 .leaflet-tooltip-right:before {
-    border: none !important;
+  border: none !important;
 }
 .mapContainer {
   position: relative;
