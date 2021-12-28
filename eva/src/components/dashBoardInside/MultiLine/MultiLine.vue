@@ -627,7 +627,7 @@ export default {
       this.clearSvgContainer()
       let barWidth = parseInt(barplotBarWidth) || 0
 
-      let hasBarplots = this.isAccumulationBarplot
+      hasBarplots = this.isAccumulationBarplot
       if (!this.isUnitedMode) {
         barplotBarWidth = 0
       } else {
