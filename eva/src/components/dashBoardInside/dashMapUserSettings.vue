@@ -13,35 +13,65 @@
           :value="options.mode"
           :menu-props="{ value: toggleSelect }"
           :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-          class="test"
           :items="mode"
           label="Режим"
           multiple
           @change="updatePipeDataSource($event)"
         />
-        <v-spacer/>
+        <v-spacer />
         <v-dialog v-model="dialog" max-width="390">
           <template v-slot:activator="{ on, attrs }">
-            <v-btn rounded :style="`background: ${theme.$secondary_bg}`" v-bind="attrs" v-on="on">
+            <v-btn
+              rounded
+              :style="`background: ${theme.$secondary_bg}`"
+              v-bind="attrs"
+              v-on="on"
+            >
               <v-icon :style="{ color: theme.$main_text }">
                 {{ mdiSettings }}
               </v-icon>
             </v-btn>
           </template>
           <v-card
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text} !important`">
-            <v-card-title class="text-h5" > Настройки </v-card-title>
-            <v-card-text :style="`color: ${theme.$main_text} !important`">
+            :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text} !important`"
+          >
+            <v-card-title
+              class="text-h5"
+              :style="`background: ${theme.$main_bg} !important`"
+            >
+              Настройки
+              <v-spacer />
+              <a style="align-self: center" @click="dialog = false">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665 5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984 11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
+                    fill="#DADADA"
+                  />
+                </svg>
+              </a>
+            </v-card-title>
+            <v-card-text
+              :style="`color: ${theme.$main_text} !important; margin-top: 20px`"
+            >
               <p>Подложка</p>
               <v-select
+                outlined
                 v-model="options.selectedLayer"
                 return-object
                 :items="tileLayers"
+                light
                 item-text="name"
                 item-value="tile[0]"
+                :dark="theme.$main_text == '#F4F4FA'"
+                :style="{ color: theme.$main_text }"
                 @change="updateTileLayer($event)"
               />
-
               <p>Начальный зум</p>
               <v-slider
                 v-model="options.zoomLevel"
@@ -52,6 +82,9 @@
               >
                 <template v-slot:label>
                   <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
                     v-model="options.zoomLevel"
                     class="mt-0 pt-0"
                     hide-details
@@ -72,6 +105,9 @@
               >
                 <template v-slot:label>
                   <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
                     v-model="options.zoomStep"
                     class="mt-0 pt-0"
                     hide-details
@@ -84,33 +120,58 @@
 
               <p>Начальная точка</p>
               <v-row>
-                <v-col>
-                  <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.x" label="X" />
+                <v-col col="6">
+                  <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
+                    type="number"
+                    :style="`color: ${theme.$secondary_text} !important`"
+                    v-model="options.initialPoint.x"
+                  >
+                    <template v-slot:prepend>
+                      <v-button>X:</v-button>
+                    </template>
+                  </v-text-field>
                 </v-col>
-                <v-col>
-                  <v-text-field type="number" :style="`color: ${theme.$secondary_text} !important`" v-model="options.initialPoint.y" label="Y" />
+                <v-col col="6">
+                  <v-text-field
+                    outlined
+                    dense
+                    :dark="theme.$main_text == '#F4F4FA'"
+                    type="number"
+                    :style="`color: ${theme.$secondary_text} !important`"
+                    v-model="options.initialPoint.y"
+                  >
+                    <template v-slot:prepend>
+                      <v-button>Y:</v-button>
+                    </template>
+                  </v-text-field>
                 </v-col>
                 <v-col class="flex-grow-0">
-                  <v-btn small color="primary" class="mt-3" @click="onClickChoosingCoordinates">Указать на карте</v-btn>
+                  <v-btn
+                    small
+                    color="primary"
+                    class="mt-3"
+                    @click="onClickChoosingCoordinates"
+                    >Указать на карте</v-btn
+                  >
                 </v-col>
               </v-row>
 
               <p>Легенда карты</p>
-              <v-checkbox
-                v-model="options.showLegend"
-                
-                hide-details
-                
-              >
-              <template v-slot:label>
-                <span :style="`color: ${theme.$secondary_text} !important`">
-                  Включить отображение легенды
-                </span>
+              <v-checkbox v-model="options.showLegend" hide-details>
+                <template v-slot:label>
+                  <span :style="`color: ${theme.$secondary_text} !important`">
+                    Включить отображение легенды
+                  </span>
                 </template>
               </v-checkbox>
 
               <p>ИД для режима мониторинга</p>
               <v-select
+                outlined
+                :dark="theme.$main_text == '#F4F4FA'"
                 v-model="options.search"
                 item-text="sid"
                 :items="searches"
@@ -133,7 +194,7 @@
           style="max-height: 466px"
           max-width="280"
           class="px-5 pb-5"
-          color="#191919"
+          :color="theme.$main_bg"
         >
           <v-subheader style="color: white" class="px-0">
             <v-row class="ma-0 fill-height">
@@ -159,7 +220,10 @@
                     </defs>
                   </svg>
 
-                  <span class="ml-2 legend-title">
+                  <span
+                    class="ml-2 legend-title"
+                    :style="`color: ${theme.$main_text} !important;`"
+                  >
                     Легенда
                   </span>
                   <v-spacer />
@@ -185,8 +249,12 @@
             style="margin-bottom: 10px; border: 1px solid #555454"
           ></v-divider>
 
-          <v-card width="240" outlined color="white">
-            <v-list style="max-height: 382px" class="overflow-y-auto">
+          <v-card width="240" outlined>
+            <v-list
+              :style="`color: ${theme.$main_text} !important; max-height: 382px`"
+              class="overflow-y-auto"
+              :color="theme.$secondary_bg"
+            >
               <v-list-item v-for="item in library.objects" :key="item.name">
                 <template v-if="item.image">
                   <v-list-item-avatar size="20px" style="align-self: center">
@@ -194,7 +262,7 @@
                   </v-list-item-avatar>
 
                   <v-list-item-title
-                    style="text-align: left"
+                    :style="`color: ${theme.$main_text} !important; text-align: left`"
                     v-text="item.name"
                   ></v-list-item-title>
                 </template>
@@ -207,7 +275,7 @@
                   />
 
                   <v-list-item-title
-                    style="text-align: left"
+                    :style="`color: ${theme.$main_text} !important; text-align: left`"
                     v-text="item.name"
                   />
                 </template>
@@ -229,7 +297,7 @@
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title
-                      style="text-align: left"
+                      :style="`color: ${theme.$main_text} !important; text-align: left`"
                       v-text="item.name"
                     />
                   </v-list-item-content>
@@ -325,8 +393,7 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (val.mode != oldVal.mode) 
-          this.updatePipeDataSource();
+        if (val.mode != oldVal.mode) this.updatePipeDataSource();
         this.updateOptions(val);
       },
     },
@@ -354,33 +421,32 @@ export default {
     } else {
       this.options = options;
     }
-    
+
     this.searches = this.loadDataForPipe();
   },
   methods: {
     onClickChoosingCoordinates(e) {
-      const cursorCssClass = 'cursor-crosshair';
+      const cursorCssClass = "cursor-crosshair";
       this.dialog = false;
       L.DomUtil.addClass(this.map._container, cursorCssClass);
-      const clickEvent = event => {
+      const clickEvent = (event) => {
         this.dialog = true;
         L.DomUtil.removeClass(this.map._container, cursorCssClass);
         this.options.initialPoint.x = event.latlng.lat;
         this.options.initialPoint.y = event.latlng.lng;
-        this.map.off('click', clickEvent)
-      }
-      this.map.on('click', clickEvent);
+        this.map.off("click", clickEvent);
+      };
+      this.map.on("click", clickEvent);
     },
     updatePipeDataSource(e) {
       let set = new Set(e);
-      set.delete(this.options.mode[0])
+      set.delete(this.options.mode[0]);
       this.options.mode = Array.from(set);
-      this.$emit("updatePipeDataSource", this.options.search)
+      this.$emit("updatePipeDataSource", this.options.search);
     },
     loadDataForPipe() {
-      let searches = this.$store.getters.getSearches(this.idDashFrom)
+      let searches = this.$store.getters.getSearches(this.idDashFrom);
       return searches;
-
     },
     closeLegend() {
       this.options.showLegend = false;
@@ -488,23 +554,25 @@ export default {
 </script>
 
 <style lang="sass" >
+.theme--light.v-select .v-select__selections
+  color: var(--main_text) !important
+
 .legend-title
   font-size: 18px
   font-weight: 600
   line-height: 22px
 
-.menuable__content__active 
+.menuable__content__active
   width: 300px
-  
 
-.med 
+.med
   height: 100%
   position: absolute
   /* left: 0px; */
   right: 0
   z-index: 1000000
 
-.theme--light.v-input input, .theme--light.v-input textarea 
+.theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
 
 .v-text-field__slot label

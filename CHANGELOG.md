@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.80.0]
+
+## Added
+
+- single value modal closes on click outside
+
+## Fixed
+
+- fixed render a lot of tooltips for dashMap component
+- fixed a problem with displaying some multi-line bar graphs
+
 ## [1.79.0]
 
 ### Added
@@ -12,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added a tooltip with information when hovering over an edge in a ygraph component
 - added pop-up information about a node or edge in the graph component
 - add env files
+- searching research v.2.0
 
 ### Fixed
 
@@ -68,7 +80,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - added redirect to dashboard with information about tabs from dash heatmap
 - сombining ticks of several Y-axes
-- searching research v.2.0
 
 ### Fixed
 
@@ -142,7 +153,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed hiding graphics when loading data
 - bug with update data search
 - hide the progress bar on the heatmap if the value is empty
-- render metrics when changed data for dashboards(single value)
+- fixed styles for user settings in dashMap
+
+### Added
+
+- added the choice of coordinates by clicking on the map
+- added the ability to use tokens in panel names
 
 ## [1.71.0]
 
@@ -182,6 +198,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed font weights 100, 200, 400, 500, 800
 - fixed SingleValue font weights
 - fixed full-screen map mode
+- problem with export / import filter on dashboard
 
 ## [1.70.0]
 

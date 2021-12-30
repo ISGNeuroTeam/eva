@@ -1,3 +1,14 @@
+# [1.80.0] - Closing single value modal on click outside and bugfixes.
+
+### New
+
+- Closing single value modal on click outside.
+
+## Fixed
+
+- Fixed render a lot of tooltips for dashMap component.
+- Fixed a problem with displaying some multi-line bar graphs.
+
 # [1.79.0] - Pop-ups and tooltips in graph component and bugfixes.
 
 ### New
