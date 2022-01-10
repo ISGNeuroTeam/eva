@@ -214,6 +214,7 @@
             </div>
           </div>
 
+          <!-- @todo: fix me -->
           <v-card-text
             v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
@@ -225,7 +226,6 @@
               Выбор типа графика
             </div>
           </v-card-text>
-
           <div
             v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
@@ -265,7 +265,6 @@
               </div>
             </div>
           </div>
-
           <v-card-text
             v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="headline pa-0"
@@ -278,6 +277,7 @@
             </div>
           </v-card-text>
 
+          <!-- @todo: fix me -->
           <div
             v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
             class="options-block united-block pa-0"
@@ -341,6 +341,7 @@
             </div>
           </div>
 
+          <!-- @todo: fix me -->
           <v-card-text
             v-if="!options.united && checkOptions('united')"
             class="headline"
@@ -519,6 +520,8 @@
               </v-icon>
             </div>
           </div>
+
+          <!-- @todo: fix me -->
           <div
             v-if="checkOptions('positionlegend')"
             class="option-item"
@@ -550,6 +553,7 @@
             </div>
           </div>
 
+          <!-- @todo: fix me -->
           <div
             v-if="checkOptions('primitivesLibrary')"
             class="option-item"
@@ -596,6 +600,8 @@
               </v-btn>
             </v-container>
           </div>
+
+          <!-- @todo: fix me -->
           <v-card-text
             v-if="checkOptions('piechartSettings')"
             class="headline "
@@ -700,6 +706,8 @@
             </div>
           </div>
         </div>
+
+        <!-- @todo: fix me -->
         <v-card-text
           v-if="tooltipSettingShow"
           class="headline "
@@ -881,6 +889,7 @@
             </v-icon>
           </div>
         </div>
+
         <v-card-actions class="actions-settings">
           <v-spacer />
           <v-btn
@@ -974,11 +983,6 @@ export default {
         "По убыванию"
       ],
       metricUnits: {},
-      barplotstyleOptions: [
-        {text:'разделенный', value:'divided'},
-        {text:'наложенный', value:'overlay'},
-        {text:'с накоплением', value:'accumulation'},
-      ],
 
       // @todo: перенести в визуализации
       fieldsForRender: [
