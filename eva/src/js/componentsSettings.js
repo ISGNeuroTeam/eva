@@ -167,7 +167,10 @@ export default {
     ygraph: ['visible','level', 'pinned'],
     bush: ['visible','level', 'pinned'],
     map: ['visible','level', 'osmserver', 'primitivesLibrary', 'pinned'],
-    heatmap: ['visible','level', 'dataFormat', 'pinned'],
+    heatmap: [
+      'visible','level', 'dataFormat', 'pinned', 'x', 'xFormat', 'xSort', 'y',
+      'yFormat', 'ySort', 'data', 'metadata', 'detailValue'
+    ],
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
   },

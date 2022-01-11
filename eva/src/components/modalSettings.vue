@@ -52,22 +52,37 @@
           <div
             v-for="field in fieldsForRender"
             :key="field.option"
-            v-if="checkOptions(field.option, field.relation)"
+            v-if="checkOptions(field.optionGroup || field.option, field.relation)"
             class="option-item"
           >
+            <v-card-text
+              v-if="field.group"
+              class="headline"
+            >
+              <div
+                class="settings-title"
+                :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+              >
+                {{ field.group }}
+              </div>
+            </v-card-text>
             <div
+              v-if="!field.group"
               class="name-option item"
               :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
-              {{ field.label || field.option }}
+              {{ field.optionGroup ? field.optionGroup+'.' : '' }}{{ field.label || field.option }}
             </div>
             <div
+              v-if="!field.group"
               class="discribe-option item"
               :style="{color:theme.$main_text, borderColor:theme.$main_border}"
             >
               {{ field.description }}
             </div>
-            <div class="status-option item">
+            <div
+              v-if="!field.group"
+              class="status-option item">
               <!-- elem: switch -->
               <v-switch
                 v-if="field.elem === 'switch'"
@@ -96,7 +111,7 @@
               <v-select
                   v-else-if="field.elem === 'select'"
                   v-model="options[field.option]"
-                  :items="field.items"
+                  :items="typeof field.items === 'function' ? field.items() : field.items"
                   :color="theme.$primary_button"
                   :style="{color:theme.$main_text, fill: theme.$main_text}"
                   hide-details
@@ -134,51 +149,6 @@
               </v-radio-group>
               <!-- end -->
             </div>
-          </div>
-
-          <!-- @todo: fix me -->
-          <div
-            v-if="checkOptions('dataFormat')"
-            class="option-item"
-            :style="{color:theme.$main_text,borderColor:theme.$main_border}"
-          >
-            <v-container fluid>
-              <v-card-text
-              class="headline"
-            >
-              <div
-                class="settings-title"
-                :style="{color:theme.$main_text,borderColor:theme.$main_border}"
-              >
-                Формат данных
-              </div>
-            </v-card-text>
-              <v-row :style="{color:theme.$main_text}" >
-                <v-col col="4">
-                  <v-select v-model="x" label="x:" :items="tableTitles" />
-                </v-col>
-                <v-col col="4">
-                   <v-select v-model="xFormat" :items="dataFormat" />
-                </v-col>
-                <v-col col="4">
-                   <v-select v-model="xSort" :items="sortType" />
-                </v-col>
-              </v-row>
-              <v-row :style="{color:theme.$main_text}" >
-                <v-col col="4">
-                  <v-select v-model="y" label="y:" :items="tableTitles" />
-                </v-col>
-                <v-col col="4">
-                   <v-select v-model="yFormat" :items="dataFormat" />
-                </v-col>
-                <v-col col="4">
-                   <v-select v-model="ySort" :items="sortType" />
-                </v-col>
-              </v-row>
-              <v-row :style="{color:theme.$main_text}" ><v-select v-model="data" label="data:" :items="tableTitles" /> </v-row>
-              <v-row :style="{color:theme.$main_text}" ><v-select v-model="metadata" label="metadata:" :items="tableTitles" /> </v-row>
-              <v-row :style="{color:theme.$main_text}" ><v-select v-model="detailValue" label="Поле для ссылки Детали:" :items="tableTitles" /> </v-row>
-            </v-container>
           </div>
 
           <!-- @todo: fix me -->
@@ -964,24 +934,6 @@ export default {
       metricsName: [],
       multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
       multilineYAxesTypes: {},
-      x: '',
-      y: '',
-      metadata: '',
-      detailValue: '',
-      data: '',
-      xFormat: 'Строка',
-      yFormat: 'Дата',
-      xSort: 'По возрастанию',
-      ySort: 'По возрастанию',
-      dataFormat: [
-        'Дата',
-        'Строка',
-        'Число',
-      ],
-      sortType: [
-        "По возрастанию",
-        "По убыванию"
-      ],
       metricUnits: {},
 
       // @todo: перенести в визуализации
@@ -1095,12 +1047,78 @@ export default {
           onChange: $event => this.titleHandler($event) // @todo: fix me
         },
 
-        // @todo: fix me for: dashTable, dashHeatMap, dashTable
-        /*{
+        // @todo: fix me for: dashHeatMap, (maybe dashTable, dashTable)
+        {
+          group: 'Формат данных',
           option: 'dataFormat',
-          description: 'Формат данных',
-          elem: 'v-card-text **',
-        },*/
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'x',
+          description: 'X axis',
+          elem: 'select',
+          items: () => this.tableTitles, // @todo: fix me
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'xFormat',
+          description: 'X-axis format',
+          elem: 'select',
+          items: ['Дата', 'Строка', 'Число'],
+          // default: 'Строка',
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'xSort',
+          description: 'Sorting by x-axis',
+          elem: 'select',
+          items: ['По возрастанию', 'По убыванию'],
+          // default: 'По возрастанию',
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'y',
+          description: 'Y axis',
+          elem: 'select',
+          items: () => this.tableTitles, // @todo: fix me
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'yFormat',
+          description: 'Y-axis format',
+          elem: 'select',
+          items: ['Дата', 'Строка', 'Число'],
+          // default: 'Дата',
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'ySort',
+          description: 'Sorting by y-axis',
+          elem: 'select',
+          items: ['По возрастанию', 'По убыванию'],
+          // default: 'По возрастанию',
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'data',
+          description: 'Значение ячейки',
+          elem: 'select',
+          items: () => this.tableTitles, // @todo: fix me
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'metadata',
+          description: 'metadata',
+          elem: 'select',
+          items: () => this.tableTitles, // @todo: fix me
+        },
+        {
+          optionGroup: 'dataFormat',
+          option: 'detailValue',
+          description: 'Поле для ссылки Детали',
+          elem: 'select',
+          items: () => this.tableTitles, // @todo: fix me
+        },
 
         // MultiLine, dashBoard
         {
@@ -1268,14 +1286,6 @@ export default {
             }
           })
         }
-        let test = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
-        if (this.element.includes("heatmap")) {
-          this.x = test.x
-          this.y = test.y
-          this.data = test.data
-          this.metadata = test.metadata
-          this.detailValue = test.detailValue
-        }
       }
       return this.$store.getters.getModalSettings(this.idDash).status;
     },
@@ -1301,6 +1311,11 @@ export default {
 
   },
   watch: {
+    element(val) {
+      console.log('watch element ' + val)
+      const options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
+      console.log('options', { ...options }, { ...this.options })
+    },
     selectedTitles(newValue) {
       this.tableTitles = newValue;
     },
@@ -1312,6 +1327,7 @@ export default {
     }
   },
   mounted() {
+    console.log('mount settings ' + this.idDashFrom)
     this.tableTitles = this.getSelectedTableTitles(this.idDashFrom);
     // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );
   },
@@ -1380,17 +1396,6 @@ export default {
         })
         this.$set(this.options,'metrics',updateMetrics);
       }
-      if (this.element.includes('heatmap')) {
-        this.options.x = this.x;
-        this.options.y = this.y;
-        this.options.data = this.data;
-        this.options.metadata = this.metadata;
-        this.options.detailValue = this.detailValue;
-        this.options.yFormat = this.yFormat;
-        this.options.ySort = this.ySort;
-        this.options.xFormat = this.xFormat;
-        this.options.xSort = this.xSort;
-      }
       if (this.element.startsWith("multiLine")) {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
@@ -1451,6 +1456,7 @@ export default {
     },
     prepareOptions() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
+      console.log('prepareOptions options', {...options})
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
 
       if (options.color) {
@@ -1469,8 +1475,11 @@ export default {
         this.replace_count = options.replace_count
       }
 
+      console.log('prepareOptions settings.options[elem]', settings.options[elem])
       this.options = {};
       this.optionsItems = settings.options[elem];
+
+      // @todo: fix me
       this.optionsItems.forEach( item => {
         if (Object.keys(options).includes(item)) {
           if (item == 'tooltip') {
