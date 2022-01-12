@@ -125,10 +125,11 @@
                 <v-checkbox
                     v-for="(setting) in field.items()"
                     :key="setting"
-                    :input-value="field.items()"
+                    :value="setting"
                     :style="{color:theme.$main_text}"
                     :label="setting"
-                    :value="setting"
+                    hide-details
+                    v-model="options[field.option]"
                     @change="val => { field.onChange ? field.onChange(val) : null}">
                 </v-checkbox>
               </div>
@@ -354,7 +355,7 @@
               />
               <v-select
                 v-model="metrics[i-1].type"
-                :items="types"
+                :items="['Line chart', 'Bar chart']"
                 :color="theme.$primary_button"
                 :style="{color:theme.$main_text, fill: theme.$main_text}"
                 hide-details
@@ -897,13 +898,13 @@ export default {
   },
   data() {
     return {
-      tableTitles:[],
       element: '',
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
       conclusion_count: {},
       replace_count: {},
       options: {
+        titles: [], // @todo: fix me
       },
       type_line: 'solid',
       color: {},
@@ -930,7 +931,6 @@ export default {
       themesArr: [],
       themes: {},
       metrics: [],
-      types: ['Line chart', 'Bar chart'],
       metricsName: [],
       multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
       multilineYAxesTypes: {},
@@ -1043,8 +1043,7 @@ export default {
           option: 'titles',
           description: 'Столбцы для отображения',
           elem: 'checkbox-list',
-          items: () => this.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-          onChange: $event => this.titleHandler($event) // @todo: fix me
+          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
         },
 
         // @todo: fix me for: dashHeatMap, (maybe dashTable, dashTable)
@@ -1057,7 +1056,7 @@ export default {
           option: 'x',
           description: 'X axis',
           elem: 'select',
-          items: () => this.tableTitles, // @todo: fix me
+          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
         },
         {
           optionGroup: 'dataFormat',
@@ -1080,7 +1079,7 @@ export default {
           option: 'y',
           description: 'Y axis',
           elem: 'select',
-          items: () => this.tableTitles, // @todo: fix me
+          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
         },
         {
           optionGroup: 'dataFormat',
@@ -1103,21 +1102,21 @@ export default {
           option: 'data',
           description: 'Значение ячейки',
           elem: 'select',
-          items: () => this.tableTitles, // @todo: fix me
+          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
         },
         {
           optionGroup: 'dataFormat',
           option: 'metadata',
           description: 'metadata',
           elem: 'select',
-          items: () => this.tableTitles, // @todo: fix me
+          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
         },
         {
           optionGroup: 'dataFormat',
           option: 'detailValue',
           description: 'Поле для ссылки Детали',
           elem: 'select',
-          items: () => this.tableTitles, // @todo: fix me
+          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
         },
 
         // MultiLine, dashBoard
@@ -1295,16 +1294,11 @@ export default {
     theme: function() {
       return this.$store.getters.getTheme
     },
-    selectedTitles() {
-      return this.$store.getters.getSelectedTableTitles(this.idDash, this.element);
-    },
     primitivesLibraryAutoGrowLinkText() {
       return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
     },
 
     ...mapGetters([
-      'getAvailableTableTitles',
-      'getSelectedTableTitles',
       'getAvailableDataFormat',
       'getSelectedDataFormat',
     ]),
@@ -1316,20 +1310,12 @@ export default {
       const options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
       console.log('options', { ...options }, { ...this.options })
     },
-    selectedTitles(newValue) {
-      this.tableTitles = newValue;
-    },
     active(status){
       if (!status) {
         // set default empty value
         this.multilineYAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} }
       }
     }
-  },
-  mounted() {
-    console.log('mount settings ' + this.idDashFrom)
-    this.tableTitles = this.getSelectedTableTitles(this.idDashFrom);
-    // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );
   },
   methods: {
     handleChangeColor(e, i) {
@@ -1345,16 +1331,6 @@ export default {
 
     handleChangeReplaceCount(e, i) {
       this.replace_count = { ...this.replace_count, [this.metrics[i].name]: Number(e) }
-    },
-    titleHandler(val) {
-      let temp = []
-      let orderArray = this.getAvailableTableTitles(this.idDash, this.element);
-      for (let setting of val) {
-        let index = orderArray.indexOf(setting);
-        temp.push({setting, index})
-      }
-      temp.sort((a, b) => a.index - b.index)
-      this.tableTitles = temp.map((el) => el.setting)
     },
     setOptions: function() {  // отправляем настройки в хранилище
       if(!this.options.level){
@@ -1400,7 +1376,7 @@ export default {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, conclusion_count: this.conclusion_count, replace_count: this.replace_count, openNewScreen: this.openNewScreen, type_line: this.type_line, color: this.color  }, titles: this.tableTitles});
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, conclusion_count: this.conclusion_count, replace_count: this.replace_count, openNewScreen: this.openNewScreen, type_line: this.type_line, color: this.color  }});
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1529,6 +1505,9 @@ export default {
           }
           if (item == 'positionlegend') {
             this.$set(this.options,item,'right');
+          }
+          if (item == 'titles') {
+            this.$set(this.options,item,[]);
           }
           if (item == 'metrics') {
             this.metrics = [];

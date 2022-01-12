@@ -198,7 +198,6 @@
                     :updateSettings="updateSettings"
                     :widthFrom="fullScreenWidth"
                     :heightFrom="fullScreenHeight"
-                    :titles="getSelectedTableTitles(idDash, element)"
                     :options="props.options"
                     :is-full-screen="true"
                     @hideDS="hideDS($event)"
@@ -337,7 +336,6 @@
         :tooltipFrom="props.tooltip"
         :widthFrom="width"
         :heightFrom="height"
-        :titles="getSelectedTableTitles(idDash, element)"
         :options="props.options"
         :currentSettings="settings"
         :updateSettings="updateSettings"
@@ -582,7 +580,6 @@ export default {
 
       return options.change;
     },
-    ...mapGetters(["getSelectedTableTitles", "getSelectedDataFormat"]),
   },
   watch: {
     fullScreenMode(to) {

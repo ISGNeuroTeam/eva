@@ -154,7 +154,10 @@ export default {
       'barplotstyle',
     ],
     piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes', 'pinned', 'piechartSettings'],
-    table: ['visible','level','boxShadow','rowcolor','columncolor','cellcolor', 'lastResult', 'titles', 'pinned'],
+    table: [
+      'visible','level','boxShadow','rowcolor','columncolor','cellcolor',
+      'lastResult', 'titles', 'pinned'
+    ],
     select: ['visible','level','boxShadow','multiple', 'pinned'],
     picker: ['visible','level', 'pinned'],
     graph: ['visible','level','boxShadow', 'pinned'],
