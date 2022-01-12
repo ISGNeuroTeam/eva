@@ -8,7 +8,7 @@
           :style="{background: theme.$main_bg, color: theme.$main_text}"
       >
         <div class="interesting-title">
-          Interesting field
+          Interesting fields
         </div>
         <div
             class="interesting-overflow-block"
@@ -19,8 +19,7 @@
               :key="item.id"
               class="interesting-row"
           >
-
-            <v-menu offset-x>
+            <v-menu offset-x :close-on-content-click="false">
               <template v-slot:activator="{ on, attrs }">
                 <div
                     @click="openStatistic(item)"
@@ -33,14 +32,14 @@
               </template>
               <v-card class="action-popup">
                 <div class="action-popup-title">
-                  Actions
+                  {{ item.text }}
                 </div>
                 <div>
                   <v-data-table
                       :style="{backgroundColor:theme.$main_bg, color: theme.$main_text, 'max-height': '500px'}"
                       disable-pagination
                       hide-default-footer
-                      :headers="[{ text: 'value', value: 'value' },{ text: 'count', value: 'count' },{ text: '%', value: '%' }]"
+                      :headers="[{ text: 'Значение', value: 'value' },{ text: 'Количество', value: 'count' },{ text: 'Процент', value: '%' }]"
                       :items="statistic"
                   />
                 </div>
@@ -130,19 +129,27 @@ export default {
     font-size: 12px
     line-height: 15px
     color: $main_text
-
+.menuable__content__active
+  width: 400px !important
 .action-popup
   padding: 0 0 0 0 !important
   border-radius: 5px
   background-color: $main_bg !important
   .action-popup-title
-    padding: 10px 10px 0 10px
+    padding: 5px 10px 5px 10px
     background-color: $main_bg
     color: $main_text
     font-weight: bold
   .v-data-table-header
     th
       color: $main_text !important
+      padding: 0 10px !important
+      height: 30px !important
+      border-bottom: none !important
+  td
+    padding: 0 10px !important
+    height: 30px !important
+    border-bottom: none !important
   tr:hover
     color: $main_bg
     background-color: $accent_ui_color !important

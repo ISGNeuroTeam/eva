@@ -15,14 +15,10 @@
           <div class="tab-block component-block d-flex justify-content-between">
             <v-tabs
                 v-model="tab" class="tabs"
-                :style="{background: theme.$main_bg, color: theme.$main_text}"
             >
-              <v-tab
-                  :style="{background: theme.$main_bg, color: theme.$main_text}">События</v-tab>
-              <v-tab
-                  :style="{background: theme.$main_bg, color: theme.$main_text}">Статистика</v-tab>
-              <v-tab
-                  :style="{background: theme.$main_bg, color: theme.$main_text}">Визуализация</v-tab>
+              <v-tab>События ({{data.length}})</v-tab>
+              <v-tab>Статистика</v-tab>
+              <v-tab>Визуализация</v-tab>
             </v-tabs>
             <div>
               <v-btn small text @click="exportDataCSV()">
@@ -33,7 +29,7 @@
               </v-btn>
             </div>
           </div>
-          <v-row v-if="data.length > 0">
+          <v-row class="mb-0" v-if="data.length > 0">
             <v-col cols="2" class="pr-0">
               <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
             </v-col>
@@ -348,12 +344,19 @@ export default {
         }
       })
       Object.keys(how_much).forEach( item => {
-
+        let percent
+        if (length > 300) {
+          percent = ((how_much[item]*100)/length).toFixed(2)
+        } else if (length > 30) {
+          percent = ((how_much[item]*100)/length).toFixed(1)
+        } else {
+          percent = ((how_much[item]*100)/length).toFixed()
+        }
         result.push(
             {
               'value': item,
               'count': how_much[item],
-              '%': Math.round((how_much[item]*100)/length)
+              '%': percent
             }
         );
       })
