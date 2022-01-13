@@ -103,7 +103,6 @@
                   outlined
                   class="subnumber"
                   hide-details
-                  @change="val => { field.onChange ? field.onChange(val) : null}"
                   :type="field.elemType"
                   :min="field.elemMin"
               />
@@ -111,7 +110,7 @@
               <v-select
                   v-else-if="field.elem === 'select'"
                   v-model="options[field.option]"
-                  :items="typeof field.items === 'function' ? field.items() : field.items"
+                  :items="field.items"
                   :color="theme.$primary_button"
                   :style="{color:theme.$main_text, fill: theme.$main_text}"
                   hide-details
@@ -123,7 +122,7 @@
                   v-else-if="field.elem === 'checkbox-list'"
                   class="checkbox-list">
                 <v-checkbox
-                    v-for="(setting) in field.items()"
+                    v-for="setting in field.items"
                     :key="setting"
                     :value="setting"
                     :style="{color:theme.$main_text}"
@@ -887,10 +886,10 @@
 
 <script>
 
-import settings from '../js/componentsSettings.js'
+import settings from "../js/componentsSettings.js";
 
-import { mdiPlusBox, mdiMinusBox } from '@mdi/js'
-import { mapGetters } from 'vuex';
+import { mdiMinusBox, mdiPlusBox } from "@mdi/js";
+import { mapGetters } from "vuex";
 
 export default {
   props: {
@@ -935,321 +934,14 @@ export default {
       multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
       multilineYAxesTypes: {},
       metricUnits: {},
-
-      // @todo: перенести в визуализации
-      fieldsForRender: [
-
-        // dashBoard
-        {
-          option: 'visible',
-          description: 'Показывает / скрывает элемент',
-          elem: 'switch',
-        },
-        {
-          option: 'pinned',
-          description: 'Закрепить на всех вкладках',
-          elem: 'switch',
-        },
-        {
-          option: 'level',
-          description: 'Установить слой отображения элемента',
-          elem: 'text-field',
-        },
-        {
-          option: 'lastResult',
-          description: 'Вывод предыдущих результатов',
-          elem: 'switch',
-        },
-
-        // dashTextArea
-        {
-          option: 'boxShadow',
-          description: 'Добавляет / удаляет тень',
-          elem: 'switch',
-        },
-        {
-          option: 'searchBtn',
-          description: 'Показывать кнопку поиска',
-          elem: 'switch',
-        },
-
-        // dashMap
-        {
-          option: 'osmserver',
-          description: 'Сервер для набора tile Пример:\nhttp://192.168.4.209/osm/{z}/{x}/{y}.png',
-          elem: 'text-field',
-        },
-
-        // MultiLine
-        {
-          option: 'strokeWidth',
-          description: 'Толщина линий',
-          elem: 'text-field',
-        },
-        {
-          option: 'thememultiline',
-          description: 'Цветовая тема',
-          elem: 'select',
-          items: ['default', 'Anna theme'],
-        },
-
-        // dashSingle
-        {
-          option: 'subnumber',
-          description: 'Выводит дополнительную надпись под числом',
-          elem: 'text-field',
-        },
-
-        // dashTable
-        {
-          option: 'rowcolor',
-          description: 'Выбрать цвет которым подсветится нужная строка',
-          elem: 'text-field',
-        },
-        {
-          option: 'columncolor',
-          description: 'Выбрать цвет которым подсветится нужный столбец',
-          elem: 'text-field',
-        },
-        {
-          option: 'cellcolor',
-          description: 'Выбрать цвет которым подсветится нужная ячейка',
-          elem: 'text-field',
-        },
-
-        // dashSingle, dashButton
-        {
-          option: 'color',
-          description: 'Выбрать цвет значения',
-          elem: 'text-field',
-        },
-
-        // dashButton
-        {
-          option: 'backgroundcolor',
-          description: 'Выбрать цвет фона',
-          elem: 'text-field',
-        },
-
-        // dashButton, MultiLine
-        {
-          option: 'name',
-          description: 'Выбрать название кнопки',
-          elem: 'text-field',
-        },
-
-        // dashTable
-        {
-          option: 'titles',
-          description: 'Столбцы для отображения',
-          elem: 'checkbox-list',
-          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-        },
-
-        // @todo: fix me for: dashHeatMap, (maybe dashTable, dashTable)
-        {
-          group: 'Формат данных',
-          option: 'dataFormat',
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'x',
-          description: 'X axis',
-          elem: 'select',
-          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'xFormat',
-          description: 'X-axis format',
-          elem: 'select',
-          items: ['Дата', 'Строка', 'Число'],
-          // default: 'Строка',
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'xSort',
-          description: 'Sorting by x-axis',
-          elem: 'select',
-          items: ['По возрастанию', 'По убыванию'],
-          // default: 'По возрастанию',
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'y',
-          description: 'Y axis',
-          elem: 'select',
-          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'yFormat',
-          description: 'Y-axis format',
-          elem: 'select',
-          items: ['Дата', 'Строка', 'Число'],
-          // default: 'Дата',
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'ySort',
-          description: 'Sorting by y-axis',
-          elem: 'select',
-          items: ['По возрастанию', 'По убыванию'],
-          // default: 'По возрастанию',
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'data',
-          description: 'Значение ячейки',
-          elem: 'select',
-          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'metadata',
-          description: 'metadata',
-          elem: 'select',
-          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-        },
-        {
-          optionGroup: 'dataFormat',
-          option: 'detailValue',
-          description: 'Поле для ссылки Детали',
-          elem: 'select',
-          items: () => this.$store.getters.getAvailableTableTitles(this.idDash, this.element), // @todo: fix me
-        },
-
-        // MultiLine, dashBoard
-        {
-          option: 'timeFormat',
-          description: 'Выбрать формат даты и времени',
-          elem: 'text-field',
-          placeholder: '%Y-%m-%d %H:%M:%S',
-        },
-
-        // dashBoard
-        {
-          option: 'widthTile',
-          description: 'Введите ширину плитки',
-          elem: 'text-field',
-          placeholder: '100',
-        },
-        {
-          option: 'heightTile',
-          description: 'Введите высоту плитки',
-          elem: 'text-field',
-          placeholder: '100',
-        },
-
-        // dashSingle
-        {
-          option: 'fontSize',
-          description: 'Выбрать размер шрифта',
-          elem: 'text-field',
-          placeholder: '30',
-        },
-
-        // dashButton
-        {
-          option: 'underline',
-          description: 'Подчеркивает текст кнопки',
-          elem: 'switch',
-        },
-        {
-          label: 'Submit',
-          option: 'onButton',
-          description: 'Перезапускать серчи по кнопке',
-          elem: 'switch',
-        },
-
-        // MultiLine
-        {
-          option: 'lastDot',
-          description: 'Показывать последнее значение',
-          elem: 'switch',
-        },
-        {
-          option: 'isDataAlwaysShow',
-          description: 'Постоянное отображение данных на графике',
-          elem: 'radio-group',
-          items: [
-            { value: false, label: 'False' },
-            { value: 'data', label: 'data' },
-            { value: 'caption', label: 'caption' },
-          ],
-        },
-        {
-          option: 'xAxisCaptionRotate',
-          description: 'Градус наклона подписей на оси X',
-          elem: 'radio-group',
-          items: [
-            { value: 0, label: '0' },
-            { value: 45, label: '45' },
-            { value: -45, label: '-45' },
-            { value: 90, label: '90' },
-            { value: -90, label: '-90' },
-          ],
-        },
-        {
-          option: 'barplotBarWidth',
-          description: 'Ширина столбцов барплот-графика',
-          elem: 'text-field',
-          elemType: 'number',
-          elemMin: 0,
-          onChange: val => {
-            console.log('onChange', val)
-            if (val < 1) this.options.barplotBarWidth = 0
-          },
-        },
-        {
-          option: 'stringOX',
-          description: 'Ось X - строки',
-          elem: 'switch',
-        },
-        {
-          option: 'united',
-          description: 'Отображать ли все метрики на одной плоскости координат',
-          elem: 'switch',
-        },
-        {
-          option: 'barplotstyle',
-          relation: 'united',
-          description: 'Стиль столбцов',
-          elem: 'select',
-          items: [
-            {text:'разделенный', value:'divided'},
-            {text:'наложенный', value:'overlay'},
-            {text:'с накоплением', value:'accumulation'},
-          ],
-        },
-
-        // dashSelect
-        {
-          option: 'multiple',
-          description: 'Возможность выбора нескольких значений',
-          elem: 'switch',
-        },
-
-        // dashMap, dashPieChart
-        {
-          option: 'showlegend',
-          description: 'Показывать ли легенду',
-          elem: 'switch',
-        },
-
-      ]
-
+      fieldsForRender: [],
     }
   },
   computed: {
     active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.$store.getters.getModalSettings(this.idDash).status){ // если окно должно быть открыто
         this.element = this.$store.getters.getModalSettings(this.idDash).element;  // получаем для каокго элемнета вывести настройки
-        if (this.element.indexOf('csvg') !== -1) {
-          this.tooltipSettingShow = true;
-        } else {
-          this.tooltipSettingShow = false;
-        }
+        this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
         this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
@@ -1309,6 +1001,10 @@ export default {
       console.log('watch element ' + val)
       const options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
       console.log('options', { ...options }, { ...this.options })
+      this.fieldsForRender = settings.optionFields.map(field => {
+        const items = typeof field.items === "function" ? field.items.call(this) : [];
+        return { ...field, items }
+      })
     },
     active(status){
       if (!status) {
