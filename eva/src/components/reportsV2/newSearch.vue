@@ -33,6 +33,7 @@
       <v-textarea
           ref="search"
           v-model="search.original_otl"
+          class="textarea"
           placeholder="Введите запрос"
           spellcheck="false"
           auto-grow
@@ -240,11 +241,11 @@ export default {
       let twsArr = dates[0].split('-')
       let timeStartArr = timeStart.split(':')
       twsArr = twsArr.concat(timeStartArr)
-      let tws = new Date(twsArr[0], twsArr[1], twsArr[2], twsArr[3], twsArr[4]).getTime()/1000
+      let tws = new Date(twsArr[0], twsArr[1]-1, twsArr[2], twsArr[3], twsArr[4]).getTime()/1000
       let twfArr = dates[1].split('-')
       let timeFinishArr = timeFinish.split(':')
       twfArr = twfArr.concat(timeFinishArr)
-      let twf = new Date(twfArr[0], twfArr[1], twfArr[2], twfArr[3], twfArr[4]).getTime()/1000
+      let twf = new Date(twfArr[0], twfArr[1]-1, twfArr[2], twfArr[3], twfArr[4]).getTime()/1000
       this.timeRangeValue = 'c ' + dates[0] + ' по ' + dates[1]
       this.setTwsTwf(tws, twf)
     },
@@ -281,6 +282,9 @@ export default {
 
 <style lang="sass" >
 @import ./../../sass/_colors
+.textarea
+  max-height: 420px
+  overflow: auto
 .time-picker
   margin-right: 20px
 .v-date-picker-table
