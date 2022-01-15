@@ -1,5 +1,5 @@
 export function filterCompile(filter) {
-  let filterOtlText = ''
+  let filterOtlText = '';
 
   if (filter.parts.length > 0) {
     let firstPartWithValuesIndex = 0;
