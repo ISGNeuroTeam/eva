@@ -1,11 +1,11 @@
 export function filterCompile(filter) {
-  let filterOtlText = ''
+  let filterOtlText = '';
 
   if (filter.parts.length > 0) {
     let firstPartWithValuesIndex = 0;
 
     for (let idxPart in filter.parts) {
-        const part = filter.parts[idxPart];
+      const part = filter.parts[idxPart];
 
       if (part.values?.length > 0 || part.filterPartType === 'manual') {
         if (idxPart == firstPartWithValuesIndex) {
