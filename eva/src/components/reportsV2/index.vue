@@ -20,13 +20,9 @@
               <v-tab>Статистика</v-tab>
               <v-tab>Визуализация</v-tab>
             </v-tabs>
-            <div>
-              <v-btn small text @click="exportDataCSV()">
-                <v-icon :style="{color: theme.$main_text}" class="download-icon">{{ mdiDownload  }}</v-icon>
-                <span class="download-btn-text" :style="{color: theme.$main_text}">
-                  Скачать
-                </span>
-              </v-btn>
+            <div class="d-flex">
+              <report :length="data.length"></report>
+              <download :data="data"></download>
             </div>
           </div>
           <v-row class="mb-0" v-if="data.length > 0">
@@ -54,11 +50,13 @@
 
 
 <script>
-import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus, mdiDownload  } from '@mdi/js'
+import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus } from '@mdi/js'
 import  settings  from '../../js/componentsSettings.js';
 import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
 import  timeline  from './timeline.vue';
+import  report  from './report.vue';
+import  download  from './download.vue';
 import  events  from './events.vue';
 import  statistic  from './statistic.vue';
 import visualisation from "./visualisation";
@@ -67,7 +65,7 @@ import intresting from "./intresting";
 
 export default {
 
-  components: { newSearch, intresting, events, timeline, statistic, visualisation },
+  components: { newSearch, intresting, events, timeline, statistic, visualisation, download, report },
   data () {
     return {
       tab: 0,
@@ -79,7 +77,6 @@ export default {
       plus: mdiPlus,
       gear: mdiSettings,
       merge: mdiMerge,
-      mdiDownload: mdiDownload,
       modal: false,
       loading: false,
       rows: [],
@@ -395,23 +392,7 @@ export default {
     },
     ResetRange () {
       console.log('resetRange')
-    },
-    exportDataCSV() {
-      const searchData = this.data
-      // const searchData = this.dataObject[searchName].data
-      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
-      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
-      csvContent += encodeURIComponent(
-          searchData.map((item) => Object.values(item).join(',')).join('\n')
-      )
-
-      const link = document.createElement('a') // создаем ссылку
-      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', 'report.csv') // указываем имя файла
-      link.click() // жмем на скачку
-      link.remove() // удаляем ссылку
-    },
+    }
   },
   beforeCreate() {
     this.$store.commit('createReportSearch');
