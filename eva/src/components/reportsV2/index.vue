@@ -153,7 +153,6 @@ export default {
   },
   methods: {
     getData: function() {
-      console.log('getData')
       let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], { type: "text/javascript" }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
       let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса

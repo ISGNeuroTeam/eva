@@ -1,39 +1,39 @@
 <template>
-    <div
-        class="timeline"
-        :style="{background: theme.$main_bg, color: theme.$main_text}"
-    >
-      <div class="select-wrap p-5">
-        <v-menu
-            v-model="menuDropdown"
-            offset-y
-            max-width="180"
-            class="select"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <div
-                v-bind="attrs"
-                v-on="on"
-            >
-              {{ select.text }}
-              <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
-            </div>
-          </template>
-          <v-list>
-            <v-list-item
-                v-for="item in periodItemsSelect"
-                :key="item.value"
-                link
-                @click="setTimePeriod(item)"
-            >
-              <v-list-item-title v-text="item.text"></v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </div>
-      <svg ref="chart" class="chart1" height="50" style="width: 100%"></svg>
-      {{dataset}}
+  <div
+      class="timeline"
+      :style="{background: theme.$main_bg, color: theme.$main_text}"
+  >
+    <div class="select-wrap p-5">
+      <v-menu
+          v-model="menuDropdown"
+          offset-y
+          max-width="180"
+          class="select"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <div
+              v-bind="attrs"
+              v-on="on"
+          >
+            {{ select.text }}
+            <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
+          </div>
+        </template>
+        <v-list>
+          <v-list-item
+              v-for="item in periodItemsSelect"
+              :key="item.value"
+              link
+              @click="setTimePeriod(item)"
+          >
+            <v-list-item-title v-text="item.text"></v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
     </div>
+    <svg ref="chart" class="chart1" height="50" style="width: 100%"></svg>
+    {{dataset}}
+  </div>
 </template>
 
 
@@ -89,49 +89,17 @@ export default {
       let getActualLongData
       if (this.select.value === 'min') {
         getActualLongData = this.getUntilMin
-        options = {
-          hour12: 'true',
-          hour: 'numeric',
-          minute: 'numeric',
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        };
         deltaTime = 60
       } else if (this.select.value === 'hour') {
         getActualLongData = this.getUntilHours
-        options = {
-          hour12: 'true',
-          hour: 'numeric',
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        };
         deltaTime = 3600
       } else if (this.select.value === 'day') {
         getActualLongData = this.getUntilDay
-        options = {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
-        }
         deltaTime = 86400
       } else {
         getActualLongData = this.getUntilMonth
-        options = {
-          month: 'long',
-          year: 'numeric'
-        }
         deltaTime = 2592000
       }
-      options = {
-        hour12: 'false',
-        hour: 'numeric',
-        minute: 'numeric',
-        day: '2-digit',
-        month: 'numeric',
-        year: 'numeric'
-      };
       while (barTime<maxTime) {
         newDate = new Date(barTime*1000);
 
@@ -159,7 +127,7 @@ export default {
           dataset[getActualLongData(item._time*1000)] ++
         }
       })
-      if (Object.keys(dataset).length > 0) {
+      if (Object.keys(dataset).length > 0) { 
         this.clearSVG(dataset)
       }
       return null
@@ -182,17 +150,45 @@ export default {
       }
       return period
     },
-    getUntilMin (data) {
-      return new Date(data).toISOString().slice(0, 16)
+    getUntilMin (date) {
+      let options1 = {
+        hour12: 'true',
+        hour: 'numeric',
+        minute: 'numeric'
+      };
+      let options2 = {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      };
+      return new Intl.DateTimeFormat("ru", options1).format(date) + ' - ' + new Intl.DateTimeFormat("ru", options2).format(date).slice(0, -3)
     },
-    getUntilHours (data) {
-      return new Date(data).toISOString().slice(0, 13)
+    getUntilHours (date) {
+      let options1 = {
+        hour12: 'true',
+        hour: 'numeric'
+      };
+      let options2 = {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      };
+      return new Intl.DateTimeFormat("ru", options1).format(date) + ' - ' + new Intl.DateTimeFormat("ru", options2).format(date).slice(0, -3)
     },
-    getUntilDay (data) {
-      return new Date(data).toISOString().slice(0, 10)
+    getUntilDay (date) {
+      let options = {
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric'
+      }
+      return new Intl.DateTimeFormat("ru", options).format(date).slice(0, -3)
     },
-    getUntilMonth (data) {
-      return new Date(data).toISOString().slice(0, 7)
+    getUntilMonth (date) {
+      let options = {
+        month: 'long',
+        year: 'numeric'
+      }
+      return new Intl.DateTimeFormat("ru", options).format(date).slice(0, -3)
     },
     clearSVG (dataset) {
       d3.selectAll('rect')
@@ -272,7 +268,7 @@ export default {
             return height - marge.top - marge.bottom - yScale(d.value)
           })
           .attr('fill', 'rgba(76, 217, 100, 0.7)')
-          .on("mouseover", d => {tooltip.html( 'Событий (' + d.value + ')' + '<br>' + d.time ); return tooltip.style("visibility", "visible")})
+          .on("mouseover", d => { console.log(d); tooltip.html( 'Событий (' + d.value + ')' + '<br>' + d.time ); return tooltip.style("visibility", "visible")})
           .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX-10)+"px");})
           .on("mouseout", () => tooltip.style("visibility", "hidden"))
 

@@ -51,6 +51,7 @@
           <div v-if="data.length > 0" :color="theme.$secondary_text">
             <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
             {{ data.length }} результатов 
+            <span v-if="searchTimeInterval">( {{searchTimeInterval}} )</span>
 <!--            <span v-if="dates.length>0">(c {{ dates[0] }} {{ timeStart }} по  {{dates[1]}} {{ timeFinish }})</span>-->
           </div>
         </div>
@@ -187,6 +188,7 @@ export default {
       dates: [],
       timeStart: '00:00',
       timeFinish: '00:00',
+      searchTimeInterval: '',
       timeRanges: [
         { text: 'Последние 60 минут', timeHours: 1 },
         { text: 'Последние 4 часа', timeHours: 4 },
@@ -202,6 +204,25 @@ export default {
     },
     dateRangeText () {
       return this.dates.join(' ~ ')
+    },
+  },
+  watch: {
+    loading: function (val) {
+      if (val === false) {
+        let options = {
+          hour12: 'true',
+          hour: 'numeric',
+          minute: 'numeric',
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric'
+        };
+        if (this.search.parametrs.twf === 0 && this.search.parametrs.twf === 0) {
+          this.searchTimeInterval = 'за все время'
+        } else {
+          this.searchTimeInterval = 'c ' + new Intl.DateTimeFormat("ru", options).format(this.search.parametrs.tws*1000) + ' по ' + new Intl.DateTimeFormat("ru", options).format(this.search.parametrs.twf*1000)
+        }
+      }
     },
   },
   methods: {
