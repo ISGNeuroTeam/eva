@@ -183,8 +183,23 @@ export default {
         conclusion_count,
         replace_count,
         barplotstyle,
-        yAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} },
+        axesCount,
+        metricTypes,
+        metricsAxis,
       } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
+
+      const yAxesBinding = {
+        axesCount,
+        metrics: metricsAxis,
+        metricTypes
+      }
+      if (!yAxesBinding.metricTypes){
+        yAxesBinding.metricTypes = {}
+      }
+      if (!yAxesBinding.metrics){
+        yAxesBinding.metrics = {}
+      }
+      console.log('const yAxesBinding', {...yAxesBinding})
       
       this.stringOX = stringOX
 
@@ -201,7 +216,7 @@ export default {
       this.timeFormat = timeFormat || '%Y-%m-%d %H:%M:%S'
       this.xAxisCaptionRotate = xAxisCaptionRotate
 
-      const metricOptions = metrics ? [...metrics] : []
+      const metricOptions = Object.keys(metrics) || []
 
       const render = () => {
         this.renderSVG(

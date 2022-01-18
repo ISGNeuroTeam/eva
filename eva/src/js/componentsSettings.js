@@ -134,26 +134,17 @@ export default {
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
   },
-  options: {
+  options: { // component to options
     multiLine: [
-      'visible',
-      'level',
-      'boxShadow',
-      'stringOX',
-      'united',
-      'lastDot',
-      'metrics',
-      'timeFormat',
-      'lastResult',
-      'strokeWidth',
-      'thememultiline',
-      'pinned',
-      'isDataAlwaysShow',
-      'xAxisCaptionRotate',
-      'barplotBarWidth',
-      'barplotstyle',
+      'visible', 'level', 'boxShadow', 'stringOX', 'united', 'lastDot',
+      'metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline',
+      'pinned', 'isDataAlwaysShow', 'xAxisCaptionRotate', 'barplotBarWidth',
+      'barplotstyle', 'metricTypes', 'axesCount', 'metricsAxis'
     ],
-    piechart: ['visible','level','metricsRelation','showlegend','positionlegend', 'colorsPie','themes', 'pinned', 'piechartSettings'],
+    piechart: [
+      'visible', 'level', 'metricsRelation', 'showlegend', 'positionlegend',
+      'colorsPie', 'themes', 'pinned', 'piechartSettings'
+    ],
     table: [
       'visible','level','boxShadow','rowcolor','columncolor','cellcolor',
       'lastResult', 'titles', 'pinned'
@@ -161,9 +152,15 @@ export default {
     select: ['visible','level','boxShadow','multiple', 'pinned'],
     picker: ['visible','level', 'pinned'],
     graph: ['visible','level','boxShadow', 'pinned'],
-    single: ['visible','level','subnumber','color','boxShadow','fontSize', 'lastResult', 'pinned'],
-    button: ['visible','level','color','backgroundcolor','name','fontSize','underline', 'pinned', 'onButton'],
-    textarea: ['visible','level', 'searchBtn', 'pinned'],
+    single: [
+      'visible', 'level', 'subnumber', 'color', 'boxShadow', 'fontSize',
+      'lastResult', 'pinned'
+    ],
+    button: [
+      'visible', 'level', 'color', 'backgroundcolor', 'name', 'fontSize',
+      'underline', 'pinned', 'onButton'
+    ],
+    textarea: ['visible', 'level', 'searchBtn', 'pinned'],
     guntt: ['visible','level','timeFormat', 'pinned'],
     tile: ['visible','level','widthTile','heightTile', 'pinned'],
     csvg: ['visible','level','tooltip', 'pinned'],
@@ -177,7 +174,7 @@ export default {
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
   },
-  optionFields: [
+  optionFields: [ // описание типов полей и их характеристик
     // dashBoard
     {
       option: 'visible',
@@ -282,9 +279,10 @@ export default {
       option: 'titles',
       description: 'Столбцы для отображения',
       elem: 'checkbox-list',
-      items: function() {
+      items: function() { // this is modalSettings context
         return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
       },
+      default: [],
     },
 
     // dashHeatMap, (maybe dashTable, dashTable)
@@ -307,7 +305,7 @@ export default {
       description: 'X-axis format',
       elem: 'select',
       items: ['Дата', 'Строка', 'Число'],
-      // default: 'Строка',
+      default: 'Строка',
     },
     {
       optionGroup: 'dataFormat',
@@ -315,7 +313,7 @@ export default {
       description: 'Sorting by x-axis',
       elem: 'select',
       items: ['По возрастанию', 'По убыванию'],
-      // default: 'По возрастанию',
+      default: 'По возрастанию',
     },
     {
       optionGroup: 'dataFormat',
@@ -340,7 +338,7 @@ export default {
       description: 'Sorting by y-axis',
       elem: 'select',
       items: ['По возрастанию', 'По убыванию'],
-      // default: 'По возрастанию',
+      default: 'По возрастанию',
     },
     {
       optionGroup: 'dataFormat',
@@ -368,14 +366,6 @@ export default {
       items: function() {
         return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
       },
-    },
-
-    // MultiLine, dashBoard
-    {
-      option: 'timeFormat',
-      description: 'Выбрать формат даты и времени',
-      elem: 'text-field',
-      placeholder: '%Y-%m-%d %H:%M:%S',
     },
 
     // dashBoard
@@ -424,7 +414,7 @@ export default {
       description: 'Постоянное отображение данных на графике',
       elem: 'radio-group',
       items: [
-        { value: false, label: 'False' },
+        { value: false, label: 'Нет' },
         { value: 'data', label: 'data' },
         { value: 'caption', label: 'caption' },
       ],
@@ -482,6 +472,65 @@ export default {
       option: 'showlegend',
       description: 'Показывать ли легенду',
       elem: 'switch',
+    },
+
+    // MultiLine, dashBoard
+    {
+      option: 'timeFormat',
+      description: 'Выбрать формат даты и времени',
+      elem: 'text-field',
+      placeholder: '%Y-%m-%d %H:%M:%S',
+    },
+    {
+      relation: 'united',
+      option: 'axesCount',
+      default: 1,
+      description: 'Привязка осей',
+      elem: 'radio-group',
+      items: [
+        { value: 1, label: 'Одна ось' },
+        { value: 2, label: 'Две оси' },
+      ],
+    },
+
+    {
+      relation: 'united',
+      group: 'Выбор типа графика', // вывод заголовка для следующих полей
+      option: 'metricTypes',
+    },
+    {
+      relation: 'united',
+      each: function() { // each пока только для select и radio-group
+        return Object.keys(this.multilineYAxesBinding.metricTypes) // @todo: планируется получить поля записи другим методом
+      },
+      label: 'metricTypes',
+      option: 'metricTypes',
+      description: 'Тип графика',
+      elem: 'select',
+      items: [
+        { value: 'linechart', text: 'Линейный' },
+        { value: 'barplot', text: 'Столбчатый' },
+      ],
+    },
+
+    {
+      relation: ['united', {axesCount: 2}],
+      group: 'Привязка осей',
+      option: 'metricsAxis',
+    },
+    {
+      relation: ['united', {axesCount: 2}],
+      each: function() { // пока только для select и radio-group, разбивает настройку для полей записи
+        return Object.keys(this.multilineYAxesBinding.metricTypes) // @todo: планируется получить поля записи другим методом
+      },
+      label: 'metricsAxis',
+      option: 'metricsAxis',
+      description: 'Привязка оси',
+      elem: 'radio-group',
+      items: [
+        { value: 'left', label: 'Слева' },
+        { value: 'right', label: 'Справа' },
+      ],
     },
 
   ],

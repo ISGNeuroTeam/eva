@@ -49,109 +49,137 @@
               Статус
             </div>
           </div>
-          <div
-            v-for="field in fieldsForRender"
-            :key="field.option"
-            v-if="checkOptions(field.optionGroup || field.option, field.relation)"
-            class="option-item"
-          >
-            <v-card-text
-              v-if="field.group"
-              class="headline"
+          <template v-for="field in fieldsForRender">
+            <div
+                v-for="prop in field.each || [null]"
+                :key="`${field.option}${prop}`"
+                v-if="checkOptions(field.optionGroup || field.option, field.relation)"
+                class="option-item"
             >
-              <div
-                class="settings-title"
-                :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+              <v-card-text
+                  v-if="field.group"
+                  class="headline"
               >
-                {{ field.group }}
-              </div>
-            </v-card-text>
-            <div
-              v-if="!field.group"
-              class="name-option item"
-              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-            >
-              {{ field.optionGroup ? field.optionGroup+'.' : '' }}{{ field.label || field.option }}
-            </div>
-            <div
-              v-if="!field.group"
-              class="discribe-option item"
-              :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-            >
-              {{ field.description }}
-            </div>
-            <div
-              v-if="!field.group"
-              class="status-option item">
-              <!-- elem: switch -->
-              <v-switch
-                v-if="field.elem === 'switch'"
-                v-model="options[field.option]"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{color:theme.$main_text}"
-                :label="String(options[field.option])"
-              />
-              <!-- elem: text-field -->
-              <v-text-field
-                  v-else-if="field.elem === 'text-field'"
-                  v-model="options[field.option]"
-                  :placeholder="field.placeholder"
-                  clearable
-                  :color="theme.$primary_button"
-                  :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
-                  outlined
-                  class="subnumber"
-                  hide-details
-                  :type="field.elemType"
-                  :min="field.elemMin"
-              />
-              <!-- elem: select -->
-              <v-select
-                  v-else-if="field.elem === 'select'"
-                  v-model="options[field.option]"
-                  :items="field.items"
-                  :color="theme.$primary_button"
-                  :style="{color:theme.$main_text, fill: theme.$main_text}"
-                  hide-details
-                  outlined
-                  class="subnumber"
-              />
-              <!-- elem: checkbox-list -->
+                <div
+                    class="settings-title"
+                    :style="{color:theme.$main_text,borderColor:theme.$main_border}"
+                >
+                  {{ field.group }}
+                </div>
+              </v-card-text>
               <div
-                  v-else-if="field.elem === 'checkbox-list'"
-                  class="checkbox-list">
-                <v-checkbox
-                    v-for="setting in field.items"
-                    :key="setting"
-                    :value="setting"
-                    :style="{color:theme.$main_text}"
-                    :label="setting"
-                    hide-details
+                  v-if="!field.group"
+                  class="name-option item"
+                  :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+              >
+                {{ field.optionGroup ? field.optionGroup+'.' : '' }}{{ field.label || field.option }}
+                <span v-if="prop">.{{ prop }}</span>
+              </div>
+              <div
+                  v-if="!field.group"
+                  class="discribe-option item"
+                  :style="{color:theme.$main_text, borderColor:theme.$main_border}"
+              >
+                {{ field.description }}&nbsp;<span :style="{ color: theme.$accent_ui_color }" v-text="prop"/>
+              </div>
+              <div
+                  v-if="!field.group"
+                  class="status-option item">
+                <!-- elem: switch -->
+                <v-switch
+                    v-if="field.elem === 'switch'"
                     v-model="options[field.option]"
-                    @change="val => { field.onChange ? field.onChange(val) : null}">
-                </v-checkbox>
-              </div>
-              <!-- elem: radio-group -->
-              <v-radio-group
-                  v-else-if="field.elem === 'radio-group'"
-                  v-model="options[field.option]"
-                  :column="false"
-              >
-                <v-radio
-                    v-for="{label, value} in field.items"
+                    class="switch"
                     :color="theme.$primary_button"
                     :style="{color:theme.$main_text}"
-                    :label="label || value"
-                    :value="value"
-                    class="mx-1"
+                    :label="String(options[field.option])"
                 />
-              </v-radio-group>
-              <!-- end -->
+                <!-- elem: text-field -->
+                <v-text-field
+                    v-else-if="field.elem === 'text-field'"
+                    v-model="options[field.option]"
+                    :placeholder="field.placeholder"
+                    clearable
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
+                    outlined
+                    class="subnumber"
+                    hide-details
+                    :type="field.elemType"
+                    :min="field.elemMin"
+                />
+                <!-- elem: select -->
+                <v-select
+                    v-else-if="field.elem === 'select' && !prop"
+                    v-model="options[field.option]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text, fill: theme.$main_text}"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                />
+                <v-select
+                    v-else-if="field.elem === 'select' && prop"
+                    v-model="options[field.option][prop]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{color:theme.$main_text, fill: theme.$main_text}"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                />
+                <!-- elem: checkbox-list -->
+                <div
+                    v-else-if="field.elem === 'checkbox-list'"
+                    class="checkbox-list">
+                  <v-checkbox
+                      v-for="setting in field.items"
+                      :key="setting"
+                      :value="setting"
+                      :style="{color:theme.$main_text}"
+                      :label="setting"
+                      hide-details
+                      v-model="options[field.option]"
+                      @change="val => { field.onChange ? field.onChange(val) : null}">
+                  </v-checkbox>
+                </div>
+                <!-- elem: radio-group -->
+                <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && !prop"
+                    v-model="options[field.option]"
+                    :column="false"
+                >
+                  <v-radio
+                      v-for="{label, value} in field.items"
+                      :color="theme.$primary_button"
+                      :style="{color:theme.$main_text}"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                  />
+                </v-radio-group>
+                <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && prop"
+                    v-model="options[field.option][prop]"
+                    :column="false"
+                >
+                  <v-radio
+                      v-for="{label, value} in field.items"
+                      :color="theme.$primary_button"
+                      :style="{color:theme.$main_text}"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                  />
+                </v-radio-group>
+                <!-- end -->
+              </div>
             </div>
-          </div>
+          </template>
 
-          <!-- @todo: fix me -->
           <div
             v-if="!options.united"
             v-for="metric in metricsName"
@@ -184,134 +212,6 @@
             </div>
           </div>
 
-          <!-- @todo: fix me -->
-          <v-card-text
-            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
-            class="headline pa-0"
-          >
-            <div
-              class="settings-title"
-              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
-            >
-              Выбор типа графика
-            </div>
-          </v-card-text>
-          <div
-            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
-            class="options-block united-block pa-0"
-          >
-            <div class="multiline-custom-opts">
-              <div style="margin-left: 350px">
-                <div
-                  v-for="(metric, i) in Object.keys(multilineYAxesBinding.metricTypes)"
-                  :key="`metric-${i}`"
-                  class="d-flex pb-3"
-                >
-                  <span :style="{ color: theme.$main_text }">
-                    Тип графика
-                    <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
-                  </span>
-                  <v-radio-group
-                    v-model="multilineYAxesBinding.metricTypes[metric]"
-                    hide-details
-                    :column="false"
-                    class="ma-0 ml-5"
-                  >
-                    <v-radio
-                      :color="theme.$primary_button"
-                      :style="{ color:theme.$main_text }"
-                      label="Линейный"
-                      :value="'linechart'"
-                    />
-                    <v-radio
-                      :color="theme.$primary_button"
-                      :style="{ color:theme.$main_text }"
-                      class="ml-2"
-                      label="Столбчатый"
-                      :value="'barplot'"
-                    />
-                  </v-radio-group>
-                </div>
-              </div>
-            </div>
-          </div>
-          <v-card-text
-            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
-            class="headline pa-0"
-          >
-            <div
-              class="settings-title"
-              :style="{color:theme.$main_text,borderColor:theme.$main_border}"
-            >
-              Привязка осей
-            </div>
-          </v-card-text>
-
-          <!-- @todo: fix me -->
-          <div
-            v-if="options.united && options.barplotstyle !== 'accumulation' && checkOptions('united')"
-            class="options-block united-block pa-0"
-          >
-            <div class="d-flex multiline-custom-opts">
-              <v-radio-group
-                v-model="multilineYAxesBinding.axesCount"
-                style="margin-left: 350px; margin-top: 0;"
-              >
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{color:theme.$main_text}"
-                  label="Одна ось"
-                  :value="1"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{color:theme.$main_text}"
-                  label="Две оси"
-                  :value="2"
-                />
-              </v-radio-group>
-
-              <div
-                v-if="multilineYAxesBinding.axesCount === 2"
-                style="margin-left: 50px"
-              >
-                <div
-                  v-for="(metric, i) in Object.keys(multilineYAxesBinding.metrics)"
-                  :key="`metric-${i}`"
-                  class="pb-3"
-                >
-                  <div class="d-flex align-center">
-                    <span :style="{ color: theme.$main_text }">
-                      Привязка
-                      <span :style="{ color: theme.$accent_ui_color }" v-text="metric"/>:
-                    </span>
-                    <v-radio-group
-                      v-model="multilineYAxesBinding.metrics[metric]"
-                      hide-details
-                      :column="false"
-                      class="ma-0 ml-5"
-                    >
-                      <v-radio
-                        :color="theme.$primary_button"
-                        :style="{ color:theme.$main_text }"
-                        label="Слева"
-                        :value="'left'"
-                      />
-                      <v-radio
-                        :color="theme.$primary_button"
-                        :style="{ color:theme.$main_text }"
-                        class="ml-2"
-                        label="Справа"
-                        :value="'right'"
-                      />
-                    </v-radio-group>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- @todo: fix me -->
           <v-card-text
             v-if="!options.united && checkOptions('united')"
             class="headline"
@@ -491,7 +391,6 @@
             </div>
           </div>
 
-          <!-- @todo: fix me -->
           <div
             v-if="checkOptions('positionlegend')"
             class="option-item"
@@ -523,7 +422,6 @@
             </div>
           </div>
 
-          <!-- @todo: fix me -->
           <div
             v-if="checkOptions('primitivesLibrary')"
             class="option-item"
@@ -571,7 +469,6 @@
             </v-container>
           </div>
 
-          <!-- @todo: fix me -->
           <v-card-text
             v-if="checkOptions('piechartSettings')"
             class="headline "
@@ -677,7 +574,6 @@
           </div>
         </div>
 
-        <!-- @todo: fix me -->
         <v-card-text
           v-if="tooltipSettingShow"
           class="headline "
@@ -902,9 +798,7 @@ export default {
       primitivesLibraryAutoGrow: false,
       conclusion_count: {},
       replace_count: {},
-      options: {
-        titles: [], // @todo: fix me
-      },
+      options: {},
       type_line: 'solid',
       color: {},
       optionsItems: [],
@@ -946,7 +840,7 @@ export default {
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
           const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
-          
+
           if (opt.conclusion_count) {
             this.conclusion_count = opt.conclusion_count
           }
@@ -998,20 +892,21 @@ export default {
   },
   watch: {
     element(val) {
-      console.log('watch element ' + val)
-      const options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
-      console.log('options', { ...options }, { ...this.options })
-      this.fieldsForRender = settings.optionFields.map(field => {
-        const items = typeof field.items === "function" ? field.items.call(this) : [];
-        return { ...field, items }
-      })
+      this.options = {};
+      this.fieldsForRender = settings.optionFields
+        .map(field => {
+          const items = typeof field.items === "function" ? field.items.call(this) : field.items;
+          const each = typeof field.each === "function" ? field.each.call(this) : field.each;
+          if (each) {
+            let options = {}
+            each.forEach(key => {
+              options[key] = field.items[0]?.value
+            })
+            this.$set(this.options, field.option, options);
+          }
+          return { ...field, items, each }
+        })
     },
-    active(status){
-      if (!status) {
-        // set default empty value
-        this.multilineYAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} }
-      }
-    }
   },
   methods: {
     handleChangeColor(e, i) {
@@ -1062,17 +957,20 @@ export default {
         }
 
       }
-      if (this.element.indexOf('multiLine') != -1) {
-        let updateMetrics = this.metrics.map( item => {
-          return JSON.parse(JSON.stringify(item))
-        })
-        this.$set(this.options,'metrics',updateMetrics);
-      }
       if (this.element.startsWith("multiLine")) {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
         this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options: { ...this.options, conclusion_count: this.conclusion_count, replace_count: this.replace_count, openNewScreen: this.openNewScreen, type_line: this.type_line, color: this.color  }});
+
+      let options = {
+        ...this.options,
+        conclusion_count: this.conclusion_count,
+        replace_count: this.replace_count,
+        openNewScreen: this.openNewScreen,
+        type_line: this.type_line,
+        color: this.color
+      }
+      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options });
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1084,8 +982,27 @@ export default {
       }
     },
     checkOptions: function(option, relation) { // проверяет есть ли такая опция уже в массиве с опциями
-      if (relation !== undefined && !this.options[relation]) {
-        return false;
+      if (relation !== undefined) {
+        if (relation.forEach) { // !this.options[relation]
+          let res = relation.filter(item => {
+            if (typeof item === 'object') {
+              let show = true
+              Object.keys(item).forEach(key => {
+                if (show && this.options[key] !== item[key]) {
+                  show = false
+                }
+              })
+              return show
+            } else {
+              return !!this.options[item]
+            }
+          })
+          if (res.length !== relation.length) {
+            return false;
+          }
+        } else if(!this.options[relation]) {
+          return false;
+        }
       }
       return this.optionsItems.includes(option)
     },
@@ -1128,7 +1045,6 @@ export default {
     },
     prepareOptions() {  //  понимает какие опции нужно вывести
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
-      console.log('prepareOptions options', {...options})
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
 
       if (options.color) {
@@ -1147,11 +1063,8 @@ export default {
         this.replace_count = options.replace_count
       }
 
-      console.log('prepareOptions settings.options[elem]', settings.options[elem])
-      this.options = {};
       this.optionsItems = settings.options[elem];
 
-      // @todo: fix me
       this.optionsItems.forEach( item => {
         if (Object.keys(options).includes(item)) {
           if (item == 'tooltip') {
@@ -1179,34 +1092,29 @@ export default {
             this.$set(this.options,item,options[item]);
           }
         } else {
-          this.$set(this.options,item,null);
           let propsToFalse = [
             'stringOX', 'united', 'isDataAlwaysShow', 'lastDot', 'multiple',
             'underline', 'onButton', 'pinned'
           ];
           if (propsToFalse.includes(item)) {
             this.$set(this.options, item, false);
-          }
-          if (item == 'barplotstyle') {
+          } else if (item === 'barplotstyle') {
             this.$set(this.options,item,'divided');
-          }
-          if (item === 'xAxisCaptionRotate') {
+          } else if (item === 'xAxisCaptionRotate') {
             this.$set(this.options, item, 0);
-          }
-          if (item === 'barplotBarWidth') {
+          } else if (item === 'barplotBarWidth') {
             this.$set(this.options, item, 0);
-          }
-          if (item == 'showlegend') {
+          } else if (item === 'showlegend') {
             this.$set(this.options,item,true);
-          }
-          if (item == 'positionlegend') {
+          } else if (item === 'positionlegend') {
             this.$set(this.options,item,'right');
-          }
-          if (item == 'titles') {
-            this.$set(this.options,item,[]);
-          }
-          if (item == 'metrics') {
+          } else if (item === 'metrics') {
             this.metrics = [];
+          } else {
+            const field = settings.optionFields.find(field => field.option === item);
+            if (field && field.default !== undefined) {
+              this.$set(this.options, item, field.default);
+            }
           }
         }
       })
