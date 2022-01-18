@@ -8,7 +8,7 @@
       <div class="main-container container-report">
         <div
             ref="report"
-            class="report-block"
+            class="report2-block"
         >
           <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data" :loading="loading"></newSearch>
           <timeline v-show="data.length > 0" class="timeline component-block" :data="data">111</timeline>
