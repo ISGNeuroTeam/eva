@@ -119,7 +119,7 @@
                         <div>c {{dates[0]}}</div>
                         <div>по {{dates[1]}}</div>
                       </div>
-                      <div class="d-flex justify-space-around p-3">
+                      <div class="time-picker d-flex justify-space-around p-3">
                         <input v-model="timeStart" type="time">
                         <input v-model="timeFinish" type="time">
                       </div>
@@ -306,10 +306,17 @@ export default {
 .textarea
   max-height: 420px
   overflow: auto
-.time-picker
-  margin-right: 20px
-.v-date-picker-table
-  height: 212px
+.v-picker__body
+  background-color: $main_bg !important
+  .v-date-picker-table
+    height: 212px
+    .v-btn--text
+      color: $main_text !important
+  .v-date-picker-header
+    button
+      color: $main_text !important
+  th
+    color: $main_text !important
 //.calendar
 //  .v-menu__content
 //    max-width: 150px
@@ -337,6 +344,13 @@ export default {
         width: 12px
   .picker-actions
     padding: 10px
+  .time-picker
+    input
+      color: $main_text
+      border: solid $main_text 1px
+      border-radius: 5px
+      padding-left: 5px
+      padding-right: 5px
 .search-block-footer
   .v-input
     padding-top: 0

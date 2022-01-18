@@ -5,7 +5,7 @@
   >
     <header-top @setUsername="setUsername($event)" :inside="true"/>
     <v-content>
-      <div class="main-container container-report" style="margin-top: 53px">
+      <div class="main-container container-report">
         <div
             ref="report"
             class="report-block"

@@ -6,15 +6,15 @@
     <div class="select-wrap p-5">
       <div>
         <v-btn class="scale-btn" text small @click="plusScale()">
-          <v-icon small>{{ mdiPlus }}</v-icon>
+          <v-icon :color="theme.$main_text" small>{{ mdiPlus }}</v-icon>
           <span class="scale-btn-text">Увеличить</span>
         </v-btn>
         <v-btn class="scale-btn" text small @click="minusScale()">
-          <v-icon small>{{ mdiMinus }}</v-icon>
+          <v-icon :color="theme.$main_text" small>{{ mdiMinus }}</v-icon>
           <span class="scale-btn-text">Уменьшить</span>
         </v-btn>
         <v-btn class="scale-btn" text small @click="refreshScale()">
-          <v-icon small>{{ mdiRefresh }}</v-icon>
+          <v-icon :color="theme.$main_text" small>{{ mdiRefresh }}</v-icon>
           <span class="scale-btn-text">Исходный вид</span>
         </v-btn>
       </div>
@@ -212,7 +212,11 @@ export default {
       return new Intl.DateTimeFormat("ru", options).format(date).slice(0, -3)
     },
     clearSVG (dataset) {
-      console.log(dataset)
+      d3.select('.block-tooltip')
+          .nodes()
+          .forEach((item) => {
+            item.remove()
+          })
       d3.selectAll('rect')
           .nodes()
           .forEach((item) => {
