@@ -4,6 +4,20 @@
       :style="{background: theme.$main_bg, color: theme.$main_text}"
   >
     <div class="select-wrap p-5">
+      <div>
+        <v-btn class="scale-btn" text small @click="plusScale()">
+          <v-icon small>{{ mdiPlus }}</v-icon>
+          <span class="scale-btn-text">Увеличить</span>
+        </v-btn>
+        <v-btn class="scale-btn" text small @click="minusScale()">
+          <v-icon small>{{ mdiMinus }}</v-icon>
+          <span class="scale-btn-text">Уменьшить</span>
+        </v-btn>
+        <v-btn class="scale-btn" text small @click="refreshScale()">
+          <v-icon small>{{ mdiRefresh }}</v-icon>
+          <span class="scale-btn-text">Исходный вид</span>
+        </v-btn>
+      </div>
       <v-menu
           v-model="menuDropdown"
           offset-y
@@ -15,7 +29,7 @@
               v-bind="attrs"
               v-on="on"
           >
-            {{ select.text }}
+            <span style="font-size: 15px">{{ select.text }}</span>
             <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
           </div>
         </template>
@@ -39,7 +53,7 @@
 
 <script>
 import * as d3 from "d3";
-import { mdiRefresh, mdiMagnify, mdiChevronDown } from '@mdi/js'
+import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiPlus, mdiMinus  } from '@mdi/js'
 
 export default {
   props: {
@@ -50,6 +64,7 @@ export default {
       search: {
         parametrs: {}
       },
+      numberInTimeline: 25,
       menuDropdown: false,
       select: { text: 'Колонка (1 день)', value: 'day' },
       periodItemsSelect: [
@@ -61,6 +76,8 @@ export default {
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
       mdiChevronDown: mdiChevronDown,
+      mdiPlus: mdiPlus,
+      mdiMinus: mdiMinus
     }
   },
   computed: {
@@ -70,6 +87,7 @@ export default {
     dataset () {
       let minTime = this.data[0]?._time
       let maxTime = this.data[0]?._time
+      console.log(this.data)
       this.data.forEach(item => {
         if (item._time < minTime) {
           minTime = item._time
@@ -81,11 +99,9 @@ export default {
 
       let barTime = minTime
       let dataset = {}
-      let dataKey = ''
       let newDate
       let datasetItemString
       let deltaTime
-      let options
       let getActualLongData
       if (this.select.value === 'min') {
         getActualLongData = this.getUntilMin
@@ -127,6 +143,11 @@ export default {
           dataset[getActualLongData(item._time*1000)] ++
         }
       })
+      if (Object.keys(dataset).length > 0) {
+        for ( let i = Object.keys(dataset).length; i<this.numberInTimeline; i++) {
+          dataset['100'+i] = 0
+        }
+      }
       if (Object.keys(dataset).length > 0) { 
         this.clearSVG(dataset)
       }
@@ -191,12 +212,30 @@ export default {
       return new Intl.DateTimeFormat("ru", options).format(date).slice(0, -3)
     },
     clearSVG (dataset) {
+      console.log(dataset)
       d3.selectAll('rect')
           .nodes()
           .forEach((item) => {
             item.remove()
           })
       this.renderSVG(dataset)
+    },
+    plusScale() {
+      if (this.numberInTimeline < 10) {
+        this.numberInTimeline = 5
+      } else {
+        this.numberInTimeline -= 5
+      }
+    },
+    minusScale() {
+      if (this.numberInTimeline > 45) {
+        this.numberInTimeline = 50
+      } else {
+        this.numberInTimeline += 5
+      }
+    },
+    refreshScale() {
+      this.numberInTimeline = 25
     },
     renderSVG (dataset) {
       let marge = { top: 0, bottom: 0, left: 0, right: 0 }
@@ -209,7 +248,7 @@ export default {
       for (let dataItem in dataset) {
         dataForSvg.push({time: dataItem, value: dataset[dataItem] })
       }
-      dataForSvg = dataForSvg.slice(dataForSvg.length - 50)
+      dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline)
       let maxY = dataForSvg[0].value
       dataForSvg.forEach(element => {
         if (element.value > maxY) {
@@ -298,7 +337,7 @@ export default {
   padding: 0 30px
 .select-wrap 
   display: flex
-  flex-direction: row-reverse
+  justify-content: space-between
   padding-top: 10px
   padding-bottom: 10px
   background-color: $main_bg !important
@@ -310,6 +349,11 @@ export default {
       border-color: $main_text
     .v-input__append-inner
       margin-bottom: 5px
+  .scale-btn
+    .scale-btn-text
+      text-transform: capitalize
+      color: $main_text
+      font-weight: normal
 .v-list
   background-color: $main_bg !important
   .v-list-item
