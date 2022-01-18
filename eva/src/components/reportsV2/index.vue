@@ -25,16 +25,22 @@
               <download :data="data"></download>
             </div>
           </div>
-          <v-row class="mb-0" v-if="data.length > 0">
-            <v-col cols="2" class="pr-0">
-              <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
-            </v-col>
-            <v-col cols="10" class="pl-0">
-              <events v-if="tab===0" class="events component-block" :data="data"></events>
-            </v-col>
-          </v-row>
-          <statistic v-if="tab===1" class="statistic component-block" :data="data" :size="size"></statistic>
-          <visualisation v-if="tab===2 && data.length > 0" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
+          <keep-alive>
+            <v-row class="mb-0" v-if="data.length > 0">
+              <v-col cols="2" class="pr-0">
+                <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
+              </v-col>
+              <v-col cols="10" class="pl-0">
+                <events v-if="tab===0" class="events component-block" :data="data"></events>
+              </v-col>
+            </v-row>
+          </keep-alive>
+          <keep-alive>
+            <statistic v-if="tab===1" class="statistic component-block" :data="data" :size="size"></statistic>
+          </keep-alive>
+          <keep-alive>
+            <visualisation v-if="tab===2 && data.length > 0" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
+          </keep-alive>
         </div>
       </div>
     </v-content>

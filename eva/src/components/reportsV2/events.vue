@@ -127,7 +127,8 @@ export default {
       background-color: $secondary_border !important
       color: $main_text !important
   .expanded
-    background-color: red
+    td
+      border-bottom: none !important
   td
     font-size: 13px !important
     //border-bottom: none !important
