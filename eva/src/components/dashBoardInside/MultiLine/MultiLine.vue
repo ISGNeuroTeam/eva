@@ -102,6 +102,11 @@ export default {
       return strokeWidth ? Number(strokeWidth) : 1.5
     },
 
+    linkOptions() {
+      const { id, idDash } = this
+      return this.$store.getters.getOptions({ id, idDash })
+    },
+
     change() {
       if (this.widthFrom && this.heightFrom && this.dataRestFrom.length !== 0) {
         this.setNoData(true)
@@ -126,6 +131,12 @@ export default {
     }
   },
   watch: {
+    linkOptions: {
+      deep: true,
+      handler(val, oldVal) {
+        this.getDataAsynchrony()
+      },
+    },
     metrics() {
       const { id, idDash, metrics } = this
       this.$store.commit('setMetricsMulti', { id, idDash, metrics })
@@ -169,6 +180,8 @@ export default {
 
       this.setNoData(false)
 
+      const options = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
+
       const {
         metrics,
         united = false,
@@ -182,25 +195,18 @@ export default {
         color,
         conclusion_count,
         replace_count,
-        barplotstyle,
+        barplotstyle = 'divided',
         axesCount,
         metricTypes,
         metricsAxis,
-      } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
+      } = options
 
       const yAxesBinding = {
-        axesCount,
-        metrics: metricsAxis,
-        metricTypes
+        axesCount: axesCount || options.yAxesBinding?.axesCount || 1,
+        metrics: metricsAxis || options.yAxesBinding?.metrics || {},
+        metricTypes: metricTypes || options.yAxesBinding?.metricTypes || {}
       }
-      if (!yAxesBinding.metricTypes){
-        yAxesBinding.metricTypes = {}
-      }
-      if (!yAxesBinding.metrics){
-        yAxesBinding.metrics = {}
-      }
-      console.log('const yAxesBinding', {...yAxesBinding})
-      
+
       this.stringOX = stringOX
 
       if (!this.stringOX && (typeof rowValue !== 'number')) {
@@ -216,7 +222,7 @@ export default {
       this.timeFormat = timeFormat || '%Y-%m-%d %H:%M:%S'
       this.xAxisCaptionRotate = xAxisCaptionRotate
 
-      const metricOptions = Object.keys(metrics) || []
+      const metricOptions = metrics ? [...metrics] : []
 
       const render = () => {
         this.renderSVG(
@@ -340,7 +346,6 @@ export default {
 
     putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj, replaceCount) {
       dot.setAttribute(attr, 'true')
-      console.log(replaceCount)
       const label = replaceCount === undefined ? d[metricName] : Number(d[metricName]).toFixed(replaceCount)
 
       const text = this.svg
@@ -732,7 +737,6 @@ export default {
 
         }
       }
-      //console.log(x.ticks())
 
       const svgWidth = this.width + margin.left + margin.right
       const svgHeight = this.height + margin.top + margin.bottom + 10

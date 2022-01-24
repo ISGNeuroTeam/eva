@@ -437,6 +437,7 @@ export default {
       elem: 'text-field',
       elemType: 'number',
       elemMin: 0,
+      placeholder: 'Не указано',
     },
     {
       option: 'stringOX',

@@ -839,6 +839,7 @@ export default {
         this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
+          console.log('%c getOptions 2', 'background: blue; color: white; border-darius: 2px')
           const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
 
           if (opt.conclusion_count) {
@@ -846,12 +847,25 @@ export default {
           }
 
           if (opt.yAxesBinding) {
+
+            // поддержка старой структуры сохраненных настроек
+            if (!opt.metricTypes) {
+              if (opt.yAxesBinding.metrics) {
+                opt.metricsAxis = opt.yAxesBinding.metrics
+              }
+              if (opt.yAxesBinding.metricTypes) {
+                opt.metricTypes = opt.yAxesBinding.metricTypes
+              }
+              if (opt.yAxesBinding.axesCount) {
+                opt.axesCount = opt.yAxesBinding.axesCount
+              }
+            }
+
             this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount
           } else {
             this.multilineYAxesBinding.axesCount = 1
           }
 
-          
           if (opt.type_line) {
             this.type_line = opt.type_line;
           }
@@ -862,6 +876,8 @@ export default {
 
           this.metricsName.forEach(metric => {
             this.metricUnits[metric.name] = metric.units;
+
+            // todo: remove it?
             if (opt.yAxesBinding && opt.yAxesBinding.metrics && opt.yAxesBinding.metricTypes) {
               this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name]
               this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name]
@@ -869,6 +885,7 @@ export default {
               this.multilineYAxesBinding.metrics[metric.name] = 'left'
               this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart'
             }
+
           })
         }
       }
@@ -892,6 +909,7 @@ export default {
   },
   watch: {
     element(val) {
+      console.log('%c watch element', 'background: yellow; border-darius: 2px')
       this.options = {};
       this.fieldsForRender = settings.optionFields
         .map(field => {
@@ -902,7 +920,7 @@ export default {
             each.forEach(key => {
               options[key] = field.items[0]?.value
             })
-            this.$set(this.options, field.option, options);
+            this.$set(this.options, field.option, { ...options });
           }
           return { ...field, items, each }
         })
@@ -959,7 +977,7 @@ export default {
       }
       if (this.element.startsWith("multiLine")) {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
-        this.options.yAxesBinding = { ...this.multilineYAxesBinding }
+        //this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
 
       let options = {
@@ -968,9 +986,11 @@ export default {
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
-        color: this.color
+        color: this.color,
+        updated: Date.now()
       }
       this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options });
+      console.log('%c setOptions', 'background: green; color: white; border-darius: 2px')
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
@@ -1044,6 +1064,7 @@ export default {
       }
     },
     prepareOptions() {  //  понимает какие опции нужно вывести
+      console.log('%c getOptions', 'background: blue; color: white; border-darius: 2px')
       let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
       let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
 
@@ -1093,23 +1114,14 @@ export default {
           }
         } else {
           let propsToFalse = [
-            'stringOX', 'united', 'isDataAlwaysShow', 'lastDot', 'multiple',
-            'underline', 'onButton', 'pinned'
+            'multiple', 'underline', 'onButton', 'pinned'
           ];
           if (propsToFalse.includes(item)) {
             this.$set(this.options, item, false);
-          } else if (item === 'barplotstyle') {
-            this.$set(this.options,item,'divided');
-          } else if (item === 'xAxisCaptionRotate') {
-            this.$set(this.options, item, 0);
-          } else if (item === 'barplotBarWidth') {
-            this.$set(this.options, item, 0);
           } else if (item === 'showlegend') {
             this.$set(this.options,item,true);
           } else if (item === 'positionlegend') {
             this.$set(this.options,item,'right');
-          } else if (item === 'metrics') {
-            this.metrics = [];
           } else {
             const field = settings.optionFields.find(field => field.option === item);
             if (field && field.default !== undefined) {
