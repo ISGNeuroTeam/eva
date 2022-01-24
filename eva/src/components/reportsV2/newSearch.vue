@@ -56,7 +56,7 @@
           </div>
         </div>
         <div class="d-flex">
-          <div class="time-picker mt-1">
+          <div class="time-picker mt-1 mr-5">
             <v-menu
                 v-model="menuDropdown"
                 :close-on-content-click="false"
@@ -165,8 +165,14 @@ import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiCalendarMonthOutline, mdiChe
 
 export default {
   props: {
-    data: [],
-    loading: false,
+    data: {
+      type: Array,
+      default: () => []
+    },
+    loading: {
+      type: Boolean,
+      default: () => false
+    }
   },
   data () {
     return {
@@ -199,15 +205,18 @@ export default {
     }
   },
   computed: {
-    theme: function() {
+    theme () {
       return this.$store.getters.getTheme
     },
     dateRangeText () {
       return this.dates.join(' ~ ')
     },
+    // effectiveDateRange () {
+    //   return this.dates.sort().join(' - ');
+    // }
   },
   watch: {
-    loading: function (val) {
+    loading (val) {
       if (val === false) {
         let options = {
           hour12: 'true',
@@ -224,6 +233,25 @@ export default {
         }
       }
     },
+  },
+  mounted() {
+    document.title="EVA | Исследование данных"
+    this.search = this.$store.getters.getReportSearch;
+    if (this.search.original_otl != '') {
+      this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: true});
+    }
+    // this.calcSize();
+    this.$refs.search.$el.addEventListener ("keypress", event =>{
+      if (event.ctrlKey && event.keyCode == 13) {
+        this.launchSearch();
+      }
+    });
+    this.$refs.report.addEventListener('click', event => {
+      if(!event.target.classList.contains('static-row')) {
+        this.showStatistic = false;
+      }
+    })
+    this.unitedData.color=  this.theme.controls;
   },
   methods: {
     addLineBreaks(event) {
@@ -271,30 +299,21 @@ export default {
       this.setTwsTwf(tws, twf)
     },
     setTwsTwf (tws, twf) {
+      let temp
+      if (tws > twf) {
+        temp = tws
+        tws = twf
+        twf = temp
+        this.sortDates()
+      }
       this.search.parametrs.tws = tws
       this.search.parametrs.twf = twf
       this.menuCalendar = false
       this.menuDropdown = false
     },
-  },
-  mounted() {
-    document.title="EVA | Исследование данных"
-    this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl != '') {
-      this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: true});
+    sortDates () {
+      this.timeRangeValue = 'c ' + this.dates[1] + ' по ' + this.dates[0]
     }
-    // this.calcSize();
-    this.$refs.search.$el.addEventListener ("keypress", event =>{
-      if (event.ctrlKey && event.keyCode == 13) {
-        this.launchSearch();
-      }
-    });
-    this.$refs.report.addEventListener('click', event => {
-      if(!event.target.classList.contains('static-row')) {
-        this.showStatistic = false;
-      }
-    })
-    this.unitedData.color=  this.theme.controls;
   }
 }
 

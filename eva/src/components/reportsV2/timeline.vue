@@ -311,7 +311,12 @@ export default {
             return height - marge.top - marge.bottom - yScale(d.value)
           })
           .attr('fill', 'rgba(76, 217, 100, 0.7)')
-          .on("mouseover", d => { console.log(d); tooltip.html( 'Событий (' + d.value + ')' + '<br>' + d.time ); return tooltip.style("visibility", "visible")})
+          .on("mouseover", d => { 
+            console.log(d); 
+            tooltip.html( 'Событий (' + d.value + ')' + '<br>' + d.time );
+            tooltip.style("display", "block");
+            return tooltip.style("visibility", "visible")
+          })
           .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX-10)+"px");})
           .on("mouseout", () => tooltip.style("visibility", "hidden"))
 
@@ -326,9 +331,6 @@ export default {
       //     .attr('stroke', this.theme.$main_text)
       //     .style('opacity', 0.3)
     }
-  },
-  mounted() {
-    // this.renderSVG()
   }
 }
 
@@ -374,6 +376,7 @@ export default {
   /*width: 50%;*/
   margin: auto
 .block-tooltip
+  display: none
   padding: 6px
   background: #FFFFFF
   box-shadow: 0px 4px 6px rgba(142, 141, 158, 0.25), 0px 1px 2px rgba(142, 141, 158, 0.4)
