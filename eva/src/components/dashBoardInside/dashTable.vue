@@ -254,7 +254,6 @@ export default {
     options: {
       deep: true,
       handler(newValue, oldValue) {
-        console.log('watch options', newValue)
         if (newValue) this.createTitles(newValue.titles);
       }
     },

@@ -786,6 +786,7 @@ import settings from "../js/componentsSettings.js";
 
 import { mdiMinusBox, mdiPlusBox } from "@mdi/js";
 import { mapGetters } from "vuex";
+import Vue from "vue";
 
 export default {
   props: {
@@ -801,7 +802,6 @@ export default {
       options: {},
       type_line: 'solid',
       color: {},
-      optionsItems: [],
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
@@ -829,19 +829,64 @@ export default {
       multilineYAxesTypes: {},
       metricUnits: {},
       fieldsForRender: [],
+      optionsByComponents: [],
     }
   },
   computed: {
-    active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет
-      if (this.$store.getters.getModalSettings(this.idDash).status){ // если окно должно быть открыто
-        this.element = this.$store.getters.getModalSettings(this.idDash).element;  // получаем для каокго элемнета вывести настройки
+    active: function() {
+      return this.$store.getters.getModalSettings(this.idDash).status;
+    },
+    idDash: function(){
+      return this.idDashFrom
+    },
+    theme: function() {
+      return this.$store.getters.getTheme
+    },
+    primitivesLibraryAutoGrowLinkText() {
+      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
+    },
+    optionsItems(){
+      if (!this.element) {
+        return []
+      }
+      let elem = this.element.split('-')[0];
+      return elem ? (this.optionsByComponents[elem] || []) : []
+    },
+    changeComponent(){
+      return this.idDash + '-' + this.element
+    },
+
+    // поля элемента данных
+    titles(){
+      return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+    },
+  },
+  created() {
+    this.cancelModal()
+  },
+  mounted() {
+    const settings = this.$store.getters.getModalSettings(this.idDash)
+    this.element = settings.element;
+    this.loadComponentsSettings()
+    this.prepareOptions()
+  },
+  watch: {
+    changeComponent(val){
+      this.loadComponentsSettings()
+      this.prepareOptions()
+    },
+    titles(val){
+      this.loadComponentsSettings()
+      this.prepareOptions()
+    },
+    async active(val) {
+      if (val){ // если окно должно быть открыто
+        const settings = this.$store.getters.getModalSettings(this.idDash)
+        this.element = settings.element;  // получаем для каокго элемнета вывести настройки
         this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-        this.prepareOptions();  // и подготовливаем модалку на основе этого элемента
         this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
         if (this.element.startsWith("multiLine")) {
-          console.log('%c getOptions 2', 'background: blue; color: white; border-darius: 2px')
-          const opt = this.$store.getters.getOptions({idDash: this.idDash, id: this.element})
-
+          const opt = await this.$store.dispatch('getSettingsByPath', {path: this.idDash, element: this.element})
           if (opt.conclusion_count) {
             this.conclusion_count = opt.conclusion_count
           }
@@ -877,7 +922,6 @@ export default {
           this.metricsName.forEach(metric => {
             this.metricUnits[metric.name] = metric.units;
 
-            // todo: remove it?
             if (opt.yAxesBinding && opt.yAxesBinding.metrics && opt.yAxesBinding.metricTypes) {
               this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name]
               this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name]
@@ -888,29 +932,16 @@ export default {
 
           })
         }
+        await this.prepareOptions();
       }
-      return this.$store.getters.getModalSettings(this.idDash).status;
     },
-    idDash: function(){
-      return this.idDashFrom
-    },
-    theme: function() {
-      return this.$store.getters.getTheme
-    },
-    primitivesLibraryAutoGrowLinkText() {
-      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
-    },
-
-    ...mapGetters([
-      'getAvailableDataFormat',
-      'getSelectedDataFormat',
-    ]),
-
-  },
-  watch: {
     element(val) {
-      console.log('%c watch element', 'background: yellow; border-darius: 2px')
-      this.options = {};
+      this.loadComponentsSettings()
+    },
+  },
+  methods: {
+    loadComponentsSettings() {
+      this.optionsByComponents = settings.options
       this.fieldsForRender = settings.optionFields
         .map(field => {
           const items = typeof field.items === "function" ? field.items.call(this) : field.items;
@@ -925,8 +956,6 @@ export default {
           return { ...field, items, each }
         })
     },
-  },
-  methods: {
     handleChangeColor(e, i) {
       this.color = { ...this.color, [this.metrics[i].name]: e.target.value };
     },
@@ -941,7 +970,7 @@ export default {
     handleChangeReplaceCount(e, i) {
       this.replace_count = { ...this.replace_count, [this.metrics[i].name]: Number(e) }
     },
-    setOptions: function() {  // отправляем настройки в хранилище
+    setOptions: async function() {  // отправляем настройки в хранилище
       if(!this.options.level){
         this.options.level = 1;
       }
@@ -977,7 +1006,6 @@ export default {
       }
       if (this.element.startsWith("multiLine")) {
         this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
-        //this.options.yAxesBinding = { ...this.multilineYAxesBinding }
       }
 
       let options = {
@@ -989,21 +1017,24 @@ export default {
         color: this.color,
         updated: Date.now()
       }
-      this.$store.commit('setOptions',  { idDash: this.idDash, id: this.element, options });
-      console.log('%c setOptions', 'background: green; color: white; border-darius: 2px')
+      await this.$store.dispatch('saveSettingsToPath',  {
+        path: this.idDash,
+        element: this.element,
+        options
+      });
       this.cancelModal();
     },
     cancelModal: function() {  // если нажали на отмену создания
-      this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );
+      this.$store.dispatch('closeModalSettings',  { path: this.idDash } );
     },
     checkEsc: function(event) {
-      if (event.code =="Escape") {
+      if (event.code === "Escape") {
         this.cancelModal();
       }
     },
     checkOptions: function(option, relation) { // проверяет есть ли такая опция уже в массиве с опциями
       if (relation !== undefined) {
-        if (relation.forEach) { // !this.options[relation]
+        if (relation.forEach) {
           let res = relation.filter(item => {
             if (typeof item === 'object') {
               let show = true
@@ -1063,10 +1094,8 @@ export default {
         })
       }
     },
-    prepareOptions() {  //  понимает какие опции нужно вывести
-      console.log('%c getOptions', 'background: blue; color: white; border-darius: 2px')
-      let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.element}); // получаем все опции
-      let elem = this.element.split('-')[0];  // понимаем какой тип элемента попал к нам
+    async prepareOptions() {  //  понимает какие опции нужно вывести
+      const options = await this.$store.dispatch('getSettingsByPath', {path: this.idDash, element: this.element});
 
       if (options.color) {
         this.color = options.color;
@@ -1083,8 +1112,6 @@ export default {
       if (options.replace_count) {
         this.replace_count = options.replace_count
       }
-
-      this.optionsItems = settings.options[elem];
 
       this.optionsItems.forEach( item => {
         if (Object.keys(options).includes(item)) {
@@ -1109,8 +1136,11 @@ export default {
           } else if (item == 'themes') {
             this.themesArr = Object.keys(options[item]);
             this.themes = options[item];
+          } else  if (item === 'titles') {
+            this.$set(this.options, item, options[item] || []);
           } else {
-            this.$set(this.options,item,options[item]);
+            let val = (options[item] !== null && typeof options[item] === 'object') ? {...options[item]} : options[item]
+            this.$set(this.options, item, val);
           }
         } else {
           let propsToFalse = [

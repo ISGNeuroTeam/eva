@@ -371,6 +371,7 @@ import {
 } from "@mdi/js";
 import { mapGetters } from "vuex";
 import settings from "../js/componentsSettings.js";
+import Vue from "vue";
 
 export default {
   props: {
@@ -642,9 +643,8 @@ export default {
       });
     },
     switchOP: function () {
-      this.$store.commit("setModalSettings", {
-        idDash: this.idDash,
-        status: true,
+      this.$store.dispatch("openModalSettings", {
+        path: this.idDash,
         element: this.element,
         titles: this.searchData[0] ? Object.keys(this.searchData[0]) : [],
       });

@@ -501,8 +501,8 @@ export default {
     },
     {
       relation: 'united',
-      each: function() { // each пока только для select и radio-group
-        return Object.keys(this.multilineYAxesBinding.metricTypes) // @todo: планируется получить поля записи другим методом
+      each: function() { // each реализовано только для select и radio-group
+        return this.titles && this.titles.splice ? [...this.titles].splice(1) : []
       },
       label: 'metricTypes',
       option: 'metricTypes',
@@ -521,8 +521,8 @@ export default {
     },
     {
       relation: ['united', {axesCount: 2}],
-      each: function() { // пока только для select и radio-group, разбивает настройку для полей записи
-        return Object.keys(this.multilineYAxesBinding.metricTypes) // @todo: планируется получить поля записи другим методом
+      each: function() { // each реализовано только для select и radio-group, разбивает настройку для полей записи
+        return this.titles && this.titles.splice ? [...this.titles].splice(1) : []
       },
       label: 'metricsAxis',
       option: 'metricsAxis',
