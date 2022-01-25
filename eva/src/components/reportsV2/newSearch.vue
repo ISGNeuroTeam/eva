@@ -23,11 +23,11 @@
         >
           Новый поиск
         </div>
-        <v-btn text @click="refreshInput">
-          <span class="refresh-btn-text" :style="{color: theme.$main_text}">
+        <v-btn class="action-btn" text @click="refreshInput">
+          <span class="action-btn-text" :style="{color: theme.$main_text}">
             Сбросить
           </span> 
-          <v-icon :style="{color: theme.$main_text}">{{ mdiRefresh }}</v-icon>
+          <v-icon class="action-btn-icon" :style="{color: theme.$main_text}">{{ mdiRefresh }}</v-icon>
         </v-btn>
       </div>
       <v-textarea
@@ -48,15 +48,15 @@
             class="search-block-title"
             :style="{color: theme.$title}"
         >
-          <div v-if="data.length > 0" :color="theme.$secondary_text">
+          <div v-if="data.length > 0" :style="{color: theme.$secondary_text}">
             <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
-            {{ data.length }} результатов 
+            <span>{{ data.length }} результатов </span>
             <span v-if="searchTimeInterval">( {{searchTimeInterval}} )</span>
 <!--            <span v-if="dates.length>0">(c {{ dates[0] }} {{ timeStart }} по  {{dates[1]}} {{ timeFinish }})</span>-->
           </div>
         </div>
         <div class="d-flex">
-          <div class="time-picker mt-1 mr-5">
+          <div class="date-time-picker-wrap mt-1 mr-5">
             <v-menu
                 v-model="menuDropdown"
                 :close-on-content-click="false"
@@ -65,6 +65,7 @@
             >
               <template v-slot:activator="{ on, attrs }">
                 <div
+                  class="date-time-picker-text"
                   v-bind="attrs"
                   v-on="on"
                 >
@@ -94,9 +95,9 @@
                       class="calendar"
                       v-model="menuCalendar"
                       :close-on-content-click="false"
-                      nudge-left="300"
-                      nudge-top="308"
-                      max-width="290"
+                      nudge-left="260"
+                      nudge-top="302"
+                      max-width="250"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <div 
@@ -110,14 +111,15 @@
                         </div>
                       </div>
                     </template>
-                    <div>
+                    <div class="date-picker-wrap">
                       <v-date-picker
                           v-model="dates"
+                          :first-day-of-week="1"
                           range
                       ></v-date-picker>
-                      <div class="d-flex justify-space-around p-3">
-                        <div>c {{dates[0]}}</div>
-                        <div>по {{dates[1]}}</div>
+                      <div class="d-flex justify-space-around date-range-wrap">
+                        <div class="date-range-string">c {{dates[0]}}</div>
+                        <div class="date-range-string">по {{dates[1]}}</div>
                       </div>
                       <div class="time-picker d-flex justify-space-around p-3">
                         <input v-model="timeStart" type="time">
@@ -143,6 +145,7 @@
             </v-menu>
           </div>
           <v-btn 
+              class="action-btn"
               dark
               depressed 
               small 
@@ -150,8 +153,8 @@
               :loading="loading"
               @click="launchSearch"
           >
-            <span class="refresh-btn-text">Поиск</span>
-            <v-icon>{{ mdiMagnify }}</v-icon>
+            <span class="action-btn-text">Поиск</span>
+            <v-icon class="action-btn-icon">{{ mdiMagnify }}</v-icon>
           </v-btn>
         </div>
       </div>
@@ -322,30 +325,24 @@ export default {
 
 <style lang="sass" >
 @import ./../../sass/_colors
+
 .textarea
   max-height: 420px
   overflow: auto
-.v-picker__body
-  background-color: $main_bg !important
-  .v-date-picker-table
-    height: 212px
-    .v-btn--text
-      color: $main_text !important
-  .v-date-picker-header
-    button
-      color: $main_text !important
-  th
-    color: $main_text !important
+
 //.calendar
 //  .v-menu__content
 //    max-width: 150px
+.date-time-picker-wrap
+  .date-time-picker-text
+    font-size: 14px
 .v-menu__content
   //width: 150px
   .dropdown-range
     padding: 6px
     max-width: 150px
     .dropdown-range-block
-      margin-bottom: 36px
+      margin-bottom: 32px
     .dropdown-range-title
       font-size: 16px
       font-weight: 600
@@ -361,21 +358,76 @@ export default {
       justify-content: space-between
       .v-icon__svg
         width: 12px
-  .picker-actions
-    padding: 10px
+        
+  .date-picker-wrap
+    .v-picker__body
+      width: 246px !important
+      background-color: $main_bg !important
+      .v-date-picker-header
+        button
+          color: $primary_button !important
+      .v-date-picker-table
+        height: 195px
+        table
+          thead
+            th
+              color: $accent_ui_color !important
+          tbody
+            tr
+              td
+                width: 28px !important
+                button
+                  height: 28px
+                  width: 28px
+                  .v-btn__content
+                    color: $main_text
+                    font-weight: 400
+                    font-size: 14px
+                .accent
+                  background-color: $primary_button !important
+                  .v-btn__content
+                    color: white !important
+                .accent--text
+                  color: $primary_button !important
+                &:nth-child(6), &:nth-child(7)
+                  button
+                    .v-btn__content
+                      color: $error_color
+  .date-range-wrap
+    .date-range-string
+      font-size: 14px
   .time-picker
+    margin-bottom: 10px
     input
-      color: $main_text
-      border: solid $main_text 1px
+      color: $primary_button
+      border: solid $main_border 1px
+      border-color: $main_border !important
       border-radius: 5px
       padding-left: 5px
       padding-right: 5px
+      font-size: 14px
+      &:focus
+        border: solid $primary_button 1px !important
+      &:active
+        border: solid $primary_button 1px !important
+  .picker-actions
+    padding: 10px 0
+    .v-btn__content
+      text-transform: capitalize
+
 .search-block-footer
   .v-input
     padding-top: 0
     margin-top: 0
     .v-input__slot:before
       display: none
+.action-btn
+  .action-btn-text
+    text-transform: capitalize
+    font-size: 14px
+    margin-right: 5px
+  .action-btn-icon
+    width: 20px
 .v-picker__title
   display: none
 

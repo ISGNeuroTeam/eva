@@ -131,9 +131,13 @@ export default {
     color: $main_text
 .menuable__content__active
   width: 400px !important
+.v-menu__content
+  border-radius: 6px !important
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important
 .action-popup
+  box-shadow: none !important
   padding: 0 0 0 0 !important
-  border-radius: 5px
+  border-radius: 6px
   background-color: $main_bg !important
   .action-popup-title
     padding: 5px 10px 5px 10px
