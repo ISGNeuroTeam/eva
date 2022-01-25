@@ -96,7 +96,7 @@
                       v-model="menuCalendar"
                       :close-on-content-click="false"
                       nudge-left="260"
-                      nudge-top="302"
+                      nudge-top="298"
                       max-width="250"
                   >
                     <template v-slot:activator="{ on, attrs }">
@@ -342,7 +342,7 @@ export default {
     padding: 6px
     max-width: 150px
     .dropdown-range-block
-      margin-bottom: 32px
+      margin-bottom: 31px
     .dropdown-range-title
       font-size: 16px
       font-weight: 600
@@ -366,6 +366,9 @@ export default {
       .v-date-picker-header
         button
           color: $primary_button !important
+          font-weight: 500
+          &:first-letter
+            text-transform: uppercase !important
       .v-date-picker-table
         height: 195px
         table
@@ -399,7 +402,8 @@ export default {
   .time-picker
     margin-bottom: 10px
     input
-      color: $primary_button
+      color: $accent_ui_color
+      font-weight: 500
       border: solid $main_border 1px
       border-color: $main_border !important
       border-radius: 5px
@@ -412,8 +416,12 @@ export default {
         border: solid $primary_button 1px !important
   .picker-actions
     padding: 10px 0
-    .v-btn__content
-      text-transform: capitalize
+    .v-btn
+      height: 24px !important
+      .v-btn__content
+        height: 24px !important
+        text-transform: capitalize
+        letter-spacing: 0.25px
 
 .search-block-footer
   .v-input

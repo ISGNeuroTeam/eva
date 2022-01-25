@@ -101,9 +101,7 @@ export default {
       console.log(dataset)
       return dataset
     },
-  },
-  methods: {},
-  mounted() {}
+  }
 }
 
 
@@ -115,7 +113,7 @@ export default {
   .collapse-row 
     border-bottom: 1px solid $main-border
   .v-data-footer
-    border-top: none
+    border-top: none !important
     .v-icon
       color: $main_text
     .v-select__selections

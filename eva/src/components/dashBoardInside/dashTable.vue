@@ -12,7 +12,7 @@
         item-key="none"
         :hide-default-footer="props.hideFooter"
         :footer-props="{
-          itemsPerPageOptions: [100, 500, 1000, -1],
+          itemsPerPageOptions: [10, 100, 500, 1000, -1],
         }"
         :height="height"
         fixed-header
