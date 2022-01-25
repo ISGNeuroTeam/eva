@@ -1137,7 +1137,13 @@ export default {
             this.themesArr = Object.keys(options[item]);
             this.themes = options[item];
           } else  if (item === 'titles') {
-            this.$set(this.options, item, options[item] || []);
+            let val = options[item]
+            if (!val) {
+              // old settings
+              let oldVal = this.$store.getters.getSelectedTableTitles(this.idDash, this.element)
+              val = oldVal || []
+            }
+            this.$set(this.options, item, val);
           } else {
             let val = (options[item] !== null && typeof options[item] === 'object') ? {...options[item]} : options[item]
             this.$set(this.options, item, val);

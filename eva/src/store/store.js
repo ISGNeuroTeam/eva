@@ -725,7 +725,7 @@ export default {
         }
       });
       if (options.titles) {
-        state[options.idDash][options.id].selectedTableTitles = options.titles;
+        state[options.idDash][options.id].selectedTableTitles = options.titles; // deprecated
       }
     },
 
