@@ -52,7 +52,6 @@
             <v-btn
               :dark="isDarkTheme"
               :color="theme.$primary_button"
-              color="primary"
               :disabled="isMinimumValue"
               @click="addValue(-1)"
             >
@@ -61,7 +60,6 @@
             <v-btn
               :dark="isDarkTheme"
               :color="theme.$primary_button"
-              color="primary"
               class="ml-2"
               :disabled="isMaximumValue"
               @click="addValue(1)"
@@ -196,7 +194,7 @@ export default {
     getElementSelected(selected) {
       this.value = selected.elemDeep;
     },
-    changedInputData(val) {
+    changedInputData() {
       this.dataField = null;
       this.value = '';
       this.$store.commit('setSelected', {
