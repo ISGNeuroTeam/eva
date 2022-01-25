@@ -11,7 +11,11 @@
     :resizable="dragRes"
     :data-grid="true"
     :grid="props.grid"
-    :style="{ zIndex: props.zIndex, outlineColor: theme.$accent_ui_color, backgroundColor: theme.$accent_ui_color, }"
+    :style="{
+      zIndex: props.zIndex,
+      outlineColor: theme.$accent_ui_color,
+      backgroundColor: theme.$accent_ui_color,
+    }"
     @resizestop="sendSize"
     @dragstop="sendMove"
     @activated="onActivated"
@@ -65,126 +69,144 @@ export default {
         step: {},
         grid: [60, 60],
       },
-    }
+    };
   },
   computed: {
     theme() {
-      return this.$store.getters.getTheme
+      return this.$store.getters.getTheme;
     },
     id() {
-      return this.dataElem
+      return this.dataElem;
     },
     idDash() {
-      return this.idDashFrom
+      return this.idDashFrom;
     },
     dataMod() {
-      return this.dataModeFrom
+      return this.dataModeFrom;
     },
     dragRes() {
-      let dragRes = this.$store.getters.getDragResize(this.idDash)
-      dragRes === 'true' ? (dragRes = true) : (dragRes = false)
-      return dragRes
+      let dragRes = this.$store.getters.getDragResize(this.idDash);
+      dragRes === 'true' ? (dragRes = true) : (dragRes = false);
+      return dragRes;
     },
     headerTop() {
       if (document.body.clientWidth <= 1400) {
-        return 40
+        return 40;
       } else {
-        return 50
+        return 50;
       }
     },
   },
   watch: {
     top(val) {
-      if (val <= this.headerTop) val = this.headerTop
+      if (val <= this.headerTop) val = this.headerTop;
     },
     left() {
-      let clientWidth = document.querySelector('#app').clientWidth
-      if (this.left < 0) this.left = 0
+      let clientWidth = document.querySelector('#app').clientWidth;
+      if (this.left < 0) this.left = 0;
       if (this.left + this.width > clientWidth) {
-        this.left = clientWidth - this.width
+        this.left = clientWidth - this.width;
       }
     },
     verticalCell() {
-      this.reload++
-      this.createGrid()
-      this.drawElement()
+      this.reload++;
+      this.createGrid();
+      this.drawElement();
     },
     horizontalCell() {
-      this.reload++
-      this.createGrid()
-      this.drawElement()
+      this.reload++;
+      this.createGrid();
+      this.drawElement();
     },
   },
   created() {
-    this.createGrid()
-    this.drawElement()
+    this.createGrid();
+    this.drawElement();
   },
   methods: {
     drawElement() {
-      let pos = this.$store.getters.getPosDash({ idDash: this.idDash, id: this.id })
+      let pos = this.$store.getters.getPosDash({
+        idDash: this.idDash,
+        id: this.id,
+      });
 
-      this.left = pos.left * this.verticalCell
-      this.top = pos.top * this.horizontalCell + this.headerTop
+      this.left = pos.left * this.verticalCell;
+      this.top = pos.top * this.horizontalCell + this.headerTop;
 
-      let size = this.$store.getters.getSizeDash({ idDash: this.idDash, id: this.id })
+      let size = this.$store.getters.getSizeDash({
+        idDash: this.idDash,
+        id: this.id,
+      });
 
-      let width = size.width * this.verticalCell
-      let height = size.height * this.horizontalCell
+      let width = size.width * this.verticalCell;
+      let height = size.height * this.horizontalCell;
 
-      this.width = width
-      this.height = height
+      this.width = width;
+      this.height = height;
     },
     onActivated() {
-      let testElements = document.getElementsByClassName('draggable resizable vdr');
-      let maxZIndex = 1
+      let testElements = document.getElementsByClassName(
+        'draggable resizable vdr'
+      );
+      let maxZIndex = 1;
       for (let i = 0; i < testElements.length; i++) {
-        if(Number(testElements[i].style.zIndex) > maxZIndex) {
-          maxZIndex = Number(testElements[i].style.zIndex)
+        if (Number(testElements[i].style.zIndex) > maxZIndex) {
+          maxZIndex = Number(testElements[i].style.zIndex);
         }
       }
-      this.props.zIndex = maxZIndex + 1
+      this.props.zIndex = maxZIndex + 1;
     },
     sendMove(x, y) {
-      let top = Math.round((y - this.headerTop) / this.horizontalCell)
-      if (top < 0) top = 0
+      let top = Math.round((y - this.headerTop) / this.horizontalCell);
+      if (top < 0) top = 0;
 
-      let left = Math.round(x / this.verticalCell)
-      if (left < 0) left = 0
-      this.$store.commit('setPosDash', { top: top, left: left, id: this.id, idDash: this.idDash })
+      let left = Math.round(x / this.verticalCell);
+      if (left < 0) left = 0;
+      this.$store.commit('setPosDash', {
+        top: top,
+        left: left,
+        id: this.id,
+        idDash: this.idDash,
+      });
     },
     sendSize(x, y, width, height) {
-      let top = Math.round((y - this.headerTop) / this.horizontalCell)
-      let left = Math.round(x / this.verticalCell)
-      this.$store.commit('setPosDash', { top: top, left: left, id: this.id, idDash: this.idDash })
+      let top = Math.round((y - this.headerTop) / this.horizontalCell);
+      let left = Math.round(x / this.verticalCell);
+      this.$store.commit('setPosDash', {
+        top: top,
+        left: left,
+        id: this.id,
+        idDash: this.idDash,
+      });
 
-      let newWidth = Math.round(width / this.verticalCell)
-      let newHeight = Math.round(height / this.horizontalCell)
-      this.height = height
-      this.width = width
+      let newWidth = Math.round(width / this.verticalCell);
+      let newHeight = Math.round(height / this.horizontalCell);
+      this.height = height;
+      this.width = width;
       this.$store.commit('setSizeDash', {
         width: newWidth,
         height: newHeight,
         id: this.id,
         idDash: this.idDash,
-      })
+      });
     },
     changeOpacity(event) {
-      this.opacity = event
+      this.opacity = event;
     },
     createGrid() {
-      this.props.grid = [this.verticalCell, this.horizontalCell]
+      this.props.grid = [this.verticalCell, this.horizontalCell];
     },
-    setRange (range) {
-      this.$emit("SetRange", range);
+    setRange(range) {
+      this.$emit('SetRange', range);
     },
-    resetRange (dataSourseTitle) {
-      this.$emit("ResetRange", dataSourseTitle);
+    resetRange(dataSourseTitle) {
+      this.$emit('ResetRange', dataSourseTitle);
     },
-  }
-}
+  },
+};
 </script>
 
-<style >
+<style>
 .vdr {
   touch-action: none;
   position: absolute;
@@ -251,7 +273,7 @@ export default {
   cursor: se-resize;
 }
 @media only screen and (max-width: 768px) {
-  [class*="handle-"]:before {
+  [class*='handle-']:before {
     content: '';
     left: -10px;
     right: -10px;
@@ -260,6 +282,4 @@ export default {
     position: absolute;
   }
 }
-
- 
 </style>

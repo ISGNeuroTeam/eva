@@ -61,8 +61,8 @@
             >
               <p>Подложка</p>
               <v-select
-                outlined
                 v-model="options.selectedLayer"
+                outlined
                 return-object
                 :items="tileLayers"
                 light
@@ -82,10 +82,10 @@
               >
                 <template v-slot:label>
                   <v-text-field
+                    v-model="options.zoomLevel"
                     outlined
                     dense
                     :dark="theme.$main_text == '#F4F4FA'"
-                    v-model="options.zoomLevel"
                     class="mt-0 pt-0"
                     hide-details
                     single-line
@@ -105,10 +105,10 @@
               >
                 <template v-slot:label>
                   <v-text-field
+                    v-model="options.zoomStep"
                     outlined
                     dense
                     :dark="theme.$main_text == '#F4F4FA'"
-                    v-model="options.zoomStep"
                     class="mt-0 pt-0"
                     hide-details
                     single-line
@@ -122,12 +122,12 @@
               <v-row>
                 <v-col col="6">
                   <v-text-field
+                    v-model="options.initialPoint.x"
                     outlined
                     dense
                     :dark="theme.$main_text == '#F4F4FA'"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
-                    v-model="options.initialPoint.x"
                   >
                     <template v-slot:prepend>
                       <v-button>X:</v-button>
@@ -136,12 +136,12 @@
                 </v-col>
                 <v-col col="6">
                   <v-text-field
+                    v-model="options.initialPoint.y"
                     outlined
                     dense
                     :dark="theme.$main_text == '#F4F4FA'"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
-                    v-model="options.initialPoint.y"
                   >
                     <template v-slot:prepend>
                       <v-button>Y:</v-button>
@@ -170,9 +170,9 @@
 
               <p>ИД для режима мониторинга</p>
               <v-select
+                v-model="options.search"
                 outlined
                 :dark="theme.$main_text == '#F4F4FA'"
-                v-model="options.search"
                 item-text="sid"
                 :items="searches"
                 :return-object="true"
@@ -270,8 +270,8 @@
                 <template v-else-if="item.background_color">
                   <v-list-item-avatar
                     size="20px"
-                    v-html="createHtmlIcon(item)"
                     style="align-self: center; border-radius: 0%"
+                    v-html="createHtmlIcon(item)"
                   />
 
                   <v-list-item-title
@@ -312,11 +312,11 @@
 </template>
 
 <script>
-import { mdiFormatListBulletedSquare, mdiSettings } from "@mdi/js";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import "leaflet.tilelayer.colorfilter";
-import "leaflet.markercluster";
+import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.tilelayer.colorfilter';
+import 'leaflet.markercluster';
 export default {
   props: {
     idElement: String,
@@ -327,7 +327,7 @@ export default {
   data() {
     return {
       toggleSelect: false,
-      mode: ["Мониторинг", "Сравнение", "Аналитика", "Поиск", "Режим 5"],
+      mode: ['Мониторинг', 'Сравнение', 'Аналитика', 'Поиск', 'Режим 5'],
       mdiSettings: mdiSettings,
       mdiList: mdiFormatListBulletedSquare,
       dialog: false,
@@ -336,33 +336,33 @@ export default {
       searches: [],
       tileLayers: [
         {
-          name: "Заданная в настройках",
+          name: 'Заданная в настройках',
           tile: [],
         },
         {
-          name: "Google спутник",
+          name: 'Google спутник',
           tile: [
-            "http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}",
+            'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
             {
-              subdomains: ["mt0", "mt1", "mt2", "mt3"],
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
               attribution: '<a http="google.ru" target="_blank">Google</a>',
             },
           ],
         },
         {
-          name: "Google карты",
+          name: 'Google карты',
           tile: [
-            "http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}",
+            'http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
             {
-              subdomains: ["mt0", "mt1", "mt2", "mt3"],
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
               attribution: '<a http="google.ru" target="_blank">Google</a>',
             },
           ],
         },
       ],
       options: {
-        selected: "яндекс",
-        selectedLayer: "",
+        selected: 'яндекс',
+        selectedLayer: '',
         zoomLevel: 10,
         zoomStep: 0.01,
         initialPoint: {
@@ -370,8 +370,8 @@ export default {
           y: 74.35169122692963,
         },
         showLegend: true,
-        mode: "",
-        search: "",
+        mode: '',
+        search: '',
       },
     };
   },
@@ -413,7 +413,7 @@ export default {
         selectedLayer: this.options.selectedLayer,
         initialPoint: this.options.initialPoint,
       };
-      this.$store.commit("setOptions", {
+      this.$store.commit('setOptions', {
         idDash: this.idDashFrom,
         id: this.idElement,
         options: initOptions,
@@ -426,7 +426,7 @@ export default {
   },
   methods: {
     onClickChoosingCoordinates(e) {
-      const cursorCssClass = "cursor-crosshair";
+      const cursorCssClass = 'cursor-crosshair';
       this.dialog = false;
       L.DomUtil.addClass(this.map._container, cursorCssClass);
       const clickEvent = (event) => {
@@ -434,15 +434,15 @@ export default {
         L.DomUtil.removeClass(this.map._container, cursorCssClass);
         this.options.initialPoint.x = event.latlng.lat;
         this.options.initialPoint.y = event.latlng.lng;
-        this.map.off("click", clickEvent);
+        this.map.off('click', clickEvent);
       };
-      this.map.on("click", clickEvent);
+      this.map.on('click', clickEvent);
     },
     updatePipeDataSource(e) {
       let set = new Set(e);
       set.delete(this.options.mode[0]);
       this.options.mode = Array.from(set);
-      this.$emit("updatePipeDataSource", this.options.search);
+      this.$emit('updatePipeDataSource', this.options.search);
     },
     loadDataForPipe() {
       let searches = this.$store.getters.getSearches(this.idDashFrom);
@@ -453,12 +453,12 @@ export default {
     },
     createHtmlIcon(lib) {
       let {
-        text_color: textColor = "#FFFFFF",
-        background_color: color = "65, 62, 218",
+        text_color: textColor = '#FFFFFF',
+        background_color: color = '65, 62, 218',
         opacity = 0.6,
-        label_field: text = "КП-240",
-        border_radius: borderRadius = "2px",
-        border = "none",
+        label_field: text = 'КП-240',
+        border_radius: borderRadius = '2px',
+        border = 'none',
         width = 20,
         height = 20,
       } = lib;
@@ -479,7 +479,7 @@ export default {
     },
     updateTileLayer(e) {
       this.map.removeLayer(this.currentTile);
-      if (typeof e.tile === "string") {
+      if (typeof e.tile === 'string') {
         let temp = e.tile;
         temp = [temp];
         this.currentTile = L.tileLayer(...temp);
@@ -493,7 +493,7 @@ export default {
     },
 
     updateOptions(newOptions) {
-      this.$store.commit("updateOptions", {
+      this.$store.commit('updateOptions', {
         idDash: this.idDashFrom,
         idElement: this.idElement,
         options: { ...this.dashSettings, ...newOptions },
@@ -507,41 +507,41 @@ export default {
       }
 
       if (
-        typeof this.options.timeFormat != "undefined" &&
+        typeof this.options.timeFormat != 'undefined' &&
         this.options.timeFormat == null
       ) {
-        this.options.timeFormat = "%Y-%m-%d %H:%M:%S";
+        this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
       }
-      if (typeof this.options.size != "undefined") {
+      if (typeof this.options.size != 'undefined') {
         if (this.options.size == null) {
-          this.options.size = "100px";
-        } else if (String(this.options.size).indexOf("px") == -1) {
+          this.options.size = '100px';
+        } else if (String(this.options.size).indexOf('px') == -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
       //let options = {...{},...this.options};
-      if (this.element.indexOf("csvg") != -1) {
+      if (this.element.indexOf('csvg') != -1) {
         this.options.tooltip = this.tooltip;
       }
-      if (this.element.indexOf("piechart") != -1) {
+      if (this.element.indexOf('piechart') != -1) {
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation)
         );
         this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme == "custom") {
+        if (this.colorsPie.theme == 'custom') {
           this.themes[this.colorsPie.nametheme] =
-            this.colorsPie.colors.split(",");
+            this.colorsPie.colors.split(',');
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
       }
-      if (this.element.indexOf("multiLine") != -1) {
+      if (this.element.indexOf('multiLine') != -1) {
         let updateMetrics = this.metrics.map((item) => {
           return JSON.parse(JSON.stringify(item));
         });
-        this.$set(this.options, "metrics", updateMetrics);
+        this.$set(this.options, 'metrics', updateMetrics);
       }
-      this.$store.commit("setOptions", {
+      this.$store.commit('setOptions', {
         idDash: this.idDash,
         id: this.element,
         options: this.options,
@@ -553,7 +553,7 @@ export default {
 };
 </script>
 
-<style lang="sass" >
+<style lang="sass">
 .theme--light.v-select .v-select__selections
   color: var(--main_text) !important
 

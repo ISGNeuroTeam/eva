@@ -1,42 +1,52 @@
-import  rest from './storeRest.js';
-import Vue from "vue";
-export default  {
-  state: {
-
-  },
+import rest from './storeRest.js';
+import Vue from 'vue';
+export default {
+  state: {},
   mutations: {
-    setCreateForm: (state,options) => {
-      Vue.set(state, 'createForm',   options);
+    setCreateForm: (state, options) => {
+      Vue.set(state, 'createForm', options);
     },
-    saveForm: (state,form) => {
+    saveForm: (state, form) => {
       rest.saveForm(form);
     },
     saveTemplateForm: (state) => {
-      let template = {name: state.createForm.name, cells: state.createForm.cells};
+      let template = {
+        name: state.createForm.name,
+        cells: state.createForm.cells,
+      };
       rest.saveTemplateForm(template);
     },
-    setTemplate:  (state,cells) => {
+    setTemplate: (state, cells) => {
       if (!state.createForm) {
-        Vue.set(state, 'createForm', {name: '', rows: '', columns: '', disabled: false});
+        Vue.set(state, 'createForm', {
+          name: '',
+          rows: '',
+          columns: '',
+          disabled: false,
+        });
       }
       state.createForm.cells = cells;
     },
-    setOptionsForm:  (state,options) => {
+    setOptionsForm: (state, options) => {
       if (!state.createForm.cells[options.element].options) {
         state.createForm.cells[options.element].options = {};
       }
       state.createForm.cells[options.element].options = {};
-      Object.keys(options.options).forEach( item => {
-        Vue.set(state.createForm.cells[options.element].options,  item, options.options[item]);
-      })
+      Object.keys(options.options).forEach((item) => {
+        Vue.set(
+          state.createForm.cells[options.element].options,
+          item,
+          options.options[item]
+        );
+      });
     },
-    setContent:  (state,content) => {
+    setContent: (state, content) => {
       if (!state.createForm.content) {
-        state.createForm.content = {}
+        state.createForm.content = {};
       }
       state.createForm.content[content.id] = content.value;
     },
-    setAllContent: (state,content) => {
+    setAllContent: (state, content) => {
       if (!state.createForm.content) {
         state.createForm.content = {};
       }
@@ -44,78 +54,71 @@ export default  {
         state.createForm.content = content;
       } else {
         state.createForm.content = {};
-      }     
+      }
     },
-    setDisabled: (state,disabled) => {
+    setDisabled: (state, disabled) => {
       state.createForm.disabled = disabled;
     },
-    deleteTemplate: (state,id) => {
+    deleteTemplate: (state, id) => {
       rest.deleteTemplate(id);
-    }
+    },
   },
-  actions: {
-
-  },
+  actions: {},
   getters: {
     getCreateForm: (state) => {
-      return state.createForm
+      return state.createForm;
     },
     getAllForm: () => {
       return (id) => {
-        return  rest.getAllForm(id); 
-      }
+        return rest.getAllForm(id);
+      };
     },
-    getOption: (state) => { 
+    getOption: (state) => {
       return (options) => {
-        
         if (state.createForm.cells[options.key].options) {
-          return state.createForm.cells[options.key].options
+          return state.createForm.cells[options.key].options;
         } else {
-          return 'empty'
+          return 'empty';
         }
-      }
+      };
     },
     getFormLocal: (state) => {
-      return state.createForm.cells
+      return state.createForm.cells;
     },
     getFormContent: () => {
       return (ids) => {
-        return  rest.getFormContent(ids); 
-      }
+        return rest.getFormContent(ids);
+      };
     },
     getContent: (state) => {
       return (id) => {
         if (state.createForm.content) {
-          return state.createForm.content[id]
+          return state.createForm.content[id];
         } else {
-          return 'empty'
-        }         
-      }
+          return 'empty';
+        }
+      };
     },
     getAllContent: (state) => {
       if (state.createForm.content) {
-        return state.createForm.content
+        return state.createForm.content;
       } else {
-        return 'empty'
-      }    
+        return 'empty';
+      }
     },
-    getAllTemplates:  () => {
-      return  rest.getTemplateList();
+    getAllTemplates: () => {
+      return rest.getTemplateList();
     },
     getTemplate: () => {
       return (id) => {
-        return  rest.getTemplate(id);      
-      }
+        return rest.getTemplate(id);
+      };
     },
     getDisabled: (state) => {
       if (!state.createForm.disabled) {
         state.createForm.disabled = false;
       }
-      return state.createForm.disabled 
-    }
-  }
+      return state.createForm.disabled;
+    },
+  },
 };
-
-
-
-

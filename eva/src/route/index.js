@@ -1,20 +1,20 @@
 // натсройки для переадресации на другие компоненты
-import Vue from "vue"
+import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueJWT from 'vuejs-jwt';
 
 Vue.use(VueRouter);
 Vue.use(VueJWT, { storage: 'cookie', keyName: 'eva_token' });
 
-const routes =  [
+const routes = [
   {
     name: 'Авторизация',
-    path: '/',  // если главная страница
+    path: '/', // если главная страница
     component: require('../components/autorization/autorization.vue').default,
   },
   {
     name: 'Главная',
-    path: '/main',  // если главная страница
+    path: '/main', // если главная страница
     component: require('../components/autorization/mainPage.vue').default,
     meta: {
       requiresAuth: true,
@@ -22,7 +22,7 @@ const routes =  [
   },
   {
     name: 'Профиль',
-    path: '/profile/',  // если главная страница
+    path: '/profile/', // если главная страница
     component: require('../components/autorization/profile.vue').default,
     meta: {
       requiresAuth: true,
@@ -30,7 +30,7 @@ const routes =  [
   },
   {
     name: 'Репорты',
-    path: '/reports',  // если главная страница
+    path: '/reports', // если главная страница
     component: require('../components/reports.vue').default,
     meta: {
       requiresAuth: true,
@@ -38,7 +38,7 @@ const routes =  [
   },
   {
     name: 'Исследование данных',
-    path: '/data-research',  // если главная страница
+    path: '/data-research', // если главная страница
     component: require('../components/reportsV2/index.vue').default,
     meta: {
       requiresAuth: true,
@@ -46,7 +46,7 @@ const routes =  [
   },
   {
     name: 'Документы',
-    path: '/papers',  // если главная страница
+    path: '/papers', // если главная страница
     component: require('../components/papers.vue').default,
     meta: {
       requiresAuth: true,
@@ -54,7 +54,7 @@ const routes =  [
   },
   {
     name: 'Дашборды',
-    path: '/dashboards',  // если главная страница
+    path: '/dashboards', // если главная страница
     component: require('../components/mainPageDash.vue').default,
     meta: {
       requiresAuth: true,
@@ -62,7 +62,7 @@ const routes =  [
   },
   {
     name: 'Дашборд',
-    path: '/dashboards/:id',  // если страница дашборда
+    path: '/dashboards/:id', // если страница дашборда
     component: require('../components/mainTitle.vue').default,
     props: true,
     meta: {
@@ -71,7 +71,7 @@ const routes =  [
   },
   {
     name: 'Дашборд',
-    path: '/dashboards/:id/:tabId',  // если страница дашборда
+    path: '/dashboards/:id/:tabId', // если страница дашборда
     component: require('../components/mainTitle.vue').default,
     props: true,
     meta: {
@@ -80,7 +80,7 @@ const routes =  [
   },
   {
     name: 'Формы',
-    path: '/forms/',  // если страница форм
+    path: '/forms/', // если страница форм
     component: require('../components/forms/formMain.vue').default,
     meta: {
       requiresAuth: true,
@@ -88,7 +88,7 @@ const routes =  [
   },
   {
     name: 'Открытая форма',
-    path: '/forms/open/',  // если страница форм
+    path: '/forms/open/', // если страница форм
     component: require('../components/forms/formOpen.vue').default,
     props: true,
     meta: {
@@ -97,7 +97,7 @@ const routes =  [
   },
   {
     name: 'Форма редактирования',
-    path: '/forms/edit/',  // если страница форм
+    path: '/forms/edit/', // если страница форм
     component: require('../components/forms/formEdit.vue').default,
     props: true,
     meta: {
@@ -106,7 +106,7 @@ const routes =  [
   },
   {
     name: 'Список формы',
-    path: '/forms/openlist/:id',  // если страница форм
+    path: '/forms/openlist/:id', // если страница форм
     component: require('../components/forms/formOpenList.vue').default,
     meta: {
       requiresAuth: true,
@@ -114,14 +114,14 @@ const routes =  [
   },
   {
     name: 'Форма',
-    path: '/forms/:id',  // если страница форм
+    path: '/forms/:id', // если страница форм
     component: require('../components/forms/formMain.vue').default,
     meta: {
       requiresAuth: true,
     },
   },
   {
-    path: '*',  // если любая другая в том числе не существующая то
+    path: '*', // если любая другая в том числе не существующая то
     component: require('../components/notFound.vue').default,
   },
 ];
@@ -144,4 +144,3 @@ router.beforeEach((to, from, next) => {
 });
 
 export default router;
-

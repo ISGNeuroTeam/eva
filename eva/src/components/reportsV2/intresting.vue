@@ -1,66 +1,67 @@
 <template>
+  <div
+    class="interesting"
+    :style="{ background: theme.$main_bg, color: theme.$main_text }"
+  >
     <div
-        class="interesting"
-        :style="{background: theme.$main_bg, color: theme.$main_text}"
+      class="interesting-block"
+      :style="{ background: theme.$main_bg, color: theme.$main_text }"
     >
+      <div class="interesting-title">Interesting field</div>
       <div
-          class="interesting-block"
-          :style="{background: theme.$main_bg, color: theme.$main_text}"
+        class="interesting-overflow-block"
+        :style="{ color: theme.$main_text }"
       >
-        <div class="interesting-title">
-          Interesting field
-        </div>
-        <div
-            class="interesting-overflow-block"
-            :style="{color:theme.$main_text}"
-        >
-          <div
-              v-for="item in rows"
-              :key="item.id"
-              class="interesting-row"
-          >
-
-            <v-menu offset-x>
-              <template v-slot:activator="{ on, attrs }">
-                <div
-                    @click="openStatistic(item)"
-                    v-bind="attrs"
-                    v-on="on"
-                >
-                  <span class="interesting-row-name">{{ item.text }} </span>
-                  <span class="interesting-row-number">{{ item.totalCount }}</span>
-                </div>
-              </template>
-              <v-card class="action-popup">
-                <div class="action-popup-title">
-                  Actions
-                </div>
-                <div>
-                  <v-data-table
-                      :style="{backgroundColor:theme.$main_bg, color: theme.$main_text, 'max-height': '500px'}"
-                      disable-pagination
-                      hide-default-footer
-                      :headers="[{ text: 'value', value: 'value' },{ text: 'count', value: 'count' },{ text: '%', value: '%' }]"
-                      :items="statistic"
-                  />
-                </div>
-              </v-card>
-            </v-menu>
-          </div>
+        <div v-for="item in rows" :key="item.id" class="interesting-row">
+          <v-menu offset-x>
+            <template v-slot:activator="{ on, attrs }">
+              <div v-bind="attrs" @click="openStatistic(item)" v-on="on">
+                <span class="interesting-row-name">{{ item.text }} </span>
+                <span class="interesting-row-number">{{
+                  item.totalCount
+                }}</span>
+              </div>
+            </template>
+            <v-card class="action-popup">
+              <div class="action-popup-title">Actions</div>
+              <div>
+                <v-data-table
+                  :style="{
+                    backgroundColor: theme.$main_bg,
+                    color: theme.$main_text,
+                    'max-height': '500px',
+                  }"
+                  disable-pagination
+                  hide-default-footer
+                  :headers="[
+                    { text: 'value', value: 'value' },
+                    { text: 'count', value: 'count' },
+                    { text: '%', value: '%' },
+                  ]"
+                  :items="statistic"
+                />
+              </div>
+            </v-card>
+          </v-menu>
         </div>
       </div>
     </div>
+  </div>
 </template>
 
-
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronRight, mdiChevronDown } from '@mdi/js'
+import {
+  mdiRefresh,
+  mdiMagnify,
+  mdiChevronRight,
+  mdiChevronDown,
+} from '@mdi/js';
 
 export default {
   props: {
     rows: [],
   },
-  data () {
+  data() {
     return {
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
@@ -68,15 +69,15 @@ export default {
       mdiChevronDown: mdiChevronDown,
       statistic: [],
       statisticKey: null,
-    }
+    };
   },
   computed: {
-    theme () {
-      return this.$store.getters.getTheme
+    theme() {
+      return this.$store.getters.getTheme;
     },
-    dataset () {
-      let dataset = []
-      this.data.forEach(item => {
+    dataset() {
+      let dataset = [];
+      this.data.forEach((item) => {
         let options = {
           hour12: 'true',
           hour: 'numeric',
@@ -84,16 +85,20 @@ export default {
           second: 'numeric',
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric'
+          year: 'numeric',
         };
-        dataset.push({time: new Date(item._time*1000).toLocaleString("ru", options), inputCount: item})
-      })
-      console.log(dataset)
-      return dataset
+        dataset.push({
+          time: new Date(item._time * 1000).toLocaleString('ru', options),
+          inputCount: item,
+        });
+      });
+      console.log(dataset);
+      return dataset;
     },
   },
+  mounted() {},
   methods: {
-    openStatistic: function(statistic) {
+    openStatistic: function (statistic) {
       if (this.showStatistic) {
         if (this.statisticKey == statistic.text) {
           // this.showStatistic = false;
@@ -108,13 +113,10 @@ export default {
       }
     },
   },
-  mounted() {}
-}
-
-
+};
 </script>
 
-<style lang="sass" >
+<style lang="sass">
 @import './../../sass/_colors'
 .interesting
   .interesting-title
