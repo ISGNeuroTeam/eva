@@ -92,8 +92,8 @@
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">Гибкий поиск</div>
                   <v-menu
-                      class="calendar"
                       v-model="menuCalendar"
+                      class="calendar"
                       :close-on-content-click="false"
                       nudge-left="260"
                       nudge-top="298"
@@ -434,6 +434,8 @@ export default {
     text-transform: capitalize
     font-size: 14px
     margin-right: 5px
+    letter-spacing: 0.25px
+    font-weight: 400
   .action-btn-icon
     width: 20px
 .v-picker__title
