@@ -360,13 +360,13 @@ export default {
       });
     },
     createTitles: function (result) {
-      if (this.options.titles && this.options.titles.length) {
+      if (this.options.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map(x => ({
           text: x,
           value: x,
           sortable: true,
-          align: this.options.titles.includes(x) ? undefined : ' d-none'
+          align: (this.options.titles.length === 0 || this.options.titles.includes(x)) ? undefined : ' d-none'
         }));
       } else {
         if (result && result.length) {

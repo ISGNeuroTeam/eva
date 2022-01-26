@@ -469,6 +469,8 @@
             </v-container>
           </div>
 
+          <pre style="color: yellow">{{ options }}</pre>
+
           <v-card-text
             v-if="checkOptions('piechartSettings')"
             class="headline "
@@ -785,8 +787,6 @@
 import settings from "../js/componentsSettings.js";
 
 import { mdiMinusBox, mdiPlusBox } from "@mdi/js";
-import { mapGetters } from "vuex";
-import Vue from "vue";
 
 export default {
   props: {
@@ -872,6 +872,7 @@ export default {
   },
   watch: {
     changeComponent(val){
+      this.options = {}
       this.loadComponentsSettings()
       this.prepareOptions()
     },
@@ -1141,9 +1142,18 @@ export default {
             if (!val) {
               // old settings
               let oldVal = this.$store.getters.getSelectedTableTitles(this.idDash, this.element)
-              val = oldVal || []
+              if (oldVal) {
+                val = oldVal
+              }
             }
-            this.$set(this.options, item, val);
+            // если не выбраны заголовки то выделить все имеющиеся
+            if (val.length === 0) {
+              let allTitles = this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+              if (allTitles.length) {
+                val = [...allTitles]
+              }
+            }
+            this.$set(this.options, item, val || []);
           } else {
             let val = (options[item] !== null && typeof options[item] === 'object') ? {...options[item]} : options[item]
             this.$set(this.options, item, val);
