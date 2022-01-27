@@ -1,7 +1,7 @@
 <template>
   <div
     class="timeline"
-    :style="{background: theme.$main_bg, color: theme.$main_text}"
+    :style="{ background: theme.$main_bg, color: theme.$main_text }"
   >
     <div class="select-wrap p-5">
       <div>
@@ -18,27 +18,19 @@
           <span class="scale-btn-text">Исходный вид</span>
         </v-btn>
       </div>
-      <v-menu
-          v-model="menuDropdown"
-          offset-y
-          max-width="180"
-          class="select"
-      >
+      <v-menu v-model="menuDropdown" offset-y max-width="180" class="select">
         <template v-slot:activator="{ on, attrs }">
-          <div
-              v-bind="attrs"
-              v-on="on"
-          >
+          <div v-bind="attrs" v-on="on">
             <span style="font-size: 15px">{{ select.text }}</span>
             <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
           </div>
         </template>
         <v-list>
           <v-list-item
-              v-for="item in periodItemsSelect"
-              :key="item.value"
-              link
-              @click="setTimePeriod(item)"
+            v-for="item in periodItemsSelect"
+            :key="item.value"
+            link
+            @click="setTimePeriod(item)"
           >
             <v-list-item-title v-text="item.text"></v-list-item-title>
           </v-list-item>
@@ -46,13 +38,19 @@
       </v-menu>
     </div>
     <svg ref="chart" class="chart1" height="50" style="width: 100%"></svg>
-    {{dataset}}
+    {{ dataset }}
   </div>
 </template>
 
 <script>
-import * as d3 from "d3";
-import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiPlus, mdiMinus  } from '@mdi/js'
+import * as d3 from 'd3';
+import {
+  mdiRefresh,
+  mdiMagnify,
+  mdiChevronDown,
+  mdiPlus,
+  mdiMinus,
+} from '@mdi/js';
 
 export default {
   props: {
@@ -76,18 +74,18 @@ export default {
       mdiMagnify: mdiMagnify,
       mdiChevronDown: mdiChevronDown,
       mdiPlus: mdiPlus,
-      mdiMinus: mdiMinus
-    }
+      mdiMinus: mdiMinus,
+    };
   },
   computed: {
     theme() {
       return this.$store.getters.getTheme;
     },
-    dataset () {
-      let minTime = this.data[0]?._time
-      let maxTime = this.data[0]?._time
-      console.log(this.data)
-      this.data.forEach(item => {
+    dataset() {
+      let minTime = this.data[0]?._time;
+      let maxTime = this.data[0]?._time;
+      console.log(this.data);
+      this.data.forEach((item) => {
         if (item._time < minTime) {
           minTime = item._time;
         }
@@ -95,27 +93,27 @@ export default {
           maxTime = item._time;
         }
       });
-      let barTime = minTime
-      let dataset = {}
-      let newDate
-      let datasetItemString
-      let deltaTime
-      let getActualLongData
+      let barTime = minTime;
+      let dataset = {};
+      let newDate;
+      let datasetItemString;
+      let deltaTime;
+      let getActualLongData;
       if (this.select.value === 'min') {
-        getActualLongData = this.getUntilMin
-        deltaTime = 60
+        getActualLongData = this.getUntilMin;
+        deltaTime = 60;
       } else if (this.select.value === 'hour') {
-        getActualLongData = this.getUntilHours
-        deltaTime = 3600
+        getActualLongData = this.getUntilHours;
+        deltaTime = 3600;
       } else if (this.select.value === 'day') {
-        getActualLongData = this.getUntilDay
-        deltaTime = 86400
+        getActualLongData = this.getUntilDay;
+        deltaTime = 86400;
       } else {
-        getActualLongData = this.getUntilMonth
-        deltaTime = 2592000
+        getActualLongData = this.getUntilMonth;
+        deltaTime = 2592000;
       }
-      while (barTime<maxTime) {
-        newDate = new Date(barTime*1000);
+      while (barTime < maxTime) {
+        newDate = new Date(barTime * 1000);
 
         if (this.select.value === 'month') {
           let newDateMonth = newDate.getMonth();
@@ -148,12 +146,16 @@ export default {
         }
       });
       if (Object.keys(dataset).length > 0) {
-        for ( let i = Object.keys(dataset).length; i<this.numberInTimeline; i++) {
-          dataset['100'+i] = 0
+        for (
+          let i = Object.keys(dataset).length;
+          i < this.numberInTimeline;
+          i++
+        ) {
+          dataset['100' + i] = 0;
         }
       }
-      if (Object.keys(dataset).length > 0) { 
-        this.clearSVG(dataset)
+      if (Object.keys(dataset).length > 0) {
+        this.clearSVG(dataset);
       }
       return null;
     },
@@ -178,52 +180,60 @@ export default {
       }
       return period;
     },
-    getUntilMin (date) {
+    getUntilMin(date) {
       let options1 = {
         hour12: 'true',
         hour: 'numeric',
-        minute: 'numeric'
+        minute: 'numeric',
       };
       let options2 = {
         day: '2-digit',
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
       };
-      return new Intl.DateTimeFormat("ru", options1).format(date) + ' - ' + new Intl.DateTimeFormat("ru", options2).format(date).slice(0, -3)
+      return (
+        new Intl.DateTimeFormat('ru', options1).format(date) +
+        ' - ' +
+        new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)
+      );
     },
-    getUntilHours (date) {
+    getUntilHours(date) {
       let options1 = {
         hour12: 'true',
-        hour: 'numeric'
+        hour: 'numeric',
       };
       let options2 = {
         day: '2-digit',
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
       };
-      return new Intl.DateTimeFormat("ru", options1).format(date) + ' - ' + new Intl.DateTimeFormat("ru", options2).format(date).slice(0, -3)
+      return (
+        new Intl.DateTimeFormat('ru', options1).format(date) +
+        ' - ' +
+        new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)
+      );
     },
-    getUntilDay (date) {
+    getUntilDay(date) {
       let options = {
         day: '2-digit',
         month: 'long',
-        year: 'numeric'
-      }
-      return new Intl.DateTimeFormat("ru", options).format(date).slice(0, -3)
+        year: 'numeric',
+      };
+      return new Intl.DateTimeFormat('ru', options).format(date).slice(0, -3);
     },
-    getUntilMonth (date) {
+    getUntilMonth(date) {
       let options = {
         month: 'long',
-        year: 'numeric'
-      }
-      return new Intl.DateTimeFormat("ru", options).format(date).slice(0, -3)
+        year: 'numeric',
+      };
+      return new Intl.DateTimeFormat('ru', options).format(date).slice(0, -3);
     },
-    clearSVG (dataset) {
+    clearSVG(dataset) {
       d3.select('.block-tooltip')
-          .nodes()
-          .forEach((item) => {
-            item.remove()
-          })
+        .nodes()
+        .forEach((item) => {
+          item.remove();
+        });
       d3.selectAll('rect')
         .nodes()
         .forEach((item) => {
@@ -233,35 +243,36 @@ export default {
     },
     plusScale() {
       if (this.numberInTimeline < 10) {
-        this.numberInTimeline = 5
+        this.numberInTimeline = 5;
       } else {
-        this.numberInTimeline -= 5
+        this.numberInTimeline -= 5;
       }
     },
     minusScale() {
       if (this.numberInTimeline > 45) {
-        this.numberInTimeline = 50
+        this.numberInTimeline = 50;
       } else {
-        this.numberInTimeline += 5
+        this.numberInTimeline += 5;
       }
     },
     refreshScale() {
-      this.numberInTimeline = 25
+      this.numberInTimeline = 25;
     },
-    renderSVG (dataset) {
-      let marge = { top: 0, bottom: 0, left: 0, right: 0 }
-      let svg = d3.select('.chart1')
-      let width = this.$refs.chart.clientWidth
-      let height = this.$refs.chart.clientHeight
-      let g = svg.append('g')
-          .attr('transform', 'translate(' + marge.top + ',' + marge.left + ')')
-      let dataForSvg = []
+    renderSVG(dataset) {
+      let marge = { top: 0, bottom: 0, left: 0, right: 0 };
+      let svg = d3.select('.chart1');
+      let width = this.$refs.chart.clientWidth;
+      let height = this.$refs.chart.clientHeight;
+      let g = svg
+        .append('g')
+        .attr('transform', 'translate(' + marge.top + ',' + marge.left + ')');
+      let dataForSvg = [];
       for (let dataItem in dataset) {
         dataForSvg.push({ time: dataItem, value: dataset[dataItem] });
       }
-      dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline)
-      let maxY = dataForSvg[0].value
-      dataForSvg.forEach(element => {
+      dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline);
+      let maxY = dataForSvg[0].value;
+      dataForSvg.forEach((element) => {
         if (element.value > maxY) {
           maxY = element.value;
         }
@@ -305,31 +316,34 @@ export default {
         .text('Simple text');
 
       gs.append('rect')
-          .attr('x', function (d, i) {
-            return xScale(i) + rectPadding / 2
-          })
-          .attr('y', function (d) {
-            return yScale(d.value)
-          })
-          .attr('width', function () {
-            return xScale.step() - rectPadding
-          })
-          .attr('height', function (d) {
-            return height - marge.top - marge.bottom - yScale(d.value)
-          })
-          .attr('fill', 'rgba(76, 217, 100, 0.7)')
-          .on("mouseover", d => { 
-            console.log(d); 
-            tooltip.html( 'Событий (' + d.value + ')' + '<br>' + d.time );
-            tooltip.style("display", "block");
-            return tooltip.style("visibility", "visible")
-          })
-          .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX-10)+"px");})
-          .on("mouseout", () => tooltip.style("visibility", "hidden"))
-    }
-  }
-}
-
+        .attr('x', function (d, i) {
+          return xScale(i) + rectPadding / 2;
+        })
+        .attr('y', function (d) {
+          return yScale(d.value);
+        })
+        .attr('width', function () {
+          return xScale.step() - rectPadding;
+        })
+        .attr('height', function (d) {
+          return height - marge.top - marge.bottom - yScale(d.value);
+        })
+        .attr('fill', 'rgba(76, 217, 100, 0.7)')
+        .on('mouseover', (d) => {
+          console.log(d);
+          tooltip.html('Событий (' + d.value + ')' + '<br>' + d.time);
+          tooltip.style('display', 'block');
+          return tooltip.style('visibility', 'visible');
+        })
+        .on('mousemove', function () {
+          return tooltip
+            .style('top', d3.event.pageY - 60 + 'px')
+            .style('left', d3.event.pageX - 10 + 'px');
+        })
+        .on('mouseout', () => tooltip.style('visibility', 'hidden'));
+    },
+  },
+};
 </script>
 
 <style lang="sass">

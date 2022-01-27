@@ -12,27 +12,19 @@
         class="interesting-overflow-block"
         :style="{ color: theme.$main_text }"
       >
-        <div class="interesting-title">
-          Interesting fields
-        </div>
+        <div class="interesting-title">Interesting fields</div>
         <div
-            class="interesting-overflow-block"
-            :style="{color:theme.$main_text}"
+          class="interesting-overflow-block"
+          :style="{ color: theme.$main_text }"
         >
-          <div
-              v-for="item in rows"
-              :key="item.id"
-              class="interesting-row"
-          >
+          <div v-for="item in rows" :key="item.id" class="interesting-row">
             <v-menu offset-x :close-on-content-click="false">
               <template v-slot:activator="{ on, attrs }">
-                <div
-                    @click="openStatistic(item)"
-                    v-bind="attrs"
-                    v-on="on"
-                >
+                <div v-bind="attrs" @click="openStatistic(item)" v-on="on">
                   <span class="interesting-row-name">{{ item.text }} </span>
-                  <span class="interesting-row-number">{{ item.totalCount }}</span>
+                  <span class="interesting-row-number">{{
+                    item.totalCount
+                  }}</span>
                 </div>
               </template>
               <v-card class="action-popup">
@@ -41,11 +33,19 @@
                 </div>
                 <div>
                   <v-data-table
-                      :style="{backgroundColor:theme.$main_bg, color: theme.$main_text, 'max-height': '500px'}"
-                      disable-pagination
-                      hide-default-footer
-                      :headers="[{ text: 'Значение', value: 'value' },{ text: 'Количество', value: 'count' },{ text: 'Процент', value: '%' }]"
-                      :items="statistic"
+                    :style="{
+                      backgroundColor: theme.$main_bg,
+                      color: theme.$main_text,
+                      'max-height': '500px',
+                    }"
+                    disable-pagination
+                    hide-default-footer
+                    :headers="[
+                      { text: 'Значение', value: 'value' },
+                      { text: 'Количество', value: 'count' },
+                      { text: 'Процент', value: '%' },
+                    ]"
+                    :items="statistic"
                   />
                 </div>
               </v-card>
