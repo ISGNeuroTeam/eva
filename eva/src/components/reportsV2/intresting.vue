@@ -12,37 +12,45 @@
         class="interesting-overflow-block"
         :style="{ color: theme.$main_text }"
       >
-        <div v-for="item in rows" :key="item.id" class="interesting-row">
-          <v-menu offset-x>
-            <template v-slot:activator="{ on, attrs }">
-              <div v-bind="attrs" @click="openStatistic(item)" v-on="on">
-                <span class="interesting-row-name">{{ item.text }} </span>
-                <span class="interesting-row-number">{{
-                  item.totalCount
-                }}</span>
-              </div>
-            </template>
-            <v-card class="action-popup">
-              <div class="action-popup-title">Actions</div>
-              <div>
-                <v-data-table
-                  :style="{
-                    backgroundColor: theme.$main_bg,
-                    color: theme.$main_text,
-                    'max-height': '500px',
-                  }"
-                  disable-pagination
-                  hide-default-footer
-                  :headers="[
-                    { text: 'value', value: 'value' },
-                    { text: 'count', value: 'count' },
-                    { text: '%', value: '%' },
-                  ]"
-                  :items="statistic"
-                />
-              </div>
-            </v-card>
-          </v-menu>
+        <div class="interesting-title">
+          Interesting fields
+        </div>
+        <div
+            class="interesting-overflow-block"
+            :style="{color:theme.$main_text}"
+        >
+          <div
+              v-for="item in rows"
+              :key="item.id"
+              class="interesting-row"
+          >
+            <v-menu offset-x :close-on-content-click="false">
+              <template v-slot:activator="{ on, attrs }">
+                <div
+                    @click="openStatistic(item)"
+                    v-bind="attrs"
+                    v-on="on"
+                >
+                  <span class="interesting-row-name">{{ item.text }} </span>
+                  <span class="interesting-row-number">{{ item.totalCount }}</span>
+                </div>
+              </template>
+              <v-card class="action-popup">
+                <div class="action-popup-title">
+                  {{ item.text }}
+                </div>
+                <div>
+                  <v-data-table
+                      :style="{backgroundColor:theme.$main_bg, color: theme.$main_text, 'max-height': '500px'}"
+                      disable-pagination
+                      hide-default-footer
+                      :headers="[{ text: 'Значение', value: 'value' },{ text: 'Количество', value: 'count' },{ text: 'Процент', value: '%' }]"
+                      :items="statistic"
+                  />
+                </div>
+              </v-card>
+            </v-menu>
+          </div>
         </div>
       </div>
     </div>
@@ -132,19 +140,31 @@ export default {
     font-size: 12px
     line-height: 15px
     color: $main_text
-
+.menuable__content__active
+  width: 400px !important
+.v-menu__content
+  border-radius: 6px !important
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important
 .action-popup
+  box-shadow: none !important
   padding: 0 0 0 0 !important
-  border-radius: 5px
+  border-radius: 6px
   background-color: $main_bg !important
   .action-popup-title
-    padding: 10px 10px 0 10px
+    padding: 5px 10px 5px 10px
     background-color: $main_bg
     color: $main_text
     font-weight: bold
   .v-data-table-header
     th
       color: $main_text !important
+      padding: 0 10px !important
+      height: 30px !important
+      border-bottom: none !important
+  td
+    padding: 0 10px !important
+    height: 30px !important
+    border-bottom: none !important
   tr:hover
     color: $main_bg
     background-color: $accent_ui_color !important
