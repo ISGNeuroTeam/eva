@@ -1,7 +1,7 @@
 <template>
   <div
-      class="events"
-      :style="{background: theme.$main_bg, color: theme.$main_text}"
+    class="events"
+    :style="{ background: theme.$main_bg, color: theme.$main_text }"
   >
     <v-data-table
       dense
@@ -12,23 +12,29 @@
       fixed-header
       :expanded.sync="expanded"
       :single-expand="false"
-      :style="{background: theme.$main_bg, color: theme.$main_text, borderColor: theme.$secondary_border}"
+      :style="{
+        background: theme.$main_bg,
+        color: theme.$main_text,
+        borderColor: theme.$secondary_border,
+      }"
     >
       <template v-slot:item="{ item, expand, isExpanded }">
         <tr :class="{ expanded: isExpanded }">
           <td>
-            <v-icon :color="theme.$main_text" @click="expand(!isExpanded)">{{ isExpanded ? mdiChevronDown : mdiChevronRight}}</v-icon>
+            <v-icon :color="theme.$main_text" @click="expand(!isExpanded)">{{
+              isExpanded ? mdiChevronDown : mdiChevronRight
+            }}</v-icon>
           </td>
           <td class="text-xs-right">{{ item.time }}</td>
           <td class="text-xs-right">
             {{ item.inputCount }}
-<!--            <br />-->
-<!--            <div v-if="isExpanded">-->
-<!--              <div v-for="(value, name) in item.inputCount">-->
-<!--                <span v-if="name != '_time'" :style="{color: theme.$raspberry}">{{ name }}: </span>-->
-<!--                <span v-if="name != '_time'" :style="{color: theme.$forest}">{{ value }}</span>-->
-<!--              </div>-->
-<!--            </div>-->
+            <!--            <br />-->
+            <!--            <div v-if="isExpanded">-->
+            <!--              <div v-for="(value, name) in item.inputCount">-->
+            <!--                <span v-if="name != '_time'" :style="{color: theme.$raspberry}">{{ name }}: </span>-->
+            <!--                <span v-if="name != '_time'" :style="{color: theme.$forest}">{{ value }}</span>-->
+            <!--              </div>-->
+            <!--            </div>-->
           </td>
         </tr>
       </template>
@@ -37,8 +43,12 @@
         <td :colspan="headers.length" class="collapse-row">
           <div style="margin-left: 216px">
             <div v-for="(value, name) in item.inputCount">
-              <span v-if="name != '_time'" :style="{color: theme.$raspberry}">{{ name }}: </span>
-              <span v-if="name != '_time'" :style="{color: theme.$forest}">{{ value }}</span>
+              <span v-if="name != '_time'" :style="{ color: theme.$raspberry }"
+                >{{ name }}:
+              </span>
+              <span v-if="name != '_time'" :style="{ color: theme.$forest }">{{
+                value
+              }}</span>
             </div>
           </div>
         </td>
@@ -46,11 +56,12 @@
 
       <template v-slot:top="{ pagination, options, updateOptions }">
         <v-data-footer
-          :style="{color: theme.$main_text}"
+          :style="{ color: theme.$main_text }"
           :pagination="pagination"
           :options="options"
+          items-per-page-text="$vuetify.dataTable.itemsPerPageText"
           @update:options="updateOptions"
-          items-per-page-text="$vuetify.dataTable.itemsPerPageText"/>
+        />
       </template>
     </v-data-table>
   </div>
@@ -92,10 +103,10 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-    dataset () {
-      let dataset = []
-      let id = 0
-      this.data.forEach(item => {
+    dataset() {
+      let dataset = [];
+      let id = 0;
+      this.data.forEach((item) => {
         let options = {
           hour12: 'true',
           hour: 'numeric',
@@ -105,15 +116,18 @@ export default {
           month: '2-digit',
           year: 'numeric',
         };
-        dataset.push({time: new Date(item._time*1000).toLocaleString("ru", options), inputCount: item, id: id})
-        id++
-      })
-      console.log(dataset)
-      return dataset
+        dataset.push({
+          time: new Date(item._time * 1000).toLocaleString('ru', options),
+          inputCount: item,
+          id: id,
+        });
+        id++;
+      });
+      console.log(dataset);
+      return dataset;
     },
-  }
-}
-
+  },
+};
 </script>
 
 <style lang="sass">

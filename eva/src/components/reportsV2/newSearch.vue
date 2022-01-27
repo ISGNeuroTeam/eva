@@ -18,34 +18,35 @@
           Новый поиск
         </div>
         <v-btn class="action-btn" text @click="refreshInput">
-          <span class="action-btn-text" :style="{color: theme.$main_text}">
+          <span class="action-btn-text" :style="{ color: theme.$main_text }">
             Сбросить
-          </span> 
-          <v-icon class="action-btn-icon" :style="{color: theme.$main_text}">{{ mdiRefresh }}</v-icon>
+          </span>
+          <v-icon
+            class="action-btn-icon"
+            :style="{ color: theme.$main_text }"
+            >{{ mdiRefresh }}</v-icon
+          >
         </v-btn>
       </div>
       <v-textarea
-          ref="search"
-          v-model="search.original_otl"
-          class="textarea"
-          placeholder="Введите запрос"
-          spellcheck="false"
-          auto-grow
-          filled
-          outlined
-          rows="1"
-          row-height="15"
-          @keyup.ctrl.\="addLineBreaks"
+        ref="search"
+        v-model="search.original_otl"
+        class="textarea"
+        placeholder="Введите запрос"
+        spellcheck="false"
+        auto-grow
+        filled
+        outlined
+        rows="1"
+        row-height="15"
+        @keyup.ctrl.\="addLineBreaks"
       ></v-textarea>
       <div class="search-block-footer">
-        <div
-            class="search-block-title"
-            :style="{color: theme.$title}"
-        >
-          <div v-if="data.length > 0" :style="{color: theme.$secondary_text}">
+        <div class="search-block-title" :style="{ color: theme.$title }">
+          <div v-if="data.length > 0" :style="{ color: theme.$secondary_text }">
             <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
             <span>{{ data.length }} результатов </span>
-            <span v-if="searchTimeInterval">( {{searchTimeInterval}} )</span>
+            <span v-if="searchTimeInterval">( {{ searchTimeInterval }} )</span>
           </div>
         </div>
         <div class="d-flex">
@@ -57,11 +58,7 @@
               max-width="150"
             >
               <template v-slot:activator="{ on, attrs }">
-                <div
-                  class="date-time-picker-text"
-                  v-bind="attrs"
-                  v-on="on"
-                >
+                <div class="date-time-picker-text" v-bind="attrs" v-on="on">
                   {{ timeRangeValue }}
                   <v-icon :color="theme.$main_text">{{
                     mdiChevronDown
@@ -97,12 +94,12 @@
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">Гибкий поиск</div>
                   <v-menu
-                      v-model="menuCalendar"
-                      class="calendar"
-                      :close-on-content-click="false"
-                      nudge-left="260"
-                      nudge-top="298"
-                      max-width="250"
+                    v-model="menuCalendar"
+                    class="calendar"
+                    :close-on-content-click="false"
+                    nudge-left="260"
+                    nudge-top="298"
+                    max-width="250"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <div
@@ -118,17 +115,17 @@
                     </template>
                     <div class="date-picker-wrap">
                       <v-date-picker
-                          v-model="dates"
-                          :first-day-of-week="1"
-                          range
+                        v-model="dates"
+                        :first-day-of-week="1"
+                        range
                       ></v-date-picker>
                       <div class="d-flex justify-space-around date-range-wrap">
-                        <div class="date-range-string">c {{dates[0]}}</div>
-                        <div class="date-range-string">по {{dates[1]}}</div>
+                        <div class="date-range-string">c {{ dates[0] }}</div>
+                        <div class="date-range-string">по {{ dates[1] }}</div>
                       </div>
                       <div class="time-picker d-flex justify-space-around p-3">
-                        <input v-model="timeStart" type="time">
-                        <input v-model="timeFinish" type="time">
+                        <input v-model="timeStart" type="time" />
+                        <input v-model="timeFinish" type="time" />
                       </div>
                       <div class="picker-actions d-flex justify-space-around">
                         <v-btn depressed small @click="menuCalendar = false"
@@ -153,11 +150,11 @@
               </div>
             </v-menu>
           </div>
-          <v-btn 
+          <v-btn
             class="action-btn"
             dark
-            depressed 
-            small 
+            depressed
+            small
             :color="theme.$ok_color"
             :loading="loading"
             @click="launchSearch"
@@ -184,12 +181,12 @@ export default {
   props: {
     data: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     loading: {
       type: Boolean,
-      default: () => false
-    }
+      default: () => false,
+    },
   },
   data() {
     return {
@@ -222,8 +219,8 @@ export default {
     };
   },
   computed: {
-    theme () {
-      return this.$store.getters.getTheme
+    theme() {
+      return this.$store.getters.getTheme;
     },
     dateRangeText() {
       return this.dates.join(' ~ ');
@@ -233,7 +230,7 @@ export default {
     // }
   },
   watch: {
-    loading (val) {
+    loading(val) {
       if (val === false) {
         let options = {
           hour12: 'true',
@@ -241,34 +238,49 @@ export default {
           minute: 'numeric',
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric'
+          year: 'numeric',
         };
-        if (this.search.parametrs.twf === 0 && this.search.parametrs.twf === 0) {
-          this.searchTimeInterval = 'за все время'
+        if (
+          this.search.parametrs.twf === 0 &&
+          this.search.parametrs.twf === 0
+        ) {
+          this.searchTimeInterval = 'за все время';
         } else {
-          this.searchTimeInterval = 'c ' + new Intl.DateTimeFormat("ru", options).format(this.search.parametrs.tws*1000) + ' по ' + new Intl.DateTimeFormat("ru", options).format(this.search.parametrs.twf*1000)
+          this.searchTimeInterval =
+            'c ' +
+            new Intl.DateTimeFormat('ru', options).format(
+              this.search.parametrs.tws * 1000
+            ) +
+            ' по ' +
+            new Intl.DateTimeFormat('ru', options).format(
+              this.search.parametrs.twf * 1000
+            );
         }
       }
     },
   },
   mounted() {
-    document.title="EVA | Исследование данных"
+    document.title = 'EVA | Исследование данных';
     this.search = this.$store.getters.getReportSearch;
     if (this.search.original_otl != '') {
-      this.$store.commit('setShould', { idDash: 'reports',  id: 'table', status: true});
+      this.$store.commit('setShould', {
+        idDash: 'reports',
+        id: 'table',
+        status: true,
+      });
     }
     // this.calcSize();
-    this.$refs.search.$el.addEventListener ("keypress", event =>{
+    this.$refs.search.$el.addEventListener('keypress', (event) => {
       if (event.ctrlKey && event.keyCode == 13) {
         this.launchSearch();
       }
     });
-    this.$refs.report.addEventListener('click', event => {
-      if(!event.target.classList.contains('static-row')) {
+    this.$refs.report.addEventListener('click', (event) => {
+      if (!event.target.classList.contains('static-row')) {
         this.showStatistic = false;
       }
-    })
-    this.unitedData.color=  this.theme.controls;
+    });
+    this.unitedData.color = this.theme.controls;
   },
   mounted() {
     document.title = 'EVA | Исследование данных';
@@ -343,37 +355,50 @@ export default {
       this.timeRangeValue = range.text;
       this.setTwsTwf(tws, twf);
     },
-    setTimeFromPicker (dates, timeStart, timeFinish) {
-      let twsArr = dates[0].split('-')
-      let timeStartArr = timeStart.split(':')
-      twsArr = twsArr.concat(timeStartArr)
-      let tws = new Date(twsArr[0], twsArr[1]-1, twsArr[2], twsArr[3], twsArr[4]).getTime()/1000
-      let twfArr = dates[1].split('-')
-      let timeFinishArr = timeFinish.split(':')
-      twfArr = twfArr.concat(timeFinishArr)
-      let twf = new Date(twfArr[0], twfArr[1]-1, twfArr[2], twfArr[3], twfArr[4]).getTime()/1000
-      this.timeRangeValue = 'c ' + dates[0] + ' по ' + dates[1]
-      this.setTwsTwf(tws, twf)
+    setTimeFromPicker(dates, timeStart, timeFinish) {
+      let twsArr = dates[0].split('-');
+      let timeStartArr = timeStart.split(':');
+      twsArr = twsArr.concat(timeStartArr);
+      let tws =
+        new Date(
+          twsArr[0],
+          twsArr[1] - 1,
+          twsArr[2],
+          twsArr[3],
+          twsArr[4]
+        ).getTime() / 1000;
+      let twfArr = dates[1].split('-');
+      let timeFinishArr = timeFinish.split(':');
+      twfArr = twfArr.concat(timeFinishArr);
+      let twf =
+        new Date(
+          twfArr[0],
+          twfArr[1] - 1,
+          twfArr[2],
+          twfArr[3],
+          twfArr[4]
+        ).getTime() / 1000;
+      this.timeRangeValue = 'c ' + dates[0] + ' по ' + dates[1];
+      this.setTwsTwf(tws, twf);
     },
-    setTwsTwf (tws, twf) {
-      let temp
+    setTwsTwf(tws, twf) {
+      let temp;
       if (tws > twf) {
-        temp = tws
-        tws = twf
-        twf = temp
-        this.sortDates()
+        temp = tws;
+        tws = twf;
+        twf = temp;
+        this.sortDates();
       }
-      this.search.parametrs.tws = tws
-      this.search.parametrs.twf = twf
-      this.menuCalendar = false
-      this.menuDropdown = false
+      this.search.parametrs.tws = tws;
+      this.search.parametrs.twf = twf;
+      this.menuCalendar = false;
+      this.menuDropdown = false;
     },
-    sortDates () {
-      this.timeRangeValue = 'c ' + this.dates[1] + ' по ' + this.dates[0]
-    }
-  }
-}
-
+    sortDates() {
+      this.timeRangeValue = 'c ' + this.dates[1] + ' по ' + this.dates[0];
+    },
+  },
+};
 </script>
 
 <style lang="sass">
@@ -411,7 +436,7 @@ export default {
       justify-content: space-between
       .v-icon__svg
         width: 12px
-        
+
   .date-picker-wrap
     .v-picker__body
       width: 246px !important
