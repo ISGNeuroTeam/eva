@@ -8,41 +8,39 @@
       <div class="main-container container-report">
         <div
             ref="report"
-            class="report-block"
+            class="report2-block"
         >
           <newSearch class="new-search component-block" @launchSearch="launchSearch($event)" :data="data" :loading="loading"></newSearch>
           <timeline v-show="data.length > 0" class="timeline component-block" :data="data">111</timeline>
           <div class="tab-block component-block d-flex justify-content-between">
             <v-tabs
                 v-model="tab" class="tabs"
-                :style="{background: theme.$main_bg, color: theme.$main_text}"
             >
-              <v-tab
-                  :style="{background: theme.$main_bg, color: theme.$main_text}">События</v-tab>
-              <v-tab
-                  :style="{background: theme.$main_bg, color: theme.$main_text}">Статистика</v-tab>
-              <v-tab
-                  :style="{background: theme.$main_bg, color: theme.$main_text}">Визуализация</v-tab>
+              <v-tab>События ({{data.length}})</v-tab>
+              <v-tab>Статистика</v-tab>
+              <v-tab>Визуализация</v-tab>
             </v-tabs>
-            <div>
-              <v-btn small text @click="exportDataCSV()">
-                <v-icon :style="{color: theme.$main_text}" class="download-icon">{{ mdiDownload  }}</v-icon>
-                <span class="download-btn-text" :style="{color: theme.$main_text}">
-                  Скачать
-                </span>
-              </v-btn>
+            <div class="d-flex">
+              <report :length="data.length"></report>
+              <download :data="data"></download>
             </div>
           </div>
-          <v-row v-if="data.length > 0">
-            <v-col cols="2" class="pr-0">
-              <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
-            </v-col>
-            <v-col cols="10" class="pl-0">
-              <events v-if="tab===0" class="events component-block" :data="data"></events>
-            </v-col>
-          </v-row>
-          <statistic v-if="tab===1" class="statistic component-block" :data="data" :size="size"></statistic>
-          <visualisation v-if="tab===2 && data.length > 0" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
+          <keep-alive>
+            <v-row class="mb-0" v-if="data.length > 0">
+              <v-col cols="2" class="pr-0">
+                <intresting v-if="tab===0" class="events component-block" :rows="rows"></intresting>
+              </v-col>
+              <v-col cols="10" class="pl-0">
+                <events v-if="tab===0" class="events component-block" :data="data"></events>
+              </v-col>
+            </v-row>
+          </keep-alive>
+          <keep-alive>
+            <statistic v-if="tab===1" class="statistic component-block" :data="data" :size="size"></statistic>
+          </keep-alive>
+          <keep-alive>
+            <visualisation v-if="tab===2 && data.length > 0" class="visualisation component-block" :data="data" :shouldGet="shouldGet"></visualisation>
+          </keep-alive>
         </div>
       </div>
     </v-content>
@@ -58,11 +56,13 @@
 
 
 <script>
-import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus, mdiDownload  } from '@mdi/js'
+import { mdiPlay, mdiSettings, mdiMerge,  mdiPlus } from '@mdi/js'
 import  settings  from '../../js/componentsSettings.js';
 import DashHeatMapLinear from "../dashBoardInside/dashHeatMapLinear";
 import  newSearch  from './newSearch.vue';
 import  timeline  from './timeline.vue';
+import  report  from './report.vue';
+import  download  from './download.vue';
 import  events  from './events.vue';
 import  statistic  from './statistic.vue';
 import visualisation from "./visualisation";
@@ -71,7 +71,7 @@ import intresting from "./intresting";
 
 export default {
 
-  components: { newSearch, intresting, events, timeline, statistic, visualisation },
+  components: { newSearch, intresting, events, timeline, statistic, visualisation, download, report },
   data () {
     return {
       tab: 0,
@@ -83,7 +83,6 @@ export default {
       plus: mdiPlus,
       gear: mdiSettings,
       merge: mdiMerge,
-      mdiDownload: mdiDownload,
       modal: false,
       loading: false,
       rows: [],
@@ -157,7 +156,6 @@ export default {
   },
   methods: {
     getData: function() {
-      console.log('getData')
       let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], { type: "text/javascript" }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
       let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
@@ -348,12 +346,19 @@ export default {
         }
       })
       Object.keys(how_much).forEach( item => {
-
+        let percent
+        if (length > 300) {
+          percent = ((how_much[item]*100)/length).toFixed(2)
+        } else if (length > 30) {
+          percent = ((how_much[item]*100)/length).toFixed(1)
+        } else {
+          percent = ((how_much[item]*100)/length).toFixed()
+        }
         result.push(
             {
               'value': item,
               'count': how_much[item],
-              '%': Math.round((how_much[item]*100)/length)
+              '%': percent
             }
         );
       })
@@ -393,23 +398,7 @@ export default {
     },
     ResetRange () {
       console.log('resetRange')
-    },
-    exportDataCSV() {
-      const searchData = this.data
-      // const searchData = this.dataObject[searchName].data
-      let csvContent = 'data:text/csv;charset=utf-8,' // задаем кодировку csv файла
-      let keys = Object.keys(searchData[0]) // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n') // добавляем ключи в файл
-      csvContent += encodeURIComponent(
-          searchData.map((item) => Object.values(item).join(',')).join('\n')
-      )
-
-      const link = document.createElement('a') // создаем ссылку
-      link.setAttribute('href', csvContent) // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', 'report.csv') // указываем имя файла
-      link.click() // жмем на скачку
-      link.remove() // удаляем ссылку
-    },
+    }
   },
   beforeCreate() {
     this.$store.commit('createReportSearch');
