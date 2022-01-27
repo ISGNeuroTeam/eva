@@ -4,7 +4,6 @@ export default {
   saveTemplateForm: async (template) => {
     let formData = new FormData();
     formData.append('json', JSON.stringify(template));
-
     let response = await fetch(`http://${host}/formbuilder/setFormTemplate`, {
       // сперва нужно подать post запрос
       method: 'POST',
@@ -13,11 +12,12 @@ export default {
     }).catch((error) => {
       console.log(error);
     });
+    console.log(response)
   },
   saveForm: async (form) => {
     let formData = new FormData();
     formData.append('json', JSON.stringify(form));
-
+    
     let response = await fetch(`http://${host}/formbuilder/setFormData`, {
       // сперва нужно подать post запрос
       method: 'POST',
@@ -26,6 +26,7 @@ export default {
     }).catch((error) => {
       console.log(error);
     });
+    console.log(response)
   },
   getTemplateList: async () => {
     let response = await fetch(

@@ -145,7 +145,7 @@ export default {
                   `Данные из запроса ${searchFrom.sid} получены успешно.&nbsp;&nbsp;status: ${dataResponse.status}&nbsp;&nbsp;url: ${dataResponse.url}`
                 );
 
-                let allData = new Promise(function (resolve, reject) {
+                let allData = new Promise(function (resolve) {
                   dataResponse.json().then(async (res) => {
                     if (res.status == 'success') {
                       restAuth.putLog(
@@ -165,7 +165,7 @@ export default {
                       let resultProm = await Promise.all(promise);
 
                       let dataProm = resultProm.map((prom, i) => {
-                        return new Promise(function (resolve, reject) {
+                        return new Promise(function (resolve) {
                           let allData = [];
 
                           prom.text().then((dataitself) => {
@@ -177,7 +177,9 @@ export default {
                               if (dataPeace != '') {
                                 try {
                                   allData.push(JSON.parse(dataPeace));
-                                } catch (error) {}
+                                } catch (error) {
+                                  console.log(error);
+                                }
                               }
                             });
                             resolve(allData);
@@ -196,11 +198,11 @@ export default {
                       });
 
                       if (shema != null && shema != '') {
-                        let keys = shema.match(/\`[^\`.]+\`/g).map((item) => {
-                          return item.replace(/\`/g, '');
+                        let keys = shema.match(/`[^`.]+`/g).map((item) => {
+                          return item.replace(/`/g, '');
                         });
                         let values = shema
-                          .replace(/\`[^\`.]+\`/g, '')
+                          .replace(/`[^`.]+`/g, '')
                           .replace(/\s*/g, '')
                           .split(',');
                         shema = {};
