@@ -469,8 +469,6 @@
             </v-container>
           </div>
 
-          <pre style="color: yellow">{{ options }}</pre>
-
           <v-card-text
             v-if="checkOptions('piechartSettings')"
             class="headline "
