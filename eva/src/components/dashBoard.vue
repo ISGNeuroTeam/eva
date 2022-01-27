@@ -12,7 +12,14 @@
         boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
-      <v-card-title v-show="element.split('-')[0] === 'singleValue' ? settings.showTitle : props.disappear" class="card-title open_title">
+      <v-card-title
+        v-show="
+          element.split('-')[0] === 'singleValue'
+            ? settings.showTitle
+            : props.disappear
+        "
+        class="card-title open_title"
+      >
         <div class="name-dash">
           <v-icon v-if="dataFromDB" class="icon" :color="theme.$main_border">
             {{ mdiDatabaseSearch }}
@@ -25,7 +32,11 @@
           >
             {{ mdiArrowDownBold }}
           </v-icon>
-          <v-icon v-show="dataMode" class="icon chart" :color="theme.$accent_ui_color">
+          <v-icon
+            v-show="dataMode"
+            class="icon chart"
+            :color="theme.$accent_ui_color"
+          >
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
@@ -74,7 +85,12 @@
           <div class="settings-dash">
             <v-dialog v-model="fullScreenMode" width="100%">
               <template v-slot:activator="{ on: onFullScreen }">
-                <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay" :disabled="disabledTooltip">
+                <v-tooltip
+                  bottom
+                  :color="theme.$accent_ui_color"
+                  :open-delay="tooltipOpenDelay"
+                  :disabled="disabledTooltip"
+                >
                   <template v-slot:activator="{ on: onTooltip }">
                     <v-icon
                       class="expand"
@@ -96,9 +112,16 @@
                     boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
                   }"
                 >
-                  <v-card-title v-show="props.disappear" class="card-title open_title">
+                  <v-card-title
+                    v-show="props.disappear"
+                    class="card-title open_title"
+                  >
                     <div class="name-dash">
-                      <v-icon v-if="dataFromDB" class="icon" :color="theme.$main_border">
+                      <v-icon
+                        v-if="dataFromDB"
+                        class="icon"
+                        :color="theme.$main_border"
+                      >
                         {{ mdiDatabaseSearch }}
                       </v-icon>
                       <v-icon
@@ -152,20 +175,29 @@
                     </div>
                     <div class="settings-dash-block">
                       <div class="settings-dash">
-                        <v-tooltip v-if="isMultiline" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+                        <v-tooltip
+                          v-if="isMultiline"
+                          bottom
+                          :color="theme.$accent_ui_color"
+                          :open-delay="tooltipOpenDelay"
+                        >
                           <template v-slot:activator="{ on }">
                             <v-icon
-                                class="datasource"
-                                :color="theme.$main_border"
-                                v-on="on"
-                                @click="resetRange()"
+                              class="datasource"
+                              :color="theme.$main_border"
+                              v-on="on"
+                              @click="resetRange()"
                             >
                               {{ props.mdiMagnifyMinusOutline }}
                             </v-icon>
                           </template>
                           <span>Сбросить зум</span>
                         </v-tooltip>
-                        <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                          :open-delay="tooltipOpenDelay"
+                        >
                           <template v-slot:activator="{ on }">
                             <v-icon
                               class="expand"
@@ -186,7 +218,10 @@
                     v-show="showElement"
                     class="card-text element-itself"
                     :colorFrom="theme"
-                    :style="{ color: theme.$main_text, background: 'transparent' }"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                    }"
                     :idFrom="element"
                     :idDashFrom="idDash"
                     :dataRestFrom="searchData"
@@ -212,24 +247,33 @@
             </v-dialog>
           </div>
           <div
+            v-show="dataMode"
             class="settings-dash"
             :class="{ settings_move: props.open_gear }"
-            v-show="dataMode"
           >
-            <v-tooltip v-if="isMultiline" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+            <v-tooltip
+              v-if="isMultiline"
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
-                    class="datasource"
-                    :color="theme.$main_border"
-                    v-on="on"
-                    @click="resetRange()"
+                  class="datasource"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  @click="resetRange()"
                 >
                   {{ props.mdiMagnifyMinusOutline }}
                 </v-icon>
               </template>
               <span>Сбросить зум</span>
             </v-tooltip>
-            <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="datasource"
@@ -242,7 +286,12 @@
               </template>
               <span>Источник данных</span>
             </v-tooltip>
-            <v-tooltip v-if="props.edit_icon" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+            <v-tooltip
+              v-if="props.edit_icon"
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="pencil"
@@ -260,7 +309,12 @@
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip v-if="!props.edit_icon" bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+            <v-tooltip
+              v-if="!props.edit_icon"
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="check"
@@ -273,7 +327,12 @@
               </template>
               <span>Переименовать</span>
             </v-tooltip>
-            <v-tooltip bottom :color="theme.$accent_ui_color" :disabled="disabledTooltip" :open-delay="tooltipOpenDelay">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              :disabled="disabledTooltip"
+              :open-delay="tooltipOpenDelay"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="option"
@@ -286,7 +345,11 @@
               </template>
               <span>Настройки</span>
             </v-tooltip>
-            <v-tooltip bottom :color="theme.$accent_ui_color" :open-delay="tooltipOpenDelay">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="delete"
@@ -309,7 +372,10 @@
           class="loading-divider"
           :class="{ loading: loading, noBorder: !dataMode }"
         >
-          <div class="loading-bar" :style="{ background: theme.$primary_button }" />
+          <div
+            class="loading-bar"
+            :style="{ background: theme.$primary_button }"
+          />
         </div>
       </div>
       <v-card-text v-show="!showElement" class="card-text">
@@ -370,9 +436,9 @@ import {
   mdiArrowDownBold,
   mdiArrowExpand,
   mdiArrowCollapse,
-} from "@mdi/js";
-import { mapGetters } from "vuex";
-import settings from "../js/componentsSettings.js";
+} from '@mdi/js';
+import { mapGetters } from 'vuex';
+import settings from '../js/componentsSettings.js';
 
 export default {
   props: {
@@ -401,11 +467,11 @@ export default {
       fullScreenMode: false,
       disabledTooltip: false,
       settings: {
-        showTitle: true
+        showTitle: true,
       },
       props: {
-        id: "",
-        name: "",
+        id: '',
+        name: '',
         mdiPencil: mdiPencil,
         mdiCheckBold: mdiCheckBold,
         mdiClose: mdiClose,
@@ -413,7 +479,7 @@ export default {
         mdiArrowExpandAll: mdiArrowExpandAll,
         mdiCodeTags: mdiCodeTags,
         mdiTrashCanOutline: mdiTrashCanOutline,
-        mdiMagnifyMinusOutline : mdiMagnifyMinusOutline ,
+        mdiMagnifyMinusOutline: mdiMagnifyMinusOutline,
         mdiDatabase: mdiDatabase,
         mdiSettings: mdiSettings,
         mdiChevronUp: mdiChevronUp,
@@ -427,17 +493,17 @@ export default {
         resize_elem: true,
         datasource_elem: true,
         showOptions: true,
-        arrow_coral: "controlsInsideDash",
-        resize_arrow_coral: "controlsInsideDash",
-        code_coral: "fill:teal",
+        arrow_coral: 'controlsInsideDash',
+        resize_arrow_coral: 'controlsInsideDash',
+        code_coral: 'fill:teal',
         transition: true,
-        element: "",
-        page: "",
+        element: '',
+        page: '',
         dataRest: [],
         loading: false,
         open_gear: true,
         arrow: {
-          direct: "down",
+          direct: 'down',
           elem: mdiChevronDown,
         },
         open_title: false,
@@ -447,12 +513,12 @@ export default {
           level: 1,
           boxShadow: false,
         },
-        optionsBoxShadow: "transparent",
+        optionsBoxShadow: 'transparent',
         differentOptions: {
           visible: true,
         },
         disappear: true,
-        timeFormat: "",
+        timeFormat: '',
         sizeTile: {},
         hideLoad: false,
         tooltip: {},
@@ -463,27 +529,26 @@ export default {
     };
   },
   computed: {
-    ...mapGetters([
-      'getTockens'
-    ]),
+    ...mapGetters(['getTockens']),
     isMultiline() {
-      return !!this.element?.includes('multiLine')
+      return !!this.element?.includes('multiLine');
     },
     getSelfTockens() {
-      return this.getTockens(this.idDash)
+      return this.getTockens(this.idDash);
     },
     boardTitle() {
       if (!this.props || !this.props.name) {
-        return this.element
+        return this.element;
       }
       let name = this.props.name;
-      name && this.getSelfTockens.forEach(token => {
-        name = name.replaceAll(`$${token.name}$`, token.value)
-      })
-      return name
+      name &&
+        this.getSelfTockens.forEach((token) => {
+          name = name.replaceAll(`$${token.name}$`, token.value);
+        });
+      return name;
     },
-    settingsIsOpened(){
-      return this.$store.getters.getModalSettings(this.idDash).status
+    settingsIsOpened() {
+      return this.$store.getters.getModalSettings(this.idDash).status;
     },
     theme: function () {
       return this.$store.getters.getTheme;
@@ -498,9 +563,9 @@ export default {
       this.changeOptions(this.dataModeFrom);
       if (!this.dataModeFrom) {
         if (
-          this.element.split("-")[0] === "button" ||
-          this.element.split("-")[0] === "csvg" ||
-          this.element.split("-")[0] === "tile"
+          this.element.split('-')[0] === 'button' ||
+          this.element.split('-')[0] === 'csvg' ||
+          this.element.split('-')[0] === 'tile'
         ) {
           this.props.disappear = false;
         }
@@ -511,17 +576,17 @@ export default {
     },
     currentElem: function () {
       // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
-      let nameElement = "";
+      let nameElement = '';
       if (this.element) {
-        let element = this.element.split("-")[0];
+        let element = this.element.split('-')[0];
         nameElement = `dash-${element}`;
       }
       return nameElement;
     },
     elemIcon: function () {
-      let element = "";
+      let element = '';
       if (this.element) {
-        element = this.element.split("-")[0];
+        element = this.element.split('-')[0];
       }
       return element;
     },
@@ -557,23 +622,23 @@ export default {
         this.props.timeFormat = this.props.options.timeFormat;
       }
       if (this.props.options.widthTile) {
-        this.$set(this.props.sizeTile, "width", this.props.options.widthTile);
+        this.$set(this.props.sizeTile, 'width', this.props.options.widthTile);
       } else {
-        this.$set(this.props.sizeTile, "width", "");
+        this.$set(this.props.sizeTile, 'width', '');
       }
       if (this.props.options.heightTile) {
-        this.$set(this.props.sizeTile, "height", this.props.options.heightTile);
+        this.$set(this.props.sizeTile, 'height', this.props.options.heightTile);
       } else {
-        this.$set(this.props.sizeTile, "height", "");
+        this.$set(this.props.sizeTile, 'height', '');
       }
       if (this.props.options.tooltip) {
         Object.keys(this.props.options.tooltip).forEach((item) => {
           this.$set(this.props.tooltip, item, this.props.options.tooltip[item]);
         });
       } else {
-        this.$set(this.props.tooltip, "texts", []);
-        this.$set(this.props.tooltip, "links", []);
-        this.$set(this.props.tooltip, "buttons", []);
+        this.$set(this.props.tooltip, 'texts', []);
+        this.$set(this.props.tooltip, 'links', []);
+        this.$set(this.props.tooltip, 'buttons', []);
       }
 
       //this.$emit("SetLevel", this.props.options.level);
@@ -582,19 +647,19 @@ export default {
 
       return options.change;
     },
-    ...mapGetters(["getSelectedTableTitles", "getSelectedDataFormat"]),
+    ...mapGetters(['getSelectedTableTitles', 'getSelectedDataFormat']),
   },
   watch: {
     fullScreenMode(to) {
-      setTimeout(() => this.disabledTooltip = to, to ? 0 : 600)
+      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
-    settingsIsOpened(to){
-      setTimeout(() => this.disabledTooltip = to, to ? 0 : 600)
-    }
+    settingsIsOpened(to) {
+      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
+    },
   },
   mounted() {
     this.props.icons = settings.icons;
-    this.page = this.$parent.$el.getAttribute("data-page"); // понимаем какая страница перед нами
+    this.page = this.$parent.$el.getAttribute('data-page'); // понимаем какая страница перед нами
     this.props.name = this.$store.getters.getNameDash({
       idDash: this.idDash,
       id: this.element,
@@ -602,11 +667,11 @@ export default {
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
-      this.props.optionsBoxShadow = "transparent";
+      this.props.optionsBoxShadow = 'transparent';
     }
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
-    })
+    });
   },
   methods: {
     onResize() {
@@ -621,7 +686,7 @@ export default {
       // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
-      this.$store.commit("setNameDash", {
+      this.$store.commit('setNameDash', {
         name: props.name,
         id: this.element,
         idDash: this.idDash,
@@ -629,7 +694,7 @@ export default {
     },
     chooseDS: function () {
       // открываем модальное окно с выбором ИС (источник данных)
-      this.$store.commit("setModalSearch", {
+      this.$store.commit('setModalSearch', {
         id: this.idDash,
         status: true,
         elem: this.element,
@@ -638,14 +703,14 @@ export default {
     switchDS: function () {
       // переключаем между режимами выбора данных и их отображением
       let status = !this.showElement;
-      this.$store.commit("setSwitch", {
+      this.$store.commit('setSwitch', {
         idDash: this.idDash,
         status: status,
         id: this.element,
       });
     },
     switchOP: function () {
-      this.$store.commit("setModalSettings", {
+      this.$store.commit('setModalSettings', {
         idDash: this.idDash,
         status: true,
         element: this.element,
@@ -660,14 +725,14 @@ export default {
       }
     },
     setLoading: function (event) {
-      if (this.element.indexOf("button") != -1) {
+      if (this.element.indexOf('button') != -1) {
         this.props.hideLoad = !event;
       }
       this.props.loading = event;
     },
     deleteDashBoard: function (props) {
       // вызываем окно для удаления элемнета
-      this.$store.commit("setModalDelete", {
+      this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: this.element,
@@ -678,31 +743,31 @@ export default {
     getDataFromDB: function (searсhID) {
       // получение данных с indexindDB
       let db = null;
-      let request = indexedDB.open("EVA", 1);
+      let request = indexedDB.open('EVA', 1);
       request.onerror = function (event) {
-        console.log("error: ", event);
+        console.log('error: ', event);
       };
 
       request.onupgradeneeded = (event) => {
-        console.log("create");
+        console.log('create');
         db = event.target.result;
-        if (!db.objectStoreNames.contains("searches")) {
+        if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
-          db.createObjectStore("searches"); // create it
+          db.createObjectStore('searches'); // create it
         }
         request.onsuccess = (event) => {
           db = request.result;
-          console.log("successEvent: " + db);
+          console.log('successEvent: ' + db);
         };
       };
       let promise = new Promise((resolve, reject) => {
         request.onsuccess = (event) => {
           db = request.result;
 
-          let transaction = db.transaction("searches"); // (1)
+          let transaction = db.transaction('searches'); // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore("searches"); // (2)
+          let searches = transaction.objectStore('searches'); // (2)
 
           let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
 
@@ -716,7 +781,7 @@ export default {
           };
 
           query.onerror = function () {
-            console.log("Ошибка", query.error);
+            console.log('Ошибка', query.error);
           };
         };
       });
@@ -724,28 +789,28 @@ export default {
     },
     openTitle: function () {
       // открываем закрываем шапку элемнета
-      if (this.props.arrow.direct == "up") {
+      if (this.props.arrow.direct == 'up') {
         this.props.arrow.elem = this.props.mdiChevronDown;
-        this.props.arrow.direct = "down";
+        this.props.arrow.direct = 'down';
       } else {
         this.props.arrow.elem = this.props.mdiChevronUp;
-        this.props.arrow.direct = "up";
+        this.props.arrow.direct = 'up';
       }
       this.props.open_title = !this.props.open_title;
     },
     hideDS: function () {
       // функция которая для определенного элемента сразу вносит ряд настроек визуализации=
-      this.$store.commit("setSwitch", {
+      this.$store.commit('setSwitch', {
         idDash: this.idDash,
         status: true,
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
     setVissible: function (event) {
-      if (event.split("-")[0] == "picker" || event.split("-")[0] == "guntt") {
+      if (event.split('-')[0] == 'picker' || event.split('-')[0] == 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
-        this.$el.querySelector(".dash-block").style.overflow = "visible"; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
+        this.$el.querySelector('.dash-block').style.overflow = 'visible'; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
       }
     },
     changeOptions: function (mode) {
@@ -762,8 +827,8 @@ export default {
           opacity = 1;
         }
       }
-      this.$emit("SetOpacity", opacity);
-      this.$emit("SetLevel", level);
+      this.$emit('SetOpacity', opacity);
+      this.$emit('SetLevel', level);
     },
     // getDataFromRest: async function (event) {
     //   // this.$set(this.loadings,event.sid,true);
@@ -808,7 +873,7 @@ export default {
         idDash: this.idDash,
         id: this.element,
       });
-      this.$emit("downloadData", searchId);
+      this.$emit('downloadData', searchId);
     },
 
     // moveElem: function (props) {  // переключаем режим разрешения перемещения элемента
@@ -840,28 +905,28 @@ export default {
     getData: function (searсhID) {
       // асинхронная функция для получения даных с реста
       let db = null;
-      let request = indexedDB.open("EVA", 1);
+      let request = indexedDB.open('EVA', 1);
       request.onerror = function (event) {
-        console.log("error: ", event);
+        console.log('error: ', event);
       };
       request.onupgradeneeded = (event) => {
-        console.log("create");
+        console.log('create');
         db = event.target.result;
-        if (!db.objectStoreNames.contains("searches")) {
+        if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
-          db.createObjectStore("searches"); // create it
+          db.createObjectStore('searches'); // create it
         }
         request.onsuccess = (event) => {
           db = request.result;
-          console.log("successEvent: " + db);
+          console.log('successEvent: ' + db);
         };
       };
       let promise = new Promise((resolve, reject) => {
         request.onsuccess = (event) => {
           db = request.result;
-          let transaction = db.transaction("searches"); // (1)
+          let transaction = db.transaction('searches'); // (1)
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore("searches"); // (2)
+          let searches = transaction.objectStore('searches'); // (2)
           let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
           query.onsuccess = (event) => {
             // (4)
@@ -872,7 +937,7 @@ export default {
             }
           };
           query.onerror = function () {
-            console.log("Ошибка", query.error);
+            console.log('Ошибка', query.error);
           };
         };
       });
@@ -881,24 +946,24 @@ export default {
     checkFilter: function () {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "OnDataCompare",
+        event: 'OnDataCompare',
         element: this.element,
       });
       let data = [];
       let incl = false;
-      let columnDel = "";
+      let columnDel = '';
       let event = {};
       this.searchData = [];
 
       events.forEach((item) => {
         event = { ...{}, ...item };
 
-        if (event.prop == "filter" && event.value == "true") {
+        if (event.prop == 'filter' && event.value == 'true') {
           data = JSON.parse(JSON.stringify(this.props.dataRest));
-          event.row = event.row.replace(/\[|\]/g, "").split(",");
+          event.row = event.row.replace(/\[|\]/g, '').split(',');
 
-          if (event.column.indexOf("!") != -1) {
-            columnDel = event.column.replace("!", "");
+          if (event.column.indexOf('!') != -1) {
+            columnDel = event.column.replace('!', '');
             this.props.dataRest.forEach((itemFil, i) => {
               if (Object.keys(itemFil).includes(columnDel)) {
                 delete data[i][columnDel];
@@ -906,14 +971,14 @@ export default {
             });
           } else {
             switch (event.compare) {
-              case "equals":
+              case 'equals':
                 let notArr = [];
                 event.row.forEach((notElem) => {
-                  if (notElem.indexOf("!") != -1) {
+                  if (notElem.indexOf('!') != -1) {
                     notArr.push(notElem.substr(1));
                   }
                 });
-                if (event.column != "") {
+                if (event.column != '') {
                   data = data.filter((itemFil) => {
                     if (notArr.length != 0) {
                       if (!notArr.includes(String(itemFil[event.column]))) {
@@ -948,12 +1013,14 @@ export default {
                   });
                 }
                 break;
-              case "over":
-                if (event.column != "") {
+              case 'over':
+                if (event.column != '') {
                   data = data.filter((itemFil) => {
                     incl = true;
                     event.row.forEach((row) => {
-                      if (parseFloat(itemFil[event.column]) <= parseFloat(row)) {
+                      if (
+                        parseFloat(itemFil[event.column]) <= parseFloat(row)
+                      ) {
                         incl = false;
                       }
                     });
@@ -963,12 +1030,14 @@ export default {
                   });
                 }
                 break;
-              case "less":
-                if (event.column != "") {
+              case 'less':
+                if (event.column != '') {
                   data = data.filter((itemFil) => {
                     incl = true;
                     event.row.forEach((row) => {
-                      if (parseFloat(itemFil[event.column]) >= parseFloat(row)) {
+                      if (
+                        parseFloat(itemFil[event.column]) >= parseFloat(row)
+                      ) {
                         incl = false;
                       }
                     });
@@ -978,8 +1047,8 @@ export default {
                   });
                 }
                 break;
-              case "in":
-                if (event.column != "") {
+              case 'in':
+                if (event.column != '') {
                   data = data.filter((itemFil) => {
                     if (event.row.includes(String(itemFil[event.column]))) {
                       return itemFil;
@@ -999,8 +1068,8 @@ export default {
                   });
                 }
                 break;
-              case "between":
-                if (event.column != "") {
+              case 'between':
+                if (event.column != '') {
                   data = data.filter((itemFil) => {
                     incl = false;
                     let min, max;
@@ -1062,21 +1131,21 @@ export default {
       }
       link.remove(); // удаляем ссылку
     },
-    setRange (range) {
-      this.$emit("SetRange", range);
+    setRange(range) {
+      this.$emit('SetRange', range);
     },
-    resetRange () {
-      this.$emit("ResetRange", this.dataSourseTitle);
+    resetRange() {
+      this.$emit('ResetRange', this.dataSourseTitle);
     },
   },
 };
 </script>
 
 <style lang="scss">
-@import "../sass/dashBoard.sass";
+@import '../sass/dashBoard.sass';
 </style>
 <style lang="sass">
-  .settings-dash
-      .v-icon:focus::after
-          opacity: 0
+.settings-dash
+    .v-icon:focus::after
+        opacity: 0
 </style>

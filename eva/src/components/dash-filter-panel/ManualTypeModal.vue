@@ -1,14 +1,17 @@
 <template>
   <div
-    :style="{ 'background-color': theme.$secondary_bg, color: theme.$main_text }"
+    :style="{
+      'background-color': theme.$secondary_bg,
+      color: theme.$main_text,
+    }"
     class="manual-type-filter-modal"
   >
     Имя поля
     <v-text-field
+      v-model="temp.fieldName"
       hide-details
       outlined
       dense
-      v-model="temp.fieldName"
       :background-color="theme.$main_bg"
       style="padding-bottom: 10px"
     />
@@ -43,8 +46,8 @@
         dense
       >
         <v-btn
-          icon
           slot="append"
+          icon
           :color="theme.$primary_button"
           @click="showDatePicker = !showDatePicker"
         >
@@ -55,8 +58,8 @@
       </v-text-field>
       <v-dialog v-model="showDatePicker" max-width="400">
         <DTPicker
-          inline
           v-model="temp.value"
+          inline
           format="YYYY-MM-DD HH:mm"
           class="dtpicker"
           :color="theme.$accent_ui_color"
@@ -78,12 +81,11 @@
       <div style="width: 100%" class="d-flex justify-space-around">
         <v-slide-item
           v-for="(item, index) in operationMap[temp.fieldType]"
-          style="text-transform: none; font-size: 12px; box-shadow: none"
           :key="index"
           v-slot="{ active, toggle }"
+          style="text-transform: none; font-size: 12px; box-shadow: none"
         >
           <v-btn
-            @click="toggle"
             style="font-size: 12px; width: 100px"
             :style="
               active
@@ -92,8 +94,12 @@
                     color: theme.$main_bg,
                     'border-radius': '3px',
                   }
-                : { 'background-color': theme.$main_bg, color: theme.$main_text }
+                : {
+                    'background-color': theme.$main_bg,
+                    color: theme.$main_text,
+                  }
             "
+            @click="toggle"
           >
             {{ getOperationManualTitle(item) }}
           </v-btn>
@@ -103,95 +109,96 @@
   </div>
 </template>
 <script>
-  import { mdiCalendarMonth } from '@mdi/js';
-  export default {
-    name: 'ManualTypeModal',
-    props: ['temp'],
-    computed: {
-      theme() {
-        return this.$store.getters.getTheme;
+import { mdiCalendarMonth } from '@mdi/js';
+export default {
+  name: 'ManualTypeModal',
+  props: ['temp'],
+  data() {
+    return {
+      fieldTypes: [
+        { value: 'string', title: 'Строка' },
+        { value: 'number', title: 'Число' },
+        { value: 'date', title: 'Дата' },
+      ],
+      currentOperationTab: 0,
+      operationMap: {
+        string: [],
+        date: ['<', '>'],
+        number: ['>', '<', '='],
       },
-    },
-    data() {
-      return {
-        fieldTypes: [
-          { value: 'string', title: 'Строка' },
-          { value: 'number', title: 'Число' },
-          { value: 'date', title: 'Дата' },
-        ],
-        currentOperationTab: 0,
-        operationMap: {
-          string: [],
-          date: ['<', '>'],
-          number: ['>', '<', '='],
+      operationManualTitleMap: {
+        number: {
+          '>': 'Больше',
+          '<': 'Меньше',
+          '=': 'Равно',
         },
-        operationManualTitleMap: {
-          number: {
-            '>': 'Больше',
-            '<': 'Меньше',
-            '=': 'Равно',
-          },
-          date: {
-            '>': 'Позже',
-            '<': 'Раньше',
-          },
+        date: {
+          '>': 'Позже',
+          '<': 'Раньше',
         },
-        showDatePicker: false,
-        calendarIcon: mdiCalendarMonth,
-      };
+      },
+      showDatePicker: false,
+      calendarIcon: mdiCalendarMonth,
+    };
+  },
+  computed: {
+    theme() {
+      return this.$store.getters.getTheme;
     },
-    methods: {
-      getOperationManualTitle(operation) {
-        return this.operationManualTitleMap[this.temp.fieldType][operation];
-      },
-      openDatePicker() {
-        this.showDatePicker = true;
-      },
-      closeDatePicker() {
-        this.showDatePicker = false;
+  },
+  watch: {
+    currentOperationTab: {
+      immediate: true,
+      handler(index) {
+        this.temp.operationManual =
+          this.operationMap[this.temp.fieldType][index];
       },
     },
-    watch: {
-      currentOperationTab:{
-        immediate:true,
-        handler(index) {
-          this.temp.operationManual = this.operationMap[this.temp.fieldType][index];
+    temp: {
+      immediate: true,
+      handler(val) {
+        if (Object.keys(this.operationMap).includes(val.fieldType)) {
+          let manualOperationMapIndex = this.operationMap[
+            val.fieldType
+          ].indexOf(val.operationManual);
+          this.currentOperationTab =
+            manualOperationMapIndex !== -1 ? manualOperationMapIndex : 0;
         }
       },
-      temp: {
-        immediate: true,
-        handler(val) {
-          if (Object.keys(this.operationMap).includes(val.fieldType)) {
-            let manualOperationMapIndex = this.operationMap[val.fieldType].indexOf(
-              val.operationManual
-            );
-            this.currentOperationTab = manualOperationMapIndex !== -1 ? manualOperationMapIndex : 0;
-          }
-        },
-      },
     },
-  };
+  },
+  methods: {
+    getOperationManualTitle(operation) {
+      return this.operationManualTitleMap[this.temp.fieldType][operation];
+    },
+    openDatePicker() {
+      this.showDatePicker = true;
+    },
+    closeDatePicker() {
+      this.showDatePicker = false;
+    },
+  },
+};
 </script>
 
 <style lang="sass">
 
-  .manual-type-filter-modal
+.manual-type-filter-modal
+  color: var(--main_text) !important
+
+  .v-text-field__slot input
+    color: var(--main_text)
+
+  .v-input__slot fieldset
     color: var(--main_text) !important
 
-    .v-text-field__slot input
-      color: var(--main_text)
-
-    .v-input__slot fieldset
+  .v-input__control
+    .v-icon
       color: var(--main_text) !important
 
-    .v-input__control
-      .v-icon
-        color: var(--main_text) !important
+  .v-select__selections
+    color: var(--main_text) !important
 
-    .v-select__selections
-      color: var(--main_text) !important
-
-    .v-input input
-      min-height: auto !important
-
+  .v-input input
+    min-height: auto !important
 </style>

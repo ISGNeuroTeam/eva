@@ -1,6 +1,8 @@
 <template>
   <v-card :style="{ 'background-color': theme.$secondary_bg }">
-    <v-card-title :style="{ color: theme.$title, 'background-color': theme.$main_bg }">
+    <v-card-title
+      :style="{ color: theme.$title, 'background-color': theme.$main_bg }"
+    >
       <v-icon :color="theme.$title" class="pr-2">{{ eyeIcon }}</v-icon
       >Предпросмотр
     </v-card-title>
@@ -30,38 +32,38 @@
         style="text-transform: none"
         :color="theme.$primary_button"
         :style="{ color: theme.$secondary_bg }"
-        @click="$emit('closeFilterPreviewModal')"
         class="ma-2"
+        @click="$emit('closeFilterPreviewModal')"
         >Хорошо</v-btn
       >
     </div>
   </v-card>
 </template>
 <script>
-  import { filterCompile } from './utils/filter-otl-compile';
-  import { mdiEyeOutline } from '@mdi/js';
+import { filterCompile } from './utils/filter-otl-compile';
+import { mdiEyeOutline } from '@mdi/js';
 
-  export default {
-    name: 'FilterPreviewModal',
-    props: ['filter'],
-    data() {
-      return {
-        eyeIcon: mdiEyeOutline,
-        filterOtlText: '',
-      };
+export default {
+  name: 'FilterPreviewModal',
+  props: ['filter'],
+  data() {
+    return {
+      eyeIcon: mdiEyeOutline,
+      filterOtlText: '',
+    };
+  },
+  computed: {
+    theme() {
+      return this.$store.getters.getTheme;
     },
-    watch: {
-      filter: {
-        immediate: true,
-        handler(filter) {
-          if (filter) this.filterOtlText = filterCompile(filter);
-        },
+  },
+  watch: {
+    filter: {
+      immediate: true,
+      handler(filter) {
+        if (filter) this.filterOtlText = filterCompile(filter);
       },
     },
-    computed: {
-      theme() {
-        return this.$store.getters.getTheme;
-      },
-    },
-  };
+  },
+};
 </script>

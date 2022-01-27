@@ -1,11 +1,16 @@
 <template>
+  <div
+    class="interesting"
+    :style="{ background: theme.$main_bg, color: theme.$main_text }"
+  >
     <div
-        class="interesting"
-        :style="{background: theme.$main_bg, color: theme.$main_text}"
+      class="interesting-block"
+      :style="{ background: theme.$main_bg, color: theme.$main_text }"
     >
+      <div class="interesting-title">Interesting field</div>
       <div
-          class="interesting-block"
-          :style="{background: theme.$main_bg, color: theme.$main_text}"
+        class="interesting-overflow-block"
+        :style="{ color: theme.$main_text }"
       >
         <div class="interesting-title">
           Interesting fields
@@ -49,17 +54,22 @@
         </div>
       </div>
     </div>
+  </div>
 </template>
 
-
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronRight, mdiChevronDown } from '@mdi/js'
+import {
+  mdiRefresh,
+  mdiMagnify,
+  mdiChevronRight,
+  mdiChevronDown,
+} from '@mdi/js';
 
 export default {
   props: {
     rows: [],
   },
-  data () {
+  data() {
     return {
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
@@ -67,15 +77,15 @@ export default {
       mdiChevronDown: mdiChevronDown,
       statistic: [],
       statisticKey: null,
-    }
+    };
   },
   computed: {
-    theme () {
-      return this.$store.getters.getTheme
+    theme() {
+      return this.$store.getters.getTheme;
     },
-    dataset () {
-      let dataset = []
-      this.data.forEach(item => {
+    dataset() {
+      let dataset = [];
+      this.data.forEach((item) => {
         let options = {
           hour12: 'true',
           hour: 'numeric',
@@ -83,16 +93,20 @@ export default {
           second: 'numeric',
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric'
+          year: 'numeric',
         };
-        dataset.push({time: new Date(item._time*1000).toLocaleString("ru", options), inputCount: item})
-      })
-      console.log(dataset)
-      return dataset
+        dataset.push({
+          time: new Date(item._time * 1000).toLocaleString('ru', options),
+          inputCount: item,
+        });
+      });
+      console.log(dataset);
+      return dataset;
     },
   },
+  mounted() {},
   methods: {
-    openStatistic: function(statistic) {
+    openStatistic: function (statistic) {
       if (this.showStatistic) {
         if (this.statisticKey == statistic.text) {
           // this.showStatistic = false;
@@ -107,13 +121,10 @@ export default {
       }
     },
   },
-  mounted() {}
-}
-
-
+};
 </script>
 
-<style lang="sass" >
+<style lang="sass">
 @import './../../sass/_colors'
 .interesting
   .interesting-title

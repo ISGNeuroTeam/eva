@@ -1,7 +1,7 @@
 <template>
   <div
-      class="timeline"
-      :style="{background: theme.$main_bg, color: theme.$main_text}"
+    class="timeline"
+    :style="{background: theme.$main_bg, color: theme.$main_text}"
   >
     <div class="select-wrap p-5">
       <div>
@@ -50,7 +50,6 @@
   </div>
 </template>
 
-
 <script>
 import * as d3 from "d3";
 import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiPlus, mdiMinus  } from '@mdi/js'
@@ -59,10 +58,10 @@ export default {
   props: {
     data: [],
   },
-  data () {
+  data() {
     return {
       search: {
-        parametrs: {}
+        parametrs: {},
       },
       numberInTimeline: 25,
       menuDropdown: false,
@@ -81,8 +80,8 @@ export default {
     }
   },
   computed: {
-    theme () {
-      return this.$store.getters.getTheme
+    theme() {
+      return this.$store.getters.getTheme;
     },
     dataset () {
       let minTime = this.data[0]?._time
@@ -90,13 +89,12 @@ export default {
       console.log(this.data)
       this.data.forEach(item => {
         if (item._time < minTime) {
-          minTime = item._time
+          minTime = item._time;
         }
         if (item._time > maxTime) {
-          maxTime = item._time
+          maxTime = item._time;
         }
-      })
-
+      });
       let barTime = minTime
       let dataset = {}
       let newDate
@@ -120,29 +118,35 @@ export default {
         newDate = new Date(barTime*1000);
 
         if (this.select.value === 'month') {
-          let newDateMonth = newDate.getMonth()
-          if (newDateMonth === 3 || newDateMonth === 5 || newDateMonth === 8 || newDateMonth === 10) {
-            deltaTime = 2592000
-          } if (newDateMonth === 1 && newDate.getFullYear()%4 === 0) {
-            deltaTime = 2505600
-          } if (newDateMonth === 1 && newDate.getFullYear()%4 !== 0) {
-            deltaTime = 2419200
+          let newDateMonth = newDate.getMonth();
+          if (
+            newDateMonth === 3 ||
+            newDateMonth === 5 ||
+            newDateMonth === 8 ||
+            newDateMonth === 10
+          ) {
+            deltaTime = 2592000;
+          }
+          if (newDateMonth === 1 && newDate.getFullYear() % 4 === 0) {
+            deltaTime = 2505600;
+          }
+          if (newDateMonth === 1 && newDate.getFullYear() % 4 !== 0) {
+            deltaTime = 2419200;
           } else {
-            deltaTime = 2678400
+            deltaTime = 2678400;
           }
         }
-        datasetItemString = getActualLongData(newDate)
-        dataset[datasetItemString] = 0
-        barTime += deltaTime
+        datasetItemString = getActualLongData(newDate);
+        dataset[datasetItemString] = 0;
+        barTime += deltaTime;
       }
-      this.data.forEach(item => {
-        
-        if (dataset[getActualLongData(item._time*1000)] === undefined) {
-          dataset[getActualLongData(item._time*1000)] = 1
+      this.data.forEach((item) => {
+        if (dataset[getActualLongData(item._time * 1000)] === undefined) {
+          dataset[getActualLongData(item._time * 1000)] = 1;
         } else {
-          dataset[getActualLongData(item._time*1000)] ++
+          dataset[getActualLongData(item._time * 1000)]++;
         }
-      })
+      });
       if (Object.keys(dataset).length > 0) {
         for ( let i = Object.keys(dataset).length; i<this.numberInTimeline; i++) {
           dataset['100'+i] = 0
@@ -151,25 +155,28 @@ export default {
       if (Object.keys(dataset).length > 0) { 
         this.clearSVG(dataset)
       }
-      return null
+      return null;
     },
+  },
+  mounted() {
+    // this.renderSVG()
   },
   methods: {
     setTimePeriod(item) {
-      this.select = item
+      this.select = item;
     },
     getTimePart(date) {
-      let period
+      let period;
       if (this.select.value === 'min') {
-        period = date.getMinutes()
+        period = date.getMinutes();
       } else if (this.select.value === 'hour') {
-        period = date.getHours()
+        period = date.getHours();
       } else if (this.select.value === 'day') {
-        period = date.getDate()
+        period = date.getDate();
       } else {
-        period = date.getMonth()
+        period = date.getMonth();
       }
-      return period
+      return period;
     },
     getUntilMin (date) {
       let options1 = {
@@ -218,11 +225,11 @@ export default {
             item.remove()
           })
       d3.selectAll('rect')
-          .nodes()
-          .forEach((item) => {
-            item.remove()
-          })
-      this.renderSVG(dataset)
+        .nodes()
+        .forEach((item) => {
+          item.remove();
+        });
+      this.renderSVG(dataset);
     },
     plusScale() {
       if (this.numberInTimeline < 10) {
@@ -250,52 +257,52 @@ export default {
           .attr('transform', 'translate(' + marge.top + ',' + marge.left + ')')
       let dataForSvg = []
       for (let dataItem in dataset) {
-        dataForSvg.push({time: dataItem, value: dataset[dataItem] })
+        dataForSvg.push({ time: dataItem, value: dataset[dataItem] });
       }
       dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline)
       let maxY = dataForSvg[0].value
       dataForSvg.forEach(element => {
         if (element.value > maxY) {
-          maxY = element.value
+          maxY = element.value;
         }
       });
 
-      let xScale = d3.scaleBand()
-          .domain(d3.range(dataForSvg.length))
-          .rangeRound([0, width - marge.left - marge.right])
-      let xAxis = d3.axisBottom(xScale)
+      let xScale = d3
+        .scaleBand()
+        .domain(d3.range(dataForSvg.length))
+        .rangeRound([0, width - marge.left - marge.right]);
+      let xAxis = d3.axisBottom(xScale);
 
-      let yScale = d3.scaleLinear()
-          .domain([0, maxY])
-          .range([height - marge.top - marge.bottom, 0])
-      let yAxis = d3.axisLeft(yScale)
+      let yScale = d3
+        .scaleLinear()
+        .domain([0, maxY])
+        .range([height - marge.top - marge.bottom, 0]);
+      let yAxis = d3.axisLeft(yScale);
 
       // g.append('g')
       //     .attr('transform', 'translate(' + 0 + ',' + (height - marge.top - marge.bottom) + ')')
       //     .call(xAxis)
       for (let i = 0; i < 6; i++) {
         g.append('g')
-            .append('line')
-            .attr('class', 'grid-line-y')
-            .attr('x1', 0)
-            .attr('y1', (height - marge.top - marge.bottom)/5*i)
-            .attr('x2', width - marge.left - marge.right)
-            .attr('y2', (height - marge.top - marge.bottom)/5*i)
-            .attr('stroke', this.theme.$secondary_border)
+          .append('line')
+          .attr('class', 'grid-line-y')
+          .attr('x1', 0)
+          .attr('y1', ((height - marge.top - marge.bottom) / 5) * i)
+          .attr('x2', width - marge.left - marge.right)
+          .attr('y2', ((height - marge.top - marge.bottom) / 5) * i)
+          .attr('stroke', this.theme.$secondary_border);
       }
-      let gs = g.selectAll('.rect')
-          .data(dataForSvg)
-          .enter()
-          .append('g')
-      let rectPadding = 10
+      let gs = g.selectAll('.rect').data(dataForSvg).enter().append('g');
+      let rectPadding = 10;
 
-      let tooltip = d3.select("body")
-          .append("div")
-          .attr("class", "block-tooltip")
-          .style("position", "absolute")
-          .style("z-index", 10)
-          .style("visibility", "hidden")
-          .text("Simple text");
+      let tooltip = d3
+        .select('body')
+        .append('div')
+        .attr('class', 'block-tooltip')
+        .style('position', 'absolute')
+        .style('z-index', 10)
+        .style('visibility', 'hidden')
+        .text('Simple text');
 
       gs.append('rect')
           .attr('x', function (d, i) {
@@ -319,21 +326,9 @@ export default {
           })
           .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-60)+"px").style("left",(d3.event.pageX-10)+"px");})
           .on("mouseout", () => tooltip.style("visibility", "hidden"))
-
-      // gs
-      //     .selectAll(`g.tick`)
-      //     .append('line')
-      //     .attr('class', 'grid-line-y')
-      //     .attr('x1', 0)
-      //     .attr('y1', 0)
-      //     .attr('x2', this.width)
-      //     .attr('y2', 0)
-      //     .attr('stroke', this.theme.$main_text)
-      //     .style('opacity', 0.3)
     }
   }
 }
-
 
 </script>
 
@@ -341,7 +336,7 @@ export default {
 @import './../../sass/_colors'
 .timeline
   padding: 0 30px
-.select-wrap 
+.select-wrap
   display: flex
   justify-content: space-between
   padding-top: 10px

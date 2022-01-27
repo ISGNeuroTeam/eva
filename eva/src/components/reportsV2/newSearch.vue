@@ -1,26 +1,20 @@
 <template>
   <div
-      class="search-block"
-      :style="{background: theme.$main_bg, color: theme.$main_text}"
+    class="search-block"
+    :style="{ background: theme.$main_bg, color: theme.$main_text }"
   >
     <div
-        class="search-card-block"
-        :style="{background: theme.$main_bg, color: theme.$main_text}"
+      class="search-card-block"
+      :style="{ background: theme.$main_bg, color: theme.$main_text }"
     >
-      <div
-          class="loading-divider"
-          :class="{loading:loading}"
-      >
+      <div class="loading-divider" :class="{ loading: loading }">
         <div
-            class="loading-bar "
-            :style="{background: theme.$primary_button}"
+          class="loading-bar"
+          :style="{ background: theme.$primary_button }"
         />
       </div>
       <div class="search-block-header">
-        <div 
-            class="search-block-title"
-            :style="{color: theme.$title}"
-        >
+        <div class="search-block-title" :style="{ color: theme.$title }">
           Новый поиск
         </div>
         <v-btn class="action-btn" text @click="refreshInput">
@@ -52,16 +46,15 @@
             <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
             <span>{{ data.length }} результатов </span>
             <span v-if="searchTimeInterval">( {{searchTimeInterval}} )</span>
-<!--            <span v-if="dates.length>0">(c {{ dates[0] }} {{ timeStart }} по  {{dates[1]}} {{ timeFinish }})</span>-->
           </div>
         </div>
         <div class="d-flex">
           <div class="date-time-picker-wrap mt-1 mr-5">
             <v-menu
-                v-model="menuDropdown"
-                :close-on-content-click="false"
-                offset-y
-                max-width="150"
+              v-model="menuDropdown"
+              :close-on-content-click="false"
+              offset-y
+              max-width="150"
             >
               <template v-slot:activator="{ on, attrs }">
                 <div
@@ -70,21 +63,33 @@
                   v-on="on"
                 >
                   {{ timeRangeValue }}
-                  <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
+                  <v-icon :color="theme.$main_text">{{
+                    mdiChevronDown
+                  }}</v-icon>
                 </div>
               </template>
               <div class="dropdown-range">
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">Общие</div>
-                  <div class="dropdown-range-item" @click="changeTimeRange( {text:'За все время', timeHours: 'all' })">За все время</div>
+                  <div
+                    class="dropdown-range-item"
+                    @click="
+                      changeTimeRange({
+                        text: 'За все время',
+                        timeHours: 'all',
+                      })
+                    "
+                  >
+                    За все время
+                  </div>
                 </div>
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">Недавние</div>
                   <div
-                      v-for="item in timeRanges"
-                      :key="item.time"
-                      class="dropdown-range-item"
-                      @click="changeTimeRange(item)"
+                    v-for="item in timeRanges"
+                    :key="item.time"
+                    class="dropdown-range-item"
+                    @click="changeTimeRange(item)"
                   >
                     {{ item.text }}
                   </div>
@@ -100,14 +105,14 @@
                       max-width="250"
                   >
                     <template v-slot:activator="{ on, attrs }">
-                      <div 
-                          class="dropdown-range-item flex-between"
-                          v-bind="attrs"
-                          v-on="on"
+                      <div
+                        class="dropdown-range-item flex-between"
+                        v-bind="attrs"
+                        v-on="on"
                       >
                         <div>Выбрать дату</div>
                         <div>
-                          <v-icon>{{ mdiCalendarMonthOutline  }}</v-icon>
+                          <v-icon>{{ mdiCalendarMonthOutline }}</v-icon>
                         </div>
                       </div>
                     </template>
@@ -126,14 +131,18 @@
                         <input v-model="timeFinish" type="time">
                       </div>
                       <div class="picker-actions d-flex justify-space-around">
-                        <v-btn depressed small @click="menuCalendar = false">Отменить</v-btn>
-                        <v-btn 
-                            depressed 
-                            small 
-                            dark 
-                            :color="theme.$primary_button" 
-                            :disabled="dates.length<2" 
-                            @click="setTimeFromPicker(dates, timeStart, timeFinish)"
+                        <v-btn depressed small @click="menuCalendar = false"
+                          >Отменить</v-btn
+                        >
+                        <v-btn
+                          depressed
+                          small
+                          dark
+                          :color="theme.$primary_button"
+                          :disabled="dates.length < 2"
+                          @click="
+                            setTimeFromPicker(dates, timeStart, timeFinish)
+                          "
                         >
                           Выбрать
                         </v-btn>
@@ -145,13 +154,13 @@
             </v-menu>
           </div>
           <v-btn 
-              class="action-btn"
-              dark
-              depressed 
-              small 
-              :color="theme.$ok_color"
-              :loading="loading"
-              @click="launchSearch"
+            class="action-btn"
+            dark
+            depressed 
+            small 
+            :color="theme.$ok_color"
+            :loading="loading"
+            @click="launchSearch"
           >
             <span class="action-btn-text">Поиск</span>
             <v-icon class="action-btn-icon">{{ mdiMagnify }}</v-icon>
@@ -162,9 +171,14 @@
   </div>
 </template>
 
-
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiCalendarMonthOutline, mdiCheck  } from '@mdi/js'
+import {
+  mdiRefresh,
+  mdiMagnify,
+  mdiChevronDown,
+  mdiCalendarMonthOutline,
+  mdiCheck,
+} from '@mdi/js';
 
 export default {
   props: {
@@ -177,14 +191,14 @@ export default {
       default: () => false
     }
   },
-  data () {
+  data() {
     return {
       twf: '',
       search: {
         parameters: {
           tws: 0,
           twf: 0,
-        }
+        },
       },
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
@@ -204,15 +218,15 @@ export default {
         { text: 'Последние 24 часа', timeHours: 24 },
         { text: 'Последние 7 дней', timeHours: 168 },
         { text: 'Последние 30 дней', timeHours: 720 },
-      ]
-    }
+      ],
+    };
   },
   computed: {
     theme () {
       return this.$store.getters.getTheme
     },
-    dateRangeText () {
-      return this.dates.join(' ~ ')
+    dateRangeText() {
+      return this.dates.join(' ~ ');
     },
     // effectiveDateRange () {
     //   return this.dates.sort().join(' - ');
@@ -256,38 +270,78 @@ export default {
     })
     this.unitedData.color=  this.theme.controls;
   },
+  mounted() {
+    document.title = 'EVA | Исследование данных';
+    this.search = this.$store.getters.getReportSearch;
+    if (this.search.original_otl != '') {
+      this.$store.commit('setShould', {
+        idDash: 'reports',
+        id: 'table',
+        status: true,
+      });
+    }
+    // this.calcSize();
+    this.$refs.search.$el.addEventListener('keypress', (event) => {
+      if (event.ctrlKey && event.keyCode == 13) {
+        this.launchSearch();
+      }
+    });
+    this.$refs.report.addEventListener('click', (event) => {
+      if (!event.target.classList.contains('static-row')) {
+        this.showStatistic = false;
+      }
+    });
+    this.unitedData.color = this.theme.controls;
+  },
   methods: {
     addLineBreaks(event) {
-      this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '|',
+        '\n' + '|'
+      );
       if (this.search.original_otl[0] === '\n') {
-        this.search.original_otl = this.search.original_otl.substring(1)
+        this.search.original_otl = this.search.original_otl.substring(1);
       }
-      this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
-      this.search.original_otl = this.search.original_otl.replaceAll('|' + '\n', '| ')
-      this.search.original_otl = this.search.original_otl.replaceAll('| ' + '\n', '| ')
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '\n\n' + '|',
+        '\n' + '|'
+      );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '|' + '\n',
+        '| '
+      );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '| ' + '\n',
+        '| '
+      );
     },
-    refreshInput () {
-      this.search.original_otl = ''
+    refreshInput() {
+      this.search.original_otl = '';
     },
-    launchSearch: async function() {
-      this.$emit("launchSearch", this.search);
+    launchSearch: async function () {
+      this.$emit('launchSearch', this.search);
     },
-    hashCode: function(otl) {
-      return otl.split('').reduce((prevHash, currVal) =>
-          (((prevHash << 5) - prevHash) + currVal.charCodeAt(0))|0, 0);
+    hashCode: function (otl) {
+      return otl
+        .split('')
+        .reduce(
+          (prevHash, currVal) =>
+            ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
+          0
+        );
     },
-    changeTimeRange (range) {
-      let twf
-      let tws
-      if (range.timeHours==='all') {
-        twf = 0
-        tws = 0
+    changeTimeRange(range) {
+      let twf;
+      let tws;
+      if (range.timeHours === 'all') {
+        twf = 0;
+        tws = 0;
       } else {
-        twf = Math.round(Date.now()/1000);
-        tws = twf - range.timeHours*3600
+        twf = Math.round(Date.now() / 1000);
+        tws = twf - range.timeHours * 3600;
       }
-      this.timeRangeValue = range.text
-      this.setTwsTwf(tws, twf)
+      this.timeRangeValue = range.text;
+      this.setTwsTwf(tws, twf);
     },
     setTimeFromPicker (dates, timeStart, timeFinish) {
       let twsArr = dates[0].split('-')
@@ -320,10 +374,9 @@ export default {
   }
 }
 
-
 </script>
 
-<style lang="sass" >
+<style lang="sass">
 @import ./../../sass/_colors
 
 .textarea
@@ -440,5 +493,4 @@ export default {
     width: 20px
 .v-picker__title
   display: none
-
 </style>

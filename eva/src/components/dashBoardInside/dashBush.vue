@@ -14,32 +14,32 @@
         </v-icon>
       </div>
       <div v-else class="buttons-wrapper">
-        <v-icon :color="'white'" @click="clickViewMode" v-if="isViewMode">
+        <v-icon v-if="isViewMode" :color="'white'" @click="clickViewMode">
           {{ icon.move }}
         </v-icon>
-        <v-icon :color="'white'" @click="clickEditorMode" v-else>
+        <v-icon v-else :color="'white'" @click="clickEditorMode">
           {{ icon.pencil }}
         </v-icon>
       </div>
       <div
+        ref="graph"
         class="bush-ygraph-container"
         :style="{ top: `${top}` }"
-        ref="graph"
       />
     </div>
   </div>
 </template>
 
 <script>
-import * as yfile from "yfiles";
-import licenseData from "./license.json";
+import * as yfile from 'yfiles';
+import licenseData from './license.json';
 
-import { mdiClose, mdiCursorMove, mdiPencil } from "@mdi/js";
+import { mdiClose, mdiCursorMove, mdiPencil } from '@mdi/js';
 
 yfile.License.value = licenseData; //проверка лицензии
 
 export default {
-  name: "dashBush",
+  name: 'dashBush',
   props: {
     // переменные полученные от родителя
     idFrom: null, // id элемнета (table, graph-2)
@@ -69,23 +69,23 @@ export default {
     top() {
       // для ряда управляющих иконок
       if (document.body.clientWidth <= 1600) {
-        return "50px";
+        return '50px';
       } else {
-        return "60px";
+        return '60px';
       }
     },
     widthPanel() {
-      return this.widthFrom / 10 + "px";
+      return this.widthFrom / 10 + 'px';
     },
     heightPanel() {
-      return this.heightFrom + "px";
+      return this.heightFrom + 'px';
     },
     dragRes() {
       let dragRes = this.$store.getters.getDragRes({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      if (dragRes === "true") {
+      if (dragRes === 'true') {
         return true;
       } else {
         return false;
@@ -179,9 +179,9 @@ export default {
         let _node;
         let _imgSource;
         if (this.nodesSource[index].anomaly === true) {
-          _imgSource = this.elementConfig.library.primitives[
-            this.nodesSource[index].type
-          ].image_on;
+          _imgSource =
+            this.elementConfig.library.primitives[this.nodesSource[index].type]
+              .image_on;
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
             style: new yfile.ImageNodeStyle(`/svg/warning_${_imgSource}`),
@@ -189,13 +189,15 @@ export default {
           });
         } else {
           if (this.nodesSource[index].status === true) {
-            _imgSource = this.elementConfig.library.primitives[
-              this.nodesSource[index].type
-            ].image_on;
+            _imgSource =
+              this.elementConfig.library.primitives[
+                this.nodesSource[index].type
+              ].image_on;
           } else {
-            _imgSource = this.elementConfig.library.primitives[
-              this.nodesSource[index].type
-            ].image_off;
+            _imgSource =
+              this.elementConfig.library.primitives[
+                this.nodesSource[index].type
+              ].image_off;
           }
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
@@ -288,7 +290,7 @@ export default {
       //sort TODO!!
       let _sort = [];
       this.edgesSource.forEach((edge) => {
-        if (edge.style === "oil") {
+        if (edge.style === 'oil') {
           _sort.unshift(edge);
         } else {
           _sort.push(edge);
@@ -349,23 +351,20 @@ export default {
     },
     initializeDefaultStyles() {
       //стиль для label
-      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle(
-        {
-          textFill: "#b8b8b8",
-          backgroundFill: "#0a0a0a",
-        }
-      );
-      this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle(
-        {
+      this.$graphComponent.graph.nodeDefaults.labels.style =
+        new yfile.DefaultLabelStyle({
+          textFill: '#b8b8b8',
+          backgroundFill: '#0a0a0a',
+        });
+      this.$graphComponent.graph.edgeDefaults.style =
+        new yfile.PolylineEdgeStyle({
           stroke: `3px white`,
-        }
-      );
+        });
 
       //положение label относительно ноды
       const labelModel = new yfile.ExteriorLabelModel({ insets: 4 });
-      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(
-        yfile.ExteriorLabelModelPosition.SOUTH
-      );
+      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter =
+        labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH);
     },
   },
 };

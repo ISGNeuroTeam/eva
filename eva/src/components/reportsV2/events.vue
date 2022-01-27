@@ -56,15 +56,19 @@
   </div>
 </template>
 
-
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronRight, mdiChevronDown } from '@mdi/js'
+import {
+  mdiRefresh,
+  mdiMagnify,
+  mdiChevronRight,
+  mdiChevronDown,
+} from '@mdi/js';
 
 export default {
   props: {
     data: [],
   },
-  data () {
+  data() {
     return {
       mdiRefresh: mdiRefresh,
       mdiMagnify: mdiMagnify,
@@ -72,15 +76,21 @@ export default {
       mdiChevronDown: mdiChevronDown,
       expanded: [],
       headers: [
-        { text: 'Инфо',  align: 'left', sortable: false, value: 'info', width: '80px' },
+        {
+          text: 'Инфо',
+          align: 'left',
+          sortable: false,
+          value: 'info',
+          width: '80px',
+        },
         { text: 'Время', sortable: false, value: 'time', width: '120px' },
         { text: 'Данные', sortable: false, value: 'inputCount' },
       ],
-    }
+    };
   },
   computed: {
-    theme () {
-      return this.$store.getters.getTheme
+    theme() {
+      return this.$store.getters.getTheme;
     },
     dataset () {
       let dataset = []
@@ -93,7 +103,7 @@ export default {
           second: 'numeric',
           day: '2-digit',
           month: '2-digit',
-          year: 'numeric'
+          year: 'numeric',
         };
         dataset.push({time: new Date(item._time*1000).toLocaleString("ru", options), inputCount: item, id: id})
         id++
@@ -104,13 +114,12 @@ export default {
   }
 }
 
-
 </script>
 
 <style lang="sass">
 @import './../../sass/_colors'
 .events
-  .collapse-row 
+  .collapse-row
     border-bottom: 1px solid $main-border
   .v-data-footer
     border-top: none !important

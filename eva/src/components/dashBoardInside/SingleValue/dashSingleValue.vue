@@ -5,7 +5,7 @@
   >
     <div class="header">
       <div>
-        <span class="data-title" v-text="tokenizedTitle"/>
+        <span class="data-title" v-text="tokenizedTitle" />
       </div>
       <v-icon
         v-show="dataModeFrom"
@@ -29,10 +29,7 @@
             class="icon"
             v-html="getIconSvgByID(metric.icon)"
           />
-          <span
-            class="title-text"
-            v-text="metric.title"
-          />
+          <span class="title-text" v-text="metric.title" />
         </span>
         <span
           class="metric-value"
@@ -72,7 +69,7 @@ export default {
     dataRestFrom: Array,
     dataModeFrom: Boolean,
     updateSettings: Function,
-    currentSettings: Object
+    currentSettings: Object,
   },
   data: () => ({
     mdiSettings,
@@ -89,7 +86,7 @@ export default {
   }),
   computed: {
     dataToRender() {
-      let temp = [...this.metricList].sort((a,b) => a.listOrder - b.listOrder)
+      let temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
       // console.log(temp)
       return this.update && temp.slice(0, this.metricCount);
     },
@@ -110,17 +107,25 @@ export default {
   watch: {
     dataRestFrom() {
       const { idFrom: id, idDashFrom: idDash } = this;
-      const options = JSON.parse(JSON.stringify(this.$store.getters.getOptions({ id, idDash })));
-      this.setVisual(this.currentSettings.metricOptions?.length ? this.currentSettings.metricOptions : options.settings?.metricOptions)
-
+      const options = JSON.parse(
+        JSON.stringify(this.$store.getters.getOptions({ id, idDash }))
+      );
+      this.setVisual(
+        this.currentSettings.metricOptions?.length
+          ? this.currentSettings.metricOptions
+          : options.settings?.metricOptions
+      );
     },
     currentSettings() {
-      let currentSettings = Object.assign({
-        metricOptions: []
-      }, this.currentSettings);
-      this.providedSettings = currentSettings
-      this.init(currentSettings)
-    }
+      let currentSettings = Object.assign(
+        {
+          metricOptions: [],
+        },
+        this.currentSettings
+      );
+      this.providedSettings = currentSettings;
+      this.init(currentSettings);
+    },
   },
   mounted() {
     /** Getting saved component options from the store. */
@@ -132,10 +137,9 @@ export default {
         return undefined;
       }
       const ranges = eval('({obj:[' + metric.metadata + ']})').obj[0];
-      Object.keys(ranges).forEach(key => {
+      Object.keys(ranges).forEach((key) => {
         ranges[key] = ranges[key].split(':').map(Number);
       });
-
 
       if (metric.color === 'range') {
         if (Number(metric.value)) {
@@ -160,7 +164,9 @@ export default {
     },
     init(settings, up) {
       const { idFrom: id, idDashFrom: idDash } = this;
-      const options = JSON.parse(JSON.stringify(this.$store.getters.getOptions({ id, idDash })));
+      const options = JSON.parse(
+        JSON.stringify(this.$store.getters.getOptions({ id, idDash }))
+      );
       if (!options.settings && !settings) {
         options.settings = {
           title: '',
@@ -170,9 +176,9 @@ export default {
         };
       }
       if (this.updateSettings && up) {
-        this.updateSettings(settings || options.settings)
+        this.updateSettings(settings || options.settings);
       }
-      this.providedSettings = settings || options.settings
+      this.providedSettings = settings || options.settings;
       const { template, metricCount } = settings || options.settings;
 
       this.options = {
@@ -181,20 +187,23 @@ export default {
       };
       this.template = template;
       this.metricCount = this.metricCount || metricCount;
-      this.updateVisual(settings || options.settings)
+      this.updateVisual(settings || options.settings);
     },
     updateCount(count) {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = { ...this.$store.getters.getOptions({ id, idDash }) };
       this.metricCount = count;
 
-      const newSettings = Object.assign({options: {}, metricCount: count}, options.settings)
+      const newSettings = Object.assign(
+        { options: {}, metricCount: count },
+        options.settings
+      );
 
-      this.$store.commit('setOptions', newSettings)
+      this.$store.commit('setOptions', newSettings);
       if (this.updateSettings) {
-        this.updateSettings(newSettings)
+        this.updateSettings(newSettings);
       }
-      
+
       this.setVisual();
     },
     setVisual(metricOptionsCurrent) {
@@ -212,9 +221,11 @@ export default {
         if (!metadata || typeof metadata !== 'string') {
           range = null;
         }
-        const startId = `${metric}_${id}`
+        const startId = `${metric}_${id}`;
 
-        const metricCurrent = metricOptionsCurrent?.find(m => m.startId === startId);
+        const metricCurrent = metricOptionsCurrent?.find(
+          (m) => m.startId === startId
+        );
         const defaultMetricOption = {
           id: metricCurrent?.id || id,
           startId: metricCurrent?.startId || startId,
@@ -224,11 +235,19 @@ export default {
           icon: metricCurrent?.icon || 'no_icon',
           fontSize: metricCurrent?.fontSize || 54,
           fontWeight: metricCurrent?.fontWeight || 400,
-          listOrder: metricCurrent?.listOrder === undefined ? index : metricCurrent?.listOrder,
+          listOrder:
+            metricCurrent?.listOrder === undefined
+              ? index
+              : metricCurrent?.listOrder,
           ...metricCurrent,
         };
         metricList.push({ value, ...defaultMetricOption });
-        metricOptions.push({ id, range, expanded: false, ...defaultMetricOption });
+        metricOptions.push({
+          id,
+          range,
+          expanded: false,
+          ...defaultMetricOption,
+        });
       }
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
@@ -239,8 +258,8 @@ export default {
         listOrder: idx,
         title: item.name || item.title,
         fontWeight: 400,
-        value: this.metricList.find(m => m.startId === item.startId)?.value
-      }))
+        value: this.metricList.find((m) => m.startId === item.startId)?.value,
+      }));
 
       this.setVisual(settings.metricOptions);
     },
@@ -254,8 +273,8 @@ export default {
 
     openSettings() {
       /** Updating the settings provided to the SingleValueSettings. */
-      this.providedSettings = { ... this.options.settings };
-      this.defaultSettings = { ... this.options.settings }
+      this.providedSettings = { ...this.options.settings };
+      this.defaultSettings = { ...this.options.settings };
       this.isSettingsComponentOpen = true;
     },
 
@@ -275,7 +294,7 @@ export default {
       const newMetricList = [];
       for (const [index, updatedMetric] of metricOptions.entries()) {
         const { icon, title, color, fontSize, fontWeight } = updatedMetric;
-        const metric = this.metricList.find(m => m.id === updatedMetric.id);
+        const metric = this.metricList.find((m) => m.id === updatedMetric.id);
         if (metric) {
           metric.icon = icon;
           metric.title = title;
@@ -283,10 +302,10 @@ export default {
           metric.fontSize = fontSize;
           metric.fontWeight = fontWeight;
           metric.listOrder = index;
-          newMetricList[index] = metric
+          newMetricList[index] = metric;
         }
       }
-      this.metricList = [...newMetricList]
+      this.metricList = [...newMetricList];
       this.providedSettings = { ...newSettings };
 
       this.$store.commit('setOptions', {
@@ -295,8 +314,7 @@ export default {
         options: { ...this.options, settings: newSettings },
       });
 
-      if (this.updateSettings)
-        this.updateSettings(newSettings)
+      if (this.updateSettings) this.updateSettings(newSettings);
       this.update++;
     },
 
@@ -305,7 +323,7 @@ export default {
     },
 
     getIconSvgByID(id) {
-      const icon = this.metricTitleIcons.find(m => m.id === id);
+      const icon = this.metricTitleIcons.find((m) => m.id === id);
       return icon?.svg;
     },
   },

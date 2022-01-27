@@ -1,22 +1,16 @@
 <template>
-  <v-dialog
-    v-model="showModal"
-    persistent
-    width="400px"
-  >
-    <div
-      class="themes-modal-wrapper"
-    >
-      <v-card :style="{backgroundColor: theme.$secondary_bg, borderRadius: '12px'}">
-        <v-toolbar :style="{backgroundColor: theme.$main_bg, color:theme.$title}">
-          <v-icon
-            :color="theme.$title"
-          >
+  <v-dialog v-model="showModal" persistent width="400px">
+    <div class="themes-modal-wrapper">
+      <v-card
+        :style="{ backgroundColor: theme.$secondary_bg, borderRadius: '12px' }"
+      >
+        <v-toolbar
+          :style="{ backgroundColor: theme.$main_bg, color: theme.$title }"
+        >
+          <v-icon :color="theme.$title">
             {{ mdiCompare }}
           </v-icon>
-          <v-card-title class="modal-title">
-            Настройки темы
-          </v-card-title>
+          <v-card-title class="modal-title"> Настройки темы </v-card-title>
           <svg
             v-if="mode === 'manual'"
             class="ml-auto"
@@ -44,7 +38,7 @@
         </v-toolbar>
         <v-card-text
           v-if="mode === 'select'"
-          :style="{color: theme.$main_text, fontSize:'15px'}"
+          :style="{ color: theme.$main_text, fontSize: '15px' }"
         >
           Выберете тему
           <v-select
@@ -56,20 +50,31 @@
             item-text="name"
             item-value="name"
           />
-          <div v-if="admin && select !== 'dark' && select !== 'light'" class="theme-control-btn-block">
-            <div :style="{color:theme.$ok_color, marginRight: '30px'}"  class="btn" @click="editTheme">
+          <div
+            v-if="admin && select !== 'dark' && select !== 'light'"
+            class="theme-control-btn-block"
+          >
+            <div
+              :style="{ color: theme.$ok_color, marginRight: '30px' }"
+              class="btn"
+              @click="editTheme"
+            >
               <v-icon
                 :color="theme.$ok_color"
-                :style="{width: '19px', height: '19px'}"
+                :style="{ width: '19px', height: '19px' }"
               >
                 {{ mdiPencil }}
               </v-icon>
               Редактировать
             </div>
-            <div :style="{color:theme.$error_color}" class="btn" @click="deleteTheme">
+            <div
+              :style="{ color: theme.$error_color }"
+              class="btn"
+              @click="deleteTheme"
+            >
               <v-icon
                 :color="theme.$error_color"
-                :style="{width: '19px', height: '19px'}"
+                :style="{ width: '19px', height: '19px' }"
               >
                 {{ mdiTrashCanOutline }}
               </v-icon>
@@ -78,13 +83,17 @@
           </div>
           <div
             v-if="admin"
-            :style="{color:theme.$accent_ui_color, width:'170px', fontWeight: '600'}"
+            :style="{
+              color: theme.$accent_ui_color,
+              width: '170px',
+              fontWeight: '600',
+            }"
             class="add-theme-button"
-            @click="mode ='create'"
+            @click="mode = 'create'"
           >
             <v-icon
               :color="theme.$accent_ui_color"
-              :style="{marginRight:'5px'}"
+              :style="{ marginRight: '5px' }"
             >
               {{ mdiPlusCircleOutline }}
             </v-icon>
@@ -93,62 +102,51 @@
         </v-card-text>
         <v-card-text
           v-if="mode === 'create' || mode === 'edit'"
-          :style="{color: theme.$main_text, fontSize:'15px'}"
+          :style="{ color: theme.$main_text, fontSize: '15px' }"
         >
           Название темы
           <v-text-field
             v-model="newTitle"
-            :style="{color:theme.$secondary_bg}"
+            :style="{ color: theme.$secondary_bg }"
             :background-color="theme.$secondary_bg"
             :color="theme.$primary_button"
             outlined
             hide-details
           />
           <div class="helper-title">
-            <p @click="mode = 'manual'">
-              Руководство по настройке темы
-            </p>
+            <p @click="mode = 'manual'">Руководство по настройке темы</p>
           </div>
           <v-row>
-            <v-col
-              v-for="row in fields"
-              :key="row.title"
-              cols="6"
-            >
+            <v-col v-for="row in fields" :key="row.title" cols="6">
               {{ row.title }}
               <v-row justify="space-between">
                 <v-col cols="2">
                   <div
                     class="color-box"
-                    :style="{ backgroundColor: row.value}"
+                    :style="{ backgroundColor: row.value }"
                   />
                 </v-col>
                 <v-col
                   cols="9"
-                  :style="{paddingLeft:'3px', position: 'relative'}"
+                  :style="{ paddingLeft: '3px', position: 'relative' }"
                 >
-                  <v-text-field
-                    v-model="row.value"
-                    outlined
-                    hide-details
-                  />
-                  <v-menu
-                    :close-on-content-click="false"
-                  >
+                  <v-text-field v-model="row.value" outlined hide-details />
+                  <v-menu :close-on-content-click="false">
                     <template v-slot:activator="{ on }">
                       <v-icon
                         small
                         :color="theme.$title"
-                        :style="{position: 'absolute', right: '19px', top: '19px'}"
+                        :style="{
+                          position: 'absolute',
+                          right: '19px',
+                          top: '19px',
+                        }"
                         v-on="on"
                       >
                         {{ mdiPencil }}
                       </v-icon>
                     </template>
-                    <v-color-picker
-                      v-model="row.value"
-                      dot-size="17"
-                    />
+                    <v-color-picker v-model="row.value" dot-size="17" />
                   </v-menu>
                 </v-col>
               </v-row>
@@ -159,14 +157,8 @@
           </div>
           <div class="upload-wrapper">
             <div v-if="imagePreview">
-              <img
-                :src="imagePreview"
-                alt=""
-                :style="{opacity: opacity}"
-              >
-              <v-icon
-                @click="removeImage"
-              >
+              <img :src="imagePreview" alt="" :style="{ opacity: opacity }" />
+              <v-icon @click="removeImage">
                 {{ mdiWindowClose }}
               </v-icon>
             </div>
@@ -177,7 +169,7 @@
                 type="file"
                 accept="image/*"
                 @change="uploadImage"
-              >
+              />
               <div class="upload-text">
                 <svg
                   width="18"
@@ -191,9 +183,7 @@
                     :fill="theme.$secondary_text"
                   />
                 </svg>
-                <div>
-                  Загрузить изображение
-                </div>
+                <div>Загрузить изображение</div>
               </div>
             </div>
           </div>
@@ -212,42 +202,66 @@
                 />
               </v-col>
               <v-col cols="3">
-                <v-text-field
-                  v-model="opacity"
-                  outlined
-                  hide-details
-                />
+                <v-text-field v-model="opacity" outlined hide-details />
               </v-col>
             </v-row>
           </div>
         </v-card-text>
         <v-card-text
           v-if="mode === 'manual'"
-          :style="{color: theme.$main_text, fontSize:'12px'}"
+          :style="{ color: theme.$main_text, fontSize: '12px' }"
         >
           <div class="manual-block">
             <h2>Руководство по настройке темы</h2>
-            <p>По возможности старайтесь не использовать светлые оттенки красного, желтого и зеленого цветов, так как они используются для технических сообщений.</p>
-            <p>Основной фон является главным цветом для фона в приложении. Дополнительный фон используется для выделения отдельных частей окон или для фона визуальных компонентов.</p>
-            <p>Основной цвет линий используется для компонентов форм или для главных линий в схемах и графиках. Дополнительный цвет нужен для неважных линий или дополнительных линий в схемах и графиках.</p>
-            <p>Цвета текста также делятся на гавный и дополнительный. Для основного текста используется основной цвет, для примечаний или пояснений - дополнительный.</p>
-            <p>Цвет заголовка используется в шапке приложения или в шапках отдельных компонентов или окон.</p>
-            <p>Акцентный цвет используется для дополнительных органов управления, иконок компонентов приложения и выделения активных элементов интерфейса.</p>
-            <p>Цвета взаимодействия используются для различных кнопок и органов управления в настройках. Дополнительный цвет должен отличаться от основного на несколько тонов, он используется для эффекта наведения.</p>
+            <p>
+              По возможности старайтесь не использовать светлые оттенки
+              красного, желтого и зеленого цветов, так как они используются для
+              технических сообщений.
+            </p>
+            <p>
+              Основной фон является главным цветом для фона в приложении.
+              Дополнительный фон используется для выделения отдельных частей
+              окон или для фона визуальных компонентов.
+            </p>
+            <p>
+              Основной цвет линий используется для компонентов форм или для
+              главных линий в схемах и графиках. Дополнительный цвет нужен для
+              неважных линий или дополнительных линий в схемах и графиках.
+            </p>
+            <p>
+              Цвета текста также делятся на гавный и дополнительный. Для
+              основного текста используется основной цвет, для примечаний или
+              пояснений - дополнительный.
+            </p>
+            <p>
+              Цвет заголовка используется в шапке приложения или в шапках
+              отдельных компонентов или окон.
+            </p>
+            <p>
+              Акцентный цвет используется для дополнительных органов управления,
+              иконок компонентов приложения и выделения активных элементов
+              интерфейса.
+            </p>
+            <p>
+              Цвета взаимодействия используются для различных кнопок и органов
+              управления в настройках. Дополнительный цвет должен отличаться от
+              основного на несколько тонов, он используется для эффекта
+              наведения.
+            </p>
           </div>
         </v-card-text>
         <v-card-actions class="justify-end">
           <div v-if="mode === 'create' || mode === 'edit'">
             <v-btn
               :color="theme.$main_bg"
-              :style="{color:theme.$main_text}"
+              :style="{ color: theme.$main_text }"
               @click="toSelectMode"
             >
               Отмена
             </v-btn>
             <v-btn
               :color="theme.$primary_button"
-              :style="{color:'#FFF', marginLeft: '10px'}"
+              :style="{ color: '#FFF', marginLeft: '10px' }"
               @click="saveNewTheme"
             >
               Сохранить
@@ -256,7 +270,7 @@
           <div v-if="mode === 'manual'">
             <v-btn
               :color="theme.$primary_button"
-              :style="{color:'#FFF'}"
+              :style="{ color: '#FFF' }"
               @click="mode = 'create'"
             >
               Понятно
@@ -269,7 +283,13 @@
 </template>
 
 <script>
-import {mdiCompare, mdiPlusCircleOutline, mdiWindowClose, mdiPencil, mdiTrashCanOutline} from '@mdi/js'
+import {
+  mdiCompare,
+  mdiPlusCircleOutline,
+  mdiWindowClose,
+  mdiPencil,
+  mdiTrashCanOutline,
+} from '@mdi/js';
 
 export default {
   props: {
@@ -291,76 +311,76 @@ export default {
         {
           title: 'Основной фон',
           propName: '$main_bg',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Дополнительный фон',
           propName: '$secondary_bg',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Основные линии',
           propName: '$main_border',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Дополнительные линии',
           propName: '$secondary_border',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Основной текст',
           propName: '$main_text',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Дополнительный текст',
           propName: '$secondary_text',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Заголовки',
           propName: '$title',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Иконки и акценты',
           propName: '$accent_ui_color',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Взаимодейтсвия',
           propName: '$primary_button',
-          value: "#8F8F9C",
+          value: '#8F8F9C',
         },
         {
           title: 'Взаимодейтсвия (доп.)',
           propName: '$primary_button_hover',
-          value: "#8F8F9C",
-        }
+          value: '#8F8F9C',
+        },
       ],
       imagePreview: null,
       mode: 'select',
-      error:false,
-    }
+      error: false,
+    };
   },
   computed: {
     showModal() {
       return this.show;
     },
     theme() {
-      return this.$store.getters.getTheme
-    }
+      return this.$store.getters.getTheme;
+    },
   },
   watch: {
     select: async function (selectedTheme) {
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         let response = await fetch(`/api/theme?themeName=${selectedTheme}`);
         let themeData = await response.json();
-        let content = JSON.parse(themeData.content)
+        let content = JSON.parse(themeData.content);
         this.$store.commit('setTheme', content);
       } else this.$store.commit('setDefaultTheme', selectedTheme);
-    }
+    },
   },
   async created() {
     await this.getThemeList();
@@ -370,7 +390,7 @@ export default {
       this.newTitle = '';
       this.opacity = 1;
       this.imagePreview = null;
-      this.fields.forEach(field => field.value = "#8F8F9C");
+      this.fields.forEach((field) => (field.value = '#8F8F9C'));
     },
     closeModal() {
       this.$emit('closeModal');
@@ -383,11 +403,13 @@ export default {
     editTheme() {
       let themeObject = this.$store.getters.getTheme;
       let themeTitle = this.$store.getters.getThemeTitle;
-      this.fields.forEach(field => {
+      this.fields.forEach((field) => {
         field.value = themeObject[field.propName];
       });
       this.opacity = themeObject.$image_opacity;
-      this.imagePreview = themeObject.$background_image ? themeObject.$background_image.slice(4,-1) : themeObject.$background_image;
+      this.imagePreview = themeObject.$background_image
+        ? themeObject.$background_image.slice(4, -1)
+        : themeObject.$background_image;
       this.newTitle = themeTitle;
       this.mode = 'edit';
     },
@@ -396,20 +418,20 @@ export default {
         await fetch(`/api/theme/delete`, {
           method: 'DELETE',
           body: JSON.stringify({
-            themeName: this.select
-          })
+            themeName: this.select,
+          }),
         });
         await this.getThemeList();
         this.select = 'dark';
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     },
     uploadImage() {
       const image = this.$refs.imageInput.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(image);
-      reader.onload = e => {
+      reader.onload = (e) => {
         this.imagePreview = e.target.result;
       };
     },
@@ -419,67 +441,64 @@ export default {
     },
     async saveNewTheme() {
       if (this.newTitle) {
-        if(this.mode === 'edit') {
+        if (this.mode === 'edit') {
           try {
             await fetch(`/api/theme/delete`, {
               method: 'DELETE',
               body: JSON.stringify({
-                themeName: this.select
-              })
+                themeName: this.select,
+              }),
             });
           } catch (e) {
-            console.log(e)
+            console.log(e);
           }
         }
         let themeObject = {
           themeName: this.newTitle,
           settings: {
             $image_opacity: this.opacity,
-            $background_image: this.imagePreview ? `url(${this.imagePreview})` : null
-          }
-        }
-        this.fields.forEach(field => {
+            $background_image: this.imagePreview
+              ? `url(${this.imagePreview})`
+              : null,
+          },
+        };
+        this.fields.forEach((field) => {
           themeObject.settings[field.propName] = field.value;
         });
 
         try {
-          let res = await fetch('/api/theme/create',
-            {
-              method:'POST',
-              body:JSON.stringify(themeObject)
-            }
-          )
-          if(res.status !== 200) return;
+          let res = await fetch('/api/theme/create', {
+            method: 'POST',
+            body: JSON.stringify(themeObject),
+          });
+          if (res.status !== 200) return;
           let themeData = await res.json();
-          let content = JSON.parse(themeData)
+          let content = JSON.parse(themeData);
           this.$store.commit('setTheme', content);
-          this.mode = 'select'
-          await this.getThemeList()
+          this.mode = 'select';
+          await this.getThemeList();
         } catch (e) {
-          console.log(e)
+          console.log(e);
         }
       } else {
-        this.error = true
+        this.error = true;
       }
     },
     async getThemeList() {
       try {
         let response = await fetch('/api/themes');
         let themeTitles = await response.json();
-        this.themeTitles = [
-          {name: 'dark'},
-          {name: 'light'},
-        ].concat(themeTitles);
+        this.themeTitles = [{ name: 'dark' }, { name: 'light' }].concat(
+          themeTitles
+        );
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style lang="scss">
-
 @import '../sass/modalThemes.sass';
-
 </style>
