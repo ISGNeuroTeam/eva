@@ -233,7 +233,6 @@
                     :updateSettings="updateSettings"
                     :widthFrom="fullScreenWidth"
                     :heightFrom="fullScreenHeight"
-                    :titles="getSelectedTableTitles(idDash, element)"
                     :options="props.options"
                     :is-full-screen="true"
                     @hideDS="hideDS($event)"
@@ -403,7 +402,6 @@
         :tooltipFrom="props.tooltip"
         :widthFrom="width"
         :heightFrom="height"
-        :titles="getSelectedTableTitles(idDash, element)"
         :options="props.options"
         :currentSettings="settings"
         :updateSettings="updateSettings"
@@ -436,9 +434,10 @@ import {
   mdiArrowDownBold,
   mdiArrowExpand,
   mdiArrowCollapse,
-} from '@mdi/js';
-import { mapGetters } from 'vuex';
-import settings from '../js/componentsSettings.js';
+} from "@mdi/js";
+import { mapGetters } from "vuex";
+import settings from "../js/componentsSettings.js";
+import Vue from "vue";
 
 export default {
   props: {
@@ -647,7 +646,6 @@ export default {
 
       return options.change;
     },
-    ...mapGetters(['getSelectedTableTitles', 'getSelectedDataFormat']),
   },
   watch: {
     fullScreenMode(to) {
@@ -710,9 +708,8 @@ export default {
       });
     },
     switchOP: function () {
-      this.$store.commit('setModalSettings', {
-        idDash: this.idDash,
-        status: true,
+      this.$store.dispatch('openModalSettings', {
+        path: this.idDash,
         element: this.element,
         titles: this.searchData[0] ? Object.keys(this.searchData[0]) : [],
       });

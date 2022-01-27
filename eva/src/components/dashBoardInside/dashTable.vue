@@ -92,8 +92,8 @@ export default {
     dataReport: null,
     activeElemFrom: null,
     dataModeFrom: null,
-    titles: Array,
     colorFrom: null,
+    options: Object,
   },
   data() {
     return {
@@ -251,8 +251,11 @@ export default {
     },
   },
   watch: {
-    titles(newValue) {
-      if (newValue) this.createTitles(newValue);
+    options: {
+      deep: true,
+      handler(newValue, oldValue) {
+        if (newValue) this.createTitles(newValue.titles);
+      }
     },
     dataRestFrom: {
       deep: true,
@@ -357,17 +360,14 @@ export default {
       });
     },
     createTitles: function (result) {
-      if (this.titles) {
+      if (this.options.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
-        let temp = [];
-        for (let x of allTitles) {
-          if (this.titles.includes(x)) {
-            temp.push({ text: x, value: x, sortable: true });
-          } else {
-            temp.push({ text: x, value: x, sortable: true, align: ' d-none' });
-          }
-        }
-        this.props.titles = temp;
+        this.props.titles = allTitles.map(x => ({
+          text: x,
+          value: x,
+          sortable: true,
+          align: (this.options.titles.length === 0 || this.options.titles.includes(x)) ? undefined : ' d-none'
+        }));
       } else {
         if (result && result.length) {
           this.props.titles = Object.keys(result[0]).map((item) => {
@@ -483,7 +483,7 @@ export default {
                           }
                           break;
                       }
-                      if (needItem != null) {
+                      if (needItem != null && this.eventRows) {
                         needItem.classList.add('event');
                         this.eventRows.push(needItem);
                       }

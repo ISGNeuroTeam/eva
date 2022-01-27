@@ -116,6 +116,11 @@ export default {
       return strokeWidth ? Number(strokeWidth) : 1.5;
     },
 
+    linkOptions() {
+      const { id, idDash } = this
+      return this.$store.getters.getOptions({ id, idDash })
+    },
+
     change() {
       if (this.widthFrom && this.heightFrom && this.dataRestFrom.length !== 0) {
         this.setNoData(true);
@@ -143,6 +148,12 @@ export default {
     },
   },
   watch: {
+    linkOptions: {
+      deep: true,
+      handler(val, oldVal) {
+        this.getDataAsynchrony()
+      },
+    },
     metrics() {
       const { id, idDash, metrics } = this;
       this.$store.commit('setMetricsMulti', { id, idDash, metrics });
@@ -189,6 +200,8 @@ export default {
 
       this.setNoData(false);
 
+      const options = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
+
       const {
         metrics,
         united = false,
@@ -202,11 +215,19 @@ export default {
         color,
         conclusion_count,
         replace_count,
-        barplotstyle,
-        yAxesBinding = { axesCount: 1, metrics: {}, metricTypes: {} },
-      } = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash });
+        barplotstyle = 'divided',
+        axesCount,
+        metricTypes,
+        metricsAxis,
+      } = options
 
-      this.stringOX = stringOX;
+      const yAxesBinding = {
+        axesCount: axesCount || options.yAxesBinding?.axesCount || 1,
+        metrics: metricsAxis || options.yAxesBinding?.metrics || {},
+        metricTypes: metricTypes || options.yAxesBinding?.metricTypes || {}
+      }
+
+      this.stringOX = stringOX
 
       if (!this.stringOX && typeof rowValue !== 'number') {
         return this.showErrorMessage(
@@ -353,24 +374,9 @@ export default {
         .style('opacity', 0.3);
     },
 
-    putLabelDot(
-      x,
-      attr,
-      className,
-      d,
-      y,
-      metricName,
-      dot,
-      elem,
-      brushObj,
-      replaceCount
-    ) {
-      dot.setAttribute(attr, 'true');
-      console.log(replaceCount);
-      const label =
-        replaceCount === undefined
-          ? d[metricName]
-          : Number(d[metricName]).toFixed(replaceCount);
+    putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj, replaceCount) {
+      dot.setAttribute(attr, 'true')
+      const label = replaceCount === undefined ? d[metricName] : Number(d[metricName]).toFixed(replaceCount)
 
       const text = this.svg
         .append('text')
@@ -841,7 +847,6 @@ export default {
           }
         }
       }
-      //console.log(x.ticks())
 
       const svgWidth = this.width + margin.left + margin.right;
       const svgHeight = this.height + margin.top + margin.bottom + 10;
