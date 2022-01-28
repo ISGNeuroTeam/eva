@@ -168,7 +168,7 @@ export default {
       }
     },
     editUser: function (act, item, key) {
-      if (act == 'create') {
+      if (act === 'create') {
         this.user = {};
         this.createSome = true;
       } else {
@@ -178,7 +178,7 @@ export default {
       this.curItem = item;
       this.keyFrom = key;
 
-      if (act != 'create') {
+      if (act !== 'create') {
         switch (key) {
           case 1:
             this.curItem.tab = 'user';
@@ -275,12 +275,12 @@ export default {
             clearTimeout(timeOut);
             table = document.querySelector(`[data-id="${i}"]`);
             table.addEventListener('mouseover', (event) => {
-              if (event.target.tagName.toLowerCase() == 'td') {
+              if (event.target.tagName.toLowerCase() === 'td') {
                 event.target.parentElement.style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
               }
             });
             table.addEventListener('mouseout', (event) => {
-              if (event.target.tagName.toLowerCase() == 'td') {
+              if (event.target.tagName.toLowerCase() === 'td') {
                 event.target.parentElement.style = `background: transparent !important;color:${this.theme.$main_text}`;
               }
             });

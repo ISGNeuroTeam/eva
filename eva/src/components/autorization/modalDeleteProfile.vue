@@ -37,8 +37,6 @@
 </template>
 
 <script>
-import {} from '@mdi/js';
-
 export default {
   props: {
     activeDelete: null,
@@ -60,7 +58,7 @@ export default {
       this.$emit('cancelModal');
     },
     checkEsc: function (event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
@@ -71,7 +69,7 @@ export default {
       });
 
       response.then((res) => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           this.cancelModal();
         }
       });

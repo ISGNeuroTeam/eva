@@ -331,24 +331,22 @@ export default {
   },
   computed: {
     active: function () {
-      let essence = this.essence;
-      if (this.create) {
-        this.alldata[essence].tab.users = 'tab-2';
-        this.alldata[essence].tab.roles = 'tab-2';
-        this.alldata[essence].tab.permissions = 'tab-2';
-        this.alldata[essence].tab.groups = 'tab-2';
-        this.alldata[essence].tab.indexes = 'tab-2';
-        this.alldata[essence].tab.dashs = 'tab-2';
-      } else {
-        this.alldata[essence].tab.users = 'tab-1';
-        this.alldata[essence].tab.roles = 'tab-1';
-        this.alldata[essence].tab.permissions = 'tab-1';
-        this.alldata[essence].tab.groups = 'tab-1';
-        this.alldata[essence].tab.indexes = 'tab-1';
-        this.alldata[essence].tab.dashs = 'tab-1';
-      }
       if (this.activeFrom) {
-        this.switchTab();
+        this.$nextTick(() => {
+          let essence = this.essence;
+          const tabs = [
+            'users',
+            'roles',
+            'permissions',
+            'groups',
+            'indexes',
+            'dashs',
+          ];
+          for (let tab of tabs) {
+            this.alldata[essence].tab[tab] = this.create ? 'tab-2' : 'tab-1';
+          }
+          this.switchTab();
+        });
       }
       return this.activeFrom;
     },
@@ -363,7 +361,7 @@ export default {
       let data = await this.dataFrom;
 
       if (this.create) {
-        if (essence == 'dash') {
+        if (essence === 'dash') {
           this.alldata[essence][subessence] = {
             selected: [],
             nodata: this.noneText[subessence],

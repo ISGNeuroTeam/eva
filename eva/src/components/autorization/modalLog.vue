@@ -43,8 +43,6 @@
 </template>
 
 <script>
-import {} from '@mdi/js';
-
 export default {
   props: {
     modalActive: null,
@@ -115,7 +113,7 @@ export default {
 
       let response = await this.$store.auth.getters.saveLogIntoBack();
 
-      if (response.status == 200) {
+      if (response.status === 200) {
         this.msgError = 'Лог сохранен успешно';
         this.colorError = 'teal';
         hide();
@@ -126,14 +124,14 @@ export default {
       }
     },
     checkEsc: function (event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
     clearLog: async function (clear) {
-      if (clear == 'Очистить') {
+      if (clear === 'Очистить') {
         let response = await this.$store.auth.getters.deleteLog();
-        if (response == 'clear') {
+        if (response === 'clear') {
           this.restore = this.text;
           this.text = '';
           this.clear = 'Восстановить';

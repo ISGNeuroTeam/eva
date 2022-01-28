@@ -233,8 +233,6 @@
 </template>
 
 <script>
-import {} from '@mdi/js';
-
 export default {
   props: {
     activeFrom: null,
@@ -297,46 +295,7 @@ export default {
   },
   computed: {
     active: function () {
-      if (this.activeFrom) {
-        if (Object.keys(this.userFrom).length != 0) {
-          this.userData.username = this.userFrom.username;
-          this.userData.pass = '';
-        } else {
-          this.userData.username = '';
-          this.userData.pass = '';
-        }
-        Object.keys(this.showBlock).forEach((item) => {
-          this.showBlock[item] = false;
-        });
-
-        switch (this.keyFrom) {
-          case 1:
-            this.showBlock.users = true;
-            break;
-          case 2:
-            this.showBlock.roles = true;
-            break;
-          case 3:
-            this.showBlock.permissions = true;
-            break;
-          case 4:
-            this.showBlock.groups = true;
-            break;
-          case 5:
-            this.showBlock.indexes = true;
-            break;
-        }
-        if (this.create) {
-          this.$set(this.userData, 'username', '');
-          this.$set(this.userData, 'pass', '');
-          this.$set(this.curItem, 'color', '');
-          this.$set(this.curItem, 'name', '');
-        } else {
-          this.$set(this.userData, 'username', this.curItemFrom.name);
-          this.curItem = Object.assign({}, this.curItemFrom);
-        }
-        this.dataRest = this.getDataForEssence();
-      }
+      console.log('computed active this.activeFrom = ', this.activeFrom);
       return this.activeFrom;
     },
     width: function () {
@@ -399,6 +358,46 @@ export default {
       return this.$store.getters.getTheme;
     },
   },
+  watch: {
+    active: function () {
+      if (this.activeFrom) {
+        this.userData.username =
+          Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
+        this.userData.pass = '';
+        Object.keys(this.showBlock).forEach((item) => {
+          this.showBlock[item] = false;
+        });
+
+        switch (this.keyFrom) {
+          case 1:
+            this.showBlock.users = true;
+            break;
+          case 2:
+            this.showBlock.roles = true;
+            break;
+          case 3:
+            this.showBlock.permissions = true;
+            break;
+          case 4:
+            this.showBlock.groups = true;
+            break;
+          case 5:
+            this.showBlock.indexes = true;
+            break;
+        }
+        if (this.create) {
+          this.$set(this.userData, 'username', '');
+          this.$set(this.userData, 'pass', '');
+          this.$set(this.curItem, 'color', '');
+          this.$set(this.curItem, 'name', '');
+        } else {
+          this.$set(this.userData, 'username', this.curItemFrom.name);
+          this.curItem = Object.assign({}, this.curItemFrom);
+        }
+        this.dataRest = this.getDataForEssence();
+      }
+    },
+  },
   mounted() {
     this.colorFrom = this.theme;
   },
@@ -429,7 +428,7 @@ export default {
       this.$emit('cancelModal');
     },
     checkEsc: function (event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
@@ -442,9 +441,9 @@ export default {
           formData.id = this.userFrom.id;
           method = 'PUT';
           this.msg = 'Пароль не может быть пустым';
-          if (act == true) {
+          if (act === true) {
             method = 'POST';
-            if (this.userData.pass.length == 0 || !this.userData.pass) {
+            if (this.userData.pass.length === 0 || !this.userData.pass) {
               this.msg = 'Логин или пароль не могут быть пустыми';
               this.openMsg = true;
               this.colorMsg = this.colorFrom.controlsActive;
@@ -463,10 +462,10 @@ export default {
               return false;
             }
             formData.password = this.userData.pass;
-          } else if (act == 'pass') {
+          } else if (act === 'pass') {
             if (
               this.oldpass == null ||
-              this.oldpass.length == 0 ||
+              this.oldpass.length === 0 ||
               !this.oldpass
             ) {
               this.msg = 'Введите старый пароль';
@@ -478,7 +477,7 @@ export default {
               return false;
             } else if (
               this.newpass == null ||
-              this.newpass.length == 0 ||
+              this.newpass.length === 0 ||
               !this.newpass
             ) {
               this.msg = 'Введите новый пароль';
@@ -496,7 +495,7 @@ export default {
                 this.openMsg = false;
               }, 2000);
               return false;
-            } else if (this.newpass == this.oldpass) {
+            } else if (this.newpass === this.oldpass) {
               this.msg = 'Пароли не должны совпадать';
               this.openMsg = true;
               this.colorMsg = this.colorFrom.controlsActive;
@@ -509,7 +508,7 @@ export default {
               formData.new_password = this.newpass;
             }
           } else {
-            if (this.userData.pass.length != 0 && this.userData.pass) {
+            if (this.userData.pass.length !== 0 && this.userData.pass) {
               if (this.userData.pass.length < 7) {
                 this.msg = 'Пароль должен быть больше 7 символов';
                 this.openMsg = true;
@@ -561,10 +560,10 @@ export default {
           break;
       }
 
-      if (Object.keys(this.changedData).length != 0) {
+      if (Object.keys(this.changedData).length !== 0) {
         let essence = this.changedData[this.essence[this.keyFrom - 1]];
         Object.keys(essence).forEach((item) => {
-          if (essence[item].length != 0) {
+          if (essence[item].length !== 0) {
             essence[item].forEach((itemEs) => {
               if (!formData[item]) {
                 formData[item] = [];
@@ -584,16 +583,16 @@ export default {
       });
 
       response.then((res) => {
-        if (res.status == 200) {
+        if (res.status === 200) {
           this.cancelModal();
-        } else if (res.status == 409) {
+        } else if (res.status === 409) {
           this.msg = sameMsg;
           this.openMsg = true;
           this.colorMsg = '#FF6D70';
           setTimeout(() => {
             this.openMsg = false;
           }, 2000);
-        } else if (res.status == 403) {
+        } else if (res.status === 403) {
           this.msg = '';
           this.openMsg = true;
           this.colorMsg = '#FF6D70';

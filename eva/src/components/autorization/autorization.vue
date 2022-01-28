@@ -81,7 +81,7 @@ export default {
   mounted() {
     this.getCookie();
     this.$refs.authForm.$el.addEventListener('keypress', (event) => {
-      if (event.keyCode == 13) {
+      if (event.keyCode === 13) {
         this.sendAut();
       }
     });
@@ -90,9 +90,9 @@ export default {
     sendAut: async function () {
       if (
         this.user.username &&
-        this.user.username.length != 0 &&
+        this.user.username.length !== 0 &&
         this.user.password &&
-        this.user.password.length != 0
+        this.user.password.length !== 0
       ) {
         let response = await fetch(`/api/auth/login`, {
           // сперва нужно подать post запрос
@@ -108,7 +108,7 @@ export default {
           };
         });
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
@@ -117,6 +117,7 @@ export default {
             );
             this.$store.commit('clearState');
             this.$router.push(`/main`);
+            return res;
           });
         } else {
           this.$store.auth.getters.putLog(
