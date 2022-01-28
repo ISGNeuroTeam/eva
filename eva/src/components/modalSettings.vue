@@ -98,9 +98,9 @@
                   }"
                 >
                   {{ field.description }}&nbsp;<span
-                  :style="{ color: theme.$accent_ui_color }"
-                  v-text="prop"
-                />
+                    :style="{ color: theme.$accent_ui_color }"
+                    v-text="prop"
+                  />
                 </div>
                 <div v-if="!field.group" class="status-option item">
                   <!-- elem: switch -->
@@ -656,7 +656,7 @@
                 :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
-              >Удалить</v-btn
+                >Удалить</v-btn
               >
             </div>
           </div>
