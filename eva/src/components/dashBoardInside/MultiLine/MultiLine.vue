@@ -1097,7 +1097,8 @@ export default {
               let allDotHover = [];
 
               const barPostfix = this.isFullScreen ? '-full' : '';
-              const getBarID = (i) => `bar--${metricName}--${i}--${barPostfix}`;
+              const getBarID = (i) =>
+                `bar--${this.id}--${metricName}--${i}--${barPostfix}`;
               let barWidth = parseInt(barplotBarWidth);
               if (!barplotBarWidth || barWidth <= 0) {
                 barWidth = d3
