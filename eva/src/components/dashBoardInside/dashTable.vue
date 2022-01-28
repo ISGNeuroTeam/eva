@@ -1,5 +1,5 @@
 <template>
-  <div class="table-block" :data-change="change">
+  <div class="table-block">
     <div class="v-data-table--container">
       <v-data-table
         v-show="!props.nodata"
@@ -12,7 +12,7 @@
         item-key="none"
         :hide-default-footer="props.hideFooter"
         :footer-props="{
-          itemsPerPageOptions: [100, 500, 1000, -1],
+          itemsPerPageOptions: [10, 100, 500, 1000, -1],
         }"
         :height="height"
         fixed-header
@@ -24,49 +24,47 @@
           v-slot:[`header.${title}`]="{ header }"
         >
           <v-menu :key="`${title + value}`" offset-y>
-            <template v-slot:activator="{ on, attrs }">
-              <v-menu z-index="100000" offset-y :close-on-content-click="false">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon
-                    v-bind="attrs"
-                    large
-                    class="icon"
-                    :color="theme.$main_border"
-                    v-on="on"
-                    >{{ mdiMagnify }}</v-icon
-                  >
-                </template>
-                <v-row v-if="value != 'string'">
-                  <v-col cols="6">
-                    <v-select
-                      :items="compare"
-                      label="Знак"
-                      @change="setFilterData(title, $event, 'compare')"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field
-                      label="значение"
-                      @change="setFilterData(title, $event)"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+            <v-menu z-index="100000" offset-y :close-on-content-click="false">
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon
+                  v-bind="attrs"
+                  large
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  >{{ mdiMagnify }}</v-icon
+                >
+              </template>
+              <v-row v-if="value !== 'string'">
+                <v-col cols="6">
+                  <v-select
+                    :items="compare"
+                    label="Знак"
+                    @change="setFilterData(title, $event, 'compare')"
+                  ></v-select>
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    label="значение"
+                    @change="setFilterData(title, $event)"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
 
-                <v-row v-else>
-                  <v-col cols="12">
-                    <v-text-field
-                      label="значение"
-                      @change="
-                        setFilterData(title, '=', 'compare');
-                        setFilterData(title, $event);
-                      "
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-menu>
-            </template>
+              <v-row v-else>
+                <v-col cols="12">
+                  <v-text-field
+                    label="значение"
+                    @change="
+                      setFilterData(title, '=', 'compare');
+                      setFilterData(title, $event);
+                    "
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-menu>
           </v-menu>
-          <v-tooltip :key="header.value" bottom>
+          <v-tooltip :key="value" bottom>
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
@@ -82,6 +80,7 @@
 
 <script>
 import { mdiMagnify } from '@mdi/js';
+
 export default {
   props: {
     dataRestFrom: null,
@@ -128,60 +127,59 @@ export default {
           let sort;
           let parseDate = function (val) {
             let parts = val.split('.');
-            let date = new Date(
+            return new Date(
               Number(parts[0]),
               Number(parts[1]) - 1,
               Number(parts[2])
             );
-            return date;
           };
-          if (sortType == '>')
+          if (sortType === '>')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate < elDate;
             };
-          else if (sortType == '<')
+          else if (sortType === '<')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate > elDate;
             };
-          else if (sortType == '=')
+          else if (sortType === '=')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
-              return valueDate.getTime() == elDate.getTime();
+              return valueDate.getTime() === elDate.getTime();
             };
           return sort;
         } else if (dataFormat === 'number') {
           let sort;
-          if (sortType == '>')
+          if (sortType === '>')
             sort = (el) => {
               return +el > +value;
             };
-          else if (sortType == '<')
+          else if (sortType === '<')
             sort = (el) => {
               return +el < +value;
             };
-          else if (sortType == '=')
+          else if (sortType === '=')
             sort = (el) => {
-              return +value == +el;
+              return +value === +el;
             };
           return sort;
         } else if (dataFormat === 'string') {
           let sort;
-          if (sortType == '>')
+          if (sortType === '>')
             sort = (el) => {
               return el > value;
             };
-          else if (sortType == '<')
+          else if (sortType === '<')
             sort = (el) => {
               return el < value;
             };
-          else if (sortType == '=')
+          else if (sortType === '=')
             sort = (el) => {
-              return value == el;
+              return value === el;
             };
           return sort;
         }
@@ -200,27 +198,17 @@ export default {
     },
 
     events() {
-      let events = this.$store.getters.getEvents({
+      return this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
       });
-      return events;
     },
     id: function () {
       return this.idFrom;
     },
     idDash: function () {
       return this.idDashFrom;
-    },
-    change: function () {
-      if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
-        this.props.itemsForTable = [];
-        this.props.nodata = true;
-      } else {
-        this.getDataAsynchrony(this.dataRestFrom);
-      }
-      return true;
     },
     theme: function () {
       return this.$store.getters.getTheme;
@@ -239,8 +227,8 @@ export default {
       if (this.dataReport) {
         otstup = otstup - 30;
       }
-      let height = this.heightFrom - otstup; // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
-      return height;
+      // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
+      return this.heightFrom - otstup;
     },
     lastResult: function () {
       let options = this.$store.getters.getOptions({
@@ -253,9 +241,9 @@ export default {
   watch: {
     options: {
       deep: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         if (newValue) this.createTitles(newValue.titles);
-      }
+      },
     },
     dataRestFrom: {
       deep: true,
@@ -264,6 +252,7 @@ export default {
           this.indexTitles(val);
         }
         this.setEventColor();
+        this.updateProps();
       },
     },
     events() {
@@ -277,8 +266,17 @@ export default {
       id: this.id,
     });
     this.setEventColor();
+    this.updateProps();
   },
   methods: {
+    updateProps() {
+      if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
+        this.props.itemsForTable = [];
+        this.props.nodata = true;
+      } else {
+        this.getDataAsynchrony(this.dataRestFrom);
+      }
+    },
     indexTitles(oldVal) {
       let type = 'no';
       for (let [key, val] of Object.entries(oldVal[0])) {
@@ -312,8 +310,7 @@ export default {
       function isNumber(n) {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
-      if (isNumber(val)) return true;
-      return false;
+      return isNumber(val);
     },
     checkForString(val) {
       return Object.prototype.toString.call(val) === '[object String]';
@@ -325,8 +322,8 @@ export default {
       let result;
       let mydate = new Date(parts[2], parts[1] - 1, parts[0]);
       if (
-        parts[2] == mydate.getYear() &&
-        parts[1] - 1 == mydate.getMonth() &&
+        parts[2] === mydate.getYear() &&
+        parts[1] - 1 === mydate.getMonth() &&
         parts[0] == mydate.getDate()
       ) {
         result = 0;
@@ -362,11 +359,14 @@ export default {
     createTitles: function (result) {
       if (this.options.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
-        this.props.titles = allTitles.map(x => ({
+        this.props.titles = allTitles.map((x) => ({
           text: x,
           value: x,
           sortable: true,
-          align: (this.options.titles.length === 0 || this.options.titles.includes(x)) ? undefined : ' d-none'
+          align:
+            this.options.titles.length === 0 || this.options.titles.includes(x)
+              ? undefined
+              : ' d-none',
         }));
       } else {
         if (result && result.length) {
@@ -412,20 +412,20 @@ export default {
         table = this.$refs.table.$el;
 
         if (
-          eventObj[index]['prop'] == 'rowcolor' ||
-          eventObj[index]['prop'] == 'columncolor' ||
-          eventObj[index]['prop'] == 'cellcolor'
+          eventObj[index]['prop'] === 'rowcolor' ||
+          eventObj[index]['prop'] === 'columncolor' ||
+          eventObj[index]['prop'] === 'cellcolor'
         ) {
           let readyTh = setTimeout(
             function tick() {
               table.querySelectorAll('thead th').style =
                 'background-color: red';
-              if (table.querySelectorAll('thead th').length != 0) {
+              if (table.querySelectorAll('thead th').length !== 0) {
                 clearTimeout(readyTh);
                 let sp = 0;
                 table.querySelectorAll('thead span').forEach((itemSpan) => {
-                  if (itemSpan.innerText != 0) {
-                    if (itemSpan.innerText == eventObj[index]['column']) {
+                  if (itemSpan.innerText !== 0) {
+                    if (itemSpan.innerText === eventObj[index]['column']) {
                       column = sp;
                     }
                     sp++;
@@ -434,7 +434,7 @@ export default {
 
                 table.querySelectorAll('tbody tr').forEach((itemRow) => {
                   itemRow.querySelectorAll('td').forEach((itemTd, i) => {
-                    if (i == column) {
+                    if (i === column) {
                       // itemRow.style.backgroundColor = 'yellow';
                       let needItem = null,
                         row,
@@ -442,7 +442,7 @@ export default {
 
                       switch (eventObj[index]['compare']) {
                         case 'equals':
-                          if (itemTd.innerText == eventObj[index]['row']) {
+                          if (itemTd.innerText === eventObj[index]['row']) {
                             needItem = itemRow;
                           }
 
@@ -459,21 +459,21 @@ export default {
                           break;
                         case 'in':
                           row = eventObj[index]['row']
-                            .replace(/\[|\]/g, '')
+                            .replace(/\[|]/g, '')
                             .split(',');
                           k = -1;
                           row.forEach((rowValue) => {
-                            if (itemTd.innerText == rowValue) {
+                            if (itemTd.innerText === rowValue) {
                               k = 0;
                             }
                           });
-                          if (k != -1) {
+                          if (k !== -1) {
                             needItem = itemRow;
                           }
                           break;
                         case 'between':
                           row = eventObj[index]['row']
-                            .replace(/\[|\]/g, '')
+                            .replace(/\[|]/g, '')
                             .split(',');
                           if (
                             itemTd.innerText > row[0] &&
@@ -492,19 +492,19 @@ export default {
                 });
 
                 if (table.querySelectorAll('.event').length > 0) {
-                  if (item.prop[0] == 'rowcolor') {
+                  if (item.prop[0] === 'rowcolor') {
                     let rows = table.querySelectorAll('.event');
                     rows.forEach((res) => {
                       res.style.background = eventObj[index]['color'];
                       //res.style.color = this.color.back;
                     });
-                  } else if (item.prop[0] == 'cellcolor') {
+                  } else if (item.prop[0] === 'cellcolor') {
                     table.querySelectorAll('.event').forEach((res) => {
                       res.children[column].style.background =
                         eventObj[index]['color'];
                       //res.children[column].style.color = this.color.back;
                     });
-                  } else if (item.prop[0] == 'columncolor') {
+                  } else if (item.prop[0] === 'columncolor') {
                     table.querySelectorAll('tbody tr').forEach((itemRow) => {
                       itemRow.children[column].style.background =
                         eventObj[index]['color'];
@@ -525,7 +525,7 @@ export default {
       document
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener('click', (event) => {
-          if (event.target.tagName.toLowerCase() == 'td') {
+          if (event.target.tagName.toLowerCase() === 'td') {
             if (event.target.parentElement.classList.contains('selected')) {
               event.target.parentElement.classList.remove('selected');
             } else {
@@ -544,14 +544,14 @@ export default {
 
             let cellRowIndex = Array.from(
               event.target.parentElement.childNodes
-            ).findIndex((item) => item == event.target);
+            ).findIndex((item) => item === event.target);
 
             let tokens = this.$store.getters.getTockens(this.idDash);
 
             tokens.forEach((token) => {
               if (
-                token.elem == this.id &&
-                token.action == 'click' &&
+                token.elem === this.id &&
+                token.action === 'click' &&
                 headers[cellRowIndex] === token.capture
               ) {
                 let value = event.target.textContent;
@@ -571,14 +571,14 @@ export default {
               partelement: 'row',
             });
 
-            if (events.length != 0) {
+            if (events.length !== 0) {
               events.forEach((item) => {
-                if (item.action == 'set') {
+                if (item.action === 'set') {
                   this.$store.commit('letEventSet', {
                     events: events,
                     idDash: this.idDash,
                   });
-                } else if (item.action == 'go') {
+                } else if (item.action === 'go') {
                   this.$store.commit('letEventGo', {
                     event: item,
                     idDash: this.idDash,

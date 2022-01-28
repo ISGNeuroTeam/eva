@@ -33,70 +33,76 @@ export default {
     // проверяет и создает объект в хранилище для настроек
     // path - это idDash либо произвольное место хранения настроек например research
     // element - например multiLine, multiLine-2, table, table-2 ...
-    async prepareSettingsStore({ commit, state, getters }, { path, element }) {
-      const idExists = (element !== undefined && element !== '')
-      if (typeof path === 'number'){
-        path = path.toString()
+    async prepareSettingsStore({ state }, { path, element }) {
+      const idExists = element !== undefined && element !== '';
+      if (typeof path === 'number') {
+        path = path.toString();
       }
       if (!state[path.toString()]) {
-        state[path] = {}
+        state[path] = {};
         if (idExists) {
-          state[path][element] = {}
+          state[path][element] = {};
         }
       }
       if (idExists) {
         if (!state[path][element].modalSettings) {
           state[path][element].modalSettings = {
             element: '',
-            status: false
-          }
+            status: false,
+          };
         }
         if (!state[path][element].options) {
-          state[path][element].options = {}
+          state[path][element].options = {};
         }
       } else {
         if (!state[path].modalSettings) {
           state[path].modalSettings = {
             element: '',
-            status: false
-          }
+            status: false,
+          };
         }
         if (!state[path].options) {
-          state[path].options = {}
+          state[path].options = {};
         }
       }
     },
 
     // сохранение настроек
-    async saveSettingsToPath({ commit, state, getters, dispatch }, { path, element, options }) {
-      await dispatch('prepareSettingsStore', { path, element })
-      commit('setOptions', { idDash: path, id: element, options })
+    async saveSettingsToPath(
+      { commit, getters, dispatch },
+      { path, element, options }
+    ) {
+      await dispatch('prepareSettingsStore', { path, element });
+      commit('setOptions', { idDash: path, id: element, options });
       return await getters.getOptions({ idDash: path, id: element });
     },
 
     // получение настроек
-    async getSettingsByPath({ commit, state, getters, dispatch }, { path, element }) {
-      await dispatch('prepareSettingsStore', { path, element })
+    async getSettingsByPath({ getters, dispatch }, { path, element }) {
+      await dispatch('prepareSettingsStore', { path, element });
       return await getters.getOptions({ idDash: path, id: element });
     },
 
     // открыть окно настроек
     // произвольный вызов this.$store.dispatch("openModalSettings", { path: 'research', element: 'multiLine' });
-    async openModalSettings({ commit, state, getters, dispatch }, { path, element, titles }) {
-      await dispatch('prepareSettingsStore', { path, element })
+    async openModalSettings({ commit, dispatch }, { path, element, titles }) {
+      await dispatch('prepareSettingsStore', { path, element });
       return await commit('setModalSettings', {
         idDash: path,
         element,
         status: true,
-        titles
+        titles,
       });
     },
 
     // закрыть окно настроек
-    async closeModalSettings({ commit, state, getters, dispatch }, { path }) {
-      return await commit('setModalSettings',  { idDash: path, status: false, id: '' } );
-    }
-
+    async closeModalSettings({ commit }, { path }) {
+      return await commit('setModalSettings', {
+        idDash: path,
+        status: false,
+        id: '',
+      });
+    },
   },
   mutations: {
     setNameDash: (state, newName) => {
@@ -278,8 +284,7 @@ export default {
           let data = null;
           eventAll.forEach((item) => {
             // пробегаемся по всем событиям
-            let k;
-            let value;
+            let value, k;
             switch (
               state[idDash].events[item].compare // проверяем какое именно событие должно произойти
             ) {
@@ -726,7 +731,7 @@ export default {
         }
       });
       if (options.titles) {
-        state[options.idDash][options.id].selectedTableTitles = options.titles; // deprecated
+        state[options.idDash][options.id].selectedTableTitles = options.titles;
       }
     },
 
@@ -1777,7 +1782,7 @@ export default {
       // получаем скриншот страницы
       return (id) => {
         if (!id.id) {
-          return []
+          return [];
         }
         if (!state[id.idDash][id.id].options) {
           Vue.set(state[id.idDash][id.id], 'options', {});

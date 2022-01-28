@@ -117,8 +117,8 @@ export default {
     },
 
     linkOptions() {
-      const { id, idDash } = this
-      return this.$store.getters.getOptions({ id, idDash })
+      const { id, idDash } = this;
+      return this.$store.getters.getOptions({ id, idDash });
     },
 
     change() {
@@ -150,8 +150,8 @@ export default {
   watch: {
     linkOptions: {
       deep: true,
-      handler(val, oldVal) {
-        this.getDataAsynchrony()
+      handler() {
+        this.getDataAsynchrony();
       },
     },
     metrics() {
@@ -200,7 +200,10 @@ export default {
 
       this.setNoData(false);
 
-      const options = this.$store.getters.getOptions({ id: this.id, idDash: this.idDash })
+      const options = this.$store.getters.getOptions({
+        id: this.id,
+        idDash: this.idDash,
+      });
 
       const {
         metrics,
@@ -219,15 +222,15 @@ export default {
         axesCount,
         metricTypes,
         metricsAxis,
-      } = options
+      } = options;
 
       const yAxesBinding = {
         axesCount: axesCount || options.yAxesBinding?.axesCount || 1,
         metrics: metricsAxis || options.yAxesBinding?.metrics || {},
-        metricTypes: metricTypes || options.yAxesBinding?.metricTypes || {}
-      }
+        metricTypes: metricTypes || options.yAxesBinding?.metricTypes || {},
+      };
 
-      this.stringOX = stringOX
+      this.stringOX = stringOX;
 
       if (!this.stringOX && typeof rowValue !== 'number') {
         return this.showErrorMessage(
@@ -374,9 +377,23 @@ export default {
         .style('opacity', 0.3);
     },
 
-    putLabelDot(x, attr, className, d, y, metricName, dot, elem, brushObj, replaceCount) {
-      dot.setAttribute(attr, 'true')
-      const label = replaceCount === undefined ? d[metricName] : Number(d[metricName]).toFixed(replaceCount)
+    putLabelDot(
+      x,
+      attr,
+      className,
+      d,
+      y,
+      metricName,
+      dot,
+      elem,
+      brushObj,
+      replaceCount
+    ) {
+      dot.setAttribute(attr, 'true');
+      const label =
+        replaceCount === undefined
+          ? d[metricName]
+          : Number(d[metricName]).toFixed(replaceCount);
 
       const text = this.svg
         .append('text')
@@ -454,7 +471,7 @@ export default {
         });
     },
 
-    updateData(x, yValue, selectRange, id = -1) {
+    updateData(x, yValue, selectRange) {
       let [invertStart, invertEnd] = selectRange;
 
       let range = [
@@ -679,11 +696,7 @@ export default {
           break;
       }
 
-      const maxCaptionWidth = d3.max(
-        captions.nodes().map((node) => node.getBBox().width)
-      );
-
-      return maxCaptionWidth;
+      return d3.max(captions.nodes().map((node) => node.getBBox().width));
     },
 
     renderSVG(
@@ -834,16 +847,10 @@ export default {
                   .sort()
               );
           } else {
-            x =
-              this.isTime && false
-                ? d3
-                    .scaleTime()
-                    .range([xStartRange + barOffset, this.width - barOffset])
-                    .domain(extentForX)
-                : d3
-                    .scaleLinear()
-                    .range([barOffset, this.width - barOffset])
-                    .domain(extentForX);
+            x = d3
+              .scaleLinear()
+              .range([barOffset, this.width - barOffset])
+              .domain(extentForX);
           }
         }
       }
@@ -1118,7 +1125,7 @@ export default {
                 .enter()
                 .append('rect')
                 .attr('id', (d, i) => getBarID(i))
-                .attr('x', (d, idx) => {
+                .attr('x', (d) => {
                   let xPos = this.isTime
                     ? x(d[xMetric] * this.secondTransf)
                     : x(d[xMetric]);
@@ -1148,7 +1155,7 @@ export default {
 
                   return h;
                 })
-                .attr('transform', function (d, j) {
+                .attr('transform', function () {
                   let translate = this.width.baseVal.value / 2;
                   return `translate(-${translate}, 0)`;
                 })
@@ -1236,7 +1243,7 @@ export default {
               yAxesBinding.metricTypes[metricName] === undefined
             ) {
               const linesWithBreak = [];
-              let dotDate = null;
+              let dotDate;
               let nullValue = -1;
               let allDotHover = [];
               let onelinesWithBreak = [];
@@ -1328,7 +1335,7 @@ export default {
                   }
 
                   mustSee.forEach((item) => {
-                    if (item[metricName] == d[metricName]) opacity = 1;
+                    if (item[metricName] === d[metricName]) opacity = 1;
                   });
 
                   const setLabel = (attr, classText, metricText) => {
@@ -1398,20 +1405,7 @@ export default {
                 )
                 .on('mouseup', () => brushObj.selectionUp())
                 .on('mousedown', () => brushObj.selectionDown())
-                .on('mouseenter', function (d, i) {
-                  // const count = Number(conclusion_count[metricName])
-                  // let hasTooltip = true;
-                  // const isNumber = typeof count === 'number';
-                  // if (isNumber && count > 1) {
-                  //   hasTooltip = i % count === 0;
-                  // }
-                  // if (isNumber && count <= 0) {
-                  //   hasTooltip = false;
-                  // }
-                  // if (hasTooltip === false) {
-                  //   return;
-                  // }
-
+                .on('mouseenter', function (d) {
                   const date = new Date(d[xMetric] * secondTransf);
                   let day = date.getDate();
                   let month = date.getMonth() + 1;
@@ -1715,7 +1709,7 @@ export default {
 
         // if (optionsKeys.length === 0 || options.type === 'Line chart') {
         const mustSee = [];
-        let dotDate = null;
+        let dotDate;
         let onelinesWithBreak = [];
         let allDotHover = [];
 
@@ -1875,20 +1869,7 @@ export default {
           )
           .on('mouseup', () => brushObj.selectionUp())
           .on('mousedown', () => brushObj.selectionDown())
-          .on('mouseenter', function (d, i) {
-            // const count = Number(conclusion_count[metric])
-            // let hasTooltip = true;
-            // const isNumber = typeof count === 'number';
-            // if (isNumber && count > 1) {
-            //   hasTooltip = i % count === 0;
-            // }
-            // if (isNumber && count <= 0) {
-            //   hasTooltip = false;
-            // }
-            // if (hasTooltip === false) {
-            //   return;
-            // }
-
+          .on('mouseenter', function (d) {
             const xVal = isTime
               ? (() => {
                   const date = new Date(d[xMetric] * secondTransf);
@@ -2255,7 +2236,7 @@ export default {
       this.svg.attr('transform', `translate(${maxLength + 15}, ${margin.top})`);
     },
 
-    renderAccumulationBarplot(x, barplotBarWidth) {
+    renderAccumulationBarplot(x) {
       // List of subgroups = header of the csv files = soil condition here
       let subgroups = [...this.metricNames];
 
@@ -2319,12 +2300,12 @@ export default {
           );
           tooltip.style('opacity', 1).style('visibility', 'visible');
         })
-        .on('mousemove', function (d) {
+        .on('mousemove', function () {
           tooltip
             .style('left', d3.mouse(this)[0] + 90 + 'px')
             .style('top', d3.mouse(this)[1] + 'px');
         })
-        .on('mouseleave', function (d) {
+        .on('mouseleave', function () {
           tooltip.style('opacity', 0).style('visibility', 'hidden');
         });
     },

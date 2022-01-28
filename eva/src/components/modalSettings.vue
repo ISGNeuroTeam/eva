@@ -56,176 +56,202 @@
             </div>
           </div>
           <template v-for="field in fieldsForRender">
-            <div
+            <template
+              v-if="
+                checkOptions(field.optionGroup || field.option, field.relation)
+              "
+            >
+              <div
                 v-for="prop in field.each || [null]"
                 :key="`${field.option}${prop}`"
-                v-if="checkOptions(field.optionGroup || field.option, field.relation)"
                 class="option-item"
-            >
-              <v-card-text
-                  v-if="field.group"
-                  class="headline"
               >
-                <div
+                <v-card-text v-if="field.group" class="headline">
+                  <div
                     class="settings-title"
-                    :style="{color:theme.$main_text,borderColor:theme.$main_border}"
-                >
-                  {{ field.group }}
-                </div>
-              </v-card-text>
-              <div
+                    :style="{
+                      color: theme.$main_text,
+                      borderColor: theme.$main_border,
+                    }"
+                  >
+                    {{ field.group }}
+                  </div>
+                </v-card-text>
+                <div
                   v-if="!field.group"
                   class="name-option item"
-                  :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-              >
-                {{ field.optionGroup ? field.optionGroup+'.' : '' }}{{ field.label || field.option }}
-                <span v-if="prop">.{{ prop }}</span>
-              </div>
-              <div
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
+                >
+                  {{ field.optionGroup ? field.optionGroup + '.' : ''
+                  }}{{ field.label || field.option }}
+                  <span v-if="prop">.{{ prop }}</span>
+                </div>
+                <div
                   v-if="!field.group"
                   class="discribe-option item"
-                  :style="{color:theme.$main_text, borderColor:theme.$main_border}"
-              >
-                {{ field.description }}&nbsp;<span :style="{ color: theme.$accent_ui_color }" v-text="prop"/>
-              </div>
-              <div
-                  v-if="!field.group"
-                  class="status-option item">
-                <!-- elem: switch -->
-                <v-switch
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
+                >
+                  {{ field.description }}&nbsp;<span
+                  :style="{ color: theme.$accent_ui_color }"
+                  v-text="prop"
+                />
+                </div>
+                <div v-if="!field.group" class="status-option item">
+                  <!-- elem: switch -->
+                  <v-switch
                     v-if="field.elem === 'switch'"
                     v-model="options[field.option]"
                     class="switch"
                     :color="theme.$primary_button"
-                    :style="{color:theme.$main_text}"
+                    :style="{ color: theme.$main_text }"
                     :label="String(options[field.option])"
-                />
-                <!-- elem: text-field -->
-                <v-text-field
+                  />
+                  <!-- elem: text-field -->
+                  <v-text-field
                     v-else-if="field.elem === 'text-field'"
                     v-model="options[field.option]"
                     :placeholder="field.placeholder"
                     clearable
                     :color="theme.$primary_button"
-                    :style="{color:theme.$main_text, background: 'transparent', borderColor: theme.$main_border}"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
                     outlined
                     class="subnumber"
                     hide-details
                     :type="field.elemType"
                     :min="field.elemMin"
-                />
-                <!-- elem: select -->
-                <v-select
+                  />
+                  <!-- elem: select -->
+                  <v-select
                     v-else-if="field.elem === 'select' && !prop"
                     v-model="options[field.option]"
                     :items="field.items"
                     :placeholder="field.default"
                     :color="theme.$primary_button"
-                    :style="{color:theme.$main_text, fill: theme.$main_text}"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
                     hide-details
                     outlined
                     class="subnumber"
-                />
-                <v-select
+                  />
+                  <v-select
                     v-else-if="field.elem === 'select' && prop"
                     v-model="options[field.option][prop]"
                     :items="field.items"
                     :placeholder="field.default"
                     :color="theme.$primary_button"
-                    :style="{color:theme.$main_text, fill: theme.$main_text}"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
                     hide-details
                     outlined
                     class="subnumber"
-                />
-                <!-- elem: checkbox-list -->
-                <div
+                  />
+                  <!-- elem: checkbox-list -->
+                  <div
                     v-else-if="field.elem === 'checkbox-list'"
-                    class="checkbox-list">
-                  <v-checkbox
+                    class="checkbox-list"
+                  >
+                    <v-checkbox
                       v-for="setting in field.items"
                       :key="setting"
+                      v-model="options[field.option]"
                       :value="setting"
-                      :style="{color:theme.$main_text}"
+                      :style="{ color: theme.$main_text }"
                       :label="setting"
                       hide-details
-                      v-model="options[field.option]"
-                      @change="val => { field.onChange ? field.onChange(val) : null}">
-                  </v-checkbox>
-                </div>
-                <!-- elem: radio-group -->
-                <v-radio-group
+                      @change="
+                        (val) => {
+                          field.onChange ? field.onChange(val) : null;
+                        }
+                      "
+                    >
+                    </v-checkbox>
+                  </div>
+                  <!-- elem: radio-group -->
+                  <v-radio-group
                     v-else-if="field.elem === 'radio-group' && !prop"
                     v-model="options[field.option]"
                     :column="false"
-                >
-                  <v-radio
-                      v-for="{label, value} in field.items"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :key="value"
                       :color="theme.$primary_button"
-                      :style="{color:theme.$main_text}"
+                      :style="{ color: theme.$main_text }"
                       :label="label || value"
                       :value="value"
                       class="mx-1"
-                  />
-                </v-radio-group>
-                <v-radio-group
+                    />
+                  </v-radio-group>
+                  <v-radio-group
                     v-else-if="field.elem === 'radio-group' && prop"
                     v-model="options[field.option][prop]"
                     :column="false"
-                >
-                  <v-radio
-                      v-for="{label, value} in field.items"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :key="value"
                       :color="theme.$primary_button"
-                      :style="{color:theme.$main_text}"
+                      :style="{ color: theme.$main_text }"
                       :label="label || value"
                       :value="value"
                       class="mx-1"
-                  />
-                </v-radio-group>
-                <!-- end -->
+                    />
+                  </v-radio-group>
+                  <!-- end -->
+                </div>
+              </div>
+            </template>
+          </template>
+
+          <template v-if="!options.united">
+            <div
+              v-for="metric in metricsName"
+              :key="metric.name"
+              class="option-item"
+            >
+              <div
+                class="name-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                {{ metric.name }} units
+              </div>
+              <div
+                class="discribe-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                Единицы измерения для линии {{ metric.name }}
+              </div>
+              <div class="status-option item">
+                <v-text-field
+                  v-model="metricUnits[metric.name]"
+                  clearable
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    background: 'transparent',
+                    borderColor: theme.$main_border,
+                  }"
+                  outlined
+                  class="subnumber"
+                  hide-details
+                />
               </div>
             </div>
           </template>
-
-          <div
-            v-if="!options.united"
-            v-for="metric in metricsName"
-            :key="metric.name"
-            class="option-item"
-          >
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              {{ metric.name }} units
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Единицы измерения для линии {{ metric.name }}
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="metricUnits[metric.name]"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
 
           <v-card-text
             v-if="!options.united && checkOptions('united')"
@@ -246,7 +272,7 @@
             class="options-block united-block"
           >
             <v-icon
-              v-if="metrics.length == 0"
+              v-if="metrics.length === 0"
               class="icon-plus"
               :color="theme.$primary_button"
               @click="addMetrics"
@@ -325,13 +351,15 @@
                   Цвет
                 </div>
                 <div class="status-option item">
-                  <input
-                    :value="color[metrics[i - 1].name]"
-                    style="width: 100px; cursor: pointer"
-                    type="color"
-                    name="multiline-color"
-                    @change="(e) => handleChangeColor(e, i - 1)"
-                  />
+                  <label>
+                    <input
+                      :value="color[metrics[i - 1].name]"
+                      style="width: 100px; cursor: pointer"
+                      type="color"
+                      name="multiline-color"
+                      @change="(e) => handleChangeColor(e, i - 1)"
+                    />
+                  </label>
                 </div>
               </div>
               <div>
@@ -434,10 +462,7 @@
             </div>
           </div>
 
-          <div
-            v-if="checkOptions('positionlegend')"
-            class="option-item"
-          >
+          <div v-if="checkOptions('positionlegend')" class="option-item">
             <div
               class="name-option item"
               :style="{
@@ -549,7 +574,7 @@
             </div>
             <div class="options-item-tooltip">
               <v-select
-                v-for="(label, i) in metricsRelation.namesMetric"
+                v-for="(_, i) in metricsRelation.namesMetric"
                 :key="i + 'metric'"
                 v-model="metricsRelation.relations[i]"
                 :items="metricsRelation.metrics"
@@ -631,7 +656,7 @@
                 :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
-                >Удалить</v-btn
+              >Удалить</v-btn
               >
             </div>
           </div>
@@ -659,7 +684,7 @@
             />
           </div>
           <v-icon
-            v-if="tooltip.texts.length == 0"
+            v-if="tooltip.texts.length === 0"
             class="icon-plus"
             :color="theme.$primary_button"
             @click="addIntoTooltip('text')"
@@ -711,7 +736,7 @@
             />
           </div>
           <v-icon
-            v-if="tooltip.links.length == 0"
+            v-if="tooltip.links.length === 0"
             class="icon-plus"
             :color="theme.$primary_button"
             @click="addIntoTooltip('link')"
@@ -777,7 +802,7 @@
             />
           </div>
           <v-icon
-            v-if="tooltip.buttons.length == 0"
+            v-if="tooltip.buttons.length === 0"
             class="icon-plus"
             :color="theme.$primary_button"
             @click="addIntoTooltip('button')"
@@ -859,9 +884,9 @@
 </template>
 
 <script>
-import settings from "../js/componentsSettings.js";
+import settings from '../js/componentsSettings.js';
 
-import { mdiMinusBox, mdiPlusBox } from "@mdi/js";
+import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
 
 export default {
   props: {
@@ -905,84 +930,86 @@ export default {
       metricUnits: {},
       fieldsForRender: [],
       optionsByComponents: [],
-    }
+    };
   },
   computed: {
-    active: function() {
+    active: function () {
       return this.$store.getters.getModalSettings(this.idDash).status;
     },
-    idDash: function(){
-      return this.idDashFrom
+    idDash: function () {
+      return this.idDashFrom;
     },
-    theme: function() {
-      return this.$store.getters.getTheme
+    theme: function () {
+      return this.$store.getters.getTheme;
     },
     primitivesLibraryAutoGrowLinkText() {
-      return this.primitivesLibraryAutoGrow ? 'Свернуть поле' : 'Расширить поле'
+      return this.primitivesLibraryAutoGrow
+        ? 'Свернуть поле'
+        : 'Расширить поле';
     },
-    optionsItems(){
+    optionsItems() {
       if (!this.element) {
-        return []
+        return [];
       }
       let elem = this.element.split('-')[0];
-      return elem ? (this.optionsByComponents[elem] || []) : []
+      return elem ? this.optionsByComponents[elem] || [] : [];
     },
-    changeComponent(){
-      return this.idDash + '-' + this.element
+    changeComponent() {
+      return this.idDash + '-' + this.element;
     },
 
     // поля элемента данных
-    titles(){
-      return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+    titles() {
+      return this.$store.getters.getAvailableTableTitles(
+        this.idDash,
+        this.element
+      );
     },
-  },
-  created() {
-    this.cancelModal()
-  },
-  mounted() {
-    const settings = this.$store.getters.getModalSettings(this.idDash)
-    this.element = settings.element;
-    this.loadComponentsSettings()
-    this.prepareOptions()
   },
   watch: {
-    changeComponent(val){
-      this.options = {}
-      this.loadComponentsSettings()
-      this.prepareOptions()
+    changeComponent() {
+      this.options = {};
+      this.loadComponentsSettings();
+      this.prepareOptions();
     },
-    titles(val){
-      this.loadComponentsSettings()
-      this.prepareOptions()
+    titles() {
+      this.loadComponentsSettings();
+      this.prepareOptions();
     },
     async active(val) {
-      if (val){ // если окно должно быть открыто
-        const settings = this.$store.getters.getModalSettings(this.idDash)
-        this.element = settings.element;  // получаем для каокго элемнета вывести настройки
+      if (val) {
+        // если окно должно быть открыто
+        const settings = this.$store.getters.getModalSettings(this.idDash);
+        this.element = settings.element; // получаем для каокго элемнета вывести настройки
         this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-        this.metricsName = this.$store.getters.getMetricsMulti({idDash: this.idDash, id: this.element});
-        if (this.element.startsWith("multiLine")) {
-          const opt = await this.$store.dispatch('getSettingsByPath', {path: this.idDash, element: this.element})
+        this.metricsName = this.$store.getters.getMetricsMulti({
+          idDash: this.idDash,
+          id: this.element,
+        });
+        if (this.element.startsWith('multiLine')) {
+          const opt = await this.$store.dispatch('getSettingsByPath', {
+            path: this.idDash,
+            element: this.element,
+          });
           if (opt.conclusion_count) {
             this.conclusion_count = opt.conclusion_count;
           }
 
           if (opt.yAxesBinding) {
-
             // поддержка старой структуры сохраненных настроек
             if (!opt.metricTypes) {
               if (opt.yAxesBinding.metrics) {
-                opt.metricsAxis = opt.yAxesBinding.metrics
+                opt.metricsAxis = opt.yAxesBinding.metrics;
               }
               if (opt.yAxesBinding.metricTypes) {
-                opt.metricTypes = opt.yAxesBinding.metricTypes
+                opt.metricTypes = opt.yAxesBinding.metricTypes;
               }
               if (opt.yAxesBinding.axesCount) {
-                opt.axesCount = opt.yAxesBinding.axesCount
+                opt.axesCount = opt.yAxesBinding.axesCount;
               }
             }
 
-            this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount
+            this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount;
           } else {
             this.multilineYAxesBinding.axesCount = 1;
           }
@@ -998,39 +1025,56 @@ export default {
           this.metricsName.forEach((metric) => {
             this.metricUnits[metric.name] = metric.units;
 
-            if (opt.yAxesBinding && opt.yAxesBinding.metrics && opt.yAxesBinding.metricTypes) {
-              this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name]
-              this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name]
+            if (
+              opt.yAxesBinding &&
+              opt.yAxesBinding.metrics &&
+              opt.yAxesBinding.metricTypes
+            ) {
+              this.multilineYAxesBinding.metrics[metric.name] =
+                opt.yAxesBinding.metrics[metric.name];
+              this.multilineYAxesBinding.metricTypes[metric.name] =
+                opt.yAxesBinding.metricTypes[metric.name];
             } else {
               this.multilineYAxesBinding.metrics[metric.name] = 'left';
               this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
             }
-
-          })
+          });
         }
         await this.prepareOptions();
       }
     },
-    element(val) {
-      this.loadComponentsSettings()
+    element() {
+      this.loadComponentsSettings();
     },
+  },
+  created() {
+    this.cancelModal();
+  },
+  mounted() {
+    const settings = this.$store.getters.getModalSettings(this.idDash);
+    this.element = settings.element;
+    this.loadComponentsSettings();
+    this.prepareOptions();
   },
   methods: {
     loadComponentsSettings() {
-      this.optionsByComponents = settings.options
-      this.fieldsForRender = settings.optionFields
-        .map(field => {
-          const items = typeof field.items === "function" ? field.items.call(this) : field.items;
-          const each = typeof field.each === "function" ? field.each.call(this) : field.each;
-          if (each) {
-            let options = {}
-            each.forEach(key => {
-              options[key] = field.items[0]?.value
-            })
-            this.$set(this.options, field.option, { ...options });
-          }
-          return { ...field, items, each }
-        })
+      this.optionsByComponents = settings.options;
+      this.fieldsForRender = settings.optionFields.map((field) => {
+        const items =
+          typeof field.items === 'function'
+            ? field.items.call(this)
+            : field.items;
+        const each =
+          typeof field.each === 'function' ? field.each.call(this) : field.each;
+        if (each) {
+          let options = {};
+          each.forEach((key) => {
+            options[key] = field.items[0]?.value;
+          });
+          this.$set(this.options, field.option, { ...options });
+        }
+        return { ...field, items, each };
+      });
     },
     handleChangeColor(e, i) {
       this.color = { ...this.color, [this.metrics[i].name]: e.target.value };
@@ -1052,8 +1096,9 @@ export default {
         [this.metrics[i].name]: Number(e),
       };
     },
-    setOptions: async function() {  // отправляем настройки в хранилище
-      if(!this.options.level){
+    setOptions: async function () {
+      // отправляем настройки в хранилище
+      if (!this.options.level) {
         this.options.level = 1;
       }
 
@@ -1066,15 +1111,15 @@ export default {
       if (typeof this.options.size != 'undefined') {
         if (this.options.size == null) {
           this.options.size = '100px';
-        } else if (String(this.options.size).indexOf('px') == -1) {
+        } else if (String(this.options.size).indexOf('px') === -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
       //let options = {...{},...this.options};
-      if (this.element.indexOf('csvg') != -1) {
+      if (this.element.indexOf('csvg') !== -1) {
         this.options.tooltip = this.tooltip;
       }
-      if (this.element.indexOf('piechart') != -1) {
+      if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation)
         );
@@ -1093,10 +1138,13 @@ export default {
           }
           this.options.themes = this.themes;
         }
-
       }
-      if (this.element.startsWith("multiLine")) {
-        this.$store.commit('setMultilineMetricUnits', { idDash: this.idDash, elem: this.element, units: this.metricUnits})
+      if (this.element.startsWith('multiLine')) {
+        this.$store.commit('setMultilineMetricUnits', {
+          idDash: this.idDash,
+          elem: this.element,
+          units: this.metricUnits,
+        });
       }
 
       let options = {
@@ -1106,54 +1154,56 @@ export default {
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
         color: this.color,
-        updated: Date.now()
-      }
-      await this.$store.dispatch('saveSettingsToPath',  {
+        updated: Date.now(),
+      };
+      await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
-        options
+        options,
       });
       this.cancelModal();
     },
-    cancelModal: function() {  // если нажали на отмену создания
-      this.$store.dispatch('closeModalSettings',  { path: this.idDash } );
+    cancelModal: function () {
+      // если нажали на отмену создания
+      this.$store.dispatch('closeModalSettings', { path: this.idDash });
     },
-    checkEsc: function(event) {
-      if (event.code === "Escape") {
+    checkEsc: function (event) {
+      if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    checkOptions: function(option, relation) { // проверяет есть ли такая опция уже в массиве с опциями
+    checkOptions: function (option, relation) {
+      // проверяет есть ли такая опция уже в массиве с опциями
       if (relation !== undefined) {
         if (relation.forEach) {
-          let res = relation.filter(item => {
+          let res = relation.filter((item) => {
             if (typeof item === 'object') {
-              let show = true
-              Object.keys(item).forEach(key => {
+              let show = true;
+              Object.keys(item).forEach((key) => {
                 if (show && this.options[key] !== item[key]) {
-                  show = false
+                  show = false;
                 }
-              })
-              return show
+              });
+              return show;
             } else {
-              return !!this.options[item]
+              return !!this.options[item];
             }
-          })
+          });
           if (res.length !== relation.length) {
             return false;
           }
-        } else if(!this.options[relation]) {
+        } else if (!this.options[relation]) {
           return false;
         }
       }
-      return this.optionsItems.includes(option)
+      return this.optionsItems.includes(option);
     },
     addIntoTooltip: function (item) {
-      if (item == 'text') {
+      if (item === 'text') {
         this.tooltip.texts.push('');
-      } else if (item == 'link') {
+      } else if (item === 'link') {
         this.tooltip.links.push({ name: '', url: '' });
-      } else if (item == 'button') {
+      } else if (item === 'button') {
         this.tooltip.buttons.push({ name: '', id: '' });
       }
     },
@@ -1167,11 +1217,11 @@ export default {
       });
     },
     deleteFromTooltip: function (item, i) {
-      if (item == 'text') {
+      if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
-      } else if (item == 'link') {
+      } else if (item === 'link') {
         this.tooltip.links.splice(i, 1);
-      } else if (item == 'button') {
+      } else if (item === 'button') {
         this.tooltip.buttons.splice(i, 1);
       }
     },
@@ -1179,7 +1229,7 @@ export default {
       this.metrics.splice(i, 1);
     },
     changeColor: function () {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
+      if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
           item.style.background = this.theme.$main_bg;
@@ -1188,8 +1238,12 @@ export default {
         });
       }
     },
-    async prepareOptions() {  //  понимает какие опции нужно вывести
-      const options = await this.$store.dispatch('getSettingsByPath', {path: this.idDash, element: this.element});
+    async prepareOptions() {
+      //  понимает какие опции нужно вывести
+      const options = await this.$store.dispatch('getSettingsByPath', {
+        path: this.idDash,
+        element: this.element,
+      });
 
       if (options.color) {
         this.color = options.color;
@@ -1207,9 +1261,9 @@ export default {
         this.replace_count = options.replace_count;
       }
 
-      this.optionsItems.forEach( item => {
+      this.optionsItems.forEach((item) => {
         if (Object.keys(options).includes(item)) {
-          if (item == 'tooltip') {
+          if (item === 'tooltip') {
             this.tooltip = {};
             this.$set(this.tooltip, 'texts', [...[], ...options[item].texts]);
             this.$set(this.tooltip, 'links', [...[], ...options[item].links]);
@@ -1217,10 +1271,10 @@ export default {
               ...[],
               ...options[item].buttons,
             ]);
-          } else if (item == 'metrics') {
+          } else if (item === 'metrics') {
             //this.$set(this,'metrics',options[item]);
             this.metrics = options[item];
-          } else if (item == 'metricsRelation') {
+          } else if (item === 'metricsRelation') {
             this.metricsRelation = {};
             this.$set(this.metricsRelation, 'metrics', [
               ...[],
@@ -1234,47 +1288,56 @@ export default {
               'Категория',
               'Процентное соотношение',
             ]);
-          } else if (item == 'colorsPie') {
+          } else if (item === 'colorsPie') {
             this.colorsPie = {};
             this.$set(this.colorsPie, 'theme', options[item].theme);
             this.$set(this.colorsPie, 'colors', options[item].colors);
             this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
-          } else if (item == 'themes') {
+          } else if (item === 'themes') {
             this.themesArr = Object.keys(options[item]);
             this.themes = options[item];
-          } else  if (item === 'titles') {
-            let val = options[item]
+          } else if (item === 'titles') {
+            let val = options[item];
             if (!val) {
               // old settings
-              let oldVal = this.$store.getters.getSelectedTableTitles(this.idDash, this.element)
+              let oldVal = this.$store.getters.getSelectedTableTitles(
+                this.idDash,
+                this.element
+              );
               if (oldVal) {
-                val = oldVal
+                val = oldVal;
               }
             }
             // если не выбраны заголовки то выделить все имеющиеся
             if (val.length === 0) {
-              let allTitles = this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+              let allTitles = this.$store.getters.getAvailableTableTitles(
+                this.idDash,
+                this.element
+              );
               if (allTitles.length) {
-                val = [...allTitles]
+                val = [...allTitles];
               }
             }
             this.$set(this.options, item, val || []);
           } else {
-            let val = (options[item] !== null && typeof options[item] === 'object') ? {...options[item]} : options[item]
+            let val =
+              options[item] !== null && typeof options[item] === 'object'
+                ? { ...options[item] }
+                : options[item];
             this.$set(this.options, item, val);
           }
         } else {
-          let propsToFalse = [
-            'multiple', 'underline', 'onButton', 'pinned'
-          ];
+          let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
           if (propsToFalse.includes(item)) {
             this.$set(this.options, item, false);
           } else if (item === 'showlegend') {
-            this.$set(this.options,item,true);
+            this.$set(this.options, item, true);
           } else if (item === 'positionlegend') {
-            this.$set(this.options,item,'right');
+            this.$set(this.options, item, 'right');
           } else {
-            const field = settings.optionFields.find(field => field.option === item);
+            const field = settings.optionFields.find(
+              (field) => field.option === item
+            );
             if (field && field.default !== undefined) {
               this.$set(this.options, item, field.default);
             }
