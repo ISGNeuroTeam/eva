@@ -973,16 +973,18 @@ export default {
       }
       state[settings.idDash].modalSettings.status = settings.status; // и заносим пару значения вроде элемнета и статуса чтобы понимать открыто оно или закрыто и чьи настройки подгрузить
       state[settings.idDash].modalSettings.element = settings.element;
-      if (
-        settings.element &&
-        (settings.element.includes('table') ||
-          settings.element.includes('heatmap'))
-      ) {
+      if (settings?.titles) {
         Vue.set(
           state[settings.idDash][settings.element],
           'availableTableTitles',
           settings?.titles
         );
+      }
+      if (
+        settings.element &&
+        (settings.element.includes('table') ||
+          settings.element.includes('heatmap'))
+      ) {
         if (!state[settings.idDash][settings.element].selectedTableTitles) {
           Vue.set(
             state[settings.idDash][settings.element],
