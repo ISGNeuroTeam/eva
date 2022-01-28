@@ -138,6 +138,7 @@ export default {
     tune: mdiTuneVertical,
   },
   options: {
+    // component to options
     multiLine: [
       'visible',
       'level',
@@ -155,6 +156,9 @@ export default {
       'xAxisCaptionRotate',
       'barplotBarWidth',
       'barplotstyle',
+      'metricTypes',
+      'axesCount',
+      'metricsAxis',
     ],
     piechart: [
       'visible',
@@ -209,10 +213,411 @@ export default {
     ygraph: ['visible', 'level', 'pinned'],
     bush: ['visible', 'level', 'pinned'],
     map: ['visible', 'level', 'osmserver', 'primitivesLibrary', 'pinned'],
-    heatmap: ['visible', 'level', 'dataFormat', 'pinned'],
+    heatmap: [
+      'visible',
+      'level',
+      'dataFormat',
+      'pinned',
+      'x',
+      'xFormat',
+      'xSort',
+      'y',
+      'yFormat',
+      'ySort',
+      'data',
+      'metadata',
+      'detailValue',
+    ],
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
   },
+  optionFields: [
+    // описание типов полей и их характеристик
+    // dashBoard
+    {
+      option: 'visible',
+      description: 'Показывает / скрывает элемент',
+      elem: 'switch',
+    },
+    {
+      option: 'pinned',
+      description: 'Закрепить на всех вкладках',
+      elem: 'switch',
+    },
+    {
+      option: 'level',
+      description: 'Установить слой отображения элемента',
+      elem: 'text-field',
+    },
+    {
+      option: 'lastResult',
+      description: 'Вывод предыдущих результатов',
+      elem: 'switch',
+    },
+
+    // dashTextArea
+    {
+      option: 'boxShadow',
+      description: 'Добавляет / удаляет тень',
+      elem: 'switch',
+    },
+    {
+      option: 'searchBtn',
+      description: 'Показывать кнопку поиска',
+      elem: 'switch',
+    },
+
+    // dashMap
+    {
+      option: 'osmserver',
+      description:
+        'Сервер для набора tile Пример:\nhttp://192.168.4.209/osm/{z}/{x}/{y}.png',
+      elem: 'text-field',
+    },
+
+    // MultiLine
+    {
+      option: 'strokeWidth',
+      description: 'Толщина линий',
+      elem: 'text-field',
+    },
+    {
+      option: 'thememultiline',
+      description: 'Цветовая тема',
+      elem: 'select',
+      items: ['default', 'Anna theme'],
+    },
+
+    // dashSingle
+    {
+      option: 'subnumber',
+      description: 'Выводит дополнительную надпись под числом',
+      elem: 'text-field',
+    },
+
+    // dashTable
+    {
+      option: 'rowcolor',
+      description: 'Выбрать цвет которым подсветится нужная строка',
+      elem: 'text-field',
+    },
+    {
+      option: 'columncolor',
+      description: 'Выбрать цвет которым подсветится нужный столбец',
+      elem: 'text-field',
+    },
+    {
+      option: 'cellcolor',
+      description: 'Выбрать цвет которым подсветится нужная ячейка',
+      elem: 'text-field',
+    },
+
+    // dashSingle, dashButton
+    {
+      option: 'color',
+      description: 'Выбрать цвет значения',
+      elem: 'text-field',
+    },
+
+    // dashButton
+    {
+      option: 'backgroundcolor',
+      description: 'Выбрать цвет фона',
+      elem: 'text-field',
+    },
+
+    // dashButton, MultiLine
+    {
+      option: 'name',
+      description: 'Выбрать название кнопки',
+      elem: 'text-field',
+    },
+
+    // dashTable
+    {
+      option: 'titles',
+      description: 'Столбцы для отображения',
+      elem: 'checkbox-list',
+      items: function () {
+        // this is modalSettings context
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
+      },
+      default: [],
+    },
+
+    // dashHeatMap, (maybe dashTable, dashTable)
+    {
+      group: 'Формат данных',
+      option: 'dataFormat',
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'x',
+      description: 'X axis',
+      elem: 'select',
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
+      },
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'xFormat',
+      description: 'X-axis format',
+      elem: 'select',
+      items: ['Дата', 'Строка', 'Число'],
+      default: 'Строка',
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'xSort',
+      description: 'Sorting by x-axis',
+      elem: 'select',
+      items: ['По возрастанию', 'По убыванию'],
+      default: 'По возрастанию',
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'y',
+      description: 'Y axis',
+      elem: 'select',
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
+      },
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'yFormat',
+      description: 'Y-axis format',
+      elem: 'select',
+      items: ['Дата', 'Строка', 'Число'],
+      // default: 'Дата',
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'ySort',
+      description: 'Sorting by y-axis',
+      elem: 'select',
+      items: ['По возрастанию', 'По убыванию'],
+      default: 'По возрастанию',
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'data',
+      description: 'Значение ячейки',
+      elem: 'select',
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
+      },
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'metadata',
+      description: 'metadata',
+      elem: 'select',
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
+      },
+    },
+    {
+      optionGroup: 'dataFormat',
+      option: 'detailValue',
+      description: 'Поле для ссылки Детали',
+      elem: 'select',
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
+      },
+    },
+
+    // dashBoard
+    {
+      option: 'widthTile',
+      description: 'Введите ширину плитки',
+      elem: 'text-field',
+      placeholder: '100',
+    },
+    {
+      option: 'heightTile',
+      description: 'Введите высоту плитки',
+      elem: 'text-field',
+      placeholder: '100',
+    },
+
+    // dashSingle
+    {
+      option: 'fontSize',
+      description: 'Выбрать размер шрифта',
+      elem: 'text-field',
+      placeholder: '30',
+    },
+
+    // dashButton
+    {
+      option: 'underline',
+      description: 'Подчеркивает текст кнопки',
+      elem: 'switch',
+    },
+    {
+      label: 'Submit',
+      option: 'onButton',
+      description: 'Перезапускать серчи по кнопке',
+      elem: 'switch',
+    },
+
+    // MultiLine
+    {
+      option: 'lastDot',
+      description: 'Показывать последнее значение',
+      elem: 'switch',
+    },
+    {
+      option: 'isDataAlwaysShow',
+      description: 'Постоянное отображение данных на графике',
+      elem: 'radio-group',
+      items: [
+        { value: false, label: 'Нет' },
+        { value: 'data', label: 'data' },
+        { value: 'caption', label: 'caption' },
+      ],
+    },
+    {
+      option: 'xAxisCaptionRotate',
+      description: 'Градус наклона подписей на оси X',
+      elem: 'radio-group',
+      items: [
+        { value: 0, label: '0' },
+        { value: 45, label: '45' },
+        { value: -45, label: '-45' },
+        { value: 90, label: '90' },
+        { value: -90, label: '-90' },
+      ],
+    },
+    {
+      option: 'barplotBarWidth',
+      description: 'Ширина столбцов барплот-графика',
+      elem: 'text-field',
+      elemType: 'number',
+      elemMin: 0,
+      placeholder: 'Не указано',
+    },
+    {
+      option: 'stringOX',
+      description: 'Ось X - строки',
+      elem: 'switch',
+    },
+    {
+      option: 'united',
+      description: 'Отображать ли все метрики на одной плоскости координат',
+      elem: 'switch',
+    },
+    {
+      option: 'barplotstyle',
+      relation: 'united',
+      description: 'Стиль столбцов',
+      elem: 'select',
+      items: [
+        { text: 'разделенный', value: 'divided' },
+        { text: 'наложенный', value: 'overlay' },
+        { text: 'с накоплением', value: 'accumulation' },
+      ],
+    },
+
+    // dashSelect
+    {
+      option: 'multiple',
+      description: 'Возможность выбора нескольких значений',
+      elem: 'switch',
+    },
+
+    // dashMap, dashPieChart
+    {
+      option: 'showlegend',
+      description: 'Показывать ли легенду',
+      elem: 'switch',
+    },
+
+    // MultiLine, dashBoard
+    {
+      option: 'timeFormat',
+      description: 'Выбрать формат даты и времени',
+      elem: 'text-field',
+      placeholder: '%Y-%m-%d %H:%M:%S',
+    },
+    {
+      relation: 'united',
+      option: 'axesCount',
+      default: 1,
+      description: 'Привязка осей',
+      elem: 'radio-group',
+      items: [
+        { value: 1, label: 'Одна ось' },
+        { value: 2, label: 'Две оси' },
+      ],
+    },
+
+    {
+      relation: 'united',
+      group: 'Выбор типа графика', // вывод заголовка для следующих полей
+      option: 'metricTypes',
+    },
+    {
+      relation: 'united',
+      each: function () {
+        // each реализовано только для select и radio-group
+        return this.titles && this.titles.splice
+          ? [...this.titles].splice(1)
+          : [];
+      },
+      label: 'metricTypes',
+      option: 'metricTypes',
+      description: 'Тип графика',
+      elem: 'select',
+      items: [
+        { value: 'linechart', text: 'Линейный' },
+        { value: 'barplot', text: 'Столбчатый' },
+      ],
+    },
+
+    {
+      relation: ['united', { axesCount: 2 }],
+      group: 'Привязка осей',
+      option: 'metricsAxis',
+    },
+    {
+      relation: ['united', { axesCount: 2 }],
+      each: function () {
+        // each реализовано только для select и radio-group, разбивает настройку для полей записи
+        return this.titles && this.titles.splice
+          ? [...this.titles].splice(1)
+          : [];
+      },
+      label: 'metricsAxis',
+      option: 'metricsAxis',
+      description: 'Привязка оси',
+      elem: 'radio-group',
+      items: [
+        { value: 'left', label: 'Слева' },
+        { value: 'right', label: 'Справа' },
+      ],
+    },
+  ],
   reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
   reports: {
     table: {

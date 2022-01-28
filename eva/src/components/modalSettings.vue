@@ -55,1334 +55,203 @@
               Статус
             </div>
           </div>
-          <div v-if="checkOptions('visible')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
+          <template v-for="field in fieldsForRender">
+            <template
+              v-if="
+                checkOptions(field.optionGroup || field.option, field.relation)
+              "
             >
-              visible
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Показывает / скрывает элемент
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.visible"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.visible)"
-              />
-            </div>
-          </div>
-          <div class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              pinned
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Закрепить на всех вкладках
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.pinned"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.pinned)"
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('level')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              level
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Установить слой отображения элемента
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.level"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('boxShadow')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              boxShadow
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Добавляет / удаляет тень
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.boxShadow"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.boxShadow)"
-              />
-            </div>
-          </div>
-          <!-- start lastResult-->
-          <div v-if="checkOptions('lastResult')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              lastResult
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Вывод предыдущих результатов
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.lastResult"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.lastResult)"
-              />
-            </div>
-          </div>
-          <!-- end lastResult-->
-          <!-- start searchBtn-->
-          <div v-if="checkOptions('searchBtn')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              searchBtn
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Показывать кнопку поиска
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.searchBtn"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.searchBtn)"
-              />
-            </div>
-          </div>
-          <!-- end searchBtn-->
-          <!-- start osmserver-->
-          <div v-if="checkOptions('osmserver')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              osmserver
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Сервер для набора tile Пример:
-              http://192.168.4.209/osm/{z}/{x}/{y}.png
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.osmserver"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <!-- end osmserver-->
-          <!--start strokeWidth-->
-          <div v-if="checkOptions('strokeWidth')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              strokeWidth
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Толщина линий
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.strokeWidth"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <!--end strokeWidth-->
-          <!--start thememultiline-->
-          <div v-if="checkOptions('thememultiline')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              thememultiline
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Цветовая тема
-            </div>
-            <div class="status-option item">
-              <v-select
-                v-model="options.thememultiline"
-                :items="['default', 'Anna theme']"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                hide-details
-                outlined
-                class="subnumber"
-              />
-            </div>
-          </div>
-
-          <!--end thememultiline-->
-          <div v-if="checkOptions('subnumber')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              subnumber
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выводит дополнительную надпись под числом
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.subnumber"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('rowcolor')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              rowcolor
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать цвет которым подсветится нужная строка
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.rowcolor"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('columncolor')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              columncolor
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать цвет которым подсветится нужный столбец
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.columncolor"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('cellcolor')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              cellcolor
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать цвет которым подсветится нужная ячейка
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.cellcolor"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('color')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              color
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать цвет значения
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.color"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('backgroundcolor')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              backgroundcolor
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать цвет фона
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.backgroundcolor"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('name')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              name
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать название кнопки
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.name"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('titles')" class="option-item">
-            <v-container fluid>
-              <v-card-text class="headline">
+              <div
+                v-for="prop in field.each || [null]"
+                :key="`${field.option}${prop}`"
+                class="option-item"
+              >
+                <v-card-text v-if="field.group" class="headline">
+                  <div
+                    class="settings-title"
+                    :style="{
+                      color: theme.$main_text,
+                      borderColor: theme.$main_border,
+                    }"
+                  >
+                    {{ field.group }}
+                  </div>
+                </v-card-text>
                 <div
-                  class="settings-title"
+                  v-if="!field.group"
+                  class="name-option item"
                   :style="{
                     color: theme.$main_text,
                     borderColor: theme.$main_border,
                   }"
                 >
-                  Столбцы для отображения
+                  {{ field.optionGroup ? field.optionGroup + '.' : ''
+                  }}{{ field.label || field.option }}
+                  <span v-if="prop">.{{ prop }}</span>
                 </div>
-              </v-card-text>
-              <v-checkbox
-                v-for="setting in getAvailableTableTitles(idDash, element)"
-                :key="setting"
-                :input-value="tableTitles"
-                :style="{ color: theme.$main_text }"
-                :label="setting"
-                :value="setting"
-                @change="titleHandler($event)"
-              >
-              </v-checkbox>
-            </v-container>
-          </div>
-
-          <div
-            v-if="checkOptions('dataFormat')"
-            class="option-item"
-            :style="{
-              color: theme.$main_text,
-              borderColor: theme.$main_border,
-            }"
-          >
-            <v-container fluid>
-              <v-card-text class="headline">
                 <div
-                  class="settings-title"
+                  v-if="!field.group"
+                  class="discribe-option item"
                   :style="{
                     color: theme.$main_text,
                     borderColor: theme.$main_border,
                   }"
                 >
-                  Формат данных
+                  {{ field.description }}&nbsp;<span
+                  :style="{ color: theme.$accent_ui_color }"
+                  v-text="prop"
+                />
                 </div>
-              </v-card-text>
-              <v-row :style="{ color: theme.$main_text }">
-                <v-col col="4">
-                  <v-select v-model="x" label="x:" :items="tableTitles" />
-                </v-col>
-                <v-col col="4">
-                  <v-select v-model="xFormat" :items="dataFormat" />
-                </v-col>
-                <v-col col="4">
-                  <v-select v-model="xSort" :items="sortType" />
-                </v-col>
-              </v-row>
-              <v-row :style="{ color: theme.$main_text }">
-                <v-col col="4">
-                  <v-select v-model="y" label="y:" :items="tableTitles" />
-                </v-col>
-                <v-col col="4">
-                  <v-select v-model="yFormat" :items="dataFormat" />
-                </v-col>
-                <v-col col="4">
-                  <v-select v-model="ySort" :items="sortType" />
-                </v-col>
-              </v-row>
-              <v-row :style="{ color: theme.$main_text }"
-                ><v-select v-model="data" label="data:" :items="tableTitles" />
-              </v-row>
-              <v-row :style="{ color: theme.$main_text }"
-                ><v-select
-                  v-model="metadata"
-                  label="metadata:"
-                  :items="tableTitles"
-                />
-              </v-row>
-              <v-row :style="{ color: theme.$main_text }"
-                ><v-select
-                  v-model="detailValue"
-                  label="Поле для ссылки Детали:"
-                  :items="tableTitles"
-                />
-              </v-row>
-            </v-container>
-          </div>
-
-          <div v-if="checkOptions('timeFormat')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              timeFormat
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать формат даты и времени
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.timeFormat"
-                clearable
-                placeholder="%Y-%m-%d %H:%M:%S"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('widthTile')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              widthTile
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Введите ширину плитки
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.widthTile"
-                clearable
-                placeholder="100"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('heightTile')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              heightTile
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Введите высоту плитки
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.heightTile"
-                clearable
-                placeholder="100"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('fontSize')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              fontSize
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбрать размер шрифта
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.fontSize"
-                clearable
-                placeholder="30"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('underline')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              underline
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Подчеркивает текст кнопки
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.underline"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.underline)"
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('lastDot')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              lastDot
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Показывать последнее значение
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.lastDot"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.lastDot)"
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('onButton')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Submit
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Перезапускать серчи по кнопке
-            </div>
-            <div class="status-option item">
-              <v-checkbox
-                v-model="options.onButton"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.onButton)"
-              />
-            </div>
-          </div>
-          <div class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              pinned
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Закрепить на всех вкладках
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.pinned"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.pinned)"
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('isDataAlwaysShow')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              isDataAlwaysShow
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Постоянное отображение данных на графике
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.isDataAlwaysShow"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.isDataAlwaysShow)"
-              />
-              <v-radio-group
-                v-if="options.isDataAlwaysShow"
-                v-model="options.isDataAlwaysShow"
-                class="ml-10"
-              >
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  label="data"
-                  value="data"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  label="caption"
-                  value="caption"
-                />
-              </v-radio-group>
-            </div>
-          </div>
-          <div v-if="checkOptions('xAxisCaptionRotate')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              xAxisCaptionRotate
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Градус наклона подписей на оси X
-            </div>
-            <div class="status-option item">
-              <v-radio-group
-                v-model="options.xAxisCaptionRotate"
-                :column="false"
-              >
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  label="0"
-                  :value="0"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  class="ml-2"
-                  label="45"
-                  :value="45"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  class="ml-2"
-                  label="-45"
-                  :value="-45"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  class="ml-2"
-                  label="90"
-                  :value="90"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  class="ml-2"
-                  label="-90"
-                  :value="-90"
-                />
-              </v-radio-group>
-            </div>
-          </div>
-          <div v-if="checkOptions('barplotBarWidth')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              barplotBarWidth
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Ширина столбцов барплот-графика
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="options.barplotBarWidth"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                class="subnumber"
-                type="number"
-                min="0"
-                outlined
-                hide-details
-                @change="
-                  (val) => {
-                    if (val < 1) options.barplotBarWidth = 0;
-                  }
-                "
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('stringOX')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              stringOX
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Ось X - строки
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.stringOX"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.stringOX)"
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('united')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              united
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Отображать ли все метрики на одной плоскости координат
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.united"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.united)"
-              />
-            </div>
-          </div>
-
-          <div
-            v-if="options.united && checkOptions('united')"
-            class="option-item"
-          >
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              barplotstyle
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Стиль столбцов
-            </div>
-            <div class="status-option item">
-              <v-select
-                v-model="options.barplotstyle"
-                :items="barplotstyleOptions"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                hide-details
-                outlined
-                class="subnumber"
-              />
-            </div>
-          </div>
-
-          <div
-            v-for="metric in metricsName"
-            v-if="!options.united"
-            :key="metric.name"
-            class="option-item"
-          >
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              {{ metric.name }} units
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Единицы измерения для линии {{ metric.name }}
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="metricUnits[metric.name]"
-                clearable
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
-            </div>
-          </div>
-
-          <v-card-text
-            v-if="
-              options.united &&
-              options.barplotstyle !== 'accumulation' &&
-              checkOptions('united')
-            "
-            class="headline pa-0"
-          >
-            <div
-              class="settings-title"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Выбор типа графика
-            </div>
-          </v-card-text>
-
-          <div
-            v-if="
-              options.united &&
-              options.barplotstyle !== 'accumulation' &&
-              checkOptions('united')
-            "
-            class="options-block united-block pa-0"
-          >
-            <div class="multiline-custom-opts">
-              <div style="margin-left: 350px">
-                <div
-                  v-for="(metric, i) in Object.keys(
-                    multilineYAxesBinding.metricTypes
-                  )"
-                  :key="`metric-${i}`"
-                  class="d-flex pb-3"
-                >
-                  <span :style="{ color: theme.$main_text }">
-                    Тип графика
-                    <span
-                      :style="{ color: theme.$accent_ui_color }"
-                      v-text="metric"
-                    />:
-                  </span>
-                  <v-radio-group
-                    v-model="multilineYAxesBinding.metricTypes[metric]"
+                <div v-if="!field.group" class="status-option item">
+                  <!-- elem: switch -->
+                  <v-switch
+                    v-if="field.elem === 'switch'"
+                    v-model="options[field.option]"
+                    class="switch"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text }"
+                    :label="String(options[field.option])"
+                  />
+                  <!-- elem: text-field -->
+                  <v-text-field
+                    v-else-if="field.elem === 'text-field'"
+                    v-model="options[field.option]"
+                    :placeholder="field.placeholder"
+                    clearable
+                    :color="theme.$primary_button"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    outlined
+                    class="subnumber"
                     hide-details
+                    :type="field.elemType"
+                    :min="field.elemMin"
+                  />
+                  <!-- elem: select -->
+                  <v-select
+                    v-else-if="field.elem === 'select' && !prop"
+                    v-model="options[field.option]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                  />
+                  <v-select
+                    v-else-if="field.elem === 'select' && prop"
+                    v-model="options[field.option][prop]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                  />
+                  <!-- elem: checkbox-list -->
+                  <div
+                    v-else-if="field.elem === 'checkbox-list'"
+                    class="checkbox-list"
+                  >
+                    <v-checkbox
+                      v-for="setting in field.items"
+                      :key="setting"
+                      v-model="options[field.option]"
+                      :value="setting"
+                      :style="{ color: theme.$main_text }"
+                      :label="setting"
+                      hide-details
+                      @change="
+                        (val) => {
+                          field.onChange ? field.onChange(val) : null;
+                        }
+                      "
+                    >
+                    </v-checkbox>
+                  </div>
+                  <!-- elem: radio-group -->
+                  <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && !prop"
+                    v-model="options[field.option]"
                     :column="false"
-                    class="ma-0 ml-5"
                   >
                     <v-radio
+                      v-for="{ label, value } in field.items"
+                      :key="value"
                       :color="theme.$primary_button"
                       :style="{ color: theme.$main_text }"
-                      label="Линейный"
-                      :value="'linechart'"
-                    />
-                    <v-radio
-                      :color="theme.$primary_button"
-                      :style="{ color: theme.$main_text }"
-                      class="ml-2"
-                      label="Столбчатый"
-                      :value="'barplot'"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
                     />
                   </v-radio-group>
+                  <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && prop"
+                    v-model="options[field.option][prop]"
+                    :column="false"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :key="value"
+                      :color="theme.$primary_button"
+                      :style="{ color: theme.$main_text }"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                    />
+                  </v-radio-group>
+                  <!-- end -->
                 </div>
               </div>
-            </div>
-          </div>
+            </template>
+          </template>
 
-          <v-card-text
-            v-if="
-              options.united &&
-              options.barplotstyle !== 'accumulation' &&
-              checkOptions('united')
-            "
-            class="headline pa-0"
-          >
+          <template v-if="!options.united">
             <div
-              class="settings-title"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
+              v-for="metric in metricsName"
+              :key="metric.name"
+              class="option-item"
             >
-              Привязка осей
-            </div>
-          </v-card-text>
-
-          <div
-            v-if="
-              options.united &&
-              options.barplotstyle !== 'accumulation' &&
-              checkOptions('united')
-            "
-            class="options-block united-block pa-0"
-          >
-            <div class="d-flex multiline-custom-opts">
-              <v-radio-group
-                v-model="multilineYAxesBinding.axesCount"
-                style="margin-left: 350px; margin-top: 0"
-              >
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  label="Одна ось"
-                  :value="1"
-                />
-                <v-radio
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  label="Две оси"
-                  :value="2"
-                />
-              </v-radio-group>
-
               <div
-                v-if="multilineYAxesBinding.axesCount === 2"
-                style="margin-left: 50px"
+                class="name-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
               >
-                <div
-                  v-for="(metric, i) in Object.keys(
-                    multilineYAxesBinding.metrics
-                  )"
-                  :key="`metric-${i}`"
-                  class="pb-3"
-                >
-                  <div class="d-flex align-center">
-                    <span :style="{ color: theme.$main_text }">
-                      Привязка
-                      <span
-                        :style="{ color: theme.$accent_ui_color }"
-                        v-text="metric"
-                      />:
-                    </span>
-                    <v-radio-group
-                      v-model="multilineYAxesBinding.metrics[metric]"
-                      hide-details
-                      :column="false"
-                      class="ma-0 ml-5"
-                    >
-                      <v-radio
-                        :color="theme.$primary_button"
-                        :style="{ color: theme.$main_text }"
-                        label="Слева"
-                        :value="'left'"
-                      />
-                      <v-radio
-                        :color="theme.$primary_button"
-                        :style="{ color: theme.$main_text }"
-                        class="ml-2"
-                        label="Справа"
-                        :value="'right'"
-                      />
-                    </v-radio-group>
-                  </div>
-                </div>
+                {{ metric.name }} units
+              </div>
+              <div
+                class="discribe-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                Единицы измерения для линии {{ metric.name }}
+              </div>
+              <div class="status-option item">
+                <v-text-field
+                  v-model="metricUnits[metric.name]"
+                  clearable
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    background: 'transparent',
+                    borderColor: theme.$main_border,
+                  }"
+                  outlined
+                  class="subnumber"
+                  hide-details
+                />
               </div>
             </div>
-          </div>
+          </template>
 
           <v-card-text
             v-if="!options.united && checkOptions('united')"
@@ -1403,7 +272,7 @@
             class="options-block united-block"
           >
             <v-icon
-              v-if="metrics.length == 0"
+              v-if="metrics.length === 0"
               class="icon-plus"
               :color="theme.$primary_button"
               @click="addMetrics"
@@ -1429,7 +298,7 @@
               />
               <v-select
                 v-model="metrics[i - 1].type"
-                :items="types"
+                :items="['Line chart', 'Bar chart']"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
                 hide-details
@@ -1482,13 +351,15 @@
                   Цвет
                 </div>
                 <div class="status-option item">
-                  <input
-                    :value="color[metrics[i - 1].name]"
-                    style="width: 100px; cursor: pointer"
-                    type="color"
-                    name="multiline-color"
-                    @change="(e) => handleChangeColor(e, i - 1)"
-                  />
+                  <label>
+                    <input
+                      :value="color[metrics[i - 1].name]"
+                      style="width: 100px; cursor: pointer"
+                      type="color"
+                      name="multiline-color"
+                      @change="(e) => handleChangeColor(e, i - 1)"
+                    />
+                  </label>
                 </div>
               </div>
               <div>
@@ -1590,64 +461,7 @@
               </v-icon>
             </div>
           </div>
-          <div v-if="checkOptions('multiple')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              multiple
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Возможность выбора нескольких значений
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.multiple"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.multiple)"
-              />
-            </div>
-          </div>
-          <div v-if="checkOptions('showlegend')" class="option-item">
-            <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              showlegend
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Показывать ли легенду
-            </div>
-            <div class="status-option item">
-              <v-switch
-                v-model="options.showlegend"
-                class="switch"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                :label="String(options.showlegend)"
-              />
-            </div>
-          </div>
+
           <div v-if="checkOptions('positionlegend')" class="option-item">
             <div
               class="name-option item"
@@ -1760,7 +574,7 @@
             </div>
             <div class="options-item-tooltip">
               <v-select
-                v-for="(label, i) in metricsRelation.namesMetric"
+                v-for="(_, i) in metricsRelation.namesMetric"
                 :key="i + 'metric'"
                 v-model="metricsRelation.relations[i]"
                 :items="metricsRelation.metrics"
@@ -1842,7 +656,7 @@
                 :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
-                >Удалить</v-btn
+              >Удалить</v-btn
               >
             </div>
           </div>
@@ -1870,7 +684,7 @@
             />
           </div>
           <v-icon
-            v-if="tooltip.texts.length == 0"
+            v-if="tooltip.texts.length === 0"
             class="icon-plus"
             :color="theme.$primary_button"
             @click="addIntoTooltip('text')"
@@ -1922,7 +736,7 @@
             />
           </div>
           <v-icon
-            v-if="tooltip.links.length == 0"
+            v-if="tooltip.links.length === 0"
             class="icon-plus"
             :color="theme.$primary_button"
             @click="addIntoTooltip('link')"
@@ -1988,7 +802,7 @@
             />
           </div>
           <v-icon
-            v-if="tooltip.buttons.length == 0"
+            v-if="tooltip.buttons.length === 0"
             class="icon-plus"
             :color="theme.$primary_button"
             @click="addIntoTooltip('button')"
@@ -2044,6 +858,7 @@
             </v-icon>
           </div>
         </div>
+
         <v-card-actions class="actions-settings">
           <v-spacer />
           <v-btn
@@ -2071,8 +886,7 @@
 <script>
 import settings from '../js/componentsSettings.js';
 
-import { mdiPlusBox, mdiMinusBox } from '@mdi/js';
-import { mapGetters } from 'vuex';
+import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
 
 export default {
   props: {
@@ -2080,7 +894,6 @@ export default {
   },
   data() {
     return {
-      tableTitles: [],
       element: '',
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
@@ -2089,7 +902,6 @@ export default {
       options: {},
       type_line: 'solid',
       color: {},
-      optionsItems: [],
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
@@ -2112,58 +924,91 @@ export default {
       themesArr: [],
       themes: {},
       metrics: [],
-      types: ['Line chart', 'Bar chart'],
       metricsName: [],
       multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
       multilineYAxesTypes: {},
-      x: '',
-      y: '',
-      metadata: '',
-      detailValue: '',
-      data: '',
-      xFormat: 'Строка',
-      yFormat: 'Дата',
-      xSort: 'По возрастанию',
-      ySort: 'По возрастанию',
-      dataFormat: ['Дата', 'Строка', 'Число'],
-      sortType: ['По возрастанию', 'По убыванию'],
       metricUnits: {},
-      barplotstyleOptions: [
-        { text: 'разделенный', value: 'divided' },
-        { text: 'наложенный', value: 'overlay' },
-        { text: 'с накоплением', value: 'accumulation' },
-      ],
+      fieldsForRender: [],
+      optionsByComponents: [],
     };
   },
   computed: {
     active: function () {
-      // тут понимаем нужно ли открыть окно с созданием или нет
-      if (this.$store.getters.getModalSettings(this.idDash).status) {
+      return this.$store.getters.getModalSettings(this.idDash).status;
+    },
+    idDash: function () {
+      return this.idDashFrom;
+    },
+    theme: function () {
+      return this.$store.getters.getTheme;
+    },
+    primitivesLibraryAutoGrowLinkText() {
+      return this.primitivesLibraryAutoGrow
+        ? 'Свернуть поле'
+        : 'Расширить поле';
+    },
+    optionsItems() {
+      if (!this.element) {
+        return [];
+      }
+      let elem = this.element.split('-')[0];
+      return elem ? this.optionsByComponents[elem] || [] : [];
+    },
+    changeComponent() {
+      return this.idDash + '-' + this.element;
+    },
+
+    // поля элемента данных
+    titles() {
+      return this.$store.getters.getAvailableTableTitles(
+        this.idDash,
+        this.element
+      );
+    },
+  },
+  watch: {
+    changeComponent() {
+      this.options = {};
+      this.loadComponentsSettings();
+      this.prepareOptions();
+    },
+    titles() {
+      this.loadComponentsSettings();
+      this.prepareOptions();
+    },
+    async active(val) {
+      if (val) {
         // если окно должно быть открыто
-        this.element = this.$store.getters.getModalSettings(
-          this.idDash
-        ).element; // получаем для каокго элемнета вывести настройки
-        if (this.element.indexOf('csvg') != -1) {
-          this.tooltipSettingShow = true;
-        } else {
-          this.tooltipSettingShow = false;
-        }
-        this.prepareOptions(); // и подготовливаем модалку на основе этого элемента
+        const settings = this.$store.getters.getModalSettings(this.idDash);
+        this.element = settings.element; // получаем для каокго элемнета вывести настройки
+        this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
         this.metricsName = this.$store.getters.getMetricsMulti({
           idDash: this.idDash,
           id: this.element,
         });
         if (this.element.startsWith('multiLine')) {
-          const opt = this.$store.getters.getOptions({
-            idDash: this.idDash,
-            id: this.element,
+          const opt = await this.$store.dispatch('getSettingsByPath', {
+            path: this.idDash,
+            element: this.element,
           });
-
           if (opt.conclusion_count) {
             this.conclusion_count = opt.conclusion_count;
           }
 
           if (opt.yAxesBinding) {
+            // поддержка старой структуры сохраненных настроек
+            if (!opt.metricTypes) {
+              if (opt.yAxesBinding.metrics) {
+                opt.metricsAxis = opt.yAxesBinding.metrics;
+              }
+              if (opt.yAxesBinding.metricTypes) {
+                opt.metricTypes = opt.yAxesBinding.metricTypes;
+              }
+              if (opt.yAxesBinding.axesCount) {
+                opt.axesCount = opt.yAxesBinding.axesCount;
+              }
+            }
+
             this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount;
           } else {
             this.multilineYAxesBinding.axesCount = 1;
@@ -2179,6 +1024,7 @@ export default {
 
           this.metricsName.forEach((metric) => {
             this.metricUnits[metric.name] = metric.units;
+
             if (
               opt.yAxesBinding &&
               opt.yAxesBinding.metrics &&
@@ -2194,65 +1040,42 @@ export default {
             }
           });
         }
-        let test = this.$store.getters.getOptions({
-          idDash: this.idDash,
-          id: this.element,
-        });
-        if (this.element.includes('heatmap')) {
-          this.x = test.x;
-          this.y = test.y;
-          this.data = test.data;
-          this.metadata = test.metadata;
-          this.detailValue = test.detailValue;
-        }
+        await this.prepareOptions();
       }
-      return this.$store.getters.getModalSettings(this.idDash).status;
     },
-    idDash: function () {
-      return this.idDashFrom;
+    element() {
+      this.loadComponentsSettings();
     },
-    theme: function () {
-      return this.$store.getters.getTheme;
-    },
-    selectedTitles() {
-      return this.$store.getters.getSelectedTableTitles(
-        this.idDash,
-        this.element
-      );
-    },
-    primitivesLibraryAutoGrowLinkText() {
-      return this.primitivesLibraryAutoGrow
-        ? 'Свернуть поле'
-        : 'Расширить поле';
-    },
-
-    ...mapGetters([
-      'getAvailableTableTitles',
-      'getSelectedTableTitles',
-      'getAvailableDataFormat',
-      'getSelectedDataFormat',
-    ]),
   },
-  watch: {
-    selectedTitles(newValue) {
-      this.tableTitles = newValue;
-    },
-    active(status) {
-      if (!status) {
-        // set default empty value
-        this.multilineYAxesBinding = {
-          axesCount: 1,
-          metrics: {},
-          metricTypes: {},
-        };
-      }
-    },
+  created() {
+    this.cancelModal();
   },
   mounted() {
-    this.tableTitles = this.getSelectedTableTitles(this.idDashFrom);
-    // this.$store.commit('setModalSettings',  { idDash: this.idDash, status: false, id: '' } );
+    const settings = this.$store.getters.getModalSettings(this.idDash);
+    this.element = settings.element;
+    this.loadComponentsSettings();
+    this.prepareOptions();
   },
   methods: {
+    loadComponentsSettings() {
+      this.optionsByComponents = settings.options;
+      this.fieldsForRender = settings.optionFields.map((field) => {
+        const items =
+          typeof field.items === 'function'
+            ? field.items.call(this)
+            : field.items;
+        const each =
+          typeof field.each === 'function' ? field.each.call(this) : field.each;
+        if (each) {
+          let options = {};
+          each.forEach((key) => {
+            options[key] = field.items[0]?.value;
+          });
+          this.$set(this.options, field.option, { ...options });
+        }
+        return { ...field, items, each };
+      });
+    },
     handleChangeColor(e, i) {
       this.color = { ...this.color, [this.metrics[i].name]: e.target.value };
     },
@@ -2273,17 +1096,7 @@ export default {
         [this.metrics[i].name]: Number(e),
       };
     },
-    titleHandler(val) {
-      let temp = [];
-      let orderArray = this.getAvailableTableTitles(this.idDash, this.element);
-      for (let setting of val) {
-        let index = orderArray.indexOf(setting);
-        temp.push({ setting, index });
-      }
-      temp.sort((a, b) => a.index - b.index);
-      this.tableTitles = temp.map((el) => el.setting);
-    },
-    setOptions: function () {
+    setOptions: async function () {
       // отправляем настройки в хранилище
       if (!this.options.level) {
         this.options.level = 1;
@@ -2298,15 +1111,15 @@ export default {
       if (typeof this.options.size != 'undefined') {
         if (this.options.size == null) {
           this.options.size = '100px';
-        } else if (String(this.options.size).indexOf('px') == -1) {
+        } else if (String(this.options.size).indexOf('px') === -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
       //let options = {...{},...this.options};
-      if (this.element.indexOf('csvg') != -1) {
+      if (this.element.indexOf('csvg') !== -1) {
         this.options.tooltip = this.tooltip;
       }
-      if (this.element.indexOf('piechart') != -1) {
+      if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation)
         );
@@ -2326,69 +1139,71 @@ export default {
           this.options.themes = this.themes;
         }
       }
-      if (this.element.indexOf('multiLine') != -1) {
-        let updateMetrics = this.metrics.map((item) => {
-          return JSON.parse(JSON.stringify(item));
-        });
-        this.$set(this.options, 'metrics', updateMetrics);
-      }
-      if (this.element.includes('heatmap')) {
-        this.options.x = this.x;
-        this.options.y = this.y;
-        this.options.data = this.data;
-        this.options.metadata = this.metadata;
-        this.options.detailValue = this.detailValue;
-        this.options.yFormat = this.yFormat;
-        this.options.ySort = this.ySort;
-        this.options.xFormat = this.xFormat;
-        this.options.xSort = this.xSort;
-      }
       if (this.element.startsWith('multiLine')) {
         this.$store.commit('setMultilineMetricUnits', {
           idDash: this.idDash,
           elem: this.element,
           units: this.metricUnits,
         });
-        this.options.yAxesBinding = { ...this.multilineYAxesBinding };
       }
-      this.$store.commit('setOptions', {
-        idDash: this.idDash,
-        id: this.element,
-        options: {
-          ...this.options,
-          conclusion_count: this.conclusion_count,
-          replace_count: this.replace_count,
-          openNewScreen: this.openNewScreen,
-          type_line: this.type_line,
-          color: this.color,
-        },
-        titles: this.tableTitles,
+
+      let options = {
+        ...this.options,
+        conclusion_count: this.conclusion_count,
+        replace_count: this.replace_count,
+        openNewScreen: this.openNewScreen,
+        type_line: this.type_line,
+        color: this.color,
+        updated: Date.now(),
+      };
+      await this.$store.dispatch('saveSettingsToPath', {
+        path: this.idDash,
+        element: this.element,
+        options,
       });
       this.cancelModal();
     },
     cancelModal: function () {
       // если нажали на отмену создания
-      this.$store.commit('setModalSettings', {
-        idDash: this.idDash,
-        status: false,
-        id: '',
-      });
+      this.$store.dispatch('closeModalSettings', { path: this.idDash });
     },
     checkEsc: function (event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    checkOptions: function (option) {
+    checkOptions: function (option, relation) {
       // проверяет есть ли такая опция уже в массиве с опциями
+      if (relation !== undefined) {
+        if (relation.forEach) {
+          let res = relation.filter((item) => {
+            if (typeof item === 'object') {
+              let show = true;
+              Object.keys(item).forEach((key) => {
+                if (show && this.options[key] !== item[key]) {
+                  show = false;
+                }
+              });
+              return show;
+            } else {
+              return !!this.options[item];
+            }
+          });
+          if (res.length !== relation.length) {
+            return false;
+          }
+        } else if (!this.options[relation]) {
+          return false;
+        }
+      }
       return this.optionsItems.includes(option);
     },
     addIntoTooltip: function (item) {
-      if (item == 'text') {
+      if (item === 'text') {
         this.tooltip.texts.push('');
-      } else if (item == 'link') {
+      } else if (item === 'link') {
         this.tooltip.links.push({ name: '', url: '' });
-      } else if (item == 'button') {
+      } else if (item === 'button') {
         this.tooltip.buttons.push({ name: '', id: '' });
       }
     },
@@ -2402,11 +1217,11 @@ export default {
       });
     },
     deleteFromTooltip: function (item, i) {
-      if (item == 'text') {
+      if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
-      } else if (item == 'link') {
+      } else if (item === 'link') {
         this.tooltip.links.splice(i, 1);
-      } else if (item == 'button') {
+      } else if (item === 'button') {
         this.tooltip.buttons.splice(i, 1);
       }
     },
@@ -2414,7 +1229,7 @@ export default {
       this.metrics.splice(i, 1);
     },
     changeColor: function () {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
+      if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
           item.style.background = this.theme.$main_bg;
@@ -2423,13 +1238,12 @@ export default {
         });
       }
     },
-    prepareOptions() {
+    async prepareOptions() {
       //  понимает какие опции нужно вывести
-      let options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.element,
-      }); // получаем все опции
-      let elem = this.element.split('-')[0]; // понимаем какой тип элемента попал к нам
+      const options = await this.$store.dispatch('getSettingsByPath', {
+        path: this.idDash,
+        element: this.element,
+      });
 
       if (options.color) {
         this.color = options.color;
@@ -2447,11 +1261,9 @@ export default {
         this.replace_count = options.replace_count;
       }
 
-      this.options = {};
-      this.optionsItems = settings.options[elem];
       this.optionsItems.forEach((item) => {
         if (Object.keys(options).includes(item)) {
-          if (item == 'tooltip') {
+          if (item === 'tooltip') {
             this.tooltip = {};
             this.$set(this.tooltip, 'texts', [...[], ...options[item].texts]);
             this.$set(this.tooltip, 'links', [...[], ...options[item].links]);
@@ -2459,10 +1271,10 @@ export default {
               ...[],
               ...options[item].buttons,
             ]);
-          } else if (item == 'metrics') {
+          } else if (item === 'metrics') {
             //this.$set(this,'metrics',options[item]);
             this.metrics = options[item];
-          } else if (item == 'metricsRelation') {
+          } else if (item === 'metricsRelation') {
             this.metricsRelation = {};
             this.$set(this.metricsRelation, 'metrics', [
               ...[],
@@ -2476,66 +1288,59 @@ export default {
               'Категория',
               'Процентное соотношение',
             ]);
-          } else if (item == 'colorsPie') {
+          } else if (item === 'colorsPie') {
             this.colorsPie = {};
             this.$set(this.colorsPie, 'theme', options[item].theme);
             this.$set(this.colorsPie, 'colors', options[item].colors);
             this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
-          } else if (item == 'themes') {
+          } else if (item === 'themes') {
             this.themesArr = Object.keys(options[item]);
             this.themes = options[item];
+          } else if (item === 'titles') {
+            let val = options[item];
+            if (!val) {
+              // old settings
+              let oldVal = this.$store.getters.getSelectedTableTitles(
+                this.idDash,
+                this.element
+              );
+              if (oldVal) {
+                val = oldVal;
+              }
+            }
+            // если не выбраны заголовки то выделить все имеющиеся
+            if (val.length === 0) {
+              let allTitles = this.$store.getters.getAvailableTableTitles(
+                this.idDash,
+                this.element
+              );
+              if (allTitles.length) {
+                val = [...allTitles];
+              }
+            }
+            this.$set(this.options, item, val || []);
           } else {
-            this.$set(this.options, item, options[item]);
+            let val =
+              options[item] !== null && typeof options[item] === 'object'
+                ? { ...options[item] }
+                : options[item];
+            this.$set(this.options, item, val);
           }
         } else {
-          this.$set(this.options, item, null);
-          if (item == 'stringOX') {
+          let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+          if (propsToFalse.includes(item)) {
             this.$set(this.options, item, false);
-          }
-          if (item == 'united') {
-            this.$set(this.options, item, false);
-          }
-          if (item == 'barplotstyle') {
-            this.$set(this.options, item, 'divided');
-          }
-          if (item === 'isDataAlwaysShow') {
-            this.$set(this.options, item, false);
-          }
-          if (item === 'xAxisCaptionRotate') {
-            this.$set(this.options, item, 0);
-          }
-          if (item === 'barplotBarWidth') {
-            this.$set(this.options, item, 0);
-          }
-          if (item == 'lastDot') {
-            this.$set(this.options, item, false);
-          }
-          if (item == 'showlegend') {
+          } else if (item === 'showlegend') {
             this.$set(this.options, item, true);
-          }
-          if (item == 'positionlegend') {
+          } else if (item === 'positionlegend') {
             this.$set(this.options, item, 'right');
-          }
-          // if (item == 'colorsPie') {
-          //   this.colorsPie = {};
-          //   this.$set(this.colorsPie,'theme', 'neitral');
-          //   this.$set(this.colorsPie,'colors', '');
-          //   this.$set(this.colorsPie,'nametheme', '');
-          // }
-          if (item == 'metrics') {
-            this.metrics = [];
-          }
-          if (item == 'multiple') {
-            this.$set(this.options, item, false);
-          }
-          if (item == 'underline') {
-            this.$set(this.options, item, false);
-          }
-          if (item == 'onButton') {
-            this.$set(this.options, item, false);
-          }
-          if (item == 'pinned') {
-            this.$set(this.options, item, false);
+          } else {
+            const field = settings.optionFields.find(
+              (field) => field.option === item
+            );
+            if (field && field.default !== undefined) {
+              this.$set(this.options, item, field.default);
+            }
           }
         }
       });
