@@ -42,7 +42,7 @@
       <template v-slot:expanded-item="{ headers, item }">
         <td :colspan="headers.length" class="collapse-row">
           <div style="margin-left: 216px">
-            <div v-for="(value, name) in item.inputCount">
+            <div v-for="(value, name) in item.inputCount" :key="name">
               <span v-if="name != '_time'" :style="{ color: theme.$raspberry }"
                 >{{ name }}:
               </span>
@@ -77,7 +77,7 @@ import {
 
 export default {
   props: {
-    data: [],
+    data: Array,
   },
   data() {
     return {
