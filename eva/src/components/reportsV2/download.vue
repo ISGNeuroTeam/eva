@@ -14,7 +14,7 @@ import { mdiDownload } from '@mdi/js';
 
 export default {
   props: {
-    data: [],
+    data: Array,
   },
   data() {
     return {

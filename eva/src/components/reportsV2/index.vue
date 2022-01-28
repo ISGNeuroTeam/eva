@@ -80,7 +80,6 @@
 <script>
 import { mdiPlay, mdiSettings, mdiMerge, mdiPlus } from '@mdi/js';
 import settings from '../../js/componentsSettings.js';
-import DashHeatMapLinear from '../dashBoardInside/dashHeatMapLinear';
 import newSearch from './newSearch.vue';
 import timeline from './timeline.vue';
 import report from './report.vue';
@@ -246,7 +245,6 @@ export default {
           this.shema = event.data.shema;
           this.data = event.data.data;
 
-          let text = '';
           Object.keys(this.shema).forEach((item, i) => {
             statistic = this.createStatistic(item, event.data.data);
             let count = 0;
@@ -302,7 +300,7 @@ export default {
           this.search.sid,
           'reports'
         );
-        responseDB.then((result) => {
+        responseDB.then(() => {
           let refresh = this.$store.getters.refreshElements(
             'reports',
             this.search.sid
@@ -312,7 +310,7 @@ export default {
         });
       }
     },
-    addLineBreaks: function (event) {
+    addLineBreaks: function () {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'
@@ -365,13 +363,13 @@ export default {
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
             console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -381,7 +379,7 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
