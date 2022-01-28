@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 - refactoring modal settings
+- date research 2.0.
 
 ## [1.80.0]
 
