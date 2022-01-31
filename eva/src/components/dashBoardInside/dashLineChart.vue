@@ -89,19 +89,19 @@ export default {
     change: function () {
       if (
         this.dataRestFrom &&
-        Object.keys(this.dataRestFrom).length != 0 &&
-        this.width != 0 &&
-        this.height != 0
+        Object.keys(this.dataRestFrom).length !== 0 &&
+        this.width !== 0 &&
+        this.height !== 0
       ) {
         if (this.dataReport) {
-          if (this.activeElemFrom == this.id) {
+          if (this.activeElemFrom === this.id) {
             this.getDataAsynchrony();
           } else {
             let graphics = d3
               .select(this.$el.querySelector('.dash-graph'))
               .selectAll('svg')
               .nodes();
-            if (graphics.length != 0) {
+            if (graphics.length !== 0) {
               // если график уже есть
               graphics[0].remove(); // удаляем его
             }
@@ -204,7 +204,7 @@ export default {
         .selectAll('svg')
         .nodes(); // получаем область в которой будем рисовтаь график
 
-      if (graphics.length != 0) {
+      if (graphics.length !== 0) {
         // если график уже есть
         graphics[0].remove(); // удаляем его
       }
@@ -225,27 +225,31 @@ export default {
           // пробегаемся по первому элементу, на основе него и будем делать выводы о метриках
           switch (i) {
             case 0: // в первый элемнет массива нам надо занести основную метрику которая рисует основную линию
-              j != 0 &&
-              item.indexOf('lowerbound') == -1 &&
-              item.indexOf('upperbound') == -1 &&
-              item.indexOf('upperthreshold') == -1 &&
-              item.indexOf('lowerthreshold') == -1
+              j !== 0 &&
+              item.indexOf('lowerbound') === -1 &&
+              item.indexOf('upperbound') === -1 &&
+              item.indexOf('upperthreshold') === -1 &&
+              item.indexOf('lowerthreshold') === -1
                 ? metricsName.push(item)
                 : false;
               break;
             case 1: // во второй заносим верхнию границу коридора
-              item.indexOf('upperbound') != -1 ? metricsName.push(item) : false;
+              item.indexOf('upperbound') !== -1
+                ? metricsName.push(item)
+                : false;
               break;
             case 2: // нижняя граница коридора
-              item.indexOf('lowerbound') != -1 ? metricsName.push(item) : false;
+              item.indexOf('lowerbound') !== -1
+                ? metricsName.push(item)
+                : false;
               break;
             case 3: // верхняя граница порога
-              item.indexOf('upperthreshold') != -1
+              item.indexOf('upperthreshold') !== -1
                 ? metricsName.push(item)
                 : false;
               break;
             case 4: // нижняя
-              item.indexOf('lowerthreshold') != -1
+              item.indexOf('lowerthreshold') !== -1
                 ? metricsName.push(item)
                 : false;
               break;
@@ -253,7 +257,7 @@ export default {
         });
       }
 
-      if (metricsName.length == 0) {
+      if (metricsName.length === 0) {
         // если метрик вообще не найдено
         this.props.nodata = true; // показываем сообщение о некорректности данных
         this.props.result = []; // очищаем массив результатов
@@ -265,7 +269,6 @@ export default {
         return false; // завершаем создание графика
       }
 
-      // console.log(data)
       let x = null;
       let maxX = 0,
         minX = 0;
@@ -344,7 +347,7 @@ export default {
       }
 
       let annotation = Object.keys(data[0]).filter((item) => {
-        if (item.indexOf('annotation') != -1) {
+        if (item.indexOf('annotation') !== -1) {
           return item;
         }
       });
@@ -362,7 +365,7 @@ export default {
               .tickFormat(d3.timeFormat('%d-%m-%Y '))
               .tickValues(
                 x.ticks().filter((item, i) => {
-                  if (i % deliter == 0) {
+                  if (i % deliter === 0) {
                     return item;
                   }
                 })
@@ -399,7 +402,7 @@ export default {
         .style('opacity', '0.3');
 
       // создаем область графика, все-что вне этой области не будет отрисованно
-      let clip = svg
+      svg
         .append('defs')
         .append('svg:clipPath')
         .attr('id', `clip-${that.id}`)
@@ -527,7 +530,7 @@ export default {
           // нам нужно понять какие точки выходят за значение порога и их мы окрасим в другой цвет
           this.setAttribute('fill', colors[0]); // поэтому сперва по умолчанию красив в цвет графика
           this.style = 'opacity:0'; // и делаем точки прозрачными
-          if (Object.keys(treshold).length == 2) {
+          if (Object.keys(treshold).length === 2) {
             // затем если вообще есть порог
             if (
               treshold[metricsName[3]][i] > d[metricsName[0]] ||
@@ -540,7 +543,7 @@ export default {
             }
           }
           if (lastDot) {
-            if (i == data.length - 1) {
+            if (i === data.length - 1) {
               // если это последняя точка, то
               putLabelDot(
                 'data-last-dote',
@@ -564,7 +567,7 @@ export default {
               this
             );
           }
-          if (annotation.length != 0) {
+          if (annotation.length !== 0) {
             annotation.forEach((item, i) => {
               if (d[item]) {
                 verticalLine(d, item, i);
@@ -719,9 +722,8 @@ export default {
 
       brushObj['selectionUp'] = () => {
         brushObj.mouseDown = false;
-        if (brushObj.direction == 'left') {
-          let change = 0;
-          change = brushObj.startX;
+        if (brushObj.direction === 'left') {
+          let change = brushObj.startX;
           brushObj.startX = brushObj.endX;
           brushObj.endX = change;
         }
@@ -732,7 +734,7 @@ export default {
 
       brushObj['clearBrush'] = () => {
         brushObj.selections = brush.selectAll(`.selection`).nodes();
-        if (brushObj.selections.length != 0) {
+        if (brushObj.selections.length !== 0) {
           brushObj.selections.forEach((item, i) => {
             brushObj.selections[i].remove();
           });
@@ -741,7 +743,7 @@ export default {
 
       function verticalLineX() {
         let linesX = svg.selectAll(`.grid-line-x`).nodes();
-        if (linesX.length != 0) {
+        if (linesX.length !== 0) {
           linesX.forEach((item, i) => {
             linesX[i].remove();
           });
@@ -885,7 +887,7 @@ export default {
             below: { x: null, y: null },
           };
         }
-        name.indexOf('upperbound') != -1
+        name.indexOf('upperbound') !== -1
           ? (areaData[i].above[point] = item)
           : (areaData[i].below[point] = item); // и наполняем его значениями
       }
@@ -897,7 +899,7 @@ export default {
 
         if (extent) {
           // если область выделена всё-таки
-          let diapason = [];
+          let diapason;
           if (time) {
             diapason = [
               parseInt(new Date(x.invert(extent[0])).getTime() / 1000),
@@ -933,7 +935,7 @@ export default {
                 .tickFormat(d3.timeFormat('%d-%m-%Y '))
                 .tickValues(
                   x.ticks().filter((item, i) => {
-                    if (i % 2 == 0) {
+                    if (i % 2 === 0) {
                       return item;
                     }
                   })
@@ -965,7 +967,7 @@ export default {
                   .tickFormat(d3.timeFormat('%d-%m-%Y '))
                   .tickValues(
                     x.ticks().filter((item, i) => {
-                      if (i % 2 == 0) {
+                      if (i % 2 === 0) {
                         return item;
                       }
                     })
@@ -1137,30 +1139,30 @@ export default {
           capture: tockens[i].capture,
         };
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == action &&
-          tockens[i].capture == 'pointX'
+          tockens[i].elem === this.id &&
+          tockens[i].action === action &&
+          tockens[i].capture === 'pointX'
         ) {
           setTocken(point.x);
           // this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point.x });
         } else if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == action &&
-          tockens[i].capture == 'pointY'
+          tockens[i].elem === this.id &&
+          tockens[i].action === action &&
+          tockens[i].capture === 'pointY'
         ) {
           setTocken(point.y);
           // this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point.y });
         } else if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == action &&
-          tockens[i].capture == 'start'
+          tockens[i].elem === this.id &&
+          tockens[i].action === action &&
+          tockens[i].capture === 'start'
         ) {
           setTocken(point[0]);
           //  this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point[0] });
         } else if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == action &&
-          tockens[i].capture == 'end'
+          tockens[i].elem === this.id &&
+          tockens[i].action === action &&
+          tockens[i].capture === 'end'
         ) {
           setTocken(point[1]);
           // this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point[1] });
@@ -1174,15 +1176,15 @@ export default {
         partelement: 'point',
       });
 
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'set') {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == 'go') {
-            if (action != 'select') {
+          } else if (item.action === 'go') {
+            if (action !== 'select') {
               this.$store.commit('letEventGo', {
                 event: item,
                 idDash: this.idDash,

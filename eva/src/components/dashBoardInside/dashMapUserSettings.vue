@@ -68,7 +68,7 @@
                 light
                 item-text="name"
                 item-value="tile[0]"
-                :dark="theme.$main_text == '#F4F4FA'"
+                :dark="isDark"
                 :style="{ color: theme.$main_text }"
                 @change="updateTileLayer($event)"
               />
@@ -85,7 +85,7 @@
                     v-model="options.zoomLevel"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     class="mt-0 pt-0"
                     hide-details
                     single-line
@@ -108,7 +108,7 @@
                     v-model="options.zoomStep"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     class="mt-0 pt-0"
                     hide-details
                     single-line
@@ -125,7 +125,7 @@
                     v-model="options.initialPoint.x"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
@@ -139,7 +139,7 @@
                     v-model="options.initialPoint.y"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
@@ -172,7 +172,7 @@
               <v-select
                 v-model="options.search"
                 outlined
-                :dark="theme.$main_text == '#F4F4FA'"
+                :dark="isDark"
                 item-text="sid"
                 :items="searches"
                 :return-object="true"
@@ -270,7 +270,7 @@
                 <template v-else-if="item.background_color">
                   <v-list-item-avatar
                     size="20px"
-                    style="align-self: center; border-radius: 0%"
+                    style="align-self: center; border-radius: 0"
                     v-html="createHtmlIcon(item)"
                   />
 
@@ -317,6 +317,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
+
 export default {
   props: {
     idElement: String,
@@ -379,6 +380,9 @@ export default {
     theme: function () {
       return this.$store.getters.getTheme;
     },
+    isDark() {
+      return this.theme.$main_text === '#F4F4FA';
+    },
     dashSettings() {
       return this.$store.getters.getOptions({
         idDash: this.idDashFrom,
@@ -393,7 +397,7 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (val.mode != oldVal.mode) this.updatePipeDataSource();
+        if (val.mode !== oldVal.mode) this.updatePipeDataSource();
         this.updateOptions(val);
       },
     },
@@ -425,7 +429,7 @@ export default {
     this.searches = this.loadDataForPipe();
   },
   methods: {
-    onClickChoosingCoordinates(e) {
+    onClickChoosingCoordinates() {
       const cursorCssClass = 'cursor-crosshair';
       this.dialog = false;
       L.DomUtil.addClass(this.map._container, cursorCssClass);
@@ -445,8 +449,7 @@ export default {
       this.$emit('updatePipeDataSource', this.options.search);
     },
     loadDataForPipe() {
-      let searches = this.$store.getters.getSearches(this.idDashFrom);
-      return searches;
+      return this.$store.getters.getSearches(this.idDashFrom);
     },
     closeLegend() {
       this.options.showLegend = false;
@@ -456,11 +459,8 @@ export default {
         text_color: textColor = '#FFFFFF',
         background_color: color = '65, 62, 218',
         opacity = 0.6,
-        label_field: text = 'КП-240',
         border_radius: borderRadius = '2px',
         border = 'none',
-        width = 20,
-        height = 20,
       } = lib;
       return `<div class="leaflet-div-icon" 
           style="
@@ -515,27 +515,27 @@ export default {
       if (typeof this.options.size != 'undefined') {
         if (this.options.size == null) {
           this.options.size = '100px';
-        } else if (String(this.options.size).indexOf('px') == -1) {
+        } else if (String(this.options.size).indexOf('px') === -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
       //let options = {...{},...this.options};
-      if (this.element.indexOf('csvg') != -1) {
+      if (this.element.indexOf('csvg') !== -1) {
         this.options.tooltip = this.tooltip;
       }
-      if (this.element.indexOf('piechart') != -1) {
+      if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation)
         );
         this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme == 'custom') {
+        if (this.colorsPie.theme === 'custom') {
           this.themes[this.colorsPie.nametheme] =
             this.colorsPie.colors.split(',');
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
       }
-      if (this.element.indexOf('multiLine') != -1) {
+      if (this.element.indexOf('multiLine') !== -1) {
         let updateMetrics = this.metrics.map((item) => {
           return JSON.parse(JSON.stringify(item));
         });

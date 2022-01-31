@@ -85,11 +85,7 @@ export default {
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
-      if (dragRes === 'true') {
-        return true;
-      } else {
-        return false;
-      }
+      return dragRes === 'true';
     },
     containerWidth() {
       return Math.floor(this.$refs.graph.clientWidth) - this.maxElementWidth;

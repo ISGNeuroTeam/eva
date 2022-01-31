@@ -5,7 +5,10 @@
     persistent
     @keydown="checkEsc($event)"
   >
-    <v-card class="delete-profile" :style="{ background: theme.$main_bg }">
+    <v-card
+      class="delete-profile"
+      :style="{ background: theme.$main_bg }"
+    >
       <v-card-text>
         <div
           class="name-profile"
@@ -39,30 +42,36 @@
 <script>
 export default {
   props: {
-    activeDelete: null,
-    dataFrom: null,
+    activeDelete: {
+      type: Boolean,
+      required: true,
+    },
+    dataFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {};
   },
   computed: {
-    active: function () {
+    active() {
       return this.activeDelete;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   methods: {
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('cancelModal');
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    deleteEssence: function () {
+    deleteEssence() {
       let response = this.$store.auth.getters.deleteEssence({
         id: this.dataFrom.id,
         essence: this.dataFrom.essence,

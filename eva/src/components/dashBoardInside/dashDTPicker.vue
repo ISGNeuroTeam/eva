@@ -280,7 +280,7 @@ export default {
         }
       }
       if (data.last != null) {
-        if (data.last.every != 0 && data.last.time != '') {
+        if (data.last.every !== 0 && data.last.time !== '') {
           let time = '...';
           switch (data.last.time) {
             case 'second':
@@ -297,11 +297,7 @@ export default {
         }
       }
 
-      if (current != '') {
-        this.show_curent = true;
-      } else {
-        this.show_curent = false;
-      }
+      this.show_curent = current !== '';
       return current;
     },
     openHidden: function () {
@@ -319,7 +315,7 @@ export default {
       }
     },
     customDate: function (elem) {
-      elem == 'begin'
+      elem === 'begin'
         ? (this.start_custom.color = 'controls')
         : (this.end_custom.color = 'controls');
       this.setTocken('custom');
@@ -354,6 +350,7 @@ export default {
       this.setTocken('time');
     },
     setTocken: function (elem) {
+      let period = 0;
       switch (elem) {
         case 'dt':
           this.startForStore = parseInt(new Date(this.start).getTime() / 1000);
@@ -399,8 +396,6 @@ export default {
           });
           break;
         case 'time':
-          let period = 0;
-
           switch (this.last.time) {
             case 'second':
               period = Number(this.last.every) * 1000;
@@ -445,18 +440,18 @@ export default {
           capture: tockens[i].capture,
         };
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == 'select' &&
-          tockens[i].capture == 'start'
+          tockens[i].elem === this.id &&
+          tockens[i].action === 'select' &&
+          tockens[i].capture === 'start'
         ) {
           if (this.startForStore != null) {
             setTocken(this.startForStore);
           }
         }
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == 'select' &&
-          tockens[i].capture == 'end'
+          tockens[i].elem === this.id &&
+          tockens[i].action === 'select' &&
+          tockens[i].capture === 'end'
         ) {
           if (this.endForStore != null) {
             setTocken(this.endForStore);
