@@ -26,7 +26,7 @@
             v-if="filterPartValues.length > 0"
             offset-y
             z-index="99"
-            attach
+            attach=".app-header"
             max-height="300"
             :close-on-content-click="false"
           >
@@ -133,15 +133,15 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'FilterPart',
-  props: [
-    'idDash',
-    'filterPart',
-    'isFocused',
-    'editPermission',
-    'filterPartIndex',
-    'filterIndex',
-    'editMode',
-  ],
+  props: {
+    idDash: String,
+    filterPart: Object,
+    isFocused: Boolean,
+    editPermission: Boolean,
+    filterPartIndex: Number,
+    filterIndex: Number,
+    editMode: Boolean,
+  },
   data() {
     return {
       closeIcon: mdiCloseCircleOutline,

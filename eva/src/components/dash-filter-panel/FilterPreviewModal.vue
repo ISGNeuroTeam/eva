@@ -45,7 +45,9 @@ import { mdiEyeOutline } from '@mdi/js';
 
 export default {
   name: 'FilterPreviewModal',
-  props: ['filter'],
+  props: {
+    filter: Object,
+  },
   data() {
     return {
       eyeIcon: mdiEyeOutline,

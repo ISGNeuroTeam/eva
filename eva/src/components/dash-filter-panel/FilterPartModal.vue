@@ -81,13 +81,13 @@ export default {
     ManualTypeModal,
     TokenTypeModal,
   },
-  props: [
-    'idDash',
-    'filterPart',
-    'filterPartIndex',
-    'editPermission',
-    'editMode',
-  ],
+  props: {
+    idDash: String,
+    filterPart: Object,
+    editPermission: Boolean,
+    filterPartIndex: Number,
+    editMode: Boolean,
+  },
   data() {
     return {
       currentTab: 0,

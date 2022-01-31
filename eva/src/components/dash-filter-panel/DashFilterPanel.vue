@@ -254,7 +254,7 @@
     </template>
 
     <v-dialog v-model="filterPartModalShow" persistent max-width="400">
-      <filter-part-modal
+      <FilterPartModal
         :idDash="idDashFrom"
         :filterPart="filterPartInModal"
         :filterPartIndex="filterPartIndexInModal"
@@ -266,7 +266,7 @@
     </v-dialog>
 
     <v-dialog v-model="showFilterPreviewModal" persistent max-width="400">
-      <filter-preview-modal
+      <FilterPreviewModal
         :filter="filterInPreviewModal"
         @closeFilterPreviewModal="closeFilterPreviewModal"
       />
@@ -374,7 +374,7 @@ export default {
         scrollWidth > clientWidth
       );
       // this.$nextTick(() => {});
-      return scrollWidth > clientWidth ? true : false;
+      return scrollWidth > clientWidth;
     },
     reverseFilter(filter) {
       filter.invertMatches = !filter.invertMatches;

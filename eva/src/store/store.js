@@ -1159,7 +1159,7 @@ export default {
       for (let part of filter.parts) {
         state[filter.idDash].stashedFilterParts.push({
           ...part,
-          values: [...part.values],
+          values: part.values ? [...part.values] : [],
         });
       }
     },
