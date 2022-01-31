@@ -295,7 +295,6 @@ export default {
   },
   computed: {
     active: function () {
-      console.log('computed active this.activeFrom = ', this.activeFrom);
       return this.activeFrom;
     },
     width: function () {

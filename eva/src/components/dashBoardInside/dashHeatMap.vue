@@ -108,12 +108,11 @@ export default {
       return this.idDashFrom;
     },
     events() {
-      let events = this.$store.getters.getEvents({
+      return this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
       });
-      return events;
     },
     filteredData() {
       return this.updateData && this.data;
@@ -210,7 +209,7 @@ export default {
         row = this.filteredData[x][y]?.row;
       }
 
-      this.$store.getters.getTockens(this.idDash).forEach((token, i) => {
+      this.$store.getters.getTockens(this.idDash).forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
           const capture = token.capture;
@@ -241,9 +240,9 @@ export default {
         element: this.id,
         partelement: 'empty',
       });
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'go') {
+          if (item.action === 'go') {
             item.value[0] = tokenValue;
             this.$store.commit('letEventGo', {
               event: item,

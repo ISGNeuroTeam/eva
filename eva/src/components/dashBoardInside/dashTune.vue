@@ -131,15 +131,6 @@ export default {
       return this.colorFrom;
     },
     values() {
-      // значения слайдера
-      if (!this.dataField && this.dataRestFrom.length) {
-        const keys = Object.keys(this.dataRestFrom[0]).filter(
-          (key) => key[0] !== '_'
-        );
-        if (keys.length === 1) {
-          this.dataField = keys[0];
-        }
-      }
       if (!this.dataField) {
         return [];
       }
@@ -210,6 +201,16 @@ export default {
     sliderValue(value) {
       if (!this.loading && this.values.length > 0) {
         this.value = this.values[value];
+      }
+    },
+    dataRestFrom(dataRestFrom) {
+      if (!this.dataField && dataRestFrom.length) {
+        const keys = Object.keys(dataRestFrom[0]).filter(
+          (key) => key[0] !== '_'
+        );
+        if (keys.length === 1) {
+          this.dataField = keys[0];
+        }
       }
     },
     dataField(value) {

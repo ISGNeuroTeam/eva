@@ -360,19 +360,11 @@ export default {
     },
 
     checkSliderOverflow(index) {
-      console.log('Check SLIDE num: ', `filter-${index}-parts-slider`);
 
       const slider = this.$refs[`filter-${index}-parts-slider`];
       if (!slider) return false;
 
       const { clientWidth, scrollWidth } = slider[0];
-      console.log(
-        'clientWidth : scrollWidth',
-        clientWidth,
-        ':',
-        scrollWidth,
-        scrollWidth > clientWidth
-      );
       // this.$nextTick(() => {});
       return scrollWidth > clientWidth;
     },
@@ -410,9 +402,9 @@ export default {
     },
     saveTempFilter() {
       if (this.filters.some((filter) => filter.id === this.tempFilter.id)) {
-        console.log('Фильтр с таким именем существует');
+        //console.log('Фильтр с таким именем существует');
       } else if (!this.tempFilter.id) {
-        console.log('Введите имя');
+        //console.log('Введите имя');
       } else {
         if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0;
         this.$store.commit('createFilter', {

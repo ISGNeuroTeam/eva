@@ -101,7 +101,7 @@ export default {
           body: JSON.stringify(this.user),
           // mode: 'no-cors'
         }).catch((error) => {
-          console.log(error);
+          console.error(error);
           return {
             status: 300,
             result: 'Post не создался, возможно из-за неточностей в запросе',

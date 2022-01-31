@@ -3,7 +3,6 @@
     <div v-if="nodata" class="nodata">
       {{ message }}
     </div>
-
     <div
       ref="chartTooltip"
       style="
@@ -21,19 +20,15 @@
       Наведите курсор на график
     </div>
 
-    <div v-show="dataLoading" class="mt-4">
+    <div v-show="dataLoading || !dataRestFrom.length" class="mt-4">
       <p>Нет данных для отображения</p>
     </div>
     <div
-      v-show="!dataLoading"
+      v-show="!dataLoading && !!dataRestFrom.length"
       class="piechart-legend-block"
       :style="{ flexFlow: positionLegends }"
     >
-      <div
-        ref="piechartItself"
-        :class="`dash-piechart ${this.idFrom}`"
-        :data-change="change"
-      />
+      <div ref="piechartItself" :class="`dash-piechart ${this.idFrom}`" />
       <div ref="legends" class="legend-block-pie">
         <div
           v-for="(item, idx) in legends"
@@ -148,57 +143,61 @@ export default {
       };
     },
     change() {
-      if (
-        this.dataRestFrom &&
-        Object.keys(this.dataRestFrom).length &&
-        this.dashSize
-      ) {
-        let graphics = d3
-          .select(this.$refs.piechartItself)
-          .selectAll('svg')
-          .nodes();
-        if (graphics.length != 0) {
-          graphics[0].remove();
-          //если строим заново(изменились данные) - очищаем токены
-          this.createPieChartDash();
-        } else {
-          this.createPieChartDash();
-        }
-      } else {
-        this.dataLoadingFrom = true;
-      }
       return true;
     },
   },
   watch: {
     selectedPieIndex(newVal) {
-      console.log(newVal);
       if (newVal !== null) this.setToken(newVal);
     },
-    dataRestFrom(newVal) {
-      if (newVal[0]) {
-        const captures = Object.keys(this.dataRestFrom[0]);
-        const actions = [{ name: 'click', capture: captures }];
+    dataRestFrom: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal[0]) {
+          const captures = Object.keys(this.dataRestFrom[0]);
+          const actions = [{ name: 'click', capture: captures }];
 
-        this.setMetrics();
+          this.setMetrics();
 
-        this.$store.commit('setActions', {
-          actions,
-          idDash: this.idDashFrom,
-          id: this.idFrom,
-        });
+          this.$store.commit('setActions', {
+            actions,
+            idDash: this.idDashFrom,
+            id: this.idFrom,
+          });
 
-        let graphics = d3
-          .select(this.$refs.piechartItself)
-          .selectAll('svg')
-          .nodes();
-        if (graphics.length != 0) {
-          graphics[0].remove();
-          this.createPieChartDash();
-        } else {
-          this.createPieChartDash();
+          let graphics = d3
+            .select(this.$refs.piechartItself)
+            .selectAll('svg')
+            .nodes();
+          if (graphics.length !== 0) {
+            graphics[0].remove();
+            this.createPieChartDash();
+          } else {
+            this.createPieChartDash();
+          }
         }
-      }
+
+        this.$nextTick(() => {
+          if (
+            this.dataRestFrom &&
+            Object.keys(this.dataRestFrom).length &&
+            this.dashSize
+          ) {
+            let graphics = d3
+              .select(this.$refs.piechartItself)
+              .selectAll('svg')
+              .nodes();
+
+            if (graphics.length !== 0) {
+              graphics[0].remove();
+              //если строим заново(изменились данные) - очищаем токены
+              this.createPieChartDash();
+            } else {
+              this.createPieChartDash();
+            }
+          }
+        });
+      },
     },
   },
   methods: {
@@ -245,20 +244,20 @@ export default {
 
       let showlegend = this.dashOptions.showlegend;
 
-      if (showlegend == undefined) {
+      if (showlegend === undefined) {
         showlegend = true;
       }
 
       let positionlegend = this.dashOptions.positionlegend;
 
-      if (positionlegend == undefined) {
+      if (positionlegend === undefined) {
         positionlegend = 'right';
       }
 
       let colorsPie = this.dashOptions.colorsPie;
 
       // SETTING DEFAULT COLORS
-      if (colorsPie == undefined) {
+      if (colorsPie === undefined) {
         colorsPie = {
           theme: 'neitral',
           colors: '',
@@ -286,7 +285,7 @@ export default {
               function tick() {
                 // важно чтобы наш график построился толкьо после того когда создался блок с легендой
 
-                if (this.$refs.legends.getBoundingClientRect().width != 0) {
+                if (this.$refs.legends.getBoundingClientRect().width !== 0) {
                   legendSize = {
                     width: Math.round(
                       this.$refs.legends.getBoundingClientRect().width
@@ -433,7 +432,7 @@ export default {
           tooltipEl.style.visibility = 'visible';
           hoverLegendLine(i);
         })
-        .on('mousemove', function (d) {
+        .on('mousemove', function () {
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
           tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
         })
@@ -458,7 +457,7 @@ export default {
       let tokens = this.$store.getters.getTockens(this.idDashFrom);
 
       tokens.forEach((tocken) => {
-        if (tocken.elem == this.idFrom) {
+        if (tocken.elem === this.idFrom) {
           const value = this.dataRestFrom[pieIndex][tocken.capture];
           this.$store.commit('setTocken', {
             tocken,

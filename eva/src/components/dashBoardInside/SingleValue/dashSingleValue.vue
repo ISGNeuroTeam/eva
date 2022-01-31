@@ -87,7 +87,6 @@ export default {
   computed: {
     dataToRender() {
       let temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
-      // console.log(temp)
       return this.update && temp.slice(0, this.metricCount);
     },
 

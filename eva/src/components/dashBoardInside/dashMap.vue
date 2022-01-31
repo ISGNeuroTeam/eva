@@ -19,6 +19,7 @@ import Vue from 'vue';
 import isMarkerInsidePolygon from './checkMarketInsideMap.js';
 import * as turf from '@turf/turf';
 import * as utils from 'leaflet-geometryutil';
+
 export default {
   props: {
     // переменные полученные от родителя
@@ -111,8 +112,8 @@ export default {
     this.initClusterTextCount();
     this.initClusterPosition();
     this.initClusterDelimiter();
-    store.subscribe((mutation, state) => {
-      if (mutation.type == 'updateOptions') {
+    store.subscribe((mutation) => {
+      if (mutation.type === 'updateOptions') {
         if (this.options.initialPoint) {
           this.map.setView(
             [this.options.initialPoint.x, this.options.initialPoint.y],
@@ -155,7 +156,7 @@ export default {
         idDash: this.idDash,
       }); // собственно проводим все операции с данными
       // вызывая метод в хранилище
-      if (response.length == 0) {
+      if (response.length === 0) {
         // если что-то пошло не так
         this.$store.commit('setLoading', {
           search: event.sid,
@@ -171,7 +172,7 @@ export default {
           event.sid,
           this.idDash
         );
-        responseDB.then((result) => {
+        responseDB.then(() => {
           this.$store.commit('setLoading', {
             search: event.sid,
             idDash: this.idDash,
@@ -184,17 +185,16 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
-      let test = await this.getDataFromRest(search);
-      this.pipelineData = test;
+      this.pipelineData = await this.getDataFromRest(search);
       this.reDrawMap(this.dataRestFrom);
     },
-    updateToken(value, test) {
+    updateToken(value) {
       let tokens = this.$store.getters.getTockens(this.idDash);
       Object.keys(tokens).forEach((i) => {
         if (
-          tokens[i].elem == this.element &&
-          tokens[i].action == 'button' &&
-          tokens[i].capture == 'zoom_level'
+          tokens[i].elem === this.element &&
+          tokens[i].action === 'button' &&
+          tokens[i].capture === 'zoom_level'
         ) {
           this.$store.commit('setTocken', {
             tocken: tokens[i],
@@ -203,9 +203,9 @@ export default {
             store: this.$store,
           });
         } else if (
-          tokens[i].elem == this.element &&
-          tokens[i].action == 'button' &&
-          tokens[i].capture == 'top_left_point'
+          tokens[i].elem === this.element &&
+          tokens[i].action === 'button' &&
+          tokens[i].capture === 'top_left_point'
         ) {
           this.$store.commit('setTocken', {
             tocken: tokens[i],
@@ -214,9 +214,9 @@ export default {
             store: this.$store,
           });
         } else if (
-          tokens[i].elem == this.element &&
-          tokens[i].action == 'button' &&
-          tokens[i].capture == 'bottom_right_point'
+          tokens[i].elem === this.element &&
+          tokens[i].action === 'button' &&
+          tokens[i].capture === 'bottom_right_point'
         ) {
           this.$store.commit('setTocken', {
             tocken: tokens[i],
@@ -227,7 +227,7 @@ export default {
         }
       });
     },
-    createTokens: function (result) {
+    createTokens: function () {
       let captures = ['top_left_point', 'bottom_right_point', 'zoom_level'];
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], 'capture', captures);
@@ -409,8 +409,8 @@ export default {
         generatedListHTML += `<li>${x.name}</li>`;
       }
       L.Control.Legend = L.Control.extend({
-        onAdd: function (map) {
-          var img = L.DomUtil.create('div');
+        onAdd: function () {
+          const img = L.DomUtil.create('div');
           img.innerHTML = `
               <div>
                 <p>Легенда</p>
@@ -422,10 +422,6 @@ export default {
           img.style.maxHeight = `466px`;
           img.style.background = 'black';
           return img;
-        },
-
-        onRemove: function (map) {
-          // Nothing to do here
         },
       });
 
@@ -515,13 +511,13 @@ export default {
     },
 
     getElementDrawType(lib) {
-      if (lib.view_type == 'html') {
+      if (lib.view_type === 'html') {
         return 'HTML';
       }
       return 'SVG';
     },
 
-    drawMarkerSVG(lib, element, isCenter) {
+    drawMarkerSVG(lib, element) {
       const icon = L.icon({
         iconUrl: `${window.location.origin}/svg/${lib.image}`,
         iconSize: [lib.width, lib.height],
@@ -544,12 +540,11 @@ export default {
       L.DomUtil.addClass(marker._icon, 'className');
     },
 
-    drawMarkerHTML({ lib, element, isCenter }) {
+    drawMarkerHTML({ lib, element }) {
       let {
         text_color: textColor = '#FFFFFF',
         background_color: color = '65, 62, 218',
         opacity = 0.6,
-        label_field: text = 'КП-240',
         border_radius: borderRadius = '2px',
         border = 'none',
         width,
@@ -623,21 +618,12 @@ export default {
         .on('mouseover', (e) => highlightFeature(e, line))
         .on('mouseout', resetHighlight);
       line.setTooltipContent(element.label);
-      let previousPoint = 0;
       let route = line.getLatLngs().map((el) => {
         return [el.lat, el.lng];
       });
       let lineTurf = turf.lineString(route);
-      let dist = 0;
-      line.getLatLngs().forEach(function (current) {
-        if (previousPoint) {
-          dist += previousPoint.distanceTo(current);
-        }
-        previousPoint = current;
-      });
-
       function resetHighlight(e) {
-        var layer = e.target;
+        const layer = e.target;
         layer.setStyle({
           color: lib.color,
           weight: lib.width,
@@ -645,7 +631,7 @@ export default {
       }
 
       function highlightFeature(e) {
-        var layer = e.target;
+        const layer = e.target;
         layer.bringToFront();
         layer.setStyle({
           weight: lib.width + 3,
@@ -654,7 +640,6 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
-        console.log(pipelineDataDictionary, element);
         if (!pipelineDataDictionary[element.ID]) return;
         const closest = (arr, num) => {
           return (
@@ -667,7 +652,7 @@ export default {
             }, Infinity) + num
           );
         };
-        if (option?.mode[0] == 'Мониторинг') {
+        if (option?.mode[0] === 'Мониторинг') {
           let newLine = turf.lineSlice(
             route[0],
             [e.latlng.lat, e.latlng.lng],
@@ -678,10 +663,10 @@ export default {
           let sum = distances[distances.length - 1];
 
           let closestData = closest(pipelineData, sum);
-          let pipelineInfo = pipelineData.find((el) => el.pos == closestData);
+          let pipelineInfo = pipelineData.find((el) => el.pos === closestData);
 
           // div for tooltip
-          var newDiv = document.createElement('div');
+          const newDiv = document.createElement('div');
           newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
           <p>${pipelineInfo.label}</p>
           <p>P ${pipelineInfo.P}</p>
@@ -689,7 +674,6 @@ export default {
           <p>L ${pipelineInfo.L}</p>
           </div>`;
 
-          console.log(isMarkerInsidePolygon(this.map.getBounds()), 'closee');
           if (isMarkerInsidePolygon(this.map.getBounds())) {
             line.setTooltipContent(newDiv);
           }

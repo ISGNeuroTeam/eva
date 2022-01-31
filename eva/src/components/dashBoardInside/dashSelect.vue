@@ -29,7 +29,6 @@
           :items="dataRest"
           :color="theme.$accent_ui_color"
           :style="{ color: theme.$main_text, fill: theme.$main_text }"
-          :data-elem="dataelem"
           hide-details
           outlined
           class="select-parent"
@@ -42,7 +41,6 @@
           :items="dataRest"
           :color="theme.$accent_ui_color"
           :style="{ color: theme.$main_text, fill: theme.$main_text }"
-          :data-elem="dataelemlink"
           hide-details
           outlined
           class="select-parent"
@@ -65,7 +63,6 @@
           :multiple="multiple"
           :color="theme.$accent_ui_color"
           :style="{ color: theme.$main_text, fill: theme.$main_text }"
-          :data-elem="dataelemDeep"
           hide-details
           class="select theme--dark"
           label="Значение"
@@ -182,21 +179,12 @@ export default {
       let data = [];
       if (this.dataReady.length > 0) {
         data = Object.keys(this.dataReady);
-        this.show = true;
-        if (Object.keys(this.dataReady).length != 0) {
-          if (this.dataReady.error) {
-            this.message = this.dataReady.error;
-            this.show = false;
-          } else {
+        if (Object.keys(this.dataReady).length !== 0) {
+          if (!this.dataReady.error) {
             data = Object.keys(this.dataReady[0]);
           }
         }
-        this.dataFromRest = data;
-        for (let action of this.actions) {
-          action.capture = data;
-        }
       }
-
       return data;
     },
     dataRestDeep: function () {
@@ -210,39 +198,19 @@ export default {
       }
       return res;
     },
-    dataelem: function () {
-      if (
-        this.$store.getters.getSelected({ idDash: this.idDash, id: this.id })
-          .elem == ''
-      ) {
-        this.elem = 'Выберите столбец данных';
-      }
+    selectedElem() {
       return this.$store.getters.getSelected({
         idDash: this.idDash,
         id: this.id,
       }).elem;
     },
-    dataelemlink: function () {
-      if (
-        this.$store.getters.getSelected({ idDash: this.idDash, id: this.id })
-          .elemlink == ''
-      ) {
-        this.elemlink = 'Выберите связанный столбец данных';
-      }
+    selectedElemLink() {
       return this.$store.getters.getSelected({
         idDash: this.idDash,
         id: this.id,
       }).elemlink;
     },
-    dataelemDeep: function () {
-      if (
-        this.$store.getters.getSelected({ idDash: this.idDash, id: this.id })
-          .elemDeep == ''
-      ) {
-        String(this.multiple) == 'true'
-          ? (this.elemDeep[String(this.multiple)] = [])
-          : (this.elemDeep[String(this.multiple)] = '');
-      }
+    selectedElemDeep() {
       return this.$store.getters.getSelected({
         idDash: this.idDash,
         id: this.id,
@@ -250,6 +218,43 @@ export default {
     },
     dataLoading: function () {
       return this.dataLoadingFrom;
+    },
+  },
+  watch: {
+    selectedElemDeep: function () {
+      if (this.selectedElemDeep.elemDeep === '') {
+        this.elemDeep[String(this.multiple)] =
+          String(this.multiple) === 'true' ? [] : '';
+      }
+    },
+    selectedElemLink: function () {
+      if (this.selectedElemLink.elemlink === '') {
+        this.elemlink = 'Выберите связанный столбец данных';
+      }
+    },
+    selectedElem(elem) {
+      if (elem === '') {
+        this.elem = 'Выберите столбец данных';
+      }
+    },
+    dataReady(dataReady) {
+      let data = [];
+      if (dataReady.length > 0) {
+        data = Object.keys(dataReady);
+        this.show = true;
+        if (Object.keys(dataReady).length !== 0) {
+          if (dataReady.error) {
+            this.message = dataReady.error;
+            this.show = false;
+          } else {
+            data = Object.keys(dataReady[0]);
+          }
+        }
+        this.dataFromRest = data;
+        for (let action of this.actions) {
+          action.capture = data;
+        }
+      }
     },
   },
   mounted() {
@@ -266,12 +271,12 @@ export default {
       selected.elem ? (this.elem = selected.elem) : false;
       selected.elemlink ? (this.elemlink = selected.elemlink) : false;
       if (
-        this.elem != 'Выберите элемент' &&
-        this.elemlink != 'Выберите связанный столбец данных'
+        this.elem !== 'Выберите элемент' &&
+        this.elemlink !== 'Выберите связанный столбец данных'
       ) {
         this.openSelect();
       }
-      if (selected.elemDeep.length != 0 || selected.elemDeep != '') {
+      if (selected.elemDeep.length !== 0 || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
@@ -302,8 +307,8 @@ export default {
           break;
       }
       if (
-        this.elem != 'Выберите элемент' &&
-        this.elemlink != 'Выберите связанный столбец данных'
+        this.elem !== 'Выберите элемент' &&
+        this.elemlink !== 'Выберите связанный столбец данных'
       ) {
         this.openSelect();
       }
@@ -316,7 +321,7 @@ export default {
       this.select_show = !this.select_show;
     },
     selectItems: function () {
-      if (this.chooseText == 'Выбрать все') {
+      if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
         this.elemDeep.true = [...this.topArray, ...this.bottomArray];
@@ -335,21 +340,15 @@ export default {
         }
       });
 
-      this.topArray = sorted(selected);
-      this.bottomArray = sorted(data);
-
-      data = [...this.topArray, ...this.bottomArray];
-
       function sorted(data) {
-        if (Number(data[0])) {
-          data = data.sort((a, b) => {
-            return a - b;
-          });
-        } else {
-          data = data.sort();
-        }
+        data = Number(data[0]) ? data.sort((a, b) => a - b) : data.sort();
         return data;
       }
+
+      this.topArray = sorted([...selected]);
+      this.bottomArray = sorted([...data]);
+
+      data = [...this.topArray, ...this.bottomArray];
 
       return data;
     },

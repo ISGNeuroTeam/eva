@@ -324,7 +324,7 @@ export default {
       if (
         parts[2] === mydate.getYear() &&
         parts[1] - 1 === mydate.getMonth() &&
-        parts[0] == mydate.getDate()
+        parts[0] === mydate.getDate().toString()
       ) {
         result = 0;
       } else {
@@ -459,7 +459,7 @@ export default {
                           break;
                         case 'in':
                           row = eventObj[index]['row']
-                            .replace(/\[|]/g, '')
+                            .replace(/[[\]]/g, '')
                             .split(',');
                           k = -1;
                           row.forEach((rowValue) => {
@@ -473,7 +473,7 @@ export default {
                           break;
                         case 'between':
                           row = eventObj[index]['row']
-                            .replace(/\[|]/g, '')
+                            .replace(/[[\]]/g, '')
                             .split(',');
                           if (
                             itemTd.innerText > row[0] &&
