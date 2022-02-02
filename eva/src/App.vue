@@ -1,6 +1,7 @@
 <template>
   <div :style="cssVariables">
-    <router-view :key="$route.fullPath" />
+<!--    <router-view :key="$route.fullPath" />-->
+    1111
   </div>
 </template>
 
