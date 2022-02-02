@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
-## Added
+### Added
 - refactoring modal settings
 - date research 2.0.
+
+### Fixed
+
+- fixed node label name in YGraph
 
 ## [1.80.0]
 
