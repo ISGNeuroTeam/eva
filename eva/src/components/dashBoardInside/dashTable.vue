@@ -360,7 +360,7 @@ export default {
       });
     },
     createTitles: function (result) {
-      if (this.options.titles) {
+      if (this.options?.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map(x => ({
           text: x,
