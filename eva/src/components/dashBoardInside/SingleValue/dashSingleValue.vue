@@ -214,6 +214,9 @@ export default {
         if (metric === '_title') {
           this.titleToken = String(value);
           continue;
+        } else if (metric === '_req') {
+          this.titleToken = '';
+          continue;
         }
 
         let range = metadata;
