@@ -1,6 +1,5 @@
 export default {
   async getEssenceList(role, create) {
-    console.log('getEssenceList', role, create);
     let data = [];
     let response = null;
     if (create) {
