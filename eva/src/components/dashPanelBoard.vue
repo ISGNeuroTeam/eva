@@ -1554,13 +1554,13 @@ export default {
     dragTool: function (event) {
       // функция для перетаскивания нового элемнета на полотно (остальную область, ну вы поняли короче)
 
-      if (event.which != 1) {
+      if (event.which !== 1) {
         // если пошло что-то не так
         return; // то прекращаем функцию
       }
       let parent = '';
       let elem = '';
-      if (event.target.nodeName != 'div') {
+      if (event.target.nodeName !== 'div') {
         // если мы ухватились не за div
         elem = event.target;
         while (!elem.classList.contains('tool-one')) {
@@ -1579,7 +1579,7 @@ export default {
       let avatar = parent.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
       document.body.appendChild(avatar); // и его уже добовляем в body
       avatar.classList.add('avatar'); // даем ему класс
-      avatar.style.zIndex = 3; // делаем его выше всех
+      avatar.style.zIndex = 99; // делаем его выше всех
       avatar.style.position = 'absolute'; // и относительно позиионируем
 
       document.onmousemove = (event) => {
