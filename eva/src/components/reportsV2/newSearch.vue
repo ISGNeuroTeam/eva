@@ -282,31 +282,8 @@ export default {
     });
     this.unitedData.color = this.theme.controls;
   },
-  mounted() {
-    document.title = 'EVA | Исследование данных';
-    this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl != '') {
-      this.$store.commit('setShould', {
-        idDash: 'reports',
-        id: 'table',
-        status: true,
-      });
-    }
-    // this.calcSize();
-    this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode == 13) {
-        this.launchSearch();
-      }
-    });
-    this.$refs.report.addEventListener('click', (event) => {
-      if (!event.target.classList.contains('static-row')) {
-        this.showStatistic = false;
-      }
-    });
-    this.unitedData.color = this.theme.controls;
-  },
   methods: {
-    addLineBreaks(event) {
+    addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'

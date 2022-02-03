@@ -31,20 +31,15 @@
             </div>
           </div>
           <keep-alive>
-            <v-row v-if="data.length > 0" class="mb-0">
+            <v-row v-if="data.length > 0 && tab === 0" class="mb-0">
               <v-col cols="2" class="pr-0">
                 <intresting
-                  v-if="tab === 0"
-                  class="events component-block"
+                  class="intresting component-block"
                   :rows="rows"
                 ></intresting>
               </v-col>
               <v-col cols="10" class="pl-0">
-                <events
-                  v-if="tab === 0"
-                  class="events component-block"
-                  :data="data"
-                ></events>
+                <events class="events component-block" :data="data"></events>
               </v-col>
             </v-row>
           </keep-alive>

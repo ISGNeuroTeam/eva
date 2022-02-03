@@ -539,7 +539,7 @@ export default {
 
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(
-        (nodeDataItem) => nodeDataItem.name
+        (nodeDataItem) => nodeDataItem.node
       );
       nodeNameCreator.defaults.layoutParameter =
         yfile.ExteriorLabelModel.NORTH_EAST;
@@ -548,6 +548,10 @@ export default {
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(
         (nodeDataItem) => {
           if (nodeDataItem.label !== '-') {
+            /*
+             TODO: У нода нет параметра лейбл, так что  свойство всегда ture
+              а данная строка всегда возвращает undefined
+            */
             return nodeDataItem.label;
           }
         }

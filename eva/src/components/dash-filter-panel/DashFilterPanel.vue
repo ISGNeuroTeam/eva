@@ -360,7 +360,6 @@ export default {
     },
 
     checkSliderOverflow(index) {
-
       const slider = this.$refs[`filter-${index}-parts-slider`];
       if (!slider) return false;
 

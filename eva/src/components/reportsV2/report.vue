@@ -48,7 +48,7 @@ import { mdiFileOutline, mdiClose } from '@mdi/js';
 
 export default {
   props: {
-    length: [],
+    length: Number,
   },
   data() {
     return {

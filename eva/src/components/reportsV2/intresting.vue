@@ -7,7 +7,6 @@
       class="interesting-block"
       :style="{ background: theme.$main_bg, color: theme.$main_text }"
     >
-      <div class="interesting-title">Interesting field</div>
       <div
         class="interesting-overflow-block"
         :style="{ color: theme.$main_text }"
@@ -67,7 +66,7 @@ import {
 
 export default {
   props: {
-    rows: [],
+    rows: Array,
   },
   data() {
     return {

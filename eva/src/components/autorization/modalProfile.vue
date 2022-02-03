@@ -612,12 +612,6 @@ export default {
             '#FF6D70'
           )
         } else if (res.status === 403) {
-          this.msg = '';
-          this.openMsg = true;
-          this.colorMsg = '#FF6D70';
-          setTimeout(() => {
-            this.openMsg = false;
-          }, 2000);
           this.showErrorMsg(
             '',
             '#FF6D70'
