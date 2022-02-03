@@ -102,7 +102,9 @@
               ref="popupContentTabChildren"
               :class="{ active: popupNodeCurrentTab === 1 }"
             >
-              <div v-for="item in childrenNodes" :key="item">• Node: {{ item }}</div>
+              <div v-for="item in childrenNodes" :key="item">
+                • Node: {{ item }}
+              </div>
               <div v-if="childrenNodes.length === 0">Empty</div>
             </div>
           </div>
@@ -558,7 +560,6 @@ export default {
             */
             return nodeDataItem.label;
           }
-
         }
       );
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST;

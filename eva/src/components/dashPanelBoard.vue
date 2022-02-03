@@ -109,7 +109,7 @@
             <span>Открыть настройки фильтров</span>
           </v-tooltip>
           <v-tooltip
-            v-if="editPermission"
+            v-if="editPermission || isEditDash"
             bottom
             :color="theme.$accent_ui_color"
           >
@@ -126,7 +126,7 @@
             <span>Открыть настройки дашборда</span>
           </v-tooltip>
           <v-tooltip
-            v-if="editPermission"
+            v-if="editPermission || isEditDash"
             bottom
             :color="theme.$accent_ui_color"
           >
@@ -759,7 +759,7 @@
       <dash-filter-panel
         :permissions-from="userPermissions"
         :idDashFrom="idDashFrom"
-        :editPermission="editPermission"
+        :editPermission="editPermission || isEditDash"
         :editMode="editMode"
       >
       </dash-filter-panel>
@@ -942,13 +942,13 @@ export default {
       modalPaper: false,
       userPermissions: [],
       screenHeight: this.getScreenHeight(),
+      allGroups: [],
     };
   },
   computed: {
     idDash: function () {
       return this.idDashFrom;
     },
-
     headerTop() {
       return document.body.clientWidth <= 1400 ? 40 : 50;
     },
@@ -1032,9 +1032,16 @@ export default {
         'max-height': this.screenHeight + 'px',
       };
     },
+    isEditDash() {
+      return !!this.allGroups.find(
+        (group) =>
+          group.dashs.includes(this.name) && group.users.includes(this.login)
+      );
+    },
   },
   mounted() {
     this.getCookie();
+    this.getGroups();
     this.tools = settings.tools;
 
     document.onmouseup = (event) => {
@@ -1075,6 +1082,12 @@ export default {
     window.removeEventListener('resize', this.updateScreenHeight);
   },
   methods: {
+    getGroups: function () {
+      let response = this.$store.getters.getGroups();
+      response.then((res) => {
+        this.allGroups = res;
+      });
+    },
     exit: function () {
       document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
       document.cookie = `eva_token=''; max-age=0 ; path=/`;
