@@ -1,20 +1,12 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog  
-    v-model="active"  
-    width="550"  
-    persistent 
-    @keydown="checkEsc($event)"
-  > 
+  <v-dialog v-model="active" width="550" persistent @keydown="checkEsc($event)">
     <div class="delete-modal-block">
-      <v-card :style="{background:theme.$main_bg}">
-        <v-card-text class="headline ">
-          <div 
-            class="create-title" 
-            :style="{color:theme.$title}"
-          >
-            Вы точно хотите удалить 
+      <v-card :style="{ background: theme.$main_bg }">
+        <v-card-text class="headline">
+          <div class="create-title" :style="{ color: theme.$title }">
+            Вы точно хотите удалить
             <p>
               {{ nameFrom }}
             </p>
@@ -23,16 +15,16 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn 
-            small 
+          <v-btn
+            small
             :color="theme.$primary_button"
-            class="create-btn" 
+            class="create-btn"
             @click="deleteBtn"
           >
             Удалить
           </v-btn>
-          <v-btn 
-            small 
+          <v-btn
+            small
             :color="theme.$primary_button"
             class="create-btn"
             @click="cancelModal"
@@ -45,38 +37,37 @@
   </v-dialog>
 </template>
 
-<script> 
-
-
+<script>
 export default {
   props: {
     modalFrom: null,
     nameFrom: null,
   },
-  data () {
-    return {
-    }
+  data() {
+    return {};
   },
   computed: {
-    theme: function() {
-      return this.$store.getters.getTheme
+    theme: function () {
+      return this.$store.getters.getTheme;
     },
-    active: function() {  // тут понимаем нужно ли открыть окно с созданием или нет  
-      return this.modalFrom
+    active: function () {
+      // тут понимаем нужно ли открыть окно с созданием или нет
+      return this.modalFrom;
     },
-    name: function() {
-      return this.nameFrom
-    }
+    name: function () {
+      return this.nameFrom;
+    },
   },
-  methods: {  
-    deleteBtn: function () { 
+  methods: {
+    deleteBtn: function () {
       this.$emit('deleteElem');
     },
-    cancelModal: function() {  // есл инажали на отмену создания
-      this.$emit('closeModal');  // передаем в родителя чтобы выключили модалку
+    cancelModal: function () {
+      // есл инажали на отмену создания
+      this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
     },
-    checkEsc: function(event) {
-      if (event.code =="Escape") {
+    checkEsc: function (event) {
+      if (event.code == 'Escape') {
         this.cancelModal();
       }
     },
@@ -93,11 +84,11 @@ export default {
     //   }
     // },
   },
-}
+};
 </script>
 
-<style lang="scss" >   // подключаем стили для этого компонента
+<style lang="scss">
+// подключаем стили для этого компонента
 
-    @import '../sass/modalDeleteFromMain.sass'
-    
+@import '../sass/modalDeleteFromMain.sass';
 </style>

@@ -25,12 +25,12 @@
   <div v-else class="empty-value">
     <span v-if="!comment" class="title-text" v-text="title" />
     <v-tooltip
-        v-else
-        bottom
-        nudge-top="15"
-        content-class="elevation-2"
-        transition="fade-transition"
-        :color="theme.$secondary_bg"
+      v-else
+      bottom
+      nudge-top="15"
+      content-class="elevation-2"
+      transition="fade-transition"
+      :color="theme.$secondary_bg"
     >
       <template v-slot:activator="{ on }">
         <span v-on="on" v-text="title" />
@@ -50,19 +50,19 @@ export default {
   },
   computed: {
     theme() {
-      return this.$store.getters.getTheme
+      return this.$store.getters.getTheme;
     },
 
     calculatedColor() {
-      return !this.color ? this.theme.$accent_ui_color : this.color
+      return !this.color ? this.theme.$accent_ui_color : this.color;
     },
 
     calculatedValue() {
-      const value = this.value <= 0 ? 0 : this.value
-      return Math.round(value >= 100 ? 100 : value)
+      const value = this.value <= 0 ? 0 : this.value;
+      return Math.round(value >= 100 ? 100 : value);
     },
   },
-}
+};
 </script>
 
 <style lang="sass" scoped>

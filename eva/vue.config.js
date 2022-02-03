@@ -12,9 +12,7 @@ module.exports = {
       .loader('vue-svg-loader');
   },
   lintOnSave: true,
-  transpileDependencies: [
-    'vuetify'
-  ],
+  transpileDependencies: ['vuetify'],
   pages: {
     index: {
       entry: 'src/index.js',
@@ -24,7 +22,7 @@ module.exports = {
   devServer: {
     overlay: {
       warnings: false,
-      errors: true
-    }
-  }
-}
+      errors: true,
+    },
+  },
+};

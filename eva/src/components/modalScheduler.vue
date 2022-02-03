@@ -1,146 +1,136 @@
 <!-- Модальное окно для выбора ИС -->
 
 <template>
-  <v-dialog  
-    :value="active"  
-    width="600" 
-    persistent 
-    @keydown="checkEsc($event)"
-  >
-    <v-card 
-      :style="{background:theme.$main_bg}" 
-      class="shedule-modal"
-    >
+  <v-dialog :value="active" width="600" persistent @keydown="checkEsc($event)">
+    <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
       <div class="schedule-block">
-        <div 
-          class="zagolovok" 
-          :style="{color:theme.$title}"
-        >
-          Расписание для запроса 
+        <div class="zagolovok" :style="{ color: theme.$title }">
+          Расписание для запроса
           <b>
             {{ sid }}
           </b>
         </div>
         <div class="tab-block">
-          <v-tabs  
-            :color="theme.$primary_button"  
+          <v-tabs
+            :color="theme.$primary_button"
             :background-color="theme.$main_bg"
           >
             <v-tabs-slider />
-            <v-tab  
-              :style="{color:theme.$main_text}"
+            <v-tab :style="{ color: theme.$main_text }"> Периодичность </v-tab>
+            <v-tab-item
+              :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
-              Периодичность
-            </v-tab>
-            <v-tab-item :style="{color:theme.$main_text, background:theme.$main_bg}">
               <div class="every">
                 <p>Каждые</p>
-                <v-text-field 
-                  v-model="every" 
-                  :color="theme.$accent_ui_color" 
-                  :style="{color: theme.$main_text, border: `1px solid ${theme.$main_border}`}" 
+                <v-text-field
+                  v-model="every"
+                  :color="theme.$accent_ui_color"
+                  :style="{
+                    color: theme.$main_text,
+                    border: `1px solid ${theme.$main_border}`,
+                  }"
                   class="textarea-item"
                   outlined
                   :disabled="disabledEvery"
                   hide-details
                 />
                 <div class="choose-time">
-                  <v-chip 
-                    :color="theme[color.hour]" 
-                    class="time" 
-                    @click="setTime('hour','every')"
+                  <v-chip
+                    :color="theme[color.hour]"
+                    class="time"
+                    @click="setTime('hour', 'every')"
                   >
                     Часов
                   </v-chip>
-                  <v-chip 
+                  <v-chip
                     :color="theme[color.minute]"
-                    class="time" 
-                    @click="setTime('minute','every')"
-                  > 
+                    class="time"
+                    @click="setTime('minute', 'every')"
+                  >
                     Минут
                   </v-chip>
-                  <v-chip 
-                    :color="theme[color.second]" 
-                    class="time" 
-                    @click="setTime('second','every')"
+                  <v-chip
+                    :color="theme[color.second]"
+                    class="time"
+                    @click="setTime('second', 'every')"
                   >
                     Секунд
                   </v-chip>
                 </div>
               </div>
-              <p 
-                class="time-select" 
-                :style="{color:theme.$main_text}"
-              >
+              <p class="time-select" :style="{ color: theme.$main_text }">
                 Получать данные за последние
               </p>
-              <v-divider :style="{borderColor:theme.$main_bg, opacity:'0.5'}" />
+              <v-divider
+                :style="{ borderColor: theme.$main_bg, opacity: '0.5' }"
+              />
               <div class="last">
-                <v-text-field 
+                <v-text-field
                   v-model="everyLast"
-                  :color="theme.$accent_ui_color" 
-                  :style="{color: theme.$main_text, border: `1px solid ${theme.$main_border}`}" 
-                  class="textarea-item" 
-                  outlined 
-                  :disabled="disabledEvery"  
+                  :color="theme.$accent_ui_color"
+                  :style="{
+                    color: theme.$main_text,
+                    border: `1px solid ${theme.$main_border}`,
+                  }"
+                  class="textarea-item"
+                  outlined
+                  :disabled="disabledEvery"
                   hide-details
                 />
                 <div class="choose-time">
-                  <v-chip 
-                    :color="theme[colorLast.hour]" 
-                    class="time" 
-                    @click="setTime('hour','last')"
+                  <v-chip
+                    :color="theme[colorLast.hour]"
+                    class="time"
+                    @click="setTime('hour', 'last')"
                   >
                     Часов
                   </v-chip>
-                  <v-chip 
-                    :color="theme[colorLast.minute]" 
-                    class="time" 
-                    @click="setTime('minute','last')"
-                  > 
+                  <v-chip
+                    :color="theme[colorLast.minute]"
+                    class="time"
+                    @click="setTime('minute', 'last')"
+                  >
                     Минут
                   </v-chip>
-                  <v-chip 
-                    :color="theme[colorLast.second]" 
-                    class="time" 
-                    @click="setTime('second','last')"
+                  <v-chip
+                    :color="theme[colorLast.second]"
+                    class="time"
+                    @click="setTime('second', 'last')"
                   >
                     Секунд
                   </v-chip>
                 </div>
               </div>
             </v-tab-item>
-            <v-tab :style="{color:theme.$main_text}">
-              Планирование
-            </v-tab>
+            <v-tab :style="{ color: theme.$main_text }"> Планирование </v-tab>
             <v-tab-item />
           </v-tabs>
         </div>
       </div>
       <v-card-actions>
         <v-spacer />
-        <v-btn 
-          small 
-          :color="theme.$primary_button" 
-          class="delete-btn" 
-          :class="{disable:disabledStop}" 
+        <v-btn
+          small
+          :color="theme.$primary_button"
+          class="delete-btn"
+          :class="{ disable: disabledStop }"
           @click="cancelSchedule"
         >
           {{ msg }}
         </v-btn>
-        <v-btn 
-          small 
-          :color="theme.$primary_button" 
-          class="delete-btn" 
-          :disabled="disabledStart" 
+        <v-btn
+          small
+          :color="theme.$primary_button"
+          class="delete-btn"
+          :disabled="disabledStart"
           @click="startSchedule"
         >
           Подтвердить
         </v-btn>
-        <v-btn 
-          small 
-          :color="theme.$primary_button" 
-          class="delete-btn" 
+        <v-btn
+          small
+          :color="theme.$primary_button"
+          class="delete-btn"
           @click="cancel"
         >
           Отмена
@@ -151,15 +141,13 @@
 </template>
 
 <script>
-
-
 export default {
   props: {
     idDashFrom: null,
     modalFrom: null,
-    dataSidFrom: null
+    dataSidFrom: null,
   },
-  data () {
+  data() {
     return {
       every: 0,
       time: '',
@@ -178,62 +166,64 @@ export default {
       disabledStop: true,
       disabledStart: false,
       disabledEvery: false,
-      msg: "Не запущен",
+      msg: 'Не запущен',
       timers: {},
       picker: {
         start: false,
-        end: false
-      }
-    }
+        end: false,
+      },
+    };
   },
-  computed: { 
-    
-    idDash: function() {  // получаем название элемента от родителя
-      return this.idDashFrom
+  computed: {
+    idDash: function () {
+      // получаем название элемента от родителя
+      return this.idDashFrom;
     },
-    active: function() {  // получаем статус открытия или нет окна модального
-      if (this.modalFrom)  {
-        if(this.schedulers.length != 0){
-          if (this.schedulers[this.sid]) { // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
+    active: function () {
+      // получаем статус открытия или нет окна модального
+      if (this.modalFrom) {
+        if (this.schedulers.length != 0) {
+          if (this.schedulers[this.sid]) {
+            // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
             this.every = this.schedulers[this.sid].every;
             this.time = this.schedulers[this.sid].time;
             this.everyLast = this.schedulers[this.sid].everyLast;
             this.timeLast = this.schedulers[this.sid].timeLast;
-            this.color[this.time] = "$primary_button";
-            this.colorLast[this.timeLast] = "$primary_button";
+            this.color[this.time] = '$primary_button';
+            this.colorLast[this.timeLast] = '$primary_button';
             this.disabledStop = false;
             this.disabledStart = true;
             this.disabledEvery = true;
-            this.msg = "Остановить";
+            this.msg = 'Остановить';
           } else {
             this.every = 0;
             this.time = '';
             this.everyLast = 0;
             this.timeLast = '';
-            Object.keys(this.color).forEach( item => {
+            Object.keys(this.color).forEach((item) => {
               this.color[item] = '$accent_ui_color';
               this.colorLast[item] = '$accent_ui_color';
-            })
+            });
             this.disabledStop = true;
             this.disabledStart = false;
             this.disabledEvery = false;
-            this.msg = "Не запущен";
+            this.msg = 'Не запущен';
           }
-        } 
-      }    
-      return this.modalFrom
+        }
+      }
+      return this.modalFrom;
     },
-    sid: function() {
-      return this.dataSidFrom
+    sid: function () {
+      return this.dataSidFrom;
     },
-    schedulers: function() {
-      return this.$store.getters.getSchedulers(this.idDash)
+    schedulers: function () {
+      return this.$store.getters.getSchedulers(this.idDash);
     },
-    searches: function() {
-      return this.$store.getters.getSearches(this.idDash)
+    searches: function () {
+      return this.$store.getters.getSearches(this.idDash);
     },
-    theme: function() {
-      return this.$store.getters.getTheme
+    theme: function () {
+      return this.$store.getters.getTheme;
     },
   },
   mounted() {
@@ -243,9 +233,12 @@ export default {
     let shedule = {};
     let curTime = {};
 
-    if (Object.keys(schedulers).length !== 0) {  // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
-      Object.keys(schedulers).forEach( scheduler => {   // пробегаемся по всем планировщикам
-        shedule = {  // создаем объект на основе настроек планировщика
+    if (Object.keys(schedulers).length !== 0) {
+      // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
+      Object.keys(schedulers).forEach((scheduler) => {
+        // пробегаемся по всем планировщикам
+        shedule = {
+          // создаем объект на основе настроек планировщика
           time: schedulers[scheduler].time,
           every: schedulers[scheduler].every,
           timeLast: schedulers[scheduler].timeLast,
@@ -256,32 +249,38 @@ export default {
           clearInterval(schedulers[scheduler].schedulerID);
         }
 
-        curTime = this.countTime(shedule.time, shedule.every)*1000; // переводим в правильный формат время
-        this.executeSearch(searches,scheduler,shedule);  // выоплняем серч один раз
-        this.timers[scheduler] = setInterval( () => {  // и запускаем в цикле
-          this.executeSearch(searches,scheduler,shedule);
-        },curTime)
-        this.$store.commit('setSchedulerID', { idDash: this.idDash, search: scheduler, schedulerID: this.timers[scheduler] })
+        curTime = this.countTime(shedule.time, shedule.every) * 1000; // переводим в правильный формат время
+        this.executeSearch(searches, scheduler, shedule); // выоплняем серч один раз
+        this.timers[scheduler] = setInterval(() => {
+          // и запускаем в цикле
+          this.executeSearch(searches, scheduler, shedule);
+        }, curTime);
+        this.$store.commit('setSchedulerID', {
+          idDash: this.idDash,
+          search: scheduler,
+          schedulerID: this.timers[scheduler],
+        });
       });
     }
-
   },
   methods: {
-    cancel: function() {  // закрываем окно
-      this.$emit("cancel");
+    cancel: function () {
+      // закрываем окно
+      this.$emit('cancel');
     },
-    checkEsc: function(event) {
-      if (event.code =="Escape") {
+    checkEsc: function (event) {
+      if (event.code == 'Escape') {
         this.cancel();
       }
     },
-    setTime: function(time,tense) {  // выставляем время и меняем цвета у кнопок
+    setTime: function (time, tense) {
+      // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
         if (tense == 'every') {
           this.time = time;
-          Object.keys(this.color).forEach( item => {
+          Object.keys(this.color).forEach((item) => {
             this.color[item] = '$accent_ui_color';
-          })
+          });
           if (this.color[time] == '$accent_ui_color') {
             this.color[time] = '$primary_button';
           } else {
@@ -289,9 +288,9 @@ export default {
           }
         } else if (tense == 'last') {
           this.timeLast = time;
-          Object.keys(this.colorLast).forEach( item => {
+          Object.keys(this.colorLast).forEach((item) => {
             this.colorLast[item] = '$accent_ui_color';
-          })
+          });
           if (this.colorLast[time] == '$accent_ui_color') {
             this.colorLast[time] = '$primary_button';
           } else {
@@ -300,60 +299,62 @@ export default {
         }
       }
     },
-    countTime(time,every) {  // переводим строковые значения времени в числовые
+    countTime(time, every) {
+      // переводим строковые значения времени в числовые
       let period = 0;
-      switch(time) {
-      case 'second':
-        period = Number(every)
-        break
+      switch (time) {
+        case 'second':
+          period = Number(every);
+          break;
 
-      case 'minute':
-        period = Number(every)   *60
-        break
+        case 'minute':
+          period = Number(every) * 60;
+          break;
 
-      case 'hour':
-        period = Number(every)  *3600
-        break
-
+        case 'hour':
+          period = Number(every) * 3600;
+          break;
       }
-      return period
+      return period;
     },
-    executeSearch: function(searches,sid,shedule) {  // выполняем серч меняя его временны рамки
-      let curTimeLast = 0
-      let tws = 0
-      let twf = 0
+    executeSearch: function (searches, sid, shedule) {
+      // выполняем серч меняя его временны рамки
+      let curTimeLast = 0;
+      let tws = 0;
+      let twf = 0;
       if (shedule.everyLast !== 0) {
-        curTimeLast = this.countTime(shedule.timeLast, shedule.everyLast)
-        tws = Math.floor(new Date().getTime()/1000-curTimeLast)
-        twf = Math.floor(new Date().getTime()/1000)
+        curTimeLast = this.countTime(shedule.timeLast, shedule.everyLast);
+        tws = Math.floor(new Date().getTime() / 1000 - curTimeLast);
+        twf = Math.floor(new Date().getTime() / 1000);
       }
       searches.forEach((item) => {
-        if (item.sid === sid ) {
-          item.parametrs.tws = tws
-          item.parametrs.twf = twf
+        if (item.sid === sid) {
+          item.parametrs.tws = tws;
+          item.parametrs.twf = twf;
           this.$store.commit('updateSearchStatus', {
             idDash: this.idDash,
             sid: item.sid,
             status: 'empty',
-          })
+          });
         }
-      })
+      });
     },
-    startSchedule() { // запускаем планировщик
+    startSchedule() {
+      // запускаем планировщик
       let schedule = {
         time: this.time,
         every: this.every,
         timeLast: this.timeLast,
         everyLast: this.everyLast,
-      }
-      let sid = this.sid
+      };
+      let sid = this.sid;
 
-      let searches = this.$store.getters.getSearches(this.idDash)
-      let curTime = this.countTime(schedule.time, schedule.every) * 1000
-      this.executeSearch(searches, sid, schedule) // сперва первый раз просто выполняем серч
-      const intervalID = this.timers[sid] = setInterval(() => {
-        this.executeSearch(searches, sid, schedule) // а затем уже выполняем его в цикле
-      }, curTime)
+      let searches = this.$store.getters.getSearches(this.idDash);
+      let curTime = this.countTime(schedule.time, schedule.every) * 1000;
+      this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
+      const intervalID = (this.timers[sid] = setInterval(() => {
+        this.executeSearch(searches, sid, schedule); // а затем уже выполняем его в цикле
+      }, curTime));
 
       this.$store.commit('setSchedule', {
         idDash: this.idDash,
@@ -363,31 +364,29 @@ export default {
         everyLast: this.everyLast,
         timeLast: this.timeLast,
         schedulerID: intervalID,
-      })
-      this.cancel()
+      });
+      this.cancel();
     },
-    cancelSchedule: function() {  // отменить планировщик
-      this.$store.commit('deleteSchedule', { idDash: this.idDash, sid: this.sid });
+    cancelSchedule: function () {
+      // отменить планировщик
+      this.$store.commit('deleteSchedule', {
+        idDash: this.idDash,
+        sid: this.sid,
+      });
       this.every = 0;
-      this.color[this.time] = "teal";
+      this.color[this.time] = 'teal';
       this.time = '';
       this.disabledStop = true;
       this.disabledStart = false;
       this.disabledEvery = false;
-      this.msg = "Не запущен";
+      this.msg = 'Не запущен';
       clearInterval(this.timers[this.sid]);
       delete this.timers[this.sid];
     },
   },
- 
-}
+};
 </script>
 
-
-<style lang="scss"> 
-  
-    @import '../sass/modalScheduler.sass'
-   
-  
+<style lang="scss">
+@import '../sass/modalScheduler.sass';
 </style>
-

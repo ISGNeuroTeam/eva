@@ -28,7 +28,6 @@
   </div>
 </template>
 
- 
 <script>
 export default {
   props: {
@@ -47,13 +46,13 @@ export default {
     return {
       actions: [
         {
-          name: "click",
+          name: 'click',
           capture: [],
         },
       ],
       captures: {},
       noMsg: false,
-      msgText: "",
+      msgText: '',
       dataTile: [],
     };
   },
@@ -81,10 +80,10 @@ export default {
     change: function () {
       if (!this.dataRestFrom.length || this.dataRestFrom.length == 0) {
         this.noMsg = true;
-        this.msgText = "Нет данных для отображения";
+        this.msgText = 'Нет данных для отображения';
       } else if (!this.dataRestFrom[0].caption || !this.dataRestFrom[0].color) {
         this.noMsg = true;
-        this.msgText = "Ожидается поле caption и color";
+        this.msgText = 'Ожидается поле caption и color';
       } else {
         if (this.dataReport) {
           if (this.activeElemFrom == this.id) {
@@ -117,21 +116,29 @@ export default {
       return this.heightFrom;
     },
     widthTile: function () {
-      return this.setSize("width");
+      return this.setSize('width');
     },
     heightTile: function () {
-      return this.setSize("height");
+      return this.setSize('height');
     },
   },
   watch: {
     captures: function (captures) {
       this.actions[0].capture = captures;
-      this.$store.commit("setActions", {
+      this.$store.commit('setActions', {
         actions: this.actions,
         idDash: this.idDash,
         id: this.id,
       });
     },
+  },
+  mounted() {
+    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
+    this.$store.commit('setActions', {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
   },
   methods: {
     pushDataAsynchrony: function () {
@@ -160,8 +167,8 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (tockens[i].elem == this.id && tockens[i].action == "click") {
-          this.$store.commit("setTocken", {
+        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
+          this.$store.commit('setTocken', {
             tocken: tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
@@ -172,20 +179,20 @@ export default {
 
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "onclick",
+        event: 'onclick',
         element: this.id,
-        partelement: "empty",
+        partelement: 'empty',
       });
 
       if (events.length != 0) {
         events.forEach((item) => {
-          if (item.action == "set") {
-            this.$store.commit("letEventSet", {
+          if (item.action == 'set') {
+            this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == "go") {
-            this.$store.commit("letEventGo", {
+          } else if (item.action == 'go') {
+            this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,
               route: this.$router,
@@ -196,14 +203,14 @@ export default {
       }
     },
     checkName: function (name) {
-      return name.replace("\\n", "<br>");
+      return name.replace('\\n', '<br>');
     },
     setSize: function (sizeFrom) {
-      let size = "";
-      if (this.sizeTileFrom[sizeFrom] == "") {
-        size = "100px";
+      let size = '';
+      if (this.sizeTileFrom[sizeFrom] == '') {
+        size = '100px';
       } else {
-        if (this.sizeTileFrom[sizeFrom].indexOf("px") != -1) {
+        if (this.sizeTileFrom[sizeFrom].indexOf('px') != -1) {
           size = this.sizeTileFrom[sizeFrom];
         } else {
           size = `${this.sizeTileFrom[sizeFrom]}px`;
@@ -212,26 +219,18 @@ export default {
       return size;
     },
     borderColor: function (border) {
-      if (border == "1") {
+      if (border == '1') {
         return this.colorFrom.controlsSystem;
-      } else if (border == "0" || border == null) {
-        return "transparent";
+      } else if (border == '0' || border == null) {
+        return 'transparent';
       } else {
         return border;
       }
     },
   },
-  mounted() {
-    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
-    this.$store.commit("setActions", {
-      actions: this.actions,
-      idDash: this.idDash,
-      id: this.id,
-    });
-  },
 };
 </script>
 
-<style lang="scss" >
-@import '../../sass/dashTile.sass'
+<style lang="scss">
+@import '../../sass/dashTile.sass';
 </style>

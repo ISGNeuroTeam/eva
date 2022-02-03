@@ -30,7 +30,10 @@
           :class="{ focused: focusedRow === filterIndex }"
           :style="{
             marginBottom:
-              filterIndex + 1 === filters.length && !(filterIndex === tempFilterIndex) ? '10px' : 0,
+              filterIndex + 1 === filters.length &&
+              !(filterIndex === tempFilterIndex)
+                ? '10px'
+                : 0,
           }"
           @click="focusRow(filterIndex)"
         >
@@ -39,7 +42,10 @@
 
           <!-- FILTER PARTS -->
           <div v-if="filter.parts.length > 0" class="filter-parts">
-            <div class="scroll-btn prev" @click.stop="scrollFilterParts(filterIndex, true)">
+            <div
+              class="scroll-btn prev"
+              @click.stop="scrollFilterParts(filterIndex, true)"
+            >
               <v-icon class="icon" v-text="mdiChevronLeft" />
             </div>
             <div :ref="`filter-${filterIndex}-parts-slider`" class="slider">
@@ -64,7 +70,10 @@
                 />
               </div>
             </div>
-            <div class="scroll-btn next" @click.stop="scrollFilterParts(filterIndex)">
+            <div
+              class="scroll-btn next"
+              @click.stop="scrollFilterParts(filterIndex)"
+            >
               <v-icon class="icon" v-text="mdiChevronRight" />
             </div>
           </div>
@@ -116,7 +125,11 @@
             <v-tooltip bottom :color="theme.$accent_ui_color">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
-                  :color="filter.invertMatches ? theme.$primary_button : theme.$main_text"
+                  :color="
+                    filter.invertMatches
+                      ? theme.$primary_button
+                      : theme.$main_text
+                  "
                   icon
                   v-bind="attrs"
                   v-on="on"
@@ -143,7 +156,11 @@
               <span>Сбросить собранные токенами значения</span>
             </v-tooltip>
 
-            <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              v-if="editPermission"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   v-show="editMode"
@@ -159,7 +176,11 @@
               <span>Посмотреть текст запроса фильтра</span>
             </v-tooltip>
 
-            <v-tooltip v-if="editPermission" bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              v-if="editPermission"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   v-show="editMode"
@@ -179,7 +200,9 @@
 
         <!-- ADD TEMP FILTER BUTTON -->
         <div
-          v-if="!(filterIndex === tempFilterIndex) && !(filterIndex === focusedRow)"
+          v-if="
+            !(filterIndex === tempFilterIndex) && !(filterIndex === focusedRow)
+          "
           class="add-new-filter-block"
           @click="tempFilterIndex = filterIndex"
         >
@@ -252,9 +275,9 @@
 </template>
 
 <script>
-import FilterPart from './FilterPart.vue'
-import FilterPartModal from './FilterPartModal'
-import FilterPreviewModal from './FilterPreviewModal'
+import FilterPart from './FilterPart.vue';
+import FilterPartModal from './FilterPartModal';
+import FilterPreviewModal from './FilterPreviewModal';
 
 import {
   mdiPlusCircleOutline,
@@ -266,7 +289,7 @@ import {
   mdiEyeOutline,
   mdiChevronLeft,
   mdiChevronRight,
-} from '@mdi/js'
+} from '@mdi/js';
 
 export default {
   name: 'DashFilterPanel',
@@ -274,7 +297,7 @@ export default {
   props: {
     editPermission: Boolean,
     idDashFrom: String,
-    editMode: Boolean
+    editMode: Boolean,
   },
   data() {
     return {
@@ -296,14 +319,14 @@ export default {
       declineIcon: mdiClose,
       reverseIcon: mdiSwapHorizontal,
       eyeIcon: mdiEyeOutline,
-    }
+    };
   },
   computed: {
     theme() {
-      return this.$store.getters.getTheme
+      return this.$store.getters.getTheme;
     },
     focusedFilter() {
-      return this.$store.getters.getFocusedFilter(this.idDashFrom)
+      return this.$store.getters.getFocusedFilter(this.idDashFrom);
     },
   },
   watch: {
@@ -314,96 +337,111 @@ export default {
         if (this.filters[rowNumber].idDash !== this.idDashFrom) {
           this.filters[rowNumber].idDash = this.idDashFrom;
         }
-        this.$store.commit('setFocusedFilter', this.filters[rowNumber])
+        this.$store.commit('setFocusedFilter', this.filters[rowNumber]);
       }
     },
   },
   mounted() {
-    this.filters = this.$store.getters.getFilters(this.idDashFrom)
-    this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] }
-    this.$store.commit('clearFocusedFilter', this.idDashFrom)
+    this.filters = this.$store.getters.getFilters(this.idDashFrom);
+    this.tempFilter = {
+      id: '',
+      idDash: this.idDashFrom,
+      invertMatches: false,
+      parts: [],
+    };
+    this.$store.commit('clearFocusedFilter', this.idDashFrom);
   },
   methods: {
     scrollFilterParts(filterIndex, isPrev = false) {
-      const slider = this.$refs[`filter-${filterIndex}-parts-slider`][0]
+      const slider = this.$refs[`filter-${filterIndex}-parts-slider`][0];
       /** scroll to 1/5 of the visible slider width */
-      const scroll = Math.floor(slider.clientWidth / 5)
-      slider.scrollLeft += isPrev ? -scroll : scroll
+      const scroll = Math.floor(slider.clientWidth / 5);
+      slider.scrollLeft += isPrev ? -scroll : scroll;
     },
 
     checkSliderOverflow(index) {
-      console.log('Check SLIDE num: ', `filter-${index}-parts-slider`)
+      console.log('Check SLIDE num: ', `filter-${index}-parts-slider`);
 
-      const slider = this.$refs[`filter-${index}-parts-slider`]
-      if (!slider) return false
+      const slider = this.$refs[`filter-${index}-parts-slider`];
+      if (!slider) return false;
 
-      const { clientWidth, scrollWidth } = slider[0]
+      const { clientWidth, scrollWidth } = slider[0];
       console.log(
         'clientWidth : scrollWidth',
         clientWidth,
         ':',
         scrollWidth,
         scrollWidth > clientWidth
-      )
+      );
       // this.$nextTick(() => {});
-      return scrollWidth > clientWidth ? true : false
+      return scrollWidth > clientWidth ? true : false;
     },
     reverseFilter(filter) {
-      filter.invertMatches = !filter.invertMatches
+      filter.invertMatches = !filter.invertMatches;
     },
     focusRow(index) {
-      if (this.focusedRow === null) this.focusedRow = index
+      if (this.focusedRow === null) this.focusedRow = index;
     },
     applyTempParts() {
-      this.$store.commit('sortFilterParts', { idDash: this.idDashFrom })
+      this.$store.commit('sortFilterParts', { idDash: this.idDashFrom });
       // this.$store.commit('clearFocusedFilter', this.idDashFrom)
       this.$store.commit('restartSearches', {
         idDash: this.idDashFrom,
         filter: this.filters[this.focusedRow].id,
-      })
-      this.focusedRow = null
-      this.filterChanged = false
+      });
+      this.focusedRow = null;
+      this.filterChanged = false;
     },
     declineTempParts() {
-      this.$store.commit('sortFilterParts', { idDash: this.idDashFrom })
-      this.$store.commit('declineFilterChanges', this.idDashFrom)
-      this.$store.commit('clearFocusedFilter', this.idDashFrom)
-      this.focusedRow = null
-      this.filterChanged = false
+      this.$store.commit('sortFilterParts', { idDash: this.idDashFrom });
+      this.$store.commit('declineFilterChanges', this.idDashFrom);
+      this.$store.commit('clearFocusedFilter', this.idDashFrom);
+      this.focusedRow = null;
+      this.filterChanged = false;
     },
     declineTempFilter() {
-      this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] }
-      this.tempFilterIndex = -1
+      this.tempFilter = {
+        id: '',
+        idDash: this.idDashFrom,
+        invertMatches: false,
+        parts: [],
+      };
+      this.tempFilterIndex = -1;
     },
     saveTempFilter() {
       if (this.filters.some((filter) => filter.id === this.tempFilter.id)) {
-        console.log('Фильтр с таким именем существует')
+        console.log('Фильтр с таким именем существует');
       } else if (!this.tempFilter.id) {
-        console.log('Введите имя')
+        console.log('Введите имя');
       } else {
-        if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0
+        if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0;
         this.$store.commit('createFilter', {
           filter: this.tempFilter,
           index: this.tempFilterIndex,
-        })
-        this.tempFilter = { id: '', idDash: this.idDashFrom, invertMatches: false, parts: [] }
-        this.tempFilterIndex = -1
-        this.filters = this.$store.getters.getFilters(this.idDashFrom)
+        });
+        this.tempFilter = {
+          id: '',
+          idDash: this.idDashFrom,
+          invertMatches: false,
+          parts: [],
+        };
+        this.tempFilterIndex = -1;
+        this.filters = this.$store.getters.getFilters(this.idDashFrom);
       }
     },
     deleteFilter(filter) {
-      this.$store.commit('deleteFilter', filter)
-      this.$store.commit('declineFilterChanges', this.idDashFrom)
-      this.$store.commit('clearFocusedFilter', this.idDashFrom)
-      this.focusedRow = null
-      this.filters = this.$store.getters.getFilters(this.idDashFrom)
+      this.$store.commit('deleteFilter', filter);
+      this.$store.commit('declineFilterChanges', this.idDashFrom);
+      this.$store.commit('clearFocusedFilter', this.idDashFrom);
+      this.focusedRow = null;
+      this.filters = this.$store.getters.getFilters(this.idDashFrom);
     },
     refreshFilter(filter) {
-      this.filterChanged = true
-      this.$store.commit('refreshFilter', filter)
+      this.filterChanged = true;
+      this.$store.commit('refreshFilter', filter);
     },
     openFilterPartModal(filterPart, index) {
-      this.filterPartIndexInModal = index
+      this.filterPartIndexInModal = index;
       this.filterPartInModal = filterPart
         ? { ...filterPart }
         : {
@@ -415,30 +453,34 @@ export default {
             fieldName: null,
             value: null,
             invertMatches: false,
-          }
-      this.filterPartModalShow = true
+          };
+      this.filterPartModalShow = true;
     },
     saveFilterPart(filterPart, filterPartIndex) {
-      this.$store.commit('saveFilterPart', { idDash: this.idDashFrom, filterPart, filterPartIndex }) // Save into focused filter
-      this.filterPartInModal = null // setup default filterPart into openFilterPartModal method
-      this.filterPartIndexInModal = null
-      this.filterPartModalShow = false
+      this.$store.commit('saveFilterPart', {
+        idDash: this.idDashFrom,
+        filterPart,
+        filterPartIndex,
+      }); // Save into focused filter
+      this.filterPartInModal = null; // setup default filterPart into openFilterPartModal method
+      this.filterPartIndexInModal = null;
+      this.filterPartModalShow = false;
     },
     closeFilterPartModal() {
-      this.filterPartInModal = null
-      this.filterPartIndexInModal = null
-      this.filterPartModalShow = false
+      this.filterPartInModal = null;
+      this.filterPartIndexInModal = null;
+      this.filterPartModalShow = false;
     },
     openFilterPreviewModal(filter) {
-      this.filterInPreviewModal = filter
-      this.showFilterPreviewModal = true
+      this.filterInPreviewModal = filter;
+      this.showFilterPreviewModal = true;
     },
     closeFilterPreviewModal() {
-      this.filterInPreviewModal = null
-      this.showFilterPreviewModal = false
+      this.filterInPreviewModal = null;
+      this.showFilterPreviewModal = false;
     },
   },
-}
+};
 </script>
 
 <style lang="sass" scoped>

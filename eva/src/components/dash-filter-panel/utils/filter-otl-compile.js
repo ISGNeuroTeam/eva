@@ -13,7 +13,6 @@ export function filterCompile(filter) {
 
           // If filter inverted to open parenthesis to "NOT" directive of whole search text
           if (filter.invertMatches) filterOtlText += 'NOT (';
-
         } else {
           filterOtlText += ' AND ';
         }
@@ -41,17 +40,18 @@ export function filterCompile(filter) {
             break;
           case 'token':
             if (part.token.elem === 'multiLine') {
-              if(part.token.capture === 'start') {
-                part.operationToken = '>'
+              if (part.token.capture === 'start') {
+                part.operationToken = '>';
               } else {
-                part.operationToken = '<'
+                part.operationToken = '<';
               }
               filterOtlText += `${part.token.filterParam}${part.operationToken}${part.token.value})`;
             } else {
               for (let idxVal in part.values) {
                 let value = part.values[idxVal];
                 if (idxVal == part.values.length - 1) {
-                  if (part.values.length > 1) filterOtlText += ` ${part.operationToken} `;
+                  if (part.values.length > 1)
+                    filterOtlText += ` ${part.operationToken} `;
                   filterOtlText += `${part.fieldName}="${value}")`;
                 } else if (idxVal == 0) {
                   filterOtlText += `${part.fieldName}="${value}"`;
@@ -63,15 +63,13 @@ export function filterCompile(filter) {
             }
             break;
         }
-
       } else {
         firstPartWithValuesIndex += 1;
       }
     }
 
     // If filter inverted to close parenthesis of "NOT" directive
-    if (filter.invertMatches && filterOtlText!=='') filterOtlText += ')';
-
+    if (filter.invertMatches && filterOtlText !== '') filterOtlText += ')';
   }
 
   return filterOtlText;

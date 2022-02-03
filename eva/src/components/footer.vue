@@ -1,32 +1,25 @@
 <template>
-  <div 
-    class="footer-block" 
-    :style="{color: theme.$main_text}"
-  >
+  <div class="footer-block" :style="{ color: theme.$main_text }">
     {{ appVersion }}
-  </div>    
+  </div>
 </template>
 
-
 <script>
-import {version} from './../../package.json'
+import { version } from './../../package.json';
 export default {
-  data () {
+  data() {
     return {
       appVersion: version,
-    } 
+    };
   },
   computed: {
-    theme: function() {
-      return this.$store.getters.getTheme
-    }
+    theme: function () {
+      return this.$store.getters.getTheme;
+    },
   },
-}
+};
 </script>
 
-<style lang="scss" > 
-  
-   @import '../sass/footer.sass'
-
-   
+<style lang="scss">
+@import '../sass/footer.sass';
 </style>

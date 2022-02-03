@@ -1,47 +1,47 @@
 <template>
   <div
-      class="dash-map"
-      :class="{'full-screen': isFullScreen}"
-      :style="{'zoom': needSetField ? 1 : htmlZoom}"
-      ref="container"
+    ref="container"
+    class="dash-map"
+    :class="{ 'full-screen': isFullScreen }"
+    :style="{ zoom: needSetField ? 1 : htmlZoom }"
   >
     <div v-if="needSetField">
       <v-select
-          v-model="dataField"
-          :dark="isDarkTheme"
-          :items="fieldList"
-          label="Столбец данных"
-          outlined
-          class="mt-6"
+        v-model="dataField"
+        :dark="isDarkTheme"
+        :items="fieldList"
+        label="Столбец данных"
+        outlined
+        class="mt-6"
       ></v-select>
     </div>
     <div
       v-else
       class="flex flex-grow-1 justify-center align-center mt-6"
-      :class="{row: vertical}"
+      :class="{ row: vertical }"
     >
       <div class="flex-grow-0">
         <v-slider
-            :class="{'slider-vertical': vertical}"
-            :dark="isDarkTheme"
-            :disabled="loading || values.length === 0"
-            v-model="sliderValue"
-            :min="0"
-            :max="values.length -1"
-            :vertical="vertical"
-            :color="theme.$primary_button"
-            ticks="always"
-            @change="onChangeSlider"
+          v-model="sliderValue"
+          :class="{ 'slider-vertical': vertical }"
+          :dark="isDarkTheme"
+          :disabled="loading || values.length === 0"
+          :min="0"
+          :max="values.length - 1"
+          :vertical="vertical"
+          :color="theme.$primary_button"
+          ticks="always"
+          @change="onChangeSlider"
         >
         </v-slider>
       </div>
       <div class="pt-4">
         <v-progress-circular
-            :rotate="360"
-            :size="circularSize"
-            :width="circularWidth"
-            :value="percentValue"
-            :color="loading ? theme.$secondary_border : theme.$primary_button"
+          :rotate="360"
+          :size="circularSize"
+          :width="circularWidth"
+          :value="percentValue"
+          :color="loading ? theme.$secondary_border : theme.$primary_button"
         >
           <div v-if="!loading">
             <span class="text-h4">{{ value }}%</span>
@@ -50,20 +50,20 @@
         <div class="pa-4">
           <div>
             <v-btn
-                :dark="isDarkTheme"
-                :color="theme.$primary_button"
-                color="primary"
-                :disabled="isMinimumValue"
-                @click="addValue(-1)">
+              :dark="isDarkTheme"
+              :color="theme.$primary_button"
+              :disabled="isMinimumValue"
+              @click="addValue(-1)"
+            >
               <v-icon>{{ icons.minus }}</v-icon>
             </v-btn>
             <v-btn
-                :dark="isDarkTheme"
-                :color="theme.$primary_button"
-                color="primary"
-                class="ml-2"
-                :disabled="isMaximumValue"
-                @click="addValue(1)">
+              :dark="isDarkTheme"
+              :color="theme.$primary_button"
+              class="ml-2"
+              :disabled="isMaximumValue"
+              @click="addValue(1)"
+            >
               <v-icon>{{ icons.plus }}</v-icon>
             </v-btn>
           </div>
@@ -74,8 +74,8 @@
 </template>
 
 <script>
-import {mdiMinus, mdiPlus} from "@mdi/js";
-import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { mdiMinus, mdiPlus } from '@mdi/js';
+import { mapActions, mapGetters, mapMutations } from 'vuex';
 
 export default {
   props: {
@@ -99,42 +99,43 @@ export default {
       actions: [
         {
           name: 'change',
-          capture: []
+          capture: [],
         },
       ],
       sliderValue: 0,
       dataField: null, // поле с данными
       value: '',
-    }
+    };
   },
   computed: {
-    ...mapGetters([
-        'getElementSelected',
-        'getElement',
-    ]),
+    ...mapGetters(['getElementSelected', 'getElement']),
     htmlZoom() {
-      const size = this.$attrs.heightFrom < this.$attrs.widthFrom
+      const size =
+        this.$attrs.heightFrom < this.$attrs.widthFrom
           ? this.$attrs.heightFrom
-          : this.$attrs.widthFrom
+          : this.$attrs.widthFrom;
       return size / 370;
     },
     isFullScreen() {
       return this.$attrs['is-full-screen'];
     },
-    storedElement(){
+    storedElement() {
       this.isFullScreen; // << dont remove
-      let {idDashFrom, idFrom} = this;
+      let { idDashFrom, idFrom } = this;
       return this.$store.getters.getElement(idDashFrom, idFrom);
     },
     needSetField() {
-      return !this.dataField && !this.loading
+      return !this.dataField && !this.loading;
     },
-    theme: function() {
-      return this.colorFrom
+    theme: function () {
+      return this.colorFrom;
     },
-    values(){ // значения слайдера
+    values() {
+      // значения слайдера
       if (!this.dataField && this.dataRestFrom.length) {
-        const keys = Object.keys(this.dataRestFrom[0]).filter(key => key[0] !== '_');
+        const keys = Object.keys(this.dataRestFrom[0]).filter(
+          (key) => key[0] !== '_'
+        );
         if (keys.length === 1) {
           this.dataField = keys[0];
         }
@@ -143,39 +144,39 @@ export default {
         return [];
       }
       const list = this.dataRestFrom
-        .map(row => {
+        .map((row) => {
           const num = Number.parseFloat(row[this.dataField]);
-          return isNaN(num) ? 0 : num
+          return isNaN(num) ? 0 : num;
         })
         .sort((a, b) => a - b);
-      return list.filter((item, pos) => list.indexOf(item) === pos) // filter duplicates
+      return list.filter((item, pos) => list.indexOf(item) === pos); // filter duplicates
     },
-    minValue(){
+    minValue() {
       return this.values ? this.values[0] : 0;
     },
-    maxValue(){
-      return this.values ? this.values[this.values.length -1] : 0
+    maxValue() {
+      return this.values ? this.values[this.values.length - 1] : 0;
     },
     fractionalValue() {
-      return (this.value - this.minValue) / (this.maxValue - this.minValue)
+      return (this.value - this.minValue) / (this.maxValue - this.minValue);
     },
     percentValue() {
-      return this.fractionalValue *100
+      return this.fractionalValue * 100;
     },
     isMinimumValue() {
-      return this.sliderValue <= 0
+      return this.sliderValue <= 0;
     },
     isMaximumValue() {
-      return this.sliderValue >= this.values.length -1
+      return this.sliderValue >= this.values.length - 1;
     },
-    isDarkTheme(){
-      return this.$store.getters.getThemeTitle.indexOf('light') === -1
+    isDarkTheme() {
+      return this.$store.getters.getThemeTitle.indexOf('light') === -1;
     },
-    fieldList(){
+    fieldList() {
       if (!this.dataRestFrom.length) {
-        return []
+        return [];
       }
-      return Object.keys(this.dataRestFrom[0]).filter(key => key[0] !== '_');
+      return Object.keys(this.dataRestFrom[0]).filter((key) => key[0] !== '_');
     },
     changedInputData() {
       return this.$store.state.store[this.idDashFrom][this.idFrom]?.switch;
@@ -183,14 +184,17 @@ export default {
   },
   watch: {
     storedElement(element) {
-      if (element?.selected !== undefined && this.value !== element.selected.elemDeep) {
-        this.loadSelectedValue()
+      if (
+        element?.selected !== undefined &&
+        this.value !== element.selected.elemDeep
+      ) {
+        this.loadSelectedValue();
       }
     },
     getElementSelected(selected) {
-      this.value = selected.elemDeep
+      this.value = selected.elemDeep;
     },
-    changedInputData(val) {
+    changedInputData() {
       this.dataField = null;
       this.value = '';
       this.$store.commit('setSelected', {
@@ -201,7 +205,7 @@ export default {
       });
     },
     values(list) {
-      this.detectSliderValue(list)
+      this.detectSliderValue(list);
     },
     sliderValue(value) {
       if (!this.loading && this.values.length > 0) {
@@ -210,45 +214,42 @@ export default {
     },
     dataField(value) {
       this.$nextTick(() => {
-        /*value !== '' && */this.$store.commit('setSelected', {
+        /*value !== '' && */ this.$store.commit('setSelected', {
           element: 'elem',
           idDash: this.idDashFrom,
           id: this.idFrom,
           value,
         });
-        this.changeValue()
-      })
-    }
+        this.changeValue();
+      });
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDashFrom,
-      id: this.idFrom
+      id: this.idFrom,
     });
     this.$nextTick(() => {
-      this.loadSelectedValue()
-    })
+      this.loadSelectedValue();
+    });
   },
   methods: {
-    ...mapActions([
-        'actionGetElementSelected',
-    ]),
-    ...mapMutations([
-        'setElementSelected',
-    ]),
-    addValue(val) { // +/- buttons
-      this.sliderValue += val
-      this.changeValue()
+    ...mapActions(['actionGetElementSelected']),
+    ...mapMutations(['setElementSelected']),
+    addValue(val) {
+      // +/- buttons
+      this.sliderValue += val;
+      this.changeValue();
     },
-    onChangeSlider(){
-      this.changeValue()
+    onChangeSlider() {
+      this.changeValue();
     },
     changeValue() {
       this.$nextTick(() => {
-        this.setToken()
-        this.storeValue()
-      })
+        this.setToken();
+        this.storeValue();
+      });
     },
     storeValue() {
       this.setElementSelected({
@@ -259,7 +260,7 @@ export default {
       });
     },
     setToken() {
-      this.$store.getters.getTockens(this.idDashFrom).forEach(token => {
+      this.$store.getters.getTockens(this.idDashFrom).forEach((token) => {
         if (token.elem === this.idFrom && token.action === 'change') {
           this.$store.commit('setTocken', {
             tocken: {
@@ -269,30 +270,30 @@ export default {
             },
             idDash: this.idDashFrom,
             value: this.value,
-          })
+          });
         }
-      })
+      });
     },
     loadSelectedValue() {
       this.actionGetElementSelected({
         idDash: this.idDashFrom,
-        id: this.idFrom
-      }).then(selected => {
+        id: this.idFrom,
+      }).then((selected) => {
         if (selected) {
-          this.dataField = selected.elem
-          this.value = selected.elemDeep
+          this.dataField = selected.elem;
+          this.value = selected.elemDeep;
         }
-        this.detectSliderValue()
+        this.detectSliderValue();
       });
     },
     detectSliderValue(values = this.values) {
-      this.sliderValue = values.findIndex(item => (item === this.value))
+      this.sliderValue = values.findIndex((item) => item === this.value);
       if (this.value === '' && values.length) {
-        this.value = values[this.sliderValue]
+        this.value = values[this.sliderValue];
       }
-    }
+    },
   },
-}
+};
 </script>
 
 <style lang="sass">

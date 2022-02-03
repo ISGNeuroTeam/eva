@@ -1,6 +1,9 @@
 <template>
   <div
-    :style="{ 'background-color': theme.$secondary_bg, color: theme.$main_text }"
+    :style="{
+      'background-color': theme.$secondary_bg,
+      color: theme.$main_text,
+    }"
     class="token-type-filter-modal"
   >
     Токен
@@ -8,12 +11,12 @@
       :value.sync="currentToken"
       :items="tokenNameList"
       :disabled="!editMode"
-      @change="changeToken"
       :background-color="theme.$main_bg"
       style="padding-bottom: 10px"
       hide-details
       outlined
       dense
+      @change="changeToken"
     />
     Операция
     <v-select
@@ -37,17 +40,9 @@ export default {
       operations: ['OR', 'AND', 'REPLACE'],
     };
   },
-  watch: {
-    temp: {
-      immediate: true,
-      handler(newVal) {
-        this.currentToken = newVal.token;
-      },
-    },
-  },
   computed: {
     tokenNameList() {
-      return this.$store.getters.getTockens(this.idDash).map(tkn => tkn.name);
+      return this.$store.getters.getTockens(this.idDash).map((tkn) => tkn.name);
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -56,9 +51,17 @@ export default {
     //   return this.$store.getters.getTockens(this.idDash).find(token => token.name === this.currentToken).elem
     // }
   },
+  watch: {
+    temp: {
+      immediate: true,
+      handler(newVal) {
+        this.currentToken = newVal.token;
+      },
+    },
+  },
   methods: {
     changeToken(newTokenName) {
-      this.temp.token = newTokenName
+      this.temp.token = newTokenName;
       this.temp.values = [];
     },
   },
