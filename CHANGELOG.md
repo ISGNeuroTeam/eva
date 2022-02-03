@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+##Fixed
+-Added a frame for the event window
+
 ## Added
 - refactoring modal settings
 - date research 2.0.
