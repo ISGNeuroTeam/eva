@@ -28,8 +28,8 @@ import { mdiRefresh, mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
-    data: [],
-    size: {},
+    data: Array,
+    size: Object,
   },
   data() {
     return {

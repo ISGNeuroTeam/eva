@@ -65,7 +65,7 @@ import settings from '../../js/componentsSettings';
 
 export default {
   props: {
-    data: [],
+    data: Array,
     // size: {},
     shouldGet: null,
   },
@@ -102,7 +102,7 @@ export default {
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
       });
-      this.activeElem = 'table';
+      this.setActiveElem('table')
       return this.$store.getters.getReportElement;
     },
   },
@@ -110,7 +110,7 @@ export default {
     this.calcSize();
   },
   methods: {
-    changeTab(elem) {
+    changeTab (elem) {
       if (elem == 'multiLine') {
         this.unitedShow = true;
       } else {
@@ -127,11 +127,14 @@ export default {
         }
       });
     },
-    calcSize: function () {
+    calcSize () {
       let size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
     },
+    setActiveElem (elemName) {
+      this.activeElem = elemName;
+    }
   },
 };
 </script>

@@ -54,7 +54,7 @@ import {
 
 export default {
   props: {
-    data: [],
+    data: Array,
   },
   data() {
     return {
@@ -282,17 +282,12 @@ export default {
         .scaleBand()
         .domain(d3.range(dataForSvg.length))
         .rangeRound([0, width - marge.left - marge.right]);
-      let xAxis = d3.axisBottom(xScale);
 
       let yScale = d3
         .scaleLinear()
         .domain([0, maxY])
         .range([height - marge.top - marge.bottom, 0]);
-      let yAxis = d3.axisLeft(yScale);
-
-      // g.append('g')
-      //     .attr('transform', 'translate(' + 0 + ',' + (height - marge.top - marge.bottom) + ')')
-      //     .call(xAxis)
+      
       for (let i = 0; i < 6; i++) {
         g.append('g')
           .append('line')

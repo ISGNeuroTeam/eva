@@ -184,7 +184,7 @@ export default {
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
       });
-      this.activeElem = 'table';
+      this.setActiveElem('table')
       return this.$store.getters.getReportElement;
     },
   },
@@ -296,7 +296,7 @@ export default {
           'reports'
         );
         responseDB.then(() => {
-          let refresh = this.$store.getters.refreshElements(
+          this.$store.getters.refreshElements(
             'reports',
             this.search.sid
           );
@@ -456,6 +456,9 @@ export default {
 
       return result;
     },
+    setActiveElem (elemName) {
+      this.activeElem = elemName;
+    },
     setSearch: function (search) {
       this.search = Object.assign({}, search);
       this.modal = false;
@@ -475,12 +478,9 @@ export default {
     //   }
     // },
     calcSize: function () {
-      // console.log('calcSize')
-      // console.log(this.$refs)
       let size = this.$refs.vis.$el.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
-      // console.log(size)
     },
     setRange(range) {
       this.data = this.data.filter(
