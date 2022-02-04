@@ -1599,7 +1599,11 @@ export default {
         // если автар существует а не потерялся по пути
         const top = Number(this.avatar.style.top.replace('px', ''));
 
-        let coord = this.avatar.getBoundingClientRect(); // берем координаты аватара
+        const clientCoord = this.avatar.getBoundingClientRect(); // берем координаты аватара
+        let coord = {
+          top: clientCoord.top + window.pageYOffset,
+          left: clientCoord.left + window.pageXOffset,
+        }
         let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
         this.avatar.remove(); // удаляем аватар из дерева dom
         this.avatar = null; // и у нас тоже его очищаем
@@ -1613,11 +1617,10 @@ export default {
           type[0].toUpperCase() + type.substring(1)
         );
 
-        let step = JSON.parse(
-          JSON.stringify(this.$store.getters.getSizeGrid(this.idDash))
-        );
-        step.vert = Math.round(screen.width / Number(step.vert));
-        step.hor = Math.round(screen.height / Number(step.hor));
+        let step = { ...this.$store.getters.getSizeGrid(this.idDash) };
+
+        step.vert = Math.round(window.innerWidth / Number(step.vert));
+        step.hor = Math.round(window.innerHeight / Number(step.hor));
 
         let size = this.calcGrid(
           settings.size[type].height,
@@ -1630,7 +1633,7 @@ export default {
         this.$set(this.newDashBoard[type], 'height', size.hor);
 
         let pos = this.calcGrid(coord.top, coord.left, step, 'pos');
-        this.$set(this.newDashBoard[type], 'top', top / this.horizontalCell);
+        this.$set(this.newDashBoard[type], 'top', pos.hor);
         this.$set(this.newDashBoard[type], 'left', pos.vert);
 
         // this.$set(this.newDashBoard[type],'width',settings.size[type].width);
@@ -1656,7 +1659,7 @@ export default {
       let size = {},
         header;
       screen.width > 1400 ? (header = 50) : (header = 40);
-      action == 'size' ? (header = 0) : false;
+      action === 'size' ? (header = 0) : false;
       size.vert = Math.round(left / step.vert);
       //size.vert = leftCoord*step.vert;
       size.hor = Math.round((top - header) / step.hor);
