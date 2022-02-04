@@ -1605,7 +1605,7 @@ export default {
       let avatar = parent.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
       document.body.appendChild(avatar); // и его уже добовляем в body
       avatar.classList.add('avatar'); // даем ему класс
-      avatar.style.zIndex = 99; // делаем его выше всех
+      avatar.style.zIndex = 3; // делаем его выше всех
       avatar.style.position = 'absolute'; // и относительно позиионируем
 
       document.onmousemove = (event) => {

@@ -123,9 +123,6 @@ export default {
     this.createGrid();
     this.drawElement();
   },
-  mounted() {
-    this.onActivated();
-  },
   methods: {
     drawElement() {
       let pos = this.$store.getters.getPosDash({
