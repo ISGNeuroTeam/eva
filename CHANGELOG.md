@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - refactoring modal settings
 - date research 2.0.
 
+## Fixed
+
+- fixed prevent deleting a custom theme without saving
+
 ## [1.80.0]
 
 ## Added
