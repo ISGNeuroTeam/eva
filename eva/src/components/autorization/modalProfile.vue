@@ -10,8 +10,13 @@
       class="passcard"
       :style="{ backgroundColor: theme.$main_bg }"
     >
-      <v-card-text class="card-text-profile" :style="{ color: theme.$title }">
-        <div class="headline">Изменить пароль</div>
+      <v-card-text
+        class="card-text-profile"
+        :style="{ color: theme.$title }"
+      >
+        <div class="headline">
+          Изменить пароль
+        </div>
         <v-text-field
           v-model="oldpass"
           label="Старый пароль"
@@ -67,12 +72,18 @@
       class="profile-tab"
       :style="{ backgroundColor: theme.$main_bg }"
     >
-      <v-card-text class="card-text-profile" :style="{ color: theme.$title }">
+      <v-card-text
+        class="card-text-profile"
+        :style="{ color: theme.$title }"
+      >
         <div class="headline">
           {{ titleModal }}
         </div>
 
-        <div v-if="showBlock.users" class="profile-block">
+        <div
+          v-if="showBlock.users"
+          class="profile-block"
+        >
           <v-text-field
             v-model="userData.username"
             label="Логин пользователя"
@@ -99,17 +110,20 @@
           <data-profile
             v-for="item in Object.keys(user.tab)"
             :key="item"
-            :colorFrom="colorFrom"
+            :color-from="colorFrom"
             essence="user"
-            :dataFrom="dataRest"
+            :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :activeFrom="activeFrom"
+            :active-from="activeFrom"
             @changeData="changeData"
           />
         </div>
 
-        <div v-if="showBlock.roles" class="profile-block">
+        <div
+          v-if="showBlock.roles"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название роли"
@@ -123,16 +137,19 @@
             v-for="item in Object.keys(role.tab)"
             :key="item"
             essence="role"
-            :colorFrom="colorFrom"
-            :dataFrom="dataRest"
+            :color-from="colorFrom"
+            :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :activeFrom="activeFrom"
+            :active-from="activeFrom"
             @changeData="changeData"
           />
         </div>
 
-        <div v-if="showBlock.permissions" class="profile-block">
+        <div
+          v-if="showBlock.permissions"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название привилегии"
@@ -146,15 +163,18 @@
             v-for="item in Object.keys(permission.tab)"
             :key="item"
             essence="permission"
-            :colorFrom="colorFrom"
-            :dataFrom="dataRest"
+            :color-from="colorFrom"
+            :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :activeFrom="activeFrom"
+            :active-from="activeFrom"
             @changeData="changeData"
           />
         </div>
-        <div v-if="showBlock.groups" class="profile-block">
+        <div
+          v-if="showBlock.groups"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название группы"
@@ -164,21 +184,29 @@
             hide-details
             clearable
           />
-          <div class="zagolovok-values">Изменить цвет группы</div>
-          <v-color-picker v-model="curItem.color" class="colorPicker" />
+          <div class="zagolovok-values">
+            Изменить цвет группы
+          </div>
+          <v-color-picker
+            v-model="curItem.color"
+            class="colorPicker"
+          />
           <data-profile
             v-for="item in Object.keys(group.tab)"
             :key="item"
             essence="group"
-            :colorFrom="colorFrom"
-            :dataFrom="dataRest"
+            :color-from="colorFrom"
+            :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :activeFrom="activeFrom"
+            :active-from="activeFrom"
             @changeData="changeData"
           />
         </div>
-        <div v-if="showBlock.indexes" class="profile-block">
+        <div
+          v-if="showBlock.indexes"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название индекса"
@@ -192,11 +220,11 @@
             v-for="item in Object.keys(index.tab)"
             :key="item"
             essence="index"
-            :colorFrom="colorFrom"
-            :dataFrom="dataRest"
+            :color-from="colorFrom"
+            :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :activeFrom="activeFrom"
+            :active-from="activeFrom"
             @changeData="changeData"
           />
         </div>
@@ -235,12 +263,29 @@
 <script>
 export default {
   props: {
-    activeFrom: null,
-    passway: null,
-    create: null,
-    userFrom: null,
-    keyFrom: null,
-    curItemFrom: null,
+    activeFrom: {
+      type: Boolean,
+      required: true,
+    },
+    passway: {
+      type: Boolean,
+      required: true,
+    },
+    create: {
+      type: Boolean,
+      required: true,
+    },
+    userFrom: {
+      type: Object,
+      required: true,
+    },
+    keyFrom: {
+      type: Number,
+    },
+    curItemFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -294,71 +339,54 @@ export default {
     };
   },
   computed: {
-    active: function () {
+    active() {
       return this.activeFrom;
     },
-    width: function () {
-      if (this.passway) {
-        return '400px';
-      } else {
-        return '90%';
-      }
+    width() {
+      return this.passway ? '400px' : '90%';
     },
-    titleModal: function () {
-      let text = '';
+    titleModal() {
       if (this.create) {
         switch (this.keyFrom) {
           case 1:
-            text = 'Создать нового пользователя';
-            break;
+            return 'Создать нового пользователя';
           case 2:
-            text = 'Создать новую роль';
-            break;
+            return 'Создать новую роль';
           case 3:
-            text = 'Создать новую привилегию';
-            break;
+            return 'Создать новую привилегию';
           case 4:
-            text = 'Создать новую группу';
-            break;
+            return 'Создать новую группу';
           case 5:
-            text = 'Создать новый индекс';
-            break;
+            return 'Создать новый индекс';
+          default:
+            return '';
         }
-        return text;
       } else {
         switch (this.keyFrom) {
           case 1:
-            text = 'Редактировать данные пользователя';
-            break;
+            return 'Редактировать данные пользователя';
           case 2:
-            text = 'Редактировать роль';
-            break;
+            return 'Редактировать роль';
           case 3:
-            text = 'Редактировать привилегию';
-            break;
+            return 'Редактировать привилегию';
           case 4:
-            text = 'Редактировать группу';
-            break;
+            return 'Редактировать группу';
           case 5:
-            text = 'Редактировать индекс';
-            break;
+            return 'Редактировать индекс';
+          default:
+            return '';
         }
       }
-      return text;
     },
-    btnMsg: function () {
-      if (this.create) {
-        return 'Создать';
-      } else {
-        return 'Редактировать';
-      }
+    btnMsg() {
+      return this.create ? 'Создать' : 'Редактировать';
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    active: function () {
+    active() {
       if (this.activeFrom) {
         this.userData.username =
           Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
@@ -423,15 +451,23 @@ export default {
         this.userFrom.id
       );
     },
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('cancelModal');
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    changeBtn: function (act) {
+    showErrorMsg(msg, color) {
+      this.msg = msg;
+      this.openMsg = true;
+      this.colorMsg = color;
+      setTimeout(() => {
+        this.openMsg = false;
+      }, 2000);
+    },
+    changeBtn(act) {
       let method = 'POST';
       let formData = {}; // формируем объект для передачи RESTу
       let sameMsg = '';
@@ -443,21 +479,17 @@ export default {
           if (act === true) {
             method = 'POST';
             if (this.userData.pass.length === 0 || !this.userData.pass) {
-              this.msg = 'Логин или пароль не могут быть пустыми';
-              this.openMsg = true;
-              this.colorMsg = this.colorFrom.controlsActive;
-              setTimeout(() => {
-                this.openMsg = false;
-              }, 2000);
+              this.showErrorMsg(
+                'Логин или пароль не могут быть пустыми',
+                this.colorFrom.controlsActive
+              )
               return false;
             }
             if (this.userData.pass.length < 7) {
-              this.msg = 'Пароль должен быть больше 7 символов';
-              this.openMsg = true;
-              this.colorMsg = this.colorFrom.controlsActive;
-              setTimeout(() => {
-                this.openMsg = false;
-              }, 2000);
+              this.showErrorMsg(
+                'Пароль должен быть больше 7 символов',
+                this.colorFrom.controlsActive
+              )
               return false;
             }
             formData.password = this.userData.pass;
@@ -467,40 +499,32 @@ export default {
               this.oldpass.length === 0 ||
               !this.oldpass
             ) {
-              this.msg = 'Введите старый пароль';
-              this.openMsg = true;
-              this.colorMsg = this.colorFrom.controlsActive;
-              setTimeout(() => {
-                this.openMsg = false;
-              }, 2000);
+              this.showErrorMsg(
+                'Введите старый пароль',
+                this.colorFrom.controlsActive
+              )
               return false;
             } else if (
               this.newpass == null ||
               this.newpass.length === 0 ||
               !this.newpass
             ) {
-              this.msg = 'Введите новый пароль';
-              this.openMsg = true;
-              this.colorMsg = this.colorFrom.controlsActive;
-              setTimeout(() => {
-                this.openMsg = false;
-              }, 2000);
+              this.showErrorMsg(
+                'Введите новый пароль',
+                this.colorFrom.controlsActive
+              )
               return false;
             } else if (this.newpass.length < 7) {
-              this.msg = 'Пароль должен быть больше 7 символов';
-              this.openMsg = true;
-              this.colorMsg = this.colorFrom.controlsActive;
-              setTimeout(() => {
-                this.openMsg = false;
-              }, 2000);
+              this.showErrorMsg(
+                'Пароль должен быть больше 7 символов',
+                this.colorFrom.controlsActive
+              )
               return false;
             } else if (this.newpass === this.oldpass) {
-              this.msg = 'Пароли не должны совпадать';
-              this.openMsg = true;
-              this.colorMsg = this.colorFrom.controlsActive;
-              setTimeout(() => {
-                this.openMsg = false;
-              }, 2000);
+              this.showErrorMsg(
+                'Пароли не должны совпадать',
+                this.colorFrom.controlsActive
+              )
               return false;
             } else {
               formData.old_password = this.oldpass;
@@ -509,12 +533,10 @@ export default {
           } else {
             if (this.userData.pass.length !== 0 && this.userData.pass) {
               if (this.userData.pass.length < 7) {
-                this.msg = 'Пароль должен быть больше 7 символов';
-                this.openMsg = true;
-                this.colorMsg = this.colorFrom.controlsActive;
-                setTimeout(() => {
-                  this.openMsg = false;
-                }, 2000);
+                this.showErrorMsg(
+                  'Пароль должен быть больше 7 символов',
+                  this.colorFrom.controlsActive
+                )
                 return false;
               } else {
                 formData.password = this.userData.pass;
@@ -585,23 +607,19 @@ export default {
         if (res.status === 200) {
           this.cancelModal();
         } else if (res.status === 409) {
-          this.msg = sameMsg;
-          this.openMsg = true;
-          this.colorMsg = '#FF6D70';
-          setTimeout(() => {
-            this.openMsg = false;
-          }, 2000);
+          this.showErrorMsg(
+            sameMsg,
+            '#FF6D70'
+          )
         } else if (res.status === 403) {
-          this.msg = '';
-          this.openMsg = true;
-          this.colorMsg = '#FF6D70';
-          setTimeout(() => {
-            this.openMsg = false;
-          }, 2000);
+          this.showErrorMsg(
+            '',
+            '#FF6D70'
+          )
         }
       });
     },
-    changeData: function (event) {
+    changeData(event) {
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }

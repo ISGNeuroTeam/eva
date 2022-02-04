@@ -1,10 +1,27 @@
 <template>
-  <v-dialog v-model="active" width="90%" persistent @keydown="checkEsc($event)">
-    <v-card class="log-block" :style="{ background: theme.$main_bg }">
-      <v-card-text class="card-log" :style="{ color: theme.$main_text }">
-        <div class="log-body" v-html="text" />
+  <v-dialog
+    v-model="active"
+    width="90%"
+    persistent
+    @keydown="checkEsc($event)"
+  >
+    <v-card
+      class="log-block"
+      :style="{ background: theme.$main_bg }"
+    >
+      <v-card-text
+        class="card-log"
+        :style="{ color: theme.$main_text }"
+      >
+        <div
+          class="log-body"
+          v-html="text"
+        />
       </v-card-text>
-      <v-card-actions class="btn-log" :style="{ background: theme.$main_bg }">
+      <v-card-actions
+        class="btn-log"
+        :style="{ background: theme.$main_bg }"
+      >
         <v-btn
           small
           :color="theme.$primary_button"
@@ -45,7 +62,10 @@
 <script>
 export default {
   props: {
-    modalActive: null,
+    modalActive: {
+      type: Boolean,
+      required: true
+    },
   },
   data() {
     return {
@@ -58,22 +78,22 @@ export default {
     };
   },
   computed: {
-    active: function () {
+    active() {
       if (this.modalActive) {
         this.getLog();
       }
       return this.modalActive;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   methods: {
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('cancelModal');
       this.clear = 'Очистить';
     },
-    getLog: async function () {
+    async getLog() {
       let front = await this.$store.auth.getters.getLog('front'); // получаем все логи для фронта
       let sizeFront = new Blob([front]).size; // смотрим их размер в байтах
       let border = 50000; // предел размера в байтах должен быть приблизителньо 5 мегабайт
@@ -85,7 +105,7 @@ export default {
         this.text = front; // то просто выведем их
       }
     },
-    containLog: async function (text, biLength, border) {
+    containLog(text, biLength, border) {
       // функция которая сократит логи до предела
       let length, procent; // переменные длины строки и 5 % от этой длины
       while (biLength > border) {
@@ -101,7 +121,7 @@ export default {
       text = text.join('<br>'); // и снова склеим
       return text; // получили строку не превышающию 5 мегабайт
     },
-    sendToBack: async function () {
+    async sendToBack() {
       let hide = () => {
         this.opacityError = 1;
         setTimeout(() => {
@@ -123,12 +143,12 @@ export default {
         hide();
       }
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    clearLog: async function (clear) {
+    async clearLog(clear) {
       if (clear === 'Очистить') {
         let response = await this.$store.auth.getters.deleteLog();
         if (response === 'clear') {

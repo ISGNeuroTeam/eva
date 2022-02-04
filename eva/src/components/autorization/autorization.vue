@@ -17,7 +17,10 @@
             >
               Авторизация
             </v-card-title>
-            <v-card-text class="text-aut" :style="{ color: theme.$main_text }">
+            <v-card-text
+              class="text-aut"
+              :style="{ color: theme.$main_text }"
+            >
               <v-text-field
                 v-model="user.username"
                 label="Логин"
@@ -54,7 +57,10 @@
                 Подтвердить
               </v-btn>
             </v-card-actions>
-            <div class="example" v-html="msgg" />
+            <div
+              class="example"
+              v-html="msgg"
+            />
           </v-card>
         </div>
       </v-container>
@@ -74,7 +80,7 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
@@ -87,7 +93,7 @@ export default {
     });
   },
   methods: {
-    sendAut: async function () {
+    async sendAut() {
       if (
         this.user.username &&
         this.user.username.length !== 0 &&
@@ -138,7 +144,7 @@ export default {
         }, 2000);
       }
     },
-    getCookie: function () {
+    getCookie() {
       if (this.$jwt.hasToken()) {
         this.$router.push(`/main`);
       }
