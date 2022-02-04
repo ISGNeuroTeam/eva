@@ -93,16 +93,14 @@
               ref="popupContentTabParents"
               :class="{ active: popupNodeCurrentTab === 0 }"
             >
-              <div v-for="item in parentNodes" :key="item">
-                • Node: {{ item }}
-              </div>
+              <div v-for="item in parentNodes">• Node: {{ item }}</div>
               <div v-if="parentNodes.length === 0">Empty</div>
             </div>
             <div
               ref="popupContentTabChildren"
               :class="{ active: popupNodeCurrentTab === 1 }"
             >
-              <div v-for="item in childrenNodes" :key="item">• Node: {{ item }}</div>
+              <div v-for="item in childrenNodes">• Node: {{ item }}</div>
               <div v-if="childrenNodes.length === 0">Empty</div>
             </div>
           </div>
@@ -543,7 +541,7 @@ export default {
 
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(
-        (nodeDataItem) => nodeDataItem.node
+        (nodeDataItem) => nodeDataItem.name
       );
       nodeNameCreator.defaults.layoutParameter =
         yfile.ExteriorLabelModel.NORTH_EAST;
@@ -552,13 +550,8 @@ export default {
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(
         (nodeDataItem) => {
           if (nodeDataItem.label !== '-') {
-            /*
-             TODO: У нода нет параметра лейбл, так что  свойство всегда ture
-              а данная строка всегда возвращает undefined
-            */
             return nodeDataItem.label;
           }
-
         }
       );
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST;
