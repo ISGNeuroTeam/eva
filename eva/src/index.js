@@ -52,6 +52,14 @@ Vue.component(
 ); // модальное окно для создания нового дашборда
 Vue.component('modal-exim', require('./components/modalExim.vue').default); // модальное окно для импорта и экспорта
 Vue.component(
+  'modal-confirm',
+  require('./components/modalConfirm.vue').default
+); // модальное окно для подтверждения закрытия другого модального окна
+Vue.component(
+  'modal-with-confirm',
+  require('./components/modalWithConfirm').default
+); // модальное окно с подтверждением закрытия
+Vue.component(
   'modal-create-search',
   require('./components/modalCreateSearch.vue').default
 ); // модальное окно для импорта и экспорта
