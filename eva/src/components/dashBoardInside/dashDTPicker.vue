@@ -1,13 +1,19 @@
 <template>
   <div class="dash-picker">
-    <div class="DTpicker" :class="{ show_picker_elem: show_picker_elem }">
+    <div
+      class="DTpicker"
+      :class="{ show_picker_elem: show_picker_elem }"
+    >
       <div
         class="DTPicker-btn"
         :style="{ background: theme.$accent_ui_color }"
         @click="openHidden"
       >
         <p>Выберите время и дату</p>
-        <v-icon :style="{ color: theme.$main_text }" class="picker-arrow">
+        <v-icon
+          :style="{ color: theme.$main_text }"
+          class="picker-arrow"
+        >
           {{ arrow.elem }}
         </v-icon>
       </div>
@@ -20,11 +26,16 @@
           border: `1px solid ${theme.$main_border}`,
         }"
       >
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Выбор времени
         </div>
         <div class="choose-period">
-          <p :style="{ color: theme.$main_text }">Последние</p>
+          <p :style="{ color: theme.$main_text }">
+            Последние
+          </p>
           <v-text-field
             v-model="last.every"
             class="textarea-item"
@@ -58,7 +69,10 @@
             Секунд
           </v-chip>
         </div>
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Выбор времени и даты
         </div>
         <DTPicker
@@ -81,7 +95,10 @@
           class="dtpicker"
           @validate="setTocken('dt')"
         />
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Диапазон дат
         </div>
         <DTPicker
@@ -95,7 +112,10 @@
           class="dtpicker range-picker"
           @validate="setTocken('range')"
         />
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Ввод даты и времени вручную
         </div>
         <v-text-field

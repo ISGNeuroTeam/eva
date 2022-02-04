@@ -1,7 +1,14 @@
 <template>
   <div class="dash-select">
-    <div v-if="show" ref="selectBlock" class="select-with-data">
-      <div v-if="dataModeFrom" class="arrow-block">
+    <div
+      v-if="show"
+      ref="selectBlock"
+      class="select-with-data"
+    >
+      <div
+        v-if="dataModeFrom"
+        class="arrow-block"
+      >
         <v-icon
           v-if="!open"
           class="arrow-down arrows-select"
@@ -68,8 +75,14 @@
           label="Значение"
           @change="setTocken"
         >
-          <template v-if="multiple" v-slot:prepend-item>
-            <v-list-item ripple @click="selectItems">
+          <template
+            v-if="multiple"
+            v-slot:prepend-item
+          >
+            <v-list-item
+              ripple
+              @click="selectItems"
+            >
               <v-list-item-action>
                 <v-icon
                   :color="
@@ -92,7 +105,10 @@
         </v-autocomplete>
       </div>
     </div>
-    <div v-if="!show" class="error-msg">
+    <div
+      v-if="!show"
+      class="error-msg"
+    >
       {{ message }}
     </div>
   </div>

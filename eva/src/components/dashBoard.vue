@@ -21,7 +21,11 @@
         class="card-title open_title"
       >
         <div class="name-dash">
-          <v-icon v-if="dataFromDB" class="icon" :color="theme.$main_border">
+          <v-icon
+            v-if="dataFromDB"
+            class="icon"
+            :color="theme.$main_border"
+          >
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-icon
@@ -54,7 +58,10 @@
               :style="{ color: theme.$main_text }"
             >
               [ {{ element }} ]
-              <span v-if="dataSourseTitle !== -1" class="ml-1">
+              <span
+                v-if="dataSourseTitle !== -1"
+                class="ml-1"
+              >
                 {{ dataSourseTitle }}
               </span>
             </div>
@@ -83,7 +90,10 @@
         </div>
         <div class="settings-dash-block">
           <div class="settings-dash">
-            <v-dialog v-model="fullScreenMode" width="100%">
+            <v-dialog
+              v-model="fullScreenMode"
+              width="100%"
+            >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip
                   bottom
@@ -104,7 +114,10 @@
                   <span>На весь экран</span>
                 </v-tooltip>
               </template>
-              <div class="full-screen-dialog" :style="{ height: '80vh' }">
+              <div
+                class="full-screen-dialog"
+                :style="{ height: '80vh' }"
+              >
                 <v-card
                   class="dash-block"
                   :style="{
@@ -146,7 +159,10 @@
                           :style="{ color: theme.$main_text }"
                         >
                           [ {{ element }} ]
-                          <span v-if="dataSourseTitle !== -1" class="ml-1">
+                          <span
+                            v-if="dataSourseTitle !== -1"
+                            class="ml-1"
+                          >
                             {{ dataSourseTitle }}
                           </span>
                         </div>
@@ -217,22 +233,22 @@
                     :is="currentElem"
                     v-show="showElement"
                     class="card-text element-itself"
-                    :colorFrom="theme"
+                    :color-from="theme"
                     :style="{
                       color: theme.$main_text,
                       background: 'transparent',
                     }"
-                    :idFrom="element"
-                    :idDashFrom="idDash"
-                    :dataRestFrom="searchData"
-                    :dataModeFrom="dataMode"
-                    :timeFormatFrom="props.timeFormat"
-                    :sizeTileFrom="props.sizeTile"
-                    :tooltipFrom="props.tooltip"
-                    :currentSettings="settings"
-                    :updateSettings="updateSettings"
-                    :widthFrom="fullScreenWidth"
-                    :heightFrom="fullScreenHeight"
+                    :id-from="element"
+                    :id-dash-from="idDash"
+                    :data-rest-from="searchData"
+                    :data-mode-from="dataMode"
+                    :time-format-from="props.timeFormat"
+                    :size-tile-from="props.sizeTile"
+                    :tooltip-from="props.tooltip"
+                    :current-settings="settings"
+                    :update-settings="updateSettings"
+                    :width-from="fullScreenWidth"
+                    :height-from="fullScreenHeight"
                     :options="props.options"
                     :is-full-screen="true"
                     @hideDS="hideDS($event)"
@@ -364,7 +380,10 @@
           </div>
         </div>
       </v-card-title>
-      <div v-if="!props.hideLoad" class="loading-block">
+      <div
+        v-if="!props.hideLoad"
+        class="loading-block"
+      >
         <div
           v-show="props.disappear"
           :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
@@ -377,7 +396,10 @@
           />
         </div>
       </div>
-      <v-card-text v-show="!showElement" class="card-text">
+      <v-card-text
+        v-show="!showElement"
+        class="card-text"
+      >
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
@@ -390,21 +412,21 @@
         :is="currentElem"
         v-show="showElement"
         class="card-text element-itself"
-        :colorFrom="theme"
+        :color-from="theme"
         :style="{ color: theme.$main_text, background: 'transparent' }"
-        :idFrom="element"
-        :idDashFrom="idDash"
-        :dataRestFrom="searchData"
-        :dataModeFrom="dataMode"
+        :id-from="element"
+        :id-dash-from="idDash"
+        :data-rest-from="searchData"
+        :data-mode-from="dataMode"
         :loading="loading"
-        :timeFormatFrom="props.timeFormat"
-        :sizeTileFrom="props.sizeTile"
-        :tooltipFrom="props.tooltip"
-        :widthFrom="width"
-        :heightFrom="height"
+        :time-format-from="props.timeFormat"
+        :size-tile-from="props.sizeTile"
+        :tooltip-from="props.tooltip"
+        :width-from="width"
+        :height-from="height"
         :options="props.options"
-        :currentSettings="settings"
-        :updateSettings="updateSettings"
+        :current-settings="settings"
+        :update-settings="updateSettings"
         :is-full-screen="false"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"

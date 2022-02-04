@@ -13,9 +13,15 @@
     }"
     :permissions="permissions"
   >
-    <div class="line-setting" :style="{ background: theme.$main_bg }" />
+    <div
+      class="line-setting"
+      :style="{ background: theme.$main_bg }"
+    />
     <div class="setting">
-      <div class="labelSetting" :style="{ color: theme.$main_text }">
+      <div
+        class="labelSetting"
+        :style="{ color: theme.$main_text }"
+      >
         Режим редактирования
       </div>
       <v-switch
@@ -25,10 +31,16 @@
         :style="{ color: theme.$main_text }"
         :label="labels[mode]"
       />
-      <div class="divider-setting" :style="{ background: theme.$title }" />
+      <div
+        class="divider-setting"
+        :style="{ background: theme.$title }"
+      />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{ color: theme.$main_text }">
+      <div
+        class="labelSetting"
+        :style="{ color: theme.$main_text }"
+      >
         Размер сетки
       </div>
       <div class="sizeGrid">
@@ -65,10 +77,16 @@
           @keyup.enter="sendSizeGrid"
         />
       </div>
-      <div class="divider-setting" :style="{ background: theme.$title }" />
+      <div
+        class="divider-setting"
+        :style="{ background: theme.$title }"
+      />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{ color: theme.$main_text }">
+      <div
+        class="labelSetting"
+        :style="{ color: theme.$main_text }"
+      >
         Перемещать/ изменять размер компонента
       </div>
       <v-switch
@@ -78,11 +96,17 @@
         :style="{ color: theme.$main_text }"
         :label="labels[dragresable]"
       />
-      <div class="divider-setting" :style="{ background: theme.$title }" />
+      <div
+        class="divider-setting"
+        :style="{ background: theme.$title }"
+      />
     </div>
 
     <div class="setting">
-      <div class="labelSetting" :style="{ color: theme.$main_text }">
+      <div
+        class="labelSetting"
+        :style="{ color: theme.$main_text }"
+      >
         Показывать сетку
       </div>
       <v-switch
@@ -92,10 +116,16 @@
         :style="{ color: theme.$main_text }"
         :label="labels[gridShow]"
       />
-      <div class="divider-setting" :style="{ background: theme.$title }" />
+      <div
+        class="divider-setting"
+        :style="{ background: theme.$title }"
+      />
     </div>
     <div class="setting">
-      <div class="labelSetting" :style="{ color: theme.$main_text }">
+      <div
+        class="labelSetting"
+        :style="{ color: theme.$main_text }"
+      >
         Вкладки
       </div>
       <v-switch

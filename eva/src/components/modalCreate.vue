@@ -1,11 +1,22 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog v-model="active" width="90%" persistent @keydown="checkEsc($event)">
-    <div v-if="groupCheck" class="create-modal-block-group">
+  <v-dialog
+    v-model="active"
+    width="90%"
+    persistent
+    @keydown="checkEsc($event)"
+  >
+    <div
+      v-if="groupCheck"
+      class="create-modal-block-group"
+    >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$title }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$title }"
+          >
             {{ nameTitle }}
           </div>
         </v-card-text>
@@ -89,7 +100,10 @@
                     />
                   </svg>
                 </template>
-                <v-color-picker v-model="pickedColor" dot-size="17" />
+                <v-color-picker
+                  v-model="pickedColor"
+                  dot-size="17"
+                />
               </v-menu>
               Свой цвет
             </div>
@@ -99,11 +113,11 @@
               v-for="item in Object.keys(group.tab)"
               :key="item"
               essence="group"
-              :dataFrom="dataRest"
+              :data-from="dataRest"
               :subessence="item"
-              :colorFrom="theme"
+              :color-from="theme"
               :create="actionFrom"
-              :activeFrom="modalFrom"
+              :active-from="modalFrom"
               @changeData="changeData"
             />
           </div>
@@ -143,7 +157,10 @@
     >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$main_text }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$main_text }"
+          >
             {{ nameTitle }}
           </div>
         </v-card-text>
@@ -163,11 +180,11 @@
             <data-profile
               essence="dash"
               subessence="groups"
-              :nameGroupFrom="nameGroupFrom"
-              :dataFrom="dataRest"
+              :name-group-from="nameGroupFrom"
+              :data-from="dataRest"
               :create="actionFrom"
-              :colorFrom="theme"
-              :activeFrom="modalFrom"
+              :color-from="theme"
+              :active-from="modalFrom"
               @changeData="changeData"
             />
           </div>

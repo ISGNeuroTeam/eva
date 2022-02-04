@@ -1,8 +1,17 @@
 <template>
   <div class="dash-graph-block">
-    <div v-show="!nomsg" class="graph-block-itself">
-      <div ref="graph" class="dash-graphVis" />
-      <v-tooltip bottom :color="colorFrom.controlsActive">
+    <div
+      v-show="!nomsg"
+      class="graph-block-itself"
+    >
+      <div
+        ref="graph"
+        class="dash-graphVis"
+      />
+      <v-tooltip
+        bottom
+        :color="colorFrom.controlsActive"
+      >
         <template v-slot:activator="{ on }">
           <v-icon
             v-show="!errorData"
@@ -59,7 +68,10 @@
         Сохранить
       </div>
     </div>
-    <div v-show="nomsg" class="nodata">
+    <div
+      v-show="nomsg"
+      class="nodata"
+    >
       {{ nomsgtext }}
     </div>
   </div>

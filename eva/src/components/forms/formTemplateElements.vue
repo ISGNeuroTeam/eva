@@ -1,6 +1,12 @@
 <template>
-  <div ref="elementBlock" class="block-of-elements">
-    <div v-if="editable == 'true'" class="element-block">
+  <div
+    ref="elementBlock"
+    class="block-of-elements"
+  >
+    <div
+      v-if="editable == 'true'"
+      class="element-block"
+    >
       <v-textarea
         v-if="visionOpt.text"
         ref="textArea"
@@ -12,7 +18,7 @@
         :height="heightFrom * 50"
         hide-details
         @blur="setValue"
-      ></v-textarea>
+      />
       <v-select
         v-if="visionOpt.select"
         v-model="value"
@@ -21,8 +27,11 @@
         hide-details
         outlined
         @change="setValue"
-      ></v-select>
-      <div v-if="visionOpt.number" class="number-block">
+      />
+      <div
+        v-if="visionOpt.number"
+        class="number-block"
+      >
         <v-text-field
           v-model="value"
           class="number"
@@ -30,8 +39,11 @@
           outlined
           hide-details
           @blur="checkNumber"
-        ></v-text-field>
-        <div class="warning-number-block" :class="{ showWarning: showWarning }">
+        />
+        <div
+          class="warning-number-block"
+          :class="{ showWarning: showWarning }"
+        >
           Только числовое значение
         </div>
       </div>
@@ -49,19 +61,27 @@
         :class="{ radioActive: value }"
         @click="checkRadio"
       >
-        <div class="radiobtn-circle"></div>
+        <div class="radiobtn-circle" />
       </div>
       <!-- <input type="radio" v-if="visionOpt.choose" name="radio" color="teal" class="radiobtn"  :value="value" v-model="value" > -->
     </div>
-    <div v-if="editable == 'false'" class="element-block-not-editable">
+    <div
+      v-if="editable == 'false'"
+      class="element-block-not-editable"
+    >
       <div
         v-if="visionOpt.choose"
         class="radiobtn-block"
         :class="{ radioActive: value }"
       >
-        <div class="radiobtn-circle"></div>
+        <div class="radiobtn-circle" />
       </div>
-      <div v-if="!visionOpt.choose" class="just-text">{{ value }}</div>
+      <div
+        v-if="!visionOpt.choose"
+        class="just-text"
+      >
+        {{ value }}
+      </div>
     </div>
   </div>
 </template>

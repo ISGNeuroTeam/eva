@@ -61,7 +61,10 @@
               :button-color="theme.$primary_button"
               class="dtpicker-search"
             >
-              <v-icon class="picker-search" :color="theme.$primary_button">
+              <v-icon
+                class="picker-search"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -90,7 +93,10 @@
               :button-color="theme.$primary_button"
               class="dtpicker-search"
             >
-              <v-icon class="picker-search" :color="theme.$primary_button">
+              <v-icon
+                class="picker-search"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -105,9 +111,9 @@
                 border: `1px solid ${theme.$main_border}`,
               }"
             >
-              <v-expansion-panel-header
-                >Дополнительные параметры</v-expansion-panel-header
-              >
+              <v-expansion-panel-header>
+                Дополнительные параметры
+              </v-expansion-panel-header>
               <v-expansion-panel-content class="order-expansion">
                 <v-text-field
                   v-model="search.parametrs.timeout"

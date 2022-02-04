@@ -2,7 +2,10 @@
   <div class="notfound">
     <h1>К сожалению, страница не найдена</h1>
     <div class="img-block">
-      <img :src="require('../images/notfound.gif')" alt="notfound" />
+      <img
+        :src="require('../images/notfound.gif')"
+        alt="notfound"
+      >
     </div>
   </div>
 </template>

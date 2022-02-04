@@ -10,9 +10,15 @@
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-text class="headline">
-        <div :style="{ color: theme.$main_text }" class="delete-title">
+        <div
+          :style="{ color: theme.$main_text }"
+          class="delete-title"
+        >
           Вы точно хотите удалить
-          <span :style="{ color: theme.$main_text }" class="delete-name">
+          <span
+            :style="{ color: theme.$main_text }"
+            class="delete-name"
+          >
             {{ deleteName }}
           </span>
           <span

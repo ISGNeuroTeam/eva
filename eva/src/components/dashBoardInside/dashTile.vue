@@ -22,7 +22,10 @@
         </div>
       </div>
     </div>
-    <div v-show="noMsg" class="errormsg">
+    <div
+      v-show="noMsg"
+      class="errormsg"
+    >
       {{ msgText }}
     </div>
   </div>

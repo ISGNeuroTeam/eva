@@ -1,5 +1,8 @@
 <template>
-  <div class="dash-guntt" :class="idDashClass()">
+  <div
+    class="dash-guntt"
+    :class="idDashClass()"
+  >
     <div class="legend-block">
       <div
         v-for="i in legends.length"
@@ -7,13 +10,19 @@
         :key="i"
         class="legends-itself"
       >
-        <div class="circle" :style="{ backgroundColor: colors[i - 1] }" />
+        <div
+          class="circle"
+          :style="{ backgroundColor: colors[i - 1] }"
+        />
         <div class="text">
           {{ legends[i - 1] }}
         </div>
       </div>
     </div>
-    <div v-show="!noMsg" class="guntt-block" />
+    <div
+      v-show="!noMsg"
+      class="guntt-block"
+    />
     <div
       ref="tooltip"
       class="tooltipGuntt"
@@ -22,7 +31,10 @@
         border: `1px solid ${colorFrom.text}`,
       }"
     />
-    <div v-show="noMsg" class="mt-4">
+    <div
+      v-show="noMsg"
+      class="mt-4"
+    >
       {{ msgText }}
     </div>
   </div>

@@ -1,10 +1,21 @@
 <!-- Модальное окно для выбора ИС -->
 
 <template>
-  <v-dialog :value="active" width="600" persistent @keydown="checkEsc($event)">
-    <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
+  <v-dialog
+    :value="active"
+    width="600"
+    persistent
+    @keydown="checkEsc($event)"
+  >
+    <v-card
+      :style="{ background: theme.$main_bg }"
+      class="shedule-modal"
+    >
       <div class="schedule-block">
-        <div class="zagolovok" :style="{ color: theme.$title }">
+        <div
+          class="zagolovok"
+          :style="{ color: theme.$title }"
+        >
           Расписание для запроса
           <b>
             {{ sid }}
@@ -16,7 +27,9 @@
             :background-color="theme.$main_bg"
           >
             <v-tabs-slider />
-            <v-tab :style="{ color: theme.$main_text }"> Периодичность </v-tab>
+            <v-tab :style="{ color: theme.$main_text }">
+              Периодичность
+            </v-tab>
             <v-tab-item
               :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
@@ -58,7 +71,10 @@
                   </v-chip>
                 </div>
               </div>
-              <p class="time-select" :style="{ color: theme.$main_text }">
+              <p
+                class="time-select"
+                :style="{ color: theme.$main_text }"
+              >
                 Получать данные за последние
               </p>
               <v-divider
@@ -102,7 +118,9 @@
                 </div>
               </div>
             </v-tab-item>
-            <v-tab :style="{ color: theme.$main_text }"> Планирование </v-tab>
+            <v-tab :style="{ color: theme.$main_text }">
+              Планирование
+            </v-tab>
             <v-tab-item />
           </v-tabs>
         </div>

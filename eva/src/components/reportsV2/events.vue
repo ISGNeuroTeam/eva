@@ -21,11 +21,18 @@
       <template v-slot:item="{ item, expand, isExpanded }">
         <tr :class="{ expanded: isExpanded }">
           <td>
-            <v-icon :color="theme.$main_text" @click="expand(!isExpanded)">{{
-              isExpanded ? mdiChevronDown : mdiChevronRight
-            }}</v-icon>
+            <v-icon
+              :color="theme.$main_text"
+              @click="expand(!isExpanded)"
+            >
+              {{
+                isExpanded ? mdiChevronDown : mdiChevronRight
+              }}
+            </v-icon>
           </td>
-          <td class="text-xs-right">{{ item.time }}</td>
+          <td class="text-xs-right">
+            {{ item.time }}
+          </td>
           <td class="text-xs-right">
             {{ item.inputCount }}
             <!--            <br />-->
@@ -40,13 +47,24 @@
       </template>
 
       <template v-slot:expanded-item="{ headers, item }">
-        <td :colspan="headers.length" class="collapse-row">
+        <td
+          :colspan="headers.length"
+          class="collapse-row"
+        >
           <div style="margin-left: 216px">
-            <div v-for="(value, name) in item.inputCount" :key="name">
-              <span v-if="name != '_time'" :style="{ color: theme.$raspberry }"
-                >{{ name }}:
+            <div
+              v-for="(value, name) in item.inputCount"
+              :key="name"
+            >
+              <span
+                v-if="name != '_time'"
+                :style="{ color: theme.$raspberry }"
+              >{{ name }}:
               </span>
-              <span v-if="name != '_time'" :style="{ color: theme.$forest }">{{
+              <span
+                v-if="name != '_time'"
+                :style="{ color: theme.$forest }"
+              >{{
                 value
               }}</span>
             </div>

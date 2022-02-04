@@ -1,6 +1,12 @@
 <template>
-  <div ref="pieChart" class="piechart-block">
-    <div v-if="nodata" class="nodata">
+  <div
+    ref="pieChart"
+    class="piechart-block"
+  >
+    <div
+      v-if="nodata"
+      class="nodata"
+    >
       {{ message }}
     </div>
     <div
@@ -20,7 +26,10 @@
       Наведите курсор на график
     </div>
 
-    <div v-show="dataLoading || !dataRestFrom.length" class="mt-4">
+    <div
+      v-show="dataLoading || !dataRestFrom.length"
+      class="mt-4"
+    >
       <p>Нет данных для отображения</p>
     </div>
     <div
@@ -28,8 +37,14 @@
       class="piechart-legend-block"
       :style="{ flexFlow: positionLegends }"
     >
-      <div ref="piechartItself" :class="`dash-piechart ${this.idFrom}`" />
-      <div ref="legends" class="legend-block-pie">
+      <div
+        ref="piechartItself"
+        :class="`dash-piechart ${this.idFrom}`"
+      />
+      <div
+        ref="legends"
+        class="legend-block-pie"
+      >
         <div
           v-for="(item, idx) in legends"
           :key="idx"
@@ -43,8 +58,14 @@
           @mouseleave="hoverLegendLine(null)"
           @click="selectedPieIndex = idx"
         >
-          <div class="square" :style="{ backgroundColor: item.color }" />
-          <div class="text" :style="{ color: theme.$main_text }">
+          <div
+            class="square"
+            :style="{ backgroundColor: item.color }"
+          />
+          <div
+            class="text"
+            :style="{ color: theme.$main_text }"
+          >
             {{ item.label }}
           </div>
         </div>

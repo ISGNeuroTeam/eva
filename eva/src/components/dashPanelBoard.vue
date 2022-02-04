@@ -1,14 +1,23 @@
 <template>
   <div class="app-header">
-    <div class="dash-main" :style="{ background: theme.$main_bg }">
+    <div
+      class="dash-main"
+      :style="{ background: theme.$main_bg }"
+    >
       <div class="main-title">
         <div class="logo-block">
           <EvaLogo />
         </div>
-        <div class="title-name" :style="{ color: theme.$title }">
+        <div
+          class="title-name"
+          :style="{ color: theme.$title }"
+        >
           {{ name }}
         </div>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="home"
@@ -21,7 +30,10 @@
           </template>
           <span>На главную</span>
         </v-tooltip>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="undo"
@@ -36,8 +48,14 @@
         </v-tooltip>
       </div>
       <div class="control-block">
-        <div class="edit-container" :class="{ hide_control: !editMode }">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+        <div
+          class="edit-container"
+          :class="{ hide_control: !editMode }"
+        >
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -51,7 +69,10 @@
             </template>
             <span>События</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -65,7 +86,10 @@
             </template>
             <span>Токены</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -79,7 +103,10 @@
             </template>
             <span>Источники данных</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -95,7 +122,10 @@
           </v-tooltip>
         </div>
         <div class="user-control-panel">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -142,7 +172,10 @@
             </template>
             <span>Сохранить</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -160,9 +193,16 @@
             <span>Открыть окно логов</span>
           </v-tooltip>
         </div>
-        <v-menu :nudge-width="100" :rounded="false" offset-y>
+        <v-menu
+          :nudge-width="100"
+          :rounded="false"
+          offset-y
+        >
           <template v-slot:activator="{ on: onMenu }">
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+            >
               <template v-slot:activator="{ on: onTooltip }">
                 <div
                   class="dropdown-profile"
@@ -187,11 +227,16 @@
           </template>
           <v-list class="profile-dropdown--list">
             <v-list-item>
-              <v-list-item-title class="profile-dropdown--title"
-                >Профиль</v-list-item-title
+              <v-list-item-title
+                class="profile-dropdown--title"
               >
+                Профиль
+              </v-list-item-title>
             </v-list-item>
-            <div v-for="item in profileDropdownButtons" :key="item.id">
+            <div
+              v-for="item in profileDropdownButtons"
+              :key="item.id"
+            >
               <v-list-item v-if="!item.hide">
                 <v-btn
                   class="profile-dropdown--button"
@@ -199,7 +244,10 @@
                   v-on="on"
                   @click="item.onClick"
                 >
-                  <v-icon class="edit icon-aut" :color="theme.$secondary_text">
+                  <v-icon
+                    class="edit icon-aut"
+                    :color="theme.$secondary_text"
+                  >
                     {{ item.icon }}
                   </v-icon>
                   {{ item.label }}
@@ -216,10 +264,16 @@
         :style="blockToolStyle"
       >
         <div class="iconsNavigations">
-          <v-icon :color="theme.$primary_button" @click="runAllSearches">
+          <v-icon
+            :color="theme.$primary_button"
+            @click="runAllSearches"
+          >
             {{ mdiAnimationPlay }}
           </v-icon>
-          <v-icon :color="theme.$primary_button" @click="openModal">
+          <v-icon
+            :color="theme.$primary_button"
+            @click="openModal"
+          >
             {{ plus_icon }}
           </v-icon>
         </div>
@@ -256,7 +310,10 @@
               :class="{ loading: search.status === 'pending' }"
             />
           </div>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-play"
@@ -269,7 +326,10 @@
             </template>
             <span>Запустить ИД</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-pencil"
@@ -282,7 +342,10 @@
             </template>
             <span>Редактировать ИД</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -295,7 +358,10 @@
             </template>
             <span>Планировщик</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -309,7 +375,10 @@
             </template>
             <span>Экспортировать ИД</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -322,7 +391,10 @@
             </template>
             <span>Создать отчет</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-trash"
@@ -364,7 +436,10 @@
               border: `2px solid ${theme.$accent_ui_color}`,
             }"
           >
-            <v-icon class="tool-img-itself" :style="{ color: '#FFF' }">
+            <v-icon
+              class="tool-img-itself"
+              :style="{ color: '#FFF' }"
+            >
               {{ `${tool.img}` }}
             </v-icon>
           </div>
@@ -470,8 +545,7 @@
               label="обновлять по кнопке"
               class="tocken-on-button theme--dark"
               :color="theme.$accent_ui_color"
-            >
-            </v-checkbox>
+            />
           </div>
           <p
             class="tocken-view"
@@ -628,7 +702,7 @@
         <v-textarea
           v-model="textarea_event"
           spellcheck="false"
-          :textAreaFull="textareaEv"
+          :text-area-full="textareaEv"
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           auto-grow
@@ -651,8 +725,14 @@
         :class="{ opensave: opensave }"
         :style="{ background: theme.$main_bg }"
       >
-        <div v-show="!errorSave" class="save-obertka">
-          <div class="question-save" :style="{ color: theme.$main_text }">
+        <div
+          v-show="!errorSave"
+          class="save-obertka"
+        >
+          <div
+            class="question-save"
+            :style="{ color: theme.$main_text }"
+          >
             Сохранить дашборд
             <span class="save-name">
               {{ name }}
@@ -681,8 +761,14 @@
             </v-btn>
           </div>
         </div>
-        <div v-show="errorSave" class="save-obertka message-save">
-          <div class="question-save" :style="{ color: theme.$error_color }">
+        <div
+          v-show="errorSave"
+          class="save-obertka message-save"
+        >
+          <div
+            class="question-save"
+            :style="{ color: theme.$error_color }"
+          >
             {{ msgErrorSave }}
           </div>
         </div>
@@ -719,10 +805,10 @@
         </div>
       </div>
       <modal-create-search
-        :idDashFrom="idDash"
-        :modalFrom="activeModal"
-        :createBtnFrom="createSearchBtn"
-        :dataSearchFrom="newSearch"
+        :id-dash-from="idDash"
+        :modal-from="activeModal"
+        :create-btn-from="createSearchBtn"
+        :data-search-from="newSearch"
         @cancelModal="cancelModal"
       />
       <modal-themes
@@ -731,10 +817,10 @@
         @closeModal="paleteShow = false"
       />
       <modal-schedule
-        :idDashFrom="idDash"
-        :colorFrom="theme"
-        :modalFrom="activeSchedule"
-        :dataSidFrom="scheduleSid"
+        :id-dash-from="idDash"
+        :color-from="theme"
+        :modal-from="activeSchedule"
+        :data-sid-from="scheduleSid"
         @cancel="activeSchedule = false"
       />
       <modal-log
@@ -744,7 +830,7 @@
       <dash-settings
         :gear-from="gearShow"
         :permissions-from="userPermissions"
-        :idDashFrom="idDashFrom"
+        :id-dash-from="idDashFrom"
         @changeMode="setEditMode"
       />
       <modal-paper
@@ -755,14 +841,16 @@
       />
     </div>
 
-    <div class="block-filter" :class="{ openfilter }">
+    <div
+      class="block-filter"
+      :class="{ openfilter }"
+    >
       <dash-filter-panel
         :permissions-from="userPermissions"
-        :idDashFrom="idDashFrom"
-        :editPermission="editPermission || isEditDash"
-        :editMode="editMode"
-      >
-      </dash-filter-panel>
+        :id-dash-from="idDashFrom"
+        :edit-permission="editPermission || isEditDash"
+        :edit-mode="editMode"
+      />
     </div>
   </div>
 </template>

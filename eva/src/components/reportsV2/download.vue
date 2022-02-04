@@ -1,9 +1,21 @@
 <template>
-  <v-btn small text @click="exportDataCSV()">
-    <v-icon :style="{ color: theme.$main_text }" class="download-icon">{{
-      mdiDownload
-    }}</v-icon>
-    <span class="download-btn-text" :style="{ color: theme.$main_text }">
+  <v-btn
+    small
+    text
+    @click="exportDataCSV()"
+  >
+    <v-icon
+      :style="{ color: theme.$main_text }"
+      class="download-icon"
+    >
+      {{
+        mdiDownload
+      }}
+    </v-icon>
+    <span
+      class="download-btn-text"
+      :style="{ color: theme.$main_text }"
+    >
       Скачать
     </span>
   </v-btn>

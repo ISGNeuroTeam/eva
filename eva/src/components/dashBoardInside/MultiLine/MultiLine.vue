@@ -1,14 +1,24 @@
 <template>
   <div class="multiline-container pa-0">
-    <div v-if="isNodata" class="nodata-block" v-text="message" />
-    <div ref="legendContainer" class="legend">
+    <div
+      v-if="isNodata"
+      class="nodata-block"
+      v-text="message"
+    />
+    <div
+      ref="legendContainer"
+      class="legend"
+    >
       <div
         v-for="item in legendList"
         v-show="!isNodata"
         :key="item.name"
         class="legend-item"
       >
-        <div class="circle" :style="{ backgroundColor: item.color }" />
+        <div
+          class="circle"
+          :style="{ backgroundColor: item.color }"
+        />
         <div
           class="text"
           :style="{ color: theme.$main_text }"
@@ -31,7 +41,7 @@
 import * as d3 from 'd3';
 
 export default {
-  name: 'dashMultiLine',
+  name: 'DashMultiLine',
   props: {
     idFrom: String,
     idDashFrom: String,

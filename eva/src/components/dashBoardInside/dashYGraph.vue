@@ -2,7 +2,10 @@
   <div class="ygraph-wrapper">
     <div class="button-block">
       <v-row align="start">
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="
@@ -20,7 +23,10 @@
           <span>Перемещение по графу</span>
         </v-tooltip>
 
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
@@ -34,7 +40,10 @@
           <span>Увеличить</span>
         </v-tooltip>
 
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
@@ -48,7 +57,10 @@
           <span>Уменьшить</span>
         </v-tooltip>
 
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
@@ -69,10 +81,17 @@
       :style="{ top: `${top}` }"
     >
       <div class="popupContainer">
-        <div ref="nodePopupContent" class="popupContent" tabindex="0">
+        <div
+          ref="nodePopupContent"
+          class="popupContent"
+          tabindex="0"
+        >
           <div class="popupContentTitle">
-            <div data-id="node"></div>
-            <div data-id="node_description" style="font-size: 0.9rem"></div>
+            <div data-id="node" />
+            <div
+              data-id="node_description"
+              style="font-size: 0.9rem"
+            />
           </div>
           <div class="popupContentTabsHeader">
             <div
@@ -93,19 +112,29 @@
               ref="popupContentTabParents"
               :class="{ active: popupNodeCurrentTab === 0 }"
             >
-              <div v-for="item in parentNodes" :key="item">
+              <div
+                v-for="item in parentNodes"
+                :key="item"
+              >
                 • Node: {{ item }}
               </div>
-              <div v-if="parentNodes.length === 0">Empty</div>
+              <div v-if="parentNodes.length === 0">
+                Empty
+              </div>
             </div>
             <div
               ref="popupContentTabChildren"
               :class="{ active: popupNodeCurrentTab === 1 }"
             >
-              <div v-for="item in childrenNodes" :key="item">
+              <div
+                v-for="item in childrenNodes"
+                :key="item"
+              >
                 • Node: {{ item }}
               </div>
-              <div v-if="childrenNodes.length === 0">Empty</div>
+              <div v-if="childrenNodes.length === 0">
+                Empty
+              </div>
             </div>
           </div>
         </div>
@@ -120,14 +149,14 @@
             <div
               data-id="sourceName"
               style="font-weight: bold; float: left"
-            ></div>
+            />
             <div style="float: left; margin-left: 5px; margin-right: 5px">
               ->
             </div>
             <div
               data-id="targetName"
               style="font-weight: bold; float: left"
-            ></div>
+            />
           </div>
         </div>
       </div>
@@ -176,7 +205,7 @@ const labelFontBOLD = new yfile.Font({
 });
 
 export default {
-  name: 'dashYGraph',
+  name: 'DashYGraph',
   props: {
     // переменные полученные от родителя
     idFrom: null, // id элемнета (table, graph-2)

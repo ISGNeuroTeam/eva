@@ -4,29 +4,40 @@
       :style="{ color: theme.$title, 'background-color': theme.$main_bg }"
       class="mb-5"
     >
-      <v-icon :color="theme.$title" class="pr-2">{{ settingsIcon }}</v-icon
-      >Настройки фильтра
+      <v-icon
+        :color="theme.$title"
+        class="pr-2"
+      >
+        {{ settingsIcon }}
+      </v-icon>Настройки фильтра
     </v-card-title>
-    <v-card-subtitle v-if="editMode && typeMap.length > 1" class="mt-5">
-      <v-item-group v-model="currentTab" mandatory>
+    <v-card-subtitle
+      v-if="editMode && typeMap.length > 1"
+      class="mt-5"
+    >
+      <v-item-group
+        v-model="currentTab"
+        mandatory
+      >
         <v-item
           v-for="(item, index) in typeMap"
           :key="index"
           v-slot="{ active, toggle }"
-          ><v-btn
+        >
+          <v-btn
             depressed
             style="text-transform: none; width: 50%"
             :style="
               active
                 ? {
-                    'background-color': theme.$primary_button,
-                    color: theme.$secondary_bg,
-                    'border-radius': '3px',
-                  }
+                  'background-color': theme.$primary_button,
+                  color: theme.$secondary_bg,
+                  'border-radius': '3px',
+                }
                 : {
-                    'background-color': theme.$main_bg,
-                    color: theme.$main_text,
-                  }
+                  'background-color': theme.$main_bg,
+                  color: theme.$main_text,
+                }
             "
             @click="toggle"
           >
@@ -38,15 +49,21 @@
     <v-card-text>
       <component
         :is="typeMap[currentTab].componentName"
-        :idDash="idDash"
+        :id-dash="idDash"
         :temp="temp"
         :edit-mode="editMode"
-      ></component>
-      <v-switch v-model="temp.invertMatches" :color="theme.$primary_button"
-        ><h5 slot="label" :style="{ color: theme.$secondary_text }">
-          Вычитать значения
-        </h5></v-switch
+      />
+      <v-switch
+        v-model="temp.invertMatches"
+        :color="theme.$primary_button"
       >
+        <h5
+          slot="label"
+          :style="{ color: theme.$secondary_text }"
+        >
+          Вычитать значения
+        </h5>
+      </v-switch>
       <div class="d-flex justify-end">
         <v-btn
           text
@@ -54,8 +71,9 @@
           style="text-transform: none"
           :style="{ color: theme.$main_text }"
           @click="closeFilterPartModal"
-          >Отменить</v-btn
         >
+          Отменить
+        </v-btn>
         <v-btn
           depressed
           style="text-transform: none"
@@ -63,8 +81,9 @@
           :style="{ color: theme.$secondary_bg }"
           class="ma-2"
           @click="saveFilterPartModal"
-          >Сохранить</v-btn
         >
+          Сохранить
+        </v-btn>
       </div>
     </v-card-text>
   </v-card>

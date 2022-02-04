@@ -19,9 +19,7 @@
           <span :title="elemName">{{ elemName }}</span>
         </div>
         <div class="part-subtitle">
-          <span
-            >{{ filterPart.fieldName }} ({{ filterPartValues.length }})</span
-          >
+          <span>{{ filterPart.fieldName }} ({{ filterPartValues.length }})</span>
           <v-menu
             v-if="filterPartValues.length > 0"
             offset-y
@@ -50,7 +48,10 @@
                 v-for="(value, index) in filterPartValues"
                 :key="index"
               >
-                <span class="flex-grow-1" v-text="value" />
+                <span
+                  class="flex-grow-1"
+                  v-text="value"
+                />
                 <v-icon
                   v-if="isFocused"
                   :color="theme.$main_text"
@@ -89,7 +90,10 @@
       </template>
     </div>
 
-    <div v-if="isFocused" class="button-col">
+    <div
+      v-if="isFocused"
+      class="button-col"
+    >
       <v-icon
         v-if="filterPart.filterPartType === 'token'"
         v-blur="140"

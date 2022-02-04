@@ -1,5 +1,9 @@
 <template>
-  <div ref="svgBlock" class="dash-csvg" tabindex="0">
+  <div
+    ref="svgBlock"
+    class="dash-csvg"
+    tabindex="0"
+  >
     <div
       v-show="noMsg === 1"
       ref="csvg"
@@ -10,7 +14,10 @@
       @mouseout="mouseoutSvg"
       v-html="svg"
     />
-    <div v-show="noMsg === 0" class="file-input">
+    <div
+      v-show="noMsg === 0"
+      class="file-input"
+    >
       <v-file-input
         :prepend-icon="image"
         :style="{ color: color.text, fill: color.text }"
@@ -36,7 +43,10 @@
         {{ answer }}
       </div>
     </div>
-    <div v-show="noMsg === 2" class="errormsg">
+    <div
+      v-show="noMsg === 2"
+      class="errormsg"
+    >
       {{ msgText }}
     </div>
     <v-icon
@@ -57,16 +67,22 @@
       <div
         v-show="
           tooltipFrom.texts &&
-          tooltipFrom.texts.length === 0 &&
-          tooltipFrom.links.length === 0 &&
-          tooltipFrom.buttons.length === 0
+            tooltipFrom.texts.length === 0 &&
+            tooltipFrom.links.length === 0 &&
+            tooltipFrom.buttons.length === 0
         "
         class="id-tooltip"
       >
         {{ idTooltip }}
       </div>
-      <div v-if="tooltipFrom.texts" class="text-block-tooltip">
-        <p v-for="i in tooltipFrom.texts.length" :key="i + 'texts'">
+      <div
+        v-if="tooltipFrom.texts"
+        class="text-block-tooltip"
+      >
+        <p
+          v-for="i in tooltipFrom.texts.length"
+          :key="i + 'texts'"
+        >
           {{ checkTokenInTooltip(tooltipFrom.texts[i - 1]) }}
         </p>
       </div>
@@ -74,7 +90,10 @@
         v-show="tooltipFrom.links && tooltipFrom.links.length !== 0"
         class="white-space"
       />
-      <div v-if="tooltipFrom.links" class="link-block-tooltip">
+      <div
+        v-if="tooltipFrom.links"
+        class="link-block-tooltip"
+      >
         <a
           v-for="i in tooltipFrom.links.length"
           :key="i + 'links'"
@@ -106,7 +125,10 @@
         </button>
       </div>
     </div>
-    <div class="link-canvas" :class="{ linkCanvasShow: linkCanvasShow }">
+    <div
+      class="link-canvas"
+      :class="{ linkCanvasShow: linkCanvasShow }"
+    >
       <canvas ref="link" />
     </div>
   </div>

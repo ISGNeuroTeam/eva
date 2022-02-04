@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="active" width="500" persistent>
+  <v-dialog
+    v-model="active"
+    width="500"
+    persistent
+  >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
@@ -10,7 +14,10 @@
             Экспорт / Импорт
           </div>
         </v-card-text>
-        <div ref="blockExim" class="block-exim">
+        <div
+          ref="blockExim"
+          class="block-exim"
+        >
           <v-select
             v-model="selected"
             :prepend-icon="selectImg"

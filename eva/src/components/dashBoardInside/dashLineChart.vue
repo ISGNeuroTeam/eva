@@ -1,6 +1,12 @@
 <template>
-  <div ref="lineChart" class="graph-block">
-    <div v-if="props.nodata" class="nodata">
+  <div
+    ref="lineChart"
+    class="graph-block"
+  >
+    <div
+      v-if="props.nodata"
+      class="nodata"
+    >
       {{ props.message }}
     </div>
     <div
@@ -9,7 +15,10 @@
       class="dash-graph report-lineChart"
       :data-change="change"
     />
-    <div v-show="dataLoading" class="loading">
+    <div
+      v-show="dataLoading"
+      class="loading"
+    >
       <div class="preloader">
         <div class="stable" />
         <div class="dynamic" />

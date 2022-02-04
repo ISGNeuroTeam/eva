@@ -1,8 +1,16 @@
 <!-- Модальное окно для создания ИС -->
 
 <template>
-  <v-dialog :value="active" width="680" persistent @keydown="checkEsc($event)">
-    <v-card class="reports-card" :style="{ background: theme.$main_bg }">
+  <v-dialog
+    :value="active"
+    width="680"
+    persistent
+    @keydown="checkEsc($event)"
+  >
+    <v-card
+      class="reports-card"
+      :style="{ background: theme.$main_bg }"
+    >
       <div class="textarea-block">
         <div class="times-block">
           <div class="time-block">
@@ -28,7 +36,10 @@
               button-color="theme.$controls"
               class="dtpicker-report"
             >
-              <v-icon class="picker-report" :color="theme.$primary_button">
+              <v-icon
+                class="picker-report"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -56,7 +67,10 @@
               button-color="theme.$controls"
               class="dtpicker-report"
             >
-              <v-icon class="picker-report" :color="theme.$primary_button">
+              <v-icon
+                class="picker-report"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -71,9 +85,9 @@
                 border: `1px solid ${theme.$main_border}`,
               }"
             >
-              <v-expansion-panel-header
-                >Дополнительные параметры</v-expansion-panel-header
-              >
+              <v-expansion-panel-header>
+                Дополнительные параметры
+              </v-expansion-panel-header>
               <v-expansion-panel-content class="order-expansion">
                 <v-text-field
                   v-model="search.parametrs.timeout"

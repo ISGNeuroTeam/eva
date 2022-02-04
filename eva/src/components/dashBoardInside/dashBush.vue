@@ -8,16 +8,30 @@
       Ошибка формата входных данных
     </div>
     <div v-else>
-      <div v-if="dragRes" class="buttons-wrapper">
+      <div
+        v-if="dragRes"
+        class="buttons-wrapper"
+      >
         <v-icon :color="'white'">
           {{ icon.close }}
         </v-icon>
       </div>
-      <div v-else class="buttons-wrapper">
-        <v-icon v-if="isViewMode" :color="'white'" @click="clickViewMode">
+      <div
+        v-else
+        class="buttons-wrapper"
+      >
+        <v-icon
+          v-if="isViewMode"
+          :color="'white'"
+          @click="clickViewMode"
+        >
           {{ icon.move }}
         </v-icon>
-        <v-icon v-else :color="'white'" @click="clickEditorMode">
+        <v-icon
+          v-else
+          :color="'white'"
+          @click="clickEditorMode"
+        >
           {{ icon.pencil }}
         </v-icon>
       </div>
@@ -39,7 +53,7 @@ import { mdiClose, mdiCursorMove, mdiPencil } from '@mdi/js';
 yfile.License.value = licenseData; //проверка лицензии
 
 export default {
-  name: 'dashBush',
+  name: 'DashBush',
   props: {
     // переменные полученные от родителя
     idFrom: null, // id элемнета (table, graph-2)

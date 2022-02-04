@@ -11,15 +11,28 @@
         class="interesting-overflow-block"
         :style="{ color: theme.$main_text }"
       >
-        <div class="interesting-title">Interesting fields</div>
+        <div class="interesting-title">
+          Interesting fields
+        </div>
         <div
           class="interesting-overflow-block"
           :style="{ color: theme.$main_text }"
         >
-          <div v-for="item in rows" :key="item.id" class="interesting-row">
-            <v-menu offset-x :close-on-content-click="false">
+          <div
+            v-for="item in rows"
+            :key="item.id"
+            class="interesting-row"
+          >
+            <v-menu
+              offset-x
+              :close-on-content-click="false"
+            >
               <template v-slot:activator="{ on, attrs }">
-                <div v-bind="attrs" @click="openStatistic(item)" v-on="on">
+                <div
+                  v-bind="attrs"
+                  @click="openStatistic(item)"
+                  v-on="on"
+                >
                   <span class="interesting-row-name">{{ item.text }} </span>
                   <span class="interesting-row-number">{{
                     item.totalCount

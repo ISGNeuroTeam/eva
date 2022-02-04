@@ -23,8 +23,15 @@
           v-for="(value, title) in typedTitles"
           v-slot:[`header.${title}`]="{ header }"
         >
-          <v-menu :key="`${title + value}`" offset-y>
-            <v-menu z-index="100000" offset-y :close-on-content-click="false">
+          <v-menu
+            :key="`${title + value}`"
+            offset-y
+          >
+            <v-menu
+              z-index="100000"
+              offset-y
+              :close-on-content-click="false"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-icon
                   v-bind="attrs"
@@ -32,8 +39,9 @@
                   class="icon"
                   :color="theme.$main_border"
                   v-on="on"
-                  >{{ mdiMagnify }}</v-icon
                 >
+                  {{ mdiMagnify }}
+                </v-icon>
               </template>
               <v-row v-if="value !== 'string'">
                 <v-col cols="6">
@@ -41,13 +49,13 @@
                     :items="compare"
                     label="Знак"
                     @change="setFilterData(title, $event, 'compare')"
-                  ></v-select>
+                  />
                 </v-col>
                 <v-col cols="6">
                   <v-text-field
                     label="значение"
                     @change="setFilterData(title, $event)"
-                  ></v-text-field>
+                  />
                 </v-col>
               </v-row>
 
@@ -59,12 +67,15 @@
                       setFilterData(title, '=', 'compare');
                       setFilterData(title, $event);
                     "
-                  ></v-text-field>
+                  />
                 </v-col>
               </v-row>
             </v-menu>
           </v-menu>
-          <v-tooltip :key="value" bottom>
+          <v-tooltip
+            :key="value"
+            bottom
+          >
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
@@ -72,7 +83,10 @@
         </template>
       </v-data-table>
     </div>
-    <div v-show="props.nodata" class="no-data-table">
+    <div
+      v-show="props.nodata"
+      class="no-data-table"
+    >
       {{ props.message }}
     </div>
   </div>

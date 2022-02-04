@@ -4,9 +4,17 @@
     class="visualisation"
     :style="{ background: theme.$main_bg, color: theme.$main_text }"
   >
-    <v-menu v-model="menuDropdown" offset-y max-width="160" class="select">
+    <v-menu
+      v-model="menuDropdown"
+      offset-y
+      max-width="160"
+      class="select"
+    >
       <template v-slot:activator="{ on, attrs }">
-        <div v-bind="attrs" v-on="on">
+        <div
+          v-bind="attrs"
+          v-on="on"
+        >
           {{ aboutElem[activeElem].tooltip }}
           <v-icon>{{ mdiChevronDown }}</v-icon>
         </div>
@@ -19,7 +27,10 @@
           :color="theme.$accent_ui_color"
           @click="changeTab(i)"
         >
-          <template v-slot:activator="{ on }" class="p-5">
+          <template
+            v-slot:activator="{ on }"
+            class="p-5"
+          >
             <v-icon
               class="title-icon"
               :color="aboutElem[i].color"
@@ -34,7 +45,10 @@
       </div>
     </v-menu>
     <v-card-title class="title-vis">
-      <div class="divider-tab" :style="{ background: theme.$primary_button }" />
+      <div
+        class="divider-tab"
+        :style="{ background: theme.$primary_button }"
+      />
     </v-card-title>
 
     <v-card-text
@@ -42,19 +56,19 @@
       v-for="i in elements"
       v-show="aboutElem[i].show"
       :key="i"
-      :idFrom="i"
-      :colorFrom="theme"
-      :activeElemFrom="activeElem"
-      idDashFrom="reports"
-      :widthFrom="size.width"
-      :heightFrom="size.height"
-      :timeFormatFrom="''"
-      :sizeTileFrom="{ width: '', height: '' }"
-      :searchRep="true"
-      :tooltipFrom="tooltipSvg"
-      :shouldGet="shouldGet"
-      :dataReport="true"
-      :dataRestFrom="data"
+      :id-from="i"
+      :color-from="theme"
+      :active-elem-from="activeElem"
+      id-dash-from="reports"
+      :width-from="size.width"
+      :height-from="size.height"
+      :time-format-from="''"
+      :size-tile-from="{ width: '', height: '' }"
+      :search-rep="true"
+      :tooltip-from="tooltipSvg"
+      :should-get="shouldGet"
+      :data-report="true"
+      :data-rest-from="data"
     />
   </div>
 </template>

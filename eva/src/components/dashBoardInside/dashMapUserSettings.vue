@@ -1,6 +1,9 @@
 <template>
   <div class="med">
-    <v-container class="fill-height" style="align-items: normal">
+    <v-container
+      class="fill-height"
+      style="align-items: normal"
+    >
       <v-row class="ma-0">
         <v-btn
           rounded
@@ -19,7 +22,10 @@
           @change="updatePipeDataSource($event)"
         />
         <v-spacer />
-        <v-dialog v-model="dialog" max-width="390">
+        <v-dialog
+          v-model="dialog"
+          max-width="390"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               rounded
@@ -41,7 +47,10 @@
             >
               Настройки
               <v-spacer />
-              <a style="align-self: center" @click="dialog = false">
+              <a
+                style="align-self: center"
+                @click="dialog = false"
+              >
                 <svg
                   width="20"
                   height="20"
@@ -154,13 +163,17 @@
                     color="primary"
                     class="mt-3"
                     @click="onClickChoosingCoordinates"
-                    >Указать на карте</v-btn
                   >
+                    Указать на карте
+                  </v-btn>
                 </v-col>
               </v-row>
 
               <p>Легенда карты</p>
-              <v-checkbox v-model="options.showLegend" hide-details>
+              <v-checkbox
+                v-model="options.showLegend"
+                hide-details
+              >
                 <template v-slot:label>
                   <span :style="`color: ${theme.$secondary_text} !important`">
                     Включить отображение легенды
@@ -189,17 +202,24 @@
         align-content="end"
         class="mb-5 mr-0"
       >
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-card
           style="max-height: 466px"
           max-width="280"
           class="px-5 pb-5"
           :color="theme.$main_bg"
         >
-          <v-subheader style="color: white" class="px-0">
+          <v-subheader
+            style="color: white"
+            class="px-0"
+          >
             <v-row class="ma-0 fill-height">
               <v-col class="ma-0 pa-0 fill-height">
-                <v-row class="mt-5 mx-0 pa-0" justify="center" align="center">
+                <v-row
+                  class="mt-5 mx-0 pa-0"
+                  justify="center"
+                  align="center"
+                >
                   <svg
                     width="24"
                     height="24"
@@ -215,7 +235,11 @@
                     </g>
                     <defs>
                       <clipPath id="clip0">
-                        <rect width="24" height="24" fill="white" />
+                        <rect
+                          width="24"
+                          height="24"
+                          fill="white"
+                        />
                       </clipPath>
                     </defs>
                   </svg>
@@ -227,7 +251,10 @@
                     Легенда
                   </span>
                   <v-spacer />
-                  <a style="align-self: center" @click="closeLegend">
+                  <a
+                    style="align-self: center"
+                    @click="closeLegend"
+                  >
                     <svg
                       width="20"
                       height="20"
@@ -247,24 +274,33 @@
           </v-subheader>
           <v-divider
             style="margin-bottom: 10px; border: 1px solid #555454"
-          ></v-divider>
+          />
 
-          <v-card width="240" outlined>
+          <v-card
+            width="240"
+            outlined
+          >
             <v-list
               :style="`color: ${theme.$main_text} !important; max-height: 382px`"
               class="overflow-y-auto"
               :color="theme.$secondary_bg"
             >
-              <v-list-item v-for="item in library.objects" :key="item.name">
+              <v-list-item
+                v-for="item in library.objects"
+                :key="item.name"
+              >
                 <template v-if="item.image">
-                  <v-list-item-avatar size="20px" style="align-self: center">
-                    <v-img :src="base_svg_url + item.image"></v-img>
+                  <v-list-item-avatar
+                    size="20px"
+                    style="align-self: center"
+                  >
+                    <v-img :src="base_svg_url + item.image" />
                   </v-list-item-avatar>
 
                   <v-list-item-title
                     :style="`color: ${theme.$main_text} !important; text-align: left`"
                     v-text="item.name"
-                  ></v-list-item-title>
+                  />
                 </template>
 
                 <template v-else-if="item.background_color">
@@ -281,9 +317,15 @@
                 </template>
 
                 <template v-else>
-                  <v-list-item-avatar size="20px" style="align-self: center">
+                  <v-list-item-avatar
+                    size="20px"
+                    style="align-self: center"
+                  >
                     <div>
-                      <svg height="210" width="200">
+                      <svg
+                        height="210"
+                        width="200"
+                      >
                         <line
                           x1="0"
                           y1="0"

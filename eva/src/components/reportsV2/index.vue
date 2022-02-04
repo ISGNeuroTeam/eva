@@ -3,43 +3,65 @@
     class="reports-v2-app-main"
     :style="{ background: theme.$secondary_bg }"
   >
-    <header-top :inside="true" @setUsername="setUsername($event)" />
+    <header-top
+      :inside="true"
+      @setUsername="setUsername($event)"
+    />
     <v-content>
       <div class="main-container container-report">
-        <div ref="report" class="report2-block">
+        <div
+          ref="report"
+          class="report2-block"
+        >
           <newSearch
             class="new-search component-block"
             :data="data"
             :loading="loading"
             @launchSearch="launchSearch($event)"
-          ></newSearch>
+          />
           <timeline
             v-show="data.length > 0"
             class="timeline component-block"
             :data="data"
-            >111</timeline
           >
+            111
+          </timeline>
           <div class="tab-block component-block d-flex justify-content-between">
-            <v-tabs v-model="tab" class="tabs">
+            <v-tabs
+              v-model="tab"
+              class="tabs"
+            >
               <v-tab>События ({{ data.length }})</v-tab>
               <v-tab>Статистика</v-tab>
               <v-tab>Визуализация</v-tab>
             </v-tabs>
             <div class="d-flex">
-              <report :length="data.length"></report>
-              <download :data="data"></download>
+              <report :length="data.length" />
+              <download :data="data" />
             </div>
           </div>
           <keep-alive>
-            <v-row v-if="data.length > 0 && tab === 0" class="mb-0">
-              <v-col cols="2" class="pr-0">
+            <v-row
+              v-if="data.length > 0 && tab === 0"
+              class="mb-0"
+            >
+              <v-col
+                cols="2"
+                class="pr-0"
+              >
                 <intresting
                   class="intresting component-block"
                   :rows="rows"
-                ></intresting>
+                />
               </v-col>
-              <v-col cols="10" class="pl-0">
-                <events class="events component-block" :data="data"></events>
+              <v-col
+                cols="10"
+                class="pl-0"
+              >
+                <events
+                  class="events component-block"
+                  :data="data"
+                />
               </v-col>
             </v-row>
           </keep-alive>
@@ -49,23 +71,23 @@
               class="statistic component-block"
               :data="data"
               :size="size"
-            ></statistic>
+            />
           </keep-alive>
           <keep-alive>
             <visualisation
               v-if="tab === 2 && data.length > 0"
               class="visualisation component-block"
               :data="data"
-              :shouldGet="shouldGet"
-            ></visualisation>
+              :should-get="shouldGet"
+            />
           </keep-alive>
         </div>
       </div>
     </v-content>
     <footer-bottom />
     <modal-report
-      :modalFrom="modal"
-      :searchFrom="search"
+      :modal-from="modal"
+      :search-from="search"
       @cancelModal="cancelModal"
       @setSearch="setSearch($event)"
     />

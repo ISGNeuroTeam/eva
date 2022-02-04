@@ -1,9 +1,20 @@
 <template>
-  <div ref="container" class="dash-map">
-    <div v-if="error" class="error-message">
+  <div
+    ref="container"
+    class="dash-map"
+  >
+    <div
+      v-if="error"
+      class="error-message"
+    >
       {{ error }}
     </div>
-    <div v-if="!error" ref="map" class="mapContainer" :style="mapStyleSize" />
+    <div
+      v-if="!error"
+      ref="map"
+      class="mapContainer"
+      :style="mapStyleSize"
+    />
   </div>
 </template>
 

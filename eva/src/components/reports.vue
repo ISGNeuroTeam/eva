@@ -1,9 +1,18 @@
 <template>
-  <v-app class="reports-app-main" :style="{ background: theme.$secondary_bg }">
-    <header-top :inside="true" @setUsername="setUsername($event)" />
+  <v-app
+    class="reports-app-main"
+    :style="{ background: theme.$secondary_bg }"
+  >
+    <header-top
+      :inside="true"
+      @setUsername="setUsername($event)"
+    />
     <v-content>
       <v-container class="main-container container-report">
-        <div ref="report" class="report-block">
+        <div
+          ref="report"
+          class="report-block"
+        >
           <v-card
             class="static-block"
             :style="{ background: theme.$main_bg, color: theme.$main_text }"
@@ -36,7 +45,10 @@
               class="search-card-block"
               :style="{ background: theme.$main_bg, color: theme.$main_text }"
             >
-              <div class="loading-divider" :class="{ loading: loading }">
+              <div
+                class="loading-divider"
+                :class="{ loading: loading }"
+              >
                 <div
                   class="loading-bar"
                   :style="{ background: theme.$primary_button }"
@@ -58,8 +70,14 @@
                 placeholder="Введите запрос"
                 @keyup.ctrl.\="addLineBreaks"
               />
-              <router-link :to="{ path: '/reports' }" target="_blank">
-                <v-tooltip bottom :color="theme.$accent_ui_color">
+              <router-link
+                :to="{ path: '/reports' }"
+                target="_blank"
+              >
+                <v-tooltip
+                  bottom
+                  :color="theme.$accent_ui_color"
+                >
                   <template v-slot:activator="{ on }">
                     <v-btn
                       :color="theme.$primary_button"
@@ -78,7 +96,10 @@
                   <span>Открыть новое Исследование данных</span>
                 </v-tooltip>
               </router-link>
-              <v-tooltip bottom :color="theme.$accent_ui_color">
+              <v-tooltip
+                bottom
+                :color="theme.$accent_ui_color"
+              >
                 <template v-slot:activator="{ on }">
                   <v-btn
                     :color="theme.$primary_button"
@@ -97,7 +118,10 @@
                 </template>
                 <span>Запустить</span>
               </v-tooltip>
-              <v-tooltip bottom :color="theme.$accent_ui_color">
+              <v-tooltip
+                bottom
+                :color="theme.$accent_ui_color"
+              >
                 <template v-slot:activator="{ on }">
                   <v-btn
                     :color="theme.$primary_button"
@@ -153,23 +177,26 @@
                 v-for="i in elements"
                 v-show="aboutElem[i].show"
                 :key="i"
-                :idFrom="i"
-                :colorFrom="theme"
-                :activeElemFrom="activeElem"
-                idDashFrom="reports"
-                :widthFrom="size.width"
-                :heightFrom="size.height"
-                :timeFormatFrom="''"
-                :sizeTileFrom="{ width: '', height: '' }"
-                :searchRep="true"
-                :tooltipFrom="tooltipSvg"
-                :shouldGet="shouldGet"
-                :dataReport="true"
-                :dataRestFrom="data"
+                :id-from="i"
+                :color-from="theme"
+                :active-elem-from="activeElem"
+                id-dash-from="reports"
+                :width-from="size.width"
+                :height-from="size.height"
+                :time-format-from="''"
+                :size-tile-from="{ width: '', height: '' }"
+                :search-rep="true"
+                :tooltip-from="tooltipSvg"
+                :should-get="shouldGet"
+                :data-report="true"
+                :data-rest-from="data"
                 @SetRange="setRange($event)"
                 @ResetRange="resetRange($event)"
               />
-              <v-tooltip bottom :color="theme.$accent_ui_color">
+              <v-tooltip
+                bottom
+                :color="theme.$accent_ui_color"
+              >
                 <template v-slot:activator="{ on }">
                   <v-icon
                     v-show="unitedShow"
@@ -215,8 +242,8 @@
     </v-content>
     <footer-bottom />
     <modal-report
-      :modalFrom="modal"
-      :searchFrom="search"
+      :modal-from="modal"
+      :search-from="search"
       @cancelModal="cancelModal"
       @setSearch="setSearch($event)"
     />

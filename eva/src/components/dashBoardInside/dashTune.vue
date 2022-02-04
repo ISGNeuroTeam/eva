@@ -13,7 +13,7 @@
         label="Столбец данных"
         outlined
         class="mt-6"
-      ></v-select>
+      />
     </div>
     <div
       v-else
@@ -32,8 +32,7 @@
           :color="theme.$primary_button"
           ticks="always"
           @change="onChangeSlider"
-        >
-        </v-slider>
+        />
       </div>
       <div class="pt-4">
         <v-progress-circular

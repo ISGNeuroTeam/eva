@@ -16,7 +16,10 @@
             <p>{{ element }}</p>
           </div>
         </v-card-text>
-        <div ref="options" class="options-block">
+        <div
+          ref="options"
+          class="options-block"
+        >
           <div class="option-item">
             <v-switch
               v-model="openNewScreen"
@@ -66,7 +69,10 @@
                 :key="`${field.option}${prop}`"
                 class="option-item"
               >
-                <v-card-text v-if="field.group" class="headline">
+                <v-card-text
+                  v-if="field.group"
+                  class="headline"
+                >
                   <div
                     class="settings-title"
                     :style="{
@@ -102,7 +108,10 @@
                     v-text="prop"
                   />
                 </div>
-                <div v-if="!field.group" class="status-option item">
+                <div
+                  v-if="!field.group"
+                  class="status-option item"
+                >
                   <!-- elem: switch -->
                   <v-switch
                     v-if="field.elem === 'switch'"
@@ -171,8 +180,7 @@
                           field.onChange ? field.onChange(val) : null;
                         }
                       "
-                    >
-                    </v-checkbox>
+                    />
                   </div>
                   <!-- elem: radio-group -->
                   <v-radio-group
@@ -339,7 +347,7 @@
                 class="item-metric border"
                 hide-details
               />
-              <br />
+              <br>
               <div class="item-metric">
                 <div
                   class="discribe-option item"
@@ -358,7 +366,7 @@
                       type="color"
                       name="multiline-color"
                       @change="(e) => handleChangeColor(e, i - 1)"
-                    />
+                    >
                   </label>
                 </div>
               </div>
@@ -462,7 +470,10 @@
             </div>
           </div>
 
-          <div v-if="checkOptions('positionlegend')" class="option-item">
+          <div
+            v-if="checkOptions('positionlegend')"
+            class="option-item"
+          >
             <div
               class="name-option item"
               :style="{
@@ -496,7 +507,10 @@
             </div>
           </div>
 
-          <div v-if="checkOptions('primitivesLibrary')" class="option-item">
+          <div
+            v-if="checkOptions('primitivesLibrary')"
+            class="option-item"
+          >
             <v-container fluid>
               <v-card-text class="headline">
                 <div
@@ -532,7 +546,7 @@
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
-              ></v-textarea>
+              />
               <v-btn
                 v-if="primitivesLibraryAutoGrow"
                 plain
@@ -546,7 +560,10 @@
               </v-btn>
             </v-container>
           </div>
-          <v-card-text v-if="checkOptions('piechartSettings')" class="headline">
+          <v-card-text
+            v-if="checkOptions('piechartSettings')"
+            class="headline"
+          >
             <div
               class="settings-title"
               :style="{
@@ -651,17 +668,21 @@
               <v-btn
                 v-if="
                   !defaultThemes.includes(colorsPie.theme) &&
-                  colorsPie.theme !== 'custom'
+                    colorsPie.theme !== 'custom'
                 "
                 :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
-                >Удалить</v-btn
               >
+                Удалить
+              </v-btn>
             </div>
           </div>
         </div>
-        <v-card-text v-if="tooltipSettingShow" class="headline">
+        <v-card-text
+          v-if="tooltipSettingShow"
+          class="headline"
+        >
           <div
             class="settings-title"
             :style="{
@@ -672,7 +693,11 @@
             Настройки tooltip
           </div>
         </v-card-text>
-        <div v-if="tooltipSettingShow" ref="options" class="options-block">
+        <div
+          v-if="tooltipSettingShow"
+          ref="options"
+          class="options-block"
+        >
           <div
             class="divider-tooltip-setting"
             :style="{ color: theme.$main_text }"

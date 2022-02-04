@@ -1,7 +1,13 @@
 <template>
   <div class="dash-barchart-block">
-    <div class="dash-barchart" :data-status="change">
-      <p v-if="nodata" class="nodata">
+    <div
+      class="dash-barchart"
+      :data-status="change"
+    >
+      <p
+        v-if="nodata"
+        class="nodata"
+      >
         {{ nodataText }}
       </p>
     </div>

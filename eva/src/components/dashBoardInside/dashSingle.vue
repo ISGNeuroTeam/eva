@@ -1,22 +1,38 @@
 <template>
-  <div ref="single" class="dash-single" @click="setClick">
+  <div
+    ref="single"
+    class="dash-single"
+    @click="setClick"
+  >
     <v-card
       v-show="!noMsg"
       class="number-block"
       outlined
       :loading="dataLoading"
-      :lookSize="changeSize"
+      :look-size="changeSize"
     >
-      <div class="number" :style="{ fontSize: `${fontSize}px` }">
-        <div class="number-itself" :style="{ color: 'var(--accent_ui_color)' }">
+      <div
+        class="number"
+        :style="{ fontSize: `${fontSize}px` }"
+      >
+        <div
+          class="number-itself"
+          :style="{ color: 'var(--accent_ui_color)' }"
+        >
           {{ number }}
         </div>
-        <div class="number-sub" :style="{ color: 'var(--primary_button)' }">
+        <div
+          class="number-sub"
+          :style="{ color: 'var(--primary_button)' }"
+        >
           {{ subnumber }}
         </div>
       </div>
     </v-card>
-    <div v-show="noMsg" class="errormsg">
+    <div
+      v-show="noMsg"
+      class="errormsg"
+    >
       {{ msgText }}
     </div>
   </div>

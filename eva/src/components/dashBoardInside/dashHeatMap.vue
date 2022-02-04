@@ -1,6 +1,11 @@
 <template>
   <div class="heatmap-container px-0">
-    <v-simple-table dense fixed-header class="heatmap-table" height="100%">
+    <v-simple-table
+      dense
+      fixed-header
+      class="heatmap-table"
+      height="100%"
+    >
       <template v-slot:default>
         <thead>
           <tr>
@@ -15,20 +20,38 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="x in filteredX" :key="x">
-            <td class="text-left" @click="onClickTd(x)">
-              <v-menu open-on-hover top offset-y>
+          <tr
+            v-for="x in filteredX"
+            :key="x"
+          >
+            <td
+              class="text-left"
+              @click="onClickTd(x)"
+            >
+              <v-menu
+                open-on-hover
+                top
+                offset-y
+              >
                 <template v-slot:activator="{ on, attrs }">
-                  <span v-bind="attrs" v-on="on">
+                  <span
+                    v-bind="attrs"
+                    v-on="on"
+                  >
                     {{ x }}
                   </span>
                 </template>
 
                 <v-list>
-                  <v-list-item v-for="(item, index) in ['Детали']" :key="index">
-                    <v-list-item-title style="color: black"
-                      ><a @click="setClick(x)">{{ item }}</a></v-list-item-title
+                  <v-list-item
+                    v-for="(item, index) in ['Детали']"
+                    :key="index"
+                  >
+                    <v-list-item-title
+                      style="color: black"
                     >
+                      <a @click="setClick(x)">{{ item }}</a>
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -71,7 +94,7 @@
 import DashHeatMapLinear from './dashHeatMapLinear.vue';
 
 export default {
-  name: 'heatmap',
+  name: 'Heatmap',
   components: { DashHeatMapLinear },
   props: {
     dataRestFrom: Array,
