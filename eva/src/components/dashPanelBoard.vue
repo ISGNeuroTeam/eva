@@ -109,7 +109,7 @@
             <span>Открыть настройки фильтров</span>
           </v-tooltip>
           <v-tooltip
-            v-if="editPermission"
+            v-if="editPermission || isEditDash"
             bottom
             :color="theme.$accent_ui_color"
           >
@@ -126,7 +126,7 @@
             <span>Открыть настройки дашборда</span>
           </v-tooltip>
           <v-tooltip
-            v-if="editPermission"
+            v-if="editPermission || isEditDash"
             bottom
             :color="theme.$accent_ui_color"
           >
@@ -256,7 +256,11 @@
               :class="{ loading: search.status === 'pending' }"
             />
           </div>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-play"
@@ -269,7 +273,11 @@
             </template>
             <span>Запустить ИД</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-pencil"
@@ -282,7 +290,11 @@
             </template>
             <span>Редактировать ИД</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -295,7 +307,11 @@
             </template>
             <span>Планировщик</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -309,7 +325,11 @@
             </template>
             <span>Экспортировать ИД</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -322,7 +342,11 @@
             </template>
             <span>Создать отчет</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            z-index="99"
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-trash"
@@ -759,7 +783,7 @@
       <dash-filter-panel
         :permissions-from="userPermissions"
         :idDashFrom="idDashFrom"
-        :editPermission="editPermission"
+        :editPermission="editPermission || isEditDash"
         :editMode="editMode"
       >
       </dash-filter-panel>
@@ -769,34 +793,34 @@
 
 <script>
 import {
-  mdiPlusBox,
-  mdiDoor,
-  mdiCompare,
-  mdiScriptTextOutline,
-  mdiAnimationPlay,
-  mdiUndoVariant,
+  mdiAccount,
   mdiAccountEdit,
-  mdiPlay,
+  mdiAnimationPlay,
+  mdiArrowDownBold,
+  mdiCheckBold,
+  mdiClockOutline,
+  mdiCodeTags,
+  mdiCompare,
+  mdiContentSave,
+  mdiDatabase,
+  mdiDoor,
   mdiEye,
   mdiFileDocumentOutline,
-  mdiArrowDownBold,
-  mdiContentSave,
-  mdiAccount,
-  mdiHomeVariantOutline,
-  mdiSettings,
-  mdiHelpCircleOutline,
-  mdiClockOutline,
-  mdiDatabase,
-  mdiTableEdit,
-  mdiCodeTags,
-  mdiTrashCanOutline,
-  mdiMinusBox,
-  mdiToolbox,
-  mdiPencil,
-  mdiVariable,
-  mdiCheckBold,
-  mdiSwapVerticalBold,
   mdiFilter,
+  mdiHelpCircleOutline,
+  mdiHomeVariantOutline,
+  mdiMinusBox,
+  mdiPencil,
+  mdiPlay,
+  mdiPlusBox,
+  mdiScriptTextOutline,
+  mdiSettings,
+  mdiSwapVerticalBold,
+  mdiTableEdit,
+  mdiToolbox,
+  mdiTrashCanOutline,
+  mdiUndoVariant,
+  mdiVariable,
 } from '@mdi/js';
 import EvaLogo from '../images/eva-logo.svg';
 
@@ -828,7 +852,7 @@ export default {
       tocken_elem: false,
       profile_elem: false,
       save_elem: false,
-      editMode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
+      editMode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       code_elem: false,
       check: mdiCheckBold,
       look: mdiEye,
@@ -942,20 +966,20 @@ export default {
       modalPaper: false,
       userPermissions: [],
       screenHeight: this.getScreenHeight(),
+      allGroups: [],
     };
   },
   computed: {
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-
     headerTop() {
       return document.body.clientWidth <= 1400 ? 40 : 50;
     },
     isAdmin() {
       return this.userPermissions && this.userPermissions.includes('admin_all');
     },
-    searches: function () {
+    searches() {
       // массив со всеми ИС на странице
       let searchesRes = [];
       if (this.idDash) {
@@ -967,29 +991,25 @@ export default {
       }
       return searchesRes;
     },
-    name: function () {
+    name() {
       return this.$store.getters.getName(this.idDash);
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    editPermission: function () {
-      if (
-        this.userPermissions.includes('admin_all') ||
-        this.userPermissions.includes('editdash')
-      ) {
-        return true;
-      }
-      return false;
+    editPermission() {
+      return this.userPermissions.includes('admin_all') ||
+        this.userPermissions.includes('editdash');
+
     },
-    textareaEv: function () {
+    textareaEv() {
       let eventFull = this.$store.getters.getEventFull(this.idDash);
-      if (eventFull != '') {
-        this.textarea_event = eventFull;
+      if (eventFull !== '') {
+        this.setTextarea_event(eventFull);
       }
       return true;
     },
-    tockens: function () {
+    tockens() {
       // получения всех токенов на страницы
       let tockens = this.$store.getters.getTockens(this.idDash);
 
@@ -999,30 +1019,28 @@ export default {
       });
       return tockens;
     },
-    elements: function () {
+    elements() {
       // получение всех элемнета на странице
       return this.$store.getters.getElements(this.idDash);
     },
-    actions: function () {
+    actions() {
       // получение всех событий элемента на странице
       return function (element) {
-        let names = this.$store.getters
+        return this.$store.getters
           .getActions({ elem: element, idDash: this.idDash })
           .map((item) => {
             return item.name;
           });
-        return names;
       };
     },
-    capture: function () {
+    capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
       return function (element) {
-        let capture = this.$store.getters.getCapture({
+        return this.$store.getters.getCapture({
           elem: element.elem,
           action: element.action,
           idDash: this.idDash,
         });
-        return capture;
       };
     },
     blockToolStyle() {
@@ -1032,9 +1050,16 @@ export default {
         'max-height': this.screenHeight + 'px',
       };
     },
+    isEditDash() {
+      return !!this.allGroups.find(
+        (group) =>
+          group.dashs.includes(this.name) && group.users.includes(this.login)
+      );
+    },
   },
   mounted() {
     this.getCookie();
+    this.getGroups();
     this.tools = settings.tools;
 
     document.onmouseup = (event) => {
@@ -1055,7 +1080,7 @@ export default {
       }
     };
     let eventFull = this.$store.getters.getEventFull(this.idDash);
-    if (eventFull != '') {
+    if (eventFull !== '') {
       this.textarea_event = eventFull;
     }
     if (document.querySelector('.block-code')) {
@@ -1075,6 +1100,15 @@ export default {
     window.removeEventListener('resize', this.updateScreenHeight);
   },
   methods: {
+    setTextarea_event(eventFull) {
+      this.textarea_event = eventFull;
+    },
+    getGroups: function () {
+      let response = this.$store.getters.getGroups();
+      response.then((res) => {
+        this.allGroups = res;
+      });
+    },
     exit: function () {
       document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
       document.cookie = `eva_token=''; max-age=0 ; path=/`;
@@ -1138,11 +1172,13 @@ export default {
         // я так понимаю если на странице есть созданные ИС
         Object.keys(this.change).forEach((item) => {
           // то пробегаемся по всем ИС
-          item == id ? (this.change[item] = true) : (this.change[item] = false); // если нашли выбронный ИС то меняем его статус
+          item === id
+            ? (this.change[item] = true)
+            : (this.change[item] = false); // если нашли выбронный ИС то меняем его статус
         });
         let search = this.searches.filter((item) => {
           // получаем только тот ИС который редактируется
-          return item.sid == id;
+          return item.sid === id;
         })[0];
         // отстутствие отступов сделано специально  чтобы красивее смотрелось на фронте
         this.newSearch = Object.assign({}, search);
@@ -1346,12 +1382,12 @@ export default {
 
       this.tockens.forEach((item, i) => {
         // затем пробегаемся по все мтокенам
-        if (item.name == this.tempTocken.name) {
+        if (item.name === this.tempTocken.name) {
           // и смотрим есть ли у нас такой токен
           j = i;
         }
       });
-      if (j != -1 || Number.isInteger(index)) {
+      if (j !== -1 || Number.isInteger(index)) {
         // если токен уже есть
         let height = this.$el
           .querySelector('.block-tocken')
@@ -1416,10 +1452,10 @@ export default {
     yesSearch: function () {
       // кнопка согласия на обновления если ИС или токен уже существует
       let elem =
-        event.target.nodeName.toLowerCase() != 'button'
+        event.target.nodeName.toLowerCase() !== 'button'
           ? event.target.parentElement
           : event.target; // сперва берем родителя кнопки, и если не получилось поймать кнопку, то еще выше уровнеь берем
-      if (elem.getAttribute('tool') == 'search') {
+      if (elem.getAttribute('tool') === 'search') {
         // если это окно ИС
         this.$store.commit('setSearch', {
           search: this.newSearch,
@@ -1430,7 +1466,7 @@ export default {
           .querySelector('.warning-block')
           .classList.remove('warning-block-show'); // убираем окно с предпреждением
         this.openSearch();
-      } else if (elem.getAttribute('tool') == 'tocken') {
+      } else if (elem.getAttribute('tool') === 'tocken') {
         // если это токен - собственно тоже самое
         const id = this.index;
         const newName = this.tempTocken.name;
@@ -1544,13 +1580,13 @@ export default {
     dragTool: function (event) {
       // функция для перетаскивания нового элемнета на полотно (остальную область, ну вы поняли короче)
 
-      if (event.which != 1) {
+      if (event.which !== 1) {
         // если пошло что-то не так
         return; // то прекращаем функцию
       }
       let parent = '';
       let elem = '';
-      if (event.target.nodeName != 'div') {
+      if (event.target.nodeName !== 'div') {
         // если мы ухватились не за div
         elem = event.target;
         while (!elem.classList.contains('tool-one')) {
@@ -1646,7 +1682,7 @@ export default {
       let size = {},
         header;
       screen.width > 1400 ? (header = 50) : (header = 40);
-      action == 'size' ? (header = 0) : false;
+      action === 'size' ? (header = 0) : false;
       size.vert = Math.round(left / step.vert);
       //size.vert = leftCoord*step.vert;
       size.hor = Math.round((top - header) / step.hor);
@@ -1664,7 +1700,7 @@ export default {
       if (size.left + size.width > clientWidth) {
         result.left = clientWidth - size.width - 20;
       } else {
-        if (result.left == 0) {
+        if (result.left === 0) {
           result.left = size.left;
         }
       }
@@ -1681,14 +1717,14 @@ export default {
     openSettings: function () {
       this.$emit('openSettings');
 
-      if (this.colorGear == 'controlsActive') {
+      if (this.colorGear === 'controlsActive') {
         this.colorGear = 'controls';
       } else {
         this.colorGear = 'controlsActive';
       }
     },
     openExim: function () {
-      if (this.colorExim == 'controlsActive') {
+      if (this.colorExim === 'controlsActive') {
         this.colorExim = 'controls';
       } else {
         this.colorExim = 'controlsActive';
@@ -1696,15 +1732,15 @@ export default {
       this.openexim = !this.openexim;
     },
     setEvents: function () {
-      if (this.textarea_event != null && this.textarea_event != '') {
+      if (this.textarea_event !== null && this.textarea_event !== '') {
         let events = this.textarea_event.split('\n');
         let reg, body, bodyArray, element, doing, originItem;
 
-        if (events.length != 0) {
+        if (events.length !== 0) {
           events.forEach((item) => {
             originItem = item;
             item = item.replace(/\s/g, '');
-            if (item != '') {
+            if (item !== '') {
               reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
               this.$set(
                 this.event,
@@ -1716,13 +1752,13 @@ export default {
               body = body.slice(1, body.length - 1);
               bodyArray = body.split(',');
               bodyArray.forEach((elem, i) => {
-                if (elem.indexOf('(') != -1) {
+                if (elem.indexOf('(') !== -1) {
                   element = bodyArray.splice(0, i);
                 }
               });
 
-              if (this.event.event == 'OnDataCompare') {
-                if (element.length > 2 && element[1].indexOf('[') == -1) {
+              if (this.event.event === 'OnDataCompare') {
+                if (element.length > 2 && element[1].indexOf('[') === -1) {
                   this.$set(this.event, 'compare', element[0]);
                   this.$set(this.event, 'column', element[1]);
                   this.$set(
@@ -1738,7 +1774,7 @@ export default {
                     element.splice(1, element.length - 1).join(',')
                   );
                 }
-              } else if (this.event.event == 'OnTokenCompare') {
+              } else if (this.event.event === 'OnTokenCompare') {
                 this.$set(this.event, 'compare', element[0]);
                 this.$set(this.event, 'token', element[1]);
                 this.$set(
@@ -1746,13 +1782,13 @@ export default {
                   'tokenval',
                   element.splice(2, element.length - 1).join(',')
                 );
-              } else if (this.event.event == 'onValueCompare') {
-                if (element.length == 2) {
+              } else if (this.event.event === 'onValueCompare') {
+                if (element.length === 2) {
                   this.$set(this.event, 'treshold', element[0]);
                   this.$set(this.event, 'color', element[1]);
                 } else {
                   for (let i = 0; i < element.length; i++) {
-                    if (element[i].indexOf(']') != -1) {
+                    if (element[i].indexOf(']') !== -1) {
                       this.$set(
                         this.event,
                         'treshold',
@@ -1770,10 +1806,10 @@ export default {
               } else {
                 this.$set(this.event, 'element', element[0]); //click
                 if (element[1]) {
-                  if (element[1].indexOf('[') != -1) {
+                  if (element[1].indexOf('[') !== -1) {
                     let j = -1;
                     element.forEach((item, i) => {
-                      if (item.indexOf(']') != -1) {
+                      if (item.indexOf(']') !== -1) {
                         j = i;
                       }
                     });
@@ -1793,13 +1829,13 @@ export default {
               doing = reg.exec(body)[0];
               doing = doing.split('(');
               this.$set(this.event, 'action', doing[0]);
-              if (doing[0].toLowerCase() == 'set'.toLowerCase()) {
+              if (doing[0].toLowerCase() === 'set'.toLowerCase()) {
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
                 this.$set(this.event, 'target', doing[0]);
                 doing.splice(0, 1);
                 doing = doing.join(',');
-                if (doing.indexOf('[') != -1 && doing.indexOf(']') != -1) {
+                if (doing.indexOf('[') !== -1 && doing.indexOf(']') !== -1) {
                   doing = doing.match(/[^\[]+(?=\])/g);
                 } else {
                   doing = doing.split(',');
@@ -1816,13 +1852,13 @@ export default {
                     this.$set(this.event, 'value', ['']);
                   }
                 }
-              } else if (doing[0].toLowerCase() == 'go'.toLowerCase()) {
+              } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
                 ///go
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
                 this.$set(this.event, 'target', doing[0]);
 
                 let prop, value;
-                if (doing[1].indexOf('[') != -1) {
+                if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
                   doing = doing.match(/[^\[]+(?=\])/g);
@@ -1835,7 +1871,7 @@ export default {
                 this.$set(this.event, 'prop', prop);
                 this.$set(this.event, 'tab', doing[2]);
                 this.$set(this.event, 'value', value);
-              } else if (doing[0].toLowerCase() == 'open'.toLowerCase()) {
+              } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
                 //open
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
@@ -1848,14 +1884,14 @@ export default {
 
                 this.$set(this.event, 'header', doing[5]);
               } else if (
-                doing[0].toLowerCase() == 'changeReport'.toLowerCase()
+                doing[0].toLowerCase() === 'changeReport'.toLowerCase()
               ) {
                 // changeReport
 
                 doing = originItem.split(doing[0])[1];
                 doing = doing.replace(/\(/g, '').replace(/\)/g, '').split(',');
                 this.$set(this.event, 'sid', doing[0]);
-                if (doing[1].indexOf('[') != -1) {
+                if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   let files = doing.map((item) => {
                     return item.replace('[', '').replace(']', '');
@@ -1865,7 +1901,7 @@ export default {
                   this.$set(this.event, 'file', [doing[1]]);
                 }
               } else if (
-                doing[0].toLowerCase() == 'exportSearch'.toLowerCase()
+                doing[0].toLowerCase() === 'exportSearch'.toLowerCase()
               ) {
                 // changeReport
 
@@ -1905,7 +1941,7 @@ export default {
     },
 
     changeColor: function () {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
+      if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
           item.style.background = this.theme.back;
@@ -1922,7 +1958,7 @@ export default {
       });
       response.then((res) => {
         this.errorSave = true;
-        if (res.status == 200) {
+        if (res.status === 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
           this.$store.auth.getters.putLog(
