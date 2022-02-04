@@ -87,7 +87,7 @@ export default {
     elements() {
       this.$store.getters.getReportElement.forEach((item, i) => {
         this.$set(this.aboutElem, item, {});
-        if (i == 0) {
+        if (i === 0) {
           this.$set(this.aboutElem[item], 'show', true);
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         } else {
@@ -102,7 +102,7 @@ export default {
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
       });
-      this.activeElem = 'table';
+      this.setActiveElem('table');
       return this.$store.getters.getReportElement;
     },
   },
@@ -110,18 +110,17 @@ export default {
     this.calcSize();
   },
   methods: {
+    setActiveElem(item) {
+      this.activeElem = item;
+    },
     changeTab(elem) {
-      if (elem == 'multiLine') {
-        this.unitedShow = true;
-      } else {
-        this.unitedShow = false;
-      }
+      this.unitedShow = elem === 'multiLine';
       Object.keys(this.aboutElem).forEach((item) => {
-        if (item != elem) {
+        if (item !== elem) {
           this.$set(this.aboutElem[item], 'show', false);
           this.$set(this.aboutElem[item], 'color', this.theme.text);
         } else {
-          this.activeElem = item;
+          this.setActiveElem(item);
           this.$set(this.aboutElem[item], 'show', true);
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         }
