@@ -1,7 +1,13 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog v-model="active" width="550" persistent @keydown="checkEsc($event)">
+  <modal-persistent
+    v-model="active"
+    width="550"
+    :theme="theme"
+    :is-confirm="false"
+    @cancelModal="cancelModal"
+  >
     <div class="delete-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
@@ -34,42 +40,49 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalDeleteFromMain',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    modalFrom: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     nameFrom: null,
   },
   data() {
     return {};
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    active: function () {
-      // тут понимаем нужно ли открыть окно с созданием или нет
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
-    name: function () {
+    name() {
       return this.nameFrom;
     },
   },
   methods: {
-    deleteBtn: function () {
+    deleteBtn() {
       this.$emit('deleteElem');
     },
-    cancelModal: function () {
+    cancelModal() {
       // есл инажали на отмену создания
-      this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
-    },
-    checkEsc: function (event) {
-      if (event.code == 'Escape') {
-        this.cancelModal();
-      }
+      this.active = false; // передаем в родителя чтобы выключили модалку
     },
     // changeStyle: function() {
     //   if (this.active) {

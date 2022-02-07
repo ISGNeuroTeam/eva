@@ -60,17 +60,14 @@ export default {
       default: false,
     },
   },
-  data() {
-    return {
-      confirmModal: false,
-    };
-  },
-  watch: {
-    modalValue(val) {
-      this.confirmModal = val;
-    },
-    confirmModal(val) {
-      this.$emit('updateModalValue', val);
+  computed: {
+    confirmModal: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
   },
   methods: {

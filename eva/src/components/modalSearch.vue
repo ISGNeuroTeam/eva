@@ -1,7 +1,13 @@
 <!-- Модальное окно для выбора ИД -->
 
 <template>
-  <v-dialog v-model="active" width="500" persistent>
+  <modal-persistent
+    v-model="active"
+    width="500"
+    persistent
+    :theme="theme"
+    @cancelModal="cancelModal"
+  >
     <v-card
       :style="{
         background: theme.$main_bg,
@@ -58,11 +64,12 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalSearch',
   props: {
     idDashFrom: null,
   },
@@ -72,19 +79,25 @@ export default {
     };
   },
   computed: {
-    idDash: function () {
+    idDash() {
       // получаем название элемнета от родителя
       return this.idDashFrom;
     },
-    active: function () {
-      // получаем статус открытия или нет окна модального
-      let active = 'false';
-      if (this.idDash) {
-        active = this.$store.getters.getModalSearch(this.idDash);
-      }
-      return active;
+    active: {
+      get() {
+        if (this.idDash) {
+          return this.$store.getters.getModalSearch(this.idDash);
+        }
+        return false;
+      },
+      set(value) {
+        this.$store.commit('setModalSearch', {
+          id: this.idDash,
+          status: value,
+        });
+      },
     },
-    searches: function () {
+    searches() {
       // получаем все ИС на странице
       let searches = [];
       if (this.idDash) {
@@ -92,7 +105,7 @@ export default {
       }
       return searches;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
@@ -100,9 +113,9 @@ export default {
     this.$store.commit('setModalSearch', { id: this.idDash, status: false }); // при создании окна на странице выключаем все открытые ранее окна
   },
   methods: {
-    startDS: function () {
+    startDS() {
       //  если нажали на кнопку согласия
-      if (this.currentId != 0) {
+      if (this.currentId !== 0) {
         // проверяем выбран ли хоть один ИС
         this.$store.commit('setDataSource', {
           id: this.idDash,
@@ -114,11 +127,11 @@ export default {
         }); // закрываем окно
       }
     },
-    cancelModal: function () {
+    cancelModal() {
       // если нажали отмену
       this.$store.commit('setModalSearch', { id: this.idDash, status: false }); // просто закрываем окно
     },
-    selectSearch: function (event, search) {
+    selectSearch(event, search) {
       // функция для выбора одного элемента из списка
       let elem = event.target.parentElement; // получаем родителя в котором находятся все элементы
       elem.parentElement.childNodes.forEach((item) => {
@@ -128,7 +141,7 @@ export default {
       this.currentId = search.sid; // затем получаем текст всего ИС который выбрали
       elem.style = `box-shadow: 0px 0px 4px 3px  ${this.theme.$accent_ui_color}`; // и делаем ему обводку
     },
-    checkSid: function (sid) {
+    checkSid(sid) {
       let newSid = sid;
       if (sid.length > 5) {
         // если там больше 10 символов

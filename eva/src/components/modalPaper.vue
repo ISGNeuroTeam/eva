@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="active" width="500" persistent>
+  <modal-persistent
+    v-model="active"
+    width="500"
+    :theme="theme"
+    @cancelModal="cancelModal"
+  >
     <div ref="paperBlock" class="paper-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
@@ -54,15 +59,23 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiSettings } from '@mdi/js';
 
 export default {
+  name: 'ModalPaper',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    active: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     sid: null,
     idDash: null,
   },
@@ -78,12 +91,20 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    active: function () {
+    active() {
       if (this.active) {
         this.getAllPapers();
         this.getData();
@@ -91,19 +112,19 @@ export default {
     },
   },
   methods: {
-    cancelModal: function () {
+    cancelModal() {
       this.selectedFile = '';
       this.data = [];
-      this.$emit('cancelModal');
+      this.active = false;
     },
-    startPaper: async function () {
-      if (this.selectedFile == '') {
+    async startPaper() {
+      if (this.selectedFile === '') {
         this.message('Выберит файл');
       } else {
-        this.getPaper();
+        await this.getPaper();
       }
     },
-    downloadFile: function (fileLink) {
+    downloadFile(fileLink) {
       let namefile = fileLink.split('/')[2];
       let link = this.$refs.paperBlock.appendChild(document.createElement('a')); // создаем ссылку
       link.setAttribute('href', `/${fileLink}`); // указываем ссылке что надо скачать наш файл csv
@@ -111,7 +132,7 @@ export default {
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
-    getPaper: async function () {
+    async getPaper() {
       this.loadingShow = true;
 
       let formData = new FormData();
@@ -119,7 +140,7 @@ export default {
       formData.append('data', JSON.stringify(this.data));
       let result = await this.$store.getters.getPaper(formData);
       try {
-        if (result.status == 'success') {
+        if (result.status === 'success') {
           this.downloadFile(result.file);
           this.loadingShow = false;
           //this.showError = false;
@@ -134,10 +155,10 @@ export default {
         this.loadingShow = false;
       }
     },
-    getAllPapers: async function () {
+    async getAllPapers() {
       let result = await this.$store.getters.getAllPaper();
       try {
-        if (JSON.parse(result).status == 'success') {
+        if (JSON.parse(result).status === 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
@@ -149,15 +170,15 @@ export default {
         this.message(`Ошибка: ${error}`);
       }
     },
-    message: function (text) {
+    message(text) {
       this.errorMsg = text;
       this.showError = true;
       setTimeout(() => {
         this.showError = false;
       }, 2000);
     },
-    changeColor: function () {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
+    changeColor() {
+      if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
           item.style.background = this.color.back;
@@ -166,7 +187,7 @@ export default {
         });
       }
     },
-    getData: function () {
+    getData() {
       let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
       }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
@@ -178,7 +199,7 @@ export default {
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
 
-        if (event.data.length != 0) {
+        if (event.data.length !== 0) {
           this.data = event.data;
         } else {
           this.errorMsg = 'Получить данные для отчета не удалось.';
@@ -190,7 +211,7 @@ export default {
 
       worker.postMessage(`${this.idDash}-${this.sid}`); // запускаем воркер на выполнение
     },
-    getDataFromDb: function () {
+    getDataFromDb() {
       return function (event) {
         let db = null;
 
@@ -210,13 +231,13 @@ export default {
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
             console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -226,7 +247,7 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции

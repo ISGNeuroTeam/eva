@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="showModal" persistent width="400px">
+  <modal-persistent
+    v-model="showModal"
+    width="400"
+    :theme="theme"
+    @cancelModal="closeModal"
+  >
     <div class="themes-modal-wrapper">
       <v-card
         :style="{ backgroundColor: theme.$secondary_bg, borderRadius: '12px' }"
@@ -279,7 +284,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -292,8 +297,16 @@ import {
 } from '@mdi/js';
 
 export default {
+  name: 'ModalThemes',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    show: Boolean,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     admin: Boolean,
   },
   data() {
@@ -365,15 +378,20 @@ export default {
     };
   },
   computed: {
-    showModal() {
-      return this.show;
+    showModal: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    select: async function (selectedTheme) {
+    async select(selectedTheme) {
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         let response = await fetch(`/api/theme?themeName=${selectedTheme}`);
         let themeData = await response.json();
@@ -393,7 +411,7 @@ export default {
       this.fields.forEach((field) => (field.value = '#8F8F9C'));
     },
     closeModal() {
-      this.$emit('closeModal');
+      this.showModal = false;
       this.toSelectMode();
     },
     toSelectMode() {

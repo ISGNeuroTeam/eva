@@ -1,10 +1,10 @@
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="680"
-    persistent
+    :theme="theme"
     :color="theme.$main_text"
-    @keydown.esc="cancelModal"
+    @cancelModal="cancelModal"
   >
     <v-card
       :style="{ background: theme.$main_bg, color: theme.$main_text }"
@@ -106,7 +106,7 @@
               }"
             >
               <v-expansion-panel-header
-                >Дополнительные параметры</v-expansion-panel-header
+              >Дополнительные параметры</v-expansion-panel-header
               >
               <v-expansion-panel-content class="order-expansion">
                 <v-text-field
@@ -187,16 +187,21 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
+  name: 'ModalCreateSearch',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
     idDashFrom: null,
-    modalFrom: null,
+    modalValue: null,
     dataSearchFrom: null,
     createBtnFrom: null,
   },
@@ -228,7 +233,27 @@ export default {
     };
   },
   computed: {
-    active: function () {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
+    dataSearch() {
+      return this.dataSearchFrom;
+    },
+    idDash() {
+      // получаем id страницы переданного от родителя
+      return this.idDashFrom;
+    },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
         this.search = this.dataSearch;
@@ -239,27 +264,14 @@ export default {
           this.createBtn = 'Создать';
         }
       }
-      return this.modalFrom;
     },
-    dataSearch: function () {
-      return this.dataSearchFrom;
-    },
-    idDash: function () {
-      // получаем id страницы переданного от родителя
-      return this.idDashFrom;
-    },
-    theme: function () {
-      return this.$store.getters.getTheme;
-    },
-  },
-  watch: {
     dataSearchFrom() {
       this.currentSid = this.dataSearchFrom?.sid;
     },
-    tws: function () {
+    tws() {
       this.search.parametrs.tws = this.tws;
     },
-    twf: function () {
+    twf() {
       this.search.parametrs.twf = this.twf;
     },
   },
@@ -267,9 +279,9 @@ export default {
     this.currentSid = this.dataSearchFrom?.sid;
   },
   methods: {
-    cancelModal: function () {
+    cancelModal() {
       if (this.cancelBtn === 'Отмена') {
-        this.$emit('cancelModal');
+        this.active = false;
       } else {
         if (this.createBtnFrom === 'edit') {
           this.createBtn = 'Редактировать';
@@ -280,7 +292,7 @@ export default {
         this.errorMsgShow = false;
       }
     },
-    addSearch: function () {
+    addSearch() {
       if (this.search.sid && this.search.sid !== '') {
         if (
           typeof this.search.parametrs.tws == 'string' &&
@@ -330,7 +342,7 @@ export default {
             });
             this.cancelBtn = 'Отмена';
             this.errorMsgShow = false;
-            this.$emit('cancelModal'); // и скрываем окно редактирования ИД
+            this.active = false; // и скрываем окно редактирования ИД
           }
         } else {
           // если нет
@@ -339,7 +351,7 @@ export default {
             idDash: this.idDash,
             reload: false,
           }); // отправляем в хранилище для создания
-          this.$emit('cancelModal'); // и скрываем окно редактирования ИС
+          this.active = false; // и скрываем окно редактирования ИС
         }
       } else {
         this.errorMsg = 'Sid источника данных не может быть пустым';
@@ -349,7 +361,7 @@ export default {
         }, 2000);
       }
     },
-    addLineBreaks: function (event) {
+    addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'

@@ -1,5 +1,10 @@
 <template>
-  <v-dialog v-model="active" width="500" persistent>
+  <modal-persistent
+    v-model="active"
+    width="500"
+    :theme="theme"
+    @cancelModal="closeModal"
+  >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
@@ -79,15 +84,23 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiFileOutline, mdiFormatListBulleted } from '@mdi/js';
 
 export default {
+  name: 'ModalExim',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    active: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     dashboards: null,
     groups: null,
     element: null,
@@ -120,32 +133,37 @@ export default {
     };
   },
   computed: {
-    theme: function () {
-      let currentTheme = this.$store.getters.getTheme;
-      // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
-      // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
-      return currentTheme;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
+    theme() {
+      return this.$store.getters.getTheme;
     },
   },
   watch: {
-    dashboards: function () {
+    dashboards() {
       let list = this.dashboards.map((item) => {
         return item.name;
       });
       list.unshift('Выбрать все');
       this.elements.dash = list;
     },
-    groups: function () {
+    groups() {
       let list = this.groups.map((item) => {
         return item.name;
       });
       list.unshift('Выбрать все');
       this.elements.group = list;
     },
-    selected: function (selected) {
+    selected(selected) {
       if (selected.includes('Выбрать все')) {
         let list = [];
-        if (this.element == 'dash') {
+        if (this.element === 'dash') {
           list = this.dashboards.map((item) => {
             return item.name;
           });
@@ -160,7 +178,7 @@ export default {
         this.elements[this.element] = list;
       } else if (selected.includes('Очистить все')) {
         let list = [];
-        if (this.element == 'dashs') {
+        if (this.element === 'dashs') {
           list = this.dashboards.map((item) => {
             return item.name;
           });
@@ -176,9 +194,9 @@ export default {
     },
   },
   methods: {
-    exportDash: async function () {
+    async exportDash() {
       let ids = [];
-      if (this.element == 'dash') {
+      if (this.element === 'dash') {
         this.dashboards.forEach((item) => {
           if (this.selected.includes(item.name)) {
             ids.push(item.id);
@@ -196,7 +214,7 @@ export default {
         element: this.element,
         ids: ids.join(','),
       });
-      if (response == '') {
+      if (response === '') {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
         this.msgExp.opacity = '1';
@@ -210,16 +228,16 @@ export default {
         this.msgExp.opacity = '0';
       }, 2000);
     },
-    importDash: async function () {
-      if (this.file == '' || this.file == undefined) {
+    async importDash() {
+      if (this.file === '' || this.file === undefined) {
         this.msgImp.text = 'Выберите файл для импорта';
         this.msgImp.color = 'controlsActive';
         this.msgImp.opacity = '1';
       } else {
         let extantion = this.file.name.split('.');
         extantion = extantion[extantion.length - 1];
-        if (extantion != this.element) {
-          if (this.element == 'group') {
+        if (extantion !== this.element) {
+          if (this.element === 'group') {
             this.msgImp.text = 'Выберите файл c группами';
           } else {
             this.msgImp.text = 'Выберите файл c дашбордами';
@@ -228,7 +246,7 @@ export default {
           this.msgImp.opacity = '1';
         } else {
           let formData = new FormData();
-          if (this.element == 'dash') {
+          if (this.element === 'dash') {
             formData.append('group', this.curName);
             formData.append('body', this.file);
           } else {
@@ -254,14 +272,14 @@ export default {
         this.msgImp.opacity = '0';
       }, 2000);
     },
-    downloadDash: function (url) {
+    downloadDash(url) {
       let link = this.$refs.blockExim.appendChild(document.createElement('a'));
       link.setAttribute('href', url);
       link.click();
       link.remove();
     },
-    closeModal: function () {
-      this.$emit('closeModal');
+    closeModal() {
+      this.active = false;
     },
     // changeColor: function() {
     //   document.querySelectorAll('.v-menu__content').forEach( item => {

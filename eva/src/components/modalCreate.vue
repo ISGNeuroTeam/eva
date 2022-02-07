@@ -1,7 +1,12 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog v-model="active" width="90%" persistent @keydown="checkEsc($event)">
+  <modal-persistent
+    v-model="active"
+    width="90%"
+    :theme="theme"
+    @cancelModal="cancelModal"
+  >
     <div v-if="groupCheck" class="create-modal-block-group">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
@@ -103,7 +108,7 @@
               :subessence="item"
               :colorFrom="theme"
               :create="actionFrom"
-              :activeFrom="modalFrom"
+              :activeFrom="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -167,7 +172,7 @@
               :dataFrom="dataRest"
               :create="actionFrom"
               :colorFrom="theme"
-              :activeFrom="modalFrom"
+              :activeFrom="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -200,13 +205,21 @@
         </div>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalCreate',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    modalFrom: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     groupFlagFrom: null,
     groupFrom: null,
     dashsFrom: null,
@@ -255,7 +268,7 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
     colors() {
@@ -275,10 +288,29 @@ export default {
         this.theme.$purple,
       ];
     },
-    active: function () {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
+    groupCheck() {
+      return this.groupFlagFrom;
+    },
+    groups() {
+      return this.groupFrom;
+    },
+    dashs() {
+      return this.dashsFrom;
+    },
+  },
+  watch: {
+    active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       this.pickedColor = this.theme.$main_bg;
-      if (this.modalFrom) {
+      if (this.modalValue) {
         if (this.dataFrom) {
           this.newGroup.name = this.dataFrom.name;
           this.newGroup.color = this.dataFrom.color;
@@ -316,19 +348,7 @@ export default {
         }
         this.dataRest = this.getDataForEssence();
       }
-      return this.modalFrom;
     },
-    groupCheck: function () {
-      return this.groupFlagFrom;
-    },
-    groups: function () {
-      return this.groupFrom;
-    },
-    dashs: function () {
-      return this.dashsFrom;
-    },
-  },
-  watch: {
     pickedColor(color) {
       if (this.colorInputMode === 'custom') this.setGroupColor(color);
     },
@@ -349,10 +369,10 @@ export default {
       this.colorInputMode = 'custom';
       this.setGroupColor(color);
     },
-    createBtn: function (name) {
+    createBtn(name) {
       // при нажатии на кнопку создать
       let hasSimilarModel = false;
-      if (!name || name == '') {
+      if (!name || name === '') {
         //  если пользователь не ввел имя
         this.showwarning = true; //  показываем предупреждение
         setTimeout(() => {
@@ -370,13 +390,13 @@ export default {
             (item) => item.name.toLowerCase() === name.toLowerCase()
           );
           dataObj = { name: this.newGroup.name, color: this.newGroup.color };
-          if (Object.keys(this.changedData).length != 0) {
+          if (Object.keys(this.changedData).length !== 0) {
             let keys = this.changedData.group;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
           }
-          if (this.curGroupFrom != -1) {
+          if (this.curGroupFrom !== -1) {
             dataObj.id = this.groupFrom[this.curGroupFrom].id;
           }
           essence = 'group';
@@ -388,12 +408,12 @@ export default {
           );
           dataObj = { name: this.newDash.name };
 
-          if (this.newDash.id != '') {
+          if (this.newDash.id !== '') {
             dataObj.id = this.newDash.id;
           }
           dataObj.idgroup = this.curGroupFrom;
 
-          if (Object.keys(this.changedData).length != 0) {
+          if (Object.keys(this.changedData).length !== 0) {
             let keys = this.changedData.dash;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
@@ -424,10 +444,10 @@ export default {
         this.createEssence(dataObj, method, essence);
       }
     },
-    cancelModal: function (btn) {
+    cancelModal(btn) {
       // есл инажали на отмену создания
-      if (btn == 'Отмена') {
-        this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
+      if (btn === 'Отмена') {
+        this.active = false; // передаем в родителя чтобы выключили модалку
         this.name = ''; // очищаем имя
       }
       this.showwarning = false;
@@ -436,29 +456,29 @@ export default {
       this.nameBtn.cancel = 'Отмена';
       this.nameWarn = 'Имя не может быть пустым';
     },
-    checkEsc: function (event) {
-      if (event.code == 'Escape') {
+    checkEsc(event) {
+      if (event.code === 'Escape') {
         this.cancelModal('Отмена');
       }
     },
-    yesDashBoards: function () {
+    yesDashBoards() {
       // если нажали на кнпку подстверждения создания дашборда
       this.createObj(this.name); // создаем его
       this.create_warning = false; // убаирем предупреждение
     },
-    noDashBoards: function () {
+    noDashBoards() {
       // если нажали на отмену
       this.create_warning = false; // просто убираем предупреждение
     },
-    createEssence: function (group, method, essence) {
+    createEssence(group, method, essence) {
       let response = this.$store.auth.getters.setEssence({
         formData: JSON.stringify(group),
         essence: essence,
         method: method,
       });
       response.then((res) => {
-        if (res.status == 200) {
-          if (essence == 'dash') {
+        if (res.status === 200) {
+          if (essence === 'dash') {
             res.json().then((data) => {
               this.createDash({
                 id: data.id,
@@ -468,10 +488,10 @@ export default {
               });
             });
           }
-          this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
-        } else if (res.status == 409) {
+          this.active = false; // передаем в родителя чтобы выключили модалку
+        } else if (res.status === 409) {
           this.showwarning = true; //  показываем предупреждение
-          essence == 'group'
+          essence === 'group'
             ? (this.nameWarn = 'Такая группа уже есть.')
             : (this.nameWarn = 'Такой дашборд уже есть.');
           setTimeout(() => {
@@ -480,7 +500,7 @@ export default {
         }
       });
     },
-    createDash: function (dash) {
+    createDash(dash) {
       this.$store.commit('setDash', {
         data: dash,
         getters: this.$store.getters.checkAlreadyDash,
@@ -489,10 +509,10 @@ export default {
         `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`
       );
     },
-    toHichName: function (name) {
+    toHichName(name) {
       return name[0].toUpperCase() + name.slice(1);
     },
-    getDataForEssence: async function () {
+    async getDataForEssence() {
       let role = '';
       let data = '';
       if (this.groupCheck) {
@@ -520,24 +540,12 @@ export default {
         data[this.curGroupFrom].id
       );
     },
-    setEnter: function (event) {
-      if (event.code == 'Enter') {
+    setEnter(event) {
+      if (event.code === 'Enter') {
         this.createBtn();
       }
     },
-    // changeStyle: function() {
-    //   if (this.active) {
-    //     let dialog = document.querySelector('.v-dialog');
-    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
-    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     })
-    //     dialog.querySelectorAll('input').forEach( item => {
-    //       item.style.color = this.color.text;
-    //     })
-    //   }
-    // },
-    changeData: function (event) {
+    changeData(event) {
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }

@@ -215,9 +215,8 @@
     </v-content>
     <footer-bottom />
     <modal-report
-      :modalFrom="modal"
+      v-model="modal"
       :searchFrom="search"
-      @cancelModal="cancelModal"
       @setSearch="setSearch($event)"
     />
   </v-app>

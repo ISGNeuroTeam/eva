@@ -1,7 +1,12 @@
 <!-- Модальное окно для выбора ИС -->
 
 <template>
-  <v-dialog :value="active" width="600" persistent @keydown="checkEsc($event)">
+  <modal-persistent
+    v-model="active"
+    width="600"
+    :theme="theme"
+    @cancelModal="cancel"
+  >
     <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
       <div class="schedule-block">
         <div class="zagolovok" :style="{ color: theme.$title }">
@@ -137,14 +142,22 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalScheduler',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
     idDashFrom: null,
-    modalFrom: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     dataSidFrom: null,
   },
   data() {
@@ -175,14 +188,36 @@ export default {
     };
   },
   computed: {
-    idDash: function () {
+    idDash() {
       // получаем название элемента от родителя
       return this.idDashFrom;
     },
-    active: function () {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
+    sid() {
+      return this.dataSidFrom;
+    },
+    schedulers() {
+      return this.$store.getters.getSchedulers(this.idDash);
+    },
+    searches() {
+      return this.$store.getters.getSearches(this.idDash);
+    },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
       // получаем статус открытия или нет окна модального
       if (this.modalFrom) {
-        if (this.schedulers.length != 0) {
+        if (this.schedulers.length !== 0) {
           if (this.schedulers[this.sid]) {
             // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
             this.every = this.schedulers[this.sid].every;
@@ -211,19 +246,6 @@ export default {
           }
         }
       }
-      return this.modalFrom;
-    },
-    sid: function () {
-      return this.dataSidFrom;
-    },
-    schedulers: function () {
-      return this.$store.getters.getSchedulers(this.idDash);
-    },
-    searches: function () {
-      return this.$store.getters.getSearches(this.idDash);
-    },
-    theme: function () {
-      return this.$store.getters.getTheme;
     },
   },
   mounted() {
@@ -264,34 +286,29 @@ export default {
     }
   },
   methods: {
-    cancel: function () {
+    cancel() {
       // закрываем окно
-      this.$emit('cancel');
+      this.active = false;
     },
-    checkEsc: function (event) {
-      if (event.code == 'Escape') {
-        this.cancel();
-      }
-    },
-    setTime: function (time, tense) {
+    setTime(time, tense) {
       // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
-        if (tense == 'every') {
+        if (tense === 'every') {
           this.time = time;
           Object.keys(this.color).forEach((item) => {
             this.color[item] = '$accent_ui_color';
           });
-          if (this.color[time] == '$accent_ui_color') {
+          if (this.color[time] === '$accent_ui_color') {
             this.color[time] = '$primary_button';
           } else {
             this.color[time] = '$accent_ui_color';
           }
-        } else if (tense == 'last') {
+        } else if (tense === 'last') {
           this.timeLast = time;
           Object.keys(this.colorLast).forEach((item) => {
             this.colorLast[item] = '$accent_ui_color';
           });
-          if (this.colorLast[time] == '$accent_ui_color') {
+          if (this.colorLast[time] === '$accent_ui_color') {
             this.colorLast[time] = '$primary_button';
           } else {
             this.colorLast[time] = '$accent_ui_color';
@@ -317,7 +334,7 @@ export default {
       }
       return period;
     },
-    executeSearch: function (searches, sid, shedule) {
+    executeSearch(searches, sid, shedule) {
       // выполняем серч меняя его временны рамки
       let curTimeLast = 0;
       let tws = 0;
@@ -367,7 +384,7 @@ export default {
       });
       this.cancel();
     },
-    cancelSchedule: function () {
+    cancelSchedule() {
       // отменить планировщик
       this.$store.commit('deleteSchedule', {
         idDash: this.idDash,

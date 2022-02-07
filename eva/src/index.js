@@ -56,8 +56,8 @@ Vue.component(
   require('./components/modalConfirm.vue').default
 ); // модальное окно для подтверждения закрытия другого модального окна
 Vue.component(
-  'modal-with-confirm',
-  require('./components/modalWithConfirm').default
+  'modal-persistent',
+  require('./components/modalPersistent').default
 ); // модальное окно с подтверждением закрытия
 Vue.component(
   'modal-create-search',

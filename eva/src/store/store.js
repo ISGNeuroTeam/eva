@@ -93,9 +93,9 @@ export default {
     },
 
     // закрыть окно настроек
-    async closeModalSettings({ commit, state, getters, dispatch }, { path }) {
-      return await commit('setModalSettings',  { idDash: path, status: false, id: '' } );
-    }
+    async closeModalSettings({ commit }, { path, status = false }) {
+      return await commit('setModalSettings', { idDash: path, status, id: '' });
+    },
 
   },
   mutations: {
