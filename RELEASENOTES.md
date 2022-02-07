@@ -1,3 +1,9 @@
+# [1.81.0] - Searching & reporting 2.0.
+
+## New
+
+- Searching & reporting 2.0.
+
 # [1.80.0] - Closing single value modal on click outside and bugfixes.
 
 ### New

@@ -7,12 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
-##Fixed
--Added a frame for the event window
+### Fixed
 
-## Added
+- Added a frame for the event window
+- fixed node label name in YGraph
+- fixed dash z index
+- fixed tooltip z-index
+
+
+## [1.81.0]
+
+### Added
 - refactoring modal settings
-- date research 2.0.
+- datа research 2.0.
+
+## Fixed
+- Fixed display of dashboard edit button
 
 ## [1.80.0]
 
