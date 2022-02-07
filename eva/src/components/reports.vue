@@ -341,7 +341,7 @@ export default {
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
       });
-      this.activeElem = 'table';
+      this.setActiveElem('table')
       return this.$store.getters.getReportElement;
     },
   },
@@ -435,8 +435,8 @@ export default {
           this.search.sid,
           'reports'
         );
-        responseDB.then((result) => {
-          let refresh = this.$store.getters.refreshElements(
+        responseDB.then(() => {
+          this.$store.getters.refreshElements(
             'reports',
             this.search.sid
           );
@@ -445,7 +445,7 @@ export default {
         });
       }
     },
-    addLineBreaks: function (event) {
+    addLineBreaks: function () {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'
@@ -498,13 +498,13 @@ export default {
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
             console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -514,7 +514,7 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
@@ -590,6 +590,9 @@ export default {
     setSearch: function (search) {
       this.search = Object.assign({}, search);
       this.modal = false;
+    },
+    setActiveElem () {
+      this.activeElem = 'table';
     },
     openStatistic: function (statistic) {
       if (this.showStatistic) {

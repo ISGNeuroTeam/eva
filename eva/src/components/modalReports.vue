@@ -198,7 +198,7 @@ export default {
     active: function () {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.search = this.searchFrom;
+        this.setSearchData(this.searchFrom)
       }
       return this.modalFrom;
     },
@@ -240,6 +240,9 @@ export default {
       }
 
       this.$emit('setSearch', this.search);
+    },
+    setSearchData(searchFrom) {
+      this.search = searchFrom;
     },
   },
 };

@@ -128,6 +128,7 @@ export default {
   },
   computed: {
     theme: function () {
+      alert(111)
       let currentTheme = this.$store.getters.getTheme;
       // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
       // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
@@ -241,12 +242,12 @@ export default {
           } else {
             formData.append('body', this.file);
           }
-          let response = await this.$store.getters.importDash({
+          await this.$store.getters.importDash({
             element: this.element,
             formData: formData,
           });
           try {
-            let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
+            // let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';

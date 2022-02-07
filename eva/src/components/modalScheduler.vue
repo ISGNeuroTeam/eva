@@ -201,32 +201,7 @@ export default {
       // получаем статус открытия или нет окна модального
       if (this.modalFrom) {
         if (this.schedulers.length != 0) {
-          if (this.schedulers[this.sid]) {
-            // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
-            this.every = this.schedulers[this.sid].every;
-            this.time = this.schedulers[this.sid].time;
-            this.everyLast = this.schedulers[this.sid].everyLast;
-            this.timeLast = this.schedulers[this.sid].timeLast;
-            this.color[this.time] = '$primary_button';
-            this.colorLast[this.timeLast] = '$primary_button';
-            this.disabledStop = false;
-            this.disabledStart = true;
-            this.disabledEvery = true;
-            this.msg = 'Остановить';
-          } else {
-            this.every = 0;
-            this.time = '';
-            this.everyLast = 0;
-            this.timeLast = '';
-            Object.keys(this.color).forEach((item) => {
-              this.color[item] = '$accent_ui_color';
-              this.colorLast[item] = '$accent_ui_color';
-            });
-            this.disabledStop = true;
-            this.disabledStart = false;
-            this.disabledEvery = false;
-            this.msg = 'Не запущен';
-          }
+          this.setData()
         }
       }
       return this.modalFrom;
@@ -282,6 +257,34 @@ export default {
     }
   },
   methods: {
+    setData () {
+      if (this.schedulers[this.sid]) {
+        // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
+        this.every = this.schedulers[this.sid].every;
+        this.time = this.schedulers[this.sid].time;
+        this.everyLast = this.schedulers[this.sid].everyLast;
+        this.timeLast = this.schedulers[this.sid].timeLast;
+        this.color[this.time] = '$primary_button';
+        this.colorLast[this.timeLast] = '$primary_button';
+        this.disabledStop = false;
+        this.disabledStart = true;
+        this.disabledEvery = true;
+        this.msg = 'Остановить';
+      } else {
+        this.every = 0;
+        this.time = '';
+        this.everyLast = 0;
+        this.timeLast = '';
+        Object.keys(this.color).forEach((item) => {
+          this.color[item] = '$accent_ui_color';
+          this.colorLast[item] = '$accent_ui_color';
+        });
+        this.disabledStop = true;
+        this.disabledStart = false;
+        this.disabledEvery = false;
+        this.msg = 'Не запущен';
+      }
+    },
     cancel: function () {
       // закрываем окно
       this.$emit('cancel');

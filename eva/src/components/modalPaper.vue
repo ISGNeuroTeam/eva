@@ -226,13 +226,13 @@ export default {
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
             console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -242,7 +242,7 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции

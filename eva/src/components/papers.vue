@@ -377,7 +377,6 @@ export default {
       },
       aboutElem: {},
       rowsCount: 9,
-      color: {},
       fileBlock: 1,
       arrowBack: mdiArrowLeftBold,
       uploadFile: '',
@@ -714,7 +713,7 @@ export default {
       this.steps['2'].text = 'Запрос завершился ошибкой ';
       this.steps['2'].error.push(() => 'false');
     },
-    addLineBreaks: function (event) {
+    addLineBreaks: function () {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'
