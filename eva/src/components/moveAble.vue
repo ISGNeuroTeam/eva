@@ -149,7 +149,7 @@ export default {
     },
     onActivated() {
       let testElements = document.getElementsByClassName(
-        'draggable resizable vdr'
+        'vdr'
       );
       let maxZIndex = 1;
       for (let i = 0; i < testElements.length; i++) {

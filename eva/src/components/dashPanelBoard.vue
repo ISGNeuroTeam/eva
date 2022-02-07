@@ -828,6 +828,7 @@ import settings from '../js/componentsSettings.js';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
 
 export default {
+  name: 'DashPanelBoard',
   components: {
     EvaLogo,
     DashFilterPanel,

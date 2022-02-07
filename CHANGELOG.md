@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- fixed selecting an object after changing dash setting
 - Added a frame for the event window
 - fixed node label name in YGraph
 - fixed the initial position of dash
