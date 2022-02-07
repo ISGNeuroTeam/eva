@@ -466,6 +466,14 @@ export default {
         dash.getters(dashboard.id, true);
       }
     },
+    changeDashboard: (state, dash) => {
+      let dashboard = dash.data;
+      if (state[dashboard.id]) {
+        Vue.set(state[dashboard.id], 'name', dashboard.name);
+        Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
+        Vue.set(state[dashboard.id], 'modified', dashboard.modified);
+      }
+    },
     updateDash: (state, dash) => {
       if (dash.dash.body != '') {
         state[dash.dash.id] = {
@@ -1251,6 +1259,7 @@ export default {
     },
     getName(state) {
       // получаем имя дашборда
+      console.log(state);
       return (id) => {
         return state[id].name;
       };
