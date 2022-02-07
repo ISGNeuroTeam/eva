@@ -36,7 +36,7 @@
             class="title-field input-create"
             :style="{ color: theme.$main_text }"
           >
-            Цвет группы
+            Цвет группы ssssssss
           </div>
           <div class="color-picker-wrapper">
             <div
@@ -293,7 +293,30 @@ export default {
       ];
     },
     active: function () {
-      // тут понимаем нужно ли открыть окно с созданием или нет
+      this.setData()
+      return this.modalFrom;
+    },
+    groupCheck: function () {
+      return this.groupFlagFrom;
+    },
+    groups: function () {
+      return this.groupFrom;
+    },
+    dashs: function () {
+      return this.dashsFrom;
+    },
+  },
+  watch: {
+    pickedColor(color) {
+      if (this.colorInputMode === 'custom') this.setGroupColor(color);
+    },
+  },
+  mounted() {
+    this.create_warning = false; // выключаем все предупреждения что были включены
+    this.pickedColor = this.theme.$main_bg;
+  },
+  methods: {
+    setData () {
       this.pickedColor = this.theme.$main_bg;
       if (this.modalFrom) {
         if (this.dataFrom) {
@@ -333,28 +356,7 @@ export default {
         }
         this.dataRest = this.getDataForEssence();
       }
-      return this.modalFrom;
     },
-    groupCheck: function () {
-      return this.groupFlagFrom;
-    },
-    groups: function () {
-      return this.groupFrom;
-    },
-    dashs: function () {
-      return this.dashsFrom;
-    },
-  },
-  watch: {
-    pickedColor(color) {
-      if (this.colorInputMode === 'custom') this.setGroupColor(color);
-    },
-  },
-  mounted() {
-    this.create_warning = false; // выключаем все предупреждения что были включены
-    this.pickedColor = this.theme.$main_bg;
-  },
-  methods: {
     setGroupColor(color) {
       this.newGroup.color = color;
     },

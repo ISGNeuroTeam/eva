@@ -237,13 +237,7 @@ export default {
     active: function () {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.search = this.dataSearch;
-
-        if (this.createBtnFrom === 'edit') {
-          this.createBtn = 'Редактировать';
-        } else {
-          this.createBtn = 'Создать';
-        }
+        this.setData()
       }
       return this.modalFrom;
     },
@@ -273,6 +267,14 @@ export default {
     this.currentSid = this.dataSearchFrom?.sid;
   },
   methods: {
+    setData () {
+      this.search = this.dataSearch;
+      if (this.createBtnFrom === 'edit') {
+        this.createBtn = 'Редактировать';
+      } else {
+        this.createBtn = 'Создать';
+      }
+    },
     cancelModal: function () {
       if (this.cancelBtn === 'Отмена') {
         this.$emit('cancelModal');
@@ -355,7 +357,7 @@ export default {
         }, 2000);
       }
     },
-    addLineBreaks: function (event) {
+    addLineBreaks: function () {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'

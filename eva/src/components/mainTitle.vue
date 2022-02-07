@@ -278,7 +278,6 @@ export default {
     },
     headerTop() {
       return 0;
-      return document.body.clientWidth <= 1400 ? 40 : 50;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -335,7 +334,7 @@ export default {
     },
     searches: {
       deep: true,
-      handler(searches, oldSearches) {
+      handler(searches) {
         function findOnButtonTokens(tokens) {
           return tokens.filter((el) => el.onButton);
         }

@@ -169,17 +169,7 @@ export default {
       return this.$store.form.getters.getCreateForm;
     },
     editable: function () {
-      // получаем настройку сообщающию может ли пользователь редактировать шаблон или нет
-      if (this.$route.query.editable == 'false') {
-        // если редактировтаь шаблон нельзя
-        this.dargrsizeable = false; // то отключаем возможность редактирования
-        this.title = 'Просмотр формы'; // и меняем заголовок шаблона
-      } else {
-        // если редактировать разрешено
-        this.dargrsizeable = true; // включаем настройку редактирования
-        this.loading = false; // отключаем загрузку
-        this.title = 'Создать форму'; // меняем заголовок
-      }
+      this.setDataEditable()
       return this.$route.query.editable; // возвращаем саму натсройку редактирования
     },
     idForm: function () {
@@ -212,6 +202,19 @@ export default {
     }
   },
   methods: {
+    setDataEditable () {
+      // получаем настройку сообщающию может ли пользователь редактировать шаблон или нет
+      if (this.$route.query.editable == 'false') {
+        // если редактировтаь шаблон нельзя
+        this.dargrsizeable = false; // то отключаем возможность редактирования
+        this.title = 'Просмотр формы'; // и меняем заголовок шаблона
+      } else {
+        // если редактировать разрешено
+        this.dargrsizeable = true; // включаем настройку редактирования
+        this.loading = false; // отключаем загрузку
+        this.title = 'Создать форму'; // меняем заголовок
+      }
+    },
     toHome: function () {
       // метод перенаправляющий на главную страницу
       this.$router.push(`/forms`);
@@ -280,7 +283,7 @@ export default {
       this.columns = max;
       this.loading = false; // отключаем загрузку
     },
-    setGrid: function (form) {
+    setGrid: function () {
       // создаем шаблон в первый раз
       let x = 0;
       let y = 0;

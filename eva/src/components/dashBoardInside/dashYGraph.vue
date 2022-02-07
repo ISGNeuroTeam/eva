@@ -601,7 +601,6 @@ export default {
         }
       });
 
-      let startedAt = Date.now();
       this.$graphComponent.graph = graphBuilder.buildGraph();
       //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
@@ -615,7 +614,6 @@ export default {
       });
       layout.nodeToNodeDistance = 201;
 
-      startedAt = Date.now();
       //применяем layout
       this.$graphComponent.graph.applyLayout(
         layout,

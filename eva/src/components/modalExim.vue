@@ -128,7 +128,6 @@ export default {
   },
   computed: {
     theme: function () {
-      alert(111)
       let currentTheme = this.$store.getters.getTheme;
       // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
       // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);

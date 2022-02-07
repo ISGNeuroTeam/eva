@@ -114,7 +114,6 @@ export default {
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
     radios: function () {
-      this.value = this.radiosFrom[this.idFrom];
       this.setValue();
       return this.radiosFrom[this.idFrom];
     },
@@ -171,8 +170,6 @@ export default {
       setTimeout(() => {
         let blockell = this.$refs.elementBlock;
         let elemBlock = blockell.querySelector('.element-block-not-editable');
-        let newValue = '';
-        // console.log(this.$refs.blockElem.parentElement.getBoundingClientRect().height);
 
         if (
           elemBlock.getBoundingClientRect().height >
@@ -186,6 +183,7 @@ export default {
   },
   methods: {
     setValue: function () {
+      this.value = this.radiosFrom[this.idFrom];
       let content = { id: this.idFrom, value: this.value };
       this.$emit('setValue', content);
     },

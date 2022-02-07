@@ -1073,7 +1073,7 @@ export default {
     textareaEv: function () {
       let eventFull = this.$store.getters.getEventFull(this.idDash);
       if (eventFull != '') {
-        this.textarea_event = eventFull;
+        this.setTextAreaEvent(eventFull)
       }
       return true;
     },
@@ -1198,6 +1198,9 @@ export default {
     setEditMode: function () {
       this.editMode = !this.editMode;
       this.$emit('changeMode');
+    },
+    setTextAreaEvent (eventFull) {
+      this.textarea_event = eventFull;
     },
     cancelModal: function () {
       this.activeModal = false;
@@ -1679,7 +1682,7 @@ export default {
         avatar.style.top = event.pageY - shiftY + 'px';
         this.avatar = avatar; // и храним объект нашего  аватара
       };
-      document.onclick = (event) => {
+      document.onclick = () => {
         // при клике на элемент
         avatar.remove(); // удаляем аватар из дерева dom
       };
@@ -1901,7 +1904,7 @@ export default {
                 doing.splice(0, 1);
                 doing = doing.join(',');
                 if (doing.indexOf('[') != -1 && doing.indexOf(']') != -1) {
-                  doing = doing.match(/[^\[]+(?=\])/g);
+                  doing = doing.match(/[^]+(?=\])/g);
                 } else {
                   doing = doing.split(',');
                 }
@@ -1926,7 +1929,7 @@ export default {
                 if (doing[1].indexOf('[') != -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
-                  doing = doing.match(/[^\[]+(?=\])/g);
+                  doing = doing.match(/[^]+(?=\])/g);
                   prop = doing[0].split(',');
                   value = doing[1].split(',');
                 } else {
