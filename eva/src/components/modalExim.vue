@@ -2,6 +2,7 @@
   <modal-persistent
     v-model="active"
     width="500"
+    :is-confirm="false"
     :theme="theme"
     @cancelModal="closeModal"
   >
