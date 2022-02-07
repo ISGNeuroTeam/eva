@@ -91,16 +91,16 @@ export default {
     },
     headerTop() {
       if (document.body.clientWidth <= 1400) {
-        return 40;
+        return 0;
       } else {
-        return 50;
+        return 0;
       }
     },
   },
   watch: {
-    top(val) {
-      if (val <= this.headerTop) val = this.headerTop;
-    },
+    // top(val) {
+    //   if (val <= this.headerTop) val = this.headerTop;
+    // },
     left() {
       let clientWidth = document.querySelector('#app').clientWidth;
       if (this.left < 0) this.left = 0;
@@ -123,6 +123,9 @@ export default {
     this.createGrid();
     this.drawElement();
   },
+  mounted() {
+    this.onActivated();
+  },
   methods: {
     drawElement() {
       let pos = this.$store.getters.getPosDash({
@@ -131,7 +134,7 @@ export default {
       });
 
       this.left = pos.left * this.verticalCell;
-      this.top = pos.top * this.horizontalCell + this.headerTop;
+      this.top = pos.top * this.horizontalCell;
 
       let size = this.$store.getters.getSizeDash({
         idDash: this.idDash,
@@ -157,7 +160,7 @@ export default {
       this.props.zIndex = maxZIndex + 1;
     },
     sendMove(x, y) {
-      let top = Math.round((y - this.headerTop) / this.horizontalCell);
+      let top = Math.round(y / this.horizontalCell);
       if (top < 0) top = 0;
 
       let left = Math.round(x / this.verticalCell);
@@ -170,7 +173,7 @@ export default {
       });
     },
     sendSize(x, y, width, height) {
-      let top = Math.round((y - this.headerTop) / this.horizontalCell);
+      let top = Math.round(y / this.horizontalCell);
       let left = Math.round(x / this.verticalCell);
       this.$store.commit('setPosDash', {
         top: top,
