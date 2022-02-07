@@ -80,6 +80,7 @@ import {
 export default {
   props: {
     rows: [],
+    test: [],
   },
   data() {
     return {
