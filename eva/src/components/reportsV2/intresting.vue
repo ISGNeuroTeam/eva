@@ -79,7 +79,7 @@ import {
 
 export default {
   props: {
-    rows: Array,
+    rows: [],
   },
   data() {
     return {
