@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed node label name in YGraph
 - fixed dash z index
 - fixed tooltip z-index
+- fixed tooltip width
 
 
 ## [1.81.0]
