@@ -89,7 +89,7 @@
   },
   "config": {
     "ghooks": {
-      "pre-commit": "cd eva && npm run lint-no-fix"
+      "pre-commit": "cd eva && npm run lint"
     }
   }
 }
