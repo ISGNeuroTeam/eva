@@ -2,7 +2,9 @@
   <v-app>
     <v-content>
       <div class="form-panel-board">
-        <div class="title-name">Список форм</div>
+        <div class="title-name">
+          Список форм
+        </div>
       </div>
 
       <!-- Страница  пользователя -->
@@ -12,7 +14,7 @@
           type="image"
           height="300"
           width="100%"
-        ></v-skeleton-loader>
+        />
         <div class="main-form-lines">
           <v-card
             v-for="item in forms"
@@ -23,26 +25,35 @@
           >
             <v-list-item-group>
               <v-list-item>
-                <div class="loading-bar"></div>
+                <div class="loading-bar" />
                 <v-list-item-content class="list-content">
-                  <v-list-item-title class="list-title">{{
-                    item[1].toUpperCase()
-                  }}</v-list-item-title>
-                  <v-list-item-subtitle class="list-subtitle">{{
-                    nameForm
-                  }}</v-list-item-subtitle>
+                  <v-list-item-title class="list-title">
+                    {{
+                      item[1].toUpperCase()
+                    }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle class="list-subtitle">
+                    {{
+                      nameForm
+                    }}
+                  </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>
           </v-card>
         </div>
-        <div class="divider"></div>
+        <div class="divider" />
         <div class="main-form">
-          <v-card class="form-block" @click="createFormTemplate($event)">
-            <div class="loading-bar"></div>
+          <v-card
+            class="form-block"
+            @click="createFormTemplate($event)"
+          >
+            <div class="loading-bar" />
             <v-card-text class="card-text">
               <p>Заполнить новую форму</p>
-              <v-icon class="plus">{{ plus }}</v-icon>
+              <v-icon class="plus">
+                {{ plus }}
+              </v-icon>
             </v-card-text>
           </v-card>
         </div>

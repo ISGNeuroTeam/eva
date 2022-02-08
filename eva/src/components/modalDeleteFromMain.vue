@@ -1,11 +1,19 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog v-model="active" width="550" persistent @keydown="checkEsc($event)">
+  <v-dialog
+    v-model="active"
+    width="550"
+    persistent
+    @keydown="checkEsc($event)"
+  >
     <div class="delete-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$title }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$title }"
+          >
             Вы точно хотите удалить
             <p>
               {{ nameFrom }}

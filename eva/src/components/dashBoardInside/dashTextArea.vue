@@ -64,8 +64,7 @@ export default {
       if (screen.width > 1920) {
         rowsCount = 25;
       }
-      let rows = Math.floor((this.heightFrom - 200) / rowsCount);
-      return rows;
+      return Math.floor((this.heightFrom - 200) / rowsCount);
     },
     height: function () {
       let otstup = 55;
@@ -131,7 +130,7 @@ export default {
       let tockens = this.$store.getters.getTockens(this.idDash);
       let name = '';
       Object.keys(tockens).forEach((i) => {
-        if (tockens[i].elem == this.id && tockens[i].action == 'accept') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
           name = tockens[i].name;
         }
       });

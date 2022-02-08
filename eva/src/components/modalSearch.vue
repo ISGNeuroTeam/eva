@@ -1,7 +1,11 @@
 <!-- Модальное окно для выбора ИД -->
 
 <template>
-  <v-dialog v-model="active" width="500" persistent>
+  <v-dialog
+    v-model="active"
+    width="500"
+    persistent
+  >
     <v-card
       :style="{
         background: theme.$main_bg,

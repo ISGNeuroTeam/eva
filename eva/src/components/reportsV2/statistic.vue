@@ -6,19 +6,19 @@
     <v-card-text
       :is="`dash-table`"
       v-show="true"
-      idFrom="table"
-      :colorFrom="theme"
-      activeElemFrom="table"
-      idDashFrom="reports"
-      :widthFrom="size.width"
-      :heightFrom="size.height"
-      :timeFormatFrom="''"
-      :sizeTileFrom="{ width: '', height: '' }"
-      :searchRep="true"
-      :tooltipFrom="tooltipSvg"
-      :shouldGet="false"
-      :dataReport="true"
-      :dataRestFrom="data"
+      id-from="table"
+      :color-from="theme"
+      active-elem-from="table"
+      id-dash-from="reports"
+      :width-from="size.width"
+      :height-from="size.height"
+      :time-format-from="''"
+      :size-tile-from="{ width: '', height: '' }"
+      :search-rep="true"
+      :tooltip-from="tooltipSvg"
+      :should-get="false"
+      :data-report="true"
+      :data-rest-from="data"
     />
   </div>
 </template>
@@ -28,8 +28,8 @@ import { mdiRefresh, mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
-    data: [],
-    size: {},
+    data: Array,
+    size: Object,
   },
   data() {
     return {

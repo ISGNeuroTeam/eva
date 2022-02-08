@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="active" width="500" persistent>
+  <v-dialog
+    v-model="active"
+    width="500"
+    persistent
+  >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
@@ -10,7 +14,10 @@
             Экспорт / Импорт
           </div>
         </v-card-text>
-        <div ref="blockExim" class="block-exim">
+        <div
+          ref="blockExim"
+          class="block-exim"
+        >
           <v-select
             v-model="selected"
             :prepend-icon="selectImg"
@@ -234,12 +241,12 @@ export default {
           } else {
             formData.append('body', this.file);
           }
-          let response = await this.$store.getters.importDash({
+          await this.$store.getters.importDash({
             element: this.element,
             formData: formData,
           });
           try {
-            let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
+            // let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';
