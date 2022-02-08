@@ -8,7 +8,7 @@ export function filterCompile(filter) {
       const part = filter.parts[idxPart];
 
       if (part.values?.length > 0 || part.filterPartType === 'manual') {
-        if (idxPart == firstPartWithValuesIndex) {
+        if (idxPart === firstPartWithValuesIndex) {
           filterOtlText += 'search ';
 
           // If filter inverted to open parenthesis to "NOT" directive of whole search text
@@ -49,13 +49,13 @@ export function filterCompile(filter) {
             } else {
               for (let idxVal in part.values) {
                 let value = part.values[idxVal];
-                if (idxVal == part.values.length - 1) {
+                if (idxVal === part.values.length - 1) {
                   if (part.values.length > 1)
                     filterOtlText += ` ${part.operationToken} `;
                   filterOtlText += `${part.fieldName}="${value}")`;
-                } else if (idxVal == 0) {
+                } else if (idxVal === 0) {
                   filterOtlText += `${part.fieldName}="${value}"`;
-                  if (part.values.length == 0) filterOtlText += ')';
+                  if (part.values.length === 0) filterOtlText += ')';
                 } else {
                   filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value}"`;
                 }

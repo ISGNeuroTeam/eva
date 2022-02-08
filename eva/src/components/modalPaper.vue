@@ -1,9 +1,19 @@
 <template>
-  <v-dialog v-model="active" width="500" persistent>
-    <div ref="paperBlock" class="paper-modal-block">
+  <v-dialog
+    v-model="active"
+    width="500"
+    persistent
+  >
+    <div
+      ref="paperBlock"
+      class="paper-modal-block"
+    >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="paper-title" :style="{ color: theme.$title }">
+          <div
+            class="paper-title"
+            :style="{ color: theme.$title }"
+          >
             Создание отчета
           </div>
         </v-card-text>
@@ -19,8 +29,14 @@
             label="Выбрать отчет"
           />
           <div class="error-block">
-            <div v-show="loadingShow" class="loading-block">
-              <v-icon :color="theme.$primary_button" medium>
+            <div
+              v-show="loadingShow"
+              class="loading-block"
+            >
+              <v-icon
+                :color="theme.$primary_button"
+                medium
+              >
                 {{ gear }}
               </v-icon>
             </div>
@@ -210,13 +226,13 @@ export default {
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
             console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -226,7 +242,7 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции

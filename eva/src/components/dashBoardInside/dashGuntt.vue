@@ -1,5 +1,8 @@
 <template>
-  <div class="dash-guntt" :class="idDashClass()">
+  <div
+    class="dash-guntt"
+    :class="idDashClass()"
+  >
     <div class="legend-block">
       <div
         v-for="i in legends.length"
@@ -7,13 +10,19 @@
         :key="i"
         class="legends-itself"
       >
-        <div class="circle" :style="{ backgroundColor: colors[i - 1] }" />
+        <div
+          class="circle"
+          :style="{ backgroundColor: colors[i - 1] }"
+        />
         <div class="text">
           {{ legends[i - 1] }}
         </div>
       </div>
     </div>
-    <div v-show="!noMsg" class="guntt-block" :data-change="change" />
+    <div
+      v-show="!noMsg"
+      class="guntt-block"
+    />
     <div
       ref="tooltip"
       class="tooltipGuntt"
@@ -22,7 +31,10 @@
         border: `1px solid ${colorFrom.text}`,
       }"
     />
-    <div v-show="noMsg" class="mt-4">
+    <div
+      v-show="noMsg"
+      class="mt-4"
+    >
       {{ msgText }}
     </div>
   </div>
@@ -71,60 +83,49 @@ export default {
     idDash: function () {
       return this.idDashFrom;
     },
-    change: function () {
-      if (this.dataRestFrom && Object.keys(this.dataRestFrom).length != 0) {
-        if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
-          if (this.dataReport) {
-            if (this.activeElemFrom == this.id) {
-              this.noMsg = false;
-              this.prepareChart(this.dataRestFrom);
-            } else {
-              let graphics = d3
-                .select(this.$el.querySelector(`.guntt-block`))
-                .selectAll('svg')
-                .nodes(); // получаем область в которой будем рисовтаь график
-
-              if (graphics.length != 0) {
-                // если график уже есть
-                graphics[0].remove(); // удаляем его
-              }
-            }
-          } else {
-            this.noMsg = false;
-            this.prepareChart(this.dataRestFrom);
-          }
-        } else {
-          (this.msgText = 'Данные не подходят для построения диаграммы гантта'),
-            (this.noMsg = true);
-        }
-      } else {
-        (this.msgText = 'Нет данных  для отображения'), (this.noMsg = true);
-      }
-      return true;
-    },
   },
   watch: {
-    // dataRestFrom: function(dataRest) {
+    dataRestFrom() {
+      this.$nextTick(() => {
+        if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
+          if (
+            this.dataRestFrom[0].start_date &&
+            this.dataRestFrom[0].end_date
+          ) {
+            if (this.dataReport) {
+              if (this.activeElemFrom === this.id) {
+                this.noMsg = false;
+                this.prepareChart(this.dataRestFrom);
+              } else {
+                let graphics = d3
+                  .select(this.$el.querySelector(`.guntt-block`))
+                  .selectAll('svg')
+                  .nodes(); // получаем область в которой будем рисовтаь график
 
-    //   if(dataRest.length > 0) {
-    //     if (dataRest[0].start_date && dataRest[0].end_date) {
-    //       this.noMsg = false;
-    //       this.prepareChart(dataRest);
-
-    //     } else {
-    //       this.msgText = 'Данные не подходят для построения диаграммы гантта',
-    //       this.noMsg = true;
-    //     }
-    //   }else {
-    //     this.msgText = 'Нет данных  для отображения',
-    //     this.noMsg = true;
-    //   }
-    // },
+                if (graphics.length !== 0) {
+                  // если график уже есть
+                  graphics[0].remove(); // удаляем его
+                }
+              }
+            } else {
+              this.noMsg = false;
+              this.prepareChart(this.dataRestFrom);
+            }
+          } else {
+            this.msgText = 'Данные не подходят для построения диаграммы гантта';
+            this.noMsg = true;
+          }
+        } else {
+          this.msgText = 'Нет данных  для отображения';
+          this.noMsg = true;
+        }
+      });
+    },
     colorFrom: function () {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
-            if (this.activeElemFrom == this.id) {
+            if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
               // .dash-guntt-${this.id}
@@ -133,7 +134,7 @@ export default {
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
-              if (graphics.length != 0) {
+              if (graphics.length !== 0) {
                 // если график уже есть
                 graphics[0].remove(); // удаляем его
               }
@@ -142,18 +143,19 @@ export default {
             this.prepareChart(this.dataRestFrom);
           }
         } else {
-          (this.msgText = 'Данные не подходят для построения диаграммы гантта'),
-            (this.noMsg = true);
+          this.msgText = 'Данные не подходят для построения диаграммы гантта';
+          this.noMsg = true;
         }
       } else {
-        (this.msgText = 'Нет данных для отображения'), (this.noMsg = true);
+        this.msgText = 'Нет данных для отображения';
+        this.noMsg = true;
       }
     },
     timeFormatFrom: function () {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
-            if (this.activeElemFrom == this.id) {
+            if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
               let graphics = d3
@@ -161,7 +163,7 @@ export default {
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
-              if (graphics.length != 0) {
+              if (graphics.length !== 0) {
                 // если график уже есть
                 graphics[0].remove(); // удаляем его
               }
@@ -170,18 +172,19 @@ export default {
             this.prepareChart(this.dataRestFrom);
           }
         } else {
-          (this.msgText = 'Данные не подходят для построения диаграммы гантта'),
-            (this.noMsg = true);
+          this.msgText = 'Данные не подходят для построения диаграммы гантта';
+          this.noMsg = true;
         }
       } else {
-        (this.msgText = 'Нет данных для отображения'), (this.noMsg = true);
+        this.msgText = 'Нет данных для отображения';
+        this.noMsg = true;
       }
     },
     widthFrom: function () {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
-            if (this.activeElemFrom == this.id) {
+            if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
               let graphics = d3
@@ -189,7 +192,7 @@ export default {
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
-              if (graphics.length != 0) {
+              if (graphics.length !== 0) {
                 // если график уже есть
                 graphics[0].remove(); // удаляем его
               }
@@ -204,7 +207,7 @@ export default {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
-            if (this.activeElemFrom == this.id) {
+            if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
               let graphics = d3
@@ -212,7 +215,7 @@ export default {
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
-              if (graphics.length != 0) {
+              if (graphics.length !== 0) {
                 // если график уже есть
                 graphics[0].remove(); // удаляем его
               }
@@ -283,7 +286,7 @@ export default {
         .selectAll('svg')
         .nodes(); // получаем область в которой будем рисовтаь график
 
-      if (graphics.length != 0) {
+      if (graphics.length !== 0) {
         // если график уже есть
         graphics[0].remove(); // удаляем его
       }
@@ -315,7 +318,7 @@ export default {
       });
 
       let dateFormat = `%Y-%m-%d %H:%M:%S`;
-      if (that.timeFormatFrom != '') {
+      if (that.timeFormatFrom !== '') {
         dateFormat = that.timeFormatFrom;
       }
 
@@ -356,16 +359,6 @@ export default {
 
       let barHeight = Math.round((height - otstupBottom) / ids.length);
 
-      let ticks = x.ticks();
-
-      if (screen.width < 1920) {
-        ticks = x.ticks().filter((item, i) => {
-          if ((i == 0, i == x.ticks().length - 1, i % 2 == 0)) {
-            return item;
-          }
-        });
-      }
-
       let otstupX = 0;
 
       if (screen.width < 1400) {
@@ -397,7 +390,7 @@ export default {
             .tickFormat(d3.timeFormat(dateFormat))
             .tickValues(
               x.ticks().filter((item, i) => {
-                if (i % deliter == 0) {
+                if (i % deliter === 0) {
                   return item;
                 }
               })
@@ -420,7 +413,7 @@ export default {
         .style('text-anchor', 'center');
 
       //горизонатьные значения (id)
-      let subjects = svg
+      svg
         .append('g')
         .selectAll('rect')
         .data(ids)
@@ -449,7 +442,7 @@ export default {
         .attr('y', function (d) {
           let j = -1;
           ids.forEach((item, i) => {
-            if (item == d.id) {
+            if (item === d.id) {
               j = i;
             }
           });
@@ -464,7 +457,7 @@ export default {
         .attr('fill', (d) => {
           let j = 0;
           phases.forEach((item, i) => {
-            if (item == d.phase) {
+            if (item === d.phase) {
               j = i;
             }
           });
@@ -527,7 +520,7 @@ export default {
         .attr('y', function (d) {
           let j = -1;
           ids.forEach((item, i) => {
-            if (item == d.id) {
+            if (item === d.id) {
               j = i;
             }
           });
@@ -568,7 +561,7 @@ export default {
         })
         .attr('x', 10)
         .attr('y', function (d, i) {
-          if (i == 0) {
+          if (i === 0) {
             currentPos = barHeight / 2 + 2;
           } else {
             currentPos += barHeight + 2;
@@ -588,8 +581,8 @@ export default {
         .attr('x1', 0)
         .attr('x2', width - otstupRight)
         .attr('y1', function (d, i) {
-          let curPos = 0;
-          if (i != ids.length - 1) {
+          let curPos;
+          if (i !== ids.length - 1) {
             curPos = currentPos + barHeight;
             currentPos += barHeight;
           } else {
@@ -599,8 +592,7 @@ export default {
           return curPos;
         })
         .attr('y2', function () {
-          let curPos = 0;
-          curPos = currentPos + barHeight;
+          let curPos = currentPos + barHeight;
           currentPos += barHeight;
           return curPos;
         })
@@ -633,16 +625,9 @@ export default {
 
       // легенда
 
-      function moveTooltip(event) {
+      function moveTooltip() {
         let x = d3.event.offsetY - 50;
         let y = d3.event.offsetX + 30;
-        // if (y < 0) {
-        //   y = 0;
-        //   x += 5;
-        // }
-        // if(x-20+tooltipBlock.offsetWidth>width-otstupRight) {
-        //   x = d3.event.layerX - 10 - tooltipBlock.offsetWidth;
-        // }
         tooltipBlock.style.top = x + 'px';
         tooltipBlock.style.left = y + 'px';
       }
@@ -681,7 +666,7 @@ export default {
             .querySelectorAll('text')
             .forEach((item) => {
               row = item.innerHTML.split(' ').filter((rowItem) => {
-                if (rowItem != '') {
+                if (rowItem !== '') {
                   return rowItem;
                 }
               });
@@ -705,7 +690,7 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
             tocken: tocken,
             idDash: this.idDash,

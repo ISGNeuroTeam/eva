@@ -1,30 +1,58 @@
 <template>
-  <v-dialog v-model="modal" width="550" persistent>
+  <v-dialog
+    v-model="modal"
+    width="550"
+    persistent
+  >
     <!--  <div class="create-modal-block" :class={create_warning:create_warning} > -->
     <div class="choose-modal-form-block">
       <v-card>
-        <v-card-text class="headline"
-          ><div class="choose-title">Выберите тип ячейки</div></v-card-text
+        <v-card-text
+          class="headline"
         >
-        <div ref="elemBlock" class="elements-block">
+          <div class="choose-title">
+            Выберите тип ячейки
+          </div>
+        </v-card-text>
+        <div
+          ref="elemBlock"
+          class="elements-block"
+        >
           <div
             v-for="element in elements"
             :key="element.name"
             class="element"
             @click="selectElem($event)"
           >
-            <v-icon class="element-img" color="teal">{{ element.img }}</v-icon>
-            <div class="element-name">{{ element.name }}</div>
+            <v-icon
+              class="element-img"
+              color="teal"
+            >
+              {{ element.img }}
+            </v-icon>
+            <div class="element-name">
+              {{ element.name }}
+            </div>
           </div>
         </div>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn small color="teal" class="create-btn" @click="acceptBtn"
-            >Подтвердить</v-btn
+          <v-spacer />
+          <v-btn
+            small
+            color="teal"
+            class="create-btn"
+            @click="acceptBtn"
           >
-          <v-btn small color="#FF6D70" class="create-btn" @click="cancelModal"
-            >Отмена</v-btn
+            Подтвердить
+          </v-btn>
+          <v-btn
+            small
+            color="#FF6D70"
+            class="create-btn"
+            @click="cancelModal"
           >
+            Отмена
+          </v-btn>
         </v-card-actions>
       </v-card>
       <!-- <div class="warning-block" :style="{background:color.backElement}">

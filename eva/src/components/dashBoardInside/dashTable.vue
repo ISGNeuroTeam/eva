@@ -24,7 +24,7 @@
           v-slot:[`header.${title}`]="{ header }"
         >
           <v-menu :key="`${title + value}`" offset-y>
-            <template v-slot:activator="{ on, attrs }">
+            <template v-slot:activator>
               <v-menu z-index="100000" offset-y :close-on-content-click="false">
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
@@ -36,7 +36,7 @@
                     >{{ mdiMagnify }}</v-icon
                   >
                 </template>
-                <v-row v-if="value != 'string'">
+                <v-row v-if="value !== 'string'">
                   <v-col cols="6">
                     <v-select
                       :items="compare"
@@ -66,20 +66,21 @@
               </v-menu>
             </template>
           </v-menu>
-          <v-tooltip :key="header.value" bottom>
+          <v-tooltip :key="header.value + value" bottom>
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
           </v-tooltip>
         </template>
-        <template v-for="(title, index) in props.titles" v-slot:item="{ item }">
+        <template v-for="(title) in props.titles" v-slot:item="{ item }">
           <tr
-            :key="item.rowIndex"
+            :key="title + item.rowIndex"
             :style="item.rowColor && `background-color: ${item.rowColor}`"
           >
             <template v-for="(col, colIndex) in item">
               <td
                 v-if="!excludeColumns.includes(colIndex)"
+                :key="colIndex"
                 class="text-start"
                 :style="
                   (item.cellColor &&
@@ -104,7 +105,8 @@
 </template>
 
 <script>
-import { mdiMagnify } from '@mdi/js';
+import {mdiMagnify} from '@mdi/js';
+
 export default {
   props: {
     dataRestFrom: null,
@@ -191,60 +193,59 @@ export default {
           let sort;
           let parseDate = function (val) {
             let parts = val.split('.');
-            let date = new Date(
+            return new Date(
               Number(parts[0]),
               Number(parts[1]) - 1,
               Number(parts[2])
             );
-            return date;
           };
-          if (sortType == '>')
+          if (sortType === '>')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate < elDate;
             };
-          else if (sortType == '<')
+          else if (sortType === '<')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
               return valueDate > elDate;
             };
-          else if (sortType == '=')
+          else if (sortType === '=')
             sort = (el) => {
               let elDate = parseDate(el);
               let valueDate = parseDate(value);
-              return valueDate.getTime() == elDate.getTime();
+              return valueDate.getTime() === elDate.getTime();
             };
           return sort;
         } else if (dataFormat === 'number') {
           let sort;
-          if (sortType == '>')
+          if (sortType === '>')
             sort = (el) => {
               return +el > +value;
             };
-          else if (sortType == '<')
+          else if (sortType === '<')
             sort = (el) => {
               return +el < +value;
             };
-          else if (sortType == '=')
+          else if (sortType === '=')
             sort = (el) => {
-              return +value == +el;
+              return +value === +el;
             };
           return sort;
         } else if (dataFormat === 'string') {
           let sort;
-          if (sortType == '>')
+          if (sortType === '>')
             sort = (el) => {
               return el > value;
             };
-          else if (sortType == '<')
+          else if (sortType === '<')
             sort = (el) => {
               return el < value;
             };
-          else if (sortType == '=')
+          else if (sortType === '=')
             sort = (el) => {
-              return value == el;
+              return value === el;
             };
           return sort;
         }
@@ -260,34 +261,33 @@ export default {
         }
       }
       return temp;
+
     },
     events() {
-      let events = this.$store.getters.getEvents({
+      return this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
       });
-      return events;
     },
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    change: function () {
+    change() {
       if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
-        this.props.itemsForTable = [];
-        this.props.nodata = true;
+        this.setNoData()
       } else {
         this.getDataAsynchrony(this.dataRestFrom);
       }
       return true;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    height: function () {
+    height() {
       let otstup = 100;
       if (screen.width <= 1600) {
         otstup = 80;
@@ -301,10 +301,10 @@ export default {
       if (this.dataReport) {
         otstup = otstup - 30;
       }
-      let height = this.heightFrom - otstup; // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
-      return height;
+       // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
+      return this.heightFrom - otstup;
     },
-    lastResult: function () {
+    lastResult() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
@@ -315,7 +315,7 @@ export default {
   watch: {
     options: {
       deep: true,
-      handler(newValue, oldValue) {
+      handler(newValue) {
         if (newValue) this.createTitles(newValue.titles);
       },
     },
@@ -341,6 +341,10 @@ export default {
     this.setEventColor();
   },
   methods: {
+    setNoData() {
+      this.props.itemsForTable = [];
+      this.props.nodata = true;
+    },
     indexTitles(oldVal) {
       let type = 'no';
       for (let [key, val] of Object.entries(oldVal[0])) {
@@ -373,8 +377,8 @@ export default {
       function isNumber(n) {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
-      if (isNumber(val)) return true;
-      return false;
+      return isNumber(val);
+
     },
     checkForString(val) {
       return Object.prototype.toString.call(val) === '[object String]';
@@ -384,11 +388,11 @@ export default {
       let parts = val.split('.');
       if (parts.length < 3) return false;
       let result;
-      let mydate = new Date(parts[2], parts[1] - 1, parts[0]);
+      let mydate = new Date(+parts[2], +parts[1] - 1, +parts[0]);
       if (
-        parts[2] == mydate.getYear() &&
-        parts[1] - 1 == mydate.getMonth() &&
-        parts[0] == mydate.getDate()
+        +parts[2] === mydate.getYear() &&
+        +parts[1] - 1 === mydate.getMonth() &&
+        +parts[0] === mydate.getDate()
       ) {
         result = 0;
       } else {
@@ -396,7 +400,7 @@ export default {
       }
       return result;
     },
-    getDataAsynchrony: function (data) {
+    getDataAsynchrony(data) {
       let prom = new Promise((resolve) => {
         if (data.error) {
           this.props.message = data.error;
@@ -420,7 +424,7 @@ export default {
         this.props.itemsForTable = data;
       });
     },
-    createTitles: function (result) {
+    createTitles(result) {
       if (this.options?.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map((x) => ({
@@ -442,7 +446,7 @@ export default {
         }
       }
     },
-    createTockens: function (result) {
+    createTockens(result) {
       let captures = Object.keys(result[0]);
       this.props.actions.forEach((item, i) => {
         this.$set(this.props.actions[i], 'capture', captures);
@@ -454,7 +458,7 @@ export default {
       });
     },
     equals(a, b) {
-      return a == b;
+      return a === b;
     },
     over(a, b) {
       return +a > +b;
@@ -468,18 +472,18 @@ export default {
     between(a, b) {
       return b[0] < a || a < b[1];
     },
-    setEventColor: function () {
+    setEventColor() {
       this.eventRows = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
       });
     },
-    selectRow: function () {
+    selectRow() {
       document
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener('click', (event) => {
-          if (event.target.tagName.toLowerCase() == 'td') {
+          if (event.target.tagName.toLowerCase() === 'td') {
             if (event.target.parentElement.classList.contains('selected')) {
               event.target.parentElement.classList.remove('selected');
             } else {
@@ -498,14 +502,14 @@ export default {
 
             let cellRowIndex = Array.from(
               event.target.parentElement.childNodes
-            ).findIndex((item) => item == event.target);
+            ).findIndex((item) => item === event.target);
 
             let tokens = this.$store.getters.getTockens(this.idDash);
 
             tokens.forEach((token) => {
               if (
-                token.elem == this.id &&
-                token.action == 'click' &&
+                token.elem === this.id &&
+                token.action === 'click' &&
                 headers[cellRowIndex] === token.capture
               ) {
                 let value = event.target.textContent;
@@ -525,14 +529,14 @@ export default {
               partelement: 'row',
             });
 
-            if (events.length != 0) {
+            if (events.length !== 0) {
               events.forEach((item) => {
-                if (item.action == 'set') {
+                if (item.action === 'set') {
                   this.$store.commit('letEventSet', {
                     events: events,
                     idDash: this.idDash,
                   });
-                } else if (item.action == 'go') {
+                } else if (item.action === 'go') {
                   this.$store.commit('letEventGo', {
                     event: item,
                     idDash: this.idDash,
