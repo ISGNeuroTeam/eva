@@ -26,6 +26,7 @@
             <v-menu
               offset-x
               :close-on-content-click="false"
+              content-class="interesting-popup"
             >
               <template v-slot:activator="{ on, attrs }">
                 <div
@@ -152,8 +153,10 @@ export default {
     font-size: 12px
     line-height: 15px
     color: $main_text
-.menuable__content__active
-  width: 400px !important
+
+.interesting-popup
+  width: 400px
+
 .v-menu__content
   border-radius: 6px !important
   box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important
