@@ -1696,8 +1696,6 @@ export default {
       // функция создания нового элемнета
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
-        const top = Number(this.avatar.style.top.replace('px', ''));
-
         const clientCoord = this.avatar.getBoundingClientRect(); // берем координаты аватара
         let coord = {
           top: clientCoord.top + window.pageYOffset,

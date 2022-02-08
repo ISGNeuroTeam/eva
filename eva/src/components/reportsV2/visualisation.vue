@@ -124,9 +124,6 @@ export default {
     this.calcSize();
   },
   methods: {
-    setActiveElem(item) {
-      this.activeElem = item;
-    },
     changeTab(elem) {
       this.unitedShow = elem === 'multiLine';
       Object.keys(this.aboutElem).forEach((item) => {
