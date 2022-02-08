@@ -7,7 +7,7 @@
         v-model="props.input"
         class="dash-table report-table"
         :headers="props.titles"
-        :items.sync="filteredTableData"
+        :items.sync="eventedTableData"
         :data-id="id"
         item-key="none"
         :hide-default-footer="props.hideFooter"
@@ -72,6 +72,29 @@
             </template>
           </v-tooltip>
         </template>
+        <template v-for="(title, index) in props.titles" v-slot:item="{ item }">
+          <tr
+            :key="item.rowIndex"
+            :style="item.rowColor && `background-color: ${item.rowColor}`"
+          >
+            <template v-for="(col, colIndex) in item">
+              <td
+                v-if="!excludeColumns.includes(colIndex)"
+                class="text-start"
+                :style="
+                  (item.cellColor &&
+                    item.cellColor[colIndex] &&
+                    `background-color: ${item.cellColor[colIndex]}`) ||
+                  (item.columnColor &&
+                    item.columnColor[colIndex] &&
+                    `background-color: ${item.columnColor[colIndex]}`)
+                "
+              >
+                {{ col }}
+              </td>
+            </template>
+          </tr>
+        </template>
       </v-data-table>
     </div>
     <div v-show="props.nodata" class="no-data-table">
@@ -119,9 +142,49 @@ export default {
       dataTitles: [],
       stringTitles: [],
       filters: {},
+      excludeColumns: ['rowColor', 'columnColor', 'cellColor', 'rowIndex'],
     };
   },
   computed: {
+    eventedTableData() {
+      const items = [...this.filteredTableData].map((item, index) => ({
+        ...item,
+        rowIndex: index,
+      }));
+      this.eventRows.forEach((event) => {
+        if (event.prop[0] === 'rowcolor') {
+          items.forEach((item) => {
+            if (this[event.compare](item[event.column], event.row)) {
+              item.rowColor = event.value[0];
+            }
+          });
+        }
+        if (event.prop[0] === 'columncolor') {
+          let isColumnMatch = items.reduce((acc, item) => {
+            return acc || this[event.compare](item[event.column], event.row);
+          }, false);
+          if (isColumnMatch) {
+            items.forEach((item) => {
+              if (!item.columnColor) {
+                item.columnColor = {};
+              }
+              item.columnColor[event.column] = event.value[0];
+            });
+          }
+        }
+        if (event.prop[0] === 'cellcolor') {
+          items.forEach((item) => {
+            if (this[event.compare](item[event.column], event.row)) {
+              if (!item.cellColor) {
+                item.cellColor = [];
+              }
+              item.cellColor[event.column] = event.value[0];
+            }
+          });
+        }
+      });
+      return items;
+    },
     filteredTableData() {
       let chooseSort = function (dataFormat, sortType, value) {
         if (dataFormat === 'date') {
@@ -198,7 +261,6 @@ export default {
       }
       return temp;
     },
-
     events() {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
@@ -255,7 +317,7 @@ export default {
       deep: true,
       handler(newValue, oldValue) {
         if (newValue) this.createTitles(newValue.titles);
-      }
+      },
     },
     dataRestFrom: {
       deep: true,
@@ -298,7 +360,6 @@ export default {
     getType(title) {
       return this.typedTitles[title];
     },
-
     setFilterData(title, event, compare) {
       if (!this.filters[title]) this.filters[title] = {};
       if (compare === 'compare') {
@@ -362,16 +423,21 @@ export default {
     createTitles: function (result) {
       if (this.options?.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
-        this.props.titles = allTitles.map(x => ({
+        this.props.titles = allTitles.map((x) => ({
           text: x,
           value: x,
           sortable: true,
-          align: (this.options.titles.length === 0 || this.options.titles.includes(x)) ? undefined : ' d-none'
+          align:
+            this.options.titles.length === 0 || this.options.titles.includes(x)
+              ? undefined
+              : ' d-none',
         }));
       } else {
         if (result && result.length) {
           this.props.titles = Object.keys(result[0]).map((item) => {
-            return { text: item, value: item, sortable: true };
+            if (!this.excludeColumns.includes(item)) {
+              return { text: item, value: item, sortable: true };
+            }
           });
         }
       }
@@ -387,138 +453,26 @@ export default {
         id: this.id,
       });
     },
+    equals(a, b) {
+      return a == b;
+    },
+    over(a, b) {
+      return +a > +b;
+    },
+    less(a, b) {
+      return +a < +b;
+    },
+    in(a, b) {
+      return b.includes(a);
+    },
+    between(a, b) {
+      return b[0] < a || a < b[1];
+    },
     setEventColor: function () {
-      if (this.eventRows.length > 0) {
-        for (let x of this.eventRows) {
-          x.style.background = '';
-          x.classList.remove('event');
-        }
-      }
-      this.eventRows = [];
-      let events = this.$store.getters.getEvents({
+      this.eventRows = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
-      });
-      let table, column;
-      let eventObj = {};
-      events.forEach((item, index) => {
-        eventObj[index] = {};
-        eventObj[index]['compare'] = item.compare;
-        eventObj[index]['column'] = item.column;
-        eventObj[index]['row'] = item.row;
-        eventObj[index]['color'] = item.value[0];
-        eventObj[index]['prop'] = item.prop[0];
-        table = this.$refs.table.$el;
-
-        if (
-          eventObj[index]['prop'] == 'rowcolor' ||
-          eventObj[index]['prop'] == 'columncolor' ||
-          eventObj[index]['prop'] == 'cellcolor'
-        ) {
-          let readyTh = setTimeout(
-            function tick() {
-              table.querySelectorAll('thead th').style =
-                'background-color: red';
-              if (table.querySelectorAll('thead th').length != 0) {
-                clearTimeout(readyTh);
-                let sp = 0;
-                table.querySelectorAll('thead span').forEach((itemSpan) => {
-                  if (itemSpan.innerText != 0) {
-                    if (itemSpan.innerText == eventObj[index]['column']) {
-                      column = sp;
-                    }
-                    sp++;
-                  }
-                });
-
-                table.querySelectorAll('tbody tr').forEach((itemRow) => {
-                  itemRow.querySelectorAll('td').forEach((itemTd, i) => {
-                    if (i == column) {
-                      // itemRow.style.backgroundColor = 'yellow';
-                      let needItem = null,
-                        row,
-                        k = -1;
-
-                      switch (eventObj[index]['compare']) {
-                        case 'equals':
-                          if (itemTd.innerText == eventObj[index]['row']) {
-                            needItem = itemRow;
-                          }
-
-                          break;
-                        case 'over':
-                          if (itemTd.innerText > eventObj[index]['row']) {
-                            needItem = itemRow;
-                          }
-                          break;
-                        case 'less':
-                          if (itemTd.innerText < eventObj[index]['row']) {
-                            needItem = itemRow;
-                          }
-                          break;
-                        case 'in':
-                          row = eventObj[index]['row']
-                            .replace(/\[|\]/g, '')
-                            .split(',');
-                          k = -1;
-                          row.forEach((rowValue) => {
-                            if (itemTd.innerText == rowValue) {
-                              k = 0;
-                            }
-                          });
-                          if (k != -1) {
-                            needItem = itemRow;
-                          }
-                          break;
-                        case 'between':
-                          row = eventObj[index]['row']
-                            .replace(/\[|\]/g, '')
-                            .split(',');
-                          if (
-                            itemTd.innerText > row[0] &&
-                            itemTd.innerText < row[1]
-                          ) {
-                            needItem = itemRow;
-                          }
-                          break;
-                      }
-                      if (needItem != null && this.eventRows) {
-                        needItem.classList.add('event');
-                        this.eventRows.push(needItem);
-                      }
-                    }
-                  });
-                });
-
-                if (table.querySelectorAll('.event').length > 0) {
-                  if (item.prop[0] == 'rowcolor') {
-                    let rows = table.querySelectorAll('.event');
-                    rows.forEach((res) => {
-                      res.style.background = eventObj[index]['color'];
-                      //res.style.color = this.color.back;
-                    });
-                  } else if (item.prop[0] == 'cellcolor') {
-                    table.querySelectorAll('.event').forEach((res) => {
-                      res.children[column].style.background =
-                        eventObj[index]['color'];
-                      //res.children[column].style.color = this.color.back;
-                    });
-                  } else if (item.prop[0] == 'columncolor') {
-                    table.querySelectorAll('tbody tr').forEach((itemRow) => {
-                      itemRow.children[column].style.background =
-                        eventObj[index]['color'];
-                      //itemRow.children[column].style.color = this.color.back;
-                    });
-                  }
-                }
-              } else {
-                readyTh = setTimeout(tick, 100);
-              }
-            }.bind(this),
-            0
-          );
-        }
       });
     },
     selectRow: function () {
