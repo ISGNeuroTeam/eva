@@ -928,7 +928,7 @@ export default {
       fieldsForRender: [],
       optionsByComponents: [],
       isDelete: false,
-      them: null,
+      them: {},
     };
   },
   computed: {
@@ -1168,6 +1168,13 @@ export default {
     // если нажали на отмену создания
     cancelModal: function () {
       this.$store.dispatch('closeModalSettings', { path: this.idDash });
+      if (this.isDelete) {
+        this.themes = { ...this.themes, ...this.them };
+        this.them = {};
+        this.options.themes = this.themes;
+        this.isDelete = false;
+        this.setOptions();
+      }
     },
     checkEsc: function (event) {
       if (event.code === 'Escape') {
@@ -1355,15 +1362,15 @@ export default {
       this.colorsPie.theme = nextTheme;
       this.colorsPie.nametheme = nextTheme;
       this.colorsPie.colors = this.themes[nextTheme].join(',');
-      this.them = theme;
+      this.them = { ...this.them, [theme]: this.themes?.[theme] };
+      delete this.themes[theme];
       this.isDelete = true;
     },
     deleteTheme() {
       this.options.colorsPie = this.colorsPie;
       this.options.themes = this.themes;
-      delete this.themes[this.them];
       this.isDelete = false;
-      this.them = null;
+      this.them = {};
     },
   },
 };
