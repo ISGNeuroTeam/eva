@@ -10,9 +10,15 @@
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-text class="headline">
-        <div :style="{ color: theme.$main_text }" class="delete-title">
+        <div
+          :style="{ color: theme.$main_text }"
+          class="delete-title"
+        >
           Вы точно хотите удалить
-          <span :style="{ color: theme.$main_text }" class="delete-name">
+          <span
+            :style="{ color: theme.$main_text }"
+            class="delete-name"
+          >
             {{ deleteName }}
           </span>
           <span
@@ -93,17 +99,7 @@ export default {
       if (this.idDash) {
         // если уже получили имя элемнета
         let modal = this.$store.getters.getModalDelete({ id: this.idDash }); // то вызываем окно с удалением чего-либо
-        this.deleteId = `[ ${modal.id} ]`; // добовляем скобки для id элемнета для красоты
-        this.deleteName = modal.name; // получаем имя удаляемого элемента
-        if (modal.page == 'tocken') {
-          // если удаляем токен
-          this.deleteId = ''; // то у него нет id
-        } else if (modal.page == 'search') {
-          // если удаляем ИС
-          this.deleteId = ''; // то прибавляем для красоты кое что к id
-          this.deleteName = modal.id; // и заносим имя ИС
-        }
-        this.page = modal.page;
+        this.setData(modal)
         active = modal.active; // получаем статус отображения модального окна
       }
       return active;
@@ -122,6 +118,19 @@ export default {
     this.changeStyle();
   },
   methods: {
+    setData (modal) {
+      this.deleteId = `[ ${modal.id} ]`; // добовляем скобки для id элемнета для красоты
+      this.deleteName = modal.name; // получаем имя удаляемого элемента
+      if (modal.page === 'tocken') {
+        // если удаляем токен
+        this.deleteId = ''; // то у него нет id
+      } else if (modal.page === 'search') {
+        // если удаляем ИС
+        this.deleteId = ''; // то прибавляем для красоты кое что к id
+        this.deleteName = modal.id; // и заносим имя ИС
+      }
+      this.page = modal.page;
+    },
     deleteBtn: function () {
       // кнопка удаления
       let id = this.deleteId.replace(/\[|\]|\s/g, ''); // получаем id и отсеиваем все лишние знаки

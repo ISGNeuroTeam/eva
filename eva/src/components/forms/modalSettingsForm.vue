@@ -1,20 +1,40 @@
 <template>
-  <v-dialog v-model="modal" width="1140" style="height: 80vh" persistent>
+  <v-dialog
+    v-model="modal"
+    width="1140"
+    style="height: 80vh"
+    persistent
+  >
     <!--  <div class="create-modal-block" :class={create_warning:create_warning} > -->
     <div class="settings-modal-form-block">
       <v-card>
-        <v-card-text class="headline"
-          ><div class="settings-title">Настройки</div></v-card-text
+        <v-card-text
+          class="headline"
         >
+          <div class="settings-title">
+            Настройки
+          </div>
+        </v-card-text>
         <div class="options-block">
           <div class="option-item">
-            <div class="name-option main item">Название</div>
-            <div class="discribe-option main item">Описание</div>
-            <div class="status-option main item">Статус</div>
+            <div class="name-option main item">
+              Название
+            </div>
+            <div class="discribe-option main item">
+              Описание
+            </div>
+            <div class="status-option main item">
+              Статус
+            </div>
           </div>
           <!-- Настройки Выпадающего списка -->
-          <div v-if="visibleOptions.select" class="option-item">
-            <div class="name-option item">Выбор элементов</div>
+          <div
+            v-if="visibleOptions.select"
+            class="option-item"
+          >
+            <div class="name-option item">
+              Выбор элементов
+            </div>
             <div class="discribe-option item">
               Элементы для выбора из выпадающего списка
             </div>
@@ -28,13 +48,18 @@
                 row-height="20px"
                 rows="3"
                 hide-details
-              ></v-textarea>
+              />
             </div>
           </div>
           <!--    ----   -->
           <!-- Настройки Радио -->
-          <div v-if="visibleOptions.radio" class="option-item">
-            <div class="name-option item">Имя группы переключателей</div>
+          <div
+            v-if="visibleOptions.radio"
+            class="option-item"
+          >
+            <div class="name-option item">
+              Имя группы переключателей
+            </div>
             <div class="discribe-option item">
               Переключатель с одинаковым имемнем работают исключая друг друга
             </div>
@@ -45,13 +70,15 @@
                 color="#333"
                 outlined
                 hide-details
-              ></v-text-field>
+              />
             </div>
           </div>
           <!--    ----   -->
           <!-- Общие настройки   -->
           <div class="option-item">
-            <div class="name-option item">Идентификатор</div>
+            <div class="name-option item">
+              Идентификатор
+            </div>
             <div class="discribe-option item">
               Это ли поле является идентификатором?
             </div>
@@ -64,20 +91,30 @@
                     general.ident = $event;
                   }
                 "
-              ></v-switch>
+              />
               <!-- <v-text-field  class="radio-name" color="#333"   outlined v-model="general.ident" hide-details ></v-text-field> -->
             </div>
           </div>
           <!--    ----   -->
         </div>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn small color="teal" class="create-btn" @click="acceptBtn"
-            >Подтвердить</v-btn
+          <v-spacer />
+          <v-btn
+            small
+            color="teal"
+            class="create-btn"
+            @click="acceptBtn"
           >
-          <v-btn small color="#FF6D70" class="create-btn" @click="cancelModal"
-            >Отмена</v-btn
+            Подтвердить
+          </v-btn>
+          <v-btn
+            small
+            color="#FF6D70"
+            class="create-btn"
+            @click="cancelModal"
           >
+            Отмена
+          </v-btn>
         </v-card-actions>
       </v-card>
       <!-- <div class="warning-block" :style="{background:color.backElement}">

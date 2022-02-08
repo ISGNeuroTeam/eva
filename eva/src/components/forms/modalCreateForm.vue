@@ -1,11 +1,19 @@
 <template>
-  <v-dialog v-model="modal" width="550" persistent>
+  <v-dialog
+    v-model="modal"
+    width="550"
+    persistent
+  >
     <!--  <div class="create-modal-block" :class={create_warning:create_warning} > -->
     <div class="create-modal-form-block">
       <v-card>
-        <v-card-text class="headline"
-          ><div class="create-title">Создать новую форму</div></v-card-text
+        <v-card-text
+          class="headline"
         >
+          <div class="create-title">
+            Создать новую форму
+          </div>
+        </v-card-text>
         <div class="rowform">
           <p>Имя формы</p>
           <v-text-field
@@ -13,7 +21,7 @@
             hide-details
             solo
             class="input"
-          ></v-text-field>
+          />
         </div>
         <div class="rowform">
           <p>Количество строк</p>
@@ -22,7 +30,7 @@
             hide-details
             solo
             class="input mini"
-          ></v-text-field>
+          />
         </div>
         <div class="rowform">
           <p>Количество столбцов</p>
@@ -31,19 +39,32 @@
             hide-details
             solo
             class="input mini"
-          ></v-text-field>
+          />
         </div>
-        <div class="warn" :class="{ showwarning: showwarning }">
+        <div
+          class="warn"
+          :class="{ showwarning: showwarning }"
+        >
           {{ warnText }}
         </div>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn small color="teal" class="create-btn" @click="createBtn"
-            >Создать</v-btn
+          <v-spacer />
+          <v-btn
+            small
+            color="teal"
+            class="create-btn"
+            @click="createBtn"
           >
-          <v-btn small color="#FF6D70" class="create-btn" @click="cancelModal"
-            >Отмена</v-btn
+            Создать
+          </v-btn>
+          <v-btn
+            small
+            color="#FF6D70"
+            class="create-btn"
+            @click="cancelModal"
           >
+            Отмена
+          </v-btn>
         </v-card-actions>
       </v-card>
       <!-- <div class="warning-block" :style="{background:color.backElement}">

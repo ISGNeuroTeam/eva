@@ -56,15 +56,12 @@ export default {
       return should;
     },
     getDataStart: function () {
-      if (this.shouldGet == true) {
-        let file = this.$store.getters.getFile(this.id);
-
-        this.props.id = this.id;
-
-        this.getData(file);
-      }
-
       return this.props.selects;
+    },
+  },
+  watch: {
+    id(val) {
+      this.props.id = val;
     },
   },
   methods: {
@@ -73,9 +70,9 @@ export default {
 
       let response = await fetch(`src/js/${file}`);
 
-      if (response.status == 404) {
+      if (response.status === 404) {
         this.props.loading = false;
-      } else if (response.status == 200) {
+      } else if (response.status === 200) {
         let result = await response.json();
 
         this.createSelects(result.data);
@@ -93,11 +90,9 @@ export default {
       }
     },
     createSelects: function (result) {
-      let selects = Object.keys(result[0]).map((item) => {
+      this.props.selects = Object.keys(result[0]).map((item) => {
         return item;
       });
-
-      this.props.selects = selects;
     },
     setItem: function (item) {
       this.props.item = item;

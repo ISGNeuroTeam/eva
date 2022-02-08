@@ -1,6 +1,9 @@
 <template>
   <div class="med">
-    <v-container class="fill-height" style="align-items: normal">
+    <v-container
+      class="fill-height"
+      style="align-items: normal"
+    >
       <v-row class="ma-0">
         <v-btn
           rounded
@@ -19,7 +22,10 @@
           @change="updatePipeDataSource($event)"
         />
         <v-spacer />
-        <v-dialog v-model="dialog" max-width="390">
+        <v-dialog
+          v-model="dialog"
+          max-width="390"
+        >
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               rounded
@@ -41,7 +47,10 @@
             >
               Настройки
               <v-spacer />
-              <a style="align-self: center" @click="dialog = false">
+              <a
+                style="align-self: center"
+                @click="dialog = false"
+              >
                 <svg
                   width="20"
                   height="20"
@@ -68,7 +77,7 @@
                 light
                 item-text="name"
                 item-value="tile[0]"
-                :dark="theme.$main_text == '#F4F4FA'"
+                :dark="isDark"
                 :style="{ color: theme.$main_text }"
                 @change="updateTileLayer($event)"
               />
@@ -85,7 +94,7 @@
                     v-model="options.zoomLevel"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     class="mt-0 pt-0"
                     hide-details
                     single-line
@@ -108,7 +117,7 @@
                     v-model="options.zoomStep"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     class="mt-0 pt-0"
                     hide-details
                     single-line
@@ -125,7 +134,7 @@
                     v-model="options.initialPoint.x"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
@@ -139,7 +148,7 @@
                     v-model="options.initialPoint.y"
                     outlined
                     dense
-                    :dark="theme.$main_text == '#F4F4FA'"
+                    :dark="isDark"
                     type="number"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
@@ -154,13 +163,17 @@
                     color="primary"
                     class="mt-3"
                     @click="onClickChoosingCoordinates"
-                    >Указать на карте</v-btn
                   >
+                    Указать на карте
+                  </v-btn>
                 </v-col>
               </v-row>
 
               <p>Легенда карты</p>
-              <v-checkbox v-model="options.showLegend" hide-details>
+              <v-checkbox
+                v-model="options.showLegend"
+                hide-details
+              >
                 <template v-slot:label>
                   <span :style="`color: ${theme.$secondary_text} !important`">
                     Включить отображение легенды
@@ -172,7 +185,7 @@
               <v-select
                 v-model="options.search"
                 outlined
-                :dark="theme.$main_text == '#F4F4FA'"
+                :dark="isDark"
                 item-text="sid"
                 :items="searches"
                 :return-object="true"
@@ -189,17 +202,24 @@
         align-content="end"
         class="mb-5 mr-0"
       >
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-card
           style="max-height: 466px"
           max-width="280"
           class="px-5 pb-5"
           :color="theme.$main_bg"
         >
-          <v-subheader style="color: white" class="px-0">
+          <v-subheader
+            style="color: white"
+            class="px-0"
+          >
             <v-row class="ma-0 fill-height">
               <v-col class="ma-0 pa-0 fill-height">
-                <v-row class="mt-5 mx-0 pa-0" justify="center" align="center">
+                <v-row
+                  class="mt-5 mx-0 pa-0"
+                  justify="center"
+                  align="center"
+                >
                   <svg
                     width="24"
                     height="24"
@@ -215,7 +235,11 @@
                     </g>
                     <defs>
                       <clipPath id="clip0">
-                        <rect width="24" height="24" fill="white" />
+                        <rect
+                          width="24"
+                          height="24"
+                          fill="white"
+                        />
                       </clipPath>
                     </defs>
                   </svg>
@@ -227,7 +251,10 @@
                     Легенда
                   </span>
                   <v-spacer />
-                  <a style="align-self: center" @click="closeLegend">
+                  <a
+                    style="align-self: center"
+                    @click="closeLegend"
+                  >
                     <svg
                       width="20"
                       height="20"
@@ -247,30 +274,39 @@
           </v-subheader>
           <v-divider
             style="margin-bottom: 10px; border: 1px solid #555454"
-          ></v-divider>
+          />
 
-          <v-card width="240" outlined>
+          <v-card
+            width="240"
+            outlined
+          >
             <v-list
               :style="`color: ${theme.$main_text} !important; max-height: 382px`"
               class="overflow-y-auto"
               :color="theme.$secondary_bg"
             >
-              <v-list-item v-for="item in library.objects" :key="item.name">
+              <v-list-item
+                v-for="item in library.objects"
+                :key="item.name"
+              >
                 <template v-if="item.image">
-                  <v-list-item-avatar size="20px" style="align-self: center">
-                    <v-img :src="base_svg_url + item.image"></v-img>
+                  <v-list-item-avatar
+                    size="20px"
+                    style="align-self: center"
+                  >
+                    <v-img :src="base_svg_url + item.image" />
                   </v-list-item-avatar>
 
                   <v-list-item-title
                     :style="`color: ${theme.$main_text} !important; text-align: left`"
                     v-text="item.name"
-                  ></v-list-item-title>
+                  />
                 </template>
 
                 <template v-else-if="item.background_color">
                   <v-list-item-avatar
                     size="20px"
-                    style="align-self: center; border-radius: 0%"
+                    style="align-self: center; border-radius: 0"
                     v-html="createHtmlIcon(item)"
                   />
 
@@ -281,9 +317,15 @@
                 </template>
 
                 <template v-else>
-                  <v-list-item-avatar size="20px" style="align-self: center">
+                  <v-list-item-avatar
+                    size="20px"
+                    style="align-self: center"
+                  >
                     <div>
-                      <svg height="210" width="200">
+                      <svg
+                        height="210"
+                        width="200"
+                      >
                         <line
                           x1="0"
                           y1="0"
@@ -317,6 +359,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
+
 export default {
   props: {
     idElement: String,
@@ -379,6 +422,9 @@ export default {
     theme: function () {
       return this.$store.getters.getTheme;
     },
+    isDark() {
+      return this.theme.$main_text === '#F4F4FA';
+    },
     dashSettings() {
       return this.$store.getters.getOptions({
         idDash: this.idDashFrom,
@@ -393,7 +439,7 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (val.mode != oldVal.mode) this.updatePipeDataSource();
+        if (val.mode !== oldVal.mode) this.updatePipeDataSource();
         this.updateOptions(val);
       },
     },
@@ -425,7 +471,7 @@ export default {
     this.searches = this.loadDataForPipe();
   },
   methods: {
-    onClickChoosingCoordinates(e) {
+    onClickChoosingCoordinates() {
       const cursorCssClass = 'cursor-crosshair';
       this.dialog = false;
       L.DomUtil.addClass(this.map._container, cursorCssClass);
@@ -445,8 +491,7 @@ export default {
       this.$emit('updatePipeDataSource', this.options.search);
     },
     loadDataForPipe() {
-      let searches = this.$store.getters.getSearches(this.idDashFrom);
-      return searches;
+      return this.$store.getters.getSearches(this.idDashFrom);
     },
     closeLegend() {
       this.options.showLegend = false;
@@ -456,11 +501,8 @@ export default {
         text_color: textColor = '#FFFFFF',
         background_color: color = '65, 62, 218',
         opacity = 0.6,
-        label_field: text = 'КП-240',
         border_radius: borderRadius = '2px',
         border = 'none',
-        width = 20,
-        height = 20,
       } = lib;
       return `<div class="leaflet-div-icon" 
           style="
@@ -515,27 +557,27 @@ export default {
       if (typeof this.options.size != 'undefined') {
         if (this.options.size == null) {
           this.options.size = '100px';
-        } else if (String(this.options.size).indexOf('px') == -1) {
+        } else if (String(this.options.size).indexOf('px') === -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
       //let options = {...{},...this.options};
-      if (this.element.indexOf('csvg') != -1) {
+      if (this.element.indexOf('csvg') !== -1) {
         this.options.tooltip = this.tooltip;
       }
-      if (this.element.indexOf('piechart') != -1) {
+      if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation)
         );
         this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme == 'custom') {
+        if (this.colorsPie.theme === 'custom') {
           this.themes[this.colorsPie.nametheme] =
             this.colorsPie.colors.split(',');
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
       }
-      if (this.element.indexOf('multiLine') != -1) {
+      if (this.element.indexOf('multiLine') !== -1) {
         let updateMetrics = this.metrics.map((item) => {
           return JSON.parse(JSON.stringify(item));
         });

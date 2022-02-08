@@ -1,13 +1,19 @@
 <template>
   <div class="dash-picker">
-    <div class="DTpicker" :class="{ show_picker_elem: show_picker_elem }">
+    <div
+      class="DTpicker"
+      :class="{ show_picker_elem: show_picker_elem }"
+    >
       <div
         class="DTPicker-btn"
         :style="{ background: theme.$accent_ui_color }"
         @click="openHidden"
       >
         <p>Выберите время и дату</p>
-        <v-icon :style="{ color: theme.$main_text }" class="picker-arrow">
+        <v-icon
+          :style="{ color: theme.$main_text }"
+          class="picker-arrow"
+        >
           {{ arrow.elem }}
         </v-icon>
       </div>
@@ -20,11 +26,16 @@
           border: `1px solid ${theme.$main_border}`,
         }"
       >
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Выбор времени
         </div>
         <div class="choose-period">
-          <p :style="{ color: theme.$main_text }">Последние</p>
+          <p :style="{ color: theme.$main_text }">
+            Последние
+          </p>
           <v-text-field
             v-model="last.every"
             class="textarea-item"
@@ -58,7 +69,10 @@
             Секунд
           </v-chip>
         </div>
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Выбор времени и даты
         </div>
         <DTPicker
@@ -81,7 +95,10 @@
           class="dtpicker"
           @validate="setTocken('dt')"
         />
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Диапазон дат
         </div>
         <DTPicker
@@ -95,7 +112,10 @@
           class="dtpicker range-picker"
           @validate="setTocken('range')"
         />
-        <div class="name-of-picker" :style="{ color: theme.$title }">
+        <div
+          class="name-of-picker"
+          :style="{ color: theme.$title }"
+        >
           Ввод даты и времени вручную
         </div>
         <v-text-field
@@ -280,7 +300,7 @@ export default {
         }
       }
       if (data.last != null) {
-        if (data.last.every != 0 && data.last.time != '') {
+        if (data.last.every !== 0 && data.last.time !== '') {
           let time = '...';
           switch (data.last.time) {
             case 'second':
@@ -297,11 +317,7 @@ export default {
         }
       }
 
-      if (current != '') {
-        this.show_curent = true;
-      } else {
-        this.show_curent = false;
-      }
+      this.show_curent = current !== '';
       return current;
     },
     openHidden: function () {
@@ -319,7 +335,7 @@ export default {
       }
     },
     customDate: function (elem) {
-      elem == 'begin'
+      elem === 'begin'
         ? (this.start_custom.color = 'controls')
         : (this.end_custom.color = 'controls');
       this.setTocken('custom');
@@ -354,6 +370,7 @@ export default {
       this.setTocken('time');
     },
     setTocken: function (elem) {
+      let period = 0;
       switch (elem) {
         case 'dt':
           this.startForStore = parseInt(new Date(this.start).getTime() / 1000);
@@ -399,8 +416,6 @@ export default {
           });
           break;
         case 'time':
-          let period = 0;
-
           switch (this.last.time) {
             case 'second':
               period = Number(this.last.every) * 1000;
@@ -445,18 +460,18 @@ export default {
           capture: tockens[i].capture,
         };
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == 'select' &&
-          tockens[i].capture == 'start'
+          tockens[i].elem === this.id &&
+          tockens[i].action === 'select' &&
+          tockens[i].capture === 'start'
         ) {
           if (this.startForStore != null) {
             setTocken(this.startForStore);
           }
         }
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == 'select' &&
-          tockens[i].capture == 'end'
+          tockens[i].elem === this.id &&
+          tockens[i].action === 'select' &&
+          tockens[i].capture === 'end'
         ) {
           if (this.endForStore != null) {
             setTocken(this.endForStore);

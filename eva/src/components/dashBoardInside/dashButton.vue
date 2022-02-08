@@ -19,7 +19,6 @@
     v-else
     ref="buttonEl"
     class="dash-button"
-    :options="options"
     style="padding: 0"
     @click="setClick"
   >
@@ -88,7 +87,55 @@ export default {
         return 0;
       }
     },
-    options: function () {
+    fontSize: function () {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
+      if (options.fontSize) {
+        return options.fontSize.split('px')[0];
+      } else {
+        return '30';
+      }
+    },
+    underlineWidth: function () {
+      let width = 30;
+      if (this.fontSize > 30) {
+        width = 90;
+      } else if (this.fontSize > 20) {
+        width = 70;
+      } else if (this.fontSize > 10) {
+        width = 50;
+      }
+      return width;
+    },
+    updatedOptions() {
+      return this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
+    },
+  },
+  watch: {
+    updatedOptions: {
+      immediate: true,
+      deep: true,
+      handler() {
+        this.updateOptionsData();
+      },
+    },
+  },
+  mounted() {
+    this.$emit('hideDS', this.id);
+    this.$emit('hideLoading');
+    this.$store.commit('setActions', {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
+  },
+  methods: {
+    updateOptionsData() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
@@ -110,43 +157,7 @@ export default {
       }
       this.underline = options.underline;
       this.optionsData.onButton = options?.onButton;
-      return true;
     },
-    fontSize: function () {
-      let options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
-      if (options.fontSize) {
-        return options.fontSize.split('px')[0];
-      } else {
-        return '30';
-      }
-    },
-    underlineWidth: function () {
-      let width = 70;
-      if (this.fontSize > 30) {
-        width = 90;
-      } else if (this.fontSize > 20) {
-        width = 70;
-      } else if (this.fontSize > 10) {
-        width = 50;
-      } else {
-        width = 30;
-      }
-      return width;
-    },
-  },
-  mounted() {
-    this.$emit('hideDS', this.id);
-    this.$emit('hideLoading');
-    this.$store.commit('setActions', {
-      actions: this.actions,
-      idDash: this.idDash,
-      id: this.id,
-    });
-  },
-  methods: {
     updateSearches() {
       this.$store.commit('updateManualTokens', { idDash: this.idDash });
     },
@@ -189,9 +200,9 @@ export default {
           capture: tockens[i].capture,
         };
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == 'click' &&
-          tockens[i].capture == 'inverse'
+          tockens[i].elem === this.id &&
+          tockens[i].action === 'click' &&
+          tockens[i].capture === 'inverse'
         ) {
           switch (tockens[i].value) {
             case '':
@@ -220,21 +231,21 @@ export default {
         element: this.id,
         partelement: 'empty',
       });
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'set') {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == 'go') {
+          } else if (item.action === 'go') {
             this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
             });
-          } else if (item.action.toLowerCase() == 'open') {
+          } else if (item.action.toLowerCase() === 'open') {
             //если экшен open
             this.actionOpen(
               item.target.toLowerCase(),
@@ -243,12 +254,12 @@ export default {
               item.heightPersent
             );
           } else if (
-            item.action.toLowerCase() == 'changeReport'.toLowerCase()
+            item.action.toLowerCase() === 'changeReport'.toLowerCase()
           ) {
             //если экшен open
             this.createReport(item, 'report');
           } else if (
-            item.action.toLowerCase() == 'exportSearch'.toLowerCase()
+            item.action.toLowerCase() === 'exportSearch'.toLowerCase()
           ) {
             //если экшен open
             this.exportSearch(item, 'search');
@@ -274,7 +285,7 @@ export default {
       formData.append('data', JSON.stringify(data));
       let result = await this.$store.getters.getPaper(formData);
       try {
-        if (result.status == 'success') {
+        if (result.status === 'success') {
           this.$emit('setLoading', false);
           this.downloadFile(result.file);
         } else {
@@ -311,9 +322,9 @@ export default {
 
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
-        if (event.data.length != 0) {
+        if (event.data.length !== 0) {
           //this.data = event.data;
-          if (type == 'report') {
+          if (type === 'report') {
             this.getPaper(file, event.data);
           } else {
             this.getSearch(event.data, sid);
@@ -336,25 +347,19 @@ export default {
 
         let request = indexedDB.open('EVA', 1);
 
-        request.onerror = function (event) {
-          console.log('error: ', event);
-        };
-
         request.onupgradeneeded = (event) => {
-          console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
-            console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -364,17 +369,13 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
             } else {
               self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
             }
-          };
-
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
           };
         };
       };
