@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- fixed setting theme
 - Added a frame for the event window
 - fixed node label name in YGraph
 - fixed ESLint errors and warnings
