@@ -3,8 +3,12 @@
     <v-card-title
       :style="{ color: theme.$title, 'background-color': theme.$main_bg }"
     >
-      <v-icon :color="theme.$title" class="pr-2">{{ eyeIcon }}</v-icon
-      >Предпросмотр
+      <v-icon
+        :color="theme.$title"
+        class="pr-2"
+      >
+        {{ eyeIcon }}
+      </v-icon>Предпросмотр
     </v-card-title>
     <v-card-text :style="{ 'background-color': theme.$secondary_bg }">
       <div
@@ -24,7 +28,9 @@
           color: theme.$main_text,
         }"
       >
-        <div class="subtitle-1">Фильтр пуст</div>
+        <div class="subtitle-1">
+          Фильтр пуст
+        </div>
       </div>
     </v-card-text>
     <div class="d-flex justify-end">
@@ -34,8 +40,9 @@
         :style="{ color: theme.$secondary_bg }"
         class="ma-2"
         @click="$emit('closeFilterPreviewModal')"
-        >Хорошо</v-btn
       >
+        Хорошо
+      </v-btn>
     </div>
   </v-card>
 </template>
@@ -45,7 +52,9 @@ import { mdiEyeOutline } from '@mdi/js';
 
 export default {
   name: 'FilterPreviewModal',
-  props: ['filter'],
+  props: {
+    filter: Object,
+  },
   data() {
     return {
       eyeIcon: mdiEyeOutline,

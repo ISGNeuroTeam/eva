@@ -56,7 +56,10 @@
           </v-icon>
         </v-btn>
       </v-text-field>
-      <v-dialog v-model="showDatePicker" max-width="400">
+      <v-dialog
+        v-model="showDatePicker"
+        max-width="400"
+      >
         <DTPicker
           v-model="temp.value"
           inline
@@ -67,7 +70,10 @@
         />
       </v-dialog>
     </div>
-    <div v-else style="padding-bottom: 10px">
+    <div
+      v-else
+      style="padding-bottom: 10px"
+    >
       Значение
       <v-text-field
         v-model="temp.value"
@@ -77,8 +83,14 @@
         dense
       />
     </div>
-    <v-slide-group v-model="currentOperationTab" mandatory>
-      <div style="width: 100%" class="d-flex justify-space-around">
+    <v-slide-group
+      v-model="currentOperationTab"
+      mandatory
+    >
+      <div
+        style="width: 100%"
+        class="d-flex justify-space-around"
+      >
         <v-slide-item
           v-for="(item, index) in operationMap[temp.fieldType]"
           :key="index"
@@ -90,14 +102,14 @@
             :style="
               active
                 ? {
-                    'background-color': theme.$primary_button,
-                    color: theme.$main_bg,
-                    'border-radius': '3px',
-                  }
+                  'background-color': theme.$primary_button,
+                  color: theme.$main_bg,
+                  'border-radius': '3px',
+                }
                 : {
-                    'background-color': theme.$main_bg,
-                    color: theme.$main_text,
-                  }
+                  'background-color': theme.$main_bg,
+                  color: theme.$main_text,
+                }
             "
             @click="toggle"
           >
@@ -112,7 +124,9 @@
 import { mdiCalendarMonth } from '@mdi/js';
 export default {
   name: 'ManualTypeModal',
-  props: ['temp'],
+  props: {
+    temp: Object,
+  },
   data() {
     return {
       fieldTypes: [

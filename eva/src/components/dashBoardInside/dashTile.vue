@@ -5,7 +5,7 @@
       class="dash-tile"
       :style="{ height: `${height - otstupBottom}px` }"
     >
-      <div class="tile-block" :data-status="change">
+      <div class="tile-block">
         <div
           v-for="i in dataTile.length"
           :key="i"
@@ -22,7 +22,10 @@
         </div>
       </div>
     </div>
-    <div v-show="noMsg" class="errormsg">
+    <div
+      v-show="noMsg"
+      class="errormsg"
+    >
       {{ msgText }}
     </div>
   </div>
@@ -53,7 +56,6 @@ export default {
       captures: {},
       noMsg: false,
       msgText: '',
-      dataTile: [],
     };
   },
   computed: {
@@ -64,41 +66,8 @@ export default {
     idDash: function () {
       return this.idDashFrom;
     },
-    // dataRest: function() {
-    //   if (!this.dataRestFrom.length || this.dataRestFrom.length == 0) {
-    //     this.noMsg = true;
-    //     this.msgText = "Нет данных для отображения";
-    //   } else if (!this.dataRestFrom[0].caption || !this.dataRestFrom[0].color) {
-    //     this.noMsg = true;
-    //     this.msgText = "Ожидается поле caption и color";
-    //   } else {
-    //     this.pushDataAsynchrony();
-
-    //   }
-    //   return 'done'
-    // },
-    change: function () {
-      if (!this.dataRestFrom.length || this.dataRestFrom.length == 0) {
-        this.noMsg = true;
-        this.msgText = 'Нет данных для отображения';
-      } else if (!this.dataRestFrom[0].caption || !this.dataRestFrom[0].color) {
-        this.noMsg = true;
-        this.msgText = 'Ожидается поле caption и color';
-      } else {
-        if (this.dataReport) {
-          if (this.activeElemFrom == this.id) {
-            this.pushDataAsynchrony();
-          } else {
-            this.dataTile = [];
-          }
-        } else {
-          this.pushDataAsynchrony();
-        }
-      }
-      return true;
-    },
     otstupBottom: function () {
-      let otstup = null;
+      let otstup;
       if (this.dataModeFrom) {
         otstup = 50;
         if (screen.width <= 1600) {
@@ -121,8 +90,30 @@ export default {
     heightTile: function () {
       return this.setSize('height');
     },
+    dataTile() {
+      // Report logic
+      if (this.dataReport) {
+        if (this.activeElemFrom === this.id) {
+          return this.dataRestFrom.map((item) => ({ ...item }));
+        }
+        return [];
+      }
+      // default logic
+      return this.dataRestFrom.map((item) => ({ ...item }));
+    },
   },
   watch: {
+    dataRestFrom: function (dataRestFrom) {
+      if (!dataRestFrom.length || dataRestFrom.length === 0) {
+        this.noMsg = true;
+        this.msgText = 'Нет данных для отображения';
+      } else if (!dataRestFrom[0].caption || !dataRestFrom[0].color) {
+        this.noMsg = true;
+        this.msgText = 'Ожидается поле caption и color';
+      } else {
+        this.captures = Object.keys(dataRestFrom[0]);
+      }
+    },
     captures: function (captures) {
       this.actions[0].capture = captures;
       this.$store.commit('setActions', {
@@ -141,22 +132,6 @@ export default {
     });
   },
   methods: {
-    pushDataAsynchrony: function () {
-      let prom = new Promise((resolve) => {
-        // создаем promise чтобы затем отрисовать график асинхронно
-        resolve();
-      });
-
-      prom.then(() => {
-        // как раз тут делаем асинхронность
-        this.dataTile = [];
-        this.noMsg = false;
-        this.dataRestFrom.forEach((item) => {
-          this.dataTile.push({ ...{}, ...item });
-        });
-        this.captures = Object.keys(this.dataRestFrom[0]);
-      });
-    },
     setClick: function (item) {
       let tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
@@ -167,7 +142,7 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
             tocken: tocken,
             idDash: this.idDash,
@@ -184,14 +159,14 @@ export default {
         partelement: 'empty',
       });
 
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'set') {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == 'go') {
+          } else if (item.action === 'go') {
             this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,
@@ -206,11 +181,11 @@ export default {
       return name.replace('\\n', '<br>');
     },
     setSize: function (sizeFrom) {
-      let size = '';
-      if (this.sizeTileFrom[sizeFrom] == '') {
+      let size;
+      if (!this.sizeTileFrom[sizeFrom] || this.sizeTileFrom[sizeFrom] === '') {
         size = '100px';
       } else {
-        if (this.sizeTileFrom[sizeFrom].indexOf('px') != -1) {
+        if (this.sizeTileFrom[sizeFrom].indexOf('px') !== -1) {
           size = this.sizeTileFrom[sizeFrom];
         } else {
           size = `${this.sizeTileFrom[sizeFrom]}px`;
@@ -219,9 +194,9 @@ export default {
       return size;
     },
     borderColor: function (border) {
-      if (border == '1') {
+      if (border === '1') {
         return this.colorFrom.controlsSystem;
-      } else if (border == '0' || border == null) {
+      } else if (border === '0' || border == null) {
         return 'transparent';
       } else {
         return border;

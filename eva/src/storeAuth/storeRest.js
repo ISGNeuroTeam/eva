@@ -121,7 +121,7 @@ export default {
   putLog(text) {
     // функция которая кладет логи в локальную бд - IndexedDB и на рест после определенной заполненности
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       // возвращаем промис, потому что записи происходят асинхронно
 
       let db = null; // переменная в которой будет лежать объект подключения к базе данных
@@ -143,7 +143,7 @@ export default {
           db.createObjectStore('searches'); // и заодно создаем таблицу для серчей чтобы потом избежать проблем с индексами базы данных
         }
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           // если успешно соеденились с бд
           db = request.result; // переопределям нашу переменную
 
@@ -153,7 +153,7 @@ export default {
 
       // тут немного дублируем, потому что в случае если только создалась бд и в случае если уже есть она, все равно нужно с ней работать
 
-      request.onsuccess = (event) => {
+      request.onsuccess = () => {
         // если успешно соеденились с бд
 
         db = request.result; // переопределям нашу переменную
@@ -176,7 +176,7 @@ export default {
 
         let query = logs.get('front'); // получаем данные лежащие по ключу front то есть те логи, что пишутся на фронте
 
-        query.onsuccess = (event) => {
+        query.onsuccess = () => {
           // если все успешно
           let oldText = ''; // переменная в которой будут храниться данные из бд
           if (query.result) {
@@ -212,7 +212,7 @@ export default {
         };
 
         let back = logs.get('back'); // дальше получаем то что лежит по ключу back то есть тот лог что будем отдавать на бэк
-        back.onsuccess = (event) => {
+        back.onsuccess = () => {
           // если данные получены успешно
           let newTextBack = `${date}&nbsp;&nbsp;${text}<br>${back.result}`; // составляем строку лога для back в виде даты,
           // текущего лога, и всего что там было до этого
@@ -230,7 +230,7 @@ export default {
             let count = logs.get('count'); // получаем  данные по ключу count он отвечает за счетчик сколько всего записей было
             // уже занесено после последнего обновления
 
-            count.onsuccess = (event) => {
+            count.onsuccess = () => {
               // если успешно получили данные
               if (count.result > 50) {
                 // смотрим если занесли уже больше 50 записей
@@ -293,14 +293,14 @@ export default {
         db.createObjectStore('logs'); // create it
       }
 
-      request.onsuccess = (event) => {
+      request.onsuccess = () => {
         db = request.result;
         console.log('successEvent: ' + db);
       };
     };
 
-    let promise = new Promise((resolve, reject) => {
-      request.onsuccess = (event) => {
+    let promise = new Promise((resolve) => {
+      request.onsuccess = () => {
         db = request.result;
 
         let transaction = db.transaction('logs'); // (1)
@@ -310,7 +310,7 @@ export default {
 
         let query = logs.get(side); // (3) return
 
-        query.onsuccess = (event) => {
+        query.onsuccess = () => {
           // (4)
           if (query.result) {
             resolve(query.result);
@@ -325,7 +325,7 @@ export default {
     return promise;
   },
   deleteLog() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       let db = null;
 
       let request = indexedDB.open('EVA', 1);
@@ -341,13 +341,13 @@ export default {
           db.createObjectStore('logs'); // create it
         }
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
           setTransaction(db);
         };
       };
 
-      request.onsuccess = (event) => {
+      request.onsuccess = () => {
         db = request.result;
 
         setTransaction(db);

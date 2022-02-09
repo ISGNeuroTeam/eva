@@ -7,11 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Added
+
+- ghooks lib for running ESLint in pre-commit hook
+
 ### Fixed
 
+- Added a frame for the event window
 - fixed node label name in YGraph
+- fixed ESLint errors and warnings
+- fixed the initial position of dash
 - fixed dash z index
 - fixed tooltip z-index
+- fixed tooltip width
+- fixed table events
+- fixed dash single value title
 - fixed rename dashboard
 
 

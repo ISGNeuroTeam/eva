@@ -7,25 +7,39 @@
       class="search-card-block"
       :style="{ background: theme.$main_bg, color: theme.$main_text }"
     >
-      <div class="loading-divider" :class="{ loading: loading }">
+      <div
+        class="loading-divider"
+        :class="{ loading: loading }"
+      >
         <div
           class="loading-bar"
           :style="{ background: theme.$primary_button }"
         />
       </div>
       <div class="search-block-header">
-        <div class="search-block-title" :style="{ color: theme.$title }">
+        <div
+          class="search-block-title"
+          :style="{ color: theme.$title }"
+        >
           Новый поиск
         </div>
-        <v-btn class="action-btn" text @click="refreshInput">
-          <span class="action-btn-text" :style="{ color: theme.$main_text }">
+        <v-btn
+          class="action-btn"
+          text
+          @click="refreshInput"
+        >
+          <span
+            class="action-btn-text"
+            :style="{ color: theme.$main_text }"
+          >
             Сбросить
           </span>
           <v-icon
             class="action-btn-icon"
             :style="{ color: theme.$main_text }"
-            >{{ mdiRefresh }}</v-icon
           >
+            {{ mdiRefresh }}
+          </v-icon>
         </v-btn>
       </div>
       <v-textarea
@@ -40,11 +54,19 @@
         rows="1"
         row-height="15"
         @keyup.ctrl.\="addLineBreaks"
-      ></v-textarea>
+      />
       <div class="search-block-footer">
-        <div class="search-block-title" :style="{ color: theme.$title }">
-          <div v-if="data.length > 0" :style="{ color: theme.$secondary_text }">
-            <v-icon :color="theme.$ok_color">{{ mdiCheck }}</v-icon>
+        <div
+          class="search-block-title"
+          :style="{ color: theme.$title }"
+        >
+          <div
+            v-if="data.length > 0"
+            :style="{ color: theme.$secondary_text }"
+          >
+            <v-icon :color="theme.$ok_color">
+              {{ mdiCheck }}
+            </v-icon>
             <span>{{ data.length }} результатов </span>
             <span v-if="searchTimeInterval">( {{ searchTimeInterval }} )</span>
           </div>
@@ -58,16 +80,24 @@
               max-width="150"
             >
               <template v-slot:activator="{ on, attrs }">
-                <div class="date-time-picker-text" v-bind="attrs" v-on="on">
+                <div
+                  class="date-time-picker-text"
+                  v-bind="attrs"
+                  v-on="on"
+                >
                   {{ timeRangeValue }}
-                  <v-icon :color="theme.$main_text">{{
-                    mdiChevronDown
-                  }}</v-icon>
+                  <v-icon :color="theme.$main_text">
+                    {{
+                      mdiChevronDown
+                    }}
+                  </v-icon>
                 </div>
               </template>
               <div class="dropdown-range">
                 <div class="dropdown-range-block">
-                  <div class="dropdown-range-title">Общие</div>
+                  <div class="dropdown-range-title">
+                    Общие
+                  </div>
                   <div
                     class="dropdown-range-item"
                     @click="
@@ -81,7 +111,9 @@
                   </div>
                 </div>
                 <div class="dropdown-range-block">
-                  <div class="dropdown-range-title">Недавние</div>
+                  <div class="dropdown-range-title">
+                    Недавние
+                  </div>
                   <div
                     v-for="item in timeRanges"
                     :key="item.time"
@@ -92,7 +124,9 @@
                   </div>
                 </div>
                 <div class="dropdown-range-block">
-                  <div class="dropdown-range-title">Гибкий поиск</div>
+                  <div class="dropdown-range-title">
+                    Гибкий поиск
+                  </div>
                   <v-menu
                     v-model="menuCalendar"
                     class="calendar"
@@ -118,19 +152,33 @@
                         v-model="dates"
                         :first-day-of-week="1"
                         range
-                      ></v-date-picker>
+                      />
                       <div class="d-flex justify-space-around date-range-wrap">
-                        <div class="date-range-string">c {{ dates[0] }}</div>
-                        <div class="date-range-string">по {{ dates[1] }}</div>
+                        <div class="date-range-string">
+                          c {{ dates[0] }}
+                        </div>
+                        <div class="date-range-string">
+                          по {{ dates[1] }}
+                        </div>
                       </div>
                       <div class="time-picker d-flex justify-space-around p-3">
-                        <input v-model="timeStart" type="time" />
-                        <input v-model="timeFinish" type="time" />
+                        <input
+                          v-model="timeStart"
+                          type="time"
+                        >
+                        <input
+                          v-model="timeFinish"
+                          type="time"
+                        >
                       </div>
                       <div class="picker-actions d-flex justify-space-around">
-                        <v-btn depressed small @click="menuCalendar = false"
-                          >Отменить</v-btn
+                        <v-btn
+                          depressed
+                          small
+                          @click="menuCalendar = false"
                         >
+                          Отменить
+                        </v-btn>
                         <v-btn
                           depressed
                           small
@@ -160,7 +208,9 @@
             @click="launchSearch"
           >
             <span class="action-btn-text">Поиск</span>
-            <v-icon class="action-btn-icon">{{ mdiMagnify }}</v-icon>
+            <v-icon class="action-btn-icon">
+              {{ mdiMagnify }}
+            </v-icon>
           </v-btn>
         </div>
       </div>
@@ -282,31 +332,8 @@ export default {
     });
     this.unitedData.color = this.theme.controls;
   },
-  mounted() {
-    document.title = 'EVA | Исследование данных';
-    this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl != '') {
-      this.$store.commit('setShould', {
-        idDash: 'reports',
-        id: 'table',
-        status: true,
-      });
-    }
-    // this.calcSize();
-    this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode == 13) {
-        this.launchSearch();
-      }
-    });
-    this.$refs.report.addEventListener('click', (event) => {
-      if (!event.target.classList.contains('static-row')) {
-        this.showStatistic = false;
-      }
-    });
-    this.unitedData.color = this.theme.controls;
-  },
   methods: {
-    addLineBreaks(event) {
+    addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'

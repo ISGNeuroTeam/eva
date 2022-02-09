@@ -21,7 +21,11 @@
         class="card-title open_title"
       >
         <div class="name-dash">
-          <v-icon v-if="dataFromDB" class="icon" :color="theme.$main_border">
+          <v-icon
+            v-if="dataFromDB"
+            class="icon"
+            :color="theme.$main_border"
+          >
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-icon
@@ -54,7 +58,10 @@
               :style="{ color: theme.$main_text }"
             >
               [ {{ element }} ]
-              <span v-if="dataSourseTitle !== -1" class="ml-1">
+              <span
+                v-if="dataSourseTitle !== -1"
+                class="ml-1"
+              >
                 {{ dataSourseTitle }}
               </span>
             </div>
@@ -83,7 +90,10 @@
         </div>
         <div class="settings-dash-block">
           <div class="settings-dash">
-            <v-dialog v-model="fullScreenMode" width="100%">
+            <v-dialog
+              v-model="fullScreenMode"
+              width="100%"
+            >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip
                   bottom
@@ -104,7 +114,10 @@
                   <span>На весь экран</span>
                 </v-tooltip>
               </template>
-              <div class="full-screen-dialog" :style="{ height: '80vh' }">
+              <div
+                class="full-screen-dialog"
+                :style="{ height: '80vh' }"
+              >
                 <v-card
                   class="dash-block"
                   :style="{
@@ -146,7 +159,10 @@
                           :style="{ color: theme.$main_text }"
                         >
                           [ {{ element }} ]
-                          <span v-if="dataSourseTitle !== -1" class="ml-1">
+                          <span
+                            v-if="dataSourseTitle !== -1"
+                            class="ml-1"
+                          >
                             {{ dataSourseTitle }}
                           </span>
                         </div>
@@ -217,22 +233,22 @@
                     :is="currentElem"
                     v-show="showElement"
                     class="card-text element-itself"
-                    :colorFrom="theme"
+                    :color-from="theme"
                     :style="{
                       color: theme.$main_text,
                       background: 'transparent',
                     }"
-                    :idFrom="element"
-                    :idDashFrom="idDash"
-                    :dataRestFrom="searchData"
-                    :dataModeFrom="dataMode"
-                    :timeFormatFrom="props.timeFormat"
-                    :sizeTileFrom="props.sizeTile"
-                    :tooltipFrom="props.tooltip"
-                    :currentSettings="settings"
-                    :updateSettings="updateSettings"
-                    :widthFrom="fullScreenWidth"
-                    :heightFrom="fullScreenHeight"
+                    :id-from="element"
+                    :id-dash-from="idDash"
+                    :data-rest-from="searchData"
+                    :data-mode-from="dataMode"
+                    :time-format-from="props.timeFormat"
+                    :size-tile-from="props.sizeTile"
+                    :tooltip-from="props.tooltip"
+                    :current-settings="settings"
+                    :update-settings="updateSettings"
+                    :width-from="fullScreenWidth"
+                    :height-from="fullScreenHeight"
                     :options="props.options"
                     :is-full-screen="true"
                     @hideDS="hideDS($event)"
@@ -364,7 +380,10 @@
           </div>
         </div>
       </v-card-title>
-      <div v-if="!props.hideLoad" class="loading-block">
+      <div
+        v-if="!props.hideLoad"
+        class="loading-block"
+      >
         <div
           v-show="props.disappear"
           :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
@@ -377,7 +396,10 @@
           />
         </div>
       </div>
-      <v-card-text v-show="!showElement" class="card-text">
+      <v-card-text
+        v-show="!showElement"
+        class="card-text"
+      >
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
@@ -390,21 +412,21 @@
         :is="currentElem"
         v-show="showElement"
         class="card-text element-itself"
-        :colorFrom="theme"
+        :color-from="theme"
         :style="{ color: theme.$main_text, background: 'transparent' }"
-        :idFrom="element"
-        :idDashFrom="idDash"
-        :dataRestFrom="searchData"
-        :dataModeFrom="dataMode"
+        :id-from="element"
+        :id-dash-from="idDash"
+        :data-rest-from="searchData"
+        :data-mode-from="dataMode"
         :loading="loading"
-        :timeFormatFrom="props.timeFormat"
-        :sizeTileFrom="props.sizeTile"
-        :tooltipFrom="props.tooltip"
-        :widthFrom="width"
-        :heightFrom="height"
+        :time-format-from="props.timeFormat"
+        :size-tile-from="props.sizeTile"
+        :tooltip-from="props.tooltip"
+        :width-from="width"
+        :height-from="height"
         :options="props.options"
-        :currentSettings="settings"
-        :updateSettings="updateSettings"
+        :current-settings="settings"
+        :update-settings="updateSettings"
         :is-full-screen="false"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"
@@ -418,26 +440,25 @@
 
 <script>
 import {
-  mdiPencil,
-  mdiCheckBold,
-  mdiClose,
   mdiArrowAll,
-  mdiArrowExpandAll,
-  mdiCodeTags,
-  mdiTrashCanOutline,
-  mdiMagnifyMinusOutline,
-  mdiDatabase,
-  mdiSettings,
-  mdiChevronDown,
-  mdiChevronUp,
-  mdiDatabaseSearch,
+  mdiArrowCollapse,
   mdiArrowDownBold,
   mdiArrowExpand,
-  mdiArrowCollapse,
-} from "@mdi/js";
-import { mapGetters } from "vuex";
-import settings from "../js/componentsSettings.js";
-import Vue from "vue";
+  mdiArrowExpandAll,
+  mdiCheckBold,
+  mdiChevronDown,
+  mdiChevronUp,
+  mdiClose,
+  mdiCodeTags,
+  mdiDatabase,
+  mdiDatabaseSearch,
+  mdiMagnifyMinusOutline,
+  mdiPencil,
+  mdiSettings,
+  mdiTrashCanOutline,
+} from '@mdi/js';
+import { mapGetters } from 'vuex';
+import settings from '../js/componentsSettings.js';
 
 export default {
   props: {
@@ -559,18 +580,7 @@ export default {
       return this.dataElemFrom;
     },
     dataMode: function () {
-      this.changeOptions(this.dataModeFrom);
-      if (!this.dataModeFrom) {
-        if (
-          this.element.split('-')[0] === 'button' ||
-          this.element.split('-')[0] === 'csvg' ||
-          this.element.split('-')[0] === 'tile'
-        ) {
-          this.props.disappear = false;
-        }
-      } else {
-        this.props.disappear = true;
-      }
+      console.log('computed dataMode this.dataModeFrom = ', this.dataModeFrom);
       return this.dataModeFrom;
     },
     currentElem: function () {
@@ -608,6 +618,33 @@ export default {
       return options.lastResult;
     },
     options: function () {
+      console.log('computed options');
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.element,
+      });
+      return options.change;
+    },
+  },
+  watch: {
+    dataMode(val) {
+      console.log('watch dataMode', val);
+      this.changeOptions(this.dataModeFrom);
+      if (!this.dataModeFrom) {
+        if (
+          this.element.split('-')[0] === 'button' ||
+          this.element.split('-')[0] === 'csvg' ||
+          this.element.split('-')[0] === 'tile'
+        ) {
+          this.props.disappear = false;
+        }
+      } else {
+        this.props.disappear = true;
+      }
+    },
+    options(val) {
+      console.log('watch options', val);
+
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.element,
@@ -620,16 +657,16 @@ export default {
       if (this.props.options.timeFormat) {
         this.props.timeFormat = this.props.options.timeFormat;
       }
-      if (this.props.options.widthTile) {
-        this.$set(this.props.sizeTile, 'width', this.props.options.widthTile);
-      } else {
-        this.$set(this.props.sizeTile, 'width', '');
-      }
-      if (this.props.options.heightTile) {
-        this.$set(this.props.sizeTile, 'height', this.props.options.heightTile);
-      } else {
-        this.$set(this.props.sizeTile, 'height', '');
-      }
+      this.$set(
+        this.props.sizeTile,
+        'width',
+        this.props.options.widthTile || ''
+      );
+      this.$set(
+        this.props.sizeTile,
+        'height',
+        this.props.options.heightTile || ''
+      );
       if (this.props.options.tooltip) {
         Object.keys(this.props.options.tooltip).forEach((item) => {
           this.$set(this.props.tooltip, item, this.props.options.tooltip[item]);
@@ -640,14 +677,14 @@ export default {
         this.$set(this.props.tooltip, 'buttons', []);
       }
 
-      //this.$emit("SetLevel", this.props.options.level);
-
       this.setShadow();
-
-      return options.change;
     },
-  },
-  watch: {
+    dataModeFrom(val) {
+      console.log('watch dataModeFrom', val);
+    },
+    'props.disappear'(val) {
+      console.log('watch props.disappear', val);
+    },
     fullScreenMode(to) {
       setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
@@ -722,7 +759,7 @@ export default {
       }
     },
     setLoading: function (event) {
-      if (this.element.indexOf('button') != -1) {
+      if (this.element.indexOf('button') !== -1) {
         this.props.hideLoad = !event;
       }
       this.props.loading = event;
@@ -737,56 +774,9 @@ export default {
         page: this.dataPageFrom,
       });
     },
-    getDataFromDB: function (searсhID) {
-      // получение данных с indexindDB
-      let db = null;
-      let request = indexedDB.open('EVA', 1);
-      request.onerror = function (event) {
-        console.log('error: ', event);
-      };
-
-      request.onupgradeneeded = (event) => {
-        console.log('create');
-        db = event.target.result;
-        if (!db.objectStoreNames.contains('searches')) {
-          // if there's no "books" store
-          db.createObjectStore('searches'); // create it
-        }
-        request.onsuccess = (event) => {
-          db = request.result;
-          console.log('successEvent: ' + db);
-        };
-      };
-      let promise = new Promise((resolve, reject) => {
-        request.onsuccess = (event) => {
-          db = request.result;
-
-          let transaction = db.transaction('searches'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
-
-          let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
-
-          query.onsuccess = (event) => {
-            // (4)
-            if (query.result) {
-              resolve(query.result);
-            } else {
-              resolve([]);
-            }
-          };
-
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
-          };
-        };
-      });
-      return promise;
-    },
     openTitle: function () {
       // открываем закрываем шапку элемнета
-      if (this.props.arrow.direct == 'up') {
+      if (this.props.arrow.direct === 'up') {
         this.props.arrow.elem = this.props.mdiChevronDown;
         this.props.arrow.direct = 'down';
       } else {
@@ -804,7 +794,7 @@ export default {
       }); // сразу переключаем элемнет на отображение данных,
     },
     setVissible: function (event) {
-      if (event.split('-')[0] == 'picker' || event.split('-')[0] == 'guntt') {
+      if (event.split('-')[0] === 'picker' || event.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
         this.$el.querySelector('.dash-block').style.overflow = 'visible'; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
@@ -899,7 +889,7 @@ export default {
     //     props.resize_elem = !props.resize_elem;
     //   }
     // },
-    getData: function (searсhID) {
+    getData: function (searchID) {
       // асинхронная функция для получения даных с реста
       let db = null;
       let request = indexedDB.open('EVA', 1);
@@ -913,19 +903,19 @@ export default {
           // if there's no "books" store
           db.createObjectStore('searches'); // create it
         }
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
           console.log('successEvent: ' + db);
         };
       };
-      let promise = new Promise((resolve, reject) => {
-        request.onsuccess = (event) => {
+      return new Promise((resolve) => {
+        request.onsuccess = () => {
           db = request.result;
           let transaction = db.transaction('searches'); // (1)
           // получить хранилище объектов для работы с ним
           let searches = transaction.objectStore('searches'); // (2)
-          let query = searches.get(String(searсhID)); // (3) return store.get('Ire Aderinokun');
-          query.onsuccess = (event) => {
+          let query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               resolve(query.result);
@@ -938,7 +928,6 @@ export default {
           };
         };
       });
-      return promise;
     },
     checkFilter: function () {
       let events = this.$store.getters.getEvents({
@@ -955,11 +944,11 @@ export default {
       events.forEach((item) => {
         event = { ...{}, ...item };
 
-        if (event.prop == 'filter' && event.value == 'true') {
+        if (event.prop === 'filter' && event.value === 'true') {
           data = JSON.parse(JSON.stringify(this.props.dataRest));
-          event.row = event.row.replace(/\[|\]/g, '').split(',');
+          event.row = event.row.replace(/[[\]]/g, '').split(',');
 
-          if (event.column.indexOf('!') != -1) {
+          if (event.column.indexOf('!') !== -1) {
             columnDel = event.column.replace('!', '');
             this.props.dataRest.forEach((itemFil, i) => {
               if (Object.keys(itemFil).includes(columnDel)) {
@@ -967,17 +956,18 @@ export default {
               }
             });
           } else {
+            let notArr;
             switch (event.compare) {
               case 'equals':
-                let notArr = [];
+                notArr = [];
                 event.row.forEach((notElem) => {
-                  if (notElem.indexOf('!') != -1) {
+                  if (notElem.indexOf('!') !== -1) {
                     notArr.push(notElem.substr(1));
                   }
                 });
-                if (event.column != '') {
+                if (event.column !== '') {
                   data = data.filter((itemFil) => {
-                    if (notArr.length != 0) {
+                    if (notArr.length !== 0) {
                       if (!notArr.includes(String(itemFil[event.column]))) {
                         return itemFil;
                       }
@@ -989,7 +979,7 @@ export default {
                   });
                 } else {
                   data = data.filter((itemFil) => {
-                    if (notArr.length != 0) {
+                    if (notArr.length !== 0) {
                       incl = true;
                       Object.values(itemFil).forEach((val) => {
                         if (notArr.includes(String(val))) {
@@ -1011,7 +1001,7 @@ export default {
                 }
                 break;
               case 'over':
-                if (event.column != '') {
+                if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = true;
                     event.row.forEach((row) => {
@@ -1028,7 +1018,7 @@ export default {
                 }
                 break;
               case 'less':
-                if (event.column != '') {
+                if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = true;
                     event.row.forEach((row) => {
@@ -1045,7 +1035,7 @@ export default {
                 }
                 break;
               case 'in':
-                if (event.column != '') {
+                if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     if (event.row.includes(String(itemFil[event.column]))) {
                       return itemFil;
@@ -1066,7 +1056,7 @@ export default {
                 }
                 break;
               case 'between':
-                if (event.column != '') {
+                if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = false;
                     let min, max;
@@ -1104,7 +1094,7 @@ export default {
                 let equalRest = true; // переменная которая скажет полностью совпал объект внутри результирующего массива
                 keys.forEach((key) => {
                   // пробегаемся по кажлому полю в объекте
-                  if (itemData[key] != itemDataRest[key]) {
+                  if (itemData[key] !== itemDataRest[key]) {
                     // если значения поля из только что отфильтрованного массива, не равно значени в уже до
                     // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
                     equalRest = false; // поэтому присваиваем переменной значение мол строки отличаются
@@ -1123,10 +1113,9 @@ export default {
           }
         }
       });
-      if (data.length == 0) {
+      if (data.length === 0) {
         this.searchData = JSON.parse(JSON.stringify(this.props.dataRest));
       }
-      link.remove(); // удаляем ссылку
     },
     setRange(range) {
       this.$emit('SetRange', range);
