@@ -1,5 +1,5 @@
 <template>
-  <div class="table-block">
+  <div class="table-block" :data-change="change">
     <div class="v-data-table--container">
       <v-data-table
         v-show="!props.nodata"
@@ -7,12 +7,12 @@
         v-model="props.input"
         class="dash-table report-table"
         :headers="props.titles"
-        :items.sync="filteredTableData"
+        :items.sync="eventedTableData"
         :data-id="id"
         item-key="none"
         :hide-default-footer="props.hideFooter"
         :footer-props="{
-          itemsPerPageOptions: [10, 100, 500, 1000, -1],
+          itemsPerPageOptions: [100, 500, 1000, -1],
         }"
         :height="height"
         fixed-header
@@ -23,77 +23,89 @@
           v-for="(value, title) in typedTitles"
           v-slot:[`header.${title}`]="{ header }"
         >
-          <v-menu
-            :key="`${title + value}`"
-            offset-y
-          >
-            <v-menu
-              z-index="100000"
-              offset-y
-              :close-on-content-click="false"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-icon
-                  v-bind="attrs"
-                  large
-                  class="icon"
-                  :color="theme.$main_border"
-                  v-on="on"
-                >
-                  {{ mdiMagnify }}
-                </v-icon>
-              </template>
-              <v-row v-if="value !== 'string'">
-                <v-col cols="6">
-                  <v-select
-                    :items="compare"
-                    label="Знак"
-                    @change="setFilterData(title, $event, 'compare')"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    label="значение"
-                    @change="setFilterData(title, $event)"
-                  />
-                </v-col>
-              </v-row>
+          <v-menu :key="`${title + value}`" offset-y>
+            <template v-slot:activator>
+              <v-menu z-index="100000" offset-y :close-on-content-click="false">
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    v-bind="attrs"
+                    large
+                    class="icon"
+                    :color="theme.$main_border"
+                    v-on="on"
+                    >{{ mdiMagnify }}</v-icon
+                  >
+                </template>
+                <v-row v-if="value !== 'string'">
+                  <v-col cols="6">
+                    <v-select
+                      :items="compare"
+                      label="Знак"
+                      @change="setFilterData(title, $event, 'compare')"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6">
+                    <v-text-field
+                      label="значение"
+                      @change="setFilterData(title, $event)"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
 
-              <v-row v-else>
-                <v-col cols="12">
-                  <v-text-field
-                    label="значение"
-                    @change="
-                      setFilterData(title, '=', 'compare');
-                      setFilterData(title, $event);
-                    "
-                  />
-                </v-col>
-              </v-row>
-            </v-menu>
+                <v-row v-else>
+                  <v-col cols="12">
+                    <v-text-field
+                      label="значение"
+                      @change="
+                        setFilterData(title, '=', 'compare');
+                        setFilterData(title, $event);
+                      "
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-menu>
+            </template>
           </v-menu>
-          <v-tooltip
-            :key="value"
-            bottom
-          >
+          <v-tooltip :key="header.value + value" bottom>
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
           </v-tooltip>
         </template>
+        <template v-for="(title) in props.titles" v-slot:item="{ item }">
+          <tr
+            :key="title + item.rowIndex"
+            :style="item.rowColor && `background-color: ${item.rowColor}`"
+          >
+            <template v-for="(col, colIndex) in item">
+              <td
+                v-if="!excludeColumns.includes(colIndex)"
+                :key="colIndex"
+                class="text-start"
+                :style="
+                  (item.cellColor &&
+                    item.cellColor[colIndex] &&
+                    `background-color: ${item.cellColor[colIndex]}`) ||
+                  (item.columnColor &&
+                    item.columnColor[colIndex] &&
+                    `background-color: ${item.columnColor[colIndex]}`)
+                "
+              >
+                {{ col }}
+              </td>
+            </template>
+          </tr>
+        </template>
       </v-data-table>
     </div>
-    <div
-      v-show="props.nodata"
-      class="no-data-table"
-    >
+    <div v-show="props.nodata" class="no-data-table">
       {{ props.message }}
     </div>
   </div>
 </template>
 
 <script>
-import { mdiMagnify } from '@mdi/js';
+import {mdiMagnify} from '@mdi/js';
 
 export default {
   props: {
@@ -132,9 +144,49 @@ export default {
       dataTitles: [],
       stringTitles: [],
       filters: {},
+      excludeColumns: ['rowColor', 'columnColor', 'cellColor', 'rowIndex'],
     };
   },
   computed: {
+    eventedTableData() {
+      const items = [...this.filteredTableData].map((item, index) => ({
+        ...item,
+        rowIndex: index,
+      }));
+      this.eventRows.forEach((event) => {
+        if (event.prop[0] === 'rowcolor') {
+          items.forEach((item) => {
+            if (this[event.compare](item[event.column], event.row)) {
+              item.rowColor = event.value[0];
+            }
+          });
+        }
+        if (event.prop[0] === 'columncolor') {
+          let isColumnMatch = items.reduce((acc, item) => {
+            return acc || this[event.compare](item[event.column], event.row);
+          }, false);
+          if (isColumnMatch) {
+            items.forEach((item) => {
+              if (!item.columnColor) {
+                item.columnColor = {};
+              }
+              item.columnColor[event.column] = event.value[0];
+            });
+          }
+        }
+        if (event.prop[0] === 'cellcolor') {
+          items.forEach((item) => {
+            if (this[event.compare](item[event.column], event.row)) {
+              if (!item.cellColor) {
+                item.cellColor = [];
+              }
+              item.cellColor[event.column] = event.value[0];
+            }
+          });
+        }
+      });
+      return items;
+    },
     filteredTableData() {
       let chooseSort = function (dataFormat, sortType, value) {
         if (dataFormat === 'date') {
@@ -209,8 +261,8 @@ export default {
         }
       }
       return temp;
-    },
 
+    },
     events() {
       return this.$store.getters.getEvents({
         idDash: this.idDash,
@@ -218,16 +270,24 @@ export default {
         element: this.id,
       });
     },
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    theme: function () {
+    change() {
+      if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
+        this.setNoData()
+      } else {
+        this.getDataAsynchrony(this.dataRestFrom);
+      }
+      return true;
+    },
+    theme() {
       return this.$store.getters.getTheme;
     },
-    height: function () {
+    height() {
       let otstup = 100;
       if (screen.width <= 1600) {
         otstup = 80;
@@ -241,10 +301,10 @@ export default {
       if (this.dataReport) {
         otstup = otstup - 30;
       }
-      // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
+       // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
       return this.heightFrom - otstup;
     },
-    lastResult: function () {
+    lastResult() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
@@ -266,7 +326,6 @@ export default {
           this.indexTitles(val);
         }
         this.setEventColor();
-        this.updateProps();
       },
     },
     events() {
@@ -280,16 +339,11 @@ export default {
       id: this.id,
     });
     this.setEventColor();
-    this.updateProps();
   },
   methods: {
-    updateProps() {
-      if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
-        this.props.itemsForTable = [];
-        this.props.nodata = true;
-      } else {
-        this.getDataAsynchrony(this.dataRestFrom);
-      }
+    setNoData() {
+      this.props.itemsForTable = [];
+      this.props.nodata = true;
     },
     indexTitles(oldVal) {
       let type = 'no';
@@ -310,7 +364,6 @@ export default {
     getType(title) {
       return this.typedTitles[title];
     },
-
     setFilterData(title, event, compare) {
       if (!this.filters[title]) this.filters[title] = {};
       if (compare === 'compare') {
@@ -325,6 +378,7 @@ export default {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
       return isNumber(val);
+
     },
     checkForString(val) {
       return Object.prototype.toString.call(val) === '[object String]';
@@ -334,11 +388,11 @@ export default {
       let parts = val.split('.');
       if (parts.length < 3) return false;
       let result;
-      let mydate = new Date(parts[2], parts[1] - 1, parts[0]);
+      let mydate = new Date(+parts[2], +parts[1] - 1, +parts[0]);
       if (
-        parts[2] === mydate.getYear() &&
-        parts[1] - 1 === mydate.getMonth() &&
-        parts[0] === mydate.getDate().toString()
+        +parts[2] === mydate.getYear() &&
+        +parts[1] - 1 === mydate.getMonth() &&
+        +parts[0] === mydate.getDate()
       ) {
         result = 0;
       } else {
@@ -346,7 +400,7 @@ export default {
       }
       return result;
     },
-    getDataAsynchrony: function (data) {
+    getDataAsynchrony(data) {
       let prom = new Promise((resolve) => {
         if (data.error) {
           this.props.message = data.error;
@@ -370,7 +424,7 @@ export default {
         this.props.itemsForTable = data;
       });
     },
-    createTitles: function (result) {
+    createTitles(result) {
       if (this.options?.titles) {
         let allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map((x) => ({
@@ -385,12 +439,14 @@ export default {
       } else {
         if (result && result.length) {
           this.props.titles = Object.keys(result[0]).map((item) => {
-            return { text: item, value: item, sortable: true };
+            if (!this.excludeColumns.includes(item)) {
+              return { text: item, value: item, sortable: true };
+            }
           });
         }
       }
     },
-    createTockens: function (result) {
+    createTockens(result) {
       let captures = Object.keys(result[0]);
       this.props.actions.forEach((item, i) => {
         this.$set(this.props.actions[i], 'capture', captures);
@@ -401,141 +457,29 @@ export default {
         id: this.id,
       });
     },
-    setEventColor: function () {
-      if (this.eventRows.length > 0) {
-        for (let x of this.eventRows) {
-          x.style.background = '';
-          x.classList.remove('event');
-        }
-      }
-      this.eventRows = [];
-      let events = this.$store.getters.getEvents({
+    equals(a, b) {
+      return a === b;
+    },
+    over(a, b) {
+      return +a > +b;
+    },
+    less(a, b) {
+      return +a < +b;
+    },
+    in(a, b) {
+      return b.includes(a);
+    },
+    between(a, b) {
+      return b[0] < a || a < b[1];
+    },
+    setEventColor() {
+      this.eventRows = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
       });
-      let table, column;
-      let eventObj = {};
-      events.forEach((item, index) => {
-        eventObj[index] = {};
-        eventObj[index]['compare'] = item.compare;
-        eventObj[index]['column'] = item.column;
-        eventObj[index]['row'] = item.row;
-        eventObj[index]['color'] = item.value[0];
-        eventObj[index]['prop'] = item.prop[0];
-        table = this.$refs.table.$el;
-
-        if (
-          eventObj[index]['prop'] === 'rowcolor' ||
-          eventObj[index]['prop'] === 'columncolor' ||
-          eventObj[index]['prop'] === 'cellcolor'
-        ) {
-          let readyTh = setTimeout(
-            function tick() {
-              table.querySelectorAll('thead th').style =
-                'background-color: red';
-              if (table.querySelectorAll('thead th').length !== 0) {
-                clearTimeout(readyTh);
-                let sp = 0;
-                table.querySelectorAll('thead span').forEach((itemSpan) => {
-                  if (itemSpan.innerText !== 0) {
-                    if (itemSpan.innerText === eventObj[index]['column']) {
-                      column = sp;
-                    }
-                    sp++;
-                  }
-                });
-
-                table.querySelectorAll('tbody tr').forEach((itemRow) => {
-                  itemRow.querySelectorAll('td').forEach((itemTd, i) => {
-                    if (i === column) {
-                      // itemRow.style.backgroundColor = 'yellow';
-                      let needItem = null,
-                        row,
-                        k = -1;
-
-                      switch (eventObj[index]['compare']) {
-                        case 'equals':
-                          if (itemTd.innerText === eventObj[index]['row']) {
-                            needItem = itemRow;
-                          }
-
-                          break;
-                        case 'over':
-                          if (itemTd.innerText > eventObj[index]['row']) {
-                            needItem = itemRow;
-                          }
-                          break;
-                        case 'less':
-                          if (itemTd.innerText < eventObj[index]['row']) {
-                            needItem = itemRow;
-                          }
-                          break;
-                        case 'in':
-                          row = eventObj[index]['row']
-                            .replace(/[[\]]/g, '')
-                            .split(',');
-                          k = -1;
-                          row.forEach((rowValue) => {
-                            if (itemTd.innerText === rowValue) {
-                              k = 0;
-                            }
-                          });
-                          if (k !== -1) {
-                            needItem = itemRow;
-                          }
-                          break;
-                        case 'between':
-                          row = eventObj[index]['row']
-                            .replace(/[[\]]/g, '')
-                            .split(',');
-                          if (
-                            itemTd.innerText > row[0] &&
-                            itemTd.innerText < row[1]
-                          ) {
-                            needItem = itemRow;
-                          }
-                          break;
-                      }
-                      if (needItem != null && this.eventRows) {
-                        needItem.classList.add('event');
-                        this.eventRows.push(needItem);
-                      }
-                    }
-                  });
-                });
-
-                if (table.querySelectorAll('.event').length > 0) {
-                  if (item.prop[0] === 'rowcolor') {
-                    let rows = table.querySelectorAll('.event');
-                    rows.forEach((res) => {
-                      res.style.background = eventObj[index]['color'];
-                      //res.style.color = this.color.back;
-                    });
-                  } else if (item.prop[0] === 'cellcolor') {
-                    table.querySelectorAll('.event').forEach((res) => {
-                      res.children[column].style.background =
-                        eventObj[index]['color'];
-                      //res.children[column].style.color = this.color.back;
-                    });
-                  } else if (item.prop[0] === 'columncolor') {
-                    table.querySelectorAll('tbody tr').forEach((itemRow) => {
-                      itemRow.children[column].style.background =
-                        eventObj[index]['color'];
-                      //itemRow.children[column].style.color = this.color.back;
-                    });
-                  }
-                }
-              } else {
-                readyTh = setTimeout(tick, 100);
-              }
-            }.bind(this),
-            0
-          );
-        }
-      });
     },
-    selectRow: function () {
+    selectRow() {
       document
         .querySelector(`[data-id=${this.id}]`)
         .addEventListener('click', (event) => {

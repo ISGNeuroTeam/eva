@@ -22,8 +22,7 @@
             v-for="item in rows"
             :key="item.id"
             class="interesting-row"
-          >
-            <v-menu
+          >  <v-menu
               offset-x
               :close-on-content-click="false"
               content-class="interesting-popup"

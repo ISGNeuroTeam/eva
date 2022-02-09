@@ -156,8 +156,6 @@ export default {
       type: Object,
       required: true,
     },
-    // TODO: возможно на удаление, так как не нашел ниодного места где передается этот проп
-    // nameGroupFrom: null,
   },
   data() {
     return {

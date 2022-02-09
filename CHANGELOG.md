@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed dash z index
 - fixed tooltip z-index
 - fixed tooltip width
+- fixed table events
 
 
 ## [1.81.0]
