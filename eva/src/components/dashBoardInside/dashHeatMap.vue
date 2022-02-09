@@ -1,6 +1,11 @@
 <template>
   <div class="heatmap-container px-0">
-    <v-simple-table dense fixed-header class="heatmap-table" height="100%">
+    <v-simple-table
+      dense
+      fixed-header
+      class="heatmap-table"
+      height="100%"
+    >
       <template v-slot:default>
         <thead>
           <tr>
@@ -9,32 +14,55 @@
               v-for="(y, index) in filteredY"
               :key="index"
               class="text-center table-th"
-              v-text="y"
               @click="onClickTd(null, y)"
+              v-text="y"
             />
           </tr>
         </thead>
         <tbody>
-          <tr v-for="x in filteredX" :key="x">
-            <td class="text-left" @click="onClickTd(x)">
-              <v-menu open-on-hover top offset-y>
+          <tr
+            v-for="x in filteredX"
+            :key="x"
+          >
+            <td
+              class="text-left"
+              @click="onClickTd(x)"
+            >
+              <v-menu
+                open-on-hover
+                top
+                offset-y
+              >
                 <template v-slot:activator="{ on, attrs }">
-                  <span v-bind="attrs" v-on="on">
+                  <span
+                    v-bind="attrs"
+                    v-on="on"
+                  >
                     {{ x }}
                   </span>
                 </template>
 
                 <v-list>
-                  <v-list-item v-for="(item, index) in ['Детали']" :key="index">
-                    <v-list-item-title style="color: black"
-                      ><a @click="setClick(x)">{{ item }}</a></v-list-item-title
+                  <v-list-item
+                    v-for="(item, index) in ['Детали']"
+                    :key="index"
+                  >
+                    <v-list-item-title
+                      style="color: black"
                     >
+                      <a @click="setClick(x)">{{ item }}</a>
+                    </v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
             </td>
 
-            <td v-for="y in filteredY" :key="y" class="pa-0" @click="onClickTd(x, y)">
+            <td
+              v-for="y in filteredY"
+              :key="y"
+              class="pa-0"
+              @click="onClickTd(x, y)"
+            >
               <div
                 v-if="filteredData[x][y] && filteredData[x][y].metadata"
                 class="td-inner"
@@ -63,10 +91,10 @@
 </template>
 
 <script>
-import DashHeatMapLinear from "./dashHeatMapLinear.vue";
+import DashHeatMapLinear from './dashHeatMapLinear.vue';
 
 export default {
-  name: "heatmap",
+  name: 'Heatmap',
   components: { DashHeatMapLinear },
   props: {
     dataRestFrom: Array,
@@ -79,21 +107,21 @@ export default {
     y: new Set(),
     updateData: 0,
     data: {},
-    xField: "x",
-    yField: "y",
-    dataField: "metric",
+    xField: 'x',
+    yField: 'y',
+    dataField: 'metric',
     detailValue: null,
-    xFieldFormat: "Строка",
-    xFieldSort: "По возрастанию",
-    yFieldFormat: "Дата",
-    yFieldSort: "По возрастанию",
-    renderData: "metadata",
+    xFieldFormat: 'Строка',
+    xFieldSort: 'По возрастанию',
+    yFieldFormat: 'Дата',
+    yFieldSort: 'По возрастанию',
+    renderData: 'metadata',
     defaultActions: [
       {
         name: 'click',
-        capture: []
+        capture: [],
       },
-    ]
+    ],
   }),
   computed: {
     id: function () {
@@ -103,12 +131,11 @@ export default {
       return this.idDashFrom;
     },
     events() {
-      let events = this.$store.getters.getEvents({
+      return this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "OnDataCompare",
+        event: 'OnDataCompare',
         element: this.id,
       });
-      return events;
     },
     filteredData() {
       return this.updateData && this.data;
@@ -116,8 +143,8 @@ export default {
 
     filteredY() {
       let temp = Array.from(this.y);
-      if (this.yFieldFormat === "Строка") {
-        if (this.yFieldSort === "По возрастанию") temp.sort();
+      if (this.yFieldFormat === 'Строка') {
+        if (this.yFieldSort === 'По возрастанию') temp.sort();
         else temp.sort().reverse();
       } else {
         let sort = this.chooseSort(this.yFieldFormat, this.yFieldSort);
@@ -128,8 +155,8 @@ export default {
 
     filteredX() {
       let temp = Array.from(this.x);
-      if (this.xFieldFormat === "Строка") {
-        if (this.xFieldSort === "По возрастанию") temp.sort();
+      if (this.xFieldFormat === 'Строка') {
+        if (this.xFieldSort === 'По возрастанию') temp.sort();
         else temp.sort().reverse();
       } else {
         let sort = this.chooseSort(this.xFieldFormat, this.xFieldSort);
@@ -139,22 +166,26 @@ export default {
     },
 
     actions() {
-      let capture = []
+      let capture = [];
       if (this.dataRestFrom && this.dataRestFrom[0]) {
-        capture = Object.keys(this.dataRestFrom[0])
+        capture = Object.keys(this.dataRestFrom[0]);
       }
-      return this.defaultActions.map(action => {
-        return { ...action, capture }
-      })
-    }
+      return this.defaultActions.map((action) => {
+        return { ...action, capture };
+      });
+    },
   },
   watch: {
     actions(actions) {
-      this.$store.commit('setActions', {actions, idDash: this.idDash, id: this.id });
+      this.$store.commit('setActions', {
+        actions,
+        idDash: this.idDash,
+        id: this.id,
+      });
     },
     dataRestFrom() {
       if (this.dataRestFrom && this.dataRestFrom[0]) {
-        let fields = Object.keys(this.dataRestFrom[0])
+        let fields = Object.keys(this.dataRestFrom[0]);
         this.$store.commit('setOptions', {
           id: this.idFrom,
           idDash: this.idDashFrom,
@@ -185,7 +216,11 @@ export default {
   },
 
   mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
+    this.$store.commit('setActions', {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
   },
 
   methods: {
@@ -193,48 +228,46 @@ export default {
       let val = null;
       let row = null;
       if (x !== null && y !== null) {
-        val = this.filteredData[x][y]?.value
-        row = this.filteredData[x][y]?.row
+        val = this.filteredData[x][y]?.value;
+        row = this.filteredData[x][y]?.row;
       }
 
-      this.$store.getters.getTockens(this.idDash).forEach((token, i) => {
+      this.$store.getters.getTockens(this.idDash).forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
           const capture = token.capture;
-          const captureIdx = ['x','y','value'].indexOf(capture);
+          const captureIdx = ['x', 'y', 'value'].indexOf(capture);
           if (captureIdx !== -1) {
-            value = ([x, y, val][captureIdx])
+            value = [x, y, val][captureIdx];
           } else if (row && capture !== '') {
-            value = row[capture]
+            value = row[capture];
           } else {
-            value = null
+            value = null;
           }
           this.$store.commit('setTocken', {
             tocken: token,
             idDash: this.idDash,
             value,
-          })
+          });
         }
-      })
-
-
+      });
     },
     setClick: function (tokenValue) {
       if (this.detailValue) {
-        let [first] = Object.keys(this.filteredData[tokenValue])
-        tokenValue = this.filteredData[tokenValue][first].row[this.detailValue]
+        let [first] = Object.keys(this.filteredData[tokenValue]);
+        tokenValue = this.filteredData[tokenValue][first].row[this.detailValue];
       }
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
-        event: "onclick",
+        event: 'onclick',
         element: this.id,
-        partelement: "empty",
+        partelement: 'empty',
       });
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == "go") {
+          if (item.action === 'go') {
             item.value[0] = tokenValue;
-            this.$store.commit("letEventGo", {
+            this.$store.commit('letEventGo', {
               event: item,
               id: this.id,
               idDash: this.idDash,
@@ -247,7 +280,7 @@ export default {
       }
     },
     chooseSort(dataFormat, sortType) {
-      if (dataFormat === "Дата") {
+      if (dataFormat === 'Дата') {
         let up = (a, b) => {
           return new Date(a) - new Date(b);
         };
@@ -256,10 +289,10 @@ export default {
         };
 
         let sort;
-        if (sortType === "По возрастанию") sort = up;
+        if (sortType === 'По возрастанию') sort = up;
         else sort = down;
         return sort;
-      } else if (dataFormat === "Число") {
+      } else if (dataFormat === 'Число') {
         let up = (a, b) => {
           return a - b;
         };
@@ -268,7 +301,7 @@ export default {
         };
 
         let sort;
-        if (sortType === "По возрастанию") sort = up;
+        if (sortType === 'По возрастанию') sort = up;
         else sort = down;
         return sort;
       }
@@ -306,7 +339,7 @@ export default {
      */
     parseMetadata(data = null) {
       try {
-        if (typeof data !== "string") return null;
+        if (typeof data !== 'string') return null;
         return !data ? null : JSON.parse(data.replaceAll(`'`, `"`));
       } catch (err) {
         return null;

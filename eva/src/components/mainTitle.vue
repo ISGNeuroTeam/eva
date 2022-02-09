@@ -1,5 +1,8 @@
 <template>
-  <v-app class="application" :style="{ background: theme.$secondary_bg }">
+  <v-app
+    class="application"
+    :style="{ background: theme.$secondary_bg }"
+  >
     <dash-panel-bord
       v-if="prepared"
       :horizontal-cell="horizontalCell"
@@ -49,8 +52,11 @@
           :width="8"
           :color="theme.$primary_button"
           indeterminate
-        ></v-progress-circular>
-        <v-container v-else class="dash-container">
+        />
+        <v-container
+          v-else
+          class="dash-container"
+        >
           <div
             v-if="gridShow"
             class="overlay-grid"
@@ -69,8 +75,8 @@
             :data-page-from="page"
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
-            :searchData="getElementData(elem)"
-            :dataSourseTitle="elem.search"
+            :search-data="getElementData(elem)"
+            :data-sourse-title="elem.search"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
@@ -81,21 +87,41 @@
             :id-dash-from="idDash"
             :data-page-from="page"
           />
-          <modal-search :color-from="theme" :id-dash-from="idDash" />
-          <modal-settings :color-from="theme" :id-dash-from="idDash" />
+          <modal-search
+            :color-from="theme"
+            :id-dash-from="idDash"
+          />
+          <modal-settings
+            :color-from="theme"
+            :id-dash-from="idDash"
+          />
         </v-container>
       </v-main>
     </div>
-    <div v-show="showTabs" class="tab-panel-wrapper">
-      <v-tooltip top :color="theme.$accent_ui_color">
+    <div
+      v-show="showTabs"
+      class="tab-panel-wrapper"
+    >
+      <v-tooltip
+        top
+        :color="theme.$accent_ui_color"
+      >
         <template v-slot:activator="{ on }">
-          <div v-show="leftDots" class="dots" v-on="on" @click="moveScroll(0)">
+          <div
+            v-show="leftDots"
+            class="dots"
+            v-on="on"
+            @click="moveScroll(0)"
+          >
             ...
           </div>
         </template>
         <span>В начало</span>
       </v-tooltip>
-      <div ref="tab-panel" class="tab-panel">
+      <div
+        ref="tab-panel"
+        class="tab-panel"
+      >
         <div
           v-for="tab in tabs"
           :key="tab.id"
@@ -109,8 +135,13 @@
           @mouseover="tabOver(tab.id)"
           @mouseleave="tabLeave(tab.id)"
         >
-          <div v-if="tab.id !== editableTabID" style="height: 40px">
-            <div class="tab-title">{{ tab.name }}</div>
+          <div
+            v-if="tab.id !== editableTabID"
+            style="height: 40px"
+          >
+            <div class="tab-title">
+              {{ tab.name }}
+            </div>
             <svg
               v-if="mode"
               class="edit-icon"
@@ -147,7 +178,7 @@
               class="tab-name-input"
               type="text"
               @keypress.enter="editTabName"
-            />
+            >
             <svg
               id="submit-icon"
               width="20"
@@ -165,7 +196,10 @@
           </div>
         </div>
       </div>
-      <v-tooltip top :color="theme.$accent_ui_color">
+      <v-tooltip
+        top
+        :color="theme.$accent_ui_color"
+      >
         <template v-slot:activator="{ on }">
           <div
             v-show="rightDots"
@@ -178,7 +212,11 @@
         </template>
         <span>В конец</span>
       </v-tooltip>
-      <div v-if="mode" id="plus-icon" @click="addNewTab">
+      <div
+        v-if="mode"
+        id="plus-icon"
+        @click="addNewTab"
+      >
         <svg
           width="14"
           height="14"
@@ -240,7 +278,6 @@ export default {
     },
     headerTop() {
       return 0;
-      return document.body.clientWidth <= 1400 ? 40 : 50;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -297,7 +334,7 @@ export default {
     },
     searches: {
       deep: true,
-      handler(searches, oldSearches) {
+      handler(searches) {
         function findOnButtonTokens(tokens) {
           return tokens.filter((el) => el.onButton);
         }

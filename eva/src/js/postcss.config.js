@@ -1,17 +1,18 @@
 module.exports = {
   plugins: [
     require('autoprefixer'),
-    require('css-mqpacker'), 
+    require('css-mqpacker'),
     require('cssnano')({
       preset: [
-        'default', {
+        'default',
+        {
           discardComments: {
-            removeAll: true
-          }
-        }
-      ]
-    })
-  ]
-}
+            removeAll: true,
+          },
+        },
+      ],
+    }),
+  ],
+};
 
 // если не ошибаюсь натсройки для sass  для webpack

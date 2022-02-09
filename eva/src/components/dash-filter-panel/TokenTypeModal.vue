@@ -1,6 +1,9 @@
 <template>
   <div
-    :style="{ 'background-color': theme.$secondary_bg, color: theme.$main_text }"
+    :style="{
+      'background-color': theme.$secondary_bg,
+      color: theme.$main_text,
+    }"
     class="token-type-filter-modal"
   >
     Токен
@@ -8,12 +11,12 @@
       :value.sync="currentToken"
       :items="tokenNameList"
       :disabled="!editMode"
-      @change="changeToken"
       :background-color="theme.$main_bg"
       style="padding-bottom: 10px"
       hide-details
       outlined
       dense
+      @change="changeToken"
     />
     Операция
     <v-select
@@ -30,12 +33,27 @@
 <script>
 export default {
   name: 'TokenTypeModal',
-  props: ['temp', 'idDash', 'editMode'],
+  props: {
+    idDash: String,
+    temp: Object,
+    editMode: Boolean,
+  },
   data() {
     return {
       currentToken: '',
       operations: ['OR', 'AND', 'REPLACE'],
     };
+  },
+  computed: {
+    tokenNameList() {
+      return this.$store.getters.getTockens(this.idDash).map((tkn) => tkn.name);
+    },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+    // currentElem() {
+    //   return this.$store.getters.getTockens(this.idDash).find(token => token.name === this.currentToken).elem
+    // }
   },
   watch: {
     temp: {
@@ -45,20 +63,9 @@ export default {
       },
     },
   },
-  computed: {
-    tokenNameList() {
-      return this.$store.getters.getTockens(this.idDash).map(tkn => tkn.name);
-    },
-    theme() {
-      return this.$store.getters.getTheme;
-    },
-    // currentElem() {
-    //   return this.$store.getters.getTockens(this.idDash).find(token => token.name === this.currentToken).elem
-    // }
-  },
   methods: {
     changeToken(newTokenName) {
-      this.temp.token = newTokenName
+      this.temp.token = newTokenName;
       this.temp.values = [];
     },
   },

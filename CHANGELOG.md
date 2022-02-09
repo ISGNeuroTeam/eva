@@ -7,13 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Added
+
+- ghooks lib for running ESLint in pre-commit hook
+
+### Fixed
+
+- Added a frame for the event window
+- fixed node label name in YGraph
+- fixed ESLint errors and warnings
+- fixed the initial position of dash
+- fixed dash z index
+- fixed tooltip z-index
+- fixed tooltip width
+- fixed table events
+
+
+## [1.81.0]
+
+### Added
+- refactoring modal settings
+- datа research 2.0.
+
+## Fixed
+- Fixed display of dashboard edit button
+
+## Fixed
+
+- fixed dash single value title
+
+## [1.80.0]
+
 ## Added
 
-- added close modal single value for click outside
+- single value modal closes on click outside
 
 ## Fixed
 
 - fixed render a lot of tooltips for dashMap component
+- fixed a problem with displaying some multi-line bar graphs
 
 ## [1.79.0]
 
@@ -152,7 +184,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed hiding graphics when loading data
 - bug with update data search
 - hide the progress bar on the heatmap if the value is empty
-- render metrics when changed data for dashboards(single value)
+- fixed styles for user settings in dashMap
+
+### Added
+
+- added the choice of coordinates by clicking on the map
+- added the ability to use tokens in panel names
 
 ## [1.71.0]
 

@@ -8,12 +8,21 @@
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
-        <v-icon left class="icon-main" v-text="mdiSettings"/>
+        <v-icon
+          left
+          class="icon-main"
+          v-text="mdiSettings"
+        />
         <span class="main-title">Настройки Single Value</span>
-        <v-icon right class="icon-close" @click="close" v-text="mdiClose"/>
+        <v-icon
+          right
+          class="icon-close"
+          @click="close"
+          v-text="mdiClose"
+        />
       </v-card-title>
 
-      <v-divider :color="theme.$secondary_border"/>
+      <v-divider :color="theme.$secondary_border" />
 
       <v-card-text class="content pa-0">
         <div class="content-section">
@@ -25,11 +34,15 @@
             hide-details
             class="input-element"
           />
-          <br />
+          <br>
           <label class="checkbox-google">
-            <input type="checkbox" :checked="settings.showTitle || false" @change="handleChangeShowTitle">
-            <span class="checkbox-google-switch"></span> &nbsp;
-            Отображение шапки компонента
+            <input
+              type="checkbox"
+              :checked="settings.showTitle || false"
+              @change="handleChangeShowTitle"
+            >
+            <span class="checkbox-google-switch" /> &nbsp; Отображение
+            шапки компонента
           </label>
         </div>
 
@@ -48,14 +61,19 @@
           />
         </div>
 
-        <div v-if="settings.metricCount > 1" class="content-section pt-0">
+        <div
+          v-if="settings.metricCount > 1"
+          class="content-section pt-0"
+        >
           <span class="section-title bold">Выберите шаблон</span>
           <div class="templates-container">
             <div
               v-for="n in templatesForMetrics[settings.metricCount]"
               :key="`data-template-${n}`"
               class="data-template"
-              :class="`metric-${settings.metricCount} v-${n} ${n === settings.template ? 'selected' : ''}`"
+              :class="`metric-${settings.metricCount} v-${n} ${
+                n === settings.template ? 'selected' : ''
+              }`"
               @click="settings.template = n"
             >
               <div
@@ -77,7 +95,11 @@
             v-html="showAllTitle"
           />
         </div>
-        <draggable v-model="settings.metricOptions" handle=".burger" @end="update()">
+        <draggable
+          v-model="settings.metricOptions"
+          handle=".burger"
+          @end="update()"
+        >
           <div
             v-for="(metric, i) in settings.metricOptions"
             :key="`metric-${metric.id}`"
@@ -91,7 +113,7 @@
               >
                 <span class="metric-title">
                   Показатель {{ i + 1 }} -
-                  {{ !metric.title ? "Нет подписи" : metric.title }}
+                  {{ !metric.title ? 'Нет подписи' : metric.title }}
                 </span>
                 <v-icon
                   size="26"
@@ -100,7 +122,13 @@
                   v-text="metric.expanded ? mdiChevronUp : mdiChevronDown"
                 />
               </span>
-              <v-icon size="16" class="burger" style="cursor: move" :color="theme.$main_border" v-text="mdiMenu"/>
+              <v-icon
+                size="16"
+                class="burger"
+                style="cursor: move"
+                :color="theme.$main_border"
+                v-text="mdiMenu"
+              />
             </div>
 
             <div class="content-section">
@@ -161,9 +189,19 @@
                   menu-props="offsetY"
                   class="input-element"
                 >
-                  <template v-slot:selection="{ item }">{{ item.title }}</template>
+                  <template v-slot:selection="{ item }">
+                    {{
+                      item.title
+                    }}
+                  </template>
                   <template v-slot:item="{ item }">
-                    <span :style="{ fontWeight: item.value, fontFamily: getFamily(item) }" v-text="item.title"/>
+                    <span
+                      :style="{
+                        fontWeight: item.value,
+                        fontFamily: getFamily(item),
+                      }"
+                      v-text="item.title"
+                    />
                   </template>
                 </v-select>
               </div>
@@ -175,24 +213,23 @@
                 <div
                   v-for="color in colorsList"
                   :key="color.name"
-                  
                   class="color-select"
                   :class="{ selected: metric.color === color.name }"
                   @click="metric.color = color.name"
                 >
                   <div
                     v-if="color.colorGrad"
-                    :class="{'gradient-style': color.colorGrad}"
+                    :class="{ 'gradient-style': color.colorGrad }"
                     :style="{
-                      background: color.colorGrad
+                      background: color.colorGrad,
                     }"
                     v-text="color.title"
-                  ></div>
+                  />
                   <div
                     v-else
-                    :style="{color: getColor(color.name)}"
+                    :style="{ color: getColor(color.name) }"
                     v-text="color.title"
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
@@ -203,35 +240,48 @@
       <v-divider :color="theme.$secondary_border" />
 
       <v-card-actions class="footer px-6">
-        <v-btn text depressed class="btn-cancel" @click="close">Отмена</v-btn>
-        <v-btn depressed class="btn-save" @click="save">Сохранить</v-btn>
+        <v-btn
+          text
+          depressed
+          class="btn-cancel"
+          @click="close"
+        >
+          Отмена
+        </v-btn>
+        <v-btn
+          depressed
+          class="btn-save"
+          @click="save"
+        >
+          Сохранить
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import metricTitleIcons from "./metricTitleIcons";
-import { no_icon } from "./metricTitleIcons";
-import draggable from "vuedraggable";
+import metricTitleIcons from './metricTitleIcons';
+import { no_icon } from './metricTitleIcons';
+import draggable from 'vuedraggable';
 import {
   mdiMenu,
   mdiClose,
   mdiSettings,
   mdiChevronUp,
   mdiChevronDown,
-} from "@mdi/js";
-import './sass/checkboxGoogle.css'
+} from '@mdi/js';
+import './sass/checkboxGoogle.css';
 
 export default {
-  name: "SingleValueSettings",
+  name: 'SingleValueSettings',
   comments: {
     draggable,
   },
   props: {
     isOpen: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
-    updateCount: Function
+    updateCount: Function,
   },
   data: () => ({
     no_icon,
@@ -246,17 +296,22 @@ export default {
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
     fontWeightList: [
-      { value: 100, title: "Thin (100)" },
-      { value: 200, title: "Light (200)" },
-      { value: 400, title: "Regular (400)" },
-      { value: 500, title: "Medium (500)" },
-      { value: 800, title: "Bold (800)" },
+      { value: 100, title: 'Thin (100)' },
+      { value: 200, title: 'Light (200)' },
+      { value: 400, title: 'Regular (400)' },
+      { value: 500, title: 'Medium (500)' },
+      { value: 800, title: 'Bold (800)' },
     ],
     /** Metric title color select items. */
     colorsList: [
-      { name: "main", title: "Основной" },
-      { name: "secondary", title: "Дополнительный" },
-      { name: "range", title: "Диапазоны", colorGrad: 'linear-gradient(270.08deg, #FF5147 1.92%, #FFE065 53.99%, #5BD97A 99.93%)' },
+      { name: 'main', title: 'Основной' },
+      { name: 'secondary', title: 'Дополнительный' },
+      {
+        name: 'range',
+        title: 'Диапазоны',
+        colorGrad:
+          'linear-gradient(270.08deg, #FF5147 1.92%, #FFE065 53.99%, #5BD97A 99.93%)',
+      },
     ],
     /**
      * The number of available templates for the selected number of metrics.
@@ -270,11 +325,11 @@ export default {
     },
 
     iconList() {
-      return metricTitleIcons.filter((icon) => icon.id !== "no_icon");
+      return metricTitleIcons.filter((icon) => icon.id !== 'no_icon');
     },
 
     showAllTitle() {
-      return this.isAllMetricsExpanded ? "Скрыть все" : "Показать все";
+      return this.isAllMetricsExpanded ? 'Скрыть все' : 'Показать все';
     },
 
     isAllMetricsExpanded() {
@@ -302,14 +357,16 @@ export default {
       const newSettings = JSON.parse(JSON.stringify(newValue));
       this.settings = {
         ...newSettings,
-        metricOptions: newSettings.metricOptions.sort((a, b) => a.listOrder - b.listOrder),
+        metricOptions: newSettings.metricOptions.sort(
+          (a, b) => a.listOrder - b.listOrder
+        ),
       };
     },
     settings(old, newSet) {
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
-    }
+    },
   },
   methods: {
     getFamily() {},
@@ -317,26 +374,26 @@ export default {
       if (this.settings) {
         this.settings = {
           ...JSON.parse(JSON.stringify(this.settings)),
-          showTitle: !this.settings.showTitle
-        }
+          showTitle: !this.settings.showTitle,
+        };
       }
     },
 
     getColor(name) {
-      return ({
+      return {
         secondary: this.theme.$secondary_text,
         main: this.theme.$blue,
-      })[name]
+      }[name];
     },
 
     save() {
-      this.$emit("save", { ...this.settings });
+      this.$emit('save', { ...this.settings });
       this.close(true);
     },
 
     handleChangeCount(count) {
-      this.settings.template = 1
-      this.settings.metricCount = count
+      this.settings.template = 1;
+      this.settings.metricCount = count;
     },
 
     update() {
@@ -348,7 +405,7 @@ export default {
         this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
       }
       this.toggleAllMetrics(false);
-      this.$emit("close");
+      this.$emit('close');
     },
 
     showAllMetrics() {

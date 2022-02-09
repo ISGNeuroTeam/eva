@@ -25,7 +25,7 @@ export default {
     $beet: '#CE609C',
     $sun: '#F4E87B',
     $kiwi: '#C9F68F',
-    $sea: '#86D9DE'
+    $sea: '#86D9DE',
   },
   light: {
     $main_bg: '#FFFFFF',
@@ -53,6 +53,6 @@ export default {
     $beet: '#CE3A8A',
     $sun: '#F9E533',
     $kiwi: '#B4F363',
-    $sea: '#2BCCD7'
+    $sea: '#2BCCD7',
   },
 };

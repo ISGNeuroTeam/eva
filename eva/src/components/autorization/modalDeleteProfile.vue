@@ -1,35 +1,35 @@
 <template>
-  <v-dialog  
-    v-model="active" 
-    width="400px" 
-    persistent  
+  <v-dialog
+    v-model="active"
+    width="400px"
+    persistent
     @keydown="checkEsc($event)"
   >
-    <v-card  
-      class="delete-profile" 
-      :style="{background: theme.$main_bg }"
+    <v-card
+      class="delete-profile"
+      :style="{ background: theme.$main_bg }"
     >
       <v-card-text>
-        <div 
-          class="name-profile" 
-          :style="{color: theme.$title }"
-          v-html="dataFrom.text" 
+        <div
+          class="name-profile"
+          :style="{ color: theme.$title }"
+          v-html="dataFrom.text"
         />
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn 
-          small  
+        <v-btn
+          small
           :color="theme.$primary_button"
-          class="profile-btn" 
+          class="profile-btn"
           @click="deleteEssence"
         >
           Удалить
         </v-btn>
-        <v-btn 
-          small 
+        <v-btn
+          small
           :color="theme.$primary_button"
-          class="profile-btn" 
+          class="profile-btn"
           @click="cancelModal"
         >
           Отмена
@@ -39,59 +39,54 @@
   </v-dialog>
 </template>
 
-
 <script>
-
-import {  } from '@mdi/js'
-
 export default {
   props: {
-    activeDelete: null,
-    dataFrom: null,
-  },
-  data () {
-    return {
-
-    } 
-  },
-  computed: { 
-    active: function() {
-      return this.activeDelete
+    activeDelete: {
+      type: Boolean,
+      required: true,
     },
-    theme: function() {
-      return this.$store.getters.getTheme
+    dataFrom: {
+      type: Object,
+      required: true,
     },
-  },  
+  },
+  data() {
+    return {};
+  },
+  computed: {
+    active() {
+      return this.activeDelete;
+    },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
+  },
   methods: {
-    cancelModal: function() {
+    cancelModal() {
       this.$emit('cancelModal');
     },
-    checkEsc: function(event) {
-      if (event.code =="Escape") {
+    checkEsc(event) {
+      if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    deleteEssence: function() {
+    deleteEssence() {
+      let response = this.$store.auth.getters.deleteEssence({
+        id: this.dataFrom.id,
+        essence: this.dataFrom.essence,
+      });
 
-
-      let response = this.$store.auth.getters.deleteEssence({id: this.dataFrom.id, essence: this.dataFrom.essence});     
-    
-      response.then( res => {
-        if (res.status == 200){
+      response.then((res) => {
+        if (res.status === 200) {
           this.cancelModal();
-        } 
-      })
-
-    }
+        }
+      });
+    },
   },
-}
-
-
+};
 </script>
 
-<style lang="scss" > 
-  
-   @import '../../sass/modalDeleteProfile.sass'
-
-   
+<style lang="scss">
+@import '../../sass/modalDeleteProfile.sass';
 </style>

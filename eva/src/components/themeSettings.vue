@@ -6,26 +6,28 @@
     right
     hide-overlay
     :color="theme.$main_text"
-    :style="{background: theme.$main_bg,
-            borderTop:`2px solid ${theme.$main_border}`,
-            borderBottom:`2px solid ${theme.$main_border}`,
-            borderLeft:`2px solid ${theme.$main_border}`}"
+    :style="{
+      background: theme.$main_bg,
+      borderTop: `2px solid ${theme.$main_border}`,
+      borderBottom: `2px solid ${theme.$main_border}`,
+      borderLeft: `2px solid ${theme.$main_border}`,
+    }"
   >
     <div class="theme-btn">
-      <v-btn 
+      <v-btn
         :color="theme.$primary_button"
-        class="theme-choise-btn" 
+        class="theme-choise-btn"
         @click="setTheme('light')"
       >
         Светлая тема
-      </v-btn> 
-      <v-btn 
+      </v-btn>
+      <v-btn
         :color="theme.$primary_button"
-        class="theme-choise-btn" 
+        class="theme-choise-btn"
         @click="setTheme('dark')"
       >
         Тёмная тема
-      </v-btn> 
+      </v-btn>
     </div>
   </v-navigation-drawer>
 </template>
@@ -36,7 +38,7 @@ export default {
   props: {
     paleteFrom: Boolean,
   },
-  data () {
+  data() {
     return {
       paleteShow: false,
       // switchers: {
@@ -65,20 +67,19 @@ export default {
       //     arrow: mdiChevronDown
       //   }
       // }
-    } 
+    };
   },
   computed: {
     // active: function() {
     //   return this.showFrom
     // },
-    theme: function() {
-      return this.$store.getters.getTheme
-    }
-  },  
+    theme: function () {
+      return this.$store.getters.getTheme;
+    },
+  },
   watch: {
     paleteFrom: function (palete) {
-      palete ? this.paleteShow = true : this.paleteShow = false;
-
+      palete ? (this.paleteShow = true) : (this.paleteShow = false);
     },
   },
   methods: {
@@ -96,22 +97,17 @@ export default {
     //     this.switchers[switcher].arrow = mdiChevronDown;
     //   }
     // },
-    setTheme: function(theme){
+    setTheme: function (theme) {
       this.$store.commit('setTheme', theme);
       let settings = JSON.stringify({
         theme: theme,
       });
-      this.$store.commit('setThemeBack', JSON.stringify({setting: settings}));
+      this.$store.commit('setThemeBack', JSON.stringify({ setting: settings }));
     },
   },
-}
-
-
+};
 </script>
 
-<style lang="scss" > 
-  
-    @import '../sass/themeSettings.sass'
-
-   
+<style lang="scss">
+@import '../sass/themeSettings.sass';
 </style>

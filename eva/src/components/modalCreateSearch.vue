@@ -6,7 +6,10 @@
     :color="theme.$main_text"
     @keydown.esc="cancelModal"
   >
-    <v-card :style="{ background: theme.$main_bg, color: theme.$main_text }" class="card-search">
+    <v-card
+      :style="{ background: theme.$main_bg, color: theme.$main_text }"
+      class="card-search"
+    >
       <div class="textarea-block">
         <v-text-field
           v-model="search.sid"
@@ -58,7 +61,10 @@
               :button-color="theme.$primary_button"
               class="dtpicker-search"
             >
-              <v-icon class="picker-search" :color="theme.$primary_button">
+              <v-icon
+                class="picker-search"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -87,7 +93,10 @@
               :button-color="theme.$primary_button"
               class="dtpicker-search"
             >
-              <v-icon class="picker-search" :color="theme.$primary_button">
+              <v-icon
+                class="picker-search"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -96,62 +105,64 @@
         <div class="d-flex">
           <v-expansion-panels class="expansion-panels">
             <v-expansion-panel
-                :style="{
-              backgroundColor: theme.$main_bg,
-              color: theme.$main_text,
-              border: `1px solid ${theme.$main_border}`,
-            }"
+              :style="{
+                backgroundColor: theme.$main_bg,
+                color: theme.$main_text,
+                border: `1px solid ${theme.$main_border}`,
+              }"
             >
-              <v-expansion-panel-header>Дополнительные параметры</v-expansion-panel-header>
+              <v-expansion-panel-header>
+                Дополнительные параметры
+              </v-expansion-panel-header>
               <v-expansion-panel-content class="order-expansion">
                 <v-text-field
-                    v-model="search.parametrs.timeout"
-                    :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text }"
-                    class="textarea-item"
-                    outlined
-                    label="Timeout"
-                    hide-details
+                  v-model="search.parametrs.timeout"
+                  :color="theme.$primary_button"
+                  :style="{ color: theme.$main_text }"
+                  class="textarea-item"
+                  outlined
+                  label="Timeout"
+                  hide-details
                 />
                 <v-text-field
-                    v-model="search.parametrs.cache_ttl"
-                    :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text }"
-                    class="textarea-item"
-                    outlined
-                    label="Cache_ttl"
-                    hide-details
+                  v-model="search.parametrs.cache_ttl"
+                  :color="theme.$primary_button"
+                  :style="{ color: theme.$main_text }"
+                  class="textarea-item"
+                  outlined
+                  label="Cache_ttl"
+                  hide-details
                 />
                 <v-text-field
-                    v-model="search.parametrs.field_extraction"
-                    :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text }"
-                    class="textarea-item"
-                    outlined
-                    label="Field_extraction"
-                    hide-details
+                  v-model="search.parametrs.field_extraction"
+                  :color="theme.$primary_button"
+                  :style="{ color: theme.$main_text }"
+                  class="textarea-item"
+                  outlined
+                  label="Field_extraction"
+                  hide-details
                 />
                 <v-text-field
-                    v-model="search.parametrs.preview"
-                    :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text }"
-                    class="textarea-item"
-                    outlined
-                    label="Preview"
-                    hide-details
+                  v-model="search.parametrs.preview"
+                  :color="theme.$primary_button"
+                  :style="{ color: theme.$main_text }"
+                  class="textarea-item"
+                  outlined
+                  label="Preview"
+                  hide-details
                 />
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
           <div class="limit-block">
             <v-text-field
-                v-model="search.limit"
-                :color="theme.$accent_ui_color"
-                :style="{color: theme.$main_text}"
-                class="textarea-item"
-                outlined
-                label="Максимальное кол-во строк"
-                hide-details
+              v-model="search.limit"
+              :color="theme.$accent_ui_color"
+              :style="{ color: theme.$main_text }"
+              class="textarea-item"
+              outlined
+              label="Максимальное кол-во строк"
+              hide-details
             />
           </div>
         </div>
@@ -164,10 +175,20 @@
         >
           {{ errorMsg }}
         </div>
-        <v-btn small :color="theme.$primary_button" class="create-btn" @click="addSearch">
+        <v-btn
+          small
+          :color="theme.$primary_button"
+          class="create-btn"
+          @click="addSearch"
+        >
           {{ createBtn }}
         </v-btn>
-        <v-btn small :color="theme.$primary_button" class="create-btn" @click="cancelModal">
+        <v-btn
+          small
+          :color="theme.$primary_button"
+          class="create-btn"
+          @click="cancelModal"
+        >
           {{ cancelBtn }}
         </v-btn>
       </v-card-actions>
@@ -176,7 +197,7 @@
 </template>
 
 <script>
-import { mdiCalendarMonth } from '@mdi/js'
+import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
   props: {
@@ -210,59 +231,61 @@ export default {
       tws: '',
       twf: '',
       pickerIcon: mdiCalendarMonth,
-    }
+    };
   },
   computed: {
     active: function () {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.search = this.dataSearch
-
-        if (this.createBtnFrom === 'edit') {
-          this.createBtn = 'Редактировать'
-        } else {
-          this.createBtn = 'Создать'
-        }
+        this.setData()
       }
-      return this.modalFrom
+      return this.modalFrom;
     },
     dataSearch: function () {
-      return this.dataSearchFrom
+      return this.dataSearchFrom;
     },
     idDash: function () {
       // получаем id страницы переданного от родителя
-      return this.idDashFrom
+      return this.idDashFrom;
     },
     theme: function () {
-      return this.$store.getters.getTheme
+      return this.$store.getters.getTheme;
     },
-  },
-  mounted() {
-    this.currentSid = this.dataSearchFrom?.sid
   },
   watch: {
     dataSearchFrom() {
-      this.currentSid = this.dataSearchFrom?.sid
+      this.currentSid = this.dataSearchFrom?.sid;
     },
     tws: function () {
-      this.search.parametrs.tws = this.tws
+      this.search.parametrs.tws = this.tws;
     },
     twf: function () {
-      this.search.parametrs.twf = this.twf
+      this.search.parametrs.twf = this.twf;
     },
   },
+  mounted() {
+    this.currentSid = this.dataSearchFrom?.sid;
+  },
   methods: {
+    setData () {
+      this.search = this.dataSearch;
+      if (this.createBtnFrom === 'edit') {
+        this.createBtn = 'Редактировать';
+      } else {
+        this.createBtn = 'Создать';
+      }
+    },
     cancelModal: function () {
       if (this.cancelBtn === 'Отмена') {
-        this.$emit('cancelModal')
+        this.$emit('cancelModal');
       } else {
         if (this.createBtnFrom === 'edit') {
-          this.createBtn = 'Редактировать'
+          this.createBtn = 'Редактировать';
         } else {
-          this.createBtn = 'Создать'
+          this.createBtn = 'Создать';
         }
-        this.cancelBtn = 'Отмена'
-        this.errorMsgShow = false
+        this.cancelBtn = 'Отмена';
+        this.errorMsgShow = false;
       }
     },
     addSearch: function () {
@@ -271,43 +294,51 @@ export default {
           typeof this.search.parametrs.tws == 'string' &&
           parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
         ) {
-          this.search.parametrs.tws = parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
+          this.search.parametrs.tws = parseInt(
+            new Date(this.search.parametrs.tws).getTime() / 1000
+          );
         }
         if (
           typeof this.search.parametrs.twf == 'string' &&
           parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
         ) {
-          this.search.parametrs.twf = parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
+          this.search.parametrs.twf = parseInt(
+            new Date(this.search.parametrs.twf).getTime() / 1000
+          );
         }
 
-        let searches = this.$store.getters.getSearches(this.idDash) // получаем все ИС
-        let j = -1
+        let searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
+        let j = -1;
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
           if (item.sid === this.currentSid) {
             // и если ИС с таким id уже есть
-            j = i // меняем переменную
+            j = i; // меняем переменную
           } else if (item.sid === this.search.sid) {
-            j = -100
+            j = -100;
           }
-        })
+        });
 
         if (j !== -1) {
           // если такой ИС уже есть вызовем сообщение с уточнением
           if (this.cancelBtn === 'Отмена') {
-            this.errorMsg = 'Такой источник данных существует. Хотите заменить его?'
-            this.createBtn = 'Да'
-            this.cancelBtn = 'Нет'
-            this.errorMsgShow = true
+            this.errorMsg =
+              'Такой источник данных существует. Хотите заменить его?';
+            this.createBtn = 'Да';
+            this.cancelBtn = 'Нет';
+            this.errorMsgShow = true;
           } else {
             this.$store.commit('setSearch', {
-              search: { ...this.search, currentSid: j === -100 ? null : this.currentSid },
+              search: {
+                ...this.search,
+                currentSid: j === -100 ? null : this.currentSid,
+              },
               idDash: this.idDash,
               reload: true,
-            })
-            this.cancelBtn = 'Отмена'
-            this.errorMsgShow = false
-            this.$emit('cancelModal') // и скрываем окно редактирования ИД
+            });
+            this.cancelBtn = 'Отмена';
+            this.errorMsgShow = false;
+            this.$emit('cancelModal'); // и скрываем окно редактирования ИД
           }
         } else {
           // если нет
@@ -315,30 +346,42 @@ export default {
             search: this.search,
             idDash: this.idDash,
             reload: false,
-          }) // отправляем в хранилище для создания
-          this.$emit('cancelModal') // и скрываем окно редактирования ИС
+          }); // отправляем в хранилище для создания
+          this.$emit('cancelModal'); // и скрываем окно редактирования ИС
         }
       } else {
-        this.errorMsg = 'Sid источника данных не может быть пустым'
-        this.errorMsgShow = true
+        this.errorMsg = 'Sid источника данных не может быть пустым';
+        this.errorMsgShow = true;
         setTimeout(() => {
-          this.errorMsgShow = false
-        }, 2000)
+          this.errorMsgShow = false;
+        }, 2000);
       }
     },
-    addLineBreaks: function(event) {
-      this.search.original_otl = this.search.original_otl.replaceAll('|', '\n' + '|')
+    addLineBreaks: function () {
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '|',
+        '\n' + '|'
+      );
       if (this.search.original_otl[0] === '\n') {
-        this.search.original_otl = this.search.original_otl.substring(1)
+        this.search.original_otl = this.search.original_otl.substring(1);
       }
-      this.search.original_otl = this.search.original_otl.replaceAll("\n\n" + '|', '\n' + '|')
-      this.search.original_otl = this.search.original_otl.replaceAll('|' + '\n', '| ')
-      this.search.original_otl = this.search.original_otl.replaceAll('| ' + '\n', '| ')
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '\n\n' + '|',
+        '\n' + '|'
+      );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '|' + '\n',
+        '| '
+      );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '| ' + '\n',
+        '| '
+      );
     },
   },
-}
+};
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 @import '../sass/modalCreateSearch.sass';
 </style>

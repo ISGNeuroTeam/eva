@@ -1,90 +1,96 @@
 <template>
   <div class="dash-select">
-    <div 
-      v-if="show" 
+    <div
+      v-if="show"
       ref="selectBlock"
-      class="select-with-data" 
+      class="select-with-data"
     >
-      <div class="arrow-block" v-if="dataModeFrom">
-        <v-icon 
-          v-if="!open" 
-          class=" arrow-down arrows-select" 
+      <div
+        v-if="dataModeFrom"
+        class="arrow-block"
+      >
+        <v-icon
+          v-if="!open"
+          class="arrow-down arrows-select"
           :color="theme.$primary_button"
           @click="openSelect"
         >
           {{ down }}
         </v-icon>
-        <v-icon 
+        <v-icon
           v-if="open"
-          class="arrow-up arrows-select" 
+          class="arrow-up arrows-select"
           :color="theme.$main_text"
           @click="openSelect"
         >
           {{ up }}
         </v-icon>
       </div>
-      <div 
-        class="source"  
-        :class="{source_show:source_show}" 
-        :style="{width:widthInput}" 
+      <div
+        class="source"
+        :class="{ source_show: source_show }"
+        :style="{ width: widthInput }"
       >
-        <v-select  
+        <v-select
           v-model="elem"
-          :items="dataRest" 
-          :color="theme.$accent_ui_color"
-          :style="{color:theme.$main_text, fill: theme.$main_text}"
-          :data-elem="dataelem"
-          hide-details  
-          outlined 
-          class="select-parent"  
-          :loading="dataLoading" 
-          label="Столбец данных"
-          @change="getItem('elem')"
-        /> 
-        <v-select  
-          v-model="elemlink" 
           :items="dataRest"
           :color="theme.$accent_ui_color"
-          :style="{color:theme.$main_text, fill: theme.$main_text}"
-          :data-elem="dataelemlink"
-          hide-details  
-          outlined 
-          class="select-parent"  
+          :style="{ color: theme.$main_text, fill: theme.$main_text }"
+          hide-details
+          outlined
+          class="select-parent"
+          :loading="dataLoading"
+          label="Столбец данных"
+          @change="getItem('elem')"
+        />
+        <v-select
+          v-model="elemlink"
+          :items="dataRest"
+          :color="theme.$accent_ui_color"
+          :style="{ color: theme.$main_text, fill: theme.$main_text }"
+          hide-details
+          outlined
+          class="select-parent"
           label="Связанный столбец данных"
-          :loading="dataLoading" 
+          :loading="dataLoading"
           @change="getItem('elemlink')"
-        /> 
+        />
       </div>
-      <div 
+      <div
         ref="targetBlock"
-        class="target" 
-        :style="{width:widthInput,borderColor:theme.$main_border}"
-        :class="{select_show:select_show}"
-      > 
-        <v-autocomplete 
-          v-model="elemDeep[String(multiple)]" 
-          :items="dataRestDeep"  
-          solo 
-          flat 
+        class="target"
+        :style="{ width: widthInput, borderColor: theme.$main_border }"
+        :class="{ select_show: select_show }"
+      >
+        <v-autocomplete
+          v-model="elemDeep[String(multiple)]"
+          :items="dataRestDeep"
+          solo
+          flat
           :multiple="multiple"
           :color="theme.$accent_ui_color"
-          :style="{color:theme.$main_text, fill: theme.$main_text}"
-          :data-elem="dataelemDeep" 
-          hide-details  
+          :style="{ color: theme.$main_text, fill: theme.$main_text }"
+          hide-details
           class="select theme--dark"
-          label="Значение"  
+          label="Значение"
           @change="setTocken"
         >
-          <template 
+          <template
             v-if="multiple"
-            v-slot:prepend-item 
+            v-slot:prepend-item
           >
             <v-list-item
               ripple
               @click="selectItems"
             >
               <v-list-item-action>
-                <v-icon :color="elemDeep[String(multiple)].length > 0 ? theme.$primary_button : theme.$main_text">
+                <v-icon
+                  :color="
+                    elemDeep[String(multiple)].length > 0
+                      ? theme.$primary_button
+                      : theme.$main_text
+                  "
+                >
                   {{ chooseIcon }}
                 </v-icon>
               </v-list-item-action>
@@ -95,24 +101,26 @@
               </v-list-item-content>
             </v-list-item>
             <v-divider class="mt-2" />
-          </template>  
-        </v-autocomplete> 
-      </div> 
+          </template>
+        </v-autocomplete>
+      </div>
     </div>
-    <div 
+    <div
       v-if="!show"
-      class="error-msg" 
+      class="error-msg"
     >
       {{ message }}
     </div>
   </div>
 </template>
 
-
-<script> 
-
-import { mdiArrowDownBoldBoxOutline, mdiArrowUpBoldBoxOutline, mdiCropSquare, mdiSquare   } from '@mdi/js'; 
-
+<script>
+import {
+  mdiArrowDownBoldBoxOutline,
+  mdiArrowUpBoldBoxOutline,
+  mdiCropSquare,
+  mdiSquare,
+} from '@mdi/js';
 
 export default {
   props: {
@@ -122,17 +130,17 @@ export default {
     colorFrom: null,
     dataLoadingFrom: null,
     widthFrom: null,
-    dataModeFrom: null
+    dataModeFrom: null,
   },
-  data () {
-    return {  
+  data() {
+    return {
       message: '',
       show: true,
-      elem: "Выберите столбец данных",
-      elemlink: "Выберите связанный столбец данных",
+      elem: 'Выберите столбец данных',
+      elemlink: 'Выберите связанный столбец данных',
       elemDeep: {
-        'true': [],
-        'false': '',
+        true: [],
+        false: '',
       },
       topArray: [],
       bottomArray: [],
@@ -146,113 +154,145 @@ export default {
       chooseText: 'Выбрать все',
       chooseIcon: mdiCropSquare,
       actions: [
-        {name: 'click',
-          capture: []
-        },
-        {name: 'change',
-          capture: []
-        },
-        {name: 'mouseover',
-          capture: []
-        },
+        { name: 'click', capture: [] },
+        { name: 'change', capture: [] },
+        { name: 'mouseover', capture: [] },
       ],
-    } 
+    };
   },
   computed: {
-    id: function() { 
-      return this.idFrom
+    id: function () {
+      return this.idFrom;
     },
-    idDash: function() { 
-      return this.idDashFrom
+    idDash: function () {
+      return this.idDashFrom;
     },
-    dataReady: function() {
+    dataReady: function () {
       let data = [];
       if (this.dataRestFrom != null) {
         data = this.dataRestFrom;
-      } 
-      return data
+      }
+      return data;
     },
-    theme: function() {
-      return this.$store.getters.getTheme
+    theme: function () {
+      return this.$store.getters.getTheme;
     },
-    widthInput: function() {
-      return `${this.widthFrom-70}px`
+    widthInput: function () {
+      return `${this.widthFrom - 70}px`;
     },
-    multiple: function() {
-      let options = this.$store.getters.getOptions({idDash: this.idDash, id: this.id});
-      if(options.multiple){
-        return options.multiple
+    multiple: function () {
+      let options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
+      if (options.multiple) {
+        return options.multiple;
       } else {
-        return false
+        return false;
       }
     },
-    dataRest: function() {
+    dataRest: function () {
       let data = [];
       if (this.dataReady.length > 0) {
         data = Object.keys(this.dataReady);
-        this.show = true;
-        if (Object.keys(this.dataReady).length != 0) {
-          if (this.dataReady.error) {
-            this.message = this.dataReady.error;
-            this.show = false;
-          } else {
+        if (Object.keys(this.dataReady).length !== 0) {
+          if (!this.dataReady.error) {
             data = Object.keys(this.dataReady[0]);
-          } 
-        }
-        this.dataFromRest = data;
-        for (let action of this.actions) {
-          action.capture = data
+          }
         }
       }
-
-      return data
+      return data;
     },
-    dataRestDeep: function() {
-          
+    dataRestDeep: function () {
       let res = [];
       if (this.dataReady.length > 0) {
         let data = this.dataReady;
-        res = Object.values(data).map( item => {
+        res = Object.values(data).map((item) => {
           return item[this.elem];
-        })
-        res = this.filterSelect(res,this.elemDeep.true);
+        });
+        res = this.filterSelect(res, this.elemDeep.true);
       }
-      return res
-
+      return res;
     },
-    dataelem: function() {
-      if (this.$store.getters.getSelected({idDash: this.idDash, id: this.id }).elem == '') {
-        this.elem = 'Выберите столбец данных'
+    selectedElem() {
+      return this.$store.getters.getSelected({
+        idDash: this.idDash,
+        id: this.id,
+      }).elem;
+    },
+    selectedElemLink() {
+      return this.$store.getters.getSelected({
+        idDash: this.idDash,
+        id: this.id,
+      }).elemlink;
+    },
+    selectedElemDeep() {
+      return this.$store.getters.getSelected({
+        idDash: this.idDash,
+        id: this.id,
+      }).elemDeep;
+    },
+    dataLoading: function () {
+      return this.dataLoadingFrom;
+    },
+  },
+  watch: {
+    selectedElemDeep: function () {
+      if (this.selectedElemDeep.elemDeep === '') {
+        this.elemDeep[String(this.multiple)] =
+          String(this.multiple) === 'true' ? [] : '';
       }
-      return this.$store.getters.getSelected({idDash: this.idDash, id: this.id }).elem
     },
-    dataelemlink: function() {
-      if (this.$store.getters.getSelected({idDash: this.idDash, id: this.id }).elemlink == '') {
-        this.elemlink = 'Выберите связанный столбец данных'
+    selectedElemLink: function () {
+      if (this.selectedElemLink.elemlink === '') {
+        this.elemlink = 'Выберите связанный столбец данных';
       }
-      return this.$store.getters.getSelected({idDash: this.idDash, id: this.id }).elemlink
     },
-    dataelemDeep: function() {
-        
-      if (this.$store.getters.getSelected({idDash: this.idDash, id: this.id }).elemDeep == '') {
-        String(this.multiple) == 'true' ?  this.elemDeep[String(this.multiple)] = [] :  this.elemDeep[String(this.multiple)] = '';
+    selectedElem(elem) {
+      if (elem === '') {
+        this.elem = 'Выберите столбец данных';
       }
-      return this.$store.getters.getSelected({idDash: this.idDash, id: this.id }).elemDeep
     },
-    dataLoading: function() {
-      return this.dataLoadingFrom
+    dataReady(dataReady) {
+      let data = [];
+      if (dataReady.length > 0) {
+        data = Object.keys(dataReady);
+        this.show = true;
+        if (Object.keys(dataReady).length !== 0) {
+          if (dataReady.error) {
+            this.message = dataReady.error;
+            this.show = false;
+          } else {
+            data = Object.keys(dataReady[0]);
+          }
+        }
+        this.dataFromRest = data;
+        for (let action of this.actions) {
+          action.capture = data;
+        }
+      }
     },
   },
   mounted() {
-    this.$store.commit('setActions', {actions: this.actions, idDash: this.idDash, id: this.id });
-    let selected =  this.$store.getters.getSelected({idDash: this.idDash, id: this.id })
-    if (selected){
-      selected.elem ? this.elem = selected.elem : false;
-      selected.elemlink ? this.elemlink = selected.elemlink : false;
-      if (this.elem != 'Выберите элемент' && this.elemlink != 'Выберите связанный столбец данных') {
+    this.$store.commit('setActions', {
+      actions: this.actions,
+      idDash: this.idDash,
+      id: this.id,
+    });
+    let selected = this.$store.getters.getSelected({
+      idDash: this.idDash,
+      id: this.id,
+    });
+    if (selected) {
+      selected.elem ? (this.elem = selected.elem) : false;
+      selected.elemlink ? (this.elemlink = selected.elemlink) : false;
+      if (
+        this.elem !== 'Выберите элемент' &&
+        this.elemlink !== 'Выберите связанный столбец данных'
+      ) {
         this.openSelect();
       }
-      if (selected.elemDeep.length != 0 || selected.elemDeep != '')  {
+      if (selected.elemDeep.length !== 0 || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
@@ -260,71 +300,73 @@ export default {
         this.chooseText = 'Выбрать все';
         this.chooseIcon = mdiCropSquare;
       }
-
     }
   },
   methods: {
-    getItem: function(element) {
-      switch (element){
-      case 'elem':
-        this.$store.commit('setSelected', {element: 'elem',value: this.elem, idDash: this.idDash, id: this.id });
-        break
-      case 'elemlink':
-        this.$store.commit('setSelected', {element: 'elemlink',value: this.elemlink, idDash: this.idDash, id: this.id });
-        break
+    getItem: function (element) {
+      switch (element) {
+        case 'elem':
+          this.$store.commit('setSelected', {
+            element: 'elem',
+            value: this.elem,
+            idDash: this.idDash,
+            id: this.id,
+          });
+          break;
+        case 'elemlink':
+          this.$store.commit('setSelected', {
+            element: 'elemlink',
+            value: this.elemlink,
+            idDash: this.idDash,
+            id: this.id,
+          });
+          break;
       }
-      if (this.elem != 'Выберите элемент' && this.elemlink != 'Выберите связанный столбец данных') {
+      if (
+        this.elem !== 'Выберите элемент' &&
+        this.elemlink !== 'Выберите связанный столбец данных'
+      ) {
         this.openSelect();
       }
       this.chooseText = 'Очистить Все';
       this.selectItems();
-
     },
-    openSelect: function() {
+    openSelect: function () {
       this.source_show = !this.source_show;
       this.open = !this.open;
       this.select_show = !this.select_show;
     },
-    selectItems: function() {
-      if (this.chooseText == 'Выбрать все') {
+    selectItems: function () {
+      if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
-        this.elemDeep.true = [...this.topArray,...this.bottomArray];
+        this.elemDeep.true = [...this.topArray, ...this.bottomArray];
       } else {
         this.chooseText = 'Выбрать все';
         this.chooseIcon = mdiCropSquare;
         this.elemDeep.true = [];
       }
-      this.setTocken()
+      this.setTocken();
     },
-    filterSelect: function(res,selected) {
-      let data = [...[],...res];
-      data = data.filter( elem => {
+    filterSelect: function (res, selected) {
+      let data = [...[], ...res];
+      data = data.filter((elem) => {
         if (!selected.includes(elem)) {
-          return elem
+          return elem;
         }
-      })
-
-      this.topArray = sorted(selected);
-      this.bottomArray = sorted(data);
-
-      data = [...this.topArray,...this.bottomArray];
+      });
 
       function sorted(data) {
-        if (Number(data[0])) {
-
-          data = data.sort( (a,b) => {
-            return a-b
-          });
-        } else {
-          data = data.sort();
-        }
-        return data
+        data = Number(data[0]) ? data.sort((a, b) => a - b) : data.sort();
+        return data;
       }
 
+      this.topArray = sorted([...selected]);
+      this.bottomArray = sorted([...data]);
 
+      data = [...this.topArray, ...this.bottomArray];
 
-      return data
+      return data;
     },
     setTocken() {
       this.$store.commit('setSelected', {
@@ -332,72 +374,70 @@ export default {
         value: this.elemDeep[String(this.multiple)],
         idDash: this.idDash,
         id: this.id,
-      })
-      let tockens = this.$store.getters.getTockens(this.idDash)
-      let name = ''
-      let capture = ''
-      let curTocken = {}
-      let data = this.dataReady
+      });
+      let tockens = this.$store.getters.getTockens(this.idDash);
+      let name = '';
+      let capture = '';
+      let curTocken = {};
+      let data = this.dataReady;
       Object.keys(tockens).forEach((i) => {
         if (tockens[i].elem === this.id && tockens[i].action === 'change') {
-          curTocken = tockens[i]
-          name = tockens[i].name
-          capture = tockens[i].capture
+          curTocken = tockens[i];
+          name = tockens[i].name;
+          capture = tockens[i].capture;
         }
-      })
-      let value = null
+      });
+      let value = null;
       if (String(this.multiple) === 'true') {
-        value = [...[], ...this.elemDeep[String(this.multiple)]]
+        value = [...[], ...this.elemDeep[String(this.multiple)]];
         for (let i = 0; i < data.length; i++) {
           value.forEach((deep, j) => {
             if (data[i][this.elem] === deep) {
-              value[j] = data[i][this.elemlink]
+              value[j] = data[i][this.elemlink];
             }
-          })
+          });
         }
       } else {
         for (let i = 0; i < data.length; i++) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
-            value = [data[i][this.elemlink]]
-            break
+            value = [data[i][this.elemlink]];
+            break;
           }
         }
       }
 
       if (curTocken.prefix && curTocken.prefix !== '') {
         value = value.map((item) => {
-          return `${curTocken.prefix}${item}`
-        })
+          return `${curTocken.prefix}${item}`;
+        });
       }
       if (curTocken.sufix && curTocken.sufix !== '') {
         value = value.map((item) => {
-          return `${item}${curTocken.sufix}`
-        })
+          return `${item}${curTocken.sufix}`;
+        });
       }
       if (curTocken.delimetr && curTocken.delimetr !== '') {
-        value = value.join(curTocken.delimetr)
+        value = value.join(curTocken.delimetr);
       } else {
-        value = value.join(',')
+        value = value.join(',');
       }
       let tocken = {
         name: name,
         action: 'change',
         capture: capture,
-      }
+      };
       if (name !== '') {
         this.$store.commit('setTocken', {
           tocken: tocken,
           idDash: this.idDash,
           value: value,
-        })
+        });
       }
     },
-  }, 
-}
-
- 
+  },
+};
 </script>
 
-<style lang="scss" >
+<style lang="scss">
 @import '../../sass/dashSelect.sass';
 </style>
