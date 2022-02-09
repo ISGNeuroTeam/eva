@@ -1265,7 +1265,6 @@ export default {
     },
     getName(state) {
       // получаем имя дашборда
-      console.log(state);
       return (id) => {
         return state[id].name;
       };
