@@ -221,7 +221,6 @@ export default {
           range = null;
         }
         const startId = `${metric}_${id}`;
-        console.log(startId);
         const metricCurrent = metricOptionsCurrent?.find(
           (m) => m.startId === startId
         );
