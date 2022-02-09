@@ -1456,13 +1456,14 @@ export default {
         }); // то создаем токен в хранилище
         this.showSign = true; // визуально скрываем окно с созданием токена
         this.opennewtocken = false;
-      }
-      this.newTockenName = null;
-      this.newElem = '';
-      this.newAction = '';
-      this.newCapture = '';
-      this.newTockenDop = {
-        defaultValue: '*',
+
+        this.newTockenName = null;
+        this.newElem = '';
+        this.newAction = '';
+        this.newCapture = '';
+        this.newTockenDop = {
+          defaultValue: '*',
+        }
       }
     },
     deleteTocken: function (name) {
@@ -1521,6 +1522,14 @@ export default {
         this.openwarning = false;
         this.showSign = true;
         this.opennewtocken = false;
+
+      this.newTockenName = null;
+      this.newElem = '';
+      this.newAction = '';
+      this.newCapture = '';
+      this.newTockenDop = {
+        defaultValue: '*',
+      }
     },
     noSearch: function () {
       // если нажали на кнопку нет
