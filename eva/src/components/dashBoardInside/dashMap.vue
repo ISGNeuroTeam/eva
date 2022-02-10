@@ -1,20 +1,9 @@
 <template>
-  <div
-    ref="container"
-    class="dash-map"
-  >
-    <div
-      v-if="error"
-      class="error-message"
-    >
+  <div ref="container" class="dash-map">
+    <div v-if="error" class="error-message">
       {{ error }}
     </div>
-    <div
-      v-if="!error"
-      ref="map"
-      class="mapContainer"
-      :style="mapStyleSize"
-    />
+    <div v-if="!error" ref="map" class="mapContainer" :style="mapStyleSize" />
   </div>
 </template>
 
@@ -66,6 +55,7 @@ export default {
       leftBottom: 0,
       rightTop: 0,
       pipelineData: [],
+      pipelineDataDictionary: {},
     };
   },
   computed: {
@@ -197,6 +187,14 @@ export default {
     },
     async loadDataForPipe(search) {
       this.pipelineData = await this.getDataFromRest(search);
+      let allPipes = {};
+      for (let x of this.pipelineData) {
+        if (!allPipes[x.ID]) {
+          allPipes[x.ID] = [];
+        }
+        allPipes[x.ID].push(x);
+      }
+      this.pipelineDataDictionary = allPipes;
       this.reDrawMap(this.dataRestFrom);
     },
     updateToken(value) {
@@ -556,6 +554,7 @@ export default {
         text_color: textColor = '#FFFFFF',
         background_color: color = '65, 62, 218',
         opacity = 0.6,
+        label_field: text = 'КП-240',
         border_radius: borderRadius = '2px',
         border = 'none',
         width,
@@ -598,13 +597,9 @@ export default {
 
     addLine(element, lib) {
       let option = this.option;
-      let pipelineDataDictionary = {};
-      for (let x of this.pipelineData) {
-        if (!pipelineDataDictionary[x.ID]) pipelineDataDictionary[x.ID] = [];
-        pipelineDataDictionary[x.ID].push(x);
-      }
 
-      let pipelineData = pipelineDataDictionary[element.ID];
+      let pipelineData = this.pipelineDataDictionary[element.ID];
+      let map = this.map;
 
       let latlngs = [];
       element.coordinates.split(';').forEach((point) => {
@@ -651,7 +646,7 @@ export default {
         if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
           layer.bringToFront();
         }
-        if (!pipelineDataDictionary[element.ID]) return;
+        if (!pipelineData) return;
         const closest = (arr, num) => {
           return (
             arr.reduce((acc, val) => {
@@ -674,8 +669,8 @@ export default {
           let sum = distances[distances.length - 1];
 
           let closestData = closest(pipelineData, sum);
-          let pipelineInfo = pipelineData.find((el) => el.pos === closestData);
 
+          let pipelineInfo = pipelineData.find((el) => el.pos === closestData);
           // div for tooltip
           const newDiv = document.createElement('div');
           newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
@@ -684,10 +679,7 @@ export default {
           <p>S ${pipelineInfo.S}</p>
           <p>L ${pipelineInfo.L}</p>
           </div>`;
-
-          if (isMarkerInsidePolygon(this.map.getBounds())) {
-            line.setTooltipContent(newDiv);
-          }
+          line.setTooltipContent(newDiv);
         }
       }
     },
