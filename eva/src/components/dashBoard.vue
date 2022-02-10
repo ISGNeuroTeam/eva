@@ -459,6 +459,7 @@ import {
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import settings from '../js/componentsSettings.js';
+import Vue from "vue";
 
 export default {
   props: {
@@ -565,6 +566,12 @@ export default {
         this.getSelfTockens.forEach((token) => {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
+
+      if (name.indexOf(`$evaTknLogin$`) != -1) {
+        if (Vue.$jwt.hasToken()) {
+          name = name.replaceAll('$evaTknLogin$', Vue.$jwt.decode().username);
+        }
+      }
       return name;
     },
     settingsIsOpened() {
@@ -718,6 +725,8 @@ export default {
     },
 
     editName: function (props) {
+      console.log('editName')
+      console.log('props.name', this.props.name)
       // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
