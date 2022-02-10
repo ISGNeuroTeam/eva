@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed tooltip z-index
 - fixed tooltip width
 - fixed token with an empty name
+- fixed name restriction for tokens
 
 ## [1.81.0]
 
