@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Added a frame for the event window
+- added a frame for the event window
 - fixed node label name in YGraph
 - fixed ESLint errors and warnings
 - fixed the initial position of dash
@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed rename dashboard
 - fixed save table settings on change fullscreen view
 - fixed filter
+- optimized pipeline information processing in dashMap
 
 ## [1.81.0]
 
