@@ -33,7 +33,11 @@
 <script>
 export default {
   name: 'TokenTypeModal',
-  props: ['temp', 'idDash', 'editMode'],
+  props: {
+    idDash: String,
+    temp: Object,
+    editMode: Boolean,
+  },
   data() {
     return {
       currentToken: '',

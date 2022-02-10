@@ -7,7 +7,11 @@
     :color="calculatedColor"
     :value="calculatedValue"
   >
-    <span v-if="!comment" class="title-text" v-text="title" />
+    <span
+      v-if="!comment"
+      class="title-text"
+      v-text="title"
+    />
     <v-tooltip
       v-else
       bottom
@@ -17,13 +21,27 @@
       :color="theme.$secondary_bg"
     >
       <template v-slot:activator="{ on }">
-        <span class="title-text" v-on="on" v-text="title" />
+        <span
+          class="title-text"
+          v-on="on"
+          v-text="title"
+        />
       </template>
-      <span :style="{ color: calculatedColor }" v-text="comment" />
+      <span
+        :style="{ color: calculatedColor }"
+        v-text="comment"
+      />
     </v-tooltip>
   </v-progress-linear>
-  <div v-else class="empty-value">
-    <span v-if="!comment" class="title-text" v-text="title" />
+  <div
+    v-else
+    class="empty-value"
+  >
+    <span
+      v-if="!comment"
+      class="title-text"
+      v-text="title"
+    />
     <v-tooltip
       v-else
       bottom
@@ -33,9 +51,15 @@
       :color="theme.$secondary_bg"
     >
       <template v-slot:activator="{ on }">
-        <span v-on="on" v-text="title" />
+        <span
+          v-on="on"
+          v-text="title"
+        />
       </template>
-      <span :style="{ color: calculatedColor }" v-text="comment" />
+      <span
+        :style="{ color: calculatedColor }"
+        v-text="comment"
+      />
     </v-tooltip>
   </div>
 </template>

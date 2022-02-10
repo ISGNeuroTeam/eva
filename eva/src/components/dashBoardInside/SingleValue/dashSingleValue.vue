@@ -5,7 +5,10 @@
   >
     <div class="header">
       <div>
-        <span class="data-title" v-text="tokenizedTitle" />
+        <span
+          class="data-title"
+          v-text="tokenizedTitle"
+        />
       </div>
       <v-icon
         v-show="dataModeFrom"
@@ -16,7 +19,10 @@
       />
     </div>
 
-    <div class="content pt-3" :class="metricTemplateClass">
+    <div
+      class="content pt-3"
+      :class="metricTemplateClass"
+    >
       <div
         v-for="(metric, idx) in dataToRender"
         :key="`metric-${metric.id}`"
@@ -29,7 +35,10 @@
             class="icon"
             v-html="getIconSvgByID(metric.icon)"
           />
-          <span class="title-text" v-text="metric.title" />
+          <span
+            class="title-text"
+            v-text="metric.title"
+          />
         </span>
         <span
           class="metric-value"
@@ -40,14 +49,14 @@
             font-weight: ${metric.fontWeight || 200};
             `"
         >
-          <span v-text="metric.value"></span>
+          <span v-text="metric.value" />
         </span>
       </div>
     </div>
     <SingleValueSettings
       :is-open="isSettingsComponentOpen"
       :received-settings="providedSettings"
-      :updateCount="updateCount"
+      :update-count="updateCount"
       :default-settings="defaultSettings"
       @save="saveSettings"
       @close="closeSettings"
@@ -61,7 +70,7 @@ import metricTitleIcons from './metricTitleIcons';
 import { mdiSettings } from '@mdi/js';
 
 export default {
-  name: 'singleValue',
+  name: 'SingleValue',
   components: { SingleValueSettings },
   props: {
     idFrom: String,
@@ -87,7 +96,6 @@ export default {
   computed: {
     dataToRender() {
       let temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
-      // console.log(temp)
       return this.update && temp.slice(0, this.metricCount);
     },
 
@@ -215,14 +223,12 @@ export default {
           this.titleToken = String(value);
           continue;
         }
-
         let range = metadata;
 
         if (!metadata || typeof metadata !== 'string') {
           range = null;
         }
         const startId = `${metric}_${id}`;
-
         const metricCurrent = metricOptionsCurrent?.find(
           (m) => m.startId === startId
         );
@@ -248,6 +254,12 @@ export default {
           expanded: false,
           ...defaultMetricOption,
         });
+      }
+      if (
+        this.dataRestFrom.length === 6 &&
+        !this.dataRestFrom.find((i) => i.metric === '_title')
+      ) {
+        this.titleToken = '';
       }
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;

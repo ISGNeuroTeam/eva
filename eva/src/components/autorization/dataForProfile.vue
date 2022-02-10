@@ -4,7 +4,10 @@
     :data-active="active"
     :style="{ borderColor: theme.$main_border }"
   >
-    <div class="headline" :style="{ color: theme.$title }">
+    <div
+      class="headline"
+      :style="{ color: theme.$title }"
+    >
       {{ alldata[essence][`${subessence}Name`] }}
     </div>
     <v-tabs
@@ -20,7 +23,10 @@
       <v-tab :href="`#tab-2`">
         {{ alldata[essence][`${subessence}TabName`].tab2 }}
       </v-tab>
-      <v-tab-item class="item" :value="'tab-1'">
+      <v-tab-item
+        class="item"
+        :value="'tab-1'"
+      >
         <v-skeleton-loader
           v-if="loaders[essence][subessence]"
           type="table-tbody"
@@ -38,7 +44,10 @@
           single-line
           hide-details
         />
-        <div v-if="!loaders[essence][subessence]" class="table-profile-block">
+        <div
+          v-if="!loaders[essence][subessence]"
+          class="table-profile-block"
+        >
           <v-data-table
             v-model="alldata[essence][subessence].selected"
             :style="{
@@ -66,7 +75,10 @@
           </v-btn>
         </div>
       </v-tab-item>
-      <v-tab-item class="item" :value="'tab-2'">
+      <v-tab-item
+        class="item"
+        :value="'tab-2'"
+      >
         <v-skeleton-loader
           v-if="loaders[essence][`all${subessence}`]"
           type="table-tbody"
@@ -124,12 +136,26 @@ import { mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
-    essence: null,
-    subessence: null,
-    create: null,
-    activeFrom: null,
-    dataFrom: null,
-    nameGroupFrom: null,
+    essence: {
+      type: String,
+      required: true
+    },
+    subessence: {
+      type: String,
+      required: true
+    },
+    create: {
+      type: Boolean,
+      required: true,
+    },
+    activeFrom: {
+      type: Boolean,
+      required: true,
+    },
+    dataFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -330,40 +356,41 @@ export default {
     };
   },
   computed: {
-    active: function () {
-      let essence = this.essence;
-      if (this.create) {
-        this.alldata[essence].tab.users = 'tab-2';
-        this.alldata[essence].tab.roles = 'tab-2';
-        this.alldata[essence].tab.permissions = 'tab-2';
-        this.alldata[essence].tab.groups = 'tab-2';
-        this.alldata[essence].tab.indexes = 'tab-2';
-        this.alldata[essence].tab.dashs = 'tab-2';
-      } else {
-        this.alldata[essence].tab.users = 'tab-1';
-        this.alldata[essence].tab.roles = 'tab-1';
-        this.alldata[essence].tab.permissions = 'tab-1';
-        this.alldata[essence].tab.groups = 'tab-1';
-        this.alldata[essence].tab.indexes = 'tab-1';
-        this.alldata[essence].tab.dashs = 'tab-1';
-      }
+    active() {
       if (this.activeFrom) {
-        this.switchTab();
+        this.$nextTick(() => {
+          let essence = this.essence;
+          const tabs = [
+            'users',
+            'roles',
+            'permissions',
+            'groups',
+            'indexes',
+            'dashs',
+          ];
+         this.setTabs(essence, tabs)
+          this.switchTab();
+        });
       }
       return this.activeFrom;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   methods: {
-    getData: async function () {
+    setTabs(essence, tabs) {
+      tabs.forEach((tab) => {
+        this.alldata[essence].tab[tab] = this.create ? 'tab-2' : 'tab-1';
+      })
+    },
+    async getData() {
       let essence = this.essence;
       let subessence = this.subessence;
       let data = await this.dataFrom;
 
       if (this.create) {
-        if (essence == 'dash') {
+        if (essence === 'dash') {
           this.alldata[essence][subessence] = {
             selected: [],
             nodata: this.noneText[subessence],
@@ -402,30 +429,29 @@ export default {
       this.loaders[essence][subessence] = false;
       this.loaders[essence][`all${subessence}`] = false;
     },
-    switchTab: function () {
+    switchTab() {
       Object.keys(this.loaders[this.essence]).forEach((item) => {
         this.loaders[this.essence][item] = true;
       });
       this.getData();
     },
-    translateToObj: function (array) {
+    translateToObj(array) {
       return array.map((item) => {
         return { name: item };
       });
     },
-    deleteSelected: function (subj) {
+    deleteSelected(subj) {
       let essence = this.essence;
       let subessence = this.subessence;
       let deleted = this.alldata[essence][subj].selected.map((item) => {
         return item.name;
       });
 
-      this.alldata[essence][subj].data = this.alldata[essence][
-        subj
-      ].data.filter((item) => {
-        if (!deleted.includes(item.name)) {
-          return item;
-        }
+      this.alldata[essence][subj].data = this.alldata[essence][subj].data
+        .filter((item) => {
+          if (!deleted.includes(item.name)) {
+            return item;
+          }
       });
       this.alldata[essence][subj].selected = [];
       this.$emit('changeData', {
@@ -434,7 +460,7 @@ export default {
         subessence: subessence,
       });
     },
-    addSelected: function (subj) {
+    addSelected(subj) {
       let essence = this.essence;
       let subessence = this.subessence;
       let added = this.alldata[essence][`all${subj}`].selected.map((item) => {
@@ -456,7 +482,7 @@ export default {
         subessence: subessence,
       });
     },
-    translateToArray: function (array) {
+    translateToArray(array) {
       return array.map((item) => {
         return item.name;
       });

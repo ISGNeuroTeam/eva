@@ -1,17 +1,23 @@
 <template>
-  <div ref="svgBlock" class="dash-csvg" tabindex="0">
+  <div
+    ref="svgBlock"
+    class="dash-csvg"
+    tabindex="0"
+  >
     <div
-      v-show="noMsg == 1"
+      v-show="noMsg === 1"
       ref="csvg"
       class="csvg-block"
-      :data-change="change"
       :style="{ width: svgStyleWidth, height: svgStyleHeight }"
       @mouseover="positionTooltip"
       @click="clickSvg"
       @mouseout="mouseoutSvg"
       v-html="svg"
     />
-    <div v-show="noMsg == 0" class="file-input">
+    <div
+      v-show="noMsg === 0"
+      class="file-input"
+    >
       <v-file-input
         :prepend-icon="image"
         :style="{ color: color.text, fill: color.text }"
@@ -37,15 +43,18 @@
         {{ answer }}
       </div>
     </div>
-    <div v-show="noMsg == 2" class="errormsg">
+    <div
+      v-show="noMsg === 2"
+      class="errormsg"
+    >
       {{ msgText }}
     </div>
     <v-icon
       v-if="dataModeFrom"
-      v-show="noMsg != 2"
+      v-show="noMsg !== 2"
       class="icon file"
       :color="colorMsg"
-      @click="noMsg == 0 ? (noMsg = 1) : (noMsg = 0)"
+      @click="noMsg === 0 ? (noMsg = 1) : (noMsg = 0)"
     >
       {{ upload }}
     </v-icon>
@@ -57,21 +66,34 @@
     >
       <div
         v-show="
-          tooltipFrom.texts.length == 0 &&
-          tooltipFrom.links.length == 0 &&
-          tooltipFrom.buttons.length == 0
+          tooltipFrom.texts &&
+            tooltipFrom.texts.length === 0 &&
+            tooltipFrom.links.length === 0 &&
+            tooltipFrom.buttons.length === 0
         "
         class="id-tooltip"
       >
         {{ idTooltip }}
       </div>
-      <div class="text-block-tooltip">
-        <p v-for="i in tooltipFrom.texts.length" :key="i + 'texts'">
+      <div
+        v-if="tooltipFrom.texts"
+        class="text-block-tooltip"
+      >
+        <p
+          v-for="i in tooltipFrom.texts.length"
+          :key="i + 'texts'"
+        >
           {{ checkTokenInTooltip(tooltipFrom.texts[i - 1]) }}
         </p>
       </div>
-      <div v-show="tooltipFrom.links.length != 0" class="white-space" />
-      <div class="link-block-tooltip">
+      <div
+        v-show="tooltipFrom.links && tooltipFrom.links.length !== 0"
+        class="white-space"
+      />
+      <div
+        v-if="tooltipFrom.links"
+        class="link-block-tooltip"
+      >
         <a
           v-for="i in tooltipFrom.links.length"
           :key="i + 'links'"
@@ -82,8 +104,15 @@
           <span />
         </a>
       </div>
-      <div v-show="tooltipFrom.buttons.length != 0" class="white-space" />
-      <div class="button-block-tooltip" :data-options="String(options)">
+      <div
+        v-show="tooltipFrom.buttons && tooltipFrom.buttons.length !== 0"
+        class="white-space"
+      />
+      <div
+        v-if="tooltipFrom.buttons"
+        class="button-block-tooltip"
+        :data-options="String(options)"
+      >
         <button
           v-for="i in tooltipFrom.buttons.length"
           :key="i + 'buttons'"
@@ -96,7 +125,10 @@
         </button>
       </div>
     </div>
-    <div class="link-canvas" :class="{ linkCanvasShow: linkCanvasShow }">
+    <div
+      class="link-canvas"
+      :class="{ linkCanvasShow: linkCanvasShow }"
+    >
       <canvas ref="link" />
     </div>
   </div>
@@ -173,34 +205,47 @@ export default {
       return this.colorFrom;
     },
     colorMsg: function () {
-      if (this.noMsg == 1) {
+      if (this.noMsg === 1) {
         return this.color.controls;
       } else {
         return this.color.controlsActive;
       }
+    },
+    updatedOptions() {
+      return this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
     },
     options: function () {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
-      let idsButton = this.tooltipFrom.buttons.map((item) => {
-        return item.id;
-      });
-
-      this.captures = idsButton;
-
       return options.change;
     },
-    change: function () {
+  },
+  watch: {
+    updatedOptions: {
+      immediate: true,
+      deep: true,
+      handler() {
+        if (this.tooltipFrom.buttons) {
+          this.captures = this.tooltipFrom.buttons.map((item) => {
+            return item.id;
+          });
+        }
+      },
+    },
+    dataRestFrom() {
       if (
         this.dataRestFrom &&
-        Object.keys(this.dataRestFrom).length != 0 &&
+        Object.keys(this.dataRestFrom).length !== 0 &&
         this.dataRestFrom[0].svg_filename &&
-        this.dataRestFrom[0].svg_filename != ''
+        this.dataRestFrom[0].svg_filename !== ''
       ) {
         if (this.dataReport) {
-          if (this.activeElemFrom == this.id) {
+          if (this.activeElemFrom === this.id) {
             this.dataFrom = this.dataRestFrom[0];
             this.getSvg(this.dataRestFrom[0].svg_filename);
             this.$store.commit('setActions', {
@@ -224,10 +269,7 @@ export default {
       if (screen.width <= 1600) {
         this.otstupBottom = 30;
       }
-      return true;
     },
-  },
-  watch: {
     dataModeFrom: function (dataMode) {
       if (dataMode) {
         this.otstupBottom = 45;
@@ -254,25 +296,26 @@ export default {
     },
   },
   mounted() {
-    this.$refs.svgBlock.addEventListener('keydown', (event) => {
-      if (event.key == 'Control') {
-        this.tooltipPress = !this.tooltipPress;
-        if (!this.tooltipPress) {
-          this.tooltipShow = false;
-          this.linkCanvasShow = false;
-        } else {
-          this.tooltipShow = true;
-          this.linkCanvasShow = true;
+    if (this.$refs.svgBlock) {
+      this.$refs.svgBlock.addEventListener('keydown', (event) => {
+        if (event.key === 'Control') {
+          this.tooltipPress = !this.tooltipPress;
+          if (!this.tooltipPress) {
+            this.tooltipShow = false;
+            this.linkCanvasShow = false;
+          } else {
+            this.tooltipShow = true;
+            this.linkCanvasShow = true;
+          }
         }
-      }
-    });
+      });
+    }
   },
   methods: {
     getSvg: async function (svg) {
       this.$emit('setLoading', true);
       let response = await this.$store.getters.getSvg(svg);
-      if (response != '') {
-        console.log('create svg');
+      if (response !== '') {
         this.$emit('setLoading', false);
         this.svg = response;
         this.noMsg = 1;
@@ -286,7 +329,7 @@ export default {
     },
     checkSize: function () {
       this.$refs.csvg;
-      if (this.svg != 'Нет данных для отображения' && this.svg != '') {
+      if (this.svg !== 'Нет данных для отображения' && this.svg !== '') {
         let timeOut = setTimeout(
           function tick() {
             if (this.$refs.csvg.querySelector('svg') != null) {
@@ -327,7 +370,7 @@ export default {
                 Object.keys(captures[item]).forEach((capture) => {
                   // пробегаемя по его свойствам
 
-                  if (capture != 'id' && capture != 'svg_filename') {
+                  if (capture !== 'id' && capture !== 'svg_filename') {
                     // если свойство не id и не название файла, потмоу что они нам не интересны
                     if (captures[item][capture] != null) {
                       // так же проверяем что свойство не равно null (не пустое)
@@ -337,7 +380,7 @@ export default {
                       }
                       if (!this.svgChanges[item][capture]) {
                         // если у созданного элемнета нет еще такого свойства ()то есть впервые оно изменилось
-                        if (capture == 'tag_value') {
+                        if (capture === 'tag_value') {
                           // то сперва проверяем текст ли это
                           this.svgChanges[item][capture] = elem.innerHTML; // и если текст то заносим в наш объект с измененными данными
                           // значение которое было изначально
@@ -350,7 +393,7 @@ export default {
                         }
                       } else {
                         // если значенеи по умолчанию уже занесено у нас в объект с изменениями
-                        if (capture == 'tag_value') {
+                        if (capture === 'tag_value') {
                           // то делаем тоже самое, толко не трогаем по умолчанию, меняем лишь значение в самой свг
                           elem.innerHTML = captures[item][capture];
                         } else {
@@ -365,7 +408,7 @@ export default {
                       }
                       if (this.svgChanges[item][capture]) {
                         // есть ли такое свойство
-                        if (capture == 'tag_value') {
+                        if (capture === 'tag_value') {
                           // и тут в свг заносим значение уже по умолчанию, а не из данных
                           elem.innerHTML = this.svgChanges[item][capture];
                         } else {
@@ -398,7 +441,7 @@ export default {
                   .querySelector('svg')
                   .querySelector(`#${change}`);
                 Object.keys(this.svgChanges[change]).forEach((defChange) => {
-                  if (defChange == 'tag_value') {
+                  if (defChange === 'tag_value') {
                     elem.innerHTML = this.svgChanges[change][defChange];
                   } else {
                     elem.setAttribute(
@@ -428,7 +471,7 @@ export default {
       let tockens = this.$store.getters.getTockens(this.idDash);
       let reg = '';
       Object.values(tockens).forEach((item) => {
-        if (text.indexOf(item.name) != -1) {
+        if (text.indexOf(item.name) !== -1) {
           reg = new RegExp(`\\$${item.name}\\$`, 'g');
           text = text.replace(reg, item.value);
         }
@@ -436,13 +479,13 @@ export default {
       return text;
     },
     setSvg: async function () {
-      if (this.file != '') {
+      if (this.file !== '') {
         let formData = new FormData();
         formData.append('file', this.file);
 
         let response = await this.$store.getters.setSvg(formData);
         try {
-          if (JSON.parse(response).status == 'ok') {
+          if (JSON.parse(response).status === 'ok') {
             this.answerColor = this.color.controls;
             this.answer = 'Изображение успешно загружено';
           }
@@ -471,8 +514,8 @@ export default {
           capture: tockens[i].capture,
         };
 
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
-          if (item == 'object') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
+          if (item === 'object') {
             this.$store.commit('setTocken', {
               tocken: tocken,
               idDash: this.idDash,
@@ -480,7 +523,7 @@ export default {
               store: this.$store,
             });
           } else {
-            if (tockens[i].capture == token) {
+            if (tockens[i].capture === token) {
               this.$store.commit('setTocken', {
                 tocken: tocken,
                 idDash: this.idDash,
@@ -492,7 +535,7 @@ export default {
         }
       });
 
-      if (item == 'object') {
+      if (item === 'object') {
         let events = this.$store.getters.getEvents({
           idDash: this.idDash,
           event: 'onclick',
@@ -500,14 +543,14 @@ export default {
           partelement: 'empty',
         });
 
-        if (events.length != 0) {
+        if (events.length !== 0) {
           events.forEach((item) => {
-            if (item.action == 'set') {
+            if (item.action === 'set') {
               this.$store.commit('letEventSet', {
                 events: events,
                 idDash: this.idDash,
               });
-            } else if (item.action == 'go') {
+            } else if (item.action === 'go') {
               this.$store.commit('letEventGo', {
                 event: item,
                 idDash: this.idDash,
@@ -529,7 +572,7 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (tockens[i].elem == this.id && tockens[i].action == 'mouseover') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
           this.$store.commit('setTocken', {
             tocken: tocken,
             idDash: this.idDash,
@@ -582,11 +625,11 @@ export default {
       let csvgSize = this.$refs.csvg.getBoundingClientRect();
       let direction = 'normal';
 
-      if (id && id.indexOf('overlay') != -1) {
+      if (id && id.indexOf('overlay') !== -1) {
         token = id.split('overlay_')[1];
         this.$refs.tooltip.setAttribute('data-id', token);
 
-        this.tooltipOptions == false ? (this.idTooltip = token) : false;
+        this.tooltipOptions === false ? (this.idTooltip = token) : false;
 
         // выходит справа
         if (event.offsetX + 40 + tooltipSize.width > csvgSize.width) {
@@ -600,7 +643,7 @@ export default {
         if (event.offsetY - 50 < 0) {
           tooltipTop = event.offsetY + 50;
           linkTop = event.offsetY;
-          if (direction == 'right') {
+          if (direction === 'right') {
             direction = 'top-right';
           } else {
             direction = 'top-left';
@@ -628,7 +671,7 @@ export default {
     clickSvg(event) {
       let token = '';
       let id = event.target.getAttribute('id');
-      if (id && id.indexOf('overlay') != -1) {
+      if (id && id.indexOf('overlay') !== -1) {
         token = id.split('overlay_')[1];
         this.setClick(token, 'object');
       }
@@ -639,7 +682,7 @@ export default {
 
       this.timeout = setTimeout(() => {
         let id = event.target.getAttribute('id');
-        if (id && id.indexOf('overlay') != -1 && !this.tooltipPress) {
+        if (id && id.indexOf('overlay') !== -1 && !this.tooltipPress) {
           this.tooltipShow = false;
           this.linkCanvasShow = false;
         }

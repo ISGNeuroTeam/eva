@@ -17,7 +17,10 @@
             >
               Авторизация
             </v-card-title>
-            <v-card-text class="text-aut" :style="{ color: theme.$main_text }">
+            <v-card-text
+              class="text-aut"
+              :style="{ color: theme.$main_text }"
+            >
               <v-text-field
                 v-model="user.username"
                 label="Логин"
@@ -54,7 +57,10 @@
                 Подтвердить
               </v-btn>
             </v-card-actions>
-            <div class="example" v-html="msgg" />
+            <div
+              class="example"
+              v-html="msgg"
+            />
           </v-card>
         </div>
       </v-container>
@@ -74,25 +80,25 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   mounted() {
     this.getCookie();
     this.$refs.authForm.$el.addEventListener('keypress', (event) => {
-      if (event.keyCode == 13) {
+      if (event.keyCode === 13) {
         this.sendAut();
       }
     });
   },
   methods: {
-    sendAut: async function () {
+    async sendAut() {
       if (
         this.user.username &&
-        this.user.username.length != 0 &&
+        this.user.username.length !== 0 &&
         this.user.password &&
-        this.user.password.length != 0
+        this.user.password.length !== 0
       ) {
         let response = await fetch(`/api/auth/login`, {
           // сперва нужно подать post запрос
@@ -101,14 +107,14 @@ export default {
           body: JSON.stringify(this.user),
           // mode: 'no-cors'
         }).catch((error) => {
-          console.log(error);
+          console.error(error);
           return {
             status: 300,
             result: 'Post не создался, возможно из-за неточностей в запросе',
           };
         });
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
@@ -117,6 +123,7 @@ export default {
             );
             this.$store.commit('clearState');
             this.$router.push(`/main`);
+            return res;
           });
         } else {
           this.$store.auth.getters.putLog(
@@ -137,7 +144,7 @@ export default {
         }, 2000);
       }
     },
-    getCookie: function () {
+    getCookie() {
       if (this.$jwt.hasToken()) {
         this.$router.push(`/main`);
       }

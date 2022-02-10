@@ -1,3 +1,25 @@
+# [1.82.0] - Positioning elements on the dashboard, fixed dashboard filters
+
+### New
+
+- ghooks lib for running ESLint before commit
+
+### Fixed
+
+- Fixed dashboard filter
+- Fixed ESLint errors and warnings
+- Optimized pipeline information processing in dashMap
+- Added a frame for the event window
+- Fixed node label name in YGraph
+- Fixed the initial position of dash
+- Fixed dash z-index
+- Fixed tooltip z-index
+- Fixed tooltip width
+- Fixed table events
+- Fixed dash single value title
+- Fixed rename dashboard
+- Fixed save table settings on change fullscreen view
+
 # [1.81.0] - Searching & reporting 2.0.
 
 ## New

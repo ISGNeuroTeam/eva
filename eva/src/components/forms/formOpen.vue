@@ -2,12 +2,24 @@
   <v-app>
     <v-content>
       <div class="form-panel-board">
-        <div class="title-name">{{ title }}</div>
-        <v-tooltip bottom color="#FF6D70">
+        <div class="title-name">
+          {{ title }}
+        </div>
+        <v-tooltip
+          bottom
+          color="#FF6D70"
+        >
           <template v-slot:activator="{ on }">
-            <v-icon class="home" color="teal" v-on="on" @click="toHome">{{
-              home
-            }}</v-icon>
+            <v-icon
+              class="home"
+              color="teal"
+              v-on="on"
+              @click="toHome"
+            >
+              {{
+                home
+              }}
+            </v-icon>
           </template>
           <span>На главную</span>
         </v-tooltip>
@@ -19,8 +31,10 @@
             type="image"
             height="500"
             width="100%"
-          ></v-skeleton-loader>
-          <div class="title-form">{{ titleForm }}</div>
+          />
+          <div class="title-form">
+            {{ titleForm }}
+          </div>
           <!-- <div class="form-itself" :style="{gridTemplateRows : `repeat(${createForm.rows}, 1fr)`, gridTemplateColumns: `repeat(${createForm.columns}, 1fr)`}">-->
           <div class="form-itself">
             <grid-layout
@@ -46,15 +60,19 @@
                 @moved="savePosSize"
                 @resized="savePosSize"
               >
-                <div class="form-cell" :class="{ vertical: item.w < 3 }">
+                <div
+                  class="form-cell"
+                  :class="{ vertical: item.w < 3 }"
+                >
                   <div class="elem-cell">
                     <v-icon
                       class="icon-cell"
                       color="teal"
                       :class="{ plusIcon: item.name == '' }"
                       @click="openModal(item.i)"
-                      >{{ item.img }}</v-icon
                     >
+                      {{ item.img }}
+                    </v-icon>
                     <div class="name-cell">
                       {{ checkName(item.name, item.w, item.h, item.img) }}
                     </div>
@@ -65,44 +83,53 @@
                     class="icon-gear"
                     color="teal"
                     @click="openModalSetting(item.i)"
-                    >{{ gear }}</v-icon
                   >
+                    {{ gear }}
+                  </v-icon>
                 </div>
               </grid-item>
             </grid-layout>
           </div>
-          <div v-if="editable == 'true'" class="form-btn">
+          <div
+            v-if="editable == 'true'"
+            class="form-btn"
+          >
             <v-btn
               small
               color="teal"
               class="create-form-btn"
               :disabled="disabled"
               @click="saveForm"
-              >Сохранить</v-btn
             >
+              Сохранить
+            </v-btn>
             <!-- <v-btn small color="teal" class="create-form-btn" @click="openForm" :disabled="followDisabled">Перейти к редактированию</v-btn> -->
           </div>
-          <div v-if="editable == 'false'" class="form-btn-not-editable">
+          <div
+            v-if="editable == 'false'"
+            class="form-btn-not-editable"
+          >
             <v-btn
               small
               color="#FF6D70"
               class="create-form-btn"
               @click="deleteForm"
-              >Удалить</v-btn
             >
+              Удалить
+            </v-btn>
           </div>
         </v-card>
       </v-container>
       <modal-choose-element
-        :modalFrom="modal"
+        :modal-from="modal"
         @hideForm="closeModal"
         @setElement="setElement($event)"
-      ></modal-choose-element>
+      />
       <modal-setting-form
-        :modalFrom="modalSettings"
-        :settingsFrom="forSettingsForm"
+        :modal-from="modalSettings"
+        :settings-from="forSettingsForm"
         @hideForm="closeModal"
-      ></modal-setting-form>
+      />
     </v-content>
   </v-app>
 </template>
@@ -142,17 +169,7 @@ export default {
       return this.$store.form.getters.getCreateForm;
     },
     editable: function () {
-      // получаем настройку сообщающию может ли пользователь редактировать шаблон или нет
-      if (this.$route.query.editable == 'false') {
-        // если редактировтаь шаблон нельзя
-        this.dargrsizeable = false; // то отключаем возможность редактирования
-        this.title = 'Просмотр формы'; // и меняем заголовок шаблона
-      } else {
-        // если редактировать разрешено
-        this.dargrsizeable = true; // включаем настройку редактирования
-        this.loading = false; // отключаем загрузку
-        this.title = 'Создать форму'; // меняем заголовок
-      }
+      this.setDataEditable()
       return this.$route.query.editable; // возвращаем саму натсройку редактирования
     },
     idForm: function () {
@@ -185,6 +202,19 @@ export default {
     }
   },
   methods: {
+    setDataEditable () {
+      // получаем настройку сообщающию может ли пользователь редактировать шаблон или нет
+      if (this.$route.query.editable == 'false') {
+        // если редактировтаь шаблон нельзя
+        this.dargrsizeable = false; // то отключаем возможность редактирования
+        this.title = 'Просмотр формы'; // и меняем заголовок шаблона
+      } else {
+        // если редактировать разрешено
+        this.dargrsizeable = true; // включаем настройку редактирования
+        this.loading = false; // отключаем загрузку
+        this.title = 'Создать форму'; // меняем заголовок
+      }
+    },
     toHome: function () {
       // метод перенаправляющий на главную страницу
       this.$router.push(`/forms`);
@@ -253,7 +283,7 @@ export default {
       this.columns = max;
       this.loading = false; // отключаем загрузку
     },
-    setGrid: function (form) {
+    setGrid: function () {
       // создаем шаблон в первый раз
       let x = 0;
       let y = 0;

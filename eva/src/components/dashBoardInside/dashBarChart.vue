@@ -1,7 +1,13 @@
 <template>
   <div class="dash-barchart-block">
-    <div class="dash-barchart" :data-status="change">
-      <p v-if="nodata" class="nodata">
+    <div
+      class="dash-barchart"
+      :data-status="change"
+    >
+      <p
+        v-if="nodata"
+        class="nodata"
+      >
         {{ nodataText }}
       </p>
     </div>
@@ -100,12 +106,12 @@ export default {
     change: function () {
       if (
         this.dataRestFrom &&
-        Object.keys(this.dataRestFrom).length != 0 &&
-        this.width != 0 &&
-        this.height != 0
+        Object.keys(this.dataRestFrom).length !== 0 &&
+        this.width !== 0 &&
+        this.height !== 0
       ) {
         if (this.dataReport) {
-          if (this.activeElemFrom == this.id) {
+          if (this.activeElemFrom === this.id) {
             this.getDataAsynchrony();
           } else {
             d3.select(this.$el.querySelector('.dash-barchart'))
@@ -193,7 +199,7 @@ export default {
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
       // создаем область графика, все-что вне этой области не будет отрисованно
-      let clip = svg
+      svg
         .append('defs')
         .append('svg:clipPath')
         .attr('id', `clip-${this.id}`)
@@ -289,7 +295,7 @@ export default {
               .tickFormat(d3.timeFormat('%d-%m-%Y '))
               .tickValues(
                 x.ticks().filter((item, i) => {
-                  if (i % deliter == 0) {
+                  if (i % deliter === 0) {
                     return item;
                   }
                 })
@@ -303,7 +309,7 @@ export default {
           .call(
             d3.axisBottom(x).tickValues(
               x.domain().filter((item, i) => {
-                if (i % deliter == 0) {
+                if (i % deliter === 0) {
                   return item;
                 }
               })
@@ -322,8 +328,8 @@ export default {
       let maxYTop = max + 0.1 * Math.abs(max);
       let minYBottom = min - 0.1 * Math.abs(min);
 
-      let tickvals = [];
-      if (minYBottom == maxYTop) {
+      let tickvals;
+      if (minYBottom === maxYTop) {
         tickvals = [minYBottom];
       } else {
         if (minYBottom < 0) {
@@ -388,7 +394,7 @@ export default {
           }
         })
         .attr('height', function (d) {
-          if (d[yMetric] == 0) {
+          if (d[yMetric] === 0) {
             return 0;
           }
           if (negative) {
@@ -446,7 +452,7 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
             tocken: tocken,
             idDash: this.idDash,
@@ -463,14 +469,14 @@ export default {
         partelement: 'empty',
       });
 
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'set') {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == 'go') {
+          } else if (item.action === 'go') {
             this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,

@@ -5,11 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.82.0]
+
+### Added
+
+- ghooks lib for running ESLint in pre-commit hook
+
+### Fixed
+
+- added a frame for the event window
+- fixed node label name in YGraph
+- fixed ESLint errors and warnings
+- fixed the initial position of dash
+- fixed dash z index
+- fixed tooltip z-index
+- fixed tooltip width
+- fixed table events
+- fixed dash single value title
+- fixed rename dashboard
+- fixed save table settings on change fullscreen view
+- fixed filter
+- optimized pipeline information processing in dashMap
+
 ## [1.81.0]
 
-## Added
+### Added
 - refactoring modal settings
 - datа research 2.0.
+
+## Fixed
+- Fixed display of dashboard edit button
 
 ## [1.80.0]
 
