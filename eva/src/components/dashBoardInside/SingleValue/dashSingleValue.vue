@@ -223,14 +223,12 @@ export default {
           this.titleToken = String(value);
           continue;
         }
-
         let range = metadata;
 
         if (!metadata || typeof metadata !== 'string') {
           range = null;
         }
         const startId = `${metric}_${id}`;
-
         const metricCurrent = metricOptionsCurrent?.find(
           (m) => m.startId === startId
         );
@@ -256,6 +254,12 @@ export default {
           expanded: false,
           ...defaultMetricOption,
         });
+      }
+      if (
+        this.dataRestFrom.length === 6 &&
+        !this.dataRestFrom.find((i) => i.metric === '_title')
+      ) {
+        this.titleToken = '';
       }
       this.metricList = metricList;
       this.options.settings.metricOptions = metricOptions;
