@@ -719,13 +719,10 @@ export default {
     },
 
     editName: function (props) {
-      console.log(props)
-      console.log('editName')
       // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
-      console.log('props.name', props.name,)
-      console.log('this.element', this.element)
+
       this.$store.commit('setNameDash', {
         name: props.name,
         id: this.element,

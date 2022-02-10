@@ -782,11 +782,9 @@
       </div>
       <div
         class="warning-block"
-        :class="{ openwarning: openwarning }"
+        :class="{ openwarning: openwarning, errorSaveToken: errorSaveToken }"
         :style="{
           background: theme.$main_bg,
-          border: `1px solid ${errorSaveToken ? theme.$error_color : theme.$main_border}`,
-          color: `${errorSaveToken ? theme.$error_color : theme.$main_text}`,
           bottom: `-${otstupBottom}px`,
         }"
       >
@@ -1401,7 +1399,10 @@ export default {
       // функция которая сохраняет токен в хранилище
 
       // проверяем не пустой ли токен
-      if ((!this.newTockenName && !Number.isInteger(index)) || (Number.isInteger(index) && !this.tockensName[this.tockens[index].name].length)) {
+      if ((!this.newTockenName
+              && !Number.isInteger(index))
+          || (Number.isInteger(index)
+              && !this.tockensName[this.tockens[index].name].length)) {
         this.errorSaveToken = true;
         this.openwarning = true;
         let height = this.$refs.blockTocken.clientHeight;
@@ -1416,8 +1417,10 @@ export default {
       }
 
       // проверяем на запретние названия
-      if ((!Number.isInteger(index) && globalTockens.includes(this.newTockenName.trim()))
-          || (Number.isInteger(index) && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
+      if ((!Number.isInteger(index)
+              && globalTockens.includes(this.newTockenName.trim()))
+          || (Number.isInteger(index)
+              && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
         this.errorSaveToken = true;
         this.openwarning = true;
         let height = this.$refs.blockTocken.clientHeight;
