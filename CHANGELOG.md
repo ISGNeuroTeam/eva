@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed the initial position of dash
 - fixed dash z index
 - fixed tooltip z-index
+- fixed filter
 
 
 ## [1.81.0]
