@@ -504,7 +504,7 @@ export default {
         border_radius: borderRadius = '2px',
         border = 'none',
       } = lib;
-      return `<div class="leaflet-div-icon" 
+      return `<div class="leaflet-div-icon"
           style="
             background-color: ${color};
             opacity: ${opacity};
@@ -603,9 +603,6 @@ export default {
   font-size: 18px
   font-weight: 600
   line-height: 22px
-
-.menuable__content__active
-  width: 300px
 
 .med
   height: 100%

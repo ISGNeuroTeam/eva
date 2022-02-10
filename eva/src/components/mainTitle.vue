@@ -526,6 +526,9 @@ export default {
       if (response.status === 'exist') {
         this.alreadyShow = true;
         this.alreadyDash = response;
+        this.$store.commit('changeDashboard', {
+          data: response,
+        });
       }
       this.prepared = true;
     },
