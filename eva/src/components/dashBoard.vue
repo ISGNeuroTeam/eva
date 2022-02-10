@@ -251,11 +251,15 @@
                     :height-from="fullScreenHeight"
                     :options="props.options"
                     :is-full-screen="true"
+                    :table-per-page="tablePerPage"
+                    :table-page="tablePage"
                     @hideDS="hideDS($event)"
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
+                    @update:table-per-page="onTableItemsPerPageChange"
+                    @update:table-page="onTableIItemsPageChange"
                   />
                 </v-card>
               </div>
@@ -428,11 +432,15 @@
         :current-settings="settings"
         :update-settings="updateSettings"
         :is-full-screen="false"
+        :table-per-page="tablePerPage"
+        :table-page="tablePage"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
+        @update:table-per-page="onTableItemsPerPageChange"
+        @update:table-page="onTableIItemsPageChange"
       />
     </v-card>
   </div>
@@ -481,6 +489,8 @@ export default {
   },
   data() {
     return {
+      tablePerPage: 100,
+      tablePage: 1,
       dataFromDB: true,
       mdiDatabaseSearch: mdiDatabaseSearch,
       mdiArrowDownBold: mdiArrowDownBold,
@@ -703,6 +713,12 @@ export default {
     });
   },
   methods: {
+    onTableIItemsPageChange(page) {
+      this.tablePage = page
+    },
+    onTableItemsPerPageChange(perPage) {
+      this.tablePerPage = perPage
+    },
     setPropsOptions(options) {
       Object.keys(options).forEach((item) => {
         this.props.options[item] = options[item];
