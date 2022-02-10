@@ -1423,7 +1423,7 @@ export default {
         let height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
-        this.msgWarn = 'Невозможно использовать жто имя для токена. Попробуйте еще раз.';
+        this.msgWarn = 'Невозможно использовать это имя для токена. Попробуйте еще раз.';
 
         setTimeout(() => {
           this.openwarning = false;
