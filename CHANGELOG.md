@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed tooltip z-index
 - fixed tooltip width
 - fixed table events
+- fixed dash single value title
+- fixed rename dashboard
 - fixed save table settings on change fullscreen view
 
 
@@ -32,10 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Fixed
 - Fixed display of dashboard edit button
-
-## Fixed
-
-- fixed dash single value title
 
 ## [1.80.0]
 
