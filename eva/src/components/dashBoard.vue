@@ -618,11 +618,11 @@ export default {
       return options.lastResult;
     },
     options: function () {
-      console.log('computed options');
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.element,
       });
+      this.setPropsOptions(options)
       return options.change;
     },
   },
@@ -679,12 +679,6 @@ export default {
 
       this.setShadow();
     },
-    dataModeFrom(val) {
-      console.log('watch dataModeFrom', val);
-    },
-    'props.disappear'(val) {
-      console.log('watch props.disappear', val);
-    },
     fullScreenMode(to) {
       setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
@@ -709,6 +703,11 @@ export default {
     });
   },
   methods: {
+    setPropsOptions(options) {
+      Object.keys(options).forEach((item) => {
+        this.props.options[item] = options[item];
+      });
+    },
     onResize() {
       this.fullScreenWidth = window.innerWidth * 0.8;
       this.fullScreenHeight = window.innerHeight * 0.8;
