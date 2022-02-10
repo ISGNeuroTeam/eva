@@ -561,12 +561,11 @@ export default {
         return this.element;
       }
       let name = this.props.name;
-      console.log('this.props.name', this.props.name)
       name &&
         this.getSelfTockens.forEach((token) => {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
-      console.log(name)
+
       return name;
     },
     settingsIsOpened() {
