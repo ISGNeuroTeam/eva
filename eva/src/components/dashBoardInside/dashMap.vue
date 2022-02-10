@@ -599,7 +599,6 @@ export default {
       let option = this.option;
 
       let pipelineData = this.pipelineDataDictionary[element.ID];
-      let map = this.map;
 
       let latlngs = [];
       element.coordinates.split(';').forEach((point) => {
