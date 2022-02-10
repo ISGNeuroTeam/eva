@@ -1400,7 +1400,7 @@ export default {
       // функция которая сохраняет токен в хранилище
 
       // проверяем не пустой ли токен
-      if (!this.newTockenName) {
+      if ((!this.newTockenName && !Number.isInteger(index)) || (Number.isInteger(index) && !this.tockensName[this.tockens[index].name].length)) {
         this.errorSaveToken = true;
         this.openwarning = true;
         let height = this.$refs.blockTocken.clientHeight;
@@ -1414,20 +1414,36 @@ export default {
         return;
       }
 
-      this.tempTocken = {
-        // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
-        name: this.newTockenName,
-        elem: this.newElem,
-        action: this.newAction,
-        capture: this.newCapture,
-        prefix: this.newTockenDop.prefix,
-        sufix: this.newTockenDop.sufix,
-        delimetr: this.newTockenDop.delimetr,
-        defaultValue: this.newTockenDop.defaultValue,
-        resetData: true, //сделать норм
-        onButton: this.newTockenDop.onButton,
-      };
-
+      // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
+      if (Number.isInteger(index)){
+        // редактирование
+        this.tempTocken = {
+          name: this.tockensName[this.tockens[index].name],
+          elem: this.tockens[index].elem,
+          action:this.tockens[index].action,
+          capture: this.tockens[index].capture,
+          prefix: this.tockens[index].prefix,
+          sufix: this.tockens[index].sufix,
+          delimetr: this.tockens[index].delimetr,
+          defaultValue: this.tockens[index].defaultValue,
+          resetData: true, //сделать норм
+          onButton: this.tockens[index].onButton,
+        };
+      } else {
+        // создание нового
+        this.tempTocken = {
+          name: this.newTockenName,
+          elem: this.newElem,
+          action: this.newAction,
+          capture: this.newCapture,
+          prefix: this.newTockenDop.prefix,
+          sufix: this.newTockenDop.sufix,
+          delimetr: this.newTockenDop.delimetr,
+          defaultValue: this.newTockenDop.defaultValue,
+          resetData: true, //сделать норм
+          onButton: this.newTockenDop.onButton,
+        };
+      }
       let j = -1;
 
       this.tockens.forEach((item, i) => {
@@ -1447,7 +1463,7 @@ export default {
         this.otstupBottom = height + 55;
         this.msgWarn = 'Такой токен уже существует. Хотите обновить?';
 
-        this.index = j;
+        this.index = j !== -1 ? j : index;
       } else {
         // если нету то етсь он новый
         this.$store.commit('createTockens', {
@@ -1507,8 +1523,8 @@ export default {
 
         const id = this.index;
         const newName = this.tempTocken.name;
-
         this.tempTocken.name = this.tockens[id].name;
+
         this.$store.commit('createTockens', {
           idDash: this.idDash,
           tocken: this.tempTocken,
