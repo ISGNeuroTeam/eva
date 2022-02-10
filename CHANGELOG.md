@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed table events
 - fixed dash single value title
 - fixed rename dashboard
+- fixed save table settings on change fullscreen view
 
 
 ## [1.81.0]
