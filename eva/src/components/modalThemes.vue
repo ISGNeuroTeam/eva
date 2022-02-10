@@ -518,7 +518,7 @@ export default {
         let newThemeTitles = themeTitles.map((them) => {
           return (them = { title: them.name, ...them });
         })
-        this.themeTitles = [{ title: 'Тёмна', name: 'dark' },
+        this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
           { title: 'Светлая', name: 'light' }].concat(
             newThemeTitles
         );
