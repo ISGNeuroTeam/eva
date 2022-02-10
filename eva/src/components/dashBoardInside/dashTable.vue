@@ -16,57 +16,63 @@
         }"
         :height="height"
         fixed-header
+        :items-per-page="tablePerPage"
         :style="{ borderColor: theme.$secondary_border }"
+        :page="tablePage"
+        @update:items-per-page="onItemsPerPageChange"
+        @update:page="onItemsPageChange"
       >
         <!-- search menu -->
         <template
           v-for="(value, title) in typedTitles"
           v-slot:[`header.${title}`]="{ header }"
         >
-          <v-menu :key="`${title + value}`" offset-y>
-            <template v-slot:activator>
-              <v-menu z-index="100000" offset-y :close-on-content-click="false">
-                <template v-slot:activator="{ on, attrs }">
-                  <v-icon
-                    v-bind="attrs"
-                    large
-                    class="icon"
-                    :color="theme.$main_border"
-                    v-on="on"
-                    >{{ mdiMagnify }}</v-icon
-                  >
-                </template>
-                <v-row v-if="value !== 'string'">
-                  <v-col cols="6">
-                    <v-select
-                      :items="compare"
-                      label="Знак"
-                      @change="setFilterData(title, $event, 'compare')"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="6">
-                    <v-text-field
-                      label="значение"
-                      @change="setFilterData(title, $event)"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-
-                <v-row v-else>
-                  <v-col cols="12">
-                    <v-text-field
-                      label="значение"
-                      @change="
-                        setFilterData(title, '=', 'compare');
-                        setFilterData(title, $event);
-                      "
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-menu>
+          <v-menu
+            :key="`${header.value + value}menu`"
+            z-index="100000"
+            offset-y
+            :close-on-content-click="false"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                v-bind="attrs"
+                large
+                class="icon"
+                :color="theme.$main_border"
+                v-on="on"
+                >
+                {{ mdiMagnify }}
+              </v-icon>
             </template>
+            <v-row v-if="value !== 'string'">
+              <v-col cols="6">
+                <v-select
+                  :items="compare"
+                  label="Знак"
+                  @change="setFilterData(title, $event, 'compare')"
+                ></v-select>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field
+                  label="значение"
+                  @change="setFilterData(title, $event)"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row v-else>
+              <v-col cols="12">
+                <v-text-field
+                  label="значение"
+                  @change="
+                    setFilterData(title, '=', 'compare');
+                    setFilterData(title, $event);
+                  "
+                ></v-text-field>
+              </v-col>
+            </v-row>
           </v-menu>
-          <v-tooltip :key="header.value + value" bottom>
+          <v-tooltip :key="`${header.value + value}tooltip`" bottom>
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
@@ -109,6 +115,14 @@ import {mdiMagnify} from '@mdi/js';
 
 export default {
   props: {
+    tablePerPage: {
+      type: Number,
+      default: 100,
+    },
+    tablePage: {
+      type: Number,
+      default: 1,
+    },
     dataRestFrom: null,
     //shouldGet: null,
     idFrom: null,
@@ -341,6 +355,12 @@ export default {
     this.setEventColor();
   },
   methods: {
+    onItemsPageChange(page) {
+      this.$emit('update:table-page', page)
+    },
+    onItemsPerPageChange(perPage) {
+      this.$emit('update:table-per-page', perPage)
+    },
     setNoData() {
       this.props.itemsForTable = [];
       this.props.nodata = true;
