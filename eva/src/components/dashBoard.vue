@@ -578,8 +578,8 @@ export default {
         });
 
       if (name.indexOf(`$evaTknLogin$`) != -1) {
-        if (Vue.$jwt.hasToken()) {
-          name = name.replaceAll('$evaTknLogin$', Vue.$jwt.decode().username);
+        if (this.$jwt.hasToken()) {
+          name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
         }
       }
       return name;
