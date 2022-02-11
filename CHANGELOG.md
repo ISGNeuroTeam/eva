@@ -7,22 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Fixed
+
+- fixed component checkboxes have undefined status
+
+## [1.82.0]
+
 ### Added
 
 - ghooks lib for running ESLint in pre-commit hook
 
 ### Fixed
 
-- Added a frame for the event window
+- added a frame for the event window
 - fixed node label name in YGraph
 - fixed ESLint errors and warnings
 - fixed the initial position of dash
 - fixed dash z index
 - fixed tooltip z-index
 - fixed tooltip width
+- fixed token with an empty name
 - fixed table events
-- fixed component checkboxes have undefined status
-
+- fixed dash single value title
+- fixed rename dashboard
+- fixed save table settings on change fullscreen view
+- fixed filter
+- optimized pipeline information processing in dashMap
 
 ## [1.81.0]
 
