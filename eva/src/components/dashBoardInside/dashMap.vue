@@ -284,9 +284,26 @@ export default {
       let element = this.$refs.map.getElementsByClassName(
         'leaflet-control-container'
       );
+
+      this.deleteTitleByAttribute();
+
       let container = element[0];
       container.appendChild(test.$el);
       this.isSettings = true;
+    },
+    deleteTitleByAttribute(){
+      const leafletControlZoomOut = this.$refs.map.querySelector(
+          '.leaflet-control-zoom-out'
+      )
+
+      const leafletControlZoomIn = this.$refs.map.querySelector(
+          '.leaflet-control-zoom-in'
+      )
+      leafletControlZoomOut.setAttribute('name', leafletControlZoomOut.getAttribute('title'))
+      leafletControlZoomIn.setAttribute('name', leafletControlZoomIn.getAttribute('title'))
+
+      leafletControlZoomOut.removeAttribute('title');
+      leafletControlZoomIn.removeAttribute('title');
     },
 
     initTheme() {
@@ -802,6 +819,32 @@ export default {
 .dash-map {
   padding: 0 20px !important;
 }
+
+.leaflet-control-zoom-in, .leaflet-control-zoom-out{
+  position: relative;
+}
+
+.leaflet-control-zoom-out[name]:hover::after, .leaflet-control-zoom-in[name]:hover::after {
+  content: attr(name);
+  position: absolute;
+  top: 0;
+  left: 30px;
+
+  width: 100px;
+  z-index: 1001;
+  border-color: rgb(110, 150, 197);
+  background-color: rgb(110, 150, 197);
+  color: #FFFFFF;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 22px;
+  display: inline-block;
+  padding: 5px 16px;
+  text-transform: initial;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
 .leaflet-tooltip-top:before,
 .leaflet-tooltip-bottom:before,
 .leaflet-tooltip-left:before,

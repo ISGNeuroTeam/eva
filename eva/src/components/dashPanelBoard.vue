@@ -561,29 +561,61 @@
           >
             {{ tocken.value }}
           </p>
-          <v-icon
-            class="row-check"
-            :color="theme.$primary_button"
-            :class="{ showIcon: lookTockens[i].show }"
-            @click="saveTocken(i)"
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ check }}
-          </v-icon>
-          <v-icon
-            class="row-look"
-            :color="theme.$primary_button"
-            @click="lookTocken(i)"
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  class="row-check"
+                  :color="theme.$primary_button"
+                  :class="{ showIcon: lookTockens[i].show }"
+                  v-on="on"
+                  @click="saveTocken(i)"
+              >
+                {{ check }}
+              </v-icon>
+            </template>
+            <span>Создать/обновить токен</span>
+          </v-tooltip>
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ look }}
-          </v-icon>
-          <v-icon
-            class="row-trash"
-            :color="theme.$primary_button"
-            :class="{ showIcon: lookTockens[i].show }"
-            @click="deleteTocken(tocken.name, i)"
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  class="row-look"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="lookTocken(i)"
+              >
+                {{ look }}
+              </v-icon>
+            </template>
+            <span>Предпросмотр токена</span>
+          </v-tooltip>
+
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ trash }}
-          </v-icon>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  class="row-trash"
+                  :color="theme.$primary_button"
+                  :class="{ showIcon: lookTockens[i].show }"
+                  @click="deleteTocken(tocken.name, i)"
+                  v-on="on"
+              >
+                {{ trash }}
+              </v-icon>
+            </template>
+            <span>Удалить токен</span>
+          </v-tooltip>
+
         </div>
         <div
           class="row-tocken new"
