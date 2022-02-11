@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- fixed component checkboxes have undefined status
+- fixed token with an empty name
+- fixed name restriction for tokens
+- Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
 
 ## [1.82.0]
 
