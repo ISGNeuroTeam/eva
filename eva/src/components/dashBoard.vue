@@ -743,6 +743,7 @@ export default {
       // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
+
       this.$store.commit('setNameDash', {
         name: props.name,
         id: this.element,
