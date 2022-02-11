@@ -26,7 +26,7 @@ export function filterCompile(filter) {
           case 'manual':
             switch (part.fieldType) {
               case 'string':
-                filterOtlText += `${part.fieldName}="${part.value}")`;
+                filterOtlText += `${part.fieldName}="${part.value.trim()}")`;
                 break;
               case 'number':
                 filterOtlText += `${part.fieldName}${part.operationManual}${part.value})`;
@@ -52,12 +52,12 @@ export function filterCompile(filter) {
                 if (idxVal === String(part.values.length - 1)) {
                   if (part.values.length > 1)
                     filterOtlText += ` ${part.operationToken} `;
-                  filterOtlText += `${part.fieldName}="${value}")`;
+                  filterOtlText += `${part.fieldName}="${value.trim()}")`;
                 } else if (idxVal === '0') {
-                  filterOtlText += `${part.fieldName}="${value}"`;
+                  filterOtlText += `${part.fieldName}="${value.trim()}"`;
                   if (part.values.length === 0) filterOtlText += ')';
                 } else {
-                  filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value}"`;
+                  filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value.trim()}"`
                 }
               }
             }
