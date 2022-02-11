@@ -32,10 +32,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed tooltip width
 - fixed token with an empty name
 - fixed table events
-- - fixed dash single value title
+- fixed dash single value title
 - fixed rename dashboard
 - fixed save table settings on change fullscreen view
 - fixed filter
+- fixed prevent deleting a custom theme without saving
 - optimized pipeline information processing in dashMap
 
 ## [1.81.0]
