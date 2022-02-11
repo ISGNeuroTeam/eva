@@ -8,9 +8,18 @@
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
-        <v-icon left class="icon-main" v-text="mdiSettings" />
+        <v-icon
+          left
+          class="icon-main"
+          v-text="mdiSettings"
+        />
         <span class="main-title">Настройки Single Value</span>
-        <v-icon right class="icon-close" @click="close" v-text="mdiClose" />
+        <v-icon
+          right
+          class="icon-close"
+          @click="close"
+          v-text="mdiClose"
+        />
       </v-card-title>
 
       <v-divider :color="theme.$secondary_border" />
@@ -25,14 +34,14 @@
             hide-details
             class="input-element"
           />
-          <br />
+          <br>
           <label class="checkbox-google">
             <input
               type="checkbox"
               :checked="settings.showTitle || false"
               @change="handleChangeShowTitle"
-            />
-            <span class="checkbox-google-switch"></span> &nbsp; Отображение
+            >
+            <span class="checkbox-google-switch" /> &nbsp; Отображение
             шапки компонента
           </label>
         </div>
@@ -52,7 +61,10 @@
           />
         </div>
 
-        <div v-if="settings.metricCount > 1" class="content-section pt-0">
+        <div
+          v-if="settings.metricCount > 1"
+          class="content-section pt-0"
+        >
           <span class="section-title bold">Выберите шаблон</span>
           <div class="templates-container">
             <div
@@ -177,9 +189,11 @@
                   menu-props="offsetY"
                   class="input-element"
                 >
-                  <template v-slot:selection="{ item }">{{
-                    item.title
-                  }}</template>
+                  <template v-slot:selection="{ item }">
+                    {{
+                      item.title
+                    }}
+                  </template>
                   <template v-slot:item="{ item }">
                     <span
                       :style="{
@@ -210,12 +224,12 @@
                       background: color.colorGrad,
                     }"
                     v-text="color.title"
-                  ></div>
+                  />
                   <div
                     v-else
                     :style="{ color: getColor(color.name) }"
                     v-text="color.title"
-                  ></div>
+                  />
                 </div>
               </div>
             </div>
@@ -226,8 +240,21 @@
       <v-divider :color="theme.$secondary_border" />
 
       <v-card-actions class="footer px-6">
-        <v-btn text depressed class="btn-cancel" @click="close">Отмена</v-btn>
-        <v-btn depressed class="btn-save" @click="save">Сохранить</v-btn>
+        <v-btn
+          text
+          depressed
+          class="btn-cancel"
+          @click="close"
+        >
+          Отмена
+        </v-btn>
+        <v-btn
+          depressed
+          class="btn-save"
+          @click="save"
+        >
+          Сохранить
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

@@ -1,5 +1,8 @@
 <template>
-  <v-app class="aut-app-main" :style="{ backgroundColor: theme.$secondary_bg }">
+  <v-app
+    class="aut-app-main"
+    :style="{ backgroundColor: theme.$secondary_bg }"
+  >
     <header-top :inside="false" />
     <v-content>
       <v-container class="main-container container-product">
@@ -9,10 +12,16 @@
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openDash"
           >
-            <v-card-text class="product-text" :style="{ color: theme.$title }">
-              Конструирование <br />
+            <v-card-text
+              class="product-text"
+              :style="{ color: theme.$title }"
+            >
+              Конструирование <br>
               дашбордов
-              <p class="delimetr" :style="{ backgroundColor: theme.$title }" />
+              <p
+                class="delimetr"
+                :style="{ backgroundColor: theme.$title }"
+              />
             </v-card-text>
           </v-card>
           <v-card
@@ -20,10 +29,16 @@
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openReport"
           >
-            <v-card-text class="product-text" :style="{ color: theme.$title }">
-              Исследование <br />
+            <v-card-text
+              class="product-text"
+              :style="{ color: theme.$title }"
+            >
+              Исследование <br>
               данных
-              <p class="delimetr" :style="{ backgroundColor: theme.$title }" />
+              <p
+                class="delimetr"
+                :style="{ backgroundColor: theme.$title }"
+              />
             </v-card-text>
           </v-card>
           <v-card
@@ -31,10 +46,16 @@
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openDataResearch"
           >
-            <v-card-text class="product-text" :style="{ color: theme.$title }">
-              Исследование <br />
+            <v-card-text
+              class="product-text"
+              :style="{ color: theme.$title }"
+            >
+              Исследование <br>
               данных 2.0
-              <p class="delimetr" :style="{ backgroundColor: theme.$title }" />
+              <p
+                class="delimetr"
+                :style="{ backgroundColor: theme.$title }"
+              />
             </v-card-text>
           </v-card>
           <v-card
@@ -42,10 +63,16 @@
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openQuis"
           >
-            <v-card-text class="product-text" :style="{ color: theme.$title }">
-              Вопрос <br />
+            <v-card-text
+              class="product-text"
+              :style="{ color: theme.$title }"
+            >
+              Вопрос <br>
               ответ
-              <p class="delimetr" :style="{ backgroundColor: theme.$title }" />
+              <p
+                class="delimetr"
+                :style="{ backgroundColor: theme.$title }"
+              />
             </v-card-text>
           </v-card>
           <v-card
@@ -53,10 +80,16 @@
             :style="{ backgroundColor: theme.$main_bg }"
             @click="openPaper"
           >
-            <v-card-text class="product-text" :style="{ color: theme.$title }">
-              Конструирование <br />
+            <v-card-text
+              class="product-text"
+              :style="{ color: theme.$title }"
+            >
+              Конструирование <br>
               отчетов
-              <p class="delimetr" :style="{ backgroundColor: theme.$title }" />
+              <p
+                class="delimetr"
+                :style="{ backgroundColor: theme.$title }"
+              />
             </v-card-text>
           </v-card>
         </div>
@@ -72,7 +105,7 @@ export default {
     return {};
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
@@ -80,22 +113,21 @@ export default {
     document.title = 'EVA';
   },
   methods: {
-    openDash: function () {
+    openDash() {
       this.$router.push(`/dashboards`);
     },
-    openReport: function () {
+    openReport() {
       this.$store.commit('createReportSearch');
       this.$router.push(`/reports`);
     },
-    openDataResearch: function () {
+    openDataResearch() {
       this.$router.push(`/data-research`);
     },
-    openPaper: function () {
+    openPaper() {
       this.$store.commit('createPaperSearch');
       this.$router.push(`/papers`);
     },
-    openQuis: function () {
-      //this.$router.push(`/quiz/list`);
+    openQuis() {
       window.location.href = `/quiz/list`; // используем window.location.href потому что /quiz/list внешняя ссылка а не часть приложения
     },
   },

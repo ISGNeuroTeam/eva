@@ -2,21 +2,38 @@
   <v-app>
     <v-content>
       <div class="form-panel-board">
-        <div class="title-name">Создать новую форму</div>
-        <v-tooltip bottom color="#FF6D70">
+        <div class="title-name">
+          Создать новую форму
+        </div>
+        <v-tooltip
+          bottom
+          color="#FF6D70"
+        >
           <template v-slot:activator="{ on }">
-            <v-icon class="home" color="teal" v-on="on" @click="toHome">{{
-              home
-            }}</v-icon>
+            <v-icon
+              class="home"
+              color="teal"
+              v-on="on"
+              @click="toHome"
+            >
+              {{
+                home
+              }}
+            </v-icon>
           </template>
           <span>На главную</span>
         </v-tooltip>
       </div>
       <v-container class="edit-form-container">
         <v-card class="form-create-block">
-          <div class="title-form">{{ nameForm }}</div>
+          <div class="title-form">
+            {{ nameForm }}
+          </div>
           <!-- <div class="form-itself" :style="{gridTemplateRows : `repeat(${createForm.rows}, 1fr)`, gridTemplateColumns: `repeat(${createForm.columns}, 1fr)`}">-->
-          <div ref="form" class="form-itself">
+          <div
+            ref="form"
+            class="form-itself"
+          >
             <grid-layout
               :layout.sync="grid"
               :col-num="columns"
@@ -38,19 +55,22 @@
                 :i="item.i"
                 class="grid-item"
               >
-                <div class="form-cell" @click="openToolTip($event)">
+                <div
+                  class="form-cell"
+                  @click="openToolTip($event)"
+                >
                   <div class="elem-cell">
                     <!-- <v-icon class="icon-cell"  color="teal" @click="openModal(item.i)" >{{item.img}}</v-icon>  -->
                     <template-elements-form
-                      :idFrom="item.i"
-                      :heightFrom="item.h"
-                      nameFormFrom="nameForm"
-                      :radiosFrom="radios"
-                      :nameFrom="item.name"
+                      :id-from="item.i"
+                      :height-from="item.h"
+                      name-form-from="nameForm"
+                      :radios-from="radios"
+                      :name-from="item.name"
                       :editable="editable"
                       @setValue="setValue($event)"
                       @checkSwitch="checkSwitch($event)"
-                    ></template-elements-form>
+                    />
                   </div>
                 </div>
               </grid-item>
@@ -64,8 +84,9 @@
               class="create-form-btn"
               :disabled="false"
               @click="saveForm"
-              >Сохранить</v-btn
             >
+              Сохранить
+            </v-btn>
             <!-- <v-btn small color="teal" class="create-form-btn" @click="openForm">Перейти к редактированию</v-btn> -->
           </div>
         </v-card>

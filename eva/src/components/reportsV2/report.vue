@@ -1,12 +1,28 @@
 <template>
   <div class="text-center">
-    <v-dialog v-model="dialog" width="500">
+    <v-dialog
+      v-model="dialog"
+      width="500"
+    >
       <template v-slot:activator="{ on, attrs }">
-        <v-btn small text v-bind="attrs" v-on="on">
-          <v-icon :style="{ color: theme.$main_text }" class="download-icon">{{
-            mdiFileOutline
-          }}</v-icon>
-          <span class="download-btn-text" :style="{ color: theme.$main_text }">
+        <v-btn
+          small
+          text
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon
+            :style="{ color: theme.$main_text }"
+            class="download-icon"
+          >
+            {{
+              mdiFileOutline
+            }}
+          </v-icon>
+          <span
+            class="download-btn-text"
+            :style="{ color: theme.$main_text }"
+          >
             Отчет
           </span>
         </v-btn>
@@ -20,12 +36,17 @@
             <v-icon
               :style="{ color: theme.$main_text }"
               class="download-icon"
-              >{{ mdiFileOutline }}</v-icon
             >
+              {{ mdiFileOutline }}
+            </v-icon>
             Отчет
           </div>
           <div>
-            <v-btn icon :color="theme.$main_text" @click="dialog = false">
+            <v-btn
+              icon
+              :color="theme.$main_text"
+              @click="dialog = false"
+            >
               <v-icon>{{ mdiClose }}</v-icon>
             </v-btn>
           </div>
@@ -48,7 +69,7 @@ import { mdiFileOutline, mdiClose } from '@mdi/js';
 
 export default {
   props: {
-    length: [],
+    length: Number,
   },
   data() {
     return {

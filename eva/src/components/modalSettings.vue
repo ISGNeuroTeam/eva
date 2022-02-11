@@ -16,7 +16,10 @@
             <p>{{ element }}</p>
           </div>
         </v-card-text>
-        <div ref="options" class="options-block">
+        <div
+          ref="options"
+          class="options-block"
+        >
           <div class="option-item">
             <v-switch
               v-model="openNewScreen"
@@ -56,157 +59,166 @@
             </div>
           </div>
           <template v-for="field in fieldsForRender">
-            <div
-              v-for="prop in field.each || [null]"
+            <template
               v-if="
                 checkOptions(field.optionGroup || field.option, field.relation)
               "
-              :key="`${field.option}${prop}`"
-              class="option-item"
             >
-              <v-card-text v-if="field.group" class="headline">
-                <div
-                  class="settings-title"
-                  :style="{
-                    color: theme.$main_text,
-                    borderColor: theme.$main_border,
-                  }"
-                >
-                  {{ field.group }}
-                </div>
-              </v-card-text>
               <div
-                v-if="!field.group"
-                class="name-option item"
-                :style="{
-                  color: theme.$main_text,
-                  borderColor: theme.$main_border,
-                }"
+                v-for="prop in field.each || [null]"
+                :key="`${field.option}${prop}`"
+                class="option-item"
               >
-                {{ field.optionGroup ? field.optionGroup + '.' : ''
-                }}{{ field.label || field.option }}
-                <span v-if="prop">.{{ prop }}</span>
-              </div>
-              <div
-                v-if="!field.group"
-                class="discribe-option item"
-                :style="{
-                  color: theme.$main_text,
-                  borderColor: theme.$main_border,
-                }"
-              >
-                {{ field.description }}&nbsp;<span
-                  :style="{ color: theme.$accent_ui_color }"
-                  v-text="prop"
-                />
-              </div>
-              <div v-if="!field.group" class="status-option item">
-                <!-- elem: switch -->
-                <v-switch
-                  v-if="field.elem === 'switch'"
-                  v-model="options[field.option]"
-                  class="switch"
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  :label="String(options[field.option])"
-                />
-                <!-- elem: text-field -->
-                <v-text-field
-                  v-else-if="field.elem === 'text-field'"
-                  v-model="options[field.option]"
-                  :placeholder="field.placeholder"
-                  clearable
-                  :color="theme.$primary_button"
-                  :style="{
-                    color: theme.$main_text,
-                    background: 'transparent',
-                    borderColor: theme.$main_border,
-                  }"
-                  outlined
-                  class="subnumber"
-                  hide-details
-                  :type="field.elemType"
-                  :min="field.elemMin"
-                />
-                <!-- elem: select -->
-                <v-select
-                  v-else-if="field.elem === 'select' && !prop"
-                  v-model="options[field.option]"
-                  :items="field.items"
-                  :placeholder="field.default"
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                  hide-details
-                  outlined
-                  class="subnumber"
-                />
-                <v-select
-                  v-else-if="field.elem === 'select' && prop"
-                  v-model="options[field.option][prop]"
-                  :items="field.items"
-                  :placeholder="field.default"
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                  hide-details
-                  outlined
-                  class="subnumber"
-                />
-                <!-- elem: checkbox-list -->
-                <div
-                  v-else-if="field.elem === 'checkbox-list'"
-                  class="checkbox-list"
+                <v-card-text
+                  v-if="field.group"
+                  class="headline"
                 >
-                  <v-checkbox
-                    v-for="setting in field.items"
-                    :key="setting"
-                    v-model="options[field.option]"
-                    :value="setting"
-                    :style="{ color: theme.$main_text }"
-                    :label="setting"
-                    hide-details
-                    @change="
-                      (val) => {
-                        field.onChange ? field.onChange(val) : null;
-                      }
-                    "
+                  <div
+                    class="settings-title"
+                    :style="{
+                      color: theme.$main_text,
+                      borderColor: theme.$main_border,
+                    }"
                   >
-                  </v-checkbox>
+                    {{ field.group }}
+                  </div>
+                </v-card-text>
+                <div
+                  v-if="!field.group"
+                  class="name-option item"
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
+                >
+                  {{ field.optionGroup ? field.optionGroup + '.' : ''
+                  }}{{ field.label || field.option }}
+                  <span v-if="prop">.{{ prop }}</span>
                 </div>
-                <!-- elem: radio-group -->
-                <v-radio-group
-                  v-else-if="field.elem === 'radio-group' && !prop"
-                  v-model="options[field.option]"
-                  :column="false"
+                <div
+                  v-if="!field.group"
+                  class="discribe-option item"
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
                 >
-                  <v-radio
-                    v-for="{ label, value } in field.items"
-                    :key="`${label || value}`"
+                  {{ field.description }}&nbsp;<span
+                    :style="{ color: theme.$accent_ui_color }"
+                    v-text="prop"
+                  />
+                </div>
+                <div
+                  v-if="!field.group"
+                  class="status-option item"
+                >
+                  <!-- elem: switch -->
+                  <v-switch
+                    v-if="field.elem === 'switch'"
+                    v-model="options[field.option]"
+                    class="switch"
                     :color="theme.$primary_button"
                     :style="{ color: theme.$main_text }"
-                    :label="label || value"
-                    :value="value"
-                    class="mx-1"
+                    :label="String(options[field.option])"
                   />
-                </v-radio-group>
-                <v-radio-group
-                  v-else-if="field.elem === 'radio-group' && prop"
-                  v-model="options[field.option][prop]"
-                  :column="false"
-                >
-                  <v-radio
-                    v-for="{ label, value } in field.items"
-                    :key="`${label || value}`"
+                  <!-- elem: text-field -->
+                  <v-text-field
+                    v-else-if="field.elem === 'text-field'"
+                    v-model="options[field.option]"
+                    :placeholder="field.placeholder"
+                    clearable
                     :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text }"
-                    :label="label || value"
-                    :value="value"
-                    class="mx-1"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    outlined
+                    class="subnumber"
+                    hide-details
+                    :type="field.elemType"
+                    :min="field.elemMin"
                   />
-                </v-radio-group>
-                <!-- end -->
+                  <!-- elem: select -->
+                  <v-select
+                    v-else-if="field.elem === 'select' && !prop"
+                    v-model="options[field.option]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                  />
+                  <v-select
+                    v-else-if="field.elem === 'select' && prop"
+                    v-model="options[field.option][prop]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                  />
+                  <!-- elem: checkbox-list -->
+                  <div
+                    v-else-if="field.elem === 'checkbox-list'"
+                    class="checkbox-list"
+                  >
+                    <v-checkbox
+                      v-for="setting in field.items"
+                      :key="setting"
+                      v-model="options[field.option]"
+                      :value="setting"
+                      :style="{ color: theme.$main_text }"
+                      :label="setting"
+                      hide-details
+                      @change="
+                        (val) => {
+                          field.onChange ? field.onChange(val) : null;
+                        }
+                      "
+                    />
+                  </div>
+                  <!-- elem: radio-group -->
+                  <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && !prop"
+                    v-model="options[field.option]"
+                    :column="false"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :key="value"
+                      :color="theme.$primary_button"
+                      :style="{ color: theme.$main_text }"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                    />
+                  </v-radio-group>
+                  <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && prop"
+                    v-model="options[field.option][prop]"
+                    :column="false"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :key="value"
+                      :color="theme.$primary_button"
+                      :style="{ color: theme.$main_text }"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                    />
+                  </v-radio-group>
+                  <!-- end -->
+                </div>
               </div>
-            </div>
+            </template>
           </template>
+
           <template v-if="!options.united">
             <div
               v-for="metric in metricsName"
@@ -335,7 +347,7 @@
                 class="item-metric border"
                 hide-details
               />
-              <br />
+              <br>
               <div class="item-metric">
                 <div
                   class="discribe-option item"
@@ -347,13 +359,15 @@
                   Цвет
                 </div>
                 <div class="status-option item">
-                  <input
-                    :value="color[metrics[i - 1].name]"
-                    style="width: 100px; cursor: pointer"
-                    type="color"
-                    name="multiline-color"
-                    @change="(e) => handleChangeColor(e, i - 1)"
-                  />
+                  <label>
+                    <input
+                      :value="color[metrics[i - 1].name]"
+                      style="width: 100px; cursor: pointer"
+                      type="color"
+                      name="multiline-color"
+                      @change="(e) => handleChangeColor(e, i - 1)"
+                    >
+                  </label>
                 </div>
               </div>
               <div>
@@ -493,7 +507,10 @@
             </div>
           </div>
 
-          <div v-if="checkOptions('primitivesLibrary')" class="option-item">
+          <div
+            v-if="checkOptions('primitivesLibrary')"
+            class="option-item"
+          >
             <v-container fluid>
               <v-card-text class="headline">
                 <div
@@ -529,7 +546,7 @@
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
-              ></v-textarea>
+              />
               <v-btn
                 v-if="primitivesLibraryAutoGrow"
                 plain
@@ -543,7 +560,10 @@
               </v-btn>
             </v-container>
           </div>
-          <v-card-text v-if="checkOptions('piechartSettings')" class="headline">
+          <v-card-text
+            v-if="checkOptions('piechartSettings')"
+            class="headline"
+          >
             <div
               class="settings-title"
               :style="{
@@ -571,7 +591,7 @@
             </div>
             <div class="options-item-tooltip">
               <v-select
-                v-for="(label, i) in metricsRelation.namesMetric"
+                v-for="(_, i) in metricsRelation.namesMetric"
                 :key="i + 'metric'"
                 v-model="metricsRelation.relations[i]"
                 :items="metricsRelation.metrics"
@@ -648,17 +668,21 @@
               <v-btn
                 v-if="
                   !defaultThemes.includes(colorsPie.theme) &&
-                  colorsPie.theme !== 'custom'
+                    colorsPie.theme !== 'custom'
                 "
                 :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
-                >Удалить</v-btn
               >
+                Удалить
+              </v-btn>
             </div>
           </div>
         </div>
-        <v-card-text v-if="tooltipSettingShow" class="headline">
+        <v-card-text
+          v-if="tooltipSettingShow"
+          class="headline"
+        >
           <div
             class="settings-title"
             :style="{
@@ -669,7 +693,11 @@
             Настройки tooltip
           </div>
         </v-card-text>
-        <div v-if="tooltipSettingShow" ref="options" class="options-block">
+        <div
+          v-if="tooltipSettingShow"
+          ref="options"
+          class="options-block"
+        >
           <div
             class="divider-tooltip-setting"
             :style="{ color: theme.$main_text }"
@@ -862,7 +890,7 @@
             small
             :color="theme.$primary_button"
             class="create-btn"
-            @click="setOptions()"
+            @click="setOptions"
           >
             Подтвердить
           </v-btn>
@@ -870,7 +898,7 @@
             small
             :color="theme.$primary_button"
             class="create-btn"
-            @click="cancelModal()"
+            @click="cancelModal"
           >
             Отмена
           </v-btn>

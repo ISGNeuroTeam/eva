@@ -1,5 +1,8 @@
 <template>
-  <div class="footer-block" :style="{ color: theme.$main_text }">
+  <div
+    class="footer-block"
+    :style="{ color: theme.$main_text }"
+  >
     {{ appVersion }}
   </div>
 </template>

@@ -2,7 +2,10 @@
   <div class="ygraph-wrapper">
     <div class="button-block">
       <v-row align="start">
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="
@@ -20,7 +23,10 @@
           <span>Перемещение по графу</span>
         </v-tooltip>
 
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
@@ -34,7 +40,10 @@
           <span>Увеличить</span>
         </v-tooltip>
 
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
@@ -48,7 +57,10 @@
           <span>Уменьшить</span>
         </v-tooltip>
 
-        <v-tooltip bottom :color="colorFrom.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="colorFrom.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
@@ -69,10 +81,17 @@
       :style="{ top: `${top}` }"
     >
       <div class="popupContainer">
-        <div ref="nodePopupContent" class="popupContent" tabindex="0">
+        <div
+          ref="nodePopupContent"
+          class="popupContent"
+          tabindex="0"
+        >
           <div class="popupContentTitle">
-            <div data-id="node"></div>
-            <div data-id="node_description" style="font-size: 0.9rem"></div>
+            <div data-id="node" />
+            <div
+              data-id="node_description"
+              style="font-size: 0.9rem"
+            />
           </div>
           <div class="popupContentTabsHeader">
             <div
@@ -93,15 +112,29 @@
               ref="popupContentTabParents"
               :class="{ active: popupNodeCurrentTab === 0 }"
             >
-              <div v-for="item in parentNodes">• Node: {{ item }}</div>
-              <div v-if="parentNodes.length === 0">Empty</div>
+              <div
+                v-for="item in parentNodes"
+                :key="item"
+              >
+                • Node: {{ item }}
+              </div>
+              <div v-if="parentNodes.length === 0">
+                Empty
+              </div>
             </div>
             <div
               ref="popupContentTabChildren"
               :class="{ active: popupNodeCurrentTab === 1 }"
             >
-              <div v-for="item in childrenNodes">• Node: {{ item }}</div>
-              <div v-if="childrenNodes.length === 0">Empty</div>
+              <div
+                v-for="item in childrenNodes"
+                :key="item"
+              >
+                • Node: {{ item }}
+              </div>
+              <div v-if="childrenNodes.length === 0">
+                Empty
+              </div>
             </div>
           </div>
         </div>
@@ -116,14 +149,14 @@
             <div
               data-id="sourceName"
               style="font-weight: bold; float: left"
-            ></div>
+            />
             <div style="float: left; margin-left: 5px; margin-right: 5px">
               ->
             </div>
             <div
               data-id="targetName"
               style="font-weight: bold; float: left"
-            ></div>
+            />
           </div>
         </div>
       </div>
@@ -147,9 +180,6 @@ import {
   GraphItemTypes,
   IEdge,
   INode,
-  NodeStyleDecorationInstaller,
-  ShapeNodeStyle,
-  ShapeNodeShape,
   Point,
   Stroke,
   Color,
@@ -160,13 +190,10 @@ import {
   StyleDecorationZoomPolicy,
   BezierEdgeStyle,
   TimeSpan,
-  IPort,
-  ILabel,
   Key,
   ModifierKeys,
   SimpleLabel,
   Size,
-  Rect,
 } from 'yfiles';
 yfile.License.value = licenseData; //проверка лицензии
 
@@ -178,7 +205,7 @@ const labelFontBOLD = new yfile.Font({
 });
 
 export default {
-  name: 'dashYGraph',
+  name: 'DashYGraph',
   props: {
     // переменные полученные от родителя
     idFrom: null, // id элемнета (table, graph-2)
@@ -229,7 +256,7 @@ export default {
     parentNodes() {
       if (!this.currentNode || !this.currentNode.id) return [];
       return this.dataRestFrom
-        .filter((item) => item.relation_id + '' == this.currentNode.id + '')
+        .filter((item) => item.relation_id + '' === this.currentNode.id + '')
         .map((item) => item.node);
     },
     childrenNodes() {
@@ -238,7 +265,7 @@ export default {
 
       const relation_ids = [];
       this.dataRestFrom
-        .filter((item) => item.id + '' == node.id + '')
+        .filter((item) => item.id + '' === node.id + '')
         .forEach((item) => {
           if (!relation_ids.includes(item.relation_id + '')) {
             relation_ids.push(item.relation_id + '');
@@ -541,7 +568,7 @@ export default {
 
       //label name для nodes
       const nodeNameCreator = this.$nodesSource.nodeCreator.createLabelBinding(
-        (nodeDataItem) => nodeDataItem.name
+        (nodeDataItem) => nodeDataItem.node
       );
       nodeNameCreator.defaults.layoutParameter =
         yfile.ExteriorLabelModel.NORTH_EAST;
@@ -550,6 +577,10 @@ export default {
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(
         (nodeDataItem) => {
           if (nodeDataItem.label !== '-') {
+            /*
+             TODO: У нода нет параметра лейбл, так что  свойство всегда ture
+              а данная строка всегда возвращает undefined
+            */
             return nodeDataItem.label;
           }
         }
@@ -564,20 +595,13 @@ export default {
         tag: (item) => item.color,
       });
 
-      const edgeLabelCreator = this.$edgesSource.edgeCreator.createLabelBinding(
-        (edgeDataItem) => {
-          if (edgeDataItem.label !== '-') {
-            return edgeDataItem.label;
-          }
+      this.$edgesSource.edgeCreator.createLabelBinding((edgeDataItem) => {
+        if (edgeDataItem.label !== '-') {
+          return edgeDataItem.label;
         }
-      );
+      });
 
-      let startedAt = Date.now();
       this.$graphComponent.graph = graphBuilder.buildGraph();
-      console.log(
-        (Date.now() - startedAt) / 1000 +
-          's. time spent for graphBuilder.buildGraph()'
-      );
       //отступы для нод
       const layoutData = new yfile.HierarchicLayoutData({
         nodeHalos: yfile.NodeHalo.create(50, 300, 50, 300),
@@ -590,7 +614,6 @@ export default {
       });
       layout.nodeToNodeDistance = 201;
 
-      startedAt = Date.now();
       //применяем layout
       this.$graphComponent.graph.applyLayout(
         layout,
@@ -601,10 +624,6 @@ export default {
         true,
         true,
         true
-      );
-      console.log(
-        (Date.now() - startedAt) / 1000 +
-          's. time spent for graph.applyLayout(...)'
       );
       this.$graphComponent.fitGraphBounds();
     },
@@ -633,7 +652,7 @@ export default {
         if (args.item instanceof yfile.INode) {
           let tokens = this.$store.getters.getTockens(this.idDashFrom);
           tokens.forEach((token) => {
-            if (token.elem == this.idFrom && token.action == 'click') {
+            if (token.elem === this.idFrom && token.action === 'click') {
               let value = args.item.tag[token.capture];
               this.$store.commit('setTocken', {
                 tocken: token,
@@ -650,14 +669,14 @@ export default {
             element: this.idFrom,
           });
 
-          if (events.length != 0) {
+          if (events.length !== 0) {
             events.forEach((item) => {
-              if (item.action == 'set') {
+              if (item.action === 'set') {
                 this.$store.commit('letEventSet', {
                   events: events,
                   idDash: this.idDashFrom,
                 });
-              } else if (item.action == 'go') {
+              } else if (item.action === 'go') {
                 this.$store.commit('letEventGo', {
                   event: item,
                   idDash: this.idDashFrom,
@@ -737,7 +756,7 @@ export default {
       inputMode.focusableItems = GraphItemTypes.NODE | GraphItemTypes.EDGE;
 
       // Register a listener that shows the pop-up for the currentItem
-      this.$graphComponent.addCurrentItemChangedListener((sender, args) => {
+      this.$graphComponent.addCurrentItemChangedListener(() => {
         const item = this.$graphComponent.currentItem;
         if (item instanceof INode) {
           this.currentNode = item.tag;
@@ -759,7 +778,7 @@ export default {
       });
 
       // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
-      inputMode.addCanvasClickedListener((sender, args) => {
+      inputMode.addCanvasClickedListener(() => {
         this.$graphComponent.currentItem = null;
       });
 
@@ -893,27 +912,25 @@ class HTMLPopupSupport {
    */
   registerListeners() {
     // Adds listener for viewport changes
-    this.graphComponent.addViewportChangedListener((sender, args) => {
+    this.graphComponent.addViewportChangedListener(() => {
       if (this.currentItem) {
         this.dirty = true;
       }
     });
 
     // Adds listeners for node bounds changes
-    this.graphComponent.graph.addNodeLayoutChangedListener(
-      (node, oldLayout) => {
-        const item = this.currentItem;
-        if (
-          item &&
-          (item === node || HTMLPopupSupport.isEdgeConnectedTo(item, node))
-        ) {
-          this.dirty = true;
-        }
+    this.graphComponent.graph.addNodeLayoutChangedListener((node) => {
+      const item = this.currentItem;
+      if (
+        item &&
+        (item === node || HTMLPopupSupport.isEdgeConnectedTo(item, node))
+      ) {
+        this.dirty = true;
       }
-    );
+    });
 
     // Adds listener for updates of the visual tree
-    this.graphComponent.addUpdatedVisualListener((sender, args) => {
+    this.graphComponent.addUpdatedVisualListener(() => {
       if (this.currentItem && this.dirty) {
         this.dirty = false;
         this.updateLocation();
