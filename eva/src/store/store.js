@@ -1802,17 +1802,17 @@ export default {
           Vue.set(state[id.idDash][id.id].options, 'searchBtn', false);
         }
 
-        if (!state[id.idDash][id.id].options.pinned) {
-          Vue.set(state[id.idDash][id.id].options, 'pinned', false);
+        if (!state[id?.idDash][id?.id]?.options.pinned) {
+          Vue.set(state[id?.idDash][id?.id].options, 'pinned', false);
         }
 
-        if (!state[id.idDash][id.id].options.lastDot) {
+        if (!state[id.idDash][id.id]?.options.lastDot) {
           Vue.set(state[id.idDash][id.id].options, 'lastDot', false);
         }
-        if (!state[id.idDash][id.id].options.stringOX) {
+        if (!state[id.idDash][id.id]?.options.stringOX) {
           Vue.set(state[id.idDash][id.id].options, 'stringOX', false);
         }
-        if (!state[id.idDash][id.id].options.united) {
+        if (!state[id.idDash][id.id]?.options.united) {
           Vue.set(state[id.idDash][id.id].options, 'united', false);
         }
 
