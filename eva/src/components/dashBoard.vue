@@ -467,6 +467,7 @@ import {
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
 import settings from '../js/componentsSettings.js';
+import Vue from "vue";
 
 export default {
   props: {
@@ -576,6 +577,11 @@ export default {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
 
+      if (name.indexOf(`$evaTknLogin$`) != -1) {
+        if (this.$jwt.hasToken()) {
+          name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
+        }
+      }
       return name;
     },
     settingsIsOpened() {
