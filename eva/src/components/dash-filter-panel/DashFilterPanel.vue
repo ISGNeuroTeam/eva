@@ -121,7 +121,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-               :style="{zIndex: 100}"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -140,7 +140,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              :style="{zIndex: 100}"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -159,7 +159,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              :style="{zIndex: 100}"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -182,7 +182,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
-              :style="{zIndex: 100}"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -202,7 +202,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
-              :style="{zIndex: 100}"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -223,7 +223,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
-              :style="{zIndex: 100}"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
