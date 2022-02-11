@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed component checkboxes have undefined status
 - fixed dash single value title
 - fixed setting theme
-- fixed saizing a filter
+- fixed sizing a filter
+- fixed dashboard component
 
 ## [1.82.0]
 
