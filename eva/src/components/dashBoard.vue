@@ -725,8 +725,6 @@ export default {
     },
 
     editName: function (props) {
-      console.log('editName')
-      console.log('props.name', this.props.name)
       // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
