@@ -472,6 +472,14 @@ export default {
         dash.getters(dashboard.id, true);
       }
     },
+    changeDashboard: (state, dash) => {
+      let dashboard = dash.data;
+      if (state[dashboard.id]) {
+        Vue.set(state[dashboard.id], 'name', dashboard.name);
+        Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
+        Vue.set(state[dashboard.id], 'modified', dashboard.modified);
+      }
+    },
     updateDash: (state, dash) => {
       if (dash.dash.body != '') {
         state[dash.dash.id] = {
@@ -1793,9 +1801,21 @@ export default {
           Vue.set(state[id.idDash][id.id].options, 'lastResult', false);
           Vue.set(state[id.idDash][id.id].options, 'searchBtn', false);
         }
-        if (!state[id.idDash][id.id].options.pinned) {
-          Vue.set(state[id.idDash][id.id].options, 'pinned', false);
+
+        if (!state[id?.idDash][id?.id]?.options.pinned) {
+          Vue.set(state[id?.idDash][id?.id].options, 'pinned', false);
         }
+
+        if (!state[id.idDash][id.id]?.options.lastDot) {
+          Vue.set(state[id.idDash][id.id].options, 'lastDot', false);
+        }
+        if (!state[id.idDash][id.id]?.options.stringOX) {
+          Vue.set(state[id.idDash][id.id].options, 'stringOX', false);
+        }
+        if (!state[id.idDash][id.id]?.options.united) {
+          Vue.set(state[id.idDash][id.id].options, 'united', false);
+        }
+
         return state[id.idDash][id.id].options;
       };
     },
