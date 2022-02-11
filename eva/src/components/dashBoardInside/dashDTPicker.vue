@@ -254,7 +254,6 @@ export default {
       id: this.id,
     });
     this.$emit('hideDS', this.id);
-    this.$emit('setVissible', this.id);
     this.curDate = this.calcCurrentDate();
   },
   methods: {
@@ -323,10 +322,14 @@ export default {
     openHidden: function () {
       this.show_picker_elem = !this.show_picker_elem;
       if (this.arrow.direct === 'down') {
+        this.$emit('setVissible', {element: this.id, overflow: 'visible'});
+
         this.arrow.direct = 'up';
         this.arrow.elem = this.up;
         this.show_curent = false;
       } else {
+        this.$emit('setVissible', {element: this.id, overflow: 'scroll'});
+
         this.changeDate = !this.changeDate;
         this.arrow.direct = 'down';
         this.arrow.elem = this.down;

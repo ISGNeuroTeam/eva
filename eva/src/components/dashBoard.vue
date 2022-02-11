@@ -816,11 +816,11 @@ export default {
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
-    setVissible: function (event) {
-      if (event.split('-')[0] === 'picker' || event.split('-')[0] === 'guntt') {
+    setVissible: function ({element, overflow}) {
+      if (element.split('-')[0] === 'picker' || element.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
-        this.$el.querySelector('.dash-block').style.overflow = 'visible'; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
+        this.$el.querySelector('.dash-block').style.overflow = overflow; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
       }
     },
     changeOptions: function (mode) {
