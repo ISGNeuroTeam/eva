@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
 - fixed component checkboxes have undefined status
 - fixed dash single value title
+- fixed time selection are rendered outside of the component's bounds
 
 ## [1.82.0]
 
