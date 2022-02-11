@@ -955,16 +955,18 @@ export default {
       metricUnits: {},
       fieldsForRender: [],
       optionsByComponents: [],
+      isDelete: false,
+      them: {},
     };
   },
   computed: {
-    active: function () {
+    active() {
       return this.$store.getters.getModalSettings(this.idDash).status;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
     primitivesLibraryAutoGrowLinkText() {
@@ -1121,8 +1123,8 @@ export default {
         [this.metrics[i].name]: Number(e),
       };
     },
-    setOptions: async function () {
-      // отправляем настройки в хранилище
+    // отправляем настройки в хранилище
+    async setOptions() {
       if (!this.options.level) {
         this.options.level = 1;
       }
@@ -1186,11 +1188,21 @@ export default {
         element: this.element,
         options,
       });
+      if (this.isDelete) {
+        this.deleteTheme();
+      }
       this.cancelModal();
     },
+    // если нажали на отмену создания
     cancelModal: function () {
-      // если нажали на отмену создания
       this.$store.dispatch('closeModalSettings', { path: this.idDash });
+      if (this.isDelete) {
+        this.themes = { ...this.themes, ...this.them };
+        this.them = {};
+        this.options.themes = this.themes;
+        this.isDelete = false;
+        this.setOptions();
+      }
     },
     checkEsc: function (event) {
       if (event.code === 'Escape') {
@@ -1263,8 +1275,8 @@ export default {
         });
       }
     },
+    //  понимает какие опции нужно вывести
     async prepareOptions() {
-      //  понимает какие опции нужно вывести
       const options = await this.$store.dispatch('getSettingsByPath', {
         path: this.idDash,
         element: this.element,
@@ -1378,9 +1390,15 @@ export default {
       this.colorsPie.theme = nextTheme;
       this.colorsPie.nametheme = nextTheme;
       this.colorsPie.colors = this.themes[nextTheme].join(',');
+      this.them = { ...this.them, [theme]: this.themes?.[theme] };
+      delete this.themes[theme];
+      this.isDelete = true;
+    },
+    deleteTheme() {
       this.options.colorsPie = this.colorsPie;
       this.options.themes = this.themes;
-      delete this.themes[theme];
+      this.isDelete = false;
+      this.them = {};
     },
   },
 };

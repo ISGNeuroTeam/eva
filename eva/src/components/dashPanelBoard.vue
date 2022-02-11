@@ -814,11 +814,9 @@
       </div>
       <div
         class="warning-block"
-        :class="{ openwarning: openwarning }"
+        :class="{ openwarning: openwarning, errorSaveToken: errorSaveToken }"
         :style="{
           background: theme.$main_bg,
-          border: `1px solid ${theme.$main_border}`,
-          color: theme.$main_text,
           bottom: `-${otstupBottom}px`,
         }"
       >
@@ -930,6 +928,7 @@ import EvaLogo from '../images/eva-logo.svg';
 
 import settings from '../js/componentsSettings.js';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
+import {globalTockens} from "@/constants/globalTockens";
 
 export default {
   components: {
@@ -1432,13 +1431,34 @@ export default {
       // функция которая сохраняет токен в хранилище
 
       // проверяем не пустой ли токен
-      if ((!this.newTockenName && !Number.isInteger(index)) || (Number.isInteger(index) && !this.tockensName[this.tockens[index].name].length)) {
+      if ((!this.newTockenName
+              && !Number.isInteger(index))
+          || (Number.isInteger(index)
+              && !this.tockensName[this.tockens[index].name].length)) {
         this.errorSaveToken = true;
         this.openwarning = true;
         let height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
         this.msgWarn = 'Имя токена пустое. Попробуйте еще раз.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
+      }
+
+      // проверяем на запретние названия
+      if ((!Number.isInteger(index)
+              && globalTockens.includes(this.newTockenName.trim()))
+          || (Number.isInteger(index)
+              && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        let height = this.$refs.blockTocken.clientHeight;
+
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Невозможно использовать это имя для токена. Попробуйте еще раз.';
 
         setTimeout(() => {
           this.openwarning = false;

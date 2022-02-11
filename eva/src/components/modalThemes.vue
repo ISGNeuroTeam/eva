@@ -46,14 +46,14 @@
           v-if="mode === 'select'"
           :style="{ color: theme.$main_text, fontSize: '15px' }"
         >
-          Выберете тему
+          Выберите тему
           <v-select
             v-model="select"
             :color="theme.$accent_ui_color"
             hide-details
             outlined
             :items="themeTitles"
-            item-text="name"
+            item-text="title"
             item-value="name"
           />
           <div
@@ -515,8 +515,12 @@ export default {
       try {
         let response = await fetch('/api/themes');
         let themeTitles = await response.json();
-        this.themeTitles = [{ name: 'dark' }, { name: 'light' }].concat(
-          themeTitles
+        let newThemeTitles = themeTitles.map((them) => {
+          return (them = { title: them.name, ...them });
+        })
+        this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
+          { title: 'Светлая', name: 'light' }].concat(
+            newThemeTitles
         );
       } catch (e) {
         console.log(e);

@@ -5,11 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [UNRELESE]
+## [Unrealese]
 
 ### Fixed
 
-- button hints
+- fixed token with an empty name
+- fixed name restriction for tokens
+- Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
+- fixed component checkboxes have undefined status
+- fixed dash single value title
+- fixed setting theme
+- fixed saizing a filter
+- fixed button hints
+
 
 ## [1.82.0]
 

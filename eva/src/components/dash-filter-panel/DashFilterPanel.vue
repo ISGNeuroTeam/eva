@@ -547,6 +547,7 @@ $filter-container-height: 60px
   width: 100%
   //max-height: calc((#{$filter-container-height} * 3) + 18px)
   overflow-y: auto
+  max-height: 180px
 
   &::-webkit-scrollbar
     width: 6px
