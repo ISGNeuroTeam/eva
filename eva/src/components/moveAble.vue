@@ -148,9 +148,7 @@ export default {
       this.height = height;
     },
     onActivated() {
-      let testElements = document.getElementsByClassName(
-        'vdr'
-      );
+      let testElements = document.getElementsByClassName('vdr');
       let maxZIndex = 1;
       for (let i = 0; i < testElements.length; i++) {
         if (Number(testElements[i].style.zIndex) > maxZIndex) {
@@ -218,7 +216,7 @@ export default {
   border-radius: 4px;
   transition: transform ease 0.3s;
 }
-.vdr.active.resizable {
+.vdr.active {
   outline-color: inherit;
   outline: 2px dashed;
 }
