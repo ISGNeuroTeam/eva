@@ -168,7 +168,7 @@ export default {
     },
   },
   watch: {
-    'dashOptions.themes': {
+    'dashOptions.colorsPie': {
       handler() {
         let graphics = d3
           .select(this.$refs.piechartItself)
