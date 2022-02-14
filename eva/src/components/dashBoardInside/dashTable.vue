@@ -47,6 +47,13 @@
             <v-row v-if="value !== 'string'">
               <v-col cols="6">
                 <v-select
+                    v-if="value === 'none'"
+                    :items="compareForBoolean"
+                    label="Знак"
+                    @change="setFilterData(title, $event, 'compare')"
+                ></v-select>
+                <v-select
+                    v-else
                   :items="compare"
                   label="Знак"
                   @change="setFilterData(title, $event, 'compare')"
@@ -137,6 +144,7 @@ export default {
   data() {
     return {
       compare: ['>', '<', '='],
+      compareForBoolean: ['='],
       mdiMagnify: mdiMagnify,
       eventRows: [],
       props: {
@@ -203,7 +211,14 @@ export default {
     },
     filteredTableData() {
       let chooseSort = function (dataFormat, sortType, value) {
-        if (dataFormat === 'date') {
+        if (dataFormat ==="none") {
+          return  (el) => {
+            if (value){
+              const isBool = value === 'true'
+              return el === isBool;
+            }
+          };
+        }else if (dataFormat === 'date') {
           let sort;
           let parseDate = function (val) {
             let parts = val.split('.');
@@ -267,11 +282,11 @@ export default {
       let temp = this.dataRestFrom;
       if (!temp) return;
       for (let [key, val] of Object.entries(this.filters)) {
-        let sort;
+
         let type = this.getType(key);
         if (val.value && val.compare) {
-          sort = chooseSort(type, val.compare, val.value);
-          temp = temp.filter((el) => sort(el[key]));
+          const sort = chooseSort(type, val.compare, val.value);
+          temp = temp.filter((el) =>  sort(el[key]));
         }
       }
       return temp;
