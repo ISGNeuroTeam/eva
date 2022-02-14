@@ -1,7 +1,7 @@
 <template>
   <div class="dash-picker">
     <div
-        v-click-outside="onClose"
+      v-click-outside="onClose"
       class="DTpicker"
       :class="{ show_picker_elem: show_picker_elem }"
     >
@@ -176,6 +176,7 @@
 
 <script>
 import { mdiChevronDown, mdiChevronUp, mdiCheckBold } from '@mdi/js';
+import Vue from "vue";
 
 export default {
   props: {
@@ -260,6 +261,16 @@ export default {
     this.curDate = this.calcCurrentDate();
   },
   methods: {
+    onClose(){
+      this.show_picker_elem = false;
+      this.$emit('setVissible', {element: this.id, overflow: 'scroll'});
+
+      this.changeDate = !this.changeDate;
+      this.arrow.direct = 'down';
+      this.arrow.elem = this.down;
+      this.showCurrent();
+      this.curDate = this.calcCurrentDate();
+    },
     calcCurrentDate: function () {
       let data = this.$store.getters.getPickerDate({
         idDash: this.idDash,
@@ -322,9 +333,6 @@ export default {
       this.show_curent = current !== '';
       return current;
     },
-    onClose(){
-      console.log('onClose')
-    },
     openHidden: function () {
       this.show_picker_elem = !this.show_picker_elem;
       if (this.arrow.direct === 'down') {
@@ -334,14 +342,7 @@ export default {
         this.arrow.elem = this.up;
         this.show_curent = false;
       } else {
-        this.$emit('setVissible', {element: this.id, overflow: 'scroll'});
-
-        this.changeDate = !this.changeDate;
-        this.arrow.direct = 'down';
-        this.arrow.elem = this.down;
-        this.showCurrent();
-        this.curDate = this.calcCurrentDate();
-        // this.onClose()
+        this.onClose()
       }
     },
     customDate: function (elem) {
