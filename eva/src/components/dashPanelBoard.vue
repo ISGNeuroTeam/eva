@@ -2127,3 +2127,10 @@ export default {
   flex-direction: row;
 }
 </style>
+
+<style scoped>
+.v-tooltip__content {
+  width: fit-content
+}
+</style>
+

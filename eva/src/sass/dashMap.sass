@@ -4,26 +4,24 @@
 .leaflet-control-zoom-in, .leaflet-control-zoom-out
   position: relative
 
-
-.leaflet-control-zoom-out[name]:hover::after, .leaflet-control-zoom-in[name]:hover::after
-  content: attr(name)
-  position: absolute
-  top: 0
-  left: 30px
-  width: 100px
-  z-index: 1001
-  border-color: rgb(110, 150, 197)
-  background-color: rgb(110, 150, 197)
-  color: #FFFFFF
-  border-radius: 4px
-  font-size: 12px
-  line-height: 22px
-  display: inline-block
-  padding: 5px 16px
-  text-transform: initial
-  opacity: 0.9
-  pointer-events: none
-
+  &[name]:hover::after
+    content: attr(name)
+    position: absolute
+    top: 0
+    left: 30px
+    width: 100px
+    z-index: 1001
+    border-color: rgb(110, 150, 197)
+    background-color: rgb(110, 150, 197)
+    color: #FFFFFF
+    border-radius: 4px
+    font-size: 12px
+    line-height: 22px
+    display: inline-block
+    padding: 5px 16px
+    text-transform: initial
+    opacity: 0.9
+    pointer-events: none
 
 .leaflet-tooltip-top:before,
 .leaflet-tooltip-bottom:before,
