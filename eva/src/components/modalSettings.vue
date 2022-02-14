@@ -2,6 +2,8 @@
   <modal-persistent
     v-model="active"
     width="1140"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
     :theme="theme"
     @cancelModal="cancelModal"
   >
@@ -56,157 +58,161 @@
             </div>
           </div>
           <template v-for="field in fieldsForRender">
-            <div
-              v-for="prop in field.each || [null]"
-              v-if="
-                checkOptions(field.optionGroup || field.option, field.relation)
-              "
-              :key="`${field.option}${prop}`"
-              class="option-item"
-            >
-              <v-card-text v-if="field.group" class="headline">
-                <div
-                  class="settings-title"
-                  :style="{
-                    color: theme.$main_text,
-                    borderColor: theme.$main_border,
-                  }"
-                >
-                  {{ field.group }}
-                </div>
-              </v-card-text>
+            <template v-for="prop in field.each || [null]">
               <div
-                v-if="!field.group"
-                class="name-option item"
-                :style="{
-                  color: theme.$main_text,
-                  borderColor: theme.$main_border,
-                }"
+                v-if="
+                  checkOptions(
+                    field.optionGroup || field.option,
+                    field.relation
+                  )
+                "
+                :key="`${field.option}${prop}`"
+                class="option-item"
               >
-                {{ field.optionGroup ? field.optionGroup + '.' : ''
-                }}{{ field.label || field.option }}
-                <span v-if="prop">.{{ prop }}</span>
-              </div>
-              <div
-                v-if="!field.group"
-                class="discribe-option item"
-                :style="{
-                  color: theme.$main_text,
-                  borderColor: theme.$main_border,
-                }"
-              >
-                {{ field.description }}
-                <span
-                  :style="{
-                    color: theme.$accent_ui_color,
-                  }"
-                  v-text="prop"
-                />
-              </div>
-              <div v-if="!field.group" class="status-option item">
-                <!-- elem: switch -->
-                <v-switch
-                  v-if="field.elem === 'switch'"
-                  v-model="options[field.option]"
-                  class="switch"
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text }"
-                  :label="String(options[field.option])"
-                />
-                <!-- elem: text-field -->
-                <v-text-field
-                  v-else-if="field.elem === 'text-field'"
-                  v-model="options[field.option]"
-                  :placeholder="field.placeholder"
-                  clearable
-                  :color="theme.$primary_button"
-                  :style="{
-                    color: theme.$main_text,
-                    background: 'transparent',
-                    borderColor: theme.$main_border,
-                  }"
-                  outlined
-                  class="subnumber"
-                  hide-details
-                  :type="field.elemType"
-                  :min="field.elemMin"
-                />
-                <!-- elem: select -->
-                <v-select
-                  v-else-if="field.elem === 'select' && !prop"
-                  v-model="options[field.option]"
-                  :items="field.items"
-                  :placeholder="field.default"
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                  hide-details
-                  outlined
-                  class="subnumber"
-                />
-                <v-select
-                  v-else-if="field.elem === 'select' && prop"
-                  v-model="options[field.option][prop]"
-                  :items="field.items"
-                  :placeholder="field.default"
-                  :color="theme.$primary_button"
-                  :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                  hide-details
-                  outlined
-                  class="subnumber"
-                />
-                <!-- elem: checkbox-list -->
-                <div
-                  v-else-if="field.elem === 'checkbox-list'"
-                  class="checkbox-list"
-                >
-                  <v-checkbox
-                    v-for="setting in field.items"
-                    :key="setting"
-                    v-model="options[field.option]"
-                    :value="setting"
-                    :style="{ color: theme.$main_text }"
-                    :label="setting"
-                    hide-details
-                    @change="
-                      (val) => {
-                        field.onChange ? field.onChange(val) : null;
-                      }
-                    "
+                <v-card-text v-if="field.group" class="headline">
+                  <div
+                    class="settings-title"
+                    :style="{
+                      color: theme.$main_text,
+                      borderColor: theme.$main_border,
+                    }"
                   >
-                  </v-checkbox>
+                    {{ field.group }}
+                  </div>
+                </v-card-text>
+                <div
+                  v-if="!field.group"
+                  class="name-option item"
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
+                >
+                  {{ field.optionGroup ? field.optionGroup + '.' : ''
+                  }}{{ field.label || field.option }}
+                  <span v-if="prop">.{{ prop }}</span>
                 </div>
-                <!-- elem: radio-group -->
-                <v-radio-group
-                  v-else-if="field.elem === 'radio-group' && !prop"
-                  v-model="options[field.option]"
-                  :column="false"
+                <div
+                  v-if="!field.group"
+                  class="discribe-option item"
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
                 >
-                  <v-radio
-                    v-for="{ label, value } in field.items"
+                  {{ field.description }}
+                  <span
+                    :style="{
+                      color: theme.$accent_ui_color,
+                    }"
+                    v-text="prop"
+                  />
+                </div>
+                <div v-if="!field.group" class="status-option item">
+                  <!-- elem: switch -->
+                  <v-switch
+                    v-if="field.elem === 'switch'"
+                    v-model="options[field.option]"
+                    class="switch"
                     :color="theme.$primary_button"
                     :style="{ color: theme.$main_text }"
-                    :label="label || value"
-                    :value="value"
-                    class="mx-1"
+                    :label="String(options[field.option])"
                   />
-                </v-radio-group>
-                <v-radio-group
-                  v-else-if="field.elem === 'radio-group' && prop"
-                  v-model="options[field.option][prop]"
-                  :column="false"
-                >
-                  <v-radio
-                    v-for="{ label, value } in field.items"
+                  <!-- elem: text-field -->
+                  <v-text-field
+                    v-else-if="field.elem === 'text-field'"
+                    v-model="options[field.option]"
+                    :placeholder="field.placeholder"
+                    clearable
                     :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text }"
-                    :label="label || value"
-                    :value="value"
-                    class="mx-1"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    outlined
+                    class="subnumber"
+                    hide-details
+                    :type="field.elemType"
+                    :min="field.elemMin"
                   />
-                </v-radio-group>
-                <!-- end -->
+                  <!-- elem: select -->
+                  <v-select
+                    v-else-if="field.elem === 'select' && !prop"
+                    v-model="options[field.option]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                  />
+                  <v-select
+                    v-else-if="field.elem === 'select' && prop"
+                    v-model="options[field.option][prop]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                  />
+                  <!-- elem: checkbox-list -->
+                  <div
+                    v-else-if="field.elem === 'checkbox-list'"
+                    class="checkbox-list"
+                  >
+                    <v-checkbox
+                      v-for="setting in field.items"
+                      :key="setting"
+                      v-model="options[field.option]"
+                      :value="setting"
+                      :style="{ color: theme.$main_text }"
+                      :label="setting"
+                      hide-details
+                      @change="
+                        (val) => {
+                          field.onChange ? field.onChange(val) : null;
+                        }
+                      "
+                    >
+                    </v-checkbox>
+                  </div>
+                  <!-- elem: radio-group -->
+                  <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && !prop"
+                    v-model="options[field.option]"
+                    :column="false"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :color="theme.$primary_button"
+                      :style="{ color: theme.$main_text }"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                    />
+                  </v-radio-group>
+                  <v-radio-group
+                    v-else-if="field.elem === 'radio-group' && prop"
+                    v-model="options[field.option][prop]"
+                    :column="false"
+                  >
+                    <v-radio
+                      v-for="{ label, value } in field.items"
+                      :color="theme.$primary_button"
+                      :style="{ color: theme.$main_text }"
+                      :label="label || value"
+                      :value="value"
+                      class="mx-1"
+                    />
+                  </v-radio-group>
+                  <!-- end -->
+                </div>
               </div>
-            </div>
+            </template>
           </template>
 
           <div
@@ -883,6 +889,7 @@ import settings from '../js/componentsSettings.js';
 import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
 
 export default {
+  name: 'ModalSettings',
   props: {
     idDashFrom: null,
   },
@@ -924,6 +931,7 @@ export default {
       metricUnits: {},
       fieldsForRender: [],
       optionsByComponents: [],
+      isChanged: false,
     };
   },
   computed: {
@@ -969,97 +977,83 @@ export default {
     },
   },
   watch: {
-    changeComponent() {
-      this.options = {};
-      this.loadComponentsSettings();
-      this.prepareOptions();
-    },
-    titles() {
-      this.loadComponentsSettings();
-      this.prepareOptions();
-    },
-    async active(val) {
-      if (val) {
-        // если окно должно быть открыто
-        const settings = this.$store.getters.getModalSettings(this.idDash);
-        this.element = settings.element; // получаем для каокго элемнета вывести настройки
-        this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-        this.metricsName = this.$store.getters.getMetricsMulti({
-          idDash: this.idDash,
-          id: this.element,
-        });
-        if (this.element.startsWith('multiLine')) {
-          const opt = await this.$store.dispatch('getSettingsByPath', {
-            path: this.idDash,
-            element: this.element,
-          });
-          if (opt.conclusion_count) {
-            this.conclusion_count = opt.conclusion_count;
-          }
-
-          if (opt.yAxesBinding) {
-            // поддержка старой структуры сохраненных настроек
-            if (!opt.metricTypes) {
-              if (opt.yAxesBinding.metrics) {
-                opt.metricsAxis = opt.yAxesBinding.metrics;
-              }
-              if (opt.yAxesBinding.metricTypes) {
-                opt.metricTypes = opt.yAxesBinding.metricTypes;
-              }
-              if (opt.yAxesBinding.axesCount) {
-                opt.axesCount = opt.yAxesBinding.axesCount;
-              }
-            }
-
-            this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount;
-          } else {
-            this.multilineYAxesBinding.axesCount = 1;
-          }
-
-          if (opt.type_line) {
-            this.type_line = opt.type_line;
-          }
-
-          if (opt.color) {
-            this.color = opt.color;
-          }
-
-          this.metricsName.forEach((metric) => {
-            this.metricUnits[metric.name] = metric.units;
-
-            if (
-              opt.yAxesBinding &&
-              opt.yAxesBinding.metrics &&
-              opt.yAxesBinding.metricTypes
-            ) {
-              this.multilineYAxesBinding.metrics[metric.name] =
-                opt.yAxesBinding.metrics[metric.name];
-              this.multilineYAxesBinding.metricTypes[metric.name] =
-                opt.yAxesBinding.metricTypes[metric.name];
-            } else {
-              this.multilineYAxesBinding.metrics[metric.name] = 'left';
-              this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
-            }
-          });
+    options: {
+      deep: true,
+      handler(val, oldVal) {
+        if (Object?.keys(oldVal)?.length > 0) {
+          this.isChanged = true;
         }
-        await this.prepareOptions();
-      }
-    },
-    element() {
-      this.loadComponentsSettings();
+      },
     },
   },
   created() {
-    this.cancelModal();
-  },
-  mounted() {
     const settings = this.$store.getters.getModalSettings(this.idDash);
     this.element = settings.element;
+    this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
+    this.metricsName = this.$store.getters.getMetricsMulti({
+      idDash: this.idDash,
+      id: this.element,
+    });
+    if (this.element.startsWith('multiLine')) {
+      const opt = this.$store.dispatch('getSettingsByPath', {
+        path: this.idDash,
+        element: this.element,
+      });
+      if (opt.conclusion_count) {
+        this.conclusion_count = opt.conclusion_count;
+      }
+      //
+      if (opt.yAxesBinding) {
+        //     // поддержка старой структуры сохраненных настроек
+        if (!opt.metricTypes) {
+          if (opt.yAxesBinding.metrics) {
+            opt.metricsAxis = opt.yAxesBinding.metrics;
+          }
+          if (opt.yAxesBinding.metricTypes) {
+            opt.metricTypes = opt.yAxesBinding.metricTypes;
+          }
+          if (opt.yAxesBinding.axesCount) {
+            opt.axesCount = opt.yAxesBinding.axesCount;
+          }
+        }
+
+        this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount;
+      } else {
+        this.multilineYAxesBinding.axesCount = 1;
+      }
+
+      if (opt.type_line) {
+        this.type_line = opt.type_line;
+      }
+
+      if (opt.color) {
+        this.color = opt.color;
+      }
+      //
+      this.metricsName.forEach((metric) => {
+        this.metricUnits[metric.name] = metric.units;
+        //
+        if (
+          opt.yAxesBinding &&
+          opt.yAxesBinding.metrics &&
+          opt.yAxesBinding.metricTypes
+        ) {
+          this.multilineYAxesBinding.metrics[metric.name] =
+            opt.yAxesBinding.metrics[metric.name];
+          this.multilineYAxesBinding.metricTypes[metric.name] =
+            opt.yAxesBinding.metricTypes[metric.name];
+        } else {
+          this.multilineYAxesBinding.metrics[metric.name] = 'left';
+          this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
+        }
+      });
+    }
     this.loadComponentsSettings();
     this.prepareOptions();
   },
   methods: {
     loadComponentsSettings() {
+      const localOptions = {};
       this.optionsByComponents = settings.options;
       this.fieldsForRender = settings.optionFields.map((field) => {
         const items =
@@ -1073,10 +1067,12 @@ export default {
           each.forEach((key) => {
             options[key] = field.items[0]?.value;
           });
-          this.$set(this.options, field.option, { ...options });
+          // this.$set(this.options, field.option, { ...options });
+          localOptions[field.options] = { ...options };
         }
         return { ...field, items, each };
       });
+      return localOptions;
     },
     handleChangeColor(e, i) {
       this.color = { ...this.color, [this.metrics[i].name]: e.target.value };
@@ -1101,44 +1097,40 @@ export default {
     setOptions: async function () {
       // отправляем настройки в хранилище
       if (!this.options.level) {
-        this.options.level = 1;
+        this.$set(this.options, 'level', 1);
       }
-
-      if (
-        typeof this.options.timeFormat != 'undefined' &&
-        this.options.timeFormat == null
-      ) {
-        this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
+      if (this.options?.timeFormat === null) {
+        this.$set(this.options, 'timeFormat', '%Y-%m-%d %H:%M:%S');
       }
       if (typeof this.options.size != 'undefined') {
         if (this.options.size == null) {
-          this.options.size = '100px';
+          this.$set(this.options, 'size', '100px');
         } else if (String(this.options.size).indexOf('px') === -1) {
-          this.options.size = `${this.options.size}px`;
+          this.$set(this.options, 'size', `${this.options.size}px`);
         }
       }
-      //let options = {...{},...this.options};
       if (this.element.indexOf('csvg') !== -1) {
-        this.options.tooltip = this.tooltip;
+        this.$set(this.options, 'tooltip', this.tooltip);
       }
       if (this.element.indexOf('piechart') !== -1) {
-        this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation)
-        );
+        this.$set(this.options, 'metricsRelation', { ...this.metricsRelation });
         if (this.colorsPie.nametheme) {
-          this.options.colorsPie = this.colorsPie;
+          this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            this.themes[this.colorsPie.nametheme] =
-              this.colorsPie.colors.split(',');
+            this.$set(
+              this.themes,
+              this.colorsPie.nametheme,
+              this.colorsPie.colors.split(',')
+            );
             if (
               this.colorsPie.theme !== 'custom' &&
               this.colorsPie.theme !== this.colorsPie.nametheme
             ) {
               delete this.themes[this.colorsPie.theme];
             }
-            this.colorsPie.theme = this.colorsPie.nametheme;
+            this.$set(this.colorsPie, 'theme', this.colorsPie.nametheme);
           }
-          this.options.themes = this.themes;
+          this.$set(this.options, 'themes', this.themes);
         }
       }
       if (this.element.startsWith('multiLine')) {
@@ -1241,122 +1233,133 @@ export default {
       }
     },
     async prepareOptions() {
+      let localOptions = {};
       //  понимает какие опции нужно вывести
       const options = await this.$store.dispatch('getSettingsByPath', {
         path: this.idDash,
         element: this.element,
       });
-
-      if (options.color) {
-        this.color = options.color;
-      }
-
-      if (options.type_line) {
-        this.type_line = options.type_line;
-      }
-
-      if (options.conclusion_count) {
-        this.conclusion_count = options.conclusion_count;
-      }
-
-      if (options.replace_count) {
-        this.replace_count = options.replace_count;
-      }
-
-      this.optionsItems.forEach((item) => {
-        if (Object.keys(options).includes(item)) {
-          if (item === 'tooltip') {
-            this.tooltip = {};
-            this.$set(this.tooltip, 'texts', [...[], ...options[item].texts]);
-            this.$set(this.tooltip, 'links', [...[], ...options[item].links]);
-            this.$set(this.tooltip, 'buttons', [
-              ...[],
-              ...options[item].buttons,
-            ]);
-          } else if (item === 'metrics') {
-            //this.$set(this,'metrics',options[item]);
-            this.metrics = options[item];
-          } else if (item === 'metricsRelation') {
-            this.metricsRelation = {};
-            this.$set(this.metricsRelation, 'metrics', [
-              ...[],
-              ...options[item].metrics,
-            ]);
-            this.$set(this.metricsRelation, 'relations', [
-              ...[],
-              ...options[item].relations,
-            ]);
-            this.$set(this.metricsRelation, 'namesMetric', [
-              'Категория',
-              'Процентное соотношение',
-            ]);
-          } else if (item === 'colorsPie') {
-            this.colorsPie = {};
-            this.$set(this.colorsPie, 'theme', options[item].theme);
-            this.$set(this.colorsPie, 'colors', options[item].colors);
-            this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
-          } else if (item === 'themes') {
-            this.themesArr = Object.keys(options[item]);
-            this.themes = options[item];
-          } else if (item === 'titles') {
-            let val = options[item];
-            if (!val) {
-              // old settings
-              let oldVal = this.$store.getters.getSelectedTableTitles(
-                this.idDash,
-                this.element
-              );
-              if (oldVal) {
-                val = oldVal;
-              }
-            }
-            // если не выбраны заголовки то выделить все имеющиеся
-            if (val.length === 0) {
-              let allTitles = this.$store.getters.getAvailableTableTitles(
-                this.idDash,
-                this.element
-              );
-              if (allTitles.length) {
-                val = [...allTitles];
-              }
-            }
-            this.$set(this.options, item, val || []);
-          } else {
-            let val =
-              options[item] !== null && typeof options[item] === 'object'
-                ? { ...options[item] }
-                : options[item];
-            this.$set(this.options, item, val);
-          }
-        } else {
-          let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
-          if (propsToFalse.includes(item)) {
-            this.$set(this.options, item, false);
-          } else if (item === 'showlegend') {
-            this.$set(this.options, item, true);
-          } else if (item === 'positionlegend') {
-            this.$set(this.options, item, 'right');
-          } else {
-            const field = settings.optionFields.find(
-              (field) => field.option === item
-            );
-            if (field && field.default !== undefined) {
-              this.$set(this.options, item, field.default);
-            }
-          }
+      if (options) {
+        if (options.color) {
+          this.color = options.color;
         }
-      });
-      if (!this.options.change) {
-        this.$set(this.options, 'change', false);
+
+        if (options.type_line) {
+          this.type_line = options.type_line;
+        }
+
+        if (options.conclusion_count) {
+          this.conclusion_count = options.conclusion_count;
+        }
+
+        if (options.replace_count) {
+          this.replace_count = options.replace_count;
+        }
+
+        this.optionsItems.forEach((item) => {
+          if (Object.keys(options).includes(item)) {
+            if (item === 'tooltip') {
+              this.tooltip = {};
+              this.$set(this.tooltip, 'texts', [...[], ...options[item].texts]);
+              this.$set(this.tooltip, 'links', [...[], ...options[item].links]);
+              this.$set(this.tooltip, 'buttons', [
+                ...[],
+                ...options[item].buttons,
+              ]);
+            } else if (item === 'metrics') {
+              //this.$set(this,'metrics',options[item]);
+              this.metrics = options[item];
+            } else if (item === 'metricsRelation') {
+              this.metricsRelation = {};
+              this.$set(this.metricsRelation, 'metrics', [
+                ...[],
+                ...options[item].metrics,
+              ]);
+              this.$set(this.metricsRelation, 'relations', [
+                ...[],
+                ...options[item].relations,
+              ]);
+              this.$set(this.metricsRelation, 'namesMetric', [
+                'Категория',
+                'Процентное соотношение',
+              ]);
+            } else if (item === 'colorsPie') {
+              this.colorsPie = {};
+              this.$set(this.colorsPie, 'theme', options[item].theme);
+              this.$set(this.colorsPie, 'colors', options[item].colors);
+              this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
+            } else if (item === 'themes') {
+              this.themesArr = Object.keys(options[item]);
+              this.themes = options[item];
+            } else if (item === 'titles') {
+              let val = options[item];
+              if (!val) {
+                // old settings
+                let oldVal = this.$store.getters.getSelectedTableTitles(
+                  this.idDash,
+                  this.element
+                );
+                if (oldVal) {
+                  val = oldVal;
+                }
+              }
+              // если не выбраны заголовки то выделить все имеющиеся
+              if (val.length === 0) {
+                let allTitles = this.$store.getters.getAvailableTableTitles(
+                  this.idDash,
+                  this.element
+                );
+                if (allTitles.length) {
+                  val = [...allTitles];
+                }
+              }
+              localOptions[item] = val || [];
+              // this.$set(this.options, item, val || []);
+            } else {
+              let val =
+                options[item] !== null && typeof options[item] === 'object'
+                  ? { ...options[item] }
+                  : options[item];
+              localOptions[item] = val;
+              // this.$set(this.options, item, val);
+            }
+          } else {
+            let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+            if (propsToFalse.includes(item)) {
+              // this.$set(this.options, item, false);
+              localOptions[item] = false;
+            } else if (item === 'showlegend') {
+              // this.$set(this.options, item, true);
+              localOptions[item] = true;
+            } else if (item === 'positionlegend') {
+              // this.$set(this.options, item, 'right');
+              localOptions[item] = 'right';
+            } else {
+              const field = settings.optionFields.find(
+                (field) => field.option === item
+              );
+              if (field && field.default !== undefined) {
+                // this.$set(this.options, item, field.default);
+                localOptions[item] = field.default;
+              }
+            }
+          }
+        });
       }
+      if (!localOptions.change) {
+        // this.$set(this.options, 'change', false);
+        localOptions.change = false;
+      }
+      localOptions = { ...localOptions, ...this.loadComponentsSettings() };
+      this.$set(this, 'options', localOptions);
     },
     onClickDeleteTheme(theme) {
       const nextTheme = this.defaultThemes[0];
-      this.colorsPie.theme = nextTheme;
-      this.colorsPie.nametheme = nextTheme;
-      this.colorsPie.colors = this.themes[nextTheme].join(',');
-      this.options.colorsPie = this.colorsPie;
-      this.options.themes = this.themes;
+      this.$set(this.colorsPie, 'theme', nextTheme);
+      this.$set(this.colorsPie, 'nametheme', nextTheme);
+      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(','));
+      this.$set(this.options, 'colorsPie', this.colorsPie);
+      this.$set(this.options, 'themes', this.themes);
       delete this.themes[theme];
     },
   },

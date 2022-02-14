@@ -1,10 +1,5 @@
 <template>
-  <modal-persistent
-    v-model="showModal"
-    width="400"
-    :theme="theme"
-    @cancelModal="closeModal"
-  >
+  <v-dialog v-model="showModal" width="400" @keydown.esc="closeModal">
     <div class="themes-modal-wrapper">
       <v-card
         :style="{ backgroundColor: theme.$secondary_bg, borderRadius: '12px' }"
@@ -284,7 +279,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </modal-persistent>
+  </v-dialog>
 </template>
 
 <script>

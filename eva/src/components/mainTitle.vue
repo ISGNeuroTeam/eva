@@ -82,7 +82,11 @@
             :data-page-from="page"
           />
           <modal-search :color-from="theme" :id-dash-from="idDash" />
-          <modal-settings :color-from="theme" :id-dash-from="idDash" />
+          <modal-settings
+            v-if="activeSettingModal"
+            :color-from="theme"
+            :id-dash-from="idDash"
+          />
         </v-container>
       </v-main>
     </div>
@@ -228,6 +232,17 @@ export default {
     };
   },
   computed: {
+    activeSettingModal: {
+      get() {
+        return this.$store.getters.getModalSettings(this.idDash).status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
     idDash: function () {
       // получаем id страницы от родителя
       return this.$route.params.id;

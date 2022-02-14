@@ -2,7 +2,7 @@
   <v-dialog
     :value="modalValue"
     v-bind="$attrs"
-    persistent
+    :persistent="persistent"
     @keydown="checkKeyDown"
     @click:outside="closeOnOutside"
     @input="$emit('updateModalValue', $event)"
@@ -27,6 +27,10 @@ export default {
   },
   props: {
     isConfirm: {
+      type: Boolean,
+      default: true,
+    },
+    persistent: {
       type: Boolean,
       default: true,
     },
