@@ -119,7 +119,7 @@ export default {
   methods: {
     async getForms() {
       // метод который получает список всех шаблонов из базы данных
-      const forms = await this.$store.form.getters.getAllTemplates; // получаем список
+      const forms = await this.$store.getters['form/getAllTemplates']; // получаем список
       this.forms = forms; // и заносим его в переменную
       this.loading = false; // отключаем блок с загрузкой
     },

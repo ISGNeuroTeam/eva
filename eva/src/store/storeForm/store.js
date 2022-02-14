@@ -1,7 +1,8 @@
 import Vue from 'vue';
-import rest from './storeRest.js';
+import rest from './storeRest';
 
 export default {
+  namespaced: true,
   state: {},
   mutations: {
     setCreateForm: (state, options) => {

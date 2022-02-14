@@ -94,33 +94,45 @@ export default {
       this.clear = 'Очистить';
     },
     async getLog() {
-      const front = await this.$store.auth.getters.getLog('front'); // получаем все логи для фронта
-      const sizeFront = new Blob([front]).size; // смотрим их размер в байтах
-      const border = 50000; // предел размера в байтах должен быть приблизителньо 5 мегабайт
+      // получаем все логи для фронта
+      const front = await this.$store.getters['auth/getLog']('front');
+      // смотрим их размер в байтах
+      const sizeFront = new Blob([front]).size;
+      // предел размера в байтах должен быть приблизителньо 5 мегабайт
+      const border = 50000;
+      // если размер логов больше предела
       if (sizeFront > border) {
-        // если размер логов больше предела
-        this.text = await this.containLog(front, sizeFront, border); // то вызовем функцию которая сократит наши логи до 5 мегабайт
+        // то вызовем функцию которая сократит наши логи до 5 мегабайт
+        this.text = await this.containLog(front, sizeFront, border);
       } else {
         // если логов меньше 5 мегабайт
-        this.text = front; // то просто выведем их
+        // то просто выведем их
+        this.text = front;
       }
     },
     containLog(text, biLength, border) {
+      let localText = text;
+      let localBitLength = biLength;
       // функция которая сократит логи до предела
-      let length; let
-        procent; // переменные длины строки и 5 % от этой длины
-      while (biLength > border) {
-        // пока размер текста в байтах превышает наш порог
-        length = text.length; // запоминаем длину текста
-        procent = Math.ceil(length * 0.05); // берем 5 % от этой длины
-        text = text.slice(0, length - procent); // затем берем текст без этих пяти процентов
-        biLength = new Blob([text]).size; // и смотрим его размер, чтобы понять стоит ли еще урезать
+      let length;
+      // переменные длины строки и 5 % от этой длины
+      let procent;
+      // пока размер текста в байтах превышает наш порог
+      while (localBitLength > border) {
+        // запоминаем длину текста
+        length = localText.length;
+        // берем 5 % от этой длины
+        procent = Math.ceil(length * 0.05);
+        // затем берем текст без этих пяти процентов
+        localText = localText.slice(0, length - procent);
+        // и смотрим его размер, чтобы понять стоит ли еще урезать
+        localBitLength = new Blob([localText]).size;
       }
       // когда уже все урезали, у нас может обрезаться на полуслове последний лог
-      text = text.split('<br>'); // чтобы этого избежать мы разобьем строку в массив по переносу строки
-      text.pop(); // удалим последний элемент, который может быть обрезан
-      text = text.join('<br>'); // и снова склеим
-      return text; // получили строку не превышающию 5 мегабайт
+      localText = localText.split('<br>'); // чтобы этого избежать мы разобьем строку в массив по переносу строки
+      localText.pop(); // удалим последний элемент, который может быть обрезан
+      localText = localText.join('<br>'); // и снова склеим
+      return localText; // получили строку не превышающию 5 мегабайт
     },
     async sendToBack() {
       const hide = () => {
@@ -132,7 +144,7 @@ export default {
         }, 2000);
       };
 
-      const response = await this.$store.auth.getters.saveLogIntoBack();
+      const response = await this.$store.getters['auth/saveLogIntoBack']();
 
       if (response.status === 200) {
         this.msgError = 'Лог сохранен успешно';
@@ -151,7 +163,7 @@ export default {
     },
     async clearLog(clear) {
       if (clear === 'Очистить') {
-        const response = await this.$store.auth.getters.deleteLog();
+        const response = await this.$store.getters['auth/deleteLog']();
         if (response === 'clear') {
           this.restore = this.text;
           this.text = '';
@@ -160,7 +172,7 @@ export default {
       } else {
         this.text = this.restore;
         this.clear = 'Очистить';
-        this.$store.auth.getters.putLog(this.text);
+        this.$store.getters['auth/putLog'](this.text);
       }
     },
   },

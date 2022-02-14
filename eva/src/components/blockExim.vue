@@ -131,7 +131,7 @@ export default {
           dash: { id: this.idDash, body: reader.result },
           modified: '',
         });
-        this.$store.auth.getters.putLog(`Импортирован дашборд ${this.idDash}`);
+        this.$store.getters['auth/putLog'](`Импортирован дашборд ${this.idDash}`);
         this.$emit('closeExim');
       };
 

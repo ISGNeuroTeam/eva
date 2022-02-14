@@ -132,7 +132,7 @@ export default {
     //  },
     disabled() {
       // переменная которая решает активна ли кнопка Сохранить
-      return this.$store.form.getters.getDisabled;
+      return this.$store.getters['form/getDisabled'];
     },
   },
   mounted() {
@@ -145,7 +145,7 @@ export default {
     },
     saveForm() {
       // сохраняем форму
-      const content = this.$store.form.getters.getAllContent; // получаем контент формы
+      const content = this.$store.getters['form/getAllContent']; // получаем контент формы
       let form_name = this.grid.filter((item) => {
         // определяем имя формы на основе ключегого поля
         if (item.options) {
@@ -163,7 +163,7 @@ export default {
 
       //    })
       // console.log(this.grid);
-      //   this.$store.form.commit('setTemplate', this.grid);
+      //   this.$store.commit('form/setTemplate', this.grid);
 
       const form = {
         // создаем объект формы
@@ -172,14 +172,14 @@ export default {
         //  content: newcontent  // контент формы
       };
 
-      this.$store.form.commit('saveForm', form); // сохраняем форму в базу данных
-      this.$store.form.commit('setDisabled', true); // отключаем кнопку Сохранить
+      this.$store.commit('form/saveForm', form); // сохраняем форму в базу данных
+      this.$store.commit('form/setDisabled', true); // отключаем кнопку Сохранить
     },
     async getForm() {
       // получаем данные по форме
 
-      const form = this.$store.form.getters.getFormLocal; // получаем структуру по форме из локального хранилища
-      const content = this.$store.form.getters.getAllContent; // получаем контент по форме из локального хранилища
+      const form = this.$store.getters['form/getFormLocal']; // получаем структуру по форме из локального хранилища
+      const content = this.$store.getters['form/getAllContent']; // получаем контент по форме из локального хранилища
       this.grid = form; // заносим объект в перемненую для отрисовки
       this.columns = form.reduce((last, next) => {
         // находим максимальное значение среди всех значений х, чтобы понять сколько колонок у нас будет
@@ -199,7 +199,7 @@ export default {
     },
     setValue(content) {
       // когда поменялось значение ячейки
-      this.$store.form.commit('setContent', content); // заносим новое значение в локальное хранилище
+      this.$store.commit('form/setContent', content); // заносим новое значение в локальное хранилище
     },
     checkSwitch(cellElem) {
       // вызывается когда нажали на radiobtn

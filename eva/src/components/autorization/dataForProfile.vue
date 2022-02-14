@@ -444,11 +444,7 @@ export default {
       const deleted = this.alldata[essence][subj].selected.map((item) => item.name);
 
       this.alldata[essence][subj].data = this.alldata[essence][subj].data
-        .filter((item) => {
-          if (!deleted.includes(item.name)) {
-            return item;
-          }
-        });
+        .filter((item) => !deleted.includes(item.name));
       this.alldata[essence][subj].selected = [];
       this.$emit('changeData', {
         data: this.translateToArray(this.alldata[essence][subj].data),

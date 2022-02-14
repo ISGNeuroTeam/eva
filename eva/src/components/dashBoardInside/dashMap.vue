@@ -161,7 +161,7 @@ export default {
         error: false,
       });
 
-      this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`);
+      this.$store.getters['auth/putLog'](`Запущен запрос  ${event.sid}`);
       const response = await this.$store.getters.getDataApi({
         search: event,
         idDash: this.idDash,
@@ -573,7 +573,7 @@ export default {
       const icon = L.divIcon({
         className: 'location-pin',
         riseOnHover: true,
-        html: `<div class="leaflet-div-icon" 
+        html: `<div class="leaflet-div-icon"
           style="
             background-color: ${color};
             opacity: ${opacity};

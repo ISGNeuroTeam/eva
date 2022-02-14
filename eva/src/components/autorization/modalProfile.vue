@@ -410,6 +410,8 @@ export default {
           case 5:
             this.showBlock.indexes = true;
             break;
+          default:
+            break;
         }
         if (this.create) {
           this.$set(this.userData, 'username', '');
@@ -435,7 +437,7 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.auth.getters.getEssenceList(item, true);
+          return this.$store.getters['auth/getEssenceList'](item, true);
         });
 
         const result = await Promise.all(promise);
@@ -445,7 +447,7 @@ export default {
 
         return allData;
       }
-      return this.$store.auth.getters.getEssence(
+      return this.$store.getters['auth/getEssence'](
         this.userFrom.tab,
         this.userFrom.id,
       );
@@ -482,14 +484,14 @@ export default {
                 'Логин или пароль не могут быть пустыми',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             }
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             }
             formData.password = this.userData.pass;
           } else if (act === 'pass') {
@@ -502,7 +504,7 @@ export default {
                 'Введите старый пароль',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             } if (
               this.newpass == null
               || this.newpass.length === 0
@@ -512,19 +514,19 @@ export default {
                 'Введите новый пароль',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             } if (this.newpass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             } if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             }
             formData.old_password = this.oldpass;
             formData.new_password = this.newpass;
@@ -534,7 +536,7 @@ export default {
                 'Пароль должен быть больше 7 символов',
                 this.colorFrom.controlsActive,
               );
-              return false;
+              return;
             }
             formData.password = this.userData.pass;
           }
@@ -574,6 +576,8 @@ export default {
           formData.name = this.curItem.name;
           sameMsg = 'Такой индекс уже есть';
           break;
+        default:
+          break;
       }
 
       if (Object.keys(this.changedData).length !== 0) {
@@ -592,7 +596,7 @@ export default {
         });
       }
 
-      const response = this.$store.auth.getters.setEssence({
+      const response = this.$store.getters['auth/setEssence']({
         formData: JSON.stringify(formData),
         essence: this.essence[this.keyFrom - 1],
         method,

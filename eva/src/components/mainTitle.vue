@@ -506,7 +506,7 @@ export default {
         dash: this.alreadyDash,
         modified: this.alreadyDash.modified,
       });
-      this.$store.auth.getters.putLog(
+      this.$store.getters['auth/putLog'](
         `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${
           this.alreadyDash.id
         }`,

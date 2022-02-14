@@ -425,7 +425,7 @@ export default {
         data = this.allDashs;
         id = this.curDash;
       }
-      response = this.$store.auth.getters.deleteEssence({
+      response = this.$store.getters['auth/deleteEssence']({
         essence: this.elemDelete,
         id: data[id].id,
       });

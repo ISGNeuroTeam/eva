@@ -184,7 +184,7 @@ export default {
         options[item] = this.general[item];
       });
       if (Object.keys(options).length != 0) {
-        this.$store.form.commit('setOptionsForm', {
+        this.$store.commit('form/setOptionsForm', {
           element: this.settings.key,
           options,
         });
@@ -198,7 +198,7 @@ export default {
       Object.keys(this.visibleOptions).forEach((item) => {
         this.visibleOptions[item] = false;
       });
-      const options = this.$store.form.getters.getOption(this.settings);
+      const options = this.$store.getters['form/getOption'](this.settings);
       switch (this.settings.name) {
         case 'Выпадающий список':
           this.currentElem = 'select';

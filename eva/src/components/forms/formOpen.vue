@@ -166,7 +166,7 @@ export default {
     // осоновные параметры, которые часто меняются и которы следует отслеживать
     createForm() {
       // получаем объект шаблона из локального хранилища
-      return this.$store.form.getters.getCreateForm;
+      return this.$store.getters['form/getCreateForm'];
     },
     editable() {
       this.setDataEditable();
@@ -178,7 +178,7 @@ export default {
     },
     disabled() {
       // получаем настройку редактирования кнопки Сохранить
-      return this.$store.form.getters.getDisabled;
+      return this.$store.getters['form/getDisabled'];
     },
   },
   mounted() {
@@ -221,16 +221,16 @@ export default {
     },
     savePosSize() {
       // метод сохраняющий позицию и размер ячеек шаблона
-      this.$store.form.commit('setTemplate', this.grid); // записываем новую позицию и размер в локальное хранилище
+      this.$store.commit('form/setTemplate', this.grid); // записываем новую позицию и размер в локальное хранилище
     },
     saveForm() {
       // сохраняем шаблон
-      this.$store.form.commit('saveTemplateForm'); // сохраняем шаблон в базу данных
-      this.$store.form.commit('setDisabled', true); // отключаем кнопку Сохранить
+      this.$store.commit('form/saveTemplateForm'); // сохраняем шаблон в базу данных
+      this.$store.commit('form/setDisabled', true); // отключаем кнопку Сохранить
     },
     deleteForm() {
       // функция удаления шаблона
-      // this.$store.form.commit("deleteTemplate",this.idForm);
+      // this.$store.commit("form/deleteTemplate",this.idForm);
     },
     checkName(name, w, h) {
       if (w < 4 || h < 3) {
@@ -245,7 +245,7 @@ export default {
       // функция срабатывающяя когда в модалки выбрали новый элемент
       this.grid[this.elemKey].name = elem[0].name; // заносим имя
       this.grid[this.elemKey].img = elem[0].img; // и картинку нового элемента
-      this.$store.form.commit('setTemplate', this.grid); // сохраняем шаблон в локальное хранилище
+      this.$store.commit('form/setTemplate', this.grid); // сохраняем шаблон в локальное хранилище
     },
     openModal(key) {
       // открываем модалку с выбором элементов
@@ -268,7 +268,7 @@ export default {
     },
     async getForm() {
       // получаем шаблон из базы данных
-      const form = await this.$store.form.getters.getTemplate(this.idForm); // получаем собственно шаблон
+      const form = await this.$store.getters['form/getTemplate'](this.idForm); // получаем собственно шаблон
       const max = form.cells.reduce((last, next) => {
         // находим максимальное значение среди всех значений х, чтобы понять сколько колонок у нас будет
         if (next.y == 0) {

@@ -120,7 +120,7 @@ export default {
         this.disapear();
       } else {
         // this.$router.push({path:`/forms/create`, props: { options: 'hello'} });
-        this.$store.form.commit('setCreateForm', this.options);
+        this.$store.commit('form/setCreateForm', this.options);
         this.$router.push('/forms/open?editable=true');
         // console.log(this.options);
       }

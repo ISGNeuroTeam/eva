@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
-import store from './store.js'; // это подключаем чтобы после перезагрузки страницы он сохранял состояние
+import store from './store'; // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 
 Vue.use(Vuex);
 

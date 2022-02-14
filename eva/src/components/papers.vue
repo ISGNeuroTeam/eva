@@ -660,7 +660,7 @@ export default {
 
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
+      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');

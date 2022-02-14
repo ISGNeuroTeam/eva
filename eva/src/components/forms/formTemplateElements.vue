@@ -120,8 +120,8 @@ export default {
   },
 
   mounted() {
-    const element = this.$store.form.getters.getFormLocal;
-    let content = this.$store.form.getters.getContent(this.idFrom);
+    const element = this.$store.getters['form/getFormLocal'];
+    let content = this.$store.getters['form/getContent'](this.idFrom);
     if (content != 'empty') {
       if (content == 'True') {
         content = true;

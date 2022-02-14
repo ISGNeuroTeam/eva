@@ -91,18 +91,18 @@ export default {
   methods: {
     async getForms(id) {
       // получаем список всех форм данного шаблона
-      const forms = await this.$store.form.getters.getAllForm(id); // собственно сам список
+      const forms = await this.$store.getters['form/getAllForm'](id); // собственно сам список
       this.forms = forms; // заносим список в переменную
       this.loading = false; // отключаем загрузку
     },
     async getTemplate(idForm) {
       // получаем структуру шаблона
-      const form = await this.$store.form.getters.getTemplate(idForm);
+      const form = await this.$store.getters['form/getTemplate'](idForm);
       return form;
     },
     async getAllContent(ids) {
       // получаем контент конкретной формы
-      const form = await this.$store.form.getters.getFormContent(ids);
+      const form = await this.$store.getters['form/getFormContent'](ids);
       return form;
     },
     async openForm(name, event) {
@@ -115,7 +115,7 @@ export default {
       element = element.querySelector('.loading-bar'); // ищем внутри нашего родителя нужный блок
       element.classList.add('loading'); // и добовляем ему видимость загрузки
       const form = await this.getTemplate(this.idForm); // получаем шаблон из базы данных
-      this.$store.form.commit('setTemplate', form.cells); // и заносим его в локальное хранилище
+      this.$store.commit('form/setTemplate', form.cells); // и заносим его в локальное хранилище
       const content = await this.getAllContent({
         idTemplate: this.idForm,
         idForm: name[0],
@@ -130,7 +130,7 @@ export default {
           contentObj[i] = item;
         }
       });
-      this.$store.form.commit('setAllContent', contentObj); // заносим контент в локальное хранилище
+      this.$store.commit('form/setAllContent', contentObj); // заносим контент в локальное хранилище
       element.classList.remove('loading'); // удаляем класс с загрузкой
       this.$router.push(
         `/forms/edit?editable=false&id=${this.idForm}&nameForm=${name[1]}`,
@@ -146,9 +146,9 @@ export default {
       loading.classList.add('loading');
       const form = await this.getTemplate(this.idForm); // получаем структуру формы
 
-      this.$store.form.commit('setTemplate', form.cells); // и заносим его в локальное хранилище
-      this.$store.form.commit('setAllContent', 'empty'); // в контент заносим пустое значение
-      this.$store.form.commit('setDisabled', false); // включаем кнопку сохранить
+      this.$store.commit('form/setTemplate', form.cells); // и заносим его в локальное хранилище
+      this.$store.commit('form/setAllContent', 'empty'); // в контент заносим пустое значение
+      this.$store.commit('form/setDisabled', false); // включаем кнопку сохранить
       loading.classList.remove('loading');
       this.$router.push(
         `/forms/edit?editable=true&id=${this.idForm}&nameForm=Новая форма`,

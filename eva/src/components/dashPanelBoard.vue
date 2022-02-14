@@ -2037,7 +2037,7 @@ export default {
         if (res.status === 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
-          this.$store.auth.getters.putLog(
+          this.$store.getters['auth/putLog'](
             `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
               res.data.id
             }`,
@@ -2059,7 +2059,7 @@ export default {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
-      this.$store.auth.getters.putLog(
+      this.$store.getters['auth/putLog'](
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
           this.idDash
         }`,

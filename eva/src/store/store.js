@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import rest from './storeRest.js';
+import rest from './storeRest';
 // import dataResearch from './dataResearch.js';
-import restAuth from '../storeAuth/storeRest.js';
-import settings from '../js/componentsSettings.js';
-import themes from '../js/themeSettings.js';
-import { filterCompile } from '../components/dash-filter-panel/utils/filter-otl-compile.js';
+import restAuth from './storeAuth/storeRest';
+import settings from '../js/componentsSettings';
+import themes from '../js/themeSettings';
+import { filterCompile } from '../components/dash-filter-panel/utils/filter-otl-compile';
 
 export default {
   // приблизительный объект хранилища, может отличаться от реального

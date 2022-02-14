@@ -468,7 +468,7 @@ export default {
       this.create_warning = false; // просто убираем предупреждение
     },
     createEssence(group, method, essence) {
-      const response = this.$store.auth.getters.setEssence({
+      const response = this.$store.getters['auth/setEssence']({
         formData: JSON.stringify(group),
         essence,
         method,
@@ -502,7 +502,7 @@ export default {
         data: dash,
         getters: this.$store.getters.checkAlreadyDash,
       });
-      this.$store.auth.getters.putLog(
+      this.$store.getters['auth/putLog'](
         `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`,
       );
     },
@@ -524,7 +524,7 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.auth.getters.getEssenceList(item, true);
+          return this.$store.getters['auth/getEssenceList'](item, true);
         });
         const result = await Promise.all(promise);
         result.forEach((item, i) => {
@@ -532,7 +532,7 @@ export default {
         });
         return allData;
       }
-      return this.$store.auth.getters.getEssence(
+      return this.$store.getters['auth/getEssence'](
         role,
         data[this.curGroupFrom].id,
       );

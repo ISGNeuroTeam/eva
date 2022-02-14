@@ -214,6 +214,8 @@ export default {
           case 5:
             this.curItem.tab = 'index';
             break;
+          default:
+            break;
         }
       }
       this.activeModal = true;
@@ -274,10 +276,12 @@ export default {
             { text: 'Группы', value: 'groups' },
             { text: '', value: 'actions' },
           ];
+        default:
+          return [];
       }
     },
     async setData(role) {
-      return await this.$store.auth.getters.getEssenceList(role, false);
+      return await this.$store.getters['auth/getEssenceList'](role, false);
     },
     setColorHover(i) {
       let table = {};
