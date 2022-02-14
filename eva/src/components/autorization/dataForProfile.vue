@@ -136,6 +136,10 @@ import { mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
+    nameGroupFrom: {
+      type: String,
+      default: '',
+    },
     essence: {
       type: String,
       required: true

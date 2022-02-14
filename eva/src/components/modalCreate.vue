@@ -185,7 +185,7 @@
               :create="actionFrom"
               :color-from="theme"
               :active-from="modalFrom"
-              @changeData="changeData"
+              @changeData="changeDataEvent"
             />
           </div>
           <div
@@ -371,7 +371,7 @@ export default {
     createBtn: function (name) {
       // при нажатии на кнопку создать
       let hasSimilarModel = false;
-      if (!name || name == '') {
+      if (!name || name === '') {
         //  если пользователь не ввел имя
         this.showwarning = true; //  показываем предупреждение
         setTimeout(() => {
@@ -389,13 +389,13 @@ export default {
             (item) => item.name.toLowerCase() === name.toLowerCase()
           );
           dataObj = { name: this.newGroup.name, color: this.newGroup.color };
-          if (Object.keys(this.changedData).length != 0) {
+          if (Object.keys(this.changedData).length !== 0) {
             let keys = this.changedData.group;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
           }
-          if (this.curGroupFrom != -1) {
+          if (this.curGroupFrom !== -1) {
             dataObj.id = this.groupFrom[this.curGroupFrom].id;
           }
           essence = 'group';
@@ -405,18 +405,23 @@ export default {
           hasSimilarModel = this.dashs.some(
             (item) => item.name.toLowerCase() === name.toLowerCase()
           );
+          console.log('hasSimilarModel', hasSimilarModel);
           dataObj = { name: this.newDash.name };
-
-          if (this.newDash.id != '') {
+          console.log('dataObj', dataObj);
+          if (this.newDash?.id !== '') {
             dataObj.id = this.newDash.id;
+            console.log('dataObj.id', dataObj);
           }
           dataObj.idgroup = this.curGroupFrom;
-
-          if (Object.keys(this.changedData).length != 0) {
+          console.log('dataObj.idgroup', dataObj);
+          if (Object.keys(this.changedData)?.length !== 0) {
             let keys = this.changedData.dash;
+            console.log('keys', keys);
             Object.keys(keys).forEach((item) => {
+              console.log('dataObj[item]', dataObj[item], 'keys[item]', keys[item]);
               dataObj[item] = keys[item];
             });
+            console.log('keys update', keys);
           }
           essence = 'dash';
           warnText = 'Такой дашборд уже существует. Хотите изменить его?';
@@ -556,7 +561,8 @@ export default {
     //     })
     //   }
     // },
-    changeData: function (event) {
+    changeDataEvent: function (event) {
+      console.log(event);
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }
