@@ -1,10 +1,12 @@
 <template>
   <div class="dash-picker">
     <div
+        v-click-outside="onClose"
       class="DTpicker"
       :class="{ show_picker_elem: show_picker_elem }"
     >
       <div
+
         class="DTPicker-btn"
         :style="{ background: theme.$accent_ui_color }"
         @click="openHidden"
@@ -18,6 +20,7 @@
         </v-icon>
       </div>
       <div
+
         class="DTPicker-elem"
         :style="{
           boxShadow: `0 5px 5px -3px ${theme.$main_border},0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
@@ -319,6 +322,9 @@ export default {
       this.show_curent = current !== '';
       return current;
     },
+    onClose(){
+      console.log('onClose')
+    },
     openHidden: function () {
       this.show_picker_elem = !this.show_picker_elem;
       if (this.arrow.direct === 'down') {
@@ -335,6 +341,7 @@ export default {
         this.arrow.elem = this.down;
         this.showCurrent();
         this.curDate = this.calcCurrentDate();
+        // this.onClose()
       }
     },
     customDate: function (elem) {
