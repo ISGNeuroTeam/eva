@@ -119,7 +119,7 @@
       </v-card>
       <!-- <div class="warning-block" :style="{background:color.backElement}">
                     <div class="warning-text"  :style="{color:color.text}">Такой DashBoard существует. Хотите заменить его?</div>
-                    <div class="btn-warning"> 
+                    <div class="btn-warning">
                         <v-btn small :color="color.controls" class="warning-btn" @click="yesDashBoards">Да</v-btn>
                         <v-btn small :color="color.controlsActive" class="warning-btn" @click="noDashBoards">Нет</v-btn>
                     </div>
@@ -157,19 +157,19 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    modal: function () {
+    modal() {
       if (this.modalFrom) {
         this.prepareModal();
       }
       return this.modalFrom;
     },
-    settings: function () {
+    settings() {
       return this.settingsFrom;
     },
   },
   mounted() {},
   methods: {
-    acceptBtn: function () {
+    acceptBtn() {
       let options = {};
 
       switch (this.currentElem) {
@@ -186,19 +186,19 @@ export default {
       if (Object.keys(options).length != 0) {
         this.$store.form.commit('setOptionsForm', {
           element: this.settings.key,
-          options: options,
+          options,
         });
       }
       this.cancelModal();
     },
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('hideForm');
     },
-    prepareModal: function () {
+    prepareModal() {
       Object.keys(this.visibleOptions).forEach((item) => {
         this.visibleOptions[item] = false;
       });
-      let options = this.$store.form.getters.getOption(this.settings);
+      const options = this.$store.form.getters.getOption(this.settings);
       switch (this.settings.name) {
         case 'Выпадающий список':
           this.currentElem = 'select';
@@ -216,7 +216,7 @@ export default {
         ? (this.general.ident = true)
         : (this.general.ident = false);
     },
-    addOptions: function (options, curOptions) {
+    addOptions(options, curOptions) {
       if (options != 'empty') {
         Object.keys(options).forEach((item) => {
           curOptions[item] = options[item];

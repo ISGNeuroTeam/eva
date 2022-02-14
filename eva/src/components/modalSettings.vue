@@ -909,9 +909,8 @@
 </template>
 
 <script>
-import settings from '../js/componentsSettings.js';
-
 import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
+import settings from '../js/componentsSettings.js';
 
 export default {
   props: {
@@ -978,18 +977,18 @@ export default {
       if (!this.element) {
         return [];
       }
-      let elem = this.element.split('-')[0];
+      const elem = this.element.split('-')[0];
       return elem ? this.optionsByComponents[elem] || [] : [];
     },
     changeComponent() {
-      return this.idDash + '-' + this.element;
+      return `${this.idDash}-${this.element}`;
     },
 
     // поля элемента данных
     titles() {
       return this.$store.getters.getAvailableTableTitles(
         this.idDash,
-        this.element
+        this.element,
       );
     },
   },
@@ -1053,14 +1052,12 @@ export default {
             this.metricUnits[metric.name] = metric.units;
 
             if (
-              opt.yAxesBinding &&
-              opt.yAxesBinding.metrics &&
-              opt.yAxesBinding.metricTypes
+              opt.yAxesBinding
+              && opt.yAxesBinding.metrics
+              && opt.yAxesBinding.metricTypes
             ) {
-              this.multilineYAxesBinding.metrics[metric.name] =
-                opt.yAxesBinding.metrics[metric.name];
-              this.multilineYAxesBinding.metricTypes[metric.name] =
-                opt.yAxesBinding.metricTypes[metric.name];
+              this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name];
+              this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name];
             } else {
               this.multilineYAxesBinding.metrics[metric.name] = 'left';
               this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
@@ -1087,14 +1084,12 @@ export default {
     loadComponentsSettings() {
       this.optionsByComponents = settings.options;
       this.fieldsForRender = settings.optionFields.map((field) => {
-        const items =
-          typeof field.items === 'function'
-            ? field.items.call(this)
-            : field.items;
-        const each =
-          typeof field.each === 'function' ? field.each.call(this) : field.each;
+        const items = typeof field.items === 'function'
+          ? field.items.call(this)
+          : field.items;
+        const each = typeof field.each === 'function' ? field.each.call(this) : field.each;
         if (each) {
-          let options = {};
+          const options = {};
           each.forEach((key) => {
             options[key] = field.items[0]?.value;
           });
@@ -1130,34 +1125,33 @@ export default {
       }
 
       if (
-        typeof this.options.timeFormat != 'undefined' &&
-        this.options.timeFormat == null
+        typeof this.options.timeFormat !== 'undefined'
+        && this.options.timeFormat == null
       ) {
         this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
       }
-      if (typeof this.options.size != 'undefined') {
+      if (typeof this.options.size !== 'undefined') {
         if (this.options.size == null) {
           this.options.size = '100px';
         } else if (String(this.options.size).indexOf('px') === -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
-      //let options = {...{},...this.options};
+      // let options = {...{},...this.options};
       if (this.element.indexOf('csvg') !== -1) {
         this.options.tooltip = this.tooltip;
       }
       if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation)
+          JSON.stringify(this.metricsRelation),
         );
         if (this.colorsPie.nametheme) {
           this.options.colorsPie = this.colorsPie;
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            this.themes[this.colorsPie.nametheme] =
-              this.colorsPie.colors.split(',');
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',');
             if (
-              this.colorsPie.theme !== 'custom' &&
-              this.colorsPie.theme !== this.colorsPie.nametheme
+              this.colorsPie.theme !== 'custom'
+              && this.colorsPie.theme !== this.colorsPie.nametheme
             ) {
               delete this.themes[this.colorsPie.theme];
             }
@@ -1174,7 +1168,7 @@ export default {
         });
       }
 
-      let options = {
+      const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
         replace_count: this.replace_count,
@@ -1194,7 +1188,7 @@ export default {
       this.cancelModal();
     },
     // если нажали на отмену создания
-    cancelModal: function () {
+    cancelModal() {
       this.$store.dispatch('closeModalSettings', { path: this.idDash });
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
@@ -1204,16 +1198,16 @@ export default {
         this.setOptions();
       }
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    checkOptions: function (option, relation) {
+    checkOptions(option, relation) {
       // проверяет есть ли такая опция уже в массиве с опциями
       if (relation !== undefined) {
         if (relation.forEach) {
-          let res = relation.filter((item) => {
+          const res = relation.filter((item) => {
             if (typeof item === 'object') {
               let show = true;
               Object.keys(item).forEach((key) => {
@@ -1222,9 +1216,8 @@ export default {
                 }
               });
               return show;
-            } else {
-              return !!this.options[item];
             }
+            return !!this.options[item];
           });
           if (res.length !== relation.length) {
             return false;
@@ -1235,7 +1228,7 @@ export default {
       }
       return this.optionsItems.includes(option);
     },
-    addIntoTooltip: function (item) {
+    addIntoTooltip(item) {
       if (item === 'text') {
         this.tooltip.texts.push('');
       } else if (item === 'link') {
@@ -1244,7 +1237,7 @@ export default {
         this.tooltip.buttons.push({ name: '', id: '' });
       }
     },
-    addMetrics: function () {
+    addMetrics() {
       this.metrics.push({
         name: '',
         type: '',
@@ -1253,7 +1246,7 @@ export default {
         manual: true,
       });
     },
-    deleteFromTooltip: function (item, i) {
+    deleteFromTooltip(item, i) {
       if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
       } else if (item === 'link') {
@@ -1262,10 +1255,10 @@ export default {
         this.tooltip.buttons.splice(i, 1);
       }
     },
-    deleteMetrics: function (i) {
+    deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
-    changeColor: function () {
+    changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
@@ -1309,7 +1302,7 @@ export default {
               ...options[item].buttons,
             ]);
           } else if (item === 'metrics') {
-            //this.$set(this,'metrics',options[item]);
+            // this.$set(this,'metrics',options[item]);
             this.metrics = options[item];
           } else if (item === 'metricsRelation') {
             this.metricsRelation = {};
@@ -1337,9 +1330,9 @@ export default {
             let val = options[item];
             if (!val) {
               // old settings
-              let oldVal = this.$store.getters.getSelectedTableTitles(
+              const oldVal = this.$store.getters.getSelectedTableTitles(
                 this.idDash,
-                this.element
+                this.element,
               );
               if (oldVal) {
                 val = oldVal;
@@ -1347,9 +1340,9 @@ export default {
             }
             // если не выбраны заголовки то выделить все имеющиеся
             if (val.length === 0) {
-              let allTitles = this.$store.getters.getAvailableTableTitles(
+              const allTitles = this.$store.getters.getAvailableTableTitles(
                 this.idDash,
-                this.element
+                this.element,
               );
               if (allTitles.length) {
                 val = [...allTitles];
@@ -1357,14 +1350,13 @@ export default {
             }
             this.$set(this.options, item, val || []);
           } else {
-            let val =
-              options[item] !== null && typeof options[item] === 'object'
-                ? { ...options[item] }
-                : options[item];
+            const val = options[item] !== null && typeof options[item] === 'object'
+              ? { ...options[item] }
+              : options[item];
             this.$set(this.options, item, val);
           }
         } else {
-          let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+          const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
           if (propsToFalse.includes(item)) {
             this.$set(this.options, item, false);
           } else if (item === 'showlegend') {
@@ -1373,7 +1365,7 @@ export default {
             this.$set(this.options, item, 'right');
           } else {
             const field = settings.optionFields.find(
-              (field) => field.option === item
+              (field) => field.option === item,
             );
             if (field && field.default !== undefined) {
               this.$set(this.options, item, field.default);

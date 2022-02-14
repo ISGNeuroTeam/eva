@@ -227,7 +227,7 @@ export default {
           Object.keys(item).forEach((itemopt) => {
             if (Array.isArray(item[itemopt])) {
               this.originData[i][itemopt] = this.checkName(
-                item[itemopt].join(', ')
+                item[itemopt].join(', '),
               );
             }
           });
@@ -300,30 +300,30 @@ export default {
             timeOut = setTimeout(tick.bind(this), 100);
           }
         }.bind(this),
-        0
+        0,
       );
     },
     checkName(name) {
-      return name.length > 25 ? name.slice(0, 25) + '...' : name
+      return name.length > 25 ? `${name.slice(0, 25)}...` : name;
     },
     openDelete(item, i) {
       let text = '';
       this.keyFrom = i;
       switch (i) {
         case 1:
-          text = `<p>Удалить пользователя</p> `;
+          text = '<p>Удалить пользователя</p> ';
           break;
         case 2:
-          text = `<p>Удалить роль</p> `;
+          text = '<p>Удалить роль</p> ';
           break;
         case 3:
-          text = `<p>Удалить привилегию</p> `;
+          text = '<p>Удалить привилегию</p> ';
           break;
         case 4:
-          text = `<p>Удалить группу</p> `;
+          text = '<p>Удалить группу</p> ';
           break;
         case 5:
-          text = `<p>Удалить индекс</p> `;
+          text = '<p>Удалить индекс</p> ';
           break;
       }
       this.dataDelete.text = `${text} <span>${item.name}</span>`;

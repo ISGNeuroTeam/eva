@@ -25,16 +25,16 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    dataRest: function () {
+    dataRest() {
       return this.dataRestFrom;
     },
-    color: function () {
+    color() {
       return this.colorFrom;
     },
   },
@@ -46,7 +46,7 @@ export default {
     });
   },
   methods: {
-    doSomething: function () {},
+    doSomething() {},
   },
 };
 </script>

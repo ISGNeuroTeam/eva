@@ -338,11 +338,11 @@ export default {
       option: 'titles',
       description: 'Столбцы для отображения',
       elem: 'checkbox-list',
-      items: function () {
+      items() {
         // this is modalSettings context
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
       default: [],
@@ -358,10 +358,10 @@ export default {
       option: 'x',
       description: 'X axis',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -386,10 +386,10 @@ export default {
       option: 'y',
       description: 'Y axis',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -414,10 +414,10 @@ export default {
       option: 'data',
       description: 'Значение ячейки',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -426,10 +426,10 @@ export default {
       option: 'metadata',
       description: 'metadata',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -438,10 +438,10 @@ export default {
       option: 'detailValue',
       description: 'Поле для ссылки Детали',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -579,7 +579,7 @@ export default {
     },
     {
       relation: 'united',
-      each: function () {
+      each() {
         // each реализовано только для select и radio-group
         return this.titles && this.titles.splice
           ? [...this.titles].splice(1)
@@ -602,7 +602,7 @@ export default {
     },
     {
       relation: ['united', { axesCount: 2 }],
-      each: function () {
+      each() {
         // each реализовано только для select и radio-group, разбивает настройку для полей записи
         return this.titles && this.titles.splice
           ? [...this.titles].splice(1)

@@ -109,10 +109,9 @@ export default {
   computed: {
     ...mapGetters(['getElementSelected', 'getElement']),
     htmlZoom() {
-      const size =
-        this.$attrs.heightFrom < this.$attrs.widthFrom
-          ? this.$attrs.heightFrom
-          : this.$attrs.widthFrom;
+      const size = this.$attrs.heightFrom < this.$attrs.widthFrom
+        ? this.$attrs.heightFrom
+        : this.$attrs.widthFrom;
       return size / 370;
     },
     isFullScreen() {
@@ -120,13 +119,13 @@ export default {
     },
     storedElement() {
       this.isFullScreen; // << dont remove
-      let { idDashFrom, idFrom } = this;
+      const { idDashFrom, idFrom } = this;
       return this.$store.getters.getElement(idDashFrom, idFrom);
     },
     needSetField() {
       return !this.dataField && !this.loading;
     },
-    theme: function () {
+    theme() {
       return this.colorFrom;
     },
     values() {
@@ -175,8 +174,8 @@ export default {
   watch: {
     storedElement(element) {
       if (
-        element?.selected !== undefined &&
-        this.value !== element.selected.elemDeep
+        element?.selected !== undefined
+        && this.value !== element.selected.elemDeep
       ) {
         this.loadSelectedValue();
       }
@@ -205,7 +204,7 @@ export default {
     dataRestFrom(dataRestFrom) {
       if (!this.dataField && dataRestFrom.length) {
         const keys = Object.keys(dataRestFrom[0]).filter(
-          (key) => key[0] !== '_'
+          (key) => key[0] !== '_',
         );
         if (keys.length === 1) {
           this.dataField = keys[0];
@@ -214,7 +213,7 @@ export default {
     },
     dataField(value) {
       this.$nextTick(() => {
-        /*value !== '' && */ this.$store.commit('setSelected', {
+        /* value !== '' && */ this.$store.commit('setSelected', {
           element: 'elem',
           idDash: this.idDashFrom,
           id: this.idFrom,

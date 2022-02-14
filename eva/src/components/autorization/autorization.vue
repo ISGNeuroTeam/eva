@@ -95,12 +95,12 @@ export default {
   methods: {
     async sendAut() {
       if (
-        this.user.username &&
-        this.user.username.length !== 0 &&
-        this.user.password &&
-        this.user.password.length !== 0
+        this.user.username
+        && this.user.username.length !== 0
+        && this.user.password
+        && this.user.password.length !== 0
       ) {
-        let response = await fetch(`/api/auth/login`, {
+        const response = await fetch('/api/auth/login', {
           // сперва нужно подать post запрос
           method: 'POST',
           credentials: 'same-origin',
@@ -119,15 +119,15 @@ export default {
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
             this.$store.auth.getters.putLog(
-              `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`
+              `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`,
             );
             this.$store.commit('clearState');
-            this.$router.push(`/main`);
+            this.$router.push('/main');
             return res;
           });
         } else {
           this.$store.auth.getters.putLog(
-            `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`
+            `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
           );
           this.msgText = 'Логин или пароль введены неверно';
           this.msg = true;
@@ -146,7 +146,7 @@ export default {
     },
     getCookie() {
       if (this.$jwt.hasToken()) {
-        this.$router.push(`/main`);
+        this.$router.push('/main');
       }
     },
   },

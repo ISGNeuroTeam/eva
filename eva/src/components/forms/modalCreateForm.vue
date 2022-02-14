@@ -69,7 +69,7 @@
       </v-card>
       <!-- <div class="warning-block" :style="{background:color.backElement}">
                     <div class="warning-text"  :style="{color:color.text}">Такой DashBoard существует. Хотите заменить его?</div>
-                    <div class="btn-warning"> 
+                    <div class="btn-warning">
                         <v-btn small :color="color.controls" class="warning-btn" @click="yesDashBoards">Да</v-btn>
                         <v-btn small :color="color.controlsActive" class="warning-btn" @click="noDashBoards">Нет</v-btn>
                     </div>
@@ -97,12 +97,12 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    modal: function () {
+    modal() {
       return this.modalFrom;
     },
   },
   methods: {
-    createBtn: function () {
+    createBtn() {
       if (this.options.name == '') {
         this.showwarning = true;
         this.warnText = 'Имя не может быть пустым';
@@ -112,8 +112,8 @@ export default {
         this.warnText = 'Количество строк должно быть числом';
         this.disapear();
       } else if (
-        !Number(this.options.columns) &&
-        Number(this.options.columns) != 0
+        !Number(this.options.columns)
+        && Number(this.options.columns) != 0
       ) {
         this.showwarning = true;
         this.warnText = 'Количество столбцов должно быть числом';
@@ -125,12 +125,12 @@ export default {
         // console.log(this.options);
       }
     },
-    disapear: function () {
+    disapear() {
       setTimeout(() => {
         this.showwarning = false;
       }, 2000);
     },
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('hideForm');
     },
   },

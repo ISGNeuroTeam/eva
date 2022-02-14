@@ -64,7 +64,7 @@ export default {
   props: {
     modalActive: {
       type: Boolean,
-      required: true
+      required: true,
     },
   },
   data() {
@@ -94,9 +94,9 @@ export default {
       this.clear = 'Очистить';
     },
     async getLog() {
-      let front = await this.$store.auth.getters.getLog('front'); // получаем все логи для фронта
-      let sizeFront = new Blob([front]).size; // смотрим их размер в байтах
-      let border = 50000; // предел размера в байтах должен быть приблизителньо 5 мегабайт
+      const front = await this.$store.auth.getters.getLog('front'); // получаем все логи для фронта
+      const sizeFront = new Blob([front]).size; // смотрим их размер в байтах
+      const border = 50000; // предел размера в байтах должен быть приблизителньо 5 мегабайт
       if (sizeFront > border) {
         // если размер логов больше предела
         this.text = await this.containLog(front, sizeFront, border); // то вызовем функцию которая сократит наши логи до 5 мегабайт
@@ -107,7 +107,8 @@ export default {
     },
     containLog(text, biLength, border) {
       // функция которая сократит логи до предела
-      let length, procent; // переменные длины строки и 5 % от этой длины
+      let length; let
+        procent; // переменные длины строки и 5 % от этой длины
       while (biLength > border) {
         // пока размер текста в байтах превышает наш порог
         length = text.length; // запоминаем длину текста
@@ -122,7 +123,7 @@ export default {
       return text; // получили строку не превышающию 5 мегабайт
     },
     async sendToBack() {
-      let hide = () => {
+      const hide = () => {
         this.opacityError = 1;
         setTimeout(() => {
           this.opacityError = 0;
@@ -131,7 +132,7 @@ export default {
         }, 2000);
       };
 
-      let response = await this.$store.auth.getters.saveLogIntoBack();
+      const response = await this.$store.auth.getters.saveLogIntoBack();
 
       if (response.status === 200) {
         this.msgError = 'Лог сохранен успешно';
@@ -150,7 +151,7 @@ export default {
     },
     async clearLog(clear) {
       if (clear === 'Очистить') {
-        let response = await this.$store.auth.getters.deleteLog();
+        const response = await this.$store.auth.getters.deleteLog();
         if (response === 'clear') {
           this.restore = this.text;
           this.text = '';

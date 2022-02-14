@@ -122,6 +122,7 @@
 </template>
 <script>
 import { mdiCalendarMonth } from '@mdi/js';
+
 export default {
   name: 'ManualTypeModal',
   props: {
@@ -164,19 +165,17 @@ export default {
     currentOperationTab: {
       immediate: true,
       handler(index) {
-        this.temp.operationManual =
-          this.operationMap[this.temp.fieldType][index];
+        this.temp.operationManual = this.operationMap[this.temp.fieldType][index];
       },
     },
     temp: {
       immediate: true,
       handler(val) {
         if (Object.keys(this.operationMap).includes(val.fieldType)) {
-          let manualOperationMapIndex = this.operationMap[
+          const manualOperationMapIndex = this.operationMap[
             val.fieldType
           ].indexOf(val.operationManual);
-          this.currentOperationTab =
-            manualOperationMapIndex !== -1 ? manualOperationMapIndex : 0;
+          this.currentOperationTab = manualOperationMapIndex !== -1 ? manualOperationMapIndex : 0;
         }
       },
     },

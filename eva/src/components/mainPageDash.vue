@@ -356,7 +356,7 @@ export default {
     // adminRool: function() {
     //   return this.adminRoot
     // },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
@@ -365,19 +365,19 @@ export default {
     document.title = 'EVA | Конструирование дашбордов';
   },
   methods: {
-    getGroups: function () {
-      let response = this.$store.getters.getGroups();
+    getGroups() {
+      const response = this.$store.getters.getGroups();
       response.then((res) => {
         this.allGroups = res;
       });
     },
-    getDashs: function (id) {
-      let response = this.$store.getters.getDashs(id);
+    getDashs(id) {
+      const response = this.$store.getters.getDashs(id);
       response.then((res) => {
         this.allDashs = res;
       });
     },
-    getDash: function (group) {
+    getDash(group) {
       this.curName = group.name;
       this.curGroup = group.id;
       this.cookieId = group.id;
@@ -386,11 +386,11 @@ export default {
       this.disabledTab = false;
       this.tab = 'tab-2';
       document.cookie = `eva-dashPage=${JSON.stringify(
-        group
+        group,
       )}; max-age=3600; path=/`;
       this.getDashs(this.curGroup);
     },
-    setPermissions: function (event) {
+    setPermissions(event) {
       this.editDashPermission = false;
       this.editGroupPermission = false;
       if (event.includes('admin_all') || event.includes('managedash')) {
@@ -400,7 +400,7 @@ export default {
         this.editGroupPermission = true;
       }
     },
-    closeModal: function () {
+    closeModal() {
       this.modalCreateGroup = false;
       this.modalExim = false;
       if (this.tab == 'tab-1') {
@@ -409,11 +409,11 @@ export default {
         this.getDashs(this.cookieId);
       }
     },
-    goToDash: function (i) {
+    goToDash(i) {
       // this.$store.commit('setDash',{data: this.allDashs[i], getters: this.$store.getters.checkAlreadyDash});
       this.$router.push(`/dashboards/${this.allDashs[i].id}`);
     },
-    deleteElem: function () {
+    deleteElem() {
       this.modalDelete = false;
       let response = null;
       let data = null;
@@ -440,8 +440,8 @@ export default {
       });
       this.$store.commit('deleteDashFromMain', data[id]);
     },
-    checkCookie: function () {
-      let cookie = document.cookie.split(';').filter((item) => {
+    checkCookie() {
+      const cookie = document.cookie.split(';').filter((item) => {
         if (item.indexOf('eva-dashPage') != -1) {
           return item;
         }
@@ -454,14 +454,14 @@ export default {
         this.getGroups();
       }
     },
-    deleteCookie: function () {
-      document.cookie = `eva-dashPage=''; max-age=0; path=/`;
+    deleteCookie() {
+      document.cookie = 'eva-dashPage=\'\'; max-age=0; path=/';
       this.getGroups();
     },
-    checkName: function (name) {
+    checkName(name) {
       let newName = name;
       if (name.length > 12) {
-        newName = name.slice(0, 12) + '...';
+        newName = `${name.slice(0, 12)}...`;
       }
       return newName;
     },

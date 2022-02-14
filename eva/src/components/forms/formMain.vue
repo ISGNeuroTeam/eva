@@ -105,7 +105,7 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    permission: function () {
+    permission() {
       // позволяет понять в режима администратора вошли или пользователя
       return this.$route.params.id;
     },
@@ -117,17 +117,17 @@ export default {
     }
   },
   methods: {
-    getForms: async function () {
+    async getForms() {
       // метод который получает список всех шаблонов из базы данных
-      let forms = await this.$store.form.getters.getAllTemplates; // получаем список
+      const forms = await this.$store.form.getters.getAllTemplates; // получаем список
       this.forms = forms; // и заносим его в переменную
       this.loading = false; // отключаем блок с загрузкой
     },
-    createForm: function () {
+    createForm() {
       // открываем модалку с созданием нового шаблона
       this.modal = !this.modal;
     },
-    openForm: function (name, permission) {
+    openForm(name, permission) {
       // открываем существующий шаблон
       if (permission == 'admin') {
         // если открывает администратор
@@ -141,7 +141,7 @@ export default {
     //        this.template = false;
     //        this.templateName = name;
     //    },
-    openMainRole: function (role) {
+    openMainRole(role) {
       // понимаем какой режим нужно отобразить
       this.getForms(); // в любом случае забираем список форм из базы данных
       this.$router.push(`/forms/${role}`); // и отображаем нужный режим
