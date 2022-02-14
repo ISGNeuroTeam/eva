@@ -1145,8 +1145,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import '../sass/dashBoard.sass';
+<style lang="sass">
+@import '../sass/dashBoard.sass'
 </style>
 <style lang="sass">
 .settings-dash

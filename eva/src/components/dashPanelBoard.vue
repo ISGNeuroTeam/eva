@@ -2120,15 +2120,13 @@ export default {
 @import '../sass/dashPanelBoard.sass';
 </style>
 
-<style>
+<style scoped>
 .iconsNavigations {
   display: flex;
   justify-content: center;
   flex-direction: row;
 }
-</style>
 
-<style scoped>
 .v-tooltip__content {
   width: fit-content
 }
