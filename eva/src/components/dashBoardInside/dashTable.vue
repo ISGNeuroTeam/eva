@@ -44,16 +44,9 @@
                 {{ mdiMagnify }}
               </v-icon>
             </template>
-            <v-row v-if="value !== 'string'">
+            <v-row v-if="value !== 'string' && value !== 'none'">
               <v-col cols="6">
                 <v-select
-                    v-if="value === 'none'"
-                    :items="compareForBoolean"
-                    label="Знак"
-                    @change="setFilterData(title, $event, 'compare')"
-                ></v-select>
-                <v-select
-                    v-else
                   :items="compare"
                   label="Знак"
                   @change="setFilterData(title, $event, 'compare')"
@@ -64,6 +57,19 @@
                   label="значение"
                   @change="setFilterData(title, $event)"
                 ></v-text-field>
+              </v-col>
+            </v-row>
+
+            <v-row v-else-if="value === 'none'">
+              <v-col cols="12">
+                <v-select
+                    label="Значение"
+                    :items="compareForBoolean"
+                    @change="
+                    setFilterData(title, '=', 'compare');
+                    setFilterData(title, $event);
+                  "
+                ></v-select>
               </v-col>
             </v-row>
 
@@ -144,7 +150,7 @@ export default {
   data() {
     return {
       compare: ['>', '<', '='],
-      compareForBoolean: ['='],
+      compareForBoolean: ['-','true', 'false'],
       mdiMagnify: mdiMagnify,
       eventRows: [],
       props: {
@@ -171,6 +177,7 @@ export default {
   },
   computed: {
     eventedTableData() {
+      console.log('eventedTableData')
       const items = [...this.filteredTableData].map((item, index) => ({
         ...item,
         rowIndex: index,
@@ -210,14 +217,16 @@ export default {
       return items;
     },
     filteredTableData() {
+      console.log('filteredTableData')
       let chooseSort = function (dataFormat, sortType, value) {
         if (dataFormat ==="none") {
-          return  (el) => {
-            if (value){
-              const isBool = value === 'true'
-              return el === isBool;
-            }
-          };
+          if (value === 'false' || value === 'true'){
+            return  (el) => {
+                const isBool = value === 'true'
+                return el === isBool;
+            };
+          }
+         return () => true;
         }else if (dataFormat === 'date') {
           let sort;
           let parseDate = function (val) {
@@ -282,7 +291,7 @@ export default {
       let temp = this.dataRestFrom;
       if (!temp) return;
       for (let [key, val] of Object.entries(this.filters)) {
-
+        console.log('type', type)
         let type = this.getType(key);
         if (val.value && val.compare) {
           const sort = chooseSort(type, val.compare, val.value);
@@ -400,12 +409,14 @@ export default {
       return this.typedTitles[title];
     },
     setFilterData(title, event, compare) {
+      console.log('setFilterData', title, event, compare)
       if (!this.filters[title]) this.filters[title] = {};
       if (compare === 'compare') {
         this.filters[title].compare = event;
       } else {
         this.filters[title].value = event;
       }
+      console.log('this.filters', this.filters)
       this.filters = { ...this.filters };
     },
     checkForNumeric(val) {
