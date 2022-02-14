@@ -1,12 +1,11 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <modal-persistent
+  <v-dialog
     v-model="active"
     width="550"
-    :theme="theme"
-    :is-confirm="false"
-    @cancelModal="cancelModal"
+    @click:outside="cancelModal"
+    @keydown.esc="cancelModal"
   >
     <div class="delete-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -40,7 +39,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </modal-persistent>
+  </v-dialog>
 </template>
 
 <script>

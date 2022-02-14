@@ -50,7 +50,9 @@ export default {
   },
   methods: {
     openConfirmModal() {
-      this.confirmModal = true;
+      if (this.isConfirm && this.persistent) {
+        this.confirmModal = true;
+      }
     },
     checkKeyDown(event) {
       if (event?.code === 'Escape') {
@@ -59,8 +61,11 @@ export default {
         this.$emit('keydown', event);
       }
     },
-    closeOnOutside() {
+    focusOnModal() {
       this.$refs.modalWithConfirm.focus();
+    },
+    closeOnOutside() {
+      this.focusOnModal();
       this.openConfirmModal();
     },
     result(value) {

@@ -90,7 +90,7 @@
         >
           <div
             v-for="(metric, i) in settings.metricOptions"
-            :key="`metric-${metric.id}`"
+            :key="`metric-${metric.listOrder}`"
             class="metric-section"
             :class="{ expanded: metric.expanded }"
           >

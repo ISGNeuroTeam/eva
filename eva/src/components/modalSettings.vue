@@ -980,7 +980,7 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (Object?.keys(oldVal)?.length > 0) {
+        if (oldVal && Object?.keys(oldVal)?.length > 0) {
           this.isChanged = true;
         }
       },
@@ -1048,7 +1048,6 @@ export default {
         }
       });
     }
-    this.loadComponentsSettings();
     this.prepareOptions();
   },
   methods: {
@@ -1067,7 +1066,6 @@ export default {
           each.forEach((key) => {
             options[key] = field.items[0]?.value;
           });
-          // this.$set(this.options, field.option, { ...options });
           localOptions[field.options] = { ...options };
         }
         return { ...field, items, each };
@@ -1267,7 +1265,6 @@ export default {
                 ...options[item].buttons,
               ]);
             } else if (item === 'metrics') {
-              //this.$set(this,'metrics',options[item]);
               this.metrics = options[item];
             } else if (item === 'metricsRelation') {
               this.metricsRelation = {};
@@ -1314,32 +1311,26 @@ export default {
                 }
               }
               localOptions[item] = val || [];
-              // this.$set(this.options, item, val || []);
             } else {
               let val =
                 options[item] !== null && typeof options[item] === 'object'
                   ? { ...options[item] }
                   : options[item];
               localOptions[item] = val;
-              // this.$set(this.options, item, val);
             }
           } else {
             let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
             if (propsToFalse.includes(item)) {
-              // this.$set(this.options, item, false);
               localOptions[item] = false;
             } else if (item === 'showlegend') {
-              // this.$set(this.options, item, true);
               localOptions[item] = true;
             } else if (item === 'positionlegend') {
-              // this.$set(this.options, item, 'right');
               localOptions[item] = 'right';
             } else {
               const field = settings.optionFields.find(
                 (field) => field.option === item
               );
               if (field && field.default !== undefined) {
-                // this.$set(this.options, item, field.default);
                 localOptions[item] = field.default;
               }
             }
@@ -1347,7 +1338,6 @@ export default {
         });
       }
       if (!localOptions.change) {
-        // this.$set(this.options, 'change', false);
         localOptions.change = false;
       }
       localOptions = { ...localOptions, ...this.loadComponentsSettings() };

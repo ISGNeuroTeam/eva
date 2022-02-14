@@ -1,13 +1,13 @@
 <!-- Модальное окно удаления различных элементов -->
 
 <template>
-  <modal-persistent
+  <v-dialog
     v-model="active"
     class="modal-delete"
     width="600"
     :theme="theme"
-    :is-confirm="false"
-    @cancelModal="cancelModal"
+    @click:outside="cancelModal"
+    @keydown.esc="cancelModal"
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-text class="headline">
@@ -46,7 +46,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </modal-persistent>
+  </v-dialog>
 </template>
 
 <script>

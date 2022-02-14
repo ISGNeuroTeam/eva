@@ -330,6 +330,7 @@ export default {
     modalCreateGroup(val) {
       if (!val) {
         this.modalExim = false;
+        this.curGroup = null;
         if (this.tab === 'tab-1') {
           this.getGroups();
         } else {

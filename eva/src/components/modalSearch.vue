@@ -4,11 +4,13 @@
   <modal-persistent
     v-model="active"
     width="500"
-    persistent
+    :is-confirm="isChanged"
+    :persistent="isChanged"
     :theme="theme"
     @cancelModal="cancelModal"
   >
     <v-card
+      v-if="active"
       :style="{
         background: theme.$main_bg,
         boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
@@ -76,6 +78,7 @@ export default {
   data() {
     return {
       currentId: 0,
+      isChanged: false,
     };
   },
   computed: {
@@ -107,6 +110,15 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
+      this.isChanged = false;
+      this.currentId = 0;
+    },
+    currentId() {
+      this.isChanged = true;
     },
   },
   created() {

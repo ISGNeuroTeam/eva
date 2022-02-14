@@ -2,9 +2,12 @@
 
 <template>
   <modal-persistent
+    ref="confirmModal"
     v-model="active"
     width="90%"
     :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
     @cancelModal="cancelModal"
   >
     <div v-if="groupCheck" class="create-modal-block-group">
@@ -265,6 +268,7 @@ export default {
       },
       colorInputMode: 'preset',
       pickedColor: '',
+      isChanged: false,
     };
   },
   computed: {
@@ -307,7 +311,53 @@ export default {
     },
   },
   watch: {
-    active() {
+    'newDash.name': {
+      handler(val, oldVal) {
+        console.log('newDash.name', val);
+        if (this.dataFrom) {
+          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
+        } else {
+          console.log('name', val !== oldVal);
+          this.isChanged = val !== oldVal;
+        }
+      },
+    },
+    'newDash.id': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
+        } else {
+          console.log('color', !!(val && oldVal));
+          this.isChanged = !!(val && oldVal);
+        }
+      },
+    },
+    'newGroup.name': {
+      handler(val, oldVal) {
+        console.log('newGroup.name', val);
+        if (this.dataFrom) {
+          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
+        } else {
+          console.log('name', val !== oldVal);
+          this.isChanged = val !== oldVal;
+        }
+      },
+    },
+    'newGroup.color': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = !!(
+            val !== '#FFA9A4' &&
+            oldVal &&
+            val !== this.dataFrom?.color
+          );
+        } else {
+          console.log('color', !!(val !== '#FFA9A4' && oldVal));
+          this.isChanged = !!(val !== '#FFA9A4' && oldVal);
+        }
+      },
+    },
+    active(val) {
       // тут понимаем нужно ли открыть окно с созданием или нет
       this.pickedColor = this.theme.$main_bg;
       if (this.modalValue) {
@@ -347,6 +397,13 @@ export default {
           this.nameBtn.create = 'Редактировать';
         }
         this.dataRest = this.getDataForEssence();
+      }
+      if (!val) {
+        this.$set(this.newGroup, 'name', '');
+        this.$set(this.newDash, 'name', '');
+        this.$set(this.newDash, 'id', '');
+        this.$set(this.newGroup, 'color', '');
+        this.isChanged = false;
       }
     },
     pickedColor(color) {
@@ -546,6 +603,8 @@ export default {
       }
     },
     changeData(event) {
+      this.isChanged = true;
+      this.$refs.confirmModal.focusOnModal();
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }

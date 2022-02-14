@@ -1,7 +1,10 @@
 <template>
   <modal-persistent
+    ref="persistentModal"
     v-model="active"
     :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
     width="90%"
     @cancelModal="cancelModal"
   >
@@ -70,6 +73,7 @@ export default {
       msgError: '',
       colorError: '',
       opacityError: 0,
+      isChanged: false,
     };
   },
   computed: {
@@ -94,8 +98,8 @@ export default {
   },
   methods: {
     cancelModal() {
+      this.clearLog('Восстановить');
       this.active = false;
-      this.clear = 'Очистить';
     },
     async getLog() {
       let front = await this.$store.auth.getters.getLog('front'); // получаем все логи для фронта
@@ -126,6 +130,8 @@ export default {
       return text; // получили строку не превышающию 5 мегабайт
     },
     async sendToBack() {
+      this.isChanged = false;
+      this.$refs.persistentModal.focusOnModal();
       let hide = () => {
         this.opacityError = 1;
         setTimeout(() => {
@@ -149,6 +155,8 @@ export default {
     },
     async clearLog(clear) {
       if (clear === 'Очистить') {
+        this.isChanged = true;
+        this.$refs.persistentModal.focusOnModal();
         let response = await this.$store.auth.getters.deleteLog();
         if (response === 'clear') {
           this.restore = this.text;
@@ -156,6 +164,7 @@ export default {
           this.clear = 'Восстановить';
         }
       } else {
+        this.isChanged = false;
         this.text = this.restore;
         this.clear = 'Очистить';
         this.$store.auth.getters.putLog(this.text);
