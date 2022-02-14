@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed setting theme
 - fixed sizing a filter
 - fixed dashboard component
+- fixed switching between filter types
 
 ## [1.82.0]
 
