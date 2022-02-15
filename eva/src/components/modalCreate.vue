@@ -311,34 +311,33 @@ export default {
     },
   },
   watch: {
+    // проверяем изменилось ли что-то в основных полях
     'newDash.name': {
       handler(val, oldVal) {
-        console.log('newDash.name', val);
+        console.log('newDash.name');
         if (this.dataFrom) {
           this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
         } else {
-          console.log('name', val !== oldVal);
           this.isChanged = val !== oldVal;
         }
       },
     },
     'newDash.id': {
       handler(val, oldVal) {
+        console.log('newDash.id');
         if (this.dataFrom) {
           this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
         } else {
-          console.log('color', !!(val && oldVal));
           this.isChanged = !!(val && oldVal);
         }
       },
     },
     'newGroup.name': {
       handler(val, oldVal) {
-        console.log('newGroup.name', val);
+        console.log('newGroup.name');
         if (this.dataFrom) {
           this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
         } else {
-          console.log('name', val !== oldVal);
           this.isChanged = val !== oldVal;
         }
       },
@@ -352,12 +351,11 @@ export default {
             val !== this.dataFrom?.color
           );
         } else {
-          console.log('color', !!(val !== '#FFA9A4' && oldVal));
           this.isChanged = !!(val !== '#FFA9A4' && oldVal);
         }
       },
     },
-    active(val) {
+    active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       this.pickedColor = this.theme.$main_bg;
       if (this.modalValue) {
@@ -397,8 +395,7 @@ export default {
           this.nameBtn.create = 'Редактировать';
         }
         this.dataRest = this.getDataForEssence();
-      }
-      if (!val) {
+      } else {
         this.$set(this.newGroup, 'name', '');
         this.$set(this.newDash, 'name', '');
         this.$set(this.newDash, 'id', '');
@@ -603,12 +600,13 @@ export default {
       }
     },
     changeData(event) {
-      this.isChanged = true;
       this.$refs.confirmModal.focusOnModal();
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
+      this.isChanged =
+        !event.data.includes(this.nameGroupFrom) || event.data.length > 1;
     },
   },
 };
