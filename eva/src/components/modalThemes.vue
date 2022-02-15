@@ -1,8 +1,11 @@
 <template>
-  <v-dialog
+  <modal-persistent
     v-model="showModal"
     width="400"
-    @keydown.esc="closeModal"
+    :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    @cancelModal="closeModal"
   >
     <div class="themes-modal-wrapper">
       <v-card
@@ -118,6 +121,7 @@
             :color="theme.$primary_button"
             outlined
             hide-details
+            @input="isChanged = true"
           />
           <div class="helper-title">
             <p @click="mode = 'manual'">
@@ -146,6 +150,7 @@
                     v-model="row.value"
                     outlined
                     hide-details
+                    @input="isChanged = true"
                   />
                   <v-menu :close-on-content-click="false">
                     <template v-slot:activator="{ on }">
@@ -165,6 +170,7 @@
                     <v-color-picker
                       v-model="row.value"
                       dot-size="17"
+                      @change="isChanged = true"
                     />
                   </v-menu>
                 </v-col>
@@ -306,7 +312,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -394,9 +400,62 @@ export default {
           value: '#8F8F9C',
         },
       ],
+      defaultFieldsValue: [
+        {
+          title: 'Основной фон',
+          propName: '$main_bg',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительный фон',
+          propName: '$secondary_bg',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Основные линии',
+          propName: '$main_border',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительные линии',
+          propName: '$secondary_border',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Основной текст',
+          propName: '$main_text',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительный текст',
+          propName: '$secondary_text',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Заголовки',
+          propName: '$title',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Иконки и акценты',
+          propName: '$accent_ui_color',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Взаимодейтсвия',
+          propName: '$primary_button',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Взаимодейтсвия (доп.)',
+          propName: '$primary_button_hover',
+          value: '#8F8F9C',
+        },
+      ],
       imagePreview: null,
       mode: 'select',
       error: false,
+      isChanged: false,
     };
   },
   computed: {
@@ -421,6 +480,12 @@ export default {
         this.$store.commit('setTheme', content);
       } else this.$store.commit('setDefaultTheme', selectedTheme);
     },
+    showModal(val) {
+      if (!val) {
+        this.isChanged = false;
+        this.mode = 'select';
+      }
+    },
   },
   async created() {
     await this.getThemeList();
@@ -433,8 +498,10 @@ export default {
       this.fields.forEach((field) => (field.value = '#8F8F9C'));
     },
     closeModal() {
-      this.showModal = false;
       this.toSelectMode();
+      this.$nextTick(() => {
+        this.showModal = false;
+      });
     },
     toSelectMode() {
       this.mode = 'select';
@@ -468,6 +535,7 @@ export default {
       }
     },
     uploadImage() {
+      this.isChanged = true;
       const image = this.$refs.imageInput.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(image);
