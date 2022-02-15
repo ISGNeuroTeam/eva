@@ -177,7 +177,6 @@ export default {
   },
   computed: {
     eventedTableData() {
-      console.log('eventedTableData')
       const items = [...this.filteredTableData].map((item, index) => ({
         ...item,
         rowIndex: index,
@@ -291,7 +290,6 @@ export default {
       let temp = this.dataRestFrom;
       if (!temp) return;
       for (let [key, val] of Object.entries(this.filters)) {
-        console.log('type', type)
         let type = this.getType(key);
         if (val.value && val.compare) {
           const sort = chooseSort(type, val.compare, val.value);
@@ -409,7 +407,6 @@ export default {
       return this.typedTitles[title];
     },
     setFilterData(title, event, compare) {
-      console.log('setFilterData', title, event, compare)
       if (!this.filters[title]) this.filters[title] = {};
       if (compare === 'compare') {
         this.filters[title].compare = event;
