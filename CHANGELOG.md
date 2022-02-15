@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed dashboard component
 - fixed switching between filter types
 - fixed cell size in tile visualization
+- fixed missing error signal in datasource exc request
 
 ## [1.82.0]
 
