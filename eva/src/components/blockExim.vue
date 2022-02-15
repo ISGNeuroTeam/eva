@@ -9,7 +9,12 @@
       color: color.text,
     }"
   >
-    <v-btn small :color="color.controls" class="export-btn" @click="exportDash">
+    <v-btn
+      small
+      :color="color.controls"
+      class="export-btn"
+      @click="exportDash"
+    >
       Экспортировать дашборд
     </v-btn>
     <p
@@ -31,7 +36,12 @@
       label="Выбрать файл дашборда"
       @change="file = $event"
     />
-    <v-btn small :color="color.controls" class="import-btn" @click="importDash">
+    <v-btn
+      small
+      :color="color.controls"
+      class="import-btn"
+      @click="importDash"
+    >
       Импортировать дашборд
     </v-btn>
     <p

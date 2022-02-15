@@ -1,11 +1,22 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog v-model="active" width="90%" persistent @keydown="checkEsc($event)">
-    <div v-if="groupCheck" class="create-modal-block-group">
+  <v-dialog
+    v-model="active"
+    width="90%"
+    persistent
+    @keydown="checkEsc($event)"
+  >
+    <div
+      v-if="groupCheck"
+      class="create-modal-block-group"
+    >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$title }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$title }"
+          >
             {{ nameTitle }}
           </div>
         </v-card-text>
@@ -25,7 +36,7 @@
             class="title-field input-create"
             :style="{ color: theme.$main_text }"
           >
-            Цвет группы
+            Цвет группы ssssssss
           </div>
           <div class="color-picker-wrapper">
             <div
@@ -89,7 +100,10 @@
                     />
                   </svg>
                 </template>
-                <v-color-picker v-model="pickedColor" dot-size="17" />
+                <v-color-picker
+                  v-model="pickedColor"
+                  dot-size="17"
+                />
               </v-menu>
               Свой цвет
             </div>
@@ -99,11 +113,11 @@
               v-for="item in Object.keys(group.tab)"
               :key="item"
               essence="group"
-              :dataFrom="dataRest"
+              :data-from="dataRest"
               :subessence="item"
-              :colorFrom="theme"
+              :color-from="theme"
               :create="actionFrom"
-              :activeFrom="modalFrom"
+              :active-from="modalFrom"
               @changeData="changeData"
             />
           </div>
@@ -143,7 +157,10 @@
     >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$main_text }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$main_text }"
+          >
             {{ nameTitle }}
           </div>
         </v-card-text>
@@ -163,11 +180,11 @@
             <data-profile
               essence="dash"
               subessence="groups"
-              :nameGroupFrom="nameGroupFrom"
-              :dataFrom="dataRest"
+              :name-group-from="nameGroupFrom"
+              :data-from="dataRest"
               :create="actionFrom"
-              :colorFrom="theme"
-              :activeFrom="modalFrom"
+              :color-from="theme"
+              :active-from="modalFrom"
               @changeData="changeData"
             />
           </div>
@@ -276,7 +293,30 @@ export default {
       ];
     },
     active: function () {
-      // тут понимаем нужно ли открыть окно с созданием или нет
+      this.setData()
+      return this.modalFrom;
+    },
+    groupCheck: function () {
+      return this.groupFlagFrom;
+    },
+    groups: function () {
+      return this.groupFrom;
+    },
+    dashs: function () {
+      return this.dashsFrom;
+    },
+  },
+  watch: {
+    pickedColor(color) {
+      if (this.colorInputMode === 'custom') this.setGroupColor(color);
+    },
+  },
+  mounted() {
+    this.create_warning = false; // выключаем все предупреждения что были включены
+    this.pickedColor = this.theme.$main_bg;
+  },
+  methods: {
+    setData () {
       this.pickedColor = this.theme.$main_bg;
       if (this.modalFrom) {
         if (this.dataFrom) {
@@ -316,28 +356,7 @@ export default {
         }
         this.dataRest = this.getDataForEssence();
       }
-      return this.modalFrom;
     },
-    groupCheck: function () {
-      return this.groupFlagFrom;
-    },
-    groups: function () {
-      return this.groupFrom;
-    },
-    dashs: function () {
-      return this.dashsFrom;
-    },
-  },
-  watch: {
-    pickedColor(color) {
-      if (this.colorInputMode === 'custom') this.setGroupColor(color);
-    },
-  },
-  mounted() {
-    this.create_warning = false; // выключаем все предупреждения что были включены
-    this.pickedColor = this.theme.$main_bg;
-  },
-  methods: {
     setGroupColor(color) {
       this.newGroup.color = color;
     },
@@ -537,7 +556,7 @@ export default {
     //     })
     //   }
     // },
-    changeData: function (event) {
+    changeData(event) {
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }

@@ -1,6 +1,9 @@
 <template>
   <div class="dash-filter-panel">
-    <div v-if="filters.length <= 0" class="add-new-filter-form">
+    <div
+      v-if="filters.length <= 0"
+      class="add-new-filter-form"
+    >
       <v-text-field
         v-model="tempFilter.id"
         class="input-box"
@@ -38,17 +41,30 @@
           @click="focusRow(filterIndex)"
         >
           <!-- FILTER ID -->
-          <div class="filter-id" :title="filter.id" v-text="filter.id" />
+          <div
+            class="filter-id"
+            :title="filter.id"
+            v-text="filter.id"
+          />
 
           <!-- FILTER PARTS -->
-          <div v-if="filter.parts.length > 0" class="filter-parts">
+          <div
+            v-if="filter.parts.length > 0"
+            class="filter-parts"
+          >
             <div
               class="scroll-btn prev"
               @click.stop="scrollFilterParts(filterIndex, true)"
             >
-              <v-icon class="icon" v-text="mdiChevronLeft" />
+              <v-icon
+                class="icon"
+                v-text="mdiChevronLeft"
+              />
             </div>
-            <div :ref="`filter-${filterIndex}-parts-slider`" class="slider">
+            <div
+              :ref="`filter-${filterIndex}-parts-slider`"
+              class="slider"
+            >
               <div
                 v-for="(part, partIndex) in filter.parts"
                 :key="partIndex"
@@ -60,13 +76,13 @@
                 "
               >
                 <FilterPart
-                  :idDash="idDashFrom"
-                  :filterPart="part"
-                  :filterPartIndex="partIndex"
-                  :filterIndex="filterIndex"
-                  :editPermission="editPermission"
-                  :editMode="editMode"
-                  :isFocused="focusedRow === filterIndex"
+                  :id-dash="idDashFrom"
+                  :filter-part="part"
+                  :filter-part-index="partIndex"
+                  :filter-index="filterIndex"
+                  :edit-permission="editPermission"
+                  :edit-mode="editMode"
+                  :is-focused="focusedRow === filterIndex"
                 />
               </div>
             </div>
@@ -74,7 +90,10 @@
               class="scroll-btn next"
               @click.stop="scrollFilterParts(filterIndex)"
             >
-              <v-icon class="icon" v-text="mdiChevronRight" />
+              <v-icon
+                class="icon"
+                v-text="mdiChevronRight"
+              />
             </div>
           </div>
 
@@ -87,12 +106,23 @@
             depressed
             @click.stop.prevent="openFilterPartModal()"
           >
-            <v-icon small left v-text="plusIcon" /> Добавить
+            <v-icon
+              small
+              left
+              v-text="plusIcon"
+            /> Добавить
           </v-btn>
 
           <!-- FILTER BUTTONS -->
-          <div v-if="focusedRow === filterIndex" class="filter-buttons">
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+          <div
+            v-if="focusedRow === filterIndex"
+            class="filter-buttons"
+          >
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              z-index="100"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :color="theme.$ok_color"
@@ -107,7 +137,11 @@
               <span>Сохранить изменения</span>
             </v-tooltip>
 
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              z-index="100"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :color="theme.$error_color"
@@ -122,7 +156,11 @@
               <span>Отменить изменения</span>
             </v-tooltip>
 
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              z-index="100"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :color="
@@ -141,7 +179,11 @@
               <span>Вычесть отфильтрованные значения</span>
             </v-tooltip>
 
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              z-index="100"
+            >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :color="theme.$main_text"
@@ -160,6 +202,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -180,6 +223,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -224,7 +268,10 @@
         </div>
 
         <!-- TEMP FILTER ADD FORM -->
-        <div v-if="filterIndex === tempFilterIndex" class="add-new-filter-form">
+        <div
+          v-if="filterIndex === tempFilterIndex"
+          class="add-new-filter-form"
+        >
           <v-text-field
             v-model="tempFilter.id"
             class="input-box"
@@ -253,20 +300,28 @@
       </div>
     </template>
 
-    <v-dialog v-model="filterPartModalShow" persistent max-width="400">
-      <filter-part-modal
-        :idDash="idDashFrom"
-        :filterPart="filterPartInModal"
-        :filterPartIndex="filterPartIndexInModal"
-        :editPermission="editPermission"
-        :editMode="editMode"
+    <v-dialog
+      v-model="filterPartModalShow"
+      persistent
+      max-width="400"
+    >
+      <FilterPartModal
+        :id-dash="idDashFrom"
+        :filter-part="filterPartInModal"
+        :filter-part-index="filterPartIndexInModal"
+        :edit-permission="editPermission"
+        :edit-mode="editMode"
         @saveFilterPart="saveFilterPart"
         @closeFilterPartModal="closeFilterPartModal"
       />
     </v-dialog>
 
-    <v-dialog v-model="showFilterPreviewModal" persistent max-width="400">
-      <filter-preview-modal
+    <v-dialog
+      v-model="showFilterPreviewModal"
+      persistent
+      max-width="400"
+    >
+      <FilterPreviewModal
         :filter="filterInPreviewModal"
         @closeFilterPreviewModal="closeFilterPreviewModal"
       />
@@ -360,21 +415,12 @@ export default {
     },
 
     checkSliderOverflow(index) {
-      console.log('Check SLIDE num: ', `filter-${index}-parts-slider`);
-
       const slider = this.$refs[`filter-${index}-parts-slider`];
       if (!slider) return false;
 
       const { clientWidth, scrollWidth } = slider[0];
-      console.log(
-        'clientWidth : scrollWidth',
-        clientWidth,
-        ':',
-        scrollWidth,
-        scrollWidth > clientWidth
-      );
       // this.$nextTick(() => {});
-      return scrollWidth > clientWidth ? true : false;
+      return scrollWidth > clientWidth;
     },
     reverseFilter(filter) {
       filter.invertMatches = !filter.invertMatches;
@@ -410,9 +456,9 @@ export default {
     },
     saveTempFilter() {
       if (this.filters.some((filter) => filter.id === this.tempFilter.id)) {
-        console.log('Фильтр с таким именем существует');
+        //console.log('Фильтр с таким именем существует');
       } else if (!this.tempFilter.id) {
-        console.log('Введите имя');
+        //console.log('Введите имя');
       } else {
         if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0;
         this.$store.commit('createFilter', {
@@ -501,6 +547,7 @@ $filter-container-height: 60px
   width: 100%
   //max-height: calc((#{$filter-container-height} * 3) + 18px)
   overflow-y: auto
+  max-height: 180px
 
   &::-webkit-scrollbar
     width: 6px

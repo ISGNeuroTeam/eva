@@ -2,21 +2,36 @@
   <v-app>
     <v-content>
       <div class="form-panel-board">
-        <div class="title-name">EVA Формы</div>
+        <div class="title-name">
+          EVA Формы
+        </div>
       </div>
       <!--  Основная страница  -->
-      <v-container v-if="!permission" class="main-form-container">
+      <v-container
+        v-if="!permission"
+        class="main-form-container"
+      >
         <div class="main-form">
-          <v-card class="form-block" @click="openMainRole('admin')">
+          <v-card
+            class="form-block"
+            @click="openMainRole('admin')"
+          >
             <v-card-text class="card-text">
               <p>Администратор</p>
-              <v-icon class="role">{{ adminRole }}</v-icon>
+              <v-icon class="role">
+                {{ adminRole }}
+              </v-icon>
             </v-card-text>
           </v-card>
-          <v-card class="form-block" @click="openMainRole('user')">
+          <v-card
+            class="form-block"
+            @click="openMainRole('user')"
+          >
             <v-card-text class="card-text">
               <p>Пользователь</p>
-              <v-icon class="role">{{ userRole }}</v-icon>
+              <v-icon class="role">
+                {{ userRole }}
+              </v-icon>
             </v-card-text>
           </v-card>
         </div>
@@ -29,7 +44,7 @@
           type="image"
           height="300"
           width="100%"
-        ></v-skeleton-loader>
+        />
         <div class="main-form-forms">
           <v-card
             v-for="item in forms"
@@ -42,21 +57,32 @@
             </v-card-text>
           </v-card>
         </div>
-        <div v-if="permission == 'admin'" class="divider"></div>
-        <div v-if="permission == 'admin'" class="main-form">
-          <v-card class="form-block" @click="createForm()">
+        <div
+          v-if="permission == 'admin'"
+          class="divider"
+        />
+        <div
+          v-if="permission == 'admin'"
+          class="main-form"
+        >
+          <v-card
+            class="form-block"
+            @click="createForm()"
+          >
             <v-card-text class="card-text">
               <p>Создать новую форму</p>
-              <v-icon class="plus">{{ plus }}</v-icon>
+              <v-icon class="plus">
+                {{ plus }}
+              </v-icon>
             </v-card-text>
           </v-card>
         </div>
       </v-container>
     </v-content>
     <modal-create-form
-      :modalFrom="modal"
+      :modal-from="modal"
       @hideForm="createForm"
-    ></modal-create-form>
+    />
   </v-app>
 </template>
 

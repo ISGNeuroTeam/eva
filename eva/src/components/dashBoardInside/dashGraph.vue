@@ -1,8 +1,17 @@
 <template>
-  <div class="dash-graph-block" :data-changeData="dataGet">
-    <div v-show="!nomsg" class="graph-block-itself">
-      <div ref="graph" class="dash-graphVis" />
-      <v-tooltip bottom :color="colorFrom.controlsActive">
+  <div class="dash-graph-block">
+    <div
+      v-show="!nomsg"
+      class="graph-block-itself"
+    >
+      <div
+        ref="graph"
+        class="dash-graphVis"
+      />
+      <v-tooltip
+        bottom
+        :color="colorFrom.controlsActive"
+      >
         <template v-slot:activator="{ on }">
           <v-icon
             v-show="!errorData"
@@ -59,7 +68,10 @@
         Сохранить
       </div>
     </div>
-    <div v-show="nomsg" class="nodata">
+    <div
+      v-show="nomsg"
+      class="nodata"
+    >
       {{ nomsgtext }}
     </div>
   </div>
@@ -132,25 +144,6 @@ export default {
     idDash: function () {
       return this.idDashFrom;
     },
-    dataGet: function () {
-      let data = this.dataRestFrom;
-      if (data.length > 0) {
-        this.stepByStep(data);
-      } else {
-        (this.nomsg = true), (this.nomsgtext = 'Нет данных для отображения');
-      }
-      return true;
-    },
-    // shouldGet: function() {
-    //   if (this.shouldFrom) {
-    //     if (this.mount) {
-    //       this.mount = false;
-    //     } else {
-    //       this.tree[this.direct] = {};
-    //     }
-    //   }
-    //   return this.shouldFrom
-    // },
     dataLoading: function () {
       return this.dataLoadingFrom;
     },
@@ -159,6 +152,16 @@ export default {
     },
     height: function () {
       return this.heightFrom;
+    },
+  },
+  watch: {
+    dataRestFrom(data) {
+      if (data.length > 0) {
+        this.stepByStep(data);
+      } else {
+        this.nomsg = true;
+        this.nomsgtext = 'Нет данных для отображения';
+      }
     },
   },
   mounted() {
@@ -215,7 +218,7 @@ export default {
         // при наведении на элемнет в полотне (ноду)
         Object.values(event.el.children).forEach((item) => {
           // пробегаемся по его детям
-          if (item.getAttribute('joint-selector') == 'label') {
+          if (item.getAttribute('joint-selector') === 'label') {
             // и ищем надпись
             let name = item.getAttribute('data-name'); // получаем полное имя ноды из атрибута
             this.tooltipName = `${name}<br>${nodes[name].label}`; // заносим это имя сперва в тултип
@@ -230,7 +233,7 @@ export default {
         // а когда увели мышку с элемента
         Object.values(event.el.children).forEach((item) => {
           // снова находим надпись
-          if (item.getAttribute('joint-selector') == 'label') {
+          if (item.getAttribute('joint-selector') === 'label') {
             tooltipName.style.opacity = '0'; // и скрываем тултип
           }
         });
@@ -347,9 +350,6 @@ export default {
         item.to.forEach((itemChild, j) => {
           // пробегаемся по всем детям (куда должна идти стрелка)
           link = link.clone(); // клонируем объект стрелки
-          // console.log(itemChild);
-          //console.log(`${itemChild} : ${tree[itemChild][2]}, ${item.from} : ${tree[item.from][2]}`);
-          // console.log(tree[this.direct]);
           if (
             tree[this.direct][itemChild][2] < tree[this.direct][item.from][2]
           ) {
@@ -463,9 +463,9 @@ export default {
 
       Object.keys(tockens).forEach((i) => {
         if (
-          tockens[i].elem == this.id &&
-          tockens[i].action == 'click' &&
-          tockens[i].capture == 'node'
+          tockens[i].elem === this.id &&
+          tockens[i].action === 'click' &&
+          tockens[i].capture === 'node'
         ) {
           tocken = {
             name: tockens[i].name,
@@ -488,14 +488,14 @@ export default {
         partelement: 'node',
       });
 
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'set') {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == 'go') {
+          } else if (item.action === 'go') {
             this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,
@@ -506,8 +506,8 @@ export default {
       }
     },
     changeName: function (element, event) {
-      let name = '';
-      if (event.target.nodeName != 'tspan') {
+      let name;
+      if (event.target.nodeName !== 'tspan') {
         name = event.target.parentElement
           .querySelector('text')
           .getAttribute('data-name');
@@ -578,7 +578,7 @@ export default {
             }
           });
 
-          if (item.node != 'start') {
+          if (item.node !== 'start') {
             // если нода не start
             nodeSizes[item.node] = {
               size: item.node_size,
@@ -621,7 +621,7 @@ export default {
     },
     setSizeElements: function (result, elementSizes, element) {
       // сохраняем размер элемнета
-      if (element == 'nodes') {
+      if (element === 'nodes') {
         // если это нода
         let max = Object.values(elementSizes).map((item) => {
           return item.size;
@@ -722,7 +722,7 @@ export default {
                 });
               }
             });
-            if (structure[i].length == 0) {
+            if (structure[i].length === 0) {
               // если уровнеь оказался пустой
               delete structure[i]; // то удаляем его
             }
@@ -744,7 +744,7 @@ export default {
             }
           });
         }
-        if (k != -1) {
+        if (k !== -1) {
           // если переменная изменилась
           if (!structure[i + 1]) {
             // проверяем если следующий уровнеь еще не создан
@@ -758,13 +758,12 @@ export default {
     createTree: function () {
       // создаем дерево с позициями нод относительно хоста
       let levels = Object.keys(this.structure).length; // понимаем скоько уровней вообще в структуре
-      if (levels != 0) {
+      if (levels !== 0) {
         // если уровни релаьно есть
-        // console.log(this.structure);
         let tree = this.tree; // заносим дерево в переменную для удобства
         let size = this.sizeGraph(); // получаем размер контейнера
         let step, otstup, center, odd; // несоклько переменных
-        if (this.direct == 'vertical') {
+        if (this.direct === 'vertical') {
           // если граф располагается вертикально
 
           step = Math.floor(size.height / levels); // то рассчитываем шаг с которым будем прыгать по уровням
@@ -774,12 +773,12 @@ export default {
           Object.values(this.structure).forEach((item, l) => {
             // пробегаемся по структуре
 
-            if (item.length == 1) {
+            if (item.length === 1) {
               // если элемент один на уровне
               tree[this.direct][item[0]] = [center - 50, otstup, l]; // добовляем его в дерево посередине отсутпив сверху сколько надо
             } else {
               // если элемнетов несколько
-              item.length % 2 == 0 ? (odd = true) : (odd = false); // то сперва понимаем четное количество элемнетов или нет
+              item.length % 2 === 0 ? (odd = true) : (odd = false); // то сперва понимаем четное количество элемнетов или нет
               let centerElem = Math.floor((item.length - 1) / 2); // затем высчитываем позицию центрального элемента
               let i = 0; // счетчик
               let between = [0, 30]; // расстояние между нодами на уровне
@@ -837,12 +836,12 @@ export default {
           otstup = 20;
 
           Object.values(this.structure).forEach((item, l) => {
-            if (item.length == 1) {
+            if (item.length === 1) {
               // если элемент один на уровне
 
               tree[this.direct][item[0]] = [otstup, center, l]; // добовляем его в дерево посередине отсутпив сверху сколько надо
             } else {
-              item.length % 2 == 0 ? (odd = true) : (odd = false);
+              item.length % 2 === 0 ? (odd = true) : (odd = false);
               let centerElem = Math.floor((item.length - 1) / 2);
               let i = 0;
               let between = [0, 0];
@@ -894,7 +893,7 @@ export default {
     },
     changeDirect: function () {
       // изменение положение отрисовки графа
-      this.direct == 'vertical'
+      this.direct === 'vertical'
         ? (this.direct = 'horizontal')
         : (this.direct = 'vertical'); // собственно меняем перемненую с положением графа
       this.$refs.saveTree.style.opacity = '1'; // и отображаем кнопку сохранить
@@ -927,12 +926,11 @@ export default {
 
       prom.then((elem) => {
         // как раз тут делаем асинхронность
-        console.log('create graph');
 
         this.prepareGraph(data); // сперва подготовливаем данные
 
         if (!this.errorData) {
-          if (Object.keys(this.tree[this.direct]).length == 0) {
+          if (Object.keys(this.tree[this.direct]).length === 0) {
             // потом смотрим если мы раньше уже сформировали дерево элемнетов, то нет смысла каждый раз его рассчитывать
 
             this.createStructure(); // а если еще не создано, то сперва создаем структуру какой элемнет на каком уровне

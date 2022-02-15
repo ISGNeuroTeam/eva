@@ -137,12 +137,29 @@ export default {
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
   },
-  options: { // component to options
+  options: {
+    // component to options
     multiLine: [
-      'visible', 'level', 'boxShadow', 'stringOX', 'united', 'lastDot',
-      'metrics', 'timeFormat', 'lastResult', 'strokeWidth', 'thememultiline',
-      'pinned', 'isDataAlwaysShow', 'xAxisCaptionRotate', 'barplotBarWidth',
-      'barplotstyle', 'metricTypes', 'axesCount', 'metricsAxis'
+      'visible',
+      'level',
+      'boxShadow',
+      'stringOX',
+      'united',
+      'zoomForAll',
+      'lastDot',
+      'metrics',
+      'timeFormat',
+      'lastResult',
+      'strokeWidth',
+      'thememultiline',
+      'pinned',
+      'isDataAlwaysShow',
+      'xAxisCaptionRotate',
+      'barplotBarWidth',
+      'barplotstyle',
+      'metricTypes',
+      'axesCount',
+      'metricsAxis',
     ],
     piechart: [
       'visible',
@@ -198,13 +215,25 @@ export default {
     bush: ['visible', 'level', 'pinned'],
     map: ['visible', 'level', 'osmserver', 'primitivesLibrary', 'pinned'],
     heatmap: [
-      'visible','level', 'dataFormat', 'pinned', 'x', 'xFormat', 'xSort', 'y',
-      'yFormat', 'ySort', 'data', 'metadata', 'detailValue'
+      'visible',
+      'level',
+      'dataFormat',
+      'pinned',
+      'x',
+      'xFormat',
+      'xSort',
+      'y',
+      'yFormat',
+      'ySort',
+      'data',
+      'metadata',
+      'detailValue',
     ],
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
   },
-  optionFields: [ // описание типов полей и их характеристик
+  optionFields: [
+    // описание типов полей и их характеристик
     // dashBoard
     {
       option: 'visible',
@@ -242,7 +271,8 @@ export default {
     // dashMap
     {
       option: 'osmserver',
-      description: 'Сервер для набора tile Пример:\nhttp://192.168.4.209/osm/{z}/{x}/{y}.png',
+      description:
+        'Сервер для набора tile Пример:\nhttp://192.168.4.209/osm/{z}/{x}/{y}.png',
       elem: 'text-field',
     },
 
@@ -309,8 +339,12 @@ export default {
       option: 'titles',
       description: 'Столбцы для отображения',
       elem: 'checkbox-list',
-      items: function() { // this is modalSettings context
-        return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+      items: function () {
+        // this is modalSettings context
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
       },
       default: [],
     },
@@ -325,8 +359,11 @@ export default {
       option: 'x',
       description: 'X axis',
       elem: 'select',
-      items: function() {
-        return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
       },
     },
     {
@@ -350,8 +387,11 @@ export default {
       option: 'y',
       description: 'Y axis',
       elem: 'select',
-      items: function() {
-        return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
       },
     },
     {
@@ -375,8 +415,11 @@ export default {
       option: 'data',
       description: 'Значение ячейки',
       elem: 'select',
-      items: function() {
-        return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
       },
     },
     {
@@ -384,8 +427,11 @@ export default {
       option: 'metadata',
       description: 'metadata',
       elem: 'select',
-      items: function() {
-        return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
       },
     },
     {
@@ -393,8 +439,11 @@ export default {
       option: 'detailValue',
       description: 'Поле для ссылки Детали',
       elem: 'select',
-      items: function() {
-        return this.$store.getters.getAvailableTableTitles(this.idDash, this.element)
+      items: function () {
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element
+        );
       },
     },
 
@@ -480,14 +529,20 @@ export default {
       elem: 'switch',
     },
     {
+      option: 'zoomForAll',
+      description: 'Режим масштабирования с одного графика на все',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'barplotstyle',
       relation: 'united',
       description: 'Стиль столбцов',
       elem: 'select',
       items: [
-        {text:'разделенный', value:'divided'},
-        {text:'наложенный', value:'overlay'},
-        {text:'с накоплением', value:'accumulation'},
+        { text: 'разделенный', value: 'divided' },
+        { text: 'наложенный', value: 'overlay' },
+        { text: 'с накоплением', value: 'accumulation' },
       ],
     },
 
@@ -531,8 +586,11 @@ export default {
     },
     {
       relation: 'united',
-      each: function() { // each реализовано только для select и radio-group
-        return this.titles && this.titles.splice ? [...this.titles].splice(1) : []
+      each: function () {
+        // each реализовано только для select и radio-group
+        return this.titles && this.titles.splice
+          ? [...this.titles].splice(1)
+          : [];
       },
       label: 'metricTypes',
       option: 'metricTypes',
@@ -545,14 +603,17 @@ export default {
     },
 
     {
-      relation: ['united', {axesCount: 2}],
+      relation: ['united', { axesCount: 2 }],
       group: 'Привязка осей',
       option: 'metricsAxis',
     },
     {
-      relation: ['united', {axesCount: 2}],
-      each: function() { // each реализовано только для select и radio-group, разбивает настройку для полей записи
-        return this.titles && this.titles.splice ? [...this.titles].splice(1) : []
+      relation: ['united', { axesCount: 2 }],
+      each: function () {
+        // each реализовано только для select и radio-group, разбивает настройку для полей записи
+        return this.titles && this.titles.splice
+          ? [...this.titles].splice(1)
+          : [];
       },
       label: 'metricsAxis',
       option: 'metricsAxis',
@@ -563,7 +624,6 @@ export default {
         { value: 'right', label: 'Справа' },
       ],
     },
-
   ],
   reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
   reports: {

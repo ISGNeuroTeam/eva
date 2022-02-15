@@ -15,9 +15,22 @@
               :style="{ background: 'none' }"
             >
               <v-tabs-slider />
-              <v-tab :href="`#tab-1`" @click="deleteCookie"> Группы </v-tab>
-              <v-tab :href="`#tab-2`" :disabled="disabledTab"> Дашборды </v-tab>
-              <v-tab-item :value="'tab-1'" class="groups-of-dash">
+              <v-tab
+                :href="`#tab-1`"
+                @click="deleteCookie"
+              >
+                Группы
+              </v-tab>
+              <v-tab
+                :href="`#tab-2`"
+                :disabled="disabledTab"
+              >
+                Дашборды
+              </v-tab>
+              <v-tab-item
+                :value="'tab-1'"
+                class="groups-of-dash"
+              >
                 <v-card
                   v-for="i in allGroups.length"
                   :key="i"
@@ -35,7 +48,10 @@
                       :style="{ borderColor: allGroups[i - 1].color }"
                     />
                     <div class="controls-group">
-                      <v-tooltip bottom :color="theme.$accent_ui_color">
+                      <v-tooltip
+                        bottom
+                        :color="theme.$accent_ui_color"
+                      >
                         <template v-slot:activator="{ on }">
                           <v-icon
                             v-if="editGroupPermission"
@@ -56,7 +72,10 @@
                         </template>
                         <span>Редактировать</span>
                       </v-tooltip>
-                      <v-tooltip bottom :color="theme.$accent_ui_color">
+                      <v-tooltip
+                        bottom
+                        :color="theme.$accent_ui_color"
+                      >
                         <template v-slot:activator="{ on }">
                           <v-icon
                             v-if="editGroupPermission"
@@ -66,9 +85,9 @@
                             @click="
                               () => {
                                 (nameDelete = allGroups[i - 1].name),
-                                  (modalDelete = true),
-                                  (elemDelete = 'group'),
-                                  (curGroup = i - 1);
+                                (modalDelete = true),
+                                (elemDelete = 'group'),
+                                (curGroup = i - 1);
                               }
                             "
                           >
@@ -137,7 +156,10 @@
                   </v-icon>
                 </v-btn>
               </v-tab-item>
-              <v-tab-item :value="'tab-2'" class="groups-of-dash">
+              <v-tab-item
+                :value="'tab-2'"
+                class="groups-of-dash"
+              >
                 <v-card
                   v-for="i in allDashs.length"
                   :key="i"
@@ -155,7 +177,10 @@
                       :style="{ borderColor: curColor }"
                     />
                     <div class="controls-group">
-                      <v-tooltip bottom :color="theme.$accent_ui_color">
+                      <v-tooltip
+                        bottom
+                        :color="theme.$accent_ui_color"
+                      >
                         <template v-slot:activator="{ on }">
                           <v-icon
                             v-if="editDashPermission"
@@ -176,7 +201,10 @@
                         </template>
                         <span>Редактировать</span>
                       </v-tooltip>
-                      <v-tooltip bottom :color="theme.$accent_ui_color">
+                      <v-tooltip
+                        bottom
+                        :color="theme.$accent_ui_color"
+                      >
                         <template v-slot:activator="{ on }">
                           <v-icon
                             v-if="editDashPermission"
@@ -186,9 +214,9 @@
                             @click="
                               () => {
                                 (nameDelete = allDashs[i - 1].name),
-                                  (modalDelete = true),
-                                  (elemDelete = 'dash'),
-                                  (curDash = i - 1);
+                                (modalDelete = true),
+                                (elemDelete = 'dash'),
+                                (curDash = i - 1);
                               }
                             "
                           >
@@ -199,7 +227,10 @@
                       </v-tooltip>
                     </div>
                   </v-card-title>
-                  <v-card-text class="dash-group-text" @click="goToDash(i - 1)">
+                  <v-card-text
+                    class="dash-group-text"
+                    @click="goToDash(i - 1)"
+                  >
                     <p class="group-text">
                       {{ checkName(allDashs[i - 1].name) }}
                     </p>
@@ -256,28 +287,28 @@
     <footer-bottom />
     <modal-exim
       :active="modalExim"
-      :curName="curName"
+      :cur-name="curName"
       :dashboards="allDashs"
       :groups="allGroups"
       :element="element"
       @closeModal="closeModal"
     />
     <modal-create
-      :modalFrom="modalCreateGroup"
-      :actionFrom="actionBtn"
-      :groupFrom="allGroups"
-      :nameGroupFrom="cookieName"
-      :dashsFrom="allDashs"
-      :dataFrom="allGroups[curGroup]"
-      :dashFrom="allDashs[curGroup]"
-      :curGroupFrom="curGroup"
-      :groupFlagFrom="createGroupFlag"
+      :modal-from="modalCreateGroup"
+      :action-from="actionBtn"
+      :group-from="allGroups"
+      :name-group-from="cookieName"
+      :dashs-from="allDashs"
+      :data-from="allGroups[curGroup]"
+      :dash-from="allDashs[curGroup]"
+      :cur-group-from="curGroup"
+      :group-flag-from="createGroupFlag"
       @createGroup="createGroup($event)"
       @closeModal="closeModal"
     />
     <modal-delete-main
-      :modalFrom="modalDelete"
-      :nameFrom="nameDelete"
+      :modal-from="modalDelete"
+      :name-from="nameDelete"
       @deleteElem="deleteElem"
       @closeModal="modalDelete = false"
     />

@@ -1,6 +1,6 @@
 {
   "name": "eva",
-  "version": "1.81.0",
+  "version": "1.82.0",
   "description": "Evolution Visualization Application",
   "author": "Fred",
   "license": "ISC",
@@ -39,6 +39,7 @@
     "eslint-plugin-prettier-vue": "^3.1.0",
     "eslint-plugin-vue": "^6.2.2",
     "file-loader": "^4.2.0",
+    "ghooks": "^2.0.4",
     "html-webpack-plugin": "^4.3.0",
     "jest": "^25.3.0",
     "jest-fetch-mock": "^3.0.3",
@@ -85,5 +86,10 @@
     "vuex": "^3.1.1",
     "vuex-persistedstate": "^2.5.4",
     "yfiles": "./src/yfiles/es-modules/yfiles-23.0.3.tgz"
+  },
+  "config": {
+    "ghooks": {
+      "pre-commit": "cd eva && npm run lint"
+    }
   }
 }

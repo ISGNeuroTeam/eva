@@ -50,7 +50,3 @@ export default {
   },
 };
 </script>
-
-<style lang="scss">
-@import '../../sass/dashTamplate.sass';
-</style>

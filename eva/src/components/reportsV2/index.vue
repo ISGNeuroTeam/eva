@@ -3,46 +3,65 @@
     class="reports-v2-app-main"
     :style="{ background: theme.$secondary_bg }"
   >
-    <header-top :inside="true" @setUsername="setUsername($event)" />
+    <header-top
+      :inside="true"
+      @setUsername="setUsername($event)"
+    />
     <v-content>
       <div class="main-container container-report">
-        <div ref="report" class="report2-block">
+        <div
+          ref="report"
+          class="report2-block"
+        >
           <newSearch
             class="new-search component-block"
             :data="data"
             :loading="loading"
             @launchSearch="launchSearch($event)"
-          ></newSearch>
+          />
           <timeline
             v-show="data.length > 0"
             class="timeline component-block"
             :data="data"
-            >111</timeline
           >
+            111
+          </timeline>
           <div class="tab-block component-block d-flex justify-content-between">
-            <v-tabs v-model="tab" class="tabs">
+            <v-tabs
+              v-model="tab"
+              class="tabs"
+            >
               <v-tab>События ({{ data.length }})</v-tab>
               <v-tab>Статистика</v-tab>
               <v-tab>Визуализация</v-tab>
             </v-tabs>
             <div class="d-flex">
-              <report :length="data.length"></report>
-              <download :data="data"></download>
+              <report :length="data.length" />
+              <download :data="data" />
             </div>
           </div>
           <keep-alive>
-            <v-row v-if="data.length > 0 && tab === 0" class="mb-0">
-              <v-col cols="2" class="pr-0">
+            <v-row
+              v-if="data.length > 0 && tab === 0"
+              class="mb-0"
+            >
+              <v-col
+                cols="2"
+                class="pr-0"
+              >
                 <intresting
                   class="intresting component-block"
                   :rows="rows"
-                ></intresting>
+                />
               </v-col>
-              <v-col cols="10" class="pl-0">
+              <v-col
+                cols="10"
+                class="pl-0"
+              >
                 <events
                   class="events component-block"
                   :data="data"
-                ></events>
+                />
               </v-col>
             </v-row>
           </keep-alive>
@@ -52,23 +71,23 @@
               class="statistic component-block"
               :data="data"
               :size="size"
-            ></statistic>
+            />
           </keep-alive>
           <keep-alive>
             <visualisation
               v-if="tab === 2 && data.length > 0"
               class="visualisation component-block"
               :data="data"
-              :shouldGet="shouldGet"
-            ></visualisation>
+              :should-get="shouldGet"
+            />
           </keep-alive>
         </div>
       </div>
     </v-content>
     <footer-bottom />
     <modal-report
-      :modalFrom="modal"
-      :searchFrom="search"
+      :modal-from="modal"
+      :search-from="search"
       @cancelModal="cancelModal"
       @setSearch="setSearch($event)"
     />
@@ -78,7 +97,6 @@
 <script>
 import { mdiPlay, mdiSettings, mdiMerge, mdiPlus } from '@mdi/js';
 import settings from '../../js/componentsSettings.js';
-import DashHeatMapLinear from '../dashBoardInside/dashHeatMapLinear';
 import newSearch from './newSearch.vue';
 import timeline from './timeline.vue';
 import report from './report.vue';
@@ -188,7 +206,7 @@ export default {
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
       });
-      this.activeElem = 'table';
+      this.setActiveElem('table')
       return this.$store.getters.getReportElement;
     },
   },
@@ -244,7 +262,6 @@ export default {
           this.shema = event.data.shema;
           this.data = event.data.data;
 
-          let text = '';
           Object.keys(this.shema).forEach((item, i) => {
             statistic = this.createStatistic(item, event.data.data);
             let count = 0;
@@ -300,8 +317,8 @@ export default {
           this.search.sid,
           'reports'
         );
-        responseDB.then((result) => {
-          let refresh = this.$store.getters.refreshElements(
+        responseDB.then(() => {
+          this.$store.getters.refreshElements(
             'reports',
             this.search.sid
           );
@@ -310,7 +327,7 @@ export default {
         });
       }
     },
-    addLineBreaks: function (event) {
+    addLineBreaks: function () {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'
@@ -363,13 +380,13 @@ export default {
             db.createObjectStore('searches'); // create it
           }
 
-          request.onsuccess = (event) => {
+          request.onsuccess = () => {
             db = request.result;
             console.log('successEvent: ' + db);
           };
         };
 
-        request.onsuccess = (event) => {
+        request.onsuccess = () => {
           db = request.result;
 
           let transaction = db.transaction('searches'); // (1)
@@ -379,7 +396,7 @@ export default {
 
           let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
-          query.onsuccess = (event) => {
+          query.onsuccess = () => {
             // (4)
             if (query.result) {
               self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
@@ -461,6 +478,9 @@ export default {
 
       return result;
     },
+    setActiveElem (elemName) {
+      this.activeElem = elemName;
+    },
     setSearch: function (search) {
       this.search = Object.assign({}, search);
       this.modal = false;
@@ -480,12 +500,9 @@ export default {
     //   }
     // },
     calcSize: function () {
-      // console.log('calcSize')
-      // console.log(this.$refs)
       let size = this.$refs.vis.$el.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
-      // console.log(size)
     },
     setRange(range) {
       this.data = this.data.filter(

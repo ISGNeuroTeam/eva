@@ -1,22 +1,38 @@
 <template>
-  <div ref="single" class="dash-single" @click="setClick">
+  <div
+    ref="single"
+    class="dash-single"
+    @click="setClick"
+  >
     <v-card
       v-show="!noMsg"
       class="number-block"
       outlined
       :loading="dataLoading"
-      :lookSize="changeSize"
+      :look-size="changeSize"
     >
-      <div class="number" :style="{ fontSize: `${fontSize}px` }">
-        <div class="number-itself" :style="{ color: 'var(--accent_ui_color)' }">
+      <div
+        class="number"
+        :style="{ fontSize: `${fontSize}px` }"
+      >
+        <div
+          class="number-itself"
+          :style="{ color: 'var(--accent_ui_color)' }"
+        >
           {{ number }}
         </div>
-        <div class="number-sub" :style="{ color: 'var(--primary_button)' }">
+        <div
+          class="number-sub"
+          :style="{ color: 'var(--primary_button)' }"
+        >
           {{ subnumber }}
         </div>
       </div>
     </v-card>
-    <div v-show="noMsg" class="errormsg">
+    <div
+      v-show="noMsg"
+      class="errormsg"
+    >
       {{ msgText }}
     </div>
   </div>
@@ -62,10 +78,8 @@ export default {
     number: function () {
       if (this.dataRestFrom && this.dataRestFrom.length > 0) {
         this.setEventColor(this.numberValue);
-        this.noMsg = false;
         return this.numberValue;
       } else {
-        this.noMsg = true;
         return null;
       }
     },
@@ -88,7 +102,6 @@ export default {
       }
     },
     changeSize: function () {
-      let width = this.widthFrom; // присваиваем просто чтобы указать за каким свойством следить
       return true;
     },
 
@@ -102,6 +115,11 @@ export default {
         color = options.color;
       }
       return color;
+    },
+  },
+  watch: {
+    dataRestFrom(dataRestFrom) {
+      this.noMsg = !(dataRestFrom && dataRestFrom.length > 0);
     },
   },
   mounted() {
@@ -125,7 +143,7 @@ export default {
       events.forEach((item) => {
         switch (item['compare']) {
           case 'equals':
-            if (Number(item.sense) == Number(number)) {
+            if (Number(item.sense) === Number(number)) {
               flag = 0;
             }
             break;
@@ -140,15 +158,15 @@ export default {
             }
             break;
           case 'in':
-            frontier = item.sense.replace(/\[|\]/g, '').split(',');
+            frontier = item.sense.replace(/[[\]]/g, '').split(',');
             frontier.forEach((itemFron) => {
-              if (Number(number) == Number(itemFron)) {
+              if (Number(number) === Number(itemFron)) {
                 flag = 0;
               }
             });
             break;
           case 'between':
-            frontier = item.sense.replace(/\[|\]/g, '').split(',');
+            frontier = item.sense.replace(/[[\]]/g, '').split(',');
             if (
               Number(number) < Number(frontier[1]) &&
               Number(number) > Number(frontier[0])
@@ -158,7 +176,7 @@ export default {
 
             break;
         }
-        if (flag != -1) {
+        if (flag !== -1) {
           this.$store.commit('letEventSet', {
             events: [
               { target: item.target, prop: item.prop[0], value: item.value[0] },
@@ -206,8 +224,6 @@ export default {
       });
     },
     setClick: function () {
-      console.log('clicked');
-
       let tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
@@ -217,7 +233,7 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (tockens[i].elem == this.id && tockens[i].action == 'click') {
+        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
             tocken: tocken,
             idDash: this.idDash,
@@ -233,15 +249,14 @@ export default {
         element: this.id,
         partelement: 'empty',
       });
-      console.log(events);
-      if (events.length != 0) {
+      if (events.length !== 0) {
         events.forEach((item) => {
-          if (item.action == 'set') {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events: events,
               idDash: this.idDash,
             });
-          } else if (item.action == 'go') {
+          } else if (item.action === 'go') {
             this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,
