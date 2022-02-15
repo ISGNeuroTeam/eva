@@ -5,7 +5,8 @@
     v-model="active"
     width="500"
     :is-confirm="isChanged"
-    :persistent="isChanged"
+    :persistent
+  ="isChanged"
     :theme="theme"
     @cancelModal="cancelModal"
   >

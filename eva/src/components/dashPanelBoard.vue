@@ -1,14 +1,23 @@
 <template>
   <div class="app-header">
-    <div class="dash-main" :style="{ background: theme.$main_bg }">
+    <div
+      class="dash-main"
+      :style="{ background: theme.$main_bg }"
+    >
       <div class="main-title">
         <div class="logo-block">
           <EvaLogo />
         </div>
-        <div class="title-name" :style="{ color: theme.$title }">
+        <div
+          class="title-name"
+          :style="{ color: theme.$title }"
+        >
           {{ name }}
         </div>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="home"
@@ -21,7 +30,10 @@
           </template>
           <span>На главную</span>
         </v-tooltip>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="undo"
@@ -36,8 +48,14 @@
         </v-tooltip>
       </div>
       <div class="control-block">
-        <div class="edit-container" :class="{ hide_control: !editMode }">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+        <div
+          class="edit-container"
+          :class="{ hide_control: !editMode }"
+        >
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -51,7 +69,10 @@
             </template>
             <span>События</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -65,7 +86,10 @@
             </template>
             <span>Токены</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -79,7 +103,10 @@
             </template>
             <span>Источники данных</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -95,7 +122,10 @@
           </v-tooltip>
         </div>
         <div class="user-control-panel">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -142,7 +172,10 @@
             </template>
             <span>Сохранить</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -160,9 +193,16 @@
             <span>Открыть окно логов</span>
           </v-tooltip>
         </div>
-        <v-menu :nudge-width="100" :rounded="false" offset-y>
+        <v-menu
+          :nudge-width="100"
+          :rounded="false"
+          offset-y
+        >
           <template v-slot:activator="{ on: onMenu }">
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+            >
               <template v-slot:activator="{ on: onTooltip }">
                 <div
                   class="dropdown-profile"
@@ -187,11 +227,16 @@
           </template>
           <v-list class="profile-dropdown--list">
             <v-list-item>
-              <v-list-item-title class="profile-dropdown--title"
-                >Профиль</v-list-item-title
+              <v-list-item-title
+                class="profile-dropdown--title"
               >
+                Профиль
+              </v-list-item-title>
             </v-list-item>
-            <div v-for="item in profileDropdownButtons" :key="item.id">
+            <div
+              v-for="item in profileDropdownButtons"
+              :key="item.id"
+            >
               <v-list-item v-if="!item.hide">
                 <v-btn
                   class="profile-dropdown--button"
@@ -199,7 +244,10 @@
                   v-on="on"
                   @click="item.onClick"
                 >
-                  <v-icon class="edit icon-aut" :color="theme.$secondary_text">
+                  <v-icon
+                    class="edit icon-aut"
+                    :color="theme.$secondary_text"
+                  >
                     {{ item.icon }}
                   </v-icon>
                   {{ item.label }}
@@ -216,10 +264,16 @@
         :style="blockToolStyle"
       >
         <div class="iconsNavigations">
-          <v-icon :color="theme.$primary_button" @click="runAllSearches">
+          <v-icon
+            :color="theme.$primary_button"
+            @click="runAllSearches"
+          >
             {{ mdiAnimationPlay }}
           </v-icon>
-          <v-icon :color="theme.$primary_button" @click="openModal">
+          <v-icon
+            :color="theme.$primary_button"
+            @click="openModal"
+          >
             {{ plus_icon }}
           </v-icon>
         </div>
@@ -388,7 +442,10 @@
               border: `2px solid ${theme.$accent_ui_color}`,
             }"
           >
-            <v-icon class="tool-img-itself" :style="{ color: '#FFF' }">
+            <v-icon
+              class="tool-img-itself"
+              :style="{ color: '#FFF' }"
+            >
               {{ `${tool.img}` }}
             </v-icon>
           </div>
@@ -405,6 +462,7 @@
         </div>
       </div>
       <div
+          ref="blockTocken"
         class="block-tocken"
         :class="{ opentocken: opentocken }"
         :style="blockToolStyle"
@@ -494,8 +552,7 @@
               label="обновлять по кнопке"
               class="tocken-on-button theme--dark"
               :color="theme.$accent_ui_color"
-            >
-            </v-checkbox>
+            />
           </div>
           <p
             class="tocken-view"
@@ -562,6 +619,7 @@
             @click="changeColor"
           />
           <v-select
+              v-model="newCapture"
             :items="capture({ action: newAction, elem: newElem })"
             :color="theme.$main_text"
             hide-details
@@ -652,7 +710,7 @@
         <v-textarea
           v-model="textarea_event"
           spellcheck="false"
-          :textAreaFull="textareaEv"
+          :text-area-full="textareaEv"
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           auto-grow
@@ -675,8 +733,13 @@
         :class="{ opensave: opensave }"
         :style="{ background: theme.$main_bg }"
       >
-        <div v-show="!errorSave" class="save-obertka">
-          <div class="question-save" :style="{ color: theme.$main_text }">
+        <div v-show="!errorSave"
+          class="save-obertka"
+        >
+          <div
+            class="question-save"
+            :style="{ color: theme.$main_text }"
+          >
             Сохранить дашборд
             <span class="save-name">
               {{ name }}
@@ -705,25 +768,30 @@
             </v-btn>
           </div>
         </div>
-        <div v-show="errorSave" class="save-obertka message-save">
-          <div class="question-save" :style="{ color: theme.$error_color }">
+        <div
+          v-show="errorSave"
+          class="save-obertka message-save"
+        >
+          <div
+            class="question-save"
+            :style="{ color: theme.$error_color }"
+          >
             {{ msgErrorSave }}
           </div>
         </div>
       </div>
       <div
         class="warning-block"
+        :class="{ openwarning: openwarning, errorSaveToken: errorSaveToken }"
         :style="{
           background: theme.$main_bg,
-          border: `1px solid ${theme.$main_border}`,
-          color: theme.$main_text,
           bottom: `-${otstupBottom}px`,
         }"
       >
         <div class="warning-text">
           {{ msgWarn }}
         </div>
-        <div class="btn-warning">
+        <div v-show="!errorSaveToken" class="btn-warning">
           <v-btn
             small
             :color="theme.$primary_button"
@@ -744,9 +812,9 @@
       </div>
       <modal-create-search
         v-model="activeModal"
-        :idDashFrom="idDash"
-        :createBtnFrom="createSearchBtn"
-        :dataSearchFrom="newSearch"
+        :id-dash-from="idDash"
+        :create-btn-from="createSearchBtn"
+        :data-search-from="newSearch"
         @cancelModal="cancelModal"
       />
       <modal-themes
@@ -755,9 +823,9 @@
       />
       <modal-schedule
         v-model="activeSchedule"
-        :idDashFrom="idDash"
-        :colorFrom="theme"
-        :dataSidFrom="scheduleSid"
+        :id-dash-from="idDash"
+        :color-from="theme"
+        :data-sid-from="scheduleSid"
       />
       <modal-log
         v-model="modalActive"
@@ -765,7 +833,7 @@
       <dash-settings
         :gear-from="gearShow"
         :permissions-from="userPermissions"
-        :idDashFrom="idDashFrom"
+        :id-dash-from="idDashFrom"
         @changeMode="setEditMode"
       />
       <modal-paper
@@ -775,14 +843,16 @@
       />
     </div>
 
-    <div class="block-filter" :class="{ openfilter }">
+    <div
+      class="block-filter"
+      :class="{ openfilter }"
+    >
       <dash-filter-panel
         :permissions-from="userPermissions"
-        :idDashFrom="idDashFrom"
-        :editPermission="editPermission || isEditDash"
-        :editMode="editMode"
-      >
-      </dash-filter-panel>
+        :id-dash-from="idDashFrom"
+        :edit-permission="editPermission || isEditDash"
+        :edit-mode="editMode"
+      />
     </div>
   </div>
 </template>
@@ -822,6 +892,7 @@ import EvaLogo from '../images/eva-logo.svg';
 
 import settings from '../js/componentsSettings.js';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
+import {globalTockens} from "@/constants/globalTockens";
 
 export default {
   components: {
@@ -877,6 +948,7 @@ export default {
       opensearch: false,
       openfilter: false,
       opensave: false,
+      openwarning: false,
       openexim: false,
       sign: true,
       gearShow: false,
@@ -924,6 +996,7 @@ export default {
       },
       newElem: '',
       newAction: '',
+      newCapture: '',
       tockensName: {},
       msgWarn: '',
       textarea_event: '',
@@ -957,6 +1030,7 @@ export default {
       msgErrorSave: '',
       colorErrorSave: '',
       createSearchBtn: '',
+      errorSaveToken: false,
       disabledDS: {},
       modalPaperSid: '',
       modalPaper: false,
@@ -1001,7 +1075,7 @@ export default {
     textareaEv() {
       let eventFull = this.$store.getters.getEventFull(this.idDash);
       if (eventFull !== '') {
-        this.setTextarea_event(eventFull);
+        this.setTextAreaEvent(eventFull)
       }
       return true;
     },
@@ -1127,6 +1201,9 @@ export default {
     setEditMode: function () {
       this.editMode = !this.editMode;
       this.$emit('changeMode');
+    },
+    setTextAreaEvent (eventFull) {
+      this.textarea_event = eventFull;
     },
     cancelModal: function () {
       this.activeModal = false;
@@ -1317,63 +1394,72 @@ export default {
     saveTocken: function (index) {
       // функция которая сохраняет токен в хранилище
 
-      let parent = event.target.parentElement; // получаем предка элемнета на который нажали для сохранения
-      while (!parent.classList.contains('row-tocken')) {
-        parent = parent.parentElement; // то еще на уровень выше берем предка
-      }
-      this.tempTocken = {
-        // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
-        name: parent.querySelector('.tocken-name').querySelector('input')
-          ? parent.querySelector('.tocken-name').querySelector('input').value
-          : '',
-        elem: parent
-          .querySelector('.tocken-elem')
-          .querySelector('.v-select__selection')
-          ? parent
-              .querySelector('.tocken-elem')
-              .querySelector('.v-select__selection').innerText
-          : '',
-        action: parent
-          .querySelector('.tocken-action')
-          .querySelector('.v-select__selection')
-          ? parent
-              .querySelector('.tocken-action')
-              .querySelector('.v-select__selection').innerText
-          : '',
-        capture: parent
-          .querySelector('.tocken-capture')
-          .querySelector('.v-select__selection')
-          ? parent
-              .querySelector('.tocken-capture')
-              .querySelector('.v-select__selection').innerText
-          : '',
-        prefix: parent.querySelector('.tocken-prefix').querySelector('input')
-          ? parent.querySelector('.tocken-prefix').querySelector('input').value
-          : '',
-        sufix: parent.querySelector('.tocken-sufix').querySelector('input')
-          ? parent.querySelector('.tocken-sufix').querySelector('input').value
-          : '',
-        delimetr: parent
-          .querySelector('.tocken-delimetr')
-          .querySelector('input')
-          ? parent.querySelector('.tocken-delimetr').querySelector('input')
-              .value
-          : '',
-        defaultValue: parent
-          .querySelector('.tocken-default-value')
-          .querySelector('input')
-          ? parent.querySelector('.tocken-default-value').querySelector('input')
-              .value
-          : '',
-        resetData: true, //сделать норм
-        onButton: parent
-          .querySelector('.tocken-on-button')
-          .querySelector('input')
-          ? parent.querySelector('.tocken-on-button').querySelector('input')
-              .checked
-          : '',
-      };
+      // проверяем не пустой ли токен
+      if ((!this.newTockenName
+              && !Number.isInteger(index))
+          || (Number.isInteger(index)
+              && !this.tockensName[this.tockens[index].name].length)) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        let height = this.$refs.blockTocken.clientHeight;
 
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Имя токена пустое. Попробуйте еще раз.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
+      }
+
+      // проверяем на запретние названия
+      if ((!Number.isInteger(index)
+              && globalTockens.includes(this.newTockenName.trim()))
+          || (Number.isInteger(index)
+              && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        let height = this.$refs.blockTocken.clientHeight;
+
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Невозможно использовать это имя для токена. Попробуйте еще раз.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
+      }
+
+      // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
+      if (Number.isInteger(index)){
+        // редактирование
+        this.tempTocken = {
+          name: this.tockensName[this.tockens[index].name],
+          elem: this.tockens[index].elem,
+          action:this.tockens[index].action,
+          capture: this.tockens[index].capture,
+          prefix: this.tockens[index].prefix,
+          sufix: this.tockens[index].sufix,
+          delimetr: this.tockens[index].delimetr,
+          defaultValue: this.tockens[index].defaultValue,
+          resetData: true, //сделать норм
+          onButton: this.tockens[index].onButton,
+        };
+      } else {
+        // создание нового
+        this.tempTocken = {
+          name: this.newTockenName,
+          elem: this.newElem,
+          action: this.newAction,
+          capture: this.newCapture,
+          prefix: this.newTockenDop.prefix,
+          sufix: this.newTockenDop.sufix,
+          delimetr: this.newTockenDop.delimetr,
+          defaultValue: this.newTockenDop.defaultValue,
+          resetData: true, //сделать норм
+          onButton: this.newTockenDop.onButton,
+        };
+      }
       let j = -1;
 
       this.tockens.forEach((item, i) => {
@@ -1385,20 +1471,15 @@ export default {
       });
       if (j !== -1 || Number.isInteger(index)) {
         // если токен уже есть
-        let height = this.$el
-          .querySelector('.block-tocken')
-          .getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
-        this.$el
-          .querySelector('.warning-block')
-          .classList.add('warning-block-show');
-        //this.$el.querySelector('.warning-block').style.bottom = `-${height+55}px; !important`; // 45 это высота самого warning и padding сверху
+        this.openwarning = true; // выводим предупреждающее сообщение, переписать ли его
+        this.errorSaveToken = false;
+
+        let height = this.$refs.blockTocken.clientHeight;
+
         this.otstupBottom = height + 55;
         this.msgWarn = 'Такой токен уже существует. Хотите обновить?';
-        this.$el
-          .querySelector('.warning-block')
-          .querySelector('.yes-btn')
-          .setAttribute('tool', 'tocken');
-        this.index = index;
+
+        this.index = j !== -1 ? j : index;
       } else {
         // если нету то етсь он новый
         this.$store.commit('createTockens', {
@@ -1407,6 +1488,14 @@ export default {
         }); // то создаем токен в хранилище
         this.showSign = true; // визуально скрываем окно с созданием токена
         this.opennewtocken = false;
+
+        this.newTockenName = null;
+        this.newElem = '';
+        this.newAction = '';
+        this.newCapture = '';
+        this.newTockenDop = {
+          defaultValue: '*',
+        }
       }
     },
     deleteTocken: function (name) {
@@ -1446,27 +1535,12 @@ export default {
       });
     },
     yesSearch: function () {
-      // кнопка согласия на обновления если ИС или токен уже существует
-      let elem =
-        event.target.nodeName.toLowerCase() !== 'button'
-          ? event.target.parentElement
-          : event.target; // сперва берем родителя кнопки, и если не получилось поймать кнопку, то еще выше уровнеь берем
-      if (elem.getAttribute('tool') === 'search') {
-        // если это окно ИС
-        this.$store.commit('setSearch', {
-          search: this.newSearch,
-          idDash: this.idDash,
-          reload: true,
-        }); // то обновляем ИС
-        this.$el
-          .querySelector('.warning-block')
-          .classList.remove('warning-block-show'); // убираем окно с предпреждением
-        this.openSearch();
-      } else if (elem.getAttribute('tool') === 'tocken') {
-        // если это токен - собственно тоже самое
+      // кнопка согласия на обновления если токен уже существует
+
         const id = this.index;
         const newName = this.tempTocken.name;
         this.tempTocken.name = this.tockens[id].name;
+
         this.$store.commit('createTockens', {
           idDash: this.idDash,
           tocken: this.tempTocken,
@@ -1476,18 +1550,22 @@ export default {
           tocken: this.tempTocken,
           value: newName,
         });
-        this.$el
-          .querySelector('.warning-block')
-          .classList.remove('warning-block-show');
+
+        this.openwarning = false;
         this.showSign = true;
         this.opennewtocken = false;
+
+      this.newTockenName = null;
+      this.newElem = '';
+      this.newAction = '';
+      this.newCapture = '';
+      this.newTockenDop = {
+        defaultValue: '*',
       }
     },
     noSearch: function () {
       // если нажали на кнопку нет
-      this.$el
-        .querySelector('.warning-block')
-        .classList.remove('warning-block-show'); // то просто убираем это окно
+      this.openwarning = false;
     },
     checkSid: function (sid) {
       let newSid = sid;
@@ -1610,7 +1688,7 @@ export default {
         avatar.style.top = event.pageY - shiftY + 'px';
         this.avatar = avatar; // и храним объект нашего  аватара
       };
-      document.onclick = (event) => {
+      document.onclick = () => {
         // при клике на элемент
         avatar.remove(); // удаляем аватар из дерева dom
       };
@@ -1619,8 +1697,6 @@ export default {
       // функция создания нового элемнета
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
-        const top = Number(this.avatar.style.top.replace('px', ''));
-
         const clientCoord = this.avatar.getBoundingClientRect(); // берем координаты аватара
         let coord = {
           top: clientCoord.top + window.pageYOffset,
@@ -1835,7 +1911,7 @@ export default {
                 doing.splice(0, 1);
                 doing = doing.join(',');
                 if (doing.indexOf('[') !== -1 && doing.indexOf(']') !== -1) {
-                  doing = doing.match(/[^\[]+(?=\])/g);
+                  doing = doing.match(/[^]+(?=\])/g);
                 } else {
                   doing = doing.split(',');
                 }
@@ -1860,7 +1936,7 @@ export default {
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
-                  doing = doing.match(/[^\[]+(?=\])/g);
+                  doing = doing.match(/[^]+(?=\])/g);
                   prop = doing[0].split(',');
                   value = doing[1].split(',');
                 } else {

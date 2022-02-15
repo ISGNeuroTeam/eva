@@ -9,7 +9,10 @@
   >
     <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
       <div class="schedule-block">
-        <div class="zagolovok" :style="{ color: theme.$title }">
+        <div
+          class="zagolovok"
+          :style="{ color: theme.$title }"
+        >
           Расписание для запроса
           <b>
             {{ sid }}
@@ -21,7 +24,9 @@
             :background-color="theme.$main_bg"
           >
             <v-tabs-slider />
-            <v-tab :style="{ color: theme.$main_text }"> Периодичность </v-tab>
+            <v-tab :style="{ color: theme.$main_text }">
+              Периодичность
+            </v-tab>
             <v-tab-item
               :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
@@ -63,7 +68,10 @@
                   </v-chip>
                 </div>
               </div>
-              <p class="time-select" :style="{ color: theme.$main_text }">
+              <p
+                class="time-select"
+                :style="{ color: theme.$main_text }"
+              >
                 Получать данные за последние
               </p>
               <v-divider
@@ -107,7 +115,9 @@
                 </div>
               </div>
             </v-tab-item>
-            <v-tab :style="{ color: theme.$main_text }"> Планирование </v-tab>
+            <v-tab :style="{ color: theme.$main_text }">
+              Планирование
+            </v-tab>
             <v-tab-item />
           </v-tabs>
         </div>
@@ -217,33 +227,8 @@ export default {
     active() {
       // получаем статус открытия или нет окна модального
       if (this.modalFrom) {
-        if (this.schedulers.length !== 0) {
-          if (this.schedulers[this.sid]) {
-            // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
-            this.every = this.schedulers[this.sid].every;
-            this.time = this.schedulers[this.sid].time;
-            this.everyLast = this.schedulers[this.sid].everyLast;
-            this.timeLast = this.schedulers[this.sid].timeLast;
-            this.color[this.time] = '$primary_button';
-            this.colorLast[this.timeLast] = '$primary_button';
-            this.disabledStop = false;
-            this.disabledStart = true;
-            this.disabledEvery = true;
-            this.msg = 'Остановить';
-          } else {
-            this.every = 0;
-            this.time = '';
-            this.everyLast = 0;
-            this.timeLast = '';
-            Object.keys(this.color).forEach((item) => {
-              this.color[item] = '$accent_ui_color';
-              this.colorLast[item] = '$accent_ui_color';
-            });
-            this.disabledStop = true;
-            this.disabledStart = false;
-            this.disabledEvery = false;
-            this.msg = 'Не запущен';
-          }
+        if (this.schedulers.length != 0) {
+          this.setData()
         }
       }
     },
@@ -286,6 +271,34 @@ export default {
     }
   },
   methods: {
+    setData () {
+      if (this.schedulers[this.sid]) {
+        // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
+        this.every = this.schedulers[this.sid].every;
+        this.time = this.schedulers[this.sid].time;
+        this.everyLast = this.schedulers[this.sid].everyLast;
+        this.timeLast = this.schedulers[this.sid].timeLast;
+        this.color[this.time] = '$primary_button';
+        this.colorLast[this.timeLast] = '$primary_button';
+        this.disabledStop = false;
+        this.disabledStart = true;
+        this.disabledEvery = true;
+        this.msg = 'Остановить';
+      } else {
+        this.every = 0;
+        this.time = '';
+        this.everyLast = 0;
+        this.timeLast = '';
+        Object.keys(this.color).forEach((item) => {
+          this.color[item] = '$accent_ui_color';
+          this.colorLast[item] = '$accent_ui_color';
+        });
+        this.disabledStop = true;
+        this.disabledStart = false;
+        this.disabledEvery = false;
+        this.msg = 'Не запущен';
+      }
+    },
     cancel() {
       // закрываем окно
       this.active = false;

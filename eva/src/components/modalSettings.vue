@@ -18,7 +18,10 @@
             <p>{{ element }}</p>
           </div>
         </v-card-text>
-        <div ref="options" class="options-block">
+        <div
+          ref="options"
+          class="options-block"
+        >
           <div class="option-item">
             <v-switch
               v-model="openNewScreen"
@@ -58,18 +61,20 @@
             </div>
           </div>
           <template v-for="field in fieldsForRender">
-            <template v-for="prop in field.each || [null]">
+            <template
+              v-if="
+                checkOptions(field.optionGroup || field.option, field.relation)
+              "
+            >
               <div
-                v-if="
-                  checkOptions(
-                    field.optionGroup || field.option,
-                    field.relation
-                  )
-                "
+                v-for="prop in field.each || [null]"
                 :key="`${field.option}${prop}`"
                 class="option-item"
               >
-                <v-card-text v-if="field.group" class="headline">
+                <v-card-text
+                  v-if="field.group"
+                  class="headline"
+                >
                   <div
                     class="settings-title"
                     :style="{
@@ -100,15 +105,15 @@
                     borderColor: theme.$main_border,
                   }"
                 >
-                  {{ field.description }}
-                  <span
-                    :style="{
-                      color: theme.$accent_ui_color,
-                    }"
+                  {{ field.description }}&nbsp;<span
+                    :style="{ color: theme.$accent_ui_color }"
                     v-text="prop"
                   />
                 </div>
-                <div v-if="!field.group" class="status-option item">
+                <div
+                  v-if="!field.group"
+                  class="status-option item"
+                >
                   <!-- elem: switch -->
                   <v-switch
                     v-if="field.elem === 'switch'"
@@ -177,8 +182,7 @@
                           field.onChange ? field.onChange(val) : null;
                         }
                       "
-                    >
-                    </v-checkbox>
+                    />
                   </div>
                   <!-- elem: radio-group -->
                   <v-radio-group
@@ -188,6 +192,7 @@
                   >
                     <v-radio
                       v-for="{ label, value } in field.items"
+                      :key="value"
                       :color="theme.$primary_button"
                       :style="{ color: theme.$main_text }"
                       :label="label || value"
@@ -202,6 +207,7 @@
                   >
                     <v-radio
                       v-for="{ label, value } in field.items"
+                      :key="value"
                       :color="theme.$primary_button"
                       :style="{ color: theme.$main_text }"
                       :label="label || value"
@@ -215,46 +221,47 @@
             </template>
           </template>
 
-          <div
-            v-for="metric in metricsName"
-            v-if="!options.united"
-            :key="metric.name"
-            class="option-item"
-          >
+          <template v-if="!options.united">
             <div
-              class="name-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
+              v-for="metric in metricsName"
+              :key="metric.name"
+              class="option-item"
             >
-              {{ metric.name }} units
-            </div>
-            <div
-              class="discribe-option item"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Единицы измерения для линии {{ metric.name }}
-            </div>
-            <div class="status-option item">
-              <v-text-field
-                v-model="metricUnits[metric.name]"
-                clearable
-                :color="theme.$primary_button"
+              <div
+                class="name-option item"
                 :style="{
                   color: theme.$main_text,
-                  background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                outlined
-                class="subnumber"
-                hide-details
-              />
+              >
+                {{ metric.name }} units
+              </div>
+              <div
+                class="discribe-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                Единицы измерения для линии {{ metric.name }}
+              </div>
+              <div class="status-option item">
+                <v-text-field
+                  v-model="metricUnits[metric.name]"
+                  clearable
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    background: 'transparent',
+                    borderColor: theme.$main_border,
+                  }"
+                  outlined
+                  class="subnumber"
+                  hide-details
+                />
+              </div>
             </div>
-          </div>
+          </template>
 
           <v-card-text
             v-if="!options.united && checkOptions('united')"
@@ -342,7 +349,7 @@
                 class="item-metric border"
                 hide-details
               />
-              <br />
+              <br>
               <div class="item-metric">
                 <div
                   class="discribe-option item"
@@ -354,13 +361,15 @@
                   Цвет
                 </div>
                 <div class="status-option item">
-                  <input
-                    :value="color[metrics[i - 1].name]"
-                    style="width: 100px; cursor: pointer"
-                    type="color"
-                    name="multiline-color"
-                    @change="(e) => handleChangeColor(e, i - 1)"
-                  />
+                  <label>
+                    <input
+                      :value="color[metrics[i - 1].name]"
+                      style="width: 100px; cursor: pointer"
+                      type="color"
+                      name="multiline-color"
+                      @change="(e) => handleChangeColor(e, i - 1)"
+                    >
+                  </label>
                 </div>
               </div>
               <div>
@@ -463,7 +472,10 @@
             </div>
           </div>
 
-          <div v-if="checkOptions('positionlegend')" class="option-item">
+          <div
+            v-if="checkOptions('positionlegend')"
+            class="option-item"
+          >
             <div
               class="name-option item"
               :style="{
@@ -497,7 +509,10 @@
             </div>
           </div>
 
-          <div v-if="checkOptions('primitivesLibrary')" class="option-item">
+          <div
+            v-if="checkOptions('primitivesLibrary')"
+            class="option-item"
+          >
             <v-container fluid>
               <v-card-text class="headline">
                 <div
@@ -533,7 +548,7 @@
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
-              ></v-textarea>
+              />
               <v-btn
                 v-if="primitivesLibraryAutoGrow"
                 plain
@@ -547,7 +562,10 @@
               </v-btn>
             </v-container>
           </div>
-          <v-card-text v-if="checkOptions('piechartSettings')" class="headline">
+          <v-card-text
+            v-if="checkOptions('piechartSettings')"
+            class="headline"
+          >
             <div
               class="settings-title"
               :style="{
@@ -575,7 +593,7 @@
             </div>
             <div class="options-item-tooltip">
               <v-select
-                v-for="(label, i) in metricsRelation.namesMetric"
+                v-for="(_, i) in metricsRelation.namesMetric"
                 :key="i + 'metric'"
                 v-model="metricsRelation.relations[i]"
                 :items="metricsRelation.metrics"
@@ -652,17 +670,21 @@
               <v-btn
                 v-if="
                   !defaultThemes.includes(colorsPie.theme) &&
-                  colorsPie.theme !== 'custom'
+                    colorsPie.theme !== 'custom'
                 "
                 :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
-                >Удалить</v-btn
               >
+                Удалить
+              </v-btn>
             </div>
           </div>
         </div>
-        <v-card-text v-if="tooltipSettingShow" class="headline">
+        <v-card-text
+          v-if="tooltipSettingShow"
+          class="headline"
+        >
           <div
             class="settings-title"
             :style="{
@@ -673,7 +695,11 @@
             Настройки tooltip
           </div>
         </v-card-text>
-        <div v-if="tooltipSettingShow" ref="options" class="options-block">
+        <div
+          v-if="tooltipSettingShow"
+          ref="options"
+          class="options-block"
+        >
           <div
             class="divider-tooltip-setting"
             :style="{ color: theme.$main_text }"
@@ -932,6 +958,8 @@ export default {
       fieldsForRender: [],
       optionsByComponents: [],
       isChanged: false,
+      isDelete: false,
+      them: {},
     };
   },
   computed: {
@@ -1154,11 +1182,21 @@ export default {
         element: this.element,
         options,
       });
+      if (this.isDelete) {
+        this.deleteTheme();
+      }
       this.cancelModal();
     },
+    // если нажали на отмену создания
     cancelModal: function () {
-      // если нажали на отмену создания
       this.$store.dispatch('closeModalSettings', { path: this.idDash });
+      if (this.isDelete) {
+        this.themes = { ...this.themes, ...this.them };
+        this.them = {};
+        this.options.themes = this.themes;
+        this.isDelete = false;
+        this.setOptions();
+      }
     },
     checkEsc: function (event) {
       if (event.code === 'Escape') {
@@ -1352,6 +1390,12 @@ export default {
       this.$set(this.options, 'colorsPie', this.colorsPie);
       this.$set(this.options, 'themes', this.themes);
       delete this.themes[theme];
+    },
+    deleteTheme() {
+      this.options.colorsPie = this.colorsPie;
+      this.options.themes = this.themes;
+      this.isDelete = false;
+      this.them = {};
     },
   },
 };

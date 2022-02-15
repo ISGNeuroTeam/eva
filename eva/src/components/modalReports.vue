@@ -33,7 +33,10 @@
               button-color="theme.$controls"
               class="dtpicker-report"
             >
-              <v-icon class="picker-report" :color="theme.$primary_button">
+              <v-icon
+                class="picker-report"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -61,7 +64,10 @@
               button-color="theme.$controls"
               class="dtpicker-report"
             >
-              <v-icon class="picker-report" :color="theme.$primary_button">
+              <v-icon
+                class="picker-report"
+                :color="theme.$primary_button"
+              >
                 {{ pickerIcon }}
               </v-icon>
             </DTPicker>
@@ -210,7 +216,7 @@ export default {
     active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.search = this.searchFrom;
+        this.setSearchData(this.searchFrom)
       }
     },
     tws(tws) {
@@ -247,6 +253,9 @@ export default {
       }
 
       this.$emit('setSearch', this.search);
+    },
+    setSearchData(searchFrom) {
+      this.search = searchFrom;
     },
   },
 };

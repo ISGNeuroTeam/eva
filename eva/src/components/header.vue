@@ -1,23 +1,39 @@
 <template>
-  <div class="dash-main" :style="{ background: theme.$main_bg, height }">
+  <div
+    class="dash-main"
+    :style="{ background: theme.$main_bg, height }"
+  >
     <div class="main-title">
       <div class="logo-block">
         <EvaLogo />
       </div>
-      <div class="title-name" :style="{ color: theme.$title }">
+      <div
+        class="title-name"
+        :style="{ color: theme.$title }"
+      >
         {{ titlePage }}
       </div>
-      <v-tooltip bottom :color="theme.$accent_ui_color">
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
+      >
         <template v-slot:activator="{ on }">
           <router-link to="main">
-            <v-icon class="home" :color="theme.$secondary_text" v-on="on">
+            <v-icon
+              class="home"
+              :color="theme.$secondary_text"
+              v-on="on"
+            >
               {{ home }}
             </v-icon>
           </router-link>
         </template>
         <span>На главную</span>
       </v-tooltip>
-      <v-tooltip bottom :color="theme.$accent_ui_color">
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
+      >
         <template v-slot:activator="{ on }">
           <v-icon
             class="undo"
@@ -32,8 +48,14 @@
       </v-tooltip>
     </div>
     <div class="control-block">
-      <div v-if="inside" class="user-control-panel">
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+      <div
+        v-if="inside"
+        class="user-control-panel"
+      >
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="control-button theme--dark"
@@ -52,11 +74,21 @@
         </v-tooltip>
       </div>
 
-      <v-menu :nudge-width="100" :rounded="false" offset-y>
+      <v-menu
+        :nudge-width="100"
+        :rounded="false"
+        offset-y
+      >
         <template v-slot:activator="{ on: onMenu }">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on: onTooltip }">
-              <div class="dropdown-profile" v-on="{ ...onMenu, ...onTooltip }">
+              <div
+                class="dropdown-profile"
+                v-on="{ ...onMenu, ...onTooltip }"
+              >
                 <v-icon
                   :style="{ color: theme.$secondary_text }"
                   class="profile theme--dark"
@@ -76,18 +108,26 @@
         </template>
         <v-list class="profile-dropdown--list">
           <v-list-item>
-            <v-list-item-title class="profile-dropdown--title"
-              >Профиль</v-list-item-title
+            <v-list-item-title
+              class="profile-dropdown--title"
             >
+              Профиль
+            </v-list-item-title>
           </v-list-item>
-          <div v-for="item in profileDropdownButtons" :key="item.id">
+          <div
+            v-for="item in profileDropdownButtons"
+            :key="item.id"
+          >
             <v-list-item v-if="!item.hide">
               <v-btn
                 class="profile-dropdown--button"
                 icon
                 @click="item.onClick"
               >
-                <v-icon class="edit icon-aut" :color="theme.$secondary_text">
+                <v-icon
+                  class="edit icon-aut"
+                  :color="theme.$secondary_text"
+                >
                   {{ item.icon }}
                 </v-icon>
                 {{ item.label }}
@@ -98,7 +138,9 @@
       </v-menu>
     </div>
 
-    <modal-log v-model="modalActive" />
+    <modal-log
+      v-model="modalActive"
+    />
     <modal-themes
       v-model="paleteShow"
       :admin="isAdmin"

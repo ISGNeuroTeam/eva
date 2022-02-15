@@ -10,7 +10,10 @@
     <div class="delete-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$title }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$title }"
+          >
             Вы точно хотите удалить
             <p>
               {{ nameFrom }}

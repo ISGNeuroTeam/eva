@@ -13,7 +13,10 @@
     <div v-if="groupCheck" class="create-modal-block-group">
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$title }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$title }"
+          >
             {{ nameTitle }}
           </div>
         </v-card-text>
@@ -97,7 +100,10 @@
                     />
                   </svg>
                 </template>
-                <v-color-picker v-model="pickedColor" dot-size="17" />
+                <v-color-picker
+                  v-model="pickedColor"
+                  dot-size="17"
+                />
               </v-menu>
               Свой цвет
             </div>
@@ -107,11 +113,11 @@
               v-for="item in Object.keys(group.tab)"
               :key="item"
               essence="group"
-              :dataFrom="dataRest"
+              :data-from="dataRest"
               :subessence="item"
-              :colorFrom="theme"
+              :color-from="theme"
               :create="actionFrom"
-              :activeFrom="modalValue"
+              :active-from="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -151,7 +157,10 @@
     >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
-          <div class="create-title" :style="{ color: theme.$main_text }">
+          <div
+            class="create-title"
+            :style="{ color: theme.$main_text }"
+          >
             {{ nameTitle }}
           </div>
         </v-card-text>
@@ -171,11 +180,11 @@
             <data-profile
               essence="dash"
               subessence="groups"
-              :nameGroupFrom="nameGroupFrom"
-              :dataFrom="dataRest"
+              :name-group-from="nameGroupFrom"
+              :data-from="dataRest"
               :create="actionFrom"
-              :colorFrom="theme"
-              :activeFrom="modalValue"
+              :color-from="theme"
+              :active-from="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -370,7 +379,7 @@ export default {
           this.newGroup.color = this.colors[0];
           this.colorInputMode = 'preset';
         }
-        if (this.dashFrom) {
+        if (this.dashFrom && this.actionFrom !== 'create') {
           this.newDash.name = this.dashFrom.name;
           this.newDash.id = this.dashFrom.id;
         } else {

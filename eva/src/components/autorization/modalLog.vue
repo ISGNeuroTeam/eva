@@ -12,7 +12,10 @@
       <v-card-text class="card-log" :style="{ color: theme.$main_text }">
         <div class="log-body" v-html="text" />
       </v-card-text>
-      <v-card-actions class="btn-log" :style="{ background: theme.$main_bg }">
+      <v-card-actions
+        class="btn-log"
+        :style="{ background: theme.$main_bg }"
+      >
         <v-btn
           small
           :color="theme.$primary_button"
@@ -51,8 +54,6 @@
 </template>
 
 <script>
-import {} from '@mdi/js';
-
 export default {
   name: 'ModalLog',
   model: {

@@ -4,28 +4,26 @@ export default {
   saveTemplateForm: async (template) => {
     let formData = new FormData();
     formData.append('json', JSON.stringify(template));
-
-    let response = await fetch(`http://${host}/formbuilder/setFormTemplate`, {
-      // сперва нужно подать post запрос
-      method: 'POST',
-      body: formData,
-      // mode: 'no-cors'
-    }).catch((error) => {
-      console.log(error);
-    });
+    // let response = await fetch(`http://${host}/formbuilder/setFormTemplate`, {
+    //   // сперва нужно подать post запрос
+    //   method: 'POST',
+    //   body: formData,
+    //   // mode: 'no-cors'
+    // }).catch((error) => {
+    //   console.log(error);
+    // });
   },
   saveForm: async (form) => {
     let formData = new FormData();
     formData.append('json', JSON.stringify(form));
-
-    let response = await fetch(`http://${host}/formbuilder/setFormData`, {
-      // сперва нужно подать post запрос
-      method: 'POST',
-      body: formData,
-      // mode: 'no-cors'
-    }).catch((error) => {
-      console.log(error);
-    });
+    // let response = await fetch(`http://${host}/formbuilder/setFormData`, {
+    //   // сперва нужно подать post запрос
+    //   method: 'POST',
+    //   body: formData,
+    //   // mode: 'no-cors'
+    // }).catch((error) => {
+    //   console.log(error);
+    // });
   },
   getTemplateList: async () => {
     let response = await fetch(

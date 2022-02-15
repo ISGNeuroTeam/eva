@@ -1,5 +1,8 @@
 <template>
-  <v-app class="papers-app-main" :style="{ background: color.back }">
+  <v-app
+    class="papers-app-main"
+    :style="{ background: color.back }"
+  >
     <header-top @setUsername="setUsername($event)" />
     <v-content>
       <v-container class="main-container container-paper">
@@ -9,7 +12,10 @@
             :data-ready="dataReady"
             :style="{ background: color.backElement, color: color.text }"
           >
-            <div v-show="fileBlock == 1" class="buttons-file-block">
+            <div
+              v-show="fileBlock == 1"
+              class="buttons-file-block"
+            >
               <v-btn
                 small
                 :color="color.controls"
@@ -32,7 +38,10 @@
                 Выбрать отчет
               </v-btn>
             </div>
-            <div v-show="fileBlock == 2" class="load-file-block">
+            <div
+              v-show="fileBlock == 2"
+              class="load-file-block"
+            >
               <v-icon
                 :color="color.controls"
                 class="arrow-back"
@@ -67,7 +76,10 @@
                 Отправить отчет
               </v-btn>
             </div>
-            <div v-show="fileBlock == 3" class="get-file-block">
+            <div
+              v-show="fileBlock == 3"
+              class="get-file-block"
+            >
               <v-icon
                 :color="color.controls"
                 class="arrow-back"
@@ -112,7 +124,10 @@
               class="search-card-block"
               :style="{ background: color.backElement, color: color.text }"
             >
-              <div class="loading-divider" :class="{ loading: loading }">
+              <div
+                class="loading-divider"
+                :class="{ loading: loading }"
+              >
                 <div
                   class="loading-bar"
                   :style="{ background: color.controls }"
@@ -135,7 +150,10 @@
                 placeholder="Введите запрос"
                 @keyup.ctrl.\="addLineBreaks"
               />
-              <v-tooltip bottom :color="color.controlsActive">
+              <v-tooltip
+                bottom
+                :color="color.controlsActive"
+              >
                 <template v-slot:activator="{ on }">
                   <v-btn
                     :color="color.controls"
@@ -154,7 +172,10 @@
                 </template>
                 <span>Запустить</span>
               </v-tooltip>
-              <v-tooltip bottom :color="color.controlsActive">
+              <v-tooltip
+                bottom
+                :color="color.controlsActive"
+              >
                 <template v-slot:activator="{ on }">
                   <v-btn
                     :color="color.controls"
@@ -179,7 +200,11 @@
             class="stepper-paper"
             :style="{ background: color.backElement, color: color.text }"
           >
-            <v-stepper ref="steppers" v-model="move" alt-labels>
+            <v-stepper
+              ref="steppers"
+              v-model="move"
+              alt-labels
+            >
               <v-stepper-header>
                 <v-stepper-step
                   step="1"
@@ -265,7 +290,10 @@
             </v-stepper>
           </v-card>
           <div class="paper-download">
-            <v-tooltip bottom :color="color.controlsActive">
+            <v-tooltip
+              bottom
+              :color="color.controlsActive"
+            >
               <template v-slot:activator="{ on }">
                 <v-icon
                   class="download-btn"
@@ -300,7 +328,10 @@
                 {{ name }}
               </v-tab>
             </v-tabs>
-            <div ref="vis" class="vis-content" />
+            <div
+              ref="vis"
+              class="vis-content"
+            />
           </v-card>
         </div>
       </v-container>
@@ -308,8 +339,8 @@
     <footer-bottom />
     <modal-report
       v-model="modal"
-      :colorFrom="color"
-      :searchFrom="search"
+      :color-from="color"
+      :search-from="search"
       @setSearch="setSearch($event)"
     />
   </v-app>
@@ -345,7 +376,6 @@ export default {
       },
       aboutElem: {},
       rowsCount: 9,
-      color: {},
       fileBlock: 1,
       arrowBack: mdiArrowLeftBold,
       uploadFile: '',
@@ -682,7 +712,7 @@ export default {
       this.steps['2'].text = 'Запрос завершился ошибкой ';
       this.steps['2'].error.push(() => 'false');
     },
-    addLineBreaks: function (event) {
+    addLineBreaks: function () {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
         '\n' + '|'

@@ -5,24 +5,64 @@
   >
     <div class="select-wrap p-5">
       <div>
-        <v-btn class="scale-btn" text small @click="plusScale()">
-          <v-icon :color="theme.$main_text" small>{{ mdiPlus }}</v-icon>
+        <v-btn
+          class="scale-btn"
+          text
+          small
+          @click="plusScale()"
+        >
+          <v-icon
+            :color="theme.$main_text"
+            small
+          >
+            {{ mdiPlus }}
+          </v-icon>
           <span class="scale-btn-text">Увеличить</span>
         </v-btn>
-        <v-btn class="scale-btn" text small @click="minusScale()">
-          <v-icon :color="theme.$main_text" small>{{ mdiMinus }}</v-icon>
+        <v-btn
+          class="scale-btn"
+          text
+          small
+          @click="minusScale()"
+        >
+          <v-icon
+            :color="theme.$main_text"
+            small
+          >
+            {{ mdiMinus }}
+          </v-icon>
           <span class="scale-btn-text">Уменьшить</span>
         </v-btn>
-        <v-btn class="scale-btn" text small @click="refreshScale()">
-          <v-icon :color="theme.$main_text" small>{{ mdiRefresh }}</v-icon>
+        <v-btn
+          class="scale-btn"
+          text
+          small
+          @click="refreshScale()"
+        >
+          <v-icon
+            :color="theme.$main_text"
+            small
+          >
+            {{ mdiRefresh }}
+          </v-icon>
           <span class="scale-btn-text">Исходный вид</span>
         </v-btn>
       </div>
-      <v-menu v-model="menuDropdown" offset-y max-width="180" class="select">
+      <v-menu
+        v-model="menuDropdown"
+        offset-y
+        max-width="180"
+        class="select"
+      >
         <template v-slot:activator="{ on, attrs }">
-          <div v-bind="attrs" v-on="on">
+          <div
+            v-bind="attrs"
+            v-on="on"
+          >
             <span style="font-size: 15px">{{ select.text }}</span>
-            <v-icon :color="theme.$main_text">{{ mdiChevronDown }}</v-icon>
+            <v-icon :color="theme.$main_text">
+              {{ mdiChevronDown }}
+            </v-icon>
           </div>
         </template>
         <v-list>
@@ -32,12 +72,17 @@
             link
             @click="setTimePeriod(item)"
           >
-            <v-list-item-title v-text="item.text"></v-list-item-title>
+            <v-list-item-title v-text="item.text" />
           </v-list-item>
         </v-list>
       </v-menu>
     </div>
-    <svg ref="chart" class="chart1" height="50" style="width: 100%"></svg>
+    <svg
+      ref="chart"
+      class="chart1"
+      height="50"
+      style="width: 100%"
+    />
     {{ dataset }}
   </div>
 </template>
@@ -54,7 +99,7 @@ import {
 
 export default {
   props: {
-    data: [],
+    data: Array,
   },
   data() {
     return {
@@ -282,17 +327,12 @@ export default {
         .scaleBand()
         .domain(d3.range(dataForSvg.length))
         .rangeRound([0, width - marge.left - marge.right]);
-      let xAxis = d3.axisBottom(xScale);
 
       let yScale = d3
         .scaleLinear()
         .domain([0, maxY])
         .range([height - marge.top - marge.bottom, 0]);
-      let yAxis = d3.axisLeft(yScale);
-
-      // g.append('g')
-      //     .attr('transform', 'translate(' + 0 + ',' + (height - marge.top - marge.bottom) + ')')
-      //     .call(xAxis)
+      
       for (let i = 0; i < 6; i++) {
         g.append('g')
           .append('line')

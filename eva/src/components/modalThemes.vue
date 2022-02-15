@@ -1,5 +1,9 @@
 <template>
-  <v-dialog v-model="showModal" width="400" @keydown.esc="closeModal">
+  <v-dialog
+    v-model="showModal"
+    width="400"
+    @keydown.esc="closeModal"
+  >
     <div class="themes-modal-wrapper">
       <v-card
         :style="{ backgroundColor: theme.$secondary_bg, borderRadius: '12px' }"
@@ -10,7 +14,9 @@
           <v-icon :color="theme.$title">
             {{ mdiCompare }}
           </v-icon>
-          <v-card-title class="modal-title"> Настройки темы </v-card-title>
+          <v-card-title class="modal-title">
+            Настройки темы
+          </v-card-title>
           <svg
             v-if="mode === 'manual'"
             class="ml-auto"
@@ -40,14 +46,14 @@
           v-if="mode === 'select'"
           :style="{ color: theme.$main_text, fontSize: '15px' }"
         >
-          Выберете тему
+          Выберите тему
           <v-select
             v-model="select"
             :color="theme.$accent_ui_color"
             hide-details
             outlined
             :items="themeTitles"
-            item-text="name"
+            item-text="title"
             item-value="name"
           />
           <div
@@ -114,10 +120,16 @@
             hide-details
           />
           <div class="helper-title">
-            <p @click="mode = 'manual'">Руководство по настройке темы</p>
+            <p @click="mode = 'manual'">
+              Руководство по настройке темы
+            </p>
           </div>
           <v-row>
-            <v-col v-for="row in fields" :key="row.title" cols="6">
+            <v-col
+              v-for="row in fields"
+              :key="row.title"
+              cols="6"
+            >
               {{ row.title }}
               <v-row justify="space-between">
                 <v-col cols="2">
@@ -130,7 +142,11 @@
                   cols="9"
                   :style="{ paddingLeft: '3px', position: 'relative' }"
                 >
-                  <v-text-field v-model="row.value" outlined hide-details />
+                  <v-text-field
+                    v-model="row.value"
+                    outlined
+                    hide-details
+                  />
                   <v-menu :close-on-content-click="false">
                     <template v-slot:activator="{ on }">
                       <v-icon
@@ -146,7 +162,10 @@
                         {{ mdiPencil }}
                       </v-icon>
                     </template>
-                    <v-color-picker v-model="row.value" dot-size="17" />
+                    <v-color-picker
+                      v-model="row.value"
+                      dot-size="17"
+                    />
                   </v-menu>
                 </v-col>
               </v-row>
@@ -157,7 +176,11 @@
           </div>
           <div class="upload-wrapper">
             <div v-if="imagePreview">
-              <img :src="imagePreview" alt="" :style="{ opacity: opacity }" />
+              <img
+                :src="imagePreview"
+                alt=""
+                :style="{ opacity: opacity }"
+              >
               <v-icon @click="removeImage">
                 {{ mdiWindowClose }}
               </v-icon>
@@ -169,7 +192,7 @@
                 type="file"
                 accept="image/*"
                 @change="uploadImage"
-              />
+              >
               <div class="upload-text">
                 <svg
                   width="18"
@@ -202,7 +225,11 @@
                 />
               </v-col>
               <v-col cols="3">
-                <v-text-field v-model="opacity" outlined hide-details />
+                <v-text-field
+                  v-model="opacity"
+                  outlined
+                  hide-details
+                />
               </v-col>
             </v-row>
           </div>
@@ -501,8 +528,12 @@ export default {
       try {
         let response = await fetch('/api/themes');
         let themeTitles = await response.json();
-        this.themeTitles = [{ name: 'dark' }, { name: 'light' }].concat(
-          themeTitles
+        let newThemeTitles = themeTitles.map((them) => {
+          return (them = { title: them.name, ...them });
+        })
+        this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
+          { title: 'Светлая', name: 'light' }].concat(
+            newThemeTitles
         );
       } catch (e) {
         console.log(e);
