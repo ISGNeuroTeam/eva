@@ -66,8 +66,7 @@
                     label="Значение"
                     :items="compareForBoolean"
                     @change="
-                    setFilterData(title, '=', 'compare');
-                    setFilterData(title, $event);
+                  onChangeForBoolean(title, $event)
                   "
                 ></v-select>
               </v-col>
@@ -216,7 +215,6 @@ export default {
       return items;
     },
     filteredTableData() {
-      console.log('filteredTableData')
       let chooseSort = function (dataFormat, sortType, value) {
         if (dataFormat ==="none") {
           if (value === 'false' || value === 'true'){
@@ -377,6 +375,10 @@ export default {
     this.setEventColor();
   },
   methods: {
+    onChangeForBoolean(title, event){
+      this.setFilterData(title, '=', 'compare');
+      this.setFilterData(title, event);
+    },
     onItemsPageChange(page) {
       this.$emit('update:table-page', page)
     },
@@ -413,7 +415,7 @@ export default {
       } else {
         this.filters[title].value = event;
       }
-      console.log('this.filters', this.filters)
+
       this.filters = { ...this.filters };
     },
     checkForNumeric(val) {
