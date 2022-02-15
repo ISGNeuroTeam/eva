@@ -242,9 +242,9 @@ export default {
           fontSize: metricCurrent?.fontSize || 54,
           fontWeight: metricCurrent?.fontWeight || 400,
           listOrder:
-              metricCurrent?.listOrder === undefined
-                  ? index
-                  : metricCurrent?.listOrder,
+            metricCurrent?.listOrder === undefined
+              ? index
+              : metricCurrent?.listOrder,
           ...metricCurrent,
         };
         metricList.push({ value, ...defaultMetricOption });
@@ -254,7 +254,6 @@ export default {
           expanded: false,
           ...defaultMetricOption,
         });
-
       }
       if (
         this.dataRestFrom.length === 6 &&
