@@ -124,6 +124,7 @@ export default {
       return this.$store.getters.getElement(idDashFrom, idFrom);
     },
     needSetField() {
+      console.log('!this.dataField && !this.loading', !this.dataField && !this.loading)
       return !this.dataField && !this.loading;
     },
     theme: function () {
@@ -203,6 +204,7 @@ export default {
       }
     },
     dataRestFrom(dataRestFrom) {
+      console.log('this.dataField', this.dataField)
       if (!this.dataField && dataRestFrom.length) {
         const keys = Object.keys(dataRestFrom[0]).filter(
           (key) => key[0] !== '_'
@@ -213,6 +215,7 @@ export default {
       }
     },
     dataField(value) {
+      console.log('dataField value', value)
       this.$nextTick(() => {
         /*value !== '' && */ this.$store.commit('setSelected', {
           element: 'elem',
@@ -231,12 +234,22 @@ export default {
       id: this.idFrom,
     });
     this.$nextTick(() => {
+      this.circularSizeNew();
       this.loadSelectedValue();
     });
   },
   methods: {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
+    circularSizeNew(){
+      if (this.$attrs['is-full-screen']){
+        this.circularWidth = 40
+        this.circularSize = 500
+      } else {
+        this.circularWidth = 20
+        this.circularSize = 190
+      }
+    },
     addValue(val) {
       // +/- buttons
       this.sliderValue += val;
