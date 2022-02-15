@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed switching between filter types
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
+- fixed tile visualization not showing after datasource restart
 
 ## [1.82.0]
 
