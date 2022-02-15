@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Added
+- added the ability to zoom out by double-clicking on a multiline
+
 ### Fixed
 
 - fixed token with an empty name
