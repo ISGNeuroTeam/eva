@@ -232,30 +232,29 @@ export default {
         const metricCurrent = metricOptionsCurrent?.find(
           (m) => m.startId === startId
         );
-        if (metricCurrent) {
-          const defaultMetricOption = {
-            id: metricCurrent?.id || id,
-            startId: metricCurrent?.startId || startId,
-            metadata: metadata,
-            title: metric || data.phase,
-            color: metricCurrent?.color || 'main',
-            icon: metricCurrent?.icon || 'no_icon',
-            fontSize: metricCurrent?.fontSize || 54,
-            fontWeight: metricCurrent?.fontWeight || 400,
-            listOrder:
-                metricCurrent?.listOrder === undefined
-                    ? index
-                    : metricCurrent?.listOrder,
-            ...metricCurrent,
-          };
-          metricList.push({ value, ...defaultMetricOption });
-          metricOptions.push({
-            id,
-            range,
-            expanded: false,
-            ...defaultMetricOption,
-          });
-        }
+        const defaultMetricOption = {
+          id: metricCurrent?.id || id,
+          startId: metricCurrent?.startId || startId,
+          metadata: metadata,
+          title: metric || data.phase,
+          color: metricCurrent?.color || 'main',
+          icon: metricCurrent?.icon || 'no_icon',
+          fontSize: metricCurrent?.fontSize || 54,
+          fontWeight: metricCurrent?.fontWeight || 400,
+          listOrder:
+              metricCurrent?.listOrder === undefined
+                  ? index
+                  : metricCurrent?.listOrder,
+          ...metricCurrent,
+        };
+        metricList.push({ value, ...defaultMetricOption });
+        metricOptions.push({
+          id,
+          range,
+          expanded: false,
+          ...defaultMetricOption,
+        });
+
       }
       if (
         this.dataRestFrom.length === 6 &&
@@ -272,7 +271,7 @@ export default {
         listOrder: idx,
         title: item.name || item.title,
         fontWeight: 400,
-        value: this.metricList.find((m) => m.startId === item.startId)?.value,
+        value: item.startId?.value,
       }));
 
       this.setVisual(settings.metricOptions);

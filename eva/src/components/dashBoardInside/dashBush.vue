@@ -154,7 +154,7 @@ export default {
       this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
     },
     generateElementConfig(dataRest) {
-      const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
+      const _tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
       try {
         this.elementConfig = JSON.parse(_tmp);
       } catch {
