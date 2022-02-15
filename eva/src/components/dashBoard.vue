@@ -258,6 +258,7 @@
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
+                    @resetRange="resetRange($event)"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
                   />
@@ -439,6 +440,7 @@
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
+        @resetRange="resetRange($event)"
         @update:table-per-page="onTableItemsPerPageChange"
         @update:table-page="onTableIItemsPageChange"
       />
