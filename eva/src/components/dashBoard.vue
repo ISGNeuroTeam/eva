@@ -12,14 +12,7 @@
         boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
-      <v-card-title
-        v-show="
-          element.split('-')[0] === 'singleValue'
-            ? settings.showTitle
-            : props.disappear
-        "
-        class="card-title open_title"
-      >
+      <v-card-title class="card-title open_title">
         <div class="name-dash">
           <v-icon v-if="dataFromDB" class="icon" :color="theme.$main_border">
             {{ mdiDatabaseSearch }}
@@ -434,18 +427,22 @@ import {
   mdiArrowDownBold,
   mdiArrowExpand,
   mdiArrowCollapse,
-} from "@mdi/js";
-import { mapGetters } from "vuex";
-import settings from "../js/componentsSettings.js";
-import Vue from "vue";
+} from '@mdi/js';
+import { mapGetters } from 'vuex';
+import settings from '../js/componentsSettings.js';
+import Vue from 'vue';
 
 export default {
+  name: 'DashBoard',
   props: {
     width: null,
     height: null,
     idDashFrom: null,
     dataElemFrom: null,
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     dataPageFrom: null,
     loading: {
       type: Boolean,
