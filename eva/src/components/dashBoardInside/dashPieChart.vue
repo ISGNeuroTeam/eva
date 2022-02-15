@@ -168,6 +168,21 @@ export default {
     },
   },
   watch: {
+    'dashOptions.colorsPie': {
+      handler() {
+        let graphics = d3
+          .select(this.$refs.piechartItself)
+          .selectAll('svg')
+          .nodes();
+        if (graphics.length !== 0) {
+          graphics[0].remove();
+          this.createPieChartDash();
+        } else {
+          this.createPieChartDash();
+        }
+      },
+      deep:true,
+    },
     selectedPieIndex(newVal) {
       if (newVal !== null) this.setToken(newVal);
     },

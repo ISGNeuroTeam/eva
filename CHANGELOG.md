@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
 - fixed component checkboxes have undefined status
 - fixed dash single value title
+- fixed setting theme
+- fixed sizing a filter
+- fixed dashboard component
+- fixed cell size in tile visualization
 - fixed time selection are rendered outside of the component's bounds
 
 ## [1.82.0]
@@ -33,10 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed tooltip width
 - fixed token with an empty name
 - fixed table events
-- - fixed dash single value title
+- fixed dash single value title
 - fixed rename dashboard
 - fixed save table settings on change fullscreen view
 - fixed filter
+- fixed prevent deleting a custom theme without saving
 - optimized pipeline information processing in dashMap
 
 ## [1.81.0]
