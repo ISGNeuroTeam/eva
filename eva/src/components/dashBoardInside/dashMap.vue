@@ -816,5 +816,5 @@ export default {
 };
 </script>
 <style lang="sass">
-@import '../../sass/dashMap.sass';
+@import '../../sass/dashMap.sass'
 </style>
