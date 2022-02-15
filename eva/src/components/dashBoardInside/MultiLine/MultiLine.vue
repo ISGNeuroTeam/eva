@@ -219,6 +219,7 @@ export default {
       const {
         metrics,
         united = false,
+        zoomForAll = false,
         stringOX = false,
         lastDot = false,
         isDataAlwaysShow = false,
@@ -255,6 +256,7 @@ export default {
       }
       this.isUnitedMode = united;
       this.barplotstyle = barplotstyle;
+      this.isZoomForAll = zoomForAll;
       this.timeFormat = timeFormat || '%Y-%m-%d %H:%M:%S';
       this.xAxisCaptionRotate = xAxisCaptionRotate;
 
@@ -502,7 +504,7 @@ export default {
           }
         });
 
-      this.$emit('SetRange', { range: range, xMetric: this.xMetric });
+      this.$emit('SetRange', { range: range, xMetric: this.xMetric, 'zoomForAll': this.isZoomForAll });
       this.setClick(range, 'select');
       // this.zoom(x, yValue, selectRange, id)
     },

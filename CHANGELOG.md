@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 ### Added
+- added ability zoom all multiline graphs
 - added the ability to zoom out by double-clicking on a multiline
 
 ### Fixed
