@@ -31,6 +31,7 @@
       ref="svgContainer"
       class="svg-container"
       :data-status="change"
+      @dblclick="$emit('resetRange')"
     >
       <div class="graph-tooltip" />
     </div>
