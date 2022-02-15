@@ -320,6 +320,7 @@
       v-model="showFilterPreviewModal"
       persistent
       max-width="400"
+      @keydown.esc="showFilterPreviewModal = false"
     >
       <FilterPreviewModal
         :filter="filterInPreviewModal"

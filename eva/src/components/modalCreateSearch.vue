@@ -207,7 +207,10 @@ export default {
   },
   props: {
     idDashFrom: null,
-    modalValue: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     dataSearchFrom: null,
     createBtnFrom: null,
   },
@@ -259,9 +262,9 @@ export default {
     },
   },
   watch: {
-    active() {
+    active(val) {
       // тут понимаем нужно ли открыть окно с созданием или нет
-      if (this.modalFrom) {
+      if (val) {
         this.setData()
       }
     },
