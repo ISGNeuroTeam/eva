@@ -556,7 +556,7 @@ export default {
     //     })
     //   }
     // },
-    changeData: function (event) {
+    changeData(event) {
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }
