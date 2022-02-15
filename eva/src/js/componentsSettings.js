@@ -145,6 +145,7 @@ export default {
       'boxShadow',
       'stringOX',
       'united',
+      'zoomForAll',
       'lastDot',
       'metrics',
       'timeFormat',
@@ -526,6 +527,12 @@ export default {
       option: 'united',
       description: 'Отображать ли все метрики на одной плоскости координат',
       elem: 'switch',
+    },
+    {
+      option: 'zoomForAll',
+      description: 'Режим масштабирования с одного графика на все',
+      elem: 'switch',
+      default: false,
     },
     {
       option: 'barplotstyle',
