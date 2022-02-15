@@ -176,7 +176,6 @@
 
 <script>
 import { mdiChevronDown, mdiChevronUp, mdiCheckBold } from '@mdi/js';
-import Vue from "vue";
 
 export default {
   props: {
