@@ -314,7 +314,6 @@ export default {
     // проверяем изменилось ли что-то в основных полях
     'newDash.name': {
       handler(val, oldVal) {
-        console.log('newDash.name');
         if (this.dataFrom) {
           this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
         } else {
@@ -324,7 +323,6 @@ export default {
     },
     'newDash.id': {
       handler(val, oldVal) {
-        console.log('newDash.id');
         if (this.dataFrom) {
           this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
         } else {
@@ -334,7 +332,6 @@ export default {
     },
     'newGroup.name': {
       handler(val, oldVal) {
-        console.log('newGroup.name');
         if (this.dataFrom) {
           this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
         } else {

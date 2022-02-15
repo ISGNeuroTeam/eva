@@ -1048,6 +1048,7 @@ export default {
         }
       });
     }
+    this.loadComponentsSettings();
     this.prepareOptions();
   },
   methods: {
