@@ -28,14 +28,24 @@
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
-          <v-icon
-            v-if="searchData.length > 0"
-            class="icon"
-            :color="theme.$main_border"
-            @click="exportDataCSV"
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ mdiArrowDownBold }}
-          </v-icon>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  v-if="searchData.length > 0"
+                  class="icon"
+                  :color="theme.$main_border"
+                  @click="exportDataCSV"
+                  v-on="on"
+              >
+                {{ mdiArrowDownBold }}
+              </v-icon>
+            </template>
+            <span>Скачать результаты</span>
+          </v-tooltip>
           <v-icon
             v-show="dataMode"
             class="icon chart"
@@ -1137,8 +1147,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import '../sass/dashBoard.sass';
+<style lang="sass">
+@import '../sass/dashBoard.sass'
 </style>
 <style lang="sass">
 .settings-dash
