@@ -294,10 +294,14 @@
       </div>
     </template>
 
-    <v-dialog
+    <modal-persistent
+      ref="confirmModal"
       v-model="filterPartModalShow"
-      persistent
-      max-width="400"
+      :theme="theme"
+      width="400"
+      :is-confirm="isChanged"
+      :persistent="isChanged"
+      @cancelModal="closeFilterPartModal"
     >
       <FilterPartModal
         :id-dash="idDashFrom"
@@ -305,10 +309,12 @@
         :filter-part-index="filterPartIndexInModal"
         :edit-permission="editPermission"
         :edit-mode="editMode"
+        @isChanged="isChanged = $event"
+        @changeTab="$refs.confirmModal.focusOnModal()"
         @saveFilterPart="saveFilterPart"
         @closeFilterPartModal="closeFilterPartModal"
       />
-    </v-dialog>
+    </modal-persistent>
 
     <v-dialog
       v-model="showFilterPreviewModal"
@@ -368,6 +374,7 @@ export default {
       declineIcon: mdiClose,
       reverseIcon: mdiSwapHorizontal,
       eyeIcon: mdiEyeOutline,
+      isChanged: false,
     };
   },
   computed: {
@@ -379,6 +386,9 @@ export default {
     },
   },
   watch: {
+    filterPartModalShow() {
+      this.isChanged = false;
+    },
     focusedRow(rowNumber) {
       if (!Number.isFinite(rowNumber)) {
         // this.$store.commit('clearFocusedFilter', this.idDashFrom)
