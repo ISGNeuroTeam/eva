@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Added
+- added ability zoom all multiline graphs
+- added the ability to zoom out by double-clicking on a multiline
+
 ### Fixed
 
 - fixed token with an empty name
@@ -18,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed sizing a filter
 - fixed dashboard component
 - fixed button hints
+- fixed switching between filter types
+- fixed cell size in tile visualization
+- fixed missing error signal in datasource exc request
+- fixed tile visualization not showing after datasource restart
 
 ## [1.82.0]
 
