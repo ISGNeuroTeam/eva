@@ -10,9 +10,9 @@
     :drag-cancel="'.v-slider'"
     :resizable="dragRes"
     :data-grid="true"
-    :grid="props.grid"
+    :grid="movableProps.grid"
     :style="{
-      zIndex: props.zIndex,
+      zIndex: movableProps.zIndex,
       outlineColor: theme.$accent_ui_color,
       backgroundColor: theme.$accent_ui_color,
     }"
@@ -30,7 +30,7 @@
       :loading="loading"
       :searchData="searchData"
       :dataSourseTitle="dataSourseTitle"
-      @SetLevel="props.zIndex = Number.parseInt($event)"
+      @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
@@ -42,7 +42,10 @@
 <script>
 export default {
   props: {
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     idDashFrom: null,
     dataElem: null,
     dataPageFrom: null,
@@ -63,7 +66,8 @@ export default {
       width: 0, // 0 не должен быть, по умолчанию беруться эти настройки
       height: 0,
       reload: 0,
-      props: {
+      maxZIndex: 1,
+      movableProps: {
         vue_drag: false,
         zIndex: 1,
         step: {},
@@ -98,6 +102,13 @@ export default {
     },
   },
   watch: {
+    'movableProps.zIndex': {
+      handler(val, oldVal) {
+        if (oldVal > val) {
+          this.$set(this.movableProps, 'zIndex', oldVal);
+        }
+      },
+    },
     // top(val) {
     //   if (val <= this.headerTop) val = this.headerTop;
     // },
@@ -124,6 +135,7 @@ export default {
     this.drawElement();
   },
   mounted() {
+    this.maxZIndex = 1;
     this.onActivated();
   },
   methods: {
@@ -149,13 +161,12 @@ export default {
     },
     onActivated() {
       let testElements = document.getElementsByClassName('vdr');
-      let maxZIndex = 1;
       for (let i = 0; i < testElements.length; i++) {
-        if (Number(testElements[i].style.zIndex) > maxZIndex) {
-          maxZIndex = Number(testElements[i].style.zIndex);
+        if (Number(testElements[i].style.zIndex) > this.maxZIndex) {
+          this.maxZIndex = Number(testElements[i].style.zIndex);
         }
       }
-      this.props.zIndex = maxZIndex + 1;
+      this.$set(this.movableProps, 'zIndex', this.maxZIndex + 1);
     },
     sendMove(x, y) {
       let top = Math.round(y / this.horizontalCell);
@@ -195,7 +206,10 @@ export default {
       this.opacity = event;
     },
     createGrid() {
-      this.props.grid = [this.verticalCell, this.horizontalCell];
+      this.$set(this.movableProps, 'grid', [
+        this.verticalCell,
+        this.horizontalCell,
+      ]);
     },
     setRange(range) {
       this.$emit('SetRange', range);
