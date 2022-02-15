@@ -26,6 +26,7 @@
       hide-details
       outlined
       dense
+      @change="changeSelected"
     />
 
     <div
@@ -190,6 +191,10 @@ export default {
     },
     closeDatePicker() {
       this.showDatePicker = false;
+    },
+    changeSelected() {
+      this.temp.operationManual =
+          this.operationMap[this.temp.fieldType][this.currentOperationTab];
     },
   },
 };
