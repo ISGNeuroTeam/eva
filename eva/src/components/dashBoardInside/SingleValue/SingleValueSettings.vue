@@ -1,10 +1,13 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="isOpen"
-    persistent
-    scrollable
+    :theme="theme"
     width="560"
-    @click:outside="close"
+    scrollable
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="close"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
@@ -33,6 +36,7 @@
             outlined
             hide-details
             class="input-element"
+            @input="isChanged = true"
           />
           <br>
           <label class="checkbox-google">
@@ -58,6 +62,7 @@
             menu-props="offsetY"
             class="input-element"
             @change="handleChangeCount"
+            @input="isChanged = true"
           />
         </div>
 
@@ -139,6 +144,7 @@
                 outlined
                 hide-details
                 class="input-element"
+                @input="isChanged = true"
               />
             </div>
 
@@ -149,7 +155,7 @@
                   title="Без иконки"
                   class="icon"
                   :class="{ selected: no_icon.id === metric.icon }"
-                  @click="metric.icon = no_icon.id"
+                  @click="metric.icon = no_icon.id; isChanged = true"
                   v-html="no_icon.svg"
                 />
                 <div
@@ -157,7 +163,7 @@
                   :key="icon.id"
                   class="icon"
                   :class="{ selected: icon.id === metric.icon }"
-                  @click="metric.icon = icon.id"
+                  @click="metric.icon = icon.id; isChanged = true"
                   v-html="icon.svg"
                 />
               </div>
@@ -175,6 +181,7 @@
                   hide-details
                   menu-props="offsetY"
                   class="input-element"
+                  @input="isChanged = true"
                 />
               </div>
               <div class="content-section pa-0">
@@ -188,6 +195,7 @@
                   hide-details
                   menu-props="offsetY"
                   class="input-element"
+                  @input="isChanged = true"
                 >
                   <template v-slot:selection="{ item }">
                     {{
@@ -215,7 +223,7 @@
                   :key="color.name"
                   class="color-select"
                   :class="{ selected: metric.color === color.name }"
-                  @click="metric.color = color.name"
+                  @click="metric.color = color.name; isChanged = true"
                 >
                   <div
                     v-if="color.colorGrad"
@@ -257,7 +265,8 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
+
 </template>
 
 <script>
@@ -278,8 +287,12 @@ export default {
   comments: {
     draggable,
   },
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    isOpen: { type: Boolean, default: false },
+    modalValue: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
     updateCount: Function,
   },
@@ -318,8 +331,18 @@ export default {
      * Data fornat: { <metricsNumber>: <availableTemplatesNumber> }.
      */
     templatesForMetrics: { 2: 2, 3: 6, 4: 7, 5: 5, 6: 2 },
+    isChanged: false,
   }),
   computed: {
+    isOpen: {
+      get() {
+        return this.modalValue;
+      },
+      set(val) {
+        this.$emit('updateModalValue', val);
+      },
+    },
+
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -353,6 +376,11 @@ export default {
     },
   },
   watch: {
+    isOpen(val) {
+      if (!val) {
+        this.isChanged = false;
+      }
+    },
     receivedSettings(newValue) {
       const newSettings = JSON.parse(JSON.stringify(newValue));
       this.settings = {
@@ -362,7 +390,7 @@ export default {
         ),
       };
     },
-    settings(old, newSet) {
+    settings(newSet, old) {
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
@@ -372,6 +400,7 @@ export default {
     getFamily() {},
     handleChangeShowTitle() {
       if (this.settings) {
+        this.isChanged = true;
         this.settings = {
           ...JSON.parse(JSON.stringify(this.settings)),
           showTitle: !this.settings.showTitle,

@@ -361,6 +361,7 @@ import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
 
 export default {
+  name: 'DashMapUserSettings',
   props: {
     idElement: String,
     idDashFrom: String,

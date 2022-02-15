@@ -12,8 +12,8 @@
       class="modal-confirm"
       :style="{ background: theme.$main_bg }"
     >
-      <v-card-text class="modal-confirm__wrapper" :style="{ color: theme.$main_text }">
-        <div class="modal-confirm__text">
+      <v-card-text class="modal-confirm__wrapper">
+        <div class="modal-confirm__text" :style="{ color: theme.$main_text }">
           {{ modalText }}
         </div>
       </v-card-text>
@@ -87,6 +87,7 @@ export default {
 
 <style lang="sass" scoped>
 .modal-confirm
+  color: #535263
   &__wrapper
     padding: 20px !important
     &--bottom
