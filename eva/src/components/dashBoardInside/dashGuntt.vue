@@ -268,6 +268,7 @@ export default {
       });
     },
     createChart: function (sizeChart, that, dataRest) {
+
       let otstupBot = 30;
       if (screen.width <= 1600) {
         otstupBot = 10;
@@ -474,6 +475,7 @@ export default {
       // Tooltip
 
       let tooltipBlock = this.$refs.tooltip;
+      const tooltipMargin =  this.$attrs['is-full-screen'] ? 170 : 30;
 
       lines
         .on('mouseover', function (event) {
@@ -486,15 +488,14 @@ export default {
               tooltip += `<p class="row-toolrip"><span>${key}</span>: ${event[key]}</p>`;
             });
           }
-
-          moveTooltip(event);
+          moveTooltip(tooltipMargin);
 
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', function (event) {
-          moveTooltip(event);
+        .on('mousemove', function () {
+          moveTooltip(tooltipMargin);
         })
         .on('mouseout', function () {
           tooltipBlock.style.opacity = '0';
@@ -543,8 +544,8 @@ export default {
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', function (event) {
-          moveTooltip(event);
+        .on('mousemove', function () {
+          moveTooltip(tooltipMargin);
         })
         .on('mouseout', function () {
           tooltipBlock.style.opacity = '0';
@@ -631,10 +632,9 @@ export default {
 
       // легенда
 
-      function moveTooltip() {
-        let x = d3.event.offsetY + 30;
-        let y = d3.event.offsetX + 30;
-        console.log('d3.event.offsetY', d3.event.offsetY, 'd3.event.offsetX', d3.event.offsetX, x, y)
+      function moveTooltip(offsetX) {
+        let x = d3.event.offsetY + 20;
+        let y = d3.event.offsetX + offsetX;
         tooltipBlock.style.top = x + 'px';
         tooltipBlock.style.left = y + 'px';
       }
