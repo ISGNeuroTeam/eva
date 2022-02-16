@@ -94,6 +94,10 @@ export default {
     update: 1,
   }),
   computed: {
+    settings() {
+      console.log(this.$attrs['current-settings'])
+      return '';
+    },
     dataToRender() {
       let temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
       return this.update && temp.slice(0, this.metricCount);
