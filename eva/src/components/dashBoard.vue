@@ -13,14 +13,12 @@
       }"
     >
       <v-card-title
-        v-show="
-          element.split('-')[0] === 'singleValue'
-            ? settings.showTitle
-            : props.disappear
-        "
+        v-show="element.split('-')[0] !== 'singleValue'
+          ? settings.showTitle
+          : props.disappear"
         class="card-title open_title"
       >
-        <div class="name-dash">
+        <div  class="name-dash">
           <v-icon
             v-if="dataFromDB"
             class="icon"
@@ -29,17 +27,17 @@
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-tooltip
-              bottom
-              :color="theme.$accent_ui_color"
-              style="z-index: 100"
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                  v-if="searchData.length > 0"
-                  class="icon"
-                  :color="theme.$main_border"
-                  @click="exportDataCSV"
-                  v-on="on"
+                v-if="searchData.length > 0"
+                class="icon"
+                :color="theme.$main_border"
+                @click="exportDataCSV"
+                v-on="on"
               >
                 {{ mdiArrowDownBold }}
               </v-icon>
@@ -72,17 +70,17 @@
                 v-if="dataSourseTitle !== -1"
                 class="ml-1"
               >
-                {{ dataSourseTitle }}
-              </span>
+              {{ dataSourseTitle }}
+            </span>
             </div>
             <div
               v-if="props.edit"
               v-show="dataMode"
               class="dash-block-sid"
               :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
+              color: theme.$main_text,
+              borderColor: theme.$main_border,
+            }"
             >
               {{ props.sid }}
             </div>
@@ -481,12 +479,16 @@ import {mapGetters} from 'vuex';
 import settings from '../js/componentsSettings.js';
 
 export default {
+  name: 'DashBoard',
   props: {
     width: null,
     height: null,
     idDashFrom: null,
     dataElemFrom: null,
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     dataPageFrom: null,
     loading: {
       type: Boolean,
