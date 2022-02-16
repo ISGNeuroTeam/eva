@@ -1947,7 +1947,7 @@ export default {
                 doing.splice(0, 1);
                 doing = doing.join(',');
                 if (doing.indexOf('[') !== -1 && doing.indexOf(']') !== -1) {
-                  doing = doing.match(/[^]+(?=\])/g);
+                  doing = doing.match(/[^[]+(?=\])/g);
                 } else {
                   doing = doing.split(',');
                 }
