@@ -86,40 +86,7 @@ export default {
   },
   watch: {
     dataRestFrom() {
-      this.$nextTick(() => {
-        if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
-          if (
-            this.dataRestFrom[0].start_date &&
-            this.dataRestFrom[0].end_date
-          ) {
-            if (this.dataReport) {
-              if (this.activeElemFrom === this.id) {
-                this.noMsg = false;
-                this.prepareChart(this.dataRestFrom);
-              } else {
-                let graphics = d3
-                  .select(this.$el.querySelector(`.guntt-block`))
-                  .selectAll('svg')
-                  .nodes(); // получаем область в которой будем рисовтаь график
-
-                if (graphics.length !== 0) {
-                  // если график уже есть
-                  graphics[0].remove(); // удаляем его
-                }
-              }
-            } else {
-              this.noMsg = false;
-              this.prepareChart(this.dataRestFrom);
-            }
-          } else {
-            this.msgText = 'Данные не подходят для построения диаграммы гантта';
-            this.noMsg = true;
-          }
-        } else {
-          this.msgText = 'Нет данных  для отображения';
-          this.noMsg = true;
-        }
-      });
+      this.dataRestFromWatch();
     },
     colorFrom: function () {
       if (this.dataRestFrom.length > 0) {
@@ -228,9 +195,48 @@ export default {
     },
   },
   mounted() {
+    if (this.$attrs['is-full-screen']){
+      this.dataRestFromWatch();
+    }
     this.$emit('setVissible', this.id);
   },
   methods: {
+    dataRestFromWatch() {
+      this.$nextTick(() => {
+        if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
+          if (
+              this.dataRestFrom[0].start_date &&
+              this.dataRestFrom[0].end_date
+          ) {
+            if (this.dataReport) {
+              if (this.activeElemFrom === this.id) {
+                this.noMsg = false;
+                this.prepareChart(this.dataRestFrom);
+              } else {
+                let graphics = d3
+                    .select(this.$el.querySelector(`.guntt-block`))
+                    .selectAll('svg')
+                    .nodes(); // получаем область в которой будем рисовтаь график
+
+                if (graphics.length !== 0) {
+                  // если график уже есть
+                  graphics[0].remove(); // удаляем его
+                }
+              }
+            } else {
+              this.noMsg = false;
+              this.prepareChart(this.dataRestFrom);
+            }
+          } else {
+            this.msgText = 'Данные не подходят для построения диаграммы гантта';
+            this.noMsg = true;
+          }
+        } else {
+          this.msgText = 'Нет данных  для отображения';
+          this.noMsg = true;
+        }
+      });
+    },
     idDashClass() {
       return `dash-guntt-${this.id}`;
     },
@@ -241,6 +247,7 @@ export default {
         let sizeChart = { width: 0, height: 0 }; // получаем размеры от родителя
         sizeChart['width'] = this.widthFrom;
         sizeChart['height'] = this.heightFrom;
+
         this.actions[0].capture = Object.keys(dataRest[0]);
         if (
           this.$store.state.store[this.idDash][this.idFrom].actions.length !==
@@ -280,7 +287,6 @@ export default {
       dataRest.forEach((item) => {
         data.push({ ...{}, ...item });
       });
-
       let graphics = d3
         .select(this.$el.querySelector(`.guntt-block`))
         .selectAll('svg')
