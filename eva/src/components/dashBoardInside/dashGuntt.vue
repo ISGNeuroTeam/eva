@@ -632,8 +632,9 @@ export default {
       // легенда
 
       function moveTooltip() {
-        let x = d3.event.offsetY - 50;
+        let x = d3.event.offsetY + 30;
         let y = d3.event.offsetX + 30;
+        console.log('d3.event.offsetY', d3.event.offsetY, 'd3.event.offsetX', d3.event.offsetX, x, y)
         tooltipBlock.style.top = x + 'px';
         tooltipBlock.style.left = y + 'px';
       }
