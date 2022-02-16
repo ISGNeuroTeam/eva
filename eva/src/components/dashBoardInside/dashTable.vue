@@ -149,7 +149,7 @@ export default {
   data() {
     return {
       compare: ['>', '<', '='],
-      compareForBoolean: ['-','true', 'false'],
+      compareForBoolean: ['-', false, true],
       mdiMagnify: mdiMagnify,
       eventRows: [],
       props: {
@@ -217,10 +217,9 @@ export default {
     filteredTableData() {
       let chooseSort = function (dataFormat, sortType, value) {
         if (dataFormat ==="none") {
-          if (value === 'false' || value === 'true'){
+          if (typeof value ==='boolean'){
             return  (el) => {
-                const isBool = value === 'true'
-                return el === isBool;
+                return el === value;
             };
           }
          return () => true;
@@ -289,7 +288,7 @@ export default {
       if (!temp) return;
       for (let [key, val] of Object.entries(this.filters)) {
         let type = this.getType(key);
-        if (val.value && val.compare) {
+        if (val.value !== undefined && val.compare) {
           const sort = chooseSort(type, val.compare, val.value);
           temp = temp.filter((el) =>  sort(el[key]));
         }
@@ -376,6 +375,7 @@ export default {
   },
   methods: {
     onChangeForBoolean(title, event){
+      console.log('event', event)
       this.setFilterData(title, '=', 'compare');
       this.setFilterData(title, event);
     },
@@ -409,6 +409,7 @@ export default {
       return this.typedTitles[title];
     },
     setFilterData(title, event, compare) {
+      console.log('this.filters[title]', this.filters[title])
       if (!this.filters[title]) this.filters[title] = {};
       if (compare === 'compare') {
         this.filters[title].compare = event;
