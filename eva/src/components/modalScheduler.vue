@@ -5,6 +5,8 @@
     v-model="active"
     width="600"
     :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
     @cancelModal="cancel"
   >
     <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
@@ -20,6 +22,7 @@
         </div>
         <div class="tab-block">
           <v-tabs
+            v-model="schedulerTab"
             :color="theme.$primary_button"
             :background-color="theme.$main_bg"
           >
@@ -28,6 +31,7 @@
               Периодичность
             </v-tab>
             <v-tab-item
+              :value="0"
               :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
               <div class="every">
@@ -43,6 +47,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -89,6 +94,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -118,7 +124,7 @@
             <v-tab :style="{ color: theme.$main_text }">
               Планирование
             </v-tab>
-            <v-tab-item />
+            <v-tab-item :value="1" />
           </v-tabs>
         </div>
       </div>
@@ -172,6 +178,7 @@ export default {
   },
   data() {
     return {
+      schedulerTab: 'tab-1',
       every: 0,
       time: '',
       everyLast: 0,
@@ -195,6 +202,7 @@ export default {
         start: false,
         end: false,
       },
+      isChanged: false,
     };
   },
   computed: {
@@ -226,10 +234,13 @@ export default {
   watch: {
     active() {
       // получаем статус открытия или нет окна модального
-      if (this.modalFrom) {
-        if (this.schedulers.length != 0) {
+      if (this.modalValue) {
+        if (this.schedulers?.length !== 0) {
           this.setData()
         }
+      } else {
+        this.schedulerTab = 0;
+        this.isChanged = false;
       }
     },
   },
@@ -304,6 +315,7 @@ export default {
       this.active = false;
     },
     setTime(time, tense) {
+      this.isChanged = true;
       // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
         if (tense === 'every') {

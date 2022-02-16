@@ -1509,6 +1509,7 @@ export default {
       }); // просто отправляем информацию об удаляемом токене в хранилище
     },
     deleteSearch: function (id) {
+      console.log(id);
       // тоже саоме для удаления ИС
       this.$store.commit('setModalDelete', {
         id: this.idDash,

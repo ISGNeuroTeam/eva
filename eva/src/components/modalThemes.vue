@@ -1,5 +1,6 @@
 <template>
   <modal-persistent
+    ref="modalPersistent"
     v-model="showModal"
     width="400"
     :theme="theme"
@@ -79,7 +80,7 @@
             <div
               :style="{ color: theme.$error_color }"
               class="btn"
-              @click="deleteTheme"
+              @click="openConfirmModal"
             >
               <v-icon
                 :color="theme.$error_color"
@@ -89,6 +90,15 @@
               </v-icon>
               Удалить
             </div>
+            <modal-delete />
+            <modal-confirm
+              v-model="isConfirmModal"
+              :theme="theme"
+              :modal-text="`Вы точно хотите удалить тему - <strong>${select}</strong>?`"
+              btn-confirm-text="Удалить"
+              btn-cancel-text="Отмена"
+              @result="deleteTheme"
+            />
           </div>
           <div
             v-if="admin"
@@ -150,7 +160,6 @@
                     v-model="row.value"
                     outlined
                     hide-details
-                    @input="isChanged = true"
                   />
                   <v-menu :close-on-content-click="false">
                     <template v-slot:activator="{ on }">
@@ -170,7 +179,7 @@
                     <v-color-picker
                       v-model="row.value"
                       dot-size="17"
-                      @change="isChanged = true"
+                      @input="isChanged = true"
                     />
                   </v-menu>
                 </v-col>
@@ -456,9 +465,13 @@ export default {
       mode: 'select',
       error: false,
       isChanged: false,
+      isConfirmModal: false,
     };
   },
   computed: {
+    currentThemeName() {
+      return this.$store.getters.getThemeTitle;
+    },
     showModal: {
       get() {
         return this.modalValue;
@@ -473,6 +486,7 @@ export default {
   },
   watch: {
     async select(selectedTheme) {
+      this.$refs.modalPersistent.focusOnModal();
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         let response = await fetch(`/api/theme?themeName=${selectedTheme}`);
         let themeData = await response.json();
@@ -488,7 +502,9 @@ export default {
     },
   },
   async created() {
-    await this.getThemeList();
+    await this.getThemeList().then(() => {
+      this.$set(this, 'select', this.currentThemeName);
+    });
   },
   methods: {
     resetForm() {
@@ -506,6 +522,8 @@ export default {
     toSelectMode() {
       this.mode = 'select';
       this.resetForm();
+      this.isChanged = false;
+      this.$refs.modalPersistent.focusOnModal();
     },
     editTheme() {
       let themeObject = this.$store.getters.getTheme;
@@ -520,7 +538,13 @@ export default {
       this.newTitle = themeTitle;
       this.mode = 'edit';
     },
-    async deleteTheme() {
+    openConfirmModal() {
+      this.isConfirmModal = true;
+    },
+    async deleteTheme(isConfirm) {
+      if (!isConfirm) {
+        return;
+      }
       try {
         await fetch(`/api/theme/delete`, {
           method: 'DELETE',
@@ -583,8 +607,12 @@ export default {
           let themeData = await res.json();
           let content = JSON.parse(themeData);
           this.$store.commit('setTheme', content);
+          this.$set(this, 'select', this.currentThemeName);
           this.mode = 'select';
-          await this.getThemeList();
+          await this.getThemeList().then(() => {
+            this.isChanged = false;
+            this.$refs.modalPersistent.focusOnModal();
+          });
         } catch (e) {
           console.log(e);
         }

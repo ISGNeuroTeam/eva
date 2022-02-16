@@ -2,6 +2,8 @@
   <modal-persistent
     v-model="active"
     width="680"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
     :theme="theme"
     :color="theme.$main_text"
     @cancelModal="cancelModal"
@@ -20,6 +22,7 @@
           label="Имя ИД"
           placeholder="Sid"
           hide-details
+          @input="isChanged = true"
         />
         <v-textarea
           v-model="search.original_otl"
@@ -35,6 +38,7 @@
           placeholder="Origin otl"
           label="Текст ИД"
           @keyup.ctrl.\="addLineBreaks"
+          @input="isChanged = true"
         />
         <div class="times-block">
           <div class="time-block">
@@ -47,6 +51,7 @@
               label="Временной интервал: начало"
               placeholder="0"
               hide-details
+              @input="isChanged = true"
             />
             <DTPicker
               v-model="tws"
@@ -60,6 +65,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
+              @input="isChanged = true"
             >
               <v-icon
                 class="picker-search"
@@ -79,6 +85,7 @@
               label="Временной интервал: конец"
               placeholder="0"
               hide-details
+              @input="isChanged = true"
             />
             <DTPicker
               v-model="twf"
@@ -92,6 +99,7 @@
               :color="theme.$primary_button"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
+              @input="isChanged = true"
             >
               <v-icon
                 class="picker-search"
@@ -123,6 +131,7 @@
                   outlined
                   label="Timeout"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.cache_ttl"
@@ -132,6 +141,7 @@
                   outlined
                   label="Cache_ttl"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.field_extraction"
@@ -141,6 +151,7 @@
                   outlined
                   label="Field_extraction"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.preview"
@@ -150,6 +161,7 @@
                   outlined
                   label="Preview"
                   hide-details
+                  @input="isChanged = true"
                 />
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -163,6 +175,7 @@
               outlined
               label="Максимальное кол-во строк"
               hide-details
+              @input="isChanged = true"
             />
           </div>
         </div>
@@ -239,6 +252,7 @@ export default {
       tws: '',
       twf: '',
       pickerIcon: mdiCalendarMonth,
+      isChanged: false,
     };
   },
   computed: {
@@ -266,6 +280,8 @@ export default {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (val) {
         this.setData()
+      } else {
+        this.isChanged = false;
       }
     },
     dataSearchFrom() {

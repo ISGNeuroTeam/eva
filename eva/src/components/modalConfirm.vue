@@ -1,8 +1,11 @@
+<!-- Модальное окно для подтверждения\отмены какого-либо действия -->
+
 <template>
   <v-dialog
     v-model="confirmModal"
-    width="20%"
+    width="600"
     persistent
+    :content-class="isShadow ? 'modal-confirm--with-shadow' : ''"
     @keydown.esc="closeOnEsc"
     @click:outside="closeOnOutside"
   >
@@ -10,29 +13,36 @@
       ref="modalConfirm"
       tabindex="2"
       class="modal-confirm"
-      :style="{ background: theme.$main_bg }"
+      :style="{
+        background: theme.$main_bg,
+        'box-shadow': `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`
+      }"
     >
       <v-card-text class="modal-confirm__wrapper">
-        <div class="modal-confirm__text" :style="{ color: theme.$main_text }">
-          {{ modalText }}
-        </div>
+        <div
+          class="modal-confirm__text"
+          :style="{ color: theme.$main_text }"
+          v-html="modalText"
+        />
       </v-card-text>
       <div class="modal-confirm__wrapper modal-confirm__wrapper--bottom">
         <v-btn
           small
           :color="theme.$primary_button"
+          :style="{color: theme.$main_text}"
           class="modal-confirm__button"
           @click="confirm(true)"
         >
-          Да
+          {{ btnConfirmText }}
         </v-btn>
         <v-btn
           small
           :color="theme.$primary_button"
+          :style="{color: theme.$main_text}"
           class="modal-confirm__button"
           @click="confirm(false)"
         >
-          Нет
+          {{ btnCancelText }}
         </v-btn>
       </div>
     </v-card>
@@ -50,6 +60,18 @@ export default {
     modalText: {
       type: String,
       default: 'Не сохраненные изменения будут отменены. Продолжить ?',
+    },
+    btnConfirmText: {
+      type: String,
+      default: 'Да'
+    },
+    btnCancelText: {
+      type: String,
+      default: 'Нет',
+    },
+    isShadow: {
+      type: Boolean,
+      default: true,
     },
     theme: {
       type: Object,
@@ -86,16 +108,32 @@ export default {
 </script>
 
 <style lang="sass" scoped>
+$main_border: var(--main_border)
+
 .modal-confirm
-  color: #535263
+
   &__wrapper
     padding: 20px !important
+    display: flex
+    justify-content: flex-end
     &--bottom
       padding: 10px !important
-  &__button, &__text
-    color: white
+  &__text
+    font-size: 1.2rem !important
+    font-weight: normal
+    padding-top: 15px
+    text-align: center
+    width: 100%
   &__button
+    text-transform: lowercase
     margin-right: 10px
+    font-size: 1rem
+    width: 20%
     &:last-child
       margin-right: 0
+  ::v-deep &--with-shadow
+    box-shadow: 0 3px 1px -2px $main_border,0 2px 2px 0 $main_border,0 1px 5px 0 $main_border
+  ::v-deep &__text > strong
+    font-weight: bold
+    font-size: 1.5rem !important
 </style>

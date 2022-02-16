@@ -2,6 +2,8 @@
   <modal-persistent
     v-model="active"
     width="500"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
     :theme="theme"
     @cancelModal="cancelModal"
   >
@@ -25,6 +27,7 @@
             hide-details
             class="file-get-itself"
             label="Выбрать отчет"
+            @input="isChanged = true"
           />
           <div class="error-block">
             <div
@@ -97,6 +100,7 @@ export default {
       errorMsg: 'Ошибка',
       gear: mdiSettings,
       loadingShow: false,
+      isChanged: false,
     };
   },
   computed: {
@@ -117,6 +121,8 @@ export default {
       if (this.active) {
         this.getAllPapers();
         this.getData();
+      } else {
+        this.isChanged = false;
       }
     },
   },
@@ -151,6 +157,7 @@ export default {
       try {
         if (result.status === 'success') {
           this.downloadFile(result.file);
+          this.isChanged = false;
           this.loadingShow = false;
           //this.showError = false;
         } else {

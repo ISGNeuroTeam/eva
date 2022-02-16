@@ -226,7 +226,7 @@
                   icon
                   v-bind="attrs"
                   v-on="on"
-                  @click.stop.prevent="deleteFilter(filter)"
+                  @click.stop.prevent="confirmDelete(filter)"
                 >
                   <v-icon v-text="trashIcon" />
                 </v-btn>
@@ -318,15 +318,24 @@
 
     <v-dialog
       v-model="showFilterPreviewModal"
-      persistent
       max-width="400"
+      @click:outside="showFilterPreviewModal = false"
       @keydown.esc="showFilterPreviewModal = false"
     >
-      <FilterPreviewModal
+      <filter-preview-modal
         :filter="filterInPreviewModal"
         @closeFilterPreviewModal="closeFilterPreviewModal"
       />
     </v-dialog>
+
+    <modal-confirm
+      v-model="isConfirmModal"
+      :theme="theme"
+      :modal-text="`Уверенны, что хотите удалить фильтр - <strong>${deleteFilterInfo.id}</strong> ?`"
+      btn-confirm-text="Удалить"
+      btn-cancel-text="Отмена"
+      @result="deleteFilter"
+    />
   </div>
 </template>
 
@@ -375,7 +384,9 @@ export default {
       declineIcon: mdiClose,
       reverseIcon: mdiSwapHorizontal,
       eyeIcon: mdiEyeOutline,
+      deleteFilterInfo: {},
       isChanged: false,
+      isConfirmModal: false,
     };
   },
   computed: {
@@ -412,6 +423,12 @@ export default {
     this.$store.commit('clearFocusedFilter', this.idDashFrom);
   },
   methods: {
+    confirmDelete(filter) {
+      this.$set(this, 'deleteFilterInfo', filter);
+      this.$nextTick(() => {
+        this.isConfirmModal = true;
+      });
+    },
     scrollFilterParts(filterIndex, isPrev = false) {
       const slider = this.$refs[`filter-${filterIndex}-parts-slider`][0];
       /** scroll to 1/5 of the visible slider width */
@@ -480,8 +497,12 @@ export default {
         this.filters = this.$store.getters.getFilters(this.idDashFrom);
       }
     },
-    deleteFilter(filter) {
-      this.$store.commit('deleteFilter', filter);
+    deleteFilter(isConfirm) {
+      if (!isConfirm) {
+        this.$set(this, 'deleteFilterInfo', {});
+        return;
+      }
+      this.$store.commit('deleteFilter', this.deleteFilterInfo);
       this.$store.commit('declineFilterChanges', this.idDashFrom);
       this.$store.commit('clearFocusedFilter', this.idDashFrom);
       this.focusedRow = null;
