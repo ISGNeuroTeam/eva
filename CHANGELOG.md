@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes
+- fixed incorrect display of the component when resizing
 
 ## [1.82.0]
 
