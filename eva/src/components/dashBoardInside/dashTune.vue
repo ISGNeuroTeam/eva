@@ -124,7 +124,6 @@ export default {
       return this.$store.getters.getElement(idDashFrom, idFrom);
     },
     needSetField() {
-      console.log('!this.dataField && !this.loading', !this.dataField && !this.loading)
       return !this.dataField && !this.loading;
     },
     theme: function () {
@@ -204,7 +203,6 @@ export default {
       }
     },
     dataRestFrom(dataRestFrom) {
-      console.log('this.dataField', this.dataField)
       if (!this.dataField && dataRestFrom.length) {
         const keys = Object.keys(dataRestFrom[0]).filter(
           (key) => key[0] !== '_'
@@ -215,7 +213,6 @@ export default {
       }
     },
     dataField(value) {
-      console.log('dataField value', value)
       this.$nextTick(() => {
         /*value !== '' && */ this.$store.commit('setSelected', {
           element: 'elem',

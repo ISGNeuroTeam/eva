@@ -635,7 +635,7 @@ export default {
           id: this.element,
         });
       }
-      console.log('show', show)
+
       return show;
     },
     lastResult() {
@@ -683,7 +683,6 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
-      console.log('to', to)
       setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
     settingsIsOpened(to) {
