@@ -285,8 +285,6 @@ export default {
         'leaflet-control-container'
       );
 
-      this.deleteTitleByAttribute();
-
       let container = element[0];
       container.appendChild(test.$el);
       this.isSettings = true;
@@ -501,6 +499,9 @@ export default {
           x.style.height = (x.naturalHeight / 10) * this.map.getZoom() + 'px';
         }
       });
+
+      this.deleteTitleByAttribute();
+
       this.$nextTick(() => {
         this.map._onResize();
       });
