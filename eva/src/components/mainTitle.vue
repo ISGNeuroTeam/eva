@@ -263,6 +263,7 @@ export default {
       firstLoad: true,
       leftDots: true,
       rightDots: true,
+      zoomedSearch: [],
     };
   },
   computed: {
@@ -594,15 +595,30 @@ export default {
         }
       });
     },
-    setRange(range, elem) {
-      this.dataObject[elem.search].data = this.sliceRange(
-        this.dataObject[elem.search].data,
-        range
-      );
+    setRange (range, elem) {
+      if (range.zoomForAll && !this.zoomedSearch.includes(elem.search)) {
+        this.zoomedSearch.push(elem.search)
+      }
+      let elements = range.zoomForAll ? this.elements : [elem];
+      elements.forEach(elem => {
+        this.dataObject[elem.search].data = this.sliceRange(
+            this.dataObject[elem.search].data,
+            range
+        );
+      })
     },
-    resetRange(dataSourseTitle) {
-      this.dataObject[dataSourseTitle].data =
-        this.dataObjectConst[dataSourseTitle].data;
+    resetRange (dataSourseTitle) {
+      let elements = [];
+      if (this.zoomedSearch.includes(dataSourseTitle)) {
+        elements = this.elements
+        this.zoomedSearch.splice(this.zoomedSearch.indexOf(dataSourseTitle), 1)
+      } else {
+        elements.push({search: dataSourseTitle})
+      }
+      elements.forEach(elem => {
+        this.dataObject[elem.search].data =
+            this.dataObjectConst[elem.search].data
+      })
     },
   },
 };
