@@ -931,6 +931,7 @@ import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
 import {globalTockens} from "@/constants/globalTockens";
 
 export default {
+  name: 'DashPanelBoard',
   components: {
     EvaLogo,
     DashFilterPanel,
