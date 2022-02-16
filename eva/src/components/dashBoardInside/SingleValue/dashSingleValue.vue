@@ -2,6 +2,7 @@
   <div
     class="single-value-container pa-3"
     :class="{ 'header-active': dataModeFrom }"
+    :style="{ height: `calc(100% - (${isHeaderOpen ? 25 : 0}px + 3px))` }"
   >
     <div class="header">
       <div>
@@ -92,12 +93,9 @@ export default {
     defaultSettings: {},
     isSettingsComponentOpen: false,
     update: 1,
+    isHeaderOpen: true,
   }),
   computed: {
-    settings() {
-      console.log(this.$attrs['current-settings'])
-      return '';
-    },
     dataToRender() {
       let temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
       return this.update && temp.slice(0, this.metricCount);
@@ -198,6 +196,7 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
+      this.isHeaderOpen = !!settings.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
     },
