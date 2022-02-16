@@ -647,6 +647,7 @@ export default {
           id: this.element,
         });
       }
+
       return show;
     },
     lastResult() {
