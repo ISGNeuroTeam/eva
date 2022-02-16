@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
+- fixed visible zoom button
 
 ## [1.82.0]
 
