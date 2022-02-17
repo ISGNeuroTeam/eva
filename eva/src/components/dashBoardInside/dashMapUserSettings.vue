@@ -624,7 +624,6 @@ export default {
 
 .v-text-field__slot label
   color: var(--main_text) !important
-  margin: 18px !important
 .med
   color: var(--main_text) !important
   .v-text-field__slot input
