@@ -2,6 +2,7 @@
   <div
     class="single-value-container pa-3"
     :class="{ 'header-active': dataModeFrom }"
+    :style="{ height: `calc(100% - (${isHeaderOpen ? 35 : 0}px + 3px))` }"
   >
     <div class="header">
       <div>
@@ -92,6 +93,7 @@ export default {
     defaultSettings: {},
     isSettingsComponentOpen: false,
     update: 1,
+    isHeaderOpen: true,
   }),
   computed: {
     dataToRender() {
@@ -192,6 +194,7 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
+      this.isHeaderOpen = !!settings.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
     },
