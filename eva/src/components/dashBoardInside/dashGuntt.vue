@@ -463,7 +463,8 @@ export default {
 
       // Tooltip
 
-      const tooltipBlock = this.$refs.tooltip;
+      let tooltipBlock = this.$refs.tooltip;
+      const tooltipMargin =  this.$attrs['is-full-screen'] ? 170 : 30;
 
       lines
         .on('mouseover', (event) => {
@@ -476,15 +477,14 @@ export default {
               tooltip += `<p class="row-toolrip"><span>${key}</span>: ${event[key]}</p>`;
             });
           }
-
-          moveTooltip(event);
+          moveTooltip(tooltipMargin);
 
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', (event) => {
-          moveTooltip(event);
+        .on('mousemove', () => {
+          moveTooltip(tooltipMargin);
         })
         .on('mouseout', () => {
           tooltipBlock.style.opacity = '0';
@@ -529,8 +529,8 @@ export default {
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', (event) => {
-          moveTooltip(event);
+        .on('mousemove', () => {
+          moveTooltip(tooltipMargin);
         })
         .on('mouseout', () => {
           tooltipBlock.style.opacity = '0';
@@ -613,9 +613,9 @@ export default {
 
       // легенда
 
-      function moveTooltip() {
+      function moveTooltip(offsetX) {
         const x = d3.event.offsetY - 50;
-        const y = d3.event.offsetX + 30;
+        const y = d3.event.offsetX + offsetX;
         tooltipBlock.style.top = `${x}px`;
         tooltipBlock.style.left = `${y}px`;
       }
