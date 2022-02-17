@@ -230,12 +230,22 @@ export default {
       id: this.idFrom,
     });
     this.$nextTick(() => {
+      this.circularSizeNew();
       this.loadSelectedValue();
     });
   },
   methods: {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
+    circularSizeNew() {
+      if (this.$attrs['is-full-screen']) {
+        this.circularWidth = 40;
+        this.circularSize = 500;
+      } else {
+        this.circularWidth = 20;
+        this.circularSize = 190;
+      }
+    },
     addValue(val) {
       // +/- buttons
       this.sliderValue += val;

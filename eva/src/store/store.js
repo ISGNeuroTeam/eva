@@ -1221,6 +1221,11 @@ export default {
       const search = state[idDash].searches.find(
         (search) => search.sid === sid,
       );
+
+      if (status === 'nodata') {
+        Vue.set(state, 'logError', true);
+      }
+
       Vue.set(search, 'status', status);
     },
   },

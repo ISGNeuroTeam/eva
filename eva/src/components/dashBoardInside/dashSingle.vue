@@ -116,10 +116,11 @@ export default {
   },
   watch: {
     dataRestFrom(dataRestFrom) {
-      this.noMsg = !(dataRestFrom && dataRestFrom.length > 0);
+      this.setNoMsg(dataRestFrom);
     },
   },
   mounted() {
+    this.setNoMsg(this.dataRestFrom);
     //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
     this.$store.commit('setActions', {
       actions: this.actions,
@@ -128,6 +129,9 @@ export default {
     });
   },
   methods: {
+    setNoMsg(dataRestFrom) {
+      this.noMsg = !(dataRestFrom && dataRestFrom.length > 0);
+    },
     setEventCompareColor(number) {
       const events = this.$store.getters.getEvents({
         idDash: this.idDash,

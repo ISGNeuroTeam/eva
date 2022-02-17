@@ -13,11 +13,9 @@
       }"
     >
       <v-card-title
-        v-show="
-          element.split('-')[0] === 'singleValue'
-            ? settings.showTitle
-            : props.disappear
-        "
+        v-show="element.split('-')[0] !== 'singleValue'
+          ? settings.showTitle
+          : props.disappear"
         class="card-title open_title"
       >
         <div class="name-dash">
@@ -28,14 +26,24 @@
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
-          <v-icon
-            v-if="searchData.length > 0"
-            class="icon"
-            :color="theme.$main_border"
-            @click="exportDataCSV"
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
-            {{ mdiArrowDownBold }}
-          </v-icon>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="searchData.length > 0"
+                class="icon"
+                :color="theme.$main_border"
+                @click="exportDataCSV"
+                v-on="on"
+              >
+                {{ mdiArrowDownBold }}
+              </v-icon>
+            </template>
+            <span>Скачать результаты</span>
+          </v-tooltip>
           <v-icon
             v-show="dataMode"
             class="icon chart"
@@ -258,6 +266,7 @@
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
+                    @resetRange="resetRange($event)"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
                   />
@@ -439,6 +448,7 @@
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
+        @resetRange="resetRange($event)"
         @update:table-per-page="onTableItemsPerPageChange"
         @update:table-page="onTableIItemsPageChange"
       />
@@ -469,12 +479,16 @@ import { mapGetters } from 'vuex';
 import settings from '../js/componentsSettings.js';
 
 export default {
+  name: 'DashBoard',
   props: {
     width: null,
     height: null,
     idDashFrom: null,
     dataElemFrom: null,
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     dataPageFrom: null,
     loading: {
       type: Boolean,
@@ -635,6 +649,7 @@ export default {
           id: this.element,
         });
       }
+
       return show;
     },
     lastResult() {
@@ -1132,8 +1147,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import '../sass/dashBoard.sass';
+<style lang="sass">
+@import '../sass/dashBoard.sass'
 </style>
 <style lang="sass">
 .settings-dash

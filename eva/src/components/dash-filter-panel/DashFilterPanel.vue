@@ -121,6 +121,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -139,6 +140,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -157,6 +159,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -179,6 +182,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -198,6 +202,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -218,6 +223,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -336,8 +342,8 @@ import {
   mdiChevronRight,
 } from '@mdi/js';
 import FilterPart from './FilterPart.vue';
-import FilterPartModal from './FilterPartModal';
-import FilterPreviewModal from './FilterPreviewModal';
+import FilterPartModal from './FilterPartModal.vue';
+import FilterPreviewModal from './FilterPreviewModal.vue';
 
 export default {
   name: 'DashFilterPanel',
