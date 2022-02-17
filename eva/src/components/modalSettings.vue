@@ -673,12 +673,12 @@
                 <template v-slot:activator="{ on }">
                   <v-icon
                     class="modal-settings__icon"
-                    v-on="on"
                     :style="{
                       color: theme.$main_text,
                       background: 'transparent',
                       borderColor: theme.$main_border,
                     }"
+                    v-on="on"
                   >
                     ?
                   </v-icon>
