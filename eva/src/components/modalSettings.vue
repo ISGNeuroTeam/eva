@@ -683,7 +683,7 @@
                     ?
                   </v-icon>
                 </template>
-                <span>Эталон red #5F27FF rgb(95,39,255)</span>
+                <span>Эталон: red #5F27FF rgb(95,39,255)</span>
               </v-tooltip>
               <v-btn
                 v-if="
@@ -1427,12 +1427,11 @@ export default {
 <style lang="scss">
 @import '../sass/modalSettings.sass';
 .modal-settings__icon {
-  //color: #fff !important;
   font-style: normal;
   padding: 2px 8px;
-  border: 1px solid #fff;
+  border: 1px solid;
   border-radius: 50%;
-  //font-size: 20px !important;
+  font-size: 20px !important;
   cursor: pointer;
   margin-right: 20px;
 }
