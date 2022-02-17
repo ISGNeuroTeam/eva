@@ -1,4 +1,10 @@
-# [1.83.0] - Positioning elements on the dashboard, fixed dashboard filters
+# [1.83.1] - RELEASENOTES fix
+
+### Fixed
+
+- Release name
+
+# [1.83.0] - Zoom for all multiline charts
 
 ### New
 
