@@ -23,6 +23,7 @@
       <div class="flex-grow-0">
         <v-slider
           v-model="sliderValue"
+          :thumb-size="400"
           :class="{ 'slider-vertical': vertical }"
           :dark="isDarkTheme"
           :disabled="loading || values.length === 0"
@@ -241,7 +242,7 @@ export default {
     circularSizeNew(){
       if (this.$attrs['is-full-screen']){
         this.circularWidth = 40
-        this.circularSize = 500
+        this.circularSize = 450
       } else {
         this.circularWidth = 20
         this.circularSize = 190
@@ -307,20 +308,5 @@ export default {
 </script>
 
 <style lang="sass">
-.dash-map
-  color: var(--main_text) !important
-  min-width: 360px
-
-  .v-input__append-inner
-    margin-top: 16px
-
-  .slider-vertical
-    height: 100%
-    padding-right: 60px
-
-    .v-slider--vertical
-      min-height: 220px
-
-  &.full-screen
-    min-width: 690px
+@import "../../sass/dashTune"
 </style>
