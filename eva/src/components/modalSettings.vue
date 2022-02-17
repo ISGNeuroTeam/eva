@@ -665,15 +665,20 @@
                 :class="{ disabled: !colorsPie.nametheme }"
                 hide-details
               />
-              <!--TODO: Добавить стили когда будет известен визуал -->
               <v-tooltip
+                v-if="!defaultThemes.includes(colorsPie.theme)"
                 bottom
                 z-index="9000"
               >
                 <template v-slot:activator="{ on }">
                   <v-icon
-                    class="control-button theme--dark"
+                    class="modal-settings__icon"
                     v-on="on"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
                   >
                     ?
                   </v-icon>
@@ -1421,4 +1426,14 @@ export default {
 
 <style lang="scss">
 @import '../sass/modalSettings.sass';
+.modal-settings__icon {
+  //color: #fff !important;
+  font-style: normal;
+  padding: 2px 8px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  //font-size: 20px !important;
+  cursor: pointer;
+  margin-right: 20px;
+}
 </style>
