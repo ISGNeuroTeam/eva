@@ -1241,6 +1241,11 @@ export default {
       const search = state[idDash].searches.find(
         (search) => search.sid === sid
       );
+
+      if (status === 'nodata'){
+        Vue.set(state, 'logError', true);
+      }
+
       Vue.set(search, 'status', status);
     },
   },
@@ -1801,9 +1806,21 @@ export default {
           Vue.set(state[id.idDash][id.id].options, 'lastResult', false);
           Vue.set(state[id.idDash][id.id].options, 'searchBtn', false);
         }
-        if (!state[id.idDash][id.id].options.pinned) {
-          Vue.set(state[id.idDash][id.id].options, 'pinned', false);
+
+        if (!state[id?.idDash][id?.id]?.options.pinned) {
+          Vue.set(state[id?.idDash][id?.id].options, 'pinned', false);
         }
+
+        if (!state[id.idDash][id.id]?.options.lastDot) {
+          Vue.set(state[id.idDash][id.id].options, 'lastDot', false);
+        }
+        if (!state[id.idDash][id.id]?.options.stringOX) {
+          Vue.set(state[id.idDash][id.id].options, 'stringOX', false);
+        }
+        if (!state[id.idDash][id.id]?.options.united) {
+          Vue.set(state[id.idDash][id.id].options, 'united', false);
+        }
+
         return state[id.idDash][id.id].options;
       };
     },

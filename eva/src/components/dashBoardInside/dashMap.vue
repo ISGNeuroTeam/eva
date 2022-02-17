@@ -284,9 +284,24 @@ export default {
       let element = this.$refs.map.getElementsByClassName(
         'leaflet-control-container'
       );
+
       let container = element[0];
       container.appendChild(test.$el);
       this.isSettings = true;
+    },
+    deleteTitleByAttribute(){
+      const leafletControlZoomOut = this.$refs.map.querySelector(
+          '.leaflet-control-zoom-out'
+      )
+
+      const leafletControlZoomIn = this.$refs.map.querySelector(
+          '.leaflet-control-zoom-in'
+      )
+      leafletControlZoomOut.setAttribute('name', leafletControlZoomOut.getAttribute('title'))
+      leafletControlZoomIn.setAttribute('name', leafletControlZoomIn.getAttribute('title'))
+
+      leafletControlZoomOut.removeAttribute('title');
+      leafletControlZoomIn.removeAttribute('title');
     },
 
     initTheme() {
@@ -484,6 +499,9 @@ export default {
           x.style.height = (x.naturalHeight / 10) * this.map.getZoom() + 'px';
         }
       });
+
+      this.deleteTitleByAttribute();
+
       this.$nextTick(() => {
         this.map._onResize();
       });
@@ -798,54 +816,6 @@ export default {
   },
 };
 </script>
-<style>
-.dash-map {
-  padding: 0 20px !important;
-}
-.leaflet-tooltip-top:before,
-.leaflet-tooltip-bottom:before,
-.leaflet-tooltip-left:before,
-.leaflet-tooltip-right:before {
-  border: none !important;
-}
-.mapContainer {
-  position: relative;
-  background: #191919;
-  margin-left: -20px;
-  margin-right: -20px;
-  top: 0;
-}
-.error-message {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  font-size: 25px;
-}
-.leaflet-tooltip-left:before {
-  margin-right: 0;
-}
-.leaftet-flex {
-  display: flex;
-  gap: 5px;
-  justify-items: left;
-}
-.wrapper-property {
-  height: 40px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr) auto;
-}
-.leaftet-hover {
-  border: 2px solid #191919;
-  border-radius: 5px;
-  text-align: left;
-  background-color: #191919;
-  color: white;
-  padding-top: 0;
-}
-.leaftet-hover::before {
-  margin-bottom: -6px;
-}
-.leaflet-container.cursor-crosshair {
-  cursor: crosshair;
-}
+<style lang="sass">
+@import '../../sass/dashMap.sass'
 </style>

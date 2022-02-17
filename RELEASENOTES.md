@@ -1,3 +1,29 @@
+# [1.83.0] - Positioning elements on the dashboard, fixed dashboard filters
+
+### New
+
+- Ability to zoom all multiline graphs
+- Ability to zoom out by double-clicking on a multiline
+- Frame for the event window
+
+### Fixed
+
+- Selecting an object after changing dash setting
+- Token with an empty name
+- Name restriction for tokens
+- Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
+- Component checkboxes have undefined status
+- Dash single value title
+- Setting theme
+- Sizing a filter
+- Dashboard component
+- Button hints
+- Switching between filter types
+- Cell size in tile visualization
+- Missing error signal in datasource exc request
+- Tile visualization not showing after datasource restart
+- Dash single value settings no closes
+
 # [1.82.0] - Positioning elements on the dashboard, fixed dashboard filters
 
 ### New

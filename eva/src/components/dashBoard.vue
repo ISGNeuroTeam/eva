@@ -13,14 +13,12 @@
       }"
     >
       <v-card-title
-        v-show="
-          element.split('-')[0] === 'singleValue'
-            ? settings.showTitle
-            : props.disappear
-        "
+        v-show="element.split('-')[0] !== 'singleValue'
+          ? settings.showTitle
+          : props.disappear"
         class="card-title open_title"
       >
-        <div class="name-dash">
+        <div  class="name-dash">
           <v-icon
             v-if="dataFromDB"
             class="icon"
@@ -28,14 +26,24 @@
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
-          <v-icon
-            v-if="searchData.length > 0"
-            class="icon"
-            :color="theme.$main_border"
-            @click="exportDataCSV"
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
-            {{ mdiArrowDownBold }}
-          </v-icon>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                v-if="searchData.length > 0"
+                class="icon"
+                :color="theme.$main_border"
+                @click="exportDataCSV"
+                v-on="on"
+              >
+                {{ mdiArrowDownBold }}
+              </v-icon>
+            </template>
+            <span>Скачать результаты</span>
+          </v-tooltip>
           <v-icon
             v-show="dataMode"
             class="icon chart"
@@ -62,17 +70,17 @@
                 v-if="dataSourseTitle !== -1"
                 class="ml-1"
               >
-                {{ dataSourseTitle }}
-              </span>
+              {{ dataSourseTitle }}
+            </span>
             </div>
             <div
               v-if="props.edit"
               v-show="dataMode"
               class="dash-block-sid"
               :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
+              color: theme.$main_text,
+              borderColor: theme.$main_border,
+            }"
             >
               {{ props.sid }}
             </div>
@@ -258,6 +266,7 @@
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
+                    @resetRange="resetRange($event)"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
                   />
@@ -439,6 +448,7 @@
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
+        @resetRange="resetRange($event)"
         @update:table-per-page="onTableItemsPerPageChange"
         @update:table-page="onTableIItemsPageChange"
       />
@@ -465,16 +475,20 @@ import {
   mdiSettings,
   mdiTrashCanOutline,
 } from '@mdi/js';
-import { mapGetters } from 'vuex';
+import {mapGetters} from 'vuex';
 import settings from '../js/componentsSettings.js';
 
 export default {
+  name: 'DashBoard',
   props: {
     width: null,
     height: null,
     idDashFrom: null,
     dataElemFrom: null,
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     dataPageFrom: null,
     loading: {
       type: Boolean,
@@ -572,28 +586,45 @@ export default {
       }
       let name = this.props.name;
       name &&
-        this.getSelfTockens.forEach((token) => {
-          name = name.replaceAll(`$${token.name}$`, token.value);
-        });
+      this.getSelfTockens.forEach((token) => {
+        name = name.replaceAll(`$${token.name}$`, token.value);
+      });
+
+      if (name.indexOf(`$evaTknLogin$`) != -1) {
+        if (this.$jwt.hasToken()) {
+          name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
+        }
+      }
       return name;
     },
     settingsIsOpened() {
       return this.$store.getters.getModalSettings(this.idDash).status;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    element: function () {
+    element() {
       return this.dataElemFrom;
     },
-    dataMode: function () {
-      console.log('computed dataMode this.dataModeFrom = ', this.dataModeFrom);
+    dataMode() {
+      this.changeOptions(this.dataModeFrom);
+      if (!this.dataModeFrom) {
+        if (
+          this.element.split('-')[0] === 'button' ||
+          this.element.split('-')[0] === 'csvg' ||
+          this.element.split('-')[0] === 'tile'
+        ) {
+          this.setPropDisappear(false);
+        }
+      } else {
+        this.setPropDisappear(true);
+      }
       return this.dataModeFrom;
     },
-    currentElem: function () {
+    currentElem() {
       // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
       let nameElement = '';
       if (this.element) {
@@ -602,14 +633,14 @@ export default {
       }
       return nameElement;
     },
-    elemIcon: function () {
+    elemIcon() {
       let element = '';
       if (this.element) {
         element = this.element.split('-')[0];
       }
       return element;
     },
-    showElement: function () {
+    showElement() {
       // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
       let show = false;
       if (this.element) {
@@ -618,77 +649,53 @@ export default {
           id: this.element,
         });
       }
+
       return show;
     },
-    lastResult: function () {
+    lastResult() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.element,
       });
       return options.lastResult;
     },
-    options: function () {
+    options() {
       let options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.element,
       });
-      this.setPropsOptions(options)
+
+      this.setOptionsItems(options);
+
+      if (this.props.options.timeFormat) {
+        this.setPropTimeFormat(this.props.options.timeFormat);
+      }
+      if (this.props.options.widthTile) {
+        this.setPropOptionsWidthTile(this.props.options.widthTile);
+      } else {
+        this.setPropOptionsWidthTile('');
+      }
+      if (this.props.options.heightTile) {
+        this.setPropOptionsHeightTile(this.props.options.heightTile);
+      } else {
+        this.setPropOptionsHeightTile('');
+      }
+      if (this.props.options.tooltip) {
+        Object.keys(this.props.options.tooltip).forEach((item) => {
+          this.setPropTooltips(item, this.props.options.tooltip[item]);
+        });
+      } else {
+        this.setPropTooltips('texts', []);
+        this.setPropTooltips('links', []);
+        this.setPropTooltips('buttons', []);
+      }
+
+      this.setShadow();
+
       return options.change;
     },
   },
   watch: {
-    dataMode(val) {
-      console.log('watch dataMode', val);
-      this.changeOptions(this.dataModeFrom);
-      if (!this.dataModeFrom) {
-        if (
-          this.element.split('-')[0] === 'button' ||
-          this.element.split('-')[0] === 'csvg' ||
-          this.element.split('-')[0] === 'tile'
-        ) {
-          this.props.disappear = false;
-        }
-      } else {
-        this.props.disappear = true;
-      }
-    },
-    options(val) {
-      console.log('watch options', val);
-
-      let options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.element,
-      });
-
-      Object.keys(options).forEach((item) => {
-        this.props.options[item] = options[item];
-      });
-
-      if (this.props.options.timeFormat) {
-        this.props.timeFormat = this.props.options.timeFormat;
-      }
-      this.$set(
-        this.props.sizeTile,
-        'width',
-        this.props.options.widthTile || ''
-      );
-      this.$set(
-        this.props.sizeTile,
-        'height',
-        this.props.options.heightTile || ''
-      );
-      if (this.props.options.tooltip) {
-        Object.keys(this.props.options.tooltip).forEach((item) => {
-          this.$set(this.props.tooltip, item, this.props.options.tooltip[item]);
-        });
-      } else {
-        this.$set(this.props.tooltip, 'texts', []);
-        this.$set(this.props.tooltip, 'links', []);
-        this.$set(this.props.tooltip, 'buttons', []);
-      }
-
-      this.setShadow();
-    },
     fullScreenMode(to) {
       setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
@@ -719,10 +726,25 @@ export default {
     onTableItemsPerPageChange(perPage) {
       this.tablePerPage = perPage
     },
-    setPropsOptions(options) {
+    setOptionsItems(options) {
       Object.keys(options).forEach((item) => {
         this.props.options[item] = options[item];
       });
+    },
+    setPropDisappear(val) {
+      this.props.disappear = val;
+    },
+    setPropTimeFormat(val) {
+      this.props.timeFormat = val;
+    },
+    setPropOptionsWidthTile(val) {
+      this.$set(this.props.sizeTile, 'width', val);
+    },
+    setPropOptionsHeightTile(val) {
+      this.$set(this.props.sizeTile, 'height', val);
+    },
+    setPropTooltips(item, value) {
+      this.$set(this.props.tooltip, item, value);
     },
     onResize() {
       this.fullScreenWidth = window.innerWidth * 0.8;
@@ -732,17 +754,18 @@ export default {
       this.settings = JSON.parse(JSON.stringify(settings));
     },
 
-    editName: function (props) {
+    editName(props) {
       // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
+
       this.$store.commit('setNameDash', {
         name: props.name,
         id: this.element,
         idDash: this.idDash,
       });
     },
-    chooseDS: function () {
+    chooseDS() {
       // открываем модальное окно с выбором ИС (источник данных)
       this.$store.commit('setModalSearch', {
         id: this.idDash,
@@ -750,7 +773,7 @@ export default {
         elem: this.element,
       });
     },
-    switchDS: function () {
+    switchDS() {
       // переключаем между режимами выбора данных и их отображением
       let status = !this.showElement;
       this.$store.commit('setSwitch', {
@@ -759,27 +782,27 @@ export default {
         id: this.element,
       });
     },
-    switchOP: function () {
+    switchOP() {
       this.$store.dispatch('openModalSettings', {
         path: this.idDash,
         element: this.element,
         titles: this.searchData[0] ? Object.keys(this.searchData[0]) : [],
       });
     },
-    setShadow: function () {
+    setShadow() {
       if (this.props.options.boxShadow) {
         this.props.optionsBoxShadow = this.theme.$primary_button;
       } else {
         this.props.optionsBoxShadow = `transparent`;
       }
     },
-    setLoading: function (event) {
+    setLoading(event) {
       if (this.element.indexOf('button') !== -1) {
         this.props.hideLoad = !event;
       }
       this.props.loading = event;
     },
-    deleteDashBoard: function (props) {
+    deleteDashBoard(props) {
       // вызываем окно для удаления элемнета
       this.$store.commit('setModalDelete', {
         id: this.idDash,
@@ -789,7 +812,54 @@ export default {
         page: this.dataPageFrom,
       });
     },
-    openTitle: function () {
+    // нужен ли этот метод
+    getDataFromDB(searchID) {
+      // получение данных с indexindDB
+      let db = null;
+      let request = indexedDB.open('EVA', 1);
+      request.onerror = function (event) {
+        console.log('error: ', event);
+      };
+
+      request.onupgradeneeded = (event) => {
+        console.log('create');
+        db = event.target.result;
+        if (!db.objectStoreNames.contains('searches')) {
+          // if there's no "books" store
+          db.createObjectStore('searches'); // create it
+        }
+        request.onsuccess = () => {
+          db = request.result;
+          console.log('successEvent: ' + db);
+        };
+      };
+      return new Promise((resolve) => {
+        request.onsuccess = () => {
+          db = request.result;
+
+          let transaction = db.transaction('searches'); // (1)
+
+          // получить хранилище объектов для работы с ним
+          let searches = transaction.objectStore('searches'); // (2)
+
+          let query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
+
+          query.onsuccess = () => {
+            // (4)
+            if (query.result) {
+              resolve(query.result);
+            } else {
+              resolve([]);
+            }
+          };
+
+          query.onerror = function () {
+            console.log('Ошибка', query.error);
+          };
+        };
+      });
+    },
+    openTitle() {
       // открываем закрываем шапку элемнета
       if (this.props.arrow.direct === 'up') {
         this.props.arrow.elem = this.props.mdiChevronDown;
@@ -800,7 +870,7 @@ export default {
       }
       this.props.open_title = !this.props.open_title;
     },
-    hideDS: function () {
+    hideDS() {
       // функция которая для определенного элемента сразу вносит ряд настроек визуализации=
       this.$store.commit('setSwitch', {
         idDash: this.idDash,
@@ -808,14 +878,14 @@ export default {
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
-    setVissible: function (event) {
+    setVissible(event) {
       if (event.split('-')[0] === 'picker' || event.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
         this.$el.querySelector('.dash-block').style.overflow = 'visible'; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
       }
     },
-    changeOptions: function (mode) {
+    changeOptions(mode) {
       let level = this.props.options.level;
       let opacity = 1;
       if (mode) {
@@ -832,44 +902,6 @@ export default {
       this.$emit('SetOpacity', opacity);
       this.$emit('SetLevel', level);
     },
-    // getDataFromRest: async function (event) {
-    //   // this.$set(this.loadings,event.sid,true);
-    //   this.$store.commit('setLoading', {
-    //     search: event.sid,
-    //     idDash: this.idDash,
-    //     should: true,
-    //     error: false,
-    //   })
-    //
-    //   this.$store.auth.getters.putLog(`Запущен запрос  ${event.sid}`)
-    //   let response = await this.$store.getters.getDataApi({
-    //     search: event,
-    //     idDash: this.idDash,
-    //   }) // собственно проводим все операции с данными
-    //   // вызывая метод в хранилище
-    //   if (response.length == 0) {
-    //     // если что-то пошло не так
-    //     this.$store.commit('setLoading', {
-    //       search: event.sid,
-    //       idDash: this.idDash,
-    //       should: false,
-    //       error: true,
-    //     })
-    //   } else {
-    //     // если все нормально
-    //
-    //     let responseDB = this.$store.getters.putIntoDB(response, event.sid, this.idDash)
-    //     responseDB.then((result) => {
-    //       this.$store.commit('setLoading', {
-    //         search: event.sid,
-    //         idDash: this.idDash,
-    //         should: false,
-    //         error: false,
-    //       })
-    //     })
-    //   }
-    //   return response
-    // },
     exportDataCSV() {
       const searchId = this.$store.getters.getSearchID({
         idDash: this.idDash,
@@ -877,34 +909,7 @@ export default {
       });
       this.$emit('downloadData', searchId);
     },
-
-    // moveElem: function (props) {  // переключаем режим разрешения перемещения элемента
-    //   if (props.move_elem) {
-    //     props.arrow_coral = 'controlsActive';
-    //     this.$emit('moveElem');  // так как это переключается у родителя, мы вынуждены вызывать событие на родителе и передавтаь туда данные
-    //     props.move_elem = !props.move_elem;
-    //   } else {
-    //     props.arrow_coral = 'controlsInsideDash';
-    //     this.$emit('moveElem');
-    //     this.$emit('sendMove');
-    //     props.move_elem = !props.move_elem;
-    //   }
-    // },
-    // resizeElem: function (props) {  // тоже самое для режима изменения размера
-    //   if (props.resize_elem) {
-    //     props.resize_arrow_coral = 'controlsActive';
-    //     props.transition = !props.transition;
-    //     this.$emit('resizeElem');
-    //     props.resize_elem = !props.resize_elem;
-    //   } else {
-    //     props.resize_arrow_coral = 'controlsInsideDash';
-    //     props.transition = !props.transition;
-    //     this.$emit('resizeElem');
-    //     this.$emit('sendSize');
-    //     props.resize_elem = !props.resize_elem;
-    //   }
-    // },
-    getData: function (searchID) {
+    getData(searchID) {
       // асинхронная функция для получения даных с реста
       let db = null;
       let request = indexedDB.open('EVA', 1);
@@ -944,7 +949,7 @@ export default {
         };
       });
     },
-    checkFilter: function () {
+    checkFilter() {
       let events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
@@ -961,7 +966,7 @@ export default {
 
         if (event.prop === 'filter' && event.value === 'true') {
           data = JSON.parse(JSON.stringify(this.props.dataRest));
-          event.row = event.row.replace(/[[\]]/g, '').split(',');
+          event.row = event.row.replace(/\[|\]/g, '').split(',');
 
           if (event.column.indexOf('!') !== -1) {
             columnDel = event.column.replace('!', '');
@@ -974,12 +979,15 @@ export default {
             let notArr;
             switch (event.compare) {
               case 'equals':
-                notArr = [];
-                event.row.forEach((notElem) => {
+                notArr = event.row.reduce((acc, notElem) => {
                   if (notElem.indexOf('!') !== -1) {
-                    notArr.push(notElem.substr(1));
+                    return [
+                      ...acc,
+                      notElem.substr(1),
+                    ]
                   }
-                });
+                  return acc
+                }, []);
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     if (notArr.length !== 0) {
@@ -1142,8 +1150,8 @@ export default {
 };
 </script>
 
-<style lang="scss">
-@import '../sass/dashBoard.sass';
+<style lang="sass">
+@import '../sass/dashBoard.sass'
 </style>
 <style lang="sass">
 .settings-dash

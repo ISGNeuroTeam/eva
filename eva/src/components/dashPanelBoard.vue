@@ -462,6 +462,7 @@
         </div>
       </div>
       <div
+          ref="blockTocken"
         class="block-tocken"
         :class="{ opentocken: opentocken }"
         :style="blockToolStyle"
@@ -560,29 +561,61 @@
           >
             {{ tocken.value }}
           </p>
-          <v-icon
-            class="row-check"
-            :color="theme.$primary_button"
-            :class="{ showIcon: lookTockens[i].show }"
-            @click="saveTocken(i)"
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ check }}
-          </v-icon>
-          <v-icon
-            class="row-look"
-            :color="theme.$primary_button"
-            @click="lookTocken(i)"
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  class="row-check"
+                  :color="theme.$primary_button"
+                  :class="{ showIcon: lookTockens[i].show }"
+                  v-on="on"
+                  @click="saveTocken(i)"
+              >
+                {{ check }}
+              </v-icon>
+            </template>
+            <span>Создать/обновить токен</span>
+          </v-tooltip>
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ look }}
-          </v-icon>
-          <v-icon
-            class="row-trash"
-            :color="theme.$primary_button"
-            :class="{ showIcon: lookTockens[i].show }"
-            @click="deleteTocken(tocken.name, i)"
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  class="row-look"
+                  :color="theme.$primary_button"
+                  v-on="on"
+                  @click="lookTocken(i)"
+              >
+                {{ look }}
+              </v-icon>
+            </template>
+            <span>Предпросмотр токена</span>
+          </v-tooltip>
+
+          <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
           >
-            {{ trash }}
-          </v-icon>
+            <template v-slot:activator="{ on }">
+              <v-icon
+                  class="row-trash"
+                  :color="theme.$primary_button"
+                  :class="{ showIcon: lookTockens[i].show }"
+                  @click="deleteTocken(tocken.name, i)"
+                  v-on="on"
+              >
+                {{ trash }}
+              </v-icon>
+            </template>
+            <span>Удалить токен</span>
+          </v-tooltip>
+
         </div>
         <div
           class="row-tocken new"
@@ -618,6 +651,7 @@
             @click="changeColor"
           />
           <v-select
+              v-model="newCapture"
             :items="capture({ action: newAction, elem: newElem })"
             :color="theme.$main_text"
             hide-details
@@ -731,8 +765,7 @@
         :class="{ opensave: opensave }"
         :style="{ background: theme.$main_bg }"
       >
-        <div
-          v-show="!errorSave"
+        <div v-show="!errorSave"
           class="save-obertka"
         >
           <div
@@ -781,17 +814,16 @@
       </div>
       <div
         class="warning-block"
+        :class="{ openwarning: openwarning, errorSaveToken: errorSaveToken }"
         :style="{
           background: theme.$main_bg,
-          border: `1px solid ${theme.$main_border}`,
-          color: theme.$main_text,
           bottom: `-${otstupBottom}px`,
         }"
       >
         <div class="warning-text">
           {{ msgWarn }}
         </div>
-        <div class="btn-warning">
+        <div v-show="!errorSaveToken" class="btn-warning">
           <v-btn
             small
             :color="theme.$primary_button"
@@ -896,8 +928,10 @@ import EvaLogo from '../images/eva-logo.svg';
 
 import settings from '../js/componentsSettings.js';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
+import {globalTockens} from "@/constants/globalTockens";
 
 export default {
+  name: 'DashPanelBoard',
   components: {
     EvaLogo,
     DashFilterPanel,
@@ -951,6 +985,7 @@ export default {
       opensearch: false,
       openfilter: false,
       opensave: false,
+      openwarning: false,
       openexim: false,
       sign: true,
       gearShow: false,
@@ -998,6 +1033,7 @@ export default {
       },
       newElem: '',
       newAction: '',
+      newCapture: '',
       tockensName: {},
       msgWarn: '',
       textarea_event: '',
@@ -1031,6 +1067,7 @@ export default {
       msgErrorSave: '',
       colorErrorSave: '',
       createSearchBtn: '',
+      errorSaveToken: false,
       disabledDS: {},
       modalPaperSid: '',
       modalPaper: false,
@@ -1394,63 +1431,72 @@ export default {
     saveTocken: function (index) {
       // функция которая сохраняет токен в хранилище
 
-      let parent = event.target.parentElement; // получаем предка элемнета на который нажали для сохранения
-      while (!parent.classList.contains('row-tocken')) {
-        parent = parent.parentElement; // то еще на уровень выше берем предка
-      }
-      this.tempTocken = {
-        // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
-        name: parent.querySelector('.tocken-name').querySelector('input')
-          ? parent.querySelector('.tocken-name').querySelector('input').value
-          : '',
-        elem: parent
-          .querySelector('.tocken-elem')
-          .querySelector('.v-select__selection')
-          ? parent
-              .querySelector('.tocken-elem')
-              .querySelector('.v-select__selection').innerText
-          : '',
-        action: parent
-          .querySelector('.tocken-action')
-          .querySelector('.v-select__selection')
-          ? parent
-              .querySelector('.tocken-action')
-              .querySelector('.v-select__selection').innerText
-          : '',
-        capture: parent
-          .querySelector('.tocken-capture')
-          .querySelector('.v-select__selection')
-          ? parent
-              .querySelector('.tocken-capture')
-              .querySelector('.v-select__selection').innerText
-          : '',
-        prefix: parent.querySelector('.tocken-prefix').querySelector('input')
-          ? parent.querySelector('.tocken-prefix').querySelector('input').value
-          : '',
-        sufix: parent.querySelector('.tocken-sufix').querySelector('input')
-          ? parent.querySelector('.tocken-sufix').querySelector('input').value
-          : '',
-        delimetr: parent
-          .querySelector('.tocken-delimetr')
-          .querySelector('input')
-          ? parent.querySelector('.tocken-delimetr').querySelector('input')
-              .value
-          : '',
-        defaultValue: parent
-          .querySelector('.tocken-default-value')
-          .querySelector('input')
-          ? parent.querySelector('.tocken-default-value').querySelector('input')
-              .value
-          : '',
-        resetData: true, //сделать норм
-        onButton: parent
-          .querySelector('.tocken-on-button')
-          .querySelector('input')
-          ? parent.querySelector('.tocken-on-button').querySelector('input')
-              .checked
-          : '',
-      };
+      // проверяем не пустой ли токен
+      if ((!this.newTockenName
+              && !Number.isInteger(index))
+          || (Number.isInteger(index)
+              && !this.tockensName[this.tockens[index].name].length)) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        let height = this.$refs.blockTocken.clientHeight;
 
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Имя токена пустое. Попробуйте еще раз.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
+      }
+
+      // проверяем на запретние названия
+      if ((!Number.isInteger(index)
+              && globalTockens.includes(this.newTockenName.trim()))
+          || (Number.isInteger(index)
+              && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        let height = this.$refs.blockTocken.clientHeight;
+
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Невозможно использовать это имя для токена. Попробуйте еще раз.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
+      }
+
+      // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
+      if (Number.isInteger(index)){
+        // редактирование
+        this.tempTocken = {
+          name: this.tockensName[this.tockens[index].name],
+          elem: this.tockens[index].elem,
+          action:this.tockens[index].action,
+          capture: this.tockens[index].capture,
+          prefix: this.tockens[index].prefix,
+          sufix: this.tockens[index].sufix,
+          delimetr: this.tockens[index].delimetr,
+          defaultValue: this.tockens[index].defaultValue,
+          resetData: true, //сделать норм
+          onButton: this.tockens[index].onButton,
+        };
+      } else {
+        // создание нового
+        this.tempTocken = {
+          name: this.newTockenName,
+          elem: this.newElem,
+          action: this.newAction,
+          capture: this.newCapture,
+          prefix: this.newTockenDop.prefix,
+          sufix: this.newTockenDop.sufix,
+          delimetr: this.newTockenDop.delimetr,
+          defaultValue: this.newTockenDop.defaultValue,
+          resetData: true, //сделать норм
+          onButton: this.newTockenDop.onButton,
+        };
+      }
       let j = -1;
 
       this.tockens.forEach((item, i) => {
@@ -1462,20 +1508,15 @@ export default {
       });
       if (j !== -1 || Number.isInteger(index)) {
         // если токен уже есть
-        let height = this.$el
-          .querySelector('.block-tocken')
-          .getBoundingClientRect().height; // выводим предупреждающее сообщение, переписать ли его
-        this.$el
-          .querySelector('.warning-block')
-          .classList.add('warning-block-show');
-        //this.$el.querySelector('.warning-block').style.bottom = `-${height+55}px; !important`; // 45 это высота самого warning и padding сверху
+        this.openwarning = true; // выводим предупреждающее сообщение, переписать ли его
+        this.errorSaveToken = false;
+
+        let height = this.$refs.blockTocken.clientHeight;
+
         this.otstupBottom = height + 55;
         this.msgWarn = 'Такой токен уже существует. Хотите обновить?';
-        this.$el
-          .querySelector('.warning-block')
-          .querySelector('.yes-btn')
-          .setAttribute('tool', 'tocken');
-        this.index = index;
+
+        this.index = j !== -1 ? j : index;
       } else {
         // если нету то етсь он новый
         this.$store.commit('createTockens', {
@@ -1484,6 +1525,14 @@ export default {
         }); // то создаем токен в хранилище
         this.showSign = true; // визуально скрываем окно с созданием токена
         this.opennewtocken = false;
+
+        this.newTockenName = null;
+        this.newElem = '';
+        this.newAction = '';
+        this.newCapture = '';
+        this.newTockenDop = {
+          defaultValue: '*',
+        }
       }
     },
     deleteTocken: function (name) {
@@ -1523,27 +1572,12 @@ export default {
       });
     },
     yesSearch: function () {
-      // кнопка согласия на обновления если ИС или токен уже существует
-      let elem =
-        event.target.nodeName.toLowerCase() !== 'button'
-          ? event.target.parentElement
-          : event.target; // сперва берем родителя кнопки, и если не получилось поймать кнопку, то еще выше уровнеь берем
-      if (elem.getAttribute('tool') === 'search') {
-        // если это окно ИС
-        this.$store.commit('setSearch', {
-          search: this.newSearch,
-          idDash: this.idDash,
-          reload: true,
-        }); // то обновляем ИС
-        this.$el
-          .querySelector('.warning-block')
-          .classList.remove('warning-block-show'); // убираем окно с предпреждением
-        this.openSearch();
-      } else if (elem.getAttribute('tool') === 'tocken') {
-        // если это токен - собственно тоже самое
+      // кнопка согласия на обновления если токен уже существует
+
         const id = this.index;
         const newName = this.tempTocken.name;
         this.tempTocken.name = this.tockens[id].name;
+
         this.$store.commit('createTockens', {
           idDash: this.idDash,
           tocken: this.tempTocken,
@@ -1553,18 +1587,22 @@ export default {
           tocken: this.tempTocken,
           value: newName,
         });
-        this.$el
-          .querySelector('.warning-block')
-          .classList.remove('warning-block-show');
+
+        this.openwarning = false;
         this.showSign = true;
         this.opennewtocken = false;
+
+      this.newTockenName = null;
+      this.newElem = '';
+      this.newAction = '';
+      this.newCapture = '';
+      this.newTockenDop = {
+        defaultValue: '*',
       }
     },
     noSearch: function () {
       // если нажали на кнопку нет
-      this.$el
-        .querySelector('.warning-block')
-        .classList.remove('warning-block-show'); // то просто убираем это окно
+      this.openwarning = false;
     },
     checkSid: function (sid) {
       let newSid = sid;
@@ -2083,10 +2121,15 @@ export default {
 @import '../sass/dashPanelBoard.sass';
 </style>
 
-<style>
+<style scoped>
 .iconsNavigations {
   display: flex;
   justify-content: center;
   flex-direction: row;
 }
+
+.v-tooltip__content {
+  width: fit-content
+}
 </style>
+

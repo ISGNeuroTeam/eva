@@ -111,6 +111,8 @@ export default {
         this.noMsg = true;
         this.msgText = 'Ожидается поле caption и color';
       } else {
+        this.noMsg = false;
+        this.msgText = '';
         this.captures = Object.keys(dataRestFrom[0]);
       }
     },
