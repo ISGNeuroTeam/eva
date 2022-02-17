@@ -95,11 +95,11 @@
                     outlined
                     dense
                     :dark="isDark"
-                    class="mt-0 pt-0"
+                    class="mt-0 pt-0 map-user-settings__input"
                     hide-details
                     single-line
                     type="number"
-                    style="width: 60px"
+                    style="width: 60px; margin-right: 10px;"
                   />
                 </template>
               </v-slider>
@@ -118,24 +118,28 @@
                     outlined
                     dense
                     :dark="isDark"
-                    class="mt-0 pt-0"
+                    class="mt-0 pt-0 map-user-settings__input"
                     hide-details
                     single-line
                     type="number"
-                    style="width: 60px"
+                    style="width: 60px; margin-right: 10px;"
                   />
                 </template>
               </v-slider>
 
               <p>Начальная точка</p>
               <v-row>
-                <v-col col="6">
+                <v-col
+                    cols="3"
+                    style="padding-right: 0"
+                >
                   <v-text-field
                     v-model="options.initialPoint.x"
                     outlined
                     dense
                     :dark="isDark"
                     type="number"
+                    class="map-user-settings__input"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
                     <template v-slot:prepend>
@@ -143,13 +147,17 @@
                     </template>
                   </v-text-field>
                 </v-col>
-                <v-col col="6">
+                <v-col
+                    cols="3"
+                    style="padding-right: 0"
+                >
                   <v-text-field
                     v-model="options.initialPoint.y"
                     outlined
                     dense
                     :dark="isDark"
                     type="number"
+                    class="map-user-settings__input"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
                     <template v-slot:prepend>
@@ -616,6 +624,7 @@ export default {
 
 .v-text-field__slot label
   color: var(--main_text) !important
+  margin: 18px !important
 .med
   color: var(--main_text) !important
   .v-text-field__slot input
@@ -629,4 +638,10 @@ export default {
     color: var(--main_text) !important
   .v-input input
     min-height: auto !important
+
+.map-user-settings__input
+  .v-input__slot
+    padding: 0 1px 0 12px !important
+  .v-text-field__slot
+    margin: 0 -12px 0 -1px
 </style>
