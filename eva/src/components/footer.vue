@@ -8,7 +8,8 @@
 </template>
 
 <script>
-import { version } from './../../package.json';
+import { version } from '../../package.json';
+
 export default {
   data() {
     return {
@@ -16,7 +17,7 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },

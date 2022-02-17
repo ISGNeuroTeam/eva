@@ -138,11 +138,11 @@ export default {
   props: {
     essence: {
       type: String,
-      required: true
+      required: true,
     },
     subessence: {
       type: String,
-      required: true
+      required: true,
     },
     create: {
       type: Boolean,
@@ -359,7 +359,7 @@ export default {
     active() {
       if (this.activeFrom) {
         this.$nextTick(() => {
-          let essence = this.essence;
+          const { essence } = this;
           const tabs = [
             'users',
             'roles',
@@ -368,7 +368,7 @@ export default {
             'indexes',
             'dashs',
           ];
-         this.setTabs(essence, tabs)
+          this.setTabs(essence, tabs);
           this.switchTab();
         });
       }
@@ -382,12 +382,12 @@ export default {
     setTabs(essence, tabs) {
       tabs.forEach((tab) => {
         this.alldata[essence].tab[tab] = this.create ? 'tab-2' : 'tab-1';
-      })
+      });
     },
     async getData() {
-      let essence = this.essence;
-      let subessence = this.subessence;
-      let data = await this.dataFrom;
+      const { essence } = this;
+      const { subessence } = this;
+      const data = await this.dataFrom;
 
       if (this.create) {
         if (essence === 'dash') {
@@ -399,8 +399,8 @@ export default {
           };
           this.$emit('changeData', {
             data: this.translateToArray([{ name: this.nameGroupFrom }]),
-            essence: essence,
-            subessence: subessence,
+            essence,
+            subessence,
           });
         } else {
           this.alldata[essence][subessence] = {
@@ -436,39 +436,27 @@ export default {
       this.getData();
     },
     translateToObj(array) {
-      return array.map((item) => {
-        return { name: item };
-      });
+      return array.map((item) => ({ name: item }));
     },
     deleteSelected(subj) {
-      let essence = this.essence;
-      let subessence = this.subessence;
-      let deleted = this.alldata[essence][subj].selected.map((item) => {
-        return item.name;
-      });
+      const { essence } = this;
+      const { subessence } = this;
+      const deleted = this.alldata[essence][subj].selected.map((item) => item.name);
 
       this.alldata[essence][subj].data = this.alldata[essence][subj].data
-        .filter((item) => {
-          if (!deleted.includes(item.name)) {
-            return item;
-          }
-      });
+        .filter((item) => !deleted.includes(item.name));
       this.alldata[essence][subj].selected = [];
       this.$emit('changeData', {
         data: this.translateToArray(this.alldata[essence][subj].data),
-        essence: essence,
-        subessence: subessence,
+        essence,
+        subessence,
       });
     },
     addSelected(subj) {
-      let essence = this.essence;
-      let subessence = this.subessence;
-      let added = this.alldata[essence][`all${subj}`].selected.map((item) => {
-        return item.name;
-      });
-      let already = this.alldata[essence][subj].data.map((item) => {
-        return item.name;
-      });
+      const { essence } = this;
+      const { subessence } = this;
+      const added = this.alldata[essence][`all${subj}`].selected.map((item) => item.name);
+      const already = this.alldata[essence][subj].data.map((item) => item.name);
       this.alldata[essence][`all${subj}`].data.forEach((item) => {
         if (added.includes(item.name) && !already.includes(item.name)) {
           this.alldata[essence][subj].data.push(item);
@@ -478,14 +466,12 @@ export default {
       this.alldata[essence].tab[subj] = 'tab-1';
       this.$emit('changeData', {
         data: this.translateToArray(this.alldata[essence][subj].data),
-        essence: essence,
-        subessence: subessence,
+        essence,
+        subessence,
       });
     },
     translateToArray(array) {
-      return array.map((item) => {
-        return item.name;
-      });
+      return array.map((item) => item.name);
     },
   },
 };

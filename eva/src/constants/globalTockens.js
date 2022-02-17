@@ -1,1 +1,1 @@
-export const globalTockens = ['evaTknLogin']
+export const globalTockens = ['evaTknLogin'];

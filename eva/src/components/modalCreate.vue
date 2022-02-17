@@ -272,7 +272,7 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
     colors() {
@@ -292,17 +292,17 @@ export default {
         this.theme.$purple,
       ];
     },
-    active: function () {
-      this.setData()
+    active() {
+      this.setData();
       return this.modalFrom;
     },
-    groupCheck: function () {
+    groupCheck() {
       return this.groupFlagFrom;
     },
-    groups: function () {
+    groups() {
       return this.groupFrom;
     },
-    dashs: function () {
+    dashs() {
       return this.dashsFrom;
     },
   },
@@ -316,7 +316,7 @@ export default {
     this.pickedColor = this.theme.$main_bg;
   },
   methods: {
-    setData () {
+    setData() {
       this.pickedColor = this.theme.$main_bg;
       if (this.modalFrom) {
         if (this.dataFrom) {
@@ -368,7 +368,7 @@ export default {
       this.colorInputMode = 'custom';
       this.setGroupColor(color);
     },
-    createBtn: function (name) {
+    createBtn(name) {
       // при нажатии на кнопку создать
       let hasSimilarModel = false;
       if (!name || name == '') {
@@ -379,18 +379,18 @@ export default {
         }, 3000); // а через три секунды убираем - чисто понты)
       } else {
         // если имя введено
-        //let actionEmit = '';
+        // let actionEmit = '';
         let dataObj = {};
         let warnText = '';
         let essence = '';
         if (this.groupCheck) {
           // для этого просматриваем все дашборды на странице (но берем их из хранилища)
           hasSimilarModel = this.groups.some(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
+            (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
           dataObj = { name: this.newGroup.name, color: this.newGroup.color };
           if (Object.keys(this.changedData).length != 0) {
-            let keys = this.changedData.group;
+            const keys = this.changedData.group;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
@@ -403,7 +403,7 @@ export default {
         } else {
           // для этого просматриваем все дашборды на странице (но берем их из хранилища)
           hasSimilarModel = this.dashs.some(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
+            (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
           dataObj = { name: this.newDash.name };
 
@@ -413,7 +413,7 @@ export default {
           dataObj.idgroup = this.curGroupFrom;
 
           if (Object.keys(this.changedData).length != 0) {
-            let keys = this.changedData.dash;
+            const keys = this.changedData.dash;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
@@ -433,8 +433,7 @@ export default {
 
         if (this.showwarning) {
           // реакция ДА на предупреждение
-          this.nameBtn.create =
-            this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+          this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
           this.nameBtn.cancel = 'Отмена';
           this.showwarning = false;
         }
@@ -443,37 +442,36 @@ export default {
         this.createEssence(dataObj, method, essence);
       }
     },
-    cancelModal: function (btn) {
+    cancelModal(btn) {
       // есл инажали на отмену создания
       if (btn == 'Отмена') {
         this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
         this.name = ''; // очищаем имя
       }
       this.showwarning = false;
-      this.nameBtn.create =
-        this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+      this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
       this.nameBtn.cancel = 'Отмена';
       this.nameWarn = 'Имя не может быть пустым';
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code == 'Escape') {
         this.cancelModal('Отмена');
       }
     },
-    yesDashBoards: function () {
+    yesDashBoards() {
       // если нажали на кнпку подстверждения создания дашборда
       this.createObj(this.name); // создаем его
       this.create_warning = false; // убаирем предупреждение
     },
-    noDashBoards: function () {
+    noDashBoards() {
       // если нажали на отмену
       this.create_warning = false; // просто убираем предупреждение
     },
-    createEssence: function (group, method, essence) {
-      let response = this.$store.auth.getters.setEssence({
+    createEssence(group, method, essence) {
+      const response = this.$store.getters['auth/setEssence']({
         formData: JSON.stringify(group),
-        essence: essence,
-        method: method,
+        essence,
+        method,
       });
       response.then((res) => {
         if (res.status == 200) {
@@ -499,19 +497,19 @@ export default {
         }
       });
     },
-    createDash: function (dash) {
+    createDash(dash) {
       this.$store.commit('setDash', {
         data: dash,
         getters: this.$store.getters.checkAlreadyDash,
       });
-      this.$store.auth.getters.putLog(
-        `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`
+      this.$store.getters['auth/putLog'](
+        `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`,
       );
     },
-    toHichName: function (name) {
+    toHichName(name) {
       return name[0].toUpperCase() + name.slice(1);
     },
-    getDataForEssence: async function () {
+    async getDataForEssence() {
       let role = '';
       let data = '';
       if (this.groupCheck) {
@@ -522,24 +520,24 @@ export default {
         data = this.dashs;
       }
       if (this.actionFrom) {
-        let allData = {};
-        let keys = [];
-        let promise = Object.keys(this.$data[role].tab).map((item) => {
+        const allData = {};
+        const keys = [];
+        const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.auth.getters.getEssenceList(item, true);
+          return this.$store.getters['auth/getEssenceList'](item, true);
         });
-        let result = await Promise.all(promise);
+        const result = await Promise.all(promise);
         result.forEach((item, i) => {
           allData[keys[i]] = item;
         });
         return allData;
       }
-      return this.$store.auth.getters.getEssence(
+      return this.$store.getters['auth/getEssence'](
         role,
-        data[this.curGroupFrom].id
+        data[this.curGroupFrom].id,
       );
     },
-    setEnter: function (event) {
+    setEnter(event) {
       if (event.code == 'Enter') {
         this.createBtn();
       }

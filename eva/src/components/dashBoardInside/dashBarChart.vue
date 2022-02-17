@@ -77,22 +77,22 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
     // dataRest: function() {
     //   return this.dataRestFrom
     // },
-    color: function () {
+    color() {
       return this.colorFrom;
     },
-    width: function () {
+    width() {
       return this.widthFrom;
     },
-    height: function () {
+    height() {
       return this.heightFrom;
     },
     // prepareBarChart: function() {
@@ -103,12 +103,12 @@ export default {
 
     //   return 'done'
     // },
-    change: function () {
+    change() {
       if (
-        this.dataRestFrom &&
-        Object.keys(this.dataRestFrom).length !== 0 &&
-        this.width !== 0 &&
-        this.height !== 0
+        this.dataRestFrom
+        && Object.keys(this.dataRestFrom).length !== 0
+        && this.width !== 0
+        && this.height !== 0
       ) {
         if (this.dataReport) {
           if (this.activeElemFrom === this.id) {
@@ -137,8 +137,8 @@ export default {
     });
   },
   methods: {
-    getDataAsynchrony: function () {
-      let prom = new Promise((resolve) => {
+    getDataAsynchrony() {
+      const prom = new Promise((resolve) => {
         // создаем promise чтобы затем отрисовать график асинхронно
 
         let otstupBottom = 55;
@@ -146,9 +146,9 @@ export default {
           otstupBottom = 30;
         }
 
-        let sizeLine = { width: 0, height: 0 }; // получаем размеры от родителя
-        sizeLine['width'] = this.width;
-        sizeLine['height'] = this.height - otstupBottom;
+        const sizeLine = { width: 0, height: 0 }; // получаем размеры от родителя
+        sizeLine.width = this.width;
+        sizeLine.height = this.height - otstupBottom;
 
         if (this.dataRestFrom.error) {
           // сомтрим если с ошибкой
@@ -165,12 +165,12 @@ export default {
         this.createBarChart(this, sizeLine);
       });
     },
-    createBarChart: function (that, sizeLine) {
-      let data = this.dataRestFrom;
+    createBarChart(that, sizeLine) {
+      const data = this.dataRestFrom;
 
       this.nodata = false;
 
-      //let max = 0;
+      // let max = 0;
 
       let otstupTop = 20;
       if (screen.width <= 1600) {
@@ -178,9 +178,11 @@ export default {
       }
 
       // устанавливаем размер и отступы графика
-      let margin = { top: otstupTop, right: 20, bottom: 40, left: 30 },
-        width = sizeLine.width - margin.left - margin.right - 40,
-        height = sizeLine.height - margin.top - margin.bottom;
+      const margin = {
+        top: otstupTop, right: 20, bottom: 40, left: 30,
+      };
+      const width = sizeLine.width - margin.left - margin.right - 40;
+      const height = sizeLine.height - margin.top - margin.bottom;
 
       d3.select(this.$el.querySelector('.dash-barchart'))
         .selectAll('svg')
@@ -190,13 +192,13 @@ export default {
         .remove();
 
       // добовляем svg элемент на страницу
-      let svg = d3
+      const svg = d3
         .select(this.$el.querySelector('.dash-barchart'))
         .append('svg')
         .attr('width', width + margin.left + margin.right)
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        .attr('transform', `translate(${margin.left},${margin.top})`);
 
       // создаем область графика, все-что вне этой области не будет отрисованно
       svg
@@ -209,14 +211,14 @@ export default {
         .attr('x', 0)
         .attr('y', 0);
 
-      let xMetric = Object.keys(data[0])[0];
-      let yMetric = Object.keys(data[0])[1];
+      const xMetric = Object.keys(data[0])[0];
+      const yMetric = Object.keys(data[0])[1];
 
       let time = false;
 
       if (
-        this.dataRestFrom[0][xMetric] > 1000000000 &&
-        this.dataRestFrom[0][xMetric] < 2000000000
+        this.dataRestFrom[0][xMetric] > 1000000000
+        && this.dataRestFrom[0][xMetric] < 2000000000
       ) {
         time = true;
       }
@@ -241,14 +243,12 @@ export default {
         secondTransf = 1000;
       }
 
-      //добавляем ось X
+      // добавляем ось X
       let x = d3
         .scaleBand()
         .range([0, width])
         .domain(
-          data.map(function (d) {
-            return d[xMetric];
-          })
+          data.map((d) => d[xMetric]),
         );
 
       let z;
@@ -258,18 +258,14 @@ export default {
           .scaleBand()
           .range([0, width])
           .domain(
-            data.map(function (d) {
-              return d[xMetric] * secondTransf;
-            })
+            data.map((d) => d[xMetric] * secondTransf),
           );
 
         // добавляем ось X
         x = d3
           .scaleTime()
           .domain(
-            d3.extent(data, function (d) {
-              return new Date(d[xMetric] * secondTransf);
-            })
+            d3.extent(data, (d) => new Date(d[xMetric] * secondTransf)),
           )
           .range([0, width]);
       } else {
@@ -278,9 +274,7 @@ export default {
           .scaleBand()
           .range([0, width])
           .domain(
-            data.map(function (d) {
-              return d[xMetric] * secondTransf;
-            })
+            data.map((d) => d[xMetric] * secondTransf),
           );
       }
 
@@ -288,7 +282,7 @@ export default {
         svg
           .append('g')
           .attr('class', 'xAxis')
-          .attr('transform', 'translate(0,' + height + ')')
+          .attr('transform', `translate(0,${height})`)
           .call(
             d3
               .axisBottom(x)
@@ -298,48 +292,42 @@ export default {
                   if (i % deliter === 0) {
                     return item;
                   }
-                })
-              )
+                }),
+              ),
           );
       } else {
         svg
           .append('g')
           .attr('class', 'xAxis')
-          .attr('transform', 'translate(0,' + height + ')')
+          .attr('transform', `translate(0,${height})`)
           .call(
             d3.axisBottom(x).tickValues(
               x.domain().filter((item, i) => {
                 if (i % deliter === 0) {
                   return item;
                 }
-              })
-            )
+              }),
+            ),
           );
       }
 
-      let max = d3.max(data, function (d) {
-        return +d[yMetric];
-      });
+      const max = d3.max(data, (d) => +d[yMetric]);
 
-      let min = d3.min(data, function (d) {
-        return d[yMetric];
-      });
+      const min = d3.min(data, (d) => d[yMetric]);
 
-      let maxYTop = max + 0.1 * Math.abs(max);
-      let minYBottom = min - 0.1 * Math.abs(min);
+      const maxYTop = max + 0.1 * Math.abs(max);
+      const minYBottom = min - 0.1 * Math.abs(min);
 
       let tickvals;
       if (minYBottom === maxYTop) {
         tickvals = [minYBottom];
+      } else if (minYBottom < 0) {
+        tickvals = [minYBottom, 0, maxYTop];
       } else {
-        if (minYBottom < 0) {
-          tickvals = [minYBottom, 0, maxYTop];
-        } else {
-          tickvals = [minYBottom, maxYTop];
-        }
+        tickvals = [minYBottom, maxYTop];
       }
 
-      let y = d3
+      const y = d3
         .scaleLinear()
         .domain([minYBottom, maxYTop])
         .range([height, 20]);
@@ -353,17 +341,17 @@ export default {
       }
 
       // создаем tooltip
-      let tooltip = d3
+      const tooltip = d3
         .select(this.$el.querySelector('.dash-barchart'))
         .append('div')
-        .attr('class', `tooltip`)
+        .attr('class', 'tooltip')
         .style('color', this.color.text)
         .style('background', this.color.backElement)
         .style('border-color', this.color.text)
         .style('z-index', '2')
         .text('');
 
-      let toolTopBlock = tooltip.nodes()[0];
+      const toolTopBlock = tooltip.nodes()[0];
 
       svg
         .append('g') // основная линия графика
@@ -372,42 +360,34 @@ export default {
         .data(data)
         .enter()
         .append('rect')
-        .attr('x', function (d) {
-          return x(d[xMetric] * secondTransf);
-        })
-        .attr('y', function (d) {
+        .attr('x', (d) => x(d[xMetric] * secondTransf))
+        .attr('y', (d) => {
           if (negative) {
             if (d[yMetric] > 0) {
               return y(0) - Math.abs(y(d[yMetric]) - y(0));
-            } else {
-              return y(0);
             }
-          } else {
-            return y(d[yMetric]);
+            return y(0);
           }
+          return y(d[yMetric]);
         })
-        .attr('width', function () {
+        .attr('width', () => {
           if (time) {
             return z.bandwidth();
-          } else {
-            return x.bandwidth();
           }
+          return x.bandwidth();
         })
-        .attr('height', function (d) {
+        .attr('height', (d) => {
           if (d[yMetric] === 0) {
             return 0;
           }
           if (negative) {
             return Math.abs(y(d[yMetric]) - y(0));
-          } else {
-            return height - y(d[yMetric]);
           }
+          return height - y(d[yMetric]);
         })
         .attr('fill', this.color.controls)
-        .on('click', function (d) {
-          return that.setClick({ x: d[xMetric], y: d[yMetric] });
-        })
-        .on('mouseover', function (d) {
+        .on('click', (d) => that.setClick({ x: d[xMetric], y: d[yMetric] }))
+        .on('mouseover', (d) => {
           let xVal = d[xMetric];
           if (time) {
             xVal = new Date(d[xMetric] * secondTransf);
@@ -423,27 +403,27 @@ export default {
             .style('opacity', '1')
             .style('visibility', 'visible')
             .html(text)
-            .style('top', event.layerY - 40 + 'px')
+            .style('top', `${event.layerY - 40}px`)
             .style('right', 'auto')
-            .style('left', event.layerX + 15 + 'px');
+            .style('left', `${event.layerX + 15}px`);
           if (event.layerX + 100 > width) {
             tooltip
               .style('left', 'auto')
-              .style('right', width - event.layerX + 100 + 'px');
+              .style('right', `${width - event.layerX + 100}px`);
           }
           if (event.layerY - 40 + toolTopBlock.offsetHeight > height) {
             tooltip.style(
               'top',
-              event.layerY - 10 - toolTopBlock.offsetHeight + 'px'
+              `${event.layerY - 10 - toolTopBlock.offsetHeight}px`,
             );
           }
         }) // при наведении мышки точка появляется
-        .on('mouseout', function () {
+        .on('mouseout', () => {
           tooltip.style('opacity', '0').style('visibility', 'hidden');
         }); // при уводе мышки исчезает, только если это не точка выходящяя порог
     },
-    setClick: function (item) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setClick(item) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -454,7 +434,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,
@@ -462,7 +442,7 @@ export default {
         }
       });
 
-      let events = this.$store.getters.getEvents({
+      const events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'onclick',
         element: this.id,
@@ -473,7 +453,7 @@ export default {
         events.forEach((item) => {
           if (item.action === 'set') {
             this.$store.commit('letEventSet', {
-              events: events,
+              events,
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
