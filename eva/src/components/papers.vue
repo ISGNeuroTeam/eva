@@ -355,7 +355,7 @@ import {
   mdiPlus,
   mdiContentSave,
 } from '@mdi/js';
-//import  settings  from '../js/componentsSettings.js';
+// import  settings  from '../js/componentsSettings.js';
 
 export default {
   data() {
@@ -449,13 +449,13 @@ export default {
     //   this.activeElem = 'table';
     //   return this.$store.getters.getReportElement
     // },
-    dataReady: function () {
+    dataReady() {
       if (this.steps['2'].complete && this.steps['3'].complete) {
         this.getPaper();
       }
       return true;
     },
-    color: function () {
+    color() {
       return this.$store.getters.getTheme;
     },
   },
@@ -463,7 +463,7 @@ export default {
     document.title = 'EVA | Конструирование отчетов';
     this.search = this.$store.getters.getPaperSearch;
     if (this.search.original_otl != '') {
-      //this.getData();
+      // this.getData();
       this.launchSearch();
     }
     // this.calcSize();
@@ -483,7 +483,7 @@ export default {
     } else if (screen.width <= 1440) {
       this.rowsCount = 6;
     }
-    //this.unitedData.color=  this.color.controls;
+    // this.unitedData.color=  this.color.controls;
     Object.values(this.steps).forEach((item) => {
       item.status = this.color.controls;
     });
@@ -494,13 +494,13 @@ export default {
       });
   },
   methods: {
-    setPaper: async function () {
+    async setPaper() {
       if (this.uploadFile == '') {
         this.message('Выберите файл');
       } else {
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append('file', this.uploadFile);
-        let result = await this.$store.getters.loadPaper(formData);
+        const result = await this.$store.getters.loadPaper(formData);
         if (result.status == 'success') {
           this.message('Файл успшено загружен');
           this.setPaperBack();
@@ -510,7 +510,7 @@ export default {
         }
       }
     },
-    setPaperBack: function () {
+    setPaperBack() {
       setTimeout(() => {
         this.fileBlock = 1;
         this.uploadFile = '';
@@ -519,7 +519,7 @@ export default {
           .click();
       }, 2000);
     },
-    choosePaper: async function () {
+    async choosePaper() {
       if (this.selectedFile == '') {
         this.message('Выберите файл');
       } else {
@@ -529,22 +529,22 @@ export default {
         this.returnArrow();
       }
     },
-    message: function (text) {
+    message(text) {
       this.errorMsg = text;
       this.showError = true;
       setTimeout(() => {
         this.showError = false;
       }, 2000);
     },
-    getPaper: async function () {
+    async getPaper() {
       this.move = 4;
       this.steps['3'].loading = true;
       this.steps['4'].error = [];
       this.steps['4'].text = 'Обрабатываю отчет';
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('cid', JSON.stringify(this.dispSid));
-      let result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.getters.getPaper(formData);
 
       if (result.status == 'success') {
         this.steps['3'].loading = false;
@@ -553,7 +553,7 @@ export default {
         this.fileLink = result.file;
         this.disabledDownload = false;
         this.createVisPaper(result.html, result.names);
-        //this.downloadFile(JSON.parse(result).file)
+        // this.downloadFile(JSON.parse(result).file)
 
         // this.allFiles = JSON.parse(result).files;
       } else {
@@ -564,7 +564,7 @@ export default {
         this.steps['4'].text = 'Ошибка обработки отчета';
       }
     },
-    getAllPapers: async function () {
+    async getAllPapers() {
       this.selectedFile = '';
       this.fileBlock = 3;
       this.move = 3;
@@ -574,14 +574,13 @@ export default {
       this.steps['4'].error = [];
       this.clearReady();
 
-      let result = await this.$store.getters.getAllPaper();
+      const result = await this.$store.getters.getAllPaper();
       try {
         if (JSON.parse(result).status == 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
-          this.errorMsg =
-            'Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.';
+          this.errorMsg = 'Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
           this.steps['2'].loading = false;
           this.steps['3'].error = [() => false];
@@ -591,23 +590,23 @@ export default {
         this.message(`Ошибка: ${error}`);
       }
     },
-    downloadFile: function () {
-      let namefile = this.fileLink.split('/')[2];
-      let link = this.$refs.stepper.$el.appendChild(
-        document.createElement('a')
+    downloadFile() {
+      const namefile = this.fileLink.split('/')[2];
+      const link = this.$refs.stepper.$el.appendChild(
+        document.createElement('a'),
       ); // создаем ссылку
       link.setAttribute('href', this.fileLink); // указываем ссылке что надо скачать наш файл csv
       link.setAttribute('download', namefile); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
-    clearReady: function () {
+    clearReady() {
       this.steps['4'].complete = false;
       this.steps['4'].text = 'Обработать отчет';
       this.fileLink = '';
       this.disabledDownload = true;
     },
-    returnArrow: function () {
+    returnArrow() {
       this.fileBlock = 1;
       this.steps['3'].error = [];
       if (this.selectedFile == '') {
@@ -651,7 +650,7 @@ export default {
     //   worker.postMessage(`papers-${this.search.sid}`);   // запускаем воркер на выполнение
 
     // },
-    launchSearch: async function () {
+    async launchSearch() {
       this.steps['2'].complete = false;
       this.steps['1'].loading = true;
       this.steps['2'].text = 'Валидирую запрос';
@@ -661,11 +660,11 @@ export default {
 
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
+      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
-      let response = await this.$store.getters.getDataApi({
+      const response = await this.$store.getters.getDataApi({
         search: this.search,
         idDash: 'papers',
       });
@@ -682,7 +681,7 @@ export default {
         // если все нормально
         this.loading = false;
         this.$store.commit('setPaperSearch', this.search);
-        //this.data = response;
+        // this.data = response;
         this.dispSid = response.sid;
         this.steps['2'].complete = true;
         this.steps['1'].loading = false;
@@ -707,43 +706,42 @@ export default {
         //   );
       }
     },
-    cancelSearch: function () {
+    cancelSearch() {
       this.steps['2'].complete = false;
       this.steps['1'].loading = false;
       this.steps['2'].text = 'Запрос завершился ошибкой ';
       this.steps['2'].error.push(() => 'false');
     },
-    addLineBreaks: function () {
+    addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
         '\n\n' + '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|' + '\n',
-        '| '
+        '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '| ' + '\n',
-        '| '
+        '| ',
       );
     },
-    setUsername: function (event) {
+    setUsername(event) {
       this.search.parametrs.username = event;
     },
-    hashCode: function (otl) {
+    hashCode(otl) {
       return otl
         .split('')
         .reduce(
-          (prevHash, currVal) =>
-            ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
-          0
+          (prevHash, currVal) => ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
+          0,
         );
     },
     // getDataFromDb: function() {
@@ -798,17 +796,17 @@ export default {
 
     //   }
     // },
-    openSettings: function () {
+    openSettings() {
       this.modal = true;
     },
-    cancelModal: function () {
+    cancelModal() {
       this.modal = false;
     },
-    setSearch: function (search) {
-      this.search = Object.assign({}, search);
+    setSearch(search) {
+      this.search = { ...search };
       this.modal = false;
     },
-    changeColor: function () {
+    changeColor() {
       if (document.querySelectorAll('.v-menu__content').length != 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           // item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
@@ -818,18 +816,17 @@ export default {
         });
       }
     },
-    createVisPaper: function (html, names) {
+    createVisPaper(html, names) {
       this.tabs = [];
       this.html = [];
       if (names.length == 1) {
-        let img = `<img class="vis-image" src="data:image/png;base64,${html[0]}" />`;
+        const img = `<img class="vis-image" src="data:image/png;base64,${html[0]}" />`;
         this.$refs.vis.innerHTML = img;
       } else if (names.length < 6) {
         this.tabs = names;
         this.html = html;
       } else {
-        this.$refs.vis.innerHTML =
-          'К сожалению файлов слишком много для визуального отображения';
+        this.$refs.vis.innerHTML = 'К сожалению файлов слишком много для визуального отображения';
       }
       // if (html.length == 1) {
       //   this.$refs.vis.innerHTML = html;
@@ -837,8 +834,8 @@ export default {
       //   console.log(html)
       // }
     },
-    changeVisTab: function (number) {
-      let img = `<img class="vis-image" src="data:image/png;base64,${this.html[number]}" />`;
+    changeVisTab(number) {
+      const img = `<img class="vis-image" src="data:image/png;base64,${this.html[number]}" />`;
       this.$refs.vis.innerHTML = img;
     },
   },

@@ -8,10 +8,10 @@ import { shallowMount} from '@vue/test-utils'
 import dashSingle from '../components/dashBoardInside/dashSingle.vue'  // подключаем сам компонент который будем тестировать
 
 
-// подключаем нужные нам библиотеки 
+// подключаем нужные нам библиотеки
 
 import store from '../store/index.js' // хранилилище local storage
-import  restAuth from '../storeAuth/storeRest.js' // хранилище с эндпоинтами и логами
+import  restAuth from '../store/storeAuth/storeRest.js' // хранилище с эндпоинтами и логами
 import vuetify from 'vuetify'  // библотека для красивого отображения элементов
 import { mdiHumanGreeting } from '@mdi/js'
 Vue.use(vuetify)
@@ -63,8 +63,8 @@ describe('Компонент dashSingle.vue', () => {  // тест самого 
     value: ['']
   }] ,eventFull: 'onValueCompare([2,4,8], [green,orange,red],set(single,color))', idDash: 16 });
 
-  
- 
+
+
   let wrapper = shallowMount(dashSingle, {   // при создании экземпляра объекта vue
     store,    // передаем store (хранилище)
     propsData: {   // эметируем входные параметры
@@ -88,8 +88,8 @@ describe('Компонент dashSingle.vue', () => {  // тест самого 
 
   const putLogMock = jest.fn(() => 'add some logs')  // задаем заглушку (mock) который будет имитировать функцию putLog, которая записывает логи
   restAuth.putLog = putLogMock // указываем что при вызове метод putLog на самом деле будет вызвана заглушка
-  
-  beforeEach(() => {  // перед каждым новым тестом 
+
+  beforeEach(() => {  // перед каждым новым тестом
     fetch.resetMocks()  // очищаем моки fetch
   })
 
@@ -97,9 +97,9 @@ describe('Компонент dashSingle.vue', () => {  // тест самого 
   it('Меняется цвет в зависимости от порога значения (5)', () => {
     expect(wrapper.vm.number).toBe(5)
     // не смог придумать как протестировать  что computed свойство color меняется
-    
-    
-    
+
+
+
   })
 
 

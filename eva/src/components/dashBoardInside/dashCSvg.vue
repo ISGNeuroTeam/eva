@@ -189,10 +189,10 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
     svgStyleWidth() {
@@ -201,15 +201,14 @@ export default {
     svgStyleHeight() {
       return `${this.heightFrom - this.otstupBottom}px`;
     },
-    color: function () {
+    color() {
       return this.colorFrom;
     },
-    colorMsg: function () {
+    colorMsg() {
       if (this.noMsg === 1) {
         return this.color.controls;
-      } else {
-        return this.color.controlsActive;
       }
+      return this.color.controlsActive;
     },
     updatedOptions() {
       return this.$store.getters.getOptions({
@@ -217,8 +216,8 @@ export default {
         id: this.id,
       });
     },
-    options: function () {
-      let options = this.$store.getters.getOptions({
+    options() {
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
@@ -231,18 +230,16 @@ export default {
       deep: true,
       handler() {
         if (this.tooltipFrom.buttons) {
-          this.captures = this.tooltipFrom.buttons.map((item) => {
-            return item.id;
-          });
+          this.captures = this.tooltipFrom.buttons.map((item) => item.id);
         }
       },
     },
     dataRestFrom() {
       if (
-        this.dataRestFrom &&
-        Object.keys(this.dataRestFrom).length !== 0 &&
-        this.dataRestFrom[0].svg_filename &&
-        this.dataRestFrom[0].svg_filename !== ''
+        this.dataRestFrom
+        && Object.keys(this.dataRestFrom).length !== 0
+        && this.dataRestFrom[0].svg_filename
+        && this.dataRestFrom[0].svg_filename !== ''
       ) {
         if (this.dataReport) {
           if (this.activeElemFrom === this.id) {
@@ -270,7 +267,7 @@ export default {
         this.otstupBottom = 30;
       }
     },
-    dataModeFrom: function (dataMode) {
+    dataModeFrom(dataMode) {
       if (dataMode) {
         this.otstupBottom = 45;
         if (screen.width <= 1600) {
@@ -280,13 +277,13 @@ export default {
         this.otstupBottom = 10;
       }
     },
-    widthFrom: function () {
+    widthFrom() {
       this.checkSize();
     },
-    heightFrom: function () {
+    heightFrom() {
       this.checkSize();
     },
-    captures: function (captures) {
+    captures(captures) {
       this.actions[0].capture = captures;
       this.$store.commit('setActions', {
         actions: this.actions,
@@ -312,9 +309,9 @@ export default {
     }
   },
   methods: {
-    getSvg: async function (svg) {
+    async getSvg(svg) {
       this.$emit('setLoading', true);
-      let response = await this.$store.getters.getSvg(svg);
+      const response = await this.$store.getters.getSvg(svg);
       if (response !== '') {
         this.$emit('setLoading', false);
         this.svg = response;
@@ -327,29 +324,29 @@ export default {
         this.$emit('setLoading', false);
       }
     },
-    checkSize: function () {
+    checkSize() {
       this.$refs.csvg;
       if (this.svg !== 'Нет данных для отображения' && this.svg !== '') {
         let timeOut = setTimeout(
           function tick() {
             if (this.$refs.csvg.querySelector('svg') != null) {
               clearTimeout(timeOut);
-              let svgElem = this.$refs.csvg.querySelector('svg');
+              const svgElem = this.$refs.csvg.querySelector('svg');
               svgElem.setAttribute('width', this.widthFrom - 40);
               svgElem.setAttribute(
                 'height',
-                this.heightFrom - this.otstupBottom
+                this.heightFrom - this.otstupBottom,
               );
             } else {
               timeOut = setTimeout(tick.bind(this), 1000);
             }
           }.bind(this),
-          0
+          0,
         );
       }
     },
-    checkCapture: async function () {
-      let captures = this.prepareCapture(); // получаем объект свойства элементов из данных
+    async checkCapture() {
+      const captures = this.prepareCapture(); // получаем объект свойства элементов из данных
       let elem = '';
       let timeOut = setTimeout(
         function tick() {
@@ -387,8 +384,7 @@ export default {
                           elem.innerHTML = captures[item][capture]; // и потом уже в самой свг обновляем значение на то, что пришло из данных
                         } else {
                           // а если не еткст а другие свойства
-                          this.svgChanges[item][capture] =
-                            elem.getAttribute(capture); // делаем тоже самое, заносим значение по умолчанию
+                          this.svgChanges[item][capture] = elem.getAttribute(capture); // делаем тоже самое, заносим значение по умолчанию
                           elem.setAttribute(capture, captures[item][capture]); // а в самой свг меняем не значение из данных
                         }
                       } else {
@@ -414,7 +410,7 @@ export default {
                         } else {
                           elem.setAttribute(
                             capture,
-                            this.svgChanges[item][capture]
+                            this.svgChanges[item][capture],
                           );
                         }
                       }
@@ -446,7 +442,7 @@ export default {
                   } else {
                     elem.setAttribute(
                       defChange,
-                      this.svgChanges[change][defChange]
+                      this.svgChanges[change][defChange],
                     ); // то значение этого свойства выставим по умолчанию
                   }
                 });
@@ -457,18 +453,18 @@ export default {
             timeOut = setTimeout(tick, 100); // прсото повторяем цикл
           }
         }.bind(this),
-        0
+        0,
       ); // здесь забайндил this чтобы он был доступен изнутри
     },
-    prepareCapture: function () {
-      let captures = {};
+    prepareCapture() {
+      const captures = {};
       this.dataRestFrom.forEach((item) => {
         captures[item.id] = item;
       });
       return captures;
     },
-    checkTokenInTooltip: function (text) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    checkTokenInTooltip(text) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let reg = '';
       Object.values(tockens).forEach((item) => {
         if (text.indexOf(item.name) !== -1) {
@@ -478,12 +474,12 @@ export default {
       });
       return text;
     },
-    setSvg: async function () {
+    async setSvg() {
       if (this.file !== '') {
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append('file', this.file);
 
-        let response = await this.$store.getters.setSvg(formData);
+        const response = await this.$store.getters.setSvg(formData);
         try {
           if (JSON.parse(response).status === 'ok') {
             this.answerColor = this.color.controls;
@@ -502,10 +498,10 @@ export default {
         this.answerShow = false;
       }, 2000);
     },
-    setClick: function (token, item) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setClick(token, item) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
-      let id = this.$refs.tooltip.getAttribute('data-id');
+      const id = this.$refs.tooltip.getAttribute('data-id');
 
       Object.keys(tockens).forEach((i) => {
         tocken = {
@@ -517,26 +513,24 @@ export default {
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           if (item === 'object') {
             this.$store.commit('setTocken', {
-              tocken: tocken,
+              tocken,
               idDash: this.idDash,
               value: token,
               store: this.$store,
             });
-          } else {
-            if (tockens[i].capture === token) {
-              this.$store.commit('setTocken', {
-                tocken: tocken,
-                idDash: this.idDash,
-                value: id,
-                store: this.$store,
-              });
-            }
+          } else if (tockens[i].capture === token) {
+            this.$store.commit('setTocken', {
+              tocken,
+              idDash: this.idDash,
+              value: id,
+              store: this.$store,
+            });
           }
         }
       });
 
       if (item === 'object') {
-        let events = this.$store.getters.getEvents({
+        const events = this.$store.getters.getEvents({
           idDash: this.idDash,
           event: 'onclick',
           element: this.id,
@@ -547,7 +541,7 @@ export default {
           events.forEach((item) => {
             if (item.action === 'set') {
               this.$store.commit('letEventSet', {
-                events: events,
+                events,
                 idDash: this.idDash,
               });
             } else if (item.action === 'go') {
@@ -562,8 +556,8 @@ export default {
         }
       }
     },
-    setOver: function (token) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setOver(token) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -574,7 +568,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
             idDash: this.idDash,
             value: token,
             store: this.$store,
@@ -582,8 +576,8 @@ export default {
         }
       });
     },
-    setLink: function (direction) {
-      let context = this.$refs.link.getContext('2d');
+    setLink(direction) {
+      const context = this.$refs.link.getContext('2d');
       context.clearRect(0, 0, this.$refs.link.width, this.$refs.link.height);
       context.beginPath();
       switch (direction) {
@@ -613,16 +607,16 @@ export default {
       context.lineWidth = 1;
     },
     positionTooltip(event) {
-      let id = event.target.getAttribute('id');
+      const id = event.target.getAttribute('id');
       let token = '';
-      let tooltipSize = this.$refs.tooltip.getBoundingClientRect();
+      const tooltipSize = this.$refs.tooltip.getBoundingClientRect();
       let tooltipLeft = event.offsetX + 40;
       let tooltipTop = event.offsetY - 50;
 
-      let linkBlockSize = this.$refs.link.parentElement.getBoundingClientRect();
+      const linkBlockSize = this.$refs.link.parentElement.getBoundingClientRect();
       let linkLeft = event.offsetX + 10;
       let linkTop = event.offsetY - 50;
-      let csvgSize = this.$refs.csvg.getBoundingClientRect();
+      const csvgSize = this.$refs.csvg.getBoundingClientRect();
       let direction = 'normal';
 
       if (id && id.indexOf('overlay') !== -1) {
@@ -670,7 +664,7 @@ export default {
     },
     clickSvg(event) {
       let token = '';
-      let id = event.target.getAttribute('id');
+      const id = event.target.getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
         token = id.split('overlay_')[1];
         this.setClick(token, 'object');
@@ -681,7 +675,7 @@ export default {
       if (this.timeout) clearTimeout(this.timeout);
 
       this.timeout = setTimeout(() => {
-        let id = event.target.getAttribute('id');
+        const id = event.target.getAttribute('id');
         if (id && id.indexOf('overlay') !== -1 && !this.tooltipPress) {
           this.tooltipShow = false;
           this.linkCanvasShow = false;
