@@ -73,8 +73,8 @@ export default {
   },
   data() {
     return {
-      mdiFileOutline: mdiFileOutline,
-      mdiClose: mdiClose,
+      mdiFileOutline,
+      mdiClose,
       dialog: false,
     };
   },

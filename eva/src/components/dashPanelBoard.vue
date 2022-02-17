@@ -462,7 +462,7 @@
         </div>
       </div>
       <div
-          ref="blockTocken"
+        ref="blockTocken"
         class="block-tocken"
         :class="{ opentocken: opentocken }"
         :style="blockToolStyle"
@@ -562,17 +562,17 @@
             {{ tocken.value }}
           </p>
           <v-tooltip
-              bottom
-              :color="theme.$accent_ui_color"
-              style="z-index: 100"
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                  class="row-check"
-                  :color="theme.$primary_button"
-                  :class="{ showIcon: lookTockens[i].show }"
-                  v-on="on"
-                  @click="saveTocken(i)"
+                class="row-check"
+                :color="theme.$primary_button"
+                :class="{ showIcon: lookTockens[i].show }"
+                v-on="on"
+                @click="saveTocken(i)"
               >
                 {{ check }}
               </v-icon>
@@ -580,16 +580,16 @@
             <span>Создать/обновить токен</span>
           </v-tooltip>
           <v-tooltip
-              bottom
-              :color="theme.$accent_ui_color"
-              style="z-index: 100"
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                  class="row-look"
-                  :color="theme.$primary_button"
-                  v-on="on"
-                  @click="lookTocken(i)"
+                class="row-look"
+                :color="theme.$primary_button"
+                v-on="on"
+                @click="lookTocken(i)"
               >
                 {{ look }}
               </v-icon>
@@ -598,24 +598,23 @@
           </v-tooltip>
 
           <v-tooltip
-              bottom
-              :color="theme.$accent_ui_color"
-              style="z-index: 100"
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                  class="row-trash"
-                  :color="theme.$primary_button"
-                  :class="{ showIcon: lookTockens[i].show }"
-                  @click="deleteTocken(tocken.name, i)"
-                  v-on="on"
+                class="row-trash"
+                :color="theme.$primary_button"
+                :class="{ showIcon: lookTockens[i].show }"
+                @click="deleteTocken(tocken.name, i)"
+                v-on="on"
               >
                 {{ trash }}
               </v-icon>
             </template>
             <span>Удалить токен</span>
           </v-tooltip>
-
         </div>
         <div
           class="row-tocken new"
@@ -651,7 +650,7 @@
             @click="changeColor"
           />
           <v-select
-              v-model="newCapture"
+            v-model="newCapture"
             :items="capture({ action: newAction, elem: newElem })"
             :color="theme.$main_text"
             hide-details
@@ -765,7 +764,8 @@
         :class="{ opensave: opensave }"
         :style="{ background: theme.$main_bg }"
       >
-        <div v-show="!errorSave"
+        <div
+          v-show="!errorSave"
           class="save-obertka"
         >
           <div
@@ -823,7 +823,10 @@
         <div class="warning-text">
           {{ msgWarn }}
         </div>
-        <div v-show="!errorSaveToken" class="btn-warning">
+        <div
+          v-show="!errorSaveToken"
+          class="btn-warning"
+        >
           <v-btn
             small
             :color="theme.$primary_button"
@@ -928,7 +931,7 @@ import EvaLogo from '../images/eva-logo.svg';
 
 import settings from '../js/componentsSettings.js';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
-import {globalTockens} from "@/constants/globalTockens";
+import { globalTockens } from '@/constants/globalTockens';
 
 export default {
   name: 'DashPanelBoard',
@@ -999,7 +1002,7 @@ export default {
       lookTockens: [],
       tools: [],
       avatar: null,
-      mdiCompare: mdiCompare,
+      mdiCompare,
       tempTocken: {},
       change: {},
       onButton: {},
@@ -1090,7 +1093,7 @@ export default {
       // массив со всеми ИС на странице
       let searchesRes = [];
       if (this.idDash) {
-        let searches = this.$store.getters.getSearches(this.idDash);
+        const searches = this.$store.getters.getSearches(this.idDash);
         searches.forEach((item) => {
           this.$set(this.change, item.sid, false);
         });
@@ -1105,20 +1108,19 @@ export default {
       return this.$store.getters.getTheme;
     },
     editPermission() {
-      return this.userPermissions.includes('admin_all') ||
-        this.userPermissions.includes('editdash');
-
+      return this.userPermissions.includes('admin_all')
+        || this.userPermissions.includes('editdash');
     },
     textareaEv() {
-      let eventFull = this.$store.getters.getEventFull(this.idDash);
+      const eventFull = this.$store.getters.getEventFull(this.idDash);
       if (eventFull !== '') {
-        this.setTextAreaEvent(eventFull)
+        this.setTextAreaEvent(eventFull);
       }
       return true;
     },
     tockens() {
       // получения всех токенов на страницы
-      let tockens = this.$store.getters.getTockens(this.idDash);
+      const tockens = this.$store.getters.getTockens(this.idDash);
 
       tockens.forEach((item) => {
         this.tockensName[item.name] = item.name;
@@ -1135,9 +1137,7 @@ export default {
       return function (element) {
         return this.$store.getters
           .getActions({ elem: element, idDash: this.idDash })
-          .map((item) => {
-            return item.name;
-          });
+          .map((item) => item.name);
       };
     },
     capture() {
@@ -1154,13 +1154,12 @@ export default {
       return {
         background: this.theme.$main_bg,
         color: this.theme.$main_text,
-        'max-height': this.screenHeight + 'px',
+        'max-height': `${this.screenHeight}px`,
       };
     },
     isEditDash() {
       return !!this.allGroups.find(
-        (group) =>
-          group.dashs.includes(this.name) && group.users.includes(this.login)
+        (group) => group.dashs.includes(this.name) && group.users.includes(this.login),
       );
     },
   },
@@ -1172,10 +1171,10 @@ export default {
     document.onmouseup = (event) => {
       // а при отпускании кнопки при перетаскивании
       document.onmousemove = null; // мы бросаем элемент где он есть
-      let width = document.querySelector('#app').clientWidth;
+      const width = document.querySelector('#app').clientWidth;
 
       if (this.avatar) {
-        let height = document.querySelector('.opentool').clientHeight;
+        const height = document.querySelector('.opentool').clientHeight;
         if (event.x > width - 450 && event.y < height) {
           this.avatar.remove(); // удаляем аватар из дерева dom
           this.avatar = null; // и у нас тоже его очищаем
@@ -1186,7 +1185,7 @@ export default {
         }
       }
     };
-    let eventFull = this.$store.getters.getEventFull(this.idDash);
+    const eventFull = this.$store.getters.getEventFull(this.idDash);
     if (eventFull !== '') {
       this.textarea_event = eventFull;
     }
@@ -1210,51 +1209,51 @@ export default {
     setTextarea_event(eventFull) {
       this.textarea_event = eventFull;
     },
-    getGroups: function () {
-      let response = this.$store.getters.getGroups();
+    getGroups() {
+      const response = this.$store.getters.getGroups();
       response.then((res) => {
         this.allGroups = res;
       });
     },
-    exit: function () {
-      document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
-      document.cookie = `eva_token=''; max-age=0 ; path=/`;
+    exit() {
+      document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
+      document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
       this.$store.commit('clearState');
-      this.$router.push(`/`);
+      this.$router.push('/');
     },
     openThemeModal() {
       this.paleteShow = !this.paleteShow;
     },
-    openLogs: function () {
+    openLogs() {
       this.modalActive = true;
       this.$store.commit('setErrorLogs', false);
     },
-    toBackward: function () {
+    toBackward() {
       this.$router.go(-1);
     },
-    edit: function () {
-      this.$router.push(`/profile`);
+    edit() {
+      this.$router.push('/profile');
     },
-    setEditMode: function () {
+    setEditMode() {
       this.editMode = !this.editMode;
       this.$emit('changeMode');
     },
-    setTextAreaEvent (eventFull) {
+    setTextAreaEvent(eventFull) {
       this.textarea_event = eventFull;
     },
-    cancelModal: function () {
+    cancelModal() {
       this.activeModal = false;
       this.modalPaper = false;
     },
-    openSchedule: function (id) {
+    openSchedule(id) {
       this.scheduleSid = id;
       this.activeSchedule = true;
     },
-    getCookie: async function () {
+    async getCookie() {
       if (this.$jwt.hasToken()) {
         this.login = this.$jwt.decode().username;
 
-        let response = await fetch(`/api/user/permissions`).catch((error) => {
+        const response = await fetch('/api/user/permissions').catch((error) => {
           console.log(error);
           return {
             status: 300,
@@ -1271,10 +1270,10 @@ export default {
           this.exit();
         }
       } else {
-        this.$router.push(`/`);
+        this.$router.push('/');
       }
     },
-    openEdit: function (id) {
+    openEdit(id) {
       // окно с редактированием search
       this.openSearch(); // то открываем его
 
@@ -1286,12 +1285,11 @@ export default {
             ? (this.change[item] = true)
             : (this.change[item] = false); // если нашли выбронный ИС то меняем его статус
         });
-        let search = this.searches.filter((item) => {
+        const search = this.searches.filter((item) =>
           // получаем только тот ИС который редактируется
-          return item.sid === id;
-        })[0];
+          item.sid === id)[0];
         // отстутствие отступов сделано специально  чтобы красивее смотрелось на фронте
-        this.newSearch = Object.assign({}, search);
+        this.newSearch = { ...search };
         this.activeModal = true;
         this.createSearchBtn = 'edit';
       } else {
@@ -1300,7 +1298,7 @@ export default {
       }
     },
     // возможно стоит переделать под цикл или типа того. ПОДУМАТЬ НАД ЭТИМ!
-    openProfile: function () {
+    openProfile() {
       // дальше будут фукнции отвечающие за переключение между разными инструментами, суть проста, если один открыт закрываем все остальные
       this.profile_elem = !this.profile_elem;
       this.openfilter = false;
@@ -1314,7 +1312,7 @@ export default {
       this.openevent = false;
       this.$emit('openProfile', this.profile_elem);
     },
-    openSave: function () {
+    openSave() {
       // дальше будут фукнции отвечающие за переключение между разными инструментами, суть проста, если один открыт закрываем все остальные
       this.errorSave = false;
       this.save_elem = !this.save_elem;
@@ -1329,7 +1327,7 @@ export default {
       this.code_elem = false;
       this.openevent = false;
     },
-    openSearchCode: function () {
+    openSearchCode() {
       this.search_elem = !this.search_elem;
       this.opencode = !this.opencode;
       this.openfilter = false;
@@ -1342,7 +1340,7 @@ export default {
       this.code_elem = false;
       this.openevent = false;
     },
-    openToolPanel: function () {
+    openToolPanel() {
       this.tool_elem = !this.tool_elem;
       this.opentool = !this.opentool;
       this.openfilter = false;
@@ -1355,7 +1353,7 @@ export default {
       this.code_elem = false;
       this.openevent = false;
     },
-    openFilterPanel: function () {
+    openFilterPanel() {
       this.openfilter = !this.openfilter;
       this.opentool = false;
       this.tool_elem = false;
@@ -1368,7 +1366,7 @@ export default {
       this.code_elem = false;
       this.openevent = false;
     },
-    openTockenCode: function () {
+    openTockenCode() {
       this.tocken_elem = !this.tocken_elem;
       this.opentocken = !this.opentocken;
       this.openfilter = false;
@@ -1381,7 +1379,7 @@ export default {
       this.code_elem = false;
       this.openevent = false;
     },
-    openEventCode: function () {
+    openEventCode() {
       this.code_elem = !this.code_elem;
       this.openevent = !this.openevent;
       this.openfilter = false;
@@ -1394,14 +1392,14 @@ export default {
       this.tocken_elem = false;
       this.opentocken = false;
     },
-    openSearch: function () {
+    openSearch() {
       // собственно функция которая показывает или нет окно с редактируемым ИД
       this.opensearch = !this.opensearch;
       Object.keys(this.change).forEach((item) => {
         this.change[item] = false;
       });
     },
-    openModal: function () {
+    openModal() {
       this.activeModal = !this.activeModal;
       this.newSearch = {
         sid: null,
@@ -1419,7 +1417,7 @@ export default {
       };
       this.createSearchBtn = 'create';
     },
-    lookTocken: function (i) {
+    lookTocken(i) {
       if (!this.lookTockens[i].show) {
         this.lookTockens[i].show = true;
         this.lookTockens[i].color = this.theme.controlsActive;
@@ -1428,7 +1426,7 @@ export default {
         this.lookTockens[i].color = this.theme.controls;
       }
     },
-    saveTocken: function (index) {
+    saveTocken(index) {
       // функция которая сохраняет токен в хранилище
 
       // проверяем не пустой ли токен
@@ -1438,7 +1436,7 @@ export default {
               && !this.tockensName[this.tockens[index].name].length)) {
         this.errorSaveToken = true;
         this.openwarning = true;
-        let height = this.$refs.blockTocken.clientHeight;
+        const height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
         this.msgWarn = 'Имя токена пустое. Попробуйте еще раз.';
@@ -1456,7 +1454,7 @@ export default {
               && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
         this.errorSaveToken = true;
         this.openwarning = true;
-        let height = this.$refs.blockTocken.clientHeight;
+        const height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
         this.msgWarn = 'Невозможно использовать это имя для токена. Попробуйте еще раз.';
@@ -1468,18 +1466,18 @@ export default {
       }
 
       // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
-      if (Number.isInteger(index)){
+      if (Number.isInteger(index)) {
         // редактирование
         this.tempTocken = {
           name: this.tockensName[this.tockens[index].name],
           elem: this.tockens[index].elem,
-          action:this.tockens[index].action,
+          action: this.tockens[index].action,
           capture: this.tockens[index].capture,
           prefix: this.tockens[index].prefix,
           sufix: this.tockens[index].sufix,
           delimetr: this.tockens[index].delimetr,
           defaultValue: this.tockens[index].defaultValue,
-          resetData: true, //сделать норм
+          resetData: true, // сделать норм
           onButton: this.tockens[index].onButton,
         };
       } else {
@@ -1493,7 +1491,7 @@ export default {
           sufix: this.newTockenDop.sufix,
           delimetr: this.newTockenDop.delimetr,
           defaultValue: this.newTockenDop.defaultValue,
-          resetData: true, //сделать норм
+          resetData: true, // сделать норм
           onButton: this.newTockenDop.onButton,
         };
       }
@@ -1511,7 +1509,7 @@ export default {
         this.openwarning = true; // выводим предупреждающее сообщение, переписать ли его
         this.errorSaveToken = false;
 
-        let height = this.$refs.blockTocken.clientHeight;
+        const height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
         this.msgWarn = 'Такой токен уже существует. Хотите обновить?';
@@ -1532,20 +1530,20 @@ export default {
         this.newCapture = '';
         this.newTockenDop = {
           defaultValue: '*',
-        }
+        };
       }
     },
-    deleteTocken: function (name) {
+    deleteTocken(name) {
       // удаляем токен
       this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: '',
-        name: name,
+        name,
         page: 'tocken',
       }); // просто отправляем информацию об удаляемом токене в хранилище
     },
-    deleteSearch: function (id) {
+    deleteSearch(id) {
       // тоже саоме для удаления ИС
       this.$store.commit('setModalDelete', {
         id: this.idDash,
@@ -1564,33 +1562,33 @@ export default {
         });
       });
     },
-    startSearch: async function (search) {
+    async startSearch(search) {
       this.$store.commit('updateSearchStatus', {
         idDash: this.idDash,
         sid: search.sid,
         status: 'empty',
       });
     },
-    yesSearch: function () {
+    yesSearch() {
       // кнопка согласия на обновления если токен уже существует
 
-        const id = this.index;
-        const newName = this.tempTocken.name;
-        this.tempTocken.name = this.tockens[id].name;
+      const id = this.index;
+      const newName = this.tempTocken.name;
+      this.tempTocken.name = this.tockens[id].name;
 
-        this.$store.commit('createTockens', {
-          idDash: this.idDash,
-          tocken: this.tempTocken,
-        });
-        this.$store.commit('changeTokenName', {
-          idDash: this.idDash,
-          tocken: this.tempTocken,
-          value: newName,
-        });
+      this.$store.commit('createTockens', {
+        idDash: this.idDash,
+        tocken: this.tempTocken,
+      });
+      this.$store.commit('changeTokenName', {
+        idDash: this.idDash,
+        tocken: this.tempTocken,
+        value: newName,
+      });
 
-        this.openwarning = false;
-        this.showSign = true;
-        this.opennewtocken = false;
+      this.openwarning = false;
+      this.showSign = true;
+      this.opennewtocken = false;
 
       this.newTockenName = null;
       this.newElem = '';
@@ -1598,29 +1596,29 @@ export default {
       this.newCapture = '';
       this.newTockenDop = {
         defaultValue: '*',
-      }
+      };
     },
-    noSearch: function () {
+    noSearch() {
       // если нажали на кнопку нет
       this.openwarning = false;
     },
-    checkSid: function (sid) {
+    checkSid(sid) {
       let newSid = sid;
       if (sid.length > 5) {
         // если там больше 10 символов
-        newSid = sid.substring(0, 5) + '...'; // обрезаем и добовляем троеточие
+        newSid = `${sid.substring(0, 5)}...`; // обрезаем и добовляем троеточие
       }
       return newSid;
     },
-    openEditSearch: function (event, sid) {
+    openEditSearch(event, sid) {
       if (
-        event.target.classList.contains('search-id') ||
-        event.target.classList.contains('search-query')
+        event.target.classList.contains('search-id')
+        || event.target.classList.contains('search-query')
       ) {
         this.openEdit(sid);
       }
     },
-    exportSearch: function (sid) {
+    exportSearch(sid) {
       this.$emit('downloadData', sid);
       // let db = null;
       //
@@ -1688,7 +1686,7 @@ export default {
     //     this.$set(this.disabledDS, sid, true);
     //   }
     // },
-    dragTool: function (event) {
+    dragTool(event) {
       // функция для перетаскивания нового элемнета на полотно (остальную область, ну вы поняли короче)
 
       if (event.which !== 1) {
@@ -1710,10 +1708,10 @@ export default {
         parent = event.target.parentElement; // то присваиваем нужно нам родителя
       }
 
-      let originCoord = parent.getBoundingClientRect(); // получаем координаты нашего элемента
-      let shiftX = event.pageX - originCoord.left; // это как бы расстояния от точки куда тыкнул пользователь до краев элемнета, это нужно чтобы красиво перемещать
-      let shiftY = event.pageY - (originCoord.top + pageYOffset);
-      let avatar = parent.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
+      const originCoord = parent.getBoundingClientRect(); // получаем координаты нашего элемента
+      const shiftX = event.pageX - originCoord.left; // это как бы расстояния от точки куда тыкнул пользователь до краев элемнета, это нужно чтобы красиво перемещать
+      const shiftY = event.pageY - (originCoord.top + pageYOffset);
+      const avatar = parent.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
       document.body.appendChild(avatar); // и его уже добовляем в body
       avatar.classList.add('avatar'); // даем ему класс
       avatar.style.zIndex = 99; // делаем его выше всех
@@ -1721,8 +1719,8 @@ export default {
 
       document.onmousemove = (event) => {
         // при движении мыши
-        avatar.style.left = event.pageX - shiftX + 'px'; // мы перемещаем на самом деле наш автар, а не сам объект
-        avatar.style.top = event.pageY - shiftY + 'px';
+        avatar.style.left = `${event.pageX - shiftX}px`; // мы перемещаем на самом деле наш автар, а не сам объект
+        avatar.style.top = `${event.pageY - shiftY}px`;
         this.avatar = avatar; // и храним объект нашего  аватара
       };
       document.onclick = () => {
@@ -1730,16 +1728,16 @@ export default {
         avatar.remove(); // удаляем аватар из дерева dom
       };
     },
-    addDashBoard: function () {
+    addDashBoard() {
       // функция создания нового элемнета
       if (this.avatar.nodeName) {
         // если автар существует а не потерялся по пути
         const clientCoord = this.avatar.getBoundingClientRect(); // берем координаты аватара
-        let coord = {
+        const coord = {
           top: clientCoord.top + window.pageYOffset,
           left: clientCoord.left + window.pageXOffset,
-        }
-        let type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
+        };
+        const type = this.avatar.getAttribute('data-type'); // и его тип (table, select and etc)
         this.avatar.remove(); // удаляем аватар из дерева dom
         this.avatar = null; // и у нас тоже его очищаем
 
@@ -1749,25 +1747,25 @@ export default {
         this.$set(
           this.newDashBoard[type],
           'name_elem',
-          type[0].toUpperCase() + type.substring(1)
+          type[0].toUpperCase() + type.substring(1),
         );
 
-        let step = { ...this.$store.getters.getSizeGrid(this.idDash) };
+        const step = { ...this.$store.getters.getSizeGrid(this.idDash) };
 
         step.vert = Math.round(window.innerWidth / Number(step.vert));
         step.hor = Math.round(window.innerHeight / Number(step.hor));
 
-        let size = this.calcGrid(
+        const size = this.calcGrid(
           settings.size[type].height,
           settings.size[type].width,
           step,
-          'size'
+          'size',
         );
 
         this.$set(this.newDashBoard[type], 'width', size.vert);
         this.$set(this.newDashBoard[type], 'height', size.hor);
 
-        let pos = this.calcGrid(coord.top, coord.left, step, 'pos');
+        const pos = this.calcGrid(coord.top, coord.left, step, 'pos');
         this.$set(this.newDashBoard[type], 'top', pos.hor);
         this.$set(this.newDashBoard[type], 'left', pos.vert);
 
@@ -1790,43 +1788,41 @@ export default {
         this.newDashBoard = {};
       }
     },
-    calcGrid: function (top, left, step, action) {
-      let size = {},
-        header;
+    calcGrid(top, left, step, action) {
+      const size = {};
+      let header;
       screen.width > 1400 ? (header = 50) : (header = 40);
       action === 'size' ? (header = 0) : false;
       size.vert = Math.round(left / step.vert);
-      //size.vert = leftCoord*step.vert;
+      // size.vert = leftCoord*step.vert;
       size.hor = Math.round((top - header) / step.hor);
-      //size.hor = (topCoord*step.hor)+header;
+      // size.hor = (topCoord*step.hor)+header;
       return size;
     },
     // calcSizePx(size,key) {
     //   return `${((size*100)/screen[key]).toFixed(1)}%`
     // },
-    checkPos: function (size) {
-      let result = { top: 0, left: 0 };
-      let clientWidth = document.querySelector('#app').clientWidth;
+    checkPos(size) {
+      const result = { top: 0, left: 0 };
+      const { clientWidth } = document.querySelector('#app');
       size.top < 50 ? (result.top = 70) : (result.top = size.top);
       size.left < 0 ? (result.left = 20) : (result.left = size.left);
       if (size.left + size.width > clientWidth) {
         result.left = clientWidth - size.width - 20;
-      } else {
-        if (result.left === 0) {
-          result.left = size.left;
-        }
+      } else if (result.left === 0) {
+        result.left = size.left;
       }
       return result;
     },
-    showModalExin: function (event) {
+    showModalExin(event) {
       // функция вызова модального окна импорта экспорта
       this.$store.commit('setModalExin', {
         idDash: this.idDash,
         status: true,
-        event: event,
+        event,
       });
     },
-    openSettings: function () {
+    openSettings() {
       this.$emit('openSettings');
 
       if (this.colorGear === 'controlsActive') {
@@ -1835,7 +1831,7 @@ export default {
         this.colorGear = 'controlsActive';
       }
     },
-    openExim: function () {
+    openExim() {
       if (this.colorExim === 'controlsActive') {
         this.colorExim = 'controls';
       } else {
@@ -1843,10 +1839,11 @@ export default {
       }
       this.openexim = !this.openexim;
     },
-    setEvents: function () {
+    setEvents() {
       if (this.textarea_event !== null && this.textarea_event !== '') {
-        let events = this.textarea_event.split('\n');
-        let reg, body, bodyArray, element, doing, originItem;
+        const events = this.textarea_event.split('\n');
+        let reg; let body; let bodyArray; let element; let doing; let
+          originItem;
 
         if (events.length !== 0) {
           events.forEach((item) => {
@@ -1857,7 +1854,7 @@ export default {
               this.$set(
                 this.event,
                 'event',
-                reg.exec(item)[0].replace('(', '')
+                reg.exec(item)[0].replace('(', ''),
               );
               reg = new RegExp(/\(.+\)/, 'g');
               body = reg.exec(item)[0];
@@ -1876,14 +1873,14 @@ export default {
                   this.$set(
                     this.event,
                     'row',
-                    element.splice(2, element.length - 1).join(',')
+                    element.splice(2, element.length - 1).join(','),
                   );
                 } else {
                   this.$set(this.event, 'compare', element[0]);
                   this.$set(
                     this.event,
                     'sense',
-                    element.splice(1, element.length - 1).join(',')
+                    element.splice(1, element.length - 1).join(','),
                   );
                 }
               } else if (this.event.event === 'OnTokenCompare') {
@@ -1892,7 +1889,7 @@ export default {
                 this.$set(
                   this.event,
                   'tokenval',
-                  element.splice(2, element.length - 1).join(',')
+                  element.splice(2, element.length - 1).join(','),
                 );
               } else if (this.event.event === 'onValueCompare') {
                 if (element.length === 2) {
@@ -1904,19 +1901,19 @@ export default {
                       this.$set(
                         this.event,
                         'treshold',
-                        element.slice(0, i + 1).join(',')
+                        element.slice(0, i + 1).join(','),
                       );
                       this.$set(
                         this.event,
                         'color',
-                        element.slice(i + 1, element.length).join(',')
+                        element.slice(i + 1, element.length).join(','),
                       );
                       break;
                     }
                   }
                 }
               } else {
-                this.$set(this.event, 'element', element[0]); //click
+                this.$set(this.event, 'element', element[0]); // click
                 if (element[1]) {
                   if (element[1].indexOf('[') !== -1) {
                     let j = -1;
@@ -1927,7 +1924,7 @@ export default {
                     });
                     let partelement = element[1];
                     for (let i = 2; i < j + 1; i++) {
-                      partelement += ',' + element[i];
+                      partelement += `,${element[i]}`;
                     }
                     this.$set(this.event, 'partelement', partelement);
                   } else {
@@ -1965,11 +1962,12 @@ export default {
                   }
                 }
               } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
-                ///go
+                /// go
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
                 this.$set(this.event, 'target', doing[0]);
 
-                let prop, value;
+                let prop; let
+                  value;
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
@@ -1984,7 +1982,7 @@ export default {
                 this.$set(this.event, 'tab', doing[2]);
                 this.$set(this.event, 'value', value);
               } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
-                //open
+                // open
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
                 this.$set(this.event, 'target', doing[0]);
@@ -2005,9 +2003,7 @@ export default {
                 this.$set(this.event, 'sid', doing[0]);
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
-                  let files = doing.map((item) => {
-                    return item.replace('[', '').replace(']', '');
-                  });
+                  const files = doing.map((item) => item.replace('[', '').replace(']', ''));
                   this.$set(this.event, 'file', files);
                 } else {
                   this.$set(this.event, 'file', [doing[1]]);
@@ -2052,7 +2048,7 @@ export default {
       }
     },
 
-    changeColor: function () {
+    changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
@@ -2062,9 +2058,9 @@ export default {
         });
       }
     },
-    saveDash: function () {
-      let dash = this.$store.getters.getDashboard(this.idDash);
-      let response = this.$store.getters.saveDashboard({
+    saveDash() {
+      const dash = this.$store.getters.getDashboard(this.idDash);
+      const response = this.$store.getters.saveDashboard({
         id: this.idDash,
         body: JSON.stringify(dash),
       });
@@ -2073,13 +2069,13 @@ export default {
         if (res.status === 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
-          this.$store.auth.getters.putLog(
+          this.$store.getters['auth/putLog'](
             `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
               res.data.id
-            }`
+            }`,
           );
           // console.log(res.data)
-          this.updateDash({ data: res.data, dash: dash });
+          this.updateDash({ data: res.data, dash });
         } else {
           this.colorErrorSave = this.theme.controlsActive;
           this.msgErrorSave = 'Не получилось. Попробуйте еще раз.';
@@ -2090,22 +2086,22 @@ export default {
         }, 2000);
       });
     },
-    updateDash: function (dash) {
+    updateDash(dash) {
       this.$store.commit('updateDash', {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
-      this.$store.auth.getters.putLog(
+      this.$store.getters['auth/putLog'](
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
           this.idDash
-        }`
+        }`,
       );
     },
-    toHichName: function (name) {
+    toHichName(name) {
       return name[0].toUpperCase() + name.slice(1);
     },
-    toHome: function () {
-      this.$router.push(`/main`);
+    toHome() {
+      this.$router.push('/main');
     },
     getScreenHeight() {
       return 0.9 * window.innerHeight;
@@ -2132,4 +2128,3 @@ export default {
   width: fit-content
 }
 </style>
-

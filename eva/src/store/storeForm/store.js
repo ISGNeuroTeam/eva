@@ -1,6 +1,8 @@
-import rest from './storeRest.js';
 import Vue from 'vue';
+import rest from './storeRest';
+
 export default {
+  namespaced: true,
   state: {},
   mutations: {
     setCreateForm: (state, options) => {
@@ -10,7 +12,7 @@ export default {
       rest.saveForm(form);
     },
     saveTemplateForm: (state) => {
-      let template = {
+      const template = {
         name: state.createForm.name,
         cells: state.createForm.cells,
       };
@@ -36,7 +38,7 @@ export default {
         Vue.set(
           state.createForm.cells[options.element].options,
           item,
-          options.options[item]
+          options.options[item],
         );
       });
     },
@@ -65,55 +67,30 @@ export default {
   },
   actions: {},
   getters: {
-    getCreateForm: (state) => {
-      return state.createForm;
+    getCreateForm: (state) => state.createForm,
+    getAllForm: () => (id) => rest.getAllForm(id),
+    getOption: (state) => (options) => {
+      if (state.createForm.cells[options.key].options) {
+        return state.createForm.cells[options.key].options;
+      }
+      return 'empty';
     },
-    getAllForm: () => {
-      return (id) => {
-        return rest.getAllForm(id);
-      };
-    },
-    getOption: (state) => {
-      return (options) => {
-        if (state.createForm.cells[options.key].options) {
-          return state.createForm.cells[options.key].options;
-        } else {
-          return 'empty';
-        }
-      };
-    },
-    getFormLocal: (state) => {
-      return state.createForm.cells;
-    },
-    getFormContent: () => {
-      return (ids) => {
-        return rest.getFormContent(ids);
-      };
-    },
-    getContent: (state) => {
-      return (id) => {
-        if (state.createForm.content) {
-          return state.createForm.content[id];
-        } else {
-          return 'empty';
-        }
-      };
+    getFormLocal: (state) => state.createForm.cells,
+    getFormContent: () => (ids) => rest.getFormContent(ids),
+    getContent: (state) => (id) => {
+      if (state.createForm.content) {
+        return state.createForm.content[id];
+      }
+      return 'empty';
     },
     getAllContent: (state) => {
       if (state.createForm.content) {
         return state.createForm.content;
-      } else {
-        return 'empty';
       }
+      return 'empty';
     },
-    getAllTemplates: () => {
-      return rest.getTemplateList();
-    },
-    getTemplate: () => {
-      return (id) => {
-        return rest.getTemplate(id);
-      };
-    },
+    getAllTemplates: () => rest.getTemplateList(),
+    getTemplate: () => (id) => rest.getTemplate(id),
     getDisabled: (state) => {
       if (!state.createForm.disabled) {
         state.createForm.disabled = false;

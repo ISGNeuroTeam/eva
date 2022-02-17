@@ -161,37 +161,36 @@ export default {
     };
   },
   computed: {
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    dataReady: function () {
+    dataReady() {
       let data = [];
       if (this.dataRestFrom != null) {
         data = this.dataRestFrom;
       }
       return data;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    widthInput: function () {
+    widthInput() {
       return `${this.widthFrom - 70}px`;
     },
-    multiple: function () {
-      let options = this.$store.getters.getOptions({
+    multiple() {
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
       if (options.multiple) {
         return options.multiple;
-      } else {
-        return false;
       }
+      return false;
     },
-    dataRest: function () {
+    dataRest() {
       let data = [];
       if (this.dataReady.length > 0) {
         data = Object.keys(this.dataReady);
@@ -203,13 +202,11 @@ export default {
       }
       return data;
     },
-    dataRestDeep: function () {
+    dataRestDeep() {
       let res = [];
       if (this.dataReady.length > 0) {
-        let data = this.dataReady;
-        res = Object.values(data).map((item) => {
-          return item[this.elem];
-        });
+        const data = this.dataReady;
+        res = Object.values(data).map((item) => item[this.elem]);
         res = this.filterSelect(res, this.elemDeep.true);
       }
       return res;
@@ -232,18 +229,17 @@ export default {
         id: this.id,
       }).elemDeep;
     },
-    dataLoading: function () {
+    dataLoading() {
       return this.dataLoadingFrom;
     },
   },
   watch: {
-    selectedElemDeep: function () {
+    selectedElemDeep() {
       if (this.selectedElemDeep.elemDeep === '') {
-        this.elemDeep[String(this.multiple)] =
-          String(this.multiple) === 'true' ? [] : '';
+        this.elemDeep[String(this.multiple)] = String(this.multiple) === 'true' ? [] : '';
       }
     },
-    selectedElemLink: function () {
+    selectedElemLink() {
       if (this.selectedElemLink.elemlink === '') {
         this.elemlink = 'Выберите связанный столбец данных';
       }
@@ -267,7 +263,7 @@ export default {
           }
         }
         this.dataFromRest = data;
-        for (let action of this.actions) {
+        for (const action of this.actions) {
           action.capture = data;
         }
       }
@@ -279,7 +275,7 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    let selected = this.$store.getters.getSelected({
+    const selected = this.$store.getters.getSelected({
       idDash: this.idDash,
       id: this.id,
     });
@@ -287,8 +283,8 @@ export default {
       selected.elem ? (this.elem = selected.elem) : false;
       selected.elemlink ? (this.elemlink = selected.elemlink) : false;
       if (
-        this.elem !== 'Выберите элемент' &&
-        this.elemlink !== 'Выберите связанный столбец данных'
+        this.elem !== 'Выберите элемент'
+        && this.elemlink !== 'Выберите связанный столбец данных'
       ) {
         this.openSelect();
       }
@@ -303,7 +299,7 @@ export default {
     }
   },
   methods: {
-    getItem: function (element) {
+    getItem(element) {
       switch (element) {
         case 'elem':
           this.$store.commit('setSelected', {
@@ -323,20 +319,20 @@ export default {
           break;
       }
       if (
-        this.elem !== 'Выберите элемент' &&
-        this.elemlink !== 'Выберите связанный столбец данных'
+        this.elem !== 'Выберите элемент'
+        && this.elemlink !== 'Выберите связанный столбец данных'
       ) {
         this.openSelect();
       }
       this.chooseText = 'Очистить Все';
       this.selectItems();
     },
-    openSelect: function () {
+    openSelect() {
       this.source_show = !this.source_show;
       this.open = !this.open;
       this.select_show = !this.select_show;
     },
-    selectItems: function () {
+    selectItems() {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
@@ -348,7 +344,7 @@ export default {
       }
       this.setTocken();
     },
-    filterSelect: function (res, selected) {
+    filterSelect(res, selected) {
       let data = [...[], ...res];
       data = data.filter((elem) => {
         if (!selected.includes(elem)) {
@@ -375,11 +371,11 @@ export default {
         idDash: this.idDash,
         id: this.id,
       });
-      let tockens = this.$store.getters.getTockens(this.idDash);
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let name = '';
       let capture = '';
       let curTocken = {};
-      let data = this.dataReady;
+      const data = this.dataReady;
       Object.keys(tockens).forEach((i) => {
         if (tockens[i].elem === this.id && tockens[i].action === 'change') {
           curTocken = tockens[i];
@@ -407,30 +403,26 @@ export default {
       }
 
       if (curTocken.prefix && curTocken.prefix !== '') {
-        value = value.map((item) => {
-          return `${curTocken.prefix}${item}`;
-        });
+        value = value.map((item) => `${curTocken.prefix}${item}`);
       }
       if (curTocken.sufix && curTocken.sufix !== '') {
-        value = value.map((item) => {
-          return `${item}${curTocken.sufix}`;
-        });
+        value = value.map((item) => `${item}${curTocken.sufix}`);
       }
       if (curTocken.delimetr && curTocken.delimetr !== '') {
         value = value.join(curTocken.delimetr);
       } else {
         value = value.join(',');
       }
-      let tocken = {
-        name: name,
+      const tocken = {
+        name,
         action: 'change',
-        capture: capture,
+        capture,
       };
       if (name !== '') {
         this.$store.commit('setTocken', {
-          tocken: tocken,
+          tocken,
           idDash: this.idDash,
-          value: value,
+          value,
         });
       }
     },
