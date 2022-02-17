@@ -1948,7 +1948,7 @@ export default {
                 doing.splice(0, 1);
                 doing = doing.join(',');
                 if (doing.indexOf('[') !== -1 && doing.indexOf(']') !== -1) {
-                  doing = doing.match(/[^]+(?=\])/g);
+                  doing = doing.match(/[^[]+(?=\])/g);
                 } else {
                   doing = doing.split(',');
                 }
@@ -1973,7 +1973,7 @@ export default {
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
-                  doing = doing.match(/[^]+(?=\])/g);
+                  doing = doing.match(/[^[]+(?=\])/g);
                   prop = doing[0].split(',');
                   value = doing[1].split(',');
                 } else {
