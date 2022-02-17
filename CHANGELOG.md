@@ -7,12 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+- fixed visible zoom button
+
+## [1.83.1]
+
+### Fixed
+- release name
+
+## [1.83.0]
+
 ### Added
 - added ability zoom all multiline graphs
 - added the ability to zoom out by double-clicking on a multiline
+- Added a frame for the event window
 
 ### Fixed
 
+- fixed selecting an object after changing dash setting
+- fixed adding multiple tokens
 - fixed token with an empty name
 - fixed name restriction for tokens
 - Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
@@ -26,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
-- fixed visible zoom button
+- fixed dash single value settings no closes
 
 ## [1.82.0]
 

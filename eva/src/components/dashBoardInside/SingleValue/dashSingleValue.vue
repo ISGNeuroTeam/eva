@@ -270,7 +270,7 @@ export default {
         listOrder: idx,
         title: item.name || item.title,
         fontWeight: 400,
-        value: this.metricList.find((m) => m.startId === item.startId)?.value,
+        value: item.startId?.value,
       }));
 
       this.setVisual(settings.metricOptions);
