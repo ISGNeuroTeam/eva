@@ -76,6 +76,8 @@ export default {
     width: 0,
     height: 0,
     line: null,
+    barplot: null,
+    brush: null,
     xAxis: null,
     xMetric: '',
     isTime: false,
@@ -911,6 +913,10 @@ export default {
         this.xAxis.attr('transform', `translate(0, ${this.height})`);
       }
 
+      this.brush = this.svg.append('g').attr('class', 'brush');
+
+      this.barplot = this.svg.append('g').attr('class', 'barplot');
+
       this.line = this.isUnitedMode
         ? this.svg.append('g').attr('clip-path', `url(#${clipPathID})`)
         : [];
@@ -1111,7 +1117,7 @@ export default {
                   - ((barplotMetrics.length - 1) / 2) * barWidth;
               }
 
-              this.line
+              this.barplot
                 .selectAll(`bar-${metricName}`)
                 .data(this.dataRestFrom)
                 .enter()
@@ -1487,15 +1493,10 @@ export default {
         }
 
         const sortedBars = bars.sort((a, b) => a.height - b.height);
-        sortedBars.reverse().forEach((item) => {
-          this.svg.append('use').attr('xlink:href', `#${item.id}`);
-        });
 
         this.unitedBars = [...sortedBars];
 
-        const brush = this.line.append('g').attr('class', 'brush');
-
-        brush
+        this.brush
           .append('rect')
           .attr('class', 'overlay')
           .attr('x', 0)
@@ -1512,7 +1513,7 @@ export default {
           brushObj.mouseDown = true;
           brushObj.clearBrush();
           brushObj.startX = d3.event.offsetX - 70;
-          brush
+          this.brush
             .append('rect')
             .attr('class', 'selection')
             .attr('x', brushObj.startX)
@@ -1534,7 +1535,7 @@ export default {
             brushObj.endX = change;
           }
 
-          if (brush.select('.selection').attr('width') > 5) {
+          if (this.brush.select('.selection').attr('width') > 5) {
             this.updateData(x, yScales, [brushObj.startX, brushObj.endX]);
           }
 
@@ -1552,9 +1553,9 @@ export default {
             brushObj.endX = isWidthPositive ? offsetX : startX + selectWidth;
 
             if (isWidthPositive) {
-              brush.select('.selection').attr('width', selectWidth);
+              this.brush.select('.selection').attr('width', selectWidth);
             } else {
-              brush
+              this.brush
                 .select('.selection')
                 .attr('x', startX + selectWidth)
                 .attr('width', -selectWidth);
@@ -1563,7 +1564,7 @@ export default {
         };
 
         brushObj.clearBrush = () => {
-          brushObj.selections = brush.selectAll('.selection').nodes();
+          brushObj.selections = this.brush.selectAll('.selection').nodes();
           brushObj.selections.forEach((sel) => sel.remove());
         };
         return null;

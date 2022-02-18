@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Fixed
+- Multiline. Moved the barplots to the background
 - fixed visible zoom button
 
 ## [1.83.1]
