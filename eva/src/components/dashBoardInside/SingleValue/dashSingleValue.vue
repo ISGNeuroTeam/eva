@@ -1,7 +1,7 @@
 <template>
   <div
     class="single-value-container pa-3"
-    :class="{ 'header-active': dataModeFrom, 'is-header-open': !isHeaderOpen}"
+    :class="{ 'header-active': dataModeFrom, 'is-header-open': !isHeaderOpen }"
   >
     <div class="header">
       <div>
@@ -193,7 +193,6 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
-      console.log('!!settings.showTitle;', !!settings.showTitle)
       this.isHeaderOpen = !!settings.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
