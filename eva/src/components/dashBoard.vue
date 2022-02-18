@@ -751,7 +751,6 @@ export default {
       this.fullScreenHeight = window.innerHeight * 0.8;
     },
     updateSettings(settings) {
-      console.log('this.settings.showTitle',this.settings.showTitle)
       this.settings = JSON.parse(JSON.stringify(settings));
     },
 

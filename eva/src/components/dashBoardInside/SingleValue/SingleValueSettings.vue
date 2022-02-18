@@ -364,7 +364,6 @@ export default {
       };
     },
     settings(old, newSet) {
-      console.log( this.settings)
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
@@ -374,7 +373,6 @@ export default {
     getFamily() {},
     handleChangeShowTitle() {
       if (this.settings) {
-        console.log('this.settings 2', this.settings)
         this.settings = {
           ...JSON.parse(JSON.stringify(this.settings)),
           showTitle: !this.settings.showTitle,
