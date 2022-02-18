@@ -249,8 +249,9 @@ export default {
         sizeChart.height = this.heightFrom;
 
         this.actions[0].capture = Object.keys(dataRest[0]);
+
         if (
-          this.$store.state.store[this.idDash][this.idFrom].actions.length
+          this.$store.state[this.idDash][this.idFrom].actions.length
           !== this.actions.length
         ) {
           this.$store.commit('setActions', {
