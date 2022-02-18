@@ -174,17 +174,17 @@ export default {
       return this.$store.getters.getTheme;
     },
     elemRawName() {
-      if (this.filterPart.token)
+      if (this.filterPart.token) {
         return this.$store.state.store[this.idDash][this.filterPart.token.elem]
           .name_elem;
-      else {
-        return 'Ручной фильтр';
       }
+
+      return 'Ручной фильтр';
     },
     elemName() {
       let name = this.elemRawName;
-      name &&
-        this.getDashTokens.forEach((token) => {
+      name
+        && this.getDashTokens.forEach((token) => {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
       return name || this.filterPart?.token?.name || 'Unknown';
@@ -192,20 +192,21 @@ export default {
     operationManualTitle() {
       return this.filterPart.operationManual
         ? this.operationManualTitleMap[this.filterPart.fieldType][
-            this.filterPart.operationManual
-          ]
+          this.filterPart.operationManual
+        ]
         : '';
     },
     filterPartValues() {
-      if (this.filterPart.token)
+      if (this.filterPart.token) {
         return this.$store.state.store[this.idDash].filters[this.filterIndex]
           .parts[this.filterPartIndex].values;
+      }
       return [];
     },
   },
   methods: {
     removeValue(valueIndex) {
-      let { idDash, filterIndex, filterPartIndex } = this;
+      const { idDash, filterIndex, filterPartIndex } = this;
       this.$store.commit('removeFilterPartValue', {
         idDash,
         filterIndex,
@@ -242,7 +243,6 @@ export default {
       > span
         overflow: hidden
         text-overflow: ellipsis
-
 
     .part-subtitle
       display: flex

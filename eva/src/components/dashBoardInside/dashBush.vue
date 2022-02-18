@@ -46,11 +46,10 @@
 
 <script>
 import * as yfile from 'yfiles';
+import { mdiClose, mdiCursorMove, mdiPencil } from '@mdi/js';
 import licenseData from './license.json';
 
-import { mdiClose, mdiCursorMove, mdiPencil } from '@mdi/js';
-
-yfile.License.value = licenseData; //проверка лицензии
+yfile.License.value = licenseData; // проверка лицензии
 
 export default {
   name: 'DashBush',
@@ -65,13 +64,13 @@ export default {
   },
   data() {
     return {
-      nodesSource: null, //ноды
-      edgesSource: null, //связи
-      maxElementWidth: 0, //макс ширина элемента
-      maxEdgeWidth: 0, //макс размер узла
+      nodesSource: null, // ноды
+      edgesSource: null, // связи
+      maxElementWidth: 0, // макс ширина элемента
+      maxEdgeWidth: 0, // макс размер узла
       jsonError: false,
       isViewMode: true,
-      elementConfig: null, //библиотека
+      elementConfig: null, // библиотека
       icon: {
         close: mdiClose,
         move: mdiCursorMove,
@@ -84,18 +83,17 @@ export default {
       // для ряда управляющих иконок
       if (document.body.clientWidth <= 1600) {
         return '50px';
-      } else {
-        return '60px';
       }
+      return '60px';
     },
     widthPanel() {
-      return this.widthFrom / 10 + 'px';
+      return `${this.widthFrom / 10}px`;
     },
     heightPanel() {
-      return this.heightFrom + 'px';
+      return `${this.heightFrom}px`;
     },
     dragRes() {
-      let dragRes = this.$store.getters.getDragRes({
+      const dragRes = this.$store.getters.getDragRes({
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
@@ -118,23 +116,23 @@ export default {
       }
     },
     dataRestFrom(_dataRest) {
-      //очистка графа
+      // очистка графа
       this.$graphComponent.graph.clear();
-      //библиотека
+      // библиотека
       this.generateElementConfig(_dataRest);
-      //если из dataRest забрали библиотеку
+      // если из dataRest забрали библиотеку
       if (!this.jsonError) {
-        //maxwidthlib
+        // maxwidthlib
         this.getMaxElementWidth();
-        //maxWidthEdge
+        // maxWidthEdge
         this.getMaxEdgeWidth();
-        //генерируем и рисуем ноды
+        // генерируем и рисуем ноды
         this.generateNodes(_dataRest);
         this.drawNodes();
-        //генерируем и рисуем связи
+        // генерируем и рисуем связи
         this.generateEdges(_dataRest);
         this.drawEdges();
-        //применяем layot
+        // применяем layot
         this.applyLayout();
       }
     },
@@ -182,16 +180,15 @@ export default {
       this.maxEdgeWidth = _max;
     },
     drawNodes() {
-      //для нод на графе, скрытая переменная yfile
+      // для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
 
       this.nodesSource.forEach((node, index) => {
         let _node;
         let _imgSource;
         if (this.nodesSource[index].anomaly === true) {
-          _imgSource =
-            this.elementConfig.library.primitives[this.nodesSource[index].type]
-              .image_on;
+          _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type]
+            .image_on;
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
             style: new yfile.ImageNodeStyle(`/svg/warning_${_imgSource}`),
@@ -199,15 +196,13 @@ export default {
           });
         } else {
           if (this.nodesSource[index].status === true) {
-            _imgSource =
-              this.elementConfig.library.primitives[
-                this.nodesSource[index].type
-              ].image_on;
+            _imgSource = this.elementConfig.library.primitives[
+              this.nodesSource[index].type
+            ].image_on;
           } else {
-            _imgSource =
-              this.elementConfig.library.primitives[
-                this.nodesSource[index].type
-              ].image_off;
+            _imgSource = this.elementConfig.library.primitives[
+              this.nodesSource[index].type
+            ].image_off;
           }
           _node = this.$graphComponent.graph.createNodeAt({
             location: node.point,
@@ -217,8 +212,8 @@ export default {
         }
 
         this.setNodeSize(_node, this.nodesSource[index].type);
-        //для дальнейшего рисования edges
-        //через tag передаётся id
+        // для дальнейшего рисования edges
+        // через tag передаётся id
         _node.tag = this.nodesSource[index].id;
         if (this.$graphNodes) {
           this.$graphNodes.push(_node);
@@ -249,24 +244,23 @@ export default {
           }
         });
         const _edge = this.$graphComponent.graph.createEdge(_fNode, _tNode);
-        //применяем этот стиль -- this.elementConfig.library.egdes[edge.style]
-        //стилизуем нарисованный edge
+        // применяем этот стиль -- this.elementConfig.library.egdes[edge.style]
+        // стилизуем нарисованный edge
         this.$graphComponent.graph.setStyle(
           _edge,
           new yfile.PolylineEdgeStyle({
             stroke: `${this.elementConfig.library.egdes[edge.style].width}px ${
               this.elementConfig.library.egdes[edge.style].color
             }`,
-          })
+          }),
         );
       });
     },
     applyLayout() {
       const layoutData = new yfile.PolylineEdgeRouterData();
       const edgeRouter = new yfile.EdgeRouter();
-      //чтобы узлы не сливались
-      edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance =
-        this.maxEdgeWidth * 2;
+      // чтобы узлы не сливались
+      edgeRouter.defaultEdgeLayoutDescriptor.minimumEdgeToEdgeDistance = this.maxEdgeWidth * 2;
 
       edgeRouter.scope = yfile.EdgeRouterScope.ROUTE_ALL_EDGES;
 
@@ -277,13 +271,13 @@ export default {
       bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider());
     },
     generateEdges(dataRest) {
-      let _allEdges = [];
-      //в последней строке доступы
+      const _allEdges = [];
+      // в последней строке доступы
       for (let i = 0; i < dataRest.length - 1; i++) {
         if (dataRest[i].edges) {
           const _tmpEdge = JSON.parse(dataRest[i].edges.replaceAll("'", '"'));
           Object.keys(_tmpEdge).forEach((key) => {
-            //прохожу по всем ключам-разного типа
+            // прохожу по всем ключам-разного типа
             _tmpEdge[key].forEach((edge) => {
               _allEdges.push({
                 fromNode: Number(dataRest[i].ID),
@@ -295,10 +289,10 @@ export default {
         }
       }
 
-      //уникальная связь
+      // уникальная связь
       this.edgesSource = this.uniqEdges(_allEdges);
-      //sort TODO!!
-      let _sort = [];
+      // sort TODO!!
+      const _sort = [];
       this.edgesSource.forEach((edge) => {
         if (edge.style === 'oil') {
           _sort.unshift(edge);
@@ -310,14 +304,14 @@ export default {
     },
 
     uniqEdges(allEdges) {
-      let _acc = [];
+      const _acc = [];
       for (let i = 0; i < allEdges.length; i++) {
         let _isUniq = true;
         for (let j = 0; j < _acc.length; j++) {
           if (
-            _acc[j].style === allEdges[i].style &&
-            _acc[j].fromNode === allEdges[i].toNode &&
-            _acc[j].toNode === allEdges[i].fromNode
+            _acc[j].style === allEdges[i].style
+            && _acc[j].fromNode === allEdges[i].toNode
+            && _acc[j].toNode === allEdges[i].fromNode
           ) {
             _isUniq = false;
           }
@@ -329,15 +323,15 @@ export default {
       return _acc;
     },
     generateNodes(dataRest) {
-      let _allNodes = [];
-      //в последней строке доступы
+      const _allNodes = [];
+      // в последней строке доступы
       for (let i = 0; i < dataRest.length - 1; i++) {
         _allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
-            dataRest[i].object_coordinate_X * this.containerWidth +
-              this.maxElementWidth / 2,
-            dataRest[i].object_coordinate_Y * this.containerHeight
+            dataRest[i].object_coordinate_X * this.containerWidth
+              + this.maxElementWidth / 2,
+            dataRest[i].object_coordinate_Y * this.containerHeight,
           ),
           label: dataRest[i].object_label,
           type: dataRest[i].object_type,
@@ -360,21 +354,18 @@ export default {
       this.initializeDefaultStyles();
     },
     initializeDefaultStyles() {
-      //стиль для label
-      this.$graphComponent.graph.nodeDefaults.labels.style =
-        new yfile.DefaultLabelStyle({
-          textFill: '#b8b8b8',
-          backgroundFill: '#0a0a0a',
-        });
-      this.$graphComponent.graph.edgeDefaults.style =
-        new yfile.PolylineEdgeStyle({
-          stroke: `3px white`,
-        });
+      // стиль для label
+      this.$graphComponent.graph.nodeDefaults.labels.style = new yfile.DefaultLabelStyle({
+        textFill: '#b8b8b8',
+        backgroundFill: '#0a0a0a',
+      });
+      this.$graphComponent.graph.edgeDefaults.style = new yfile.PolylineEdgeStyle({
+        stroke: '3px white',
+      });
 
-      //положение label относительно ноды
+      // положение label относительно ноды
       const labelModel = new yfile.ExteriorLabelModel({ insets: 4 });
-      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter =
-        labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH);
+      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH);
     },
   },
 };

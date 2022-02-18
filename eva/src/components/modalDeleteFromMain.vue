@@ -55,26 +55,26 @@ export default {
     return {};
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    active: function () {
+    active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       return this.modalFrom;
     },
-    name: function () {
+    name() {
       return this.nameFrom;
     },
   },
   methods: {
-    deleteBtn: function () {
+    deleteBtn() {
       this.$emit('deleteElem');
     },
-    cancelModal: function () {
+    cancelModal() {
       // есл инажали на отмену создания
       this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code == 'Escape') {
         this.cancelModal();
       }

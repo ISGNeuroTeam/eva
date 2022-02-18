@@ -73,12 +73,12 @@ export default {
     // active: function() {
     //   return this.showFrom
     // },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    paleteFrom: function (palete) {
+    paleteFrom(palete) {
       palete ? (this.paleteShow = true) : (this.paleteShow = false);
     },
   },
@@ -97,10 +97,10 @@ export default {
     //     this.switchers[switcher].arrow = mdiChevronDown;
     //   }
     // },
-    setTheme: function (theme) {
+    setTheme(theme) {
       this.$store.commit('setTheme', theme);
-      let settings = JSON.stringify({
-        theme: theme,
+      const settings = JSON.stringify({
+        theme,
       });
       this.$store.commit('setThemeBack', JSON.stringify({ setting: settings }));
     },
