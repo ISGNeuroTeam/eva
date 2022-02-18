@@ -5,14 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unrealese]
+## [1.83.1]
+
+### Fixed
+- release name
+- fixed guntt full screen improvements.
+
+## [1.83.0]
 
 ### Added
 - added ability zoom all multiline graphs
 - added the ability to zoom out by double-clicking on a multiline
+- Added a frame for the event window
 
 ### Fixed
 
+- fixed selecting an object after changing dash setting
+- fixed adding multiple tokens
 - fixed token with an empty name
 - fixed name restriction for tokens
 - Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
@@ -21,10 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed setting theme
 - fixed sizing a filter
 - fixed dashboard component
+- fixed button hints
 - fixed switching between filter types
 - fixed searching by bool type
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
+- fixed tile visualization not showing after datasource restart
+- fixed setting the title breaks the scrolling of the component
+- fixed dash single value settings no closes
 
 ## [1.82.0]
 

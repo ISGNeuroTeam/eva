@@ -164,11 +164,11 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    permissions: function () {
-      this.setDragresable()
+    permissions() {
+      this.setDragresable();
       return true;
     },
     gridShow: {
@@ -184,13 +184,13 @@ export default {
     },
   },
   watch: {
-    gearFrom: function (gear) {
+    gearFrom(gear) {
       gear ? (this.gearShow = true) : (this.gearShow = false);
     },
-    mode: function () {
+    mode() {
       this.$emit('changeMode');
     },
-    dragresable: function () {
+    dragresable() {
       this.$store.commit('setDragResize', {
         id: this.idDashFrom,
         item: String(this.dragresable),
@@ -204,12 +204,12 @@ export default {
     },
   },
   mounted() {
-    let grid = this.$store.getters.getSizeGrid(this.idDashFrom);
+    const grid = this.$store.getters.getSizeGrid(this.idDashFrom);
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
     if (
-      !this.permissionsFrom.includes('admin_all') &&
-      !this.permissionsFrom.includes('editdash')
+      !this.permissionsFrom.includes('admin_all')
+      && !this.permissionsFrom.includes('editdash')
     ) {
       this.dragresable = false;
     } else {
@@ -220,10 +220,10 @@ export default {
     this.showTabs = this.$store.getters.getShowTabs(this.idDashFrom);
   },
   methods: {
-    setDragresable () {
+    setDragresable() {
       if (
-          !this.permissionsFrom.includes('admin_all') &&
-          !this.permissionsFrom.includes('editdash')
+        !this.permissionsFrom.includes('admin_all')
+          && !this.permissionsFrom.includes('editdash')
       ) {
         // this.mode = false;
         this.dragresable = false;
@@ -232,7 +232,7 @@ export default {
         this.dragresable = true;
       }
     },
-    sendSizeGrid: function () {
+    sendSizeGrid() {
       this.$store.commit('setSizeGrid', {
         id: this.idDashFrom,
         grid: JSON.parse(JSON.stringify(this.sizeGrid)),

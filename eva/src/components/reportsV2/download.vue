@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      mdiDownload: mdiDownload,
+      mdiDownload,
     };
   },
   computed: {
@@ -43,10 +43,10 @@ export default {
       const searchData = this.data;
       // const searchData = this.dataObject[searchName].data
       let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
-      let keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
+      const keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(`${keys.join(',')}\n`); // добавляем ключи в файл
       csvContent += encodeURIComponent(
-        searchData.map((item) => Object.values(item).join(',')).join('\n')
+        searchData.map((item) => Object.values(item).join(',')).join('\n'),
       );
 
       const link = document.createElement('a'); // создаем ссылку

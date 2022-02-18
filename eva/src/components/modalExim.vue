@@ -127,39 +127,31 @@ export default {
     };
   },
   computed: {
-    theme: function () {
-      let currentTheme = this.$store.getters.getTheme;
+    theme() {
+      const currentTheme = this.$store.getters.getTheme;
       // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
       // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
       return currentTheme;
     },
   },
   watch: {
-    dashboards: function () {
-      let list = this.dashboards.map((item) => {
-        return item.name;
-      });
+    dashboards() {
+      const list = this.dashboards.map((item) => item.name);
       list.unshift('Выбрать все');
       this.elements.dash = list;
     },
-    groups: function () {
-      let list = this.groups.map((item) => {
-        return item.name;
-      });
+    groups() {
+      const list = this.groups.map((item) => item.name);
       list.unshift('Выбрать все');
       this.elements.group = list;
     },
-    selected: function (selected) {
+    selected(selected) {
       if (selected.includes('Выбрать все')) {
         let list = [];
         if (this.element == 'dash') {
-          list = this.dashboards.map((item) => {
-            return item.name;
-          });
+          list = this.dashboards.map((item) => item.name);
         } else {
-          list = this.groups.map((item) => {
-            return item.name;
-          });
+          list = this.groups.map((item) => item.name);
         }
         this.selected = list;
         list = [...[], ...list];
@@ -168,13 +160,9 @@ export default {
       } else if (selected.includes('Очистить все')) {
         let list = [];
         if (this.element == 'dashs') {
-          list = this.dashboards.map((item) => {
-            return item.name;
-          });
+          list = this.dashboards.map((item) => item.name);
         } else {
-          list = this.groups.map((item) => {
-            return item.name;
-          });
+          list = this.groups.map((item) => item.name);
         }
         this.selected = [];
         list.unshift('Выбрать все');
@@ -183,8 +171,8 @@ export default {
     },
   },
   methods: {
-    exportDash: async function () {
-      let ids = [];
+    async exportDash() {
+      const ids = [];
       if (this.element == 'dash') {
         this.dashboards.forEach((item) => {
           if (this.selected.includes(item.name)) {
@@ -199,7 +187,7 @@ export default {
         });
       }
 
-      let response = await this.$store.getters.exportDash({
+      const response = await this.$store.getters.exportDash({
         element: this.element,
         ids: ids.join(','),
       });
@@ -217,7 +205,7 @@ export default {
         this.msgExp.opacity = '0';
       }, 2000);
     },
-    importDash: async function () {
+    async importDash() {
       if (this.file == '' || this.file == undefined) {
         this.msgImp.text = 'Выберите файл для импорта';
         this.msgImp.color = 'controlsActive';
@@ -234,7 +222,7 @@ export default {
           this.msgImp.color = 'controlsActive';
           this.msgImp.opacity = '1';
         } else {
-          let formData = new FormData();
+          const formData = new FormData();
           if (this.element == 'dash') {
             formData.append('group', this.curName);
             formData.append('body', this.file);
@@ -243,7 +231,7 @@ export default {
           }
           await this.$store.getters.importDash({
             element: this.element,
-            formData: formData,
+            formData,
           });
           try {
             // let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
@@ -261,13 +249,13 @@ export default {
         this.msgImp.opacity = '0';
       }, 2000);
     },
-    downloadDash: function (url) {
-      let link = this.$refs.blockExim.appendChild(document.createElement('a'));
+    downloadDash(url) {
+      const link = this.$refs.blockExim.appendChild(document.createElement('a'));
       link.setAttribute('href', url);
       link.click();
       link.remove();
     },
-    closeModal: function () {
+    closeModal() {
       this.$emit('closeModal');
     },
     // changeColor: function() {
