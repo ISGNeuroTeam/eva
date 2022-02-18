@@ -375,7 +375,6 @@ export default {
   },
   methods: {
     onChangeForBoolean(title, event){
-      console.log('event', event)
       this.setFilterData(title, '=', 'compare');
       this.setFilterData(title, event);
     },
@@ -409,7 +408,6 @@ export default {
       return this.typedTitles[title];
     },
     setFilterData(title, event, compare) {
-      console.log('this.filters[title]', this.filters[title])
       if (!this.filters[title]) this.filters[title] = {};
       if (compare === 'compare') {
         this.filters[title].compare = event;
