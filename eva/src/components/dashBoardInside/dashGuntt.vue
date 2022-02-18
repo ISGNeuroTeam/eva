@@ -494,21 +494,17 @@ export default {
           }
 
           moveTooltip(event);
-          console.log('mouseover')
 
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
-          tooltipBlock.style.display = 'block';
         })
         .on('mousemove', function (event) {
           moveTooltip(event);
         })
         .on('mouseout', function () {
-          console.log('mouseout')
           tooltipBlock.style.opacity = '0';
           tooltipBlock.style.visibility = 'hidden';
-          tooltipBlock.style.display = 'none';
         })
         .on('click', function (d) {
           return that.setClick(d);
@@ -550,21 +546,15 @@ export default {
 
       texts
         .on('mouseover', function () {
-          console.log('mouseover 2' )
-
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
-          tooltipBlock.style.display = 'block';
         })
         .on('mousemove', function (event) {
           moveTooltip(event);
         })
         .on('mouseout', function () {
-          console.log('mouseout 2' )
           tooltipBlock.style.opacity = '0';
           tooltipBlock.style.visibility = 'hidden';
-          tooltipBlock.style.display = 'none';
-
         })
         .on('click', function (d) {
           return that.setClick(d);
