@@ -34,9 +34,9 @@
       }"
     >
       {{ optionsData.name }}
-      <!-- <div 
+      <!-- <div
         v-if="underline"
-        class="underline" 
+        class="underline"
         :style="{background:optionsData.colorText, width: `${underlineWidth}%`}"
       /> -->
     </div>
@@ -68,37 +68,35 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    color: function () {
+    color() {
       return this.colorFrom;
     },
-    height: function () {
+    height() {
       return this.heightFrom;
     },
-    dataMode: function () {
+    dataMode() {
       if (this.dataModeFrom) {
         return 35;
-      } else {
-        return 0;
       }
+      return 0;
     },
-    fontSize: function () {
-      let options = this.$store.getters.getOptions({
+    fontSize() {
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
       if (options.fontSize) {
         return options.fontSize.split('px')[0];
-      } else {
-        return '30';
       }
+      return '30';
     },
-    underlineWidth: function () {
+    underlineWidth() {
       let width = 30;
       if (this.fontSize > 30) {
         width = 90;
@@ -136,7 +134,7 @@ export default {
   },
   methods: {
     updateOptionsData() {
-      let options = this.$store.getters.getOptions({
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
@@ -161,35 +159,35 @@ export default {
     updateSearches() {
       this.$store.commit('updateManualTokens', { idDash: this.idDash });
     },
-    actionOpen: function (targetLink, header, widthPersent, heightPersent) {
-      //размер нового окна
-      let _width = screen.width * widthPersent;
-      let _height = screen.height * heightPersent;
+    actionOpen(targetLink, header, widthPersent, heightPersent) {
+      // размер нового окна
+      const _width = screen.width * widthPersent;
+      const _height = screen.height * heightPersent;
 
-      //устанавливаем положение нового окна.
-      let _left = (screen.width - screen.width * widthPersent) / 2;
-      let _top = (screen.height - screen.height * heightPersent) / 3;
+      // устанавливаем положение нового окна.
+      const _left = (screen.width - screen.width * widthPersent) / 2;
+      const _top = (screen.height - screen.height * heightPersent) / 3;
 
-      //адрес перехода
-      let _link = `${window.location.origin}/dashboards/${targetLink}${
+      // адрес перехода
+      const _link = `${window.location.origin}/dashboards/${targetLink}${
         header === 'false' || header === '0' ? '?header=false' : ''
       }`;
       window.open(
         _link,
         '',
-        `width=${_width}, height=${_height}, top=${_top}, left=${_left}`
+        `width=${_width}, height=${_height}, top=${_top}, left=${_left}`,
       );
     },
-    createReport: function (item, type) {
+    createReport(item, type) {
       this.getData(item.sid, item.file, type);
     },
-    exportSearch: function (item, type) {
+    exportSearch(item, type) {
       item.searches.forEach((sid) => {
         this.getData(sid, '', type);
       });
     },
-    setClick: function () {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setClick() {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
       let value = false;
 
@@ -200,9 +198,9 @@ export default {
           capture: tockens[i].capture,
         };
         if (
-          tockens[i].elem === this.id &&
-          tockens[i].action === 'click' &&
-          tockens[i].capture === 'inverse'
+          tockens[i].elem === this.id
+          && tockens[i].action === 'click'
+          && tockens[i].capture === 'inverse'
         ) {
           switch (tockens[i].value) {
             case '':
@@ -217,15 +215,15 @@ export default {
           }
 
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
             idDash: this.idDash,
-            value: value,
+            value,
             store: this.$store,
           });
         }
       });
 
-      let events = this.$store.getters.getEvents({
+      const events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'onclick',
         element: this.id,
@@ -235,7 +233,7 @@ export default {
         events.forEach((item) => {
           if (item.action === 'set') {
             this.$store.commit('letEventSet', {
-              events: events,
+              events,
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
@@ -246,44 +244,44 @@ export default {
               store: this.$store,
             });
           } else if (item.action.toLowerCase() === 'open') {
-            //если экшен open
+            // если экшен open
             this.actionOpen(
               item.target.toLowerCase(),
               item.header,
               item.widthPersent,
-              item.heightPersent
+              item.heightPersent,
             );
           } else if (
             item.action.toLowerCase() === 'changeReport'.toLowerCase()
           ) {
-            //если экшен open
+            // если экшен open
             this.createReport(item, 'report');
           } else if (
             item.action.toLowerCase() === 'exportSearch'.toLowerCase()
           ) {
-            //если экшен open
+            // если экшен open
             this.exportSearch(item, 'search');
           }
         });
       }
     },
-    downloadFile: function (fileLink) {
-      let namefile = fileLink.split('/')[2];
-      let url = `${window.location.protocol}//${window.location.host}/${fileLink}`;
-      let link = this.$refs.buttonEl.parentElement.appendChild(
-        document.createElement('a')
+    downloadFile(fileLink) {
+      const namefile = fileLink.split('/')[2];
+      const url = `${window.location.protocol}//${window.location.host}/${fileLink}`;
+      const link = this.$refs.buttonEl.parentElement.appendChild(
+        document.createElement('a'),
       ); // создаем ссылку
       link.setAttribute('href', url); // указываем ссылке что надо скачать наш файл csv
       link.setAttribute('download', namefile); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
-    getPaper: async function (file, data) {
+    async getPaper(file, data) {
       this.$emit('setLoading', true);
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('file', file);
       formData.append('data', JSON.stringify(data));
-      let result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.getters.getPaper(formData);
       try {
         if (result.status === 'success') {
           this.$emit('setLoading', false);
@@ -292,38 +290,37 @@ export default {
           return false;
         }
       } catch (error) {
-        //this.message(`Ошибка: ${error}`);
+        // this.message(`Ошибка: ${error}`);
       }
     },
-    getSearch: function (search, sid) {
-      let csvContent =
-        'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла
-      let keys = Object.keys(search[0]); // получаем ключи для заголовков столбцов
-      csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
+    getSearch(search, sid) {
+      let csvContent = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла
+      const keys = Object.keys(search[0]); // получаем ключи для заголовков столбцов
+      csvContent += encodeURIComponent(`${keys.join(',')}\n`); // добавляем ключи в файл
       csvContent += encodeURIComponent(
-        search.map((item) => Object.values(item).join(',')).join('\n')
+        search.map((item) => Object.values(item).join(',')).join('\n'),
       ); // добовляем все значения по ключам в файл
-      let link = this.$refs.buttonEl.parentElement.appendChild(
-        document.createElement('a')
+      const link = this.$refs.buttonEl.parentElement.appendChild(
+        document.createElement('a'),
       ); // создаем ссылку
       link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
       link.setAttribute('download', `${this.idDash}-${sid}.csv`); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
-    getData: function (sid, file, type) {
-      let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
+    getData(sid, file, type) {
+      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
       }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
-      let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
 
-      let worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
 
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
         if (event.data.length !== 0) {
-          //this.data = event.data;
+          // this.data = event.data;
           if (type === 'report') {
             this.getPaper(file, event.data);
           } else {
@@ -339,13 +336,13 @@ export default {
 
       worker.postMessage(`${this.idDash}-${sid}`); // запускаем воркер на выполнение
     },
-    getDataFromDb: function () {
+    getDataFromDb() {
       return function (event) {
         let db = null;
 
-        let searchSid = event.data;
+        const searchSid = event.data;
 
-        let request = indexedDB.open('EVA', 1);
+        const request = indexedDB.open('EVA', 1);
 
         request.onupgradeneeded = (event) => {
           db = event.target.result;
@@ -362,12 +359,12 @@ export default {
         request.onsuccess = () => {
           db = request.result;
 
-          let transaction = db.transaction('searches'); // (1)
+          const transaction = db.transaction('searches'); // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
+          const searches = transaction.objectStore('searches'); // (2)
 
-          let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
           query.onsuccess = () => {
             // (4)

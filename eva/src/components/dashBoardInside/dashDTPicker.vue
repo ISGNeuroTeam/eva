@@ -6,7 +6,6 @@
       :class="{ show_picker_elem: show_picker_elem }"
     >
       <div
-
         class="DTPicker-btn"
         :style="{ background: theme.$accent_ui_color }"
         @click="openHidden"
@@ -20,7 +19,6 @@
         </v-icon>
       </div>
       <div
-
         class="DTPicker-elem"
         :style="{
           boxShadow: `0 5px 5px -3px ${theme.$main_border},0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
@@ -237,16 +235,16 @@ export default {
     };
   },
   computed: {
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    dataRest: function () {
+    dataRest() {
       return this.dataRestFrom;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
@@ -270,8 +268,8 @@ export default {
       this.showCurrent();
       this.curDate = this.calcCurrentDate();
     },
-    calcCurrentDate: function () {
-      let data = this.$store.getters.getPickerDate({
+    calcCurrentDate () {
+      const data = this.$store.getters.getPickerDate({
         idDash: this.idDash,
         id: this.id,
       });
@@ -286,10 +284,8 @@ export default {
         } else {
           current += '...';
         }
-      } else {
-        if (data.end != null) {
-          current = `... - ${data.end}`;
-        }
+      } else if (data.end != null) {
+        current = `... - ${data.end}`;
       }
 
       if (data.range != null) {
@@ -306,10 +302,8 @@ export default {
         } else {
           current += '...';
         }
-      } else {
-        if (data.endCus != null) {
-          current = `... - ${data.endCus}`;
-        }
+      } else if (data.endCus != null) {
+        current = `... - ${data.endCus}`;
       }
       if (data.last != null) {
         if (data.last.every !== 0 && data.last.time !== '') {
@@ -332,7 +326,7 @@ export default {
       this.show_curent = current !== '';
       return current;
     },
-    openHidden: function () {
+    openHidden() {
       this.show_picker_elem = !this.show_picker_elem;
       if (this.arrow.direct === 'down') {
         this.$emit('setVissible', {element: this.id, overflow: 'visible'});
@@ -344,13 +338,13 @@ export default {
         this.onClose()
       }
     },
-    customDate: function (elem) {
+    customDate(elem) {
       elem === 'begin'
         ? (this.start_custom.color = 'controls')
         : (this.end_custom.color = 'controls');
       this.setTocken('custom');
     },
-    showCurrent: function () {
+    showCurrent() {
       this.$set(this.date, 'start', this.start);
       this.$set(this.date, 'end', this.end);
       this.$set(this.date, 'range', this.range);
@@ -363,11 +357,11 @@ export default {
         id: this.id,
       });
     },
-    setLast: function (event) {
+    setLast(event) {
       this.last.every = event;
       this.setTocken('time');
     },
-    setTime: function (time) {
+    setTime(time) {
       this.last.time = time;
       Object.keys(this.color).forEach((item) => {
         this.color[item] = '$accent_ui_color';
@@ -379,7 +373,7 @@ export default {
       }
       this.setTocken('time');
     },
-    setTocken: function (elem) {
+    setTocken(elem) {
       let period = 0;
       switch (elem) {
         case 'dt':
@@ -397,10 +391,10 @@ export default {
 
         case 'range':
           this.startForStore = parseInt(
-            new Date(this.range.start).getTime() / 1000
+            new Date(this.range.start).getTime() / 1000,
           );
           this.endForStore = parseInt(
-            new Date(this.range.end).getTime() / 1000
+            new Date(this.range.end).getTime() / 1000,
           );
           this.start = null;
           this.end = null;
@@ -450,15 +444,15 @@ export default {
           break;
       }
     },
-    setDate: function () {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setDate() {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
-      let setTocken = (value) => {
+      const setTocken = (value) => {
         this.$store.commit('setTocken', {
-          tocken: tocken,
+          tocken,
           idDash: this.idDash,
-          value: value,
+          value,
           store: this.$store,
         });
       };
@@ -470,18 +464,18 @@ export default {
           capture: tockens[i].capture,
         };
         if (
-          tockens[i].elem === this.id &&
-          tockens[i].action === 'select' &&
-          tockens[i].capture === 'start'
+          tockens[i].elem === this.id
+          && tockens[i].action === 'select'
+          && tockens[i].capture === 'start'
         ) {
           if (this.startForStore != null) {
             setTocken(this.startForStore);
           }
         }
         if (
-          tockens[i].elem === this.id &&
-          tockens[i].action === 'select' &&
-          tockens[i].capture === 'end'
+          tockens[i].elem === this.id
+          && tockens[i].action === 'select'
+          && tockens[i].capture === 'end'
         ) {
           if (this.endForStore != null) {
             setTocken(this.endForStore);
