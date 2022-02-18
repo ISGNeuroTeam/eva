@@ -121,6 +121,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -139,6 +140,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -157,6 +159,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -179,6 +182,7 @@
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -198,6 +202,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -218,6 +223,7 @@
               v-if="editPermission"
               bottom
               :color="theme.$accent_ui_color"
+              z-index="100"
             >
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
@@ -324,10 +330,6 @@
 </template>
 
 <script>
-import FilterPart from './FilterPart.vue';
-import FilterPartModal from './FilterPartModal';
-import FilterPreviewModal from './FilterPreviewModal';
-
 import {
   mdiPlusCircleOutline,
   mdiTrashCanOutline,
@@ -339,6 +341,9 @@ import {
   mdiChevronLeft,
   mdiChevronRight,
 } from '@mdi/js';
+import FilterPart from './FilterPart.vue';
+import FilterPartModal from './FilterPartModal.vue';
+import FilterPreviewModal from './FilterPreviewModal.vue';
 
 export default {
   name: 'DashFilterPanel',
@@ -450,9 +455,9 @@ export default {
     },
     saveTempFilter() {
       if (this.filters.some((filter) => filter.id === this.tempFilter.id)) {
-        //console.log('Фильтр с таким именем существует');
+        // console.log('Фильтр с таким именем существует');
       } else if (!this.tempFilter.id) {
-        //console.log('Введите имя');
+        // console.log('Введите имя');
       } else {
         if (!Number.isFinite(this.tempFilterIndex)) this.tempFilterIndex = 0;
         this.$store.commit('createFilter', {
@@ -485,15 +490,15 @@ export default {
       this.filterPartInModal = filterPart
         ? { ...filterPart }
         : {
-            filterPartType: 'manual',
-            operationToken: 'OR',
-            token: null,
-            fieldType: 'number',
-            operationManual: '>',
-            fieldName: null,
-            value: null,
-            invertMatches: false,
-          };
+          filterPartType: 'manual',
+          operationToken: 'OR',
+          token: null,
+          fieldType: 'number',
+          operationManual: '>',
+          fieldName: null,
+          value: null,
+          invertMatches: false,
+        };
       this.filterPartModalShow = true;
     },
     saveFilterPart(filterPart, filterPartIndex) {
@@ -594,7 +599,6 @@ $filter-container-height: 60px
 
     $add-new-filter-block-height: 4px
     $add-new-filter-inner-height: 18px
-
 
     .add-new-filter-block
       position: absolute

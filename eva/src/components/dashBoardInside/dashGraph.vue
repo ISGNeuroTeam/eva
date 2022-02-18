@@ -138,19 +138,19 @@ export default {
     };
   },
   computed: {
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    dataLoading: function () {
+    dataLoading() {
       return this.dataLoadingFrom;
     },
-    width: function () {
+    width() {
       return this.widthFrom;
     },
-    height: function () {
+    height() {
       return this.heightFrom;
     },
   },
@@ -167,7 +167,7 @@ export default {
   mounted() {
     // при первом появлении графа
 
-    let stateTree = this.$store.getters.getGraphTree({
+    const stateTree = this.$store.getters.getGraphTree({
       idDash: this.idDash,
       id: this.id,
     }); // забираем уже сохраненные данные из store
@@ -184,19 +184,19 @@ export default {
     });
   },
   methods: {
-    createGraph: function (elem) {
+    createGraph(elem) {
       // функция отрисовки графа
 
-      let size = this.sizeGraph(); // сперва получаем размеры контейнера для графа
+      const size = this.sizeGraph(); // сперва получаем размеры контейнера для графа
 
-      let graph = new joint.dia.Graph(); // объект самого графа
+      const graph = new joint.dia.Graph(); // объект самого графа
 
-      let tooltipName = this.$refs.tooltipName; // получаем тултип всплывающий при наведении мышки
+      const { tooltipName } = this.$refs; // получаем тултип всплывающий при наведении мышки
 
-      let links = this.preperedData.links; // линии графа
-      let nodes = this.preperedData.nodes; // ноды графа
+      const { links } = this.preperedData; // линии графа
+      const { nodes } = this.preperedData; // ноды графа
 
-      let paper = new joint.dia.Paper({
+      const paper = new joint.dia.Paper({
         // объект полотна для графа
         el: elem, // размещать будем в нашем нотбуке
         model: graph, // размещать будем граф
@@ -220,7 +220,7 @@ export default {
           // пробегаемся по его детям
           if (item.getAttribute('joint-selector') === 'label') {
             // и ищем надпись
-            let name = item.getAttribute('data-name'); // получаем полное имя ноды из атрибута
+            const name = item.getAttribute('data-name'); // получаем полное имя ноды из атрибута
             this.tooltipName = `${name}<br>${nodes[name].label}`; // заносим это имя сперва в тултип
             tooltipName.style.opacity = '0.7'; // потом отражаем его
             tooltipName.style.left = `${this.rects[name].position().x + 70}px`; // и позиционируем
@@ -241,7 +241,7 @@ export default {
 
       paper.on('element:pointerclick', (element) => {
         this.setClick(
-          element.el.querySelector('text').getAttribute('data-name')
+          element.el.querySelector('text').getAttribute('data-name'),
         );
       });
 
@@ -253,7 +253,7 @@ export default {
       link.attr('line/strokeWidth', '1'); // толщина стрелок
       link.attr('line/targetMarker/d', 'M 10 -1.5 0 0 10 1.5 z'); // форма самих стрелок, сейчас уже чем стандарт
 
-      let rectClass = joint.dia.Element.define(
+      const rectClass = joint.dia.Element.define(
         'examples.CustomElement',
         {
           // создаем кастомный шаблон для элемнетов, нужен для двухцветной раскраски
@@ -311,13 +311,13 @@ export default {
               selector: 'label',
             },
           ],
-        }
+        },
       );
 
       let rect = new rectClass(); // экземпляр нашего кастомного класса
 
-      let tree = this.tree; // дерево с элементами и их позициями на холсте
-      let saveBtn = this.$refs.saveTree; // кнопка сохранить
+      const { tree } = this; // дерево с элементами и их позициями на холсте
+      const saveBtn = this.$refs.saveTree; // кнопка сохранить
       let label; // обрезанное или нет имя ноды
 
       Object.keys(tree[this.direct]).forEach((item) => {
@@ -335,15 +335,13 @@ export default {
 
         rect.on('change:position', (element, position) => {
           // при смене позиции элемента
-          this.tree[this.direct][element.attr('label/data-name')][0] =
-            position.x; // меняем данные в нашем дереве
-          this.tree[this.direct][element.attr('label/data-name')][1] =
-            position.y;
+          this.tree[this.direct][element.attr('label/data-name')][0] = position.x; // меняем данные в нашем дереве
+          this.tree[this.direct][element.attr('label/data-name')][1] = position.y;
           saveBtn.style.opacity = '1'; // и появляется кнопка сохранить измененное положение
         });
       });
 
-      let rects = this.rects; // сохраняем созданный объект в локлаьную переменную для удобства
+      const { rects } = this; // сохраняем созданный объект в локлаьную переменную для удобства
 
       links.forEach((item) => {
         // пробегаемся по массиву линий
@@ -385,7 +383,7 @@ export default {
           label = alies[label];
         } else if (label.length > 10) {
           // если там больше 10 символов
-          label = label.substring(0, 10) + '...'; // обрезаем и добовляем троеточие
+          label = `${label.substring(0, 10)}...`; // обрезаем и добовляем троеточие
         }
         return label;
       }
@@ -457,15 +455,15 @@ export default {
         ];
       }
     },
-    setClick: function (name) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setClick(name) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
         if (
-          tockens[i].elem === this.id &&
-          tockens[i].action === 'click' &&
-          tockens[i].capture === 'node'
+          tockens[i].elem === this.id
+          && tockens[i].action === 'click'
+          && tockens[i].capture === 'node'
         ) {
           tocken = {
             name: tockens[i].name,
@@ -473,7 +471,7 @@ export default {
             capture: tockens[i].capture,
           };
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
             idDash: this.idDash,
             value: name,
             store: this.$store,
@@ -481,7 +479,7 @@ export default {
         }
       });
 
-      let events = this.$store.getters.getEvents({
+      const events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'onclick',
         element: this.id,
@@ -492,7 +490,7 @@ export default {
         events.forEach((item) => {
           if (item.action === 'set') {
             this.$store.commit('letEventSet', {
-              events: events,
+              events,
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
@@ -505,7 +503,7 @@ export default {
         });
       }
     },
-    changeName: function (element, event) {
+    changeName(element, event) {
       let name;
       if (event.target.nodeName !== 'tspan') {
         name = event.target.parentElement
@@ -514,7 +512,7 @@ export default {
       } else {
         name = event.target.parentElement.getAttribute('data-name');
       }
-      let rect = this.rects[name];
+      const rect = this.rects[name];
       this.changedRect.name = name;
       this.changedRect.leftColor = rect.attr('left/fill');
       this.changedRect.rightColor = rect.attr('right/fill');
@@ -522,8 +520,8 @@ export default {
       rect.attr('right/fill', '#C0C0C0');
       this.showChangeName = true;
     },
-    setName: function () {
-      let rect = this.rects[this.changedRect.name];
+    setName() {
+      const rect = this.rects[this.changedRect.name];
       rect.attr('left/fill', this.changedRect.leftColor);
       rect.attr('right/fill', this.changedRect.rightColor);
       rect.attr('label/text', this.newNameRect);
@@ -532,17 +530,17 @@ export default {
       this.showChangeName = false;
       this.$refs.saveTree.style.opacity = '1';
     },
-    sizeGraph: function () {
+    sizeGraph() {
       // получить размеры контейнера для графа
-      let size = { width: 0, height: 0 }; // получаем размеры от родителя
-      size['width'] = this.width;
-      size['height'] = this.height;
+      const size = { width: 0, height: 0 }; // получаем размеры от родителя
+      size.width = this.width;
+      size.height = this.height;
       if (size.width > 0 && size.height > 0) {
         // если он уже отрисован и размеры есть
         return { width: size.width, height: size.height }; // то добовляем их в объект
       }
     },
-    prepareGraph: function (data) {
+    prepareGraph(data) {
       // первичная подготовка данных
 
       if (!data[0].relations || !data[0].node) {
@@ -564,7 +562,7 @@ export default {
 
         let link = []; // здесь будем хранить детей каждой записи данных
 
-        let nodeSizes = {}; // промежуточный объект в котором будет нода и ее размер
+        const nodeSizes = {}; // промежуточный объект в котором будет нода и ее размер
 
         data.forEach((item) => {
           // пробегаемся по всем данным
@@ -584,24 +582,24 @@ export default {
               size: item.node_size,
             };
             if (item.node_metric) {
-              nodeSizes[item.node]['met'] = item.node_metric;
-              nodeSizes[item.node]['tsh'] = item.node_threshold;
+              nodeSizes[item.node].met = item.node_metric;
+              nodeSizes[item.node].tsh = item.node_threshold;
             }
             if (item.label_n) {
-              nodeSizes[item.node]['label'] = item.label_n;
+              nodeSizes[item.node].label = item.label_n;
             }
 
-            let linkObj = {
+            const linkObj = {
               from: item.node,
               to: link,
               thick: String(item.transition_thick).split('#'),
             };
             if (item.transition_metrics) {
-              linkObj['met'] = String(item.transition_metrics).split('#');
-              linkObj['tsh'] = String(item.transition_thresholds).split('#');
+              linkObj.met = String(item.transition_metrics).split('#');
+              linkObj.tsh = String(item.transition_thresholds).split('#');
             }
             if (item.label_t) {
-              linkObj['label'] = String(item.label_t).split('#');
+              linkObj.label = String(item.label_t).split('#');
             }
 
             result.links.push(linkObj); // так же заполняем объект линий
@@ -619,15 +617,14 @@ export default {
         this.nomsg = false;
       }
     },
-    setSizeElements: function (result, elementSizes, element) {
+    setSizeElements(result, elementSizes, element) {
       // сохраняем размер элемнета
       if (element === 'nodes') {
         // если это нода
-        let max = Object.values(elementSizes).map((item) => {
-          return item.size;
-        });
+        let max = Object.values(elementSizes).map((item) => item.size);
         max = Math.max.apply(null, max); // находим максимальное значение размера ноды
-        let procent, needSize; // создаем несоклько переменных
+        let procent; let
+          needSize; // создаем несоклько переменных
         result.nodes.forEach((item) => {
           // пробегаемся по всем нодам
           if (elementSizes[item]) {
@@ -654,13 +651,14 @@ export default {
         result.nodes = elementSizes; // и обновляем объект в котором указаны уже наши размеры
       } else {
         // если это линия
-        let sizesLinks = []; // переменная с массивом всех размеров всех линий
+        const sizesLinks = []; // переменная с массивом всех размеров всех линий
         result.links.forEach((item) => {
           // пробегаемся по всем линиям
           sizesLinks.push.apply(sizesLinks, item.thick); // и создаем массив со всеми размерами линий
         });
-        let procent, needSize; // несколько переменных
-        let max = Math.max.apply(null, sizesLinks); // находим самую толстую линию
+        let procent; let
+          needSize; // несколько переменных
+        const max = Math.max.apply(null, sizesLinks); // находим самую толстую линию
         result.links.forEach((item, i) => {
           // пробегаемся по всем линиям
           item.thick.forEach((itemChild, j) => {
@@ -677,12 +675,12 @@ export default {
 
       return result;
     },
-    createStructure: function () {
+    createStructure() {
       // создаем структуру графа какие ноды на каком уровне располагать
-      let data = this.preperedData; // берем сформированные ранее данные
-      let links = {}; // несколько переменных
-      let structure = {};
-      let use = [];
+      const data = this.preperedData; // берем сформированные ранее данные
+      const links = {}; // несколько переменных
+      const structure = {};
+      const use = [];
       if (data.nodes || data.links) {
         // если ноды и линии есть
 
@@ -755,14 +753,15 @@ export default {
         }
       }
     },
-    createTree: function () {
+    createTree() {
       // создаем дерево с позициями нод относительно хоста
-      let levels = Object.keys(this.structure).length; // понимаем скоько уровней вообще в структуре
+      const levels = Object.keys(this.structure).length; // понимаем скоько уровней вообще в структуре
       if (levels !== 0) {
         // если уровни релаьно есть
-        let tree = this.tree; // заносим дерево в переменную для удобства
-        let size = this.sizeGraph(); // получаем размер контейнера
-        let step, otstup, center, odd; // несоклько переменных
+        const { tree } = this; // заносим дерево в переменную для удобства
+        const size = this.sizeGraph(); // получаем размер контейнера
+        let step; let otstup; let center; let
+          odd; // несоклько переменных
         if (this.direct === 'vertical') {
           // если граф располагается вертикально
 
@@ -779,9 +778,9 @@ export default {
             } else {
               // если элемнетов несколько
               item.length % 2 === 0 ? (odd = true) : (odd = false); // то сперва понимаем четное количество элемнетов или нет
-              let centerElem = Math.floor((item.length - 1) / 2); // затем высчитываем позицию центрального элемента
+              const centerElem = Math.floor((item.length - 1) / 2); // затем высчитываем позицию центрального элемента
               let i = 0; // счетчик
-              let between = [0, 30]; // расстояние между нодами на уровне
+              const between = [0, 30]; // расстояние между нодами на уровне
 
               if (odd) {
                 // если четное число нодов
@@ -842,9 +841,9 @@ export default {
               tree[this.direct][item[0]] = [otstup, center, l]; // добовляем его в дерево посередине отсутпив сверху сколько надо
             } else {
               item.length % 2 === 0 ? (odd = true) : (odd = false);
-              let centerElem = Math.floor((item.length - 1) / 2);
+              const centerElem = Math.floor((item.length - 1) / 2);
               let i = 0;
-              let between = [0, 0];
+              const between = [0, 0];
               if (odd) {
                 do {
                   between[0] += 70; // увеличиваем отступ в зависимости от размера добавленного узла
@@ -891,14 +890,14 @@ export default {
         this.tree = tree; // заносим сформированное дерево в переменную
       }
     },
-    changeDirect: function () {
+    changeDirect() {
       // изменение положение отрисовки графа
       this.direct === 'vertical'
         ? (this.direct = 'horizontal')
         : (this.direct = 'vertical'); // собственно меняем перемненую с положением графа
       this.$refs.saveTree.style.opacity = '1'; // и отображаем кнопку сохранить
     },
-    saveTree: function (event) {
+    saveTree(event) {
       // кнопка сохранения графа и его положения
       this.$store.commit('setGraphTree', {
         tree: this.tree,
@@ -909,13 +908,13 @@ export default {
       }); // отслыаем граф и его положение для соранения во store
       event.target.style.opacity = '0'; // скрываем кнопку сохранить
     },
-    stepByStep: function (data) {
+    stepByStep(data) {
       // функция выоплняющяя все шаги по созаднию графа
 
-      let prom = new Promise((resolve) => {
+      const prom = new Promise((resolve) => {
         // создаем promise чтобы затем отрисовать график асинхронно
 
-        let elem = this.$refs.graph; // получаем элемент графа
+        const elem = this.$refs.graph; // получаем элемент графа
 
         if (elem) {
           // если он уже создался на странице

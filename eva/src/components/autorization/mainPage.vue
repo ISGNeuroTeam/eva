@@ -114,21 +114,21 @@ export default {
   },
   methods: {
     openDash() {
-      this.$router.push(`/dashboards`);
+      this.$router.push('/dashboards');
     },
     openReport() {
       this.$store.commit('createReportSearch');
-      this.$router.push(`/reports`);
+      this.$router.push('/reports');
     },
     openDataResearch() {
-      this.$router.push(`/data-research`);
+      this.$router.push('/data-research');
     },
     openPaper() {
       this.$store.commit('createPaperSearch');
-      this.$router.push(`/papers`);
+      this.$router.push('/papers');
     },
     openQuis() {
-      window.location.href = `/quiz/list`; // используем window.location.href потому что /quiz/list внешняя ссылка а не часть приложения
+      window.location.href = '/quiz/list'; // используем window.location.href потому что /quiz/list внешняя ссылка а не часть приложения
     },
   },
 };

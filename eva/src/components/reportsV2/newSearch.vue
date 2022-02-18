@@ -247,11 +247,11 @@ export default {
           twf: 0,
         },
       },
-      mdiRefresh: mdiRefresh,
-      mdiMagnify: mdiMagnify,
-      mdiChevronDown: mdiChevronDown,
-      mdiCheck: mdiCheck,
-      mdiCalendarMonthOutline: mdiCalendarMonthOutline,
+      mdiRefresh,
+      mdiMagnify,
+      mdiChevronDown,
+      mdiCheck,
+      mdiCalendarMonthOutline,
       timeRangeValue: 'За все время',
       menuCalendar: false,
       menuDropdown: false,
@@ -282,7 +282,7 @@ export default {
   watch: {
     loading(val) {
       if (val === false) {
-        let options = {
+        const options = {
           hour12: 'true',
           hour: 'numeric',
           minute: 'numeric',
@@ -291,20 +291,19 @@ export default {
           year: 'numeric',
         };
         if (
-          this.search.parametrs.twf === 0 &&
           this.search.parametrs.twf === 0
+          && this.search.parametrs.twf === 0
         ) {
           this.searchTimeInterval = 'за все время';
         } else {
-          this.searchTimeInterval =
-            'c ' +
+          this.searchTimeInterval = `c ${
             new Intl.DateTimeFormat('ru', options).format(
-              this.search.parametrs.tws * 1000
-            ) +
-            ' по ' +
+              this.search.parametrs.tws * 1000,
+            )
+          } по ${
             new Intl.DateTimeFormat('ru', options).format(
-              this.search.parametrs.twf * 1000
-            );
+              this.search.parametrs.twf * 1000,
+            )}`;
         }
       }
     },
@@ -336,37 +335,36 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
         '\n\n' + '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|' + '\n',
-        '| '
+        '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '| ' + '\n',
-        '| '
+        '| ',
       );
     },
     refreshInput() {
       this.search.original_otl = '';
     },
-    launchSearch: async function () {
+    async launchSearch() {
       this.$emit('launchSearch', this.search);
     },
-    hashCode: function (otl) {
+    hashCode(otl) {
       return otl
         .split('')
         .reduce(
-          (prevHash, currVal) =>
-            ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
-          0
+          (prevHash, currVal) => ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
+          0,
         );
     },
     changeTimeRange(range) {
@@ -384,28 +382,26 @@ export default {
     },
     setTimeFromPicker(dates, timeStart, timeFinish) {
       let twsArr = dates[0].split('-');
-      let timeStartArr = timeStart.split(':');
+      const timeStartArr = timeStart.split(':');
       twsArr = twsArr.concat(timeStartArr);
-      let tws =
-        new Date(
-          twsArr[0],
-          twsArr[1] - 1,
-          twsArr[2],
-          twsArr[3],
-          twsArr[4]
-        ).getTime() / 1000;
+      const tws = new Date(
+        twsArr[0],
+        twsArr[1] - 1,
+        twsArr[2],
+        twsArr[3],
+        twsArr[4],
+      ).getTime() / 1000;
       let twfArr = dates[1].split('-');
-      let timeFinishArr = timeFinish.split(':');
+      const timeFinishArr = timeFinish.split(':');
       twfArr = twfArr.concat(timeFinishArr);
-      let twf =
-        new Date(
-          twfArr[0],
-          twfArr[1] - 1,
-          twfArr[2],
-          twfArr[3],
-          twfArr[4]
-        ).getTime() / 1000;
-      this.timeRangeValue = 'c ' + dates[0] + ' по ' + dates[1];
+      const twf = new Date(
+        twfArr[0],
+        twfArr[1] - 1,
+        twfArr[2],
+        twfArr[3],
+        twfArr[4],
+      ).getTime() / 1000;
+      this.timeRangeValue = `c ${dates[0]} по ${dates[1]}`;
       this.setTwsTwf(tws, twf);
     },
     setTwsTwf(tws, twf) {
@@ -422,7 +418,7 @@ export default {
       this.menuDropdown = false;
     },
     sortDates() {
-      this.timeRangeValue = 'c ' + this.dates[1] + ' по ' + this.dates[0];
+      this.timeRangeValue = `c ${this.dates[1]} по ${this.dates[0]}`;
     },
   },
 };

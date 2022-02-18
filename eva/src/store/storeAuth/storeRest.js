@@ -6,15 +6,15 @@ export default {
       response = await fetch(`/api/user/${role}?names_only=1`).catch(
         (error) => {
           this.putLog(
-            `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`
+            `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
           );
           return response;
-        }
+        },
       );
     } else {
       response = await fetch(`/api/${role}`).catch((error) => {
         this.putLog(
-          `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`
+          `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
         );
         return response;
       });
@@ -27,17 +27,17 @@ export default {
           // переводим полученные данные из json в нормальный объект
           data = res.data;
           this.putLog(
-            `Список всех данных получен успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`
+            `Список всех данных получен успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
           );
         })
         .catch((error) => {
           this.putLog(
-            `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`
+            `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
           );
         });
     } else {
       this.putLog(
-        `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`
+        `Список всех данных получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
       );
       return response;
     }
@@ -46,9 +46,9 @@ export default {
   async getEssence(essence, id) {
     let data = [];
 
-    let response = await fetch(`/api/${essence}?id=${id}`).catch((error) => {
+    const response = await fetch(`/api/${essence}?id=${id}`).catch((error) => {
       this.putLog(
-        `Данные для элемента получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`
+        `Данные для элемента получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
       );
       return data;
     });
@@ -60,24 +60,24 @@ export default {
           // переводим полученные данные из json в нормальный объект
           data = res;
           this.putLog(
-            `Данные для элемента получены успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`
+            `Данные для элемента получены успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
           );
         })
         .catch((error) => {
           this.putLog(
-            `Данные для элемента получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`
+            `Данные для элемента получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
           );
         });
     } else {
       this.putLog(
-        `Данные для элемента получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`
+        `Данные для элемента получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
       );
       return response;
     }
     return data;
   },
   async setEssence(data) {
-    let response = await fetch(`/api/${data.essence}`, {
+    const response = await fetch(`/api/${data.essence}`, {
       // сперва нужно подать post запрос
       method: data.method,
       // headers: {
@@ -87,28 +87,28 @@ export default {
       // mode: 'no-cors'
     }).catch((error) => {
       this.putLog(
-        `Сохранить элемент не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка:${error}`
+        `Сохранить элемент не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка:${error}`,
       );
       return response;
     });
     this.putLog(
-      `Элемент сохранен успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`
+      `Элемент сохранен успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
     );
     return response;
   },
   async deleteEssence(data) {
-    let response = await fetch(`/api/${data.essence}?id=${data.id}`, {
+    const response = await fetch(`/api/${data.essence}?id=${data.id}`, {
       // сперва нужно подать post запрос
       method: 'DELETE',
     }).catch((error) => {
       this.putLog(
-        `Удалить элемент не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`
+        `Удалить элемент не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
       );
       return response;
     });
 
     this.putLog(
-      `Элемент удален успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`
+      `Элемент удален успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
     );
 
     return response;
@@ -126,7 +126,7 @@ export default {
 
       let db = null; // переменная в которой будет лежать объект подключения к базе данных
 
-      let request = indexedDB.open('EVA', 1); // октрываем базу данных  IndexedDB
+      const request = indexedDB.open('EVA', 1); // октрываем базу данных  IndexedDB
 
       request.onerror = function (event) {
         // сразу отлавливаем если есть ошибка при соеденении с бд
@@ -170,11 +170,11 @@ export default {
       function setTransaction(db, text) {
         // функция работы с базой данных
 
-        let transaction = db.transaction('logs', 'readwrite'); // открываем таблицу logs для записи и чтения
+        const transaction = db.transaction('logs', 'readwrite'); // открываем таблицу logs для записи и чтения
 
-        let logs = transaction.objectStore('logs'); // получаем хранилище объектов для работы с ним
+        const logs = transaction.objectStore('logs'); // получаем хранилище объектов для работы с ним
 
-        let query = logs.get('front'); // получаем данные лежащие по ключу front то есть те логи, что пишутся на фронте
+        const query = logs.get('front'); // получаем данные лежащие по ключу front то есть те логи, что пишутся на фронте
 
         query.onsuccess = () => {
           // если все успешно
@@ -195,29 +195,29 @@ export default {
       function putTransaction(oldText, text, logs) {
         // функция для оработки данных и правильной записи оных в бд
 
-        let now = new Date(); // получаем дату и время
+        const now = new Date(); // получаем дату и время
         // приводим дату и время в нормальный вид, по сути добовляя нули где надо
-        let date = `${checkZero(now.getHours())}:${checkZero(
-          now.getMinutes()
+        const date = `${checkZero(now.getHours())}:${checkZero(
+          now.getMinutes(),
         )}:${checkZero(now.getSeconds())} ${now.getDate()}-${checkZero(
-          now.getMonth() + 1
+          now.getMonth() + 1,
         )}-${checkZero(now.getFullYear())}`;
-        let newText = `${date}&nbsp;&nbsp;${text}<br>${oldText}`; // создаем наш лог в виде даты, текущего лога и всего того что у же там было
+        const newText = `${date}&nbsp;&nbsp;${text}<br>${oldText}`; // создаем наш лог в виде даты, текущего лога и всего того что у же там было
 
-        let front = logs.put(newText, 'front'); // кладем этот лог по ключу front
+        const front = logs.put(newText, 'front'); // кладем этот лог по ключу front
 
         front.onerror = function () {
           // если не поулчилось, сообщим об этом
           console.log('Ошибка', front.error);
         };
 
-        let back = logs.get('back'); // дальше получаем то что лежит по ключу back то есть тот лог что будем отдавать на бэк
+        const back = logs.get('back'); // дальше получаем то что лежит по ключу back то есть тот лог что будем отдавать на бэк
         back.onsuccess = () => {
           // если данные получены успешно
-          let newTextBack = `${date}&nbsp;&nbsp;${text}<br>${back.result}`; // составляем строку лога для back в виде даты,
+          const newTextBack = `${date}&nbsp;&nbsp;${text}<br>${back.result}`; // составляем строку лога для back в виде даты,
           // текущего лога, и всего что там было до этого
 
-          let backPut = logs.put(newTextBack, 'back'); // кладем этот лог в бд по ключу back
+          const backPut = logs.put(newTextBack, 'back'); // кладем этот лог в бд по ключу back
 
           backPut.onerror = function () {
             // если не поулчилось, сразу сообщим об этом
@@ -227,7 +227,7 @@ export default {
           backPut.onsuccess = function () {
             // а если положии успешно то идем дальше
 
-            let count = logs.get('count'); // получаем  данные по ключу count он отвечает за счетчик сколько всего записей было
+            const count = logs.get('count'); // получаем  данные по ключу count он отвечает за счетчик сколько всего записей было
             // уже занесено после последнего обновления
 
             count.onsuccess = () => {
@@ -279,7 +279,7 @@ export default {
   getLog(side) {
     let db = null;
 
-    let request = indexedDB.open('EVA', 1);
+    const request = indexedDB.open('EVA', 1);
 
     request.onerror = function (event) {
       console.log('error: ', event);
@@ -295,20 +295,20 @@ export default {
 
       request.onsuccess = () => {
         db = request.result;
-        console.log('successEvent: ' + db);
+        console.log(`successEvent: ${db}`);
       };
     };
 
-    let promise = new Promise((resolve) => {
+    const promise = new Promise((resolve) => {
       request.onsuccess = () => {
         db = request.result;
 
-        let transaction = db.transaction('logs'); // (1)
+        const transaction = db.transaction('logs'); // (1)
 
         // получить хранилище объектов для работы с ним
-        let logs = transaction.objectStore('logs'); // (2)
+        const logs = transaction.objectStore('logs'); // (2)
 
-        let query = logs.get(side); // (3) return
+        const query = logs.get(side); // (3) return
 
         query.onsuccess = () => {
           // (4)
@@ -328,7 +328,7 @@ export default {
     return new Promise((resolve) => {
       let db = null;
 
-      let request = indexedDB.open('EVA', 1);
+      const request = indexedDB.open('EVA', 1);
 
       request.onerror = function (event) {
         console.log('error:', event);
@@ -354,10 +354,10 @@ export default {
       };
 
       function setTransaction(db) {
-        let transaction = db.transaction('logs', 'readwrite'); // (1)
+        const transaction = db.transaction('logs', 'readwrite'); // (1)
 
         // получить хранилище объектов для работы с ним
-        let logs = transaction.objectStore('logs'); // (2)
+        const logs = transaction.objectStore('logs'); // (2)
 
         logs.clear();
         resolve('clear');
@@ -369,7 +369,7 @@ export default {
 async function putLogIntoBack(text) {
   let textForBack = text.replace(/&nbsp;/g, ' ');
   textForBack = textForBack.replace(/<br>/g, '\n');
-  let response = await fetch(`/api/logs/save`, {
+  const response = await fetch('/api/logs/save', {
     // сперва нужно подать post запрос
     method: 'POST',
     body: JSON.stringify({ log: textForBack }),

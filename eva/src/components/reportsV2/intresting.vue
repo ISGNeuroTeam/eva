@@ -22,7 +22,8 @@
             v-for="item in rows"
             :key="item.id"
             class="interesting-row"
-          >  <v-menu
+          >
+            <v-menu
               offset-x
               :close-on-content-click="false"
               content-class="interesting-popup"
@@ -83,10 +84,10 @@ export default {
   },
   data() {
     return {
-      mdiRefresh: mdiRefresh,
-      mdiMagnify: mdiMagnify,
-      mdiChevronRight: mdiChevronRight,
-      mdiChevronDown: mdiChevronDown,
+      mdiRefresh,
+      mdiMagnify,
+      mdiChevronRight,
+      mdiChevronDown,
       statistic: [],
       statisticKey: null,
     };
@@ -96,9 +97,9 @@ export default {
       return this.$store.getters.getTheme;
     },
     dataset() {
-      let dataset = [];
+      const dataset = [];
       this.data.forEach((item) => {
-        let options = {
+        const options = {
           hour12: 'true',
           hour: 'numeric',
           minute: 'numeric',
@@ -118,7 +119,7 @@ export default {
   },
   mounted() {},
   methods: {
-    openStatistic: function (statistic) {
+    openStatistic(statistic) {
       if (this.showStatistic) {
         if (this.statisticKey == statistic.text) {
           // this.showStatistic = false;
