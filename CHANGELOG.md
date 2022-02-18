@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - release name
+- fixed setting the title breaks the scrolling of the component
 - fixed guntt full screen improvements.
 - fixed searching by bool type
 - fixed fullscreen improvements tune
@@ -36,11 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed switching between filter types
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
-- fixed time selection are rendered outside of the component's bounds
 - fixed tile visualization not showing after datasource restart
 - fixed setting the title breaks the scrolling of the component
 - fixed dash single value settings no closes
-- fixed incorrect display of the component when resizing
 
 ## [1.82.0]
 

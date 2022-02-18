@@ -13,7 +13,7 @@
       }"
     >
       <v-card-title
-        v-show="element.split('-')[0] !== 'singleValue'
+        v-show="element.split('-')[0] === 'singleValue'
           ? settings.showTitle
           : props.disappear"
         class="card-title open_title"
