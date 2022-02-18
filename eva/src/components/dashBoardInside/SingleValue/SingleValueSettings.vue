@@ -261,8 +261,6 @@
 </template>
 
 <script>
-import metricTitleIcons from './metricTitleIcons';
-import { no_icon } from './metricTitleIcons';
 import draggable from 'vuedraggable';
 import {
   mdiMenu,
@@ -271,6 +269,7 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from '@mdi/js';
+import metricTitleIcons, { no_icon } from './metricTitleIcons';
 import './sass/checkboxGoogle.css';
 
 export default {
@@ -317,7 +316,9 @@ export default {
      * The number of available templates for the selected number of metrics.
      * Data fornat: { <metricsNumber>: <availableTemplatesNumber> }.
      */
-    templatesForMetrics: { 2: 2, 3: 6, 4: 7, 5: 5, 6: 2 },
+    templatesForMetrics: {
+      2: 2, 3: 6, 4: 7, 5: 5, 6: 2,
+    },
   }),
   computed: {
     theme() {
@@ -358,11 +359,12 @@ export default {
       this.settings = {
         ...newSettings,
         metricOptions: newSettings.metricOptions.sort(
-          (a, b) => a.listOrder - b.listOrder
+          (a, b) => a.listOrder - b.listOrder,
         ),
       };
     },
     settings(old, newSet) {
+      console.log( this.settings)
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
@@ -372,6 +374,7 @@ export default {
     getFamily() {},
     handleChangeShowTitle() {
       if (this.settings) {
+        console.log('this.settings 2', this.settings)
         this.settings = {
           ...JSON.parse(JSON.stringify(this.settings)),
           showTitle: !this.settings.showTitle,

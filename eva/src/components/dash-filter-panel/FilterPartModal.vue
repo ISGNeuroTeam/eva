@@ -90,9 +90,9 @@
 </template>
 
 <script>
+import { mdiSettings } from '@mdi/js';
 import ManualTypeModal from './ManualTypeModal';
 import TokenTypeModal from './TokenTypeModal';
-import { mdiSettings } from '@mdi/js';
 
 export default {
   name: 'FilterPartModal',
@@ -116,7 +116,7 @@ export default {
   },
   computed: {
     typeMap() {
-      let mapOfTypes = [
+      const mapOfTypes = [
         { title: 'Токен', componentName: 'TokenTypeModal', type: 'token' },
         {
           title: 'Ручной ввод',
@@ -138,16 +138,16 @@ export default {
       immediate: true,
       handler(filterPart) {
         if (filterPart) {
-          let itemIndex = this.typeMap.findIndex(
-            (itemTypeMap) => itemTypeMap.type === filterPart.filterPartType
+          const itemIndex = this.typeMap.findIndex(
+            (itemTypeMap) => itemTypeMap.type === filterPart.filterPartType,
           );
           if (itemIndex !== -1) {
             this.currentTab = itemIndex;
-            this.temp = Object.assign({}, filterPart);
+            this.temp = { ...filterPart };
             this.temp.token = filterPart?.token?.name;
           } else {
             throw new Error(
-              `Type "${filterPart.filterPartType}" of filter part does not recognized`
+              `Type "${filterPart.filterPartType}" of filter part does not recognized`,
             );
           }
         }

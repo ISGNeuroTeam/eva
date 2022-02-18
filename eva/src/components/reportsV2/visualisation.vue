@@ -88,9 +88,9 @@ export default {
       aboutElem: {},
       activeElem: 'table',
       tooltipSvg: { texts: [], links: [], buttons: [] },
-      mdiRefresh: mdiRefresh,
-      mdiMagnify: mdiMagnify,
-      mdiChevronDown: mdiChevronDown,
+      mdiRefresh,
+      mdiMagnify,
+      mdiChevronDown,
       size: {},
     };
   },
@@ -111,7 +111,7 @@ export default {
         this.$set(
           this.aboutElem[item],
           'tooltip',
-          settings.reports[item].tooltip
+          settings.reports[item].tooltip,
         );
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
@@ -137,14 +137,14 @@ export default {
         }
       });
     },
-    calcSize () {
-      let size = this.$refs.vis.getBoundingClientRect();
+    calcSize() {
+      const size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
     },
-    setActiveElem (elemName) {
+    setActiveElem(elemName) {
       this.activeElem = elemName;
-    }
+    },
   },
 };
 </script>
