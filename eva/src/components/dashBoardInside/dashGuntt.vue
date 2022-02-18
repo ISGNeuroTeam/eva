@@ -150,6 +150,7 @@ export default {
     widthFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+          this.hiddenTooltip()
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
@@ -201,6 +202,11 @@ export default {
     this.$emit('setVissible', this.id);
   },
   methods: {
+    hiddenTooltip() {
+      let tooltipBlock = this.$refs.tooltip;
+      tooltipBlock.style.opacity = '0';
+      tooltipBlock.style.visibility = 'hidden';
+    },
     dataRestFromWatch() {
       this.$nextTick(() => {
         if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
