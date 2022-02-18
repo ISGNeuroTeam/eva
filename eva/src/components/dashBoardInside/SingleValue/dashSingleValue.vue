@@ -1,8 +1,7 @@
 <template>
   <div
     class="single-value-container pa-3"
-    :class="{ 'header-active': dataModeFrom }"
-    :style="{ height: `calc(100% - (${isHeaderOpen ? 35 : 0}px + 3px))` }"
+    :class="{ 'header-active': dataModeFrom, 'is-header-open': !isHeaderOpen }"
   >
     <div class="header">
       <div>
