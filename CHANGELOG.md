@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - release name
 - fixed guntt full screen improvements.
 - fixed searching by bool type
+- fixed filters. name and content
 
 ## [1.83.0]
 
