@@ -99,10 +99,10 @@ export default {
   },
   data() {
     return {
-      mdiRefresh: mdiRefresh,
-      mdiMagnify: mdiMagnify,
-      mdiChevronRight: mdiChevronRight,
-      mdiChevronDown: mdiChevronDown,
+      mdiRefresh,
+      mdiMagnify,
+      mdiChevronRight,
+      mdiChevronDown,
       expanded: [],
       headers: [
         {
@@ -112,7 +112,9 @@ export default {
           value: 'info',
           width: '80px',
         },
-        { text: 'Время', sortable: false, value: 'time', width: '120px' },
+        {
+          text: 'Время', sortable: false, value: 'time', width: '120px',
+        },
         { text: 'Данные', sortable: false, value: 'inputCount' },
       ],
     };
@@ -122,10 +124,10 @@ export default {
       return this.$store.getters.getTheme;
     },
     dataset() {
-      let dataset = [];
+      const dataset = [];
       let id = 0;
       this.data.forEach((item) => {
-        let options = {
+        const options = {
           hour12: 'true',
           hour: 'numeric',
           minute: 'numeric',
@@ -137,7 +139,7 @@ export default {
         dataset.push({
           time: new Date(item._time * 1000).toLocaleString('ru', options),
           inputCount: item,
-          id: id,
+          id,
         });
         id++;
       });

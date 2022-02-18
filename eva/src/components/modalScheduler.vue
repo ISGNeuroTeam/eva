@@ -193,36 +193,36 @@ export default {
     };
   },
   computed: {
-    idDash: function () {
+    idDash() {
       // получаем название элемента от родителя
       return this.idDashFrom;
     },
-    active: function () {
+    active() {
       // получаем статус открытия или нет окна модального
       if (this.modalFrom) {
         if (this.schedulers.length != 0) {
-          this.setData()
+          this.setData();
         }
       }
       return this.modalFrom;
     },
-    sid: function () {
+    sid() {
       return this.dataSidFrom;
     },
-    schedulers: function () {
+    schedulers() {
       return this.$store.getters.getSchedulers(this.idDash);
     },
-    searches: function () {
+    searches() {
       return this.$store.getters.getSearches(this.idDash);
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   mounted() {
     // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
-    let schedulers = this.schedulers;
-    let searches = this.$store.getters.getSearches(this.idDash);
+    const { schedulers } = this;
+    const searches = this.$store.getters.getSearches(this.idDash);
     let shedule = {};
     let curTime = {};
 
@@ -257,7 +257,7 @@ export default {
     }
   },
   methods: {
-    setData () {
+    setData() {
       if (this.schedulers[this.sid]) {
         // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
         this.every = this.schedulers[this.sid].every;
@@ -285,16 +285,16 @@ export default {
         this.msg = 'Не запущен';
       }
     },
-    cancel: function () {
+    cancel() {
       // закрываем окно
       this.$emit('cancel');
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code == 'Escape') {
         this.cancel();
       }
     },
-    setTime: function (time, tense) {
+    setTime(time, tense) {
       // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
         if (tense == 'every') {
@@ -338,7 +338,7 @@ export default {
       }
       return period;
     },
-    executeSearch: function (searches, sid, shedule) {
+    executeSearch(searches, sid, shedule) {
       // выполняем серч меняя его временны рамки
       let curTimeLast = 0;
       let tws = 0;
@@ -362,16 +362,16 @@ export default {
     },
     startSchedule() {
       // запускаем планировщик
-      let schedule = {
+      const schedule = {
         time: this.time,
         every: this.every,
         timeLast: this.timeLast,
         everyLast: this.everyLast,
       };
-      let sid = this.sid;
+      const { sid } = this;
 
-      let searches = this.$store.getters.getSearches(this.idDash);
-      let curTime = this.countTime(schedule.time, schedule.every) * 1000;
+      const searches = this.$store.getters.getSearches(this.idDash);
+      const curTime = this.countTime(schedule.time, schedule.every) * 1000;
       this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
       const intervalID = (this.timers[sid] = setInterval(() => {
         this.executeSearch(searches, sid, schedule); // а затем уже выполняем его в цикле
@@ -388,7 +388,7 @@ export default {
       });
       this.cancel();
     },
-    cancelSchedule: function () {
+    cancelSchedule() {
       // отменить планировщик
       this.$store.commit('deleteSchedule', {
         idDash: this.idDash,

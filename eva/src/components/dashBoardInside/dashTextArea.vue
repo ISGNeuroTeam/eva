@@ -47,16 +47,16 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    color: function () {
+    color() {
       return this.colorFrom;
     },
-    rows: function () {
+    rows() {
       let rowsCount = 20;
       if (screen.width < 1400) {
         rowsCount = 15;
@@ -66,7 +66,7 @@ export default {
       }
       return Math.floor((this.heightFrom - 200) / rowsCount);
     },
-    height: function () {
+    height() {
       let otstup = 55;
       if (screen.width < 1600) {
         otstup = 45;
@@ -74,7 +74,7 @@ export default {
       return `${this.heightFrom - otstup}px`;
     },
     searchBtn() {
-      let options = this.$store.getters.getOptions({
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
@@ -114,7 +114,7 @@ export default {
       });
       this.setTocken();
     },
-    acceptTextArea: function () {
+    acceptTextArea() {
       this.$store.commit('setTextArea', {
         idDash: this.idDash,
         id: this.id,
@@ -122,27 +122,27 @@ export default {
       });
       this.setTocken();
     },
-    setTockenByPress: function (event) {
+    setTockenByPress(event) {
       event.preventDefault();
       this.setTocken();
     },
-    setTocken: function () {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setTocken() {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let name = '';
       Object.keys(tockens).forEach((i) => {
         if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
           name = tockens[i].name;
         }
       });
-      let textarea = this.textarea.replace(/\n/g, ' ');
-      let tocken = {
-        name: name,
+      const textarea = this.textarea.replace(/\n/g, ' ');
+      const tocken = {
+        name,
         action: 'accept',
         capture: '',
       };
 
       this.$store.commit('setTocken', {
-        tocken: tocken,
+        tocken,
         idDash: this.idDash,
         value: textarea,
         store: this.$store,

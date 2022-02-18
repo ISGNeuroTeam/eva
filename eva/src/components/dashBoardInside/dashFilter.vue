@@ -45,17 +45,17 @@ export default {
     };
   },
   computed: {
-    id: function () {
+    id() {
       return this.$attrs['data-id'];
     },
-    shouldGet: function () {
+    shouldGet() {
       let should = false;
       if (this.id) {
         should = this.$store.getters.getShouldGet(this.id);
       }
       return should;
     },
-    getDataStart: function () {
+    getDataStart() {
       return this.props.selects;
     },
   },
@@ -65,15 +65,15 @@ export default {
     },
   },
   methods: {
-    getData: async function (file) {
+    async getData(file) {
       this.props.loading = true;
 
-      let response = await fetch(`src/js/${file}`);
+      const response = await fetch(`src/js/${file}`);
 
       if (response.status === 404) {
         this.props.loading = false;
       } else if (response.status === 200) {
-        let result = await response.json();
+        const result = await response.json();
 
         this.createSelects(result.data);
 
@@ -89,25 +89,23 @@ export default {
         }, 1500);
       }
     },
-    createSelects: function (result) {
-      this.props.selects = Object.keys(result[0]).map((item) => {
-        return item;
-      });
+    createSelects(result) {
+      this.props.selects = Object.keys(result[0]).map((item) => item);
     },
-    setItem: function (item) {
+    setItem(item) {
       this.props.item = item;
       this.setFilter();
     },
-    setSign: function (sign) {
+    setSign(sign) {
       this.props.sign = sign;
       this.setFilter();
     },
-    setValue: function (event) {
+    setValue(event) {
       this.props.value = event.target.value;
       this.setFilter();
     },
-    setFilter: function () {
-      let filter = `${this.props.item} ${this.props.sign} ${this.props.value}`;
+    setFilter() {
+      const filter = `${this.props.item} ${this.props.sign} ${this.props.value}`;
       this.$store.commit('setFilter', { id: this.id, string: filter });
     },
   },
