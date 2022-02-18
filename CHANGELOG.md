@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - release name
 - fixed guntt full screen improvements.
+- fixed searching by bool type
 
 ## [1.83.0]
 
