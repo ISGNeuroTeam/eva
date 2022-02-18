@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - release name
+- fixed setting the title breaks the scrolling of the component
 
 ## [1.83.0]
 
