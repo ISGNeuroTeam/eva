@@ -150,6 +150,7 @@ export default {
     widthFrom: function () {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+          this.hiddenTooltip()
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
@@ -201,6 +202,11 @@ export default {
     this.$emit('setVissible', this.id);
   },
   methods: {
+    hiddenTooltip() {
+      let tooltipBlock = this.$refs.tooltip;
+      tooltipBlock.style.opacity = '0';
+      tooltipBlock.style.visibility = 'hidden';
+    },
     dataRestFromWatch() {
       this.$nextTick(() => {
         if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
@@ -488,17 +494,21 @@ export default {
           }
 
           moveTooltip(event);
+          console.log('mouseover')
 
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
+          tooltipBlock.style.display = 'block';
         })
         .on('mousemove', function (event) {
           moveTooltip(event);
         })
         .on('mouseout', function () {
+          console.log('mouseout')
           tooltipBlock.style.opacity = '0';
           tooltipBlock.style.visibility = 'hidden';
+          tooltipBlock.style.display = 'none';
         })
         .on('click', function (d) {
           return that.setClick(d);
@@ -540,15 +550,21 @@ export default {
 
       texts
         .on('mouseover', function () {
+          console.log('mouseover 2' )
+
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
+          tooltipBlock.style.display = 'block';
         })
         .on('mousemove', function (event) {
           moveTooltip(event);
         })
         .on('mouseout', function () {
+          console.log('mouseout 2' )
           tooltipBlock.style.opacity = '0';
           tooltipBlock.style.visibility = 'hidden';
+          tooltipBlock.style.display = 'none';
+
         })
         .on('click', function (d) {
           return that.setClick(d);
