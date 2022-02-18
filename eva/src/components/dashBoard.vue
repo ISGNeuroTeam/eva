@@ -13,7 +13,9 @@
       }"
     >
       <v-card-title
-        v-show="setShowTitle"
+        v-show="element.split('-')[0] === 'singleValue'
+          ? settings.showTitle
+          : props.disappear"
         class="card-title open_title"
       >
         <div class="name-dash">
@@ -718,12 +720,6 @@ export default {
     });
   },
   methods: {
-    setShowTitle(){
-      console.log('setShowTitle',this.settings.showTitle)
-      return element.split('-')[0] !== 'singleValue'
-          ? this.settings.showTitle
-          : this.disappear
-    },
     onTableIItemsPageChange(page) {
       this.tablePage = page;
     },
