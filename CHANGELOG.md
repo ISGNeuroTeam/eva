@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - release name
 - fixed guntt full screen improvements.
+- fixed searching by bool type
 
 ## [1.83.0]
 
@@ -32,7 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed dashboard component
 - fixed button hints
 - fixed switching between filter types
-- fixed searching by bool type
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
