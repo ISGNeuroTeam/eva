@@ -1,6 +1,7 @@
 <template>
   <div class="dash-picker">
     <div
+      v-click-outside="onClose"
       class="DTpicker"
       :class="{ show_picker_elem: show_picker_elem }"
     >
@@ -254,11 +255,20 @@ export default {
       id: this.id,
     });
     this.$emit('hideDS', this.id);
-    this.$emit('setVissible', this.id);
     this.curDate = this.calcCurrentDate();
   },
   methods: {
-    calcCurrentDate() {
+    onClose(){
+      this.show_picker_elem = false;
+      this.$emit('setVissible', {element: this.id, overflow: 'scroll'});
+
+      this.changeDate = !this.changeDate;
+      this.arrow.direct = 'down';
+      this.arrow.elem = this.down;
+      this.showCurrent();
+      this.curDate = this.calcCurrentDate();
+    },
+    calcCurrentDate () {
       const data = this.$store.getters.getPickerDate({
         idDash: this.idDash,
         id: this.id,
@@ -319,15 +329,13 @@ export default {
     openHidden() {
       this.show_picker_elem = !this.show_picker_elem;
       if (this.arrow.direct === 'down') {
+        this.$emit('setVissible', {element: this.id, overflow: 'visible'});
+
         this.arrow.direct = 'up';
         this.arrow.elem = this.up;
         this.show_curent = false;
       } else {
-        this.changeDate = !this.changeDate;
-        this.arrow.direct = 'down';
-        this.arrow.elem = this.down;
-        this.showCurrent();
-        this.curDate = this.calcCurrentDate();
+        this.onClose()
       }
     },
     customDate(elem) {
