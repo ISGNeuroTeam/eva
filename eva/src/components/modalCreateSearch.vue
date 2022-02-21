@@ -287,11 +287,11 @@ export default {
     dataSearchFrom() {
       this.currentSid = this.dataSearchFrom?.sid;
     },
-    tws() {
-      this.search.parametrs.tws = this.tws;
+    tws(val) {
+      this.search.parametrs.tws = val;
     },
-    twf() {
-      this.search.parametrs.twf = this.twf;
+    twf(val) {
+      this.search.parametrs.twf = val;
     },
   },
   mounted() {
@@ -299,7 +299,7 @@ export default {
   },
   methods: {
     setData () {
-      this.search = this.dataSearch;
+      this.search = JSON.parse(JSON.stringify(this.dataSearch));
       if (this.createBtnFrom === 'edit') {
         this.createBtn = 'Редактировать';
       } else {

@@ -471,7 +471,7 @@
               <v-icon
                 class="icon-inside"
                 :color="theme.$primary_button"
-                @click="deleteMetrics(i - 1)"
+                @click="confirmDeleteMetric(i - 1)"
               >
                 {{ minus_icon }}
               </v-icon>
@@ -922,6 +922,14 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <modal-confirm
+        v-model="isConfirmModal"
+        :theme="theme"
+        :modal-text="`Уверенны, что хотите удалить вариант отображения ?`"
+        btn-confirm-text="Удалить"
+        btn-cancel-text="Отмена"
+        @result="deleteMetrics(deleteMetricId)"
+      />
     </div>
   </modal-persistent>
 </template>
@@ -977,6 +985,8 @@ export default {
       isChanged: false,
       isDelete: false,
       them: {},
+      isConfirmModal: false,
+      deleteMetricId: '',
     };
   },
   computed: {
@@ -1097,6 +1107,10 @@ export default {
     this.prepareOptions();
   },
   methods: {
+    confirmDeleteMetric(val) {
+      this.isConfirmModal = true;
+      this.deleteMetricId = val;
+    },
     loadComponentsSettings() {
       const localOptions = {};
       this.optionsByComponents = settings.options;
@@ -1112,7 +1126,7 @@ export default {
           each.forEach((key) => {
             options[key] = field.items[0]?.value;
           });
-          localOptions[field.options] = { ...options };
+          localOptions[field.option] = { ...options };
         }
         return { ...field, items, each };
       });
@@ -1158,7 +1172,7 @@ export default {
         }
       }
       if (this.element.indexOf('csvg') !== -1) {
-        this.$set(this.options, 'tooltip', this.tooltip);
+        this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
       }
       if (this.element.indexOf('piechart') !== -1) {
         this.$set(this.options, 'metricsRelation', { ...this.metricsRelation });
@@ -1251,6 +1265,7 @@ export default {
       return this.optionsItems.includes(option);
     },
     addIntoTooltip: function (item) {
+      this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.push('');
       } else if (item === 'link') {
@@ -1269,6 +1284,7 @@ export default {
       });
     },
     deleteFromTooltip: function (item, i) {
+      this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
       } else if (item === 'link') {
@@ -1291,117 +1307,117 @@ export default {
       }
     },
     async prepareOptions() {
-      let localOptions = {};
-      //  понимает какие опции нужно вывести
-      const options = await this.$store.dispatch('getSettingsByPath', {
+      await this.$store.dispatch('getSettingsByPath', {
         path: this.idDash,
         element: this.element,
-      });
-      if (options) {
-        if (options.color) {
-          this.color = options.color;
-        }
-
-        if (options.type_line) {
-          this.type_line = options.type_line;
-        }
-
-        if (options.conclusion_count) {
-          this.conclusion_count = options.conclusion_count;
-        }
-
-        if (options.replace_count) {
-          this.replace_count = options.replace_count;
-        }
-
-        this.optionsItems.forEach((item) => {
-          if (Object.keys(options).includes(item)) {
-            if (item === 'tooltip') {
-              this.tooltip = {};
-              this.$set(this.tooltip, 'texts', [...[], ...options[item].texts]);
-              this.$set(this.tooltip, 'links', [...[], ...options[item].links]);
-              this.$set(this.tooltip, 'buttons', [
-                ...[],
-                ...options[item].buttons,
-              ]);
-            } else if (item === 'metrics') {
-              this.metrics = options[item];
-            } else if (item === 'metricsRelation') {
-              this.metricsRelation = {};
-              this.$set(this.metricsRelation, 'metrics', [
-                ...[],
-                ...options[item].metrics,
-              ]);
-              this.$set(this.metricsRelation, 'relations', [
-                ...[],
-                ...options[item].relations,
-              ]);
-              this.$set(this.metricsRelation, 'namesMetric', [
-                'Категория',
-                'Процентное соотношение',
-              ]);
-            } else if (item === 'colorsPie') {
-              this.colorsPie = {};
-              this.$set(this.colorsPie, 'theme', options[item].theme);
-              this.$set(this.colorsPie, 'colors', options[item].colors);
-              this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
-            } else if (item === 'themes') {
-              this.themesArr = Object.keys(options[item]);
-              this.themes = options[item];
-            } else if (item === 'titles') {
-              let val = options[item];
-              if (!val) {
-                // old settings
-                let oldVal = this.$store.getters.getSelectedTableTitles(
-                  this.idDash,
-                  this.element
-                );
-                if (oldVal) {
-                  val = oldVal;
-                }
-              }
-              // если не выбраны заголовки то выделить все имеющиеся
-              if (val.length === 0) {
-                let allTitles = this.$store.getters.getAvailableTableTitles(
-                  this.idDash,
-                  this.element
-                );
-                if (allTitles.length) {
-                  val = [...allTitles];
-                }
-              }
-              localOptions[item] = val || [];
-            } else {
-              let val =
-                options[item] !== null && typeof options[item] === 'object'
-                  ? { ...options[item] }
-                  : options[item];
-              localOptions[item] = val;
-            }
-          } else {
-            let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
-            if (propsToFalse.includes(item)) {
-              localOptions[item] = false;
-            } else if (item === 'showlegend') {
-              localOptions[item] = true;
-            } else if (item === 'positionlegend') {
-              localOptions[item] = 'right';
-            } else {
-              const field = settings.optionFields.find(
-                (field) => field.option === item
-              );
-              if (field && field.default !== undefined) {
-                localOptions[item] = field.default;
-              }
-            }
+      }).then((options) => {
+        let localOptions = {};
+        if (options) {
+          if (options.color) {
+            this.color = options.color;
           }
-        });
-      }
-      if (!localOptions.change) {
-        localOptions.change = false;
-      }
-      localOptions = { ...localOptions, ...this.loadComponentsSettings() };
-      this.$set(this, 'options', localOptions);
+
+          if (options.type_line) {
+            this.type_line = options.type_line;
+          }
+
+          if (options.conclusion_count) {
+            this.conclusion_count = options.conclusion_count;
+          }
+
+          if (options.replace_count) {
+            this.replace_count = options.replace_count;
+          }
+
+          this.optionsItems.forEach((item) => {
+            if (Object.keys(options).includes(item)) {
+              if (item === 'tooltip') {
+                this.tooltip = {};
+                this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([...[], ...options[item].texts])));
+                this.$set(this.tooltip, 'links', JSON.parse(JSON.stringify([...[], ...options[item].links])));
+                this.$set(this.tooltip, 'buttons', JSON.parse(JSON.stringify([
+                  ...[],
+                  ...options[item].buttons,
+                ])));
+              } else if (item === 'metrics') {
+                this.metrics = options[item];
+              } else if (item === 'metricsRelation') {
+                this.metricsRelation = {};
+                this.$set(this.metricsRelation, 'metrics', [
+                  ...[],
+                  ...options[item].metrics,
+                ]);
+                this.$set(this.metricsRelation, 'relations', [
+                  ...[],
+                  ...options[item].relations,
+                ]);
+                this.$set(this.metricsRelation, 'namesMetric', [
+                  'Категория',
+                  'Процентное соотношение',
+                ]);
+              } else if (item === 'colorsPie') {
+                this.colorsPie = {};
+                this.$set(this.colorsPie, 'theme', options[item].theme);
+                this.$set(this.colorsPie, 'colors', options[item].colors);
+                this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
+              } else if (item === 'themes') {
+                this.themesArr = Object.keys(options[item]);
+                this.themes = options[item];
+              } else if (item === 'titles') {
+                let val = options[item];
+                if (!val) {
+                  // old settings
+                  let oldVal = this.$store.getters.getSelectedTableTitles(
+                    this.idDash,
+                    this.element
+                  );
+                  if (oldVal) {
+                    val = oldVal;
+                  }
+                }
+                // если не выбраны заголовки то выделить все имеющиеся
+                if (val.length === 0) {
+                  let allTitles = this.$store.getters.getAvailableTableTitles(
+                    this.idDash,
+                    this.element
+                  );
+                  if (allTitles.length) {
+                    val = [...allTitles];
+                  }
+                }
+                localOptions[item] = val || [];
+              } else {
+                let val =
+                  options[item] !== null && typeof options[item] === 'object'
+                    ? { ...options[item] }
+                    : options[item];
+                localOptions[item] = val;
+              }
+            } else {
+              let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+              if (propsToFalse.includes(item)) {
+                localOptions[item] = false;
+              } else if (item === 'showlegend') {
+                localOptions[item] = true;
+              } else if (item === 'positionlegend') {
+                localOptions[item] = 'right';
+              } else {
+                const field = settings.optionFields.find(
+                  (field) => field.option === item
+                );
+                if (field && field.default !== undefined) {
+                  localOptions[item] = field.default;
+                }
+              }
+            }
+          });
+        }
+        if (!localOptions?.change) {
+          localOptions.change = false;
+        }
+        localOptions = { ...localOptions, ...this.loadComponentsSettings() };
+        this.$set(this, 'options', localOptions);
+      });
     },
     onClickDeleteTheme(theme) {
       const nextTheme = this.defaultThemes[0];
