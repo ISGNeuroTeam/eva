@@ -13,7 +13,7 @@
       }"
     >
       <v-card-title
-        v-show="element.split('-')[0] !== 'singleValue'
+        v-show="element.split('-')[0] === 'singleValue'
           ? settings.showTitle
           : props.disappear"
         class="card-title open_title"
@@ -273,12 +273,6 @@
                 </v-card>
               </div>
             </v-dialog>
-          </div>
-          <div
-            v-show="dataMode"
-            class="settings-dash"
-            :class="{ settings_move: props.open_gear }"
-          >
             <v-tooltip
               v-if="isMultiline"
               bottom
@@ -297,6 +291,13 @@
               </template>
               <span>Сбросить зум</span>
             </v-tooltip>
+          </div>
+          <div
+            v-show="dataMode"
+            class="settings-dash"
+            :class="{ settings_move: props.open_gear }"
+          >
+
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"

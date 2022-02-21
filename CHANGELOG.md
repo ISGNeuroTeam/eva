@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealese]
+
+- fixed visible zoom button
+- fixed filters. name and content
+
 ## [1.83.1]
 
 ### Fixed
 - release name
+- fixed setting the title breaks the scrolling of the component
 - fixed guntt full screen improvements.
 - fixed searching by bool type
-- fixed filters. name and content
+- fixed fullscreen improvements tune
 
 ## [1.83.0]
 
@@ -36,7 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed switching between filter types
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
-- fixed time selection are rendered outside of the component's bounds
 - fixed tile visualization not showing after datasource restart
 - fixed setting the title breaks the scrolling of the component
 - fixed dash single value settings no closes

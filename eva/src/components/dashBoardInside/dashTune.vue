@@ -238,9 +238,9 @@ export default {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
     circularSizeNew() {
-      if (this.$attrs['is-full-screen']) {
+      if (this.$attrs['is-full-screen']){
         this.circularWidth = 40;
-        this.circularSize = 500;
+        this.circularSize = 450;
       } else {
         this.circularWidth = 20;
         this.circularSize = 190;
@@ -322,4 +322,12 @@ export default {
 
   &.full-screen
     min-width: 690px
+    .v-input__slot
+      height: 100%
+    .v-slider--vertical
+      min-height: 470px
+    .text-h4
+      font-size: 62px !important
+    .v-size--default
+      padding: 25px 48px
 </style>
