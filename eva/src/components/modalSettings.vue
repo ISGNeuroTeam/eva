@@ -29,6 +29,7 @@
               :color="theme.$primary_button"
               :style="{ color: theme.$main_text }"
               label="Открыть в новой вкладке"
+              @change="isChanged = true"
             />
           </div>
           <div class="option-item">
@@ -305,6 +306,7 @@
                 class="item-metric"
                 label="Имя метрики"
                 @click="changeColor"
+                @change="isChanged = true"
               />
               <v-select
                 v-model="metrics[i - 1].type"
@@ -316,6 +318,7 @@
                 class="item-metric"
                 label="Тип графика"
                 @click="changeColor"
+                @change="isChanged = true"
               />
               <v-text-field
                 v-model="metrics[i - 1].lowborder"
@@ -332,6 +335,7 @@
                 outlined
                 class="item-metric border"
                 hide-details
+                @input="isChanged = true"
               />
               <v-text-field
                 v-model="metrics[i - 1].upborder"
@@ -348,6 +352,7 @@
                 outlined
                 class="item-metric border"
                 hide-details
+                @input="isChanged = true"
               />
               <br>
               <div class="item-metric">
@@ -454,6 +459,7 @@
                 class="item-metric checkbox"
                 label="Автоматически/Вручную"
                 hide-details
+                @change="isChanged = true"
               />
               <v-icon
                 class="icon-inside"
@@ -505,6 +511,7 @@
                 class="subnumber"
                 label="Позиция легенды"
                 @click="changeColor"
+                @change="isChanged = true"
               />
             </div>
           </div>
@@ -548,6 +555,7 @@
                 :style="{ color: theme.$main_text }"
                 outlined
                 hide-details
+                @input="isChanged = true"
               />
               <v-btn
                 v-if="primitivesLibraryAutoGrow"
@@ -604,6 +612,7 @@
                 outlined
                 class="item-metric"
                 @click="changeColor"
+                @input="isChanged = true"
               />
             </div>
             <div
@@ -634,6 +643,7 @@
                     colorsPie.colors = themes[colorsPie.theme].join(',');
                   }
                 "
+                @input="isChanged = true"
               />
               <v-text-field
                 v-show="!defaultThemes.includes(colorsPie.theme)"
@@ -649,6 +659,7 @@
                 outlined
                 class="item-metric"
                 hide-details
+                @input="isChanged = true"
               />
               <v-text-field
                 v-show="!defaultThemes.includes(colorsPie.theme)"
@@ -666,6 +677,7 @@
                 class="item-metric"
                 :class="{ disabled: !colorsPie.nametheme }"
                 hide-details
+                @input="isChanged = true"
               />
               <v-btn
                 v-if="
@@ -736,6 +748,7 @@
               outlined
               class="item-text"
               hide-details
+              @input="isChanged = true"
             />
             <v-icon
               class="icon-inside"
@@ -788,6 +801,7 @@
               outlined
               class="item-link"
               hide-details
+              @input="isChanged = true"
             />
             <v-text-field
               v-model="tooltip.links[i - 1].url"
@@ -802,6 +816,7 @@
               outlined
               class="item-link"
               hide-details
+              @input="isChanged = true"
             />
             <v-icon
               class="icon-inside"
@@ -854,6 +869,7 @@
               outlined
               class="item-button"
               hide-details
+              @input="isChanged = true"
             />
             <v-text-field
               v-model="tooltip.buttons[i - 1].id"
@@ -868,6 +884,7 @@
               outlined
               class="item-button"
               hide-details
+              @input="isChanged = true"
             />
             <v-icon
               class="icon-inside"
@@ -1103,9 +1120,11 @@ export default {
     },
     handleChangeColor(e, i) {
       this.color = { ...this.color, [this.metrics[i].name]: e.target.value };
+      this.isChanged = true;
     },
     handleChangeTypeLine(e, i) {
       this.type_line = { ...this.type_line, [this.metrics[i].name]: e };
+      this.isChanged = true;
     },
 
     handleChangeConlusionCount(e, i) {
@@ -1113,6 +1132,7 @@ export default {
         ...this.conclusion_count,
         [this.metrics[i].name]: Number(e),
       };
+      this.isChanged = true;
     },
 
     handleChangeReplaceCount(e, i) {
@@ -1120,6 +1140,7 @@ export default {
         ...this.replace_count,
         [this.metrics[i].name]: Number(e),
       };
+      this.isChanged = true;
     },
     setOptions: async function () {
       // отправляем настройки в хранилище

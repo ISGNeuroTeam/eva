@@ -4,7 +4,6 @@
   <v-dialog
     v-model="confirmModal"
     width="600"
-    persistent
     :content-class="isShadow ? 'modal-confirm--with-shadow' : ''"
     @keydown.esc="closeOnEsc"
     @click:outside="closeOnOutside"
@@ -97,7 +96,8 @@ export default {
       this.$emit('result', result);
       this.confirmModal = false;
     },
-    closeOnEsc() {
+    closeOnEsc(e) {
+      this.$emit('closeOnEsc', e);
       this.$refs.modalConfirm.$el.focus();
     },
     closeOnOutside() {

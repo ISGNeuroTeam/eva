@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 ### Fixed
-
 - Fixed persistent modal
 - fixed token with an empty name
 - fixed name restriction for tokens
@@ -19,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed sizing a filter
 - fixed dashboard component
 - fixed cell size in tile visualization
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 
 ## [1.82.0]
 
