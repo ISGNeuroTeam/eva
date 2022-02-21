@@ -5,8 +5,7 @@
     v-model="active"
     width="500"
     :is-confirm="isChanged"
-    :persistent
-  ="isChanged"
+    :persistent="isChanged"
     :theme="theme"
     @cancelModal="cancelModal"
   >
@@ -103,11 +102,9 @@ export default {
     },
     searches() {
       // получаем все ИС на странице
-      let searches = [];
-      if (this.idDash) {
-        searches = this.$store.getters.getSearches(this.idDash);
-      }
-      return searches;
+      return this.idDash
+        ? this.$store.getters.getSearches(this.idDash)
+        : [];
     },
     theme() {
       return this.$store.getters.getTheme;

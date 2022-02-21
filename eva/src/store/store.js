@@ -1323,9 +1323,9 @@ export default {
     getSearches(state) {
       // получаем все ИС
       return (id) => {
-        if (!state[id].searches) {
-          Vue.set(state[id], 'searches', []);
-        }
+        // if (!state[id].searches) {
+        //   Vue.set(state[id], 'searches', []);
+        // }
         return state[id].searches;
       };
     },

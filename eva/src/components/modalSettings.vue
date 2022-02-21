@@ -62,11 +62,7 @@
             </div>
           </div>
           <template v-for="field in fieldsForRender">
-            <template
-              v-if="
-                checkOptions(field.optionGroup || field.option, field.relation)
-              "
-            >
+            <template v-if="checkOptions(field.optionGroup || field.option, field.relation)">
               <div
                 v-for="prop in field.each || [null]"
                 :key="`${field.option}${prop}`"
@@ -123,6 +119,7 @@
                     :color="theme.$primary_button"
                     :style="{ color: theme.$main_text }"
                     :label="String(options[field.option])"
+                    @change="isChanged = true"
                   />
                   <!-- elem: text-field -->
                   <v-text-field
@@ -141,6 +138,7 @@
                     hide-details
                     :type="field.elemType"
                     :min="field.elemMin"
+                    @input="isChanged = true"
                   />
                   <!-- elem: select -->
                   <v-select
@@ -153,6 +151,7 @@
                     hide-details
                     outlined
                     class="subnumber"
+                    @change="isChanged = true"
                   />
                   <v-select
                     v-else-if="field.elem === 'select' && prop"
@@ -164,6 +163,7 @@
                     hide-details
                     outlined
                     class="subnumber"
+                    @change="isChanged = true"
                   />
                   <!-- elem: checkbox-list -->
                   <div
@@ -178,6 +178,7 @@
                       :style="{ color: theme.$main_text }"
                       :label="setting"
                       hide-details
+                      @input="isChanged = true"
                       @change="
                         (val) => {
                           field.onChange ? field.onChange(val) : null;
@@ -190,6 +191,7 @@
                     v-else-if="field.elem === 'radio-group' && !prop"
                     v-model="options[field.option]"
                     :column="false"
+                    @input="isChanged = true"
                   >
                     <v-radio
                       v-for="{ label, value } in field.items"
@@ -205,6 +207,7 @@
                     v-else-if="field.elem === 'radio-group' && prop"
                     v-model="options[field.option][prop]"
                     :column="false"
+                    @input="isChanged = true"
                   >
                     <v-radio
                       v-for="{ label, value } in field.items"
@@ -259,6 +262,7 @@
                   outlined
                   class="subnumber"
                   hide-details
+                  @input="isChanged = true"
                 />
               </div>
             </div>
@@ -471,7 +475,7 @@
               <v-icon
                 class="icon-inside"
                 :color="theme.$primary_button"
-                @click="deleteMetrics(i - 1)"
+                @click="confirmDeleteMetric(i - 1)"
               >
                 {{ minus_icon }}
               </v-icon>
@@ -922,6 +926,14 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <modal-confirm
+        v-model="isConfirmModal"
+        :theme="theme"
+        :modal-text="`Уверенны, что хотите удалить вариант отображения ?`"
+        btn-confirm-text="Удалить"
+        btn-cancel-text="Отмена"
+        @result="deleteMetrics(deleteMetricId)"
+      />
     </div>
   </modal-persistent>
 </template>
@@ -938,7 +950,6 @@ export default {
   },
   data() {
     return {
-      element: '',
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
       conclusion_count: {},
@@ -969,7 +980,7 @@ export default {
       themes: {},
       metrics: [],
       metricsName: [],
-      multilineYAxesBinding: { axesCount: 1, metrics: {}, metricTypes: {} },
+      multilineYAxesBinding: { axesCount: 1, metrics: [], metricTypes: {} },
       multilineYAxesTypes: {},
       metricUnits: {},
       fieldsForRender: [],
@@ -977,6 +988,8 @@ export default {
       isChanged: false,
       isDelete: false,
       them: {},
+      isConfirmModal: false,
+      deleteMetricId: '',
     };
   },
   computed: {
@@ -1012,7 +1025,9 @@ export default {
     changeComponent() {
       return this.idDash + '-' + this.element;
     },
-
+    element() {
+      return this.$store.getters.getModalSettings(this.idDash).element;
+    },
     // поля элемента данных
     titles() {
       return this.$store.getters.getAvailableTableTitles(
@@ -1031,72 +1046,20 @@ export default {
       },
     },
   },
-  created() {
-    const settings = this.$store.getters.getModalSettings(this.idDash);
-    this.element = settings.element;
+  mounted() {
     this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
     this.metricsName = this.$store.getters.getMetricsMulti({
       idDash: this.idDash,
       id: this.element,
     });
-    if (this.element.startsWith('multiLine')) {
-      const opt = this.$store.dispatch('getSettingsByPath', {
-        path: this.idDash,
-        element: this.element,
-      });
-      if (opt.conclusion_count) {
-        this.conclusion_count = opt.conclusion_count;
-      }
-      //
-      if (opt.yAxesBinding) {
-        //     // поддержка старой структуры сохраненных настроек
-        if (!opt.metricTypes) {
-          if (opt.yAxesBinding.metrics) {
-            opt.metricsAxis = opt.yAxesBinding.metrics;
-          }
-          if (opt.yAxesBinding.metricTypes) {
-            opt.metricTypes = opt.yAxesBinding.metricTypes;
-          }
-          if (opt.yAxesBinding.axesCount) {
-            opt.axesCount = opt.yAxesBinding.axesCount;
-          }
-        }
-
-        this.multilineYAxesBinding.axesCount = opt.yAxesBinding.axesCount;
-      } else {
-        this.multilineYAxesBinding.axesCount = 1;
-      }
-
-      if (opt.type_line) {
-        this.type_line = opt.type_line;
-      }
-
-      if (opt.color) {
-        this.color = opt.color;
-      }
-      //
-      this.metricsName.forEach((metric) => {
-        this.metricUnits[metric.name] = metric.units;
-        //
-        if (
-          opt.yAxesBinding &&
-          opt.yAxesBinding.metrics &&
-          opt.yAxesBinding.metricTypes
-        ) {
-          this.multilineYAxesBinding.metrics[metric.name] =
-            opt.yAxesBinding.metrics[metric.name];
-          this.multilineYAxesBinding.metricTypes[metric.name] =
-            opt.yAxesBinding.metricTypes[metric.name];
-        } else {
-          this.multilineYAxesBinding.metrics[metric.name] = 'left';
-          this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
-        }
-      });
-    }
     this.loadComponentsSettings();
     this.prepareOptions();
   },
   methods: {
+    confirmDeleteMetric(val) {
+      this.isConfirmModal = true;
+      this.deleteMetricId = val;
+    },
     loadComponentsSettings() {
       const localOptions = {};
       this.optionsByComponents = settings.options;
@@ -1112,7 +1075,7 @@ export default {
           each.forEach((key) => {
             options[key] = field.items[0]?.value;
           });
-          localOptions[field.options] = { ...options };
+          localOptions[field.option] = { ...options };
         }
         return { ...field, items, each };
       });
@@ -1126,7 +1089,6 @@ export default {
       this.type_line = { ...this.type_line, [this.metrics[i].name]: e };
       this.isChanged = true;
     },
-
     handleChangeConlusionCount(e, i) {
       this.conclusion_count = {
         ...this.conclusion_count,
@@ -1134,7 +1096,6 @@ export default {
       };
       this.isChanged = true;
     },
-
     handleChangeReplaceCount(e, i) {
       this.replace_count = {
         ...this.replace_count,
@@ -1158,7 +1119,7 @@ export default {
         }
       }
       if (this.element.indexOf('csvg') !== -1) {
-        this.$set(this.options, 'tooltip', this.tooltip);
+        this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
       }
       if (this.element.indexOf('piechart') !== -1) {
         this.$set(this.options, 'metricsRelation', { ...this.metricsRelation });
@@ -1192,6 +1153,7 @@ export default {
       let options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
+        metrics: this.metrics,
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
@@ -1216,7 +1178,7 @@ export default {
         this.them = {};
         this.options.themes = this.themes;
         this.isDelete = false;
-        this.setOptions();
+        // this.setOptions();
       }
     },
     checkEsc: function (event) {
@@ -1251,6 +1213,7 @@ export default {
       return this.optionsItems.includes(option);
     },
     addIntoTooltip: function (item) {
+      this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.push('');
       } else if (item === 'link') {
@@ -1260,15 +1223,19 @@ export default {
       }
     },
     addMetrics: function () {
-      this.metrics.push({
+      this.isChanged = true;
+      const arr = JSON.parse(JSON.stringify(this.metrics));
+      arr.push({
         name: '',
         type: '',
         upborder: 0,
         lowborder: 0,
         manual: true,
       });
+      this.$set(this, 'metrics', arr);
     },
     deleteFromTooltip: function (item, i) {
+      this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
       } else if (item === 'link') {
@@ -1291,117 +1258,158 @@ export default {
       }
     },
     async prepareOptions() {
-      let localOptions = {};
-      //  понимает какие опции нужно вывести
-      const options = await this.$store.dispatch('getSettingsByPath', {
+      await this.$store.dispatch('getSettingsByPath', {
         path: this.idDash,
         element: this.element,
-      });
-      if (options) {
-        if (options.color) {
-          this.color = options.color;
-        }
-
-        if (options.type_line) {
-          this.type_line = options.type_line;
-        }
-
-        if (options.conclusion_count) {
-          this.conclusion_count = options.conclusion_count;
-        }
-
-        if (options.replace_count) {
-          this.replace_count = options.replace_count;
-        }
-
-        this.optionsItems.forEach((item) => {
-          if (Object.keys(options).includes(item)) {
-            if (item === 'tooltip') {
-              this.tooltip = {};
-              this.$set(this.tooltip, 'texts', [...[], ...options[item].texts]);
-              this.$set(this.tooltip, 'links', [...[], ...options[item].links]);
-              this.$set(this.tooltip, 'buttons', [
-                ...[],
-                ...options[item].buttons,
-              ]);
-            } else if (item === 'metrics') {
-              this.metrics = options[item];
-            } else if (item === 'metricsRelation') {
-              this.metricsRelation = {};
-              this.$set(this.metricsRelation, 'metrics', [
-                ...[],
-                ...options[item].metrics,
-              ]);
-              this.$set(this.metricsRelation, 'relations', [
-                ...[],
-                ...options[item].relations,
-              ]);
-              this.$set(this.metricsRelation, 'namesMetric', [
-                'Категория',
-                'Процентное соотношение',
-              ]);
-            } else if (item === 'colorsPie') {
-              this.colorsPie = {};
-              this.$set(this.colorsPie, 'theme', options[item].theme);
-              this.$set(this.colorsPie, 'colors', options[item].colors);
-              this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
-            } else if (item === 'themes') {
-              this.themesArr = Object.keys(options[item]);
-              this.themes = options[item];
-            } else if (item === 'titles') {
-              let val = options[item];
-              if (!val) {
-                // old settings
-                let oldVal = this.$store.getters.getSelectedTableTitles(
-                  this.idDash,
-                  this.element
-                );
-                if (oldVal) {
-                  val = oldVal;
-                }
-              }
-              // если не выбраны заголовки то выделить все имеющиеся
-              if (val.length === 0) {
-                let allTitles = this.$store.getters.getAvailableTableTitles(
-                  this.idDash,
-                  this.element
-                );
-                if (allTitles.length) {
-                  val = [...allTitles];
-                }
-              }
-              localOptions[item] = val || [];
-            } else {
-              let val =
-                options[item] !== null && typeof options[item] === 'object'
-                  ? { ...options[item] }
-                  : options[item];
-              localOptions[item] = val;
-            }
-          } else {
-            let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
-            if (propsToFalse.includes(item)) {
-              localOptions[item] = false;
-            } else if (item === 'showlegend') {
-              localOptions[item] = true;
-            } else if (item === 'positionlegend') {
-              localOptions[item] = 'right';
-            } else {
-              const field = settings.optionFields.find(
-                (field) => field.option === item
-              );
-              if (field && field.default !== undefined) {
-                localOptions[item] = field.default;
-              }
-            }
+      }).then((options) => {
+        let localOptions = {};
+        if (options) {
+          if (options.color) {
+            this.color = options.color;
           }
-        });
-      }
-      if (!localOptions.change) {
-        localOptions.change = false;
-      }
-      localOptions = { ...localOptions, ...this.loadComponentsSettings() };
-      this.$set(this, 'options', localOptions);
+
+          if (options.type_line) {
+            this.type_line = options.type_line;
+          }
+
+          if (options.conclusion_count) {
+            this.conclusion_count = options.conclusion_count;
+          }
+
+          if (options.replace_count) {
+            this.replace_count = options.replace_count;
+          }
+
+          if (this.element.startsWith('multiLine')) {
+            if (options.yAxesBinding) {
+              //     // поддержка старой структуры сохраненных настроек
+              if (!options.metricTypes) {
+                if (options.yAxesBinding.metrics) {
+                  options.metricsAxis = options.yAxesBinding.metrics;
+                }
+                if (options.yAxesBinding.metricTypes) {
+                  options.metricTypes = options.yAxesBinding.metricTypes;
+                }
+                if (options.yAxesBinding.axesCount) {
+                  options.axesCount = options.yAxesBinding.axesCount;
+                }
+              }
+
+              this.multilineYAxesBinding.axesCount = options.yAxesBinding.axesCount;
+            } else {
+              this.multilineYAxesBinding.axesCount = 1;
+            }
+            if (options.color) {
+              this.color = options.color;
+            }
+            this.metricsName.forEach((metric) => {
+              this.metricUnits[metric.name] = metric.units;
+              //
+              if (
+                options.yAxesBinding &&
+                options.yAxesBinding.metrics &&
+                options.yAxesBinding.metricTypes
+              ) {
+                this.multilineYAxesBinding.metrics[metric.name] =
+                  options.yAxesBinding.metrics[metric.name];
+                this.multilineYAxesBinding.metricTypes[metric.name] =
+                  options.yAxesBinding.metricTypes[metric.name];
+              } else {
+                this.multilineYAxesBinding.metrics[metric.name] = 'left';
+                this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
+              }
+            });
+          }
+
+          this.optionsItems.forEach((item) => {
+            if (Object.keys(options).includes(item)) {
+              if (item === 'tooltip') {
+                this.tooltip = {};
+                this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([...[], ...options[item].texts])));
+                this.$set(this.tooltip, 'links', JSON.parse(JSON.stringify([...[], ...options[item].links])));
+                this.$set(this.tooltip, 'buttons', JSON.parse(JSON.stringify([
+                  ...[],
+                  ...options[item].buttons,
+                ])));
+              } else if (item === 'metrics') {
+                this.metrics = JSON.parse(JSON.stringify(options[item]));
+              } else if (item === 'metricsRelation') {
+                this.metricsRelation = {};
+                this.$set(this.metricsRelation, 'metrics', [
+                  ...[],
+                  ...options[item].metrics,
+                ]);
+                this.$set(this.metricsRelation, 'relations', [
+                  ...[],
+                  ...options[item].relations,
+                ]);
+                this.$set(this.metricsRelation, 'namesMetric', [
+                  'Категория',
+                  'Процентное соотношение',
+                ]);
+              } else if (item === 'colorsPie') {
+                this.colorsPie = {};
+                this.$set(this.colorsPie, 'theme', options[item].theme);
+                this.$set(this.colorsPie, 'colors', options[item].colors);
+                this.$set(this.colorsPie, 'nametheme', options[item].nametheme);
+              } else if (item === 'themes') {
+                this.themesArr = Object.keys(options[item]);
+                this.themes = options[item];
+              } else if (item === 'titles') {
+                let val = options[item];
+                if (!val) {
+                  // old settings
+                  let oldVal = this.$store.getters.getSelectedTableTitles(
+                    this.idDash,
+                    this.element
+                  );
+                  if (oldVal) {
+                    val = oldVal;
+                  }
+                }
+                // если не выбраны заголовки то выделить все имеющиеся
+                if (val.length === 0) {
+                  let allTitles = this.$store.getters.getAvailableTableTitles(
+                    this.idDash,
+                    this.element
+                  );
+                  if (allTitles.length) {
+                    val = [...allTitles];
+                  }
+                }
+                localOptions[item] = val || [];
+              } else {
+                let val =
+                  options[item] !== null && typeof options[item] === 'object'
+                    ? { ...options[item] }
+                    : options[item];
+                localOptions[item] = val;
+              }
+            } else {
+              let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+              if (propsToFalse.includes(item)) {
+                localOptions[item] = false;
+              } else if (item === 'showlegend') {
+                localOptions[item] = true;
+              } else if (item === 'positionlegend') {
+                localOptions[item] = 'right';
+              } else {
+                const field = settings.optionFields.find(
+                  (field) => field.option === item
+                );
+                if (field && field.default !== undefined) {
+                  localOptions[item] = field.default;
+                }
+              }
+            }
+          });
+        }
+        if (!localOptions?.change) {
+          localOptions.change = false;
+        }
+        localOptions = { ...this.loadComponentsSettings(), ...localOptions };
+        this.$set(this, 'options', localOptions);
+      });
     },
     onClickDeleteTheme(theme) {
       const nextTheme = this.defaultThemes[0];
