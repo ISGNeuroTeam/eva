@@ -327,6 +327,7 @@ export default {
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
+        // await this.$store.dispatch('dataResearch/getTimeline', this.search.sid);
       }
     },
     addLineBreaks() {

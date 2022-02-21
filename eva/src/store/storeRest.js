@@ -237,6 +237,26 @@ export default {
               } else {
                 resolveMain(allData);
               }
+
+              const test = await fetch(
+                  `/api/gettimelines?cid=${result.cid}`,
+              ).catch((error) => {
+                console.log(error)
+              }).then((data) => {
+                console.log(data)
+              });
+              console.log(test)
+
+              const test2 = await fetch(
+                  `/api/getinterestingfields?cid=${result.cid}`,
+              ).catch((error) => {
+                console.log(error)
+              }).then((data) => {
+                console.log(data)
+              });
+              console.log(test2)
+              
+              
             }
           });
         });

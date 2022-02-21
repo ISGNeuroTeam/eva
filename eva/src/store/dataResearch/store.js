@@ -9,9 +9,8 @@ export default {
     },
   },
   actions: {
-    getTimeline({ commit }) {
-      alert(1)
-      return fetch('/api/gettimelines?cid=79')
+    getTimeline({ commit }, sid) {
+      return fetch(`/api/gettimelines?cid=${sid}`)
         .then((response) => {
           console.log(response);
           commit('SET_TIMELINE', response);
