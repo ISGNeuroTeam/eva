@@ -431,7 +431,6 @@ export default {
       } else {
         // если все нормально
         console.log('data ready');
-
         const responseDB = this.$store.getters.putIntoDB(
           response,
           this.search.sid,
@@ -445,6 +444,7 @@ export default {
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
+        await this.$store.dispatch('getTimeline');
       }
     },
     addLineBreaks() {

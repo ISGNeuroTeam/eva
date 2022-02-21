@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import rest from './storeRest';
-// import dataResearch from './dataResearch.js';
 import restAuth from './storeAuth/storeRest';
 import settings from '../js/componentsSettings';
 import themes from '../js/themeSettings';
