@@ -9,16 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Multiline. Moved the barplots to the background
+
+## [1.84.0]
+
+### Added
+- multiple tokens
+
+### Fixed
+- fixed filters. name and content
 - fixed visible zoom button
+- fixed setting the title breaks the scrolling of the component
+- fixed guntt full screen improvements.
+- fixed searching by bool type
+- fixed fullscreen improvements tune
 
 ## [1.83.1]
 
 ### Fixed
 - release name
-- fixed setting the title breaks the scrolling of the component
-- fixed guntt full screen improvements.
-- fixed searching by bool type
-- fixed fullscreen improvements tune
 
 ## [1.83.0]
 
@@ -30,7 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - fixed selecting an object after changing dash setting
-- fixed adding multiple tokens
 - fixed token with an empty name
 - fixed name restriction for tokens
 - Visualization. Time selection. Parts of a component are rendered outside of the component's bounds
@@ -44,7 +51,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed cell size in tile visualization
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
-- fixed setting the title breaks the scrolling of the component
 - fixed dash single value settings no closes
 
 ## [1.82.0]
