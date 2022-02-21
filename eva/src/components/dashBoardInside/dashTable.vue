@@ -47,7 +47,7 @@
                 {{ mdiMagnify }}
               </v-icon>
             </template>
-            <v-row v-if="value !== 'string'">
+            <v-row v-if="value !== 'string' && value !== 'none'">
               <v-col cols="6">
                 <v-select
                   :items="compare"
@@ -59,6 +59,18 @@
                 <v-text-field
                   label="значение"
                   @change="setFilterData(title, $event)"
+                />
+              </v-col>
+            </v-row>
+
+            <v-row v-else-if="value === 'none'">
+              <v-col cols="12">
+                <v-select
+                    label="Значение"
+                    :items="compareForBoolean"
+                    @change="
+                  onChangeForBoolean(title, $event)
+                  "
                 />
               </v-col>
             </v-row>
@@ -150,6 +162,7 @@ export default {
     return {
       compare: ['>', '<', '='],
       mdiMagnify,
+      compareForBoolean: ['-', false, true],
       eventRows: [],
       props: {
         titles: [],
@@ -212,8 +225,15 @@ export default {
       return items;
     },
     filteredTableData() {
-      const chooseSort = function (dataFormat, sortType, value) {
-        if (dataFormat === 'date') {
+      let chooseSort = function (dataFormat, sortType, value) {
+        if (dataFormat ==="none") {
+          if (typeof value ==='boolean'){
+            return  (el) => {
+                return el === value;
+            };
+          }
+         return () => true;
+        }else if (dataFormat === 'date') {
           let sort;
           const parseDate = function (val) {
             const parts = val.split('.');
@@ -347,6 +367,10 @@ export default {
     this.setEventColor();
   },
   methods: {
+    onChangeForBoolean(title, event){
+      this.setFilterData(title, '=', 'compare');
+      this.setFilterData(title, event);
+    },
     onItemsPageChange(page) {
       this.$emit('update:table-page', page);
     },
