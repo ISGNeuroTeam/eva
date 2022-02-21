@@ -47,8 +47,8 @@
   </v-card>
 </template>
 <script>
-import { filterCompile } from './utils/filter-otl-compile';
 import { mdiEyeOutline } from '@mdi/js';
+import { filterCompile } from './utils/filter-otl-compile';
 
 export default {
   name: 'FilterPreviewModal',

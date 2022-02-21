@@ -32,7 +32,7 @@ $dash-loading-height: 3px
   display: flex
   flex-direction: column
   overflow: auto
-  @include container-height(0px)
+  @include container-height(35px)
 
   &::-webkit-scrollbar
     width: 6px
@@ -46,9 +46,20 @@ $dash-loading-height: 3px
   &.header-active
     @include container-height(35px)
 
+  &.is-header-open
+    @include container-height(0px)
+
   @media screen and (max-width: 1600px)
     &.header-active
       @include container-height(25px)
+    &.is-header-open
+    @include container-height(0px)
+
+    &.is-header-open
+      @include container-height(0px)
+
+    &.is-header-open
+    @include container-height(0px)
 
   .header
     display: flex
