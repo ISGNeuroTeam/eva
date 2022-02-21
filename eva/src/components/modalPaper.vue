@@ -94,12 +94,12 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    active: function () {
+    active() {
       if (this.active) {
         this.getAllPapers();
         this.getData();
@@ -107,41 +107,40 @@ export default {
     },
   },
   methods: {
-    cancelModal: function () {
+    cancelModal() {
       this.selectedFile = '';
       this.data = [];
       this.$emit('cancelModal');
     },
-    startPaper: async function () {
+    async startPaper() {
       if (this.selectedFile == '') {
         this.message('Выберит файл');
       } else {
         this.getPaper();
       }
     },
-    downloadFile: function (fileLink) {
-      let namefile = fileLink.split('/')[2];
-      let link = this.$refs.paperBlock.appendChild(document.createElement('a')); // создаем ссылку
+    downloadFile(fileLink) {
+      const namefile = fileLink.split('/')[2];
+      const link = this.$refs.paperBlock.appendChild(document.createElement('a')); // создаем ссылку
       link.setAttribute('href', `/${fileLink}`); // указываем ссылке что надо скачать наш файл csv
       link.setAttribute('download', namefile); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
-    getPaper: async function () {
+    async getPaper() {
       this.loadingShow = true;
 
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('data', JSON.stringify(this.data));
-      let result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.getters.getPaper(formData);
       try {
         if (result.status == 'success') {
           this.downloadFile(result.file);
           this.loadingShow = false;
-          //this.showError = false;
+          // this.showError = false;
         } else {
-          this.errorMsg =
-            'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
+          this.errorMsg = 'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
           this.loadingShow = false;
         }
@@ -150,29 +149,28 @@ export default {
         this.loadingShow = false;
       }
     },
-    getAllPapers: async function () {
-      let result = await this.$store.getters.getAllPaper();
+    async getAllPapers() {
+      const result = await this.$store.getters.getAllPaper();
       try {
         if (JSON.parse(result).status == 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
-          this.errorMsg =
-            'Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.';
+          this.errorMsg = 'Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
         }
       } catch (error) {
         this.message(`Ошибка: ${error}`);
       }
     },
-    message: function (text) {
+    message(text) {
       this.errorMsg = text;
       this.showError = true;
       setTimeout(() => {
         this.showError = false;
       }, 2000);
     },
-    changeColor: function () {
+    changeColor() {
       if (document.querySelectorAll('.v-menu__content').length != 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
@@ -182,14 +180,14 @@ export default {
         });
       }
     },
-    getData: function () {
-      let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
+    getData() {
+      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
       }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
-      let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
 
-      let worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
 
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
@@ -206,13 +204,13 @@ export default {
 
       worker.postMessage(`${this.idDash}-${this.sid}`); // запускаем воркер на выполнение
     },
-    getDataFromDb: function () {
+    getDataFromDb() {
       return function (event) {
         let db = null;
 
-        let searchSid = event.data;
+        const searchSid = event.data;
 
-        let request = indexedDB.open('EVA', 1);
+        const request = indexedDB.open('EVA', 1);
 
         request.onerror = function (event) {
           console.log('error: ', event);
@@ -228,19 +226,19 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            console.log('successEvent: ' + db);
+            console.log(`successEvent: ${db}`);
           };
         };
 
         request.onsuccess = () => {
           db = request.result;
 
-          let transaction = db.transaction('searches'); // (1)
+          const transaction = db.transaction('searches'); // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
+          const searches = transaction.objectStore('searches'); // (2)
 
-          let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
           query.onsuccess = () => {
             // (4)

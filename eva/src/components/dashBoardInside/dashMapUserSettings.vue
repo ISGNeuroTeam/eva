@@ -371,7 +371,7 @@ export default {
     return {
       toggleSelect: false,
       mode: ['Мониторинг', 'Сравнение', 'Аналитика', 'Поиск', 'Режим 5'],
-      mdiSettings: mdiSettings,
+      mdiSettings,
       mdiList: mdiFormatListBulletedSquare,
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
@@ -419,7 +419,7 @@ export default {
     };
   },
   computed: {
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
     isDark() {
@@ -445,14 +445,14 @@ export default {
     },
   },
   mounted() {
-    let options = this.$store.getters.getOptions({
+    const options = this.$store.getters.getOptions({
       idDash: this.idDashFrom,
       id: this.idElement,
     });
     this.tileLayers[0].tile = options.osmserver;
     // init store for reactivity
     if (!options.showLegend || !options.initialPoint) {
-      let initOptions = {
+      const initOptions = {
         showLegend: true,
         zoomLevel: this.options.zoomLevel,
         zoomStep: this.options.zoomStep,
@@ -485,7 +485,7 @@ export default {
       this.map.on('click', clickEvent);
     },
     updatePipeDataSource(e) {
-      let set = new Set(e);
+      const set = new Set(e);
       set.delete(this.options.mode[0]);
       this.options.mode = Array.from(set);
       this.$emit('updatePipeDataSource', this.options.search);
@@ -497,7 +497,7 @@ export default {
       this.options.showLegend = false;
     },
     createHtmlIcon(lib) {
-      let {
+      const {
         text_color: textColor = '#FFFFFF',
         background_color: color = '65, 62, 218',
         opacity = 0.6,
@@ -542,45 +542,42 @@ export default {
       });
     },
 
-    setOptions: function () {
+    setOptions() {
       // отправляем настройки в хранилище
       if (!this.options.level) {
         this.options.level = 1;
       }
 
       if (
-        typeof this.options.timeFormat != 'undefined' &&
-        this.options.timeFormat == null
+        typeof this.options.timeFormat !== 'undefined'
+        && this.options.timeFormat == null
       ) {
         this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
       }
-      if (typeof this.options.size != 'undefined') {
+      if (typeof this.options.size !== 'undefined') {
         if (this.options.size == null) {
           this.options.size = '100px';
         } else if (String(this.options.size).indexOf('px') === -1) {
           this.options.size = `${this.options.size}px`;
         }
       }
-      //let options = {...{},...this.options};
+      // let options = {...{},...this.options};
       if (this.element.indexOf('csvg') !== -1) {
         this.options.tooltip = this.tooltip;
       }
       if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation)
+          JSON.stringify(this.metricsRelation),
         );
         this.options.colorsPie = this.colorsPie;
         if (this.colorsPie.theme === 'custom') {
-          this.themes[this.colorsPie.nametheme] =
-            this.colorsPie.colors.split(',');
+          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',');
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
       }
       if (this.element.indexOf('multiLine') !== -1) {
-        let updateMetrics = this.metrics.map((item) => {
-          return JSON.parse(JSON.stringify(item));
-        });
+        const updateMetrics = this.metrics.map((item) => JSON.parse(JSON.stringify(item)));
         this.$set(this.options, 'metrics', updateMetrics);
       }
       this.$store.commit('setOptions', {

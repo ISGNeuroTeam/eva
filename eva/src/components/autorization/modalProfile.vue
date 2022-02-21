@@ -388,8 +388,7 @@ export default {
   watch: {
     active() {
       if (this.activeFrom) {
-        this.userData.username =
-          Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
+        this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
         this.userData.pass = '';
         Object.keys(this.showBlock).forEach((item) => {
           this.showBlock[item] = false;
@@ -411,6 +410,8 @@ export default {
           case 5:
             this.showBlock.indexes = true;
             break;
+          default:
+            break;
         }
         if (this.create) {
           this.$set(this.userData, 'username', '');
@@ -419,7 +420,7 @@ export default {
           this.$set(this.curItem, 'name', '');
         } else {
           this.$set(this.userData, 'username', this.curItemFrom.name);
-          this.curItem = Object.assign({}, this.curItemFrom);
+          this.curItem = { ...this.curItemFrom };
         }
         this.dataRest = this.getDataForEssence();
       }
@@ -429,26 +430,26 @@ export default {
     this.colorFrom = this.theme;
   },
   methods: {
-    getDataForEssence: async function () {
+    async getDataForEssence() {
       if (this.create) {
-        let role = this.essence[this.keyFrom - 1];
-        let allData = {};
-        let keys = [];
-        let promise = Object.keys(this.$data[role].tab).map((item) => {
+        const role = this.essence[this.keyFrom - 1];
+        const allData = {};
+        const keys = [];
+        const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.auth.getters.getEssenceList(item, true);
+          return this.$store.getters['auth/getEssenceList'](item, true);
         });
 
-        let result = await Promise.all(promise);
+        const result = await Promise.all(promise);
         result.forEach((item, i) => {
           allData[keys[i]] = item;
         });
 
         return allData;
       }
-      return this.$store.auth.getters.getEssence(
+      return this.$store.getters['auth/getEssence'](
         this.userFrom.tab,
-        this.userFrom.id
+        this.userFrom.id,
       );
     },
     cancelModal() {
@@ -469,7 +470,7 @@ export default {
     },
     changeBtn(act) {
       let method = 'POST';
-      let formData = {}; // формируем объект для передачи RESTу
+      const formData = {}; // формируем объект для передачи RESTу
       let sameMsg = '';
       switch (this.keyFrom) {
         case 1:
@@ -481,67 +482,63 @@ export default {
             if (this.userData.pass.length === 0 || !this.userData.pass) {
               this.showErrorMsg(
                 'Логин или пароль не могут быть пустыми',
-                this.colorFrom.controlsActive
-              )
-              return false;
+                this.colorFrom.controlsActive,
+              );
+              return;
             }
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive
-              )
-              return false;
+                this.colorFrom.controlsActive,
+              );
+              return;
             }
             formData.password = this.userData.pass;
           } else if (act === 'pass') {
             if (
-              this.oldpass == null ||
-              this.oldpass.length === 0 ||
-              !this.oldpass
+              this.oldpass == null
+              || this.oldpass.length === 0
+              || !this.oldpass
             ) {
               this.showErrorMsg(
                 'Введите старый пароль',
-                this.colorFrom.controlsActive
-              )
-              return false;
-            } else if (
-              this.newpass == null ||
-              this.newpass.length === 0 ||
-              !this.newpass
+                this.colorFrom.controlsActive,
+              );
+              return;
+            } if (
+              this.newpass == null
+              || this.newpass.length === 0
+              || !this.newpass
             ) {
               this.showErrorMsg(
                 'Введите новый пароль',
-                this.colorFrom.controlsActive
-              )
-              return false;
-            } else if (this.newpass.length < 7) {
+                this.colorFrom.controlsActive,
+              );
+              return;
+            } if (this.newpass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive
-              )
-              return false;
-            } else if (this.newpass === this.oldpass) {
+                this.colorFrom.controlsActive,
+              );
+              return;
+            } if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
-                this.colorFrom.controlsActive
-              )
-              return false;
-            } else {
-              formData.old_password = this.oldpass;
-              formData.new_password = this.newpass;
+                this.colorFrom.controlsActive,
+              );
+              return;
             }
-          } else {
-            if (this.userData.pass.length !== 0 && this.userData.pass) {
-              if (this.userData.pass.length < 7) {
-                this.showErrorMsg(
-                  'Пароль должен быть больше 7 символов',
-                  this.colorFrom.controlsActive
-                )
-                return false;
-              } else {
-                formData.password = this.userData.pass;
-              }
+            formData.old_password = this.oldpass;
+            formData.new_password = this.newpass;
+          } else if (this.userData.pass.length !== 0 && this.userData.pass) {
+            if (this.userData.pass.length < 7) {
+              this.showErrorMsg(
+                'Пароль должен быть больше 7 символов',
+                this.colorFrom.controlsActive,
+              );
+              return;
             }
+            formData.password = this.userData.pass;
           }
           formData.name = this.userData.username;
           sameMsg = 'Такой пользователь уже есть';
@@ -579,10 +576,12 @@ export default {
           formData.name = this.curItem.name;
           sameMsg = 'Такой индекс уже есть';
           break;
+        default:
+          break;
       }
 
       if (Object.keys(this.changedData).length !== 0) {
-        let essence = this.changedData[this.essence[this.keyFrom - 1]];
+        const essence = this.changedData[this.essence[this.keyFrom - 1]];
         Object.keys(essence).forEach((item) => {
           if (essence[item].length !== 0) {
             essence[item].forEach((itemEs) => {
@@ -597,10 +596,10 @@ export default {
         });
       }
 
-      let response = this.$store.auth.getters.setEssence({
+      const response = this.$store.getters['auth/setEssence']({
         formData: JSON.stringify(formData),
         essence: this.essence[this.keyFrom - 1],
-        method: method,
+        method,
       });
 
       response.then((res) => {
@@ -609,13 +608,13 @@ export default {
         } else if (res.status === 409) {
           this.showErrorMsg(
             sameMsg,
-            '#FF6D70'
-          )
+            '#FF6D70',
+          );
         } else if (res.status === 403) {
           this.showErrorMsg(
             '',
-            '#FF6D70'
-          )
+            '#FF6D70',
+          );
         }
       });
     },

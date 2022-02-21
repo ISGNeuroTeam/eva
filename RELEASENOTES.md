@@ -1,3 +1,16 @@
+# [1.84.0] - Fixed dashboard filters, multiple tokens
+
+### New
+- Multiple tokens
+
+### Fixed
+- Dashboard filters. Name and content
+- Visible zoom button
+- Setting the title breaks the scrolling of the component
+- Guntt full screen improvements
+- Searching by bool type
+- Fullscreen improvements tune
+
 # [1.83.1] - RELEASENOTES fix
 
 ### Fixed

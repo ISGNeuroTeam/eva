@@ -77,10 +77,10 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
   },
@@ -88,7 +88,7 @@ export default {
     dataRestFrom() {
       this.dataRestFromWatch();
     },
-    colorFrom: function () {
+    colorFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
@@ -96,8 +96,8 @@ export default {
               this.prepareChart(this.dataRestFrom);
             } else {
               // .dash-guntt-${this.id}
-              let graphics = d3
-                .select(this.$el.querySelector(`.guntt-block`))
+              const graphics = d3
+                .select(this.$el.querySelector('.guntt-block'))
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
@@ -118,15 +118,15 @@ export default {
         this.noMsg = true;
       }
     },
-    timeFormatFrom: function () {
+    timeFormatFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
-              let graphics = d3
-                .select(this.$el.querySelector(`.guntt-block`))
+              const graphics = d3
+                .select(this.$el.querySelector('.guntt-block'))
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
@@ -147,15 +147,16 @@ export default {
         this.noMsg = true;
       }
     },
-    widthFrom: function () {
+    widthFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+          this.hiddenTooltip()
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
-              let graphics = d3
-                .select(this.$el.querySelector(`.guntt-block`))
+              const graphics = d3
+                .select(this.$el.querySelector('.guntt-block'))
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
@@ -170,15 +171,15 @@ export default {
         }
       }
     },
-    heightFrom: function () {
+    heightFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
             } else {
-              let graphics = d3
-                .select(this.$el.querySelector(`.guntt-block`))
+              const graphics = d3
+                .select(this.$el.querySelector('.guntt-block'))
                 .selectAll('svg')
                 .nodes(); // получаем область в которой будем рисовтаь график
 
@@ -195,28 +196,33 @@ export default {
     },
   },
   mounted() {
-    if (this.$attrs['is-full-screen']){
+    if (this.$attrs['is-full-screen']) {
       this.dataRestFromWatch();
     }
     this.$emit('setVissible', this.id);
   },
   methods: {
+    hiddenTooltip() {
+      let tooltipBlock = this.$refs.tooltip;
+      tooltipBlock.style.opacity = '0';
+      tooltipBlock.style.visibility = 'hidden';
+    },
     dataRestFromWatch() {
       this.$nextTick(() => {
         if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
           if (
-              this.dataRestFrom[0].start_date &&
-              this.dataRestFrom[0].end_date
+            this.dataRestFrom[0].start_date
+              && this.dataRestFrom[0].end_date
           ) {
             if (this.dataReport) {
               if (this.activeElemFrom === this.id) {
                 this.noMsg = false;
                 this.prepareChart(this.dataRestFrom);
               } else {
-                let graphics = d3
-                    .select(this.$el.querySelector(`.guntt-block`))
-                    .selectAll('svg')
-                    .nodes(); // получаем область в которой будем рисовтаь график
+                const graphics = d3
+                  .select(this.$el.querySelector('.guntt-block'))
+                  .selectAll('svg')
+                  .nodes(); // получаем область в которой будем рисовтаь график
 
                 if (graphics.length !== 0) {
                   // если график уже есть
@@ -240,18 +246,18 @@ export default {
     idDashClass() {
       return `dash-guntt-${this.id}`;
     },
-    prepareChart: function (dataRest) {
-      let prom = new Promise((resolve) => {
+    prepareChart(dataRest) {
+      const prom = new Promise((resolve) => {
         // создаем promise чтобы затем отрисовать график асинхронно
 
-        let sizeChart = { width: 0, height: 0 }; // получаем размеры от родителя
-        sizeChart['width'] = this.widthFrom;
-        sizeChart['height'] = this.heightFrom;
+        const sizeChart = { width: 0, height: 0 }; // получаем размеры от родителя
+        sizeChart.width = this.widthFrom;
+        sizeChart.height = this.heightFrom;
 
         this.actions[0].capture = Object.keys(dataRest[0]);
         if (
-          this.$store.state.store[this.idDash][this.idFrom].actions.length !==
-          this.actions.length
+          this.$store.state.store[this.idDash][this.idFrom].actions.length
+          !== this.actions.length
         ) {
           this.$store.commit('setActions', {
             actions: this.actions,
@@ -267,28 +273,30 @@ export default {
         this.createChart(sizeChart, this, dataRest);
       });
     },
-    createChart: function (sizeChart, that, dataRest) {
+    createChart(sizeChart, that, dataRest) {
       let otstupBot = 30;
       if (screen.width <= 1600) {
         otstupBot = 10;
       }
 
-      let margin = { top: 20, right: 20, bottom: otstupBot, left: 20 },
-        width = sizeChart.width - margin.left - margin.right,
-        height = sizeChart.height - margin.top - margin.bottom,
-        otstupLeft = 70,
-        otstupRight = 80;
+      const margin = {
+        top: 20, right: 20, bottom: otstupBot, left: 20,
+      };
+      const width = sizeChart.width - margin.left - margin.right;
+      const height = sizeChart.height - margin.top - margin.bottom;
+      let otstupLeft = 70;
+      const otstupRight = 80;
 
       if (screen.width > 1920) {
         otstupLeft = 90;
       }
 
-      let data = [];
+      const data = [];
       dataRest.forEach((item) => {
         data.push({ ...{}, ...item });
       });
-      let graphics = d3
-        .select(this.$el.querySelector(`.guntt-block`))
+      const graphics = d3
+        .select(this.$el.querySelector('.guntt-block'))
         .selectAll('svg')
         .nodes(); // получаем область в которой будем рисовтаь график
 
@@ -297,8 +305,8 @@ export default {
         graphics[0].remove(); // удаляем его
       }
 
-      let svg = d3
-        .select(this.$el.querySelector(`.guntt-block`))
+      const svg = d3
+        .select(this.$el.querySelector('.guntt-block'))
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -307,42 +315,38 @@ export default {
       data.forEach((item, i) => {
         let newDate = new Date(item.start_date * 1000);
         data[i].start_date = `${newDate.getFullYear()}-${checkZero(
-          newDate.getMonth() + 1
+          newDate.getMonth() + 1,
         )}-${checkZero(newDate.getDate())} ${checkZero(
-          newDate.getHours()
+          newDate.getHours(),
         )}:${checkZero(newDate.getMinutes())}:${checkZero(
-          newDate.getSeconds()
+          newDate.getSeconds(),
         )}`;
         newDate = new Date(item.end_date * 1000);
         data[i].end_date = `${newDate.getFullYear()}-${checkZero(
-          newDate.getMonth() + 1
+          newDate.getMonth() + 1,
         )}-${checkZero(newDate.getDate())} ${checkZero(
-          newDate.getHours()
+          newDate.getHours(),
         )}:${checkZero(newDate.getMinutes())}:${checkZero(
-          newDate.getSeconds()
+          newDate.getSeconds(),
         )}`;
       });
 
-      let dateFormat = `%Y-%m-%d %H:%M:%S`;
+      let dateFormat = '%Y-%m-%d %H:%M:%S';
       if (that.timeFormatFrom !== '') {
         dateFormat = that.timeFormatFrom;
       }
 
-      let x = d3
+      const x = d3
         .scaleTime()
         .domain([
-          d3.min(data, function (d) {
-            return new Date(d.start_date);
-          }),
-          d3.max(data, function (d) {
-            return new Date(d.end_date);
-          }),
+          d3.min(data, (d) => new Date(d.start_date)),
+          d3.max(data, (d) => new Date(d.end_date)),
         ])
         .range([otstupLeft, width - otstupRight]);
 
       // рассчитываем набор фаз (состояний)
-      let phases = [];
-      let ids = [];
+      const phases = [];
+      const ids = [];
       data.forEach((ph) => {
         if (ph.phase) {
           if (!phases.includes(ph.phase)) {
@@ -363,7 +367,7 @@ export default {
         otstupBottom = 60;
       }
 
-      let barHeight = Math.round((height - otstupBottom) / ids.length);
+      const barHeight = Math.round((height - otstupBottom) / ids.length);
 
       let otstupX = 0;
 
@@ -387,7 +391,7 @@ export default {
       }
 
       // добавляем ось X
-      let xAxis = svg
+      const xAxis = svg
         .append('g')
         .attr('transform', `translate(0,${height - otstupBottom})`)
         .call(
@@ -399,8 +403,8 @@ export default {
                 if (i % deliter === 0) {
                   return item;
                 }
-              })
-            )
+              }),
+            ),
         )
         .call(wrap);
 
@@ -418,7 +422,7 @@ export default {
         .style('color', this.colorFrom.text)
         .style('text-anchor', 'center');
 
-      //горизонатьные значения (id)
+      // горизонатьные значения (id)
       svg
         .append('g')
         .selectAll('rect')
@@ -426,26 +430,20 @@ export default {
         .enter()
         .append('rect')
         .attr('x', 0)
-        .attr('y', function (d, i) {
-          return i * barHeight;
-        })
-        .attr('width', function () {
-          return width;
-        })
+        .attr('y', (d, i) => i * barHeight)
+        .attr('width', () => width)
         .attr('height', barHeight)
         .attr('stroke', 'none')
         .attr('opacity', 0.2);
 
       // сами строки данных относителньо времени
-      let bars = svg.append('g').selectAll('rect').data(data).enter();
-      let lines = bars
+      const bars = svg.append('g').selectAll('rect').data(data).enter();
+      const lines = bars
         .append('rect')
         .attr('rx', 3)
         .attr('ry', 3)
-        .attr('x', function (d) {
-          return x(Date.parse(d.start_date));
-        })
-        .attr('y', function (d) {
+        .attr('x', (d) => x(Date.parse(d.start_date)))
+        .attr('y', (d) => {
           let j = -1;
           ids.forEach((item, i) => {
             if (item === d.id) {
@@ -454,9 +452,7 @@ export default {
           });
           return j * barHeight;
         })
-        .attr('width', function (d) {
-          return x(Date.parse(d.end_date)) - x(Date.parse(d.start_date));
-        })
+        .attr('width', (d) => x(Date.parse(d.end_date)) - x(Date.parse(d.start_date)))
         .attr('height', barHeight)
         .attr('stroke', 'none')
         .style('cursor', 'pointer')
@@ -474,9 +470,10 @@ export default {
       // Tooltip
 
       let tooltipBlock = this.$refs.tooltip;
+      const tooltipMargin =  this.$attrs['is-full-screen'] ? 170 : 30;
 
       lines
-        .on('mouseover', function (event) {
+        .on('mouseover', (event) => {
           let tooltip = '';
 
           if (data[0].description) {
@@ -486,44 +483,39 @@ export default {
               tooltip += `<p class="row-toolrip"><span>${key}</span>: ${event[key]}</p>`;
             });
           }
-
-          moveTooltip(event);
+          moveTooltip(tooltipMargin);
 
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', function (event) {
-          moveTooltip(event);
+        .on('mousemove', () => {
+          moveTooltip(tooltipMargin);
         })
-        .on('mouseout', function () {
+        .on('mouseout', () => {
           tooltipBlock.style.opacity = '0';
           tooltipBlock.style.visibility = 'hidden';
         })
-        .on('click', function (d) {
-          return that.setClick(d);
-        });
+        .on('click', (d) => that.setClick(d));
 
-      let texts = bars
+      const texts = bars
         .append('text')
-        .text(function (d) {
+        .text((d) => {
           if (d.phase) {
             if (
-              x(Date.parse(d.end_date)) - x(Date.parse(d.start_date)) >
-              d.phase.length * 8
+              x(Date.parse(d.end_date)) - x(Date.parse(d.start_date))
+              > d.phase.length * 8
             ) {
               return d.phase;
             }
           }
           return '';
         })
-        .attr('x', function (d) {
-          return (
-            x(Date.parse(d.start_date)) +
-            (x(Date.parse(d.end_date)) - x(Date.parse(d.start_date))) / 2
-          );
-        })
-        .attr('y', function (d) {
+        .attr('x', (d) => (
+          x(Date.parse(d.start_date))
+            + (x(Date.parse(d.end_date)) - x(Date.parse(d.start_date))) / 2
+        ))
+        .attr('y', (d) => {
           let j = -1;
           ids.forEach((item, i) => {
             if (item === d.id) {
@@ -539,34 +531,30 @@ export default {
         .attr('fill', '#fff');
 
       texts
-        .on('mouseover', function () {
+        .on('mouseover', () => {
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', function (event) {
-          moveTooltip(event);
+        .on('mousemove', () => {
+          moveTooltip(tooltipMargin);
         })
-        .on('mouseout', function () {
+        .on('mouseout', () => {
           tooltipBlock.style.opacity = '0';
           tooltipBlock.style.visibility = 'hidden';
         })
-        .on('click', function (d) {
-          return that.setClick(d);
-        });
+        .on('click', (d) => that.setClick(d));
 
       // подписи слева
 
       let currentPos = 0;
 
-      let idsCaption = svg.append('g').selectAll('text').data(ids).enter();
+      const idsCaption = svg.append('g').selectAll('text').data(ids).enter();
 
       idsCaption
         .append('text')
-        .text(function (d) {
-          return checkCaption(d);
-        })
+        .text((d) => checkCaption(d))
         .attr('x', 10)
-        .attr('y', function (d, i) {
+        .attr('y', (d, i) => {
           if (i === 0) {
             currentPos = barHeight / 2 + 2;
           } else {
@@ -586,7 +574,7 @@ export default {
         .append('line')
         .attr('x1', 0)
         .attr('x2', width - otstupRight)
-        .attr('y1', function (d, i) {
+        .attr('y1', (d, i) => {
           let curPos;
           if (i !== ids.length - 1) {
             curPos = currentPos + barHeight;
@@ -597,8 +585,8 @@ export default {
           }
           return curPos;
         })
-        .attr('y2', function () {
-          let curPos = currentPos + barHeight;
+        .attr('y2', () => {
+          const curPos = currentPos + barHeight;
           currentPos += barHeight;
           return curPos;
         })
@@ -631,26 +619,24 @@ export default {
 
       // легенда
 
-      function moveTooltip() {
-        let x = d3.event.offsetY - 50;
-        let y = d3.event.offsetX + 30;
-        tooltipBlock.style.top = x + 'px';
-        tooltipBlock.style.left = y + 'px';
+      function moveTooltip(offsetX) {
+        const x = d3.event.offsetY - 50;
+        const y = d3.event.offsetX + offsetX;
+        tooltipBlock.style.top = `${x}px`;
+        tooltipBlock.style.left = `${y}px`;
       }
 
       function transformDescription(text) {
         let rows = text.split('\\n');
-        rows = rows.map((item) => {
-          return `<p class="row-toolrip">${item}</p>`;
-        });
-        //rows = '<div class = "tooltip-guntt">' + rows.join('') + '</div>';
+        rows = rows.map((item) => `<p class="row-toolrip">${item}</p>`);
+        // rows = '<div class = "tooltip-guntt">' + rows.join('') + '</div>';
         return rows.join('');
       }
 
       function checkCaption(name) {
         if (name.length > 6) {
           // если там больше 10 символов
-          name = name.substring(0, 6) + '...'; // обрезаем и добовляем троеточие
+          name = `${name.substring(0, 6)}...`; // обрезаем и добовляем троеточие
         }
         return name;
       }
@@ -665,7 +651,7 @@ export default {
 
       function wrap(text) {
         text.each(function () {
-          let text = d3.select(this);
+          const text = d3.select(this);
           let row = [];
           text
             .node()
@@ -686,8 +672,8 @@ export default {
       }
     },
 
-    setClick: function (item) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setClick(item) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -698,7 +684,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,

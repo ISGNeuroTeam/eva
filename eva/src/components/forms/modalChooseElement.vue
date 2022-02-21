@@ -57,7 +57,7 @@
       </v-card>
       <!-- <div class="warning-block" :style="{background:color.backElement}">
                     <div class="warning-text"  :style="{color:color.text}">Такой DashBoard существует. Хотите заменить его?</div>
-                    <div class="btn-warning"> 
+                    <div class="btn-warning">
                         <v-btn small :color="color.controls" class="warning-btn" @click="yesDashBoards">Да</v-btn>
                         <v-btn small :color="color.controlsActive" class="warning-btn" @click="noDashBoards">Нет</v-btn>
                     </div>
@@ -91,16 +91,16 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    modal: function () {
+    modal() {
       return this.modalFrom;
     },
   },
   methods: {
-    acceptBtn: function () {
+    acceptBtn() {
       this.$emit('setElement', this.choose);
       this.cancelModal();
     },
-    selectElem: function (event) {
+    selectElem(event) {
       // функция для выбора одного элемента из списка
 
       let elem = event.target;
@@ -112,11 +112,9 @@ export default {
         // пробегаемся по всем элементам
         item.style = 'box-shadow: none'; // и отключаем  обводку
       });
-      elem.style = `box-shadow: 0px 0px 4px 3px  #FF6D70`;
-      let name = elem.querySelector('.element-name').textContent;
-      let result = this.elements.filter((item) => {
-        return item.name == name;
-      });
+      elem.style = 'box-shadow: 0px 0px 4px 3px  #FF6D70';
+      const name = elem.querySelector('.element-name').textContent;
+      const result = this.elements.filter((item) => item.name == name);
       this.choose = result;
       //   let elem = event.target.parentElement; // получаем родителя в котором находятся все элементы
       //   elem.parentElement.childNodes.forEach( item => {  // пробегаемся по всем элементам
@@ -125,7 +123,7 @@ export default {
       //   this.currentId = elem.querySelector('.search-id').innerHTML; // затем получаем текст всего ИС который выбрали
       //   elem.style = `box-shadow: 0px 0px 4px 3px  ${this.color.controlsActive}`;  // и делаем ему обводку
     },
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('hideForm');
     },
   },
