@@ -96,9 +96,8 @@ export default {
     headerTop() {
       if (document.body.clientWidth <= 1400) {
         return 0;
-      } else {
-        return 0;
       }
+      return 0;
     },
   },
   watch: {
@@ -113,7 +112,7 @@ export default {
     //   if (val <= this.headerTop) val = this.headerTop;
     // },
     left() {
-      let clientWidth = document.querySelector('#app').clientWidth;
+      const { clientWidth } = document.querySelector('#app');
       if (this.left < 0) this.left = 0;
       if (this.left + this.width > clientWidth) {
         this.left = clientWidth - this.width;
@@ -140,7 +139,7 @@ export default {
   },
   methods: {
     drawElement() {
-      let pos = this.$store.getters.getPosDash({
+      const pos = this.$store.getters.getPosDash({
         idDash: this.idDash,
         id: this.id,
       });
@@ -148,19 +147,19 @@ export default {
       this.left = pos.left * this.verticalCell;
       this.top = pos.top * this.horizontalCell;
 
-      let size = this.$store.getters.getSizeDash({
+      const size = this.$store.getters.getSizeDash({
         idDash: this.idDash,
         id: this.id,
       });
 
-      let width = size.width * this.verticalCell;
-      let height = size.height * this.horizontalCell;
+      const width = size.width * this.verticalCell;
+      const height = size.height * this.horizontalCell;
 
       this.width = width;
       this.height = height;
     },
     onActivated() {
-      let testElements = document.getElementsByClassName('vdr');
+      const testElements = document.getElementsByClassName('vdr');
       for (let i = 0; i < testElements.length; i++) {
         if (Number(testElements[i].style.zIndex) > this.maxZIndex) {
           this.maxZIndex = Number(testElements[i].style.zIndex);
@@ -175,24 +174,24 @@ export default {
       let left = Math.round(x / this.verticalCell);
       if (left < 0) left = 0;
       this.$store.commit('setPosDash', {
-        top: top,
-        left: left,
+        top,
+        left,
         id: this.id,
         idDash: this.idDash,
       });
     },
     sendSize(x, y, width, height) {
-      let top = Math.round(y / this.horizontalCell);
-      let left = Math.round(x / this.verticalCell);
+      const top = Math.round(y / this.horizontalCell);
+      const left = Math.round(x / this.verticalCell);
       this.$store.commit('setPosDash', {
-        top: top,
-        left: left,
+        top,
+        left,
         id: this.id,
         idDash: this.idDash,
       });
 
-      let newWidth = Math.round(width / this.verticalCell);
-      let newHeight = Math.round(height / this.horizontalCell);
+      const newWidth = Math.round(width / this.verticalCell);
+      const newHeight = Math.round(height / this.horizontalCell);
       this.height = height;
       this.width = width;
       this.$store.commit('setSizeDash', {
