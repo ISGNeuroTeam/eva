@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 - fixed visible zoom button
+- fixed filters. name and content
 
 ## [1.83.1]
 
