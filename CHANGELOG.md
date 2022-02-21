@@ -5,12 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unrealese]
+## [1.84.0]
+
+### Added
+- multiple tokens
 
 ### Fixed
 - fixed filters. name and content
 - fixed visible zoom button
-- fixed adding multiple tokens
 - fixed setting the title breaks the scrolling of the component
 - fixed guntt full screen improvements.
 - fixed searching by bool type
