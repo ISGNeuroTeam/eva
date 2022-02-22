@@ -501,13 +501,14 @@ export default {
         [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
         this.updateToken(this.map.getZoom());
       });
-      this.map.on('zoomend', () => {
-        const layers = document.getElementsByClassName('leaflet-marker-icon');
-        for (const x of layers) {
-          x.style.width = `${(x.naturalWidth / 10) * this.map.getZoom()}px`;
-          x.style.height = `${(x.naturalHeight / 10) * this.map.getZoom()}px`;
-        }
-      });
+      // TODO: Не совсем понятно нужно ли это
+      // this.map.on('zoomend', () => {
+      //   const layers = document.getElementsByClassName('leaflet-marker-icon');
+      //   for (const x of layers) {
+      //     x.style.width = `${(x.naturalWidth / 10) * this.map.getZoom()}px`;
+      //     x.style.height = `${(x.naturalHeight / 10) * this.map.getZoom()}px`;
+      //   }
+      // });
 
       this.deleteTitleByAttribute();
 
