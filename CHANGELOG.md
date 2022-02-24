@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Multiline. Moved the barplots to the background
+- fixed gis settings styles
 
 ## [1.84.0]
 
@@ -55,7 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes
-- fixed gis settings styles
 
 ## [1.82.0]
 
