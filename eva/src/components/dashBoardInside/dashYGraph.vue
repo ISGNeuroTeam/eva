@@ -205,6 +205,183 @@ const labelFontBOLD = new yfile.Font({
   fontWeight: 'BOLD',
 });
 
+class HTMLPopupSupport {
+  /**
+   * Initializes a new HTMLPopupSupport instance for the given graph component, pop-up container
+   * div, and pop-up placement parameter.
+   * @param {!GraphComponent} graphComponent The GraphComponent
+   * that displays the nodes and edges for which pop-ups
+   * will be shown.
+   * @param {!HTMLElement} div The HTMLDivElement that is
+   * used as parent element for the pop-up element.
+   * @param {!ILabelModelParameter} labelModelParameter The placement
+   * parameter that determines the pop-up location.
+   */
+  constructor(graphComponent, div, labelModelParameter) {
+    this.labelModelParameter = labelModelParameter;
+    this.div = div;
+    this.graphComponent = graphComponent;
+    this._currentItem = null;
+    this.dirty = false;
+    // make the popup invisible
+    div.style.opacity = '0';
+    div.style.display = 'none';
+
+    this.registerListeners();
+  }
+
+  /**
+   * Gets the node or edge to display information for.
+   * @type {?(IEdge|INode)}
+   */
+  get currentItem() {
+    return this._currentItem;
+  }
+
+  /**
+   * Sets the node or edge to display information for.
+   * Setting this property to a value other than null shows the pop-up.
+   * Setting the property to null hides the pop-up.
+   * @type {?(IEdge|INode)}
+   */
+  set currentItem(value) {
+    // if (value === this._currentItem) {
+    //   return;
+    // }
+    this._currentItem = value;
+    if (value) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  }
+
+  /**
+   * Registers viewport, node bounds changes, and visual tree listeners to the support's associated
+   * graph component.
+   */
+  registerListeners() {
+    // Adds listener for viewport changes
+    this.graphComponent.addViewportChangedListener(() => {
+      if (this.currentItem) {
+        this.dirty = true;
+      }
+    });
+
+    // Adds listeners for node bounds changes
+    this.graphComponent.graph.addNodeLayoutChangedListener((node) => {
+      const item = this.currentItem;
+      if (
+        item
+        && (item === node || HTMLPopupSupport.isEdgeConnectedTo(item, node))
+      ) {
+        this.dirty = true;
+      }
+    });
+
+    // Adds listener for updates of the visual tree
+    this.graphComponent.addUpdatedVisualListener(() => {
+      if (this.currentItem && this.dirty) {
+        this.dirty = false;
+        this.updateLocation();
+      }
+    });
+  }
+
+  /**
+   * Makes this pop-up visible.
+   */
+  show() {
+    this.div.style.display = 'block';
+    setTimeout(() => {
+      this.div.style.opacity = '1';
+    }, 0);
+    this.updateLocation();
+  }
+
+  /**
+   * Hides this pop-up.
+   */
+  hide() {
+    const parent = this.div.parentNode;
+    const popupClone = this.div.cloneNode(true);
+    popupClone.setAttribute(
+      'class',
+      `${popupClone.getAttribute('class')} popupContentClone`,
+    );
+    parent.appendChild(popupClone);
+    // fade the clone out, then remove it from the DOM. Both actions need to be timed.
+    setTimeout(() => {
+      popupClone.setAttribute(
+        'style',
+        `${popupClone.getAttribute('style')} opacity: 0;`,
+      );
+      setTimeout(() => {
+        parent.removeChild(popupClone);
+      }, 300);
+    }, 0);
+    this.div.style.opacity = '0';
+    this.div.style.display = 'none';
+  }
+
+  /**
+   * Changes the location of this pop-up to the location calculated by the
+   * {@link HTMLPopupSupport#labelModelParameter}. Currently, this implementation does not support rotated pop-ups.
+   */
+  updateLocation() {
+    if (!this.currentItem && !this.labelModelParameter) {
+      return;
+    }
+    const width = this.div.clientWidth;
+    const height = this.div.clientHeight;
+    const { zoom } = this.graphComponent;
+
+    const dummyLabel = new SimpleLabel(
+      this.currentItem,
+      '',
+      this.labelModelParameter,
+    );
+    if (this.labelModelParameter.supports(dummyLabel)) {
+      dummyLabel.preferredSize = new Size(width / zoom, height / zoom);
+      const newLayout = this.labelModelParameter.model.getGeometry(
+        dummyLabel,
+        this.labelModelParameter,
+      );
+      this.setLocation(
+        newLayout.anchorX,
+        newLayout.anchorY - (height + 10) / zoom,
+      );
+    }
+  }
+
+  /**
+   * Sets the location of this pop-up to the given world coordinates.
+   * @param {number} x The target x-coordinate of the pop-up.
+   * @param {number} y The target y-coordinate of the pop-up.
+   */
+  setLocation(x, y) {
+    // Calculate the view coordinates since we have to place the div in the regular HTML coordinate space
+    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
+    this.div.style.setProperty(
+      'transform',
+      `translate(${viewPoint.x}px, ${viewPoint.y}px)`,
+    );
+  }
+
+  /**
+   * Determines if the given item is an IEdge connected to the given node.
+   * @param {!IModelItem} item
+   * @param {!INode} node
+   * @returns {boolean}
+   */
+  static isEdgeConnectedTo(item, node) {
+    return (
+      item instanceof IEdge
+      && (item.sourcePort.owner === node || item.targetPort.owner === node)
+    );
+  }
+}
+
 export default {
   name: 'DashYGraph',
   props: {
@@ -327,7 +504,7 @@ export default {
     changeInputMode() {
       // меняем режим графика
       if (this.isEditor) {
-        this.$graphComponent.inputMode = null;
+        this.$graphComponent.inputMode = this.initMode();
       } else {
         this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
       }
@@ -556,9 +733,6 @@ export default {
         data: this.nodesSource, // .slice(0,10),
         id: 'id',
         tag: (item) => item
-        // return item.name.toLowerCase()==='start'|| item.name.toLowerCase()==='finish' ?
-        // item.name :
-        // item.color
         ,
       });
 
@@ -633,10 +807,7 @@ export default {
         id: this.idFrom,
       });
     },
-    createGraph() {
-      this.labelStyleList = {}; // варианты labelStyle
-      this.edgeStyleList = {};
-      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+    initMode() {
       const mode = new yfile.GraphEditorInputMode({
         allowGroupingOperations: false,
         allowAddLabel: false,
@@ -685,7 +856,7 @@ export default {
       });
 
       mode.itemHoverInputMode.enabled = true;
-      mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE | GraphItemTypes.NODE;
+      mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE || GraphItemTypes.NODE;
       mode.itemHoverInputMode.discardInvalidItems = false;
       mode.itemHoverInputMode.addHoveredItemChangedListener((sender, e) => {
         const manager = this.$graphComponent.highlightIndicatorManager;
@@ -698,9 +869,9 @@ export default {
           manager.addHighlight(newItem);
           if (newItem instanceof INode) {
             // and if it's a node, we highlight all adjacent edges, too
-            for (const edge of this.$graphComponent.graph.edgesAt(newItem)) {
+            this.$graphComponent.graph.edgesAt(newItem).forEach((edge) => {
               manager.addHighlight(edge);
-            }
+            });
           } else if (newItem instanceof IEdge) {
             // if it's an edge - we highlight the adjacent nodes
             manager.addHighlight(newItem.sourceNode);
@@ -708,18 +879,21 @@ export default {
           }
         }
       });
-
-      this.$graphComponent.inputMode = mode;
+      // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
+      mode.addCanvasClickedListener(() => {
+        this.$graphComponent.currentItem = null;
+      });
+      return mode;
+    },
+    createGraph() {
+      this.labelStyleList = {}; // варианты labelStyle
+      this.edgeStyleList = {};
+      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+      this.$graphComponent.inputMode = this.initMode();
 
       this.initializeDefaultStyles();
       this.initializeTooltips();
       this.initializePopups();
-
-      // убираем надпись о license
-      // document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
-      //   item.children[1].style.opacity = 0
-      //   item.children[2].style.opacity = 0
-      // })
     },
     initializePopups() {
       // Creates a label model parameter that is used to position the node pop-up
@@ -747,7 +921,7 @@ export default {
       const { inputMode } = this.$graphComponent;
 
       // The pop-up is shown for the currentItem thus nodes and edges should be focusable
-      inputMode.focusableItems = GraphItemTypes.NODE | GraphItemTypes.EDGE;
+      inputMode.focusableItems = GraphItemTypes.NODE || GraphItemTypes.EDGE;
 
       // Register a listener that shows the pop-up for the currentItem
       this.$graphComponent.addCurrentItemChangedListener(() => {
@@ -769,11 +943,6 @@ export default {
           nodePopup.currentItem = null;
           edgePopup.currentItem = null;
         }
-      });
-
-      // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
-      inputMode.addCanvasClickedListener(() => {
-        this.$graphComponent.currentItem = null;
       });
 
       // On press of the ESCAPE key, set currentItem to <code>null</code> to hide the pop-ups
@@ -851,180 +1020,6 @@ export default {
     },
   },
 };
-
-class HTMLPopupSupport {
-  /**
-   * Initializes a new HTMLPopupSupport instance for the given graph component, pop-up container
-   * div, and pop-up placement parameter.
-   * @param {!GraphComponent} graphComponent The GraphComponent that displays the nodes and edges for which pop-ups
-   * will be shown.
-   * @param {!HTMLElement} div The HTMLDivElement that is used as parent element for the pop-up element.
-   * @param {!ILabelModelParameter} labelModelParameter The placement parameter that determines the pop-up location.
-   */
-  constructor(graphComponent, div, labelModelParameter) {
-    this.labelModelParameter = labelModelParameter;
-    this.div = div;
-    this.graphComponent = graphComponent;
-    this._currentItem = null;
-    this.dirty = false;
-    // make the popup invisible
-    div.style.opacity = '0';
-    div.style.display = 'none';
-
-    this.registerListeners();
-  }
-
-  /**
-   * Gets the node or edge to display information for.
-   * @type {?(IEdge|INode)}
-   */
-  get currentItem() {
-    return this._currentItem;
-  }
-
-  /**
-   * Sets the node or edge to display information for.
-   * Setting this property to a value other than null shows the pop-up.
-   * Setting the property to null hides the pop-up.
-   * @type {?(IEdge|INode)}
-   */
-  set currentItem(value) {
-    if (value === this._currentItem) {
-      return;
-    }
-    this._currentItem = value;
-    if (value) {
-      this.show();
-    } else {
-      this.hide();
-    }
-  }
-
-  /**
-   * Registers viewport, node bounds changes, and visual tree listeners to the support's associated
-   * graph component.
-   */
-  registerListeners() {
-    // Adds listener for viewport changes
-    this.graphComponent.addViewportChangedListener(() => {
-      if (this.currentItem) {
-        this.dirty = true;
-      }
-    });
-
-    // Adds listeners for node bounds changes
-    this.graphComponent.graph.addNodeLayoutChangedListener((node) => {
-      const item = this.currentItem;
-      if (
-        item
-        && (item === node || HTMLPopupSupport.isEdgeConnectedTo(item, node))
-      ) {
-        this.dirty = true;
-      }
-    });
-
-    // Adds listener for updates of the visual tree
-    this.graphComponent.addUpdatedVisualListener(() => {
-      if (this.currentItem && this.dirty) {
-        this.dirty = false;
-        this.updateLocation();
-      }
-    });
-  }
-
-  /**
-   * Makes this pop-up visible.
-   */
-  show() {
-    this.div.style.display = 'block';
-    setTimeout(() => {
-      this.div.style.opacity = '1';
-    }, 0);
-    this.updateLocation();
-  }
-
-  /**
-   * Hides this pop-up.
-   */
-  hide() {
-    const parent = this.div.parentNode;
-    const popupClone = this.div.cloneNode(true);
-    popupClone.setAttribute(
-      'class',
-      `${popupClone.getAttribute('class')} popupContentClone`,
-    );
-    parent.appendChild(popupClone);
-    // fade the clone out, then remove it from the DOM. Both actions need to be timed.
-    setTimeout(() => {
-      popupClone.setAttribute(
-        'style',
-        `${popupClone.getAttribute('style')} opacity: 0;`,
-      );
-      setTimeout(() => {
-        parent.removeChild(popupClone);
-      }, 300);
-    }, 0);
-    this.div.style.opacity = '0';
-    this.div.style.display = 'none';
-  }
-
-  /**
-   * Changes the location of this pop-up to the location calculated by the
-   * {@link HTMLPopupSupport#labelModelParameter}. Currently, this implementation does not support rotated pop-ups.
-   */
-  updateLocation() {
-    if (!this.currentItem && !this.labelModelParameter) {
-      return;
-    }
-    const width = this.div.clientWidth;
-    const height = this.div.clientHeight;
-    const { zoom } = this.graphComponent;
-
-    const dummyLabel = new SimpleLabel(
-      this.currentItem,
-      '',
-      this.labelModelParameter,
-    );
-    if (this.labelModelParameter.supports(dummyLabel)) {
-      dummyLabel.preferredSize = new Size(width / zoom, height / zoom);
-      const newLayout = this.labelModelParameter.model.getGeometry(
-        dummyLabel,
-        this.labelModelParameter,
-      );
-      this.setLocation(
-        newLayout.anchorX,
-        newLayout.anchorY - (height + 10) / zoom,
-      );
-    }
-  }
-
-  /**
-   * Sets the location of this pop-up to the given world coordinates.
-   * @param {number} x The target x-coordinate of the pop-up.
-   * @param {number} y The target y-coordinate of the pop-up.
-   */
-  setLocation(x, y) {
-    // Calculate the view coordinates since we have to place the div in the regular HTML coordinate space
-    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
-    this.div.style.setProperty(
-      'transform',
-      `translate(${viewPoint.x}px, ${viewPoint.y}px)`,
-    );
-  }
-
-  /**
-   * Determines if the given item is an IEdge connected to the given node.
-   * @param {!IModelItem} item
-   * @param {!INode} node
-   * @returns {boolean}
-   */
-  static isEdgeConnectedTo(item, node) {
-    return (
-      item instanceof IEdge
-      && (item.sourcePort.owner === node || item.targetPort.owner === node)
-    );
-  }
-}
 </script>
 
 <style lang="css">
