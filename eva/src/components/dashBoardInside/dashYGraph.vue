@@ -249,7 +249,6 @@ class HTMLPopupSupport {
     //   return;
     // }
     this._currentItem = value;
-    console.log('setCurrentItem', value);
     if (value) {
       this.show();
     } else {
@@ -304,7 +303,6 @@ class HTMLPopupSupport {
    * Hides this pop-up.
    */
   hide() {
-    console.log('hide');
     const parent = this.div.parentNode;
     const popupClone = this.div.cloneNode(true);
     popupClone.setAttribute(
@@ -735,9 +733,6 @@ export default {
         data: this.nodesSource, // .slice(0,10),
         id: 'id',
         tag: (item) => item
-        // return item.name.toLowerCase()==='start'|| item.name.toLowerCase()==='finish' ?
-        // item.name :
-        // item.color
         ,
       });
 
@@ -886,7 +881,6 @@ export default {
       });
       // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
       mode.addCanvasClickedListener(() => {
-        console.log('inputMode', mode);
         this.$graphComponent.currentItem = null;
       });
       return mode;
@@ -900,12 +894,6 @@ export default {
       this.initializeDefaultStyles();
       this.initializeTooltips();
       this.initializePopups();
-
-      // убираем надпись о license
-      // document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
-      //   item.children[1].style.opacity = 0
-      //   item.children[2].style.opacity = 0
-      // })
     },
     initializePopups() {
       // Creates a label model parameter that is used to position the node pop-up
@@ -956,11 +944,6 @@ export default {
           edgePopup.currentItem = null;
         }
       });
-
-      // // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
-      // inputMode.addCanvasClickedListener(() => {
-      //   this.$graphComponent.currentItem = null;
-      // });
 
       // On press of the ESCAPE key, set currentItem to <code>null</code> to hide the pop-ups
       inputMode.keyboardInputMode.addKeyBinding(

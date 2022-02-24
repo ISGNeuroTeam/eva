@@ -1938,7 +1938,7 @@ export default {
               doing = reg.exec(body)[0];
               doing = doing.split('(');
               this.$set(this.event, 'action', doing[0]);
-              if (doing[0].toLowerCase() === 'set'.toLowerCase()) {
+              if (doing[0].toLowerCase() === 'set') {
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
                 this.$set(this.event, 'target', doing[0]);
@@ -1961,9 +1961,10 @@ export default {
                     this.$set(this.event, 'value', ['']);
                   }
                 }
-              } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
+              } else if (doing[0].toLowerCase() === 'go') {
                 /// go
-                doing = doing[1].slice(0, doing[1].length - 1).split(',');
+                // parse string: 109,tknUser,1,[tkn1,tkn2,tkn3])
+                doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
                 this.$set(this.event, 'target', doing[0]);
 
                 let prop; let
@@ -1981,7 +1982,14 @@ export default {
                 this.$set(this.event, 'prop', prop);
                 this.$set(this.event, 'tab', doing[2]);
                 this.$set(this.event, 'value', value);
-              } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
+                if (doing[3]) {
+                  this.$set(
+                    this.event,
+                    'updateTokens',
+                    doing[3].match(/([\w-_]+)/g),
+                  );
+                }
+              } else if (doing[0].toLowerCase() === 'open') {
                 // open
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
