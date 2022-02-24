@@ -34,8 +34,8 @@ export default {
   data() {
     return {
       tooltipSvg: { texts: [], links: [], buttons: [] },
-      mdiRefresh: mdiRefresh,
-      mdiMagnify: mdiMagnify,
+      mdiRefresh,
+      mdiMagnify,
     };
   },
   computed: {
@@ -47,9 +47,9 @@ export default {
     // this.calcSize();
   },
   methods: {
-    calcSize: function () {
+    calcSize() {
       alert('calcSize');
-      let size = this.$refs.vis.getBoundingClientRect();
+      const size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
       console.log(size);

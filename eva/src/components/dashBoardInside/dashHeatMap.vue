@@ -124,10 +124,10 @@ export default {
     ],
   }),
   computed: {
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
     events() {
@@ -142,24 +142,24 @@ export default {
     },
 
     filteredY() {
-      let temp = Array.from(this.y);
+      const temp = Array.from(this.y);
       if (this.yFieldFormat === 'Строка') {
         if (this.yFieldSort === 'По возрастанию') temp.sort();
         else temp.sort().reverse();
       } else {
-        let sort = this.chooseSort(this.yFieldFormat, this.yFieldSort);
+        const sort = this.chooseSort(this.yFieldFormat, this.yFieldSort);
         temp.sort(sort);
       }
       return this.updateData && temp;
     },
 
     filteredX() {
-      let temp = Array.from(this.x);
+      const temp = Array.from(this.x);
       if (this.xFieldFormat === 'Строка') {
         if (this.xFieldSort === 'По возрастанию') temp.sort();
         else temp.sort().reverse();
       } else {
-        let sort = this.chooseSort(this.xFieldFormat, this.xFieldSort);
+        const sort = this.chooseSort(this.xFieldFormat, this.xFieldSort);
         temp.sort(sort);
       }
       return this.updateData && temp;
@@ -170,9 +170,7 @@ export default {
       if (this.dataRestFrom && this.dataRestFrom[0]) {
         capture = Object.keys(this.dataRestFrom[0]);
       }
-      return this.defaultActions.map((action) => {
-        return { ...action, capture };
-      });
+      return this.defaultActions.map((action) => ({ ...action, capture }));
     },
   },
   watch: {
@@ -185,7 +183,7 @@ export default {
     },
     dataRestFrom() {
       if (this.dataRestFrom && this.dataRestFrom[0]) {
-        let fields = Object.keys(this.dataRestFrom[0]);
+        const fields = Object.keys(this.dataRestFrom[0]);
         this.$store.commit('setOptions', {
           id: this.idFrom,
           idDash: this.idDashFrom,
@@ -235,7 +233,7 @@ export default {
       this.$store.getters.getTockens(this.idDash).forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
-          const capture = token.capture;
+          const { capture } = token;
           const captureIdx = ['x', 'y', 'value'].indexOf(capture);
           if (captureIdx !== -1) {
             value = [x, y, val][captureIdx];
@@ -252,12 +250,12 @@ export default {
         }
       });
     },
-    setClick: function (tokenValue) {
+    setClick(tokenValue) {
       if (this.detailValue) {
-        let [first] = Object.keys(this.filteredData[tokenValue]);
+        const [first] = Object.keys(this.filteredData[tokenValue]);
         tokenValue = this.filteredData[tokenValue][first].row[this.detailValue];
       }
-      let events = this.$store.getters.getEvents({
+      const events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'onclick',
         element: this.id,
@@ -274,37 +272,30 @@ export default {
               route: this.$router,
               store: this.$store,
             });
-            //this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
+            // this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
           }
         });
       }
     },
     chooseSort(dataFormat, sortType) {
       if (dataFormat === 'Дата') {
-        let up = (a, b) => {
-          return new Date(a) - new Date(b);
-        };
-        let down = (a, b) => {
-          return new Date(b) - new Date(a);
-        };
+        const up = (a, b) => new Date(a) - new Date(b);
+        const down = (a, b) => new Date(b) - new Date(a);
 
         let sort;
         if (sortType === 'По возрастанию') sort = up;
         else sort = down;
         return sort;
-      } else if (dataFormat === 'Число') {
-        let up = (a, b) => {
-          return a - b;
-        };
-        let down = (a, b) => {
-          return b - a;
-        };
+      } if (dataFormat === 'Число') {
+        const up = (a, b) => a - b;
+        const down = (a, b) => b - a;
 
         let sort;
         if (sortType === 'По возрастанию') sort = up;
         else sort = down;
         return sort;
       }
+      return undefined;
     },
 
     render() {
@@ -312,7 +303,7 @@ export default {
       this.y = new Set();
       this.updateData = 0;
       this.data = {};
-      for (let obj of this.dataRestFrom) {
+      this.dataRestFrom.forEach((obj) => {
         const xField = obj[this.xField];
         const yField = obj[this.yField];
 
@@ -329,7 +320,7 @@ export default {
         this.x.add(xField);
         this.y.add(yField);
         this.updateData += 1;
-      }
+      });
     },
 
     /**
@@ -340,7 +331,7 @@ export default {
     parseMetadata(data = null) {
       try {
         if (typeof data !== 'string') return null;
-        return !data ? null : JSON.parse(data.replaceAll(`'`, `"`));
+        return !data ? null : JSON.parse(data.replaceAll('\'', '"'));
       } catch (err) {
         return null;
       }

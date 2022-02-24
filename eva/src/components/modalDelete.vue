@@ -69,15 +69,15 @@ export default {
     };
   },
   computed: {
-    idDash: function () {
+    idDash() {
       // получаем название элемнета от родителя
       return this.idDashFrom;
     },
-    parent: function () {
+    parent() {
       // получаем родителя
       return this.$el;
     },
-    idTitle: function () {
+    idTitle() {
       // смотрим окно было вызвано на странице элемнета или на главной странице
       let title = false;
       if (this.dataPage == 'dash') {
@@ -87,19 +87,19 @@ export default {
       }
       return title;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    dataPage: function () {
+    dataPage() {
       return this.dataPageFrom;
     },
-    active: function () {
+    active() {
       // проверям стоит ли окрыть окно с удалением
       let active = false;
       if (this.idDash) {
         // если уже получили имя элемнета
-        let modal = this.$store.getters.getModalDelete({ id: this.idDash }); // то вызываем окно с удалением чего-либо
-        this.setData(modal)
+        const modal = this.$store.getters.getModalDelete({ id: this.idDash }); // то вызываем окно с удалением чего-либо
+        this.setData(modal);
         active = modal.active; // получаем статус отображения модального окна
       }
       return active;
@@ -118,7 +118,7 @@ export default {
     this.changeStyle();
   },
   methods: {
-    setData (modal) {
+    setData(modal) {
       this.deleteId = `[ ${modal.id} ]`; // добовляем скобки для id элемнета для красоты
       this.deleteName = modal.name; // получаем имя удаляемого элемента
       if (modal.page === 'tocken') {
@@ -131,18 +131,18 @@ export default {
       }
       this.page = modal.page;
     },
-    deleteBtn: function () {
+    deleteBtn() {
       // кнопка удаления
-      let id = this.deleteId.replace(/\[|\]|\s/g, ''); // получаем id и отсеиваем все лишние знаки
+      const id = this.deleteId.replace(/\[|\]|\s/g, ''); // получаем id и отсеиваем все лишние знаки
 
       this.$store.commit('deleteDashboardVisualization', {
         idDash: this.idDash,
-        id: id,
+        id,
         page: this.page,
         name: this.deleteName,
       }); // отправляем информацию про удаляемый объект в хранилище
       if (this.page == 'search') {
-        let searchesId = [];
+        const searchesId = [];
         searchesId.push(this.deleteName);
         this.$store.getters.deleteFromDb(searchesId, this.idDash);
       }
@@ -154,7 +154,7 @@ export default {
         page: this.page,
       }); // и закрываем окно с удалением
     },
-    cancelModal: function () {
+    cancelModal() {
       // кнопка отмены удаления
       this.$store.commit('setModalDelete', {
         id: this.idDash,
@@ -164,15 +164,15 @@ export default {
         page: this.page,
       }); // просто закрываем окно
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code == 'Escape') {
         this.cancelModal();
       }
     },
-    changeStyle: function () {
+    changeStyle() {
       if (this.active) {
         document.querySelector(
-          '.v-dialog'
+          '.v-dialog',
         ).style.boxShadow = `0 3px 1px -2px ${this.theme.$main_border},0 2px 2px 0 ${this.theme.$main_border},0 1px 5px 0 ${this.theme.$main_border}`;
       }
     },

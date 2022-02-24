@@ -60,13 +60,13 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    id: function () {
+    id() {
       return this.idFrom;
     },
-    idDash: function () {
+    idDash() {
       return this.idDashFrom;
     },
-    otstupBottom: function () {
+    otstupBottom() {
       let otstup;
       if (this.dataModeFrom) {
         otstup = 50;
@@ -78,16 +78,16 @@ export default {
       }
       return otstup;
     },
-    color: function () {
+    color() {
       return this.colorFrom;
     },
-    height: function () {
+    height() {
       return this.heightFrom;
     },
-    widthTile: function () {
+    widthTile() {
       return this.setSize('width');
     },
-    heightTile: function () {
+    heightTile() {
       return this.setSize('height');
     },
     dataTile() {
@@ -103,7 +103,7 @@ export default {
     },
   },
   watch: {
-    dataRestFrom: function (dataRestFrom) {
+    dataRestFrom(dataRestFrom) {
       if (!dataRestFrom.length || dataRestFrom.length === 0) {
         this.noMsg = true;
         this.msgText = 'Нет данных для отображения';
@@ -116,7 +116,7 @@ export default {
         this.captures = Object.keys(dataRestFrom[0]);
       }
     },
-    captures: function (captures) {
+    captures(captures) {
       this.actions[0].capture = captures;
       this.$store.commit('setActions', {
         actions: this.actions,
@@ -134,8 +134,8 @@ export default {
     });
   },
   methods: {
-    setClick: function (item) {
-      let tockens = this.$store.getters.getTockens(this.idDash);
+    setClick(item) {
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -146,7 +146,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken: tocken,
+            tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,
@@ -154,7 +154,7 @@ export default {
         }
       });
 
-      let events = this.$store.getters.getEvents({
+      const events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'onclick',
         element: this.id,
@@ -165,7 +165,7 @@ export default {
         events.forEach((item) => {
           if (item.action === 'set') {
             this.$store.commit('letEventSet', {
-              events: events,
+              events,
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
@@ -179,30 +179,27 @@ export default {
         });
       }
     },
-    checkName: function (name) {
+    checkName(name) {
       return name.replace('\\n', '<br>');
     },
-    setSize: function (sizeFrom) {
+    setSize(sizeFrom) {
       let size;
       if (!this.sizeTileFrom[sizeFrom] || this.sizeTileFrom[sizeFrom] === '') {
         size = '100px';
+      } else if (this.sizeTileFrom[sizeFrom].indexOf('px') !== -1) {
+        size = this.sizeTileFrom[sizeFrom];
       } else {
-        if (this.sizeTileFrom[sizeFrom].indexOf('px') !== -1) {
-          size = this.sizeTileFrom[sizeFrom];
-        } else {
-          size = `${this.sizeTileFrom[sizeFrom]}px`;
-        }
+        size = `${this.sizeTileFrom[sizeFrom]}px`;
       }
       return size;
     },
-    borderColor: function (border) {
+    borderColor(border) {
       if (border === '1') {
         return this.colorFrom.controlsSystem;
-      } else if (border === '0' || border == null) {
+      } if (border === '0' || border == null) {
         return 'transparent';
-      } else {
-        return border;
       }
+      return border;
     },
   },
 };

@@ -13,11 +13,9 @@
       }"
     >
       <v-card-title
-        v-show="
-          element.split('-')[0] === 'singleValue'
-            ? settings.showTitle
-            : props.disappear
-        "
+        v-show="element.split('-')[0] === 'singleValue'
+          ? settings.showTitle
+          : props.disappear"
         class="card-title open_title"
       >
         <div class="name-dash">
@@ -29,17 +27,17 @@
             {{ mdiDatabaseSearch }}
           </v-icon>
           <v-tooltip
-              bottom
-              :color="theme.$accent_ui_color"
-              style="z-index: 100"
+            bottom
+            :color="theme.$accent_ui_color"
+            style="z-index: 100"
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                  v-if="searchData.length > 0"
-                  class="icon"
-                  :color="theme.$main_border"
-                  @click="exportDataCSV"
-                  v-on="on"
+                v-if="searchData.length > 0"
+                class="icon"
+                :color="theme.$main_border"
+                @click="exportDataCSV"
+                v-on="on"
               >
                 {{ mdiArrowDownBold }}
               </v-icon>
@@ -275,12 +273,6 @@
                 </v-card>
               </div>
             </v-dialog>
-          </div>
-          <div
-            v-show="dataMode"
-            class="settings-dash"
-            :class="{ settings_move: props.open_gear }"
-          >
             <v-tooltip
               v-if="isMultiline"
               bottom
@@ -299,6 +291,13 @@
               </template>
               <span>Сбросить зум</span>
             </v-tooltip>
+          </div>
+          <div
+            v-show="dataMode"
+            class="settings-dash"
+            :class="{ settings_move: props.open_gear }"
+          >
+
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
@@ -477,16 +476,20 @@ import {
   mdiSettings,
   mdiTrashCanOutline,
 } from '@mdi/js';
-import {mapGetters} from 'vuex';
+import { mapGetters } from 'vuex';
 import settings from '../js/componentsSettings.js';
 
 export default {
+  name: 'DashBoard',
   props: {
     width: null,
     height: null,
     idDashFrom: null,
     dataElemFrom: null,
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     dataPageFrom: null,
     loading: {
       type: Boolean,
@@ -504,8 +507,8 @@ export default {
       tablePerPage: 100,
       tablePage: 1,
       dataFromDB: true,
-      mdiDatabaseSearch: mdiDatabaseSearch,
-      mdiArrowDownBold: mdiArrowDownBold,
+      mdiDatabaseSearch,
+      mdiArrowDownBold,
       fullScreenMode: false,
       disabledTooltip: false,
       settings: {
@@ -514,20 +517,20 @@ export default {
       props: {
         id: '',
         name: '',
-        mdiPencil: mdiPencil,
-        mdiCheckBold: mdiCheckBold,
-        mdiClose: mdiClose,
-        mdiArrowAll: mdiArrowAll,
-        mdiArrowExpandAll: mdiArrowExpandAll,
-        mdiCodeTags: mdiCodeTags,
-        mdiTrashCanOutline: mdiTrashCanOutline,
-        mdiMagnifyMinusOutline: mdiMagnifyMinusOutline,
-        mdiDatabase: mdiDatabase,
-        mdiSettings: mdiSettings,
-        mdiChevronUp: mdiChevronUp,
-        mdiChevronDown: mdiChevronDown,
-        mdiArrowExpand: mdiArrowExpand,
-        mdiArrowCollapse: mdiArrowCollapse,
+        mdiPencil,
+        mdiCheckBold,
+        mdiClose,
+        mdiArrowAll,
+        mdiArrowExpandAll,
+        mdiCodeTags,
+        mdiTrashCanOutline,
+        mdiMagnifyMinusOutline,
+        mdiDatabase,
+        mdiSettings,
+        mdiChevronUp,
+        mdiChevronDown,
+        mdiArrowExpand,
+        mdiArrowCollapse,
         icons: {},
         edit: true,
         edit_icon: true,
@@ -582,13 +585,13 @@ export default {
       if (!this.props || !this.props.name) {
         return this.element;
       }
-      let name = this.props.name;
-      name &&
-      this.getSelfTockens.forEach((token) => {
+      let { name } = this.props;
+      name
+      && this.getSelfTockens.forEach((token) => {
         name = name.replaceAll(`$${token.name}$`, token.value);
       });
 
-      if (name.indexOf(`$evaTknLogin$`) != -1) {
+      if (name.indexOf('$evaTknLogin$') != -1) {
         if (this.$jwt.hasToken()) {
           name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
         }
@@ -611,9 +614,9 @@ export default {
       this.changeOptions(this.dataModeFrom);
       if (!this.dataModeFrom) {
         if (
-          this.element.split('-')[0] === 'button' ||
-          this.element.split('-')[0] === 'csvg' ||
-          this.element.split('-')[0] === 'tile'
+          this.element.split('-')[0] === 'button'
+          || this.element.split('-')[0] === 'csvg'
+          || this.element.split('-')[0] === 'tile'
         ) {
           this.setPropDisappear(false);
         }
@@ -626,7 +629,7 @@ export default {
       // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
       let nameElement = '';
       if (this.element) {
-        let element = this.element.split('-')[0];
+        const element = this.element.split('-')[0];
         nameElement = `dash-${element}`;
       }
       return nameElement;
@@ -651,14 +654,14 @@ export default {
       return show;
     },
     lastResult() {
-      let options = this.$store.getters.getOptions({
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.element,
       });
       return options.lastResult;
     },
     options() {
-      let options = this.$store.getters.getOptions({
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.element,
       });
@@ -719,10 +722,10 @@ export default {
   },
   methods: {
     onTableIItemsPageChange(page) {
-      this.tablePage = page
+      this.tablePage = page;
     },
     onTableItemsPerPageChange(perPage) {
-      this.tablePerPage = perPage
+      this.tablePerPage = perPage;
     },
     setOptionsItems(options) {
       Object.keys(options).forEach((item) => {
@@ -773,10 +776,10 @@ export default {
     },
     switchDS() {
       // переключаем между режимами выбора данных и их отображением
-      let status = !this.showElement;
+      const status = !this.showElement;
       this.$store.commit('setSwitch', {
         idDash: this.idDash,
-        status: status,
+        status,
         id: this.element,
       });
     },
@@ -791,7 +794,7 @@ export default {
       if (this.props.options.boxShadow) {
         this.props.optionsBoxShadow = this.theme.$primary_button;
       } else {
-        this.props.optionsBoxShadow = `transparent`;
+        this.props.optionsBoxShadow = 'transparent';
       }
     },
     setLoading(event) {
@@ -814,7 +817,7 @@ export default {
     getDataFromDB(searchID) {
       // получение данных с indexindDB
       let db = null;
-      let request = indexedDB.open('EVA', 1);
+      const request = indexedDB.open('EVA', 1);
       request.onerror = function (event) {
         console.log('error: ', event);
       };
@@ -828,19 +831,19 @@ export default {
         }
         request.onsuccess = () => {
           db = request.result;
-          console.log('successEvent: ' + db);
+          console.log(`successEvent: ${db}`);
         };
       };
       return new Promise((resolve) => {
         request.onsuccess = () => {
           db = request.result;
 
-          let transaction = db.transaction('searches'); // (1)
+          const transaction = db.transaction('searches'); // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
+          const searches = transaction.objectStore('searches'); // (2)
 
-          let query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
 
           query.onsuccess = () => {
             // (4)
@@ -876,26 +879,24 @@ export default {
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
-    setVissible(event) {
-      if (event.split('-')[0] === 'picker' || event.split('-')[0] === 'guntt') {
+    setVissible({element, overflow}) {
+      if (element.split('-')[0] === 'picker' || element.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
-        this.$el.querySelector('.dash-block').style.overflow = 'visible'; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
+        this.$el.querySelector('.dash-block').style.overflow = overflow; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
       }
     },
     changeOptions(mode) {
-      let level = this.props.options.level;
+      const { level } = this.props.options;
       let opacity = 1;
       if (mode) {
         this.props.differentOptions.visible = true;
+      } else if (!this.props.options.visible) {
+        this.props.differentOptions.visible = false;
+        opacity = 0;
       } else {
-        if (!this.props.options.visible) {
-          this.props.differentOptions.visible = false;
-          opacity = 0;
-        } else {
-          this.props.differentOptions.visible = true;
-          opacity = 1;
-        }
+        this.props.differentOptions.visible = true;
+        opacity = 1;
       }
       this.$emit('SetOpacity', opacity);
       this.$emit('SetLevel', level);
@@ -910,7 +911,7 @@ export default {
     getData(searchID) {
       // асинхронная функция для получения даных с реста
       let db = null;
-      let request = indexedDB.open('EVA', 1);
+      const request = indexedDB.open('EVA', 1);
       request.onerror = function (event) {
         console.log('error: ', event);
       };
@@ -923,16 +924,16 @@ export default {
         }
         request.onsuccess = () => {
           db = request.result;
-          console.log('successEvent: ' + db);
+          console.log(`successEvent: ${db}`);
         };
       };
       return new Promise((resolve) => {
         request.onsuccess = () => {
           db = request.result;
-          let transaction = db.transaction('searches'); // (1)
+          const transaction = db.transaction('searches'); // (1)
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
-          let query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
+          const searches = transaction.objectStore('searches'); // (2)
+          const query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
           query.onsuccess = () => {
             // (4)
             if (query.result) {
@@ -948,7 +949,7 @@ export default {
       });
     },
     checkFilter() {
-      let events = this.$store.getters.getEvents({
+      const events = this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.element,
@@ -982,9 +983,9 @@ export default {
                     return [
                       ...acc,
                       notElem.substr(1),
-                    ]
+                    ];
                   }
-                  return acc
+                  return acc;
                 }, []);
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
@@ -992,10 +993,8 @@ export default {
                       if (!notArr.includes(String(itemFil[event.column]))) {
                         return itemFil;
                       }
-                    } else {
-                      if (event.row.includes(String(itemFil[event.column]))) {
-                        return itemFil;
-                      }
+                    } else if (event.row.includes(String(itemFil[event.column]))) {
+                      return itemFil;
                     }
                   });
                 } else {
@@ -1080,7 +1079,8 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = false;
-                    let min, max;
+                    let min; let
+                      max;
                     if (parseFloat(event.row[0]) > parseFloat(event.row[1])) {
                       max = event.row[0];
                       min = event.row[1];
@@ -1089,8 +1089,8 @@ export default {
                       min = event.row[0];
                     }
                     if (
-                      parseFloat(itemFil[event.column]) > min &&
-                      parseFloat(itemFil[event.column]) < max
+                      parseFloat(itemFil[event.column]) > min
+                      && parseFloat(itemFil[event.column]) < max
                     ) {
                       incl = true;
                     }
@@ -1109,7 +1109,7 @@ export default {
             data.forEach((itemData) => {
               // пробегаемся по все мотфильтрвоанным элементам
               let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
-              let keys = Object.keys(itemData); // ключи объекта внутри фильтрованного массива
+              const keys = Object.keys(itemData); // ключи объекта внутри фильтрованного массива
               this.searchData.forEach((itemDataRest) => {
                 // пробегаемся пов сем отфильтрованным данным
                 let equalRest = true; // переменная которая скажет полностью совпал объект внутри результирующего массива

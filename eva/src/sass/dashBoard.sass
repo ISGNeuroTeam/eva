@@ -71,8 +71,11 @@ $transition: all 0.4s ease
         height: 100%
         border: 2px solid var(--secondary_bg)
         position: relative
-        overflow: hidden
+        overflow: scroll
         box-shadow: none !important
+
+        &::-webkit-scrollbar
+            display: none
 
         .fakeblock
             height: 35px
