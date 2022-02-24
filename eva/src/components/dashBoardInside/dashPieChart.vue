@@ -44,6 +44,10 @@
       <div
         ref="legends"
         class="legend-block-pie"
+        :class="dashOptions.positionlegend === 'top'
+          || dashOptions.positionlegend === 'bottom'
+          ? 'legend-block-pie__horizontally'
+          : 'legend-block-pie__vertically'"
       >
         <div
           v-for="(item, idx) in legends"
@@ -170,18 +174,21 @@ export default {
   watch: {
     'dashOptions.colorsPie': {
       handler() {
-        const graphics = d3
-          .select(this.$refs.piechartItself)
-          .selectAll('svg')
-          .nodes();
-        if (graphics.length !== 0) {
-          graphics[0].remove();
-          this.createPieChartDash();
-        } else {
-          this.createPieChartDash();
-        }
+        this.changePieChart();
       },
       deep: true,
+    },
+    'dashOptions.positionlegend': {
+      handler() {
+        this.changePieChart();
+      },
+      deep: true,
+    },
+    widthFrom() {
+      this.changePieChart();
+    },
+    heightFrom() {
+      this.changePieChart();
     },
     selectedPieIndex(newVal) {
       if (newVal !== null) this.setToken(newVal);
@@ -410,8 +417,8 @@ export default {
           height = height - legendSize.height - MARGIN;
           break;
       }
-
-      const radius = Math.min(width, height) / 2 - MARGIN; // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+      // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+      const radius = Math.min(width, height) / 2 - MARGIN;
 
       const svg = d3
         .select(this.$refs.piechartItself) // добовляем svg объект в нужный div
@@ -496,6 +503,18 @@ export default {
           });
         }
       });
+    },
+    changePieChart() {
+      const graphics = d3
+        .select(this.$refs.piechartItself)
+        .selectAll('svg')
+        .nodes();
+      if (graphics.length !== 0) {
+        graphics[0].remove();
+        this.createPieChartDash();
+      } else {
+        this.createPieChartDash();
+      }
     },
   },
 };
