@@ -100,6 +100,7 @@ export default {
       return dragRes === 'true';
     },
     containerWidth() {
+      console.log('containerWidth');
       return Math.floor(this.$refs.graph.clientWidth) - this.maxElementWidth;
     },
     containerHeight() {
@@ -108,6 +109,7 @@ export default {
   },
   watch: {
     dragRes(val) {
+      console.log('dragRes dragRes dragRes');
       if (val === true) {
         this.$graphComponent.inputMode = null;
       } else {
@@ -116,11 +118,49 @@ export default {
       }
     },
     dataRestFrom(_dataRest) {
+      this.dataRestFromGet(_dataRest);
+      // console.log('_dataRest', _dataRest);
+      // // очистка графа
+      // this.$graphComponent.graph.clear();
+      // // библиотека
+      // this.generateElementConfig(_dataRest);
+      // // если из dataRest забрали библиотеку
+      // if (!this.jsonError) {
+      //   // maxwidthlib
+      //   this.getMaxElementWidth();
+      //   // maxWidthEdge
+      //   this.getMaxEdgeWidth();
+      //   // генерируем и рисуем ноды
+      //   this.generateNodes(_dataRest);
+      //   this.drawNodes();
+      //   // генерируем и рисуем связи
+      //   this.generateEdges(_dataRest);
+      //   this.drawEdges();
+      //   // применяем layot
+      //   this.applyLayout();
+      // }
+    },
+  },
+  mounted() {
+    console.log('this.$refs.graph', this.$refs.graph);
+    console.log('mounted');
+
+    this.createGraph();
+    console.log('mounted this.dragRes', this.dragRes);
+    console.log('this.dataRestFrom && this.dataRestFrom.length', this.dataRestFrom && this.dataRestFrom.length);
+    if (this.dataRestFrom && this.dataRestFrom.length) {
+      this.dataRestFromGet(this.dataRestFrom);
+    }
+  },
+  methods: {
+    dataRestFromGet(_dataRest) {
+      console.log('_dataRest', _dataRest);
       // очистка графа
       this.$graphComponent.graph.clear();
       // библиотека
       this.generateElementConfig(_dataRest);
       // если из dataRest забрали библиотеку
+      console.log('this.jsonError', this.jsonError);
       if (!this.jsonError) {
         // maxwidthlib
         this.getMaxElementWidth();
@@ -136,11 +176,6 @@ export default {
         this.applyLayout();
       }
     },
-  },
-  mounted() {
-    this.createGraph();
-  },
-  methods: {
     clickViewMode() {
       this.isViewMode = false;
       this.$graphComponent.inputMode = new yfile.GraphEditorInputMode({
@@ -343,7 +378,9 @@ export default {
     },
 
     createGraph() {
+      console.log('this.$graphComponent', this.$graphComponent);
       this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+      console.log('this.dragRes 33333 =======!!!!', this.dragRes);
       if (this.dragRes) {
         this.$graphComponent.inputMode = null;
       } else {
