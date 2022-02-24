@@ -214,8 +214,9 @@
                   v-for="color in colorsList"
                   :key="color.name"
                   class="color-select"
-                  :class="{ selected: metric.color === color.name,
-                            disabled: color.name === 'range' && !metric.metadata
+                  :class="{
+                    selected: metric.color === color.name,
+                    disabled: color.name === 'range' && !metric.metadata
                   }"
                   @click="changeColorData(metric, color)"
                 >
