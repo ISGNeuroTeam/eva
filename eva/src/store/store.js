@@ -1682,7 +1682,7 @@ export default {
         },
       };
     },
-    getReportElement: (state) => state.reports.elements,
+    getReportElement: () => settings.reporstElements,
     getGroups() {
       return () => rest.getGroups(restAuth);
     },

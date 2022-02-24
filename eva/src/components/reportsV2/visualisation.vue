@@ -6,14 +6,14 @@
   >
     <div class="d-flex">
       <v-menu
-          offset-y
-          max-width="160"
-          class="select"
+        offset-y
+        max-width="160"
+        class="select"
       >
         <template v-slot:activator="{ on, attrs }">
           <div
-              v-bind="attrs"
-              v-on="on"
+            v-bind="attrs"
+            v-on="on"
           >
             {{ aboutElem[activeElem].tooltip }}
             <v-icon>{{ mdiChevronDown }}</v-icon>
@@ -21,21 +21,21 @@
         </template>
         <div style="min-height: 40px">
           <v-tooltip
-              v-for="i in elements"
-              :key="aboutElem[i].key"
-              bottom
-              :color="theme.$accent_ui_color"
-              @click="changeTab(i)"
+            v-for="i in elements"
+            :key="aboutElem[i].key"
+            bottom
+            :color="theme.$accent_ui_color"
+            @click="changeTab(i)"
           >
             <template
-                v-slot:activator="{ on }"
-                class="p-5"
+              v-slot:activator="{ on }"
+              class="p-5"
             >
               <v-icon
-                  class="title-icon"
-                  :color="aboutElem[i].color"
-                  v-on="on"
-                  @click="changeTab(i)"
+                class="title-icon"
+                :color="aboutElem[i].color"
+                v-on="on"
+                @click="changeTab(i)"
               >
                 {{ aboutElem[i].icon }}
               </v-icon>
@@ -45,18 +45,18 @@
         </div>
       </v-menu>
       <v-tooltip
-          class="ml-5"
-          bottom
-          :color="theme.$accent_ui_color"
-          :disabled="false"
-          :open-delay="false"
+        class="ml-5"
+        bottom
+        :color="theme.$accent_ui_color"
+        :disabled="false"
+        :open-delay="false"
       >
         <template v-slot:activator="{ on }">
           <v-icon
-              class="option"
-              :color="theme.$main_border"
-              v-on="on"
-              @click="switchOP()"
+            class="option"
+            :color="theme.$main_border"
+            v-on="on"
+            @click="switchOP()"
           >
             {{ mdiSettings }}
           </v-icon>
@@ -91,14 +91,16 @@
       :data-rest-from="data"
     />
     <modal-settings
-        :color-from="theme"
-        id-dash-from="reports"
+      :color-from="theme"
+      id-dash-from="reports"
     />
   </div>
 </template>
 
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings } from '@mdi/js';
+import {
+  mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings,
+} from '@mdi/js';
 import settings from '../../js/componentsSettings';
 
 export default {
@@ -118,7 +120,7 @@ export default {
       mdiSettings,
       size: {
         width: 1000,
-        height: 500
+        height: 500,
       },
     };
   },
@@ -127,6 +129,8 @@ export default {
       return this.$store.getters.getTheme;
     },
     elements() {
+      console.log(this.$store.getters.getReportElement)
+      console.log(this.aboutElem)
       this.$store.getters.getReportElement.forEach((item, i) => {
         this.$set(this.aboutElem, item, {});
         if (i === 0) {
@@ -174,11 +178,11 @@ export default {
     },
     switchOP() {
       this.$store.dispatch('openModalSettings', {
-        path: "reports",
+        path: 'reports',
         element: this.activeElem,
         titles: this.data[0] ? Object.keys(this.data[0]) : [],
       });
-    }
+    },
   },
 };
 </script>
