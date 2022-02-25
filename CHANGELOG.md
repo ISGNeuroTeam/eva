@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Multiline. Moved the barplots to the background
+- fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
 
 ## [1.84.0]
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed guntt full screen improvements.
 - fixed searching by bool type
 - fixed fullscreen improvements tune
+- fixed removed all download buttons for components
 
 ## [1.83.1]
 
