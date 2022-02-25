@@ -149,7 +149,7 @@ export default {
       });
 
       if (metric.color === 'range') {
-        if (Number(metric.value)) {
+        if (!Number.isNaN(metric.value)) {
           const val = Number(metric.value);
           if (val >= ranges.red[0] && val <= ranges.red[1]) {
             return '#FF5147';

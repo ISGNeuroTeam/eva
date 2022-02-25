@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Multiline. Moved the barplots to the background
+- fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 
 ## [1.84.0]
 
