@@ -337,7 +337,6 @@ export default {
     },
 
     isAllMetricsExpanded() {
-      console.log('this.settings', this.settings);
       const { metricOptions = [] } = this.settings;
       return metricOptions.every((m) => m.expanded === true);
     },
