@@ -320,7 +320,7 @@ export default {
      * Data fornat: { <metricsNumber>: <availableTemplatesNumber> }.
      */
     templatesForMetrics: {
-      2: 2, 3: 6, 4: 7, 5: 5, 6: 2,
+      2: 2, 3: 6, 4: 7, 5: 4, 6: 2,
     },
   }),
   computed: {
