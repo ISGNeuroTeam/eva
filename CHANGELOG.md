@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealese]
+
+### Added
+- added the ability to update tokens when executing a go event
+
+### Fixed
+- Multiline. Moved the barplots to the background
+- fixed single value metadata and ranges if the boundaries coincide - incorrect processing
+- SingleValue Color setting for indicators via the Ranges button
+- fixed piechart color rgb
+- fixed gis settings styles
+- fixed calendar in data source
+- fixed styles theme
+
 ## [1.84.0]
 
 ### Added
@@ -17,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed guntt full screen improvements.
 - fixed searching by bool type
 - fixed fullscreen improvements tune
-- fixed styles theme
+- fixed removed all download buttons for components
 
 ## [1.83.1]
 

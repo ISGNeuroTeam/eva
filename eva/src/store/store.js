@@ -879,10 +879,40 @@ export default {
         });
       });
 
+      if (item.updateTokens) {
+        const fromElementNames = {};
+        const tokenNames = Object.assign([], item.updateTokens);
+        tockens
+          .filter(token => tokenNames.includes(token.name))
+          .forEach(token => {
+            values[token.name] = token.value;
+            fromElementNames[token.elem] = token.elem;
+          });
+
+        tockensTarget
+          .filter(token => tokenNames.includes(token.name))
+          .forEach(token => {
+            // copy token value
+            token.value = values[token.name];
+
+            // copy component value
+            if (fromElementNames[token.elem] && state[id][token.elem]) {
+              const fromElem = state[event.idDash][fromElementNames[token.elem]];
+              const toElem = state[id][token.elem];
+              if (token.elem.indexOf('picker') === 0) {
+                toElem.date = fromElem.date;
+              } else if (token.elem.indexOf('select') === 0) {
+                toElem.selected = fromElem.selected;
+              }
+            }
+          });
+      }
+
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
-      let lastEl;
+      const lastEl = state[id]?.tabList
+        .find((el) => el.id.toString() === event.event.tab);
       // const isGoToTabExsits = state[id]?.tabList.find((el) => {
       //   lastEl = el;
       //   return el.id == event.event.tab;
@@ -890,12 +920,20 @@ export default {
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}/1`);
-        } else if (!event.event.tab) event.route.push(`/dashboards/${id}/${currentTab || ''}`);
-        else event.route.push(`/dashboards/${id}/${lastEl.id}`);
-      } else if (!isTabMode) {
-        window.open(`/dashboards/${id}/1`);
-      } else if (!event.event.tab) window.open(`/dashboards/${id}/${currentTab || ''}`);
-      else window.open(`/dashboards/${id}/${lastEl.id}`);
+        } else {
+          if (!event.event.tab || !lastEl)
+            event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+          else event.route.push(`/dashboards/${id}/${lastEl.id}`);
+        }
+      } else {
+        if (!isTabMode) {
+          window.open(`/dashboards/${id}/1`);
+        } else {
+          if (!event.event.tab || !lastEl)
+            window.open(`/dashboards/${id}/${currentTab || ''}`);
+          else window.open(`/dashboards/${id}/${lastEl.id}`);
+        }
+      }
       const { searches } = state[id];
 
       let response = {};
