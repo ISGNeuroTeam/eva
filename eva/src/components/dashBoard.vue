@@ -13,7 +13,7 @@
       }"
     >
       <v-card-title
-        v-show="element.split('-')[0] !== 'singleValue'
+        v-show="element.split('-')[0] === 'singleValue'
           ? settings.showTitle
           : props.disappear"
         class="card-title open_title"
@@ -33,7 +33,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="searchData.length > 0"
+                v-show="searchingData"
                 class="icon"
                 :color="theme.$main_border"
                 @click="exportDataCSV"
@@ -273,12 +273,6 @@
                 </v-card>
               </div>
             </v-dialog>
-          </div>
-          <div
-            v-show="dataMode"
-            class="settings-dash"
-            :class="{ settings_move: props.open_gear }"
-          >
             <v-tooltip
               v-if="isMultiline"
               bottom
@@ -297,6 +291,12 @@
               </template>
               <span>Сбросить зум</span>
             </v-tooltip>
+          </div>
+          <div
+            v-show="dataMode"
+            class="settings-dash"
+            :class="{ settings_move: props.open_gear }"
+          >
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
@@ -694,6 +694,9 @@ export default {
 
       return options.change;
     },
+    searchingData() {
+      return this.searchData.length > 0;
+    },
   },
   watch: {
     fullScreenMode(to) {
@@ -878,11 +881,11 @@ export default {
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
-    setVissible(event) {
-      if (event.split('-')[0] === 'picker' || event.split('-')[0] === 'guntt') {
+    setVissible({ element, overflow }) {
+      if (element.split('-')[0] === 'picker' || element.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
-        this.$el.querySelector('.dash-block').style.overflow = 'visible'; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
+        this.$el.querySelector('.dash-block').style.overflow = overflow; // и еще меняем скрытие элемнета,  чтобы раскрывающийся список вылазхил из него
       }
     },
     changeOptions(mode) {

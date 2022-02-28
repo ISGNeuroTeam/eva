@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealese]
+
+### Added
+- added the ability to update tokens when executing a go event
+
+### Fixed
+- Multiline. Moved the barplots to the background
+- fixed single value metadata and ranges if the boundaries coincide - incorrect processing
+- SingleValue Color setting for indicators via the Ranges button
+- fixed piechart color rgb
+- fixed gis settings styles
+
+## [1.84.0]
+
+### Added
+- multiple tokens
+
+### Fixed
+- fixed filters. name and content
+- fixed visible zoom button
+- fixed setting the title breaks the scrolling of the component
+- fixed guntt full screen improvements.
+- fixed searching by bool type
+- fixed fullscreen improvements tune
+- fixed removed all download buttons for components
+
 ## [1.83.1]
 
 ### Fixed
@@ -21,7 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - fixed selecting an object after changing dash setting
-- fixed adding multiple tokens
 - fixed token with an empty name
 - fixed name restriction for tokens
 - Visualization. Time selection. Parts of a component are rendered outside of the component's bounds

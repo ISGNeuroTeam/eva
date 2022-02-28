@@ -1,7 +1,7 @@
 <template>
   <div
     class="single-value-container pa-3"
-    :class="{ 'header-active': dataModeFrom }"
+    :class="{ 'header-active': dataModeFrom, 'is-header-open': !isHeaderOpen }"
   >
     <div class="header">
       <div>
@@ -92,6 +92,7 @@ export default {
     defaultSettings: {},
     isSettingsComponentOpen: false,
     update: 1,
+    isHeaderOpen: true,
   }),
   computed: {
     dataToRender() {
@@ -148,7 +149,7 @@ export default {
       });
 
       if (metric.color === 'range') {
-        if (Number(metric.value)) {
+        if (!Number.isNaN(metric.value)) {
           const val = Number(metric.value);
           if (val >= ranges.red[0] && val <= ranges.red[1]) {
             return '#FF5147';
@@ -192,6 +193,7 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
+      this.isHeaderOpen = !!settings.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
     },

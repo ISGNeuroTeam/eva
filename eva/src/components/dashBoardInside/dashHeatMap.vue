@@ -295,6 +295,7 @@ export default {
         else sort = down;
         return sort;
       }
+      return undefined;
     },
 
     render() {
@@ -302,7 +303,7 @@ export default {
       this.y = new Set();
       this.updateData = 0;
       this.data = {};
-      for (const obj of this.dataRestFrom) {
+      this.dataRestFrom.forEach((obj) => {
         const xField = obj[this.xField];
         const yField = obj[this.yField];
 
@@ -319,7 +320,7 @@ export default {
         this.x.add(xField);
         this.y.add(yField);
         this.updateData += 1;
-      }
+      });
     },
 
     /**

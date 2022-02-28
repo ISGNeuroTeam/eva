@@ -150,6 +150,7 @@ export default {
     widthFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+          this.hiddenTooltip()
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
@@ -201,6 +202,11 @@ export default {
     this.$emit('setVissible', this.id);
   },
   methods: {
+    hiddenTooltip() {
+      let tooltipBlock = this.$refs.tooltip;
+      tooltipBlock.style.opacity = '0';
+      tooltipBlock.style.visibility = 'hidden';
+    },
     dataRestFromWatch() {
       this.$nextTick(() => {
         if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
@@ -249,8 +255,9 @@ export default {
         sizeChart.height = this.heightFrom;
 
         this.actions[0].capture = Object.keys(dataRest[0]);
+
         if (
-          this.$store.state.store[this.idDash][this.idFrom].actions.length
+          this.$store.state[this.idDash][this.idFrom].actions.length
           !== this.actions.length
         ) {
           this.$store.commit('setActions', {
@@ -463,7 +470,8 @@ export default {
 
       // Tooltip
 
-      const tooltipBlock = this.$refs.tooltip;
+      let tooltipBlock = this.$refs.tooltip;
+      const tooltipMargin =  this.$attrs['is-full-screen'] ? 170 : 30;
 
       lines
         .on('mouseover', (event) => {
@@ -476,15 +484,14 @@ export default {
               tooltip += `<p class="row-toolrip"><span>${key}</span>: ${event[key]}</p>`;
             });
           }
-
-          moveTooltip(event);
+          moveTooltip(tooltipMargin);
 
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', (event) => {
-          moveTooltip(event);
+        .on('mousemove', () => {
+          moveTooltip(tooltipMargin);
         })
         .on('mouseout', () => {
           tooltipBlock.style.opacity = '0';
@@ -529,8 +536,8 @@ export default {
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
         })
-        .on('mousemove', (event) => {
-          moveTooltip(event);
+        .on('mousemove', () => {
+          moveTooltip(tooltipMargin);
         })
         .on('mouseout', () => {
           tooltipBlock.style.opacity = '0';
@@ -613,9 +620,9 @@ export default {
 
       // легенда
 
-      function moveTooltip() {
+      function moveTooltip(offsetX) {
         const x = d3.event.offsetY - 50;
-        const y = d3.event.offsetX + 30;
+        const y = d3.event.offsetX + offsetX;
         tooltipBlock.style.top = `${x}px`;
         tooltipBlock.style.left = `${y}px`;
       }

@@ -175,7 +175,7 @@ export default {
     },
     elemRawName() {
       if (this.filterPart.token) {
-        return this.$store.state.store[this.idDash][this.filterPart.token.elem]
+        return this.$store.state[this.idDash][this.filterPart.token.elem]
           .name_elem;
       }
 
@@ -198,7 +198,7 @@ export default {
     },
     filterPartValues() {
       if (this.filterPart.token) {
-        return this.$store.state.store[this.idDash].filters[this.filterIndex]
+        return this.$store.state[this.idDash].filters[this.filterIndex]
           .parts[this.filterPartIndex].values;
       }
       return [];

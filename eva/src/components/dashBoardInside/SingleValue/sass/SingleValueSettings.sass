@@ -270,6 +270,9 @@ $metric-header-height: 40px
           user-select: none
           @include text-truncated()
 
+          &.disabled
+            opacity: 0.5
+            cursor: auto
           &.selected
             color: $accent_ui_color
             border: 1px solid $accent_ui_color
