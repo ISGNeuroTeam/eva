@@ -265,6 +265,9 @@ export default {
       const metricOptions = metrics ? [...metrics] : [];
 
       const render = () => {
+        // скрываем посказки при зуме
+        this.hideGraphTooltip();
+
         this.renderSVG(
           lastDot,
           isDataAlwaysShow,
@@ -2260,6 +2263,12 @@ export default {
         .on('mouseleave', () => {
           tooltip.style('opacity', 0).style('visibility', 'hidden');
         });
+    },
+
+    hideGraphTooltip() {
+      const { svgContainer } = this.$refs;
+      const tooltip = d3.select(svgContainer).select('.graph-tooltip');
+      tooltip.style('opacity', 0).style('visibility', 'hidden');
     },
   },
 };
