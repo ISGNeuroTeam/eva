@@ -89,7 +89,7 @@
                 background: theme.$main_bg,
                 color: theme.$main_text,
               }"
-              :color="theme.$primary_button"
+              :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
             >

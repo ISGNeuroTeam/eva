@@ -652,7 +652,7 @@
                 v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.colors"
                 :disabled="!colorsPie.nametheme"
-                placeholder="red,#5F27FF,rgb(95, 39, 255)"
+                placeholder="red #5F27FF rgb(95,39,255)"
                 label="Набор цветов"
                 :color="theme.$primary_button"
                 :style="{
@@ -665,6 +665,26 @@
                 :class="{ disabled: !colorsPie.nametheme }"
                 hide-details
               />
+              <v-tooltip
+                v-if="!defaultThemes.includes(colorsPie.theme)"
+                bottom
+                z-index="9000"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-icon
+                    class="modal-settings__icon"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    v-on="on"
+                  >
+                    ?
+                  </v-icon>
+                </template>
+                <span>Эталон: red #5F27FF rgb(95,39,255)</span>
+              </v-tooltip>
               <v-btn
                 v-if="
                   !defaultThemes.includes(colorsPie.theme) &&
@@ -1188,7 +1208,8 @@ export default {
         if (this.colorsPie.nametheme) {
           this.options.colorsPie = this.colorsPie;
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',');
+            this.themes[this.colorsPie.nametheme] =
+              this.colorsPie.colors.split(' ');
             if (
               this.colorsPie.theme !== 'custom'
               && this.colorsPie.theme !== this.colorsPie.nametheme
@@ -1440,4 +1461,13 @@ export default {
 
 <style lang="scss">
 @import '../sass/modalSettings.sass';
+.modal-settings__icon {
+  font-style: normal;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 50%;
+  font-size: 20px !important;
+  cursor: pointer;
+  margin-right: 20px;
+}
 </style>
