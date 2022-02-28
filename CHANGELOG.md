@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SingleValue Color setting for indicators via the Ranges button
 - fixed piechart color rgb
 - fixed gis settings styles
+- fixed calendar in data source
 
 ## [1.84.0]
 
@@ -35,7 +36,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - release name
-- fixed calendar in data source
 
 ## [1.83.0]
 
