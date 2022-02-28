@@ -501,7 +501,8 @@ export default {
         [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
         this.updateToken(this.map.getZoom());
       });
-      // TODO: Не совсем понятно нужно ли это
+      // TODO: Пока просили приостановить работу с ГИС.
+      // Возможно пригодится для масштабирования иконок в зависимости от зума
       // this.map.on('zoomend', () => {
       //   const layers = document.getElementsByClassName('leaflet-marker-icon');
       //   for (const x of layers) {
