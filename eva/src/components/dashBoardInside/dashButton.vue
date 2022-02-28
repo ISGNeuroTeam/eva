@@ -86,15 +86,52 @@ export default {
       }
       return 0;
     },
-    fontSize() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
-      if (options.fontSize) {
-        return options.fontSize.split('px')[0];
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
       }
-      return '30';
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
+    fontSize() {
+      const { fontSize } = this.getOptions;
+      return fontSize ? fontSize.split('px')[0] : '30';
     },
     underlineWidth() {
       let width = 30;
@@ -108,10 +145,7 @@ export default {
       return width;
     },
     updatedOptions() {
-      return this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      return this.getOptions;
     },
   },
   watch: {
@@ -134,10 +168,7 @@ export default {
   },
   methods: {
     updateOptionsData() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const options = this.getOptions;
       if (options.color) {
         this.optionsData.colorText = options.color;
       } else {
@@ -161,21 +192,21 @@ export default {
     },
     actionOpen(targetLink, header, widthPersent, heightPersent) {
       // размер нового окна
-      const _width = screen.width * widthPersent;
-      const _height = screen.height * heightPersent;
+      const width = window.screen.width * widthPersent;
+      const height = window.screen.height * heightPersent;
 
       // устанавливаем положение нового окна.
-      const _left = (screen.width - screen.width * widthPersent) / 2;
-      const _top = (screen.height - screen.height * heightPersent) / 3;
+      const left = (window.screen.width - window.screen.width * widthPersent) / 2;
+      const top = (window.screen.height - window.screen.height * heightPersent) / 3;
 
       // адрес перехода
-      const _link = `${window.location.origin}/dashboards/${targetLink}${
+      const link = `${window.location.origin}/dashboards/${targetLink}${
         header === 'false' || header === '0' ? '?header=false' : ''
       }`;
       window.open(
-        _link,
+        link,
         '',
-        `width=${_width}, height=${_height}, top=${_top}, left=${_left}`,
+        `width=${width}, height=${height}, top=${top}, left=${left}`,
       );
     },
     createReport(item, type) {
@@ -186,8 +217,32 @@ export default {
         this.getData(sid, '', type);
       });
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setClick() {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
       let value = false;
 
@@ -212,6 +267,8 @@ export default {
             case false:
               value = true;
               break;
+            default:
+              break;
           }
 
           this.$store.commit('setTocken', {
@@ -223,10 +280,8 @@ export default {
         }
       });
 
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onclick',
-        element: this.id,
         partelement: 'empty',
       });
       if (events.length !== 0) {
@@ -281,7 +336,7 @@ export default {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('data', JSON.stringify(data));
-      const result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.dispatch('getPaper', formData);
       try {
         if (result.status === 'success') {
           this.$emit('setLoading', false);
@@ -290,8 +345,10 @@ export default {
           return false;
         }
       } catch (error) {
+
         // this.message(`Ошибка: ${error}`);
       }
+      return false;
     },
     getSearch(search, sid) {
       let csvContent = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла

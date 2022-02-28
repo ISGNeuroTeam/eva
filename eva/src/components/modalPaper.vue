@@ -113,7 +113,7 @@ export default {
       this.$emit('cancelModal');
     },
     async startPaper() {
-      if (this.selectedFile == '') {
+      if (this.selectedFile === '') {
         this.message('Выберит файл');
       } else {
         this.getPaper();
@@ -133,9 +133,9 @@ export default {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('data', JSON.stringify(this.data));
-      const result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.dispatch('getPaper', formData);
       try {
-        if (result.status == 'success') {
+        if (result.status === 'success') {
           this.downloadFile(result.file);
           this.loadingShow = false;
           // this.showError = false;
@@ -150,9 +150,9 @@ export default {
       }
     },
     async getAllPapers() {
-      const result = await this.$store.getters.getAllPaper();
+      const result = await this.$store.dispatch('getAllPaper');
       try {
-        if (JSON.parse(result).status == 'success') {
+        if (JSON.parse(result).status === 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
@@ -171,7 +171,7 @@ export default {
       }, 2000);
     },
     changeColor() {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
+      if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
           item.style.background = this.color.back;
@@ -192,7 +192,7 @@ export default {
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
 
-        if (event.data.length != 0) {
+        if (event.data.length !== 0) {
           this.data = event.data;
         } else {
           this.errorMsg = 'Получить данные для отчета не удалось.';

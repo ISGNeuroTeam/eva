@@ -959,8 +959,36 @@ export default {
     };
   },
   computed: {
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    // получаем объект с настройками моадлки натсроек
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
     active() {
-      return this.$store.getters.getModalSettings(this.idDash).status;
+      return this.getModalSettings.status;
     },
     idDash() {
       return this.idDashFrom;
@@ -977,7 +1005,7 @@ export default {
       if (!this.element) {
         return [];
       }
-      const elem = this.element.split('-')[0];
+      const [elem] = this.element.split('-');
       return elem ? this.optionsByComponents[elem] || [] : [];
     },
     changeComponent() {
@@ -986,10 +1014,13 @@ export default {
 
     // поля элемента данных
     titles() {
-      return this.$store.getters.getAvailableTableTitles(
-        this.idDash,
-        this.element,
-      );
+      return this.elementFromStore?.availableTableTitles;
+    },
+    elementFromStore() {
+      return this.$store.state[this.idDash][this.element];
+    },
+    getSelectedTableTitles() {
+      return this.elementFromStore?.selectedTableTitles;
     },
   },
   watch: {
@@ -1005,15 +1036,12 @@ export default {
     async active(val) {
       if (val) {
         // если окно должно быть открыто
-        const settings = this.$store.getters.getModalSettings(this.idDash);
-        this.element = settings.element; // получаем для каокго элемнета вывести настройки
+        const localSettings = this.getModalSettings;
+        this.element = localSettings.element; // получаем для каокго элемнета вывести настройки
         this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-        this.metricsName = this.$store.getters.getMetricsMulti({
-          idDash: this.idDash,
-          id: this.element,
-        });
+        this.metricsName = this.getMetricsMulti();
         if (this.element.startsWith('multiLine')) {
-          const opt = await this.$store.dispatch('getSettingsByPath', {
+          const opt = this.$store.dispatch('getSettingsByPath', {
             path: this.idDash,
             element: this.element,
           });
@@ -1056,8 +1084,10 @@ export default {
               && opt.yAxesBinding.metrics
               && opt.yAxesBinding.metricTypes
             ) {
-              this.multilineYAxesBinding.metrics[metric.name] = opt.yAxesBinding.metrics[metric.name];
-              this.multilineYAxesBinding.metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name];
+              this.multilineYAxesBinding
+                .metrics[metric.name] = opt.yAxesBinding.metrics[metric.name];
+              this.multilineYAxesBinding
+                .metricTypes[metric.name] = opt.yAxesBinding.metricTypes[metric.name];
             } else {
               this.multilineYAxesBinding.metrics[metric.name] = 'left';
               this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
@@ -1075,12 +1105,22 @@ export default {
     this.cancelModal();
   },
   mounted() {
-    const settings = this.$store.getters.getModalSettings(this.idDash);
-    this.element = settings.element;
+    const localSettings = this.getModalSettings;
+    this.element = localSettings.element || '';
     this.loadComponentsSettings();
     this.prepareOptions();
   },
   methods: {
+    getMetricsMulti() {
+      if (!this.elementFromStore.metrics) {
+        this.$store.commit('setState', [{
+          object: this.elementFromStore,
+          prop: 'metrics',
+          value: [],
+        }]);
+      }
+      return this.elementFromStore.metrics;
+    },
     loadComponentsSettings() {
       this.optionsByComponents = settings.options;
       this.fieldsForRender = settings.optionFields.map((field) => {
@@ -1119,7 +1159,7 @@ export default {
       };
     },
     // отправляем настройки в хранилище
-    async setOptions() {
+    setOptions() {
       if (!this.options.level) {
         this.options.level = 1;
       }
@@ -1177,7 +1217,7 @@ export default {
         color: this.color,
         updated: Date.now(),
       };
-      await this.$store.dispatch('saveSettingsToPath', {
+      this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
         options,
@@ -1189,7 +1229,11 @@ export default {
     },
     // если нажали на отмену создания
     cancelModal() {
-      this.$store.dispatch('closeModalSettings', { path: this.idDash });
+      this.$store.commit('setModalSettings', {
+        idDash: this.idDash,
+        status: false,
+        id: '',
+      });
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
         this.them = {};
@@ -1258,6 +1302,13 @@ export default {
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
+    getSettingsByPath() {
+      this.$store.commit('prepareSettingsStore', {
+        path: this.idDash,
+        element: this.element,
+      });
+      return this.$store.state[this.idDash][this.element]?.options || {};
+    },
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
@@ -1270,10 +1321,7 @@ export default {
     },
     //  понимает какие опции нужно вывести
     async prepareOptions() {
-      const options = await this.$store.dispatch('getSettingsByPath', {
-        path: this.idDash,
-        element: this.element,
-      });
+      const options = this.getSettingsByPath();
 
       if (options.color) {
         this.color = options.color;
@@ -1330,20 +1378,14 @@ export default {
             let val = options[item];
             if (!val) {
               // old settings
-              const oldVal = this.$store.getters.getSelectedTableTitles(
-                this.idDash,
-                this.element,
-              );
+              const oldVal = this.getSelectedTableTitles;
               if (oldVal) {
                 val = oldVal;
               }
             }
             // если не выбраны заголовки то выделить все имеющиеся
             if (val.length === 0) {
-              const allTitles = this.$store.getters.getAvailableTableTitles(
-                this.idDash,
-                this.element,
-              );
+              const allTitles = this.titles;
               if (allTitles.length) {
                 val = [...allTitles];
               }
@@ -1365,7 +1407,7 @@ export default {
             this.$set(this.options, item, 'right');
           } else {
             const field = settings.optionFields.find(
-              (field) => field.option === item,
+              (optionField) => optionField.option === item,
             );
             if (field && field.default !== undefined) {
               this.$set(this.options, item, field.default);

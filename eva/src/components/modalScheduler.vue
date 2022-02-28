@@ -200,7 +200,7 @@ export default {
     active() {
       // получаем статус открытия или нет окна модального
       if (this.modalFrom) {
-        if (this.schedulers.length != 0) {
+        if (this.schedulers.length !== 0) {
           this.setData();
         }
       }
@@ -209,11 +209,27 @@ export default {
     sid() {
       return this.dataSidFrom;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    getSchedulers() {
+      if (!this.dashFromStore.schedulers) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'schedulers',
+          value: {},
+        }]);
+      }
+      return this.dashFromStore.schedulers;
+    },
     schedulers() {
-      return this.$store.getters.getSchedulers(this.idDash);
+      return this.getSchedulers;
+    },
+    getSearches() {
+      return this.$store.state[this.idDash]?.searches || [];
     },
     searches() {
-      return this.$store.getters.getSearches(this.idDash);
+      return this.getSearches;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -222,7 +238,7 @@ export default {
   mounted() {
     // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
     const { schedulers } = this;
-    const searches = this.$store.getters.getSearches(this.idDash);
+    const searches = this.getSearches;
     let shedule = {};
     let curTime = {};
 
@@ -290,29 +306,29 @@ export default {
       this.$emit('cancel');
     },
     checkEsc(event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancel();
       }
     },
     setTime(time, tense) {
       // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
-        if (tense == 'every') {
+        if (tense === 'every') {
           this.time = time;
           Object.keys(this.color).forEach((item) => {
             this.color[item] = '$accent_ui_color';
           });
-          if (this.color[time] == '$accent_ui_color') {
+          if (this.color[time] === '$accent_ui_color') {
             this.color[time] = '$primary_button';
           } else {
             this.color[time] = '$accent_ui_color';
           }
-        } else if (tense == 'last') {
+        } else if (tense === 'last') {
           this.timeLast = time;
           Object.keys(this.colorLast).forEach((item) => {
             this.colorLast[item] = '$accent_ui_color';
           });
-          if (this.colorLast[time] == '$accent_ui_color') {
+          if (this.colorLast[time] === '$accent_ui_color') {
             this.colorLast[time] = '$primary_button';
           } else {
             this.colorLast[time] = '$accent_ui_color';
@@ -370,7 +386,7 @@ export default {
       };
       const { sid } = this;
 
-      const searches = this.$store.getters.getSearches(this.idDash);
+      const searches = this.getSearches;
       const curTime = this.countTime(schedule.time, schedule.every) * 1000;
       this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
       const intervalID = (this.timers[sid] = setInterval(() => {

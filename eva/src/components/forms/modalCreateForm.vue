@@ -122,7 +122,6 @@ export default {
         // this.$router.push({path:`/forms/create`, props: { options: 'hello'} });
         this.$store.commit('form/setCreateForm', this.options);
         this.$router.push('/forms/open?editable=true');
-        // console.log(this.options);
       }
     },
     disapear() {

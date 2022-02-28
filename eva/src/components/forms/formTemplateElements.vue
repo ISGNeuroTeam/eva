@@ -198,43 +198,8 @@ export default {
       }
     },
     checkRadio() {
-      // this.value == true ? this.value = false : this.value = true;
-      // if (this.value && this.radioname != this.idFrom){
       this.$emit('checkSwitch', { id: this.idFrom, name: this.radioname });
-      // } else {
-      //     this.setValue();
-      // }
     },
-    //  toolTipShow: function() {
-
-    //     let tooltip = null;
-    //     let elem = this.$refs.elementBlock.querySelector('.element-block-not-editable');
-
-    //     if (elem.parentElement.classList.contains('toobig')){
-    //          // console.log(event.target.getBoundingClientRect().left);
-    //          // console.log(event.clientX-30);
-    //          // this.tooltip.style=`left: ${event.target.getBoundingClientRect().left-30}px; top: ${event.target.getBoundingClientRect().top}px; opacity: 1; visibility: visible;`;
-    // //         //this.$emit('showTooltip',event);
-    // //         console.log(elem);
-    //      console.log('create');
-    //      tooltip = elem.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
-    //      tooltip.classList.add('tooltip'); // даем ему класс
-    //      tooltip.style.opacity="1";
-    //      elem.parentElement.parentElement.parentElement.appendChild(tooltip);  // и его уже добовляем в body
-    //      tooltip.parentElement.parentElement.style['z-index'] = "2";
-    //      this.tooltip = tooltip;
-
-    // //    console.log(tooltip);
-    //     }
-
-    //       if (tooltip != null) {
-    //             tooltip.addEventListener("mouseout", () => {
-    //                 console.log("delete");
-    //                 tooltip.remove();
-    //             });
-    //       }
-
-    // },
   },
 };
 </script>

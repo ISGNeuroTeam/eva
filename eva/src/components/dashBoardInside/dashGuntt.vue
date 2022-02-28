@@ -150,7 +150,7 @@ export default {
     widthFrom() {
       if (this.dataRestFrom.length > 0) {
         if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
-          this.hiddenTooltip()
+          this.hiddenTooltip();
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
@@ -199,11 +199,11 @@ export default {
     if (this.$attrs['is-full-screen']) {
       this.dataRestFromWatch();
     }
-    this.$emit('setVissible', this.id);
+    this.$emit('setVissible', { element: this.id });
   },
   methods: {
     hiddenTooltip() {
-      let tooltipBlock = this.$refs.tooltip;
+      const tooltipBlock = this.$refs.tooltip;
       tooltipBlock.style.opacity = '0';
       tooltipBlock.style.visibility = 'hidden';
     },
@@ -276,7 +276,7 @@ export default {
     },
     createChart(sizeChart, that, dataRest) {
       let otstupBot = 30;
-      if (screen.width <= 1600) {
+      if (window.screen.width <= 1600) {
         otstupBot = 10;
       }
 
@@ -288,7 +288,7 @@ export default {
       let otstupLeft = 70;
       const otstupRight = 80;
 
-      if (screen.width > 1920) {
+      if (window.screen.width > 1920) {
         otstupLeft = 90;
       }
 
@@ -364,7 +364,7 @@ export default {
 
       let otstupBottom = 50;
 
-      if (screen.width > 1920) {
+      if (window.screen.width > 1920) {
         otstupBottom = 60;
       }
 
@@ -372,7 +372,7 @@ export default {
 
       let otstupX = 0;
 
-      if (screen.width < 1400) {
+      if (window.screen.width < 1400) {
         otstupX = -10;
       }
 
@@ -411,7 +411,7 @@ export default {
 
       let otstupY = 10;
 
-      if (screen.width > 1920) {
+      if (window.screen.width > 1920) {
         otstupY = 15;
       }
 
@@ -470,8 +470,8 @@ export default {
 
       // Tooltip
 
-      let tooltipBlock = this.$refs.tooltip;
-      const tooltipMargin =  this.$attrs['is-full-screen'] ? 170 : 30;
+      const tooltipBlock = this.$refs.tooltip;
+      const tooltipMargin = this.$attrs['is-full-screen'] ? 170 : 30;
 
       lines
         .on('mouseover', (event) => {

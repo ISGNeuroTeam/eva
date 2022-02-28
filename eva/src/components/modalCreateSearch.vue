@@ -251,6 +251,9 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    getSearches() {
+      return this.$store.state[this.idDash]?.searches || [];
+    },
   },
   watch: {
     dataSearchFrom() {
@@ -292,22 +295,24 @@ export default {
       if (this.search.sid && this.search.sid !== '') {
         if (
           typeof this.search.parametrs.tws === 'string'
-          && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
+          && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000, 10)
         ) {
           this.search.parametrs.tws = parseInt(
             new Date(this.search.parametrs.tws).getTime() / 1000,
+            10,
           );
         }
         if (
           typeof this.search.parametrs.twf === 'string'
-          && parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
+          && parseInt(new Date(this.search.parametrs.twf).getTime() / 1000, 10)
         ) {
           this.search.parametrs.twf = parseInt(
             new Date(this.search.parametrs.twf).getTime() / 1000,
+            10,
           );
         }
 
-        const searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
+        const searches = this.getSearches; // получаем все ИС
         let j = -1;
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
