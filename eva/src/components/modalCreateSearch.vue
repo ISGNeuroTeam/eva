@@ -321,7 +321,7 @@ export default {
 
         if (j !== -1) {
           // если такой ИС уже есть вызовем сообщение с уточнением
-          if (this.cancelBtn === 'Отмена') {
+          if (this.cancelBtn === 'Отмена' && this.currentSid === this.search.sid) {
             this.errorMsg = 'Такой источник данных существует. Хотите заменить его?';
             this.createBtn = 'Да';
             this.cancelBtn = 'Нет';
