@@ -33,7 +33,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="searchData.length > 0"
+                v-show="searchingData"
                 class="icon"
                 :color="theme.$main_border"
                 @click="exportDataCSV"
@@ -297,7 +297,6 @@
             class="settings-dash"
             :class="{ settings_move: props.open_gear }"
           >
-
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
@@ -695,6 +694,9 @@ export default {
 
       return options.change;
     },
+    searchingData() {
+      return this.searchData.length > 0;
+    },
   },
   watch: {
     fullScreenMode(to) {
@@ -879,7 +881,7 @@ export default {
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
-    setVissible({element, overflow}) {
+    setVissible({ element, overflow }) {
       if (element.split('-')[0] === 'picker' || element.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
