@@ -1306,7 +1306,7 @@ export default {
                 .data(dotDate)
                 .enter()
                 .append('circle')
-                .attr('class', `dot dot-${metricIndex}`)
+                .attr('class', `dot dot-${metricIndex} ${this.isFullScreen ? 'full' : ''}`)
                 .attr('cx', (d) => (this.isTime
                   ? x(d[xMetric] * this.secondTransf)
                   : x(d[xMetric])))
@@ -1419,6 +1419,10 @@ export default {
                   const cx = d3.select(this).attr('cx');
                   const cy = d3.select(this).attr('cy');
 
+                  const classDot = d3.select(this).attr('class')
+                    .split(' ')
+                    .find((item) => item === 'full');
+
                   const [mouseX, mouseY] = d3.mouse(this);
                   const diffX = Math.ceil(mouseX) - d3.event.offsetX;
                   const diffY = Math.ceil(mouseY) - d3.event.offsetY;
@@ -1429,7 +1433,9 @@ export default {
                   let left = cx - diffX + 20;
                   let top = cy - diffY - tooltipHalfHeight;
 
-                  if (left + tooltipWidth > width - diffX) {
+                  if (classDot) {
+                    left = left - tooltipWidth - 25 + 100;
+                  } else {
                     left = left - tooltipWidth - 25;
                   }
 
