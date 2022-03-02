@@ -115,11 +115,11 @@ export default {
         { text: 'Колонка (1 день)', value: 'day' },
         { text: 'Колонка (1 месяц)', value: 'month' },
       ],
-      mdiRefresh: mdiRefresh,
-      mdiMagnify: mdiMagnify,
-      mdiChevronDown: mdiChevronDown,
-      mdiPlus: mdiPlus,
-      mdiMinus: mdiMinus,
+      mdiRefresh,
+      mdiMagnify,
+      mdiChevronDown,
+      mdiPlus,
+      mdiMinus,
     };
   },
   computed: {
@@ -139,7 +139,7 @@ export default {
         }
       });
       let barTime = minTime;
-      let dataset = {};
+      const dataset = {};
       let newDate;
       let datasetItemString;
       let deltaTime;
@@ -161,12 +161,12 @@ export default {
         newDate = new Date(barTime * 1000);
 
         if (this.select.value === 'month') {
-          let newDateMonth = newDate.getMonth();
+          const newDateMonth = newDate.getMonth();
           if (
-            newDateMonth === 3 ||
-            newDateMonth === 5 ||
-            newDateMonth === 8 ||
-            newDateMonth === 10
+            newDateMonth === 3
+            || newDateMonth === 5
+            || newDateMonth === 8
+            || newDateMonth === 10
           ) {
             deltaTime = 2592000;
           }
@@ -196,7 +196,7 @@ export default {
           i < this.numberInTimeline;
           i++
         ) {
-          dataset['100' + i] = 0;
+          dataset[`100${i}`] = 0;
         }
       }
       if (Object.keys(dataset).length > 0) {
@@ -226,40 +226,40 @@ export default {
       return period;
     },
     getUntilMin(date) {
-      let options1 = {
+      const options1 = {
         hour12: 'true',
         hour: 'numeric',
         minute: 'numeric',
       };
-      let options2 = {
+      const options2 = {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
       };
       return (
-        new Intl.DateTimeFormat('ru', options1).format(date) +
-        ' - ' +
-        new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)
+        `${new Intl.DateTimeFormat('ru', options1).format(date)
+        } - ${
+          new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)}`
       );
     },
     getUntilHours(date) {
-      let options1 = {
+      const options1 = {
         hour12: 'true',
         hour: 'numeric',
       };
-      let options2 = {
+      const options2 = {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
       };
       return (
-        new Intl.DateTimeFormat('ru', options1).format(date) +
-        ' - ' +
-        new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)
+        `${new Intl.DateTimeFormat('ru', options1).format(date)
+        } - ${
+          new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)}`
       );
     },
     getUntilDay(date) {
-      let options = {
+      const options = {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
@@ -267,7 +267,7 @@ export default {
       return new Intl.DateTimeFormat('ru', options).format(date).slice(0, -3);
     },
     getUntilMonth(date) {
-      let options = {
+      const options = {
         month: 'long',
         year: 'numeric',
       };
@@ -304,15 +304,17 @@ export default {
       this.numberInTimeline = 25;
     },
     renderSVG(dataset) {
-      let marge = { top: 0, bottom: 0, left: 0, right: 0 };
-      let svg = d3.select('.chart1');
-      let width = this.$refs.chart.clientWidth;
-      let height = this.$refs.chart.clientHeight;
-      let g = svg
+      const marge = {
+        top: 0, bottom: 0, left: 0, right: 0,
+      };
+      const svg = d3.select('.chart1');
+      const width = this.$refs.chart.clientWidth;
+      const height = this.$refs.chart.clientHeight;
+      const g = svg
         .append('g')
-        .attr('transform', 'translate(' + marge.top + ',' + marge.left + ')');
+        .attr('transform', `translate(${marge.top},${marge.left})`);
       let dataForSvg = [];
-      for (let dataItem in dataset) {
+      for (const dataItem in dataset) {
         dataForSvg.push({ time: dataItem, value: dataset[dataItem] });
       }
       dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline);
@@ -323,16 +325,16 @@ export default {
         }
       });
 
-      let xScale = d3
+      const xScale = d3
         .scaleBand()
         .domain(d3.range(dataForSvg.length))
         .rangeRound([0, width - marge.left - marge.right]);
 
-      let yScale = d3
+      const yScale = d3
         .scaleLinear()
         .domain([0, maxY])
         .range([height - marge.top - marge.bottom, 0]);
-      
+
       for (let i = 0; i < 6; i++) {
         g.append('g')
           .append('line')
@@ -343,10 +345,10 @@ export default {
           .attr('y2', ((height - marge.top - marge.bottom) / 5) * i)
           .attr('stroke', this.theme.$secondary_border);
       }
-      let gs = g.selectAll('.rect').data(dataForSvg).enter().append('g');
-      let rectPadding = 10;
+      const gs = g.selectAll('.rect').data(dataForSvg).enter().append('g');
+      const rectPadding = 10;
 
-      let tooltip = d3
+      const tooltip = d3
         .select('body')
         .append('div')
         .attr('class', 'block-tooltip')
@@ -356,30 +358,20 @@ export default {
         .text('Simple text');
 
       gs.append('rect')
-        .attr('x', function (d, i) {
-          return xScale(i) + rectPadding / 2;
-        })
-        .attr('y', function (d) {
-          return yScale(d.value);
-        })
-        .attr('width', function () {
-          return xScale.step() - rectPadding;
-        })
-        .attr('height', function (d) {
-          return height - marge.top - marge.bottom - yScale(d.value);
-        })
+        .attr('x', (d, i) => xScale(i) + rectPadding / 2)
+        .attr('y', (d) => yScale(d.value))
+        .attr('width', () => xScale.step() - rectPadding)
+        .attr('height', (d) => height - marge.top - marge.bottom - yScale(d.value))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
           console.log(d);
-          tooltip.html('Событий (' + d.value + ')' + '<br>' + d.time);
+          tooltip.html(`Событий (${d.value})` + `<br>${d.time}`);
           tooltip.style('display', 'block');
           return tooltip.style('visibility', 'visible');
         })
-        .on('mousemove', function () {
-          return tooltip
-            .style('top', d3.event.pageY - 60 + 'px')
-            .style('left', d3.event.pageX - 10 + 'px');
-        })
+        .on('mousemove', () => tooltip
+          .style('top', `${d3.event.pageY - 60}px`)
+          .style('left', `${d3.event.pageX - 10}px`))
         .on('mouseout', () => tooltip.style('visibility', 'hidden'));
     },
   },

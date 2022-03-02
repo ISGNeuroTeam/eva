@@ -111,41 +111,41 @@ export default {
   },
   computed: {
     // осоновные параметры, которые часто меняются и которые следует отслеживать
-    idForm: function () {
+    idForm() {
       // получаем id формы
       return this.$route.query.id;
     },
-    idTemplate: function () {
+    idTemplate() {
       //  получаем id шаблона
       return this.$route.query.idTemplate;
     },
-    nameForm: function () {
+    nameForm() {
       // получаем имя шаблона
       return this.$route.query.nameForm;
     },
-    editable: function () {
+    editable() {
       // переменная котора ярешает следует ли редактировать форму
       return this.$route.query.editable;
     },
     //  empty: function() {
     //      return this.$route.query.empty
     //  },
-    disabled: function () {
+    disabled() {
       // переменная которая решает активна ли кнопка Сохранить
-      return this.$store.form.getters.getDisabled;
+      return this.$store.getters['form/getDisabled'];
     },
   },
   mounted() {
     this.getForm(); // при загрузке страницы получаем форму для отрисовки из локального хранилища
   },
   methods: {
-    toHome: function () {
+    toHome() {
       // метод переключающий нас на домашнию страницу
-      this.$router.push(`/forms`);
+      this.$router.push('/forms');
     },
-    saveForm: function () {
+    saveForm() {
       // сохраняем форму
-      let content = this.$store.form.getters.getAllContent; // получаем контент формы
+      const content = this.$store.getters['form/getAllContent']; // получаем контент формы
       let form_name = this.grid.filter((item) => {
         // определяем имя формы на основе ключегого поля
         if (item.options) {
@@ -163,31 +163,30 @@ export default {
 
       //    })
       // console.log(this.grid);
-      //   this.$store.form.commit('setTemplate', this.grid);
+      //   this.$store.commit('form/setTemplate', this.grid);
 
-      let form = {
+      const form = {
         // создаем объект формы
         template_id: this.idForm, // id шаблона
-        form_name: form_name, // имя формы
+        form_name, // имя формы
         //  content: newcontent  // контент формы
       };
 
-      this.$store.form.commit('saveForm', form); // сохраняем форму в базу данных
-      this.$store.form.commit('setDisabled', true); // отключаем кнопку Сохранить
+      this.$store.commit('form/saveForm', form); // сохраняем форму в базу данных
+      this.$store.commit('form/setDisabled', true); // отключаем кнопку Сохранить
     },
-    getForm: async function () {
+    async getForm() {
       // получаем данные по форме
 
-      let form = this.$store.form.getters.getFormLocal; // получаем структуру по форме из локального хранилища
-      let content = this.$store.form.getters.getAllContent; // получаем контент по форме из локального хранилища
+      const form = this.$store.getters['form/getFormLocal']; // получаем структуру по форме из локального хранилища
+      const content = this.$store.getters['form/getAllContent']; // получаем контент по форме из локального хранилища
       this.grid = form; // заносим объект в перемненую для отрисовки
-      this.columns = form.reduce(function (last, next) {
+      this.columns = form.reduce((last, next) => {
         // находим максимальное значение среди всех значений х, чтобы понять сколько колонок у нас будет
         if (next.y == 0) {
           return last + next.w;
-        } else {
-          return last;
         }
+        return last;
       }, 0);
 
       for (let i = 0; i < this.grid.length; i++) {
@@ -198,11 +197,11 @@ export default {
         }
       }
     },
-    setValue: function (content) {
+    setValue(content) {
       // когда поменялось значение ячейки
-      this.$store.form.commit('setContent', content); // заносим новое значение в локальное хранилище
+      this.$store.commit('form/setContent', content); // заносим новое значение в локальное хранилище
     },
-    checkSwitch: function (cellElem) {
+    checkSwitch(cellElem) {
       // вызывается когда нажали на radiobtn
       this.radios[cellElem.id] = !this.radios[cellElem.id]; // меняем значение у radiobtn
       this.$refs.form
@@ -215,7 +214,7 @@ export default {
           }
         });
     },
-    openToolTip: function (event) {
+    openToolTip(event) {
       let block = event.target;
       let tooltip = null;
       while (!block.classList.contains('elem-cell')) {
@@ -227,7 +226,7 @@ export default {
           block.querySelector('.tooltip').remove();
           block.parentElement.parentElement.style['z-index'] = '1';
         } else {
-          let elem = block.querySelector('.element-block-not-editable');
+          const elem = block.querySelector('.element-block-not-editable');
           tooltip = elem.cloneNode(true);
           tooltip.classList.add('tooltip');
           tooltip.style.opacity = '1';

@@ -109,7 +109,7 @@ export default {
         id: this.idFrom,
       });
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
     colors() {
@@ -154,7 +154,7 @@ export default {
         custom: [],
       };
     },
-    dataLoading: function () {
+    dataLoading() {
       return this.dataLoadingFrom;
     },
     dashSize() {
@@ -168,9 +168,9 @@ export default {
     },
   },
   watch: {
-    'dashOptions.themes': {
+    'dashOptions.colorsPie': {
       handler() {
-        let graphics = d3
+        const graphics = d3
           .select(this.$refs.piechartItself)
           .selectAll('svg')
           .nodes();
@@ -181,7 +181,7 @@ export default {
           this.createPieChartDash();
         }
       },
-      deep:true,
+      deep: true,
     },
     selectedPieIndex(newVal) {
       if (newVal !== null) this.setToken(newVal);
@@ -201,7 +201,7 @@ export default {
             id: this.idFrom,
           });
 
-          let graphics = d3
+          const graphics = d3
             .select(this.$refs.piechartItself)
             .selectAll('svg')
             .nodes();
@@ -215,18 +215,18 @@ export default {
 
         this.$nextTick(() => {
           if (
-            this.dataRestFrom &&
-            Object.keys(this.dataRestFrom).length &&
-            this.dashSize
+            this.dataRestFrom
+            && Object.keys(this.dataRestFrom).length
+            && this.dashSize
           ) {
-            let graphics = d3
+            const graphics = d3
               .select(this.$refs.piechartItself)
               .selectAll('svg')
               .nodes();
 
             if (graphics.length !== 0) {
               graphics[0].remove();
-              //если строим заново(изменились данные) - очищаем токены
+              // если строим заново(изменились данные) - очищаем токены
               this.createPieChartDash();
             } else {
               this.createPieChartDash();
@@ -244,10 +244,9 @@ export default {
           const node = nodes[i];
           if (i === legendLineIndex) node.classList.add('piepartSelect');
           else if (
-            node.classList.contains('piepartSelect') &&
-            this.selectedPieIndex !== i
-          )
-            node.classList.remove('piepartSelect');
+            node.classList.contains('piepartSelect')
+            && this.selectedPieIndex !== i
+          ) node.classList.remove('piepartSelect');
         });
 
       d3.select(this.$refs.legends)
@@ -256,8 +255,7 @@ export default {
           const node = nodes[i];
           if (legendLineIndex === i) {
             node.classList.add('legend-line_hover');
-          } else if (node.classList.contains('legend-line_hover'))
-            node.classList.remove('legend-line_hover');
+          } else if (node.classList.contains('legend-line_hover')) node.classList.remove('legend-line_hover');
         });
     },
     setMetrics() {
@@ -272,25 +270,25 @@ export default {
         id: this.idFrom,
       });
     },
-    createPieChartDash: function () {
+    createPieChartDash() {
       if (this.dataRestFrom.error) {
         // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
       }
 
-      let showlegend = this.dashOptions.showlegend;
+      let { showlegend } = this.dashOptions;
 
       if (showlegend === undefined) {
         showlegend = true;
       }
 
-      let positionlegend = this.dashOptions.positionlegend;
+      let { positionlegend } = this.dashOptions;
 
       if (positionlegend === undefined) {
         positionlegend = 'right';
       }
 
-      let colorsPie = this.dashOptions.colorsPie;
+      let { colorsPie } = this.dashOptions;
 
       // SETTING DEFAULT COLORS
       if (colorsPie === undefined) {
@@ -301,17 +299,16 @@ export default {
         };
       }
 
-      let metrics = this.dashOptions.metricsRelation.relations;
+      const metrics = this.dashOptions.metricsRelation.relations;
 
-      if (typeof this.dataRestFrom[0][metrics[1]] == 'number') {
+      if (typeof this.dataRestFrom[0][metrics[1]] === 'number') {
         // если все-таки число
         this.nodata = false; // то убираем соощение о отсутствии данных
         if (this.dataRestFrom.length > 20) {
           // если элемнетов больше 20
           this.nodata = true; // показываем сообщение о некорректности данных
           this.legends = [];
-          this.message =
-            'К сожалению данных слишком много для построения диаграммы'; // выводим сообщение
+          this.message = 'К сожалению данных слишком много для построения диаграммы'; // выводим сообщение
           d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
         } else {
           this.createLegend(this.dataRestFrom, metrics, showlegend, colorsPie);
@@ -324,10 +321,10 @@ export default {
                 if (this.$refs.legends.getBoundingClientRect().width !== 0) {
                   legendSize = {
                     width: Math.round(
-                      this.$refs.legends.getBoundingClientRect().width
+                      this.$refs.legends.getBoundingClientRect().width,
                     ),
                     height: Math.round(
-                      this.$refs.legends.getBoundingClientRect().height
+                      this.$refs.legends.getBoundingClientRect().height,
                     ),
                   };
                   this.createPieChart(
@@ -336,14 +333,14 @@ export default {
                     metrics,
                     legendSize,
                     positionlegend,
-                    colorsPie
+                    colorsPie,
                   ); // и собственно создаем график
                   clearTimeout(timeOut);
                 } else {
                   timeOut = setTimeout(tick.bind(this), 100);
                 }
               }.bind(this),
-              0
+              0,
             );
           } else {
             legendSize = { width: 0, height: 0 };
@@ -353,7 +350,7 @@ export default {
               metrics,
               legendSize,
               positionlegend,
-              colorsPie
+              colorsPie,
             ); // и собственно создаем график
           }
         }
@@ -366,7 +363,7 @@ export default {
       }
     },
 
-    createLegend: function (data, metrics, showlegend, colorsPie) {
+    createLegend(data, metrics, showlegend, colorsPie) {
       this.legends = [];
       if (showlegend) {
         const colors = this.dashOptions.themes[colorsPie.theme];
@@ -384,23 +381,23 @@ export default {
       metrics,
       legendSize,
       positionlegend,
-      colorsPie
+      colorsPie,
     ) {
       // создает диаграмму
       d3.select(this.$refs.piechartItself).selectAll('svg').remove();
       const MARGIN = 40; // отступ от контейнера
-      let width = sizeLine['width'] - MARGIN; // отступ по бокам
-      let height = sizeLine['height'] - 35; // минус шапка
+      let width = sizeLine.width - MARGIN; // отступ по бокам
+      let height = sizeLine.height - 35; // минус шапка
 
       switch (positionlegend) {
         case 'right':
           this.positionLegends = 'row nowrap';
-          width = width - legendSize.width;
+          width -= legendSize.width;
           break;
 
         case 'left':
           this.positionLegends = 'row-reverse nowrap';
-          width = width - legendSize.width;
+          width -= legendSize.width;
           break;
 
         case 'top':
@@ -414,32 +411,32 @@ export default {
           break;
       }
 
-      let radius = Math.min(width, height) / 2 - MARGIN; // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+      const radius = Math.min(width, height) / 2 - MARGIN; // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
 
-      let svg = d3
+      const svg = d3
         .select(this.$refs.piechartItself) // добовляем svg объект в нужный div
         .append('svg')
         .attr('width', width)
         .attr('height', height)
         .append('g')
-        .attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+        .attr('transform', `translate(${width / 2},${height / 2})`);
 
-      let data = {};
+      const data = {};
 
-      let selectedDefault = [];
+      const selectedDefault = [];
 
       dataFrom.forEach((item) => {
         data[item[metrics[0]]] = item[metrics[1]];
         selectedDefault.push(item[metrics[2]]);
       });
 
-      let color = d3
+      const color = d3
         .scaleOrdinal() // устанавливаем цветовую схему для pie chart
         .domain(data)
         .range(this.dashOptions.themes[colorsPie.theme]);
 
-      let pie = d3.pie().value((d) => d.value);
-      let data_ready = pie(d3.entries(data));
+      const pie = d3.pie().value((d) => d.value);
+      const data_ready = pie(d3.entries(data));
 
       const tooltipEl = this.$refs.chartTooltip;
       const tooltipOffset = { x: 30, y: 5 };
@@ -453,28 +450,24 @@ export default {
         .append('path')
         .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
         .attr('class', 'piepart')
-        .attr('fill', (d) => {
-          return color(d.data.key);
-        })
+        .attr('fill', (d) => color(d.data.key))
         .attr('stroke', this.theme.$main_bg)
         .style('stroke-width', '2px')
         .on('mouseover', (d, i, nodes) => {
           const node = nodes[i];
-          if (!node.classList.contains('piepartSelect'))
-            nodes[i].classList.add('piepartSelect');
+          if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
           tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
           tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
           tooltipEl.style.visibility = 'visible';
           hoverLegendLine(i);
         })
-        .on('mousemove', function () {
+        .on('mousemove', () => {
           tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
           tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
         })
         .on('mouseout', (_, i, nodes) => {
-          if (i !== this.selectedPieIndex)
-            nodes[i].classList.remove('piepartSelect');
+          if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
           hoverLegendLine(null);
         })
@@ -490,7 +483,7 @@ export default {
         });
     },
     setToken(pieIndex) {
-      let tokens = this.$store.getters.getTockens(this.idDashFrom);
+      const tokens = this.$store.getters.getTockens(this.idDashFrom);
 
       tokens.forEach((tocken) => {
         if (tocken.elem === this.idFrom) {

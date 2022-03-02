@@ -89,7 +89,7 @@
                 background: theme.$main_bg,
                 color: theme.$main_text,
               }"
-              :color="theme.$primary_button"
+              :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
             >
@@ -234,21 +234,21 @@ export default {
     };
   },
   computed: {
-    active: function () {
+    active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.setData()
+        this.setData();
       }
       return this.modalFrom;
     },
-    dataSearch: function () {
+    dataSearch() {
       return this.dataSearchFrom;
     },
-    idDash: function () {
+    idDash() {
       // получаем id страницы переданного от родителя
       return this.idDashFrom;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
@@ -256,10 +256,10 @@ export default {
     dataSearchFrom() {
       this.currentSid = this.dataSearchFrom?.sid;
     },
-    tws: function () {
+    tws() {
       this.search.parametrs.tws = this.tws;
     },
-    twf: function () {
+    twf() {
       this.search.parametrs.twf = this.twf;
     },
   },
@@ -267,7 +267,7 @@ export default {
     this.currentSid = this.dataSearchFrom?.sid;
   },
   methods: {
-    setData () {
+    setData() {
       this.search = this.dataSearch;
       if (this.createBtnFrom === 'edit') {
         this.createBtn = 'Редактировать';
@@ -275,7 +275,7 @@ export default {
         this.createBtn = 'Создать';
       }
     },
-    cancelModal: function () {
+    cancelModal() {
       if (this.cancelBtn === 'Отмена') {
         this.$emit('cancelModal');
       } else {
@@ -288,26 +288,26 @@ export default {
         this.errorMsgShow = false;
       }
     },
-    addSearch: function () {
+    addSearch() {
       if (this.search.sid && this.search.sid !== '') {
         if (
-          typeof this.search.parametrs.tws == 'string' &&
-          parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
+          typeof this.search.parametrs.tws === 'string'
+          && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
         ) {
           this.search.parametrs.tws = parseInt(
-            new Date(this.search.parametrs.tws).getTime() / 1000
+            new Date(this.search.parametrs.tws).getTime() / 1000,
           );
         }
         if (
-          typeof this.search.parametrs.twf == 'string' &&
-          parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
+          typeof this.search.parametrs.twf === 'string'
+          && parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
         ) {
           this.search.parametrs.twf = parseInt(
-            new Date(this.search.parametrs.twf).getTime() / 1000
+            new Date(this.search.parametrs.twf).getTime() / 1000,
           );
         }
 
-        let searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
+        const searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
         let j = -1;
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
@@ -322,8 +322,7 @@ export default {
         if (j !== -1) {
           // если такой ИС уже есть вызовем сообщение с уточнением
           if (this.cancelBtn === 'Отмена') {
-            this.errorMsg =
-              'Такой источник данных существует. Хотите заменить его?';
+            this.errorMsg = 'Такой источник данных существует. Хотите заменить его?';
             this.createBtn = 'Да';
             this.cancelBtn = 'Нет';
             this.errorMsgShow = true;
@@ -357,25 +356,25 @@ export default {
         }, 2000);
       }
     },
-    addLineBreaks: function () {
+    addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
         '\n\n' + '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|' + '\n',
-        '| '
+        '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '| ' + '\n',
-        '| '
+        '| ',
       );
     },
   },

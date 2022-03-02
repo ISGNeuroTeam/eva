@@ -1,7 +1,7 @@
 <template>
   <div
     class="single-value-container pa-3"
-    :class="{ 'header-active': dataModeFrom }"
+    :class="{ 'header-active': dataModeFrom, 'is-header-open': !isHeaderOpen }"
   >
     <div class="header">
       <div>
@@ -65,9 +65,9 @@
 </template>
 
 <script>
+import { mdiSettings } from '@mdi/js';
 import SingleValueSettings from './SingleValueSettings';
 import metricTitleIcons from './metricTitleIcons';
-import { mdiSettings } from '@mdi/js';
 
 export default {
   name: 'SingleValue',
@@ -92,10 +92,11 @@ export default {
     defaultSettings: {},
     isSettingsComponentOpen: false,
     update: 1,
+    isHeaderOpen: true,
   }),
   computed: {
     dataToRender() {
-      let temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
+      const temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
       return this.update && temp.slice(0, this.metricCount);
     },
 
@@ -116,21 +117,19 @@ export default {
     dataRestFrom() {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(
-        JSON.stringify(this.$store.getters.getOptions({ id, idDash }))
+        JSON.stringify(this.$store.getters.getOptions({ id, idDash })),
       );
       this.setVisual(
         this.currentSettings.metricOptions?.length
           ? this.currentSettings.metricOptions
-          : options.settings?.metricOptions
+          : options.settings?.metricOptions,
       );
     },
     currentSettings() {
-      let currentSettings = Object.assign(
-        {
-          metricOptions: [],
-        },
-        this.currentSettings
-      );
+      const currentSettings = {
+        metricOptions: [],
+        ...this.currentSettings,
+      };
       this.providedSettings = currentSettings;
       this.init(currentSettings);
     },
@@ -144,13 +143,13 @@ export default {
       if (!metric.metadata) {
         return undefined;
       }
-      const ranges = eval('({obj:[' + metric.metadata + ']})').obj[0];
+      const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
         ranges[key] = ranges[key].split(':').map(Number);
       });
 
       if (metric.color === 'range') {
-        if (Number(metric.value)) {
+        if (!Number.isNaN(metric.value)) {
           const val = Number(metric.value);
           if (val >= ranges.red[0] && val <= ranges.red[1]) {
             return '#FF5147';
@@ -173,7 +172,7 @@ export default {
     init(settings, up) {
       const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(
-        JSON.stringify(this.$store.getters.getOptions({ id, idDash }))
+        JSON.stringify(this.$store.getters.getOptions({ id, idDash })),
       );
       if (!options.settings && !settings) {
         options.settings = {
@@ -194,6 +193,7 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
+      this.isHeaderOpen = !!settings.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
     },
@@ -202,10 +202,11 @@ export default {
       const options = { ...this.$store.getters.getOptions({ id, idDash }) };
       this.metricCount = count;
 
-      const newSettings = Object.assign(
-        { options: {}, metricCount: count },
-        options.settings
-      );
+      const newSettings = {
+        options: {},
+        metricCount: count,
+        ...options.settings,
+      };
 
       this.$store.commit('setOptions', newSettings);
       if (this.updateSettings) {
@@ -218,7 +219,9 @@ export default {
       const metricList = [];
       const metricOptions = [];
       for (const [index, data] of this.dataRestFrom.entries()) {
-        const { metric, value, id, metadata } = data;
+        const {
+          metric, value, id, metadata,
+        } = data;
         if (metric === '_title') {
           this.titleToken = String(value);
           continue;
@@ -230,12 +233,12 @@ export default {
         }
         const startId = `${metric}_${id}`;
         const metricCurrent = metricOptionsCurrent?.find(
-          (m) => m.startId === startId
+          (m) => m.startId === startId,
         );
         const defaultMetricOption = {
           id: metricCurrent?.id || id,
           startId: metricCurrent?.startId || startId,
-          metadata: metadata,
+          metadata,
           title: metric || data.phase,
           color: metricCurrent?.color || 'main',
           icon: metricCurrent?.icon || 'no_icon',
@@ -256,8 +259,8 @@ export default {
         });
       }
       if (
-        this.dataRestFrom.length === 6 &&
-        !this.dataRestFrom.find((i) => i.metric === '_title')
+        this.dataRestFrom.length === 6
+        && !this.dataRestFrom.find((i) => i.metric === '_title')
       ) {
         this.titleToken = '';
       }
@@ -270,7 +273,7 @@ export default {
         listOrder: idx,
         title: item.name || item.title,
         fontWeight: 400,
-        value: this.metricList.find((m) => m.startId === item.startId)?.value,
+        value: item.startId?.value,
       }));
 
       this.setVisual(settings.metricOptions);
@@ -305,7 +308,9 @@ export default {
       /** Updated local metricList array. */
       const newMetricList = [];
       for (const [index, updatedMetric] of metricOptions.entries()) {
-        const { icon, title, color, fontSize, fontWeight } = updatedMetric;
+        const {
+          icon, title, color, fontSize, fontWeight,
+        } = updatedMetric;
         const metric = this.metricList.find((m) => m.id === updatedMetric.id);
         if (metric) {
           metric.icon = icon;

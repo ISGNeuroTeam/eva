@@ -195,47 +195,47 @@ export default {
     };
   },
   computed: {
-    active: function () {
+    active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.setSearchData(this.searchFrom)
+        this.setSearchData(this.searchFrom);
       }
       return this.modalFrom;
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    tws: function (tws) {
+    tws(tws) {
       this.search.parametrs.tws = tws;
     },
-    twf: function (twf) {
+    twf(twf) {
       this.search.parametrs.twf = twf;
     },
   },
   methods: {
-    cancelModal: function () {
+    cancelModal() {
       this.$emit('cancelModal');
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code == 'Escape') {
         this.cancelModal();
       }
     },
-    setSearch: function () {
+    setSearch() {
       if (Number(this.search.parametrs.tws) || this.search.parametrs.tws == 0) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.tws = parseInt(
-          new Date(this.search.parametrs.tws).getTime() / 1000
+          new Date(this.search.parametrs.tws).getTime() / 1000,
         );
       }
       if (Number(this.search.parametrs.twf) || this.search.parametrs.twf == 0) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.twf = parseInt(
-          new Date(this.search.parametrs.twf).getTime() / 1000
+          new Date(this.search.parametrs.twf).getTime() / 1000,
         );
       }
 

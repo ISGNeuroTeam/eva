@@ -1,15 +1,27 @@
 module.exports = {
   root: true,
+
+  parserOptions: {
+    parser: 'babel-eslint',
+    ecmaVersion: 2018, // Allows for the parsing of modern ECMAScript features
+    sourceType: 'module', // Allows for the use of imports
+  },
+
   env: {
     node: true,
   },
+
   extends: [
-    'plugin:vue/essential',
-    'eslint:recommended',
+    // 'eslint:recommended',
+    'plugin:vue/strongly-recommended',
+    'airbnb-base',
   ],
-  parserOptions: {
-    parser: 'babel-eslint',
-  },
+  plugins: [
+    // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-file
+    // required to lint *.vue files
+    'vue',
+  ],
+
   rules: {
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
@@ -24,6 +36,17 @@ module.exports = {
     'vue/attributes-order': 'warn',
     'vue/no-confusing-v-for-v-if': 'warn',
     'vue/order-in-components': 'warn',
+
+    'vue/max-attributes-per-line': [
+      'error',
+      {
+        singleline: 1,
+        multiline: {
+          max: 1,
+          allowFirstLine: false,
+        },
+      },
+    ],
   },
   overrides: [
     {
