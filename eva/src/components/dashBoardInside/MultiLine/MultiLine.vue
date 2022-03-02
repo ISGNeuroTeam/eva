@@ -1434,7 +1434,7 @@ export default {
                   let top = cy - diffY - tooltipHalfHeight;
 
                   if (classDot) {
-                    left = left - tooltipWidth - 25 + 100;
+                    left = left - tooltipWidth - 25 + 150;
                   } else {
                     left = left - tooltipWidth - 25;
                   }
