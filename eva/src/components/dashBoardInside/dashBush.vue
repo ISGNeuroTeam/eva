@@ -100,7 +100,6 @@ export default {
       return dragRes === 'true';
     },
     containerWidth() {
-      console.log('containerWidth');
       return Math.floor(this.$refs.graph.clientWidth) - this.maxElementWidth;
     },
     containerHeight() {
