@@ -1206,7 +1206,6 @@ export default {
                   const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
 
                   if (brushObj.mouseDown) brushObj.selectionMove();
-
                   let left = offsetX + 20;
                   let top = offsetY - tooltipHalfHeight;
 
@@ -1216,6 +1215,9 @@ export default {
 
                   if (top + tooltipHalfHeight > height) {
                     top -= tooltipHalfHeight;
+                  }
+                  if (this.$attrs['full-screen']) {
+                    left = offsetX - 70;
                   }
 
                   tooltip.style('left', `${left}px`).style('top', `${top}px`);

@@ -259,6 +259,7 @@
                     :height-from="fullScreenHeight"
                     :options="props.options"
                     :is-full-screen="true"
+                    :full-screen="true"
                     :table-per-page="tablePerPage"
                     :table-page="tablePage"
                     @hideDS="hideDS($event)"
