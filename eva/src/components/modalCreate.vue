@@ -369,6 +369,7 @@ export default {
       this.setGroupColor(color);
     },
     createBtn(name) {
+      let method = 'POST';
       // при нажатии на кнопку создать
       let hasSimilarModel = false;
       if (!name || name === '') {
@@ -405,23 +406,16 @@ export default {
           hasSimilarModel = this.dashs.some(
             (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
-          console.log('hasSimilarModel', hasSimilarModel);
           dataObj = { name: this.newDash.name };
-          console.log('dataObj', dataObj);
           if (this.newDash?.id !== '') {
             dataObj.id = this.newDash.id;
-            console.log('dataObj.id', dataObj);
           }
-          dataObj.idgroup = this.curGroupFrom;
-          console.log('dataObj.idgroup', dataObj);
+          // dataObj.idgroup = this.curGroupFrom;
           if (Object.keys(this.changedData)?.length !== 0) {
             const keys = this.changedData.dash;
-            console.log('keys', keys);
             Object.keys(keys).forEach((item) => {
-              console.log('dataObj[item]', dataObj[item], 'keys[item]', keys[item]);
               dataObj[item] = keys[item];
             });
-            console.log('keys update', keys);
           }
           essence = 'dash';
           warnText = 'Такой дашборд уже существует. Хотите изменить его?';
@@ -441,15 +435,16 @@ export default {
           this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
           this.nameBtn.cancel = 'Отмена';
           this.showwarning = false;
+          method = 'PUT';
+          dataObj.id = this.dashsFrom.find((dash) => dash.name === dataObj.name).id;
         }
 
-        const method = this.actionFrom === false ? 'PUT' : 'POST';
         this.createEssence(dataObj, method, essence);
       }
     },
     cancelModal(btn) {
       // есл инажали на отмену создания
-      if (btn == 'Отмена') {
+      if (btn === 'Отмена') {
         this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
         this.name = ''; // очищаем имя
       }
@@ -459,7 +454,7 @@ export default {
       this.nameWarn = 'Имя не может быть пустым';
     },
     checkEsc(event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancelModal('Отмена');
       }
     },
@@ -479,8 +474,8 @@ export default {
         method,
       });
       response.then((res) => {
-        if (res.status == 200) {
-          if (essence == 'dash') {
+        if (res.status === 200) {
+          if (essence === 'dash') {
             res.json().then((data) => {
               this.createDash({
                 id: data.id,
