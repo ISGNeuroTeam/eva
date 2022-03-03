@@ -353,9 +353,6 @@ export default {
     };
   },
   computed: {
-    // adminRool: function() {
-    //   return this.adminRoot
-    // },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -401,14 +398,13 @@ export default {
     closeModal() {
       this.modalCreateGroup = false;
       this.modalExim = false;
-      if (this.tab == 'tab-1') {
+      if (this.tab === 'tab-1') {
         this.getGroups();
       } else {
         this.getDashs(this.cookieId);
       }
     },
     goToDash(i) {
-      // this.$store.commit('setDash',{data: this.allDashs[i], getters: this.$store.getters.checkAlreadyDash});
       this.$router.push(`/dashboards/${this.allDashs[i].id}`);
     },
     deleteElem() {
@@ -416,7 +412,7 @@ export default {
       let response = null;
       let data = null;
       let id = -1;
-      if (this.elemDelete == 'group') {
+      if (this.elemDelete === 'group') {
         data = this.allGroups;
         id = this.curGroup;
       } else {
@@ -428,8 +424,8 @@ export default {
         id: data[id].id,
       });
       response.then((res) => {
-        if (res.status == 200) {
-          if (this.elemDelete == 'group') {
+        if (res.status === 200) {
+          if (this.elemDelete === 'group') {
             this.getGroups();
           } else {
             this.getDashs(this.cookieId);
@@ -439,12 +435,8 @@ export default {
       this.$store.commit('deleteDashFromMain', data[id]);
     },
     checkCookie() {
-      const cookie = document.cookie.split(';').filter((item) => {
-        if (item.indexOf('eva-dashPage') != -1) {
-          return item;
-        }
-      });
-      if (cookie.length != 0) {
+      const cookie = document.cookie.split(';').filter((item) => item.indexOf('eva-dashPage') !== -1);
+      if (cookie.length !== 0) {
         this.cookieId = JSON.parse(cookie[0].split('=')[1]).id;
         this.cookieName = JSON.parse(cookie[0].split('=')[1]).name;
         this.getDash(JSON.parse(cookie[0].split('=')[1]));

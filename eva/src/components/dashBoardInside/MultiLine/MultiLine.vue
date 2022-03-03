@@ -159,6 +159,9 @@ export default {
     isOverlayBarplot() {
       return this.barplotstyle === 'overlay';
     },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
   },
   watch: {
     linkOptions: {
@@ -302,7 +305,7 @@ export default {
     setClick(point, actionName) {
       const { id, idDash } = this;
       const store = this.$store;
-      const tokens = this.$store.getters.getTockens(this.idDash);
+      const tokens = this.getTockens;
 
       for (const {
         elem, action, name, capture,

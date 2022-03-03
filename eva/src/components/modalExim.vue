@@ -128,10 +128,9 @@ export default {
   },
   computed: {
     theme() {
-      const currentTheme = this.$store.getters.getTheme;
       // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
       // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
-      return currentTheme;
+      return this.$store.getters.getTheme;
     },
   },
   watch: {
@@ -187,7 +186,7 @@ export default {
         });
       }
 
-      const response = await this.$store.getters.exportDash({
+      const response = await this.$store.dispatch('exportDash', {
         element: this.element,
         ids: ids.join(','),
       });
@@ -229,7 +228,7 @@ export default {
           } else {
             formData.append('body', this.file);
           }
-          await this.$store.getters.importDash({
+          const response = await this.$store.dispatch('importDash', {
             element: this.element,
             formData,
           });

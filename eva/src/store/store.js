@@ -1260,421 +1260,7 @@ export default {
     },
   },
   getters: {
-    getDashTabs: (state) => (id) => {
-      if (!state[id].tabList) {
-        Vue.set(state[id], 'tabList', [{ id: 1, name: 'Без названия' }]);
-      }
-      return state[id].tabList;
-    },
-    getCurrentDashTab: (state) => (id) => {
-      if (!state[id].currentTab) {
-        Vue.set(state[id], 'currentTab', 1);
-      }
-      return state[id].currentTab;
-    },
-    getShowTabs: (state) => (idDash) => {
-      if (!state[idDash].tabs) {
-        Vue.set(state[idDash], 'tabs', false);
-      }
-      return state[idDash].tabs;
-    },
-    getName(state) {
-      // получаем имя дашборда
-      return (id) => state[id].name;
-    },
-    getElements: (state) => (id) => {
-      if (!state[id].elements) {
-        Vue.set(state[id], 'elements', []);
-      }
-      return state[id].elements.filter(
-        (elem) => state[id][elem].tab === state[id].currentTab
-          || state[id][elem].options.pinned,
-      );
-    },
-    getElementsWithSearches: (state) => (id) => state[id].elements
-      .filter(
-        (elem) => state[id][elem].tab === state[id].currentTab
-            || state[id][elem].options.pinned,
-      )
-      .map((elem) => ({ elem, search: state[id][elem].search })),
-    getAllElements: (state) => (id) => {
-      if (!state[id].elements) {
-        Vue.set(state[id], 'elements', []);
-      }
-      return state[id].elements;
-    },
 
-    getNameDash(state) {
-      // получаем имя самого элемента
-      return (ids) => state[ids.idDash][ids.id].name_elem;
-    },
-    getPosDash(state) {
-      // получаем позицию элемнета
-      return (ids) => ({
-        top: state[ids.idDash][ids.id].top,
-        left: state[ids.idDash][ids.id].left,
-      });
-    },
-    getSizeDash(state) {
-      // получаем размер элемента
-      return (ids) => ({
-        width: state[ids.idDash][ids.id].width,
-        height: state[ids.idDash][ids.id].height,
-      });
-    },
-    getSearches(state) {
-      // получаем все ИС
-      return (id) => {
-        if (!state[id].searches) {
-          Vue.set(state[id], 'searches', []);
-        }
-        return state[id].searches;
-      };
-    },
-    getModalSearch(state) {
-      // получаем статус модального окна, чтобы знать открыто оно или нет
-      return (id) => {
-        if (!state[id].modalSearch) {
-          Vue.set(state[id], 'modalSearch', {});
-          Vue.set(state[id].modalDelete, 'elem', '');
-          Vue.set(state[id].modalDelete, 'status', true);
-        }
-        return state[id].modalSearch.status;
-      };
-    },
-    getSearch(state) {
-      // получаем определенный ИС по переданному id
-      return (ids) => {
-        const id = state[ids.idDash][ids.id].search;
-        const search = state[ids.idDash].searches.filter((item) => item.sid == id)[0];
-        return search;
-      };
-    },
-    getShouldGet(state) {
-      // получаем статус должен ли элемнет запрашивать данные
-      return (ids) => state[ids.idDash][ids.id].should;
-    },
-    getSearchID(state) {
-      // получаем статус должен ли элемнет запрашивать данные
-      return (ids) => state[ids.idDash][ids.id].search;
-    },
-    getSwitch(state) {
-      // получаем статус какой режим сейчас выбран у элемента
-      return (ids) => state[ids.idDash][ids.id].switch;
-    },
-    getTockens(state) {
-      // получаем массив с токенами
-      return (id) => {
-        if (!state[id].tockens) {
-          Vue.set(state[id], 'tockens', []);
-        }
-        return state[id].tockens;
-      };
-    },
-    getActions(state) {
-      // получаем массив с событиями элемента
-      return (elem) => {
-        if (state[elem.idDash][elem.elem]) {
-          return state[elem.idDash][elem.elem].actions;
-        }
-        return [];
-      };
-    },
-    getCapture(state) {
-      // получаем массив с событиями элемента
-      return (elem) => {
-        if (state[elem.idDash][elem.elem]) {
-          let j = -1;
-          Object.keys(state[elem.idDash][elem.elem].actions).forEach((item) => {
-            if (
-              state[elem.idDash][elem.elem].actions[item].name == elem.action
-            ) {
-              j = item;
-            }
-          });
-
-          if (j != -1) {
-            return state[elem.idDash][elem.elem].actions[j].capture;
-          }
-          return [];
-        }
-        return [];
-      };
-    },
-    getGraphTree: (state) =>
-      // получаем структуру и позицию графа
-      (tree) => {
-        if (
-          state[tree.idDash][tree.id].tree
-          && state[tree.idDash][tree.id].direct
-          && state[tree.idDash][tree.id].alies
-        ) {
-          // если все это существует то просто возвращаем их
-          return {
-            tree: state[tree.idDash][tree.id].tree,
-            direct: state[tree.idDash][tree.id].direct,
-            alies: state[tree.idDash][tree.id].alies,
-          };
-        }
-        return {
-          tree: {
-            // если нет, то возвращаем пустую заготовку
-            vertical: {},
-            horizontal: {},
-          },
-          direct: 'vertical',
-          alies: {},
-        };
-      },
-    getPickerDate(state) {
-      // получаем объект с выбором даты
-      return (elem) => {
-        if (!state[elem.idDash][elem.id].date) {
-          // если его нет то создаем пустой шаблон
-          state[elem.idDash][elem.id].date = {
-            end: null,
-            endCus: null,
-            range: null,
-            start: null,
-            startCus: null,
-          };
-          state[elem.idDash][elem.id].changeDate = false;
-        }
-        return state[elem.idDash][elem.id].date; // возвращаем либо новый созданный либо имеющийся
-      };
-    },
-    getSelected(state) {
-      // получаем объект в котором храниться информация для элемнета select
-      return (elem) => {
-        if (!state[elem.idDash][elem.id].selected) {
-          state[elem.idDash][elem.id].selected = {
-            elem: '',
-            elemlink: '',
-            elemDeep: '',
-          };
-        }
-
-        return state[elem.idDash][elem.id].selected;
-      };
-    },
-    getElementSelected: (state) => (elem) => state[elem.idDash][elem.id]?.selected,
-    getElement: (state) => (idDash, id) => state[idDash][id],
-    getDataApi(state) {
-      // метод получающий данные из rest
-      return (searchFrom) => {
-        const hash = Math.floor(Math.random() * 1000); // создаем произвольный хэш чтобы наши запросы не повторялись
-
-        // let search = getters.getSearch(searchOut);  // получаем нужный ИС на основе полученных при вызове настроек
-        const { search } = searchFrom;
-        const { idDash } = searchFrom;
-        let otl = search.original_otl;
-        let { tws } = search.parametrs;
-        let { twf } = search.parametrs;
-        let reg = null;
-        if (state[idDash].filters) {
-          Object.values(state[idDash].filters).forEach((filter) => {
-            reg = new RegExp(`\\$${filter.id}\\$`, 'g');
-            if (otl.indexOf(`$${filter.id}$`) != -1) {
-              const filterOtlText = filterCompile(filter);
-              otl = otl.replace(reg, filterOtlText);
-            }
-          });
-        }
-        if (otl.indexOf('$evaTknLogin$') != -1) {
-          if (Vue.$jwt.hasToken()) {
-            otl = otl.replaceAll('$evaTknLogin$', Vue.$jwt.decode().username);
-          }
-        }
-        if (state[idDash].tockens) {
-          Object.keys(state[idDash].tockens).forEach((item) => {
-            // если есть токены в запросе то меняем временные метки в зависимости от значения токена
-            // let reg = `\\$${state[idDash].tockens[item].name}`;
-            reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
-            if (otl.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
-              if (state[idDash].tockens[item].value) {
-                otl = otl.replace(reg, state[idDash].tockens[item].value);
-              } else {
-                otl = otl.replace(
-                  reg,
-                  state[idDash].tockens[item].defaultValue,
-                );
-              }
-            }
-
-            if (
-              typeof tws === 'string'
-              && tws.indexOf(`$${state[idDash].tockens[item].name}$`) != -1
-            ) {
-              tws = state[idDash].tockens[item].value;
-            }
-
-            if (
-              typeof twf === 'string'
-              && twf.indexOf(`$${state[idDash].tockens[item].name}$`) != -1
-            ) {
-              twf = state[idDash].tockens[item].value;
-            }
-
-            if (
-              state[idDash].tockens[item].elem == 'picker'
-              && state[idDash].tockens[item].capture == 'start'
-            ) {
-              if (typeof search.parametrs.tws !== 'number') {
-                if (
-                  search.parametrs.tws.indexOf(
-                    `$${state[idDash].tockens[item].name}$`,
-                  ) != -1
-                ) {
-                  tws = state[idDash].tockens[item].value;
-                }
-              }
-            }
-            if (
-              state[idDash].tockens[item].elem == 'picker'
-              && state[idDash].tockens[item].capture == 'end'
-            ) {
-              if (typeof search.parametrs.twf !== 'number') {
-                if (
-                  search.parametrs.twf.indexOf(
-                    `$${state[idDash].tockens[item].name}$`,
-                  ) != -1
-                ) {
-                  twf = state[idDash].tockens[item].value;
-                }
-              }
-            }
-          });
-        }
-        if (search.limit > 0 && !otl.includes('head')) {
-          // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
-          otl += `|head ${search.limit}`;
-        }
-
-        otl = otl.replace(/\r|\n/g, '');
-
-        const formData = new FormData(); // формируем объект для передачи RESTу
-        formData.append('sid', `${search.sid}+${hash}`);
-        formData.append('original_otl', String(otl));
-        formData.append('tws', tws);
-        formData.append('twf', twf);
-        formData.append('username', search.parametrs.username);
-        formData.append('preview', search.parametrs.preview);
-        formData.append('field_extraction', search.parametrs.field_extraction);
-        formData.append('cache_ttl', search.parametrs.cache_ttl);
-        formData.append('timeout', search.parametrs.timeout);
-
-        const searchForRest = {
-          sid: search.sid,
-          otl: String(otl),
-          tws,
-          twf,
-          cache_ttl: search.parametrs.cache_ttl,
-        };
-        return rest.rest(formData, searchForRest, restAuth, idDash); // отправляем в файл storeRest.js
-      };
-    },
-    putIntoDB() {
-      // затем полученные данные нужно положить в indexed db
-      return (result, sid, idDash) => new Promise((resolve) => {
-        let db = null;
-        const id = idDash;
-        const key = `${id}-${sid}`;
-
-        const request = indexedDB.open('EVA', 1);
-
-        request.onerror = function (event) {
-          console.log('error:', event);
-        };
-
-        request.onupgradeneeded = (event) => {
-          console.log('create');
-          db = event.target.result;
-          if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
-            db.createObjectStore('searches'); // create it
-          }
-
-          request.onsuccess = () => {
-            db = request.result;
-            console.log(`success: ${db}`);
-
-            setTransaction(db, result, key, idDash);
-          };
-        };
-
-        request.onsuccess = () => {
-          db = request.result;
-
-          setTransaction(db, result, key, idDash);
-        };
-
-        function setTransaction(db, result, key) {
-          const transaction = db.transaction('searches', 'readwrite'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          const search = result;
-
-          const query = searches.put(search, key); // (3)
-
-          query.onsuccess = function () {
-            // (4)
-            resolve('result');
-            restAuth.putLog(`Добавлен запрос ${query.result}`);
-          };
-
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
-          };
-        }
-      });
-    },
-    refreshElements(state) {
-      return (idDash, key) => {
-        if (idDash == 'reports') {
-          state[idDash].table.should = true;
-        } else {
-          state[idDash].elements.forEach((item) => {
-            // пробегаемся по всем элементам
-            if (state[idDash][item].search == key) {
-              // то смотрим если наш элемент завязан на search который поменялся
-              state[idDash][item].should = true; // то его нужно пересчитать
-            }
-          });
-        }
-      };
-    },
-    deleteFromDb() {
-      // удаляем данные источников данных из базы данных indexed db
-      return (ids, idDash) => {
-        let db = null;
-        const nameDash = idDash;
-        const searchName = [];
-        ids.forEach((id) => {
-          searchName.push(`${nameDash}-${id}`);
-        });
-
-        const request = indexedDB.open('EVA', 1);
-
-        request.onerror = function () {
-          console.log('error: ');
-        };
-
-        request.onsuccess = () => {
-          db = request.result;
-
-          const transaction = db.transaction('searches', 'readwrite'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          searchName.forEach((item) => {
-            searches.delete(String(item)); // (3) return store.get('Ire Aderinokun');
-          });
-        };
-      };
-    },
     getReportSearch: (state) => {
       const key = state.reports.table.search;
       if (key != '') {
@@ -1713,332 +1299,746 @@ export default {
       };
     },
     getReportElement: (state) => state.reports.elements,
-    getGroups() {
-      return () => rest.getGroups(restAuth);
-    },
-    getDashs: () =>
-      // получения списка дашбордов
-      (id) => rest.getDashs(id, restAuth),
-    getModalDelete(state) {
-      // получаем объект модального окна в котором храним тот элемнет что хотим удалить
-      return (ids) => {
-        if (!state[ids.id].modalDelete) {
-          Vue.set(state[ids.id], 'modalDelete', {});
-          Vue.set(state[ids.id].modalDelete, 'active', false);
-          Vue.set(state[ids.id].modalDelete, 'id', '');
-          Vue.set(state[ids.id].modalDelete, 'name', '');
-        }
-        return state[ids.id].modalDelete;
-      };
-    },
-    getModalExin(state) {
-      // получаем объект модального окна в котором храним тот элемнет что хотим удалить
-      return (ids) => {
-        if (ids.page == 'dash') {
-          return state[ids.id].modalExin;
-        } if (ids.page == 'layout') {
-          return state.modalExin;
-        }
-      };
-    },
-    getScreenShot(state) {
-      // получаем скриншот страницы
-      return (id) => state[id].screenshot;
-    },
-    getDashboard(state) {
-      // получаем скриншот страницы
-      return (id) => state[id];
-    },
-    getLoading(state) {
-      // получаем скриншот страницы
-      return (elem, id) => {
-        if (!state[id][elem].loading) {
-          Vue.set(state[id][elem], 'loading', false);
-        }
-        return state[id][elem].loading;
-      };
-    },
-    getOptions(state) {
-      // получаем скриншот страницы
-      return (id) => {
-        if (!id.id) {
-          return [];
-        }
-        if (!state[id.idDash][id.id].options) {
-          Vue.set(state[id.idDash][id.id], 'options', {});
-          Vue.set(state[id.idDash][id.id].options, 'change', false);
-          Vue.set(state[id.idDash][id.id].options, 'visible', true);
-          Vue.set(state[id.idDash][id.id].options, 'level', 1);
-          Vue.set(state[id.idDash][id.id].options, 'boxShadow', false);
-          Vue.set(state[id.idDash][id.id].options, 'lastResult', false);
-          Vue.set(state[id.idDash][id.id].options, 'searchBtn', false);
-        }
-
-        if (!state[id?.idDash][id?.id]?.options.pinned) {
-          Vue.set(state[id?.idDash][id?.id].options, 'pinned', false);
-        }
-
-        if (!state[id.idDash][id.id]?.options.lastDot) {
-          Vue.set(state[id.idDash][id.id].options, 'lastDot', false);
-        }
-        if (!state[id.idDash][id.id]?.options.stringOX) {
-          Vue.set(state[id.idDash][id.id].options, 'stringOX', false);
-        }
-        if (!state[id.idDash][id.id]?.options.united) {
-          Vue.set(state[id.idDash][id.id].options, 'united', false);
-        }
-
-        return state[id.idDash][id.id].options;
-      };
-    },
-    getEventFull(state) {
-      // получаем скриншот страницы
-
-      return (id) => {
-        if (state[id].eventFull) {
-          return state[id].eventFull;
-        }
-        return '';
-      };
-    },
-    getDragRes(state) {
-      return (id) => state[id.idDash].dragRes;
-    },
-
-    getEvents(state) {
-      // получаем скриншот страницы
-      return (event) => {
-        let result = [];
-        if (!state[event.idDash].events) {
-          state[event.idDash].events = [];
-          return [];
-        }
-        if (event.partelement) {
-          result = state[event.idDash].events.filter((item) => (
-            item.event == event.event
-                && item.element == event.element
-                && item.partelement == event.partelement
-          ));
-        } else {
-          result = state[event.idDash].events.filter((item) => item.event == event.event && item.target == event.element);
-        }
-        return result;
-      };
-    },
-    getChangeDate(state) {
-      // получаем скриншот страницы
-      return (date) => state[date.idDash][date.id].changeDate;
-    },
-    getSchedulers(state) {
-      // получаем все планировщики что были созданы
-      return (id) => {
-        if (!state[id].schedulers) {
-          state[id].schedulers = {};
-        }
-        return state[id].schedulers;
-      };
-    },
     getThemeTitle(state) {
       return state.theme.name;
     },
     getTheme(state) {
       return state.theme.settings;
     },
-    getThemeBack() {
-      return () => rest.getThemeBack(restAuth);
-    },
-    getModalSettings(state) {
-      // получаем объект с настройками моадлки натсроек
-      return (idDash) => {
-        if (!state[idDash] || !state[idDash].modalSettings) {
-          Vue.set(state[idDash], 'modalSettings', {});
-          Vue.set(state[idDash].modalSettings, 'element', '');
-          Vue.set(state[idDash].modalSettings, 'status', false);
-        }
-        return state[idDash].modalSettings;
-      };
-    },
-    getTextArea(state) {
-      return (textarea) => {
-        if (!state[textarea.idDash][textarea.id].textarea) {
-          return '';
-        }
-        return state[textarea.idDash][textarea.id].textarea;
-      };
-    },
-    saveDashboard: () => (dash) => new Promise((resolve) => {
-      const response = restAuth.setEssence({
-        formData: JSON.stringify(dash),
-        essence: 'dash',
-        method: 'PUT',
-      });
-      response.then((res) => {
-        if (res.status == 200) {
-          res.json().then((data) => {
-            resolve({ status: 200, data });
-          });
-        } else if (res.status == 409) {
-          resolve({ status: 409 });
-        }
-      });
-    }),
-    checkAlreadyDash: (state) => (id, first) => new Promise((resolve) => {
-      const result = rest.getState(id, restAuth);
-      result.then((stateFrom) => {
-        if (stateFrom) {
-          if (!state[id]) {
-            Vue.set(state, id, {});
-            if (stateFrom.body !== '') {
-              Vue.set(state, id, JSON.parse(stateFrom.body));
-            }
-            Vue.set(state[id], 'name', stateFrom.name);
-            Vue.set(state[id], 'idgroup', stateFrom.idgroup);
-            Vue.set(state[id], 'modified', stateFrom.modified);
-          }
-          if (stateFrom.modified > state[id].modified) {
-            resolve({
-              status: 'exist',
-              body: stateFrom.body,
-              name: stateFrom.name,
-              id: stateFrom.id,
-              modified: stateFrom.modified,
-            });
-          }
-          if (first) {
-            if (stateFrom.body !== '') {
-              Vue.set(state, id, JSON.parse(stateFrom.body));
-              Vue.set(state[id], 'idgroup', stateFrom.idgroup);
-              Vue.set(state[id], 'name', stateFrom.name);
-              Vue.set(state[id], 'modified', stateFrom.modified);
-            }
-          }
-          if (state[id].elements) {
-            state[id].elements.forEach((elem) => {
-              if (!state[id][elem].tab) {
-                Vue.set(state[id][elem], 'tab', 1);
-              }
-            });
-          }
-
-          state[id].filters?.forEach((filter) => {
-            if (filter.idDash !== id) {
-              Vue.set(filter, 'idDash', id);
-            }
-          });
-
-          if (state[id].searches) {
-            state[id].searches.forEach((search) => Vue.set(search, 'status', 'empty'));
-          }
-          resolve({ status: 'finish' });
-          // }
-        } else {
-          resolve({ status: 'failed' });
-        }
-      });
-    }),
-    checkDataSearch: () => (sid) => new Promise((resolve) => {
-      let db = null;
-
-      const request = indexedDB.open('EVA', 1);
-
-      request.onerror = function (event) {
-        console.log('error:', event);
-      };
-
-      request.onupgradeneeded = (event) => {
-        console.log('create');
-        db = event.target.result;
-        if (!db.objectStoreNames.contains('searches')) {
-          // if there's no "books" store
-          db.createObjectStore('searches'); // create it
-        }
-
-        request.onsuccess = () => {
-          db = request.result;
-          // this.alreadyDB = request.result;
-          console.log(`success: ${db}`);
-
-          setTransaction(db);
-        };
-      };
-
-      request.onsuccess = () => {
-        db = request.result;
-
-        setTransaction(db);
-      };
-
-      function setTransaction(db) {
-        const transaction = db.transaction('searches', 'readwrite'); // (1)
-
-        // получить хранилище объектов для работы с ним
-        const searches = transaction.objectStore('searches'); // (2)
-
-        const query = searches.get(sid); // (3) return store.get('Ire Aderinokun');
-
-        query.onsuccess = () => {
-          // (4)
-
-          if (query.result) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        };
-
-        query.onerror = function () {
-          console.log('Ошибка', query.error);
-        };
-      }
-    }),
     getColorError: (state) => {
       if (!state.logError) {
         Vue.set(state, 'logError', false);
       }
       return state.logError;
     },
-    getSvg: () => (svg) => rest.getSvg(svg, restAuth), // отправляем в файл storeRest.js
-    setSvg: () => (svg) => rest.setSvg(svg, restAuth), // отправляем в файл storeRest.js
-    exportDash: () => (dash) => rest.exportDash(dash, restAuth), // отправляем в файл storeRest.js
-    importDash: () => (dash) => rest.importDash(dash, restAuth), // отправляем в файл storeRest.js
-    getMetricsMulti: (state) => (dash) => {
-      if (!state[dash.idDash][dash.id].metrics) {
-        Vue.set(state[dash.idDash][dash.id], 'metrics', []);
-      }
-      return state[dash.idDash][dash.id].metrics;
-    },
-    getSizeGrid: (state) => (id) => {
-      if (!state[id]?.grid) {
-        Vue.set(state[id], 'grid', {});
-        Vue.set(state[id]?.grid, 'vert', '32');
-        Vue.set(state[id]?.grid, 'hor', '18');
-      }
-      return state[id]?.grid;
-    },
-    getDragResize: (state) => (id) => {
-      if (!state[id].dragRes) {
-        Vue.set(state[id], 'dragRes', 'true');
-      }
-      return state[id].dragRes;
-    },
-    getGridShow: (state) => (id) => {
-      if (!state[id].gridShow) {
-        Vue.set(state[id], 'gridShow', 'true');
-      }
-      return state[id].gridShow;
-    },
-    loadPaper: () => (paper) => rest.loadPaper(paper, restAuth),
-    getAllPaper: () => () => rest.getAllPaper(restAuth),
-    getPaper: () => (fileData) => rest.getPaper(restAuth, fileData),
-    getPaperVis: () => (url) => rest.getPaperVis(restAuth, url),
-    getSelectedTableTitles: (state) => (dashId, elementId) => state[dashId][elementId]?.selectedTableTitles,
-    getAvailableTableTitles: (state) => (dashId, elementId) => state[dashId][elementId]?.availableTableTitles,
-    getSelectedDataFormat: (state) => (dashId, elementId) => state[dashId][elementId]?.selectedDataFormat,
-    getAvailableDataFormat: (state) => (dashId, elementId) => state[dashId][elementId]?.availableDataFormat,
-    getLibrary: (state) => (dashId, elementId) => state[dashId][elementId]?.options?.library,
-    getFilters: (state) => (dashId) => (state[dashId].filters ? state[dashId].filters : []),
-    getFocusedFilter(state) {
-      return (dashId) => state[dashId].focusedFilter;
-    },
+    // getDashTabs: (state) => (id) => {
+    //   if (!state[id].tabList) {
+    //     Vue.set(state[id], 'tabList', [{ id: 1, name: 'Без названия' }]);
+    //   }
+    //   return state[id].tabList;
+    // },
+    // getCurrentDashTab: (state) => (id) => {
+    //   if (!state[id].currentTab) {
+    //     Vue.set(state[id], 'currentTab', 1);
+    //   }
+    //   return state[id].currentTab;
+    // },
+    // getShowTabs: (state) => (idDash) => {
+    //   if (!state[idDash].tabs) {
+    //     Vue.set(state[idDash], 'tabs', false);
+    //   }
+    //   return state[idDash].tabs;
+    // },
+    // getName(state) {
+    //  // получаем имя дашборда
+    //   return (id) => state[id].name;
+    // },
+    // getElements: (state) => (id) => {
+    //   if (!state[id].elements) {
+    //     Vue.set(state[id], 'elements', []);
+    //   }
+    //   return state[id].elements.filter(
+    //     (elem) => state[id][elem].tab === state[id].currentTab
+    //       || state[id][elem].options.pinned,
+    //   );
+    // },
+    // getElementsWithSearches: (state) => (id) => state[id].elements
+    //   .filter(
+    //     (elem) => state[id][elem].tab === state[id].currentTab
+    //         || state[id][elem].options.pinned,
+    //   )
+    //   .map((elem) => ({ elem, search: state[id][elem].search })),
+    // getAllElements: (state) => (id) => {
+    //   if (!state[id].elements) {
+    //     Vue.set(state[id], 'elements', []);
+    //   }
+    //   return state[id].elements;
+    // },
+
+    // getNameDash(state) {
+    //  // получаем имя самого элемента
+    //   return (ids) => state[ids.idDash][ids.id].name_elem;
+    // },
+    // getPosDash(state) {
+    //  // получаем позицию элемнета
+    //   return (ids) => ({
+    //     top: state[ids.idDash][ids.id].top,
+    //     left: state[ids.idDash][ids.id].left,
+    //   });
+    // },
+    // getSizeDash(state) {
+    //  // получаем размер элемента
+    //   return (ids) => ({
+    //     width: state[ids.idDash][ids.id].width,
+    //     height: state[ids.idDash][ids.id].height,
+    //   });
+    // },
+    // getSearches(state) {
+    //  // получаем все ИС
+    //   return (id) => {
+    //     if (!state[id].searches) {
+    //       Vue.set(state[id], 'searches', []);
+    //     }
+    //     return state[id].searches;
+    //   };
+    // },
+    // getModalSearch(state) {
+    //  // получаем статус модального окна, чтобы знать открыто оно или нет
+    //   return (id) => {
+    //     if (!state[id].modalSearch) {
+    //       Vue.set(state[id], 'modalSearch', {});
+    //       Vue.set(state[id].modalDelete, 'elem', '');
+    //       Vue.set(state[id].modalDelete, 'status', true);
+    //     }
+    //     return state[id].modalSearch.status;
+    //   };
+    // },
+    // getSearch(state) {
+    //  // получаем определенный ИС по переданному id
+    //   return (ids) => {
+    //     const id = state[ids.idDash][ids.id].search;
+    //     const search = state[ids.idDash].searches.filter((item) => item.sid == id)[0];
+    //     return search;
+    //   };
+    // },
+    // getShouldGet(state) {
+    //  // получаем статус должен ли элемнет запрашивать данные
+    //   return (ids) => state[ids.idDash][ids.id].should;
+    // },
+    // getSearchID(state) {
+    //  // получаем статус должен ли элемнет запрашивать данные
+    //   return (ids) => state[ids.idDash][ids.id].search;
+    // },
+    // getSwitch(state) {
+    //  // получаем статус какой режим сейчас выбран у элемента
+    //   return (ids) => state[ids.idDash][ids.id].switch;
+    // },
+    // getTockens(state) {
+    //   // получаем массив с токенами
+    //   return (id) => {
+    //     if (!state[id].tockens) {
+    //       Vue.set(state[id], 'tockens', []);
+    //     }
+    //     return state[id].tockens;
+    //   };
+    // },
+    // getActions(state) {
+    //   // получаем массив с событиями элемента
+    //   return (elem) => {
+    //     if (state[elem.idDash][elem.elem]) {
+    //       return state[elem.idDash][elem.elem].actions;
+    //     }
+    //     return [];
+    //   };
+    // },
+    // getCapture(state) {
+    //   // получаем массив с событиями элемента
+    //   return (elem) => {
+    //     if (state[elem.idDash][elem.elem]) {
+    //       let j = -1;
+    //       Object.keys(state[elem.idDash][elem.elem].actions).forEach((item) => {
+    //         if (
+    //           state[elem.idDash][elem.elem].actions[item].name == elem.action
+    //         ) {
+    //           j = item;
+    //         }
+    //       });
+    //
+    //       if (j != -1) {
+    //         return state[elem.idDash][elem.elem].actions[j].capture;
+    //       }
+    //       return [];
+    //     }
+    //     return [];
+    //   };
+    // },
+    // getGraphTree: (state) =>
+    //   // получаем структуру и позицию графа
+    //   (tree) => {
+    //     if (
+    //       state[tree.idDash][tree.id].tree
+    //       && state[tree.idDash][tree.id].direct
+    //       && state[tree.idDash][tree.id].alies
+    //     ) {
+    //       // если все это существует то просто возвращаем их
+    //       return {
+    //         tree: state[tree.idDash][tree.id].tree,
+    //         direct: state[tree.idDash][tree.id].direct,
+    //         alies: state[tree.idDash][tree.id].alies,
+    //       };
+    //     }
+    //     return {
+    //       tree: {
+    //         // если нет, то возвращаем пустую заготовку
+    //         vertical: {},
+    //         horizontal: {},
+    //       },
+    //       direct: 'vertical',
+    //       alies: {},
+    //     };
+    //   },
+    // getPickerDate(state) {
+    //   // получаем объект с выбором даты
+    //   return (elem) => {
+    //     if (!state[elem.idDash][elem.id].date) {
+    //       // если его нет то создаем пустой шаблон
+    //       state[elem.idDash][elem.id].date = {
+    //         end: null,
+    //         endCus: null,
+    //         range: null,
+    //         start: null,
+    //         startCus: null,
+    //       };
+    //       state[elem.idDash][elem.id].changeDate = false;
+    //     }
+    //     return state[elem.idDash][elem.id].date; // возвращаем либо новый созданный либо имеющийся
+    //   };
+    // },
+    // getSelected(state) {
+    //   // получаем объект в котором храниться информация для элемнета select
+    //   return (elem) => {
+    //     if (!state[elem.idDash][elem.id].selected) {
+    //       state[elem.idDash][elem.id].selected = {
+    //         elem: '',
+    //         elemlink: '',
+    //         elemDeep: '',
+    //       };
+    //     }
+    //
+    //     return state[elem.idDash][elem.id].selected;
+    //   };
+    // },
+    // getElementSelected: (state) => (elem) => state[elem.idDash][elem.id]?.selected,
+    // getElement: (state) => (idDash, id) => state[idDash][id],
+    // getDataApi(state) {
+    //   // метод получающий данные из rest
+    //   return (searchFrom) => {
+    //     const hash = Math.floor(Math.random() * 1000); // создаем произвольный хэш чтобы наши запросы не повторялись
+    //
+    //     // let search = getters.getSearch(searchOut);  // получаем нужный ИС на основе полученных при вызове настроек
+    //     const { search } = searchFrom;
+    //     const { idDash } = searchFrom;
+    //     let otl = search.original_otl;
+    //     let { tws } = search.parametrs;
+    //     let { twf } = search.parametrs;
+    //     let reg = null;
+    //     if (state[idDash].filters) {
+    //       Object.values(state[idDash].filters).forEach((filter) => {
+    //         reg = new RegExp(`\\$${filter.id}\\$`, 'g');
+    //         if (otl.indexOf(`$${filter.id}$`) != -1) {
+    //           const filterOtlText = filterCompile(filter);
+    //           otl = otl.replace(reg, filterOtlText);
+    //         }
+    //       });
+    //     }
+    //     if (otl.indexOf('$evaTknLogin$') != -1) {
+    //       if (Vue.$jwt.hasToken()) {
+    //         otl = otl.replaceAll('$evaTknLogin$', Vue.$jwt.decode().username);
+    //       }
+    //     }
+    //     if (state[idDash].tockens) {
+    //       Object.keys(state[idDash].tockens).forEach((item) => {
+    //         // если есть токены в запросе то меняем временные метки в зависимости от значения токена
+    //         // let reg = `\\$${state[idDash].tockens[item].name}`;
+    //         reg = new RegExp(`\\$${state[idDash].tockens[item].name}\\$`, 'g');
+    //         if (otl.indexOf(`$${state[idDash].tockens[item].name}$`) != -1) {
+    //           if (state[idDash].tockens[item].value) {
+    //             otl = otl.replace(reg, state[idDash].tockens[item].value);
+    //           } else {
+    //             otl = otl.replace(
+    //               reg,
+    //               state[idDash].tockens[item].defaultValue,
+    //             );
+    //           }
+    //         }
+    //
+    //         if (
+    //           typeof tws === 'string'
+    //           && tws.indexOf(`$${state[idDash].tockens[item].name}$`) != -1
+    //         ) {
+    //           tws = state[idDash].tockens[item].value;
+    //         }
+    //
+    //         if (
+    //           typeof twf === 'string'
+    //           && twf.indexOf(`$${state[idDash].tockens[item].name}$`) != -1
+    //         ) {
+    //           twf = state[idDash].tockens[item].value;
+    //         }
+    //
+    //         if (
+    //           state[idDash].tockens[item].elem == 'picker'
+    //           && state[idDash].tockens[item].capture == 'start'
+    //         ) {
+    //           if (typeof search.parametrs.tws !== 'number') {
+    //             if (
+    //               search.parametrs.tws.indexOf(
+    //                 `$${state[idDash].tockens[item].name}$`,
+    //               ) != -1
+    //             ) {
+    //               tws = state[idDash].tockens[item].value;
+    //             }
+    //           }
+    //         }
+    //         if (
+    //           state[idDash].tockens[item].elem == 'picker'
+    //           && state[idDash].tockens[item].capture == 'end'
+    //         ) {
+    //           if (typeof search.parametrs.twf !== 'number') {
+    //             if (
+    //               search.parametrs.twf.indexOf(
+    //                 `$${state[idDash].tockens[item].name}$`,
+    //               ) != -1
+    //             ) {
+    //               twf = state[idDash].tockens[item].value;
+    //             }
+    //           }
+    //         }
+    //       });
+    //     }
+    //     if (search.limit > 0 && !otl.includes('head')) {
+    //       // добавляем ограничитель кол-ва строк ответа, если в тексте запроса это не прописано явно
+    //       otl += `|head ${search.limit}`;
+    //     }
+    //
+    //     otl = otl.replace(/\r|\n/g, '');
+    //
+    //     const formData = new FormData(); // формируем объект для передачи RESTу
+    //     formData.append('sid', `${search.sid}+${hash}`);
+    //     formData.append('original_otl', String(otl));
+    //     formData.append('tws', tws);
+    //     formData.append('twf', twf);
+    //     formData.append('username', search.parametrs.username);
+    //     formData.append('preview', search.parametrs.preview);
+    //     formData.append('field_extraction', search.parametrs.field_extraction);
+    //     formData.append('cache_ttl', search.parametrs.cache_ttl);
+    //     formData.append('timeout', search.parametrs.timeout);
+    //
+    //     const searchForRest = {
+    //       sid: search.sid,
+    //       otl: String(otl),
+    //       tws,
+    //       twf,
+    //       cache_ttl: search.parametrs.cache_ttl,
+    //     };
+    //     return rest.rest(formData, searchForRest, restAuth, idDash); // отправляем в файл storeRest.js
+    //   };
+    // },
+    // putIntoDB() {
+    //   // затем полученные данные нужно положить в indexed db
+    //   return (result, sid, idDash) => new Promise((resolve) => {
+    //     let db = null;
+    //     const id = idDash;
+    //     const key = `${id}-${sid}`;
+    //
+    //     const request = indexedDB.open('EVA', 1);
+    //
+    //     request.onerror = function (event) {
+    //       console.log('error:', event);
+    //     };
+    //
+    //     request.onupgradeneeded = (event) => {
+    //       console.log('create');
+    //       db = event.target.result;
+    //       if (!db.objectStoreNames.contains('searches')) {
+    //         // if there's no "books" store
+    //         db.createObjectStore('searches'); // create it
+    //       }
+    //
+    //       request.onsuccess = () => {
+    //         db = request.result;
+    //         console.log(`success: ${db}`);
+    //
+    //         setTransaction(db, result, key, idDash);
+    //       };
+    //     };
+    //
+    //     request.onsuccess = () => {
+    //       db = request.result;
+    //
+    //       setTransaction(db, result, key, idDash);
+    //     };
+    //
+    //     function setTransaction(db, result, key) {
+    //       const transaction = db.transaction('searches', 'readwrite'); // (1)
+    //
+    //       // получить хранилище объектов для работы с ним
+    //       const searches = transaction.objectStore('searches'); // (2)
+    //
+    //       const search = result;
+    //
+    //       const query = searches.put(search, key); // (3)
+    //
+    //       query.onsuccess = function () {
+    //         // (4)
+    //         resolve('result');
+    //         restAuth.putLog(`Добавлен запрос ${query.result}`);
+    //       };
+    //
+    //       query.onerror = function () {
+    //         console.log('Ошибка', query.error);
+    //       };
+    //     }
+    //   });
+    // },
+    // refreshElements(state) {
+    //   return (idDash, key) => {
+    //     if (idDash == 'reports') {
+    //       state[idDash].table.should = true;
+    //     } else {
+    //       state[idDash].elements.forEach((item) => {
+    //         // пробегаемся по всем элементам
+    //         if (state[idDash][item].search == key) {
+    //           // то смотрим если наш элемент завязан на search который поменялся
+    //           state[idDash][item].should = true; // то его нужно пересчитать
+    //         }
+    //       });
+    //     }
+    //   };
+    // },
+    // deleteFromDb() {
+    //   // удаляем данные источников данных из базы данных indexed db
+    //   return (ids, idDash) => {
+    //     let db = null;
+    //     const nameDash = idDash;
+    //     const searchName = [];
+    //     ids.forEach((id) => {
+    //       searchName.push(`${nameDash}-${id}`);
+    //     });
+    //
+    //     const request = indexedDB.open('EVA', 1);
+    //
+    //     request.onerror = function () {
+    //       console.log('error: ');
+    //     };
+    //
+    //     request.onsuccess = () => {
+    //       db = request.result;
+    //
+    //       const transaction = db.transaction('searches', 'readwrite'); // (1)
+    //
+    //       // получить хранилище объектов для работы с ним
+    //       const searches = transaction.objectStore('searches'); // (2)
+    //
+    //       searchName.forEach((item) => {
+    //         searches.delete(String(item)); // (3) return store.get('Ire Aderinokun');
+    //       });
+    //     };
+    //   };
+    // },
+    // getGroups() {
+    //   return () => rest.getGroups(restAuth);
+    // },
+    // getDashs: () =>
+    //   // получения списка дашбордов
+    //   (id) => rest.getDashs(id, restAuth),
+    // getModalDelete(state) {
+    //   // получаем объект модального окна в котором храним тот элемнет что хотим удалить
+    //   return (ids) => {
+    //     if (!state[ids.id].modalDelete) {
+    //       Vue.set(state[ids.id], 'modalDelete', {});
+    //       Vue.set(state[ids.id].modalDelete, 'active', false);
+    //       Vue.set(state[ids.id].modalDelete, 'id', '');
+    //       Vue.set(state[ids.id].modalDelete, 'name', '');
+    //     }
+    //     return state[ids.id].modalDelete;
+    //   };
+    // },
+    // getModalExin(state) {
+    //   // получаем объект модального окна в котором храним тот элемнет что хотим удалить
+    //   return (ids) => {
+    //     if (ids.page == 'dash') {
+    //       return state[ids.id].modalExin;
+    //     } if (ids.page == 'layout') {
+    //       return state.modalExin;
+    //     }
+    //   };
+    // },
+    // getScreenShot(state) {
+    //   // получаем скриншот страницы
+    //   return (id) => state[id].screenshot;
+    // },
+    // getDashboard(state) {
+    //   // получаем скриншот страницы
+    //   return (id) => state[id];
+    // },
+    // getLoading(state) {
+    //   // получаем скриншот страницы
+    //   return (elem, id) => {
+    //     if (!state[id][elem].loading) {
+    //       Vue.set(state[id][elem], 'loading', false);
+    //     }
+    //     return state[id][elem].loading;
+    //   };
+    // },
+    // getOptions(state) {
+    //   // получаем скриншот страницы
+    //   return (id) => {
+    //     if (!id.id) {
+    //       return [];
+    //     }
+    //     if (!state[id.idDash][id.id].options) {
+    //       Vue.set(state[id.idDash][id.id], 'options', {});
+    //       Vue.set(state[id.idDash][id.id].options, 'change', false);
+    //       Vue.set(state[id.idDash][id.id].options, 'visible', true);
+    //       Vue.set(state[id.idDash][id.id].options, 'level', 1);
+    //       Vue.set(state[id.idDash][id.id].options, 'boxShadow', false);
+    //       Vue.set(state[id.idDash][id.id].options, 'lastResult', false);
+    //       Vue.set(state[id.idDash][id.id].options, 'searchBtn', false);
+    //     }
+    //
+    //     if (!state[id?.idDash][id?.id]?.options.pinned) {
+    //       Vue.set(state[id?.idDash][id?.id].options, 'pinned', false);
+    //     }
+    //
+    //     if (!state[id.idDash][id.id]?.options.lastDot) {
+    //       Vue.set(state[id.idDash][id.id].options, 'lastDot', false);
+    //     }
+    //     if (!state[id.idDash][id.id]?.options.stringOX) {
+    //       Vue.set(state[id.idDash][id.id].options, 'stringOX', false);
+    //     }
+    //     if (!state[id.idDash][id.id]?.options.united) {
+    //       Vue.set(state[id.idDash][id.id].options, 'united', false);
+    //     }
+    //
+    //     return state[id.idDash][id.id].options;
+    //   };
+    // },
+    // getEventFull(state) {
+    //   // получаем скриншот страницы
+    //
+    //   return (id) => {
+    //     if (state[id].eventFull) {
+    //       return state[id].eventFull;
+    //     }
+    //     return '';
+    //   };
+    // },
+    // getDragRes(state) {
+    //   return (id) => state[id.idDash].dragRes;
+    // },
+    // getEvents(state) {
+    //   // получаем скриншот страницы
+    //   return (event) => {
+    //     let result = [];
+    //     if (!state[event.idDash].events) {
+    //       state[event.idDash].events = [];
+    //       return [];
+    //     }
+    //     if (event.partelement) {
+    //       result = state[event.idDash].events.filter((item) => (
+    //         item.event == event.event
+    //             && item.element == event.element
+    //             && item.partelement == event.partelement
+    //       ));
+    //     } else {
+    //       result = state[event.idDash].events.filter((item) => item.event == event.event && item.target == event.element);
+    //     }
+    //     return result;
+    //   };
+    // },
+    // getChangeDate(state) {
+    //   // получаем скриншот страницы
+    //   return (date) => state[date.idDash][date.id].changeDate;
+    // },
+    // getSchedulers(state) {
+    //   // получаем все планировщики что были созданы
+    //   return (id) => {
+    //     if (!state[id].schedulers) {
+    //       state[id].schedulers = {};
+    //     }
+    //     return state[id].schedulers;
+    //   };
+    // },
+    // getThemeBack() {
+    //   return () => rest.getThemeBack(restAuth);
+    // },
+    // getModalSettings(state) {
+    //   // получаем объект с настройками моадлки натсроек
+    //   return (idDash) => {
+    //     if (!state[idDash] || !state[idDash].modalSettings) {
+    //       Vue.set(state[idDash], 'modalSettings', {});
+    //       Vue.set(state[idDash].modalSettings, 'element', '');
+    //       Vue.set(state[idDash].modalSettings, 'status', false);
+    //     }
+    //     return state[idDash].modalSettings;
+    //   };
+    // },
+    // getTextArea(state) {
+    //   return (textarea) => {
+    //     if (!state[textarea.idDash][textarea.id].textarea) {
+    //       return '';
+    //     }
+    //     return state[textarea.idDash][textarea.id].textarea;
+    //   };
+    // },
+    // saveDashboard: () => (dash) => new Promise((resolve) => {
+    //   const response = restAuth.setEssence({
+    //     formData: JSON.stringify(dash),
+    //     essence: 'dash',
+    //     method: 'PUT',
+    //   });
+    //   response.then((res) => {
+    //     if (res.status == 200) {
+    //       res.json().then((data) => {
+    //         resolve({ status: 200, data });
+    //       });
+    //     } else if (res.status == 409) {
+    //       resolve({ status: 409 });
+    //     }
+    //   });
+    // }),
+    // checkAlreadyDash: (state) => (id, first) => new Promise((resolve) => {
+    //   const result = rest.getState(id, restAuth);
+    //   result.then((stateFrom) => {
+    //     if (stateFrom) {
+    //       if (!state[id]) {
+    //         Vue.set(state, id, {});
+    //         if (stateFrom.body !== '') {
+    //           Vue.set(state, id, JSON.parse(stateFrom.body));
+    //         }
+    //         Vue.set(state[id], 'name', stateFrom.name);
+    //         Vue.set(state[id], 'idgroup', stateFrom.idgroup);
+    //         Vue.set(state[id], 'modified', stateFrom.modified);
+    //       }
+    //       if (stateFrom.modified > state[id].modified) {
+    //         resolve({
+    //           status: 'exist',
+    //           body: stateFrom.body,
+    //           name: stateFrom.name,
+    //           id: stateFrom.id,
+    //           modified: stateFrom.modified,
+    //         });
+    //       }
+    //       if (first) {
+    //         if (stateFrom.body !== '') {
+    //           Vue.set(state, id, JSON.parse(stateFrom.body));
+    //           Vue.set(state[id], 'idgroup', stateFrom.idgroup);
+    //           Vue.set(state[id], 'name', stateFrom.name);
+    //           Vue.set(state[id], 'modified', stateFrom.modified);
+    //         }
+    //       }
+    //       if (state[id].elements) {
+    //         state[id].elements.forEach((elem) => {
+    //           if (!state[id][elem].tab) {
+    //             Vue.set(state[id][elem], 'tab', 1);
+    //           }
+    //         });
+    //       }
+    //
+    //       state[id].filters?.forEach((filter) => {
+    //         if (filter.idDash !== id) {
+    //           Vue.set(filter, 'idDash', id);
+    //         }
+    //       });
+    //
+    //       if (state[id].searches) {
+    //         state[id].searches.forEach((search) => Vue.set(search, 'status', 'empty'));
+    //       }
+    //       resolve({ status: 'finish' });
+    //       // }
+    //     } else {
+    //       resolve({ status: 'failed' });
+    //     }
+    //   });
+    // }),
+    // checkDataSearch: () => (sid) => new Promise((resolve) => {
+    //   let db = null;
+    //
+    //   const request = indexedDB.open('EVA', 1);
+    //
+    //   request.onerror = function (event) {
+    //     console.log('error:', event);
+    //   };
+    //
+    //   request.onupgradeneeded = (event) => {
+    //     console.log('create');
+    //     db = event.target.result;
+    //     if (!db.objectStoreNames.contains('searches')) {
+    //       // if there's no "books" store
+    //       db.createObjectStore('searches'); // create it
+    //     }
+    //
+    //     request.onsuccess = () => {
+    //       db = request.result;
+    //       // this.alreadyDB = request.result;
+    //       console.log(`success: ${db}`);
+    //
+    //       setTransaction(db);
+    //     };
+    //   };
+    //
+    //   request.onsuccess = () => {
+    //     db = request.result;
+    //
+    //     setTransaction(db);
+    //   };
+    //
+    //   function setTransaction(db) {
+    //     const transaction = db.transaction('searches', 'readwrite'); // (1)
+    //
+    //     // получить хранилище объектов для работы с ним
+    //     const searches = transaction.objectStore('searches'); // (2)
+    //
+    //     const query = searches.get(sid); // (3) return store.get('Ire Aderinokun');
+    //
+    //     query.onsuccess = () => {
+    //       // (4)
+    //
+    //       if (query.result) {
+    //         resolve(true);
+    //       } else {
+    //         resolve(false);
+    //       }
+    //     };
+    //
+    //     query.onerror = function () {
+    //       console.log('Ошибка', query.error);
+    //     };
+    //   }
+    // }),
+    // getSvg: () => (svg) => rest.getSvg(svg, restAuth), // отправляем в файл storeRest.js
+    // setSvg: () => (svg) => rest.setSvg(svg, restAuth), // отправляем в файл storeRest.js
+    // exportDash: () => (dash) => rest.exportDash(dash, restAuth), // отправляем в файл storeRest.js
+    // importDash: () => (dash) => rest.importDash(dash, restAuth), // отправляем в файл storeRest.js
+    // getMetricsMulti: (state) => (dash) => {
+    //   if (!state[dash.idDash][dash.id].metrics) {
+    //     Vue.set(state[dash.idDash][dash.id], 'metrics', []);
+    //   }
+    //   return state[dash.idDash][dash.id].metrics;
+    // },
+    // getSizeGrid: (state) => (id) => {
+    //   if (!state[id]?.grid) {
+    //     Vue.set(state[id], 'grid', {});
+    //     Vue.set(state[id]?.grid, 'vert', '32');
+    //     Vue.set(state[id]?.grid, 'hor', '18');
+    //   }
+    //   return state[id]?.grid;
+    // },
+    // getDragResize: (state) => (id) => {
+    //   if (!state[id].dragRes) {
+    //     Vue.set(state[id], 'dragRes', 'true');
+    //   }
+    //   return state[id].dragRes;
+    // },
+    // getGridShow: (state) => (id) => {
+    //   if (!state[id].gridShow) {
+    //     Vue.set(state[id], 'gridShow', 'true');
+    //   }
+    //   return state[id].gridShow;
+    // },
+    // loadPaper: () => (paper) => rest.loadPaper(paper, restAuth),
+    // getAllPaper: () => () => rest.getAllPaper(restAuth),
+    // getPaper: () => (fileData) => rest.getPaper(restAuth, fileData),
+    // getPaperVis: () => (url) => rest.getPaperVis(restAuth, url),
+    // getSelectedTableTitles: (state) => (dashId, elementId) => state[dashId][elementId]?.selectedTableTitles,
+    // getAvailableTableTitles: (state) => (dashId, elementId) => state[dashId][elementId]?.availableTableTitles,
+    // getSelectedDataFormat: (state) => (dashId, elementId) => state[dashId][elementId]?.selectedDataFormat,
+    // getAvailableDataFormat: (state) => (dashId, elementId) => state[dashId][elementId]?.availableDataFormat,
+    // getLibrary: (state) => (dashId, elementId) => state[dashId][elementId]?.options?.library,
+    // getFilters: (state) => (dashId) => (state[dashId].filters ? state[dashId].filters : []),
+    // getFocusedFilter(state) {
+    //   return (dashId) => state[dashId].focusedFilter;
+    // },
   },
 };

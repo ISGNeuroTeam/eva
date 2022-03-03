@@ -28,7 +28,7 @@ import * as turf from '@turf/turf';
 import * as utils from 'leaflet-geometryutil';
 import vuetify from '../../plugins/vuetify';
 import dashMapUserSettings from './dashMapUserSettings.vue';
-import store from '../../store/index.js'; // подключаем файл с настройками хранилища Vuex
+import store from '../../store/index'; // подключаем файл с настройками хранилища Vuex
 
 export default {
   props: {
@@ -144,7 +144,9 @@ export default {
     },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
-      this.reDrawMap(_dataRest);
+      if (_dataRest) {
+        this.reDrawMap(_dataRest);
+      }
     },
     clusterTextCount() {
       this.clearCluster();
@@ -199,10 +201,12 @@ export default {
       });
 
       this.$store.getters['auth/putLog'](`Запущен запрос  ${event.sid}`);
-      const response = await this.$store.getters.getDataApi({
+      // собственно проводим все операции с данными
+      const response = await this.$store.dispatch('getDataApi', {
         search: event,
         idDash: this.idDash,
-      }); // собственно проводим все операции с данными
+      });
+      console.log('response', response);
       // вызывая метод в хранилище
       if (response.length === 0) {
         // если что-то пошло не так
@@ -238,12 +242,14 @@ export default {
     async loadDataForPipe(search) {
       this.pipelineData = await this.getDataFromRest(search);
       const allPipes = {};
-      for (const x of this.pipelineData) {
+      console.log('pipelineData', this.pipelineData);
+      this.pipelineData.forEach((x) => {
         if (!allPipes[x.ID]) {
           allPipes[x.ID] = [];
         }
         allPipes[x.ID].push(x);
-      }
+      });
+
       this.pipelineDataDictionary = allPipes;
       this.reDrawMap(this.dataRestFrom);
     },
@@ -298,7 +304,7 @@ export default {
       // получаем osm server
       this.getOSM();
       // получаем библиотеку
-      this.generateLibrary(dataRest, this.options?.primitivesLibrary); // get all icons that we need on map
+      // get all icons that we need on map
       this.generateClusterPositionItems();
       this.initSettings();
       if (!this.error) {

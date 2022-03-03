@@ -477,7 +477,6 @@ import {
   mdiSettings,
   mdiTrashCanOutline,
 } from '@mdi/js';
-import { mapGetters } from 'vuex';
 import settings from '../js/componentsSettings.js';
 
 export default {

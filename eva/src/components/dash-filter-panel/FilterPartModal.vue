@@ -129,6 +129,9 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
   },
   watch: {
     currentTab(val) {
@@ -157,8 +160,7 @@ export default {
   methods: {
     saveFilterPartModal() {
       if (this.temp.filterPartType === 'token') {
-        const originToken = this.$store.getters
-          .getTockens(this.idDash)
+        const originToken = this.getTockens
           .find((tkn) => tkn.name === this.temp.token);
         if (originToken) {
           this.temp.token = originToken;

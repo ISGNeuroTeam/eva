@@ -69,7 +69,10 @@
 <script>
 export default {
   props: {
-    idDashFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -83,20 +86,20 @@ export default {
     getModalSearch() {
       return this.$store.state[this.idDash]?.modalSearch?.status || false;
     },
+    // получаем название элемнета от родителя
     idDash() {
-      // получаем название элемнета от родителя
       return this.idDashFrom;
     },
+    // получаем статус открытия или нет окна модального
     active() {
-      // получаем статус открытия или нет окна модального
       let active = 'false';
       if (this.idDash) {
         active = this.getModalSearch;
       }
       return active;
     },
+    // получаем все ИС на странице
     searches() {
-      // получаем все ИС на странице
       let searches = [];
       if (this.idDash) {
         searches = this.getSearches;
@@ -107,43 +110,52 @@ export default {
       return this.$store.getters.getTheme;
     },
   },
+  // при создании окна на странице выключаем все открытые ранее окна
   created() {
-    this.$store.commit('setModalSearch', { id: this.idDash, status: false }); // при создании окна на странице выключаем все открытые ранее окна
+    this.$store.commit('setModalSearch', { id: this.idDash, status: false });
   },
   methods: {
+    //  если нажали на кнопку согласия
     startDS() {
-      //  если нажали на кнопку согласия
+      // проверяем выбран ли хоть один ИС
       if (this.currentId !== 0) {
-        // проверяем выбран ли хоть один ИС
+        // отправляем данные  в хранилище чтобы укзаать элемнету
+        // что он должен ссылаться на выбранный ИС
         this.$store.commit('setDataSource', {
           id: this.idDash,
           searchid: this.currentId,
-        }); // отправляем данные  в хранилище чтобы укзаать элемнету что он должен ссылаться на выбранный ИС
+        });
+        // закрываем окно
         this.$store.commit('setModalSearch', {
           id: this.idDash,
           status: false,
-        }); // закрываем окно
+        });
       }
     },
+    // если нажали отмену
     cancelModal() {
-      // если нажали отмену
       this.$store.commit('setModalSearch', { id: this.idDash, status: false }); // просто закрываем окно
     },
+    // функция для выбора одного элемента из списка
     selectSearch(event, search) {
-      // функция для выбора одного элемента из списка
-      const elem = event.target.parentElement; // получаем родителя в котором находятся все элементы
+      // получаем родителя в котором находятся все элементы
+      const elem = event.target.parentElement;
+      // пробегаемся по всем элементам
       elem.parentElement.childNodes.forEach((item) => {
-        // пробегаемся по всем элементам
-        item.style = 'box-shadow: none'; // и отключаем  обводку
+        // и отключаем  обводку
+        item.style = 'box-shadow: none';
       });
-      this.currentId = search.sid; // затем получаем текст всего ИС который выбрали
-      elem.style = `box-shadow: 0px 0px 4px 3px  ${this.theme.$accent_ui_color}`; // и делаем ему обводку
+      // затем получаем текст всего ИС который выбрали
+      this.currentId = search.sid;
+      // и делаем ему обводку
+      elem.style = `box-shadow: 0px 0px 4px 3px  ${this.theme.$accent_ui_color}`;
     },
     checkSid(sid) {
       let newSid = sid;
+      // если там больше 10 символов
       if (sid.length > 5) {
-        // если там больше 10 символов
-        newSid = `${sid.substring(0, 5)}...`; // обрезаем и добовляем троеточие
+        // обрезаем и добовляем троеточие
+        newSid = `${sid.substring(0, 5)}...`;
       }
       return newSid;
     },

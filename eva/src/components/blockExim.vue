@@ -81,7 +81,7 @@ export default {
   computed: {},
   methods: {
     async exportDash() {
-      const response = await this.$store.getters.exportDash(this.idDash);
+      const response = await this.$store.dispatch('exportDash', this.idDash);
       if (response.status != 200) {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
@@ -102,7 +102,7 @@ export default {
         this.msgImp.color = 'controlsActive';
         this.msgImp.opacity = '1';
       } else {
-        const response = await this.$store.getters.importDash({
+        const response = await this.$store.dispatch('importDash', {
           idDash: this.idDash,
           file: this.file,
         });

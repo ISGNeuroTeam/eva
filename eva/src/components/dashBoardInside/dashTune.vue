@@ -107,7 +107,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getElementSelected', 'getElement']),
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
         ? this.$attrs.heightFrom
@@ -120,7 +119,12 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
+    getElementSelected() {
+      return this.dashFromStore?.selected;
+    },
     storedElement() {
+      // TODO: разобраться для чего это здесь
+      // eslint-disable-next-line no-unused-expressions
       this.isFullScreen; // << dont remove
       return this.dashFromStore;
     },

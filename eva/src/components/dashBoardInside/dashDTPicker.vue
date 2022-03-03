@@ -393,7 +393,7 @@ export default {
       this.$set(this.date, 'endCus', this.end_custom.value);
       this.$set(this.date, 'last', this.last);
       this.$store.commit('setPickerDate', {
-        date: this.date,
+        date: JSON.parse(JSON.stringify(this.date)),
         idDash: this.idDash,
         id: this.id,
       });

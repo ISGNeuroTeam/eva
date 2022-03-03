@@ -13,7 +13,7 @@ module.exports = {
 
   extends: [
     // 'eslint:recommended',
-    'plugin:vue/strongly-recommended',
+    'plugin:vue/recommended',
     'airbnb-base',
   ],
   plugins: [

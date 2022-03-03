@@ -161,9 +161,19 @@
 <script>
 export default {
   props: {
-    idDashFrom: null,
-    modalFrom: null,
-    dataSidFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
+    dataSidFrom: {
+      type: [String, Number],
+      required: true,
+    },
+
   },
   data() {
     return {
@@ -193,16 +203,14 @@ export default {
     };
   },
   computed: {
+    // получаем название элемента от родителя
     idDash() {
-      // получаем название элемента от родителя
       return this.idDashFrom;
     },
+    // получаем статус открытия или нет окна модального
     active() {
-      // получаем статус открытия или нет окна модального
-      if (this.modalFrom) {
-        if (this.schedulers.length !== 0) {
-          this.setData();
-        }
+      if (this.modalFrom && this.schedulers.length !== 0) {
+        this.setData();
       }
       return this.modalFrom;
     },
@@ -236,18 +244,17 @@ export default {
     },
   },
   mounted() {
-    // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
     const { schedulers } = this;
     const searches = this.getSearches;
     let shedule = {};
     let curTime = {};
 
+    // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
     if (Object.keys(schedulers).length !== 0) {
-      // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
+      // пробегаемся по всем планировщикам
       Object.keys(schedulers).forEach((scheduler) => {
-        // пробегаемся по всем планировщикам
+        // создаем объект на основе настроек планировщика
         shedule = {
-          // создаем объект на основе настроек планировщика
           time: schedulers[scheduler].time,
           every: schedulers[scheduler].every,
           timeLast: schedulers[scheduler].timeLast,
@@ -258,10 +265,12 @@ export default {
           clearInterval(schedulers[scheduler].schedulerID);
         }
 
-        curTime = this.countTime(shedule.time, shedule.every) * 1000; // переводим в правильный формат время
-        this.executeSearch(searches, scheduler, shedule); // выоплняем серч один раз
+        // переводим в правильный формат время
+        curTime = this.countTime(shedule.time, shedule.every) * 1000;
+        // выоплняем серч один раз
+        this.executeSearch(searches, scheduler, shedule);
+        // и запускаем в цикле
         this.timers[scheduler] = setInterval(() => {
-          // и запускаем в цикле
           this.executeSearch(searches, scheduler, shedule);
         }, curTime);
         this.$store.commit('setSchedulerID', {
@@ -274,8 +283,8 @@ export default {
   },
   methods: {
     setData() {
+      // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
       if (this.schedulers[this.sid]) {
-        // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
         this.every = this.schedulers[this.sid].every;
         this.time = this.schedulers[this.sid].time;
         this.everyLast = this.schedulers[this.sid].everyLast;
@@ -301,8 +310,8 @@ export default {
         this.msg = 'Не запущен';
       }
     },
+    // закрываем окно
     cancel() {
-      // закрываем окно
       this.$emit('cancel');
     },
     checkEsc(event) {
@@ -310,8 +319,8 @@ export default {
         this.cancel();
       }
     },
+    // выставляем время и меняем цвета у кнопок
     setTime(time, tense) {
-      // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
         if (tense === 'every') {
           this.time = time;
@@ -336,8 +345,8 @@ export default {
         }
       }
     },
+    // переводим строковые значения времени в числовые
     countTime(time, every) {
-      // переводим строковые значения времени в числовые
       let period = 0;
       switch (time) {
         case 'second':
@@ -351,11 +360,13 @@ export default {
         case 'hour':
           period = Number(every) * 3600;
           break;
+        default:
+          break;
       }
       return period;
     },
+    // выполняем серч меняя его временны рамки
     executeSearch(searches, sid, shedule) {
-      // выполняем серч меняя его временны рамки
       let curTimeLast = 0;
       let tws = 0;
       let twf = 0;
@@ -368,6 +379,15 @@ export default {
         if (item.sid === sid) {
           item.parametrs.tws = tws;
           item.parametrs.twf = twf;
+          this.$store.commit('setState', [{
+            object: item.parametrs,
+            prop: 'tws',
+            value: tws,
+          }, {
+            object: item.parametrs,
+            prop: 'twf',
+            value: twf,
+          }]);
           this.$store.commit('updateSearchStatus', {
             idDash: this.idDash,
             sid: item.sid,
@@ -376,8 +396,8 @@ export default {
         }
       });
     },
+    // запускаем планировщик
     startSchedule() {
-      // запускаем планировщик
       const schedule = {
         time: this.time,
         every: this.every,
@@ -388,9 +408,11 @@ export default {
 
       const searches = this.getSearches;
       const curTime = this.countTime(schedule.time, schedule.every) * 1000;
-      this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
+      // сперва первый раз просто выполняем серч
+      this.executeSearch(searches, sid, schedule);
+      // а затем уже выполняем его в цикле
       const intervalID = (this.timers[sid] = setInterval(() => {
-        this.executeSearch(searches, sid, schedule); // а затем уже выполняем его в цикле
+        this.executeSearch(searches, sid, schedule);
       }, curTime));
 
       this.$store.commit('setSchedule', {

@@ -930,11 +930,14 @@
 
 <script>
 import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
-import settings from '../js/componentsSettings.js';
+import settings from '../js/componentsSettings';
 
 export default {
   props: {
-    idDashFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -1208,8 +1211,7 @@ export default {
         if (this.colorsPie.nametheme) {
           this.options.colorsPie = this.colorsPie;
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            this.themes[this.colorsPie.nametheme] =
-              this.colorsPie.colors.split(' ');
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
             if (
               this.colorsPie.theme !== 'custom'
               && this.colorsPie.theme !== this.colorsPie.nametheme

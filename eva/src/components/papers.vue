@@ -473,7 +473,7 @@ export default {
       } else {
         const formData = new FormData();
         formData.append('file', this.uploadFile);
-        const result = await this.$store.getters.loadPaper(formData);
+        const result = await this.$store.dispatch('loadPaper', formData);
         if (result.status === 'success') {
           this.message('Файл успшено загружен');
           this.setPaperBack();

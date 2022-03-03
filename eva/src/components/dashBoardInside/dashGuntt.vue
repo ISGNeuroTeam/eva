@@ -83,6 +83,9 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
   },
   watch: {
     dataRestFrom() {
@@ -674,7 +677,7 @@ export default {
     },
 
     setClick(item) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const tockens = this.getTockens;
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {

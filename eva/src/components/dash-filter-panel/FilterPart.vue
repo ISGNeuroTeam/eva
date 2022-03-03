@@ -133,7 +133,6 @@ import {
   mdiPencil,
   mdiChevronDown,
 } from '@mdi/js';
-import { mapGetters } from 'vuex';
 
 export default {
   name: 'FilterPart',

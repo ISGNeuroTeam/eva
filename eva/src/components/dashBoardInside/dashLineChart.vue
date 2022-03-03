@@ -128,13 +128,6 @@ export default {
     height() {
       return this.heightFrom;
     },
-    // getDataStart: function() {
-    //   if (this.width != 0 && this.height != 0 && this.dataRest.length > 0) {   // если размеры получены выше нуля и  если данные от родителя тоже пришли
-    //     //this.getDataAsynchrony(); // вызываем функцию в которой будет происходить асинхронная отрисовка графика
-    //   }
-
-    //   return 'done'
-    // },
     change() {
       if (
         this.dataRestFrom
@@ -160,6 +153,9 @@ export default {
         }
       }
       return true;
+    },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
     },
   },
   mounted() {
@@ -1147,7 +1143,7 @@ export default {
       return result;
     },
     setClick(point, action) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const tockens = this.getTockens;
       let tocken = {};
 
       const setTocken = (value) => {

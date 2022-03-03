@@ -70,7 +70,7 @@ export default {
       let otstup;
       if (this.dataModeFrom) {
         otstup = 50;
-        if (screen.width <= 1600) {
+        if (window.screen.width <= 1600) {
           otstup = 35;
         }
       } else {

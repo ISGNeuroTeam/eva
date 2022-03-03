@@ -170,8 +170,14 @@ import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
   props: {
-    searchFrom: null,
-    modalFrom: null,
+    searchFrom: {
+      type: Object,
+      required: true,
+    },
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -195,8 +201,8 @@ export default {
     };
   },
   computed: {
+    // тут понимаем нужно ли открыть окно с созданием или нет
     active() {
-      // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
         this.setSearchData(this.searchFrom);
       }

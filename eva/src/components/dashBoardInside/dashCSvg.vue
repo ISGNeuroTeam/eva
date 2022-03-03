@@ -266,7 +266,9 @@ export default {
       deep: true,
       handler() {
         if (this.tooltipFrom.buttons) {
-          this.captures = this.tooltipFrom.buttons.map((item) => item.id);
+          // this.captures = this.tooltipFrom.buttons.map((item) => item.id);
+          console.log('this.captures', this.tooltipFrom.buttons.map((item) => item.id));
+          console.log(this.captures);
         }
       },
     },
@@ -344,7 +346,7 @@ export default {
   methods: {
     async getSvg(svg) {
       this.$emit('setLoading', true);
-      const response = await this.$store.getters.getSvg(svg);
+      const response = await this.$store.dispatch('setSvg', svg);
       if (response !== '') {
         this.$emit('setLoading', false);
         this.svg = response;
@@ -513,7 +515,7 @@ export default {
         const formData = new FormData();
         formData.append('file', this.file);
 
-        const response = await this.$store.getters.setSvg(formData);
+        const response = await this.$store.dispatch('setSvg', formData);
         try {
           if (JSON.parse(response).status === 'ok') {
             this.answerColor = this.color.controls;
