@@ -471,7 +471,7 @@ export default {
       // Tooltip
 
       let tooltipBlock = this.$refs.tooltip;
-      const tooltipMargin = this.$attrs['is-full-screen'] ? 170 : 30;
+      const tooltipMargin = this.$attrs['is-full-screen'] ? 230 : 40;
 
       lines
         .on('mouseover', (event) => {
@@ -622,10 +622,10 @@ export default {
       // легенда
 
       function moveTooltip(offsetX) {
-        const x = d3.event.offsetY - 100;
-        const y = d3.event.offsetX + offsetX;
-        tooltipBlock.style.top = `${x}px`;
-        tooltipBlock.style.left = `${y}px`;
+        const y = d3.event.offsetY;
+        const x = d3.event.offsetX + offsetX;
+        tooltipBlock.style.top = `${y}px`;
+        tooltipBlock.style.left = `${x}px`;
       }
 
       function transformDescription(text) {
