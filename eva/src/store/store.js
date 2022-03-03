@@ -1682,7 +1682,7 @@ export default {
         },
       };
     },
-    getReportElement: () => settings.reporstElements,
+    getReportElement: () => ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg', 'ygraph', 'bush', 'map', 'heatmap', 'singleValue', 'tune'],
     getGroups() {
       return () => rest.getGroups(restAuth);
     },
