@@ -56,7 +56,7 @@
           "
           @mouseover="hoverLegendLine(idx)"
           @mouseleave="hoverLegendLine(null)"
-          @click="selectedPieIndex = idx"
+          @click="selectedPie = idx"
         >
           <div
             class="square"
@@ -89,11 +89,11 @@ export default {
     heightFrom: null, // высота родительского компонента
     activeElemFrom: null, // id активного элемента
     dataReport: null, // проверяет что элемент в исследовании данных
+    selectedPieIndex: null, // индекс активного элемента
   },
   data() {
     return {
       nodata: true,
-      selectedPieIndex: null,
       message: 'Нет данных для отображения',
       legends: [],
       positionLegends: 'row nowrap',
@@ -165,6 +165,15 @@ export default {
     },
     change() {
       return true;
+    },
+    selectedPie: {
+      get() {
+        return this.selectedPieIndex;
+      },
+      set(val) {
+        console.log(val);
+        this.$emit('changeSelectPie', val);
+      },
     },
   },
   watch: {
@@ -238,17 +247,22 @@ export default {
   },
   methods: {
     hoverLegendLine(legendLineIndex) {
+      this.setActiveLegendLine(legendLineIndex);
+    },
+    setActiveLegendLine(legendLineIndex) {
       d3.select(this.$refs.pieChart)
         .selectAll('.piepart')
         .each((_, i, nodes) => {
           const node = nodes[i];
-          if (i === legendLineIndex) node.classList.add('piepartSelect');
-          else if (
+          if (i === legendLineIndex) {
+            node.classList.add('piepartSelect');
+          } else if (
             node.classList.contains('piepartSelect')
             && this.selectedPieIndex !== i
-          ) node.classList.remove('piepartSelect');
+          ) {
+            node.classList.remove('piepartSelect');
+          }
         });
-
       d3.select(this.$refs.legends)
         .selectAll('.legend-line')
         .each((_, i, nodes) => {
@@ -474,10 +488,10 @@ export default {
         .on('click', (_, i, nodes) => {
           const node = nodes[i];
           if (this.selectedPieIndex === i) {
-            this.selectedPieIndex = null;
+            this.selectedPie = null;
             node.classList.remove('piepartSelect');
           } else {
-            this.selectedPieIndex = i;
+            this.selectedPie = i;
             node.classList.add('piepartSelect');
           }
         });
