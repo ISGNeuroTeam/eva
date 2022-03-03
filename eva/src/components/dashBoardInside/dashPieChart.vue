@@ -89,7 +89,10 @@ export default {
     heightFrom: null, // высота родительского компонента
     activeElemFrom: null, // id активного элемента
     dataReport: null, // проверяет что элемент в исследовании данных
-    selectedPieIndex: null, // индекс активного элемента
+    selectedPieIndex: {
+      type: Number,
+      default: -1,
+    }, // индекс активного элемента
   },
   data() {
     return {
@@ -171,7 +174,6 @@ export default {
         return this.selectedPieIndex;
       },
       set(val) {
-        console.log(val);
         this.$emit('changeSelectPie', val);
       },
     },
@@ -350,6 +352,7 @@ export default {
                     colorsPie,
                   ); // и собственно создаем график
                   clearTimeout(timeOut);
+                  this.setActiveLegendLine(this.selectedPieIndex);
                 } else {
                   timeOut = setTimeout(tick.bind(this), 100);
                 }
@@ -366,6 +369,7 @@ export default {
               positionlegend,
               colorsPie,
             ); // и собственно создаем график
+            this.setActiveLegendLine(this.selectedPieIndex);
           }
         }
       } else {
@@ -483,12 +487,12 @@ export default {
         .on('mouseout', (_, i, nodes) => {
           if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
-          hoverLegendLine(null);
+          hoverLegendLine(-1);
         })
         .on('click', (_, i, nodes) => {
           const node = nodes[i];
           if (this.selectedPieIndex === i) {
-            this.selectedPie = null;
+            this.selectedPie = -1;
             node.classList.remove('piepartSelect');
           } else {
             this.selectedPie = i;

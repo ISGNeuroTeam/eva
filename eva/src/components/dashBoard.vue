@@ -240,7 +240,7 @@
                   </v-card-title>
                   <v-card-text
                     :is="currentElem"
-                    v-show="showElement"
+                    v-if="showElement"
                     ref="dashBoardInsideFull"
                     class="card-text element-itself"
                     :color-from="theme"
@@ -427,7 +427,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-show="showElement"
+        v-if="showElement"
         ref="dashBoardInside"
         class="card-text element-itself"
         :color-from="theme"
@@ -577,7 +577,7 @@ export default {
       },
       fullScreenWidth: 0.8 * window.innerWidth,
       fullScreenHeight: 0.8 * window.innerHeight,
-      selectedPieIndex: null,
+      selectedPieIndex: -1,
     };
   },
   computed: {
