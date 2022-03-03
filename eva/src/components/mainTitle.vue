@@ -446,7 +446,7 @@ export default {
       if (!this.tabEditMode) {
         this.$store.commit('changeCurrentTab', {
           idDash: this.idDash,
-          tab: tabID,
+          tab: this.tabs.find((tab) => tabID === tab.id) ? tabID : 1,
         });
       }
     },
