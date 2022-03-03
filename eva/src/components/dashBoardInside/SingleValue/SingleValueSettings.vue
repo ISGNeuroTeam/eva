@@ -96,6 +96,7 @@
           />
         </div>
         <draggable
+          v-if="settings.metricOptions && settings.metricOptions.length > 0"
           v-model="settings.metricOptions"
           handle=".burger"
           @end="update()"
@@ -214,8 +215,11 @@
                   v-for="color in colorsList"
                   :key="color.name"
                   class="color-select"
-                  :class="{ selected: metric.color === color.name }"
-                  @click="metric.color = color.name"
+                  :class="{
+                    selected: metric.color === color.name,
+                    disabled: color.name === 'range' && !metric.metadata
+                  }"
+                  @click="changeColorData(metric, color)"
                 >
                   <div
                     v-if="color.colorGrad"
@@ -269,12 +273,13 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from '@mdi/js';
+// eslint-disable-next-line camelcase
 import metricTitleIcons, { no_icon } from './metricTitleIcons';
 import './sass/checkboxGoogle.css';
 
 export default {
   name: 'SingleValueSettings',
-  comments: {
+  components: {
     draggable,
   },
   props: {
@@ -356,6 +361,7 @@ export default {
   watch: {
     receivedSettings(newValue) {
       const newSettings = JSON.parse(JSON.stringify(newValue));
+      // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
       this.settings = {
         ...newSettings,
         metricOptions: newSettings.metricOptions.sort(
@@ -370,6 +376,9 @@ export default {
     },
   },
   methods: {
+    changeColorData(metric, color) {
+      if (color.name !== 'range' || (color.name === 'range' && metric.metadata)) metric.color = color.name;
+    },
     getFamily() {},
     handleChangeShowTitle() {
       if (this.settings) {

@@ -58,33 +58,73 @@ export default {
     },
     rows() {
       let rowsCount = 20;
-      if (screen.width < 1400) {
+      if (window.screen.width < 1400) {
         rowsCount = 15;
       }
-      if (screen.width > 1920) {
+      if (window.screen.width > 1920) {
         rowsCount = 25;
       }
       return Math.floor((this.heightFrom - 200) / rowsCount);
     },
     height() {
-      let otstup = 55;
-      if (screen.width < 1600) {
-        otstup = 45;
-      }
+      const otstup = window.screen.width < 1600 ? 45 : 55;
       return `${this.heightFrom - otstup}px`;
     },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     searchBtn() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const options = this.getOptions;
       return options.searchBtn;
     },
     textAreaValue() {
-      return this.$store.getters.getTextArea({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      return this.getTextArea;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getTextArea() {
+      if (!this.dashFromStore.textarea) {
+        return '';
+      }
+      return this.dashFromStore.textarea;
     },
   },
   watch: {
@@ -94,10 +134,7 @@ export default {
   },
   mounted() {
     this.$emit('hideDS', this.id);
-    this.textarea = this.$store.getters.getTextArea({
-      idDash: this.idDash,
-      id: this.id,
-    });
+    this.textarea = this.getTextArea;
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -127,7 +164,7 @@ export default {
       this.setTocken();
     },
     setTocken() {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let name = '';
       Object.keys(tockens).forEach((i) => {
         if (tockens[i].elem === this.id && tockens[i].action === 'accept') {

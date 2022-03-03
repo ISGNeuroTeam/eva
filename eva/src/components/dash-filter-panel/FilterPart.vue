@@ -166,16 +166,15 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getTockens']),
     getDashTokens() {
-      return this.getTockens(this.idDash);
+      return this.$store.state[this.idDash].tockens;
     },
     theme() {
       return this.$store.getters.getTheme;
     },
     elemRawName() {
       if (this.filterPart.token) {
-        return this.$store.state.store[this.idDash][this.filterPart.token.elem]
+        return this.$store.state[this.idDash][this.filterPart.token.elem]
           .name_elem;
       }
 
@@ -183,10 +182,13 @@ export default {
     },
     elemName() {
       let name = this.elemRawName;
-      name
-        && this.getDashTokens.forEach((token) => {
+
+      if (this.elemRawName) {
+        this.getDashTokens.forEach((token) => {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
+      }
+
       return name || this.filterPart?.token?.name || 'Unknown';
     },
     operationManualTitle() {
@@ -198,7 +200,7 @@ export default {
     },
     filterPartValues() {
       if (this.filterPart.token) {
-        return this.$store.state.store[this.idDash].filters[this.filterIndex]
+        return this.$store.state[this.idDash].filters[this.filterIndex]
           .parts[this.filterPartIndex].values;
       }
       return [];

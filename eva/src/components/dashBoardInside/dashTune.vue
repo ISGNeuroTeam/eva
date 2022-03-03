@@ -117,10 +117,12 @@ export default {
     isFullScreen() {
       return this.$attrs['is-full-screen'];
     },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
     storedElement() {
       this.isFullScreen; // << dont remove
-      const { idDashFrom, idFrom } = this;
-      return this.$store.getters.getElement(idDashFrom, idFrom);
+      return this.dashFromStore;
     },
     needSetField() {
       return !this.dataField && !this.loading;
@@ -135,7 +137,7 @@ export default {
       const list = this.dataRestFrom
         .map((row) => {
           const num = Number.parseFloat(row[this.dataField]);
-          return isNaN(num) ? 0 : num;
+          return Number.isNaN(num) ? 0 : num;
         })
         .sort((a, b) => a - b);
       return list.filter((item, pos) => list.indexOf(item) === pos); // filter duplicates
@@ -168,7 +170,7 @@ export default {
       return Object.keys(this.dataRestFrom[0]).filter((key) => key[0] !== '_');
     },
     changedInputData() {
-      return this.$store.state.store[this.idDashFrom][this.idFrom]?.switch;
+      return this.$store.state[this.idDashFrom][this.idFrom]?.switch;
     },
   },
   watch: {
@@ -207,7 +209,7 @@ export default {
           (key) => key[0] !== '_',
         );
         if (keys.length === 1) {
-          this.dataField = keys[0];
+          [this.dataField] = keys;
         }
       }
     },
@@ -238,7 +240,7 @@ export default {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
     circularSizeNew() {
-      if (this.$attrs['is-full-screen']){
+      if (this.$attrs['is-full-screen']) {
         this.circularWidth = 40;
         this.circularSize = 450;
       } else {
@@ -269,7 +271,7 @@ export default {
       });
     },
     setToken() {
-      this.$store.getters.getTockens(this.idDashFrom).forEach((token) => {
+      this.$store.state[this.idDashFrom]?.tockens?.forEach((token) => {
         if (token.elem === this.idFrom && token.action === 'change') {
           this.$store.commit('setTocken', {
             tocken: {
@@ -284,16 +286,15 @@ export default {
       });
     },
     loadSelectedValue() {
-      this.actionGetElementSelected({
+      const selected = this.actionGetElementSelected({
         idDash: this.idDashFrom,
         id: this.idFrom,
-      }).then((selected) => {
-        if (selected) {
-          this.dataField = selected.elem;
-          this.value = selected.elemDeep;
-        }
-        this.detectSliderValue();
       });
+      if (selected) {
+        this.dataField = selected.elem;
+        this.value = selected.elemDeep;
+      }
+      this.detectSliderValue();
     },
     detectSliderValue(values = this.values) {
       this.sliderValue = values.findIndex((item) => item === this.value);

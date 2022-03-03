@@ -131,10 +131,8 @@ export default {
       return this.idDashFrom;
     },
     events() {
-      return this.$store.getters.getEvents({
-        idDash: this.idDash,
+      return this.getEvents({
         event: 'OnDataCompare',
-        element: this.id,
       });
     },
     filteredData() {
@@ -230,7 +228,7 @@ export default {
         row = this.filteredData[x][y]?.row;
       }
 
-      this.$store.getters.getTockens(this.idDash).forEach((token) => {
+      this.$store.state[this.idDash].tockens.forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
           const { capture } = token;
@@ -250,51 +248,70 @@ export default {
         }
       });
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setClick(tokenValue) {
       if (this.detailValue) {
         const [first] = Object.keys(this.filteredData[tokenValue]);
         tokenValue = this.filteredData[tokenValue][first].row[this.detailValue];
       }
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onclick',
-        element: this.id,
         partelement: 'empty',
       });
       if (events.length !== 0) {
         events.forEach((item) => {
           if (item.action === 'go') {
             item.value[0] = tokenValue;
-            this.$store.commit('letEventGo', {
+            this.$store.dispatch('letEventGo', {
               event: item,
               id: this.id,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
             });
-            // this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
           }
         });
       }
     },
     chooseSort(dataFormat, sortType) {
+      let sort;
       if (dataFormat === 'Дата') {
         const up = (a, b) => new Date(a) - new Date(b);
         const down = (a, b) => new Date(b) - new Date(a);
 
-        let sort;
-        if (sortType === 'По возрастанию') sort = up;
-        else sort = down;
+        sort = sortType === 'По возрастанию' ? up : down;
         return sort;
       } if (dataFormat === 'Число') {
         const up = (a, b) => a - b;
         const down = (a, b) => b - a;
 
-        let sort;
-        if (sortType === 'По возрастанию') sort = up;
-        else sort = down;
+        sort = sortType === 'По возрастанию' ? up : down;
         return sort;
       }
+      return sort;
     },
 
     render() {
@@ -302,7 +319,7 @@ export default {
       this.y = new Set();
       this.updateData = 0;
       this.data = {};
-      for (const obj of this.dataRestFrom) {
+      this.dataRestFrom.forEach((obj) => {
         const xField = obj[this.xField];
         const yField = obj[this.yField];
 
@@ -319,7 +336,7 @@ export default {
         this.x.add(xField);
         this.y.add(yField);
         this.updateData += 1;
-      }
+      });
     },
 
     /**

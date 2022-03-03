@@ -9,7 +9,8 @@
       class="dash-block"
       :style="{
         background: theme.$main_bg,
-        boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+        boxShadow: `0 3px 1px -2px ${theme.$main_border},
+        0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
       <v-card-title
@@ -33,7 +34,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
-                v-if="searchData.length > 0"
+                v-show="searchingData"
                 class="icon"
                 :color="theme.$main_border"
                 @click="exportDataCSV"
@@ -130,7 +131,8 @@
                   class="dash-block"
                   :style="{
                     background: theme.$main_bg,
-                    boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+                    boxShadow: `0 3px 1px -2px ${theme.$main_border},
+                    0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
                   }"
                 >
                   <v-card-title
@@ -297,7 +299,6 @@
             class="settings-dash"
             :class="{ settings_move: props.open_gear }"
           >
-
             <v-tooltip
               bottom
               :color="theme.$accent_ui_color"
@@ -574,24 +575,28 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getTockens']),
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
     isMultiline() {
       return !!this.element?.includes('multiLine');
     },
     getSelfTockens() {
-      return this.getTockens(this.idDash);
+      return this.getTockens || [];
     },
     boardTitle() {
       if (!this.props || !this.props.name) {
         return this.element;
       }
       let { name } = this.props;
-      name
-      && this.getSelfTockens.forEach((token) => {
-        name = name.replaceAll(`$${token.name}$`, token.value);
-      });
 
-      if (name.indexOf('$evaTknLogin$') != -1) {
+      if (name) {
+        this.getSelfTockens.forEach((token) => {
+          name = name.replaceAll(`$${token.name}$`, token.value);
+        });
+      }
+
+      if (name.indexOf('$evaTknLogin$') !== -1) {
         if (this.$jwt.hasToken()) {
           name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
         }
@@ -599,7 +604,7 @@ export default {
       return name;
     },
     settingsIsOpened() {
-      return this.$store.getters.getModalSettings(this.idDash).status;
+      return this.$store.state[this.idDash].modalSettings.status;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -637,35 +642,63 @@ export default {
     elemIcon() {
       let element = '';
       if (this.element) {
-        element = this.element.split('-')[0];
+        [element] = this.element.split('-');
       }
       return element;
     },
     showElement() {
       // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
-      let show = false;
-      if (this.element) {
-        show = this.$store.getters.getSwitch({
-          idDash: this.idDash,
-          id: this.element,
-        });
+      return this.element ? this.$store.state[this.idDash][this.element].switch : false;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.element];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.element, idDash: this.idDash });
       }
 
-      return show;
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
     },
     lastResult() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.element,
-      });
+      const options = this.getOptions;
       return options.lastResult;
     },
     options() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.element,
-      });
-
+      const options = this.getOptions;
       this.setOptionsItems(options);
 
       if (this.props.options.timeFormat) {
@@ -695,22 +728,26 @@ export default {
 
       return options.change;
     },
+    searchingData() {
+      return this.searchData.length > 0;
+    },
   },
   watch: {
     fullScreenMode(to) {
-      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
+      setTimeout(() => {
+        this.disabledTooltip = to;
+      }, to ? 0 : 600);
     },
     settingsIsOpened(to) {
-      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
+      setTimeout(() => {
+        this.disabledTooltip = to;
+      }, to ? 0 : 600);
     },
   },
   mounted() {
     this.props.icons = settings.icons;
     this.page = this.$parent.$el.getAttribute('data-page'); // понимаем какая страница перед нами
-    this.props.name = this.$store.getters.getNameDash({
-      idDash: this.idDash,
-      id: this.element,
-    }); // получаем имя этой страницы
+    this.props.name = this.$store.state[this.idDash][this.element].name_elem; // получаем имя этой страницы
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
@@ -751,8 +788,8 @@ export default {
       this.fullScreenWidth = window.innerWidth * 0.8;
       this.fullScreenHeight = window.innerHeight * 0.8;
     },
-    updateSettings(settings) {
-      this.settings = JSON.parse(JSON.stringify(settings));
+    updateSettings(localSettings) {
+      this.settings = JSON.parse(JSON.stringify(localSettings));
     },
 
     editName(props) {
@@ -879,7 +916,7 @@ export default {
         id: this.element,
       }); // сразу переключаем элемнет на отображение данных,
     },
-    setVissible({element, overflow}) {
+    setVissible({ element, overflow }) {
       if (element.split('-')[0] === 'picker' || element.split('-')[0] === 'guntt') {
         // собственно если элемнет выбора даты и времен
         // поскольку запроса данных никакого не надо
@@ -902,10 +939,7 @@ export default {
       this.$emit('SetLevel', level);
     },
     exportDataCSV() {
-      const searchId = this.$store.getters.getSearchID({
-        idDash: this.idDash,
-        id: this.element,
-      });
+      const searchId = this.$store.state[this.idDash][this.element].should;
       this.$emit('downloadData', searchId);
     },
     getData(searchID) {
@@ -948,11 +982,33 @@ export default {
         };
       });
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     checkFilter() {
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'OnDataCompare',
-        element: this.element,
       });
       let data = [];
       let incl = false;

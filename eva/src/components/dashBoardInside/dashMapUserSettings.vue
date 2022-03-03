@@ -95,11 +95,11 @@
                     outlined
                     dense
                     :dark="isDark"
-                    class="mt-0 pt-0"
+                    class="mt-0 pt-0 map-user-settings__input"
                     hide-details
                     single-line
                     type="number"
-                    style="width: 60px"
+                    style="width: 60px; margin-right: 10px;"
                   />
                 </template>
               </v-slider>
@@ -118,24 +118,28 @@
                     outlined
                     dense
                     :dark="isDark"
-                    class="mt-0 pt-0"
+                    class="mt-0 pt-0 map-user-settings__input"
                     hide-details
                     single-line
                     type="number"
-                    style="width: 60px"
+                    style="width: 60px; margin-right: 10px;"
                   />
                 </template>
               </v-slider>
 
               <p>Начальная точка</p>
               <v-row>
-                <v-col col="6">
+                <v-col
+                    cols="3"
+                    style="padding-right: 0"
+                >
                   <v-text-field
                     v-model="options.initialPoint.x"
                     outlined
                     dense
                     :dark="isDark"
                     type="number"
+                    class="map-user-settings__input"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
                     <template v-slot:prepend>
@@ -143,13 +147,17 @@
                     </template>
                   </v-text-field>
                 </v-col>
-                <v-col col="6">
+                <v-col
+                    cols="3"
+                    style="padding-right: 0"
+                >
                   <v-text-field
                     v-model="options.initialPoint.y"
                     outlined
                     dense
                     :dark="isDark"
                     type="number"
+                    class="map-user-settings__input"
                     :style="`color: ${theme.$secondary_text} !important`"
                   >
                     <template v-slot:prepend>
@@ -426,13 +434,56 @@ export default {
       return this.theme.$main_text === '#F4F4FA';
     },
     dashSettings() {
-      return this.$store.getters.getOptions({
-        idDash: this.idDashFrom,
-        id: this.idElement,
-      });
+      return this.getOptions;
     },
     library() {
-      return this.$store.getters.getLibrary(this.idDashFrom, this.idElement);
+      return this.getLibrary;
+    },
+    getLibrary() {
+      return this.elementFromStore?.options?.library;
+    },
+    elementFromStore() {
+      return this.$store.state[this.idDashFrom][this.idElement];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idDashFrom });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
     },
   },
   watch: {
@@ -445,10 +496,7 @@ export default {
     },
   },
   mounted() {
-    const options = this.$store.getters.getOptions({
-      idDash: this.idDashFrom,
-      id: this.idElement,
-    });
+    const options = this.getOptions;
     this.tileLayers[0].tile = options.osmserver;
     // init store for reactivity
     if (!options.showLegend || !options.initialPoint) {
@@ -491,7 +539,7 @@ export default {
       this.$emit('updatePipeDataSource', this.options.search);
     },
     loadDataForPipe() {
-      return this.$store.getters.getSearches(this.idDashFrom);
+      return this.$store.state[this.idDashFrom].searches;
     },
     closeLegend() {
       this.options.showLegend = false;
@@ -626,4 +674,10 @@ export default {
     color: var(--main_text) !important
   .v-input input
     min-height: auto !important
+
+.map-user-settings__input
+  .v-input__slot
+    padding: 0 1px 0 12px !important
+  .v-text-field__slot
+    margin: 0 -12px 0 -1px
 </style>

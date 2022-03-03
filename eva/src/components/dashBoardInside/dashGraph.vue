@@ -153,6 +153,31 @@ export default {
     height() {
       return this.heightFrom;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getGraphTree() {
+      if (
+        this.dashFromStore.tree
+        && this.dashFromStore.direct
+        && this.dashFromStore.alies
+      ) {
+        return {
+          tree: this.dashFromStore.tree,
+          direct: this.dashFromStore.direct,
+          alies: this.dashFromStore.alies,
+        };
+      }
+      // если нет, то возвращаем пустую заготовку
+      return {
+        tree: {
+          vertical: {},
+          horizontal: {},
+        },
+        direct: 'vertical',
+        alies: {},
+      };
+    },
   },
   watch: {
     dataRestFrom(data) {
@@ -167,16 +192,14 @@ export default {
   mounted() {
     // при первом появлении графа
 
-    const stateTree = this.$store.getters.getGraphTree({
-      idDash: this.idDash,
-      id: this.id,
-    }); // забираем уже сохраненные данные из store
+    const stateTree = this.getGraphTree; // забираем уже сохраненные данные из store
     this.tree = stateTree.tree; // добовляем сохраненный граф
     this.direct = stateTree.direct; // и его положение
     this.alies = stateTree.alies; // и его положение
     this.mount = true;
 
-    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
+    //  В первый раз раскомментить чтобы создать события для элемнета,
+    //  а затем лучше закоментить чтобы каждый раз не обращаться к store
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -455,8 +478,32 @@ export default {
         ];
       }
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setClick(name) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -479,10 +526,8 @@ export default {
         }
       });
 
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onclick',
-        element: this.id,
         partelement: 'node',
       });
 
@@ -494,7 +539,7 @@ export default {
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
-            this.$store.commit('letEventGo', {
+            this.$store.dispatch('letEventGo', {
               event: item,
               idDash: this.idDash,
             });
