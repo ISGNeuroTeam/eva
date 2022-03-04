@@ -301,9 +301,10 @@ export default {
         search: this.search,
         idDash: 'reports',
       });
+      await this.$store.dispatch('dataResearch/getTimeline', response.cid);
+      // this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
+      
       // вызывая метод в хранилище
-
-      console.log(response);
       if (!response.data || response.data.length == 0) {
         // если что-то пошло не так
         this.loading = false;
@@ -327,7 +328,6 @@ export default {
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
-        // await this.$store.dispatch('dataResearch/getTimeline', this.search.sid);
       }
     },
     addLineBreaks() {

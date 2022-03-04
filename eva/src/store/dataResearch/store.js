@@ -9,15 +9,37 @@ export default {
     },
   },
   actions: {
-    getTimeline({ commit }, sid) {
-      return fetch(`/api/gettimelines?cid=${sid}`)
-        .then((response) => {
-          console.log(response);
-          commit('SET_TIMELINE', response);
+    async getTimeline({ commit }, cid) {
+      // return fetch(`/api/gettimelines?cid=${sid}`)
+      //   .then((response) => {
+      //     console.log(response);
+      //     commit('SET_TIMELINE', response);
+      //   })
+      //   .catch((error) => {
+      //     console.error(error);
+      //   });
+      const test = await fetch(
+          `/api/gettimelines?cid=${cid}`,
+      ).catch((error) => {
+        console.error(error)
+      })
+      if (test.status == 200) {
+        // если получилось
+        return test.json().then((answerTest) => {
+          console.log(answerTest)
+          commit('SET_TIMELINE', answerTest);
         })
-        .catch((error) => {
-          console.error(error);
-        });
+      }
     },
+    // async getInterestingFields({commit}, cid) {
+    //   const test2 = await fetch(
+    //       `/api/getinterestingfields?cid=${cid}`,
+    //   ).catch((error) => {
+    //     console.log(error)
+    //   }).then((data) => {
+    //     return data
+    //     // console.log(data)
+    //   });
+    // }
   },
 };

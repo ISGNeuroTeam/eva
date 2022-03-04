@@ -220,7 +220,7 @@ export default {
                       `Все данные из запроса ${searchFrom.sid} обработаны  успешно.&nbsp;&nbsp;status: ${res.status}`,
                     );
                     if (idDash == 'reports') {
-                      resolve({ data: resolveData, shema });
+                      resolve({ data: resolveData, shema, cid: result.cid });
                     } else {
                       resolve(resolveData);
                     }
@@ -236,27 +236,7 @@ export default {
                 resolveMain({ data: allData, sid: result.cid });
               } else {
                 resolveMain(allData);
-              }
-
-              const test = await fetch(
-                  `/api/gettimelines?cid=${result.cid}`,
-              ).catch((error) => {
-                console.log(error)
-              }).then((data) => {
-                console.log(data)
-              });
-              console.log(test)
-
-              const test2 = await fetch(
-                  `/api/getinterestingfields?cid=${result.cid}`,
-              ).catch((error) => {
-                console.log(error)
-              }).then((data) => {
-                console.log(data)
-              });
-              console.log(test2)
-              
-              
+              }              
             }
           });
         });
