@@ -118,7 +118,7 @@
               :color-from="theme"
               :create="actionFrom"
               :active-from="modalFrom"
-              @changeData="changeData"
+              @changeData="changeDataEvent"
             />
           </div>
           <div
@@ -222,6 +222,7 @@
 
 <script>
 export default {
+  name: 'ModalCreate',
   props: {
     modalFrom: null,
     groupFlagFrom: null,
@@ -294,6 +295,7 @@ export default {
     },
     active() {
       this.setData();
+      this.resetModal(this.modalFrom);
       return this.modalFrom;
     },
     groupCheck() {
@@ -316,6 +318,32 @@ export default {
     this.pickedColor = this.theme.$main_bg;
   },
   methods: {
+    resetModal(val) {
+      if (!val) {
+        this.name = '';
+        this.nameTitle = '';
+        this.$set(this, 'newDash', {
+          name: '',
+          id: '',
+        });
+        console.log(this.newDash);
+        this.newGroup = {
+          name: '',
+          color: '',
+        };
+        this.nameBtn = {
+          create: 'Создать',
+          cancel: 'Отмена',
+        };
+        this.group = {
+          tab: {
+            users: null,
+            dashs: null,
+            indexes: null,
+          },
+        };
+      }
+    },
     setData() {
       this.pickedColor = this.theme.$main_bg;
       if (this.modalFrom) {
@@ -369,7 +397,9 @@ export default {
       this.setGroupColor(color);
     },
     createBtn(name) {
-      let method = 'POST';
+      // TODO: Поправить редактирование дашборда, сейчас происходит замена - некорректно
+      // TODO: Поправить создание\редактирование\замену группы - сейчас не работает - некорректно
+      let method = this.dashFrom ? 'PUT' : 'POST';
       // при нажатии на кнопку создать
       let hasSimilarModel = false;
       if (!name || name === '') {
@@ -391,7 +421,7 @@ export default {
           );
           dataObj = { name: this.newGroup.name, color: this.newGroup.color };
           if (Object.keys(this.changedData).length !== 0) {
-            let keys = this.changedData.group;
+            const keys = this.changedData.group;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
@@ -409,6 +439,7 @@ export default {
           dataObj = { name: this.newDash.name };
           if (this.newDash?.id !== '') {
             dataObj.id = this.newDash.id;
+            console.log(this.newDash.id);
           }
           // dataObj.idgroup = this.curGroupFrom;
           if (Object.keys(this.changedData)?.length !== 0) {
@@ -436,9 +467,8 @@ export default {
           this.nameBtn.cancel = 'Отмена';
           this.showwarning = false;
           method = 'PUT';
-          dataObj.id = this.dashsFrom.find((dash) => dash.name === dataObj.name).id;
+          dataObj.id = this.dashsFrom.find((dash) => dash.name.toLowerCase() === dataObj.name.toLowerCase()).id;
         }
-
         this.createEssence(dataObj, method, essence);
       }
     },
@@ -554,7 +584,7 @@ export default {
     //     })
     //   }
     // },
-    changeDataEvent: function (event) {
+    changeDataEvent(event) {
       console.log(event);
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};

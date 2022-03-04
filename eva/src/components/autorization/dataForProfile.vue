@@ -157,7 +157,7 @@ export default {
       required: true,
     },
     dataFrom: {
-      type: Object,
+      type: Promise,
       required: true,
     },
   },

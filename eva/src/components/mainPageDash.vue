@@ -187,14 +187,7 @@
                             class="edit control-group"
                             :color="theme.$primary_button"
                             v-on="on"
-                            @click="
-                              () => {
-                                modalCreateGroup = true;
-                                createGroupFlag = false;
-                                actionBtn = false;
-                                curGroup = i - 1;
-                              }
-                            "
+                            @click="openEditModal(i)"
                           >
                             {{ pencil }}
                           </v-icon>
@@ -294,13 +287,14 @@
       @closeModal="closeModal"
     />
     <modal-create
+      v-if="modalCreateGroup"
       :modal-from="modalCreateGroup"
       :action-from="actionBtn"
       :group-from="allGroups"
       :name-group-from="cookieName"
       :dashs-from="allDashs"
-      :data-from="allGroups[curGroup]"
-      :dash-from="allDashs[curGroup]"
+      :data-from="allGroups[curGroup] || curGroup"
+      :dash-from="actionBtn === 'create' ? null : allDashs[curGroup]"
       :cur-group-from="curGroup"
       :group-flag-from="createGroupFlag"
       @createGroup="createGroup($event)"
@@ -365,6 +359,12 @@ export default {
     document.title = 'EVA | Конструирование дашбордов';
   },
   methods: {
+    openEditModal(i) {
+      this.modalCreateGroup = true;
+      this.createGroupFlag = false;
+      this.actionBtn = false;
+      this.curGroup = i - 1;
+    },
     getGroups() {
       const response = this.$store.getters.getGroups();
       response.then((res) => {

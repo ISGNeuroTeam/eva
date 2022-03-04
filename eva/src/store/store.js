@@ -459,12 +459,12 @@ export default {
       // обновляем порядок layout на странице
       const dashboard = dash.data;
       if (!state[dashboard.id]) {
-        Vue.set(state, dashboard.id, {});
-        Vue.set(state[dashboard.id], 'name', dashboard.name);
-        Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
-        Vue.set(state[dashboard.id], 'modified', dashboard.modified);
         dash.getters(dashboard.id, true);
       }
+      Vue.set(state, dashboard.id, {});
+      Vue.set(state[dashboard.id], 'name', dashboard.name);
+      Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
+      Vue.set(state[dashboard.id], 'modified', dashboard.modified);
     },
     changeDashboard: (state, dash) => {
       const dashboard = dash.data;
