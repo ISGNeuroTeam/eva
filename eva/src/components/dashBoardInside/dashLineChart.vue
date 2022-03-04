@@ -33,15 +33,39 @@ import * as d3 from 'd3';
 
 export default {
   props: {
-    dataRestFrom: null,
-    colorFrom: null,
-    widthFrom: null,
-    heightFrom: null,
-    idFrom: null,
-    idDashFrom: null,
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    colorFrom: {
+      type: Object,
+      required: true,
+    },
+    widthFrom: {
+      type: Number,
+      required: true,
+    },
+    heightFrom: {
+      type: Number,
+      required: true,
+    },
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
     dataLoadingFrom: null,
-    activeElemFrom: null,
-    dataReport: null,
+    activeElemFrom: {
+      type: String,
+      required: true,
+    },
+    dataReport: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -113,9 +137,6 @@ export default {
 
       return this.dashFromStore.options;
     },
-    // dataRest: function() {
-    //   return this.dataRestFrom
-    // },
     color() {
       return this.colorFrom;
     },
@@ -143,9 +164,10 @@ export default {
               .select(this.$el.querySelector('.dash-graph'))
               .selectAll('svg')
               .nodes();
+            // если график уже есть
             if (graphics.length !== 0) {
-              // если график уже есть
-              graphics[0].remove(); // удаляем его
+              // удаляем его
+              graphics[0].remove();
             }
           }
         } else {
@@ -168,53 +190,61 @@ export default {
   },
   methods: {
     getDataAsynchrony() {
+      // создаем promise чтобы затем отрисовать график асинхронно
       const prom = new Promise((resolve) => {
-        // создаем promise чтобы затем отрисовать график асинхронно
-
-        const sizeLine = { width: 0, height: 0 }; // получаем размеры от родителя
+        // получаем размеры от родителя
+        const sizeLine = { width: 0, height: 0 };
         sizeLine.width = this.width;
         sizeLine.height = this.height;
 
+        // смотрим если с ошибкой
         if (this.dataRestFrom.error) {
-          // смотрим если с ошибкой
-          this.props.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
-        } else {
+          // то выводим сообщение о ошибке
+          this.props.message = this.dataRestFrom.error;
           // если нет
-
-          resolve(sizeLine); // передаем в результат размеры графика
+        } else {
+          // передаем в результат размеры графика
+          resolve(sizeLine);
         }
       });
 
+      // как раз тут делаем асинхронность
       prom.then((sizeLine) => {
-        // как раз тут делаем асинхронность
         let time = false;
         const key = Object.keys(this.dataRestFrom[0])[0];
         const { lastDot } = this.getOptions;
         const onlyNum = typeof this.dataRestFrom[0][key] === 'number';
+        // если все-таки число
         if (onlyNum) {
-          // если все-таки число
           if (
             this.dataRestFrom[0][key] > 1000000000
             && this.dataRestFrom[0][key] < 2000000000
           ) {
             time = true;
           }
-          this.props.nodata = false; // то убираем соощение о отсутствии данных
-          this.props.result = this.dataRestFrom; // заносим все данные в переменную
-          this.createLineChart(this.props, this, sizeLine, time, lastDot); // и собственно создаем график
-        } else {
+          // то убираем соощение о отсутствии данных
+          this.props.nodata = false;
+          // заносим все данные в переменную
+          this.props.result = this.dataRestFrom;
+          // и собственно создаем график
+          this.createLineChart(this.props, this, sizeLine, time, lastDot);
           // если первое значение первого элемнета (подразумеваем что это time не число)
-          this.props.nodata = true; // показываем сообщение о некорректности данных
-          this.props.result = []; // очищаем массив результатов
-          this.props.message = 'К сожалению данные не подходят к линейному графику'; // выводим сообщение
+        } else {
+          // показываем сообщение о некорректности данных
+          this.props.nodata = true;
+          // очищаем массив результатов
+          this.props.result = [];
+          // выводим сообщение
+          this.props.message = 'К сожалению данные не подходят к линейному графику';
+          // и еще график очищаем, чтобы не мешался
           d3.select(this.$el.querySelector('.dash-graph'))
             .selectAll('svg')
-            .remove(); // и еще график очищаем, чтобы не мешался
+            .remove();
         }
       });
     },
+    // основные используемые цвета
     createLineChart(props, that, sizeLine, time, lastDot) {
-      // основные используемые цвета
       const colors = [
         this.colorFrom.controls || this.colorFrom.$accent_ui_color,
         this.colorFrom.text || this.colorFrom.$blue,
@@ -343,7 +373,7 @@ export default {
           }
           return last;
         }, 0);
-        // находим максимальное значение среди всех метрик
+        // находим минимальное значение среди всех метрик
         minX = data.reduce((last, next) => {
           if (next[xMetric] < last) {
             return next[xMetric];
@@ -420,6 +450,26 @@ export default {
         .attr('class', 'yAxis')
         .call(d3.axisLeft(y).ticks(y.ticks().length / 2));
 
+      function verticalLineX() {
+        const linesX = svg.selectAll('.grid-line-x').nodes();
+        if (linesX.length !== 0) {
+          linesX.forEach((item, i) => {
+            linesX[i].remove();
+          });
+        }
+
+        svg
+          .selectAll('g.xAxis g.tick')
+          .append('line') // добавляем линию
+          .attr('class', 'grid-line-x') // добавляем класс
+          .attr('x1', 0)
+          .attr('x2', 0)
+          .attr('y1', 0)
+          .attr('y2', -(height - 20))
+          .attr('stroke', colors[1])
+          .style('opacity', '0.3');
+      }
+
       // отрисуем сетку сперва для горизотнальных тиков
       verticalLineX();
 
@@ -476,6 +526,57 @@ export default {
       // массив с точками для области закрашивания
       const areaData = [];
 
+      // функция которая создает правильный массив точек для области закрашивания коридора
+      function addToArea(item, i, point, name) {
+        // если элемнета массива еще нет
+        if (!areaData[i]) {
+          // то создаем его нужным нам образом
+          areaData[i] = {
+            above: { x: null, y: null },
+            below: { x: null, y: null },
+          };
+        }
+        // и наполняем его значениями
+        if (name.indexOf('upperbound') !== -1) {
+          areaData[i].above[point] = item;
+        } else {
+          areaData[i].below[point] = item;
+        }
+      }
+
+      // функция создающяя линию коридора
+      function addHall(j) {
+        // добовляем объект для линии коридора, верхней или нижней
+        lineName[j] = svg
+          .append('g')
+          .attr('clip-path', `url(#clip-${that.id})`);
+
+        // Добовляем  саму линию
+        // добовляем свой класс
+        lineName[j]
+          .append('path')
+          .datum(data)
+          .attr('class', 'lineHall')
+          .attr('fill', 'none')
+          .attr('stroke', colors[0])
+          .style('stroke-dasharray', '3 3')
+          .attr('stroke-width', 1.5)
+          .attr(
+            'd',
+            d3
+              .line()
+              .x((d, i) => {
+                addToArea(x(d[xMetric] * secondTransf), i, 'x', metricsName[j]);
+                return x(d[xMetric] * secondTransf);
+              }) // тут вызываем функцию которая еще и правлиьно формирует точки
+              // для области закрашивания между линиями коридора
+              .y((d, i) => {
+                addToArea(y(d[metricsName[j]]), i, 'y', metricsName[j]);
+                return y(d[metricsName[j]]);
+              }),
+          );
+      }
+
       //  если коридор вообще есть (может быть и просто линейный график)
       if (metricsName[1] && metricsName[2]) {
         // функция строящая линию коридора
@@ -505,6 +606,43 @@ export default {
 
       // здесь будет объект с границами порога
       const treshold = {};
+
+      // TODO: убрать putLabelDotThat
+      function putLabelDot(attr, classText, d, metric, putLabelDotThat) {
+        // красим точку в другой цвет
+        putLabelDotThat.setAttribute('fill', colors[0]);
+        // и постоянно ее отображаем
+        putLabelDotThat.style = 'opacity:1';
+        // так же зададим атрибут сосбтвенный, чтобы потом понимать с какой точки мышка ушла
+        putLabelDotThat.setAttribute(attr, 'true');
+        // текст легенды (название метрики)
+        svg
+          .append('text')
+          .attr('class', classText)
+          .attr(
+            'transform',
+            `translate(${x(d[xMetric] * secondTransf)},${
+              y(d[metricsName[0]]) - 10
+            })`,
+          )
+          .attr('font-size', '0.7em')
+          .attr('text-anchor', 'end')
+          .style('fill', colors[1])
+          .text(d[metric])
+          .on('mouseover', () => {
+            if (brushObj.mouseDown) {
+              brushObj.selectionMove();
+            }
+          })
+          .on('mousemove', () => {
+            if (brushObj.mouseDown) {
+              brushObj.selectionMove();
+            }
+          })
+          .on('mouseup', () => {
+            brushObj.selectionUp();
+          });
+      }
 
       // если порог вообще есть (может быть просто линия ведь графика)
       if (metricsName[3] && metricsName[4]) {
@@ -543,6 +681,49 @@ export default {
             .x((d) => x(d[xMetric] * secondTransf))
             .y((d) => y(d[metricsName[0]])),
         );
+
+      function verticalLine(d, item, i) {
+        const group = svg.append('g').attr('class', 'vetical-line-group');
+
+        group
+          .append('line')
+          .attr('class', 'vetical-line')
+          .attr('x1', x(d[xMetric] * secondTransf))
+          .attr('y1', 20)
+          .attr('x2', x(d[xMetric] * secondTransf))
+          .attr('y2', height)
+          .attr('xVal', d[xMetric] * secondTransf)
+          .attr('stroke', colors[i + 2])
+          .style('opacity', '0.7');
+
+        group
+          .append('circle')
+          .attr('cx', x(d[xMetric] * secondTransf))
+          .attr('cy', 20)
+          .attr('xVal', d[xMetric] * secondTransf)
+          .attr('r', 5)
+          .attr('opacity', '0.7')
+          .attr('fill', colors[i + 2])
+          .attr('class', 'dot-vertical')
+          .on('mouseover', () => {
+            tooltip
+              .style('opacity', '1')
+              .style('visibility', 'visible')
+              .html(`<p>${d[item]}</p>`)
+              .style('top', `${event.layerY - 30}px`)
+              .style('right', 'auto')
+              .style('left', `${event.layerX + 20}px`);
+            if (event.layerX + 100 > width) {
+              tooltip
+                .style('left', 'auto')
+                .style('right', `${width - event.layerX + 110}px`);
+            }
+          }) // при наведении мышки точка появляется
+          .on('mouseout', () => {
+            tooltip.style('opacity', '0').style('visibility', 'hidden');
+          });
+      }
+
       // Добовляем точки
       // нам нужно понять какие точки выходят за значение порога и их мы окрасим в другой цвет
       svg
@@ -598,9 +779,9 @@ export default {
             );
           }
           if (annotation.length !== 0) {
-            annotation.forEach((item, i) => {
+            annotation.forEach((item, index) => {
               if (d[item]) {
-                verticalLine(d, item, i);
+                verticalLine(d, item, index);
               }
             });
           }
@@ -615,16 +796,16 @@ export default {
         ))
         // при наведении мышки точка появляется
         .on('mouseover', (d) => {
-          let x = d[xMetric];
+          let localX = d[xMetric];
           if (time) {
-            x = new Date(d[xMetric] * secondTransf);
-            x = `${x.getDate()}-${x.getMonth() + 1}-${x.getFullYear()}`;
+            localX = new Date(d[xMetric] * secondTransf);
+            localX = `${localX.getDate()}-${localX.getMonth() + 1}-${localX.getFullYear()}`;
           }
           tooltip
             .style('opacity', '1')
             .style('visibility', 'visible')
             .html(
-              `<p><span>${xMetric}</span> : ${x}</p>
+              `<p><span>${xMetric}</span> : ${localX}</p>
             <p><span>${metricsName[0]}</span> : ${d[metricsName[0]]}</p>`,
             )
             .style('top', `${event.layerY - 30}px`)
@@ -658,6 +839,16 @@ export default {
         .on('mouseup', () => {
           brushObj.selectionUp();
         });
+
+      // функция которая проверяет не слишком ли длинное название и сокращает его
+      function checkName(name) {
+        // если там больше 10 символов
+        if (name.length > 10) {
+          // обрезаем и добовляем троеточие
+          name = `${name.substring(0, 10)}...`;
+        }
+        return name;
+      }
 
       const legend = svg
         .append('g') // доволяем легенду
@@ -743,265 +934,12 @@ export default {
         }
       };
 
-      brushObj.selectionUp = () => {
-        brushObj.mouseDown = false;
-        if (brushObj.direction === 'left') {
-          const change = brushObj.startX;
-          brushObj.startX = brushObj.endX;
-          brushObj.endX = change;
-        }
-        if (brush.select('.selection').attr('width') > 5) {
-          updateData([brushObj.startX, brushObj.endX], brushObj);
-        }
-      };
-
-      brushObj.clearBrush = () => {
-        brushObj.selections = brush.selectAll('.selection').nodes();
-        if (brushObj.selections.length !== 0) {
-          brushObj.selections.forEach((item, i) => {
-            brushObj.selections[i].remove();
-          });
-        }
-      };
-
-      function verticalLineX() {
-        const linesX = svg.selectAll('.grid-line-x').nodes();
-        if (linesX.length !== 0) {
-          linesX.forEach((item, i) => {
-            linesX[i].remove();
-          });
-        }
-
-        svg
-          .selectAll('g.xAxis g.tick')
-          .append('line') // добавляем линию
-          .attr('class', 'grid-line-x') // добавляем класс
-          .attr('x1', 0)
-          .attr('x2', 0)
-          .attr('y1', 0)
-          .attr('y2', -(height - 20))
-          .attr('stroke', colors[1])
-          .style('opacity', '0.3');
-      }
-
-      function verticalLine(d, item, i) {
-        const group = svg.append('g').attr('class', 'vetical-line-group');
-
-        group
-          .append('line')
-          .attr('class', 'vetical-line')
-          .attr('x1', x(d[xMetric] * secondTransf))
-          .attr('y1', 20)
-          .attr('x2', x(d[xMetric] * secondTransf))
-          .attr('y2', height)
-          .attr('xVal', d[xMetric] * secondTransf)
-          .attr('stroke', colors[i + 2])
-          .style('opacity', '0.7');
-
-        group
-          .append('circle')
-          .attr('cx', x(d[xMetric] * secondTransf))
-          .attr('cy', 20)
-          .attr('xVal', d[xMetric] * secondTransf)
-          .attr('r', 5)
-          .attr('opacity', '0.7')
-          .attr('fill', colors[i + 2])
-          .attr('class', 'dot-vertical')
-          .on('mouseover', () => {
-            tooltip
-              .style('opacity', '1')
-              .style('visibility', 'visible')
-              .html(`<p>${d[item]}</p>`)
-              .style('top', `${event.layerY - 30}px`)
-              .style('right', 'auto')
-              .style('left', `${event.layerX + 20}px`);
-            if (event.layerX + 100 > width) {
-              tooltip
-                .style('left', 'auto')
-                .style('right', `${width - event.layerX + 110}px`);
-            }
-          }) // при наведении мышки точка появляется
-          .on('mouseout', () => {
-            tooltip.style('opacity', '0').style('visibility', 'hidden');
-          });
-      }
-
-      function putLabelDot(attr, classText, d, metric, that) {
-        // красим точку в другой цвет
-        that.setAttribute('fill', colors[0]);
-        // и постоянно ее отображаем
-        that.style = 'opacity:1';
-        // так же зададим атрибут сосбтвенный, чтобы потом понимать с какой точки мышка ушла
-        that.setAttribute(attr, 'true');
-        // текст легенды (название метрики)
-        svg
-          .append('text')
-          .attr('class', classText)
-          .attr(
-            'transform',
-            `translate(${x(d[xMetric] * secondTransf)},${
-              y(d[metricsName[0]]) - 10
-            })`,
-          )
-          .attr('font-size', '0.7em')
-          .attr('text-anchor', 'end')
-          .style('fill', colors[1])
-          .text(d[metric])
-          .on('mouseover', () => {
-            if (brushObj.mouseDown) {
-              brushObj.selectionMove();
-            }
-          })
-          .on('mousemove', () => {
-            if (brushObj.mouseDown) {
-              brushObj.selectionMove();
-            }
-          })
-          .on('mouseup', () => {
-            brushObj.selectionUp();
-          });
-      }
-
-      // функция которая проверяет не слишком ли длинное название и сокращает его
-      function checkName(name) {
-        // если там больше 10 символов
-        if (name.length > 10) {
-          // обрезаем и добовляем троеточие
-          name = `${name.substring(0, 10)}...`;
-        }
-        return name;
-      }
-
-      // функция создающяя линию коридора
-      function addHall(j) {
-        // добовляем объект для линии коридора, верхней или нижней
-        lineName[j] = svg
-          .append('g')
-          .attr('clip-path', `url(#clip-${that.id})`);
-
-        // Добовляем  саму линию
-        // добовляем свой класс
-        lineName[j]
-          .append('path')
-          .datum(data)
-          .attr('class', 'lineHall')
-          .attr('fill', 'none')
-          .attr('stroke', colors[0])
-          .style('stroke-dasharray', '3 3')
-          .attr('stroke-width', 1.5)
-          .attr(
-            'd',
-            d3
-              .line()
-              .x((d, i) => {
-                addToArea(x(d[xMetric] * secondTransf), i, 'x', metricsName[j]);
-                return x(d[xMetric] * secondTransf);
-              }) // тут вызываем функцию которая еще и правлиьно формирует точки
-              // для области закрашивания между линиями коридора
-              .y((d, i) => {
-                addToArea(y(d[metricsName[j]]), i, 'y', metricsName[j]);
-                return y(d[metricsName[j]]);
-              }),
-          );
-      }
-
-      // функция которая создает правильный массив точек для области закрашивания коридора
-      function addToArea(item, i, point, name) {
-        // если элемнета массива еще нет
-        if (!areaData[i]) {
-          // то создаем его нужным нам образом
-          areaData[i] = {
-            above: { x: null, y: null },
-            below: { x: null, y: null },
-          };
-        }
-        // и наполняем его значениями
-        if (name.indexOf('upperbound') !== -1) {
-          areaData[i].above[point] = item;
-        } else {
-          areaData[i].below[point] = item;
-        }
-      }
-
-      // функция которая вызывается каждый раз, когда происходит выделение области (brush)
-      function updateData(extent, brushObj) {
-        if (extent) {
-          // если область выделена всё-таки
-          let diapason;
-          if (time) {
-            // получаем эти значения в нужном нам виде
-            diapason = [
-              parseInt(new Date(x.invert(extent[0])).getTime() / 1000, 10),
-              parseInt(new Date(x.invert(extent[1])).getTime() / 1000, 10),
-            ];
-          } else {
-            diapason = [
-              parseFloat(x.invert(extent[0]).toFixed(5)),
-              parseFloat(x.invert(extent[1]).toFixed(5)),
-            ];
-          }
-          // вызываем функцию создающию токены
-          that.setClick(diapason, 'select');
-          // делаем зумирование  графика
-          zoom(extent, brushObj);
-        }
-      }
       // функция делающяя зумирование графика
-      function zoom(extent, brushObj) {
+      function zoom(extent, localBrushObj) {
         // меняем значения оси х на основе нашего выделенного диапазона
         x.domain([x.invert(extent[0]), x.invert(extent[1])]);
-        brushObj.clearBrush();
+        localBrushObj.clearBrush();
 
-        // растягиваем плавно ось x
-        if (time) {
-          xAxis
-            .transition()
-            .duration(secondTransf)
-            .call(
-              d3
-                .axisBottom(x)
-                .tickFormat(d3.timeFormat('%d-%m-%Y '))
-                .tickValues(
-                  x.ticks().filter((item, i) => i % 2 === 0),
-                )
-                .ticks(5),
-            );
-        } else {
-          xAxis.transition().duration(1000).call(d3.axisBottom(x));
-        }
-
-        verticalLineX();
-        // вызываем функцию которая перересует все линии и точки как надо
-        changeZoom(1000);
-        // если дважды щелкнуть по любому месту
-        svg.on('dblclick', () => {
-          // то вернем ось х в исходное состояние
-          if (time) {
-            x.domain(
-              d3.extent(data, (d) => new Date(d[xMetric] * secondTransf)),
-            );
-            xAxis
-              .transition()
-              .duration(secondTransf)
-              .call(
-                d3
-                  .axisBottom(x)
-                  .tickFormat(d3.timeFormat('%d-%m-%Y '))
-                  .tickValues(
-                    x.ticks().filter((item, i) => i % 2 === 0),
-                  )
-                  .ticks(5),
-              );
-          } else {
-            x.domain([minX, maxX]);
-            xAxis.transition().duration(1000).call(d3.axisBottom(x));
-          }
-
-          verticalLineX();
-          // и вернем все линии  в исходное состояние
-          changeZoom(300);
-        });
-        // функция которая перерисовывает все линии
         function changeZoom(dauration) {
           // основная линия
           lineName[0]
@@ -1067,27 +1005,6 @@ export default {
             .duration(dauration)
             .attr('cx', () => x(this.getAttribute('xVal')));
 
-          // проверяем если коридор есть
-          if (metricsName[1] && metricsName[2]) {
-            // его тоже перерисовываем
-            addHallBrush(1, dauration);
-            addHallBrush(2, dauration);
-
-            // и закрашиваем
-            svg
-              .select('.area')
-              .transition()
-              .duration(dauration)
-              .attr(
-                'd',
-                d3
-                  .area()
-                  .x((d) => d.above.x)
-                  .y0((d) => d.below.y)
-                  .y1((d) => d.above.y),
-              );
-          }
-
           // функция которая перерисовывает коридор
           function addHallBrush(j, duration) {
             // Добовляем линию
@@ -1115,8 +1032,125 @@ export default {
                   }),
               );
           }
+
+          // проверяем если коридор есть
+          if (metricsName[1] && metricsName[2]) {
+            // его тоже перерисовываем
+            addHallBrush(1, dauration);
+            addHallBrush(2, dauration);
+
+            // и закрашиваем
+            svg
+              .select('.area')
+              .transition()
+              .duration(dauration)
+              .attr(
+                'd',
+                d3
+                  .area()
+                  .x((d) => d.above.x)
+                  .y0((d) => d.below.y)
+                  .y1((d) => d.above.y),
+              );
+          }
+        }
+
+        // растягиваем плавно ось x
+        if (time) {
+          xAxis
+            .transition()
+            .duration(secondTransf)
+            .call(
+              d3
+                .axisBottom(x)
+                .tickFormat(d3.timeFormat('%d-%m-%Y '))
+                .tickValues(
+                  x.ticks().filter((item, i) => i % 2 === 0),
+                )
+                .ticks(5),
+            );
+        } else {
+          xAxis.transition().duration(1000).call(d3.axisBottom(x));
+        }
+
+        verticalLineX();
+        // вызываем функцию которая перересует все линии и точки как надо
+        changeZoom(1000);
+        // если дважды щелкнуть по любому месту
+        svg.on('dblclick', () => {
+          // то вернем ось х в исходное состояние
+          if (time) {
+            x.domain(
+              d3.extent(data, (d) => new Date(d[xMetric] * secondTransf)),
+            );
+            xAxis
+              .transition()
+              .duration(secondTransf)
+              .call(
+                d3
+                  .axisBottom(x)
+                  .tickFormat(d3.timeFormat('%d-%m-%Y '))
+                  .tickValues(
+                    x.ticks().filter((item, i) => i % 2 === 0),
+                  )
+                  .ticks(5),
+              );
+          } else {
+            x.domain([minX, maxX]);
+            xAxis.transition().duration(1000).call(d3.axisBottom(x));
+          }
+
+          verticalLineX();
+          // и вернем все линии  в исходное состояние
+          changeZoom(300);
+        });
+        // функция которая перерисовывает все линии
+      }
+
+      // функция которая вызывается каждый раз, когда происходит выделение области (brush)
+      function updateData(extent, localBrushObj) {
+        if (extent) {
+          // если область выделена всё-таки
+          let diapason;
+          if (time) {
+            // получаем эти значения в нужном нам виде
+            diapason = [
+              parseInt(new Date(x.invert(extent[0])).getTime() / 1000, 10),
+              parseInt(new Date(x.invert(extent[1])).getTime() / 1000, 10),
+            ];
+          } else {
+            diapason = [
+              parseFloat(x.invert(extent[0]).toFixed(5)),
+              parseFloat(x.invert(extent[1]).toFixed(5)),
+            ];
+          }
+          // вызываем функцию создающию токены
+          that.setClick(diapason, 'select');
+          // делаем зумирование  графика
+          zoom(extent, localBrushObj);
         }
       }
+
+      brushObj.selectionUp = () => {
+        brushObj.mouseDown = false;
+        if (brushObj.direction === 'left') {
+          const change = brushObj.startX;
+          brushObj.startX = brushObj.endX;
+          brushObj.endX = change;
+        }
+        if (brush.select('.selection').attr('width') > 5) {
+          updateData([brushObj.startX, brushObj.endX], brushObj);
+        }
+      };
+
+      brushObj.clearBrush = () => {
+        brushObj.selections = brush.selectAll('.selection').nodes();
+        if (brushObj.selections.length !== 0) {
+          brushObj.selections.forEach((item, i) => {
+            brushObj.selections[i].remove();
+          });
+        }
+      };
     },
     getEvents({ event, partelement }) {
       let result = [];
@@ -1167,28 +1201,24 @@ export default {
           && tockens[i].capture === 'pointX'
         ) {
           setTocken(point.x);
-          // this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point.x });
         } else if (
           tockens[i].elem === this.id
           && tockens[i].action === action
           && tockens[i].capture === 'pointY'
         ) {
           setTocken(point.y);
-          // this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point.y });
         } else if (
           tockens[i].elem === this.id
           && tockens[i].action === action
           && tockens[i].capture === 'start'
         ) {
           setTocken(point[0]);
-          //  this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point[0] });
         } else if (
           tockens[i].elem === this.id
           && tockens[i].action === action
           && tockens[i].capture === 'end'
         ) {
           setTocken(point[1]);
-          // this.$store.commit('setTocken', {tocken: tocken, idDash: this.idDash, value: point[1] });
         }
       });
 

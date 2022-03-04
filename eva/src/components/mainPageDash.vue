@@ -39,7 +39,7 @@
                   :style="{
                     background: theme.$main_bg,
                     color: theme.$main_text,
-                    borderColors: theme.$main_border,
+                    borderColors: theme.$main_border
                   }"
                 >
                   <v-card-title class="dash-group-title">
@@ -419,7 +419,7 @@ export default {
         data = this.allDashs;
         id = this.curDash;
       }
-      response = this.$store.getters['auth/deleteEssence']({
+      response = this.$store.dispatch('auth/deleteEssence', {
         essence: this.elemDelete,
         id: data[id].id,
       });

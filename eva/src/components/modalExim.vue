@@ -94,11 +94,26 @@ import { mdiFileOutline, mdiFormatListBulleted } from '@mdi/js';
 
 export default {
   props: {
-    active: null,
-    dashboards: null,
-    groups: null,
-    element: null,
-    curName: null,
+    active: {
+      type: Boolean,
+      required: true,
+    },
+    dashboards: {
+      type: Array,
+      default: () => ([]),
+    },
+    groups: {
+      type: Array,
+      default: () => ([]),
+    },
+    element: {
+      type: String,
+      required: true,
+    },
+    curName: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -172,7 +187,7 @@ export default {
   methods: {
     async exportDash() {
       const ids = [];
-      if (this.element == 'dash') {
+      if (this.element === 'dash') {
         this.dashboards.forEach((item) => {
           if (this.selected.includes(item.name)) {
             ids.push(item.id);
@@ -190,7 +205,7 @@ export default {
         element: this.element,
         ids: ids.join(','),
       });
-      if (response == '') {
+      if (response === '') {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
         this.msgExp.opacity = '1';
@@ -205,7 +220,7 @@ export default {
       }, 2000);
     },
     async importDash() {
-      if (this.file == '' || this.file == undefined) {
+      if (this.file === '' || this.file === undefined) {
         this.msgImp.text = 'Выберите файл для импорта';
         this.msgImp.color = 'controlsActive';
         this.msgImp.opacity = '1';
@@ -228,12 +243,13 @@ export default {
           } else {
             formData.append('body', this.file);
           }
-          const response = await this.$store.dispatch('importDash', {
+          await this.$store.dispatch('importDash', {
             element: this.element,
             formData,
           });
           try {
-            // let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
+            // тут проверяем может ли распарситься ответ от сервера
+            // let res = JSON.parse(response);
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';

@@ -4,7 +4,7 @@
     class="block-of-elements"
   >
     <div
-      v-if="editable == 'true'"
+      v-if="editable === 'true'"
       class="element-block"
     >
       <v-textarea
@@ -47,11 +47,6 @@
           Только числовое значение
         </div>
       </div>
-      <!-- <v-radio-group   :mandatory="true" v-if="visionOpt.choose" name="radio"  v-model="value">
-                    <v-radio    class="radiobtn" color="teal"   ></v-radio>
-                </v-radio-group> -->
-      <!-- <v-switch :v-model="value" color="teal" class="form-switch"  :data-switch="switchbox" :data-id="idFrom" v-if="visionOpt.choose" @change="checkSwitch()"></v-switch> -->
-      <!-- <v-checkbox  v-model="value" color="teal" :data-checkbox="checkbox" v-if="visionOpt.choose" @update="checkRadio"></v-checkbox> -->
       <div
         v-if="visionOpt.choose"
         class="radiobtn-block"
@@ -63,10 +58,9 @@
       >
         <div class="radiobtn-circle" />
       </div>
-      <!-- <input type="radio" v-if="visionOpt.choose" name="radio" color="teal" class="radiobtn"  :value="value" v-model="value" > -->
     </div>
     <div
-      v-if="editable == 'false'"
+      v-if="editable === 'false'"
       class="element-block-not-editable"
     >
       <div
@@ -89,12 +83,24 @@
 <script>
 export default {
   props: {
-    nameFrom: null,
-    idFrom: null,
-    nameFormFrom: null,
+    nameFrom: {
+      type: String,
+      required: true,
+    },
+    idFrom: {
+      type: String,
+      required: true,
+    },
     radiosFrom: null,
-    editable: null,
-    heightFrom: null,
+    // TODO: переделать на Boolean!!!
+    editable: {
+      type: String,
+      required: true,
+    },
+    heightFrom: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -111,25 +117,31 @@ export default {
       tooltip: null,
     };
   },
+  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
   computed: {
-    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
     radios() {
       this.setValue();
       return this.radiosFrom[this.idFrom];
+    },
+    getContent() {
+      if (this.$store.state.form.createForm.content) {
+        return this.$store.state.form.createForm.content[this.idFrom];
+      }
+      return 'empty';
     },
   },
 
   mounted() {
     const element = this.$store.getters['form/getFormLocal'];
-    let content = this.$store.getters['form/getContent'](this.idFrom);
-    if (content != 'empty') {
-      if (content == 'True') {
+    let content = this.getContent;
+    if (content !== 'empty') {
+      if (content === 'True') {
         content = true;
       }
-      if (content == 'False') {
+      if (content === 'False') {
         content = false;
       }
-      if (content == 'None') {
+      if (content === 'None') {
         content = '';
       }
       this.value = content;
@@ -147,7 +159,7 @@ export default {
       case 'Выбор одного варианта':
         this.visionOpt.choose = true;
         if (element[this.idFrom].options) {
-          if (element[this.idFrom].options.nameRadio != '') {
+          if (element[this.idFrom].options.nameRadio) {
             this.radioname = element[this.idFrom].options.nameRadio;
           } else {
             this.radioname = 'empty';
@@ -155,18 +167,14 @@ export default {
         } else {
           this.radioname = 'empty';
         }
-        //   if (element.options) {
-        //       this.selectElems = element.options.select.split(';');
-        //   }
         break;
       case 'Числовое поле':
         this.visionOpt.number = true;
-        //   if (element.options) {
-        //       this.selectElems = element.options.select.split(';');
-        //   }
+        break;
+      default:
         break;
     }
-    if (this.editable == 'false') {
+    if (this.editable === 'false') {
       setTimeout(() => {
         const blockell = this.$refs.elementBlock;
         const elemBlock = blockell.querySelector('.element-block-not-editable');

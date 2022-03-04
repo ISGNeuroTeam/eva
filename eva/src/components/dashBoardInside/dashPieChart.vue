@@ -39,7 +39,7 @@
     >
       <div
         ref="piechartItself"
-        :class="`dash-piechart ${this.idFrom}`"
+        :class="`dash-piechart ${idFrom}`"
       />
       <div
         ref="legends"
@@ -80,15 +80,36 @@ import * as d3 from 'd3';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     dataLoadingFrom: null, // сообщает что компонент в режиме получения данных
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // высота родительского компонента
-    activeElemFrom: null, // id активного элемента
-    dataReport: null, // проверяет что элемент в исследовании данных
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // высота родительского компонента
+    activeElemFrom: {
+      type: String,
+      required: true,
+    }, // id активного элемента
+    dataReport: {
+      type: Boolean,
+      required: true,
+    }, // проверяет что элемент в исследовании данных
   },
   data() {
     return {
@@ -357,7 +378,8 @@ export default {
             if (this.legends.length > 0) {
               let timeOut = setTimeout(
                 function tick() {
-                  // важно чтобы наш график построился толкьо после того когда создался блок с легендой
+                  // важно чтобы наш график построился
+                  // толкьо после того когда создался блок с легендой
 
                   if (this.$refs.legends.getBoundingClientRect().width !== 0) {
                     legendSize = {
@@ -451,12 +473,16 @@ export default {
           this.positionLegends = 'column nowrap';
           height = height - legendSize.height - MARGIN;
           break;
+        default:
+          break;
       }
 
-      const radius = Math.min(width, height) / 2 - MARGIN; // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+      // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+      const radius = Math.min(width, height) / 2 - MARGIN;
 
+      // добовляем svg объект в нужный div
       const svg = d3
-        .select(this.$refs.piechartItself) // добовляем svg объект в нужный div
+        .select(this.$refs.piechartItself)
         .append('svg')
         .attr('width', width)
         .attr('height', height)
@@ -478,6 +504,7 @@ export default {
         .range(this.dashOptions.themes[colorsPie.theme]);
 
       const pie = d3.pie().value((d) => d.value);
+      // eslint-disable-next-line camelcase
       const data_ready = pie(d3.entries(data));
 
       const tooltipEl = this.$refs.chartTooltip;

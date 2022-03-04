@@ -124,13 +124,31 @@ import {
 
 export default {
   props: {
-    idFrom: null,
-    idDashFrom: null,
-    dataRestFrom: null,
-    colorFrom: null,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    colorFrom: {
+      type: Object,
+      required: true,
+    },
     dataLoadingFrom: null,
-    widthFrom: null,
-    dataModeFrom: null,
+    widthFrom: {
+      type: Number,
+      required: true,
+    },
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -372,6 +390,8 @@ export default {
             id: this.id,
           });
           break;
+        default:
+          break;
       }
       if (
         this.elem !== 'Выберите элемент'
@@ -401,15 +421,11 @@ export default {
     },
     filterSelect(res, selected) {
       let data = [...[], ...res];
-      data = data.filter((elem) => {
-        if (!selected.includes(elem)) {
-          return elem;
-        }
-      });
+      data = data.filter((elem) => !selected.includes(elem));
 
-      function sorted(data) {
-        data = Number(data[0]) ? data.sort((a, b) => a - b) : data.sort();
-        return data;
+      function sorted(sortData) {
+        sortData = Number(sortData[0]) ? sortData.sort((a, b) => a - b) : sortData.sort();
+        return sortData;
       }
 
       this.topArray = sorted([...selected]);

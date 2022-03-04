@@ -409,7 +409,7 @@ export default {
     async launchSearch() {
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
+      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');

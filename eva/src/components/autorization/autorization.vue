@@ -118,7 +118,8 @@ export default {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
-            this.$store.getters['auth/putLog'](
+            this.$store.dispatch(
+              'auth/putLog',
               `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`,
             );
             this.$store.commit('clearState');
@@ -126,7 +127,8 @@ export default {
             return res;
           });
         } else {
-          this.$store.getters['auth/putLog'](
+          await this.$store.dispatch(
+            'auth/putLog',
             `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
           );
           this.msgText = 'Логин или пароль введены неверно';

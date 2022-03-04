@@ -77,11 +77,11 @@
               @click="settings.template = n"
             >
               <div
-                v-for="n in settings.metricCount"
-                :key="`item-${n}`"
+                v-for="m in settings.metricCount"
+                :key="`item-${m}`"
                 class="item"
-                :style="{ gridArea: `item-${n}` }"
-                v-text="n"
+                :style="{ gridArea: `item-${m}` }"
+                v-text="m"
               />
             </div>
           </div>
@@ -285,7 +285,10 @@ export default {
   props: {
     isOpen: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
-    updateCount: Function,
+    updateCount: {
+      type: Function,
+      required: true,
+    },
   },
   data: () => ({
     no_icon,
@@ -350,7 +353,7 @@ export default {
 
       if (metricCount > 0) {
         const max = metricCount <= 6 ? metricCount : 6;
-        for (let i = 0; i < max; i++) {
+        for (let i = 0; i < max; i += 1) {
           countList.push(i + 1);
         }
       }
@@ -428,9 +431,9 @@ export default {
 
     toggleAllMetrics(value = true) {
       const { metricOptions = [] } = this.settings;
-      for (const metric of metricOptions) {
+      metricOptions.forEach((metric) => {
         metric.expanded = value;
-      }
+      });
     },
   },
 };

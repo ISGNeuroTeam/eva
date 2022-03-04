@@ -939,9 +939,14 @@ export default {
     DashFilterPanel,
   },
   props: {
-    idDashFrom: null,
-    inside: null,
-    horizontalCell: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    inside: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -1170,7 +1175,7 @@ export default {
     },
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
-      return function ({ elem, action, idDash }) {
+      return ({ elem, action, idDash }) => {
         if (
           this.$store.state[idDash]
           && this.$store.state[idDash][elem]
@@ -1276,9 +1281,6 @@ export default {
     window.removeEventListener('resize', this.updateScreenHeight);
   },
   methods: {
-    setTextarea_event(eventFull) {
-      this.textarea_event = eventFull;
-    },
     getGroups() {
       this.$store.dispatch('getGroups').then((res) => {
         this.allGroups = res;
@@ -2113,7 +2115,8 @@ export default {
         if (res.status === 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
-          this.$store.getters['auth/putLog'](
+          this.$store.dispatch(
+            'auth/putLog',
             `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
               res.data.id
             }`,
@@ -2134,7 +2137,8 @@ export default {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
           this.idDash
         }`,

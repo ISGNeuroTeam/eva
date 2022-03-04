@@ -66,19 +66,37 @@
 
 <script>
 import { mdiSettings } from '@mdi/js';
-import SingleValueSettings from './SingleValueSettings';
+import SingleValueSettings from './SingleValueSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
 
 export default {
   name: 'SingleValue',
   components: { SingleValueSettings },
   props: {
-    idFrom: String,
-    idDashFrom: String,
-    dataRestFrom: Array,
-    dataModeFrom: Boolean,
-    updateSettings: Function,
-    currentSettings: Object,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
+    updateSettings: {
+      type: Function,
+      required: true,
+    },
+    currentSettings: {
+      type: Object,
+      required: true,
+    },
   },
   data: () => ({
     mdiSettings,
@@ -258,46 +276,47 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
-      for (const [index, data] of this.dataRestFrom.entries()) {
+      this.dataRestFrom.forEach((data, index) => {
         const {
           metric, value, id, metadata,
         } = data;
         if (metric === '_title') {
           this.titleToken = String(value);
-          continue;
-        }
-        let range = metadata;
+        } else {
+          let range = metadata;
 
-        if (!metadata || typeof metadata !== 'string') {
-          range = null;
+          if (!metadata || typeof metadata !== 'string') {
+            range = null;
+          }
+          const startId = `${metric}_${id}`;
+          const metricCurrent = metricOptionsCurrent?.find(
+            (m) => m.startId === startId,
+          );
+          const defaultMetricOption = {
+            id: metricCurrent?.id || id,
+            startId: metricCurrent?.startId || startId,
+            metadata,
+            title: metric || data.phase,
+            color: metricCurrent?.color || 'main',
+            icon: metricCurrent?.icon || 'no_icon',
+            fontSize: metricCurrent?.fontSize || 54,
+            fontWeight: metricCurrent?.fontWeight || 400,
+            listOrder:
+              metricCurrent?.listOrder === undefined
+                ? index
+                : metricCurrent?.listOrder,
+            ...metricCurrent,
+          };
+          metricList.push({ value, ...defaultMetricOption });
+          metricOptions.push({
+            id,
+            range,
+            expanded: false,
+            ...defaultMetricOption,
+          });
         }
-        const startId = `${metric}_${id}`;
-        const metricCurrent = metricOptionsCurrent?.find(
-          (m) => m.startId === startId,
-        );
-        const defaultMetricOption = {
-          id: metricCurrent?.id || id,
-          startId: metricCurrent?.startId || startId,
-          metadata,
-          title: metric || data.phase,
-          color: metricCurrent?.color || 'main',
-          icon: metricCurrent?.icon || 'no_icon',
-          fontSize: metricCurrent?.fontSize || 54,
-          fontWeight: metricCurrent?.fontWeight || 400,
-          listOrder:
-            metricCurrent?.listOrder === undefined
-              ? index
-              : metricCurrent?.listOrder,
-          ...metricCurrent,
-        };
-        metricList.push({ value, ...defaultMetricOption });
-        metricOptions.push({
-          id,
-          range,
-          expanded: false,
-          ...defaultMetricOption,
-        });
-      }
+      });
+
       if (
         this.dataRestFrom.length === 6
         && !this.dataRestFrom.find((i) => i.metric === '_title')
@@ -346,22 +365,48 @@ export default {
       this.options.settings = newSettings;
 
       /** Updated local metricList array. */
-      const newMetricList = [];
-      for (const [index, updatedMetric] of metricOptions.entries()) {
-        const {
-          icon, title, color, fontSize, fontWeight,
-        } = updatedMetric;
-        const metric = this.metricList.find((m) => m.id === updatedMetric.id);
-        if (metric) {
-          metric.icon = icon;
-          metric.title = title;
-          metric.color = color;
-          metric.fontSize = fontSize;
-          metric.fontWeight = fontWeight;
-          metric.listOrder = index;
-          newMetricList[index] = metric;
-        }
-      }
+      const newMetricList = metricOptions
+        .reduce((acc, updatedMetric, index) => {
+          const {
+            icon, title, color, fontSize, fontWeight,
+          } = updatedMetric;
+          const metric = this.metricList.find((m) => m.id === updatedMetric.id);
+          if (metric) {
+            return [
+              ...acc,
+              {
+                ...metric,
+                icon,
+                title,
+                color,
+                fontSize,
+                fontWeight,
+                listOrder: index,
+              },
+            ];
+          }
+          return acc;
+        }, []);
+
+      // TODO: оставил старый цикл так как не уверен,
+      //  что все предусмотрул в новой реализации
+
+      // metricOptions.forEach((updatedMetric, index) => {
+      //   const {
+      //     icon, title, color, fontSize, fontWeight,
+      //   } = updatedMetric;
+      //   const metric = this.metricList.find((m) => m.id === updatedMetric.id);
+      //   if (metric) {
+      //     metric.icon = icon;
+      //     metric.title = title;
+      //     metric.color = color;
+      //     metric.fontSize = fontSize;
+      //     metric.fontWeight = fontWeight;
+      //     metric.listOrder = index;
+      //     newMetricList[index] = metric;
+      //   }
+      // });
+
       this.metricList = [...newMetricList];
       this.providedSettings = { ...newSettings };
 
@@ -372,7 +417,7 @@ export default {
       });
 
       if (this.updateSettings) this.updateSettings(newSettings);
-      this.update++;
+      this.update += 1;
     },
 
     closeSettings() {

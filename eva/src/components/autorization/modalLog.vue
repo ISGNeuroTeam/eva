@@ -95,7 +95,7 @@ export default {
     },
     async getLog() {
       // получаем все логи для фронта
-      const front = await this.$store.getters['auth/getLog']('front');
+      const front = await this.$store.dispatch('auth/getLog', 'front');
       // смотрим их размер в байтах
       const sizeFront = new Blob([front]).size;
       // предел размера в байтах должен быть приблизителньо 5 мегабайт
@@ -144,7 +144,7 @@ export default {
         }, 2000);
       };
 
-      const response = await this.$store.getters['auth/saveLogIntoBack']();
+      const response = await this.$store.dispatch('auth/saveLogIntoBack');
 
       if (response.status === 200) {
         this.msgError = 'Лог сохранен успешно';
@@ -163,7 +163,7 @@ export default {
     },
     async clearLog(clear) {
       if (clear === 'Очистить') {
-        const response = await this.$store.getters['auth/deleteLog']();
+        const response = await this.$store.dispatch('auth/deleteLog');
         if (response === 'clear') {
           this.restore = this.text;
           this.text = '';
@@ -172,7 +172,7 @@ export default {
       } else {
         this.text = this.restore;
         this.clear = 'Очистить';
-        this.$store.getters['auth/putLog'](this.text);
+        await this.$store.dispatch('auth/putLog', this.text);
       }
     },
   },

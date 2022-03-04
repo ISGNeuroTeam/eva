@@ -101,11 +101,26 @@ export default {
     TokenTypeModal,
   },
   props: {
-    idDash: String,
-    filterPart: Object,
-    editPermission: Boolean,
-    filterPartIndex: Number,
-    editMode: Boolean,
+    idDash: {
+      type: String,
+      required: true,
+    },
+    filterPart: {
+      type: Object,
+      required: true,
+    },
+    editPermission: {
+      type: Boolean,
+      required: true,
+    },
+    filterPartIndex: {
+      type: Number,
+      required: true,
+    },
+    editMode: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

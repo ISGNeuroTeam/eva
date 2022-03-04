@@ -35,15 +35,33 @@
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    sizeTileFrom: null, // размер плиток
-    heightFrom: null, // высота родительского элемента
-    dataModeFrom: null, // включена ли шапка
-    activeElemFrom: null,
-    dataReport: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    // sizeTileFrom: null, // размер плиток
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // высота родительского элемента
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    }, // включена ли шапка
+    // activeElemFrom: null,
+    // dataReport: null,
   },
   data() {
     return {

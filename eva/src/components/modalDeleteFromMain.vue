@@ -48,8 +48,14 @@
 <script>
 export default {
   props: {
-    modalFrom: null,
-    nameFrom: null,
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
+    nameFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {};
@@ -58,8 +64,8 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    // тут понимаем нужно ли открыть окно с созданием или нет
     active() {
-      // тут понимаем нужно ли открыть окно с созданием или нет
       return this.modalFrom;
     },
     name() {
@@ -79,18 +85,6 @@ export default {
         this.cancelModal();
       }
     },
-    // changeStyle: function() {
-    //   if (this.active) {
-    //     let dialog = document.querySelector('.v-dialog');
-    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
-    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     })
-    //     dialog.querySelectorAll('input').forEach( item => {
-    //       item.style.color = this.color.text;
-    //     })
-    //   }
-    // },
   },
 };
 </script>

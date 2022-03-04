@@ -57,8 +57,14 @@
 <script>
 export default {
   props: {
-    idDashFrom: null,
-    dataPageFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataPageFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {

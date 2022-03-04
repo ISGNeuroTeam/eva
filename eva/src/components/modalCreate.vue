@@ -244,15 +244,39 @@
 <script>
 export default {
   props: {
-    modalFrom: null,
-    groupFlagFrom: null,
-    groupFrom: null,
-    dashsFrom: null,
-    actionFrom: null,
-    dataFrom: null,
-    dashFrom: null,
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
+    groupFlagFrom: {
+      type: Boolean,
+      required: true,
+    },
+    groupFrom: {
+      type: Array,
+      required: true,
+    },
+    dashsFrom: {
+      type: Array,
+      required: true,
+    },
+    actionFrom: {
+      type: String,
+      required: true,
+    },
+    dataFrom: {
+      type: Object,
+      required: true,
+    },
+    dashFrom: {
+      type: Object,
+      required: true,
+    },
     curGroupFrom: null,
-    nameGroupFrom: null,
+    nameGroupFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -482,20 +506,13 @@ export default {
         this.cancelModal('Отмена');
       }
     },
-    // если нажали на кнпку подстверждения создания дашборда
-    yesDashBoards() {
-      // создаем его
-      this.createObj(this.name);
-      // убаирем предупреждение
-      this.create_warning = false;
-    },
     // если нажали на отмену
     noDashBoards() {
       // просто убираем предупреждение
       this.create_warning = false;
     },
     createEssence(group, method, essence) {
-      const response = this.$store.getters['auth/setEssence']({
+      const response = this.$store.dispatch('auth/setEssence', {
         formData: JSON.stringify(group),
         essence,
         method,
@@ -529,7 +546,8 @@ export default {
         data: dash,
         getters: (payload) => this.$store.dispatch('checkAlreadyDash', payload),
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`,
       );
     },
@@ -551,7 +569,7 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.getters['auth/getEssenceList'](item, true);
+          return this.$store.dispatch('auth/getEssenceList', { role: item, create: true });
         });
         const result = await Promise.all(promise);
         result.forEach((item, i) => {
@@ -559,10 +577,10 @@ export default {
         });
         return allData;
       }
-      return this.$store.getters['auth/getEssence'](
-        role,
-        data[this.curGroupFrom].id,
-      );
+      return this.$store.dispatch('auth/getEssence', {
+        essence: role,
+        id: data[this.curGroupFrom].id,
+      });
     },
     setEnter(event) {
       if (event.code === 'Enter') {

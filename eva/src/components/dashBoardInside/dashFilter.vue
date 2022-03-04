@@ -29,7 +29,6 @@
 </template>
 
 <script>
-// TODO: КОМПОНЕНТ НИГДЕ НЕ ИСПОЛЬЗУЕТСЯ!!!!
 export default {
   data() {
     return {

@@ -477,26 +477,47 @@ import {
   mdiSettings,
   mdiTrashCanOutline,
 } from '@mdi/js';
-import settings from '../js/componentsSettings.js';
+import settings from '../js/componentsSettings';
 
 export default {
   name: 'DashBoard',
   props: {
-    width: null,
-    height: null,
-    idDashFrom: null,
-    dataElemFrom: null,
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataElemFrom: {
+      type: String,
+      required: true,
+    },
     dataModeFrom: {
       type: Boolean,
       required: true,
     },
-    dataPageFrom: null,
+    dataPageFrom: {
+      type: String,
+      required: true,
+    },
     loading: {
       type: Boolean,
       default: false,
     },
-    searchData: Array,
-    dataSourseTitle: null,
+    searchData: {
+      type: Array,
+      default: () => ([]),
+    },
+    dataSourseTitle: {
+      type: [String, Number],
+      default: -1,
+    },
     tooltipOpenDelay: {
       type: Number,
       default: 500,
@@ -629,8 +650,8 @@ export default {
       }
       return this.dataModeFrom;
     },
+    // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
     currentElem() {
-      // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
       let nameElement = '';
       if (this.element) {
         const element = this.element.split('-')[0];
@@ -645,8 +666,8 @@ export default {
       }
       return element;
     },
+    // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
     showElement() {
-      // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
       return this.element ? this.$store.state[this.idDash][this.element].switch : false;
     },
     dashFromStore() {
@@ -745,8 +766,10 @@ export default {
   },
   mounted() {
     this.props.icons = settings.icons;
-    this.page = this.$parent.$el.getAttribute('data-page'); // понимаем какая страница перед нами
-    this.props.name = this.$store.state[this.idDash][this.element].name_elem; // получаем имя этой страницы
+    // понимаем какая страница перед нами
+    this.page = this.$parent.$el.getAttribute('data-page');
+    // получаем имя этой страницы
+    this.props.name = this.$store.state[this.idDash][this.element].name_elem;
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
@@ -791,8 +814,8 @@ export default {
       this.settings = JSON.parse(JSON.stringify(localSettings));
     },
 
+    // изменяем имя элемнета
     editName(props) {
-      // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
 
@@ -802,16 +825,16 @@ export default {
         idDash: this.idDash,
       });
     },
+    // открываем модальное окно с выбором ИС (источник данных)
     chooseDS() {
-      // открываем модальное окно с выбором ИС (источник данных)
       this.$store.commit('setModalSearch', {
         id: this.idDash,
         status: true,
         elem: this.element,
       });
     },
+    // переключаем между режимами выбора данных и их отображением
     switchDS() {
-      // переключаем между режимами выбора данных и их отображением
       const status = !this.showElement;
       this.$store.commit('setSwitch', {
         idDash: this.idDash,
@@ -839,61 +862,14 @@ export default {
       }
       this.props.loading = event;
     },
+    // вызываем окно для удаления элемнета
     deleteDashBoard(props) {
-      // вызываем окно для удаления элемнета
       this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: this.element,
         name: props.name,
         page: this.dataPageFrom,
-      });
-    },
-    // нужен ли этот метод
-    getDataFromDB(searchID) {
-      // получение данных с indexindDB
-      let db = null;
-      const request = indexedDB.open('EVA', 1);
-      request.onerror = function (event) {
-        console.log('error: ', event);
-      };
-
-      request.onupgradeneeded = (event) => {
-        console.log('create');
-        db = event.target.result;
-        if (!db.objectStoreNames.contains('searches')) {
-          // if there's no "books" store
-          db.createObjectStore('searches'); // create it
-        }
-        request.onsuccess = () => {
-          db = request.result;
-          console.log(`successEvent: ${db}`);
-        };
-      };
-      return new Promise((resolve) => {
-        request.onsuccess = () => {
-          db = request.result;
-
-          const transaction = db.transaction('searches'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          const query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
-
-          query.onsuccess = () => {
-            // (4)
-            if (query.result) {
-              resolve(query.result);
-            } else {
-              resolve([]);
-            }
-          };
-
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
-          };
-        };
       });
     },
     openTitle() {
@@ -945,7 +921,7 @@ export default {
       // асинхронная функция для получения даных с реста
       let db = null;
       const request = indexedDB.open('EVA', 1);
-      request.onerror = function (event) {
+      request.onerror = (event) => {
         console.log('error: ', event);
       };
       request.onupgradeneeded = (event) => {
@@ -975,7 +951,7 @@ export default {
               resolve([]);
             }
           };
-          query.onerror = function () {
+          query.onerror = () => {
             console.log('Ошибка', query.error);
           };
         };
@@ -1045,12 +1021,9 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     if (notArr.length !== 0) {
-                      if (!notArr.includes(String(itemFil[event.column]))) {
-                        return itemFil;
-                      }
-                    } else if (event.row.includes(String(itemFil[event.column]))) {
-                      return itemFil;
+                      return !notArr.includes(String(itemFil[event.column])) ? itemFil : false;
                     }
+                    return event.row.includes(String(itemFil[event.column])) ? itemFil : false;
                   });
                 } else {
                   data = data.filter((itemFil) => {
@@ -1069,9 +1042,7 @@ export default {
                         }
                       });
                     }
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
@@ -1086,9 +1057,7 @@ export default {
                         incl = false;
                       }
                     });
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
@@ -1103,19 +1072,14 @@ export default {
                         incl = false;
                       }
                     });
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
               case 'in':
                 if (event.column !== '') {
-                  data = data.filter((itemFil) => {
-                    if (event.row.includes(String(itemFil[event.column]))) {
-                      return itemFil;
-                    }
-                  });
+                  data = data.filter((itemFil) => !!event.row
+                    .includes(String(itemFil[event.column])));
                 } else {
                   data = data.filter((itemFil) => {
                     incl = false;
@@ -1124,9 +1088,7 @@ export default {
                         incl = true;
                       }
                     });
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
@@ -1134,14 +1096,12 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = false;
-                    let min; let
-                      max;
+                    let min;
+                    let max;
                     if (parseFloat(event.row[0]) > parseFloat(event.row[1])) {
-                      max = event.row[0];
-                      min = event.row[1];
+                      [max, min] = event.row;
                     } else {
-                      max = event.row[1];
-                      min = event.row[0];
+                      [min, max] = event.row;
                     }
                     if (
                       parseFloat(itemFil[event.column]) > min
@@ -1149,41 +1109,50 @@ export default {
                     ) {
                       incl = true;
                     }
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
+                break;
+              default:
                 break;
             }
           }
           if (this.searchData.length === 0) {
             this.searchData = [...this.searchData, ...data];
-          } else {
             // если в массив результирующем уже что-то было, то надо добавить только новые элементы
+          } else {
+            // пробегаемся по все мотфильтрвоанным элементам
             data.forEach((itemData) => {
-              // пробегаемся по все мотфильтрвоанным элементам
-              let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
-              const keys = Object.keys(itemData); // ключи объекта внутри фильтрованного массива
+              // переменная которая скажет встречается ли такая строка уже в выборке
+              let equal = false;
+              // ключи объекта внутри фильтрованного массива
+              const keys = Object.keys(itemData);
+              // пробегаемся пов сем отфильтрованным данным
               this.searchData.forEach((itemDataRest) => {
-                // пробегаемся пов сем отфильтрованным данным
-                let equalRest = true; // переменная которая скажет полностью совпал объект внутри результирующего массива
+                // переменная которая скажет полностью совпал объект внутри результирующего массива
+                let equalRest = true;
+                // пробегаемся по кажлому полю в объекте
                 keys.forEach((key) => {
-                  // пробегаемся по кажлому полю в объекте
+                  // если значения поля из только что отфильтрованного массива,
+                  // не равно значени в уже до этого отфильтрованном массиве,
+                  // то значит что строка не полностью совпала, а значит строки не равны
                   if (itemData[key] !== itemDataRest[key]) {
-                    // если значения поля из только что отфильтрованного массива, не равно значени в уже до
-                    // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
-                    equalRest = false; // поэтому присваиваем переменной значение мол строки отличаются
+                    // поэтому присваиваем переменной значение мол строки отличаются
+                    equalRest = false;
                   }
                 });
+                // а вот если строка в только
+                // что отфлильтрованном массиве полностью совпала
+                // со строкой в уже до этого отфильтрованном
                 if (equalRest) {
-                  // а вот если строка в только что отфлильтрованном массиве полностью совпала со строкой в уже до этого отфильтрованном
-                  equal = true; // то присваиваем true переменной которай говорит что такая строка уже есть
+                  // то присваиваем true переменной которай говорит что такая строка уже есть
+                  equal = true;
                 }
               });
+              // и вот если такой строки все же нет
               if (!equal) {
-                // и вот если такой строки все же нет
-                this.searchData.push(itemData); // то смело добовляем ее в результирующий массив
+                // то смело добовляем ее в результирующий массив
+                this.searchData.push(itemData);
               }
             });
           }

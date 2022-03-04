@@ -29,7 +29,9 @@
             @click="mode = 'create'"
           >
             <path
-              d="M8.5348 0.514893L0.0498047 8.99989L8.5348 17.4849L9.9498 16.0709L2.8778 8.99989L9.9498 1.92889L8.5348 0.514893Z"
+              d="M8.5348 0.514893L0.0498047 8.99989L8.5348
+               17.4849L9.9498 16.0709L2.8778 8.99989L9.9498
+               1.92889L8.5348 0.514893Z"
               :fill="theme.$main_text"
             />
           </svg>
@@ -202,7 +204,11 @@
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M16 18H2C0.89543 18 0 17.1046 0 16V2C0 0.89543 0.89543 0 2 0H16C17.1046 0 18 0.89543 18 2V16C18 17.1046 17.1046 18 16 18ZM2 2V16H16V2H2ZM15 14H3L6 10L7 11L10 7L15 14ZM5.5 8C4.67157 8 4 7.32843 4 6.5C4 5.67157 4.67157 5 5.5 5C6.32843 5 7 5.67157 7 6.5C7 7.32843 6.32843 8 5.5 8Z"
+                    d="M16 18H2C0.89543 18 0 17.1046 0 16V2C0 0.89543 0.89543 0 2
+                     0H16C17.1046 0 18 0.89543 18 2V16C18 17.1046 17.1046 18 16
+                     18ZM2 2V16H16V2H2ZM15 14H3L6 10L7 11L10 7L15 14ZM5.5 8C4.67157
+                     8 4 7.32843 4 6.5C4 5.67157 4.67157 5 5.5 5C6.32843 5 7 5.67157
+                     7 6.5C7 7.32843 6.32843 8 5.5 8Z"
                     :fill="theme.$secondary_text"
                   />
                 </svg>
@@ -320,8 +326,14 @@ import {
 
 export default {
   props: {
-    show: Boolean,
-    admin: Boolean,
+    show: {
+      type: Boolean,
+      required: true,
+    },
+    admin: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -417,7 +429,9 @@ export default {
       this.newTitle = '';
       this.opacity = 1;
       this.imagePreview = null;
-      this.fields.forEach((field) => (field.value = '#8F8F9C'));
+      this.fields.forEach((field) => {
+        field.value = '#8F8F9C';
+      });
     },
     closeModal() {
       this.$emit('closeModal');
@@ -515,7 +529,7 @@ export default {
       try {
         const response = await fetch('/api/themes');
         const themeTitles = await response.json();
-        const newThemeTitles = themeTitles.map((them) => (them = { title: them.name, ...them }));
+        const newThemeTitles = themeTitles.map((them) => ({ title: them.name, ...them }));
         this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
           { title: 'Светлая', name: 'light' }].concat(
           newThemeTitles,

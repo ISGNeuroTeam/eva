@@ -33,13 +33,34 @@ import store from '../../store/index'; // подключаем файл с на�
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // выоста родительского компонента
-    options: Object,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // выоста родительского компонента
+    options: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -200,7 +221,7 @@ export default {
         error: false,
       });
 
-      this.$store.getters['auth/putLog'](`Запущен запрос  ${event.sid}`);
+      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${event.sid}`);
       // собственно проводим все операции с данными
       const response = await this.$store.dispatch('getDataApi', {
         search: event,
@@ -457,9 +478,9 @@ export default {
 
     createLegend() {
       let generatedListHTML = '';
-      for (const x of Object.values(this.library.objects)) {
-        generatedListHTML += `<li>${x.name}</li>`;
-      }
+      Object.keys(this.library.objects).forEach((key) => {
+        generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
+      });
       L.Control.Legend = L.Control.extend({
         onAdd() {
           const img = L.DomUtil.create('div');
@@ -477,9 +498,7 @@ export default {
         },
       });
 
-      L.control.legend = function (opts) {
-        return new L.Control.Legend(opts);
-      };
+      L.control.legend = (opts) => new L.Control.Legend(opts);
 
       L.control.legend({ position: 'bottomright' }).addTo(this.map);
       this.isLegendGenerated = true;
@@ -522,10 +541,10 @@ export default {
       });
       this.map.on('zoomend', () => {
         const layers = document.getElementsByClassName('leaflet-marker-icon');
-        for (const x of layers) {
-          x.style.width = `${(x.naturalWidth / 10) * this.map.getZoom()}px`;
-          x.style.height = `${(x.naturalHeight / 10) * this.map.getZoom()}px`;
-        }
+        layers.forEach((layer) => {
+          layer.style.width = `${(layer.naturalWidth / 10) * this.map.getZoom()}px`;
+          layer.style.height = `${(layer.naturalHeight / 10) * this.map.getZoom()}px`;
+        });
       });
 
       this.deleteTitleByAttribute();
@@ -539,20 +558,18 @@ export default {
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i += 1) {
         const lib = this.library.objects[dataRest[i].type]; // choosing drawing type for each object
-        if (!lib) {
-          // if no lib for drawing object - just skip
-          continue;
-        }
-        if (dataRest[i].ID === '1') {
-          const point = dataRest[i].coordinates.split(':');
-          const coord = point[1].split(',');
-          this.startingPoint = [coord[0], coord[1]];
-        }
-        if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
-          this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
-        }
-        if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
-          this.addLine(dataRest[i], lib);
+        if (lib) {
+          if (dataRest[i].ID === '1') {
+            const point = dataRest[i].coordinates.split(':');
+            const coord = point[1].split(',');
+            this.startingPoint = [coord[0], coord[1]];
+          }
+          if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
+            this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
+          }
+          if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
+            this.addLine(dataRest[i], lib);
+          }
         }
       }
     },
@@ -602,7 +619,6 @@ export default {
         text_color: textColor = '#FFFFFF',
         background_color: color = '65, 62, 218',
         opacity = 0.6,
-        label_field: text = 'КП-240',
         border_radius: borderRadius = '2px',
         border = 'none',
         width,
@@ -665,14 +681,6 @@ export default {
         sticky: true,
       });
 
-      line
-        .addTo(this.map)
-        .bindTooltip(tooltip)
-        .on('mouseover', (e) => highlightFeature(e, line))
-        .on('mouseout', resetHighlight);
-      line.setTooltipContent(element.label);
-      const route = line.getLatLngs().map((el) => [el.lat, el.lng]);
-      const lineTurf = turf.lineString(route);
       function resetHighlight(e) {
         const layer = e.target;
         layer.setStyle({
@@ -680,6 +688,9 @@ export default {
           weight: lib.width,
         });
       }
+
+      const route = line.getLatLngs().map((el) => [el.lat, el.lng]);
+      const lineTurf = turf.lineString(route);
 
       function highlightFeature(e) {
         const layer = e.target;
@@ -724,6 +735,13 @@ export default {
           line.setTooltipContent(newDiv);
         }
       }
+
+      line
+        .addTo(this.map)
+        .bindTooltip(tooltip)
+        .on('mouseover', (e) => highlightFeature(e, line))
+        .on('mouseout', resetHighlight);
+      line.setTooltipContent(element.label);
     },
 
     clustering(dataRest) {

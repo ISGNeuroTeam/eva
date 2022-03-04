@@ -216,12 +216,6 @@ export default {
         status: true,
       });
     }
-    this.calcSize();
-    this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode === 13) {
-        this.launchSearch();
-      }
-    });
     this.$refs.report.addEventListener('click', (event) => {
       if (!event.target.classList.contains('static-row')) {
         this.showStatistic = false;
@@ -282,7 +276,7 @@ export default {
       this.search.parametrs.twf = search.parametrs.twf;
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
+      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
@@ -476,11 +470,6 @@ export default {
     setSearch(search) {
       this.search = { ...search };
       this.modal = false;
-    },
-    calcSize() {
-      const size = this.$refs.vis.$el.getBoundingClientRect();
-      this.size.width = Math.round(size.width) - 16;
-      this.size.height = Math.round(size.height) - 66;
     },
     setRange(range) {
       this.data = this.data.filter(

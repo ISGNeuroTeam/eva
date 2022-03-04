@@ -201,10 +201,22 @@ import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
   props: {
-    idDashFrom: null,
-    modalFrom: null,
-    dataSearchFrom: null,
-    createBtnFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
+    dataSearchFrom: {
+      type: Object,
+      required: true,
+    },
+    createBtnFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -234,8 +246,8 @@ export default {
     };
   },
   computed: {
+    // тут понимаем нужно ли открыть окно с созданием или нет
     active() {
-      // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
         this.setData();
       }
@@ -244,8 +256,8 @@ export default {
     dataSearch() {
       return this.dataSearchFrom;
     },
+    // получаем id страницы переданного от родителя
     idDash() {
-      // получаем id страницы переданного от родителя
       return this.idDashFrom;
     },
     theme() {
@@ -312,20 +324,22 @@ export default {
           );
         }
 
-        const searches = this.getSearches; // получаем все ИС
+        // получаем все ИС
+        const searches = this.getSearches;
         let j = -1;
+        // пробегаемся по всем ИС
         searches.forEach((item, i) => {
-          // пробегаемся по всем ИС
+          // и если ИС с таким id уже есть
           if (item.sid === this.currentSid) {
-            // и если ИС с таким id уже есть
-            j = i; // меняем переменную
+            // меняем переменную
+            j = i;
           } else if (item.sid === this.search.sid) {
             j = -100;
           }
         });
 
+        // если такой ИС уже есть вызовем сообщение с уточнением
         if (j !== -1) {
-          // если такой ИС уже есть вызовем сообщение с уточнением
           if (this.cancelBtn === 'Отмена') {
             this.errorMsg = 'Такой источник данных существует. Хотите заменить его?';
             this.createBtn = 'Да';
@@ -342,16 +356,19 @@ export default {
             });
             this.cancelBtn = 'Отмена';
             this.errorMsgShow = false;
-            this.$emit('cancelModal'); // и скрываем окно редактирования ИД
+            // и скрываем окно редактирования ИД
+            this.$emit('cancelModal');
           }
-        } else {
           // если нет
+        } else {
+          // отправляем в хранилище для создания
           this.$store.commit('setSearch', {
             search: this.search,
             idDash: this.idDash,
             reload: false,
-          }); // отправляем в хранилище для создания
-          this.$emit('cancelModal'); // и скрываем окно редактирования ИС
+          });
+          // и скрываем окно редактирования ИС
+          this.$emit('cancelModal');
         }
       } else {
         this.errorMsg = 'Sid источника данных не может быть пустым';
@@ -364,21 +381,21 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|',
+        '\n|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n' + '|',
-        '\n' + '|',
+        '\n\n|',
+        '\n|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '|' + '\n',
+        '|\n',
         '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '| ' + '\n',
+        '| \n',
         '| ',
       );
     },

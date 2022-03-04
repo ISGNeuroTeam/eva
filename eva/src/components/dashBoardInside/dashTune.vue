@@ -74,17 +74,35 @@
 
 <script>
 import { mdiMinus, mdiPlus } from '@mdi/js';
-import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapMutations } from 'vuex';
 
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    dataModeFrom: null, // включена ли шапка
-    loading: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    }, // включена ли шапка
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {

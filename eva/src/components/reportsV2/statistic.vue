@@ -28,8 +28,14 @@ import { mdiRefresh, mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
-    data: Array,
-    size: Object,
+    data: {
+      type: Array,
+      default: () => ([]),
+    },
+    size: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -48,7 +54,7 @@ export default {
   },
   methods: {
     calcSize() {
-      alert('calcSize');
+      // alert('calcSize');
       const size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;

@@ -127,7 +127,10 @@ import { mdiCalendarMonth } from '@mdi/js';
 export default {
   name: 'ManualTypeModal',
   props: {
-    temp: Object,
+    temp: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {

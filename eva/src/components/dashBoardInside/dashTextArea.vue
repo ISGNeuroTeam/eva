@@ -33,10 +33,22 @@ import { mdiMagnify } from '@mdi/js';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    colorFrom: null, // цветовые переменные
-    heightFrom: null, // выоста родительского компонента
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // выоста родительского компонента
   },
   data() {
     return {

@@ -147,16 +147,43 @@ export default {
       type: Number,
       default: 1,
     },
-    dataRestFrom: null,
-    // shouldGet: null,
-    idFrom: null,
-    idDashFrom: null,
-    heightFrom: null,
-    dataReport: null,
-    activeElemFrom: null,
-    dataModeFrom: null,
-    colorFrom: null,
-    options: Object,
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    shouldGet: null,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    heightFrom: {
+      type: Number,
+      required: true,
+    },
+    dataReport: {
+      type: Boolean,
+      required: true,
+    },
+    activeElemFrom: {
+      type: String,
+      required: true,
+    },
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
+    colorFrom: {
+      type: Object,
+      required: true,
+    },
+    options: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -196,18 +223,22 @@ export default {
         if (event.prop[0] === 'rowcolor') {
           items.forEach((item) => {
             if (this[event.compare](item[event.column], event.row)) {
-              item.rowColor = event.value[0];
+              [item.rowColor] = event.value;
             }
           });
         }
         if (event.prop[0] === 'columncolor') {
-          const isColumnMatch = items.reduce((acc, item) => acc || this[event.compare](item[event.column], event.row), false);
+          const isColumnMatch = items
+            .reduce(
+              (acc, item) => acc || this[event.compare](item[event.column], event.row),
+              false,
+            );
           if (isColumnMatch) {
             items.forEach((item) => {
               if (!item.columnColor) {
                 item.columnColor = {};
               }
-              item.columnColor[event.column] = event.value[0];
+              [item.columnColor[event.column]] = event.value;
             });
           }
         }
@@ -217,7 +248,7 @@ export default {
               if (!item.cellColor) {
                 item.cellColor = [];
               }
-              item.cellColor[event.column] = event.value[0];
+              [item.cellColor[event.column]] = event.value;
             }
           });
         }

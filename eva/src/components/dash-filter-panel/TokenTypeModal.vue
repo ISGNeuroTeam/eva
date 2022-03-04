@@ -34,9 +34,18 @@
 export default {
   name: 'TokenTypeModal',
   props: {
-    idDash: String,
-    temp: Object,
-    editMode: Boolean,
+    idDash: {
+      type: String,
+      required: true,
+    },
+    temp: {
+      type: Object,
+      required: true,
+    },
+    editMode: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

@@ -41,12 +41,27 @@
 <script>
 export default {
   props: {
-    idFrom: null,
-    idDashFrom: null,
-    dataRestFrom: null,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
     dataLoadingFrom: null,
-    widthFrom: null,
-    colorFrom: null,
+    widthFrom: {
+      type: Number,
+      required: true,
+    },
+    colorFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -155,7 +170,8 @@ export default {
   },
   mounted() {
     this.setNoMsg(this.dataRestFrom);
-    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
+    //  В первый раз раскомментить чтобы создать события для элемнета,
+    //  а затем лучше закоментить чтобы каждый раз не обращаться к store
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -229,7 +245,8 @@ export default {
             ) {
               flag = 0;
             }
-
+            break;
+          default:
             break;
         }
         if (flag !== -1) {
@@ -260,8 +277,8 @@ export default {
       events.forEach((item) => {
         treshold = item.treshold.replace('[', '').replace(']', '').split(',');
         color = item.color.replace('[', '').replace(']', '').split(',');
-        treshold.forEach((item, i) => {
-          if (number > Number(item)) {
+        treshold.forEach((tresholdItem, i) => {
+          if (number > Number(tresholdItem)) {
             value = color[i];
           }
         });

@@ -44,16 +44,43 @@ import * as d3 from 'd3';
 export default {
   name: 'DashMultiLine',
   props: {
-    idFrom: String,
-    idDashFrom: String,
-    widthFrom: Number,
-    heightFrom: Number,
-    dataRestFrom: Array,
-    dataModeFrom: Boolean,
-    isFullScreen: Boolean,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    widthFrom: {
+      type: Number,
+      required: true,
+    },
+    heightFrom: {
+      type: Number,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
+    isFullScreen: {
+      type: Boolean,
+      required: true,
+    },
     /** Props from Reports page. */
-    dataReport: Boolean,
-    activeElemFrom: String,
+    dataReport: {
+      type: Boolean,
+      required: true,
+    },
+    activeElemFrom: {
+      type: String,
+      required: true,
+    },
   },
   data: () => ({
     metrics: [],
@@ -122,16 +149,56 @@ export default {
         this.theme.$sea,
       ];
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
 
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     strokeWidth() {
-      const { id, idDash } = this;
-      const { strokeWidth } = this.$store.getters.getOptions({ id, idDash });
+      const { strokeWidth } = this.getOptions;
       return strokeWidth ? Number(strokeWidth) : 1.5;
     },
 
     linkOptions() {
-      const { id, idDash } = this;
-      return this.$store.getters.getOptions({ id, idDash });
+      return this.getOptions;
     },
 
     change() {
@@ -207,19 +274,21 @@ export default {
 
     getDataAsynchrony() {
       if (this.dataRestFrom.error) {
-        return this.showErrorMessage(this.dataRestFrom.error);
+        this.showErrorMessage(this.dataRestFrom.error);
+        return;
       }
 
       const firstDataRow = this.dataRestFrom[0];
-      const firstDataRowKeys = Object.keys(firstDataRow);
-      const rowValue = firstDataRow[firstDataRowKeys[0]];
+      let rowValue;
+      let firstDataRowKeys;
+      if (firstDataRow) {
+        firstDataRowKeys = Object.keys(firstDataRow);
+        rowValue = firstDataRow[firstDataRowKeys[0]];
+      }
 
       this.setNoData(false);
 
-      const options = this.$store.getters.getOptions({
-        id: this.id,
-        idDash: this.idDash,
-      });
+      const options = this.getOptions;
 
       const {
         metrics,
@@ -230,10 +299,13 @@ export default {
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
         barplotBarWidth = 0,
+        // eslint-disable-next-line camelcase
         type_line,
         timeFormat,
         color,
+        // eslint-disable-next-line camelcase
         conclusion_count,
+        // eslint-disable-next-line camelcase
         replace_count,
         barplotstyle = 'divided',
         axesCount,
@@ -250,9 +322,10 @@ export default {
       this.stringOX = stringOX;
 
       if (!this.stringOX && typeof rowValue !== 'number') {
-        return this.showErrorMessage(
+        this.showErrorMessage(
           'К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.',
         );
+        return;
       }
       if (this.stringOX) {
         this.isTime = false;
@@ -282,7 +355,8 @@ export default {
       };
 
       if (this.legendList.length > 0) {
-        return render();
+        render();
+        return;
       }
 
       const metricList = firstDataRowKeys.filter(
@@ -290,9 +364,10 @@ export default {
       );
 
       if (metricList.length <= 0) {
-        return this.showErrorMessage(
+        this.showErrorMessage(
           'Данные не подходят для построения графика',
         );
+        return;
       }
 
       this.metrics = [...metricList];
@@ -320,7 +395,7 @@ export default {
           };
           const value = values[capture];
 
-          tocken.filterParam = Object.keys(this.dataRestFrom[0])[0];
+          [tocken.filterParam] = Object.keys(this.dataRestFrom[0]);
           this.$store.commit('setTocken', {
             tocken, value, idDash, store,
           });
@@ -516,7 +591,7 @@ export default {
       // this.zoom(x, yValue, selectRange, id)
     },
 
-    zoom(x, yValue, selectRange = [], id) {
+    zoom(x, yValue, selectRange, id) {
       const [rangeStart, rangeEnd] = selectRange;
 
       x.domain([x.invert(rangeStart), x.invert(rangeEnd)]);
@@ -625,7 +700,7 @@ export default {
         .selectAll(`.dot-${i}`)
         .transition()
         .duration(duration)
-        .attr('cx', function (d) {
+        .attr('cx', (d) => {
           const xVal = x(d[xMetric] * secondTransf);
           const yVal = isUnitedMode
             ? y(d[metricNames[i]])
@@ -649,7 +724,7 @@ export default {
         .duration(duration)
         .attr(
           'transform',
-          (d, i) => `translate(${dotLabelPos[i].x - 5}, ${dotLabelPos[i].y - 5})`,
+          (d, j) => `translate(${dotLabelPos[j].x - 5}, ${dotLabelPos[j].y - 5})`,
         );
 
       if (lastDotPos !== null) {
@@ -669,20 +744,14 @@ export default {
         .selectAll('.vetical-line')
         .transition()
         .duration(duration)
-        .attr('x1', function () {
-          return x(this.getAttribute('xVal'));
-        })
-        .attr('x2', function () {
-          return x(this.getAttribute('xVal'));
-        });
+        .attr('x1', () => x(this.getAttribute('xVal')))
+        .attr('x2', () => x(this.getAttribute('xVal')));
 
       group
         .selectAll('.dot-vertical')
         .transition()
         .duration(duration)
-        .attr('cx', function () {
-          return x(this.getAttribute('xVal'));
-        });
+        .attr('cx', () => x(this.getAttribute('xVal')));
     },
 
     setXAxisCaptionsRotate() {
@@ -707,6 +776,8 @@ export default {
             .style('text-anchor', 'end')
             .attr('transform', 'rotate(-90) translate(-10, -13)');
           break;
+        default:
+          break;
       }
 
       return d3.max(captions.nodes().map((node) => node.getBBox().width));
@@ -718,13 +789,13 @@ export default {
       barplotBarWidth,
       metricOptions,
       yAxesBinding,
-      type_line,
+      typeLine,
       color = {},
       conclusion_count = {},
       replace_count = {},
     ) {
-      if (type_line === undefined) {
-        type_line = {};
+      if (typeLine === undefined) {
+        typeLine = {};
       }
 
       let hasBarplots = false;
@@ -742,7 +813,7 @@ export default {
       }
 
       this.clearSvgContainer();
-      const barWidth = parseInt(barplotBarWidth) || 0;
+      const barWidth = parseInt(barplotBarWidth, 10) || 0;
 
       hasBarplots = this.isAccumulationBarplot;
       if (!this.isUnitedMode) {
@@ -770,14 +841,17 @@ export default {
         if (type === 'double') {
           return '1, 3, 6, 3';
         }
+        // TODO: стрелочная функия должна чтото возвращать
+        return '1, 3, 6, 3';
       };
 
       const metricNamesCount = this.metricNames.length;
 
       if (metricNamesCount <= 0) {
-        return this.showErrorMessage(
+        this.showErrorMessage(
           'Ни одной метрики не найдено. Проверьте корректность данных.',
         );
+        return;
       }
 
       const { svgContainer, legendContainer } = this.$refs;
@@ -822,7 +896,7 @@ export default {
           .padding([0.1])
           .domain(groups);
 
-        if (parseInt(barplotBarWidth)) {
+        if (parseInt(barplotBarWidth, 10)) {
           x.padding([(x.bandwidth() - barplotBarWidth) / x.bandwidth()]).domain(
             groups,
           );
@@ -838,8 +912,8 @@ export default {
               .sort(),
           );
       } else {
-        const barWidth = parseInt(barplotBarWidth) || 0;
-        const barOffset = (barWidth / 2) * 1.5;
+        const localBarWidth = parseInt(barplotBarWidth, 10) || 0;
+        const barOffset = (localBarWidth / 2) * 1.5;
 
         if (hasBarplots) {
           x = d3
@@ -954,8 +1028,10 @@ export default {
       );
 
       const dataRestLength = this.dataRestFrom.length;
-      const minMetricsValues = this.metricNames.map((item) => d3.min(this.dataRestFrom, (d) => d[item]));
-      const maxMetricsValues = this.metricNames.map((item) => d3.max(this.dataRestFrom, (d) => d[item]));
+      const minMetricsValues = this.metricNames
+        .map((item) => d3.min(this.dataRestFrom, (d) => d[item]));
+      const maxMetricsValues = this.metricNames
+        .map((item) => d3.max(this.dataRestFrom, (d) => d[item]));
 
       const dataRest = [...this.dataRestFrom];
 
@@ -1055,7 +1131,7 @@ export default {
                   .attr('stroke', this.theme.$main_text)
                   .style('opacity', 0.3);
               }
-              numberLeft++;
+              numberLeft += 1;
             } else {
               let translateY;
               if (numberRight === 0) {
@@ -1089,7 +1165,7 @@ export default {
                   .attr('stroke', this.theme.$main_text)
                   .style('opacity', 0.3);
               }
-              numberRight++;
+              numberRight += 1;
             }
 
             this.svg
@@ -1102,22 +1178,24 @@ export default {
 
               const barPostfix = this.isFullScreen ? '-full' : '';
               const getBarID = (i) => `bar--${this.id}--${metricName}--${i}--${barPostfix}`;
-              let barWidth = parseInt(barplotBarWidth);
-              if (!barplotBarWidth || barWidth <= 0) {
-                barWidth = d3
+              let localBarWidth = parseInt(barplotBarWidth, 10);
+              if (!barplotBarWidth || localBarWidth <= 0) {
+                localBarWidth = d3
                   .scaleBand()
                   .range([0, this.width])
                   .domain(
-                    this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
+                    this.dataRestFrom.map((d) => (this.isTime
+                      ? d[xMetric] * this.secondTransf
+                      : d[xMetric])),
                   )
                   .bandwidth();
               }
 
               let dividedBarplotPos = 0;
               if (this.isDividedBarplot && this.metricNames.length) {
-                barWidth /= barplotMetrics.length;
-                dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth
-                  - ((barplotMetrics.length - 1) / 2) * barWidth;
+                localBarWidth /= barplotMetrics.length;
+                dividedBarplotPos = barplotMetrics.indexOf(metricName) * localBarWidth
+                  - ((barplotMetrics.length - 1) / 2) * localBarWidth;
               }
 
               this.barplot
@@ -1133,8 +1211,8 @@ export default {
                   return xPos + dividedBarplotPos;
                 })
                 .attr('y', (d) => yScale(d[metricName]))
-                .attr('width', barWidth)
-                .attr('height', function (d, j) {
+                .attr('width', localBarWidth)
+                .attr('height', (d, j) => {
                   const setLabel = (attr, classText, metricText) => {
                     putLabel(
                       attr,
@@ -1156,12 +1234,12 @@ export default {
 
                   return h;
                 })
-                .attr('transform', function () {
+                .attr('transform', () => {
                   const translate = this.width.baseVal.value / 2;
                   return `translate(-${translate}, 0)`;
                 })
                 .attr('fill', this.legendColors[metricIndex])
-                .on('mouseenter', function (d) {
+                .on('mouseenter', (d) => {
                   const date = new Date(d[xMetric] * secondTransf);
                   let day = date.getDate();
                   let month = date.getMonth() + 1;
@@ -1185,17 +1263,12 @@ export default {
                   allDotHover = svg
                     .selectAll('circle')
                     .nodes()
-                    .filter((dot) => {
-                      if (
-                        dot.classList.contains('dot')
+                    .filter((dot) => dot.classList.contains('dot')
+                    // eslint-disable-next-line no-underscore-dangle
                         && dot.__data__[xMetric]
                           === d[xMetric] * secondTransf
-                        && dot.__data__[dot.getAttribute('metric')] !== null
-                      ) {
-                        dot.style.opacity = 1;
-                        return dot;
-                      }
-                    });
+                    // eslint-disable-next-line no-underscore-dangle
+                        && dot.__data__[dot.getAttribute('metric')] !== null);
 
                   lineDot
                     .attr('x1', rectX)
@@ -1223,9 +1296,10 @@ export default {
 
                   tooltip.style('left', `${left}px`).style('top', `${top}px`);
                 })
-                .on('mouseleave', function () {
+                .on('mouseleave', () => {
                   if (!this.getAttribute('data-last-bar')) {
                     allDotHover.forEach((dot) => {
+                      // eslint-disable-next-line no-underscore-dangle
                       if (extraDot.indexOf(dot.__data__) === -1) {
                         dot.style.opacity = 0;
                       }
@@ -1284,7 +1358,7 @@ export default {
                     .attr('stroke-width', this.strokeWidth)
                     .style(
                       'stroke-dasharray',
-                      getStyleLine(type_line[metricName]),
+                      getStyleLine(typeLine[metricName]),
                     )
                     .attr(
                       'd',
@@ -1314,7 +1388,7 @@ export default {
                 .attr('r', 5)
                 .attr('metric', metricName)
                 .attr('fill', this.legendColors[metricIndex])
-                .style('opacity', function (d, j) {
+                .style('opacity', (d, j) => {
                   let opacity = nullValue !== -1 ? 1 : 0;
 
                   const count = Number(conclusion_count[metricName]);
@@ -1398,7 +1472,7 @@ export default {
                 .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
                 .on('mouseup', () => brushObj.selectionUp())
                 .on('mousedown', () => brushObj.selectionDown())
-                .on('mouseenter', function (d) {
+                .on('mouseenter', (d) => {
                   const date = new Date(d[xMetric] * secondTransf);
                   let day = date.getDate();
                   let month = date.getMonth() + 1;
@@ -1442,16 +1516,10 @@ export default {
                   allDotHover = svg
                     .selectAll('circle')
                     .nodes()
-                    .filter((dot) => {
-                      if (
-                        dot.classList.contains('dot')
+                    .filter((dot) => dot.classList.contains('dot')
+                        // eslint-disable-next-line no-underscore-dangle
                         && dot.__data__[dot.getAttribute('metric')] !== null
-                        && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
-                      ) {
-                        dot.style.opacity = 1;
-                        return dot;
-                      }
-                    });
+                        && dot.getAttribute('cx') === x(d[xMetric] * secondTransf));
 
                   this.style.opacity = 1;
                   lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
@@ -1460,11 +1528,12 @@ export default {
                 .on('mousemove', () => {
                   if (brushObj.mouseDown) brushObj.selectionMove();
                 })
-                .on('mouseleave', function (d) {
+                .on('mouseleave', (d) => {
                   let opacity = 1;
 
                   if (!this.getAttribute('data-last-dot')) {
                     allDotHover.forEach((dot) => {
+                      // eslint-disable-next-line no-underscore-dangle
                       if (extraDot.indexOf(dot.__data__) === -1) {
                         dot.style.opacity = 0;
                       }
@@ -1570,7 +1639,7 @@ export default {
           brushObj.selections = this.brush.selectAll('.selection').nodes();
           brushObj.selections.forEach((sel) => sel.remove());
         };
-        return null;
+        return;
       }
 
       const step = ((this.height - 20) / metricNamesCount).toFixed(5);
@@ -1603,24 +1672,30 @@ export default {
             .attr('y2', step * metricIndex + 20)
             .attr('opacity', 0.3)
             .attr('stroke', color[metric] || this.theme.$main_text)
-            .style('stroke-dasharray', getStyleLine(type_line[metric]));
+            .style('stroke-dasharray', getStyleLine(typeLine[metric]));
         }
 
         const foundOptions = metricOptions.find((o) => o.name === metric);
         const options = foundOptions || {};
         const optionsKeys = Object.keys(options);
 
-        const minY = optionsKeys.length === 0
-          ? minMetricsValues[metricIndex]
-          : options.manual
+        let minY;
+        if (optionsKeys.length === 0) {
+          minY = minMetricsValues[metricIndex];
+        } else {
+          minY = options.manual
             ? minMetricsValues[metricIndex]
             : parseFloat(options.lowborder);
+        }
 
-        const maxY = optionsKeys.length === 0
-          ? maxMetricsValues[metricIndex]
-          : options.manual
+        let maxY;
+        if (optionsKeys.length === 0) {
+          maxY = maxMetricsValues[metricIndex];
+        } else {
+          maxY = options.manual
             ? maxMetricsValues[metricIndex]
             : parseFloat(options.upborder);
+        }
 
         const maxYTop = maxY + 0.1 * Math.abs(maxY);
         const minYBottom = minY - 0.1 * Math.abs(minY);
@@ -1636,11 +1711,14 @@ export default {
             .range([yRangeStart, startY[metricIndex]]),
         );
 
-        const tickValues = minYBottom === maxYTop
-          ? [minYBottom]
-          : minYBottom < 0
+        let tickValues;
+        if (minYBottom === maxYTop) {
+          tickValues = [minYBottom];
+        } else {
+          tickValues = minYBottom < 0
             ? [minYBottom, 0, maxYTop]
             : [minYBottom, maxYTop];
+        }
 
         const metricUnits = this.$store.getters.getMetricsMulti({
           id: this.id,
@@ -1655,7 +1733,7 @@ export default {
               .axisLeft(y[metricIndex])
               .tickValues(tickValues)
               .tickFormat(
-                (x) => `${x} ${
+                (z) => `${z} ${
                   metricUnits[metricIndex]
                     ? metricUnits[metricIndex].units
                     : ''
@@ -1663,7 +1741,7 @@ export default {
               ),
           )
           .selectAll('.tick > text')
-          .each(function () {
+          .each(() => {
             const w = this.getBBox().width;
             if (w > maxLength) maxLength = w;
           });
@@ -1675,13 +1753,18 @@ export default {
           .select('text')
           .nodes();
         textNodes.forEach((node, i) => {
-          const value = textNodes.length > 1
-            ? i === 0
-              ? -5
-              : i === textNodes.length - 1
+          let value;
+          if (textNodes.length > 1) {
+            if (i === 0) {
+              value = -5;
+            } else {
+              value = i === textNodes.length - 1
                 ? 5
-                : 0
-            : 5;
+                : 0;
+            }
+          } else {
+            value = 5;
+          }
           node.style.transform = `translateY(${value}px)`;
         });
 
@@ -1734,7 +1817,7 @@ export default {
                 .attr('fill', color[metric] || 'none')
                 .attr('stroke', color[metric] || this.legendColors[metricIndex])
                 .attr('stroke-width', this.strokeWidth)
-                .style('stroke-dasharray', getStyleLine(type_line[metric]))
+                .style('stroke-dasharray', getStyleLine(typeLine[metric]))
                 .attr(
                   'd',
                   d3
@@ -1756,7 +1839,7 @@ export default {
                 .attr('opacity', '.3')
                 .attr('stroke', color[metric] || this.theme.$main_text)
                 .attr('stroke-dasharray', '3 3')
-                .style('stroke-dasharray', getStyleLine(type_line[metric]));
+                .style('stroke-dasharray', getStyleLine(typeLine[metric]));
             }
           }
 
@@ -1777,7 +1860,7 @@ export default {
           .attr('r', 5)
           .attr('metric', metric)
           .attr('fill', color[metric] || this.legendColors[metricIndex])
-          .style('stroke-dasharray', getStyleLine(type_line[metric]))
+          .style('stroke-dasharray', getStyleLine(typeLine[metric]))
           .style('opacity', function (d, j) {
             let opacity = nullValue !== -1 ? 1 : 0;
 
@@ -1889,16 +1972,10 @@ export default {
             allDotHover = svg
               .selectAll('circle')
               .nodes()
-              .filter((dot) => {
-                if (
-                  dot.classList.contains('dot')
+              .filter((dot) => dot.classList.contains('dot')
+              // eslint-disable-next-line no-underscore-dangle
                   && dot.__data__[dot.getAttribute('metric')] !== null
-                  && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
-                ) {
-                  dot.style.opacity = 1;
-                  return dot;
-                }
-              });
+                  && dot.getAttribute('cx') === x(d[xMetric] * secondTransf));
 
             this.style.opacity = 1;
             lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
@@ -1907,11 +1984,12 @@ export default {
           .on('mousemove', () => {
             if (brushObj.mouseDown) brushObj.selectionMove();
           })
-          .on('mouseleave', function (d) {
+          .on('mouseleave', (d) => {
             let opacity = 1;
 
             if (!this.getAttribute('data-last-dot')) {
               allDotHover.forEach((dot) => {
+                // eslint-disable-next-line no-underscore-dangle
                 if (extraDot.indexOf(dot.__data__) === -1) {
                   dot.style.opacity = 0;
                 }
@@ -2027,7 +2105,7 @@ export default {
 
         // }
         if (optionsKeys.length > 0 && options.type === 'Bar chart') {
-          let allDotHover = [];
+          let localAllDotHover = [];
 
           x = this.isTime
             ? d3
@@ -2043,7 +2121,9 @@ export default {
               .scaleBand()
               .range([0, this.width])
               .domain(
-                this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
+                this.dataRestFrom.map((d) => (this.isTime
+                  ? d[xMetric] * this.secondTransf
+                  : d[xMetric])),
               );
 
           this.svg
@@ -2052,16 +2132,16 @@ export default {
             .style('opacity', 0)
             .call(d3.axisBottom(x));
 
-          const cutData = this.dataRestFrom.filter(
+          const localCutData = this.dataRestFrom.filter(
             (item) => item[options.name] >= minY && item[options.name] <= maxY,
           );
 
-          const thisMetrics = [...this.metrics];
+          const localThisMetrics = [...this.metrics];
           const isNegative = minY < 0;
 
           this.line[metricIndex]
             .selectAll(`bar-${metricIndex}`)
-            .data(cutData)
+            .data(localCutData)
             .enter()
             .append('rect')
             .attr('x', (d) => (this.isTime ? x(d[xMetric] * this.secondTransf) : x(d[xMetric])))
@@ -2083,13 +2163,15 @@ export default {
                   .scaleBand()
                   .range([0, this.width])
                   .domain(
-                    this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
+                    this.dataRestFrom.map((d) => (this.isTime
+                      ? d[xMetric] * this.secondTransf
+                      : d[xMetric])),
                   )
                   .bandwidth();
               }
               return barplotBarWidth;
             })
-            .attr('height', function (d, j) {
+            .attr('height', (d, j) => {
               const setLabel = (attr, classText, metricText) => {
                 putLabel(
                   attr,
@@ -2102,7 +2184,7 @@ export default {
                 );
               };
 
-              if (isLastDotShow && j === cutData.length - 1) {
+              if (isLastDotShow && j === localCutData.length - 1) {
                 setLabel('data-last-bar', 'last-bar-text', options.name);
               }
 
@@ -2120,14 +2202,14 @@ export default {
                 ? Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
                 : startY[metricIndex + 1] - y[metricIndex](d[options.name]);
             })
-            .attr('transform', function (d, j) {
+            .attr('transform', (d, j) => {
               const w = this.width.baseVal.value;
               let translate = j === 0 ? 0 : w / 2;
               if (j === dataRest.length - 1) translate = w;
               return `translate(-${translate}, 0)`;
             })
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[options.name] }, 'click'))
-            .on('mouseenter', function (d) {
+            .on('mouseenter', (d) => {
               const date = new Date(d[xMetric] * secondTransf);
               let day = date.getDate();
               if (day < 10) day = `0${day}`;
@@ -2138,7 +2220,7 @@ export default {
               const xVal = !isTime ? d[xMetric] : `${day}-${month}-${year}`;
 
               tooltip.html(
-                thisMetrics.reduce((prev, cur) => {
+                localThisMetrics.reduce((prev, cur) => {
                   const value = cur === xMetric ? xVal : d[cur];
                   return `${prev}<p><span>${cur}</span>: ${value}</p>`;
                 }, ''),
@@ -2146,19 +2228,14 @@ export default {
 
               const rectX = +d3.select(this).attr('x');
 
-              allDotHover = svg
+              localAllDotHover = svg
                 .selectAll('circle')
                 .nodes()
-                .filter((dot) => {
-                  if (
-                    dot.classList.contains('dot')
+                .filter((dot) => dot.classList.contains('dot')
+                // eslint-disable-next-line no-underscore-dangle
                     && dot.__data__[xMetric] === d[xMetric] * secondTransf
-                    && dot.__data__[dot.getAttribute('metric')] !== null
-                  ) {
-                    dot.style.opacity = 1;
-                    return dot;
-                  }
-                });
+                // eslint-disable-next-line no-underscore-dangle
+                    && dot.__data__[dot.getAttribute('metric')] !== null);
 
               lineDot.attr('x1', rectX).attr('x2', rectX).attr('opacity', 0.7);
               tooltip.style('opacity', 1).style('visibility', 'visible');
@@ -2181,9 +2258,10 @@ export default {
 
               tooltip.style('left', `${left}px`).style('top', `${top}px`);
             })
-            .on('mouseleave', function () {
+            .on('mouseleave', () => {
               if (!this.getAttribute('data-last-bar')) {
-                allDotHover.forEach((dot) => {
+                localAllDotHover.forEach((dot) => {
+                  // eslint-disable-next-line no-underscore-dangle
                   if (extraDot.indexOf(dot.__data__) === -1) {
                     dot.style.opacity = 0;
                   }
@@ -2210,7 +2288,7 @@ export default {
 
       // Add Y axis
       let maxY = [];
-      for (let i = 0; i < stackedData.length; i++) {
+      for (let i = 0; i < stackedData.length; i += 1) {
         maxY.push(Math.max(...stackedData[i].map((item) => item[1])));
       }
       maxY = Math.max(...maxY);
@@ -2241,7 +2319,7 @@ export default {
         .attr('y', (d) => y(d[1]))
         .attr('height', (d) => y(d[0]) - y(d[1]))
         .attr('width', x.bandwidth())
-        .on('mouseover', function (d) {
+        .on('mouseover', (d) => {
           const values = d.data;
           const date = new Date(values[this.xMetric] * this.secondTransf);
           const xVal = !this.isTime
@@ -2255,7 +2333,7 @@ export default {
           );
           tooltip.style('opacity', 1).style('visibility', 'visible');
         })
-        .on('mousemove', function () {
+        .on('mousemove', () => {
           tooltip
             .style('left', `${d3.mouse(this)[0] + 90}px`)
             .style('top', `${d3.mouse(this)[1]}px`);

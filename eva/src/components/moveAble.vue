@@ -134,9 +134,6 @@ export default {
         }
       },
     },
-    // top(val) {
-    //   if (val <= this.headerTop) val = this.headerTop;
-    // },
     left() {
       const { clientWidth } = document.querySelector('#app');
       if (this.left < 0) this.left = 0;
