@@ -9,8 +9,7 @@
     <v-card
       :style="{
         background: theme.$main_bg,
-        boxShadow: `0 3px 1px -2px ${theme.$main_border},
-        0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+        boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
         color: theme.$main_text,
       }"
     >
@@ -77,12 +76,6 @@ export default {
     };
   },
   computed: {
-    getSearches() {
-      return this.$store.state[this.idDash]?.searches || [];
-    },
-    getModalSearch() {
-      return this.$store.state[this.idDash]?.modalSearch?.status || false;
-    },
     idDash() {
       // получаем название элемнета от родителя
       return this.idDashFrom;
@@ -91,7 +84,7 @@ export default {
       // получаем статус открытия или нет окна модального
       let active = 'false';
       if (this.idDash) {
-        active = this.getModalSearch;
+        active = this.$store.getters.getModalSearch(this.idDash);
       }
       return active;
     },
@@ -99,7 +92,7 @@ export default {
       // получаем все ИС на странице
       let searches = [];
       if (this.idDash) {
-        searches = this.getSearches;
+        searches = this.$store.getters.getSearches(this.idDash);
       }
       return searches;
     },
@@ -113,7 +106,7 @@ export default {
   methods: {
     startDS() {
       //  если нажали на кнопку согласия
-      if (this.currentId !== 0) {
+      if (this.currentId != 0) {
         // проверяем выбран ли хоть один ИС
         this.$store.commit('setDataSource', {
           id: this.idDash,

@@ -148,7 +148,7 @@ export default {
     selected(selected) {
       if (selected.includes('Выбрать все')) {
         let list = [];
-        if (this.element === 'dash') {
+        if (this.element == 'dash') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
@@ -159,7 +159,7 @@ export default {
         this.elements[this.element] = list;
       } else if (selected.includes('Очистить все')) {
         let list = [];
-        if (this.element === 'dashs') {
+        if (this.element == 'dashs') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
@@ -213,8 +213,8 @@ export default {
       } else {
         let extantion = this.file.name.split('.');
         extantion = extantion[extantion.length - 1];
-        if (extantion !== this.element) {
-          if (this.element === 'group') {
+        if (extantion != this.element) {
+          if (this.element == 'group') {
             this.msgImp.text = 'Выберите файл c группами';
           } else {
             this.msgImp.text = 'Выберите файл c дашбордами';
@@ -223,7 +223,7 @@ export default {
           this.msgImp.opacity = '1';
         } else {
           const formData = new FormData();
-          if (this.element === 'dash') {
+          if (this.element == 'dash') {
             formData.append('group', this.curName);
             formData.append('body', this.file);
           } else {

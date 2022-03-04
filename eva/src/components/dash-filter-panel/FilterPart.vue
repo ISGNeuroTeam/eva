@@ -166,8 +166,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['getTockens']),
     getDashTokens() {
-      return this.$store.state[this.idDash].tockens;
+      return this.getTockens(this.idDash);
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -182,13 +183,10 @@ export default {
     },
     elemName() {
       let name = this.elemRawName;
-
-      if (this.elemRawName) {
-        this.getDashTokens.forEach((token) => {
+      name
+        && this.getDashTokens.forEach((token) => {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
-      }
-
       return name || this.filterPart?.token?.name || 'Unknown';
     },
     operationManualTitle() {

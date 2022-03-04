@@ -380,16 +380,7 @@ export default {
       return this.$store.getters.getTheme;
     },
     focusedFilter() {
-      return this.getFocusedFilter;
-    },
-    dashFromStore() {
-      return this.$store.state[this.idDashFrom];
-    },
-    getFocusedFilter() {
-      return this.dashFromStore.focusedFilter;
-    },
-    getFilters() {
-      return this.dashFromStore.filters ? this.dashFromStore.filters : [];
+      return this.$store.getters.getFocusedFilter(this.idDashFrom);
     },
   },
   watch: {
@@ -405,7 +396,7 @@ export default {
     },
   },
   mounted() {
-    this.filters = this.getFilters;
+    this.filters = this.$store.getters.getFilters(this.idDashFrom);
     this.tempFilter = {
       id: '',
       idDash: this.idDashFrom,
@@ -480,7 +471,7 @@ export default {
           parts: [],
         };
         this.tempFilterIndex = -1;
-        this.filters = this.getFilters;
+        this.filters = this.$store.getters.getFilters(this.idDashFrom);
       }
     },
     deleteFilter(filter) {
@@ -488,7 +479,7 @@ export default {
       this.$store.commit('declineFilterChanges', this.idDashFrom);
       this.$store.commit('clearFocusedFilter', this.idDashFrom);
       this.focusedRow = null;
-      this.filters = this.getFilters;
+      this.filters = this.$store.getters.getFilters(this.idDashFrom);
     },
     refreshFilter(filter) {
       this.filterChanged = true;

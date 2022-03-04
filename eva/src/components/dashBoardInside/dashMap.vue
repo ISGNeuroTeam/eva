@@ -29,6 +29,7 @@ import * as utils from 'leaflet-geometryutil';
 import vuetify from '../../plugins/vuetify';
 import dashMapUserSettings from './dashMapUserSettings.vue';
 import store from '../../store/index.js'; // подключаем файл с настройками хранилища Vuex
+import isMarkerInsidePolygon from './checkMarketInsideMap.js';
 
 export default {
   props: {
@@ -80,56 +81,19 @@ export default {
       // получаем название элемента
       return this.idFrom;
     },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.idFrom];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
-    },
     option() {
-      return this.getOptions;
+      return this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.element,
+      });
     },
 
     top() {
       // для ряда управляющих иконок
-      return document.body.clientWidth <= 1600 ? 50 : 60;
+      if (document.body.clientWidth <= 1600) {
+        return 50;
+      }
+      return 60;
     },
     mapStyleSize() {
       return {
@@ -139,7 +103,6 @@ export default {
   },
   watch: {
     mapStyleSize() {
-      // eslint-disable-next-line no-underscore-dangle
       this.map._onResize();
     },
     dataRestFrom(_dataRest) {
@@ -215,13 +178,10 @@ export default {
       } else {
         // если все нормально
 
-        const responseDB = this.$store.dispatch(
-          'putIntoDB',
-          {
-            result: response,
-            sid: event.sid,
-            idDash: this.idDash,
-          },
+        const responseDB = this.$store.getters.putIntoDB(
+          response,
+          event.sid,
+          this.idDash,
         );
         responseDB.then(() => {
           this.$store.commit('setLoading', {
@@ -248,7 +208,7 @@ export default {
       this.reDrawMap(this.dataRestFrom);
     },
     updateToken(value) {
-      const tokens = this.$store.state[this.idDash].tockens;
+      const tokens = this.$store.getters.getTockens(this.idDash);
       Object.keys(tokens).forEach((i) => {
         if (
           tokens[i].elem === this.element
@@ -354,7 +314,10 @@ export default {
     },
 
     initTheme() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       if (options.maptheme) {
         this.maptheme = options.maptheme;
       } else {
@@ -362,11 +325,17 @@ export default {
       }
     },
     changeMapTheme(val) {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       options.maptheme = val;
     },
     initClusterTextCount() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       if (options.clusterTextCount) {
         this.clusterTextCount = options.clusterTextCount;
       } else {
@@ -374,7 +343,10 @@ export default {
       }
     },
     initClusterDelimiter() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       if (options.clusterDelimiter) {
         this.clusterDelimiter = options.clusterDelimiter;
       } else {
@@ -382,7 +354,10 @@ export default {
       }
     },
     initClusterPosition() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       if (options.clusterPosition) {
         this.clusterPosition = options.clusterPosition;
       } else {
@@ -390,11 +365,17 @@ export default {
       }
     },
     changeClusterTextCount(val) {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       options.clusterTextCount = val;
     },
     blurClusterPosition() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       if (this.clusterPosition.length > 0) {
         options.clusterPosition = this.clusterPosition;
       } else {
@@ -405,7 +386,10 @@ export default {
       this.clustering(this.dataRestFrom);
     },
     blurClusterDelimiter() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       options.clusterDelimiter = this.clusterDelimiter;
       this.clearCluster();
       this.clustering(this.dataRestFrom);
@@ -416,7 +400,10 @@ export default {
       });
     },
     getOSM() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       if (options.selectedLayer) {
         this.osmserver = options.selectedLayer;
       } else if (options.osmserver) {
@@ -426,12 +413,12 @@ export default {
       }
     },
     generateLibrary(dataRest, options) {
-      const tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
+      const _tmp = dataRest[dataRest.length - 1].ID.replaceAll("'", '"');
       try {
         if (options) {
           this.library = JSON.parse(options);
         } else {
-          this.library = JSON.parse(tmp);
+          this.library = JSON.parse(_tmp);
         }
         this.$store.commit('setLibrary', {
           library: this.library,
@@ -483,8 +470,8 @@ export default {
       this.clusterPositionItems = null;
       Object.entries(this.library.objects).forEach((object) => {
         if (object[1].image) {
-          const tmpObject = { ...object[1], id: Number(object[0]) };
-          this.clusterPositionItems = [tmpObject];
+          const _tmpObject = { ...object[1], id: Number(object[0]) };
+          this.clusterPositionItems = [_tmpObject];
         }
       });
 
@@ -525,22 +512,21 @@ export default {
       this.deleteTitleByAttribute();
 
       this.$nextTick(() => {
-        // eslint-disable-next-line no-underscore-dangle
         this.map._onResize();
       });
     },
 
     drawObjects(dataRest) {
-      for (let i = 0; i < dataRest.length - 1; i += 1) {
+      for (let i = 0; i < dataRest.length - 1; i++) {
         const lib = this.library.objects[dataRest[i].type]; // choosing drawing type for each object
         if (!lib) {
           // if no lib for drawing object - just skip
           continue;
         }
         if (dataRest[i].ID === '1') {
-          const point = dataRest[i].coordinates.split(':');
-          const coord = point[1].split(',');
-          this.startingPoint = [coord[0], coord[1]];
+          const _point = dataRest[i].coordinates.split(':');
+          const _coord = _point[1].split(',');
+          this.startingPoint = [_coord[0], _coord[1]];
         }
         if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
           this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
@@ -573,10 +559,10 @@ export default {
         iconSize: [lib.width, lib.height],
       });
 
-      const point = element.coordinates.split(':');
-      const coord = point[1].split(',');
-      this.startingPoint = [coord[0], coord[1]];
-      const marker = L.marker([coord[0], coord[1]], {
+      const _point = element.coordinates.split(':');
+      const _coord = _point[1].split(',');
+      this.startingPoint = [_coord[0], _coord[1]];
+      const marker = L.marker([_coord[0], _coord[1]], {
         icon,
         zIndexOffset: -1000,
         riseOnHover: true,
@@ -587,7 +573,6 @@ export default {
           direction: 'top',
           className: 'leaftet-hover',
         });
-      // eslint-disable-next-line no-underscore-dangle
       L.DomUtil.addClass(marker._icon, 'className');
     },
 
@@ -621,9 +606,9 @@ export default {
         </div>`,
         iconSize: [width, height],
       });
-      const point = element.coordinates.split(':');
-      const coord = point[1].split(',');
-      L.marker([coord[0], coord[1]], {
+      const _point = element.coordinates.split(':');
+      const _coord = _point[1].split(',');
+      L.marker([_coord[0], _coord[1]], {
         icon,
         zIndexOffset: -1000,
         riseOnHover: true,
@@ -725,14 +710,13 @@ export default {
         showCoverageOnHover: false,
         iconCreateFunction: (cluster) => {
           const markers = cluster.getAllChildMarkers();
-          // eslint-disable-next-line no-underscore-dangle
           if (cluster._zoom > 10) {
-            const html = `<div class='leaflet-tooltip'>${
+            const _html = `<div class='leaflet-tooltip'>${
               this.generateHtml(markers)
             }</div>`;
             return L.divIcon({
               iconSize: [0, 0],
-              html,
+              html: _html,
             });
           }
           return L.divIcon({
@@ -740,49 +724,46 @@ export default {
           });
         },
       });
-      const sortDataRest = this.sortForTooltip(dataRest);
-      for (let i = 0; i < sortDataRest.length - 1; i += 1) {
-        this.addTooltip(this.cluster, sortDataRest[i]);
+      const _sortDataRest = this.sortForTooltip(dataRest);
+      for (let i = 0; i < _sortDataRest.length - 1; i++) {
+        this.addTooltip(this.cluster, _sortDataRest[i]);
       }
     },
     sortForTooltip(dataRest) {
-      const sortDataRest = [];
+      const _sortDataRest = [];
       this.clusterPosition?.forEach((position) => {
         dataRest.forEach((dr) => {
           if (position === dr.type) {
-            sortDataRest.push(dr);
+            _sortDataRest.push(dr);
           }
         });
       });
-      return sortDataRest;
+      return _sortDataRest;
     },
     generateHtml(markers) {
-      // eslint-disable-next-line no-underscore-dangle
-      let html = "<div class ='leaftet-flex'>";
-      // eslint-disable-next-line no-underscore-dangle
-      let count = 0;
+      let _html = "<div class ='leaftet-flex'>";
+      let _count = 0;
       let i;
       for (
         i = 0;
-        i < markers.length - 1 && count < this.clusterTextCount;
-        i += 1
+        i < markers.length - 1 && _count < this.clusterTextCount;
+        i++
       ) {
-        // eslint-disable-next-line no-underscore-dangle
-        html = `${html}<div>${markers[i].getTooltip()._content}</div>`;
-        html += `<div> ${this.clusterDelimiter} </div>`;
-        count += 1;
+        _html = `${_html}<div>${markers[i].getTooltip()._content}</div>`;
+        _html += `<div> ${this.clusterDelimiter} </div>`;
+        _count++;
       }
       // удаление лишенего дилителя
-      html = html.substr(
+      _html = _html.substr(
         0,
-        html.length - `<div> ${this.clusterDelimiter} </div>`.length,
+        _html.length - `<div> ${this.clusterDelimiter} </div>`.length,
       );
       // закрываем leaftet-flex
-      html += '</div>';
+      _html += '</div>';
       if (i !== markers.length - 1) {
-        html += "<div class ='leaftet-flex'>...</div>";
+        _html += "<div class ='leaftet-flex'>...</div>";
       }
-      return html;
+      return _html;
     },
     clearCluster() {
       if (this.map.hasLayer(this.cluster)) {
@@ -794,9 +775,9 @@ export default {
       const icon = L.divIcon({
         iconSize: [0, 0],
       });
-      const point = element.coordinates.split(':');
-      const coord = point[1].split(',');
-      const marker = L.marker([coord[0], coord[1]], {
+      const _point = element.coordinates.split(':');
+      const _coord = _point[1].split(',');
+      const marker = L.marker([_coord[0], _coord[1]], {
         icon,
       }).bindTooltip(element.label, {
         permanent: true,
