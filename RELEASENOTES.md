@@ -1,3 +1,17 @@
+# [1.85.0] - Token update when executing a go event, visualisations in data research
+
+### New
+- Added the ability to update tokens when executing a go event
+- Visualisations in datа research 2.0.
+
+### Fixed
+- Multiline. Moved the barplots to the background
+- Single value metadata and ranges if the boundaries coincide - incorrect processing
+- SingleValue Color setting for indicators via the Ranges button
+- Piechart color rgb
+- Gis settings styles
+- Calendar in data source
+
 # [1.84.0] - Fixed dashboard filters, multiple tokens
 
 ### New
