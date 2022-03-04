@@ -500,7 +500,7 @@ export default {
     createDash(dash) {
       this.$store.commit('setDash', {
         data: dash,
-        getters: this.$store.getters.checkAlreadyDash,
+        getters: (payload) => this.$store.dispatch('checkAlreadyDash', payload),
       });
       this.$store.getters['auth/putLog'](
         `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`,
@@ -538,7 +538,7 @@ export default {
       );
     },
     setEnter(event) {
-      if (event.code == 'Enter') {
+      if (event.code === 'Enter') {
         this.createBtn();
       }
     },

@@ -79,7 +79,7 @@ export default {
   },
   watch: {
     paleteFrom(palete) {
-      palete ? (this.paleteShow = true) : (this.paleteShow = false);
+      this.paleteShow = !!palete;
     },
   },
   methods: {

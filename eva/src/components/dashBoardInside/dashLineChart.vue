@@ -73,6 +73,46 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     // dataRest: function() {
     //   return this.dataRestFrom
     // },
@@ -152,15 +192,9 @@ export default {
       prom.then((sizeLine) => {
         // как раз тут делаем асинхронность
         let time = false;
-        let onlyNum = true;
         const key = Object.keys(this.dataRestFrom[0])[0];
-        const { lastDot } = this.$store.getters.getOptions({
-          idDash: this.idDash,
-          id: this.id,
-        });
-        typeof this.dataRestFrom[0][key] !== 'number'
-          ? (onlyNum = false)
-          : false;
+        const { lastDot } = this.getOptions;
+        const onlyNum = typeof this.dataRestFrom[0][key] === 'number';
         if (onlyNum) {
           // если все-таки число
           if (
@@ -184,8 +218,7 @@ export default {
       });
     },
     createLineChart(props, that, sizeLine, time, lastDot) {
-      // создает график
-
+      // основные используемые цвета
       const colors = [
         this.colorFrom.controls || this.colorFrom.$accent_ui_color,
         this.colorFrom.text || this.colorFrom.$blue,
@@ -196,27 +229,30 @@ export default {
         '#fbbe18',
         '#26295a',
         '#228B22',
-      ]; // основные используемые цвета
+      ];
 
+      // устанавливаем размер и отступы графика
       let otstupBottom = 60;
-      if (screen.width <= 1600) {
+      if (window.screen.width <= 1600) {
         otstupBottom = 40;
       }
-      // устанавливаем размер и отступы графика
+
       const margin = {
         top: 10, right: 20, bottom: 20, left: 60,
       };
       const width = sizeLine.width - margin.left - margin.right - 20;
       const height = sizeLine.height - margin.top - margin.bottom - otstupBottom;
 
+      // получаем область в которой будем рисовтаь график
       const graphics = d3
         .select(this.$el.querySelector('.dash-graph'))
         .selectAll('svg')
-        .nodes(); // получаем область в которой будем рисовтаь график
+        .nodes();
 
+      // если график уже есть
       if (graphics.length !== 0) {
-        // если график уже есть
-        graphics[0].remove(); // удаляем его
+        // удаляем его
+        graphics[0].remove();
       }
 
       // полготавливаем данные
@@ -225,57 +261,72 @@ export default {
 
       let secondTransf = 1000;
 
-      const xMetric = Object.keys(data[0])[0]; // в эту переменную кладем временную метрику (подразумеваем, что она первая по счету)
+      // в эту переменную кладем временную метрику (подразумеваем, что она первая по счету)
+      const xMetric = Object.keys(data[0])[0];
 
-      const metricsName = []; // массив из всех метрик что доступны на графике и в нужном нам порядке
+      // массив из всех метрик что доступны на графике и в нужном нам порядке
+      const metricsName = [];
 
-      for (let i = 0; i < 5; i++) {
-        // предполагаем что наших метрик всегда максимум пять не считая временной
+      // предполагаем что наших метрик всегда максимум пять не считая временной
+      for (let i = 0; i < 5; i += 1) {
+        // пробегаемся по первому элементу, на основе него и будем делать выводы о метриках
         Object.keys(data[0]).forEach((item, j) => {
-          // пробегаемся по первому элементу, на основе него и будем делать выводы о метриках
           switch (i) {
-            case 0: // в первый элемнет массива нам надо занести основную метрику которая рисует основную линию
-              j !== 0
-              && item.indexOf('lowerbound') === -1
-              && item.indexOf('upperbound') === -1
-              && item.indexOf('upperthreshold') === -1
-              && item.indexOf('lowerthreshold') === -1
-                ? metricsName.push(item)
-                : false;
+            // в первый элемнет массива нам надо занести основную метрику
+            // которая рисует основную линию
+            case 0:
+              if (j !== 0
+                && item.indexOf('lowerbound') === -1
+                && item.indexOf('upperbound') === -1
+                && item.indexOf('upperthreshold') === -1
+                && item.indexOf('lowerthreshold') === -1) {
+                metricsName.push(item);
+              }
               break;
-            case 1: // во второй заносим верхнию границу коридора
-              item.indexOf('upperbound') !== -1
-                ? metricsName.push(item)
-                : false;
+            // во второй заносим верхнию границу коридора
+            case 1:
+              if (item.indexOf('upperbound') !== -1) {
+                metricsName.push(item);
+              }
               break;
-            case 2: // нижняя граница коридора
-              item.indexOf('lowerbound') !== -1
-                ? metricsName.push(item)
-                : false;
+            // нижняя граница коридора
+            case 2:
+              if (item.indexOf('lowerbound') !== -1) {
+                metricsName.push(item);
+              }
               break;
-            case 3: // верхняя граница порога
-              item.indexOf('upperthreshold') !== -1
-                ? metricsName.push(item)
-                : false;
+            // верхняя граница порога
+            case 3:
+              if (item.indexOf('upperthreshold') !== -1) {
+                metricsName.push(item);
+              }
               break;
-            case 4: // нижняя
-              item.indexOf('lowerthreshold') !== -1
-                ? metricsName.push(item)
-                : false;
+            // нижняя
+            case 4:
+              if (item.indexOf('lowerthreshold') !== -1) {
+                metricsName.push(item);
+              }
+              break;
+            default:
               break;
           }
         });
       }
 
+      // если метрик вообще не найдено
       if (metricsName.length === 0) {
-        // если метрик вообще не найдено
-        this.props.nodata = true; // показываем сообщение о некорректности данных
-        this.props.result = []; // очищаем массив результатов
-        this.props.message = 'Ни одной метрики не найдено. Проверьте корректность данных'; // выводим сообщение
+        // показываем сообщение о некорректности данных
+        this.props.nodata = true;
+        // очищаем массив результатов
+        this.props.result = [];
+        // выводим сообщение
+        this.props.message = 'Ни одной метрики не найдено. Проверьте корректность данных';
+        // и еще график очищаем, чтобы не мешался
         d3.select(this.$el.querySelector('.dash-graph'))
           .selectAll('svg')
-          .remove(); // и еще график очищаем, чтобы не мешался
-        return false; // завершаем создание графика
+          .remove();
+        // завершаем создание графика
+        return;
       }
 
       let x = null;
@@ -289,15 +340,15 @@ export default {
           )
           .range([0, width]);
       } else {
+        // находим максимальное значение среди всех метрик
         maxX = data.reduce((last, next) => {
-          // находим максимальное значение среди всех метрик
           if (next[xMetric] > last) {
             return next[xMetric];
           }
           return last;
         }, 0);
+        // находим максимальное значение среди всех метрик
         minX = data.reduce((last, next) => {
-          // находим максимальное значение среди всех метрик
           if (next[xMetric] < last) {
             return next[xMetric];
           }
@@ -307,17 +358,11 @@ export default {
         secondTransf = 1;
       }
 
-      let max = metricsName.map((item, i) =>
-        // получаем массив с максимальным значением каждой метрики, кроме временной
-        d3.max(data, (d) => +d[metricsName[i]]));
+      // получаем массив с максимальным значением каждой метрики, кроме временной
+      let max = metricsName.map((item, i) => d3.max(data, (d) => +d[metricsName[i]]));
 
-      max = max.reduce((last, next) => {
-        // находим максимальное значение среди всех метрик
-        if (next > last) {
-          return next;
-        }
-        return last;
-      }, 0);
+      // находим максимальное значение среди всех метрик
+      max = max.reduce((last, next) => (next > last ? next : last), 0);
 
       const y = d3.scaleLinear().domain([0, max]).range([height, 20]);
 
@@ -347,11 +392,7 @@ export default {
         deliter = 6;
       }
 
-      const annotation = Object.keys(data[0]).filter((item) => {
-        if (item.indexOf('annotation') !== -1) {
-          return item;
-        }
-      });
+      const annotation = Object.keys(data[0]).filter((item) => item.indexOf('annotation') !== -1);
 
       // добавляем ось X
       let xAxis = null;
@@ -365,11 +406,7 @@ export default {
               .axisBottom(x)
               .tickFormat(d3.timeFormat('%d-%m-%Y '))
               .tickValues(
-                x.ticks().filter((item, i) => {
-                  if (i % deliter === 0) {
-                    return item;
-                  }
-                }),
+                x.ticks().filter((item, i) => i % deliter === 0),
               )
               .ticks(5),
           );
@@ -427,11 +464,6 @@ export default {
         .style('border-color', colors[1])
         .text('');
 
-      // // создаем область выделения
-      // let brush = d3.brushX()                   // область выделения
-      //   .extent( [ [0,0], [width,height] ] )  // инициализируем область выделения на весь граф от начала до width, heigh
-      //   .on("end", updateData)               // каждый раз как область выделения изменится вызовется функция
-
       const brushObj = {};
       brushObj.selections = [];
       brushObj.mouseDown = false;
@@ -439,16 +471,19 @@ export default {
       brushObj.startX = 0;
       brushObj.endX = 0;
 
-      const lineName = ['general', 'upbound', 'lowbound']; // массив в котором будем хранить наши линии, основную, и коридор, сейчас названия произвольные выставлены
+      // массив в котором будем хранить наши линии,
+      // основную, и коридор, сейчас названия произвольные выставлены
+      const lineName = ['general', 'upbound', 'lowbound'];
 
       // строим коридор метрики
 
-      const areaData = []; // массив с точками для области закрашивания
+      // массив с точками для области закрашивания
+      const areaData = [];
 
+      //  если коридор вообще есть (может быть и просто линейный график)
       if (metricsName[1] && metricsName[2]) {
-        //  если коридор вообще есть (может быть и просто линейный график)
-
-        addHall(1); // функция строящая линию коридора
+        // функция строящая линию коридора
+        addHall(1);
         addHall(2);
       }
 
@@ -472,31 +507,36 @@ export default {
 
       // подготавливаем данные для порога
 
-      const treshold = {}; // здесь будет объект с границами порога
+      // здесь будет объект с границами порога
+      const treshold = {};
 
+      // если порог вообще есть (может быть просто линия ведь графика)
       if (metricsName[3] && metricsName[4]) {
-        // если порог вообще есть (может быть просто линия ведь графика)
-        treshold[metricsName[3]] = []; // сперва создаем объекты верхнего и нижнего порога во избежании ошибок
+        // сперва создаем объекты верхнего и нижнего порога во избежании ошибок
+        treshold[metricsName[3]] = [];
         treshold[metricsName[4]] = [];
 
+        // пробегаемся пов сем данным
         data.forEach((item) => {
-          // пробегаемся пов сем данным
-          treshold[metricsName[3]].push(item[metricsName[3]]); // изаносим в нужном нам виде порог
+          // изаносим в нужном нам виде порог
+          treshold[metricsName[3]].push(item[metricsName[3]]);
           treshold[metricsName[4]].push(item[metricsName[4]]);
         });
       }
 
       // строим основную линию
 
+      // основная линия графика
       lineName[0] = svg
-        .append('g') // основная линия графика
+        .append('g')
         .attr('clip-path', `url(#clip-${that.id})`);
 
       // Добовляем линию
+      // добовляем свой класс
       lineName[0]
         .append('path')
         .datum(data)
-        .attr('class', 'line') // добовляем свой класс
+        .attr('class', 'line')
         .attr('fill', 'none')
         .attr('stroke', colors[0])
         .attr('stroke-width', 1.5)
@@ -508,6 +548,7 @@ export default {
             .y((d) => y(d[metricsName[0]])),
         );
       // Добовляем точки
+      // нам нужно понять какие точки выходят за значение порога и их мы окрасим в другой цвет
       svg
         .append('g')
         .selectAll('dot')
@@ -515,25 +556,29 @@ export default {
         .enter()
         .append('circle')
         .attr('cx', (d) => x(d[xMetric] * secondTransf))
-        .attr('cy', function (d, i) {
-          // нам нужно понять какие точки выходят за значение порога и их мы окрасим в другой цвет
-          this.setAttribute('fill', colors[0]); // поэтому сперва по умолчанию красив в цвет графика
-          this.style = 'opacity:0'; // и делаем точки прозрачными
+        .attr('cy', (d, i) => {
+          // поэтому сперва по умолчанию красив в цвет графика
+          this.setAttribute('fill', colors[0]);
+          // и делаем точки прозрачными
+          this.style = 'opacity:0';
+          // затем если вообще есть порог
           if (Object.keys(treshold).length === 2) {
-            // затем если вообще есть порог
+            // смотрим если значение  выходят за верхний или нижний порог
             if (
               treshold[metricsName[3]][i] > d[metricsName[0]]
               || treshold[metricsName[4]][i] < d[metricsName[0]]
             ) {
-              // смотрим если значение  выходят за верхний или нижний порог
-              this.setAttribute('fill', colors[2]); // красим точку в другой цвет
-              this.style = 'opacity:1'; // и постоянно ее отображаем
-              this.setAttribute('data-anomaly', 'true'); // так же зададим атрибут сосбтвенный, чтобы потом понимать с какой точки мышка ушла
+              // красим точку в другой цвет
+              this.setAttribute('fill', colors[2]);
+              // и постоянно ее отображаем
+              this.style = 'opacity:1';
+              // так же зададим атрибут сосбтвенный, чтобы потом понимать с какой точки мышка ушла
+              this.setAttribute('data-anomaly', 'true');
             }
           }
           if (lastDot) {
+            // если это последняя точка, то
             if (i === data.length - 1) {
-              // если это последняя точка, то
               putLabelDot(
                 'data-last-dote',
                 'last-dot-text',
@@ -572,7 +617,8 @@ export default {
           { x: d[xMetric], y: d[metricsName[0]] },
           'click',
         ))
-        .on('mouseover', function (d) {
+        // при наведении мышки точка появляется
+        .on('mouseover', (d) => {
           let x = d[xMetric];
           if (time) {
             x = new Date(d[xMetric] * secondTransf);
@@ -582,7 +628,7 @@ export default {
             .style('opacity', '1')
             .style('visibility', 'visible')
             .html(
-              `<p><span>${xMetric}</span> : ${x}</p> 
+              `<p><span>${xMetric}</span> : ${x}</p>
             <p><span>${metricsName[0]}</span> : ${d[metricsName[0]]}</p>`,
             )
             .style('top', `${event.layerY - 30}px`)
@@ -599,8 +645,8 @@ export default {
           }
 
           this.style = 'opacity:1';
-        }) // при наведении мышки точка появляется
-        .on('mouseout', function () {
+        })
+        .on('mouseout', () => {
           if (
             !this.getAttribute('data-anomaly')
             && !this.getAttribute('data-last-dote')
@@ -633,13 +679,8 @@ export default {
         .attr('transform', `translate(${width - 5},5)`)
         .attr('data-name', metricsName[0])
         .style('fill', colors[1])
-        .text(checkName(metricsName[0])); // здесь вызываем функцию которая проверяет не слишком ли длинное название и сокращает его
-
-      // добовляем область выделения
-      // lineName[0]
-      //   .append("g")
-      //   .attr("class", `brush-${that.id}`)
-      //   .call(brush);
+        // здесь вызываем функцию которая проверяет не слишком ли длинное название и сокращает его
+        .text(checkName(metricsName[0]));
 
       const brush = lineName[0].append('g').attr('class', 'brush');
 
@@ -790,11 +831,15 @@ export default {
       }
 
       function putLabelDot(attr, classText, d, metric, that) {
-        that.setAttribute('fill', colors[0]); // красим точку в другой цвет
-        that.style = 'opacity:1'; // и постоянно ее отображаем
-        that.setAttribute(attr, 'true'); // так же зададим атрибут сосбтвенный, чтобы потом понимать с какой точки мышка ушла
+        // красим точку в другой цвет
+        that.setAttribute('fill', colors[0]);
+        // и постоянно ее отображаем
+        that.style = 'opacity:1';
+        // так же зададим атрибут сосбтвенный, чтобы потом понимать с какой точки мышка ушла
+        that.setAttribute(attr, 'true');
+        // текст легенды (название метрики)
         svg
-          .append('text') // текст легенды (название метрики)
+          .append('text')
           .attr('class', classText)
           .attr(
             'transform',
@@ -821,27 +866,29 @@ export default {
           });
       }
 
+      // функция которая проверяет не слишком ли длинное название и сокращает его
       function checkName(name) {
-        // функция которая проверяет не слишком ли длинное название и сокращает его
+        // если там больше 10 символов
         if (name.length > 10) {
-          // если там больше 10 символов
-          name = `${name.substring(0, 10)}...`; // обрезаем и добовляем троеточие
+          // обрезаем и добовляем троеточие
+          name = `${name.substring(0, 10)}...`;
         }
         return name;
       }
 
+      // функция создающяя линию коридора
       function addHall(j) {
-        // функция создающяя линию коридора
-
+        // добовляем объект для линии коридора, верхней или нижней
         lineName[j] = svg
-          .append('g') // добовляем объект для линии коридора, верхней или нижней
+          .append('g')
           .attr('clip-path', `url(#clip-${that.id})`);
 
         // Добовляем  саму линию
+        // добовляем свой класс
         lineName[j]
           .append('path')
           .datum(data)
-          .attr('class', 'lineHall') // добовляем свой класс
+          .attr('class', 'lineHall')
           .attr('fill', 'none')
           .attr('stroke', colors[0])
           .style('stroke-dasharray', '3 3')
@@ -862,55 +909,54 @@ export default {
           );
       }
 
+      // функция которая создает правильный массив точек для области закрашивания коридора
       function addToArea(item, i, point, name) {
-        // функция которая создает правильный массив точек для области закрашивания коридора
-
+        // если элемнета массива еще нет
         if (!areaData[i]) {
-          // если элемнета массива еще нет
+          // то создаем его нужным нам образом
           areaData[i] = {
-            // то создаем его нужным нам образом
             above: { x: null, y: null },
             below: { x: null, y: null },
           };
         }
-        name.indexOf('upperbound') !== -1
-          ? (areaData[i].above[point] = item)
-          : (areaData[i].below[point] = item); // и наполняем его значениями
+        // и наполняем его значениями
+        if (name.indexOf('upperbound') !== -1) {
+          areaData[i].above[point] = item;
+        } else {
+          areaData[i].below[point] = item;
+        }
       }
 
+      // функция которая вызывается каждый раз, когда происходит выделение области (brush)
       function updateData(extent, brushObj) {
-        // функция которая вызывается каждый раз, когда происходит выделение области (brush)
-
-        // let extent = d3.event.selection;  // значения выделенной области
-
         if (extent) {
           // если область выделена всё-таки
           let diapason;
           if (time) {
+            // получаем эти значения в нужном нам виде
             diapason = [
-              parseInt(new Date(x.invert(extent[0])).getTime() / 1000),
-              parseInt(new Date(x.invert(extent[1])).getTime() / 1000),
-            ]; // получаем эти значения в нужном нам виде
+              parseInt(new Date(x.invert(extent[0])).getTime() / 1000, 10),
+              parseInt(new Date(x.invert(extent[1])).getTime() / 1000, 10),
+            ];
           } else {
             diapason = [
               parseFloat(x.invert(extent[0]).toFixed(5)),
               parseFloat(x.invert(extent[1]).toFixed(5)),
             ];
           }
-
-          that.setClick(diapason, 'select'); // вызываем функцию создающию токены
-
-          zoom(extent, brushObj); // делаем зумирование  графика
+          // вызываем функцию создающию токены
+          that.setClick(diapason, 'select');
+          // делаем зумирование  графика
+          zoom(extent, brushObj);
         }
       }
-
+      // функция делающяя зумирование графика
       function zoom(extent, brushObj) {
-        // функция делающяя зумирование графика
-
-        x.domain([x.invert(extent[0]), x.invert(extent[1])]); // меняем значения оси х на основе нашего выделенного диапазона
-        // lineName[0].select(`.brush-${that.id}`).call(brush.move, null);  // убираем область выделения
+        // меняем значения оси х на основе нашего выделенного диапазона
+        x.domain([x.invert(extent[0]), x.invert(extent[1])]);
         brushObj.clearBrush();
 
+        // растягиваем плавно ось x
         if (time) {
           xAxis
             .transition()
@@ -920,28 +966,24 @@ export default {
                 .axisBottom(x)
                 .tickFormat(d3.timeFormat('%d-%m-%Y '))
                 .tickValues(
-                  x.ticks().filter((item, i) => {
-                    if (i % 2 === 0) {
-                      return item;
-                    }
-                  }),
+                  x.ticks().filter((item, i) => i % 2 === 0),
                 )
                 .ticks(5),
-            ); // растягиваем плавно ось x
+            );
         } else {
           xAxis.transition().duration(1000).call(d3.axisBottom(x));
         }
 
         verticalLineX();
-
-        changeZoom(1000); // вызываем функцию которая перересует все линии и точки как надо
-
+        // вызываем функцию которая перересует все линии и точки как надо
+        changeZoom(1000);
+        // если дважды щелкнуть по любому месту
         svg.on('dblclick', () => {
-          // если дважды щелкнуть по любому месту
+          // то вернем ось х в исходное состояние
           if (time) {
             x.domain(
               d3.extent(data, (d) => new Date(d[xMetric] * secondTransf)),
-            ); // то вернем ось х в исходное состояние
+            );
             xAxis
               .transition()
               .duration(secondTransf)
@@ -950,11 +992,7 @@ export default {
                   .axisBottom(x)
                   .tickFormat(d3.timeFormat('%d-%m-%Y '))
                   .tickValues(
-                    x.ticks().filter((item, i) => {
-                      if (i % 2 === 0) {
-                        return item;
-                      }
-                    }),
+                    x.ticks().filter((item, i) => i % 2 === 0),
                   )
                   .ticks(5),
               );
@@ -964,13 +1002,13 @@ export default {
           }
 
           verticalLineX();
-
-          changeZoom(300); // и вернем все линии  в исходное состояние
+          // и вернем все линии  в исходное состояние
+          changeZoom(300);
         });
-
+        // функция которая перерисовывает все линии
         function changeZoom(dauration) {
-          // функция которая перерисовывает все линии
-          lineName[0] // основная линия
+          // основная линия
+          lineName[0]
             .select('.line')
             .transition()
             .duration(dauration)
@@ -988,7 +1026,7 @@ export default {
             .selectAll('.dot')
             .transition()
             .duration(dauration)
-            .attr('cx', function (d) {
+            .attr('cx', (d) => {
               if (this.getAttribute('data-with-caption')) {
                 dotLabelPos.push({
                   x: x(d[xMetric] * secondTransf),
@@ -1024,28 +1062,23 @@ export default {
             .selectAll('.vetical-line')
             .transition()
             .duration(dauration)
-            .attr('x1', function () {
-              return x(this.getAttribute('xVal'));
-            })
-            .attr('x2', function () {
-              return x(this.getAttribute('xVal'));
-            });
+            .attr('x1', () => x(this.getAttribute('xVal')))
+            .attr('x2', () => x(this.getAttribute('xVal')));
 
           group
             .selectAll('.dot-vertical')
             .transition()
             .duration(dauration)
-            .attr('cx', function () {
-              return x(this.getAttribute('xVal'));
-            });
+            .attr('cx', () => x(this.getAttribute('xVal')));
 
+          // проверяем если коридор есть
           if (metricsName[1] && metricsName[2]) {
-            // проверяем если коридор есть
-
-            addHallBrush(1, dauration); // его тоже перерисовываем
+            // его тоже перерисовываем
+            addHallBrush(1, dauration);
             addHallBrush(2, dauration);
 
-            svg // и закрашиваем
+            // и закрашиваем
+            svg
               .select('.area')
               .transition()
               .duration(dauration)
@@ -1059,11 +1092,11 @@ export default {
               );
           }
 
+          // функция которая перерисовывает коридор
           function addHallBrush(j, duration) {
-            // функция которая перерисовывает коридор
-
             // Добовляем линию
-            lineName[j] // линии кордиора - нижняя и верхняя
+            // линии кордиора - нижняя и верхняя
+            lineName[j]
               .select('.lineHall')
               .transition()
               .duration(duration)
@@ -1088,6 +1121,30 @@ export default {
           }
         }
       }
+    },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
     },
     setClick(point, action) {
       const tockens = this.$store.getters.getTockens(this.idDash);
@@ -1139,10 +1196,8 @@ export default {
         }
       });
 
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onclick',
-        element: this.id,
         partelement: 'point',
       });
 

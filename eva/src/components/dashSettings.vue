@@ -150,7 +150,7 @@ export default {
     return {
       gearShow: false,
       settings: {},
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
+      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       sizeGrid: {
         vert: '32',
         hor: '18',
@@ -171,9 +171,19 @@ export default {
       this.setDragresable();
       return true;
     },
+    getGridShow() {
+      if (!this.dashFromStore.gridShow) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'gridShow',
+          value: 'true',
+        }]);
+      }
+      return this.dashFromStore.gridShow;
+    },
     gridShow: {
       get() {
-        return this.$store.getters.getGridShow(this.idDashFrom) === 'true';
+        return this.getGridShow === 'true';
       },
       set(value) {
         this.$store.commit('setGridShow', {
@@ -182,10 +192,47 @@ export default {
         });
       },
     },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom];
+    },
+    getSizeGrid() {
+      if (!this.dashFromStore?.grid) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'grid',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.grid,
+            prop: 'vert',
+            value: '32',
+          },
+          {
+            object: this.dashFromStore.grid,
+            prop: 'hor',
+            value: '18',
+          },
+        ]);
+      }
+      return this.dashFromStore?.grid;
+    },
+    getDragResize() {
+      if (!this.dashFromStore.dragRes) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'dragRes',
+          value: 'true',
+        }]);
+      }
+      return this.dashFromStore.dragRes;
+    },
   },
   watch: {
     gearFrom(gear) {
-      gear ? (this.gearShow = true) : (this.gearShow = false);
+      this.gearShow = !!gear;
     },
     mode() {
       this.$emit('changeMode');
@@ -204,7 +251,7 @@ export default {
     },
   },
   mounted() {
-    const grid = this.$store.getters.getSizeGrid(this.idDashFrom);
+    const grid = this.getSizeGrid;
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
     if (
@@ -213,24 +260,15 @@ export default {
     ) {
       this.dragresable = false;
     } else {
-      let dragRes = this.$store.getters.getDragResize(this.idDashFrom);
-      dragRes === 'true' ? (dragRes = true) : (dragRes = false);
-      this.dragresable = dragRes;
+      const dragRes = this.getDragResize;
+      this.dragresable = dragRes === 'true';
     }
-    this.showTabs = this.$store.getters.getShowTabs(this.idDashFrom);
+    this.showTabs = this.$store.state[this.idDashFrom]?.tabs || false;
   },
   methods: {
     setDragresable() {
-      if (
-        !this.permissionsFrom.includes('admin_all')
-          && !this.permissionsFrom.includes('editdash')
-      ) {
-        // this.mode = false;
-        this.dragresable = false;
-      } else {
-        // this.mode = true;
-        this.dragresable = true;
-      }
+      this.dragresable = !(!this.permissionsFrom.includes('admin_all')
+        && !this.permissionsFrom.includes('editdash'));
     },
     sendSizeGrid() {
       this.$store.commit('setSizeGrid', {

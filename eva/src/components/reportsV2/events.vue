@@ -143,7 +143,6 @@ export default {
         });
         id++;
       });
-      console.log(dataset);
       return dataset;
     },
   },

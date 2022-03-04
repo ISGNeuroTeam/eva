@@ -112,12 +112,54 @@ export default {
     metricTemplateClass() {
       return `metric-${this.metricCount} v-${this.template}`;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
+    getOptions() {
+      if (!this.idFrom) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDashFrom });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
   },
   watch: {
     dataRestFrom() {
-      const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(
-        JSON.stringify(this.$store.getters.getOptions({ id, idDash })),
+        JSON.stringify(this.getOptions),
       );
       this.setVisual(
         this.currentSettings.metricOptions?.length
@@ -170,9 +212,8 @@ export default {
       return '#5980f8';
     },
     init(settings, up) {
-      const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(
-        JSON.stringify(this.$store.getters.getOptions({ id, idDash })),
+        JSON.stringify(this.getOptions),
       );
       if (!options.settings && !settings) {
         options.settings = {
@@ -193,13 +234,12 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
-      this.isHeaderOpen = !!settings.showTitle;
+      this.isHeaderOpen = !!settings?.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
     },
     updateCount(count) {
-      const { idFrom: id, idDashFrom: idDash } = this;
-      const options = { ...this.$store.getters.getOptions({ id, idDash }) };
+      const options = { ...this.getOptions };
       this.metricCount = count;
 
       const newSettings = {

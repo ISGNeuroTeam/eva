@@ -210,18 +210,54 @@ export default {
       }
       return this.color.controlsActive;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     updatedOptions() {
-      return this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      return this.getOptions;
     },
     options() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
-      return options.change;
+      return this.getOptions.change;
     },
   },
   watch: {
@@ -243,7 +279,7 @@ export default {
       ) {
         if (this.dataReport) {
           if (this.activeElemFrom === this.id) {
-            this.dataFrom = this.dataRestFrom[0];
+            [this.dataFrom] = this.dataRestFrom;
             this.getSvg(this.dataRestFrom[0].svg_filename);
             this.$store.commit('setActions', {
               actions: this.actions,
@@ -254,7 +290,7 @@ export default {
             this.svg = '';
           }
         } else {
-          this.dataFrom = this.dataRestFrom[0];
+          [this.dataFrom] = this.dataRestFrom;
           this.getSvg(this.dataRestFrom[0].svg_filename);
           this.$store.commit('setActions', {
             actions: this.actions,
@@ -263,16 +299,13 @@ export default {
           });
         }
       }
-      if (screen.width <= 1600) {
+      if (window.screen.width <= 1600) {
         this.otstupBottom = 30;
       }
     },
     dataModeFrom(dataMode) {
       if (dataMode) {
-        this.otstupBottom = 45;
-        if (screen.width <= 1600) {
-          this.otstupBottom = 30;
-        }
+        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
       } else {
         this.otstupBottom = 10;
       }
@@ -346,7 +379,8 @@ export default {
       }
     },
     async checkCapture() {
-      const captures = this.prepareCapture(); // получаем объект свойства элементов из данных
+      // получаем объект свойства элементов из данных
+      const captures = this.prepareCapture();
       let elem = '';
       let timeOut = setTimeout(
         function tick() {
@@ -464,7 +498,7 @@ export default {
       return captures;
     },
     checkTokenInTooltip(text) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let reg = '';
       Object.values(tockens).forEach((item) => {
         if (text.indexOf(item.name) !== -1) {
@@ -498,8 +532,32 @@ export default {
         this.answerShow = false;
       }, 2000);
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setClick(token, item) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
       const id = this.$refs.tooltip.getAttribute('data-id');
 
@@ -530,23 +588,21 @@ export default {
       });
 
       if (item === 'object') {
-        const events = this.$store.getters.getEvents({
-          idDash: this.idDash,
+        const events = this.getEvents({
           event: 'onclick',
-          element: this.id,
           partelement: 'empty',
         });
 
         if (events.length !== 0) {
-          events.forEach((item) => {
-            if (item.action === 'set') {
+          events.forEach((event) => {
+            if (event.action === 'set') {
               this.$store.commit('letEventSet', {
                 events,
                 idDash: this.idDash,
               });
-            } else if (item.action === 'go') {
+            } else if (event.action === 'go') {
               this.$store.commit('letEventGo', {
-                event: item,
+                event,
                 idDash: this.idDash,
                 route: this.$router,
                 store: this.$store,
@@ -557,7 +613,7 @@ export default {
       }
     },
     setOver(token) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -601,6 +657,8 @@ export default {
           context.lineTo(20, 50);
           context.lineTo(30, 50);
           break;
+        default:
+          break;
       }
       context.strokeStyle = this.color.text;
       context.stroke();
@@ -620,10 +678,12 @@ export default {
       let direction = 'normal';
 
       if (id && id.indexOf('overlay') !== -1) {
-        token = id.split('overlay_')[1];
+        [token] = id.split('overlay_');
         this.$refs.tooltip.setAttribute('data-id', token);
 
-        this.tooltipOptions === false ? (this.idTooltip = token) : false;
+        if (this.tooltipOptions === false) {
+          this.idTooltip = token;
+        }
 
         // выходит справа
         if (event.offsetX + 40 + tooltipSize.width > csvgSize.width) {
@@ -666,7 +726,7 @@ export default {
       let token = '';
       const id = event.target.getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
-        token = id.split('overlay_')[1];
+        [token] = id.split('overlay_');
         this.setClick(token, 'object');
       }
     },
