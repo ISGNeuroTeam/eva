@@ -247,6 +247,16 @@ export default {
     this.$store.commit('setActions', { id, idDash, actions });
   },
   methods: {
+    getMetricsMulti() {
+      if (!this.dashFromStore.metrics) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'metrics',
+          value: [],
+        }]);
+      }
+      return this.dashFromStore.metrics;
+    },
     async setLegendItems(items = []) {
       const list = items.map((name, i) => ({
         name,
@@ -402,9 +412,7 @@ export default {
         }
       }
 
-      const events = this.$store.getters.getEvents({
-        idDash,
-        element: id,
+      const events = this.getEvents({
         event: 'onclick',
         partelement: 'point',
       });
@@ -421,6 +429,30 @@ export default {
           });
         }
       }
+    },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
     },
 
     checkExtraDot() {
@@ -1720,10 +1752,7 @@ export default {
             : [minYBottom, maxYTop];
         }
 
-        const metricUnits = this.$store.getters.getMetricsMulti({
-          id: this.id,
-          idDash: this.idDash,
-        });
+        const metricUnits = this.getMetricsMulti();
 
         this.svg
           .append('g')
