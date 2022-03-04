@@ -4,46 +4,66 @@
     class="visualisation"
     :style="{ background: theme.$main_bg, color: theme.$main_text }"
   >
-    <v-menu
-      v-model="menuDropdown"
-      offset-y
-      max-width="160"
-      class="select"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <div
-          v-bind="attrs"
-          v-on="on"
-        >
-          {{ aboutElem[activeElem].tooltip }}
-          <v-icon>{{ mdiChevronDown }}</v-icon>
+    <div class="d-flex">
+      <v-menu
+          offset-y
+          max-width="160"
+          class="select"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <div
+              v-bind="attrs"
+              v-on="on"
+          >
+            {{ aboutElem[activeElem].tooltip }}
+            <v-icon>{{ mdiChevronDown }}</v-icon>
+          </div>
+        </template>
+        <div style="min-height: 40px">
+          <v-tooltip
+              v-for="i in elements"
+              :key="aboutElem[i].key"
+              bottom
+              :color="theme.$accent_ui_color"
+              @click="changeTab(i)"
+          >
+            <template
+                v-slot:activator="{ on }"
+                class="p-5"
+            >
+              <v-icon
+                  class="title-icon"
+                  :color="aboutElem[i].color"
+                  v-on="on"
+                  @click="changeTab(i)"
+              >
+                {{ aboutElem[i].icon }}
+              </v-icon>
+            </template>
+            <span>{{ aboutElem[i].tooltip }}</span>
+          </v-tooltip>
         </div>
-      </template>
-      <div style="min-height: 40px">
-        <v-tooltip
-          v-for="i in elements"
-          :key="aboutElem[i].key"
+      </v-menu>
+      <v-tooltip
+          class="ml-5"
           bottom
           :color="theme.$accent_ui_color"
-          @click="changeTab(i)"
-        >
-          <template
-            v-slot:activator="{ on }"
-            class="p-5"
-          >
-            <v-icon
-              class="title-icon"
-              :color="aboutElem[i].color"
+          :disabled="false"
+          :open-delay="false"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon
+              class="option"
+              :color="theme.$main_border"
               v-on="on"
-              @click="changeTab(i)"
-            >
-              {{ aboutElem[i].icon }}
-            </v-icon>
-          </template>
-          <span>{{ aboutElem[i].tooltip }}</span>
-        </v-tooltip>
-      </div>
-    </v-menu>
+              @click="switchOP()"
+          >
+            {{ mdiSettings }}
+          </v-icon>
+        </template>
+        <span>Настройки</span>
+      </v-tooltip>
+    </div>
     <v-card-title class="title-vis">
       <div
         class="divider-tab"
@@ -70,11 +90,15 @@
       :data-report="true"
       :data-rest-from="data"
     />
+    <modal-settings
+        :color-from="theme"
+        id-dash-from="reports"
+    />
   </div>
 </template>
 
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronDown } from '@mdi/js';
+import { mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings } from '@mdi/js';
 import settings from '../../js/componentsSettings';
 
 export default {
@@ -91,7 +115,11 @@ export default {
       mdiRefresh,
       mdiMagnify,
       mdiChevronDown,
-      size: {},
+      mdiSettings,
+      size: {
+        width: 1000,
+        height: 500
+      },
     };
   },
   computed: {
@@ -140,18 +168,24 @@ export default {
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
-      this.size.height = Math.round(size.height) - 66;
     },
     setActiveElem(elemName) {
       this.activeElem = elemName;
     },
+    switchOP() {
+      this.$store.dispatch('openModalSettings', {
+        path: "reports",
+        element: this.activeElem,
+        titles: this.data[0] ? Object.keys(this.data[0]) : [],
+      });
+    }
   },
 };
 </script>
 
-<style lang="scss">
-.visualisation {
-  //height: 600px;
-  width: 100%;
-}
+<style lang="sass">
+.visualisation
+  width: 100%
+  .option
+    margin-left: 30px
 </style>
