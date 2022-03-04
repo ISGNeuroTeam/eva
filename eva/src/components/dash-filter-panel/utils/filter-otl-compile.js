@@ -73,5 +73,3 @@ export function filterCompile(filter) {
 
   return filterOtlText;
 }
-
-export default {};

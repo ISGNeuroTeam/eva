@@ -366,12 +366,14 @@ export default {
   },
   methods: {
     getGroups() {
-      this.$store.dispatch('getGroups').then((res) => {
+      const response = this.$store.getters.getGroups();
+      response.then((res) => {
         this.allGroups = res;
       });
     },
     getDashs(id) {
-      this.$store.dispatch('getDashs', id).then((res) => {
+      const response = this.$store.getters.getDashs(id);
+      response.then((res) => {
         this.allDashs = res;
       });
     },

@@ -422,6 +422,33 @@ export default {
   },
 
   computed: {
+    // getDataRest:  function() {
+    //   if (this.shouldGet) {
+    //     console.log(this.getDataAsynchrony());
+    //   }
+    //   return 'done'
+    // },
+    // shouldGet: function() {  // понимаем нужно ли запрашивтаь данные с реста
+    //   return this.$store.getters.getShouldGet({id: 'table', idDash: 'reports'})
+    // },
+    // elements: function() {
+
+    //   this.$store.getters.getReportElement.forEach( (item,i) => {
+    //     this.$set(this.aboutElem,item,{});
+    //     if (i == 0) {
+    //       this.$set(this.aboutElem[item],'show',true);
+    //       this.$set(this.aboutElem[item],'color',this.color.controls);
+    //     } else {
+    //       this.$set(this.aboutElem[item],'show',false);
+    //       this.$set(this.aboutElem[item],'color',this.color.text);
+    //     }
+    //     this.$set(this.aboutElem[item],'tooltip',settings.reports[item].tooltip);
+    //     this.$set(this.aboutElem[item],'icon',settings.reports[item].icon);
+    //     this.$set(this.aboutElem[item],'key',i);
+    //   })
+    //   this.activeElem = 'table';
+    //   return this.$store.getters.getReportElement
+    // },
     dataReady() {
       if (this.steps['2'].complete && this.steps['3'].complete) {
         this.getPaper();
@@ -451,9 +478,9 @@ export default {
     //   }
     // })
 
-    if (window.screen.width > 1920) {
+    if (screen.width > 1920) {
       this.rowsCount = 14;
-    } else if (window.screen.width <= 1440) {
+    } else if (screen.width <= 1440) {
       this.rowsCount = 6;
     }
     // this.unitedData.color=  this.color.controls;
@@ -474,7 +501,7 @@ export default {
         const formData = new FormData();
         formData.append('file', this.uploadFile);
         const result = await this.$store.getters.loadPaper(formData);
-        if (result.status === 'success') {
+        if (result.status == 'success') {
           this.message('Файл успшено загружен');
           this.setPaperBack();
         } else {
@@ -517,9 +544,9 @@ export default {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('cid', JSON.stringify(this.dispSid));
-      const result = await this.$store.dispatch('getPaper', formData);
+      const result = await this.$store.getters.getPaper(formData);
 
-      if (result.status === 'success') {
+      if (result.status == 'success') {
         this.steps['3'].loading = false;
         this.steps['4'].complete = true;
         this.steps['4'].text = 'Отчет готов';
@@ -547,9 +574,9 @@ export default {
       this.steps['4'].error = [];
       this.clearReady();
 
-      const result = await this.$store.dispatch('getAllPaper');
+      const result = await this.$store.getters.getAllPaper();
       try {
-        if (JSON.parse(result).status === 'success') {
+        if (JSON.parse(result).status == 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
@@ -637,13 +664,13 @@ export default {
 
       this.loading = true;
       console.log('launch search');
-      const response = await this.$store.dispatch('getDataApi', {
+      const response = await this.$store.getters.getDataApi({
         search: this.search,
         idDash: 'papers',
       });
       // вызывая метод в хранилище
 
-      if (!response || response.length === 0) {
+      if (!response || response.length == 0) {
         // если что-то пошло не так
 
         this.loading = false;

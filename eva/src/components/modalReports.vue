@@ -219,25 +219,23 @@ export default {
       this.$emit('cancelModal');
     },
     checkEsc(event) {
-      if (event.code === 'Escape') {
+      if (event.code == 'Escape') {
         this.cancelModal();
       }
     },
     setSearch() {
-      if (Number(this.search.parametrs.tws) || this.search.parametrs.tws === 0) {
+      if (Number(this.search.parametrs.tws) || this.search.parametrs.tws == 0) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.tws = parseInt(
           new Date(this.search.parametrs.tws).getTime() / 1000,
-          10,
         );
       }
-      if (Number(this.search.parametrs.twf) || this.search.parametrs.twf === 0) {
+      if (Number(this.search.parametrs.twf) || this.search.parametrs.twf == 0) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.twf = parseInt(
           new Date(this.search.parametrs.twf).getTime() / 1000,
-          10,
         );
       }
 

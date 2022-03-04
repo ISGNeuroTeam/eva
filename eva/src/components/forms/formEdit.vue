@@ -153,6 +153,17 @@ export default {
         }
       })[0].i;
       form_name = content[form_name]; // заносим указанное поле как имя формы
+      //    let newcontent = {};
+      //    content.forEach( (item,i) => {
+      //        if (Number(item)) {
+      //            newcontent[i] = Number(item);
+      //        } else {
+      //            newcontent[i] = item;
+      //        }
+
+      //    })
+      // console.log(this.grid);
+      //   this.$store.commit('form/setTemplate', this.grid);
 
       const form = {
         // создаем объект формы

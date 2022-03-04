@@ -81,55 +81,18 @@ export default {
       }
       return null;
     },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
-    },
     subnumber() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
       return options.subnumber;
     },
     fontSize() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
       if (options.fontSize) {
         return options.fontSize.split('px')[0];
       }
@@ -140,7 +103,10 @@ export default {
     },
 
     color() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
       let color = this.colorFrom.controls;
       if (options.color) {
         color = options.color;
@@ -166,34 +132,13 @@ export default {
     setNoMsg(dataRestFrom) {
       this.noMsg = !(dataRestFrom && dataRestFrom.length > 0);
     },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
     setEventCompareColor(number) {
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'OnDataCompare',
+        element: this.id,
       });
+
       let flag = -1;
       let frontier;
       events.forEach((item) => {
@@ -251,8 +196,10 @@ export default {
 
     setEventColor(number) {
       this.setEventCompareColor(number);
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'onValueCompare',
+        element: this.id,
       });
       let treshold; let color; let
         value;
@@ -279,7 +226,7 @@ export default {
       });
     },
     setClick() {
-      const { tockens } = this.$store.state[this.idDash];
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -298,8 +245,10 @@ export default {
         }
       });
 
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'onclick',
+        element: this.id,
         partelement: 'empty',
       });
       if (events.length !== 0) {
@@ -310,7 +259,7 @@ export default {
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
-            this.$store.dispatch('letEventGo', {
+            this.$store.commit('letEventGo', {
               event: item,
               idDash: this.idDash,
               route: this.$router,

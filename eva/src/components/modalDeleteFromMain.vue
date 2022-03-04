@@ -75,7 +75,7 @@ export default {
       this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
     },
     checkEsc(event) {
-      if (event.code === 'Escape') {
+      if (event.code == 'Escape') {
         this.cancelModal();
       }
     },

@@ -81,7 +81,10 @@ export default {
   computed: {
     top() {
       // для ряда управляющих иконок
-      return document.body.clientWidth <= 1600 ? '50px' : '60px';
+      if (document.body.clientWidth <= 1600) {
+        return '50px';
+      }
+      return '60px';
     },
     widthPanel() {
       return `${this.widthFrom / 10}px`;
@@ -89,14 +92,11 @@ export default {
     heightPanel() {
       return `${this.heightFrom}px`;
     },
-    dashFromStore() {
-      return this.$store.state[this.idDashFrom];
-    },
-    getDragRes() {
-      return this.dashFromStore.dragRes;
-    },
     dragRes() {
-      const dragRes = this.getDragRes;
+      const dragRes = this.$store.getters.getDragRes({
+        idDash: this.idDashFrom,
+        id: this.idFrom,
+      });
       return dragRes === 'true';
     },
     containerWidth() {
@@ -152,7 +152,7 @@ export default {
       this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
     },
     generateElementConfig(dataRest) {
-      const _tmp = dataRest[dataRest.length - 1]?.ID?.replaceAll("'", '"');
+      const _tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
       try {
         this.elementConfig = JSON.parse(_tmp);
       } catch {

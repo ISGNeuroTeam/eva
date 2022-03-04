@@ -96,7 +96,6 @@
           />
         </div>
         <draggable
-          v-if="settings.metricOptions && settings.metricOptions.length > 0"
           v-model="settings.metricOptions"
           handle=".burger"
           @end="update()"
@@ -273,13 +272,12 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from '@mdi/js';
-// eslint-disable-next-line camelcase
 import metricTitleIcons, { no_icon } from './metricTitleIcons';
 import './sass/checkboxGoogle.css';
 
 export default {
   name: 'SingleValueSettings',
-  components: {
+  comments: {
     draggable,
   },
   props: {
@@ -361,7 +359,6 @@ export default {
   watch: {
     receivedSettings(newValue) {
       const newSettings = JSON.parse(JSON.stringify(newValue));
-      // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
       this.settings = {
         ...newSettings,
         metricOptions: newSettings.metricOptions.sort(

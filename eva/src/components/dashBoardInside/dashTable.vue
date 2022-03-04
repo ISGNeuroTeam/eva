@@ -66,10 +66,10 @@
             <v-row v-else-if="value === 'none'">
               <v-col cols="12">
                 <v-select
-                  label="Значение"
-                  :items="compareForBoolean"
-                  @change="
-                    onChangeForBoolean(title, $event)
+                    label="Значение"
+                    :items="compareForBoolean"
+                    @change="
+                  onChangeForBoolean(title, $event)
                   "
                 />
               </v-col>
@@ -225,21 +225,72 @@ export default {
       return items;
     },
     filteredTableData() {
+      let chooseSort = function (dataFormat, sortType, value) {
+        if (dataFormat ==="none") {
+          if (typeof value ==='boolean'){
+            return  (el) => {
+                return el === value;
+            };
+          }
+         return () => true;
+        }else if (dataFormat === 'date') {
+          let sort;
+          const parseDate = function (val) {
+            const parts = val.split('.');
+            return new Date(
+              Number(parts[0]),
+              Number(parts[1]) - 1,
+              Number(parts[2]),
+            );
+          };
+          if (sortType === '>') {
+            sort = (el) => {
+              const elDate = parseDate(el);
+              const valueDate = parseDate(value);
+              return valueDate < elDate;
+            };
+          } else if (sortType === '<') {
+            sort = (el) => {
+              const elDate = parseDate(el);
+              const valueDate = parseDate(value);
+              return valueDate > elDate;
+            };
+          } else if (sortType === '=') {
+            sort = (el) => {
+              const elDate = parseDate(el);
+              const valueDate = parseDate(value);
+              return valueDate.getTime() === elDate.getTime();
+            };
+          }
+          return sort;
+        } if (dataFormat === 'number') {
+          let sort;
+          if (sortType === '>') sort = (el) => +el > +value;
+          else if (sortType === '<') sort = (el) => +el < +value;
+          else if (sortType === '=') sort = (el) => +value === +el;
+          return sort;
+        } if (dataFormat === 'string') {
+          let sort;
+          if (sortType === '>') sort = (el) => el > value;
+          else if (sortType === '<') sort = (el) => el < value;
+          else if (sortType === '=') sort = (el) => value === el;
+          return sort;
+        }
+      };
       let temp = this.dataRestFrom;
-      if (!temp) return [];
-      Object.keys(this.filters).forEach((key) => {
+      if (!temp) return;
+      for (const [key, val] of Object.entries(this.filters)) {
         let sort;
         const type = this.getType(key);
-        if (this.filters[key].value && this.filters[key].compare) {
-          sort = this.chooseSort(type, this.filters[key].compare, this.filters[key].value);
+        if (val.value && val.compare) {
+          sort = chooseSort(type, val.compare, val.value);
           temp = temp.filter((el) => sort(el[key]));
         }
-      });
-
+      }
       return temp;
     },
     events() {
-      return this.getEvents({
+      return this.$store.getters.getEvents({
         idDash: this.idDash,
         event: 'OnDataCompare',
         element: this.id,
@@ -264,10 +315,10 @@ export default {
     },
     height() {
       let otstup = 100;
-      if (window.screen.width <= 1600) {
+      if (screen.width <= 1600) {
         otstup = 80;
       }
-      if (window.screen.width <= 1400) {
+      if (screen.width <= 1400) {
         otstup = 70;
       }
       if (this.props.hideFooter) {
@@ -278,49 +329,6 @@ export default {
       }
       // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
       return this.heightFrom - otstup;
-    },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
     },
     lastResult() {
       const options = this.$store.getters.getOptions({
@@ -359,81 +367,7 @@ export default {
     this.setEventColor();
   },
   methods: {
-    getEvents({ event, partelement }) {
-      let result = [];
-      console.log(this.$store.state[this.idDash]);
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
-    chooseSort(dataFormat, sortType, value) {
-      if (dataFormat === 'date') {
-        let sort;
-
-        if (sortType === '>') {
-          sort = (el) => {
-            const elDate = this.parseDate(el);
-            const valueDate = this.parseDate(value);
-            return valueDate < elDate;
-          };
-        } else if (sortType === '<') {
-          sort = (el) => {
-            const elDate = this.parseDate(el);
-            const valueDate = this.parseDate(value);
-            return valueDate > elDate;
-          };
-        } else if (sortType === '=') {
-          sort = (el) => {
-            const elDate = this.parseDate(el);
-            const valueDate = this.parseDate(value);
-            return valueDate.getTime() === elDate.getTime();
-          };
-        }
-        return sort;
-      }
-      if (dataFormat === 'number') {
-        let sort;
-        if (sortType === '>') sort = (el) => +el > +value;
-        else if (sortType === '<') sort = (el) => +el < +value;
-        else if (sortType === '=') sort = (el) => +value === +el;
-        return sort;
-      }
-      if (dataFormat === 'string') {
-        let sort;
-        if (sortType === '>') sort = (el) => el > value;
-        else if (sortType === '<') sort = (el) => el < value;
-        else if (sortType === '=') sort = (el) => value === el;
-        return sort;
-      }
-      return false;
-    },
-    parseDate(val) {
-      const parts = val.split('.');
-      return new Date(
-        Number(parts[0]),
-        Number(parts[1]) - 1,
-        Number(parts[2]),
-      );
-    },
-    onChangeForBoolean(title, event) {
+    onChangeForBoolean(title, event){
       this.setFilterData(title, '=', 'compare');
       this.setFilterData(title, event);
     },
@@ -449,14 +383,14 @@ export default {
     },
     indexTitles(oldVal) {
       let type = 'no';
-      Object.keys(oldVal[0]).forEach((key) => {
-        if (this.checkForDate(oldVal[0][key])) type = 'date';
-        else if (this.checkForNumeric(oldVal[0][key])) type = 'number';
-        else if (this.checkForString(oldVal[0][key])) type = 'string';
+      for (const [key, val] of Object.entries(oldVal[0])) {
+        if (this.checkForDate(val)) type = 'date';
+        else if (this.checkForNumeric(val)) type = 'number';
+        else if (this.checkForString(val)) type = 'string';
         else type = 'none';
         this.typedTitles[key] = type;
         this.filtersForTypedTitles[key] = { action: '', value: '' };
-      });
+      }
       this.typedTitles = { ...this.typedTitles };
       this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
       // make filter objects
@@ -510,17 +444,19 @@ export default {
           resolve(data);
         }
       });
-      prom.then((promData) => {
-        this.props.hideFooter = promData.length <= 100;
-        this.createTitles(promData);
-        this.createTockens(promData);
+      prom.then((data) => {
+        data.length <= 100
+          ? (this.props.hideFooter = true)
+          : (this.props.hideFooter = false);
+        this.createTitles(data);
+        this.createTockens(data);
         if (this.props.justCreate) {
           this.selectRow();
           this.props.justCreate = false;
         }
 
         this.props.nodata = false;
-        this.props.itemsForTable = promData;
+        this.props.itemsForTable = data;
       });
     },
     createTitles(result) {
@@ -536,15 +472,11 @@ export default {
               : ' d-none',
         }));
       } else if (result && result.length) {
-        this.props.titles = Object.keys(result[0]).reduce((titles, item) => {
+        this.props.titles = Object.keys(result[0]).map((item) => {
           if (!this.excludeColumns.includes(item)) {
-            return [
-              ...titles,
-              { text: item, value: item, sortable: true },
-            ];
+            return { text: item, value: item, sortable: true };
           }
-          return titles;
-        }, []);
+        });
       }
     },
     createTockens(result) {
@@ -574,14 +506,11 @@ export default {
       return b[0] < a || a < b[1];
     },
     setEventColor() {
-      if (!this.$store.state[this.idDash].events) {
-        this.eventRows = [];
-      } else {
-        this.eventRows = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === 'OnDataCompare'
-            && item.target === this.id,
-        );
-      }
+      this.eventRows = this.$store.getters.getEvents({
+        idDash: this.idDash,
+        event: 'OnDataCompare',
+        element: this.id,
+      });
     },
     selectRow() {
       document
@@ -608,7 +537,7 @@ export default {
               event.target.parentElement.childNodes,
             ).findIndex((item) => item === event.target);
 
-            const tokens = this.$store.state[this.idDash].tockens;
+            const tokens = this.$store.getters.getTockens(this.idDash);
 
             tokens.forEach((token) => {
               if (
@@ -626,8 +555,10 @@ export default {
               }
             });
 
-            const events = this.getEvents({
+            const events = this.$store.getters.getEvents({
+              idDash: this.idDash,
               event: 'onclick',
+              element: this.id,
               partelement: 'row',
             });
 
@@ -639,7 +570,7 @@ export default {
                     idDash: this.idDash,
                   });
                 } else if (item.action === 'go') {
-                  this.$store.dispatch('letEventGo', {
+                  this.$store.commit('letEventGo', {
                     event: item,
                     idDash: this.idDash,
                     route: this.$router,

@@ -434,56 +434,13 @@ export default {
       return this.theme.$main_text === '#F4F4FA';
     },
     dashSettings() {
-      return this.getOptions;
+      return this.$store.getters.getOptions({
+        idDash: this.idDashFrom,
+        id: this.idElement,
+      });
     },
     library() {
-      return this.getLibrary;
-    },
-    getLibrary() {
-      return this.elementFromStore?.options?.library;
-    },
-    elementFromStore() {
-      return this.$store.state[this.idDashFrom][this.idElement];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idDashFrom });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
+      return this.$store.getters.getLibrary(this.idDashFrom, this.idElement);
     },
   },
   watch: {
@@ -496,7 +453,10 @@ export default {
     },
   },
   mounted() {
-    const options = this.getOptions;
+    const options = this.$store.getters.getOptions({
+      idDash: this.idDashFrom,
+      id: this.idElement,
+    });
     this.tileLayers[0].tile = options.osmserver;
     // init store for reactivity
     if (!options.showLegend || !options.initialPoint) {
@@ -539,7 +499,7 @@ export default {
       this.$emit('updatePipeDataSource', this.options.search);
     },
     loadDataForPipe() {
-      return this.$store.state[this.idDashFrom].searches;
+      return this.$store.getters.getSearches(this.idDashFrom);
     },
     closeLegend() {
       this.options.showLegend = false;

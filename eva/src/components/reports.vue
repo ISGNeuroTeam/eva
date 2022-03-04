@@ -254,7 +254,7 @@
 import {
   mdiPlay, mdiSettings, mdiMerge, mdiPlus,
 } from '@mdi/js';
-import settings from '../js/componentsSettings';
+import settings from '../js/componentsSettings.js';
 
 export default {
   data() {
@@ -320,12 +320,15 @@ export default {
     },
     shouldGet() {
       // понимаем нужно ли запрашивтаь данные с реста
-      return this.$store.state.reports.table.should;
+      return this.$store.getters.getShouldGet({
+        id: 'table',
+        idDash: 'reports',
+      });
     },
     elements() {
       this.$store.getters.getReportElement.forEach((item, i) => {
         this.$set(this.aboutElem, item, {});
-        if (i === 0) {
+        if (i == 0) {
           this.$set(this.aboutElem[item], 'show', true);
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         } else {
@@ -366,9 +369,9 @@ export default {
       }
     });
 
-    if (window.screen.width > 1920) {
+    if (screen.width > 1920) {
       this.rowsCount = 14;
-    } else if (window.screen.width <= 1440) {
+    } else if (screen.width <= 1440) {
       this.rowsCount = 6;
     }
     this.unitedData.color = this.theme.controls;
@@ -413,13 +416,13 @@ export default {
 
       this.loading = true;
       console.log('launch search');
-      const response = await this.$store.dispatch('getDataApi', {
+      const response = await this.$store.getters.getDataApi({
         search: this.search,
         idDash: 'reports',
       });
       // вызывая метод в хранилище
 
-      if (!response.data || response.data.length === 0) {
+      if (!response.data || response.data.length == 0) {
         // если что-то пошло не так
         this.loading = false;
         this.$store.commit('setErrorLogs', true);
@@ -429,19 +432,16 @@ export default {
         // если все нормально
         console.log('data ready');
 
-        const responseDB = this.$store.dispatch(
-          'putIntoDB',
-          {
-            result: response,
-            sid: this.search.sid,
-            idDash: 'reports',
-          },
+        const responseDB = this.$store.getters.putIntoDB(
+          response,
+          this.search.sid,
+          'reports',
         );
         responseDB.then(() => {
-          this.$store.dispatch('refreshElements', {
-            idDash: 'reports',
-            key: this.search.sid,
-          });
+          this.$store.getters.refreshElements(
+            'reports',
+            this.search.sid,
+          );
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
