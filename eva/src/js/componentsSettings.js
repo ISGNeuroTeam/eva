@@ -145,6 +145,7 @@ export default {
       'boxShadow',
       'stringOX',
       'united',
+      'zoomForAll',
       'lastDot',
       'metrics',
       'timeFormat',
@@ -338,11 +339,11 @@ export default {
       option: 'titles',
       description: 'Столбцы для отображения',
       elem: 'checkbox-list',
-      items: function () {
+      items() {
         // this is modalSettings context
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
       default: [],
@@ -358,10 +359,10 @@ export default {
       option: 'x',
       description: 'X axis',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -386,10 +387,10 @@ export default {
       option: 'y',
       description: 'Y axis',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -414,10 +415,10 @@ export default {
       option: 'data',
       description: 'Значение ячейки',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -426,10 +427,10 @@ export default {
       option: 'metadata',
       description: 'metadata',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -438,10 +439,10 @@ export default {
       option: 'detailValue',
       description: 'Поле для ссылки Детали',
       elem: 'select',
-      items: function () {
+      items() {
         return this.$store.getters.getAvailableTableTitles(
           this.idDash,
-          this.element
+          this.element,
         );
       },
     },
@@ -528,6 +529,12 @@ export default {
       elem: 'switch',
     },
     {
+      option: 'zoomForAll',
+      description: 'Режим масштабирования с одного графика на все',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'barplotstyle',
       relation: 'united',
       description: 'Стиль столбцов',
@@ -579,7 +586,7 @@ export default {
     },
     {
       relation: 'united',
-      each: function () {
+      each() {
         // each реализовано только для select и radio-group
         return this.titles && this.titles.splice
           ? [...this.titles].splice(1)
@@ -602,7 +609,7 @@ export default {
     },
     {
       relation: ['united', { axesCount: 2 }],
-      each: function () {
+      each() {
         // each реализовано только для select и radio-group, разбивает настройку для полей записи
         return this.titles && this.titles.splice
           ? [...this.titles].splice(1)
@@ -618,7 +625,7 @@ export default {
       ],
     },
   ],
-  reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
+  reporstElements: ['table', 'multiLine', 'piechart', 'graph', 'guntt', 'tile', 'csvg', 'ygraph', 'bush', 'map', 'heatmap', 'singleValue', 'tune'],
   reports: {
     table: {
       tooltip: 'Таблица',
@@ -670,7 +677,7 @@ export default {
     },
     tune: {
       tooltip: 'Ползунок',
-      icon: mdiNumeric,
+      icon: mdiTuneVertical,
     },
   },
 };

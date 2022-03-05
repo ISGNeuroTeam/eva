@@ -80,8 +80,8 @@ export default {
   },
   computed: {},
   methods: {
-    exportDash: async function () {
-      let response = await this.$store.getters.exportDash(this.idDash);
+    async exportDash() {
+      const response = await this.$store.getters.exportDash(this.idDash);
       if (response.status != 200) {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
@@ -96,13 +96,13 @@ export default {
         this.msgExp.opacity = '0';
       }, 2000);
     },
-    importDash: async function () {
+    async importDash() {
       if (this.file == '' || this.file == undefined) {
         this.msgImp.text = 'Выберите файл для импорта';
         this.msgImp.color = 'controlsActive';
         this.msgImp.opacity = '1';
       } else {
-        let response = await this.$store.getters.importDash({
+        const response = await this.$store.getters.importDash({
           idDash: this.idDash,
           file: this.file,
         });
@@ -121,8 +121,8 @@ export default {
         this.msgImp.opacity = '0';
       }, 2000);
     },
-    uploadDash: function () {
-      let reader = new FileReader();
+    uploadDash() {
+      const reader = new FileReader();
 
       reader.readAsText(this.file);
 
@@ -131,7 +131,7 @@ export default {
           dash: { id: this.idDash, body: reader.result },
           modified: '',
         });
-        this.$store.auth.getters.putLog(`Импортирован дашборд ${this.idDash}`);
+        this.$store.getters['auth/putLog'](`Импортирован дашборд ${this.idDash}`);
         this.$emit('closeExim');
       };
 
@@ -139,8 +139,8 @@ export default {
         console.log(reader.error);
       };
     },
-    downloadDash: function (url) {
-      let link = this.$refs.blockExim.appendChild(document.createElement('a'));
+    downloadDash(url) {
+      const link = this.$refs.blockExim.appendChild(document.createElement('a'));
       link.setAttribute('href', url);
       link.setAttribute('download', url);
       link.click();

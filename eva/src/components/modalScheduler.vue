@@ -246,8 +246,8 @@ export default {
   },
   mounted() {
     // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
-    let schedulers = this.schedulers;
-    let searches = this.$store.getters.getSearches(this.idDash);
+    const { schedulers } = this;
+    const searches = this.$store.getters.getSearches(this.idDash);
     let shedule = {};
     let curTime = {};
 
@@ -282,7 +282,7 @@ export default {
     }
   },
   methods: {
-    setData () {
+    setData() {
       if (this.schedulers[this.sid]) {
         // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
         this.every = this.schedulers[this.sid].every;
@@ -383,16 +383,16 @@ export default {
     },
     startSchedule() {
       // запускаем планировщик
-      let schedule = {
+      const schedule = {
         time: this.time,
         every: this.every,
         timeLast: this.timeLast,
         everyLast: this.everyLast,
       };
-      let sid = this.sid;
+      const { sid } = this;
 
-      let searches = this.$store.getters.getSearches(this.idDash);
-      let curTime = this.countTime(schedule.time, schedule.every) * 1000;
+      const searches = this.$store.getters.getSearches(this.idDash);
+      const curTime = this.countTime(schedule.time, schedule.every) * 1000;
       this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
       const intervalID = (this.timers[sid] = setInterval(() => {
         this.executeSearch(searches, sid, schedule); // а затем уже выполняем его в цикле

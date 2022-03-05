@@ -1,5 +1,8 @@
 <template>
-  <div class="table-block" :data-change="change">
+  <div
+    class="table-block"
+    :data-change="change"
+  >
     <div class="v-data-table--container">
       <v-data-table
         v-show="!props.nodata"
@@ -40,23 +43,35 @@
                 class="icon"
                 :color="theme.$main_border"
                 v-on="on"
-                >
+              >
                 {{ mdiMagnify }}
               </v-icon>
             </template>
-            <v-row v-if="value !== 'string'">
+            <v-row v-if="value !== 'string' && value !== 'none'">
               <v-col cols="6">
                 <v-select
                   :items="compare"
                   label="Знак"
                   @change="setFilterData(title, $event, 'compare')"
-                ></v-select>
+                />
               </v-col>
               <v-col cols="6">
                 <v-text-field
                   label="значение"
                   @change="setFilterData(title, $event)"
-                ></v-text-field>
+                />
+              </v-col>
+            </v-row>
+
+            <v-row v-else-if="value === 'none'">
+              <v-col cols="12">
+                <v-select
+                    label="Значение"
+                    :items="compareForBoolean"
+                    @change="
+                  onChangeForBoolean(title, $event)
+                  "
+                />
               </v-col>
             </v-row>
 
@@ -68,17 +83,23 @@
                     setFilterData(title, '=', 'compare');
                     setFilterData(title, $event);
                   "
-                ></v-text-field>
+                />
               </v-col>
             </v-row>
           </v-menu>
-          <v-tooltip :key="`${header.value + value}tooltip`" bottom>
+          <v-tooltip
+            :key="`${header.value + value}tooltip`"
+            bottom
+          >
             <template v-slot:activator="{ on }">
               <span v-on="on">{{ header.text }}</span>
             </template>
           </v-tooltip>
         </template>
-        <template v-for="(title) in props.titles" v-slot:item="{ item }">
+        <template
+          v-for="(title) in props.titles"
+          v-slot:item="{ item }"
+        >
           <tr
             :key="title + item.rowIndex"
             :style="item.rowColor && `background-color: ${item.rowColor}`"
@@ -92,9 +113,9 @@
                   (item.cellColor &&
                     item.cellColor[colIndex] &&
                     `background-color: ${item.cellColor[colIndex]}`) ||
-                  (item.columnColor &&
-                    item.columnColor[colIndex] &&
-                    `background-color: ${item.columnColor[colIndex]}`)
+                    (item.columnColor &&
+                      item.columnColor[colIndex] &&
+                      `background-color: ${item.columnColor[colIndex]}`)
                 "
               >
                 {{ col }}
@@ -104,14 +125,17 @@
         </template>
       </v-data-table>
     </div>
-    <div v-show="props.nodata" class="no-data-table">
+    <div
+      v-show="props.nodata"
+      class="no-data-table"
+    >
       {{ props.message }}
     </div>
   </div>
 </template>
 
 <script>
-import {mdiMagnify} from '@mdi/js';
+import { mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
@@ -124,7 +148,7 @@ export default {
       default: 1,
     },
     dataRestFrom: null,
-    //shouldGet: null,
+    // shouldGet: null,
     idFrom: null,
     idDashFrom: null,
     heightFrom: null,
@@ -137,7 +161,8 @@ export default {
   data() {
     return {
       compare: ['>', '<', '='],
-      mdiMagnify: mdiMagnify,
+      mdiMagnify,
+      compareForBoolean: ['-', false, true],
       eventRows: [],
       props: {
         titles: [],
@@ -176,9 +201,7 @@ export default {
           });
         }
         if (event.prop[0] === 'columncolor') {
-          let isColumnMatch = items.reduce((acc, item) => {
-            return acc || this[event.compare](item[event.column], event.row);
-          }, false);
+          const isColumnMatch = items.reduce((acc, item) => acc || this[event.compare](item[event.column], event.row), false);
           if (isColumnMatch) {
             items.forEach((item) => {
               if (!item.columnColor) {
@@ -203,79 +226,68 @@ export default {
     },
     filteredTableData() {
       let chooseSort = function (dataFormat, sortType, value) {
-        if (dataFormat === 'date') {
+        if (dataFormat ==="none") {
+          if (typeof value ==='boolean'){
+            return  (el) => {
+                return el === value;
+            };
+          }
+         return () => true;
+        }else if (dataFormat === 'date') {
           let sort;
-          let parseDate = function (val) {
-            let parts = val.split('.');
+          const parseDate = function (val) {
+            const parts = val.split('.');
             return new Date(
               Number(parts[0]),
               Number(parts[1]) - 1,
-              Number(parts[2])
+              Number(parts[2]),
             );
           };
-          if (sortType === '>')
+          if (sortType === '>') {
             sort = (el) => {
-              let elDate = parseDate(el);
-              let valueDate = parseDate(value);
+              const elDate = parseDate(el);
+              const valueDate = parseDate(value);
               return valueDate < elDate;
             };
-          else if (sortType === '<')
+          } else if (sortType === '<') {
             sort = (el) => {
-              let elDate = parseDate(el);
-              let valueDate = parseDate(value);
+              const elDate = parseDate(el);
+              const valueDate = parseDate(value);
               return valueDate > elDate;
             };
-          else if (sortType === '=')
+          } else if (sortType === '=') {
             sort = (el) => {
-              let elDate = parseDate(el);
-              let valueDate = parseDate(value);
+              const elDate = parseDate(el);
+              const valueDate = parseDate(value);
               return valueDate.getTime() === elDate.getTime();
             };
+          }
           return sort;
-        } else if (dataFormat === 'number') {
+        } if (dataFormat === 'number') {
           let sort;
-          if (sortType === '>')
-            sort = (el) => {
-              return +el > +value;
-            };
-          else if (sortType === '<')
-            sort = (el) => {
-              return +el < +value;
-            };
-          else if (sortType === '=')
-            sort = (el) => {
-              return +value === +el;
-            };
+          if (sortType === '>') sort = (el) => +el > +value;
+          else if (sortType === '<') sort = (el) => +el < +value;
+          else if (sortType === '=') sort = (el) => +value === +el;
           return sort;
-        } else if (dataFormat === 'string') {
+        } if (dataFormat === 'string') {
           let sort;
-          if (sortType === '>')
-            sort = (el) => {
-              return el > value;
-            };
-          else if (sortType === '<')
-            sort = (el) => {
-              return el < value;
-            };
-          else if (sortType === '=')
-            sort = (el) => {
-              return value === el;
-            };
+          if (sortType === '>') sort = (el) => el > value;
+          else if (sortType === '<') sort = (el) => el < value;
+          else if (sortType === '=') sort = (el) => value === el;
           return sort;
         }
       };
       let temp = this.dataRestFrom;
       if (!temp) return;
-      for (let [key, val] of Object.entries(this.filters)) {
+      for (const [key, val] of Object.entries(this.filters)) {
         let sort;
-        let type = this.getType(key);
+        const type = this.getType(key);
         if (val.value && val.compare) {
           sort = chooseSort(type, val.compare, val.value);
           temp = temp.filter((el) => sort(el[key]));
         }
       }
       return temp;
-
     },
     events() {
       return this.$store.getters.getEvents({
@@ -292,7 +304,7 @@ export default {
     },
     change() {
       if (!this.dataRestFrom || this.dataRestFrom.length === 0) {
-        this.setNoData()
+        this.setNoData();
       } else {
         this.getDataAsynchrony(this.dataRestFrom);
       }
@@ -313,13 +325,13 @@ export default {
         otstup = 45;
       }
       if (this.dataReport) {
-        otstup = otstup - 30;
+        otstup -= 30;
       }
-       // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
+      // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
       return this.heightFrom - otstup;
     },
     lastResult() {
-      let options = this.$store.getters.getOptions({
+      const options = this.$store.getters.getOptions({
         idDash: this.idDash,
         id: this.id,
       });
@@ -355,11 +367,15 @@ export default {
     this.setEventColor();
   },
   methods: {
+    onChangeForBoolean(title, event){
+      this.setFilterData(title, '=', 'compare');
+      this.setFilterData(title, event);
+    },
     onItemsPageChange(page) {
-      this.$emit('update:table-page', page)
+      this.$emit('update:table-page', page);
     },
     onItemsPerPageChange(perPage) {
-      this.$emit('update:table-per-page', perPage)
+      this.$emit('update:table-per-page', perPage);
     },
     setNoData() {
       this.props.itemsForTable = [];
@@ -367,7 +383,7 @@ export default {
     },
     indexTitles(oldVal) {
       let type = 'no';
-      for (let [key, val] of Object.entries(oldVal[0])) {
+      for (const [key, val] of Object.entries(oldVal[0])) {
         if (this.checkForDate(val)) type = 'date';
         else if (this.checkForNumeric(val)) type = 'number';
         else if (this.checkForString(val)) type = 'string';
@@ -377,9 +393,9 @@ export default {
       }
       this.typedTitles = { ...this.typedTitles };
       this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
-      //make filter objects
+      // make filter objects
 
-      //make title: type object
+      // make title: type object
     },
     getType(title) {
       return this.typedTitles[title];
@@ -398,21 +414,20 @@ export default {
         return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
       }
       return isNumber(val);
-
     },
     checkForString(val) {
       return Object.prototype.toString.call(val) === '[object String]';
     },
     checkForDate(val) {
-      if (typeof val != 'string') return false;
-      let parts = val.split('.');
+      if (typeof val !== 'string') return false;
+      const parts = val.split('.');
       if (parts.length < 3) return false;
       let result;
-      let mydate = new Date(+parts[2], +parts[1] - 1, +parts[0]);
+      const mydate = new Date(+parts[2], +parts[1] - 1, +parts[0]);
       if (
-        +parts[2] === mydate.getYear() &&
-        +parts[1] - 1 === mydate.getMonth() &&
-        +parts[0] === mydate.getDate()
+        +parts[2] === mydate.getYear()
+        && +parts[1] - 1 === mydate.getMonth()
+        && +parts[0] === mydate.getDate()
       ) {
         result = 0;
       } else {
@@ -421,7 +436,7 @@ export default {
       return result;
     },
     getDataAsynchrony(data) {
-      let prom = new Promise((resolve) => {
+      const prom = new Promise((resolve) => {
         if (data.error) {
           this.props.message = data.error;
           this.props.nodata = true;
@@ -446,7 +461,7 @@ export default {
     },
     createTitles(result) {
       if (this.options?.titles) {
-        let allTitles = Object.keys(this.dataRestFrom[0]);
+        const allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map((x) => ({
           text: x,
           value: x,
@@ -456,18 +471,16 @@ export default {
               ? undefined
               : ' d-none',
         }));
-      } else {
-        if (result && result.length) {
-          this.props.titles = Object.keys(result[0]).map((item) => {
-            if (!this.excludeColumns.includes(item)) {
-              return { text: item, value: item, sortable: true };
-            }
-          });
-        }
+      } else if (result && result.length) {
+        this.props.titles = Object.keys(result[0]).map((item) => {
+          if (!this.excludeColumns.includes(item)) {
+            return { text: item, value: item, sortable: true };
+          }
+        });
       }
     },
     createTockens(result) {
-      let captures = Object.keys(result[0]);
+      const captures = Object.keys(result[0]);
       this.props.actions.forEach((item, i) => {
         this.$set(this.props.actions[i], 'capture', captures);
       });
@@ -516,23 +529,23 @@ export default {
               event.target.parentElement.classList.add('selected');
             }
 
-            let headers = Array.from(
-              this.$refs.table.$el.querySelector('thead tr').childNodes
+            const headers = Array.from(
+              this.$refs.table.$el.querySelector('thead tr').childNodes,
             ).map((item) => item.textContent);
 
-            let cellRowIndex = Array.from(
-              event.target.parentElement.childNodes
+            const cellRowIndex = Array.from(
+              event.target.parentElement.childNodes,
             ).findIndex((item) => item === event.target);
 
-            let tokens = this.$store.getters.getTockens(this.idDash);
+            const tokens = this.$store.getters.getTockens(this.idDash);
 
             tokens.forEach((token) => {
               if (
-                token.elem === this.id &&
-                token.action === 'click' &&
-                headers[cellRowIndex] === token.capture
+                token.elem === this.id
+                && token.action === 'click'
+                && headers[cellRowIndex] === token.capture
               ) {
-                let value = event.target.textContent;
+                const value = event.target.textContent;
                 this.$store.commit('setTocken', {
                   tocken: token,
                   idDash: this.idDash,
@@ -542,7 +555,7 @@ export default {
               }
             });
 
-            let events = this.$store.getters.getEvents({
+            const events = this.$store.getters.getEvents({
               idDash: this.idDash,
               event: 'onclick',
               element: this.id,
@@ -553,7 +566,7 @@ export default {
               events.forEach((item) => {
                 if (item.action === 'set') {
                   this.$store.commit('letEventSet', {
-                    events: events,
+                    events,
                     idDash: this.idDash,
                   });
                 } else if (item.action === 'go') {

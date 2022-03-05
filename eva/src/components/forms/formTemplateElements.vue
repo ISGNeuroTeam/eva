@@ -47,7 +47,7 @@
           Только числовое значение
         </div>
       </div>
-      <!-- <v-radio-group   :mandatory="true" v-if="visionOpt.choose" name="radio"  v-model="value"> 
+      <!-- <v-radio-group   :mandatory="true" v-if="visionOpt.choose" name="radio"  v-model="value">
                     <v-radio    class="radiobtn" color="teal"   ></v-radio>
                 </v-radio-group> -->
       <!-- <v-switch :v-model="value" color="teal" class="form-switch"  :data-switch="switchbox" :data-id="idFrom" v-if="visionOpt.choose" @change="checkSwitch()"></v-switch> -->
@@ -113,15 +113,15 @@ export default {
   },
   computed: {
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
-    radios: function () {
+    radios() {
       this.setValue();
       return this.radiosFrom[this.idFrom];
     },
   },
 
   mounted() {
-    let element = this.$store.form.getters.getFormLocal;
-    let content = this.$store.form.getters.getContent(this.idFrom);
+    const element = this.$store.getters['form/getFormLocal'];
+    let content = this.$store.getters['form/getContent'](this.idFrom);
     if (content != 'empty') {
       if (content == 'True') {
         content = true;
@@ -168,12 +168,12 @@ export default {
     }
     if (this.editable == 'false') {
       setTimeout(() => {
-        let blockell = this.$refs.elementBlock;
-        let elemBlock = blockell.querySelector('.element-block-not-editable');
+        const blockell = this.$refs.elementBlock;
+        const elemBlock = blockell.querySelector('.element-block-not-editable');
 
         if (
-          elemBlock.getBoundingClientRect().height >
-          blockell.getBoundingClientRect().height
+          elemBlock.getBoundingClientRect().height
+          > blockell.getBoundingClientRect().height
         ) {
           elemBlock.style = 'position:absolute;top:5px;left:5px';
           blockell.classList.add('toobig');
@@ -182,12 +182,12 @@ export default {
     }
   },
   methods: {
-    setValue: function () {
+    setValue() {
       this.value = this.radiosFrom[this.idFrom];
-      let content = { id: this.idFrom, value: this.value };
+      const content = { id: this.idFrom, value: this.value };
       this.$emit('setValue', content);
     },
-    checkNumber: function () {
+    checkNumber() {
       if (!Number(this.value)) {
         this.showWarning = true;
         setTimeout(() => {
@@ -197,8 +197,8 @@ export default {
         this.setValue();
       }
     },
-    checkRadio: function () {
-      //this.value == true ? this.value = false : this.value = true;
+    checkRadio() {
+      // this.value == true ? this.value = false : this.value = true;
       // if (this.value && this.radioname != this.idFrom){
       this.$emit('checkSwitch', { id: this.idFrom, name: this.radioname });
       // } else {

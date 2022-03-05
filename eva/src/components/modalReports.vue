@@ -238,7 +238,7 @@ export default {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.tws = parseInt(
-          new Date(this.search.parametrs.tws).getTime() / 1000
+          new Date(this.search.parametrs.tws).getTime() / 1000,
         );
       }
       if (
@@ -248,7 +248,7 @@ export default {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.twf = parseInt(
-          new Date(this.search.parametrs.twf).getTime() / 1000
+          new Date(this.search.parametrs.twf).getTime() / 1000,
         );
       }
 

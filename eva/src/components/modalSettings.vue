@@ -669,7 +669,7 @@
                 v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.colors"
                 :disabled="!colorsPie.nametheme"
-                placeholder="red,#5F27FF,rgb(95, 39, 255)"
+                placeholder="red #5F27FF rgb(95,39,255)"
                 label="Набор цветов"
                 :color="theme.$primary_button"
                 :style="{
@@ -683,6 +683,26 @@
                 hide-details
                 @input="isChanged = true"
               />
+              <v-tooltip
+                v-if="!defaultThemes.includes(colorsPie.theme)"
+                bottom
+                z-index="9000"
+              >
+                <template v-slot:activator="{ on }">
+                  <v-icon
+                    class="modal-settings__icon"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    v-on="on"
+                  >
+                    ?
+                  </v-icon>
+                </template>
+                <span>Эталон: red #5F27FF rgb(95,39,255)</span>
+              </v-tooltip>
               <v-btn
                 v-if="
                   !defaultThemes.includes(colorsPie.theme) &&
@@ -939,9 +959,8 @@
 </template>
 
 <script>
-import settings from '../js/componentsSettings.js';
-
 import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
+import settings from '../js/componentsSettings.js';
 
 export default {
   name: 'ModalSettings',
@@ -1019,11 +1038,11 @@ export default {
       if (!this.element) {
         return [];
       }
-      let elem = this.element.split('-')[0];
+      const elem = this.element.split('-')[0];
       return elem ? this.optionsByComponents[elem] || [] : [];
     },
     changeComponent() {
-      return this.idDash + '-' + this.element;
+      return `${this.idDash}-${this.element}`;
     },
     element() {
       return this.$store.getters.getModalSettings(this.idDash).element;
@@ -1032,7 +1051,7 @@ export default {
     titles() {
       return this.$store.getters.getAvailableTableTitles(
         this.idDash,
-        this.element
+        this.element,
       );
     },
   },
@@ -1064,14 +1083,12 @@ export default {
       const localOptions = {};
       this.optionsByComponents = settings.options;
       this.fieldsForRender = settings.optionFields.map((field) => {
-        const items =
-          typeof field.items === 'function'
-            ? field.items.call(this)
-            : field.items;
-        const each =
-          typeof field.each === 'function' ? field.each.call(this) : field.each;
+        const items = typeof field.items === 'function'
+          ? field.items.call(this)
+          : field.items;
+        const each = typeof field.each === 'function' ? field.each.call(this) : field.each;
         if (each) {
-          let options = {};
+          const options = {};
           each.forEach((key) => {
             options[key] = field.items[0]?.value;
           });
@@ -1111,7 +1128,7 @@ export default {
       if (this.options?.timeFormat === null) {
         this.$set(this.options, 'timeFormat', '%Y-%m-%d %H:%M:%S');
       }
-      if (typeof this.options.size != 'undefined') {
+      if (typeof this.options.size !== 'undefined') {
         if (this.options.size == null) {
           this.$set(this.options, 'size', '100px');
         } else if (String(this.options.size).indexOf('px') === -1) {
@@ -1123,6 +1140,9 @@ export default {
       }
       if (this.element.indexOf('piechart') !== -1) {
         this.$set(this.options, 'metricsRelation', { ...this.metricsRelation });
+        this.options.metricsRelation = JSON.parse(
+          JSON.stringify(this.metricsRelation),
+        );
         if (this.colorsPie.nametheme) {
           this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
@@ -1132,8 +1152,8 @@ export default {
               this.colorsPie.colors.split(',')
             );
             if (
-              this.colorsPie.theme !== 'custom' &&
-              this.colorsPie.theme !== this.colorsPie.nametheme
+              this.colorsPie.theme !== 'custom'
+              && this.colorsPie.theme !== this.colorsPie.nametheme
             ) {
               delete this.themes[this.colorsPie.theme];
             }
@@ -1150,7 +1170,7 @@ export default {
         });
       }
 
-      let options = {
+      const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
         metrics: this.metrics,
@@ -1171,7 +1191,7 @@ export default {
       this.cancelModal();
     },
     // если нажали на отмену создания
-    cancelModal: function () {
+    cancelModal() {
       this.$store.dispatch('closeModalSettings', { path: this.idDash });
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
@@ -1181,16 +1201,16 @@ export default {
         // this.setOptions();
       }
     },
-    checkEsc: function (event) {
+    checkEsc(event) {
       if (event.code === 'Escape') {
         this.cancelModal();
       }
     },
-    checkOptions: function (option, relation) {
+    checkOptions(option, relation) {
       // проверяет есть ли такая опция уже в массиве с опциями
       if (relation !== undefined) {
         if (relation.forEach) {
-          let res = relation.filter((item) => {
+          const res = relation.filter((item) => {
             if (typeof item === 'object') {
               let show = true;
               Object.keys(item).forEach((key) => {
@@ -1199,9 +1219,8 @@ export default {
                 }
               });
               return show;
-            } else {
-              return !!this.options[item];
             }
+            return !!this.options[item];
           });
           if (res.length !== relation.length) {
             return false;
@@ -1244,10 +1263,10 @@ export default {
         this.tooltip.buttons.splice(i, 1);
       }
     },
-    deleteMetrics: function (i) {
+    deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
-    changeColor: function () {
+    changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
           item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
@@ -1432,4 +1451,13 @@ export default {
 
 <style lang="scss">
 @import '../sass/modalSettings.sass';
+.modal-settings__icon {
+  font-style: normal;
+  padding: 2px 8px;
+  border: 1px solid;
+  border-radius: 50%;
+  font-size: 20px !important;
+  cursor: pointer;
+  margin-right: 20px;
+}
 </style>

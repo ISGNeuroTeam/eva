@@ -96,7 +96,7 @@
                 background: theme.$main_bg,
                 color: theme.$main_text,
               }"
-              :color="theme.$primary_button"
+              :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
               @input="isChanged = true"
@@ -322,23 +322,23 @@ export default {
     addSearch() {
       if (this.search.sid && this.search.sid !== '') {
         if (
-          typeof this.search.parametrs.tws == 'string' &&
-          parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
+          typeof this.search.parametrs.tws === 'string'
+          && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
         ) {
           this.search.parametrs.tws = parseInt(
-            new Date(this.search.parametrs.tws).getTime() / 1000
+            new Date(this.search.parametrs.tws).getTime() / 1000,
           );
         }
         if (
-          typeof this.search.parametrs.twf == 'string' &&
-          parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
+          typeof this.search.parametrs.twf === 'string'
+          && parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
         ) {
           this.search.parametrs.twf = parseInt(
-            new Date(this.search.parametrs.twf).getTime() / 1000
+            new Date(this.search.parametrs.twf).getTime() / 1000,
           );
         }
 
-        let searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
+        const searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
         let j = -1;
         searches.forEach((item, i) => {
           // пробегаемся по всем ИС
@@ -353,8 +353,7 @@ export default {
         if (j !== -1) {
           // если такой ИС уже есть вызовем сообщение с уточнением
           if (this.cancelBtn === 'Отмена') {
-            this.errorMsg =
-              'Такой источник данных существует. Хотите заменить его?';
+            this.errorMsg = 'Такой источник данных существует. Хотите заменить его?';
             this.createBtn = 'Да';
             this.cancelBtn = 'Нет';
             this.errorMsgShow = true;
@@ -391,22 +390,22 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
         '\n\n' + '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|' + '\n',
-        '| '
+        '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '| ' + '\n',
-        '| '
+        '| ',
       );
     },
   },

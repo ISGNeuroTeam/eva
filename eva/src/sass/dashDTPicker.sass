@@ -38,7 +38,9 @@
         
 
         .DTPicker-elem
-            display: flex
+            position: absolute
+            width: 320px
+            display: none
             flex-flow: column nowrap
             justify-content: flex-start
             align-items: flex-start
@@ -298,6 +300,7 @@
             border-radius:  4px 4px 0 0
 
         .DTPicker-elem
+            display: flex
             opacity: 1
             z-index: 4
 
@@ -456,7 +459,9 @@
             margin: 5px 0
             height: 28px
 
-            .DTPicker-elem 
+            .DTPicker-elem
+                width: 93%
+                min-width: 132px
                 
                 .dtpicker
                     width: 100%

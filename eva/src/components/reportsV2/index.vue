@@ -94,7 +94,9 @@
 </template>
 
 <script>
-import { mdiPlay, mdiSettings, mdiMerge, mdiPlus } from '@mdi/js';
+import {
+  mdiPlay, mdiSettings, mdiMerge, mdiPlus,
+} from '@mdi/js';
 import settings from '../../js/componentsSettings.js';
 import newSearch from './newSearch.vue';
 import timeline from './timeline.vue';
@@ -177,17 +179,17 @@ export default {
     //   }
     //   return 'done'
     // },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
-    shouldGet: function () {
+    shouldGet() {
       // понимаем нужно ли запрашивтаь данные с реста
       return this.$store.getters.getShouldGet({
         id: 'table',
         idDash: 'reports',
       });
     },
-    elements: function () {
+    elements() {
       this.$store.getters.getReportElement.forEach((item, i) => {
         this.$set(this.aboutElem, item, {});
         if (i == 0) {
@@ -200,12 +202,12 @@ export default {
         this.$set(
           this.aboutElem[item],
           'tooltip',
-          settings.reports[item].tooltip
+          settings.reports[item].tooltip,
         );
         this.$set(this.aboutElem[item], 'icon', settings.reports[item].icon);
         this.$set(this.aboutElem[item], 'key', i);
       });
-      this.setActiveElem('table')
+      this.setActiveElem('table');
       return this.$store.getters.getReportElement;
     },
   },
@@ -242,14 +244,14 @@ export default {
     this.unitedData.color = this.theme.controls;
   },
   methods: {
-    getData: function () {
-      let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
+    getData() {
+      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
       }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
-      let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
 
-      let worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
 
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
@@ -283,18 +285,18 @@ export default {
 
       worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
     },
-    launchSearch: async function (search) {
+    async launchSearch(search) {
       this.search.original_otl = search.original_otl;
       this.search.parametrs.tws = search.parametrs.tws;
       this.search.parametrs.twf = search.parametrs.twf;
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.auth.getters.putLog(`Запущен запрос  ${this.search.sid}`);
+      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
       console.log(this.search);
-      let response = await this.$store.getters.getDataApi({
+      const response = await this.$store.getters.getDataApi({
         search: this.search,
         idDash: 'reports',
       });
@@ -311,61 +313,60 @@ export default {
         // если все нормально
         console.log('data ready');
 
-        let responseDB = this.$store.getters.putIntoDB(
+        const responseDB = this.$store.getters.putIntoDB(
           response,
           this.search.sid,
-          'reports'
+          'reports',
         );
         responseDB.then(() => {
           this.$store.getters.refreshElements(
             'reports',
-            this.search.sid
+            this.search.sid,
           );
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
       }
     },
-    addLineBreaks: function () {
+    addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
         '\n\n' + '|',
-        '\n' + '|'
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|' + '\n',
-        '| '
+        '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
         '| ' + '\n',
-        '| '
+        '| ',
       );
     },
-    setUsername: function (event) {
+    setUsername(event) {
       this.search.parametrs.username = event;
     },
-    hashCode: function (otl) {
+    hashCode(otl) {
       return otl
         .split('')
         .reduce(
-          (prevHash, currVal) =>
-            ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
-          0
+          (prevHash, currVal) => ((prevHash << 5) - prevHash + currVal.charCodeAt(0)) | 0,
+          0,
         );
     },
-    getDataFromDb: function () {
+    getDataFromDb() {
       return function (event) {
         let db = null;
 
-        let searchSid = event.data;
+        const searchSid = event.data;
 
-        let request = indexedDB.open('EVA', 1);
+        const request = indexedDB.open('EVA', 1);
 
         request.onerror = function (event) {
           console.log('error: ', event);
@@ -381,19 +382,19 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            console.log('successEvent: ' + db);
+            console.log(`successEvent: ${db}`);
           };
         };
 
         request.onsuccess = () => {
           db = request.result;
 
-          let transaction = db.transaction('searches'); // (1)
+          const transaction = db.transaction('searches'); // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
+          const searches = transaction.objectStore('searches'); // (2)
 
-          let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
           query.onsuccess = () => {
             // (4)
@@ -410,13 +411,13 @@ export default {
         };
       };
     },
-    openSettings: function () {
+    openSettings() {
       this.modal = true;
     },
-    cancelModal: function () {
+    cancelModal() {
       this.modal = false;
     },
-    changeTab: function (elem) {
+    changeTab(elem) {
       if (elem == 'multiLine') {
         this.unitedShow = true;
       } else {
@@ -433,7 +434,7 @@ export default {
         }
       });
     },
-    changeUnited: function () {
+    changeUnited() {
       console.log('changeUnited');
       if (!this.unitedData.united) {
         this.unitedData.united = true;
@@ -448,10 +449,10 @@ export default {
         options: { united: this.unitedData.united },
       });
     },
-    createStatistic: function (key, data) {
-      let how_much = {};
-      let result = [];
-      let length = data.length;
+    createStatistic(key, data) {
+      const how_much = {};
+      const result = [];
+      const { length } = data;
       data.forEach((item) => {
         if (how_much[item[key]]) {
           how_much[item[key]]++;
@@ -477,11 +478,11 @@ export default {
 
       return result;
     },
-    setActiveElem (elemName) {
+    setActiveElem(elemName) {
       this.activeElem = elemName;
     },
-    setSearch: function (search) {
-      this.search = Object.assign({}, search);
+    setSearch(search) {
+      this.search = { ...search };
       this.modal = false;
     },
     // openStatistic: function(statistic) {
@@ -498,14 +499,14 @@ export default {
     //     this.statistic = statistic.static;
     //   }
     // },
-    calcSize: function () {
-      let size = this.$refs.vis.$el.getBoundingClientRect();
+    calcSize() {
+      const size = this.$refs.vis.$el.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
       this.size.height = Math.round(size.height) - 66;
     },
     setRange(range) {
       this.data = this.data.filter(
-        (item) => item.day > range[0] && item.day < range[1]
+        (item) => item.day > range[0] && item.day < range[1],
       );
     },
     ResetRange() {

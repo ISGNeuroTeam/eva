@@ -176,7 +176,7 @@ export default {
       user: {},
       titlePage: this.$router.history.current.name,
       door: mdiDoor,
-      mdiCompare: mdiCompare,
+      mdiCompare,
       userEdit: mdiAccountEdit,
       code_icon: mdiCodeTags,
       tocken_icon: mdiVariable,
@@ -212,42 +212,40 @@ export default {
     };
   },
   computed: {
-    height: function () {
+    height() {
       if (screen.width < 1400) {
         return '50px';
-      } else {
-        return '51px';
       }
+      return '51px';
     },
-    theme: function () {
+    theme() {
       return this.$store.getters.getTheme;
     },
     isAdmin() {
       if (this.userPermissions && this.userPermissions.includes('admin_all')) {
         return true;
-      } else {
-        return false;
       }
+      return false;
     },
   },
   mounted() {
     this.getCookie();
   },
   methods: {
-    getTheme: async function () {
+    async getTheme() {
       this.$store.commit('setTheme', 'dark');
     },
     openThemeModal() {
       this.paleteShow = !this.paleteShow;
     },
-    getCookie: async function () {
-      //console.log(this.$jwt.hasToken())
+    async getCookie() {
+      // console.log(this.$jwt.hasToken())
       if (this.$jwt.hasToken()) {
         this.login = this.$jwt.decode().username;
-        //let id = this.$jwt.decode().user_id;
+        // let id = this.$jwt.decode().user_id;
         let permissions = [];
 
-        let response = await fetch(`/api/user/permissions`).catch((error) => {
+        const response = await fetch('/api/user/permissions').catch((error) => {
           console.log(error);
           return {
             status: 300,
@@ -270,22 +268,22 @@ export default {
         }
       }
     },
-    exit: function () {
-      document.cookie = `eva-dashPage=''; max-age=0 ; path=/`;
-      document.cookie = `eva_token=''; max-age=0 ; path=/`;
+    exit() {
+      document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
+      document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
       this.$store.commit('clearState');
-      this.$router.push(`/`);
+      this.$router.push('/');
     },
-    edit: function () {
-      this.$router.push(`/profile`);
+    edit() {
+      this.$router.push('/profile');
     },
-    toHome: function () {
-      this.$router.push(`/main`);
+    toHome() {
+      this.$router.push('/main');
     },
-    toBackward: function () {
+    toBackward() {
       this.$router.go(-1);
     },
-    openLogs: function () {
+    openLogs() {
       this.modalActive = true;
       this.$store.commit('setErrorLogs', false);
     },

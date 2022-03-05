@@ -8,12 +8,12 @@ import { shallowMount} from '@vue/test-utils'
 import Paper from '../components/papers.vue'  // подключаем сам компонент который будем тестировать
 
 
-// подключаем нужные нам библиотеки 
+// подключаем нужные нам библиотеки
 
 import store from '../store/index.js' // хранилилище local storage
 import  rest from '../store/storeRest.js' // основное хранилище с эндпоинтами и логами
-import storeAuth from '../storeAuth/index.js' // подключаем файл с настройками хранилища Vuex (авторизация)
-import  restAuth from '../storeAuth/storeRest.js' // хранилище с эндпоинтами и логами
+import storeAuth from '../store/storeAuth/index.js' // подключаем файл с настройками хранилища Vuex (авторизация)
+import  restAuth from '../store/storeAuth/storeRest.js' // хранилище с эндпоинтами и логами
 import vuetify from 'vuetify'  // библотека для красивого отображения элементов
 Vue.use(vuetify)
 store.auth = storeAuth
@@ -34,7 +34,7 @@ describe('Компонент papers.vue', () => {  // тест самого ко
   const putLogMock = jest.fn(() => 'add some logs')  // задаем заглушку (mock) который будет имитировать функцию putLog, которая записывает логи
   restAuth.putLog = putLogMock // указываем что при вызове метод putLog на самом деле будет вызвана заглушка
 
-  beforeEach(() => {  // перед каждым новым тестом 
+  beforeEach(() => {  // перед каждым новым тестом
     fetch.resetMocks()  // очищаем моки fetch
   })
 
@@ -69,35 +69,35 @@ describe('Компонент papers.vue', () => {  // тест самого ко
         username: "admin"
       }
     }});
-    
+
     fetch
       .once(JSON.stringify({ status: 'success' }))  // makejob
       .once(JSON.stringify({ status: 'success', cid: 16 })) // checkjob
       .once(JSON.stringify({ status: 'success', data_urls: ['some/direct/data.json','some/shema/_SCHEMA'] }))  // getresult
-    
-    await wrapper.vm.launchSearch()  // запускаем функцию отправки файла на бэк 
-    expect(wrapper.vm.steps['2'].complete).toBe(true) 
-    
+
+    await wrapper.vm.launchSearch()  // запускаем функцию отправки файла на бэк
+    expect(wrapper.vm.steps['2'].complete).toBe(true)
+
   })
-  
+
   it('При выборе файла и подтверждения выбора должен поменяться статус третьего кружочка', async () => {
     wrapper.setData({ selectedFile: 'test.csv'}) // заносим в переменную фиктивный файл
     wrapper.vm.choosePaper()  // запускаем метод выбора файла
-    expect(wrapper.vm.steps['3'].complete).toBe(true) 
+    expect(wrapper.vm.steps['3'].complete).toBe(true)
 
     // так как предыдущие тесты прошли успешно то автоматом запустился метод getPaper
 
     fetch
-      .once(JSON.stringify({ 
-        status: 'success', 
-        file: 'some/link.zip', 
-        html: ['some image','anothe some img'], 
-        names: ['some name file', 'another some name file'] 
+      .once(JSON.stringify({
+        status: 'success',
+        file: 'some/link.zip',
+        html: ['some image','anothe some img'],
+        names: ['some name file', 'another some name file']
       }))  // getPaper
 
     await wrapper.vm.getPaper()   // запускаем метод обработки файла
 
-    expect(wrapper.vm.steps['4'].complete).toBe(true) 
+    expect(wrapper.vm.steps['4'].complete).toBe(true)
     expect(wrapper.vm.fileLink).toBe('some/link.zip')
     expect(wrapper.vm.tabs).toEqual(['some name file', 'another some name file'])
     expect(wrapper.vm.html).toEqual(['some image','anothe some img'])

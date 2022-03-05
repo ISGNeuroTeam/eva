@@ -109,10 +109,9 @@ export default {
   computed: {
     ...mapGetters(['getElementSelected', 'getElement']),
     htmlZoom() {
-      const size =
-        this.$attrs.heightFrom < this.$attrs.widthFrom
-          ? this.$attrs.heightFrom
-          : this.$attrs.widthFrom;
+      const size = this.$attrs.heightFrom < this.$attrs.widthFrom
+        ? this.$attrs.heightFrom
+        : this.$attrs.widthFrom;
       return size / 370;
     },
     isFullScreen() {
@@ -120,13 +119,13 @@ export default {
     },
     storedElement() {
       this.isFullScreen; // << dont remove
-      let { idDashFrom, idFrom } = this;
+      const { idDashFrom, idFrom } = this;
       return this.$store.getters.getElement(idDashFrom, idFrom);
     },
     needSetField() {
       return !this.dataField && !this.loading;
     },
-    theme: function () {
+    theme() {
       return this.colorFrom;
     },
     values() {
@@ -175,8 +174,8 @@ export default {
   watch: {
     storedElement(element) {
       if (
-        element?.selected !== undefined &&
-        this.value !== element.selected.elemDeep
+        element?.selected !== undefined
+        && this.value !== element.selected.elemDeep
       ) {
         this.loadSelectedValue();
       }
@@ -205,7 +204,7 @@ export default {
     dataRestFrom(dataRestFrom) {
       if (!this.dataField && dataRestFrom.length) {
         const keys = Object.keys(dataRestFrom[0]).filter(
-          (key) => key[0] !== '_'
+          (key) => key[0] !== '_',
         );
         if (keys.length === 1) {
           this.dataField = keys[0];
@@ -214,7 +213,7 @@ export default {
     },
     dataField(value) {
       this.$nextTick(() => {
-        /*value !== '' && */ this.$store.commit('setSelected', {
+        /* value !== '' && */ this.$store.commit('setSelected', {
           element: 'elem',
           idDash: this.idDashFrom,
           id: this.idFrom,
@@ -231,12 +230,22 @@ export default {
       id: this.idFrom,
     });
     this.$nextTick(() => {
+      this.circularSizeNew();
       this.loadSelectedValue();
     });
   },
   methods: {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
+    circularSizeNew() {
+      if (this.$attrs['is-full-screen']){
+        this.circularWidth = 40;
+        this.circularSize = 450;
+      } else {
+        this.circularWidth = 20;
+        this.circularSize = 190;
+      }
+    },
     addValue(val) {
       // +/- buttons
       this.sliderValue += val;
@@ -313,4 +322,12 @@ export default {
 
   &.full-screen
     min-width: 690px
+    .v-input__slot
+      height: 100%
+    .v-slider--vertical
+      min-height: 470px
+    .text-h4
+      font-size: 62px !important
+    .v-size--default
+      padding: 25px 48px
 </style>

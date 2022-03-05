@@ -87,7 +87,10 @@
             :id-dash-from="idDash"
             :data-page-from="page"
           />
-          <modal-search :color-from="theme" :id-dash-from="idDash" />
+          <modal-search
+            :color-from="theme"
+            :id-dash-from="idDash"
+          />
           <modal-settings
             v-if="activeSettingModal"
             :color-from="theme"
@@ -254,7 +257,7 @@ export default {
       letElements: false,
       prepared: false,
       colorChange: false,
-      deltaHorizontal: 0, //сколько надо увеличить высоту overlay-grid,по первое знач-500,
+      deltaHorizontal: 0, // сколько надо увеличить высоту overlay-grid,по первое знач-500,
       startClientHeight: 0,
       startClientWidth: 0,
       verticalCell: 0,
@@ -269,6 +272,7 @@ export default {
       firstLoad: true,
       leftDots: true,
       rightDots: true,
+      zoomedSearch: [],
       isConfirmModal: false,
       deleteTabId: '',
     };
@@ -285,11 +289,11 @@ export default {
         });
       },
     },
-    idDash: function () {
+    idDash() {
       // получаем id страницы от родителя
       return this.$route.params.id;
     },
-    elements: function () {
+    elements() {
       // получаем название элемента  от родителя
       return this.loadingDash
         ? []
@@ -357,7 +361,7 @@ export default {
         function findOnButtonTokens(tokens) {
           return tokens.filter((el) => el.onButton);
         }
-        let onButton = findOnButtonTokens(this.tokens);
+        const onButton = findOnButtonTokens(this.tokens);
         console.log(onButton);
         if (this.firstLoad) {
           searches.forEach((search) => {
@@ -425,11 +429,11 @@ export default {
       let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
 
       if (searchData.length) {
-        let keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
-        csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
+        const keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
+        csvContent += encodeURIComponent(`${keys.join(',')}\n`); // добавляем ключи в файл
       }
       csvContent += encodeURIComponent(
-        searchData.map((item) => Object.values(item).join(',')).join('\n')
+        searchData.map((item) => Object.values(item).join(',')).join('\n'),
       );
 
       const link = document.createElement('a'); // создаем ссылку
@@ -440,8 +444,7 @@ export default {
     },
     scroll(event) {
       event.preventDefault();
-      this.$refs['tab-panel'].scrollLeft =
-        this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY;
+      this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY;
       this.checkTabOverflow();
     },
     moveScroll(value) {
@@ -450,13 +453,11 @@ export default {
     },
     checkTabOverflow() {
       setTimeout(() => {
-        const { clientWidth, scrollWidth, scrollLeft } =
-          this.$refs['tab-panel'];
+        const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel'];
         scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false);
         if (clientWidth < scrollWidth) {
-          this.rightDots =
-            clientWidth + scrollLeft < scrollWidth + 5 &&
-            clientWidth + scrollLeft < scrollWidth - 5;
+          this.rightDots = clientWidth + scrollLeft < scrollWidth + 5
+            && clientWidth + scrollLeft < scrollWidth - 5;
         } else this.rightDots = false;
       }, 0);
     },
@@ -478,7 +479,7 @@ export default {
     },
     addNewTab() {
       if (!this.tabEditMode) {
-        let tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
+        const tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
         this.$store.commit('addNewTab', {
           idDash: this.idDash,
           tabID,
@@ -525,33 +526,33 @@ export default {
     tabLeave() {
       this.hoveredTabID = 0;
     },
-    hash: function (elem) {
+    hash(elem) {
       return `${elem}#${this.idDash}`;
     },
-    changeMode: function () {
+    changeMode() {
       this.mode = !this.mode;
     },
-    openSettings: function () {
+    openSettings() {
       this.showSetting = !this.showSetting;
     },
-    updateDash: function () {
+    updateDash() {
       this.$store.commit('updateDash', {
         dash: this.alreadyDash,
         modified: this.alreadyDash.modified,
       });
-      this.$store.auth.getters.putLog(
+      this.$store.getters['auth/putLog'](
         `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${
           this.alreadyDash.id
-        }`
+        }`,
       );
       this.alreadyShow = false;
     },
-    toHichName: function (name) {
+    toHichName(name) {
       return name[0].toUpperCase() + name.slice(1);
     },
-    checkAlreadyDash: async function () {
-      let response = await this.$store.getters.checkAlreadyDash(
-        this.$route.params.id
+    async checkAlreadyDash() {
+      const response = await this.$store.getters.checkAlreadyDash(
+        this.$route.params.id,
       );
       if (response.status === 'exist') {
         this.alreadyShow = true;
@@ -562,33 +563,33 @@ export default {
       }
       this.prepared = true;
     },
-    createStartClient: function () {
-      //первоначальные значения высоты и ширины
+    createStartClient() {
+      // первоначальные значения высоты и ширины
       this.startClientHeight = document.body.clientHeight - this.headerTop;
       this.startClientWidth = document.body.clientWidth;
     },
-    calcSizeCell: function () {
-      //размер ячейки
-      let grid = this.$store.getters.getSizeGrid(this.idDash);
+    calcSizeCell() {
+      // размер ячейки
+      const grid = this.$store.getters.getSizeGrid(this.idDash);
       this.verticalCell = Number(
-        (this.startClientWidth / grid.vert).toFixed(1)
+        (this.startClientWidth / grid.vert).toFixed(1),
       );
       this.horizontalCell = Number(
-        (this.startClientHeight / grid.hor).toFixed(1)
+        (this.startClientHeight / grid.hor).toFixed(1),
       );
     },
-    addScrollListener: function () {
+    addScrollListener() {
       let offset = 0;
       window.addEventListener('scroll', () => {
         // при увеличении экрана в высоту (вообще коненчо срабатывает при скролле страницы)
         if (document.querySelector('.application')) {
           if (document.body.scrollHeight > document.body.clientHeight) {
             // если высота скролируемого экрана больше чем клиентского
-            //добавляем размер
+            // добавляем размер
             offset = this.horizontalCell;
           } else {
             offset = 0;
-            //просто сработало событие
+            // просто сработало событие
           }
 
           document.querySelector('.application').style.height = `${
@@ -600,39 +601,52 @@ export default {
     sliceRange(arr, range) {
       return arr.filter((item, idx) => {
         if (
-          (item[range.xMetric] >= range.range[0] &&
-            item[range.xMetric] <= range.range[1]) ||
-          (arr[idx - 1]?.[range.xMetric] >= range.range[0] &&
-            arr[idx - 1]?.[range.xMetric] <= range.range[1]) ||
-          (arr[idx + 1]?.[range.xMetric] >= range.range[0] &&
-            arr[idx + 1]?.[range.xMetric] <= range.range[1])
+          (item[range.xMetric] >= range.range[0]
+            && item[range.xMetric] <= range.range[1])
+          || (arr[idx - 1]?.[range.xMetric] >= range.range[0]
+            && arr[idx - 1]?.[range.xMetric] <= range.range[1])
+          || (arr[idx + 1]?.[range.xMetric] >= range.range[0]
+            && arr[idx + 1]?.[range.xMetric] <= range.range[1])
         ) {
           return true;
         }
 
         const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
-        const idxArrSecond =
-          range.range[0] > range.range[1] ? idx - 1 : idx + 1;
+        const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
 
         if (
-          (item[range.xMetric] <= range.range[0] &&
-            arr[idxArrFirst]?.[range.xMetric] >= range.range[1]) ||
-          (item[range.xMetric] >= range.range[1] &&
-            arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
+          (item[range.xMetric] <= range.range[0]
+            && arr[idxArrFirst]?.[range.xMetric] >= range.range[1])
+          || (item[range.xMetric] >= range.range[1]
+            && arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
         ) {
           return true;
         }
       });
     },
     setRange(range, elem) {
-      this.dataObject[elem.search].data = this.sliceRange(
-        this.dataObject[elem.search].data,
-        range
-      );
+      if (range.zoomForAll && !this.zoomedSearch.includes(elem.search)) {
+        this.zoomedSearch.push(elem.search);
+      }
+      const elements = range.zoomForAll ? this.elements : [elem];
+      elements.forEach((elem) => {
+        this.dataObject[elem.search].data = this.sliceRange(
+          this.dataObject[elem.search].data,
+          range,
+        );
+      });
     },
     resetRange(dataSourseTitle) {
-      this.dataObject[dataSourseTitle].data =
-        this.dataObjectConst[dataSourseTitle].data;
+      let elements = [];
+      if (this.zoomedSearch.includes(dataSourseTitle)) {
+        elements = this.elements;
+        this.zoomedSearch.splice(this.zoomedSearch.indexOf(dataSourseTitle), 1);
+      } else {
+        elements.push({ search: dataSourseTitle });
+      }
+      elements.forEach((elem) => {
+        this.dataObject[elem.search].data = this.dataObjectConst[elem.search].data;
+      });
     },
   },
 };

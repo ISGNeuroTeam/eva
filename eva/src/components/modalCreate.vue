@@ -10,7 +10,10 @@
     :persistent="isChanged"
     @cancelModal="cancelModal"
   >
-    <div v-if="groupCheck" class="create-modal-block-group">
+    <div
+      v-if="groupCheck"
+      class="create-modal-block-group"
+    >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
           <div
@@ -58,7 +61,14 @@
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
+                  d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325
+                   4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802
+                   14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925
+                   13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264
+                   5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272
+                   5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925
+                   13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659
+                   9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
                   fill="white"
                 />
               </svg>
@@ -78,7 +88,16 @@
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
+                    d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325
+                     7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818
+                     1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801
+                     11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444
+                     13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278
+                     10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272
+                     5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303
+                     7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992
+                     7.72659L6.66659 9.44659L11.0599
+                     5.05325L11.9999 5.99992L6.66659 11.3333Z"
                     fill="white"
                   />
                 </svg>
@@ -95,7 +114,18 @@
                     v-on="on"
                   >
                     <path
-                      d="M4.41999 20.5789C4.13948 20.5784 3.87206 20.4601 3.68299 20.2529C3.49044 20.0474 3.39476 19.7694 3.41999 19.4889L3.66499 16.7949L14.983 5.48091L18.52 9.0169L7.20499 20.3299L4.51099 20.5749C4.47999 20.5779 4.44899 20.5789 4.41999 20.5789ZM19.226 8.30991L15.69 4.77391L17.811 2.65291C17.9986 2.46513 18.2531 2.35962 18.5185 2.35962C18.7839 2.35962 19.0384 2.46513 19.226 2.65291L21.347 4.77391C21.5348 4.96147 21.6403 5.216 21.6403 5.48141C21.6403 5.74681 21.5348 6.00134 21.347 6.18891L19.227 8.30891L19.226 8.30991Z"
+                      d="M4.41999 20.5789C4.13948 20.5784 3.87206
+                       20.4601 3.68299 20.2529C3.49044 20.0474
+                       3.39476 19.7694 3.41999 19.4889L3.66499
+                       16.7949L14.983 5.48091L18.52 9.0169L7.20499
+                       20.3299L4.51099 20.5749C4.47999 20.5779
+                       4.44899 20.5789 4.41999 20.5789ZM19.226
+                       8.30991L15.69 4.77391L17.811 2.65291C17.9986
+                       2.46513 18.2531 2.35962 18.5185 2.35962C18.7839
+                       2.35962 19.0384 2.46513 19.226 2.65291L21.347
+                       4.77391C21.5348 4.96147 21.6403 5.216 21.6403
+                       5.48141C21.6403 5.74681 21.5348 6.00134 21.347
+                       6.18891L19.227 8.30891L19.226 8.30991Z"
                       :fill="theme.$main_border"
                     />
                   </svg>
@@ -352,9 +382,9 @@ export default {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = !!(
-            val !== '#FFA9A4' &&
-            oldVal &&
-            val !== this.dataFrom?.color
+            val !== '#FFA9A4'
+            && oldVal
+            && val !== this.dataFrom?.color
           );
         } else {
           this.isChanged = !!(val !== '#FFA9A4' && oldVal);
@@ -440,18 +470,18 @@ export default {
         }, 3000); // а через три секунды убираем - чисто понты)
       } else {
         // если имя введено
-        //let actionEmit = '';
+        // let actionEmit = '';
         let dataObj = {};
         let warnText = '';
         let essence = '';
         if (this.groupCheck) {
           // для этого просматриваем все дашборды на странице (но берем их из хранилища)
           hasSimilarModel = this.groups.some(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
+            (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
           dataObj = { name: this.newGroup.name, color: this.newGroup.color };
           if (Object.keys(this.changedData).length !== 0) {
-            let keys = this.changedData.group;
+            const keys = this.changedData.group;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
@@ -464,7 +494,7 @@ export default {
         } else {
           // для этого просматриваем все дашборды на странице (но берем их из хранилища)
           hasSimilarModel = this.dashs.some(
-            (item) => item.name.toLowerCase() === name.toLowerCase()
+            (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
           dataObj = { name: this.newDash.name };
 
@@ -474,7 +504,7 @@ export default {
           dataObj.idgroup = this.curGroupFrom;
 
           if (Object.keys(this.changedData).length !== 0) {
-            let keys = this.changedData.dash;
+            const keys = this.changedData.dash;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
@@ -494,8 +524,7 @@ export default {
 
         if (this.showwarning) {
           // реакция ДА на предупреждение
-          this.nameBtn.create =
-            this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+          this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
           this.nameBtn.cancel = 'Отмена';
           this.showwarning = false;
         }
@@ -511,8 +540,7 @@ export default {
         this.name = ''; // очищаем имя
       }
       this.showwarning = false;
-      this.nameBtn.create =
-        this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+      this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
       this.nameBtn.cancel = 'Отмена';
       this.nameWarn = 'Имя не может быть пустым';
     },
@@ -531,10 +559,10 @@ export default {
       this.create_warning = false; // просто убираем предупреждение
     },
     createEssence(group, method, essence) {
-      let response = this.$store.auth.getters.setEssence({
+      const response = this.$store.getters['auth/setEssence']({
         formData: JSON.stringify(group),
-        essence: essence,
-        method: method,
+        essence,
+        method,
       });
       response.then((res) => {
         if (res.status === 200) {
@@ -565,8 +593,8 @@ export default {
         data: dash,
         getters: this.$store.getters.checkAlreadyDash,
       });
-      this.$store.auth.getters.putLog(
-        `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`
+      this.$store.getters['auth/putLog'](
+        `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`,
       );
     },
     toHichName(name) {
@@ -583,21 +611,21 @@ export default {
         data = this.dashs;
       }
       if (this.actionFrom) {
-        let allData = {};
-        let keys = [];
-        let promise = Object.keys(this.$data[role].tab).map((item) => {
+        const allData = {};
+        const keys = [];
+        const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.auth.getters.getEssenceList(item, true);
+          return this.$store.getters['auth/getEssenceList'](item, true);
         });
-        let result = await Promise.all(promise);
+        const result = await Promise.all(promise);
         result.forEach((item, i) => {
           allData[keys[i]] = item;
         });
         return allData;
       }
-      return this.$store.auth.getters.getEssence(
+      return this.$store.getters['auth/getEssence'](
         role,
-        data[this.curGroupFrom].id
+        data[this.curGroupFrom].id,
       );
     },
     setEnter(event) {
@@ -611,8 +639,7 @@ export default {
         this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
-      this.isChanged =
-        !event.data.includes(this.nameGroupFrom) || event.data.length > 1;
+      this.isChanged = !event.data.includes(this.nameGroupFrom) || event.data.length > 1;
     },
   },
 };

@@ -10,9 +10,9 @@
     :drag-cancel="'.v-slider'"
     :resizable="dragRes"
     :data-grid="true"
-    :grid="props.grid"
+    :grid="movableProps.grid"
     :style="{
-      zIndex: props.zIndex,
+      zIndex: movableProps.zIndex,
       outlineColor: theme.$accent_ui_color,
       backgroundColor: theme.$accent_ui_color,
     }"
@@ -30,7 +30,7 @@
       :loading="loading"
       :search-data="searchData"
       :data-sourse-title="dataSourseTitle"
-      @SetLevel="props.zIndex = Number.parseInt($event)"
+      @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
       @SetRange="setRange($event)"
@@ -42,7 +42,10 @@
 <script>
 export default {
   props: {
-    dataModeFrom: null,
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
     idDashFrom: null,
     dataElem: null,
     dataPageFrom: null,
@@ -63,7 +66,8 @@ export default {
       width: 0, // 0 не должен быть, по умолчанию беруться эти настройки
       height: 0,
       reload: 0,
-      props: {
+      maxZIndex: 1,
+      movableProps: {
         vue_drag: false,
         zIndex: 1,
         step: {},
@@ -92,17 +96,23 @@ export default {
     headerTop() {
       if (document.body.clientWidth <= 1400) {
         return 0;
-      } else {
-        return 0;
       }
+      return 0;
     },
   },
   watch: {
+    'movableProps.zIndex': {
+      handler(val, oldVal) {
+        if (oldVal > val) {
+          this.$set(this.movableProps, 'zIndex', oldVal);
+        }
+      },
+    },
     // top(val) {
     //   if (val <= this.headerTop) val = this.headerTop;
     // },
     left() {
-      let clientWidth = document.querySelector('#app').clientWidth;
+      const { clientWidth } = document.querySelector('#app');
       if (this.left < 0) this.left = 0;
       if (this.left + this.width > clientWidth) {
         this.left = clientWidth - this.width;
@@ -124,11 +134,12 @@ export default {
     this.drawElement();
   },
   mounted() {
+    this.maxZIndex = 1;
     this.onActivated();
   },
   methods: {
     drawElement() {
-      let pos = this.$store.getters.getPosDash({
+      const pos = this.$store.getters.getPosDash({
         idDash: this.idDash,
         id: this.id,
       });
@@ -136,28 +147,25 @@ export default {
       this.left = pos.left * this.verticalCell;
       this.top = pos.top * this.horizontalCell;
 
-      let size = this.$store.getters.getSizeDash({
+      const size = this.$store.getters.getSizeDash({
         idDash: this.idDash,
         id: this.id,
       });
 
-      let width = size.width * this.verticalCell;
-      let height = size.height * this.horizontalCell;
+      const width = size.width * this.verticalCell;
+      const height = size.height * this.horizontalCell;
 
       this.width = width;
       this.height = height;
     },
     onActivated() {
-      let testElements = document.getElementsByClassName(
-        'draggable resizable vdr'
-      );
-      let maxZIndex = 1;
+      const testElements = document.getElementsByClassName('vdr');
       for (let i = 0; i < testElements.length; i++) {
-        if (Number(testElements[i].style.zIndex) > maxZIndex) {
-          maxZIndex = Number(testElements[i].style.zIndex);
+        if (Number(testElements[i].style.zIndex) > this.maxZIndex) {
+          this.maxZIndex = Number(testElements[i].style.zIndex);
         }
       }
-      this.props.zIndex = maxZIndex + 1;
+      this.$set(this.movableProps, 'zIndex', this.maxZIndex + 1);
     },
     sendMove(x, y) {
       let top = Math.round(y / this.horizontalCell);
@@ -166,24 +174,24 @@ export default {
       let left = Math.round(x / this.verticalCell);
       if (left < 0) left = 0;
       this.$store.commit('setPosDash', {
-        top: top,
-        left: left,
+        top,
+        left,
         id: this.id,
         idDash: this.idDash,
       });
     },
     sendSize(x, y, width, height) {
-      let top = Math.round(y / this.horizontalCell);
-      let left = Math.round(x / this.verticalCell);
+      const top = Math.round(y / this.horizontalCell);
+      const left = Math.round(x / this.verticalCell);
       this.$store.commit('setPosDash', {
-        top: top,
-        left: left,
+        top,
+        left,
         id: this.id,
         idDash: this.idDash,
       });
 
-      let newWidth = Math.round(width / this.verticalCell);
-      let newHeight = Math.round(height / this.horizontalCell);
+      const newWidth = Math.round(width / this.verticalCell);
+      const newHeight = Math.round(height / this.horizontalCell);
       this.height = height;
       this.width = width;
       this.$store.commit('setSizeDash', {
@@ -197,7 +205,10 @@ export default {
       this.opacity = event;
     },
     createGrid() {
-      this.props.grid = [this.verticalCell, this.horizontalCell];
+      this.$set(this.movableProps, 'grid', [
+        this.verticalCell,
+        this.horizontalCell,
+      ]);
     },
     setRange(range) {
       this.$emit('SetRange', range);
@@ -218,7 +229,7 @@ export default {
   border-radius: 4px;
   transition: transform ease 0.3s;
 }
-.vdr.active.resizable {
+.vdr.active {
   outline-color: inherit;
   outline: 2px dashed;
 }

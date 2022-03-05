@@ -488,9 +488,9 @@ export default {
     async select(selectedTheme) {
       this.$refs.modalPersistent.focusOnModal();
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
-        let response = await fetch(`/api/theme?themeName=${selectedTheme}`);
-        let themeData = await response.json();
-        let content = JSON.parse(themeData.content);
+        const response = await fetch(`/api/theme?themeName=${selectedTheme}`);
+        const themeData = await response.json();
+        const content = JSON.parse(themeData.content);
         this.$store.commit('setTheme', content);
       } else this.$store.commit('setDefaultTheme', selectedTheme);
     },
@@ -526,8 +526,8 @@ export default {
       this.$refs.modalPersistent.focusOnModal();
     },
     editTheme() {
-      let themeObject = this.$store.getters.getTheme;
-      let themeTitle = this.$store.getters.getThemeTitle;
+      const themeObject = this.$store.getters.getTheme;
+      const themeTitle = this.$store.getters.getThemeTitle;
       this.fields.forEach((field) => {
         field.value = themeObject[field.propName];
       });
@@ -546,7 +546,7 @@ export default {
         return;
       }
       try {
-        await fetch(`/api/theme/delete`, {
+        await fetch('/api/theme/delete', {
           method: 'DELETE',
           body: JSON.stringify({
             themeName: this.select,
@@ -575,7 +575,7 @@ export default {
       if (this.newTitle) {
         if (this.mode === 'edit') {
           try {
-            await fetch(`/api/theme/delete`, {
+            await fetch('/api/theme/delete', {
               method: 'DELETE',
               body: JSON.stringify({
                 themeName: this.select,
@@ -585,7 +585,7 @@ export default {
             console.log(e);
           }
         }
-        let themeObject = {
+        const themeObject = {
           themeName: this.newTitle,
           settings: {
             $image_opacity: this.opacity,
@@ -599,13 +599,13 @@ export default {
         });
 
         try {
-          let res = await fetch('/api/theme/create', {
+          const res = await fetch('/api/theme/create', {
             method: 'POST',
             body: JSON.stringify(themeObject),
           });
           if (res.status !== 200) return;
-          let themeData = await res.json();
-          let content = JSON.parse(themeData);
+          const themeData = await res.json();
+          const content = JSON.parse(themeData);
           this.$store.commit('setTheme', content);
           this.$set(this, 'select', this.currentThemeName);
           this.mode = 'select';
@@ -622,14 +622,12 @@ export default {
     },
     async getThemeList() {
       try {
-        let response = await fetch('/api/themes');
-        let themeTitles = await response.json();
-        let newThemeTitles = themeTitles.map((them) => {
-          return (them = { title: them.name, ...them });
-        })
+        const response = await fetch('/api/themes');
+        const themeTitles = await response.json();
+        const newThemeTitles = themeTitles.map((them) => (them = { title: them.name, ...them }));
         this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
           { title: 'Светлая', name: 'light' }].concat(
-            newThemeTitles
+          newThemeTitles,
         );
       } catch (e) {
         console.log(e);

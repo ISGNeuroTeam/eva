@@ -140,8 +140,8 @@ export default {
       }
     },
     downloadFile(fileLink) {
-      let namefile = fileLink.split('/')[2];
-      let link = this.$refs.paperBlock.appendChild(document.createElement('a')); // создаем ссылку
+      const namefile = fileLink.split('/')[2];
+      const link = this.$refs.paperBlock.appendChild(document.createElement('a')); // создаем ссылку
       link.setAttribute('href', `/${fileLink}`); // указываем ссылке что надо скачать наш файл csv
       link.setAttribute('download', namefile); // указываем имя файла
       link.click(); // жмем на скачку
@@ -150,19 +150,18 @@ export default {
     async getPaper() {
       this.loadingShow = true;
 
-      let formData = new FormData();
+      const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('data', JSON.stringify(this.data));
-      let result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.getters.getPaper(formData);
       try {
         if (result.status === 'success') {
           this.downloadFile(result.file);
           this.isChanged = false;
           this.loadingShow = false;
-          //this.showError = false;
+          // this.showError = false;
         } else {
-          this.errorMsg =
-            'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
+          this.errorMsg = 'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
           this.loadingShow = false;
         }
@@ -172,14 +171,13 @@ export default {
       }
     },
     async getAllPapers() {
-      let result = await this.$store.getters.getAllPaper();
+      const result = await this.$store.getters.getAllPaper();
       try {
         if (JSON.parse(result).status === 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
-          this.errorMsg =
-            'Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.';
+          this.errorMsg = 'Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
         }
       } catch (error) {
@@ -204,13 +202,13 @@ export default {
       }
     },
     getData() {
-      let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
+      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
       }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
-      let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
 
-      let worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
 
       worker.onmessage = function (event) {
         // при успешном выполнении функции что передали в blob изначально сработает этот код
@@ -231,9 +229,9 @@ export default {
       return function (event) {
         let db = null;
 
-        let searchSid = event.data;
+        const searchSid = event.data;
 
-        let request = indexedDB.open('EVA', 1);
+        const request = indexedDB.open('EVA', 1);
 
         request.onerror = function (event) {
           console.log('error: ', event);
@@ -249,19 +247,19 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            console.log('successEvent: ' + db);
+            console.log(`successEvent: ${db}`);
           };
         };
 
         request.onsuccess = () => {
           db = request.result;
 
-          let transaction = db.transaction('searches'); // (1)
+          const transaction = db.transaction('searches'); // (1)
 
           // получить хранилище объектов для работы с ним
-          let searches = transaction.objectStore('searches'); // (2)
+          const searches = transaction.objectStore('searches'); // (2)
 
-          let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
           query.onsuccess = () => {
             // (4)

@@ -143,7 +143,7 @@ export default {
     },
     selectSearch(event, search) {
       // функция для выбора одного элемента из списка
-      let elem = event.target.parentElement; // получаем родителя в котором находятся все элементы
+      const elem = event.target.parentElement; // получаем родителя в котором находятся все элементы
       elem.parentElement.childNodes.forEach((item) => {
         // пробегаемся по всем элементам
         item.style = 'box-shadow: none'; // и отключаем  обводку
@@ -155,7 +155,7 @@ export default {
       let newSid = sid;
       if (sid.length > 5) {
         // если там больше 10 символов
-        newSid = sid.substring(0, 5) + '...'; // обрезаем и добовляем троеточие
+        newSid = `${sid.substring(0, 5)}...`; // обрезаем и добовляем троеточие
       }
       return newSid;
     },
