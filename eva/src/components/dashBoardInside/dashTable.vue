@@ -66,10 +66,10 @@
             <v-row v-else-if="value === 'none'">
               <v-col cols="12">
                 <v-select
-                    label="Значение"
-                    :items="compareForBoolean"
-                    @change="
-                  onChangeForBoolean(title, $event)
+                  label="Значение"
+                  :items="compareForBoolean"
+                  @change="
+                    onChangeForBoolean(title, $event)
                   "
                 />
               </v-col>
@@ -109,6 +109,7 @@
                 v-if="!excludeColumns.includes(colIndex)"
                 :key="colIndex"
                 class="text-start"
+                :class="{'d-none': !options.titles.includes(colIndex)}"
                 :style="
                   (item.cellColor &&
                     item.cellColor[colIndex] &&
@@ -225,15 +226,13 @@ export default {
       return items;
     },
     filteredTableData() {
-      let chooseSort = function (dataFormat, sortType, value) {
-        if (dataFormat ==="none") {
-          if (typeof value ==='boolean'){
-            return  (el) => {
-                return el === value;
-            };
+      const chooseSort = function (dataFormat, sortType, value) {
+        if (dataFormat === 'none') {
+          if (typeof value === 'boolean') {
+            return (el) => el === value;
           }
-         return () => true;
-        }else if (dataFormat === 'date') {
+          return () => true;
+        } if (dataFormat === 'date') {
           let sort;
           const parseDate = function (val) {
             const parts = val.split('.');
@@ -367,7 +366,7 @@ export default {
     this.setEventColor();
   },
   methods: {
-    onChangeForBoolean(title, event){
+    onChangeForBoolean(title, event) {
       this.setFilterData(title, '=', 'compare');
       this.setFilterData(title, event);
     },
@@ -448,7 +447,7 @@ export default {
         data.length <= 100
           ? (this.props.hideFooter = true)
           : (this.props.hideFooter = false);
-        this.createTitles(data);
+        this.createTitles(this.options?.titles);
         this.createTockens(data);
         if (this.props.justCreate) {
           this.selectRow();
