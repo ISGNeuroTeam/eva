@@ -121,11 +121,12 @@ export default {
     },
     setSearch: (state, payload) => {
       const { idDash, reload, search } = payload;
-      const checkId = search.currentSid || search.sid;
+      const checkId = search.sid;
       search.status = 'empty';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
-          if (checkId === item.sid) {
+          if (checkId === item.sid || search.currentSid === item.sid) {
+            delete search.currentSid;
             Vue.set(state[idDash].searches, i, search);
           }
         });

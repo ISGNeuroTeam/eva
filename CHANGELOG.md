@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed piechart color rgb
 - fixed gis settings styles
 - fixed calendar in data source
-
+- fixed renaming with data source replacement
 ## [1.84.0]
 
 ### Added
