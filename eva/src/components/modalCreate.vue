@@ -22,7 +22,7 @@
         </v-card-text>
         <div class="create-block">
           <v-text-field
-            v-model="newGroup.name"
+            v-model="newElement.name"
             hide-details
             class="input-create"
             :style="{ color: theme.$main_text }"
@@ -36,21 +36,21 @@
             class="title-field input-create"
             :style="{ color: theme.$main_text }"
           >
-            Цвет группы ssssssss
+            Цвет группы
           </div>
           <div class="color-picker-wrapper">
             <div
-              v-for="color in colors"
-              :key="color"
+              v-for="(color, index) in colors"
+              :key="`${color}${index}`"
               class="color-box"
               :class="{
-                active: colorInputMode === 'preset' && newGroup.color === color,
+                active: colorInputMode === 'preset' && newElement.color === color,
               }"
               :style="{ backgroundColor: color }"
               @click="setPresetGroupColor(color)"
             >
               <svg
-                v-show="colorInputMode === 'preset' && newGroup.color === color"
+                v-show="colorInputMode === 'preset' && newElement.color === color"
                 width="16"
                 height="16"
                 viewBox="0 0 16 16"
@@ -134,7 +134,7 @@
               small
               :color="theme.$primary_button"
               class="create-btn"
-              @click="createBtn(newGroup.name)"
+              @click="createBtn(newElement.name)"
             >
               {{ nameBtn.create }}
             </v-btn>
@@ -166,7 +166,7 @@
         </v-card-text>
         <div class="create-block">
           <v-text-field
-            v-model="newDash.name"
+            v-model="newElement.name"
             hide-details
             class="input-create"
             :style="{ color: theme.$main_text }"
@@ -201,7 +201,7 @@
               small
               :color="theme.$primary_button"
               class="create-btn"
-              @click="createBtn(newDash.name)"
+              @click="createBtn(newElement.name)"
             >
               {{ nameBtn.create }}
             </v-btn>
@@ -224,25 +224,53 @@
 export default {
   name: 'ModalCreate',
   props: {
-    modalFrom: null,
-    groupFlagFrom: null,
-    groupFrom: null,
-    dashsFrom: null,
-    actionFrom: null,
-    dataFrom: null,
-    dashFrom: null,
-    curGroupFrom: null,
-    nameGroupFrom: null,
+    modalFrom: {
+      type: Boolean,
+      default: false,
+    },
+    groupFlagFrom: {
+      type: Boolean,
+      default: false,
+    },
+    groupFrom: {
+      type: Array,
+      required: true,
+    },
+    dashsFrom: {
+      type: Array,
+      required: true,
+    },
+    actionFrom: {
+      type: [Boolean, String],
+      default: false,
+    },
+    dataFrom: {
+      type: [Number, Object],
+      required: true,
+    },
+    dashFrom: {
+      type: Object,
+      default: () => ({}),
+    },
+    curGroupFrom: {
+      type: [Number, Object],
+      required: true,
+    },
+    nameGroupFrom: {
+      type: String,
+      default: '',
+    },
+    isEdit: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       name: '',
-      newDash: {
+      newElement: {
         name: '',
         id: '',
-      },
-      newGroup: {
-        name: '',
         color: '',
       },
       nameBtn: {
@@ -294,7 +322,6 @@ export default {
       ];
     },
     active() {
-      this.setData();
       this.resetModal(this.modalFrom);
       return this.modalFrom;
     },
@@ -316,21 +343,18 @@ export default {
   mounted() {
     this.create_warning = false; // выключаем все предупреждения что были включены
     this.pickedColor = this.theme.$main_bg;
+    this.setData();
   },
   methods: {
     resetModal(val) {
       if (!val) {
         this.name = '';
         this.nameTitle = '';
-        this.$set(this, 'newDash', {
+        this.$set(this, 'newElement', {
           name: '',
           id: '',
-        });
-        console.log(this.newDash);
-        this.newGroup = {
-          name: '',
           color: '',
-        };
+        });
         this.nameBtn = {
           create: 'Создать',
           cancel: 'Отмена',
@@ -344,28 +368,39 @@ export default {
         };
       }
     },
+    setDashData() {
+      if (this.dashFrom && Object.keys(this.dashFrom)?.length > 0) {
+        this.$set(this.newElement, 'name', this.dashFrom?.name);
+        this.$set(this.newElement, 'id', this.dashFrom?.id);
+      } else {
+        this.newElement.name = '';
+        this.$set(this.newElement, 'name', '');
+        this.$set(this.newElement, 'id', '');
+      }
+    },
+    setGroupData() {
+      if (this.dataFrom && this.dataFrom !== -1) {
+        this.$set(this.newElement, 'name', this.dataFrom.name);
+        this.$set(this.newElement, 'color', this.dataFrom.color);
+        if (this.colors.includes(this.dataFrom.color)) {
+          this.colorInputMode = 'preset';
+        } else {
+          this.colorInputMode = 'custom';
+          this.pickedColor = this.dataFrom?.color;
+        }
+      } else {
+        this.$set(this.newElement, 'name', '');
+        [this.newElement.color] = this.colors;
+        this.colorInputMode = 'preset';
+      }
+    },
     setData() {
       this.pickedColor = this.theme.$main_bg;
       if (this.modalFrom) {
-        if (this.dataFrom) {
-          this.newGroup.name = this.dataFrom.name;
-          this.newGroup.color = this.dataFrom.color;
-          if (this.colors.includes(this.dataFrom.color)) {
-            this.colorInputMode = 'preset';
-          } else {
-            this.colorInputMode = 'custom';
-            this.pickedColor = this.dataFrom.color;
-          }
+        if (this.groupFlagFrom) {
+          this.setGroupData();
         } else {
-          this.newGroup.name = '';
-          this.newGroup.color = this.colors[0];
-          this.colorInputMode = 'preset';
-        }
-        if (this.dashFrom) {
-          this.newDash.name = this.dashFrom.name;
-          this.newDash.id = this.dashFrom.id;
-        } else {
-          this.newDash.name = '';
+          this.setDashData();
         }
         if (this.actionFrom) {
           if (this.groupCheck) {
@@ -386,7 +421,7 @@ export default {
       }
     },
     setGroupColor(color) {
-      this.newGroup.color = color;
+      this.$set(this.newElement, 'color', color);
     },
     setPresetGroupColor(color) {
       this.colorInputMode = 'preset';
@@ -396,81 +431,117 @@ export default {
       this.colorInputMode = 'custom';
       this.setGroupColor(color);
     },
-    createBtn(name) {
-      // TODO: Поправить редактирование дашборда, сейчас происходит замена - некорректно
-      // TODO: Поправить создание\редактирование\замену группы - сейчас не работает - некорректно
-      let method = this.dashFrom ? 'PUT' : 'POST';
-      // при нажатии на кнопку создать
-      let hasSimilarModel = false;
-      if (!name || name === '') {
-        //  если пользователь не ввел имя
-        this.showwarning = true; //  показываем предупреждение
+    showWarningMessage(message, autoHide = true) {
+      this.nameWarn = message;
+      this.showwarning = true;
+      if (autoHide) {
         setTimeout(() => {
           this.showwarning = false;
-        }, 3000); // а через три секунды убираем - чисто понты)
-      } else {
-        // если имя введено
-        // let actionEmit = '';
-        let dataObj = {};
-        let warnText = '';
-        let essence = '';
-        if (this.groupCheck) {
-          // для этого просматриваем все дашборды на странице (но берем их из хранилища)
-          hasSimilarModel = this.groups.some(
-            (item) => item.name.toLowerCase() === name.toLowerCase(),
-          );
-          dataObj = { name: this.newGroup.name, color: this.newGroup.color };
-          if (Object.keys(this.changedData).length !== 0) {
-            const keys = this.changedData.group;
-            Object.keys(keys).forEach((item) => {
-              dataObj[item] = keys[item];
-            });
-          }
-          if (this.curGroupFrom !== -1) {
-            dataObj.id = this.groupFrom[this.curGroupFrom].id;
-          }
-          essence = 'group';
-          warnText = 'Такая группа уже существует. Хотите изменить её?';
-        } else {
-          // для этого просматриваем все дашборды на странице (но берем их из хранилища)
-          hasSimilarModel = this.dashs.some(
-            (item) => item.name.toLowerCase() === name.toLowerCase(),
-          );
-          dataObj = { name: this.newDash.name };
-          if (this.newDash?.id !== '') {
-            dataObj.id = this.newDash.id;
-            console.log(this.newDash.id);
-          }
-          // dataObj.idgroup = this.curGroupFrom;
-          if (Object.keys(this.changedData)?.length !== 0) {
-            const keys = this.changedData.dash;
-            Object.keys(keys).forEach((item) => {
-              dataObj[item] = keys[item];
-            });
-          }
-          essence = 'dash';
-          warnText = 'Такой дашборд уже существует. Хотите изменить его?';
-        }
-
-        if (hasSimilarModel && !this.showwarning) {
-          // показываем предупреждение
-          this.nameBtn.create = 'Да';
-          this.nameBtn.cancel = 'Нет';
-          this.nameWarn = warnText;
-          this.showwarning = true;
-          return;
-        }
-
-        if (this.showwarning) {
-          // реакция ДА на предупреждение
-          this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
-          this.nameBtn.cancel = 'Отмена';
-          this.showwarning = false;
-          method = 'PUT';
-          dataObj.id = this.dashsFrom.find((dash) => dash.name.toLowerCase() === dataObj.name.toLowerCase()).id;
-        }
-        this.createEssence(dataObj, method, essence);
+        }, 3000);
       }
+    },
+    createBtn(name) {
+      if (name) {
+        const dataObj = {
+          name,
+        };
+        // Группа
+        if (this.groupCheck) {
+          dataObj.color = this.newElement.color;
+          this.setElement(name, 'group', dataObj);
+        // Дашборд
+        } else {
+          this.setElement(name, 'dash', dataObj);
+        }
+      } else {
+        // Имя не введено
+        this.showWarningMessage('Имя не может быть пустым');
+      }
+    },
+    setElement(name, type, data) {
+      // Метод отправки данных
+      let method = 'POST';
+      // Объект с данными
+      const dataObj = data;
+      // Проверка на существование текущего элемента
+      const hasSimilarModel = this.checkSimilarModel(type, name);
+      // Создание нового элемента
+      if (!this.isEdit) {
+        if (type === 'dash') {
+          // Id группы из которой создается дашборд
+          dataObj.idGroup = this.dataFrom?.id || this.dataFrom;
+        }
+        // Если группа\дашборд существует и об этом еще небыло оповещения
+        if (hasSimilarModel) {
+          if (!this.showwarning) {
+            // Выводим сообщение
+            this.showWarningMessage(
+              type === 'group'
+                ? 'Такая группа уже существует. Хотите изменить её?'
+                : 'Такой дашборд уже существует. Хотите изменить его?',
+              false,
+            );
+            // Меняем текст кнопок
+            this.nameBtn.create = 'Да';
+            this.nameBtn.cancel = 'Нет';
+          } else {
+            // Меняем текст кнопок
+            this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+            this.nameBtn.cancel = 'Отмена';
+            // Скрываем сообщение
+            this.showwarning = false;
+            // Удаляем старый дашборд
+            this.deleteOldElement(this.findElementId(name, type), type);
+          }
+        }
+      // Редактирование существующего элемента
+      } else {
+        // Меняем метод отправки данных
+        method = 'PUT';
+        // Id элемента который редактируем
+        if (type === 'group') {
+          dataObj.id = this.curGroupFrom;
+        } else {
+          dataObj.id = this.dashFrom.id;
+        }
+      }
+      // Если изменились группы\пользователи\дашборды доступные этому элементу
+      if (Object.keys(this.changedData).length !== 0) {
+        const keys = this.changedData[type];
+        // Добавляем эти поля в объект для отправки на сервер
+        Object.keys(keys).forEach((item) => {
+          dataObj[item] = keys[item];
+        });
+      }
+      // Если подтвердили замену дашборда
+      if (!this.showwarning) {
+        this.createEssence(dataObj, method, type);
+      }
+    },
+    async deleteOldElement(id, type) {
+      let data = null;
+      let element = null;
+      if (type === 'group') {
+        data = this.groupFrom;
+      } else {
+        data = this.dashsFrom;
+      }
+      element = data.find((el) => el.id === id);
+      this.$store.getters['auth/deleteEssence']({
+        essence: type,
+        id: element.id,
+      });
+      this.$store.commit('deleteDashFromMain', element);
+    },
+    findElementId(name, type) {
+      const fieldName = type === 'dash' ? `${type}sFrom` : `${type}From`;
+      return this[fieldName]
+        .find((el) => el.name.toLowerCase() === name.toLowerCase())
+        .id;
+    },
+    checkSimilarModel(type, name) {
+      const fieldName = type === 'dash' ? `${type}sFrom` : `${type}From`;
+      return this[fieldName].some((item) => item.name.toLowerCase() === name.toLowerCase());
     },
     cancelModal(btn) {
       // есл инажали на отмену создания
@@ -510,15 +581,15 @@ export default {
               this.createDash({
                 id: data.id,
                 name: group.name,
-                idgroup: group.idgroup,
+                idgroup: group.idGroup,
                 modified: data.modified,
               });
             });
           }
           this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
-        } else if (res.status == 409) {
+        } else if (res.status === 409) {
           this.showwarning = true; //  показываем предупреждение
-          essence == 'group'
+          essence === 'group'
             ? (this.nameWarn = 'Такая группа уже есть.')
             : (this.nameWarn = 'Такой дашборд уже есть.');
           setTimeout(() => {
@@ -562,30 +633,23 @@ export default {
         });
         return allData;
       }
+      if (this.groupFlagFrom) {
+        return this.$store.getters['auth/getEssence'](
+          role,
+          data.find((el) => el.id === this.curGroupFrom).id,
+        );
+      }
       return this.$store.getters['auth/getEssence'](
         role,
-        data[this.curGroupFrom].id,
+        data.find((el) => el.id === this.dashFrom.id).id,
       );
     },
     setEnter(event) {
-      if (event.code == 'Enter') {
+      if (event.code === 'Enter') {
         this.createBtn();
       }
     },
-    // changeStyle: function() {
-    //   if (this.active) {
-    //     let dialog = document.querySelector('.v-dialog');
-    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
-    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     })
-    //     dialog.querySelectorAll('input').forEach( item => {
-    //       item.style.color = this.color.text;
-    //     })
-    //   }
-    // },
     changeDataEvent(event) {
-      console.log(event);
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }

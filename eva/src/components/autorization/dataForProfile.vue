@@ -157,7 +157,7 @@ export default {
       required: true,
     },
     dataFrom: {
-      type: Promise,
+      type: [Promise, Object],
       required: true,
     },
   },
@@ -440,7 +440,10 @@ export default {
       this.getData();
     },
     translateToObj(array) {
-      return array.map((item) => ({ name: item }));
+      if (array?.length > 0) {
+        return array.map((item) => ({ name: item }));
+      }
+      return [];
     },
     deleteSelected(subj) {
       const { essence } = this;

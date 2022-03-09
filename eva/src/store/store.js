@@ -459,12 +459,12 @@ export default {
       // обновляем порядок layout на странице
       const dashboard = dash.data;
       if (!state[dashboard.id]) {
+        Vue.set(state, dashboard.id, {});
+        Vue.set(state[dashboard.id], 'name', dashboard.name);
+        Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
+        Vue.set(state[dashboard.id], 'modified', dashboard.modified);
         dash.getters(dashboard.id, true);
       }
-      Vue.set(state, dashboard.id, {});
-      Vue.set(state[dashboard.id], 'name', dashboard.name);
-      Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
-      Vue.set(state[dashboard.id], 'modified', dashboard.modified);
     },
     changeDashboard: (state, dash) => {
       const dashboard = dash.data;
@@ -475,14 +475,14 @@ export default {
       }
     },
     updateDash: (state, dash) => {
-      if (dash.dash.body != '') {
-        state[dash.dash.id] = {
+      if (dash.dash.body !== '') {
+        Vue.set(state, dash.dash.id, {
           ...state[dash.dash.id],
           ...JSON.parse(dash.dash.body),
-        };
+        });
       }
-      if (dash.modified != '') {
-        state[dash.dash.id].modified = dash.modified;
+      if (dash.modified !== '') {
+        Vue.set(state[dash.dash.id], 'modified', dash.modified);
       }
     },
     setLoading: (state, load) => {
@@ -883,15 +883,15 @@ export default {
         const fromElementNames = {};
         const tokenNames = Object.assign([], item.updateTokens);
         tockens
-          .filter(token => tokenNames.includes(token.name))
-          .forEach(token => {
+          .filter((token) => tokenNames.includes(token.name))
+          .forEach((token) => {
             values[token.name] = token.value;
             fromElementNames[token.elem] = token.elem;
           });
 
         tockensTarget
-          .filter(token => tokenNames.includes(token.name))
-          .forEach(token => {
+          .filter((token) => tokenNames.includes(token.name))
+          .forEach((token) => {
             // copy token value
             token.value = values[token.name];
 
@@ -920,20 +920,12 @@ export default {
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}/1`);
-        } else {
-          if (!event.event.tab || !lastEl)
-            event.route.push(`/dashboards/${id}/${currentTab || ''}`);
-          else event.route.push(`/dashboards/${id}/${lastEl.id}`);
-        }
-      } else {
-        if (!isTabMode) {
-          window.open(`/dashboards/${id}/1`);
-        } else {
-          if (!event.event.tab || !lastEl)
-            window.open(`/dashboards/${id}/${currentTab || ''}`);
-          else window.open(`/dashboards/${id}/${lastEl.id}`);
-        }
-      }
+        } else if (!event.event.tab || !lastEl) event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+        else event.route.push(`/dashboards/${id}/${lastEl.id}`);
+      } else if (!isTabMode) {
+        window.open(`/dashboards/${id}/1`);
+      } else if (!event.event.tab || !lastEl) window.open(`/dashboards/${id}/${currentTab || ''}`);
+      else window.open(`/dashboards/${id}/${lastEl.id}`);
       const { searches } = state[id];
 
       let response = {};
@@ -1724,9 +1716,7 @@ export default {
     getGroups() {
       return () => rest.getGroups(restAuth);
     },
-    getDashs: () =>
-      // получения списка дашбордов
-      (id) => rest.getDashs(id, restAuth),
+    getDashs: () => (id) => rest.getDashs(id, restAuth), // получения списка дашбордов
     getModalDelete(state) {
       // получаем объект модального окна в котором храним тот элемнет что хотим удалить
       return (ids) => {
@@ -1893,6 +1883,7 @@ export default {
     checkAlreadyDash: (state) => (id, first) => new Promise((resolve) => {
       const result = rest.getState(id, restAuth);
       result.then((stateFrom) => {
+        console.log('checkAlreadyDash', stateFrom);
         if (stateFrom) {
           if (!state[id]) {
             Vue.set(state, id, {});
