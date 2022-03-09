@@ -139,13 +139,11 @@
     </div>
 
     <modal-log
-      :modal-active="modalActive"
-      @cancelModal="modalActive = false"
+      v-model="modalActive"
     />
     <modal-themes
-      :show="paleteShow"
+      v-model="paleteShow"
       :admin="isAdmin"
-      @closeModal="paleteShow = false"
     />
   </div>
 </template>

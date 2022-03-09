@@ -1,8 +1,12 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="modalPersistent"
     v-model="showModal"
-    persistent
-    width="400px"
+    width="400"
+    :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    @cancelModal="closeModal"
   >
     <div class="themes-modal-wrapper">
       <v-card
@@ -76,7 +80,7 @@
             <div
               :style="{ color: theme.$error_color }"
               class="btn"
-              @click="deleteTheme"
+              @click="openConfirmModal"
             >
               <v-icon
                 :color="theme.$error_color"
@@ -86,6 +90,15 @@
               </v-icon>
               Удалить
             </div>
+            <modal-delete />
+            <modal-confirm
+              v-model="isConfirmModal"
+              :theme="theme"
+              :modal-text="`Вы точно хотите удалить тему - <strong>${select}</strong>?`"
+              btn-confirm-text="Удалить"
+              btn-cancel-text="Отмена"
+              @result="deleteTheme"
+            />
           </div>
           <div
             v-if="admin"
@@ -118,6 +131,7 @@
             :color="theme.$primary_button"
             outlined
             hide-details
+            @input="isChanged = true"
           />
           <div class="helper-title">
             <p @click="mode = 'manual'">
@@ -165,6 +179,7 @@
                     <v-color-picker
                       v-model="row.value"
                       dot-size="17"
+                      @input="isChanged = true"
                     />
                   </v-menu>
                 </v-col>
@@ -306,7 +321,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -319,8 +334,16 @@ import {
 } from '@mdi/js';
 
 export default {
+  name: 'ModalThemes',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    show: Boolean,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     admin: Boolean,
   },
   data() {
@@ -386,14 +409,76 @@ export default {
           value: '#8F8F9C',
         },
       ],
+      defaultFieldsValue: [
+        {
+          title: 'Основной фон',
+          propName: '$main_bg',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительный фон',
+          propName: '$secondary_bg',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Основные линии',
+          propName: '$main_border',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительные линии',
+          propName: '$secondary_border',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Основной текст',
+          propName: '$main_text',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительный текст',
+          propName: '$secondary_text',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Заголовки',
+          propName: '$title',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Иконки и акценты',
+          propName: '$accent_ui_color',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Взаимодейтсвия',
+          propName: '$primary_button',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Взаимодейтсвия (доп.)',
+          propName: '$primary_button_hover',
+          value: '#8F8F9C',
+        },
+      ],
       imagePreview: null,
       mode: 'select',
       error: false,
+      isChanged: false,
+      isConfirmModal: false,
     };
   },
   computed: {
-    showModal() {
-      return this.show;
+    currentThemeName() {
+      return this.$store.getters.getThemeTitle;
+    },
+    showModal: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -401,6 +486,7 @@ export default {
   },
   watch: {
     async select(selectedTheme) {
+      this.$refs.modalPersistent.focusOnModal();
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         const response = await fetch(`/api/theme?themeName=${selectedTheme}`);
         const themeData = await response.json();
@@ -408,9 +494,17 @@ export default {
         this.$store.commit('setTheme', content);
       } else this.$store.commit('setDefaultTheme', selectedTheme);
     },
+    showModal(val) {
+      if (!val) {
+        this.isChanged = false;
+        this.mode = 'select';
+      }
+    },
   },
   async created() {
-    await this.getThemeList();
+    await this.getThemeList().then(() => {
+      this.$set(this, 'select', this.currentThemeName);
+    });
   },
   methods: {
     resetForm() {
@@ -420,12 +514,16 @@ export default {
       this.fields.forEach((field) => (field.value = '#8F8F9C'));
     },
     closeModal() {
-      this.$emit('closeModal');
       this.toSelectMode();
+      this.$nextTick(() => {
+        this.showModal = false;
+      });
     },
     toSelectMode() {
       this.mode = 'select';
       this.resetForm();
+      this.isChanged = false;
+      this.$refs.modalPersistent.focusOnModal();
     },
     editTheme() {
       const themeObject = this.$store.getters.getTheme;
@@ -440,7 +538,13 @@ export default {
       this.newTitle = themeTitle;
       this.mode = 'edit';
     },
-    async deleteTheme() {
+    openConfirmModal() {
+      this.isConfirmModal = true;
+    },
+    async deleteTheme(isConfirm) {
+      if (!isConfirm) {
+        return;
+      }
       try {
         await fetch('/api/theme/delete', {
           method: 'DELETE',
@@ -455,6 +559,7 @@ export default {
       }
     },
     uploadImage() {
+      this.isChanged = true;
       const image = this.$refs.imageInput.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(image);
@@ -502,8 +607,12 @@ export default {
           const themeData = await res.json();
           const content = JSON.parse(themeData);
           this.$store.commit('setTheme', content);
+          this.$set(this, 'select', this.currentThemeName);
           this.mode = 'select';
-          await this.getThemeList();
+          await this.getThemeList().then(() => {
+            this.isChanged = false;
+            this.$refs.modalPersistent.focusOnModal();
+          });
         } catch (e) {
           console.log(e);
         }

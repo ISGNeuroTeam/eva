@@ -1,16 +1,15 @@
 <!-- Модальное окно для выбора ИС -->
 
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="600"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    @cancelModal="cancel"
   >
-    <v-card
-      :style="{ background: theme.$main_bg }"
-      class="shedule-modal"
-    >
+    <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
       <div class="schedule-block">
         <div
           class="zagolovok"
@@ -23,6 +22,7 @@
         </div>
         <div class="tab-block">
           <v-tabs
+            v-model="schedulerTab"
             :color="theme.$primary_button"
             :background-color="theme.$main_bg"
           >
@@ -31,6 +31,7 @@
               Периодичность
             </v-tab>
             <v-tab-item
+              :value="0"
               :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
               <div class="every">
@@ -46,6 +47,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -92,6 +94,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -121,7 +124,7 @@
             <v-tab :style="{ color: theme.$main_text }">
               Планирование
             </v-tab>
-            <v-tab-item />
+            <v-tab-item :value="1" />
           </v-tabs>
         </div>
       </div>
@@ -155,18 +158,27 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalScheduler',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
     idDashFrom: null,
-    modalFrom: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     dataSidFrom: null,
   },
   data() {
     return {
+      schedulerTab: 'tab-1',
       every: 0,
       time: '',
       everyLast: 0,
@@ -190,6 +202,7 @@ export default {
         start: false,
         end: false,
       },
+      isChanged: false,
     };
   },
   computed: {
@@ -197,14 +210,13 @@ export default {
       // получаем название элемента от родителя
       return this.idDashFrom;
     },
-    active() {
-      // получаем статус открытия или нет окна модального
-      if (this.modalFrom) {
-        if (this.schedulers.length != 0) {
-          this.setData();
-        }
-      }
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     sid() {
       return this.dataSidFrom;
@@ -217,6 +229,19 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
+      // получаем статус открытия или нет окна модального
+      if (this.modalValue) {
+        if (this.schedulers?.length !== 0) {
+          this.setData()
+        }
+      } else {
+        this.schedulerTab = 0;
+        this.isChanged = false;
+      }
     },
   },
   mounted() {
@@ -287,32 +312,28 @@ export default {
     },
     cancel() {
       // закрываем окно
-      this.$emit('cancel');
-    },
-    checkEsc(event) {
-      if (event.code == 'Escape') {
-        this.cancel();
-      }
+      this.active = false;
     },
     setTime(time, tense) {
+      this.isChanged = true;
       // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
-        if (tense == 'every') {
+        if (tense === 'every') {
           this.time = time;
           Object.keys(this.color).forEach((item) => {
             this.color[item] = '$accent_ui_color';
           });
-          if (this.color[time] == '$accent_ui_color') {
+          if (this.color[time] === '$accent_ui_color') {
             this.color[time] = '$primary_button';
           } else {
             this.color[time] = '$accent_ui_color';
           }
-        } else if (tense == 'last') {
+        } else if (tense === 'last') {
           this.timeLast = time;
           Object.keys(this.colorLast).forEach((item) => {
             this.colorLast[item] = '$accent_ui_color';
           });
-          if (this.colorLast[time] == '$accent_ui_color') {
+          if (this.colorLast[time] === '$accent_ui_color') {
             this.colorLast[time] = '$primary_button';
           } else {
             this.colorLast[time] = '$accent_ui_color';

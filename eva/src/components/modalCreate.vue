@@ -1,11 +1,14 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="active"
     width="90%"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="cancelModal"
   >
     <div
       v-if="groupCheck"
@@ -36,7 +39,7 @@
             class="title-field input-create"
             :style="{ color: theme.$main_text }"
           >
-            Цвет группы ssssssss
+            Цвет группы
           </div>
           <div class="color-picker-wrapper">
             <div
@@ -58,7 +61,14 @@
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
+                  d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325
+                   4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802
+                   14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925
+                   13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264
+                   5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272
+                   5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925
+                   13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659
+                   9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
                   fill="white"
                 />
               </svg>
@@ -78,7 +88,16 @@
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
+                    d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325
+                     7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818
+                     1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801
+                     11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444
+                     13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278
+                     10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272
+                     5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303
+                     7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992
+                     7.72659L6.66659 9.44659L11.0599
+                     5.05325L11.9999 5.99992L6.66659 11.3333Z"
                     fill="white"
                   />
                 </svg>
@@ -95,7 +114,18 @@
                     v-on="on"
                   >
                     <path
-                      d="M4.41999 20.5789C4.13948 20.5784 3.87206 20.4601 3.68299 20.2529C3.49044 20.0474 3.39476 19.7694 3.41999 19.4889L3.66499 16.7949L14.983 5.48091L18.52 9.0169L7.20499 20.3299L4.51099 20.5749C4.47999 20.5779 4.44899 20.5789 4.41999 20.5789ZM19.226 8.30991L15.69 4.77391L17.811 2.65291C17.9986 2.46513 18.2531 2.35962 18.5185 2.35962C18.7839 2.35962 19.0384 2.46513 19.226 2.65291L21.347 4.77391C21.5348 4.96147 21.6403 5.216 21.6403 5.48141C21.6403 5.74681 21.5348 6.00134 21.347 6.18891L19.227 8.30891L19.226 8.30991Z"
+                      d="M4.41999 20.5789C4.13948 20.5784 3.87206
+                       20.4601 3.68299 20.2529C3.49044 20.0474
+                       3.39476 19.7694 3.41999 19.4889L3.66499
+                       16.7949L14.983 5.48091L18.52 9.0169L7.20499
+                       20.3299L4.51099 20.5749C4.47999 20.5779
+                       4.44899 20.5789 4.41999 20.5789ZM19.226
+                       8.30991L15.69 4.77391L17.811 2.65291C17.9986
+                       2.46513 18.2531 2.35962 18.5185 2.35962C18.7839
+                       2.35962 19.0384 2.46513 19.226 2.65291L21.347
+                       4.77391C21.5348 4.96147 21.6403 5.216 21.6403
+                       5.48141C21.6403 5.74681 21.5348 6.00134 21.347
+                       6.18891L19.227 8.30891L19.226 8.30991Z"
                       :fill="theme.$main_border"
                     />
                   </svg>
@@ -117,7 +147,7 @@
               :subessence="item"
               :color-from="theme"
               :create="actionFrom"
-              :active-from="modalFrom"
+              :active-from="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -184,7 +214,7 @@
               :data-from="dataRest"
               :create="actionFrom"
               :color-from="theme"
-              :active-from="modalFrom"
+              :active-from="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -217,13 +247,21 @@
         </div>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalCreate',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    modalFrom: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     groupFlagFrom: null,
     groupFrom: null,
     dashsFrom: null,
@@ -269,6 +307,7 @@ export default {
       },
       colorInputMode: 'preset',
       pickedColor: '',
+      isChanged: false,
     };
   },
   computed: {
@@ -292,9 +331,13 @@ export default {
         this.theme.$purple,
       ];
     },
-    active() {
-      this.setData();
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     groupCheck() {
       return this.groupFlagFrom;
@@ -307,18 +350,51 @@ export default {
     },
   },
   watch: {
-    pickedColor(color) {
-      if (this.colorInputMode === 'custom') this.setGroupColor(color);
+    // проверяем изменилось ли что-то в основных полях
+    'newDash.name': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
+        } else {
+          this.isChanged = val !== oldVal;
+        }
+      },
     },
-  },
-  mounted() {
-    this.create_warning = false; // выключаем все предупреждения что были включены
-    this.pickedColor = this.theme.$main_bg;
-  },
-  methods: {
-    setData() {
+    'newDash.id': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
+        } else {
+          this.isChanged = !!(val && oldVal);
+        }
+      },
+    },
+    'newGroup.name': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
+        } else {
+          this.isChanged = val !== oldVal;
+        }
+      },
+    },
+    'newGroup.color': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = !!(
+            val !== '#FFA9A4'
+            && oldVal
+            && val !== this.dataFrom?.color
+          );
+        } else {
+          this.isChanged = !!(val !== '#FFA9A4' && oldVal);
+        }
+      },
+    },
+    active() {
+      // тут понимаем нужно ли открыть окно с созданием или нет
       this.pickedColor = this.theme.$main_bg;
-      if (this.modalFrom) {
+      if (this.modalValue) {
         if (this.dataFrom) {
           this.newGroup.name = this.dataFrom.name;
           this.newGroup.color = this.dataFrom.color;
@@ -333,7 +409,7 @@ export default {
           this.newGroup.color = this.colors[0];
           this.colorInputMode = 'preset';
         }
-        if (this.dashFrom) {
+        if (this.dashFrom && this.actionFrom !== 'create') {
           this.newDash.name = this.dashFrom.name;
           this.newDash.id = this.dashFrom.id;
         } else {
@@ -355,8 +431,23 @@ export default {
           this.nameBtn.create = 'Редактировать';
         }
         this.dataRest = this.getDataForEssence();
+      } else {
+        this.$set(this.newGroup, 'name', '');
+        this.$set(this.newDash, 'name', '');
+        this.$set(this.newDash, 'id', '');
+        this.$set(this.newGroup, 'color', '');
+        this.isChanged = false;
       }
     },
+    pickedColor(color) {
+      if (this.colorInputMode === 'custom') this.setGroupColor(color);
+    },
+  },
+  mounted() {
+    this.create_warning = false; // выключаем все предупреждения что были включены
+    this.pickedColor = this.theme.$main_bg;
+  },
+  methods: {
     setGroupColor(color) {
       this.newGroup.color = color;
     },
@@ -371,7 +462,7 @@ export default {
     createBtn(name) {
       // при нажатии на кнопку создать
       let hasSimilarModel = false;
-      if (!name || name == '') {
+      if (!name || name === '') {
         //  если пользователь не ввел имя
         this.showwarning = true; //  показываем предупреждение
         setTimeout(() => {
@@ -389,13 +480,13 @@ export default {
             (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
           dataObj = { name: this.newGroup.name, color: this.newGroup.color };
-          if (Object.keys(this.changedData).length != 0) {
+          if (Object.keys(this.changedData).length !== 0) {
             const keys = this.changedData.group;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
             });
           }
-          if (this.curGroupFrom != -1) {
+          if (this.curGroupFrom !== -1) {
             dataObj.id = this.groupFrom[this.curGroupFrom].id;
           }
           essence = 'group';
@@ -407,12 +498,12 @@ export default {
           );
           dataObj = { name: this.newDash.name };
 
-          if (this.newDash.id != '') {
+          if (this.newDash.id !== '') {
             dataObj.id = this.newDash.id;
           }
           dataObj.idgroup = this.curGroupFrom;
 
-          if (Object.keys(this.changedData).length != 0) {
+          if (Object.keys(this.changedData).length !== 0) {
             const keys = this.changedData.dash;
             Object.keys(keys).forEach((item) => {
               dataObj[item] = keys[item];
@@ -444,8 +535,8 @@ export default {
     },
     cancelModal(btn) {
       // есл инажали на отмену создания
-      if (btn == 'Отмена') {
-        this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
+      if (btn === 'Отмена') {
+        this.active = false; // передаем в родителя чтобы выключили модалку
         this.name = ''; // очищаем имя
       }
       this.showwarning = false;
@@ -454,7 +545,7 @@ export default {
       this.nameWarn = 'Имя не может быть пустым';
     },
     checkEsc(event) {
-      if (event.code == 'Escape') {
+      if (event.code === 'Escape') {
         this.cancelModal('Отмена');
       }
     },
@@ -474,8 +565,8 @@ export default {
         method,
       });
       response.then((res) => {
-        if (res.status == 200) {
-          if (essence == 'dash') {
+        if (res.status === 200) {
+          if (essence === 'dash') {
             res.json().then((data) => {
               this.createDash({
                 id: data.id,
@@ -485,10 +576,10 @@ export default {
               });
             });
           }
-          this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
-        } else if (res.status == 409) {
+          this.active = false; // передаем в родителя чтобы выключили модалку
+        } else if (res.status === 409) {
           this.showwarning = true; //  показываем предупреждение
-          essence == 'group'
+          essence === 'group'
             ? (this.nameWarn = 'Такая группа уже есть.')
             : (this.nameWarn = 'Такой дашборд уже есть.');
           setTimeout(() => {
@@ -538,27 +629,17 @@ export default {
       );
     },
     setEnter(event) {
-      if (event.code == 'Enter') {
+      if (event.code === 'Enter') {
         this.createBtn();
       }
     },
-    // changeStyle: function() {
-    //   if (this.active) {
-    //     let dialog = document.querySelector('.v-dialog');
-    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
-    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     })
-    //     dialog.querySelectorAll('input').forEach( item => {
-    //       item.style.color = this.color.text;
-    //     })
-    //   }
-    // },
     changeData(event) {
+      this.$refs.confirmModal.focusOnModal();
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
+      this.isChanged = !event.data.includes(this.nameGroupFrom) || event.data.length > 1;
     },
   },
 };
