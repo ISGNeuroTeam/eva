@@ -54,7 +54,7 @@
       </div>
     </div>
     <SingleValueSettings
-      :is-open="isSettingsComponentOpen"
+      v-model="isSettingsComponentOpen"
       :received-settings="providedSettings"
       :update-count="updateCount"
       :default-settings="defaultSettings"
