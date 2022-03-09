@@ -629,7 +629,7 @@
                   () => {
                     colorsPie.nametheme =
                       colorsPie.theme === 'custom' ? '' : colorsPie.theme;
-                    colorsPie.colors = themes[colorsPie.theme].join(',');
+                    colorsPie.colors = themes[colorsPie.theme].join(' ');
                   }
                 "
               />
@@ -1402,7 +1402,7 @@ export default {
       const nextTheme = this.defaultThemes[0];
       this.colorsPie.theme = nextTheme;
       this.colorsPie.nametheme = nextTheme;
-      this.colorsPie.colors = this.themes[nextTheme].join(',');
+      this.colorsPie.colors = this.themes[nextTheme].join(' ');
       this.them = { ...this.them, [theme]: this.themes?.[theme] };
       delete this.themes[theme];
       this.isDelete = true;
