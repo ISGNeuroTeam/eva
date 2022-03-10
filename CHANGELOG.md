@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed gis settings styles
 - fixed calendar in data source
 - fixed creating/editing dashboards/groups
+- fixed guntt disappears data when navigating through tabs
+- fixed multiline tooltip display on fullscreen not working
 
 ## [1.84.0]
 
@@ -25,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiple tokens
 
 ### Fixed
+- Fixed persistent modal
 - fixed filters. name and content
 - fixed visible zoom button
 - fixed setting the title breaks the scrolling of the component
@@ -60,6 +63,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed button hints
 - fixed switching between filter types
 - fixed cell size in tile visualization
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes

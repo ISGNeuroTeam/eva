@@ -6,6 +6,7 @@
  * as well as its children, must not have 'fill' property.
  */
 
+// eslint-disable-next-line camelcase
 export const no_icon = {
   id: 'no_icon',
   svg: `
@@ -22,6 +23,7 @@ export const no_icon = {
 `,
 };
 
+// eslint-disable-next-line camelcase
 export const icon_1 = {
   id: 'icon_1',
   svg: `
@@ -31,6 +33,7 @@ export const icon_1 = {
 `,
 };
 
+// eslint-disable-next-line camelcase
 export const icon_2 = {
   id: 'icon_2',
   svg: `
@@ -40,6 +43,7 @@ export const icon_2 = {
 `,
 };
 
+// eslint-disable-next-line camelcase
 export const icon_3 = {
   id: 'icon_3',
   svg: `
@@ -53,6 +57,7 @@ export const icon_3 = {
 `,
 };
 
+// eslint-disable-next-line camelcase
 export const icon_4 = {
   id: 'icon_4',
   svg: `
@@ -62,6 +67,7 @@ export const icon_4 = {
 `,
 };
 
+// eslint-disable-next-line camelcase
 export const icon_5 = {
   id: 'icon_5',
   svg: `
@@ -82,6 +88,7 @@ export const icon_5 = {
 `,
 };
 
+// eslint-disable-next-line camelcase
 export const icon_6 = {
   id: 'icon_6',
   svg: `
@@ -94,4 +101,5 @@ export const icon_6 = {
 };
 
 /** Export of all icons as an array. */
+// eslint-disable-next-line camelcase
 export default [no_icon, icon_1, icon_2, icon_3, icon_4, icon_5, icon_6];

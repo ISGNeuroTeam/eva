@@ -39,7 +39,7 @@
                   :style="{
                     background: theme.$main_bg,
                     color: theme.$main_text,
-                    borderColors: theme.$main_border,
+                    borderColors: theme.$main_border
                   }"
                 >
                   <v-card-title class="dash-group-title">
@@ -75,7 +75,7 @@
                             class="delete control-group"
                             :color="theme.$primary_button"
                             v-on="on"
-                            @click="deleteGroup(group.id, i - 1)"
+                            @click="deleteGroup(group.id, i)"
                           >
                             {{ trash }}
                           </v-icon>
@@ -244,16 +244,14 @@
     </v-main>
     <footer-bottom />
     <modal-exim
-      :active="modalExim"
+      v-model="modalExim"
       :cur-name="curName"
       :dashboards="allDashs"
       :groups="allGroups"
       :element="element"
-      @closeModal="closeModal"
     />
     <modal-create
-      v-if="modalCreate"
-      :modal-from="modalCreate"
+      v-model="modalCreate"
       :action-from="actionBtn"
       :group-from="allGroups"
       :name-group-from="cookieName"
@@ -263,13 +261,12 @@
       :dash-from="dashFrom"
       :cur-group-from="curGroup"
       :group-flag-from="createGroupFlag"
-      @closeModal="closeModal"
+      @createGroup="createGroup($event)"
     />
     <modal-delete-main
-      :modal-from="modalDelete"
+      v-model="modalDelete"
       :name-from="nameDelete"
       @deleteElem="deleteElem"
-      @closeModal="modalDelete = false"
     />
   </v-app>
 </template>
@@ -323,10 +320,13 @@ export default {
   watch: {
     modalCreate(val) {
       if (!val) {
-        this.isEdit = false;
-        this.dashFrom = null;
-        this.groupFrom = null;
-        // this.getDashs(this.curGroup);
+        this.modalExim = false;
+        this.curGroup = -1;
+        if (this.tab === 'tab-1') {
+          this.getGroups();
+        } else {
+          this.getDashs(this.cookieId);
+        }
       }
     },
   },
@@ -367,6 +367,7 @@ export default {
       this.curDash = dashId;
     },
     createDashboard() {
+      this.isEdit = false;
       this.modalCreate = true;
       this.createGroupFlag = false;
       this.actionBtn = 'create';
@@ -382,14 +383,12 @@ export default {
       this.updateModalCreateFrom(dashIndex);
     },
     getGroups() {
-      const response = this.$store.getters.getGroups();
-      response.then((res) => {
+      this.$store.dispatch('getGroups').then((res) => {
         this.allGroups = res;
       });
     },
     getDashs(id) {
-      const response = this.$store.getters.getDashs(id);
-      response.then((res) => {
+      this.$store.dispatch('getDashs', id).then((res) => {
         this.allDashs = res;
       });
     },
@@ -440,7 +439,7 @@ export default {
         data = this.allDashs;
         id = this.curDash;
       }
-      response = this.$store.getters['auth/deleteEssence']({
+      response = this.$store.dispatch('auth/deleteEssence', {
         essence: this.elemDelete,
         id,
       });

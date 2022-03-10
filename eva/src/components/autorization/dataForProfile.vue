@@ -415,6 +415,7 @@ export default {
           };
         }
       } else {
+        console.log(data, essence);
         this.alldata[essence][subessence] = {
           selected: [],
           nodata: this.noneText[subessence],
