@@ -92,6 +92,7 @@
             :id-dash-from="idDash"
           />
           <modal-settings
+            v-if="activeSettingModal"
             :color-from="theme"
             :id-dash-from="idDash"
           />
@@ -164,7 +165,7 @@
               height="13"
               viewBox="0 0 8 8"
               xmlns="http://www.w3.org/2000/svg"
-              @click.stop="deleteTab(tab.id)"
+              @click.stop="confirmDeleteTab(tab.id)"
             >
               <path
                 d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
@@ -231,6 +232,14 @@
         </svg>
       </div>
     </div>
+    <modal-confirm
+      v-model="isConfirmModal"
+      :theme="theme"
+      :modal-text="`Уверенны, что хотите удалить вкладку - <strong>${deleteTabId}</strong> ?`"
+      btn-confirm-text="Удалить"
+      btn-cancel-text="Отмена"
+      @result="deleteTab"
+    />
   </v-app>
 </template>
 
@@ -264,9 +273,22 @@ export default {
       leftDots: true,
       rightDots: true,
       zoomedSearch: [],
+      isConfirmModal: false,
+      deleteTabId: '',
     };
   },
   computed: {
+    activeSettingModal: {
+      get() {
+        return this.$store.getters.getModalSettings(this.idDash).status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
     idDash() {
       // получаем id страницы от родителя
       return this.$route.params.id;
@@ -380,6 +402,11 @@ export default {
         });
       },
     },
+    isConfirmModal(val) {
+      if (!val) {
+        this.deleteTabId = '';
+      }
+    },
   },
   async mounted() {
     await this.checkAlreadyDash();
@@ -461,11 +488,17 @@ export default {
       }
       this.checkTabOverflow();
     },
-    deleteTab(tabID) {
-      if (this.tabsMoreOne && !this.tabEditMode) {
-        this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID });
+    confirmDeleteTab(tabId) {
+      this.isConfirmModal = true;
+      this.deleteTabId = tabId;
+    },
+    deleteTab(isConfirm) {
+      if (isConfirm) {
+        if (this.tabsMoreOne && !this.tabEditMode) {
+          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.deleteTabId });
+        }
+        this.checkTabOverflow();
       }
-      this.checkTabOverflow();
     },
     enterEditMode(tab) {
       if (!this.tabEditMode && !this.editableTabID) {

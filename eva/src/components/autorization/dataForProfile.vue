@@ -153,8 +153,12 @@ export default {
       required: true,
     },
     dataFrom: {
-      type: Object,
+      type: [Object, Promise],
       required: true,
+    },
+    nameGroupFrom: {
+      type: String,
+      default: '',
     },
   },
   data() {

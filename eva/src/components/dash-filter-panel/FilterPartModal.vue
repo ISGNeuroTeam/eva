@@ -18,6 +18,7 @@
       <v-item-group
         v-model="currentTab"
         mandatory
+        @change="$emit('changeTab')"
       >
         <v-item
           v-for="(item, index) in typeMap"
@@ -52,10 +53,12 @@
         :id-dash="idDash"
         :temp="temp"
         :edit-mode="editMode"
+        @isChanged="$emit('isChanged', $event)"
       />
       <v-switch
         v-model="temp.invertMatches"
         :color="theme.$primary_button"
+        @change="$emit('isChanged', true)"
       >
         <h5
           slot="label"

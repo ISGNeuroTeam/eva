@@ -1,16 +1,13 @@
 <!-- Модальное окно для создания ИС -->
 
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="680"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    @cancelModal="cancelModal"
   >
-    <v-card
-      class="reports-card"
-      :style="{ background: theme.$main_bg }"
-    >
+    <v-card class="reports-card" :style="{ background: theme.$main_bg }">
       <div class="textarea-block">
         <div class="times-block">
           <div class="time-block">
@@ -162,16 +159,24 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
+  name: 'ModalReports',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
     searchFrom: null,
-    modalFrom: null,
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -195,18 +200,25 @@ export default {
     };
   },
   computed: {
-    active() {
-      // тут понимаем нужно ли открыть окно с созданием или нет
-      if (this.modalFrom) {
-        this.setSearchData(this.searchFrom);
-      }
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
+    active() {
+      // тут понимаем нужно ли открыть окно с созданием или нет
+      if (this.modalFrom) {
+        this.setSearchData(this.searchFrom)
+      }
+    },
     tws(tws) {
       this.search.parametrs.tws = tws;
     },
@@ -216,22 +228,23 @@ export default {
   },
   methods: {
     cancelModal() {
-      this.$emit('cancelModal');
-    },
-    checkEsc(event) {
-      if (event.code == 'Escape') {
-        this.cancelModal();
-      }
+      this.active = false;
     },
     setSearch() {
-      if (Number(this.search.parametrs.tws) || this.search.parametrs.tws == 0) {
+      if (
+        Number(this.search.parametrs.tws) ||
+        this.search.parametrs.tws === 0
+      ) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.tws = parseInt(
           new Date(this.search.parametrs.tws).getTime() / 1000,
         );
       }
-      if (Number(this.search.parametrs.twf) || this.search.parametrs.twf == 0) {
+      if (
+        Number(this.search.parametrs.twf) ||
+        this.search.parametrs.twf === 0
+      ) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.twf = parseInt(

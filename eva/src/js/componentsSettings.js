@@ -625,7 +625,7 @@ export default {
       ],
     },
   ],
-  reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
+  reporstElements: ['table', 'multiLine', 'piechart', 'graph', 'guntt', 'tile', 'csvg', 'ygraph', 'bush', 'map', 'heatmap', 'singleValue', 'tune'],
   reports: {
     table: {
       tooltip: 'Таблица',
@@ -677,7 +677,7 @@ export default {
     },
     tune: {
       tooltip: 'Ползунок',
-      icon: mdiNumeric,
+      icon: mdiTuneVertical,
     },
   },
 };

@@ -1,9 +1,12 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="persistentModal"
     v-model="active"
+    :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
     width="90%"
-    persistent
-    @keydown="checkEsc($event)"
+    @cancelModal="cancelModal"
   >
     <v-card
       class="log-block"
@@ -56,15 +59,20 @@
         </div>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalLog',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    modalActive: {
+    modalValue: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -75,23 +83,33 @@ export default {
       msgError: '',
       colorError: '',
       opacityError: 0,
+      isChanged: false,
     };
   },
   computed: {
-    active() {
-      if (this.modalActive) {
-        this.getLog();
-      }
-      return this.modalActive;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     theme() {
       return this.$store.getters.getTheme;
     },
   },
+  watch: {
+    active() {
+      if (this.modalValue) {
+        this.getLog();
+      }
+    },
+  },
   methods: {
     cancelModal() {
-      this.$emit('cancelModal');
-      this.clear = 'Очистить';
+      this.clearLog('Восстановить');
+      this.active = false;
     },
     async getLog() {
       // получаем все логи для фронта
@@ -110,7 +128,7 @@ export default {
         this.text = front;
       }
     },
-    containLog(text, biLength, border) {
+    async containLog(text, biLength, border) {
       let localText = text;
       let localBitLength = biLength;
       // функция которая сократит логи до предела
@@ -135,6 +153,8 @@ export default {
       return localText; // получили строку не превышающию 5 мегабайт
     },
     async sendToBack() {
+      this.isChanged = false;
+      this.$refs.persistentModal.focusOnModal();
       const hide = () => {
         this.opacityError = 1;
         setTimeout(() => {
@@ -156,20 +176,18 @@ export default {
         hide();
       }
     },
-    checkEsc(event) {
-      if (event.code === 'Escape') {
-        this.cancelModal();
-      }
-    },
     async clearLog(clear) {
       if (clear === 'Очистить') {
         const response = await this.$store.getters['auth/deleteLog']();
+        this.isChanged = true;
+        this.$refs.persistentModal.focusOnModal();
         if (response === 'clear') {
           this.restore = this.text;
           this.text = '';
           this.clear = 'Восстановить';
         }
       } else {
+        this.isChanged = false;
         this.text = this.restore;
         this.clear = 'Очистить';
         this.$store.getters['auth/putLog'](this.text);
