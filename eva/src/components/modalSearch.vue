@@ -1,12 +1,16 @@
 <!-- Модальное окно для выбора ИД -->
 
 <template>
-  <v-dialog
+  <modal-persistent
     v-model="active"
     width="500"
-    persistent
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    :theme="theme"
+    @cancelModal="cancelModal"
   >
     <v-card
+      v-if="active"
       :style="{
         background: theme.$main_bg,
         boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
@@ -62,17 +66,19 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalSearch',
   props: {
     idDashFrom: null,
   },
   data() {
     return {
       currentId: 0,
+      isChanged: false,
     };
   },
   computed: {
@@ -80,24 +86,37 @@ export default {
       // получаем название элемнета от родителя
       return this.idDashFrom;
     },
-    active() {
-      // получаем статус открытия или нет окна модального
-      let active = 'false';
-      if (this.idDash) {
-        active = this.$store.getters.getModalSearch(this.idDash);
-      }
-      return active;
+    active: {
+      get() {
+        if (this.idDash) {
+          return this.$store.getters.getModalSearch(this.idDash);
+        }
+        return false;
+      },
+      set(value) {
+        this.$store.commit('setModalSearch', {
+          id: this.idDash,
+          status: value,
+        });
+      },
     },
     searches() {
       // получаем все ИС на странице
-      let searches = [];
-      if (this.idDash) {
-        searches = this.$store.getters.getSearches(this.idDash);
-      }
-      return searches;
+      return this.idDash
+        ? this.$store.getters.getSearches(this.idDash)
+        : [];
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
+      this.isChanged = false;
+      this.currentId = 0;
+    },
+    currentId() {
+      this.isChanged = true;
     },
   },
   created() {
@@ -106,7 +125,7 @@ export default {
   methods: {
     startDS() {
       //  если нажали на кнопку согласия
-      if (this.currentId != 0) {
+      if (this.currentId !== 0) {
         // проверяем выбран ли хоть один ИС
         this.$store.commit('setDataSource', {
           id: this.idDash,

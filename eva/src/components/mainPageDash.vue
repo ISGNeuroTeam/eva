@@ -286,15 +286,14 @@
     </v-main>
     <footer-bottom />
     <modal-exim
-      :active="modalExim"
+      v-model="modalExim"
       :cur-name="curName"
       :dashboards="allDashs"
       :groups="allGroups"
       :element="element"
-      @closeModal="closeModal"
     />
     <modal-create
-      :modal-from="modalCreateGroup"
+      v-model="modalCreateGroup"
       :action-from="actionBtn"
       :group-from="allGroups"
       :name-group-from="cookieName"
@@ -304,13 +303,11 @@
       :cur-group-from="curGroup"
       :group-flag-from="createGroupFlag"
       @createGroup="createGroup($event)"
-      @closeModal="closeModal"
     />
     <modal-delete-main
-      :modal-from="modalDelete"
+      v-model="modalDelete"
       :name-from="nameDelete"
       @deleteElem="deleteElem"
-      @closeModal="modalDelete = false"
     />
   </v-app>
 </template>
@@ -324,6 +321,7 @@ import {
 } from '@mdi/js';
 
 export default {
+  name: 'MainPageDash',
   data() {
     return {
       tab: 'tab-1',
@@ -358,6 +356,19 @@ export default {
     // },
     theme() {
       return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    modalCreateGroup(val) {
+      if (!val) {
+        this.modalExim = false;
+        this.curGroup = null;
+        if (this.tab === 'tab-1') {
+          this.getGroups();
+        } else {
+          this.getDashs(this.cookieId);
+        }
+      }
     },
   },
   mounted() {

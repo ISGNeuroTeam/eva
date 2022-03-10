@@ -417,7 +417,7 @@
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
-          @click="chooseDS()"
+          @click="chooseDS(idDash)"
         >
           Выберите источник данных
         </button>
@@ -769,10 +769,10 @@ export default {
         idDash: this.idDash,
       });
     },
-    chooseDS() {
+    chooseDS(idDash) {
       // открываем модальное окно с выбором ИС (источник данных)
       this.$store.commit('setModalSearch', {
-        id: this.idDash,
+        id: idDash,
         status: true,
         elem: this.element,
       });
