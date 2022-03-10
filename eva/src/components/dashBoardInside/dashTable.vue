@@ -66,10 +66,10 @@
             <v-row v-else-if="value === 'none'">
               <v-col cols="12">
                 <v-select
-                    label="Значение"
-                    :items="compareForBoolean"
-                    @change="
-                  onChangeForBoolean(title, $event)
+                  label="Значение"
+                  :items="compareForBoolean"
+                  @change="
+                    onChangeForBoolean(title, $event)
                   "
                 />
               </v-col>
@@ -188,10 +188,18 @@ export default {
   },
   computed: {
     eventedTableData() {
-      const items = [...this.filteredTableData].map((item, index) => ({
-        ...item,
-        rowIndex: index,
-      }));
+      const items = [...this.filteredTableData].map((item, index) => {
+        const obj = {};
+        for (const key of this.props.titles) {
+          obj[key.value] = item[key.value];
+        }
+
+        return {
+          ...obj,
+          rowIndex: index,
+        };
+      });
+
       this.eventRows.forEach((event) => {
         if (event.prop[0] === 'rowcolor') {
           items.forEach((item) => {
@@ -225,15 +233,13 @@ export default {
       return items;
     },
     filteredTableData() {
-      let chooseSort = function (dataFormat, sortType, value) {
-        if (dataFormat ==="none") {
-          if (typeof value ==='boolean'){
-            return  (el) => {
-                return el === value;
-            };
+      const chooseSort = function (dataFormat, sortType, value) {
+        if (dataFormat === 'none') {
+          if (typeof value === 'boolean') {
+            return (el) => el === value;
           }
-         return () => true;
-        }else if (dataFormat === 'date') {
+          return () => true;
+        } if (dataFormat === 'date') {
           let sort;
           const parseDate = function (val) {
             const parts = val.split('.');
@@ -367,7 +373,7 @@ export default {
     this.setEventColor();
   },
   methods: {
-    onChangeForBoolean(title, event){
+    onChangeForBoolean(title, event) {
       this.setFilterData(title, '=', 'compare');
       this.setFilterData(title, event);
     },
@@ -448,7 +454,10 @@ export default {
         data.length <= 100
           ? (this.props.hideFooter = true)
           : (this.props.hideFooter = false);
-        this.createTitles(data);
+        if (data.length > 1) {
+          const titles = Object.keys(data[0]);
+          this.createTitles(titles);
+        }
         this.createTockens(data);
         if (this.props.justCreate) {
           this.selectRow();
@@ -472,7 +481,7 @@ export default {
               : ' d-none',
         }));
       } else if (result && result.length) {
-        this.props.titles = Object.keys(result[0]).map((item) => {
+        this.props.titles = result.map((item) => {
           if (!this.excludeColumns.includes(item)) {
             return { text: item, value: item, sortable: true };
           }
