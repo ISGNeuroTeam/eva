@@ -995,7 +995,7 @@ export default {
             (this.height - 20) / 3 + 20,
             20,
           ];
-          debugger;
+
           const yScal = d3.scaleOrdinal().domain(yDomainArr).range(yRangeArr);
 
           const subgroups = [...this.metricNames];
@@ -1135,7 +1135,7 @@ export default {
                   this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
                 )
                 .bandwidth();
-              barWidth -= 1;
+              barWidth -= 8;
             }
 
             let dividedBarplotPos = 0;
