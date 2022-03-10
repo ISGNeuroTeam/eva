@@ -196,7 +196,7 @@ export default {
         data = Object.keys(this.dataReady);
         if (Object.keys(this.dataReady).length !== 0) {
           if (!this.dataReady.error) {
-            data = Object.keys(this.dataReady[0]).filter((item) => this.dataReady.map((x) => x[item]).every((x) => !!x));
+            data = Object.keys(this.dataReady[0]).filter((item) => !this.dataReady.map((x) => x[item]).every((x) => x === null));
           }
         }
       }
