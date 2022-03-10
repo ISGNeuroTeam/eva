@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed calendar in data source
 - fixed guntt disappears data when navigating through tabs
 - fixed multiline tooltip display on fullscreen not working
+- fixed an empty data source will load indefinitely
 
 ## [1.84.0]
 
