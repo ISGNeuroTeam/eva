@@ -135,9 +135,7 @@ export default {
     active: {
       get() {
         if (this.idDash) {
-          return this.$store.getters.getModalDelete({
-            id: this.idDash,
-          }).active;
+          return this.getModalDelete.active;
         }
         return false;
       },

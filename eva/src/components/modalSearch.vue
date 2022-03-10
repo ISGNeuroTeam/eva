@@ -99,7 +99,7 @@ export default {
     active: {
       get() {
         if (this.idDash) {
-          return this.$store.getters.getModalSearch(this.idDash);
+          return this.getModalSearch;
         }
         return false;
       },

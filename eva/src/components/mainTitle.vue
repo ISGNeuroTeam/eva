@@ -295,9 +295,37 @@ export default {
     modalText() {
       return `Уверенны, что хотите удалить вкладку - <strong>${this.deleteTabId}</strong> ?`;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    // получаем объект с настройками моадлки натсроек
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
     activeSettingModal: {
       get() {
-        return this.$store.getters.getModalSettings(this.idDash).status;
+        return this.getModalSettings.status;
       },
       set(value) {
         this.$store.dispatch('closeModalSettings', {
