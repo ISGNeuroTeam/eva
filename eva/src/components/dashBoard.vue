@@ -612,14 +612,6 @@ export default {
     dataMode() {
       this.changeOptions(this.dataModeFrom);
       if (!this.dataModeFrom) {
-        if (
-          this.element.split('-')[0] === 'button'
-          || this.element.split('-')[0] === 'csvg'
-          || this.element.split('-')[0] === 'tile'
-        ) {
-          this.setPropDisappear(false);
-        }
-      } else {
         this.setPropDisappear(true);
       }
       return this.dataModeFrom;
