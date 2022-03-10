@@ -7,7 +7,10 @@
     :theme="theme"
     @cancelModal="cancelModal"
   >
-    <div ref="paperBlock" class="paper-modal-block">
+    <div
+      ref="paperBlock"
+      class="paper-modal-block"
+    >
       <v-card :style="{ background: theme.$main_bg }">
         <v-card-text class="headline">
           <div
@@ -84,12 +87,18 @@ export default {
     event: 'updateModalValue',
   },
   props: {
+    sid: {
+      type: String,
+      required: true,
+    },
+    idDash: {
+      type: String,
+      required: true,
+    },
     modalValue: {
       type: Boolean,
       default: false,
     },
-    sid: null,
-    idDash: null,
   },
   data() {
     return {
@@ -153,13 +162,12 @@ export default {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('data', JSON.stringify(this.data));
-      const result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.dispatch('getPaper', formData);
       try {
         if (result.status === 'success') {
           this.downloadFile(result.file);
           this.isChanged = false;
           this.loadingShow = false;
-          // this.showError = false;
         } else {
           this.errorMsg = 'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
@@ -171,7 +179,7 @@ export default {
       }
     },
     async getAllPapers() {
-      const result = await this.$store.getters.getAllPaper();
+      const result = await this.$store.dispatch('getAllPaper');
       try {
         if (JSON.parse(result).status === 'success') {
           this.allFiles = JSON.parse(result).files;
@@ -202,17 +210,19 @@ export default {
       }
     },
     getData() {
+      // создаем blob объект чтобы с его помощью использовать функцию для web worker
       const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
-      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
+      });
 
-      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob);
 
-      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL);
 
+      // при успешном выполнении функции что передали в blob изначально сработает этот код
       worker.onmessage = function (event) {
-        // при успешном выполнении функции что передали в blob изначально сработает этот код
-
         if (event.data.length !== 0) {
           this.data = event.data;
         } else {
@@ -226,22 +236,21 @@ export default {
       worker.postMessage(`${this.idDash}-${this.sid}`); // запускаем воркер на выполнение
     },
     getDataFromDb() {
-      return function (event) {
+      return (event) => {
         let db = null;
 
         const searchSid = event.data;
 
         const request = indexedDB.open('EVA', 1);
 
-        request.onerror = function (event) {
-          console.log('error: ', event);
+        request.onerror = (error) => {
+          console.log('error: ', error);
         };
 
-        request.onupgradeneeded = (event) => {
+        request.onupgradeneeded = (onUpgradeNeededEvent) => {
           console.log('create');
-          db = event.target.result;
+          db = onUpgradeNeededEvent.target.result;
           if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
             db.createObjectStore('searches'); // create it
           }
 
@@ -259,18 +268,21 @@ export default {
           // получить хранилище объектов для работы с ним
           const searches = transaction.objectStore('searches'); // (2)
 
-          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid));
 
+          // (4)
           query.onsuccess = () => {
-            // (4)
             if (query.result) {
-              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage(query.result);
             } else {
-              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage([]);
             }
           };
 
-          query.onerror = function () {
+          query.onerror = () => {
             console.log('Ошибка', query.error);
           };
         };

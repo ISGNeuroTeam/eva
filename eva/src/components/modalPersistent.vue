@@ -7,11 +7,19 @@
     @click:outside="closeOnOutside"
     @input="$emit('updateModalValue', $event)"
   >
-    <div ref="modalWithConfirm" tabindex="99999" class="modal-persistent">
+    <div
+      ref="modalWithConfirm"
+      tabindex="99999"
+      class="modal-persistent"
+    >
       <slot name="activator" />
       <slot />
       <template v-if="isConfirm">
-        <modal-confirm v-model="confirmModal" :theme="theme" @result="result" />
+        <modal-confirm
+          v-model="confirmModal"
+          :theme="theme"
+          @result="result"
+        />
       </template>
     </div>
   </v-dialog>
@@ -19,7 +27,7 @@
 
 <script>
 export default {
-  name: 'modalPersistent',
+  name: 'ModalPersistent',
   inheritAttrs: false,
   model: {
     prop: 'modalValue',
