@@ -14,6 +14,7 @@
       dense
       :background-color="theme.$main_bg"
       style="padding-bottom: 10px"
+      @input="$emit('isChanged', true)"
     />
     Тип
     <v-select
@@ -26,6 +27,7 @@
       hide-details
       outlined
       dense
+      @input="$emit('isChanged', true)"
       @change="changeSelected"
     />
 
@@ -45,6 +47,7 @@
         hide-details
         outlined
         dense
+        @input="$emit('isChanged', true)"
       >
         <v-btn
           slot="append"
@@ -60,6 +63,7 @@
       <v-dialog
         v-model="showDatePicker"
         max-width="400"
+        @input="$emit('isChanged', true)"
       >
         <DTPicker
           v-model="temp.value"
@@ -68,6 +72,7 @@
           class="dtpicker"
           :color="theme.$accent_ui_color"
           :button-color="theme.$primary_button"
+          @input="$emit('isChanged', true)"
         />
       </v-dialog>
     </div>
@@ -82,11 +87,13 @@
         hide-details
         outlined
         dense
+        @input="$emit('isChanged', true)"
       />
     </div>
     <v-slide-group
       v-model="currentOperationTab"
       mandatory
+      @change="$emit('isChanged', true)"
     >
       <div
         style="width: 100%"

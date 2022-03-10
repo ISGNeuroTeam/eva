@@ -4,8 +4,8 @@
   <v-dialog
     v-model="active"
     width="550"
-    persistent
-    @keydown="checkEsc($event)"
+    @click:outside="cancelModal"
+    @keydown.esc="cancelModal"
   >
     <div class="delete-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -47,14 +47,19 @@
 
 <script>
 export default {
+  name: 'ModalDeleteFromMain',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    modalFrom: {
-      type: Boolean,
-      required: true,
-    },
     nameFrom: {
       type: String,
       required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -64,9 +69,13 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-    // тут понимаем нужно ли открыть окно с созданием или нет
-    active() {
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     name() {
       return this.nameFrom;
@@ -78,12 +87,7 @@ export default {
     },
     cancelModal() {
       // есл инажали на отмену создания
-      this.$emit('closeModal'); // передаем в родителя чтобы выключили модалку
-    },
-    checkEsc(event) {
-      if (event.code === 'Escape') {
-        this.cancelModal();
-      }
+      this.active = false; // передаем в родителя чтобы выключили модалку
     },
   },
 };

@@ -846,27 +846,24 @@
         </div>
       </div>
       <modal-create-search
+        v-model="activeModal"
         :id-dash-from="idDash"
-        :modal-from="activeModal"
         :create-btn-from="createSearchBtn"
         :data-search-from="newSearch"
         @cancelModal="cancelModal"
       />
       <modal-themes
-        :show="paleteShow"
+        v-model="paleteShow"
         :admin="isAdmin"
-        @closeModal="paleteShow = false"
       />
       <modal-schedule
+        v-model="activeSchedule"
         :id-dash-from="idDash"
         :color-from="theme"
-        :modal-from="activeSchedule"
         :data-sid-from="scheduleSid"
-        @cancel="activeSchedule = false"
       />
       <modal-log
-        :modal-active="modalActive"
-        @cancelModal="modalActive = false"
+        v-model="modalActive"
       />
       <dash-settings
         :gear-from="gearShow"
@@ -875,10 +872,9 @@
         @changeMode="setEditMode"
       />
       <modal-paper
-        :active="modalPaper"
+        v-model="modalPaper"
         :sid="modalPaperSid"
         :id-dash="idDash"
-        @cancelModal="cancelModal"
       />
     </div>
 

@@ -1,8 +1,11 @@
 <template>
-  <v-dialog
+  <modal-persistent
     v-model="active"
     width="500"
-    persistent
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    :theme="theme"
+    @cancelModal="cancelModal"
   >
     <div
       ref="paperBlock"
@@ -27,6 +30,7 @@
             hide-details
             class="file-get-itself"
             label="Выбрать отчет"
+            @input="isChanged = true"
           />
           <div class="error-block">
             <div
@@ -70,18 +74,19 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiSettings } from '@mdi/js';
 
 export default {
+  name: 'ModalPaper',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    active: {
-      type: Boolean,
-      required: true,
-    },
     sid: {
       type: String,
       required: true,
@@ -89,6 +94,10 @@ export default {
     idDash: {
       type: String,
       required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -100,9 +109,18 @@ export default {
       errorMsg: 'Ошибка',
       gear: mdiSettings,
       loadingShow: false,
+      isChanged: false,
     };
   },
   computed: {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -112,6 +130,8 @@ export default {
       if (this.active) {
         this.getAllPapers();
         this.getData();
+      } else {
+        this.isChanged = false;
       }
     },
   },
@@ -119,7 +139,7 @@ export default {
     cancelModal() {
       this.selectedFile = '';
       this.data = [];
-      this.$emit('cancelModal');
+      this.active = false;
     },
     async startPaper() {
       if (this.selectedFile === '') {
@@ -146,8 +166,8 @@ export default {
       try {
         if (result.status === 'success') {
           this.downloadFile(result.file);
+          this.isChanged = false;
           this.loadingShow = false;
-          // this.showError = false;
         } else {
           this.errorMsg = 'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;

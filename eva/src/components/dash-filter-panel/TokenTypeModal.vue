@@ -17,6 +17,7 @@
       outlined
       dense
       @change="changeToken"
+      @input="$emit('isChanged', true)"
     />
     Операция
     <v-select
@@ -27,6 +28,7 @@
       hide-details
       outlined
       dense
+      @input="$emit('isChanged', true)"
     />
   </div>
 </template>

@@ -1,11 +1,13 @@
 <!-- Модальное окно для выбора ИС -->
 
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="600"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    @cancelModal="cancel"
   >
     <v-card
       :style="{ background: theme.$main_bg }"
@@ -23,6 +25,7 @@
         </div>
         <div class="tab-block">
           <v-tabs
+            v-model="schedulerTab"
             :color="theme.$primary_button"
             :background-color="theme.$main_bg"
           >
@@ -31,6 +34,7 @@
               Периодичность
             </v-tab>
             <v-tab-item
+              :value="0"
               :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
               <div class="every">
@@ -46,6 +50,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -92,6 +97,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -121,7 +127,7 @@
             <v-tab :style="{ color: theme.$main_text }">
               Планирование
             </v-tab>
-            <v-tab-item />
+            <v-tab-item :value="1" />
           </v-tabs>
         </div>
       </div>
@@ -155,11 +161,16 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalScheduler',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
     idDashFrom: {
       type: String,
@@ -173,10 +184,14 @@ export default {
       type: [String, Number],
       required: true,
     },
-
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      schedulerTab: 'tab-1',
       every: 0,
       time: '',
       everyLast: 0,
@@ -200,6 +215,7 @@ export default {
         start: false,
         end: false,
       },
+      isChanged: false,
     };
   },
   computed: {
@@ -207,12 +223,13 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
-    // получаем статус открытия или нет окна модального
-    active() {
-      if (this.modalFrom && this.schedulers.length !== 0) {
-        this.setData();
-      }
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     sid() {
       return this.dataSidFrom;
@@ -241,6 +258,19 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
+      // получаем статус открытия или нет окна модального
+      if (this.modalValue) {
+        if (this.schedulers?.length !== 0) {
+          this.setData();
+        }
+      } else {
+        this.schedulerTab = 0;
+        this.isChanged = false;
+      }
     },
   },
   mounted() {
@@ -310,17 +340,13 @@ export default {
         this.msg = 'Не запущен';
       }
     },
-    // закрываем окно
     cancel() {
-      this.$emit('cancel');
-    },
-    checkEsc(event) {
-      if (event.code === 'Escape') {
-        this.cancel();
-      }
+      // закрываем окно
+      this.active = false;
     },
     // выставляем время и меняем цвета у кнопок
     setTime(time, tense) {
+      this.isChanged = true;
       if (!this.disabledEvery) {
         if (tense === 'every') {
           this.time = time;

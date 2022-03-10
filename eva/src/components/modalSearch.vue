@@ -1,12 +1,16 @@
 <!-- Модальное окно для выбора ИД -->
 
 <template>
-  <v-dialog
+  <modal-persistent
     v-model="active"
     width="500"
-    persistent
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    :theme="theme"
+    @cancelModal="cancelModal"
   >
     <v-card
+      v-if="active"
       :style="{
         background: theme.$main_bg,
         boxShadow: `0 3px 1px -2px ${theme.$main_border},
@@ -63,11 +67,12 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalSearch',
   props: {
     idDashFrom: {
       type: String,
@@ -77,6 +82,7 @@ export default {
   data() {
     return {
       currentId: 0,
+      isChanged: false,
     };
   },
   computed: {
@@ -90,13 +96,19 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
-    // получаем статус открытия или нет окна модального
-    active() {
-      let active = 'false';
-      if (this.idDash) {
-        active = this.getModalSearch;
-      }
-      return active;
+    active: {
+      get() {
+        if (this.idDash) {
+          return this.$store.getters.getModalSearch(this.idDash);
+        }
+        return false;
+      },
+      set(value) {
+        this.$store.commit('setModalSearch', {
+          id: this.idDash,
+          status: value,
+        });
+      },
     },
     // получаем все ИС на странице
     searches() {
@@ -108,6 +120,15 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+  },
+  watch: {
+    active() {
+      this.isChanged = false;
+      this.currentId = 0;
+    },
+    currentId() {
+      this.isChanged = true;
     },
   },
   // при создании окна на странице выключаем все открытые ранее окна

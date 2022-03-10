@@ -2,7 +2,8 @@
   <v-dialog
     v-model="active"
     width="500"
-    persistent
+    @click:outside="closeModal"
+    @keydown.esc="closeModal"
   >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -93,11 +94,12 @@
 import { mdiFileOutline, mdiFormatListBulleted } from '@mdi/js';
 
 export default {
+  name: 'ModalExim',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    active: {
-      type: Boolean,
-      required: true,
-    },
     dashboards: {
       type: Array,
       default: () => ([]),
@@ -113,6 +115,10 @@ export default {
     curName: {
       type: String,
       required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -142,6 +148,14 @@ export default {
     };
   },
   computed: {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
     theme() {
       // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
       // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
@@ -271,7 +285,7 @@ export default {
       link.remove();
     },
     closeModal() {
-      this.$emit('closeModal');
+      this.active = false;
     },
     // changeColor: function() {
     //   document.querySelectorAll('.v-menu__content').forEach( item => {

@@ -1,10 +1,12 @@
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="680"
-    persistent
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    :theme="theme"
     :color="theme.$main_text"
-    @keydown.esc="cancelModal"
+    @cancelModal="cancelModal"
   >
     <v-card
       :style="{ background: theme.$main_bg, color: theme.$main_text }"
@@ -20,6 +22,7 @@
           label="Имя ИД"
           placeholder="Sid"
           hide-details
+          @input="isChanged = true"
         />
         <v-textarea
           v-model="search.original_otl"
@@ -35,6 +38,7 @@
           placeholder="Origin otl"
           label="Текст ИД"
           @keyup.ctrl.\="addLineBreaks"
+          @input="isChanged = true"
         />
         <div class="times-block">
           <div class="time-block">
@@ -47,6 +51,7 @@
               label="Временной интервал: начало"
               placeholder="0"
               hide-details
+              @input="isChanged = true"
             />
             <DTPicker
               v-model="tws"
@@ -60,6 +65,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
+              @input="isChanged = true"
             >
               <v-icon
                 class="picker-search"
@@ -79,6 +85,7 @@
               label="Временной интервал: конец"
               placeholder="0"
               hide-details
+              @input="isChanged = true"
             />
             <DTPicker
               v-model="twf"
@@ -92,6 +99,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
+              @input="isChanged = true"
             >
               <v-icon
                 class="picker-search"
@@ -123,6 +131,7 @@
                   outlined
                   label="Timeout"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.cache_ttl"
@@ -132,6 +141,7 @@
                   outlined
                   label="Cache_ttl"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.field_extraction"
@@ -141,6 +151,7 @@
                   outlined
                   label="Field_extraction"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.preview"
@@ -150,6 +161,7 @@
                   outlined
                   label="Preview"
                   hide-details
+                  @input="isChanged = true"
                 />
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -163,6 +175,7 @@
               outlined
               label="Максимальное кол-во строк"
               hide-details
+              @input="isChanged = true"
             />
           </div>
         </div>
@@ -193,20 +206,21 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
+  name: 'ModalCreateSearch',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
     idDashFrom: {
       type: String,
-      required: true,
-    },
-    modalFrom: {
-      type: Boolean,
       required: true,
     },
     dataSearchFrom: {
@@ -216,6 +230,10 @@ export default {
     createBtnFrom: {
       type: String,
       required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {
@@ -243,15 +261,17 @@ export default {
       tws: '',
       twf: '',
       pickerIcon: mdiCalendarMonth,
+      isChanged: false,
     };
   },
   computed: {
-    // тут понимаем нужно ли открыть окно с созданием или нет
-    active() {
-      if (this.modalFrom) {
-        this.setData();
-      }
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     dataSearch() {
       return this.dataSearchFrom;
@@ -268,6 +288,14 @@ export default {
     },
   },
   watch: {
+    active(val) {
+      // тут понимаем нужно ли открыть окно с созданием или нет
+      if (val) {
+        this.setData();
+      } else {
+        this.isChanged = false;
+      }
+    },
     dataSearchFrom() {
       this.currentSid = this.dataSearchFrom?.sid;
     },
@@ -283,7 +311,7 @@ export default {
   },
   methods: {
     setData() {
-      this.search = this.dataSearch;
+      this.search = JSON.parse(JSON.stringify(this.dataSearch));
       if (this.createBtnFrom === 'edit') {
         this.createBtn = 'Редактировать';
       } else {
@@ -292,7 +320,7 @@ export default {
     },
     cancelModal() {
       if (this.cancelBtn === 'Отмена') {
-        this.$emit('cancelModal');
+        this.active = false;
       } else {
         if (this.createBtnFrom === 'edit') {
           this.createBtn = 'Редактировать';
@@ -357,7 +385,7 @@ export default {
             this.cancelBtn = 'Отмена';
             this.errorMsgShow = false;
             // и скрываем окно редактирования ИД
-            this.$emit('cancelModal');
+            this.active = false;
           }
           // если нет
         } else {
@@ -368,7 +396,7 @@ export default {
             reload: false,
           });
           // и скрываем окно редактирования ИС
-          this.$emit('cancelModal');
+          this.active = false;
         }
       } else {
         this.errorMsg = 'Sid источника данных не может быть пустым';

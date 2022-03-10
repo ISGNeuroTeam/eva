@@ -226,10 +226,8 @@ export default {
     },
   },
   mounted() {
-    if (this.$attrs['is-full-screen']) {
-      this.dataRestFromWatch();
-    }
-    this.$emit('setVissible', { element: this.id });
+    this.dataRestFromWatch();
+    this.$emit('setVissible', this.id);
   },
   methods: {
     hiddenTooltip() {

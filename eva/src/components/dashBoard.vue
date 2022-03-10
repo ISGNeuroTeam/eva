@@ -261,6 +261,7 @@
                     :height-from="fullScreenHeight"
                     :options="props.options"
                     :is-full-screen="true"
+                    :full-screen="true"
                     :table-per-page="tablePerPage"
                     :table-page="tablePage"
                     @hideDS="hideDS($event)"
@@ -418,7 +419,7 @@
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
-          @click="chooseDS()"
+          @click="chooseDS(idDash)"
         >
           Выберите источник данных
         </button>

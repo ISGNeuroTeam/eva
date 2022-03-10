@@ -1,11 +1,14 @@
 <!-- Модальное окно для создания дашборда -->
 
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="active"
     width="90%"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="cancelModal"
   >
     <div
       v-if="groupCheck"
@@ -36,7 +39,7 @@
             class="title-field input-create"
             :style="{ color: theme.$main_text }"
           >
-            Цвет группы ssssssss
+            Цвет группы
           </div>
           <div class="color-picker-wrapper">
             <div
@@ -138,7 +141,7 @@
               :subessence="item"
               :color-from="theme"
               :create="actionFrom"
-              :active-from="modalFrom"
+              :active-from="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -205,7 +208,7 @@
               :data-from="dataRest"
               :create="actionFrom"
               :color-from="theme"
-              :active-from="modalFrom"
+              :active-from="modalValue"
               @changeData="changeData"
             />
           </div>
@@ -238,16 +241,17 @@
         </div>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalCreate',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    modalFrom: {
-      type: Boolean,
-      required: true,
-    },
     groupFlagFrom: {
       type: Boolean,
       required: true,
@@ -271,6 +275,10 @@ export default {
     dashFrom: {
       type: Object,
       required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
     },
     curGroupFrom: null,
     nameGroupFrom: {
@@ -314,6 +322,7 @@ export default {
       },
       colorInputMode: 'preset',
       pickedColor: '',
+      isChanged: false,
     };
   },
   computed: {
@@ -337,9 +346,13 @@ export default {
         this.theme.$purple,
       ];
     },
-    active() {
-      this.setData();
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     groupCheck() {
       return this.groupFlagFrom;
@@ -352,18 +365,51 @@ export default {
     },
   },
   watch: {
-    pickedColor(color) {
-      if (this.colorInputMode === 'custom') this.setGroupColor(color);
+    // проверяем изменилось ли что-то в основных полях
+    'newDash.name': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
+        } else {
+          this.isChanged = val !== oldVal;
+        }
+      },
     },
-  },
-  mounted() {
-    this.create_warning = false; // выключаем все предупреждения что были включены
-    this.pickedColor = this.theme.$main_bg;
-  },
-  methods: {
-    setData() {
+    'newDash.id': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
+        } else {
+          this.isChanged = !!(val && oldVal);
+        }
+      },
+    },
+    'newGroup.name': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
+        } else {
+          this.isChanged = val !== oldVal;
+        }
+      },
+    },
+    'newGroup.color': {
+      handler(val, oldVal) {
+        if (this.dataFrom) {
+          this.isChanged = !!(
+            val !== '#FFA9A4'
+            && oldVal
+            && val !== this.dataFrom?.color
+          );
+        } else {
+          this.isChanged = !!(val !== '#FFA9A4' && oldVal);
+        }
+      },
+    },
+    active() {
+      // тут понимаем нужно ли открыть окно с созданием или нет
       this.pickedColor = this.theme.$main_bg;
-      if (this.modalFrom) {
+      if (this.modalValue) {
         if (this.dataFrom) {
           this.newGroup.name = this.dataFrom.name;
           this.newGroup.color = this.dataFrom.color;
@@ -378,7 +424,7 @@ export default {
           [this.newGroup.color] = this.colors;
           this.colorInputMode = 'preset';
         }
-        if (this.dashFrom) {
+        if (this.dashFrom && this.actionFrom !== 'create') {
           this.newDash.name = this.dashFrom.name;
           this.newDash.id = this.dashFrom.id;
         } else {
@@ -400,8 +446,23 @@ export default {
           this.nameBtn.create = 'Редактировать';
         }
         this.dataRest = this.getDataForEssence();
+      } else {
+        this.$set(this.newGroup, 'name', '');
+        this.$set(this.newDash, 'name', '');
+        this.$set(this.newDash, 'id', '');
+        this.$set(this.newGroup, 'color', '');
+        this.isChanged = false;
       }
     },
+    pickedColor(color) {
+      if (this.colorInputMode === 'custom') this.setGroupColor(color);
+    },
+  },
+  mounted() {
+    this.create_warning = false; // выключаем все предупреждения что были включены
+    this.pickedColor = this.theme.$main_bg;
+  },
+  methods: {
     setGroupColor(color) {
       this.newGroup.color = color;
     },
@@ -492,7 +553,7 @@ export default {
     cancelModal(btn) {
       if (btn === 'Отмена') {
         // передаем в родителя чтобы выключили модалку
-        this.$emit('closeModal');
+        this.active = false;
         // очищаем имя
         this.name = '';
       }
@@ -530,7 +591,7 @@ export default {
             });
           }
           // передаем в родителя чтобы выключили модалку
-          this.$emit('closeModal');
+          this.active = false;
         } else if (res.status === 409) {
           //  показываем предупреждение
           this.showwarning = true;
@@ -588,10 +649,12 @@ export default {
       }
     },
     changeData(event) {
+      this.$refs.confirmModal.focusOnModal();
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
+      this.isChanged = !event.data.includes(this.nameGroupFrom) || event.data.length > 1;
     },
   },
 };

@@ -338,10 +338,9 @@
     </v-content>
     <footer-bottom />
     <modal-report
+      v-model="modal"
       :color-from="color"
-      :modal-from="modal"
       :search-from="search"
-      @cancelModal="cancelModal"
       @setSearch="setSearch($event)"
     />
   </v-app>
