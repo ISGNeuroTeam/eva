@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed gis settings styles
 - fixed calendar in data source
 - fixed guntt disappears data when navigating through tabs
+- fixed expand to full screen not available in Component View Protocol
 
 ## [1.84.0]
 
