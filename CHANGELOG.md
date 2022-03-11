@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed multiline tooltip display on fullscreen not working
 - fixed styles theme
 - fixed gis icons
+- Fixed template for metrics
 
 ## [1.84.0]
 
