@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed guntt disappears data when navigating through tabs
 - fixed multiline tooltip display on fullscreen not working
 - fixed styles theme
+- fixed gis icons
 
 ## [1.84.0]
 
