@@ -10,12 +10,12 @@ const routes = [
   {
     name: 'Авторизация',
     path: '/', // если главная страница
-    component: require('../components/autorization/autorization.vue').default,
+    component: () => import('../components/autorization/autorization.vue'),
   },
   {
     name: 'Главная',
     path: '/main', // если главная страница
-    component: require('../components/autorization/mainPage.vue').default,
+    component: () => import('../components/autorization/mainPage.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -23,7 +23,7 @@ const routes = [
   {
     name: 'Профиль',
     path: '/profile/', // если главная страница
-    component: require('../components/autorization/profile.vue').default,
+    component: () => import('../components/autorization/profile.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -31,7 +31,7 @@ const routes = [
   {
     name: 'Репорты',
     path: '/reports', // если главная страница
-    component: require('../components/reports.vue').default,
+    component: () => import('../components/reports.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -39,7 +39,7 @@ const routes = [
   {
     name: 'Исследование данных',
     path: '/data-research', // если главная страница
-    component: require('../components/reportsV2/index.vue').default,
+    component: () => import('../components/reportsV2/index.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -47,7 +47,7 @@ const routes = [
   {
     name: 'Документы',
     path: '/papers', // если главная страница
-    component: require('../components/papers.vue').default,
+    component: () => import('../components/papers.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -55,7 +55,7 @@ const routes = [
   {
     name: 'Дашборды',
     path: '/dashboards', // если главная страница
-    component: require('../components/mainPageDash.vue').default,
+    component: () => import('../components/mainPageDash.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -63,7 +63,7 @@ const routes = [
   {
     name: 'Дашборд',
     path: '/dashboards/:id', // если страница дашборда
-    component: require('../components/mainTitle.vue').default,
+    component: () => import('../components/mainTitle.vue'),
     props: true,
     meta: {
       requiresAuth: true,
@@ -72,7 +72,7 @@ const routes = [
   {
     name: 'Дашборд',
     path: '/dashboards/:id/:tabId', // если страница дашборда
-    component: require('../components/mainTitle.vue').default,
+    component: () => import('../components/mainTitle.vue'),
     props: true,
     meta: {
       requiresAuth: true,
@@ -81,7 +81,7 @@ const routes = [
   {
     name: 'Формы',
     path: '/forms/', // если страница форм
-    component: require('../components/forms/formMain.vue').default,
+    component: () => import('../components/forms/formMain.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -89,7 +89,7 @@ const routes = [
   {
     name: 'Открытая форма',
     path: '/forms/open/', // если страница форм
-    component: require('../components/forms/formOpen.vue').default,
+    component: () => import('../components/forms/formOpen.vue'),
     props: true,
     meta: {
       requiresAuth: true,
@@ -98,7 +98,7 @@ const routes = [
   {
     name: 'Форма редактирования',
     path: '/forms/edit/', // если страница форм
-    component: require('../components/forms/formEdit.vue').default,
+    component: () => import('../components/forms/formEdit.vue'),
     props: true,
     meta: {
       requiresAuth: true,
@@ -107,7 +107,7 @@ const routes = [
   {
     name: 'Список формы',
     path: '/forms/openlist/:id', // если страница форм
-    component: require('../components/forms/formOpenList.vue').default,
+    component: () => import('../components/forms/formOpenList.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -115,14 +115,14 @@ const routes = [
   {
     name: 'Форма',
     path: '/forms/:id', // если страница форм
-    component: require('../components/forms/formMain.vue').default,
+    component: () => import('../components/forms/formMain.vue'),
     meta: {
       requiresAuth: true,
     },
   },
   {
     path: '*', // если любая другая в том числе не существующая то
-    component: require('../components/notFound.vue').default,
+    component: () => import('../components/notFound.vue'),
   },
 ];
 
