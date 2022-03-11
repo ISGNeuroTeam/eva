@@ -14,13 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
+- Added blocking of the scheduler application button
 - fixed piechart color rgb
 - fixed gis settings styles
 - fixed calendar in data source
+- fixed creating/editing dashboards/groups
 - fixed guntt disappears data when navigating through tabs
 - fixed multiline tooltip display on fullscreen not working
 - fixed styles theme
 - fixed gis icons
+- Fixed template for metrics
+- fixed dashboard creation
+- fixed columns in the table are not hidden
 - fixed additional message about existing data source when renaming
 
 ## [1.84.0]
