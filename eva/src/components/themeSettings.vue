@@ -33,7 +33,6 @@
 </template>
 
 <script>
-// import {  mdiChevronDown, mdiChevronUp } from '@mdi/js'
 export default {
   props: {
     paleteFrom: Boolean,
@@ -41,62 +40,19 @@ export default {
   data() {
     return {
       paleteShow: false,
-      // switchers: {
-      //   textBlock: {
-      //     status: false,
-      //     arrow: mdiChevronDown
-      //   },
-      //   backBlock: {
-      //     status: false,
-      //     arrow: mdiChevronDown
-      //   },
-      //   controlsBlock: {
-      //     status: false,
-      //     arrow: mdiChevronDown
-      //   },
-      //   controlsActiveBlock: {
-      //     status: false,
-      //     arrow: mdiChevronDown
-      //   },
-      //   borderBlock: {
-      //     status: false,
-      //     arrow: mdiChevronDown
-      //   },
-      //   backElementBlock: {
-      //     status: false,
-      //     arrow: mdiChevronDown
-      //   }
-      // }
     };
   },
   computed: {
-    // active: function() {
-    //   return this.showFrom
-    // },
     theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
     paleteFrom(palete) {
-      palete ? (this.paleteShow = true) : (this.paleteShow = false);
+      this.paleteShow = !!palete;
     },
   },
   methods: {
-    // switchBlock: function(switcher) {
-    //   Object.keys(this.switchers).forEach( item => {
-    //     if (item != switcher) {
-    //       this.switchers[item].status = false;
-    //       this.switchers[item].arrow = mdiChevronDown;
-    //     }
-    //   })
-    //   this.switchers[switcher].status = !this.switchers[switcher].status;
-    //   if (this.switchers[switcher].status) {
-    //     this.switchers[switcher].arrow = mdiChevronUp;
-    //   } else {
-    //     this.switchers[switcher].arrow = mdiChevronDown;
-    //   }
-    // },
     setTheme(theme) {
       this.$store.commit('setTheme', theme);
       const settings = JSON.stringify({
