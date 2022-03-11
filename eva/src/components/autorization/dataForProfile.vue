@@ -156,6 +156,10 @@ export default {
       type: Object,
       required: true,
     },
+    nameGroupFrom: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {

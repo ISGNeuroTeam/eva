@@ -59,7 +59,9 @@
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665 5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984 11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
+                    d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665
+                     5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984
+                     11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
                     fill="#DADADA"
                   />
                 </svg>
@@ -130,8 +132,8 @@
               <p>Начальная точка</p>
               <v-row>
                 <v-col
-                    cols="3"
-                    style="padding-right: 0"
+                  cols="3"
+                  style="padding-right: 0"
                 >
                   <v-text-field
                     v-model="options.initialPoint.x"
@@ -148,8 +150,8 @@
                   </v-text-field>
                 </v-col>
                 <v-col
-                    cols="3"
-                    style="padding-right: 0"
+                  cols="3"
+                  style="padding-right: 0"
                 >
                   <v-text-field
                     v-model="options.initialPoint.y"
@@ -237,7 +239,10 @@
                   >
                     <g clip-path="url(#clip0)">
                       <path
-                        d="M19 5V19H5V5H19ZM20.1 3H3.9C3.4 3 3 3.4 3 3.9V20.1C3 20.5 3.4 21 3.9 21H20.1C20.5 21 21 20.5 21 20.1V3.9C21 3.4 20.5 3 20.1 3ZM11 7H17V9H11V7ZM11 11H17V13H11V11ZM11 15H17V17H11V15ZM7 7H9V9H7V7ZM7 11H9V13H7V11ZM7 15H9V17H7V15Z"
+                        d="M19 5V19H5V5H19ZM20.1 3H3.9C3.4 3 3 3.4 3 3.9V20.1C3 20.5 3.4 21 3.9
+                         21H20.1C20.5 21 21 20.5 21 20.1V3.9C21 3.4 20.5 3 20.1 3ZM11
+                         7H17V9H11V7ZM11 11H17V13H11V11ZM11 15H17V17H11V15ZM7
+                         7H9V9H7V7ZM7 11H9V13H7V11ZM7 15H9V17H7V15Z"
                         fill="white"
                       />
                     </g>
@@ -271,7 +276,9 @@
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665 5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984 11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
+                        d="M15.8332 5.3415L14.6582 4.1665L9.99984 8.82484L5.3415 4.1665L4.1665
+                         5.3415L8.82484 9.99984L4.1665 14.6582L5.3415 15.8332L9.99984
+                         11.1748L14.6582 15.8332L15.8332 14.6582L11.1748 9.99984L15.8332 5.3415Z"
                         fill="#DADADA"
                       />
                     </svg>
@@ -369,10 +376,20 @@ import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
 
 export default {
+  name: 'DashMapUserSettings',
   props: {
-    idElement: String,
-    idDashFrom: String,
-    map: Object,
+    idElement: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    map: {
+      type: Object,
+      required: true,
+    },
     // library: Object
   },
   data() {
@@ -434,13 +451,56 @@ export default {
       return this.theme.$main_text === '#F4F4FA';
     },
     dashSettings() {
-      return this.$store.getters.getOptions({
-        idDash: this.idDashFrom,
-        id: this.idElement,
-      });
+      return this.getOptions;
     },
     library() {
-      return this.$store.getters.getLibrary(this.idDashFrom, this.idElement);
+      return this.getLibrary;
+    },
+    getLibrary() {
+      return this.elementFromStore?.options?.library;
+    },
+    elementFromStore() {
+      return this.$store.state[this.idDashFrom][this.idElement];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idDashFrom });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
     },
   },
   watch: {
@@ -453,10 +513,7 @@ export default {
     },
   },
   mounted() {
-    const options = this.$store.getters.getOptions({
-      idDash: this.idDashFrom,
-      id: this.idElement,
-    });
+    const options = this.getOptions;
     this.tileLayers[0].tile = options.osmserver;
     // init store for reactivity
     if (!options.showLegend || !options.initialPoint) {
@@ -482,9 +539,11 @@ export default {
     onClickChoosingCoordinates() {
       const cursorCssClass = 'cursor-crosshair';
       this.dialog = false;
+      // eslint-disable-next-line no-underscore-dangle
       L.DomUtil.addClass(this.map._container, cursorCssClass);
       const clickEvent = (event) => {
         this.dialog = true;
+        // eslint-disable-next-line no-underscore-dangle
         L.DomUtil.removeClass(this.map._container, cursorCssClass);
         this.options.initialPoint.x = event.latlng.lat;
         this.options.initialPoint.y = event.latlng.lng;
@@ -499,7 +558,7 @@ export default {
       this.$emit('updatePipeDataSource', this.options.search);
     },
     loadDataForPipe() {
-      return this.$store.getters.getSearches(this.idDashFrom);
+      return this.$store.state[this.idDashFrom].searches;
     },
     closeLegend() {
       this.options.showLegend = false;
