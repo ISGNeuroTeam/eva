@@ -539,13 +539,14 @@ export default {
         [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
         this.updateToken(this.map.getZoom());
       });
-      this.map.on('zoomend', () => {
-        const layers = document.getElementsByClassName('leaflet-marker-icon');
-        layers.forEach((layer) => {
-          layer.style.width = `${(layer.naturalWidth / 10) * this.map.getZoom()}px`;
-          layer.style.height = `${(layer.naturalHeight / 10) * this.map.getZoom()}px`;
-        });
-      });
+      // TODO: Пока просили приостановить работу с ГИС.
+      // this.map.on('zoomend', () => {
+      //   const layers = document.getElementsByClassName('leaflet-marker-icon');
+      //   layers.forEach((layer) => {
+      //     layer.style.width = `${(layer.naturalWidth / 10) * this.map.getZoom()}px`;
+      //     layer.style.height = `${(layer.naturalHeight / 10) * this.map.getZoom()}px`;
+      //   });
+      // });
 
       this.deleteTitleByAttribute();
 

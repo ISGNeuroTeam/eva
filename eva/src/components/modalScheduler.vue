@@ -146,7 +146,7 @@
           small
           :color="theme.$primary_button"
           class="delete-btn"
-          :disabled="disabledStart"
+          :disabled="disabledStart || isDisable"
           @click="startSchedule"
         >
           Подтвердить
@@ -258,6 +258,9 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+    isDisable() {
+      return !(this.time && this.every > 0);
     },
   },
   watch: {

@@ -1076,7 +1076,7 @@ export default {
       return `${this.idDash}-${this.element}`;
     },
     element() {
-      return this.$store.getters.getModalSettings(this.idDash).element;
+      return this.getModalSettings.element;
     },
     // поля элемента данных
     titles() {
@@ -1087,6 +1087,16 @@ export default {
     },
     getSelectedTableTitles() {
       return this.elementFromStore?.selectedTableTitles;
+    },
+    getMetricsMulti() {
+      if (!this.elementFromStore.metrics) {
+        this.$store.commit('setState', [{
+          object: this.elementFromStore,
+          prop: 'metrics',
+          value: [],
+        }]);
+      }
+      return this.elementFromStore.metrics;
     },
   },
   watch: {
@@ -1101,10 +1111,7 @@ export default {
   },
   mounted() {
     this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-    this.metricsName = this.$store.getters.getMetricsMulti({
-      idDash: this.idDash,
-      id: this.element,
-    });
+    this.metricsName = this.getMetricsMulti;
     this.loadComponentsSettings();
     this.prepareOptions();
   },

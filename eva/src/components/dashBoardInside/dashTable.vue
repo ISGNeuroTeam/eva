@@ -166,7 +166,7 @@ export default {
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     activeElemFrom: {
       type: String,
@@ -354,11 +354,7 @@ export default {
       return this.dashFromStore.options;
     },
     lastResult() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
-      return options.lastResult;
+      return this.getOptions.lastResult;
     },
   },
   watch: {
