@@ -18,11 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed piechart color rgb
 - fixed gis settings styles
 - fixed calendar in data source
+- fixed creating/editing dashboards/groups
 - fixed guntt disappears data when navigating through tabs
 - fixed multiline tooltip display on fullscreen not working
 - fixed styles theme
 - fixed gis icons
 - Fixed template for metrics
+- fixed dashboard creation
 
 ## [1.84.0]
 
