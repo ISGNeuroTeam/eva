@@ -43,8 +43,8 @@
           </div>
           <div class="color-picker-wrapper">
             <div
-              v-for="(color, index) in colors"
-              :key="`${color}${index}`"
+              v-for="color in colors"
+              :key="color"
               class="color-box"
               :class="{
                 active: colorInputMode === 'preset' && newElement.color === color,
@@ -718,7 +718,6 @@ export default {
           id: data.find((el) => el.id === this.curGroupFrom).id,
         });
       }
-      console.log('test');
       return this.$store.dispatch('auth/getEssence', {
         essence: role,
         id: data.find((el) => el.id === this.dashFrom.id).id,

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed creating/editing dashboards/groups
 - fixed guntt disappears data when navigating through tabs
 - fixed multiline tooltip display on fullscreen not working
+- fixed dashboard creation
 
 ## [1.84.0]
 
@@ -38,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.83.1]
 
-- fixed dashboard creation
 ### Fixed
 - release name
 
