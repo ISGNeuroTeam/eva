@@ -99,7 +99,10 @@ import {
 
 export default {
   props: {
-    data: Array,
+    data: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   data() {
     return {
@@ -127,14 +130,19 @@ export default {
       return this.$store.getters.getTheme;
     },
     dataset() {
+      // eslint-disable-next-line no-underscore-dangle
       let minTime = this.data[0]?._time;
+      // eslint-disable-next-line no-underscore-dangle
       let maxTime = this.data[0]?._time;
-      console.log(this.data);
       this.data.forEach((item) => {
+        // eslint-disable-next-line no-underscore-dangle
         if (item._time < minTime) {
+          // eslint-disable-next-line no-underscore-dangle
           minTime = item._time;
         }
+        // eslint-disable-next-line no-underscore-dangle
         if (item._time > maxTime) {
+          // eslint-disable-next-line no-underscore-dangle
           maxTime = item._time;
         }
       });
@@ -184,17 +192,20 @@ export default {
         barTime += deltaTime;
       }
       this.data.forEach((item) => {
+        // eslint-disable-next-line no-underscore-dangle
         if (dataset[getActualLongData(item._time * 1000)] === undefined) {
+          // eslint-disable-next-line no-underscore-dangle
           dataset[getActualLongData(item._time * 1000)] = 1;
         } else {
-          dataset[getActualLongData(item._time * 1000)]++;
+          // eslint-disable-next-line no-underscore-dangle
+          dataset[getActualLongData(item._time * 1000)] += 1;
         }
       });
       if (Object.keys(dataset).length > 0) {
         for (
           let i = Object.keys(dataset).length;
           i < this.numberInTimeline;
-          i++
+          i += 1
         ) {
           dataset[`100${i}`] = 0;
         }
@@ -284,7 +295,11 @@ export default {
         .forEach((item) => {
           item.remove();
         });
-      this.renderSVG(dataset);
+      if (this.$refs.chart) {
+        this.renderSVG(dataset);
+      } else {
+        console.error('элемент для отрисовки таймлайна не найдет');
+      }
     },
     plusScale() {
       if (this.numberInTimeline < 10) {
@@ -314,9 +329,13 @@ export default {
         .append('g')
         .attr('transform', `translate(${marge.top},${marge.left})`);
       let dataForSvg = [];
-      for (const dataItem in dataset) {
-        dataForSvg.push({ time: dataItem, value: dataset[dataItem] });
-      }
+      dataForSvg = Object.keys(dataset).reduce((acc, dataItem) => [
+        ...acc,
+        {
+          time: dataItem,
+          value: dataset[dataItem],
+        },
+      ], []);
       dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline);
       let maxY = dataForSvg[0].value;
       dataForSvg.forEach((element) => {
@@ -335,7 +354,7 @@ export default {
         .domain([0, maxY])
         .range([height - marge.top - marge.bottom, 0]);
 
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 6; i += 1) {
         g.append('g')
           .append('line')
           .attr('class', 'grid-line-y')
@@ -364,8 +383,7 @@ export default {
         .attr('height', (d) => height - marge.top - marge.bottom - yScale(d.value))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
-          console.log(d);
-          tooltip.html(`Событий (${d.value})` + `<br>${d.time}`);
+          tooltip.html(`Событий (${d.value})<br>${d.time}`);
           tooltip.style('display', 'block');
           return tooltip.style('visibility', 'visible');
         })
@@ -378,6 +396,7 @@ export default {
 };
 </script>
 
+<!-- eslint-disable -->
 <style lang="sass">
 @import './../../sass/_colors'
 .timeline
