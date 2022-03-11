@@ -92,7 +92,6 @@
                   }
                 "
               />
-              <!-- <v-text-field  class="radio-name" color="#333"   outlined v-model="general.ident" hide-details ></v-text-field> -->
             </div>
           </div>
           <!--    ----   -->
@@ -117,13 +116,6 @@
           </v-btn>
         </v-card-actions>
       </v-card>
-      <!-- <div class="warning-block" :style="{background:color.backElement}">
-                    <div class="warning-text"  :style="{color:color.text}">Такой DashBoard существует. Хотите заменить его?</div>
-                    <div class="btn-warning">
-                        <v-btn small :color="color.controls" class="warning-btn" @click="yesDashBoards">Да</v-btn>
-                        <v-btn small :color="color.controlsActive" class="warning-btn" @click="noDashBoards">Нет</v-btn>
-                    </div>
-        </div> -->
     </div>
   </v-dialog>
 </template>
@@ -133,7 +125,10 @@ import {} from '@mdi/js';
 
 export default {
   props: {
-    modalFrom: null,
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
     settingsFrom: null,
   },
   data() {
@@ -155,8 +150,8 @@ export default {
       val: '',
     };
   },
+  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
   computed: {
-    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
     modal() {
       if (this.modalFrom) {
         this.prepareModal();
@@ -179,11 +174,13 @@ export default {
         case 'radio':
           options = this.radioOptions;
           break;
+        default:
+          break;
       }
       Object.keys(this.general).forEach((item) => {
         options[item] = this.general[item];
       });
-      if (Object.keys(options).length != 0) {
+      if (Object.keys(options).length !== 0) {
         this.$store.commit('form/setOptionsForm', {
           element: this.settings.key,
           options,
@@ -194,11 +191,17 @@ export default {
     cancelModal() {
       this.$emit('hideForm');
     },
+    getOptions(options) {
+      if (this.$store.state.form.createForm.cells[options.key].options) {
+        return this.$store.state.form.createForm.cells[options.key].options;
+      }
+      return 'empty';
+    },
     prepareModal() {
       Object.keys(this.visibleOptions).forEach((item) => {
         this.visibleOptions[item] = false;
       });
-      const options = this.$store.getters['form/getOption'](this.settings);
+      const options = this.getOptions(this.settings);
       switch (this.settings.name) {
         case 'Выпадающий список':
           this.currentElem = 'select';
@@ -211,13 +214,13 @@ export default {
 
           this.addOptions(options, this.radioOptions);
           break;
+        default:
+          break;
       }
-      options.ident == true
-        ? (this.general.ident = true)
-        : (this.general.ident = false);
+      this.general.ident = options.ident === true;
     },
     addOptions(options, curOptions) {
-      if (options != 'empty') {
+      if (options !== 'empty') {
         Object.keys(options).forEach((item) => {
           curOptions[item] = options[item];
         });

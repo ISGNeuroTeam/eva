@@ -26,12 +26,6 @@ import screenshot from './plugins/screenshot';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import App from './App.vue';
 
-// TODO: на удаление
-// // подключаем Vue
-// window.Vue = require('vue');
-// // позволяет создавтаь асинхронные computed
-// window.Vue = Vue;
-
 // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.use(AsyncComputed);
 // подключаем стили для этого компонента
@@ -67,9 +61,13 @@ Vue.component('modal-create', () => import('./components/modalCreate.vue'));
 Vue.component('modal-schedule', () => import('./components/modalScheduler.vue'));
 // модальное окно для импорта и экспорта
 Vue.component('modal-exim', () => import('./components/modalExim.vue'));
-// модальное окно для импорта и экспорта
+// модальное окно для подтверждения закрытия другого модального окна
+Vue.component('modal-confirm', () => import('./components/modalConfirm.vue'));
+// модальное окно с подтверждением закрытия
+Vue.component('modal-persistent', () => import('./components/modalPersistent.vue'));
+// модальное окно с источниками данных
 Vue.component('modal-create-search', () => import('./components/modalCreateSearch.vue'));
-// модальное окно для импорта и экспорта
+// модальное окно настроект
 Vue.component('modal-settings', () => import('./components/modalSettings.vue'));
 // настройки системы
 Vue.component('theme-settings', () => import('./components/themeSettings.vue'));

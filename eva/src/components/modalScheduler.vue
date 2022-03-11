@@ -1,11 +1,13 @@
 <!-- Модальное окно для выбора ИС -->
 
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="600"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    @cancelModal="cancel"
   >
     <v-card
       :style="{ background: theme.$main_bg }"
@@ -23,6 +25,7 @@
         </div>
         <div class="tab-block">
           <v-tabs
+            v-model="schedulerTab"
             :color="theme.$primary_button"
             :background-color="theme.$main_bg"
           >
@@ -31,6 +34,7 @@
               Периодичность
             </v-tab>
             <v-tab-item
+              :value="0"
               :style="{ color: theme.$main_text, background: theme.$main_bg }"
             >
               <div class="every">
@@ -46,6 +50,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -92,6 +97,7 @@
                   outlined
                   :disabled="disabledEvery"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <div class="choose-time">
                   <v-chip
@@ -121,7 +127,7 @@
             <v-tab :style="{ color: theme.$main_text }">
               Планирование
             </v-tab>
-            <v-tab-item />
+            <v-tab-item :value="1" />
           </v-tabs>
         </div>
       </div>
@@ -140,7 +146,7 @@
           small
           :color="theme.$primary_button"
           class="delete-btn"
-          :disabled="disabledStart"
+          :disabled="disabledStart || isDisable"
           @click="startSchedule"
         >
           Подтвердить
@@ -155,18 +161,37 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalScheduler',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    idDashFrom: null,
-    modalFrom: null,
-    dataSidFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
+    dataSidFrom: {
+      type: [String, Number],
+      required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      schedulerTab: 'tab-1',
       every: 0,
       time: '',
       everyLast: 0,
@@ -190,48 +215,79 @@ export default {
         start: false,
         end: false,
       },
+      isChanged: false,
     };
   },
   computed: {
+    // получаем название элемента от родителя
     idDash() {
-      // получаем название элемента от родителя
       return this.idDashFrom;
     },
-    active() {
-      // получаем статус открытия или нет окна модального
-      if (this.modalFrom) {
-        if (this.schedulers.length != 0) {
-          this.setData();
-        }
-      }
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     sid() {
       return this.dataSidFrom;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    getSchedulers() {
+      if (!this.dashFromStore.schedulers) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'schedulers',
+          value: {},
+        }]);
+      }
+      return this.dashFromStore.schedulers;
+    },
     schedulers() {
-      return this.$store.getters.getSchedulers(this.idDash);
+      return this.getSchedulers;
+    },
+    getSearches() {
+      return this.$store.state[this.idDash]?.searches || [];
     },
     searches() {
-      return this.$store.getters.getSearches(this.idDash);
+      return this.getSearches;
     },
     theme() {
       return this.$store.getters.getTheme;
     },
+    isDisable() {
+      return !(this.time && this.every > 0);
+    },
+  },
+  watch: {
+    active() {
+      // получаем статус открытия или нет окна модального
+      if (this.modalValue) {
+        if (this.schedulers?.length !== 0) {
+          this.setData();
+        }
+      } else {
+        this.schedulerTab = 0;
+        this.isChanged = false;
+      }
+    },
   },
   mounted() {
-    // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
     const { schedulers } = this;
-    const searches = this.$store.getters.getSearches(this.idDash);
+    const searches = this.getSearches;
     let shedule = {};
     let curTime = {};
 
+    // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
     if (Object.keys(schedulers).length !== 0) {
-      // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
+      // пробегаемся по всем планировщикам
       Object.keys(schedulers).forEach((scheduler) => {
-        // пробегаемся по всем планировщикам
+        // создаем объект на основе настроек планировщика
         shedule = {
-          // создаем объект на основе настроек планировщика
           time: schedulers[scheduler].time,
           every: schedulers[scheduler].every,
           timeLast: schedulers[scheduler].timeLast,
@@ -242,10 +298,12 @@ export default {
           clearInterval(schedulers[scheduler].schedulerID);
         }
 
-        curTime = this.countTime(shedule.time, shedule.every) * 1000; // переводим в правильный формат время
-        this.executeSearch(searches, scheduler, shedule); // выоплняем серч один раз
+        // переводим в правильный формат время
+        curTime = this.countTime(shedule.time, shedule.every) * 1000;
+        // выоплняем серч один раз
+        this.executeSearch(searches, scheduler, shedule);
+        // и запускаем в цикле
         this.timers[scheduler] = setInterval(() => {
-          // и запускаем в цикле
           this.executeSearch(searches, scheduler, shedule);
         }, curTime);
         this.$store.commit('setSchedulerID', {
@@ -258,8 +316,8 @@ export default {
   },
   methods: {
     setData() {
+      // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
       if (this.schedulers[this.sid]) {
-        // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
         this.every = this.schedulers[this.sid].every;
         this.time = this.schedulers[this.sid].time;
         this.everyLast = this.schedulers[this.sid].everyLast;
@@ -287,32 +345,28 @@ export default {
     },
     cancel() {
       // закрываем окно
-      this.$emit('cancel');
+      this.active = false;
     },
-    checkEsc(event) {
-      if (event.code == 'Escape') {
-        this.cancel();
-      }
-    },
+    // выставляем время и меняем цвета у кнопок
     setTime(time, tense) {
-      // выставляем время и меняем цвета у кнопок
+      this.isChanged = true;
       if (!this.disabledEvery) {
-        if (tense == 'every') {
+        if (tense === 'every') {
           this.time = time;
           Object.keys(this.color).forEach((item) => {
             this.color[item] = '$accent_ui_color';
           });
-          if (this.color[time] == '$accent_ui_color') {
+          if (this.color[time] === '$accent_ui_color') {
             this.color[time] = '$primary_button';
           } else {
             this.color[time] = '$accent_ui_color';
           }
-        } else if (tense == 'last') {
+        } else if (tense === 'last') {
           this.timeLast = time;
           Object.keys(this.colorLast).forEach((item) => {
             this.colorLast[item] = '$accent_ui_color';
           });
-          if (this.colorLast[time] == '$accent_ui_color') {
+          if (this.colorLast[time] === '$accent_ui_color') {
             this.colorLast[time] = '$primary_button';
           } else {
             this.colorLast[time] = '$accent_ui_color';
@@ -320,8 +374,8 @@ export default {
         }
       }
     },
+    // переводим строковые значения времени в числовые
     countTime(time, every) {
-      // переводим строковые значения времени в числовые
       let period = 0;
       switch (time) {
         case 'second':
@@ -335,11 +389,13 @@ export default {
         case 'hour':
           period = Number(every) * 3600;
           break;
+        default:
+          break;
       }
       return period;
     },
+    // выполняем серч меняя его временны рамки
     executeSearch(searches, sid, shedule) {
-      // выполняем серч меняя его временны рамки
       let curTimeLast = 0;
       let tws = 0;
       let twf = 0;
@@ -352,6 +408,15 @@ export default {
         if (item.sid === sid) {
           item.parametrs.tws = tws;
           item.parametrs.twf = twf;
+          this.$store.commit('setState', [{
+            object: item.parametrs,
+            prop: 'tws',
+            value: tws,
+          }, {
+            object: item.parametrs,
+            prop: 'twf',
+            value: twf,
+          }]);
           this.$store.commit('updateSearchStatus', {
             idDash: this.idDash,
             sid: item.sid,
@@ -360,8 +425,8 @@ export default {
         }
       });
     },
+    // запускаем планировщик
     startSchedule() {
-      // запускаем планировщик
       const schedule = {
         time: this.time,
         every: this.every,
@@ -370,11 +435,13 @@ export default {
       };
       const { sid } = this;
 
-      const searches = this.$store.getters.getSearches(this.idDash);
+      const searches = this.getSearches;
       const curTime = this.countTime(schedule.time, schedule.every) * 1000;
-      this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
+      // сперва первый раз просто выполняем серч
+      this.executeSearch(searches, sid, schedule);
+      // а затем уже выполняем его в цикле
       const intervalID = (this.timers[sid] = setInterval(() => {
-        this.executeSearch(searches, sid, schedule); // а затем уже выполняем его в цикле
+        this.executeSearch(searches, sid, schedule);
       }, curTime));
 
       this.$store.commit('setSchedule', {

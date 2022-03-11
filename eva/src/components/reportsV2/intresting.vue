@@ -80,7 +80,10 @@ import {
 
 export default {
   props: {
-    rows: Array,
+    rows: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   data() {
     return {
@@ -109,6 +112,7 @@ export default {
           year: 'numeric',
         };
         dataset.push({
+          // eslint-disable-next-line no-underscore-dangle
           time: new Date(item._time * 1000).toLocaleString('ru', options),
           inputCount: item,
         });
@@ -121,7 +125,7 @@ export default {
   methods: {
     openStatistic(statistic) {
       if (this.showStatistic) {
-        if (this.statisticKey == statistic.text) {
+        if (this.statisticKey === statistic.text) {
           // this.showStatistic = false;
         } else {
           this.statisticKey = statistic.text;
@@ -136,7 +140,7 @@ export default {
   },
 };
 </script>
-
+<!-- eslint-disable -->
 <style lang="sass">
 @import './../../sass/_colors'
 .interesting

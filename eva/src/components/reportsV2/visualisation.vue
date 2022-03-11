@@ -79,9 +79,15 @@ import settings from '../../js/componentsSettings';
 
 export default {
   props: {
-    data: Array,
+    data: {
+      type: Array,
+      default: () => ([]),
+    },
     // size: {},
-    shouldGet: null,
+    shouldGet: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
