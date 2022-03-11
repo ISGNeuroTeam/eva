@@ -65,10 +65,10 @@
                    4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802
                    14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925
                    13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264
-                   5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272
-                   5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925
-                   13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992 7.72659L6.66659
-                   9.44659L11.0599 5.05325L11.9999 5.99992L6.66659 11.3333Z"
+                   5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278
+                   2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659
+                   11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599
+                   5.05325L11.9999 5.99992L6.66659 11.3333Z"
                   fill="white"
                 />
               </svg>
@@ -88,15 +88,13 @@
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325
-                     7.99992C1.33325 4.31802 4.31802 1.33325 7.99992 1.33325C11.6818
-                     1.33325 14.6666 4.31802 14.6666 7.99992C14.6625 11.6801
-                     11.6801 14.6625 7.99992 14.6666ZM7.98925 13.3333H7.99992C10.9444
-                     13.3303 13.3294 10.9417 13.3279 7.99725C13.3264 5.05278
-                     10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272
-                     5.05278 2.66125 7.99725C2.65978 10.9417 5.04478 13.3303
-                     7.98925 13.3333ZM6.66659 11.3333L3.99992 8.66659L4.93992
-                     7.72659L6.66659 9.44659L11.0599
+                    d="M7.99992 14.6666C4.31802 14.6666 1.33325 11.6818 1.33325 7.99992C1.33325
+                     4.31802 4.31802 1.33325 7.99992 1.33325C11.6818 1.33325 14.6666 4.31802
+                     14.6666 7.99992C14.6625 11.6801 11.6801 14.6625 7.99992 14.6666ZM7.98925
+                     13.3333H7.99992C10.9444 13.3303 13.3294 10.9417 13.3279 7.99725C13.3264
+                     5.05278 10.9391 2.66659 7.99459 2.66659C5.05011 2.66659 2.66272 5.05278
+                     2.66125 7.99725C2.65978 10.9417 5.04478 13.3303 7.98925 13.3333ZM6.66659
+                     11.3333L3.99992 8.66659L4.93992 7.72659L6.66659 9.44659L11.0599
                      5.05325L11.9999 5.99992L6.66659 11.3333Z"
                     fill="white"
                   />
@@ -114,18 +112,14 @@
                     v-on="on"
                   >
                     <path
-                      d="M4.41999 20.5789C4.13948 20.5784 3.87206
-                       20.4601 3.68299 20.2529C3.49044 20.0474
-                       3.39476 19.7694 3.41999 19.4889L3.66499
-                       16.7949L14.983 5.48091L18.52 9.0169L7.20499
-                       20.3299L4.51099 20.5749C4.47999 20.5779
-                       4.44899 20.5789 4.41999 20.5789ZM19.226
-                       8.30991L15.69 4.77391L17.811 2.65291C17.9986
-                       2.46513 18.2531 2.35962 18.5185 2.35962C18.7839
-                       2.35962 19.0384 2.46513 19.226 2.65291L21.347
-                       4.77391C21.5348 4.96147 21.6403 5.216 21.6403
-                       5.48141C21.6403 5.74681 21.5348 6.00134 21.347
-                       6.18891L19.227 8.30891L19.226 8.30991Z"
+                      d="M4.41999 20.5789C4.13948 20.5784 3.87206 20.4601 3.68299 20.2529C3.49044
+                       20.0474 3.39476 19.7694 3.41999 19.4889L3.66499 16.7949L14.983
+                       5.48091L18.52 9.0169L7.20499 20.3299L4.51099 20.5749C4.47999 20.5779
+                       4.44899 20.5789 4.41999
+                       20.5789ZM19.226 8.30991L15.69 4.77391L17.811 2.65291C17.9986 2.46513 18.2531
+                       2.35962 18.5185 2.35962C18.7839 2.35962 19.0384 2.46513 19.226 2.65291L21.347
+                       4.77391C21.5348 4.96147 21.6403 5.216 21.6403 5.48141C21.6403 5.74681 21.5348
+                       6.00134 21.347 6.18891L19.227 8.30891L19.226 8.30991Z"
                       :fill="theme.$main_border"
                     />
                   </svg>
@@ -258,18 +252,39 @@ export default {
     event: 'updateModalValue',
   },
   props: {
+    groupFlagFrom: {
+      type: Boolean,
+      required: true,
+    },
+    groupFrom: {
+      type: Array,
+      required: true,
+    },
+    dashsFrom: {
+      type: Array,
+      required: true,
+    },
+    actionFrom: {
+      type: String,
+      required: true,
+    },
+    dataFrom: {
+      type: Object,
+      required: true,
+    },
+    dashFrom: {
+      type: Object,
+      required: true,
+    },
     modalValue: {
       type: Boolean,
       default: false,
     },
-    groupFlagFrom: null,
-    groupFrom: null,
-    dashsFrom: null,
-    actionFrom: null,
-    dataFrom: null,
-    dashFrom: null,
     curGroupFrom: null,
-    nameGroupFrom: null,
+    nameGroupFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -406,7 +421,7 @@ export default {
           }
         } else {
           this.newGroup.name = '';
-          this.newGroup.color = this.colors[0];
+          [this.newGroup.color] = this.colors;
           this.colorInputMode = 'preset';
         }
         if (this.dashFrom && this.actionFrom !== 'create') {
@@ -459,18 +474,19 @@ export default {
       this.colorInputMode = 'custom';
       this.setGroupColor(color);
     },
+    // при нажатии на кнопку создать
     createBtn(name) {
-      // при нажатии на кнопку создать
       let hasSimilarModel = false;
+      //  если пользователь не ввел имя
       if (!name || name === '') {
-        //  если пользователь не ввел имя
-        this.showwarning = true; //  показываем предупреждение
+        //  показываем предупреждение
+        this.showwarning = true;
+        // а через три секунды убираем - чисто понты)
         setTimeout(() => {
           this.showwarning = false;
-        }, 3000); // а через три секунды убираем - чисто понты)
-      } else {
+        }, 3000);
         // если имя введено
-        // let actionEmit = '';
+      } else {
         let dataObj = {};
         let warnText = '';
         let essence = '';
@@ -491,8 +507,8 @@ export default {
           }
           essence = 'group';
           warnText = 'Такая группа уже существует. Хотите изменить её?';
-        } else {
           // для этого просматриваем все дашборды на странице (но берем их из хранилища)
+        } else {
           hasSimilarModel = this.dashs.some(
             (item) => item.name.toLowerCase() === name.toLowerCase(),
           );
@@ -522,8 +538,8 @@ export default {
           return;
         }
 
+        // реакция ДА на предупреждение
         if (this.showwarning) {
-          // реакция ДА на предупреждение
           this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
           this.nameBtn.cancel = 'Отмена';
           this.showwarning = false;
@@ -533,11 +549,13 @@ export default {
         this.createEssence(dataObj, method, essence);
       }
     },
+    // есл инажали на отмену создания
     cancelModal(btn) {
-      // есл инажали на отмену создания
       if (btn === 'Отмена') {
-        this.active = false; // передаем в родителя чтобы выключили модалку
-        this.name = ''; // очищаем имя
+        // передаем в родителя чтобы выключили модалку
+        this.active = false;
+        // очищаем имя
+        this.name = '';
       }
       this.showwarning = false;
       this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
@@ -549,17 +567,13 @@ export default {
         this.cancelModal('Отмена');
       }
     },
-    yesDashBoards() {
-      // если нажали на кнпку подстверждения создания дашборда
-      this.createObj(this.name); // создаем его
-      this.create_warning = false; // убаирем предупреждение
-    },
+    // если нажали на отмену
     noDashBoards() {
-      // если нажали на отмену
-      this.create_warning = false; // просто убираем предупреждение
+      // просто убираем предупреждение
+      this.create_warning = false;
     },
     createEssence(group, method, essence) {
-      const response = this.$store.getters['auth/setEssence']({
+      const response = this.$store.dispatch('auth/setEssence', {
         formData: JSON.stringify(group),
         essence,
         method,
@@ -576,12 +590,12 @@ export default {
               });
             });
           }
-          this.active = false; // передаем в родителя чтобы выключили модалку
+          // передаем в родителя чтобы выключили модалку
+          this.active = false;
         } else if (res.status === 409) {
-          this.showwarning = true; //  показываем предупреждение
-          essence === 'group'
-            ? (this.nameWarn = 'Такая группа уже есть.')
-            : (this.nameWarn = 'Такой дашборд уже есть.');
+          //  показываем предупреждение
+          this.showwarning = true;
+          this.nameWarn = essence === 'group' ? 'Такая группа уже есть.' : 'Такой дашборд уже есть.';
           setTimeout(() => {
             this.showwarning = false;
           }, 2000);
@@ -591,9 +605,10 @@ export default {
     createDash(dash) {
       this.$store.commit('setDash', {
         data: dash,
-        getters: this.$store.getters.checkAlreadyDash,
+        getters: (payload) => this.$store.dispatch('checkAlreadyDash', payload),
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Создан дашборд ${this.toHichName(dash.name)} с id ${dash.id}`,
       );
     },
@@ -615,7 +630,7 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.getters['auth/getEssenceList'](item, true);
+          return this.$store.dispatch('auth/getEssenceList', { role: item, create: true });
         });
         const result = await Promise.all(promise);
         result.forEach((item, i) => {
@@ -623,10 +638,10 @@ export default {
         });
         return allData;
       }
-      return this.$store.getters['auth/getEssence'](
-        role,
-        data[this.curGroupFrom].id,
-      );
+      return this.$store.dispatch('auth/getEssence', {
+        essence: role,
+        id: data[this.curGroupFrom].id,
+      });
     },
     setEnter(event) {
       if (event.code === 'Enter') {

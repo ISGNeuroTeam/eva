@@ -960,12 +960,15 @@
 
 <script>
 import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
-import settings from '../js/componentsSettings.js';
+import settings from '../js/componentsSettings';
 
 export default {
   name: 'ModalSettings',
   props: {
-    idDashFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -1012,9 +1015,37 @@ export default {
     };
   },
   computed: {
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    // получаем объект с настройками моадлки натсроек
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
     active: {
       get() {
-        return this.$store.getters.getModalSettings(this.idDash).status;
+        return this.getModalSettings.status;
       },
       set(value) {
         this.$store.dispatch('closeModalSettings', {
@@ -1038,21 +1069,34 @@ export default {
       if (!this.element) {
         return [];
       }
-      const elem = this.element.split('-')[0];
+      const [elem] = this.element.split('-');
       return elem ? this.optionsByComponents[elem] || [] : [];
     },
     changeComponent() {
       return `${this.idDash}-${this.element}`;
     },
     element() {
-      return this.$store.getters.getModalSettings(this.idDash).element;
+      return this.getModalSettings.element;
     },
     // поля элемента данных
     titles() {
-      return this.$store.getters.getAvailableTableTitles(
-        this.idDash,
-        this.element,
-      );
+      return this.elementFromStore?.availableTableTitles;
+    },
+    elementFromStore() {
+      return this.$store.state[this.idDash][this.element];
+    },
+    getSelectedTableTitles() {
+      return this.elementFromStore?.selectedTableTitles;
+    },
+    getMetricsMulti() {
+      if (!this.elementFromStore.metrics) {
+        this.$store.commit('setState', [{
+          object: this.elementFromStore,
+          prop: 'metrics',
+          value: [],
+        }]);
+      }
+      return this.elementFromStore.metrics;
     },
   },
   watch: {
@@ -1067,10 +1111,7 @@ export default {
   },
   mounted() {
     this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-    this.metricsName = this.$store.getters.getMetricsMulti({
-      idDash: this.idDash,
-      id: this.element,
-    });
+    this.metricsName = this.getMetricsMulti;
     this.loadComponentsSettings();
     this.prepareOptions();
   },
@@ -1120,8 +1161,8 @@ export default {
       };
       this.isChanged = true;
     },
-    setOptions: async function () {
-      // отправляем настройки в хранилище
+    // отправляем настройки в хранилище
+    async setOptions() {
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1139,7 +1180,6 @@ export default {
         this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
       }
       if (this.element.indexOf('piechart') !== -1) {
-        this.$set(this.options, 'metricsRelation', { ...this.metricsRelation });
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation),
         );
@@ -1149,7 +1189,7 @@ export default {
             this.$set(
               this.themes,
               this.colorsPie.nametheme,
-              this.colorsPie.colors.split(',')
+              this.colorsPie.colors.split(' '),
             );
             if (
               this.colorsPie.theme !== 'custom'
@@ -1180,7 +1220,7 @@ export default {
         color: this.color,
         updated: Date.now(),
       };
-      await this.$store.dispatch('saveSettingsToPath', {
+      this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
         options,
@@ -1192,13 +1232,16 @@ export default {
     },
     // если нажали на отмену создания
     cancelModal() {
-      this.$store.dispatch('closeModalSettings', { path: this.idDash });
+      this.$store.commit('setModalSettings', {
+        idDash: this.idDash,
+        status: false,
+        id: '',
+      });
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
         this.them = {};
         this.options.themes = this.themes;
         this.isDelete = false;
-        // this.setOptions();
       }
     },
     checkEsc(event) {
@@ -1231,7 +1274,7 @@ export default {
       }
       return this.optionsItems.includes(option);
     },
-    addIntoTooltip: function (item) {
+    addIntoTooltip(item) {
       this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.push('');
@@ -1241,7 +1284,7 @@ export default {
         this.tooltip.buttons.push({ name: '', id: '' });
       }
     },
-    addMetrics: function () {
+    addMetrics() {
       this.isChanged = true;
       const arr = JSON.parse(JSON.stringify(this.metrics));
       arr.push({
@@ -1253,7 +1296,7 @@ export default {
       });
       this.$set(this, 'metrics', arr);
     },
-    deleteFromTooltip: function (item, i) {
+    deleteFromTooltip(item, i) {
       this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
@@ -1266,6 +1309,13 @@ export default {
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
+    getSettingsByPath() {
+      this.$store.commit('prepareSettingsStore', {
+        path: this.idDash,
+        element: this.element,
+      });
+      return this.$store.state[this.idDash][this.element]?.options || {};
+    },
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
@@ -1276,6 +1326,7 @@ export default {
         });
       }
     },
+    //  понимает какие опции нужно вывести
     async prepareOptions() {
       await this.$store.dispatch('getSettingsByPath', {
         path: this.idDash,
@@ -1325,14 +1376,12 @@ export default {
               this.metricUnits[metric.name] = metric.units;
               //
               if (
-                options.yAxesBinding &&
-                options.yAxesBinding.metrics &&
-                options.yAxesBinding.metricTypes
+                options.yAxesBinding
+                && options.yAxesBinding.metrics
+                && options.yAxesBinding.metricTypes
               ) {
-                this.multilineYAxesBinding.metrics[metric.name] =
-                  options.yAxesBinding.metrics[metric.name];
-                this.multilineYAxesBinding.metricTypes[metric.name] =
-                  options.yAxesBinding.metricTypes[metric.name];
+                this.multilineYAxesBinding.metrics[metric.name] = options.yAxesBinding.metrics[metric.name];
+                this.multilineYAxesBinding.metricTypes[metric.name] = options.yAxesBinding.metricTypes[metric.name];
               } else {
                 this.multilineYAxesBinding.metrics[metric.name] = 'left';
                 this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
@@ -1378,34 +1427,27 @@ export default {
                 let val = options[item];
                 if (!val) {
                   // old settings
-                  let oldVal = this.$store.getters.getSelectedTableTitles(
-                    this.idDash,
-                    this.element
-                  );
+                  const oldVal = this.getSelectedTableTitles;
                   if (oldVal) {
                     val = oldVal;
                   }
                 }
                 // если не выбраны заголовки то выделить все имеющиеся
                 if (val.length === 0) {
-                  let allTitles = this.$store.getters.getAvailableTableTitles(
-                    this.idDash,
-                    this.element
-                  );
+                  const allTitles = this.titles;
                   if (allTitles.length) {
                     val = [...allTitles];
                   }
                 }
                 localOptions[item] = val || [];
               } else {
-                let val =
-                  options[item] !== null && typeof options[item] === 'object'
-                    ? { ...options[item] }
-                    : options[item];
+                const val = options[item] !== null && typeof options[item] === 'object'
+                  ? { ...options[item] }
+                  : options[item];
                 localOptions[item] = val;
               }
             } else {
-              let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+              const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;
               } else if (item === 'showlegend') {
@@ -1414,7 +1456,7 @@ export default {
                 localOptions[item] = 'right';
               } else {
                 const field = settings.optionFields.find(
-                  (field) => field.option === item
+                  (field) => field.option === item,
                 );
                 if (field && field.default !== undefined) {
                   localOptions[item] = field.default;

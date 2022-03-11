@@ -259,7 +259,14 @@
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M7.00002 12.8334C3.77836 12.8334 1.16669 10.2217 1.16669 7.00002C1.16669 3.77836 3.77836 1.16669 7.00002 1.16669C10.2217 1.16669 12.8334 3.77836 12.8334 7.00002C12.8298 10.2202 10.2202 12.8298 7.00002 12.8334ZM2.33335 7.10035C2.36095 9.66774 4.45733 11.7306 7.02484 11.7169C9.59234 11.703 11.6664 9.61773 11.6664 7.05019C11.6664 4.48265 9.59234 2.39739 7.02484 2.38352C4.45733 2.36979 2.36095 4.43263 2.33335 7.00002V7.10035ZM7.58335 9.91669H6.41669V7.58335H4.08335V6.41669H6.41669V4.08335H7.58335V6.41669H9.91669V7.58335H7.58335V9.91669Z"
+                d="M7.00002 12.8334C3.77836 12.8334 1.16669 10.2217 1.16669 7.00002C1.16669
+                 3.77836 3.77836 1.16669 7.00002 1.16669C10.2217 1.16669 12.8334 3.77836
+                 12.8334 7.00002C12.8298 10.2202 10.2202 12.8298 7.00002 12.8334ZM2.33335
+                 7.10035C2.36095 9.66774 4.45733 11.7306 7.02484 11.7169C9.59234 11.703
+                 11.6664 9.61773 11.6664 7.05019C11.6664 4.48265 9.59234 2.39739 7.02484
+                 2.38352C4.45733 2.36979 2.36095 4.43263 2.33335 7.00002V7.10035ZM7.58335
+                 9.91669H6.41669V7.58335H4.08335V6
+                 .41669H6.41669V4.08335H7.58335V6.41669H9.91669V7.58335H7.58335V9.91669Z"
                 :fill="theme.$ok_color"
               />
             </svg>
@@ -337,7 +344,7 @@
     <modal-confirm
       v-model="isConfirmModal"
       :theme="theme"
-      :modal-text="`Уверенны, что хотите удалить фильтр - <strong>${deleteFilterInfo.id}</strong> ?`"
+      :modal-text="modalText"
       btn-confirm-text="Удалить"
       btn-cancel-text="Отмена"
       @result="deleteFilter"
@@ -366,7 +373,10 @@ export default {
   components: { FilterPartModal, FilterPart, FilterPreviewModal },
   props: {
     editPermission: Boolean,
-    idDashFrom: String,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
     editMode: Boolean,
   },
   data() {
@@ -395,11 +405,23 @@ export default {
     };
   },
   computed: {
+    modalText() {
+      return `Уверенны, что хотите удалить фильтр - <strong>${this.deleteFilterInfo.id}</strong> ?`;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
     focusedFilter() {
-      return this.$store.getters.getFocusedFilter(this.idDashFrom);
+      return this.getFocusedFilter;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom];
+    },
+    getFocusedFilter() {
+      return this.dashFromStore.focusedFilter;
+    },
+    getFilters() {
+      return this.dashFromStore.filters ? this.dashFromStore.filters : [];
     },
   },
   watch: {
@@ -418,7 +440,7 @@ export default {
     },
   },
   mounted() {
-    this.filters = this.$store.getters.getFilters(this.idDashFrom);
+    this.filters = this.getFilters;
     this.tempFilter = {
       id: '',
       idDash: this.idDashFrom,
@@ -499,7 +521,7 @@ export default {
           parts: [],
         };
         this.tempFilterIndex = -1;
-        this.filters = this.$store.getters.getFilters(this.idDashFrom);
+        this.filters = this.getFilters;
       }
     },
     deleteFilter(isConfirm) {
@@ -511,7 +533,7 @@ export default {
       this.$store.commit('declineFilterChanges', this.idDashFrom);
       this.$store.commit('clearFocusedFilter', this.idDashFrom);
       this.focusedRow = null;
-      this.filters = this.$store.getters.getFilters(this.idDashFrom);
+      this.filters = this.getFilters;
     },
     refreshFilter(filter) {
       this.filterChanged = true;
@@ -559,7 +581,7 @@ export default {
   },
 };
 </script>
-
+<!-- eslint-disable -->
 <style lang="sass" scoped>
 $main_text: var(--main_text)
 $main_border: var(--main_border)

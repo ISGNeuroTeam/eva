@@ -16,9 +16,7 @@
               v-on="on"
               @click="toHome"
             >
-              {{
-                home
-              }}
+              {{ home }}
             </v-icon>
           </template>
           <span>На главную</span>
@@ -29,7 +27,6 @@
           <div class="title-form">
             {{ nameForm }}
           </div>
-          <!-- <div class="form-itself" :style="{gridTemplateRows : `repeat(${createForm.rows}, 1fr)`, gridTemplateColumns: `repeat(${createForm.columns}, 1fr)`}">-->
           <div
             ref="form"
             class="form-itself"
@@ -60,7 +57,6 @@
                   @click="openToolTip($event)"
                 >
                   <div class="elem-cell">
-                    <!-- <v-icon class="icon-cell"  color="teal" @click="openModal(item.i)" >{{item.img}}</v-icon>  -->
                     <template-elements-form
                       :id-from="item.i"
                       :height-from="item.h"
@@ -78,7 +74,7 @@
           </div>
           <div class="form-btn">
             <v-btn
-              v-if="editable == 'true'"
+              v-if="editable === 'true'"
               small
               color="teal"
               class="create-form-btn"
@@ -87,7 +83,6 @@
             >
               Сохранить
             </v-btn>
-            <!-- <v-btn small color="teal" class="create-form-btn" @click="openForm">Перейти к редактированию</v-btn> -->
           </div>
         </v-card>
       </v-container>
@@ -109,108 +104,108 @@ export default {
       tooltip: null,
     };
   },
+  // осоновные параметры, которые часто меняются и которые следует отслеживать
   computed: {
-    // осоновные параметры, которые часто меняются и которые следует отслеживать
+    // получаем id формы
     idForm() {
-      // получаем id формы
       return this.$route.query.id;
     },
+    //  получаем id шаблона
     idTemplate() {
-      //  получаем id шаблона
       return this.$route.query.idTemplate;
     },
+    // получаем имя шаблона
     nameForm() {
-      // получаем имя шаблона
       return this.$route.query.nameForm;
     },
+    // переменная котора ярешает следует ли редактировать форму
     editable() {
-      // переменная котора ярешает следует ли редактировать форму
       return this.$route.query.editable;
     },
     //  empty: function() {
     //      return this.$route.query.empty
     //  },
+    // переменная которая решает активна ли кнопка Сохранить
     disabled() {
-      // переменная которая решает активна ли кнопка Сохранить
       return this.$store.getters['form/getDisabled'];
     },
   },
   mounted() {
-    this.getForm(); // при загрузке страницы получаем форму для отрисовки из локального хранилища
+    // при загрузке страницы получаем форму для отрисовки из локального хранилища
+    this.getForm();
   },
   methods: {
+    // метод переключающий нас на домашнию страницу
     toHome() {
-      // метод переключающий нас на домашнию страницу
       this.$router.push('/forms');
     },
+    // сохраняем форму
     saveForm() {
-      // сохраняем форму
-      const content = this.$store.getters['form/getAllContent']; // получаем контент формы
-      let form_name = this.grid.filter((item) => {
-        // определяем имя формы на основе ключегого поля
-        if (item.options) {
-          return item.options.ident == true;
-        }
-      })[0].i;
-      form_name = content[form_name]; // заносим указанное поле как имя формы
-      //    let newcontent = {};
-      //    content.forEach( (item,i) => {
-      //        if (Number(item)) {
-      //            newcontent[i] = Number(item);
-      //        } else {
-      //            newcontent[i] = item;
-      //        }
+      // получаем контент формы
+      const content = this.$store.getters['form/getAllContent'];
+      // определяем имя формы на основе ключегого поля
+      // eslint-disable-next-line camelcase
+      let form_name = this.grid
+        .filter((item) => (item.options ? !!item.options.ident : false))[0].i;
+      // заносим указанное поле как имя формы
+      // eslint-disable-next-line camelcase
+      form_name = content[form_name];
 
-      //    })
-      // console.log(this.grid);
-      //   this.$store.commit('form/setTemplate', this.grid);
-
+      // создаем объект формы
       const form = {
-        // создаем объект формы
         template_id: this.idForm, // id шаблона
         form_name, // имя формы
         //  content: newcontent  // контент формы
       };
 
-      this.$store.commit('form/saveForm', form); // сохраняем форму в базу данных
-      this.$store.commit('form/setDisabled', true); // отключаем кнопку Сохранить
+      // сохраняем форму в базу данных
+      this.$store.dispatch('form/saveForm', form);
+      // отключаем кнопку Сохранить
+      this.$store.commit('form/setDisabled', true);
     },
+    // получаем данные по форме
     async getForm() {
-      // получаем данные по форме
-
-      const form = this.$store.getters['form/getFormLocal']; // получаем структуру по форме из локального хранилища
-      const content = this.$store.getters['form/getAllContent']; // получаем контент по форме из локального хранилища
-      this.grid = form; // заносим объект в перемненую для отрисовки
+      // получаем структуру по форме из локального хранилища
+      const form = this.$store.getters['form/getFormLocal'];
+      // получаем контент по форме из локального хранилища
+      const content = this.$store.getters['form/getAllContent'];
+      // заносим объект в перемненую для отрисовки
+      this.grid = form;
+      // находим максимальное значение среди всех значений х,
+      // чтобы понять сколько колонок у нас будет
       this.columns = form.reduce((last, next) => {
-        // находим максимальное значение среди всех значений х, чтобы понять сколько колонок у нас будет
-        if (next.y == 0) {
+        if (next.y === 0) {
           return last + next.w;
         }
         return last;
       }, 0);
 
-      for (let i = 0; i < this.grid.length; i++) {
-        // пробегаемся по всем ячейкам
-        if (this.grid[i].name == 'Выбор одного варианта') {
-          // и если есть ячейки определенного типа
-          this.$set(this.radios, i, content[i]); // то выставляем их значение в объект
+      // пробегаемся по всем ячейкам
+      for (let i = 0; i < this.grid.length; i += 1) {
+        // и если есть ячейки определенного типа
+        if (this.grid[i].name === 'Выбор одного варианта') {
+          // то выставляем их значение в объект
+          this.$set(this.radios, i, content[i]);
         }
       }
     },
+    // когда поменялось значение ячейки
     setValue(content) {
-      // когда поменялось значение ячейки
-      this.$store.commit('form/setContent', content); // заносим новое значение в локальное хранилище
+      // заносим новое значение в локальное хранилище
+      this.$store.commit('form/setContent', content);
     },
+    // вызывается когда нажали на radiobtn
     checkSwitch(cellElem) {
-      // вызывается когда нажали на radiobtn
-      this.radios[cellElem.id] = !this.radios[cellElem.id]; // меняем значение у radiobtn
+      // меняем значение у radiobtn
+      this.radios[cellElem.id] = !this.radios[cellElem.id];
+      // ищем все radiobtn с определенным парамтером name
       this.$refs.form
         .querySelectorAll(`[name="${cellElem.name}"]`)
         .forEach((item) => {
-          // ищем все radiobtn с определенным парамтером name
-          if (item.getAttribute('data-id') != cellElem.id) {
-            // и если этот элемнет не тот на который тыкнули
-            this.radios[item.getAttribute('data-id')] = false; // то отключаем их
+          // и если этот элемнет не тот на который тыкнули
+          if (item.getAttribute('data-id') !== cellElem.id) {
+            // то отключаем их
+            this.radios[item.getAttribute('data-id')] = false;
           }
         });
     },

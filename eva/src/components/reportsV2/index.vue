@@ -97,15 +97,15 @@
 import {
   mdiPlay, mdiSettings, mdiMerge, mdiPlus,
 } from '@mdi/js';
-import settings from '../../js/componentsSettings.js';
+import settings from '../../js/componentsSettings';
 import newSearch from './newSearch.vue';
 import timeline from './timeline.vue';
 import report from './report.vue';
 import download from './download.vue';
 import events from './events.vue';
 import statistic from './statistic.vue';
-import visualisation from './visualisation';
-import intresting from './intresting';
+import visualisation from './visualisation.vue';
+import intresting from './intresting.vue';
 
 export default {
   components: {
@@ -173,26 +173,17 @@ export default {
     },
   },
   computed: {
-    // getDataRest:  function() {
-    //   if (this.shouldGet) {
-    //     console.log(this.getDataAsynchrony());
-    //   }
-    //   return 'done'
-    // },
     theme() {
       return this.$store.getters.getTheme;
     },
     shouldGet() {
       // понимаем нужно ли запрашивтаь данные с реста
-      return this.$store.getters.getShouldGet({
-        id: 'table',
-        idDash: 'reports',
-      });
+      return this.$store.state.reports.table.should;
     },
     elements() {
       this.$store.getters.getReportElement.forEach((item, i) => {
         this.$set(this.aboutElem, item, {});
-        if (i == 0) {
+        if (i === 0) {
           this.$set(this.aboutElem[item], 'show', true);
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         } else {
@@ -217,64 +208,57 @@ export default {
   mounted() {
     document.title = 'EVA | Исследование данных';
     this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl != '') {
+    if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
         id: 'table',
         status: true,
       });
     }
-    this.calcSize();
-    this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode == 13) {
-        this.launchSearch();
-      }
-    });
     this.$refs.report.addEventListener('click', (event) => {
       if (!event.target.classList.contains('static-row')) {
         this.showStatistic = false;
       }
     });
 
-    if (screen.width > 1920) {
+    if (window.screen.width > 1920) {
       this.rowsCount = 14;
-    } else if (screen.width <= 1440) {
+    } else if (window.screen.width <= 1440) {
       this.rowsCount = 6;
     }
     this.unitedData.color = this.theme.controls;
   },
   methods: {
     getData() {
+      // создаем blob объект чтобы с его помощью использовать функцию для web worker
       const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
-      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
-
-      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
-
-      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
-
+      });
+      // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob);
+      // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL);
+      // при успешном выполнении функции что передали в blob изначально сработает этот код
       worker.onmessage = function (event) {
-        // при успешном выполнении функции что передали в blob изначально сработает этот код
-
-        let statistic = '';
+        let localStatistic = '';
         this.rows = [];
-        if (event.data.data.length != 0) {
+        if (event.data.data.length !== 0) {
           console.log('event.data.data.length != 0');
           this.shema = event.data.shema;
           this.data = event.data.data;
 
           Object.keys(this.shema).forEach((item, i) => {
-            statistic = this.createStatistic(item, event.data.data);
+            localStatistic = this.createStatistic(item, event.data.data);
             let count = 0;
             event.data.data.forEach((element) => {
               if (element[item]) {
-                count++;
+                count += 1;
               }
             });
             this.rows.push({
               id: i,
               text: item,
-              static: statistic,
+              static: localStatistic,
               totalCount: count,
             });
           });
@@ -291,19 +275,19 @@ export default {
       this.search.parametrs.twf = search.parametrs.twf;
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
+      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
       console.log(this.search);
-      const response = await this.$store.getters.getDataApi({
+      const response = await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
       });
       // вызывая метод в хранилище
 
       console.log(response);
-      if (!response.data || response.data.length == 0) {
+      if (!response.data || response.data.length === 0) {
         // если что-то пошло не так
         this.loading = false;
         this.$store.commit('setErrorLogs', true);
@@ -313,16 +297,19 @@ export default {
         // если все нормально
         console.log('data ready');
 
-        const responseDB = this.$store.getters.putIntoDB(
-          response,
-          this.search.sid,
-          'reports',
+        const responseDB = this.$store.dispatch(
+          'putIntoDB',
+          {
+            result: response,
+            sid: this.search.sid,
+            idDash: 'reports',
+          },
         );
         responseDB.then(() => {
-          this.$store.getters.refreshElements(
-            'reports',
-            this.search.sid,
-          );
+          this.$store.dispatch('refreshElements', {
+            idDash: 'reports',
+            key: this.search.sid,
+          });
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
@@ -331,21 +318,21 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|',
+        '\n|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n' + '|',
-        '\n' + '|',
+        '\n\n|',
+        '\n|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '|' + '\n',
+        '| \n',
         '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '| ' + '\n',
+        '| \n',
         '| ',
       );
     },
@@ -368,15 +355,15 @@ export default {
 
         const request = indexedDB.open('EVA', 1);
 
-        request.onerror = function (event) {
-          console.log('error: ', event);
+        request.onerror = (requestEvent) => {
+          console.log('error: ', requestEvent);
         };
 
-        request.onupgradeneeded = (event) => {
+        request.onupgradeneeded = (requestEvent) => {
           console.log('create');
-          db = event.target.result;
+          db = requestEvent.target.result;
+          // if there's no "books" store
           if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
             db.createObjectStore('searches'); // create it
           }
 
@@ -396,16 +383,18 @@ export default {
 
           const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
+          // (4)
           query.onsuccess = () => {
-            // (4)
             if (query.result) {
-              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage(query.result);
             } else {
-              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage([]);
             }
           };
 
-          query.onerror = function () {
+          query.onerror = () => {
             console.log('Ошибка', query.error);
           };
         };
@@ -418,13 +407,9 @@ export default {
       this.modal = false;
     },
     changeTab(elem) {
-      if (elem == 'multiLine') {
-        this.unitedShow = true;
-      } else {
-        this.unitedShow = false;
-      }
+      this.unitedShow = elem === 'multiLine';
       Object.keys(this.aboutElem).forEach((item) => {
-        if (item != elem) {
+        if (item !== elem) {
           this.$set(this.aboutElem[item], 'show', false);
           this.$set(this.aboutElem[item], 'color', this.theme.text);
         } else {
@@ -450,28 +435,28 @@ export default {
       });
     },
     createStatistic(key, data) {
-      const how_much = {};
+      const howMuch = {};
       const result = [];
       const { length } = data;
       data.forEach((item) => {
-        if (how_much[item[key]]) {
-          how_much[item[key]]++;
+        if (howMuch[item[key]]) {
+          howMuch[item[key]] += 1;
         } else {
-          how_much[item[key]] = 1;
+          howMuch[item[key]] = 1;
         }
       });
-      Object.keys(how_much).forEach((item) => {
+      Object.keys(howMuch).forEach((item) => {
         let percent;
         if (length > 300) {
-          percent = ((how_much[item] * 100) / length).toFixed(2);
+          percent = ((howMuch[item] * 100) / length).toFixed(2);
         } else if (length > 30) {
-          percent = ((how_much[item] * 100) / length).toFixed(1);
+          percent = ((howMuch[item] * 100) / length).toFixed(1);
         } else {
-          percent = ((how_much[item] * 100) / length).toFixed();
+          percent = ((howMuch[item] * 100) / length).toFixed();
         }
         result.push({
           value: item,
-          count: how_much[item],
+          count: howMuch[item],
           '%': percent,
         });
       });
@@ -484,25 +469,6 @@ export default {
     setSearch(search) {
       this.search = { ...search };
       this.modal = false;
-    },
-    // openStatistic: function(statistic) {
-    //   if (this.showStatistic) {
-    //     if (this.statisticKey == statistic.text) {
-    //       this.showStatistic = false;
-    //     } else {
-    //       this.statisticKey = statistic.text;
-    //       this.statistic = statistic.static;
-    //     }
-    //   } else {
-    //     this.showStatistic = true;
-    //     this.statisticKey = statistic.text;
-    //     this.statistic = statistic.static;
-    //   }
-    // },
-    calcSize() {
-      const size = this.$refs.vis.$el.getBoundingClientRect();
-      this.size.width = Math.round(size.width) - 16;
-      this.size.height = Math.round(size.height) - 66;
     },
     setRange(range) {
       this.data = this.data.filter(

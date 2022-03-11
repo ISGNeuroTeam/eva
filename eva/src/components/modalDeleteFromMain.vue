@@ -53,11 +53,14 @@ export default {
     event: 'updateModalValue',
   },
   props: {
+    nameFrom: {
+      type: String,
+      required: true,
+    },
     modalValue: {
       type: Boolean,
       default: false,
     },
-    nameFrom: null,
   },
   data() {
     return {};
@@ -86,18 +89,6 @@ export default {
       // есл инажали на отмену создания
       this.active = false; // передаем в родителя чтобы выключили модалку
     },
-    // changeStyle: function() {
-    //   if (this.active) {
-    //     let dialog = document.querySelector('.v-dialog');
-    //     dialog.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     dialog.querySelectorAll('.v-input__slot').forEach( item => {
-    //       item.style.boxShadow = `0 3px 1px -2px ${this.color.border},0 2px 2px 0 ${this.color.border},0 1px 5px 0 ${this.color.border}`;
-    //     })
-    //     dialog.querySelectorAll('input').forEach( item => {
-    //       item.style.color = this.color.text;
-    //     })
-    //   }
-    // },
   },
 };
 </script>

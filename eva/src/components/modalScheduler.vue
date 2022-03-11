@@ -9,7 +9,10 @@
     :is-confirm="isChanged"
     @cancelModal="cancel"
   >
-    <v-card :style="{ background: theme.$main_bg }" class="shedule-modal">
+    <v-card
+      :style="{ background: theme.$main_bg }"
+      class="shedule-modal"
+    >
       <div class="schedule-block">
         <div
           class="zagolovok"
@@ -169,12 +172,22 @@ export default {
     event: 'updateModalValue',
   },
   props: {
-    idDashFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    modalFrom: {
+      type: Boolean,
+      required: true,
+    },
+    dataSidFrom: {
+      type: [String, Number],
+      required: true,
+    },
     modalValue: {
       type: Boolean,
       default: false,
     },
-    dataSidFrom: null,
   },
   data() {
     return {
@@ -206,8 +219,8 @@ export default {
     };
   },
   computed: {
+    // получаем название элемента от родителя
     idDash() {
-      // получаем название элемента от родителя
       return this.idDashFrom;
     },
     active: {
@@ -221,11 +234,27 @@ export default {
     sid() {
       return this.dataSidFrom;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    getSchedulers() {
+      if (!this.dashFromStore.schedulers) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'schedulers',
+          value: {},
+        }]);
+      }
+      return this.dashFromStore.schedulers;
+    },
     schedulers() {
-      return this.$store.getters.getSchedulers(this.idDash);
+      return this.getSchedulers;
+    },
+    getSearches() {
+      return this.$store.state[this.idDash]?.searches || [];
     },
     searches() {
-      return this.$store.getters.getSearches(this.idDash);
+      return this.getSearches;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -236,7 +265,7 @@ export default {
       // получаем статус открытия или нет окна модального
       if (this.modalValue) {
         if (this.schedulers?.length !== 0) {
-          this.setData()
+          this.setData();
         }
       } else {
         this.schedulerTab = 0;
@@ -245,18 +274,17 @@ export default {
     },
   },
   mounted() {
-    // this.$store.commit('setModalSearch', { id: this.idDash, status: false });  // при создании окна на странице выключаем все открытые ранее окна
     const { schedulers } = this;
-    const searches = this.$store.getters.getSearches(this.idDash);
+    const searches = this.getSearches;
     let shedule = {};
     let curTime = {};
 
+    // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
     if (Object.keys(schedulers).length !== 0) {
-      // при обновлении страницы нужно понять  есть ли уже планировщики и снова их запустить
+      // пробегаемся по всем планировщикам
       Object.keys(schedulers).forEach((scheduler) => {
-        // пробегаемся по всем планировщикам
+        // создаем объект на основе настроек планировщика
         shedule = {
-          // создаем объект на основе настроек планировщика
           time: schedulers[scheduler].time,
           every: schedulers[scheduler].every,
           timeLast: schedulers[scheduler].timeLast,
@@ -267,10 +295,12 @@ export default {
           clearInterval(schedulers[scheduler].schedulerID);
         }
 
-        curTime = this.countTime(shedule.time, shedule.every) * 1000; // переводим в правильный формат время
-        this.executeSearch(searches, scheduler, shedule); // выоплняем серч один раз
+        // переводим в правильный формат время
+        curTime = this.countTime(shedule.time, shedule.every) * 1000;
+        // выоплняем серч один раз
+        this.executeSearch(searches, scheduler, shedule);
+        // и запускаем в цикле
         this.timers[scheduler] = setInterval(() => {
-          // и запускаем в цикле
           this.executeSearch(searches, scheduler, shedule);
         }, curTime);
         this.$store.commit('setSchedulerID', {
@@ -283,8 +313,8 @@ export default {
   },
   methods: {
     setData() {
+      // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
       if (this.schedulers[this.sid]) {
-        // отображаем цвета и доступность кнопок исходя из того запущен ли планировщик
         this.every = this.schedulers[this.sid].every;
         this.time = this.schedulers[this.sid].time;
         this.everyLast = this.schedulers[this.sid].everyLast;
@@ -314,9 +344,9 @@ export default {
       // закрываем окно
       this.active = false;
     },
+    // выставляем время и меняем цвета у кнопок
     setTime(time, tense) {
       this.isChanged = true;
-      // выставляем время и меняем цвета у кнопок
       if (!this.disabledEvery) {
         if (tense === 'every') {
           this.time = time;
@@ -341,8 +371,8 @@ export default {
         }
       }
     },
+    // переводим строковые значения времени в числовые
     countTime(time, every) {
-      // переводим строковые значения времени в числовые
       let period = 0;
       switch (time) {
         case 'second':
@@ -356,11 +386,13 @@ export default {
         case 'hour':
           period = Number(every) * 3600;
           break;
+        default:
+          break;
       }
       return period;
     },
+    // выполняем серч меняя его временны рамки
     executeSearch(searches, sid, shedule) {
-      // выполняем серч меняя его временны рамки
       let curTimeLast = 0;
       let tws = 0;
       let twf = 0;
@@ -373,6 +405,15 @@ export default {
         if (item.sid === sid) {
           item.parametrs.tws = tws;
           item.parametrs.twf = twf;
+          this.$store.commit('setState', [{
+            object: item.parametrs,
+            prop: 'tws',
+            value: tws,
+          }, {
+            object: item.parametrs,
+            prop: 'twf',
+            value: twf,
+          }]);
           this.$store.commit('updateSearchStatus', {
             idDash: this.idDash,
             sid: item.sid,
@@ -381,8 +422,8 @@ export default {
         }
       });
     },
+    // запускаем планировщик
     startSchedule() {
-      // запускаем планировщик
       const schedule = {
         time: this.time,
         every: this.every,
@@ -391,11 +432,13 @@ export default {
       };
       const { sid } = this;
 
-      const searches = this.$store.getters.getSearches(this.idDash);
+      const searches = this.getSearches;
       const curTime = this.countTime(schedule.time, schedule.every) * 1000;
-      this.executeSearch(searches, sid, schedule); // сперва первый раз просто выполняем серч
+      // сперва первый раз просто выполняем серч
+      this.executeSearch(searches, sid, schedule);
+      // а затем уже выполняем его в цикле
       const intervalID = (this.timers[sid] = setInterval(() => {
-        this.executeSearch(searches, sid, schedule); // а затем уже выполняем его в цикле
+        this.executeSearch(searches, sid, schedule);
       }, curTime));
 
       this.$store.commit('setSchedule', {
