@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed gis icons
 - Fixed template for metrics
 - fixed dashboard creation
+- fixed columns in the table are not hidden
 
 ## [1.84.0]
 
