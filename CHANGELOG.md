@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed gis settings styles
 - fixed calendar in data source
 - fixed multiselect refinement
+- fixed multiselect placing data on multiple lines
 
 ## [1.84.0]
 
