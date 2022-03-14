@@ -1022,10 +1022,6 @@ export default {
         this.xAxis.attr('transform', `translate(0, ${this.height})`);
       }
 
-      this.brush = this.svg.append('g').attr('class', 'brush');
-
-      this.barplot = this.svg.append('g').attr('class', 'barplot');
-
       this.line = this.isUnitedMode
         ? this.svg.append('g').attr('clip-path', `url(#${clipPathID})`)
         : [];
@@ -1034,18 +1030,6 @@ export default {
 
       const tooltip = d3.select(svgContainer).select('.graph-tooltip');
       const [tooltipBlock] = tooltip.nodes();
-
-      const lineDot = this.svg
-        .append('g')
-        .append('line')
-        .attr('class', 'line-dot')
-        .attr('x1', 0)
-        .attr('y1', 20)
-        .attr('x2', 0)
-        .attr('y2', this.height)
-        .attr('opacity', 0)
-        .attr('stroke', this.theme.$main_text)
-        .attr('stroke-dasharray', '3 3');
 
       const putLabel = (...args) => this.putLabelDot(x, ...args);
       const createAnnotation = (...args) => this.createAnnotationLine(x, ...args);
@@ -1082,154 +1066,282 @@ export default {
           (name) => yAxesBinding.metricTypes[name] === 'barplot',
         );
 
-        if (this.isAccumulationBarplot) {
-          this.renderAccumulationBarplot(x, barplotBarWidth);
-        } else {
-          this.metricNames.forEach((metricName, metricIndex) => {
-            const isBarplotMetric = yAxesBinding.metricTypes[metricName] === 'barplot';
-            const minVal = isBarplotMetric ? 0 : minMetricsValues[metricIndex];
-            const maxVal = barplotMetrics.length
-              ? maxAllY
-              : maxMetricsValues[metricIndex];
+        const metricNames = this.isAccumulationBarplot ? this.metricNames.filter((x, i) => i === 0) : this.metricNames;
 
-            const extra = (val) => Math.abs((val * 10) / 100);
+        metricNames.forEach((metricName, metricIndex) => {
+          const isBarplotMetric = yAxesBinding.metricTypes[metricName] === 'barplot';
+          const minVal = isBarplotMetric ? 0 : minMetricsValues[metricIndex];
+          const maxVal = barplotMetrics.length
+            ? maxAllY
+            : maxMetricsValues[metricIndex];
 
-            const yScale = d3
-              .scaleLinear()
-              .range([this.height, 20])
-              .domain([minVal - extra(minVal), maxVal + extra(maxVal)]);
+          const extra = (val) => Math.abs((val * 10) / 100);
 
-            yScales.push(yScale);
+          const yScale = d3
+            .scaleLinear()
+            .range([this.height, 20])
+            .domain([minVal - extra(minVal), maxVal + extra(maxVal)]);
 
-            const yAxisClass = `yAxis-${metricName}`;
+          yScales.push(yScale);
 
-            const yDomainArr = [
-              Math.round(minVal - extra(minVal)),
-              Math.round(
-                (maxVal - minVal + 2 * extra(maxVal)) / 3
+          const yAxisClass = `yAxis-${metricName}`;
+
+          const yDomainArr = [
+            Math.round(minVal - extra(minVal)),
+            Math.round(
+              (maxVal - minVal + 2 * extra(maxVal)) / 3
                   + minVal
                   - extra(minVal),
-              ),
-              Math.round(
-                ((maxVal - minVal + 2 * extra(maxVal)) / 3) * 2
+            ),
+            Math.round(
+              ((maxVal - minVal + 2 * extra(maxVal)) / 3) * 2
                   + minVal
                   - extra(minVal),
-              ),
-              Math.round(maxVal + extra(maxVal)),
-            ];
-            const yRangeArr = [
-              this.height,
-              ((this.height - 20) / 3) * 2 + 20,
-              (this.height - 20) / 3 + 20,
-              20,
-            ];
+            ),
+            Math.round(maxVal + extra(maxVal)),
+          ];
+          const yRangeArr = [
+            this.height,
+            ((this.height - 20) / 3) * 2 + 20,
+            (this.height - 20) / 3 + 20,
+            20,
+          ];
 
-            const yScal = d3.scaleOrdinal().domain(yDomainArr).range(yRangeArr);
+          const yScal = d3.scaleOrdinal().domain(yDomainArr).range(yRangeArr);
 
-            if (
-              yAxesBinding.axesCount === 1
+          const subgroups = [...this.metricNames];
+
+          // stack the data? --> stack per subgroup
+          const stackedData = d3.stack().keys(subgroups)(this.dataRestFrom);
+
+          // Add Y axis
+          let maxY = [];
+          for (let i = 0; i < stackedData.length; i++) {
+            maxY.push(Math.max(...stackedData[i].map((item) => item[1])));
+          }
+          maxY = Math.max(...maxY);
+          const y = d3
+            .scaleLinear()
+            .domain([0, maxY * 1.05])
+            .range([this.height, 0]);
+
+          if (
+            yAxesBinding.axesCount === 1
               || yAxesBinding.metrics[metricName] === 'left'
-            ) {
-              let translateY;
-              if (numberLeft === 0) {
-                translateY = 0;
-              } else if (numberLeft % 2 !== 0) {
-                translateY = ((numberLeft + 1) / 2) * 10;
-              } else {
-                translateY = -(numberLeft / 2) * 10;
-              }
+          ) {
+            let translateY;
+            if (numberLeft === 0) {
+              translateY = 0;
+            } else if (numberLeft % 2 !== 0) {
+              translateY = ((numberLeft + 1) / 2) * 10;
+            } else {
+              translateY = -(numberLeft / 2) * 10;
+            }
+
+            if (!this.isAccumulationBarplot) {
               this.svg
                 .append('g')
                 .attr('transform', `translate(0, ${translateY})`)
                 .attr('class', yAxisClass)
                 .call(d3.axisLeft(yScal));
-
-              if (numberLeft !== 0) {
-                this.svg
-                  .selectAll(`g.${yAxisClass} g.tick line`)
-                  .style('visibility', 'hidden');
-                this.svg
-                  .selectAll(`g.${yAxisClass} .domain`)
-                  .style('visibility', 'hidden');
-              } else {
-                this.svg
-                  .selectAll(`g.${yAxisClass} g.tick`)
-                  .append('line')
-                  .attr('class', 'grid-line-y')
-                  .attr('x1', 0)
-                  .attr('y1', 0)
-                  .attr('x2', this.width)
-                  .attr('y2', 0)
-                  .attr('stroke', this.theme.$main_text)
-                  .style('opacity', 0.3);
-              }
-              numberLeft += 1;
             } else {
-              let translateY;
-              if (numberRight === 0) {
-                translateY = 0;
-              } else if (numberRight % 2 !== 0) {
-                translateY = ((numberRight + 1) / 2) * 10;
-              } else {
-                translateY = -(numberRight / 2) * 10;
-              }
               this.svg
                 .append('g')
-                .attr('transform', `translate( ${this.width}, ${translateY})`)
+                .attr('transform', `translate(0, ${translateY})`)
                 .attr('class', yAxisClass)
-                .call(d3.axisRight(yScal));
-              if (numberRight !== 0) {
-                this.svg
-                  .selectAll(`g.${yAxisClass} g.tick line`)
-                  .style('visibility', 'hidden');
-                this.svg
-                  .selectAll(`g.${yAxisClass} .domain`)
-                  .style('visibility', 'hidden');
-              } else {
-                this.svg
-                  .selectAll(`g.${yAxisClass} g.tick`)
-                  .append('line')
-                  .attr('class', 'grid-line-y')
-                  .attr('x1', 0)
-                  .attr('y1', 0)
-                  .attr('x2', -this.width)
-                  .attr('y2', 0)
-                  .attr('stroke', this.theme.$main_text)
-                  .style('opacity', 0.3);
-              }
-              numberRight += 1;
+                .call(d3.axisLeft(y));
+            }
+
+            if (numberLeft !== 0) {
+              this.svg
+                .selectAll(`g.${yAxisClass} g.tick line`)
+                .style('visibility', 'hidden');
+              this.svg
+                .selectAll(`g.${yAxisClass} .domain`)
+                .style('visibility', 'hidden');
+            } else {
+              this.svg
+                .selectAll(`g.${yAxisClass} g.tick`)
+                .append('line')
+                .attr('class', 'grid-line-y')
+                .attr('x1', 0)
+                .attr('y1', 0)
+                .attr('x2', this.width)
+                .attr('y2', 0)
+                .attr('stroke', this.theme.$main_text)
+                .style('opacity', 0.3);
+            }
+            numberLeft++;
+          } else {
+            let translateY;
+            if (numberRight === 0) {
+              translateY = 0;
+            } else if (numberRight % 2 !== 0) {
+              translateY = ((numberRight + 1) / 2) * 10;
+            } else {
+              translateY = -(numberRight / 2) * 10;
             }
 
             this.svg
-              .selectAll(`g.${yAxisClass} g.tick text`)
-              .attr('fill', this.legendColors[metricIndex]);
+              .append('g')
+              .attr('transform', `translate( ${this.width}, ${translateY})`)
+              .attr('class', yAxisClass)
+              .call(d3.axisRight(yScal));
+            if (numberRight !== 0) {
+              this.svg
+                .selectAll(`g.${yAxisClass} g.tick line`)
+                .style('visibility', 'hidden');
+              this.svg
+                .selectAll(`g.${yAxisClass} .domain`)
+                .style('visibility', 'hidden');
+            } else {
+              this.svg
+                .selectAll(`g.${yAxisClass} g.tick`)
+                .append('line')
+                .attr('class', 'grid-line-y')
+                .attr('x1', 0)
+                .attr('y1', 0)
+                .attr('x2', -this.width)
+                .attr('y2', 0)
+                .attr('stroke', this.theme.$main_text)
+                .style('opacity', 0.3);
+            }
+            numberRight++;
+          }
 
-            if (yAxesBinding.metricTypes[metricName] === 'barplot') {
-              const thisMetrics = [...this.metrics];
-              let allDotHover = [];
+          this.svg
+            .selectAll(`g.${yAxisClass} g.tick text`)
+            .attr('fill', this.legendColors[metricIndex]);
 
-              const barPostfix = this.isFullScreen ? '-full' : '';
-              const getBarID = (i) => `bar--${this.id}--${metricName}--${i}--${barPostfix}`;
-              let localBarWidth = parseInt(barplotBarWidth, 10);
-              if (!barplotBarWidth || localBarWidth <= 0) {
-                localBarWidth = d3
-                  .scaleBand()
-                  .range([0, this.width])
-                  .domain(
-                    this.dataRestFrom.map((d) => (this.isTime
-                      ? d[xMetric] * this.secondTransf
-                      : d[xMetric])),
-                  )
-                  .bandwidth();
-              }
+          if (metricIndex === 0) {
+            this.brush = this.svg.append('g').attr('class', 'brush');
 
-              let dividedBarplotPos = 0;
-              if (this.isDividedBarplot && this.metricNames.length) {
-                localBarWidth /= barplotMetrics.length;
-                dividedBarplotPos = barplotMetrics.indexOf(metricName) * localBarWidth
-                  - ((barplotMetrics.length - 1) / 2) * localBarWidth;
-              }
+            this.barplot = this.svg.append('g').attr('class', 'barplot');
+          }
 
+          const lineDot = this.svg
+            .append('g')
+            .append('line')
+            .attr('class', 'line-dot')
+            .attr('x1', 0)
+            .attr('y1', 20)
+            .attr('x2', 0)
+            .attr('y2', this.height)
+            .attr('opacity', 0)
+            .attr('stroke', this.theme.$main_text)
+            .attr('stroke-dasharray', '3 3');
+
+          if (yAxesBinding.metricTypes[metricName] === 'barplot') {
+            const thisMetrics = [...this.metrics];
+            let allDotHover = [];
+
+            const barPostfix = this.isFullScreen ? '-full' : '';
+            const getBarID = (i) => `bar--${this.id}--${metricName}--${i}--${barPostfix}`;
+            let barWidth = parseInt(barplotBarWidth);
+            if (!barplotBarWidth || barWidth <= 0) {
+              barWidth = d3
+                .scaleBand()
+                .range([0, this.width])
+                .domain(
+                  this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
+                )
+                .bandwidth();
+              barWidth -= 8;
+            }
+
+            let dividedBarplotPos = 0;
+
+            if ((this.isDividedBarplot && this.metricNames.length)) {
+              barWidth /= barplotMetrics.length;
+              dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth
+                  - ((barplotMetrics.length - 1) / 2) * barWidth;
+            }
+
+            if (this.isAccumulationBarplot) {
+              barWidth = x.bandwidth();
+              dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth
+                  - ((barplotMetrics.length - 1) / 2) * barWidth;
+
+              const colorItem = d3.scaleOrdinal().domain(subgroups).range(this.legendColors);
+
+              this.barplot
+                .append('g')
+                .selectAll('g')
+                .data(stackedData)
+                .enter()
+                .append('g')
+                .attr('fill', (d) => colorItem(d.key))
+                .selectAll('rect')
+                .data((d) => d)
+                .enter()
+                .append('rect')
+                .attr('x', (d) => x(this.isTime ? d.data[this.xMetric] * 1000 : d.data[this.xMetric]) + dividedBarplotPos)
+                .attr('y', (d) => y(d[1]))
+                .attr('height', (d) => y(d[0]) - y(d[1]))
+                .attr('width', x.bandwidth())
+                .attr('transform', function () {
+                  const translate = this.width.baseVal.value / 2;
+                  return `translate(-${translate}, 0)`;
+                })
+                .on('mouseenter', function (d) {
+                  const rectX = +d3.select(this).attr('x');
+
+                  const values = d.data;
+                  const date = new Date(values[this.xMetric] * this.secondTransf);
+                  const xVal = !this.isTime
+                    ? values[this.xMetric]
+                    : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+                  tooltip.html(
+                    thisMetrics.reduce((prev, cur) => {
+                      const value = cur === this.xMetric ? xVal : values[cur];
+                      return `${prev}<p><span>${cur}</span>: ${value}</p>`;
+                    }, ''),
+                  );
+                  tooltip.style('opacity', 1).style('visibility', 'visible');
+
+                  lineDot
+                    .attr('x1', rectX)
+                    .attr('x2', rectX)
+                    .attr('opacity', 0.7);
+                  tooltip.style('opacity', 1).style('visibility', 'visible');
+                })
+                .on('mousemove', () => {
+                  const { offsetX, offsetY } = d3.event;
+                  const tooltipWidth = tooltipBlock.offsetWidth;
+                  const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
+
+                  if (brushObj.mouseDown) brushObj.selectionMove();
+
+                  let left = offsetX + 20;
+                  let top = offsetY - tooltipHalfHeight;
+
+                  if (this.isFullScreen) {
+                    left = offsetX - 50;
+                  } else if (left + tooltipWidth > width + margin.left + 15 && !this.isFullScreen) {
+                    left = left - tooltipWidth - 20;
+                  }
+
+                  if (top + tooltipHalfHeight > height) {
+                    top -= tooltipHalfHeight;
+                  }
+
+                  tooltip.style('left', `${left}px`).style('top', `${top}px`);
+                })
+                .on('mouseleave', function () {
+                  if (!this.getAttribute('data-last-bar')) {
+                    allDotHover.forEach((dot) => {
+                      if (extraDot.indexOf(dot.__data__) === -1) {
+                        dot.style.opacity = 0;
+                      }
+                      if (dot.getAttribute('data-with-caption')) {
+                        dot.style.opacity = 1;
+                      }
+                    });
+                  }
+                  lineDot.attr('opacity', 0);
+                  tooltip.style('opacity', 0).style('visibility', 'hidden');
+                });
+            } else {
               this.barplot
                 .selectAll(`bar-${metricName}`)
                 .data(this.dataRestFrom)
@@ -1243,8 +1355,8 @@ export default {
                   return xPos + dividedBarplotPos;
                 })
                 .attr('y', (d) => yScale(d[metricName]))
-                .attr('width', localBarWidth)
-                .attr('height', (d, j) => {
+                .attr('width', barWidth)
+                .attr('height', function (d, j) {
                   const setLabel = (attr, classText, metricText) => {
                     putLabel(
                       attr,
@@ -1295,13 +1407,17 @@ export default {
                   allDotHover = svg
                     .selectAll('circle')
                     .nodes()
-                    .filter((dot) => dot.classList.contains('dot')
-                    // eslint-disable-next-line no-underscore-dangle
-                        && dot.__data__[xMetric]
-                          === d[xMetric] * secondTransf
-                    // eslint-disable-next-line no-underscore-dangle
-                        && dot.__data__[dot.getAttribute('metric')] !== null);
-
+                    .filter((dot) => {
+                      if (
+                        dot.classList.contains('dot')
+                              && dot.__data__[xMetric]
+                              === d[xMetric] * secondTransf
+                              && dot.__data__[dot.getAttribute('metric')] !== null
+                      ) {
+                        dot.style.opacity = 1;
+                        return dot;
+                      }
+                    });
                   lineDot
                     .attr('x1', rectX)
                     .attr('x2', rectX)
@@ -1317,15 +1433,14 @@ export default {
                   let left = offsetX + 20;
                   let top = offsetY - tooltipHalfHeight;
 
-                  if (left + tooltipWidth > width + margin.left + 15) {
+                  if (this.isFullScreen) {
+                    left = offsetX - 50;
+                  } else if (left + tooltipWidth > width + margin.left + 15 && !this.isFullScreen) {
                     left = left - tooltipWidth - 20;
                   }
 
                   if (top + tooltipHalfHeight > height) {
                     top -= tooltipHalfHeight;
-                  }
-                  if (this.$attrs['full-screen']) {
-                    left = offsetX - 70;
                   }
 
                   tooltip.style('left', `${left}px`).style('top', `${top}px`);
@@ -1346,257 +1461,263 @@ export default {
                   tooltip.style('opacity', 0).style('visibility', 'hidden');
                 });
             }
+          }
 
-            if (
-              yAxesBinding.metricTypes[metricName] === 'linechart'
+          if (
+            yAxesBinding.metricTypes[metricName] === 'linechart'
               || yAxesBinding.metricTypes[metricName] === undefined
-            ) {
-              const linesWithBreak = [];
-              let dotDate;
-              let nullValue = -1;
-              let allDotHover = [];
-              let onelinesWithBreak = [];
+          ) {
+            const linesWithBreak = [];
+            let dotDate;
+            let nullValue = -1;
+            let allDotHover = [];
+            let onelinesWithBreak = [];
 
-              extraDot.forEach((item, j) => {
-                if (metricName === item.column) nullValue = j;
+            extraDot.forEach((item, j) => {
+              if (metricName === item.column) nullValue = j;
+            });
+
+            if (nullValue !== -1) {
+              dotDate = [extraDot[nullValue]];
+            } else {
+              this.dataRestFrom.forEach((line) => {
+                if (!Number(line[metricName]) && line[metricName] !== 0) {
+                  if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
+                  linesWithBreak.push(onelinesWithBreak);
+                  onelinesWithBreak = [];
+                } else {
+                  onelinesWithBreak.push(line);
+                }
               });
 
-              if (nullValue !== -1) {
-                dotDate = [extraDot[nullValue]];
-              } else {
-                this.dataRestFrom.forEach((line) => {
-                  if (!Number(line[metricName]) && line[metricName] !== 0) {
-                    if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
-                    linesWithBreak.push(onelinesWithBreak);
-                    onelinesWithBreak = [];
-                  } else {
-                    onelinesWithBreak.push(line);
-                  }
+              if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
+
+              linesWithBreak.push(onelinesWithBreak);
+              this.allLinesWithBreak.push(linesWithBreak);
+
+              linesWithBreak.forEach((lineItself, lineIndex) => {
+                this.line
+                  .append('path')
+                  .datum(lineItself)
+                  .attr('class', `line-${metricIndex}-${lineIndex}`)
+                  .attr('fill', color[metricName] || 'none')
+                  .attr(
+                    'stroke',
+                    color[metricName] || this.legendColors[metricIndex],
+                  )
+                  .attr('stroke-width', this.strokeWidth)
+                  .style(
+                    'stroke-dasharray',
+                    getStyleLine(type_line[metricName]),
+                  )
+                  .attr(
+                    'd',
+                    d3
+                      .line()
+                      .x((d) => (this.isTime
+                        ? x(d[xMetric] * this.secondTransf)
+                        : x(d[xMetric])))
+                      .y((d) => yScale(d[metricName])),
+                  );
+              });
+
+              dotDate = this.dataRestFrom;
+            }
+
+            this.svg
+              .append('g')
+              .selectAll('dot')
+              .data(dotDate)
+              .enter()
+              .append('circle')
+              .attr('class', `dot dot-${metricIndex}`)
+              .attr('cx', (d) => (this.isTime
+                ? x(d[xMetric] * this.secondTransf)
+                : x(d[xMetric])))
+              .attr('cy', (d) => yScale(d[metricName]))
+              .attr('r', 5)
+              .attr('metric', metricName)
+              .attr('fill', this.legendColors[metricIndex])
+              .style('opacity', function (d, j) {
+                let opacity = nullValue !== -1 ? 1 : 0;
+
+                const count = Number(conclusion_count[metricName]);
+                const replaceCount = Number(replace_count[metricName]);
+
+                let hasTooltip = true;
+                const isNumber = typeof count === 'number';
+                if (isNumber && count > 1) {
+                  hasTooltip = j % count === 0;
+                }
+                if (isNumber && count <= 0) {
+                  hasTooltip = false;
+                }
+
+                mustSee.forEach((item) => {
+                  if (item[metricName] === d[metricName]) opacity = 1;
                 });
 
-                if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
+                const setLabel = (attr, classText, metricText) => {
+                  putLabel(
+                    attr,
+                    classText,
+                    d,
+                    yScale(d[metricName]) - 5,
+                    metricText,
+                    this,
+                    'line',
+                    brushObj,
+                    replaceCount,
+                  );
+                };
 
-                linesWithBreak.push(onelinesWithBreak);
-                this.allLinesWithBreak.push(linesWithBreak);
-
-                linesWithBreak.forEach((lineItself, lineIndex) => {
-                  this.line
-                    .append('path')
-                    .datum(lineItself)
-                    .attr('class', `line-${metricIndex}-${lineIndex}`)
-                    .attr('fill', color[metricName] || 'none')
-                    .attr(
-                      'stroke',
-                      color[metricName] || this.legendColors[metricIndex],
-                    )
-                    .attr('stroke-width', this.strokeWidth)
-                    .style(
-                      'stroke-dasharray',
-                      getStyleLine(typeLine[metricName]),
-                    )
-                    .attr(
-                      'd',
-                      d3
-                        .line()
-                        .x((d) => (this.isTime
-                          ? x(d[xMetric] * this.secondTransf)
-                          : x(d[xMetric])))
-                        .y((d) => yScale(d[metricName])),
-                    );
-                });
-
-                dotDate = this.dataRestFrom;
-              }
-
-              this.svg
-                .append('g')
-                .selectAll('dot')
-                .data(dotDate)
-                .enter()
-                .append('circle')
-                .attr('class', `dot dot-${metricIndex}`)
-                .attr('cx', (d) => (this.isTime
-                  ? x(d[xMetric] * this.secondTransf)
-                  : x(d[xMetric])))
-                .attr('cy', (d) => yScale(d[metricName]))
-                .attr('r', 5)
-                .attr('metric', metricName)
-                .attr('fill', this.legendColors[metricIndex])
-                .style('opacity', (d, j) => {
-                  let opacity = nullValue !== -1 ? 1 : 0;
-
-                  const count = Number(conclusion_count[metricName]);
-                  const replaceCount = Number(replace_count[metricName]);
-
-                  let hasTooltip = true;
-                  const isNumber = typeof count === 'number';
-                  if (isNumber && count > 1) {
-                    hasTooltip = j % count === 0;
-                  }
-                  if (isNumber && count <= 0) {
-                    hasTooltip = false;
-                  }
-
-                  mustSee.forEach((item) => {
-                    if (item[metricName] === d[metricName]) opacity = 1;
-                  });
-
-                  const setLabel = (attr, classText, metricText) => {
-                    putLabel(
-                      attr,
-                      classText,
-                      d,
-                      yScale(d[metricName]) - 5,
-                      metricText,
-                      this,
-                      'line',
-                      brushObj,
-                      replaceCount,
-                    );
-                  };
-
-                  if (
-                    isDataAlwaysShow
+                if (
+                  isDataAlwaysShow
                     && isDataAlwaysShow === 'data'
                     && hasTooltip
-                  ) {
-                    opacity = 1;
-                    setLabel(
-                      'data-always-dot',
-                      `data-always-dot-text-${metricName}`,
-                      metricName,
-                    );
-                  }
+                ) {
+                  opacity = 1;
+                  setLabel(
+                    'data-always-dot',
+                    `data-always-dot-text-${metricName}`,
+                    metricName,
+                  );
+                }
 
-                  if (
-                    isDataAlwaysShow
+                if (
+                  isDataAlwaysShow
                     && isDataAlwaysShow === 'caption'
                     && hasTooltip
-                  ) {
-                    opacity = 1;
-                    setLabel(
-                      'data-always-dot',
-                      `data-always-dot-text-${metricName}`,
-                      `_${metricName}_caption`,
+                ) {
+                  opacity = 1;
+                  setLabel(
+                    'data-always-dot',
+                    `data-always-dot-text-${metricName}`,
+                    `_${metricName}_caption`,
+                  );
+                }
+
+                if (isLastDotShow && j === dataRestLength - 1) {
+                  opacity = 1;
+                  setLabel(
+                    'data-last-dot',
+                    `last-dot-text-${metricName}`,
+                    metricName,
+                  );
+                }
+
+                annotationList.forEach((annotation, i) => {
+                  if (d[annotation]) {
+                    createAnnotation(
+                      d,
+                      annotation,
+                      metricNamesCount + 1 + i,
+                      tooltip,
                     );
                   }
+                });
 
-                  if (isLastDotShow && j === dataRestLength - 1) {
-                    opacity = 1;
-                    setLabel(
-                      'data-last-dot',
-                      `last-dot-text-${metricName}`,
-                      metricName,
-                    );
-                  }
+                return opacity;
+              })
+              .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
+              .on('mouseup', () => brushObj.selectionUp())
+              .on('mousedown', () => brushObj.selectionDown())
+              .on('mouseenter', function (d) {
+                const date = new Date(d[xMetric] * secondTransf);
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                if (day < 10) day = `0${day}`;
+                if (month < 10) month = `0${month}`;
 
-                  annotationList.forEach((annotation, i) => {
-                    if (d[annotation]) {
-                      createAnnotation(
-                        d,
-                        annotation,
-                        metricNamesCount + 1 + i,
-                        tooltip,
-                      );
+                const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric];
+                tooltip.html(
+                  Object.keys(d).reduce((prev, cur) => {
+                    let value = '';
+                    if (cur === xMetric) value = xVal;
+                    else if (cur.indexOf('annotation') === -1) value = d[cur];
+                    return `${prev}<p><span>${cur}</span>:: ${value}</p>`;
+                  }, ''),
+                );
+
+                const cx = d3.select(this).attr('cx');
+                const cy = d3.select(this).attr('cy');
+
+                const [mouseX, mouseY] = d3.mouse(this);
+                const diffX = Math.ceil(mouseX) - d3.event.offsetX;
+                const diffY = Math.ceil(mouseY) - d3.event.offsetY;
+
+                const tooltipWidth = tooltipBlock.offsetWidth;
+                const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
+
+                let left = cx - diffX + 20;
+                let top = cy - diffY - tooltipHalfHeight;
+
+                if (left + tooltipWidth > width - diffX) {
+                  left = left - tooltipWidth - 25;
+                }
+
+                if (top + tooltipHalfHeight > height) {
+                  top -= tooltipHalfHeight;
+                }
+
+                tooltip.style('left', `${left}px`).style('top', `${top}px`);
+
+                allDotHover = svg
+                  .selectAll('circle')
+                  .nodes()
+                  .filter((dot) => {
+                    if (
+                      dot.classList.contains('dot')
+                        && dot.__data__[dot.getAttribute('metric')] !== null
+                        && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
+                    ) {
+                      dot.style.opacity = 1;
+                      return dot;
                     }
                   });
 
-                  return opacity;
-                })
-                .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
-                .on('mouseup', () => brushObj.selectionUp())
-                .on('mousedown', () => brushObj.selectionDown())
-                .on('mouseenter', (d) => {
-                  const date = new Date(d[xMetric] * secondTransf);
-                  let day = date.getDate();
-                  let month = date.getMonth() + 1;
-                  const year = date.getFullYear();
-                  if (day < 10) day = `0${day}`;
-                  if (month < 10) month = `0${month}`;
+                this.style.opacity = 1;
+                lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
+                tooltip.style('opacity', 1).style('visibility', 'visible');
+              })
+              .on('mousemove', () => {
+                if (brushObj.mouseDown) brushObj.selectionMove();
+              })
+              .on('mouseleave', function (d) {
+                let opacity = 1;
 
-                  const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric];
-                  tooltip.html(
-                    Object.keys(d).reduce((prev, cur) => {
-                      let value = '';
-                      if (cur === xMetric) value = xVal;
-                      else if (cur.indexOf('annotation') === -1) value = d[cur];
-                      return `${prev}<p><span>${cur}</span>:: ${value}</p>`;
-                    }, ''),
-                  );
-
-                  const cx = d3.select(this).attr('cx');
-                  const cy = d3.select(this).attr('cy');
-
-                  const [mouseX, mouseY] = d3.mouse(this);
-                  const diffX = Math.ceil(mouseX) - d3.event.offsetX;
-                  const diffY = Math.ceil(mouseY) - d3.event.offsetY;
-
-                  const tooltipWidth = tooltipBlock.offsetWidth;
-                  const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
-
-                  let left = cx - diffX + 20;
-                  let top = cy - diffY - tooltipHalfHeight;
-
-                  if (left + tooltipWidth > width - diffX) {
-                    left = left - tooltipWidth - 25;
-                  }
-
-                  if (top + tooltipHalfHeight > height) {
-                    top -= tooltipHalfHeight;
-                  }
-
-                  tooltip.style('left', `${left}px`).style('top', `${top}px`);
-
-                  allDotHover = svg
-                    .selectAll('circle')
-                    .nodes()
-                    .filter((dot) => dot.classList.contains('dot')
-                        // eslint-disable-next-line no-underscore-dangle
-                        && dot.__data__[dot.getAttribute('metric')] !== null
-                        && dot.getAttribute('cx') === x(d[xMetric] * secondTransf));
-
-                  this.style.opacity = 1;
-                  lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
-                  tooltip.style('opacity', 1).style('visibility', 'visible');
-                })
-                .on('mousemove', () => {
-                  if (brushObj.mouseDown) brushObj.selectionMove();
-                })
-                .on('mouseleave', (d) => {
-                  let opacity = 1;
-
-                  if (!this.getAttribute('data-last-dot')) {
-                    allDotHover.forEach((dot) => {
-                      // eslint-disable-next-line no-underscore-dangle
-                      if (extraDot.indexOf(dot.__data__) === -1) {
-                        dot.style.opacity = 0;
-                      }
-                      if (
-                        dot.getAttribute('data-with-caption')
+                if (!this.getAttribute('data-last-dot')) {
+                  allDotHover.forEach((dot) => {
+                    if (extraDot.indexOf(dot.__data__) === -1) {
+                      dot.style.opacity = 0;
+                    }
+                    if (
+                      dot.getAttribute('data-with-caption')
                         || dot.getAttribute('data-always-dot')
-                      ) {
-                        dot.style.opacity = 1;
-                      }
-                    });
-                    opacity = nullValue === -1 ? 0 : opacity;
-                  }
-
-                  if (
-                    this.getAttribute('data-with-caption')
-                    || this.getAttribute('data-always-dot')
-                  ) opacity = 1;
-
-                  mustSee.forEach((item) => {
-                    if (item[metricName] === d[metricName]) opacity = 1;
+                    ) {
+                      dot.style.opacity = 1;
+                    }
                   });
+                  opacity = nullValue === -1 ? 0 : opacity;
+                }
 
-                  this.style.opacity = opacity;
-                  lineDot.attr('opacity', 0);
-                  tooltip.style('opacity', 0).style('visibility', 'hidden');
+                if (
+                  this.getAttribute('data-with-caption')
+                    || this.getAttribute('data-always-dot')
+                ) opacity = 1;
+
+                mustSee.forEach((item) => {
+                  if (item[metricName] === d[metricName]) opacity = 1;
                 });
-            }
-          });
-        }
+
+                this.style.opacity = opacity;
+                lineDot.attr('opacity', 0);
+                tooltip.style('opacity', 0).style('visibility', 'hidden');
+              });
+          }
+        });
+        // }
 
         const sortedBars = bars.sort((a, b) => a.height - b.height);
 
@@ -2308,70 +2429,6 @@ export default {
       });
 
       this.svg.attr('transform', `translate(${maxLength + 15}, ${margin.top})`);
-    },
-
-    renderAccumulationBarplot(x) {
-      // List of subgroups = header of the csv files = soil condition here
-      const subgroups = [...this.metricNames];
-
-      // stack the data? --> stack per subgroup
-      const stackedData = d3.stack().keys(subgroups)(this.dataRestFrom);
-
-      // Add Y axis
-      let maxY = [];
-      for (let i = 0; i < stackedData.length; i += 1) {
-        maxY.push(Math.max(...stackedData[i].map((item) => item[1])));
-      }
-      maxY = Math.max(...maxY);
-      const y = d3
-        .scaleLinear()
-        .domain([0, maxY * 1.05])
-        .range([this.height, 0]);
-      this.svg.append('g').call(d3.axisLeft(y));
-
-      // color palette = one color per subgroup
-      const color = d3.scaleOrdinal().domain(subgroups).range(this.legendColors);
-
-      const { svgContainer } = this.$refs;
-      const tooltip = d3.select(svgContainer).select('.graph-tooltip');
-      const thisMetrics = [...this.metrics];
-      this.svg
-        .append('g')
-        .selectAll('g')
-        .data(stackedData)
-        .enter()
-        .append('g')
-        .attr('fill', (d) => color(d.key))
-        .selectAll('rect')
-        .data((d) => d)
-        .enter()
-        .append('rect')
-        .attr('x', (d) => x(this.isTime ? d.data[this.xMetric] * 1000 : d.data[this.xMetric]))
-        .attr('y', (d) => y(d[1]))
-        .attr('height', (d) => y(d[0]) - y(d[1]))
-        .attr('width', x.bandwidth())
-        .on('mouseover', (d) => {
-          const values = d.data;
-          const date = new Date(values[this.xMetric] * this.secondTransf);
-          const xVal = !this.isTime
-            ? values[this.xMetric]
-            : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-          tooltip.html(
-            thisMetrics.reduce((prev, cur) => {
-              const value = cur === this.xMetric ? xVal : values[cur];
-              return `${prev}<p><span>${cur}</span>: ${value}</p>`;
-            }, ''),
-          );
-          tooltip.style('opacity', 1).style('visibility', 'visible');
-        })
-        .on('mousemove', () => {
-          tooltip
-            .style('left', `${d3.mouse(this)[0] + 90}px`)
-            .style('top', `${d3.mouse(this)[1]}px`);
-        })
-        .on('mouseleave', () => {
-          tooltip.style('opacity', 0).style('visibility', 'hidden');
-        });
     },
   },
 };
