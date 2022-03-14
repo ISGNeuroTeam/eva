@@ -144,6 +144,7 @@ export default {
       'level',
       'boxShadow',
       'stringOX',
+      'yFromZero',
       'united',
       'zoomForAll',
       'lastDot',
@@ -287,6 +288,12 @@ export default {
       description: 'Цветовая тема',
       elem: 'select',
       items: ['default', 'Anna theme'],
+    },
+    {
+      option: 'yFromZero',
+      description: 'Ось Y - от нуля',
+      elem: 'switch',
+      default: false,
     },
 
     // dashSingle

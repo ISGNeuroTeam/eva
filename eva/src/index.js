@@ -88,7 +88,8 @@ Vue.component('dash-graph', () => import('./components/dashBoardInside/dashGraph
 // элемент графика
 Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashLineChart.vue'));
 // элемент графика с несоклькими линиями
-Vue.component('dash-multiLine', () => import('./components/dashBoardInside/MultiLine/MultiLine.vue'));
+// Vue.component('dash-multiLine', () => import('./components/dashBoardInside/MultiLine/MultiLine.vue'));
+Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashMultiLine.vue'));
 // элемент графика
 Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
 // элемент выбора даты и времени
