@@ -109,6 +109,7 @@
                 v-if="!excludeColumns.includes(colIndex)"
                 :key="colIndex"
                 class="text-start"
+                :class="{'d-none': !options.titles.includes(colIndex)}"
                 :style="
                   (item.cellColor &&
                     item.cellColor[colIndex] &&
@@ -539,7 +540,7 @@ export default {
       });
       prom.then((promData) => {
         this.props.hideFooter = promData.length <= 100;
-        this.createTitles(promData);
+        this.createTitles(this.options?.titles);
         this.createTockens(promData);
         if (this.props.justCreate) {
           this.selectRow();
