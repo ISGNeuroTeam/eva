@@ -351,6 +351,9 @@ export default {
       const metricOptions = metrics ? [...metrics] : [];
 
       const render = () => {
+        // скрываем посказки при зуме
+        this.hideGraphTooltip();
+
         this.renderSVG(
           lastDot,
           isDataAlwaysShow,
@@ -1530,7 +1533,7 @@ export default {
               .data(dotDate)
               .enter()
               .append('circle')
-              .attr('class', `dot dot-${metricIndex}`)
+              .attr('class', `dot dot-${metricIndex} ${this.isFullScreen ? 'full' : ''}`)
               .attr('cx', (d) => (this.isTime
                 ? x(d[xMetric] * this.secondTransf)
                 : x(d[xMetric])))
@@ -1643,6 +1646,10 @@ export default {
                 const cx = d3.select(this).attr('cx');
                 const cy = d3.select(this).attr('cy');
 
+                // const classDot = d3.select(this).attr('class')
+                //     .split(' ')
+                //     .find((item) => item === 'full');
+
                 const [mouseX, mouseY] = d3.mouse(this);
                 const diffX = Math.ceil(mouseX) - d3.event.offsetX;
                 const diffY = Math.ceil(mouseY) - d3.event.offsetY;
@@ -1656,6 +1663,11 @@ export default {
                 if (left + tooltipWidth > width - diffX) {
                   left = left - tooltipWidth - 25;
                 }
+                // if (classDot) {
+                //   left = left - tooltipWidth - 25 + 150;
+                // } else {
+                //   left = left - tooltipWidth - 25;
+                // }
 
                 if (top + tooltipHalfHeight > height) {
                   top -= tooltipHalfHeight;
@@ -2429,6 +2441,11 @@ export default {
       });
 
       this.svg.attr('transform', `translate(${maxLength + 15}, ${margin.top})`);
+    },
+    hideGraphTooltip() {
+      const { svgContainer } = this.$refs;
+      const tooltip = d3.select(svgContainer).select('.graph-tooltip');
+      tooltip.style('opacity', 0).style('visibility', 'hidden');
     },
   },
 };
