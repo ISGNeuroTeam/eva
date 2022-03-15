@@ -434,11 +434,6 @@ export default {
     searches: {
       deep: true,
       handler(searches) {
-        function findOnButtonTokens(tokens) {
-          return tokens.filter((el) => el.onButton);
-        }
-        const onButton = findOnButtonTokens(this.tokens);
-        console.log(onButton);
         if (this.firstLoad) {
           searches.forEach((search) => {
             this.$set(this.dataObject, search.sid, { data: [], loading: true });
@@ -463,6 +458,13 @@ export default {
             });
             this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
               .then((res) => {
+                if (res?.length === 0) {
+                  this.$store.commit('setState', [{
+                    object: this.$store.state,
+                    prop: 'logError',
+                    value: true,
+                  }]);
+                }
                 this.$store.commit('updateSearchStatus', {
                   idDash: this.idDash,
                   sid: search.sid,
