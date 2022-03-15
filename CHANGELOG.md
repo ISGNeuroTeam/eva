@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed additional message about existing data source when renaming
 - fixed multiline label
 - fixed heatmap. Transition by event to tabs.
+- fixed renaming with data source replacement
 
 ## [1.84.0]
 
