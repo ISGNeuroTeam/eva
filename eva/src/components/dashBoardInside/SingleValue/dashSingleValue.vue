@@ -48,7 +48,6 @@
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
             display: ${metric.value.split(',').length > 1 ? 'flex' : 'block'};
-            flex-direction: column;
             `"
         >
           <span
