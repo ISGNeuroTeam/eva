@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added the ability to update tokens when executing a go event
+- *added nginx configuration files for /eva endpoint
 
 ### Fixed
 - Multiline. Moved the barplots to the background
