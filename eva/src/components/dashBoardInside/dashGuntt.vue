@@ -46,15 +46,42 @@ import * as d3 from 'd3';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // высота родительского компонента
-    timeFormatFrom: null, // настройки родительского компонента
-    activeElemFrom: null,
-    dataReport: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // высота родительского компонента
+    timeFormatFrom: {
+      type: String,
+      required: true,
+    }, // настройки родительского компонента
+    activeElemFrom: {
+      type: String,
+      required: true,
+    },
+    dataReport: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -82,6 +109,9 @@ export default {
     },
     idDash() {
       return this.idDashFrom;
+    },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
     },
   },
   watch: {
@@ -196,10 +226,8 @@ export default {
     },
   },
   mounted() {
-    if (this.$attrs['is-full-screen']) {
-      this.dataRestFromWatch();
-    }
-    this.$emit('setVissible', { element: this.id });
+    this.dataRestFromWatch();
+    this.$emit('setVissible', this.id);
   },
   methods: {
     hiddenTooltip() {
@@ -313,6 +341,14 @@ export default {
         .attr('height', height)
         .attr('class', 'guntt-svg');
 
+      function checkZero(item) {
+        if (item < 10) {
+          // если там больше 10 символов
+          item = `0${item}`;
+        }
+        return item;
+      }
+
       data.forEach((item, i) => {
         let newDate = new Date(item.start_date * 1000);
         data[i].start_date = `${newDate.getFullYear()}-${checkZero(
@@ -391,6 +427,24 @@ export default {
         deliter = 6;
       }
 
+      function wrap(text) {
+        text.each(() => {
+          const localText = d3.select(this);
+          let row = [];
+          localText
+            .node()
+            .querySelectorAll('text')
+            .forEach((item) => {
+              row = item.innerHTML.split(' ').filter((rowItem) => rowItem !== '');
+              if (row[1]) {
+                row[0] = `<tspan x=0 y=10>${row[0]}</tspan>`;
+                row[1] = `<tspan x=0 y=30>${row[1]}</tspan>`;
+                item.innerHTML = row.join('');
+              }
+            });
+        });
+      }
+
       // добавляем ось X
       const xAxis = svg
         .append('g')
@@ -400,11 +454,7 @@ export default {
             .axisBottom(x)
             .tickFormat(d3.timeFormat(dateFormat))
             .tickValues(
-              x.ticks().filter((item, i) => {
-                if (i % deliter === 0) {
-                  return item;
-                }
-              }),
+              x.ticks().filter((item, i) => i % deliter === 0),
             ),
         )
         .call(wrap);
@@ -472,6 +522,20 @@ export default {
 
       const tooltipBlock = this.$refs.tooltip;
       const tooltipMargin = this.$attrs['is-full-screen'] ? 170 : 30;
+
+      function transformDescription(text) {
+        let rows = text.split('\\n');
+        rows = rows.map((item) => `<p class="row-toolrip">${item}</p>`);
+        // rows = '<div class = "tooltip-guntt">' + rows.join('') + '</div>';
+        return rows.join('');
+      }
+
+      function moveTooltip(offsetX) {
+        const localX = d3.event.offsetY - 50;
+        const y = d3.event.offsetX + offsetX;
+        tooltipBlock.style.top = `${localX}px`;
+        tooltipBlock.style.left = `${y}px`;
+      }
 
       lines
         .on('mouseover', (event) => {
@@ -551,6 +615,14 @@ export default {
 
       const idsCaption = svg.append('g').selectAll('text').data(ids).enter();
 
+      function checkCaption(name) {
+        if (name.length > 6) {
+          // если там больше 10 символов
+          name = `${name.substring(0, 6)}...`; // обрезаем и добовляем троеточие
+        }
+        return name;
+      }
+
       idsCaption
         .append('text')
         .text((d) => checkCaption(d))
@@ -617,64 +689,10 @@ export default {
         .attr('y2', height - 50)
         .style('stroke', 'black')
         .attr('opacity', '0.3');
-
-      // легенда
-
-      function moveTooltip(offsetX) {
-        const x = d3.event.offsetY - 50;
-        const y = d3.event.offsetX + offsetX;
-        tooltipBlock.style.top = `${x}px`;
-        tooltipBlock.style.left = `${y}px`;
-      }
-
-      function transformDescription(text) {
-        let rows = text.split('\\n');
-        rows = rows.map((item) => `<p class="row-toolrip">${item}</p>`);
-        // rows = '<div class = "tooltip-guntt">' + rows.join('') + '</div>';
-        return rows.join('');
-      }
-
-      function checkCaption(name) {
-        if (name.length > 6) {
-          // если там больше 10 символов
-          name = `${name.substring(0, 6)}...`; // обрезаем и добовляем троеточие
-        }
-        return name;
-      }
-
-      function checkZero(item) {
-        if (item < 10) {
-          // если там больше 10 символов
-          item = `0${item}`;
-        }
-        return item;
-      }
-
-      function wrap(text) {
-        text.each(function () {
-          const text = d3.select(this);
-          let row = [];
-          text
-            .node()
-            .querySelectorAll('text')
-            .forEach((item) => {
-              row = item.innerHTML.split(' ').filter((rowItem) => {
-                if (rowItem !== '') {
-                  return rowItem;
-                }
-              });
-              if (row[1]) {
-                row[0] = `<tspan x=0 y=10>${row[0]}</tspan>`;
-                row[1] = `<tspan x=0 y=30>${row[1]}</tspan>`;
-                item.innerHTML = row.join('');
-              }
-            });
-        });
-      }
     },
 
     setClick(item) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const tockens = this.getTockens;
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {

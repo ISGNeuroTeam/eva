@@ -143,8 +143,14 @@
 export default {
   props: {
     gearFrom: Boolean,
-    idDashFrom: null,
-    permissionsFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    permissionsFrom: {
+      type: Array,
+      required: true,
+    },
   },
   data() {
     return {

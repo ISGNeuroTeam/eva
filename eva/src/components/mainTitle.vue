@@ -94,6 +94,7 @@
             :id-dash-from="idDash"
           />
           <modal-settings
+            v-if="activeSettingModal"
             :color-from="theme"
             :id-dash-from="idDash"
           />
@@ -173,7 +174,7 @@
               height="13"
               viewBox="0 0 8 8"
               xmlns="http://www.w3.org/2000/svg"
-              @click.stop="deleteTab(tab.id)"
+              @click.stop="confirmDeleteTab(tab.id)"
             >
               <path
                 d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719
@@ -245,6 +246,14 @@
         </svg>
       </div>
     </div>
+    <modal-confirm
+      v-model="isConfirmModal"
+      :theme="theme"
+      :modal-text="modalText"
+      btn-confirm-text="Удалить"
+      btn-cancel-text="Отмена"
+      @result="deleteTab"
+    />
   </v-app>
 </template>
 
@@ -278,9 +287,53 @@ export default {
       leftDots: true,
       rightDots: true,
       zoomedSearch: [],
+      isConfirmModal: false,
+      deleteTabId: '',
     };
   },
   computed: {
+    modalText() {
+      return `Уверенны, что хотите удалить вкладку - <strong>${this.deleteTabId}</strong> ?`;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    // получаем объект с настройками моадлки натсроек
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
+    activeSettingModal: {
+      get() {
+        return this.getModalSettings.status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
     idDash() {
       // получаем id страницы от родителя
       return this.$route.params.id;
@@ -396,7 +449,7 @@ export default {
           });
           this.firstLoad = false;
         }
-        searches.map((search) => {
+        searches.forEach((search) => {
           if (search.status === 'empty') {
             this.$set(this.dataObject, search.sid, { data: [], loading: true });
             this.$set(this.dataObjectConst, search.sid, {
@@ -424,6 +477,11 @@ export default {
         });
       },
     },
+    isConfirmModal(val) {
+      if (!val) {
+        this.deleteTabId = '';
+      }
+    },
   },
   async mounted() {
     await this.checkAlreadyDash();
@@ -443,21 +501,29 @@ export default {
   methods: {
     exportDataCSV(searchName) {
       const searchData = this.dataObject[searchName].data;
-      let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
+      // задаем кодировку csv файла
+      let csvContent = 'data:text/csv;charset=utf-8,';
 
       if (searchData.length) {
-        const keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
-        csvContent += encodeURIComponent(`${keys.join(',')}\n`); // добавляем ключи в файл
+        // получаем ключи для заголовков столбцов
+        const keys = Object.keys(searchData[0]);
+        // добавляем ключи в файл
+        csvContent += encodeURIComponent(`${keys.join(',')}\n`);
       }
       csvContent += encodeURIComponent(
         searchData.map((item) => Object.values(item).join(',')).join('\n'),
       );
 
-      const link = document.createElement('a'); // создаем ссылку
-      link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', `${this.idDash}-${searchName}.csv`); // указываем имя файла
-      link.click(); // жмем на скачку
-      link.remove(); // удаляем ссылку
+      // создаем ссылку
+      const link = document.createElement('a');
+      // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('href', csvContent);
+      // указываем имя файла
+      link.setAttribute('download', `${this.idDash}-${searchName}.csv`);
+      // жмем на скачку
+      link.click();
+      // удаляем ссылку
+      link.remove();
     },
     scroll(event) {
       event.preventDefault();
@@ -507,11 +573,17 @@ export default {
       }
       this.checkTabOverflow();
     },
-    deleteTab(tabID) {
-      if (this.tabsMoreOne && !this.tabEditMode) {
-        this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID });
+    confirmDeleteTab(tabId) {
+      this.isConfirmModal = true;
+      this.deleteTabId = tabId;
+    },
+    deleteTab(isConfirm) {
+      if (isConfirm) {
+        if (this.tabsMoreOne && !this.tabEditMode) {
+          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.deleteTabId });
+        }
+        this.checkTabOverflow();
       }
-      this.checkTabOverflow();
     },
     enterEditMode(tab) {
       if (!this.tabEditMode && !this.editableTabID) {
@@ -553,7 +625,8 @@ export default {
         dash: this.alreadyDash,
         modified: this.alreadyDash.modified,
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${
           this.alreadyDash.id
         }`,
@@ -626,15 +699,10 @@ export default {
         const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
         const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
 
-        if (
-          (item[range.xMetric] <= range.range[0]
+        return (item[range.xMetric] <= range.range[0]
             && arr[idxArrFirst]?.[range.xMetric] >= range.range[1])
           || (item[range.xMetric] >= range.range[1]
-            && arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
-        ) {
-          return true;
-        }
-        return false;
+            && arr[idxArrSecond]?.[range.xMetric] <= range.range[0]);
       });
     },
     setRange(range, elem) {

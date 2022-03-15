@@ -25,7 +25,7 @@
           0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
           background: theme.$main_bg,
           color: theme.$main_text,
-          border: `1px solid ${theme.$main_border}`,
+          border: `1px solid ${theme.$main_border}`
         }"
       >
         <div
@@ -164,7 +164,7 @@
       class="current-date"
       :style="{
         color: theme.$main_text,
-        border: `1px solid ${theme.$main_border}`,
+        border: `1px solid ${theme.$main_border}`
       }"
       :class="{ show_curent: show_curent }"
     >
@@ -178,9 +178,18 @@ import { mdiChevronDown, mdiChevronUp, mdiCheckBold } from '@mdi/js';
 
 export default {
   props: {
-    idFrom: null,
-    idDashFrom: null,
-    dataRestFrom: null,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
     DTPickerCustomShortcuts: {
       type: Array,
       default: function _default() {
@@ -393,7 +402,7 @@ export default {
       this.$set(this.date, 'endCus', this.end_custom.value);
       this.$set(this.date, 'last', this.last);
       this.$store.commit('setPickerDate', {
-        date: this.date,
+        date: JSON.parse(JSON.stringify(this.date)),
         idDash: this.idDash,
         id: this.id,
       });

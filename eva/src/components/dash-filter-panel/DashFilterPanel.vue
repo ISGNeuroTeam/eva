@@ -232,7 +232,7 @@
                   icon
                   v-bind="attrs"
                   v-on="on"
-                  @click.stop.prevent="deleteFilter(filter)"
+                  @click.stop.prevent="confirmDelete(filter)"
                 >
                   <v-icon v-text="trashIcon" />
                 </v-btn>
@@ -259,7 +259,14 @@
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                d="M7.00002 12.8334C3.77836 12.8334 1.16669 10.2217 1.16669 7.00002C1.16669 3.77836 3.77836 1.16669 7.00002 1.16669C10.2217 1.16669 12.8334 3.77836 12.8334 7.00002C12.8298 10.2202 10.2202 12.8298 7.00002 12.8334ZM2.33335 7.10035C2.36095 9.66774 4.45733 11.7306 7.02484 11.7169C9.59234 11.703 11.6664 9.61773 11.6664 7.05019C11.6664 4.48265 9.59234 2.39739 7.02484 2.38352C4.45733 2.36979 2.36095 4.43263 2.33335 7.00002V7.10035ZM7.58335 9.91669H6.41669V7.58335H4.08335V6.41669H6.41669V4.08335H7.58335V6.41669H9.91669V7.58335H7.58335V9.91669Z"
+                d="M7.00002 12.8334C3.77836 12.8334 1.16669 10.2217 1.16669 7.00002C1.16669
+                 3.77836 3.77836 1.16669 7.00002 1.16669C10.2217 1.16669 12.8334 3.77836
+                 12.8334 7.00002C12.8298 10.2202 10.2202 12.8298 7.00002 12.8334ZM2.33335
+                 7.10035C2.36095 9.66774 4.45733 11.7306 7.02484 11.7169C9.59234 11.703
+                 11.6664 9.61773 11.6664 7.05019C11.6664 4.48265 9.59234 2.39739 7.02484
+                 2.38352C4.45733 2.36979 2.36095 4.43263 2.33335 7.00002V7.10035ZM7.58335
+                 9.91669H6.41669V7.58335H4.08335V6
+                 .41669H6.41669V4.08335H7.58335V6.41669H9.91669V7.58335H7.58335V9.91669Z"
                 :fill="theme.$ok_color"
               />
             </svg>
@@ -300,10 +307,14 @@
       </div>
     </template>
 
-    <v-dialog
+    <modal-persistent
+      ref="confirmModal"
       v-model="filterPartModalShow"
-      persistent
-      max-width="400"
+      :theme="theme"
+      width="400"
+      :is-confirm="isChanged"
+      :persistent="isChanged"
+      @cancelModal="closeFilterPartModal"
     >
       <FilterPartModal
         :id-dash="idDashFrom"
@@ -311,21 +322,33 @@
         :filter-part-index="filterPartIndexInModal"
         :edit-permission="editPermission"
         :edit-mode="editMode"
+        @isChanged="isChanged = $event"
+        @changeTab="$refs.confirmModal.focusOnModal()"
         @saveFilterPart="saveFilterPart"
         @closeFilterPartModal="closeFilterPartModal"
       />
-    </v-dialog>
+    </modal-persistent>
 
     <v-dialog
       v-model="showFilterPreviewModal"
-      persistent
       max-width="400"
+      @click:outside="showFilterPreviewModal = false"
+      @keydown.esc="showFilterPreviewModal = false"
     >
-      <FilterPreviewModal
+      <filter-preview-modal
         :filter="filterInPreviewModal"
         @closeFilterPreviewModal="closeFilterPreviewModal"
       />
     </v-dialog>
+
+    <modal-confirm
+      v-model="isConfirmModal"
+      :theme="theme"
+      :modal-text="modalText"
+      btn-confirm-text="Удалить"
+      btn-cancel-text="Отмена"
+      @result="deleteFilter"
+    />
   </div>
 </template>
 
@@ -350,7 +373,10 @@ export default {
   components: { FilterPartModal, FilterPart, FilterPreviewModal },
   props: {
     editPermission: Boolean,
-    idDashFrom: String,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
     editMode: Boolean,
   },
   data() {
@@ -373,9 +399,15 @@ export default {
       declineIcon: mdiClose,
       reverseIcon: mdiSwapHorizontal,
       eyeIcon: mdiEyeOutline,
+      deleteFilterInfo: {},
+      isChanged: false,
+      isConfirmModal: false,
     };
   },
   computed: {
+    modalText() {
+      return `Уверенны, что хотите удалить фильтр - <strong>${this.deleteFilterInfo.id}</strong> ?`;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -393,6 +425,9 @@ export default {
     },
   },
   watch: {
+    filterPartModalShow() {
+      this.isChanged = false;
+    },
     focusedRow(rowNumber) {
       if (!Number.isFinite(rowNumber)) {
         // this.$store.commit('clearFocusedFilter', this.idDashFrom)
@@ -415,6 +450,12 @@ export default {
     this.$store.commit('clearFocusedFilter', this.idDashFrom);
   },
   methods: {
+    confirmDelete(filter) {
+      this.$set(this, 'deleteFilterInfo', filter);
+      this.$nextTick(() => {
+        this.isConfirmModal = true;
+      });
+    },
     scrollFilterParts(filterIndex, isPrev = false) {
       const slider = this.$refs[`filter-${filterIndex}-parts-slider`][0];
       /** scroll to 1/5 of the visible slider width */
@@ -483,8 +524,12 @@ export default {
         this.filters = this.getFilters;
       }
     },
-    deleteFilter(filter) {
-      this.$store.commit('deleteFilter', filter);
+    deleteFilter(isConfirm) {
+      if (!isConfirm) {
+        this.$set(this, 'deleteFilterInfo', {});
+        return;
+      }
+      this.$store.commit('deleteFilter', this.deleteFilterInfo);
       this.$store.commit('declineFilterChanges', this.idDashFrom);
       this.$store.commit('clearFocusedFilter', this.idDashFrom);
       this.focusedRow = null;
@@ -536,7 +581,7 @@ export default {
   },
 };
 </script>
-
+<!-- eslint-disable -->
 <style lang="sass" scoped>
 $main_text: var(--main_text)
 $main_border: var(--main_border)

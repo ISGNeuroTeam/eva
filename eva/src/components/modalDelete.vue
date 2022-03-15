@@ -3,10 +3,11 @@
 <template>
   <v-dialog
     v-model="active"
-    width="600"
-    persistent
     class="modal-delete"
-    @keydown="checkEsc($event)"
+    width="600"
+    :theme="theme"
+    @click:outside="cancelModal"
+    @keydown.esc="cancelModal"
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-text class="headline">
@@ -56,9 +57,16 @@
 
 <script>
 export default {
+  name: 'ModalDelete',
   props: {
-    idDashFrom: null,
-    dataPageFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataPageFrom: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -124,18 +132,36 @@ export default {
       }
       return this.dashFromStore.modalDelete;
     },
-    // проверям стоит ли окрыть окно с удалением
+    active: {
+      get() {
+        if (this.idDash) {
+          return this.getModalDelete.active;
+        }
+        return false;
+      },
+      set(value) {
+        if (this.idDash) {
+          this.$store.commit('setModalDelete', {
+            id: this.idDash,
+            status: value,
+            elem: '',
+            name: '',
+            page: this.page,
+          });
+        } else {
+          this.modalValue = false;
+        }
+      },
+    },
+  },
+  watch: {
     active() {
-      let active = false;
       // если уже получили имя элемнета
       if (this.idDash) {
         // то вызываем окно с удалением чего-либо
         const modal = this.getModalDelete;
         this.setData(modal);
-        // получаем статус отображения модального окна
-        active = modal.active;
       }
-      return active;
     },
   },
   created() {
@@ -187,20 +213,10 @@ export default {
         page: this.page,
       }); // и закрываем окно с удалением
     },
+    // кнопка отмены удаления
     cancelModal() {
-      // кнопка отмены удаления
-      this.$store.commit('setModalDelete', {
-        id: this.idDash,
-        status: false,
-        elem: '',
-        name: '',
-        page: this.page,
-      }); // просто закрываем окно
-    },
-    checkEsc(event) {
-      if (event.code === 'Escape') {
-        this.cancelModal();
-      }
+      // просто закрываем окно
+      this.active = false;
     },
     changeStyle() {
       if (this.active) {

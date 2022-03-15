@@ -47,12 +47,30 @@
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    colorFrom: null, // цветовые переменные
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // выоста родительского компонента
-    dataModeFrom: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // выоста родительского компонента
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -366,16 +384,19 @@ export default {
       link.remove(); // удаляем ссылку
     },
     getData(sid, file, type) {
+      // создаем blob объект чтобы с его помощью использовать функцию для web worker
       const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
-      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
+      });
 
-      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob);
 
-      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL);
 
+      // при успешном выполнении функции что передали в blob изначально сработает этот код
       worker.onmessage = function (event) {
-        // при успешном выполнении функции что передали в blob изначально сработает этот код
         if (event.data.length !== 0) {
           // this.data = event.data;
           if (type === 'report') {
@@ -394,10 +415,10 @@ export default {
       worker.postMessage(`${this.idDash}-${sid}`); // запускаем воркер на выполнение
     },
     getDataFromDb() {
-      return function (event) {
+      return function ({ data }) {
         let db = null;
 
-        const searchSid = event.data;
+        const searchSid = data;
 
         const request = indexedDB.open('EVA', 1);
 
@@ -426,9 +447,11 @@ export default {
           query.onsuccess = () => {
             // (4)
             if (query.result) {
-              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage(query.result);
             } else {
-              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage([]);
             }
           };
         };

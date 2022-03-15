@@ -139,13 +139,11 @@
     </div>
 
     <modal-log
-      :modal-active="modalActive"
-      @cancelModal="modalActive = false"
+      v-model="modalActive"
     />
     <modal-themes
-      :show="paleteShow"
+      v-model="paleteShow"
       :admin="isAdmin"
-      @closeModal="paleteShow = false"
     />
   </div>
 </template>
@@ -170,7 +168,10 @@ export default {
     EvaLogo,
   },
   props: {
-    inside: null,
+    inside: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -258,7 +259,7 @@ export default {
           };
         });
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект

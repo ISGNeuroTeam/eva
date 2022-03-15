@@ -191,11 +191,13 @@ export default new Vuex.Store({
       state[datasource.id][elem].should = true;
       // и перключить на вкладку с результатами
       state[datasource.id][elem].switch = true;
-      state[datasource.id].tockens.forEach((item) => {
-        if (item.elem === elem) {
-          item.value = '';
-        }
-      });
+      if (state[datasource.id].tockens) {
+        state[datasource.id].tockens.forEach((item) => {
+          if (item.elem === elem) {
+            item.value = '';
+          }
+        });
+      }
       if (elem.split('-')[0] === 'select') {
         if (state[datasource.id][elem].selected) {
           state[datasource.id][elem].selected = {
@@ -1775,7 +1777,7 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    ...store.getters,
+    // ...store.getters,
     getReportSearch: (state) => {
       const key = state.reports?.table?.search || '';
       if (key !== '') {

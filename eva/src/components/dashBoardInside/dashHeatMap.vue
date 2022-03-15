@@ -97,10 +97,22 @@ export default {
   name: 'Heatmap',
   components: { DashHeatMapLinear },
   props: {
-    dataRestFrom: Array,
-    options: Object,
-    idFrom: null,
-    idDashFrom: null,
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    options: {
+      type: Object,
+      required: true,
+    },
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
   },
   data: () => ({
     x: new Set(),

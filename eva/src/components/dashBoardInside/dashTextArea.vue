@@ -33,10 +33,22 @@ import { mdiMagnify } from '@mdi/js';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    colorFrom: null, // цветовые переменные
-    heightFrom: null, // выоста родительского компонента
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // выоста родительского компонента
   },
   data() {
     return {
@@ -165,25 +177,27 @@ export default {
     },
     setTocken() {
       const { tockens } = this.$store.state[this.idDash];
-      let name = '';
-      Object.keys(tockens).forEach((i) => {
-        if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
-          name = tockens[i].name;
-        }
-      });
-      const textarea = this.textarea.replace(/\n/g, ' ');
-      const tocken = {
-        name,
-        action: 'accept',
-        capture: '',
-      };
+      if (tockens) {
+        let name = '';
+        Object.keys(tockens).forEach((i) => {
+          if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
+            name = tockens[i].name;
+          }
+        });
+        const textarea = this.textarea.replace(/\n/g, ' ');
+        const tocken = {
+          name,
+          action: 'accept',
+          capture: '',
+        };
 
-      this.$store.commit('setTocken', {
-        tocken,
-        idDash: this.idDash,
-        value: textarea,
-        store: this.$store,
-      });
+        this.$store.commit('setTocken', {
+          tocken,
+          idDash: this.idDash,
+          value: textarea,
+          store: this.$store,
+        });
+      }
     },
   },
 };

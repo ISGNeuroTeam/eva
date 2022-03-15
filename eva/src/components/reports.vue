@@ -242,9 +242,8 @@
     </v-content>
     <footer-bottom />
     <modal-report
-      :modal-from="modal"
+      v-model="modal"
       :search-from="search"
-      @cancelModal="cancelModal"
       @setSearch="setSearch($event)"
     />
   </v-app>
@@ -309,17 +308,11 @@ export default {
     },
   },
   computed: {
-    // getDataRest:  function() {
-    //   if (this.shouldGet) {
-    //     console.log(this.getDataAsynchrony());
-    //   }
-    //   return 'done'
-    // },
     theme() {
       return this.$store.getters.getTheme;
     },
+    // понимаем нужно ли запрашивтаь данные с реста
     shouldGet() {
-      // понимаем нужно ли запрашивтаь данные с реста
       return this.$store.state.reports.table.should;
     },
     elements() {
@@ -347,7 +340,7 @@ export default {
   mounted() {
     document.title = 'EVA | Исследование данных';
     this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl != '') {
+    if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
         id: 'table',
@@ -356,7 +349,7 @@ export default {
     }
     this.calcSize();
     this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode == 13) {
+      if (event.ctrlKey && event.keyCode === 13) {
         this.launchSearch();
       }
     });
@@ -374,21 +367,11 @@ export default {
     this.unitedData.color = this.theme.controls;
   },
   methods: {
-    getData() {
-      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
-        type: 'text/javascript',
-      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
-
-      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
-
-      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
-
-      worker.onmessage = function (event) {
-        // при успешном выполнении функции что передали в blob изначально сработает этот код
-
+    workerOnMessage(worker) {
+      return (event) => {
         let statistic = '';
         this.rows = [];
-        if (event.data.data.length != 0) {
+        if (event.data.data.length !== 0) {
           this.shema = event.data.shema;
           this.data = event.data.data;
 
@@ -402,25 +385,41 @@ export default {
         }
 
         worker.terminate();
-      }.bind(this);
+      };
+    },
+    getData() {
+      // создаем blob объект чтобы с его помощью использовать функцию для web worker
+      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
+        type: 'text/javascript',
+      });
 
-      worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
+      // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob);
+
+      // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL);
+
+      // при успешном выполнении функции что передали в blob изначально сработает этот код
+      worker.onmessage = this.workerOnMessage(worker);
+
+      // запускаем воркер на выполнение
+      worker.postMessage(`reports-${this.search.sid}`);
     },
     async launchSearch() {
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
+      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
+      // вызывая метод в хранилище
       const response = await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
       });
-      // вызывая метод в хранилище
 
+      // если что-то пошло не так
       if (!response.data || response.data.length === 0) {
-        // если что-то пошло не так
         this.loading = false;
         this.$store.commit('setErrorLogs', true);
         this.data = [];
@@ -450,23 +449,22 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|',
+        '\n|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
-      this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n' + '|',
-        '\n' + '|',
-      );
-      this.search.original_otl = this.search.original_otl.replaceAll(
-        '|' + '\n',
-        '| ',
-      );
-      this.search.original_otl = this.search.original_otl.replaceAll(
-        '| ' + '\n',
-        '| ',
-      );
+      this.search.original_otl = this.search.original_otl
+        .replaceAll(
+          '\n\n|',
+          '\n|',
+        ).replaceAll(
+          '|\n',
+          '| ',
+        ).replaceAll(
+          '| \n',
+          '| ',
+        );
     },
     setUsername(event) {
       this.search.parametrs.username = event;
@@ -480,22 +478,21 @@ export default {
         );
     },
     getDataFromDb() {
-      return function (event) {
+      return (event) => {
         let db = null;
 
         const searchSid = event.data;
 
         const request = indexedDB.open('EVA', 1);
 
-        request.onerror = function (event) {
-          console.log('error: ', event);
+        request.onerror = (requestEvent) => {
+          console.log('error: ', requestEvent);
         };
 
-        request.onupgradeneeded = (event) => {
+        request.onupgradeneeded = (requestEvent) => {
           console.log('create');
-          db = event.target.result;
+          db = requestEvent.target.result;
           if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
             db.createObjectStore('searches'); // create it
           }
 
@@ -508,23 +505,30 @@ export default {
         request.onsuccess = () => {
           db = request.result;
 
-          const transaction = db.transaction('searches'); // (1)
+          // (1)
+          const transaction = db.transaction('searches');
 
+          // (2)
           // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
+          const searches = transaction.objectStore('searches');
 
-          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid));
 
           query.onsuccess = () => {
             // (4)
             if (query.result) {
-              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
+              self.postMessage(query.result);
             } else {
-              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
+              self.postMessage([]);
             }
           };
 
-          query.onerror = function () {
+          query.onerror = () => {
             console.log('Ошибка', query.error);
           };
         };
@@ -537,13 +541,9 @@ export default {
       this.modal = false;
     },
     changeTab(elem) {
-      if (elem == 'multiLine') {
-        this.unitedShow = true;
-      } else {
-        this.unitedShow = false;
-      }
+      this.unitedShow = elem === 'multiLine';
       Object.keys(this.aboutElem).forEach((item) => {
-        if (item != elem) {
+        if (item !== elem) {
           this.$set(this.aboutElem[item], 'show', false);
           this.$set(this.aboutElem[item], 'color', this.theme.text);
         } else {
@@ -568,21 +568,21 @@ export default {
       });
     },
     createStatistic(key, data) {
-      const how_much = {};
+      const howMuch = {};
       const result = [];
       const { length } = data;
       data.forEach((item) => {
-        if (how_much[item[key]]) {
-          how_much[item[key]]++;
+        if (howMuch[item[key]]) {
+          howMuch[item[key]] += 1;
         } else {
-          how_much[item[key]] = 1;
+          howMuch[item[key]] = 1;
         }
       });
-      Object.keys(how_much).forEach((item) => {
+      Object.keys(howMuch).forEach((item) => {
         result.push({
           value: item,
-          count: how_much[item],
-          '%': Math.round((how_much[item] * 100) / length),
+          count: howMuch[item],
+          '%': Math.round((howMuch[item] * 100) / length),
         });
       });
 
@@ -597,7 +597,7 @@ export default {
     },
     openStatistic(statistic) {
       if (this.showStatistic) {
-        if (this.statisticKey == statistic.text) {
+        if (this.statisticKey === statistic.text) {
           this.showStatistic = false;
         } else {
           this.statisticKey = statistic.text;

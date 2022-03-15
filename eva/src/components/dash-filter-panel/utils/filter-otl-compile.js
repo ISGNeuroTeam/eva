@@ -36,6 +36,8 @@ export function filterCompile(filter) {
                   Date.parse(part.value) / 1000
                 })`;
                 break;
+              default:
+                break;
             }
             break;
           case 'token':
@@ -60,6 +62,8 @@ export function filterCompile(filter) {
                 }
               }
             }
+            break;
+          default:
             break;
         }
       } else {

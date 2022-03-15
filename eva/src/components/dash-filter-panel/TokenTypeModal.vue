@@ -17,6 +17,7 @@
       outlined
       dense
       @change="changeToken"
+      @input="$emit('isChanged', true)"
     />
     Операция
     <v-select
@@ -27,6 +28,7 @@
       hide-details
       outlined
       dense
+      @input="$emit('isChanged', true)"
     />
   </div>
 </template>
@@ -34,9 +36,18 @@
 export default {
   name: 'TokenTypeModal',
   props: {
-    idDash: String,
-    temp: Object,
-    editMode: Boolean,
+    idDash: {
+      type: String,
+      required: true,
+    },
+    temp: {
+      type: Object,
+      required: true,
+    },
+    editMode: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {

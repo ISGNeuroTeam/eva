@@ -1,10 +1,12 @@
 <template>
-  <v-dialog
-    :value="active"
+  <modal-persistent
+    v-model="active"
     width="680"
-    persistent
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    :theme="theme"
     :color="theme.$main_text"
-    @keydown.esc="cancelModal"
+    @cancelModal="cancelModal"
   >
     <v-card
       :style="{ background: theme.$main_bg, color: theme.$main_text }"
@@ -20,6 +22,7 @@
           label="Имя ИД"
           placeholder="Sid"
           hide-details
+          @input="isChanged = true"
         />
         <v-textarea
           v-model="search.original_otl"
@@ -35,6 +38,7 @@
           placeholder="Origin otl"
           label="Текст ИД"
           @keyup.ctrl.\="addLineBreaks"
+          @input="isChanged = true"
         />
         <div class="times-block">
           <div class="time-block">
@@ -47,6 +51,7 @@
               label="Временной интервал: начало"
               placeholder="0"
               hide-details
+              @input="isChanged = true"
             />
             <DTPicker
               v-model="tws"
@@ -60,6 +65,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
+              @input="isChanged = true"
             >
               <v-icon
                 class="picker-search"
@@ -79,6 +85,7 @@
               label="Временной интервал: конец"
               placeholder="0"
               hide-details
+              @input="isChanged = true"
             />
             <DTPicker
               v-model="twf"
@@ -92,6 +99,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker-search"
+              @input="isChanged = true"
             >
               <v-icon
                 class="picker-search"
@@ -123,6 +131,7 @@
                   outlined
                   label="Timeout"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.cache_ttl"
@@ -132,6 +141,7 @@
                   outlined
                   label="Cache_ttl"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.field_extraction"
@@ -141,6 +151,7 @@
                   outlined
                   label="Field_extraction"
                   hide-details
+                  @input="isChanged = true"
                 />
                 <v-text-field
                   v-model="search.parametrs.preview"
@@ -150,6 +161,7 @@
                   outlined
                   label="Preview"
                   hide-details
+                  @input="isChanged = true"
                 />
               </v-expansion-panel-content>
             </v-expansion-panel>
@@ -163,6 +175,7 @@
               outlined
               label="Максимальное кол-во строк"
               hide-details
+              @input="isChanged = true"
             />
           </div>
         </div>
@@ -193,18 +206,35 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiCalendarMonth } from '@mdi/js';
 
 export default {
+  name: 'ModalCreateSearch',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    idDashFrom: null,
-    modalFrom: null,
-    dataSearchFrom: null,
-    createBtnFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataSearchFrom: {
+      type: Object,
+      required: true,
+    },
+    createBtnFrom: {
+      type: String,
+      required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -231,21 +261,23 @@ export default {
       tws: '',
       twf: '',
       pickerIcon: mdiCalendarMonth,
+      isChanged: false,
     };
   },
   computed: {
-    active() {
-      // тут понимаем нужно ли открыть окно с созданием или нет
-      if (this.modalFrom) {
-        this.setData();
-      }
-      return this.modalFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     dataSearch() {
       return this.dataSearchFrom;
     },
+    // получаем id страницы переданного от родителя
     idDash() {
-      // получаем id страницы переданного от родителя
       return this.idDashFrom;
     },
     theme() {
@@ -256,6 +288,14 @@ export default {
     },
   },
   watch: {
+    active(val) {
+      // тут понимаем нужно ли открыть окно с созданием или нет
+      if (val) {
+        this.setData();
+      } else {
+        this.isChanged = false;
+      }
+    },
     dataSearchFrom() {
       this.currentSid = this.dataSearchFrom?.sid;
     },
@@ -271,7 +311,7 @@ export default {
   },
   methods: {
     setData() {
-      this.search = this.dataSearch;
+      this.search = JSON.parse(JSON.stringify(this.dataSearch));
       if (this.createBtnFrom === 'edit') {
         this.createBtn = 'Редактировать';
       } else {
@@ -280,7 +320,7 @@ export default {
     },
     cancelModal() {
       if (this.cancelBtn === 'Отмена') {
-        this.$emit('cancelModal');
+        this.active = false;
       } else {
         if (this.createBtnFrom === 'edit') {
           this.createBtn = 'Редактировать';
@@ -312,21 +352,23 @@ export default {
           );
         }
 
-        const searches = this.getSearches; // получаем все ИС
+        // получаем все ИС
+        const searches = this.getSearches;
         let j = -1;
+        // пробегаемся по всем ИС
         searches.forEach((item, i) => {
-          // пробегаемся по всем ИС
+          // и если ИС с таким id уже есть
           if (item.sid === this.currentSid) {
-            // и если ИС с таким id уже есть
-            j = i; // меняем переменную
+            // меняем переменную
+            j = i;
           } else if (item.sid === this.search.sid) {
             j = -100;
           }
         });
 
+        // если такой ИС уже есть вызовем сообщение с уточнением
         if (j !== -1) {
-          // если такой ИС уже есть вызовем сообщение с уточнением
-          if (this.cancelBtn === 'Отмена') {
+          if (this.cancelBtn === 'Отмена' && this.currentSid === this.search.sid) {
             this.errorMsg = 'Такой источник данных существует. Хотите заменить его?';
             this.createBtn = 'Да';
             this.cancelBtn = 'Нет';
@@ -342,16 +384,19 @@ export default {
             });
             this.cancelBtn = 'Отмена';
             this.errorMsgShow = false;
-            this.$emit('cancelModal'); // и скрываем окно редактирования ИД
+            // и скрываем окно редактирования ИД
+            this.active = false;
           }
-        } else {
           // если нет
+        } else {
+          // отправляем в хранилище для создания
           this.$store.commit('setSearch', {
             search: this.search,
             idDash: this.idDash,
             reload: false,
-          }); // отправляем в хранилище для создания
-          this.$emit('cancelModal'); // и скрываем окно редактирования ИС
+          });
+          // и скрываем окно редактирования ИС
+          this.active = false;
         }
       } else {
         this.errorMsg = 'Sid источника данных не может быть пустым';
@@ -364,21 +409,21 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|',
+        '\n|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n' + '|',
-        '\n' + '|',
+        '\n\n|',
+        '\n|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '|' + '\n',
+        '|\n',
         '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '| ' + '\n',
+        '| \n',
         '| ',
       );
     },

@@ -846,27 +846,24 @@
         </div>
       </div>
       <modal-create-search
+        v-model="activeModal"
         :id-dash-from="idDash"
-        :modal-from="activeModal"
         :create-btn-from="createSearchBtn"
         :data-search-from="newSearch"
         @cancelModal="cancelModal"
       />
       <modal-themes
-        :show="paleteShow"
+        v-model="paleteShow"
         :admin="isAdmin"
-        @closeModal="paleteShow = false"
       />
       <modal-schedule
+        v-model="activeSchedule"
         :id-dash-from="idDash"
         :color-from="theme"
-        :modal-from="activeSchedule"
         :data-sid-from="scheduleSid"
-        @cancel="activeSchedule = false"
       />
       <modal-log
-        :modal-active="modalActive"
-        @cancelModal="modalActive = false"
+        v-model="modalActive"
       />
       <dash-settings
         :gear-from="gearShow"
@@ -875,10 +872,9 @@
         @changeMode="setEditMode"
       />
       <modal-paper
-        :active="modalPaper"
+        v-model="modalPaper"
         :sid="modalPaperSid"
         :id-dash="idDash"
-        @cancelModal="cancelModal"
       />
     </div>
 
@@ -939,9 +935,14 @@ export default {
     DashFilterPanel,
   },
   props: {
-    idDashFrom: null,
-    inside: null,
-    horizontalCell: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    inside: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -1170,7 +1171,7 @@ export default {
     },
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
-      return function ({ elem, action, idDash }) {
+      return ({ elem, action, idDash }) => {
         if (
           this.$store.state[idDash]
           && this.$store.state[idDash][elem]
@@ -1276,9 +1277,6 @@ export default {
     window.removeEventListener('resize', this.updateScreenHeight);
   },
   methods: {
-    setTextarea_event(eventFull) {
-      this.textarea_event = eventFull;
-    },
     getGroups() {
       this.$store.dispatch('getGroups').then((res) => {
         this.allGroups = res;
@@ -2113,7 +2111,8 @@ export default {
         if (res.status === 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
-          this.$store.getters['auth/putLog'](
+          this.$store.dispatch(
+            'auth/putLog',
             `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
               res.data.id
             }`,
@@ -2134,7 +2133,8 @@ export default {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
           this.idDash
         }`,

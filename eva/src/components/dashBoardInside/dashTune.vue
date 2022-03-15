@@ -74,17 +74,35 @@
 
 <script>
 import { mdiMinus, mdiPlus } from '@mdi/js';
-import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapMutations } from 'vuex';
 
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    dataModeFrom: null, // включена ли шапка
-    loading: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    }, // включена ли шапка
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -107,7 +125,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getElementSelected', 'getElement']),
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
         ? this.$attrs.heightFrom
@@ -120,7 +137,12 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
+    getElementSelected() {
+      return this.dashFromStore?.selected;
+    },
     storedElement() {
+      // TODO: разобраться для чего это здесь
+      // eslint-disable-next-line no-unused-expressions
       this.isFullScreen; // << dont remove
       return this.dashFromStore;
     },

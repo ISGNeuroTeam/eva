@@ -2,14 +2,18 @@ export default {
   namespaced: true,
   state: {
     timeline: [],
+    interesting: [],
   },
   mutations: {
     SET_TIMELINE(state, data) {
       state.timeline = data;
     },
+    SET_INTERESTING(state, data) {
+      state.interesting = data;
+    },
   },
   actions: {
-    async getTimeline({ commit }, cid) {
+    async fetchTimeline({ commit }, cid) {
       // return fetch(`/api/gettimelines?cid=${sid}`)
       //   .then((response) => {
       //     console.log(response);
@@ -19,27 +23,39 @@ export default {
       //     console.error(error);
       //   });
       const test = await fetch(
-          `/api/gettimelines?cid=${cid}`,
+        `/api/gettimelines?cid=${cid}`,
       ).catch((error) => {
-        console.error(error)
-      })
-      if (test.status == 200) {
+        console.error(error);
+      });
+      if (test.status === 200) {
         // если получилось
-        return test.json().then((answerTest) => {
-          console.log(answerTest)
+        test.json().then((answerTest) => {
+          // console.log('answerTest', answerTest);
           commit('SET_TIMELINE', answerTest);
-        })
+        });
       }
     },
-    // async getInterestingFields({commit}, cid) {
-    //   const test2 = await fetch(
-    //       `/api/getinterestingfields?cid=${cid}`,
-    //   ).catch((error) => {
-    //     console.log(error)
-    //   }).then((data) => {
-    //     return data
-    //     // console.log(data)
-    //   });
-    // }
+    async getInterestingFields({ commit }, cid) {
+      await fetch(
+        `/api/getinterestingfields?cid=${cid}`,
+      ).catch((error) => {
+        console.log(error);
+      }).then((data) => {
+        data.json().then((interesting) => {
+          console.log('Interesting', interesting);
+          commit('SET_INTERESTING', interesting);
+        });
+        // console.log(data);
+        return data;
+      });
+    },
+  },
+  getters: {
+    getTimeline(state) {
+      return state.timeline || [];
+    },
+    getInteresting(state) {
+      return state.interesting || [];
+    },
   },
 };

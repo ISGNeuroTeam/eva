@@ -46,17 +46,38 @@ export default {
       type: Boolean,
       required: true,
     },
-    idDashFrom: null,
-    dataElem: null,
-    dataPageFrom: null,
-    verticalCell: null,
-    horizontalCell: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataElem: {
+      type: String,
+      required: true,
+    },
+    dataPageFrom: {
+      type: String,
+      required: true,
+    },
+    verticalCell: {
+      type: Number,
+      required: true,
+    },
+    horizontalCell: {
+      type: Number,
+      required: true,
+    },
     loading: {
       type: Boolean,
       default: false,
     },
-    searchData: Array,
-    dataSourseTitle: null,
+    searchData: {
+      type: Array,
+      default: () => ([]),
+    },
+    dataSourseTitle: {
+      type: [String, Number],
+      default: -1,
+    },
   },
   data() {
     return {
@@ -113,9 +134,6 @@ export default {
         }
       },
     },
-    // top(val) {
-    //   if (val <= this.headerTop) val = this.headerTop;
-    // },
     left() {
       const { clientWidth } = document.querySelector('#app');
       if (this.left < 0) this.left = 0;
