@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed template for metrics
 - fixed dashboard creation
 - fixed columns in the table are not hidden
+- fixed multiline settings and design improvements
+- fixed additional message about existing data source when renaming
 - fixed multiline label
 
 ## [1.84.0]
