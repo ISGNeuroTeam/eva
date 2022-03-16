@@ -227,7 +227,7 @@ export default {
   },
   mounted() {
     this.dataRestFromWatch();
-    this.$emit('setVissible', this.id);
+    this.$emit('setVissible', { element: this.id, overflow: 'visible' });
   },
   methods: {
     hiddenTooltip() {
@@ -428,7 +428,7 @@ export default {
       }
 
       function wrap(text) {
-        text.each(() => {
+        text.each(function () {
           const localText = d3.select(this);
           let row = [];
           localText

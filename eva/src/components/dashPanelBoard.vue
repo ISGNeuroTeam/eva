@@ -941,7 +941,7 @@ export default {
     },
     inside: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {

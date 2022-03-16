@@ -170,7 +170,7 @@ export default {
   props: {
     inside: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {

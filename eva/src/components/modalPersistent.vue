@@ -60,6 +60,8 @@ export default {
     openConfirmModal() {
       if (this.isConfirm && this.persistent) {
         this.confirmModal = true;
+      } else {
+        this.cancelModal();
       }
     },
     checkKeyDown(event) {

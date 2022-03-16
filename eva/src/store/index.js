@@ -191,7 +191,7 @@ export default new Vuex.Store({
       state[datasource.id][elem].should = true;
       // и перключить на вкладку с результатами
       state[datasource.id][elem].switch = true;
-      if (state[datasource.id].tockens) {
+      if (state[datasource.id].tockens?.length > 0) {
         state[datasource.id].tockens.forEach((item) => {
           if (item.elem === elem) {
             item.value = '';
@@ -438,6 +438,7 @@ export default new Vuex.Store({
         Vue.set(state, dashboard.id, {});
         Vue.set(state[dashboard.id], 'name', dashboard.name);
         Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
+        Vue.set(state[dashboard.id], 'currentTab', dashboard?.currentTab || 1);
         Vue.set(state[dashboard.id], 'modified', dashboard.modified);
         // TODO: убрать геттер из мутации
         getters({ id: dashboard.id, first: true });
@@ -747,7 +748,7 @@ export default new Vuex.Store({
       idDash, status, element, titles,
     }) {
       // если объект с натсройками модального окна натсроек еще нет
-      if (!state[idDash].modalSettings) {
+      if (!state[idDash]?.modalSettings) {
         // то создаем его сразу реактивным
         Vue.set(state[idDash], 'modalSettings', {});
         Vue.set(state[idDash].modalSettings, 'element', '');
@@ -896,6 +897,9 @@ export default new Vuex.Store({
       state[id].gridShow = item;
     },
     addNewTab(state, { idDash, tabID, tabName }) {
+      if (!state[idDash].tabList) {
+        Vue.set(state[idDash], 'tabList', []);
+      }
       state[idDash].tabList.push({
         id: tabID,
         name: tabName,
@@ -1150,6 +1154,7 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
+          console.log('result', stateFrom);
           if (stateFrom) {
             if (!state[id]) {
               commit('setState', [

@@ -169,10 +169,6 @@ export default {
       type: Boolean,
       default: false,
     },
-    activeElemFrom: {
-      type: String,
-      required: true,
-    },
     dataModeFrom: {
       type: Boolean,
       required: true,
