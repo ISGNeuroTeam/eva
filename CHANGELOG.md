@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed heatmap. Transition by event to tabs.
 - fixed renaming with data source replacement
 - fixed passed properties to token
+- fixed dashTable.vue
+- fixed save dashboards
 
 ## [1.84.0]
 

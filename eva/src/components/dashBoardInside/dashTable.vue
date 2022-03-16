@@ -385,7 +385,6 @@ export default {
   methods: {
     getEvents({ event, partelement }) {
       let result = [];
-      console.log(this.$store.state[this.idDash]);
       if (!this.$store.state[this.idDash].events) {
         this.$store.commit('setState', [{
           object: this.$store.state[this.idDash],
@@ -548,7 +547,6 @@ export default {
       });
     },
     createTitles(result) {
-      console.log('result', result);
       if (this.options?.titles) {
         const allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map((x) => ({

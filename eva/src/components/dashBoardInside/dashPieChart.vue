@@ -102,14 +102,6 @@ export default {
       type: Number,
       required: true,
     }, // высота родительского компонента
-    activeElemFrom: {
-      type: String,
-      required: true,
-    }, // id активного элемента
-    dataReport: {
-      type: Boolean,
-      required: true,
-    }, // проверяет что элемент в исследовании данных
   },
   data() {
     return {
