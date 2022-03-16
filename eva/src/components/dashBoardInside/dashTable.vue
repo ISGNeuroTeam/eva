@@ -646,7 +646,7 @@ export default {
               ) {
                 const value = event.target.textContent;
                 this.$store.commit('setTocken', {
-                  tocken: token,
+                  token,
                   idDash: this.idDash,
                   store: this.$store,
                   value,

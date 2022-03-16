@@ -296,7 +296,7 @@ export default {
       this.$store.state[this.idDashFrom]?.tockens?.forEach((token) => {
         if (token.elem === this.idFrom && token.action === 'change') {
           this.$store.commit('setTocken', {
-            tocken: {
+            token: {
               name: token.name,
               action: 'change',
               capture: '',

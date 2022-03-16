@@ -620,19 +620,23 @@ export default new Vuex.Store({
     // создаем токен
     createTockens(state, { idDash, tocken }) {
       console.log('tockens.push');
+      let foundItem = null;
       //  проверяем есть ли такой токен уже
-      const foundIten = state[idDash].tockens
-        .find((item) => item.name === tocken.name);
-      if (foundIten) {
+      if (state[idDash]?.tockens) {
+        foundItem = state[idDash].tockens.find((item) => item.name === tocken.name);
+      } else {
+        Vue.set(state[idDash], 'tockens', []);
+      }
+      if (foundItem) {
         //  если такой токен уже есть
-        foundIten.name = tocken.name; // обновляем его данные
-        foundIten.elem = tocken.elem;
-        foundIten.action = tocken.action;
-        foundIten.capture = tocken.capture;
-        foundIten.prefix = tocken.prefix;
-        foundIten.sufix = tocken.sufix;
-        foundIten.delimetr = tocken.delimetr;
-        foundIten.defaultValue = tocken.defaultValue;
+        foundItem.name = tocken.name; // обновляем его данные
+        foundItem.elem = tocken.elem;
+        foundItem.action = tocken.action;
+        foundItem.capture = tocken.capture;
+        foundItem.prefix = tocken.prefix;
+        foundItem.sufix = tocken.sufix;
+        foundItem.delimetr = tocken.delimetr;
+        foundItem.defaultValue = tocken.defaultValue;
       } else {
         // а елси нету
         state[idDash].tockens.push(

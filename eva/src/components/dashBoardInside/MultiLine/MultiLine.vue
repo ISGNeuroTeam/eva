@@ -410,7 +410,7 @@ export default {
 
           [tocken.filterParam] = Object.keys(this.dataRestFrom[0]);
           this.$store.commit('setTocken', {
-            tocken, value, idDash, store,
+            token: tocken, value, idDash, store,
           });
         }
       }

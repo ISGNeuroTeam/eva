@@ -579,7 +579,7 @@ export default {
             capture: tockens[i].capture,
           };
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: name,
             store: this.$store,

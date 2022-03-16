@@ -558,7 +558,7 @@ export default {
         if (tocken.elem === this.idFrom) {
           const value = this.dataRestFrom[pieIndex][tocken.capture];
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             value,
             idDash: this.idDashFrom,
             store: this.$store,
