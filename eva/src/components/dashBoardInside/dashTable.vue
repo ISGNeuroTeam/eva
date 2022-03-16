@@ -109,7 +109,7 @@
                 v-if="!excludeColumns.includes(colIndex)"
                 :key="colIndex"
                 class="text-start"
-                :class="{'d-none': !options.titles.includes(colIndex)}"
+                :class="{'d-none': options.titles && !options.titles.includes(colIndex)}"
                 :style="
                   (item.cellColor &&
                     item.cellColor[colIndex] &&
@@ -536,7 +536,7 @@ export default {
       });
       prom.then((promData) => {
         this.props.hideFooter = promData.length <= 100;
-        this.createTitles(this.options?.titles);
+        this.createTitles(promData);
         this.createTockens(promData);
         if (this.props.justCreate) {
           this.selectRow();
@@ -548,6 +548,7 @@ export default {
       });
     },
     createTitles(result) {
+      console.log('result', result);
       if (this.options?.titles) {
         const allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map((x) => ({

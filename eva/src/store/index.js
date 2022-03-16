@@ -1154,7 +1154,6 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
-          console.log('result', stateFrom);
           if (stateFrom) {
             if (!state[id]) {
               commit('setState', [
