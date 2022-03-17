@@ -836,12 +836,13 @@ export default {
           .find((item) => item.name === metric)?.type;
         return (metricType === 'Bar chart') ? 'barplot' : 'linechart';
       }
-      // eslint-disable-next-line no-nested-ternary
-      return metricTypes
-        ? metricTypes[metric]
-        : ((yAxesBinding.metricTypes && yAxesBinding.metricTypes[metric])
-          ? yAxesBinding.metricTypes[metric]
-          : 'linechart');
+      if (metricTypes) {
+        return metricTypes[metric] || 'linechart';
+      }
+      if (yAxesBinding && yAxesBinding.metricTypes[metric]) {
+        return yAxesBinding.metricTypes[metric];
+      }
+      return 'linechart';
     },
 
     // горизонтальные полосы на графике
