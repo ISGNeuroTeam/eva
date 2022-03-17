@@ -644,7 +644,7 @@
                   () => {
                     colorsPie.nametheme =
                       colorsPie.theme === 'custom' ? '' : colorsPie.theme;
-                    colorsPie.colors = themes[colorsPie.theme].join(',');
+                    colorsPie.colors = themes[colorsPie.theme].join(' ');
                   }
                 "
                 @input="isChanged = true"
@@ -1488,10 +1488,11 @@ export default {
       const nextTheme = this.defaultThemes[0];
       this.$set(this.colorsPie, 'theme', nextTheme);
       this.$set(this.colorsPie, 'nametheme', nextTheme);
-      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(','));
+      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(' '));
       this.$set(this.options, 'colorsPie', this.colorsPie);
       this.$set(this.options, 'themes', this.themes);
       delete this.themes[theme];
+      this.isDelete = true;
     },
     deleteTheme() {
       this.options.colorsPie = this.colorsPie;

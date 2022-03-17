@@ -298,7 +298,7 @@
             <v-list
               :style="`color: ${theme.$main_text} !important; max-height: 382px`"
               class="overflow-y-auto"
-              :color="theme.$secondary_bg"
+              :color="theme.$main_bg"
             >
               <v-list-item
                 v-for="item in library.objects"
@@ -457,17 +457,17 @@ export default {
       return this.getLibrary;
     },
     getLibrary() {
-      return this.elementFromStore?.options?.library;
+      return this.dashFromStore?.options?.library;
     },
-    elementFromStore() {
+    dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
     },
     getOptions() {
-      if (!this.idDash) {
+      if (!this.idElement) {
         return [];
       }
       if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idDashFrom });
+        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idElement });
       }
 
       if (!this.dashFromStore?.options.pinned) {
@@ -638,7 +638,7 @@ export default {
         );
         this.options.colorsPie = this.colorsPie;
         if (this.colorsPie.theme === 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',');
+          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;

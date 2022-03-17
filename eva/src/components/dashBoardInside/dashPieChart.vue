@@ -115,6 +115,9 @@ export default {
     };
   },
   computed: {
+    idDash() {
+      return this.idDashFrom;
+    },
     dashFromStore() {
       return this.$store.state[this.idDash][this.idFrom];
     },

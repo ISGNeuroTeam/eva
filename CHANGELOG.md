@@ -35,6 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed dashTable.vue
 - fixed save dashboards
 - fixed log icon light up on error
+- fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
 
 ## [1.84.0]
 
