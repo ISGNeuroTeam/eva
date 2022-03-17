@@ -949,7 +949,7 @@
       <modal-confirm
         v-model="isConfirmModal"
         :theme="theme"
-        :modal-text="`Уверенны, что хотите удалить вариант отображения ?`"
+        :modal-text="`Вы точно хотите удалить вариант отображения ?`"
         btn-confirm-text="Удалить"
         btn-cancel-text="Отмена"
         @result="deleteMetrics(deleteMetricId)"
