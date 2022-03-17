@@ -172,6 +172,7 @@ export default {
       if (this.dataRestFrom != null) {
         data = this.dataRestFrom;
       }
+      console.log('dataRestFrom', this.dataRestFrom);
       return data;
     },
     theme() {
@@ -204,9 +205,9 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      if (this.dataReady.length > 0) {
+      if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
         const data = this.dataReady;
-        res = Object.values(data).map((item) => item[this.elem]);
+        res = Object.values(data).map((item) => item[this.elem]).filter((x) => !!x);
         res = this.filterSelect(res, this.elemDeep.true);
       }
       return res;
@@ -250,6 +251,7 @@ export default {
       }
     },
     dataReady(dataReady) {
+      console.log('dataReady', dataReady);
       let data = [];
       if (dataReady.length > 0) {
         data = Object.keys(dataReady);
@@ -359,9 +361,10 @@ export default {
 
       this.topArray = sorted([...selected]);
       this.bottomArray = sorted([...data]);
-
+      console.log('this.topArray', this.topArray);
+      console.log('this.bottomArray', this.bottomArray);
       data = [...this.topArray, ...this.bottomArray];
-
+      console.log('data', data);
       return data;
     },
     setTocken() {
