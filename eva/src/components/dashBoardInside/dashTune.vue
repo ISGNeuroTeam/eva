@@ -237,13 +237,15 @@ export default {
     },
     dataField(value) {
       this.$nextTick(() => {
-        /* value !== '' && */ this.$store.commit('setSelected', {
-          element: 'elem',
-          idDash: this.idDashFrom,
-          id: this.idFrom,
-          value,
-        });
-        this.changeValue();
+        if (typeof value !== 'undefined') {
+          this.$store.commit('setSelected', {
+            element: 'elem',
+            idDash: this.idDashFrom,
+            id: this.idFrom,
+            value,
+          });
+          this.changeValue();
+        }
       });
     },
   },
@@ -289,7 +291,7 @@ export default {
         element: 'elemDeep',
         idDash: this.idDashFrom,
         id: this.idFrom,
-        value: this.value,
+        value: this.value || 0,
       });
     },
     setToken() {
@@ -308,14 +310,15 @@ export default {
       });
     },
     loadSelectedValue() {
-      const selected = this.actionGetElementSelected({
+      this.actionGetElementSelected({
         idDash: this.idDashFrom,
         id: this.idFrom,
+      }).then((selected) => {
+        if (selected) {
+          this.dataField = selected?.elem || null;
+          this.value = selected?.elemDeep || '';
+        }
       });
-      if (selected) {
-        this.dataField = selected.elem;
-        this.value = selected.elemDeep;
-      }
       this.detectSliderValue();
     },
     detectSliderValue(values = this.values) {

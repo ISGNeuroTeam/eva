@@ -1485,9 +1485,8 @@ export default new Vuex.Store({
     actionGetElementSelected({ state, commit }, element) {
       const selected = state[element.idDash][element.id]?.selected;
       if (!selected) {
-        commit('createElementSelected', { ...element });
+        commit('setSelected', { ...element });
       }
-      commit('setElementSelected', { ...element });
       return state[element.idDash][element.id]?.selected;
     },
 
