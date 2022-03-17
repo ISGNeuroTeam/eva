@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import './fonts.css';
 import './scroll.css';
+import './scss/globalStyles.scss';
 
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 

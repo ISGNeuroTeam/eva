@@ -1,0 +1,28 @@
+#app {
+  .v-menu__content {
+    color: var(--main_text);
+    background-color: var(--main_bg) !important;
+    border: 1px solid var(--main_border);
+
+    .v-select-list {
+      background: inherit !important;
+      .v-list-item {
+        background: inherit !important;
+        color: inherit !important;
+      }
+    }
+    .v-list {
+      color: var(--main_text);
+      .v-list-item {
+        color: inherit !important;
+      }
+    }
+  }
+  .v-data-table--container {
+    background-color: var(--main_bg)
+  }
+
+  .v-data-table-header th {
+    white-space: nowrap
+  }
+}
