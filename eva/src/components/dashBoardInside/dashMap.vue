@@ -177,7 +177,7 @@ export default {
       this.createMap();
     },
   },
-  async mounted() {
+  mounted() {
     this.initMap();
     this.initTheme();
     this.initClusterTextCount();
@@ -209,7 +209,7 @@ export default {
       idDash: this.idDash,
       id: this.element,
     });
-    await this.loadDataForPipe(this.$store.getters.getPaperSearch);
+    this.loadDataForPipe(this.$store.getters.getPaperSearch);
   },
   methods: {
     async getDataFromRest(event) {
@@ -283,7 +283,7 @@ export default {
           && tokens[i].capture === 'zoom_level'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value,
             store: this.$store,
@@ -294,7 +294,7 @@ export default {
           && tokens[i].capture === 'top_left_point'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value: this.leftBottom[1],
             store: this.$store,
@@ -305,7 +305,7 @@ export default {
           && tokens[i].capture === 'bottom_right_point'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value: this.rightTop[1],
             store: this.$store,
@@ -326,6 +326,7 @@ export default {
       this.getOSM();
       // получаем библиотеку
       // get all icons that we need on map
+      this.generateLibrary(dataRest, this.options?.primitivesLibrary);
       this.generateClusterPositionItems();
       this.initSettings();
       if (!this.error) {
@@ -498,7 +499,9 @@ export default {
         },
       });
 
-      L.control.legend = (opts) => new L.Control.Legend(opts);
+      L.control.legend = function (opts) {
+        return new L.Control.Legend(opts);
+      };
 
       L.control.legend({ position: 'bottomright' }).addTo(this.map);
       this.isLegendGenerated = true;

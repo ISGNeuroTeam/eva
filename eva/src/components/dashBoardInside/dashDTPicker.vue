@@ -511,7 +511,7 @@ export default {
 
       const setTocken = (value) => {
         this.$store.commit('setTocken', {
-          tocken,
+          token: tocken,
           idDash: this.idDash,
           value,
           store: this.$store,

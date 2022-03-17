@@ -491,7 +491,7 @@ export default {
       };
       if (name !== '') {
         this.$store.commit('setTocken', {
-          tocken,
+          token: tocken,
           idDash: this.idDash,
           value,
         });

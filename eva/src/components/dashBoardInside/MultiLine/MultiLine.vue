@@ -410,7 +410,7 @@ export default {
 
           [tocken.filterParam] = Object.keys(this.dataRestFrom[0]);
           this.$store.commit('setTocken', {
-            tocken, value, idDash, store,
+            token: tocken, value, idDash, store,
           });
         }
       }
@@ -735,7 +735,7 @@ export default {
         .selectAll(`.dot-${i}`)
         .transition()
         .duration(duration)
-        .attr('cx', (d) => {
+        .attr('cx', function (d) {
           const xVal = x(d[xMetric] * secondTransf);
           const yVal = isUnitedMode
             ? y(d[metricNames[i]])
@@ -779,14 +779,20 @@ export default {
         .selectAll('.vetical-line')
         .transition()
         .duration(duration)
-        .attr('x1', () => x(this.getAttribute('xVal')))
-        .attr('x2', () => x(this.getAttribute('xVal')));
+        .attr('x1', function () {
+          return x(this.getAttribute('xVal'));
+        })
+        .attr('x2', function () {
+          return x(this.getAttribute('xVal'));
+        });
 
       group
         .selectAll('.dot-vertical')
         .transition()
         .duration(duration)
-        .attr('cx', () => x(this.getAttribute('xVal')));
+        .attr('cx', function () {
+          return x(this.getAttribute('xVal'));
+        });
     },
 
     setXAxisCaptionsRotate() {
@@ -1381,12 +1387,12 @@ export default {
 
                   return h;
                 })
-                .attr('transform', () => {
+                .attr('transform', function () {
                   const translate = this.width.baseVal.value / 2;
                   return `translate(-${translate}, 0)`;
                 })
                 .attr('fill', this.legendColors[metricIndex])
-                .on('mouseenter', (d) => {
+                .on('mouseenter', function (d) {
                   const date = new Date(d[xMetric] * secondTransf);
                   let day = date.getDate();
                   let month = date.getMonth() + 1;
@@ -1427,7 +1433,7 @@ export default {
                     .attr('opacity', 0.7);
                   tooltip.style('opacity', 1).style('visibility', 'visible');
                 })
-                .on('mousemove', () => {
+                .on('mousemove', function () {
                   const { offsetX, offsetY } = d3.event;
                   const tooltipWidth = tooltipBlock.offsetWidth;
                   const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
@@ -1448,7 +1454,7 @@ export default {
 
                   tooltip.style('left', `${left}px`).style('top', `${top}px`);
                 })
-                .on('mouseleave', () => {
+                .on('mouseleave', function () {
                   if (!this.getAttribute('data-last-bar')) {
                     allDotHover.forEach((dot) => {
                       // eslint-disable-next-line no-underscore-dangle
@@ -1511,7 +1517,7 @@ export default {
                   .attr('stroke-width', this.strokeWidth)
                   .style(
                     'stroke-dasharray',
-                    getStyleLine(type_line[metricName]),
+                    getStyleLine(typeLine[metricName]),
                   )
                   .attr(
                     'd',

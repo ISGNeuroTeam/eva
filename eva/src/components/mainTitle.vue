@@ -344,16 +344,16 @@ export default {
       //   ? []
       //   : this.$store.getters.getElementsWithSearches(this.idDash);
 
-      if (this.loadingDash || !this.$store.state[this.idDash]?.elements) {
+      if (this.loadingDash || !this.dashFromStore?.elements) {
         return [];
       }
-      return this.$store.state[this.idDash].elements
+      return this.dashFromStore.elements
         .filter(
-          (elem) => this.$store.state[this.idDash][elem]
-            .tab === this.$store.state[this.idDash].currentTab
-            || this.$store.state[this.idDash][elem].options.pinned,
+          (elem) => this.dashFromStore[elem].tab
+                === this.dashFromStore.currentTab
+                || this.dashFromStore[elem].options.pinned,
         )
-        .map((elem) => ({ elem, search: this.$store.state[this.idDash][elem].search }));
+        .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
     headerTop() {
       return 0;
@@ -434,11 +434,6 @@ export default {
     searches: {
       deep: true,
       handler(searches) {
-        function findOnButtonTokens(tokens) {
-          return tokens.filter((el) => el.onButton);
-        }
-        const onButton = findOnButtonTokens(this.tokens);
-        console.log(onButton);
         if (this.firstLoad) {
           searches.forEach((search) => {
             this.$set(this.dataObject, search.sid, { data: [], loading: true });
@@ -463,6 +458,13 @@ export default {
             });
             this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
               .then((res) => {
+                if (res?.length === 0) {
+                  this.$store.commit('setState', [{
+                    object: this.$store.state,
+                    prop: 'logError',
+                    value: true,
+                  }]);
+                }
                 this.$store.commit('updateSearchStatus', {
                   idDash: this.idDash,
                   sid: search.sid,
@@ -564,7 +566,9 @@ export default {
     },
     addNewTab() {
       if (!this.tabEditMode) {
-        const tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
+        const tabID = this.tabs?.length > 0
+          ? [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1
+          : 1;
         this.$store.commit('addNewTab', {
           idDash: this.idDash,
           tabID,

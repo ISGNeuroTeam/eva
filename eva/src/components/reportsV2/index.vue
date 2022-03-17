@@ -290,7 +290,7 @@ export default {
       await this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
 
       // вызывая метод в хранилище
-      if (!response.data || response.data.length === 0) {
+      if (!response?.data || response.data.length === 0) {
         // если что-то пошло не так
         this.loading = false;
         this.$store.commit('setErrorLogs', true);

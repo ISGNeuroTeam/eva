@@ -617,14 +617,14 @@ export default {
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           if (item === 'object') {
             this.$store.commit('setTocken', {
-              tocken,
+              token: tocken,
               idDash: this.idDash,
               value: token,
               store: this.$store,
             });
           } else if (tockens[i].capture === token) {
             this.$store.commit('setTocken', {
-              tocken,
+              token: tocken,
               idDash: this.idDash,
               value: id,
               store: this.$store,
@@ -670,7 +670,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: token,
             store: this.$store,
