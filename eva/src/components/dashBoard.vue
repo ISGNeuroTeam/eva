@@ -100,6 +100,7 @@
         <div class="settings-dash-block">
           <div class="settings-dash">
             <v-dialog
+              ref="fullScreenModal"
               v-model="fullScreenMode"
               width="100%"
             >
@@ -241,7 +242,8 @@
                   </v-card-title>
                   <v-card-text
                     :is="currentElem"
-                    v-show="showElement"
+                    v-if="showElement"
+                    ref="dashBoardInsideFull"
                     class="card-text element-itself"
                     :color-from="theme"
                     :style="{
@@ -264,12 +266,14 @@
                     :full-screen="true"
                     :table-per-page="tablePerPage"
                     :table-page="tablePage"
+                    :selected-pie-index="selectedPieIndex"
                     @hideDS="hideDS($event)"
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
                     @resetRange="resetRange($event)"
+                    @changeSelectPie="changeSelectedPie"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
                   />
@@ -426,7 +430,8 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-show="showElement"
+        v-if="showElement"
+        ref="dashBoardInside"
         class="card-text element-itself"
         :color-from="theme"
         :style="{ color: theme.$main_text, background: 'transparent' }"
@@ -446,12 +451,14 @@
         :is-full-screen="false"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
+        :selected-pie-index="selectedPieIndex"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
         @resetRange="resetRange($event)"
+        @changeSelectPie="changeSelectedPie"
         @update:table-per-page="onTableItemsPerPageChange"
         @update:table-page="onTableIItemsPageChange"
       />
@@ -593,6 +600,7 @@ export default {
       },
       fullScreenWidth: 0.8 * window.innerWidth,
       fullScreenHeight: 0.8 * window.innerHeight,
+      selectedPieIndex: -1,
     };
   },
   computed: {
@@ -755,6 +763,11 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
+      if (this.dataElemFrom === 'piechart') {
+        this.$nextTick(() => {
+          this.$refs[`${to ? 'dashBoardInsideFull' : 'dashBoardInside'}`].setActiveLegendLine(this.selectedPieIndex);
+        });
+      }
       setTimeout(() => {
         this.disabledTooltip = to;
       }, to ? 0 : 600);
@@ -781,6 +794,9 @@ export default {
     });
   },
   methods: {
+    changeSelectedPie(val) {
+      this.selectedPieIndex = val;
+    },
     onTableIItemsPageChange(page) {
       this.tablePage = page;
     },

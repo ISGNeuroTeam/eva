@@ -56,7 +56,7 @@
           "
           @mouseover="hoverLegendLine(idx)"
           @mouseleave="hoverLegendLine(null)"
-          @click="selectedPieIndex = idx"
+          @click="selectedPie = idx"
         >
           <div
             class="square"
@@ -102,11 +102,14 @@ export default {
       type: Number,
       required: true,
     }, // высота родительского компонента
+    selectedPieIndex: {
+      type: Number,
+      default: -1,
+    }, // индекс активного элемента
   },
   data() {
     return {
       nodata: true,
-      selectedPieIndex: null,
       message: 'Нет данных для отображения',
       legends: [],
       positionLegends: 'row nowrap',
@@ -222,6 +225,14 @@ export default {
     change() {
       return true;
     },
+    selectedPie: {
+      get() {
+        return this.selectedPieIndex;
+      },
+      set(val) {
+        this.$emit('changeSelectPie', val);
+      },
+    },
   },
   watch: {
     'dashOptions.colorsPie': {
@@ -296,17 +307,22 @@ export default {
   },
   methods: {
     hoverLegendLine(legendLineIndex) {
+      this.setActiveLegendLine(legendLineIndex);
+    },
+    setActiveLegendLine(legendLineIndex) {
       d3.select(this.$refs.pieChart)
         .selectAll('.piepart')
         .each((_, i, nodes) => {
           const node = nodes[i];
-          if (i === legendLineIndex) node.classList.add('piepartSelect');
-          else if (
+          if (i === legendLineIndex) {
+            node.classList.add('piepartSelect');
+          } else if (
             node.classList.contains('piepartSelect')
             && this.selectedPieIndex !== i
-          ) node.classList.remove('piepartSelect');
+          ) {
+            node.classList.remove('piepartSelect');
+          }
         });
-
       d3.select(this.$refs.legends)
         .selectAll('.legend-line')
         .each((_, i, nodes) => {
@@ -396,6 +412,7 @@ export default {
                       colorsPie,
                     ); // и собственно создаем график
                     clearTimeout(timeOut);
+                    this.setActiveLegendLine(this.selectedPieIndex);
                   } else {
                     timeOut = setTimeout(tick.bind(this), 100);
                   }
@@ -412,6 +429,7 @@ export default {
                 positionlegend,
                 colorsPie,
               ); // и собственно создаем график
+              this.setActiveLegendLine(this.selectedPieIndex);
             }
           }
         } else {
@@ -535,15 +553,15 @@ export default {
         .on('mouseout', (_, i, nodes) => {
           if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
-          hoverLegendLine(null);
+          hoverLegendLine(-1);
         })
         .on('click', (_, i, nodes) => {
           const node = nodes[i];
           if (this.selectedPieIndex === i) {
-            this.selectedPieIndex = null;
+            this.selectedPie = -1;
             node.classList.remove('piepartSelect');
           } else {
-            this.selectedPieIndex = i;
+            this.selectedPie = i;
             node.classList.add('piepartSelect');
           }
         });

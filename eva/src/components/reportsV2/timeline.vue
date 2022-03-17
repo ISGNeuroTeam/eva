@@ -83,7 +83,6 @@
       height="50"
       style="width: 100%"
     />
-    {{ dataset }}
   </div>
 </template>
 
@@ -96,8 +95,18 @@ import {
   mdiPlus,
   mdiMinus,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
+import moment from 'moment';
+
+const timelineEnum = {
+  min: 1,
+  hour: 1,
+  day: 2,
+  month: 3,
+};
 
 export default {
+  name: 'Timeline',
   props: {
     data: {
       type: Array,
@@ -126,180 +135,41 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('dataResearch', ['getTimeline']),
+    getPreparedTimeLine() {
+      const timeLineFormats = {
+        min: 'h:mm A - DD MMMM YYYY',
+        hour: 'h A - DD MMMM YYYY',
+        day: 'DD MMMM YYYY',
+        month: 'MMMM YYYY',
+      };
+
+      return this.getTimeline[timelineEnum[this.select.value]]
+        .reduce((acc, { time, value }) => ({
+          ...acc,
+          [moment.unix(time).format(timeLineFormats[this.select.value])]: value,
+        }), {});
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
-    dataset() {
-      // eslint-disable-next-line no-underscore-dangle
-      let minTime = this.data[0]?._time;
-      // eslint-disable-next-line no-underscore-dangle
-      let maxTime = this.data[0]?._time;
-      this.data.forEach((item) => {
-        // eslint-disable-next-line no-underscore-dangle
-        if (item._time < minTime) {
-          // eslint-disable-next-line no-underscore-dangle
-          minTime = item._time;
-        }
-        // eslint-disable-next-line no-underscore-dangle
-        if (item._time > maxTime) {
-          // eslint-disable-next-line no-underscore-dangle
-          maxTime = item._time;
-        }
-      });
-      let barTime = minTime;
-      const dataset = {};
-      let newDate;
-      let datasetItemString;
-      let deltaTime;
-      let getActualLongData;
-      if (this.select.value === 'min') {
-        getActualLongData = this.getUntilMin;
-        deltaTime = 60;
-      } else if (this.select.value === 'hour') {
-        getActualLongData = this.getUntilHours;
-        deltaTime = 3600;
-      } else if (this.select.value === 'day') {
-        getActualLongData = this.getUntilDay;
-        deltaTime = 86400;
-      } else {
-        getActualLongData = this.getUntilMonth;
-        deltaTime = 2592000;
-      }
-      while (barTime < maxTime) {
-        newDate = new Date(barTime * 1000);
-
-        if (this.select.value === 'month') {
-          const newDateMonth = newDate.getMonth();
-          if (
-            newDateMonth === 3
-            || newDateMonth === 5
-            || newDateMonth === 8
-            || newDateMonth === 10
-          ) {
-            deltaTime = 2592000;
-          }
-          if (newDateMonth === 1 && newDate.getFullYear() % 4 === 0) {
-            deltaTime = 2505600;
-          }
-          if (newDateMonth === 1 && newDate.getFullYear() % 4 !== 0) {
-            deltaTime = 2419200;
-          } else {
-            deltaTime = 2678400;
-          }
-        }
-        datasetItemString = getActualLongData(newDate);
-        dataset[datasetItemString] = 0;
-        barTime += deltaTime;
-      }
-      this.data.forEach((item) => {
-        // eslint-disable-next-line no-underscore-dangle
-        if (dataset[getActualLongData(item._time * 1000)] === undefined) {
-          // eslint-disable-next-line no-underscore-dangle
-          dataset[getActualLongData(item._time * 1000)] = 1;
-        } else {
-          // eslint-disable-next-line no-underscore-dangle
-          dataset[getActualLongData(item._time * 1000)] += 1;
-        }
-      });
-      if (Object.keys(dataset).length > 0) {
-        for (
-          let i = Object.keys(dataset).length;
-          i < this.numberInTimeline;
-          i += 1
-        ) {
-          dataset[`100${i}`] = 0;
-        }
-      }
-      if (Object.keys(dataset).length > 0) {
-        this.clearSVG(dataset);
-      }
-      return null;
+  },
+  watch: {
+    getPreparedTimeLine: {
+      handler(newVal) {
+        this.clearSVG(newVal);
+      },
+      deep: true,
     },
   },
   mounted() {
-    // this.renderSVG()
+    this.$nextTick(() => {
+      this.clearSVG(this.getPreparedTimeLine);
+    });
   },
   methods: {
     setTimePeriod(item) {
       this.select = item;
-    },
-    getTimePart(date) {
-      let period;
-      if (this.select.value === 'min') {
-        period = date.getMinutes();
-      } else if (this.select.value === 'hour') {
-        period = date.getHours();
-      } else if (this.select.value === 'day') {
-        period = date.getDate();
-      } else {
-        period = date.getMonth();
-      }
-      return period;
-    },
-    getUntilMin(date) {
-      const options1 = {
-        hour12: 'true',
-        hour: 'numeric',
-        minute: 'numeric',
-      };
-      const options2 = {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      };
-      return (
-        `${new Intl.DateTimeFormat('ru', options1).format(date)
-        } - ${
-          new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)}`
-      );
-    },
-    getUntilHours(date) {
-      const options1 = {
-        hour12: 'true',
-        hour: 'numeric',
-      };
-      const options2 = {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      };
-      return (
-        `${new Intl.DateTimeFormat('ru', options1).format(date)
-        } - ${
-          new Intl.DateTimeFormat('ru', options2).format(date).slice(0, -3)}`
-      );
-    },
-    getUntilDay(date) {
-      const options = {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-      };
-      return new Intl.DateTimeFormat('ru', options).format(date).slice(0, -3);
-    },
-    getUntilMonth(date) {
-      const options = {
-        month: 'long',
-        year: 'numeric',
-      };
-      return new Intl.DateTimeFormat('ru', options).format(date).slice(0, -3);
-    },
-    clearSVG(dataset) {
-      d3.select('.block-tooltip')
-        .nodes()
-        .forEach((item) => {
-          item.remove();
-        });
-      d3.selectAll('rect')
-        .nodes()
-        .forEach((item) => {
-          item.remove();
-        });
-      if (this.$refs.chart) {
-        this.renderSVG(dataset);
-      } else {
-        console.error('элемент для отрисовки таймлайна не найдет');
-      }
     },
     plusScale() {
       if (this.numberInTimeline < 10) {
@@ -317,6 +187,23 @@ export default {
     },
     refreshScale() {
       this.numberInTimeline = 25;
+    },
+    clearSVG(dataset) {
+      d3.select('.block-tooltip')
+        .nodes()
+        .forEach((item) => {
+          item.remove();
+        });
+      d3.selectAll('rect')
+        .nodes()
+        .forEach((item) => {
+          item.remove();
+        });
+      if (this.$refs.chart) {
+        this.renderSVG(dataset);
+      } else {
+        console.error('элемент для отрисовки таймлайна не найдет');
+      }
     },
     renderSVG(dataset) {
       const marge = {
@@ -424,18 +311,11 @@ export default {
   background-color: $main_bg !important
   .v-list-item
     background-color: $main_bg
-//.chart div {
-//  font: 10px sans-serif;
-//  background-color: steelblue;
-//  text-align: right;
-//  padding: 3px;
-//  margin: 1px;
-//  color: white;
-//}
+
 .container-chart
-  /*width: 50%;*/
   margin: auto
 .block-tooltip
+  pointer-events: none
   display: none
   padding: 6px
   background: #FFFFFF
