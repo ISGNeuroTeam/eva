@@ -376,12 +376,7 @@ export default {
   async setSvg(svg, restAuth) {
     let data = [];
 
-    const response = await fetch('/api/load/svg', {
-      // сперва нужно подать post запрос
-      method: 'POST',
-      body: svg,
-      // mode: 'no-cors'
-    }).catch((error) => {
+    const response = await fetch(`/svg/${svg}`).catch((error) => {
       restAuth.putLog(
         `Изображение отправить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
       );
