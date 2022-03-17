@@ -66,20 +66,20 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     isFullScreen: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     /** Props from Reports page. */
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
   },
   data: () => ({
@@ -1419,9 +1419,9 @@ export default {
                     .filter((dot) => {
                       if (
                         dot.classList.contains('dot')
-                              && dot.__data__[xMetric]
-                              === d[xMetric] * secondTransf
-                              && dot.__data__[dot.getAttribute('metric')] !== null
+                          && dot.__data__[xMetric]
+                          === d[xMetric] * secondTransf
+                          && dot.__data__[dot.getAttribute('metric')] !== null
                       ) {
                         dot.style.opacity = 1;
                         return dot;
@@ -1780,7 +1780,7 @@ export default {
             brushObj.endX = change;
           }
 
-          if (this.brush.select('.selection').attr('width') > 5) {
+          if (this.brush?.select('.selection').attr('width') > 5) {
             this.updateData(x, yScales, [brushObj.startX, brushObj.endX]);
           }
 
@@ -1911,7 +1911,7 @@ export default {
               ),
           )
           .selectAll('.tick > text')
-          .each(() => {
+          .each(function () {
             const w = this.getBBox().width;
             if (w > maxLength) maxLength = w;
           });

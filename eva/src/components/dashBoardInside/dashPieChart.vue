@@ -225,16 +225,18 @@ export default {
   },
   watch: {
     'dashOptions.colorsPie': {
-      handler() {
-        const graphics = d3
-          .select(this.$refs.piechartItself)
-          .selectAll('svg')
-          .nodes();
-        if (graphics.length !== 0) {
-          graphics[0].remove();
-          this.createPieChartDash();
-        } else {
-          this.createPieChartDash();
+      handler(val, old) {
+        if (val !== old) {
+          const graphics = d3
+            .select(this.$refs.piechartItself)
+            .selectAll('svg')
+            .nodes();
+          if (graphics.length !== 0) {
+            graphics[0].remove();
+            this.createPieChartDash();
+          } else {
+            this.createPieChartDash();
+          }
         }
       },
       deep: true,
@@ -358,7 +360,7 @@ export default {
       if (this.dashOptions?.metricsRelation?.relations) {
         const metrics = this.dashOptions.metricsRelation.relations;
 
-        if (typeof this.dataRestFrom[0][metrics[1]] === 'number') {
+        if (typeof this.dataRestFrom[0]?.[metrics[1]] === 'number') {
           // если все-таки число
           this.nodata = false; // то убираем соощение о отсутствии данных
           if (this.dataRestFrom.length > 20) {
