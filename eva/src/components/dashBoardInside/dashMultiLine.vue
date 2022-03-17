@@ -105,7 +105,8 @@ export default {
       const { id, idDash } = this;
       return {
         ...this.defaultOptions,
-        ...this.$store.getters.getOptions({ id, idDash }),
+        // ...this.$store.getters.getOptions({ id, idDash }),
+        ...this.$store.state[idDash][id].options,
       };
     },
     colors() {
@@ -142,7 +143,7 @@ export default {
       const { color } = this.options;
       return this.metrics.map((name) => ({
         name,
-        color: (color && color[name]) || this.color(name),
+        color: (color && color[name]) ? color[name] : this.color(name),
       }));
     },
     xMetric() {
@@ -161,7 +162,7 @@ export default {
         width: this.widthFrom - margin.left - margin.right
           - marginOffset.left - marginOffset.right,
         height: this.heightFrom - margin.top - margin.bottom
-          - marginOffset.bottom - marginOffset.top - 100,
+          - marginOffset.bottom - marginOffset.top - 60,
       };
     },
     color() {
@@ -170,13 +171,10 @@ export default {
         .range(this.colors);
     },
     metricUnits() {
-      return this.$store.getters.getMetricsMulti({
-        id: this.idFrom,
-        idDash: this.idDashFrom,
-      });
+      return this.$store.state[this.idDashFrom][this.idFrom].metrics || [];
     },
     barplotMetrics() {
-      const { united, metricsCustom, metricTypes } = this.options;
+      const { united, metricsCustom, metricTypes, yAxesBinding } = this.options;
       if (!united) {
         if (metricsCustom) {
           return metricsCustom
@@ -185,8 +183,9 @@ export default {
         }
         return [];
       }
+      const types = metricTypes || yAxesBinding.metricTypes;
       return this.metrics
-        .filter((item) => metricTypes[item] === 'barplot');
+        .filter((item) => types && (types[item] === 'barplot'));
     },
     lineChartMetrics() {
       return this.metrics
@@ -221,6 +220,8 @@ export default {
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
   },
   methods: {
+    prepareOldOptions() {
+    },
     reRenderChart() {
       this.clearSvgContainer();
       this.createChart();
@@ -274,7 +275,9 @@ export default {
         : (this.box.height / this.metrics.length);
 
       this.metrics.forEach((metric, i) => {
-        const customColor = (color && color[metric]) || this.color(metric);
+        const currentColor = (color && color[metric])
+          ? color[metric]
+          : this.color(metric);
         const metricType = this.getMetricType(metric);
         const groups = d3.map(this.data, (d) => d[this.xMetric]).keys();
 
@@ -338,7 +341,7 @@ export default {
 
         const yAxisElem = this.svg
           .append('g')
-          .attr('stroke', customColor);
+          .attr('stroke', currentColor);
         let axisFunc;
         if (!united || !axisMetricsToRight.includes(metric)) {
           axisFunc = d3.axisLeft;
@@ -387,15 +390,14 @@ export default {
       // Add brushing
       this.brush = d3.brushX()
         .extent([[0, 0], [width, height]])
-        .on('end', this.updateChart);
+        .on('end', this.zoomChart);
 
       // Create the line variable: where both the line and the brush take place
       this.line = this.svg.append('g')
         .attr('clip-path', 'url(#clip)');
 
       this.bars = this.svg.append('g')
-        .attr('class', 'barplot')
-        .attr('clip-path', 'url(#clip)');
+        .attr('class', 'barplot');
 
       // Add the brushing
       this.line
@@ -416,8 +418,7 @@ export default {
         .attr('stroke', this.theme.$main_text)
         .attr('stroke-dasharray', '3 3');
     },
-    updateChart() {
-      // What are the selected boundaries?
+    zoomChart() {
       const { selection } = d3.event;
       const { invert } = this.xZoom;
       if (selection) {
@@ -481,15 +482,14 @@ export default {
       let isAddedBarplots = false;
 
       this.metrics.forEach((metric, i) => {
-        const currentColor = (color && color[metric])
-          || this.color(metric);
+        const currentColor = (color && color[metric]) ? color[metric] : this.color(metric);
         // Create a update selection: bind to the new data
         this.line = this.svg.selectAll(`.line-${metric}`)
           .data([data], (d) => d[this.xMetric]);
 
         const metricType = this.getMetricType(metric);
 
-        let bandwidth; let xSubgroup; let barWidth = 0;
+        let bandwidth; let xSubgroup; let barWidth = 1;
 
         // подгонка отступов на оси x
         if (this.barplotMetrics.length) {
@@ -522,13 +522,13 @@ export default {
                   const stackedData = d3.stack()
                     .keys(this.barplotMetrics)(data);
 
-                  const xBarOffset = (united && barplotstyle === 'divided' ? (barWidth / 2) : 0);
+                  const xBarOffset = (united ? (barWidth / 2) : 0);
                   this.bars.append('g')
                     .selectAll('g')
                     .data(stackedData)
                     .enter()
                     .append('g')
-                    .attr('fill', (d) => color[d.key] || this.color(d.key))
+                    .attr('fill', (d) => ((color && color[d.key]) ? color[d.key] : this.color(d.key)))
                     .selectAll('rect')
                     .data((d) => d)
                     .enter()
@@ -536,7 +536,7 @@ export default {
                     .attr('x', (d) => this.x[metric](d.data[this.xMetric]) + xBarOffset)
                     .attr('y', (d) => this.y[metric](d[1]))
                     .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
-                    .attr('width', barWidth >= barplotBarWidth
+                    .attr('width', barplotBarWidth && (barWidth >= barplotBarWidth)
                       ? barplotBarWidth
                       : barWidth)
                     .on('click', (d) => this.setClick({
@@ -548,7 +548,7 @@ export default {
                     .on('mousemove', (d) => {
                       this.updateTooltip(d.data);
                       const lineXPos = this.x[metric](d.data[this.xMetric])
-                        + (united && barplotstyle === 'divided' ? 0 : barWidth / 2);
+                        + (barWidth);
                       this.lineDot
                         .attr('x1', lineXPos)
                         .attr('x2', lineXPos);
@@ -571,7 +571,7 @@ export default {
                     .attr('x', (d) => xSubgroup(d.key))
                     .attr('y', (d) => this.y[metric](d.value))
                     .attr('width', barWidth >= barplotBarWidth
-                      ? barplotBarWidth
+                      ? (barplotBarWidth || xSubgroup.bandwidth())
                       : barWidth)
                     .attr('height', (d) => {
                       const varHeight = this.box.height - this.y[metric](d.value);
@@ -580,7 +580,7 @@ export default {
                         : varHeight - (this.box.height / this.metrics.length)
                           * (this.metrics.length - (i + 1));
                     })
-                    .attr('fill', (d) => color[d.key] || this.color(d.key))
+                    .attr('fill', (d) => ((color && color[d.key]) ? color[d.key] : this.color(d.key)))
                     .on('click', (d) => this.setClick({
                       x: d.data[this.xMetric],
                       y: d.value,
@@ -825,13 +825,20 @@ export default {
     },
 
     getMetricType(metric) {
-      const { united, metricsCustom, metricTypes } = this.options;
+      const {
+        united, metricsCustom, metricTypes, yAxesBinding,
+      } = this.options;
       if (!united && metricsCustom) {
         const metricType = metricsCustom
           .find((item) => item.name === metric)?.type;
         return (metricType === 'Bar chart') ? 'barplot' : 'linechart';
       }
-      return metricTypes ? metricTypes[metric] : 'linechart';
+      // eslint-disable-next-line no-nested-ternary
+      return metricTypes
+        ? metricTypes[metric]
+        : ((yAxesBinding.metricTypes && yAxesBinding.metricTypes[metric])
+          ? yAxesBinding.metricTypes[metric]
+          : 'linechart');
     },
 
     // горизонтальные полосы на графике
