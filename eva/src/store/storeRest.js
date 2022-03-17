@@ -382,6 +382,7 @@ export default {
       );
       return response;
     });
+
     if (response.status === 200) {
       // если получилось
       await response
