@@ -3,6 +3,8 @@
 ### New
 - Added the ability to update tokens when executing a go event
 - Visualisations in datа research 2.0.
+- Data Exploration 2.0 timeline get data from backend
+- Data Exploration 2.0 interesting get data from backend
 
 ### Fixed
 - Multiline. Moved the barplots to the background
@@ -11,6 +13,33 @@
 - Piechart color rgb
 - Gis settings styles
 - Calendar in data source
+- Added scheduler app button lock
+- Fixed creation and editing of dashboards and groups
+- Fixed data disappearing in Gantt when navigating through tabs
+- Fixed broken popup hint display in fullscreen mode on Multiline
+- Fixed the theme of styles
+- Fixed GIS icons
+- Fixed the template for metrics
+- Fixed a problem that occurred when creating a dashboard
+- Fixed problems with columns in the table when hiding
+- Fixed the Multiline settings and improved design
+- Fixed a problem with renaming the data source
+- Fixed the label of Multiline
+- Fixed switching by event to tabs in the heat map.
+- Fixed renaming with data source replacement
+- Fixed passed properties to token
+- Fixed Tables
+- Fixed saving dashboards
+- Fixed log icon light up on error
+- Fixed Piechart. Custom themes color set reset
+- Fixed GIS
+- The Multiline component has been updated
+- Fixed synchronization of selection of pie chart fragments
+- Fixed dashSelect
+- Fixed persistent modal
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 
 # [1.84.0] - Fixed dashboard filters, multiple tokens
 
