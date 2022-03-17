@@ -9,15 +9,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added the ability to update tokens when executing a go event
+- reportsV2 timeline get data from backend
+- reportsV2 interesting get data from backend
 - added visualisations to datа research 2.0.
 
 ### Fixed
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
+- Added blocking of the scheduler application button
 - fixed piechart color rgb
 - fixed gis settings styles
 - fixed calendar in data source
+- fixed creating/editing dashboards/groups
+- fixed guntt disappears data when navigating through tabs
+- fixed multiline tooltip display on fullscreen not working
+- fixed styles theme
+- fixed gis icons
+- Fixed template for metrics
+- fixed dashboard creation
+- fixed columns in the table are not hidden
+- fixed multiline settings and design improvements
+- fixed additional message about existing data source when renaming
+- fixed multiline label
+- fixed heatmap. Transition by event to tabs.
+- fixed renaming with data source replacement
+- fixed passed properties to token
+- fixed dashTable.vue
+- fixed save dashboards
+- fixed log icon light up on error
+- fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
+- fixed piechart chunk selection syncing
+- fixed dashSelect
+- refactoring a multiline
+- Fixed persistent modal
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 
 ## [1.84.0]
 
