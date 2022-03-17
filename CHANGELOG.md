@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed multiline label
 - fixed heatmap. Transition by event to tabs.
 - fixed renaming with data source replacement
+- fixed log icon light up on error
 
 ## [1.84.0]
 

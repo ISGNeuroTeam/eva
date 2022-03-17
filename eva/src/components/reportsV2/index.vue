@@ -287,7 +287,7 @@ export default {
       // вызывая метод в хранилище
 
       console.log(response);
-      if (!response.data || response.data.length === 0) {
+      if (!response?.data || response.data.length === 0) {
         // если что-то пошло не так
         this.loading = false;
         this.$store.commit('setErrorLogs', true);
