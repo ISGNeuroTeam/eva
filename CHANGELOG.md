@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed columns in the table are not hidden
 - fixed multiline settings and design improvements
 - fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
 
 ## [1.84.0]
 
