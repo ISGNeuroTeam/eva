@@ -310,6 +310,7 @@ export default {
           });
         }
       }
+
       if (screen.width <= 1600) {
         this.otstupBottom = 30;
       }
