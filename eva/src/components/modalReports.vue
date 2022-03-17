@@ -7,7 +7,10 @@
     :theme="theme"
     @cancelModal="cancelModal"
   >
-    <v-card class="reports-card" :style="{ background: theme.$main_bg }">
+    <v-card
+      class="reports-card"
+      :style="{ background: theme.$main_bg }"
+    >
       <div class="textarea-block">
         <div class="times-block">
           <div class="time-block">
@@ -172,7 +175,10 @@ export default {
     event: 'updateModalValue',
   },
   props: {
-    searchFrom: null,
+    searchFrom: {
+      type: Object,
+      required: true,
+    },
     modalValue: {
       type: Boolean,
       default: false,
@@ -216,7 +222,7 @@ export default {
     active() {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (this.modalFrom) {
-        this.setSearchData(this.searchFrom)
+        this.setSearchData(this.searchFrom);
       }
     },
     tws(tws) {
@@ -232,23 +238,25 @@ export default {
     },
     setSearch() {
       if (
-        Number(this.search.parametrs.tws) ||
-        this.search.parametrs.tws === 0
+        Number(this.search.parametrs.tws)
+        || this.search.parametrs.tws === 0
       ) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.tws = parseInt(
           new Date(this.search.parametrs.tws).getTime() / 1000,
+          10,
         );
       }
       if (
-        Number(this.search.parametrs.twf) ||
-        this.search.parametrs.twf === 0
+        Number(this.search.parametrs.twf)
+        || this.search.parametrs.twf === 0
       ) {
         // не придумал ка кполучить не Number()
       } else {
         this.search.parametrs.twf = parseInt(
           new Date(this.search.parametrs.twf).getTime() / 1000,
+          10,
         );
       }
 

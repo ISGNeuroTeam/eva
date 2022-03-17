@@ -281,6 +281,7 @@ export default {
     },
     keyFrom: {
       type: Number,
+      required: true,
     },
     curItemFrom: {
       type: Object,
@@ -437,7 +438,7 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.getters['auth/getEssenceList'](item, true);
+          return this.$store.dispatch('auth/getEssenceList', { role: item, create: true });
         });
 
         const result = await Promise.all(promise);
@@ -447,10 +448,10 @@ export default {
 
         return allData;
       }
-      return this.$store.getters['auth/getEssence'](
-        this.userFrom.tab,
-        this.userFrom.id,
-      );
+      return this.$store.dispatch('auth/getEssence', {
+        essence: this.userFrom.tab,
+        id: this.userFrom.id,
+      });
     },
     cancelModal() {
       this.$emit('cancelModal');
@@ -596,7 +597,7 @@ export default {
         });
       }
 
-      const response = this.$store.getters['auth/setEssence']({
+      const response = this.$store.dispatch('auth/setEssence', {
         formData: JSON.stringify(formData),
         essence: this.essence[this.keyFrom - 1],
         method,
