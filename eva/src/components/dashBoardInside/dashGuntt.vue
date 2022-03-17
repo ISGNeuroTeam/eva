@@ -227,7 +227,7 @@ export default {
   },
   mounted() {
     this.dataRestFromWatch();
-    this.$emit('setVissible', this.id);
+    this.$emit('setVissible', { element: this.id, overflow: 'visible' });
   },
   methods: {
     hiddenTooltip() {
@@ -428,7 +428,7 @@ export default {
       }
 
       function wrap(text) {
-        text.each(() => {
+        text.each(function () {
           const localText = d3.select(this);
           let row = [];
           localText
@@ -703,7 +703,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,

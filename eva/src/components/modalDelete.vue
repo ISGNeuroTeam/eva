@@ -167,7 +167,7 @@ export default {
   created() {
     this.$store.commit('setModalDelete', {
       id: this.idDash,
-      status: false,
+      active: false,
       elem: '',
       name: '',
       page: this.dataPage,

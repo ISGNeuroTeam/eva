@@ -5,7 +5,7 @@
     :is-confirm="isChanged"
     :persistent="isChanged"
     :theme="theme"
-    @cancelModal="cancelModal"
+    @cancelModal="checkOnCancel"
   >
     <div class="settings-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -964,7 +964,15 @@ import settings from '../js/componentsSettings';
 
 export default {
   name: 'ModalSettings',
+  model: {
+    prop: 'modalValue',
+    event: 'changeModalValue',
+  },
   props: {
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     idDashFrom: {
       type: String,
       required: true,
@@ -1045,11 +1053,12 @@ export default {
     },
     active: {
       get() {
-        return this.getModalSettings.status;
+        return this.dashFromStore.modalSettings.status;
       },
       set(value) {
-        this.$store.dispatch('closeModalSettings', {
-          path: this.idDash,
+        this.$store.commit('setModalSettings', {
+          idDash: this.idDash,
+          element: this.element,
           status: value,
         });
       },
@@ -1070,7 +1079,10 @@ export default {
         return [];
       }
       const [elem] = this.element.split('-');
-      return elem ? this.optionsByComponents[elem] || [] : [];
+      if (elem) {
+        return this.optionsByComponents[elem] || [];
+      }
+      return [];
     },
     changeComponent() {
       return `${this.idDash}-${this.element}`;
@@ -1109,7 +1121,7 @@ export default {
       },
     },
   },
-  mounted() {
+  created() {
     this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
     this.metricsName = this.getMetricsMulti;
     this.loadComponentsSettings();
@@ -1230,13 +1242,12 @@ export default {
       }
       this.cancelModal();
     },
-    // если нажали на отмену создания
     cancelModal() {
-      this.$store.commit('setModalSettings', {
-        idDash: this.idDash,
-        status: false,
-        id: '',
-      });
+      this.active = false;
+      this.checkOnCancel();
+    },
+    // если нажали на отмену создания
+    checkOnCancel() {
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
         this.them = {};
@@ -1246,7 +1257,7 @@ export default {
     },
     checkEsc(event) {
       if (event.code === 'Escape') {
-        this.cancelModal();
+        this.checkOnCancel();
       }
     },
     checkOptions(option, relation) {
@@ -1468,6 +1479,7 @@ export default {
         if (!localOptions?.change) {
           localOptions.change = false;
         }
+
         localOptions = { ...this.loadComponentsSettings(), ...localOptions };
         this.$set(this, 'options', localOptions);
       });

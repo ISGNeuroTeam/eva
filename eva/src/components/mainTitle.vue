@@ -344,16 +344,16 @@ export default {
       //   ? []
       //   : this.$store.getters.getElementsWithSearches(this.idDash);
 
-      if (this.loadingDash || !this.$store.state[this.idDash]?.elements) {
+      if (this.loadingDash || !this.dashFromStore?.elements) {
         return [];
       }
-      return this.$store.state[this.idDash].elements
+      return this.dashFromStore.elements
         .filter(
-          (elem) => this.$store.state[this.idDash][elem]
-            .tab === this.$store.state[this.idDash].currentTab
-            || this.$store.state[this.idDash][elem].options.pinned,
+          (elem) => this.dashFromStore[elem].tab
+                === this.dashFromStore.currentTab
+                || this.dashFromStore[elem].options.pinned,
         )
-        .map((elem) => ({ elem, search: this.$store.state[this.idDash][elem].search }));
+        .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
     headerTop() {
       return 0;
@@ -566,7 +566,9 @@ export default {
     },
     addNewTab() {
       if (!this.tabEditMode) {
-        const tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
+        const tabID = this.tabs?.length > 0
+          ? [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1
+          : 1;
         this.$store.commit('addNewTab', {
           idDash: this.idDash,
           tabID,

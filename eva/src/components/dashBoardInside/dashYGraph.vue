@@ -863,7 +863,7 @@ export default {
             if (token.elem === this.idFrom && token.action === 'click') {
               const value = args.item.tag[token.capture];
               this.$store.commit('setTocken', {
-                tocken: token,
+                token,
                 idDash: this.idDashFrom,
                 store: this.$store,
                 value,

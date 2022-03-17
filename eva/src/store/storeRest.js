@@ -183,7 +183,6 @@ export default {
                       }));
 
                     resultProm = await Promise.all(dataProm);
-                    console.log('resultProm', resultProm);
                     let resolveData = [];
 
                     resultProm.forEach((item) => {
