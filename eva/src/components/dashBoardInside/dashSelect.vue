@@ -270,7 +270,7 @@ export default {
       return this.$store.state[this.idDash][this.id];
     },
     getSelected() {
-      if (!this.selected) {
+      if (!this.dashFromStore.selected) {
         this.$store.commit('setState', [{
           object: this.dashFromStore,
           prop: 'selected',

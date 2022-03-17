@@ -308,14 +308,16 @@ export default {
   },
   methods: {
     onClose() {
-      this.show_picker_elem = false;
-      this.$emit('setVissible', { element: this.id, overflow: 'scroll' });
+      if (this.show_picker_elem) {
+        this.show_picker_elem = false;
+        this.$emit('setVissible', { element: this.id, overflow: 'scroll' });
 
-      this.changeDate = !this.changeDate;
-      this.arrow.direct = 'down';
-      this.arrow.elem = this.down;
-      this.showCurrent();
-      this.curDate = this.calcCurrentDate();
+        this.changeDate = !this.changeDate;
+        this.arrow.direct = 'down';
+        this.arrow.elem = this.down;
+        this.showCurrent();
+        this.curDate = this.calcCurrentDate();
+      }
     },
     calcCurrentDate() {
       const data = this.getPickerDate;
