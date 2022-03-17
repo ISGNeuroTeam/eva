@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed gis
 - fixed multiline
 - fixed piechart chunk selection syncing
+- fixed dashSelect
 
 ## [1.84.0]
 
