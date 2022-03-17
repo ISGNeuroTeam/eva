@@ -11,6 +11,7 @@ import VueDraggableResizable from 'vue-draggable-resizable';
 // TODO: что это за модуль, почему ide считает что он не установлен
 import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
 // подключаем файл с настройками хранилища Vuex
+import moment from 'moment';
 import store from './store/index';
 // подключаем файл с настройками хранилища Vuex (формы)
 // import storeForm from './store/storeForm/index';
@@ -25,12 +26,6 @@ import screenshot from './plugins/screenshot';
 
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import App from './App.vue';
-
-// TODO: на удаление
-// // подключаем Vue
-// window.Vue = require('vue');
-// // позволяет создавтаь асинхронные computed
-// window.Vue = Vue;
 
 // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.use(AsyncComputed);
@@ -155,8 +150,7 @@ Vue.directive('blur', {
   },
 });
 
-// store.form = storeForm;
-// store.auth = storeAuth;
+moment.locale('ru');
 
 Vue.config.productionTip = true;
 // создаем экземпляр vue где подключаем самое главное переадрасицию,

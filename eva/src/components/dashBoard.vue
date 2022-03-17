@@ -9,7 +9,8 @@
       class="dash-block"
       :style="{
         background: theme.$main_bg,
-        boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+        boxShadow: `0 3px 1px -2px ${theme.$main_border},
+        0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
       <v-card-title
@@ -99,6 +100,7 @@
         <div class="settings-dash-block">
           <div class="settings-dash">
             <v-dialog
+              ref="fullScreenModal"
               v-model="fullScreenMode"
               width="100%"
             >
@@ -130,7 +132,8 @@
                   class="dash-block"
                   :style="{
                     background: theme.$main_bg,
-                    boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+                    boxShadow: `0 3px 1px -2px ${theme.$main_border},
+                    0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
                   }"
                 >
                   <v-card-title
@@ -239,7 +242,8 @@
                   </v-card-title>
                   <v-card-text
                     :is="currentElem"
-                    v-show="showElement"
+                    v-if="showElement"
+                    ref="dashBoardInsideFull"
                     class="card-text element-itself"
                     :color-from="theme"
                     :style="{
@@ -262,12 +266,14 @@
                     :full-screen="true"
                     :table-per-page="tablePerPage"
                     :table-page="tablePage"
+                    :selected-pie-index="selectedPieIndex"
                     @hideDS="hideDS($event)"
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
                     @resetRange="resetRange($event)"
+                    @changeSelectPie="changeSelectedPie"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
                   />
@@ -424,7 +430,8 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-show="showElement"
+        v-if="showElement"
+        ref="dashBoardInside"
         class="card-text element-itself"
         :color-from="theme"
         :style="{ color: theme.$main_text, background: 'transparent' }"
@@ -444,12 +451,14 @@
         :is-full-screen="false"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
+        :selected-pie-index="selectedPieIndex"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
         @resetRange="resetRange($event)"
+        @changeSelectPie="changeSelectedPie"
         @update:table-per-page="onTableItemsPerPageChange"
         @update:table-page="onTableIItemsPageChange"
       />
@@ -476,27 +485,47 @@ import {
   mdiSettings,
   mdiTrashCanOutline,
 } from '@mdi/js';
-import { mapGetters } from 'vuex';
-import settings from '../js/componentsSettings.js';
+import settings from '../js/componentsSettings';
 
 export default {
   name: 'DashBoard',
   props: {
-    width: null,
-    height: null,
-    idDashFrom: null,
-    dataElemFrom: null,
+    width: {
+      type: Number,
+      required: true,
+    },
+    height: {
+      type: Number,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataElemFrom: {
+      type: String,
+      required: true,
+    },
     dataModeFrom: {
       type: Boolean,
       required: true,
     },
-    dataPageFrom: null,
+    dataPageFrom: {
+      type: String,
+      required: true,
+    },
     loading: {
       type: Boolean,
       default: false,
     },
-    searchData: Array,
-    dataSourseTitle: null,
+    searchData: {
+      type: Array,
+      default: () => ([]),
+    },
+    dataSourseTitle: {
+      type: [String, Number],
+      default: -1,
+    },
     tooltipOpenDelay: {
       type: Number,
       default: 500,
@@ -571,27 +600,32 @@ export default {
       },
       fullScreenWidth: 0.8 * window.innerWidth,
       fullScreenHeight: 0.8 * window.innerHeight,
+      selectedPieIndex: -1,
     };
   },
   computed: {
-    ...mapGetters(['getTockens']),
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
     isMultiline() {
       return !!this.element?.includes('multiLine');
     },
     getSelfTockens() {
-      return this.getTockens(this.idDash);
+      return this.getTockens || [];
     },
     boardTitle() {
       if (!this.props || !this.props.name) {
         return this.element;
       }
       let { name } = this.props;
-      name
-      && this.getSelfTockens.forEach((token) => {
-        name = name.replaceAll(`$${token.name}$`, token.value);
-      });
 
-      if (name.indexOf('$evaTknLogin$') != -1) {
+      if (name) {
+        this.getSelfTockens.forEach((token) => {
+          name = name.replaceAll(`$${token.name}$`, token.value);
+        });
+      }
+
+      if (name.indexOf('$evaTknLogin$') !== -1) {
         if (this.$jwt.hasToken()) {
           name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
         }
@@ -599,7 +633,7 @@ export default {
       return name;
     },
     settingsIsOpened() {
-      return this.$store.getters.getModalSettings(this.idDash).status;
+      return this.$store.state[this.idDash].modalSettings.status;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -625,8 +659,8 @@ export default {
       }
       return this.dataModeFrom;
     },
+    // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
     currentElem() {
-      // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
       let nameElement = '';
       if (this.element) {
         const element = this.element.split('-')[0];
@@ -637,35 +671,63 @@ export default {
     elemIcon() {
       let element = '';
       if (this.element) {
-        element = this.element.split('-')[0];
+        [element] = this.element.split('-');
       }
       return element;
     },
+    // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
     showElement() {
-      // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
-      let show = false;
-      if (this.element) {
-        show = this.$store.getters.getSwitch({
-          idDash: this.idDash,
-          id: this.element,
-        });
+      return this.element ? this.$store.state[this.idDash][this.element].switch : false;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.element];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.element, idDash: this.idDash });
       }
 
-      return show;
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
     },
     lastResult() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.element,
-      });
+      const options = this.getOptions;
       return options.lastResult;
     },
     options() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.element,
-      });
-
+      const options = this.getOptions;
       this.setOptionsItems(options);
 
       if (this.props.options.timeFormat) {
@@ -701,19 +763,27 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
-      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
+      if (this.dataElemFrom === 'piechart') {
+        this.$nextTick(() => {
+          this.$refs[`${to ? 'dashBoardInsideFull' : 'dashBoardInside'}`].setActiveLegendLine(this.selectedPieIndex);
+        });
+      }
+      setTimeout(() => {
+        this.disabledTooltip = to;
+      }, to ? 0 : 600);
     },
     settingsIsOpened(to) {
-      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
+      setTimeout(() => {
+        this.disabledTooltip = to;
+      }, to ? 0 : 600);
     },
   },
   mounted() {
     this.props.icons = settings.icons;
-    this.page = this.$parent.$el.getAttribute('data-page'); // понимаем какая страница перед нами
-    this.props.name = this.$store.getters.getNameDash({
-      idDash: this.idDash,
-      id: this.element,
-    }); // получаем имя этой страницы
+    // понимаем какая страница перед нами
+    this.page = this.$parent.$el.getAttribute('data-page');
+    // получаем имя этой страницы
+    this.props.name = this.$store.state[this.idDash][this.element].name_elem;
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
@@ -724,6 +794,9 @@ export default {
     });
   },
   methods: {
+    changeSelectedPie(val) {
+      this.selectedPieIndex = val;
+    },
     onTableIItemsPageChange(page) {
       this.tablePage = page;
     },
@@ -754,12 +827,12 @@ export default {
       this.fullScreenWidth = window.innerWidth * 0.8;
       this.fullScreenHeight = window.innerHeight * 0.8;
     },
-    updateSettings(settings) {
-      this.settings = JSON.parse(JSON.stringify(settings));
+    updateSettings(localSettings) {
+      this.settings = JSON.parse(JSON.stringify(localSettings));
     },
 
+    // изменяем имя элемнета
     editName(props) {
-      // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
 
@@ -769,16 +842,16 @@ export default {
         idDash: this.idDash,
       });
     },
-    chooseDS(idDash) {
-      // открываем модальное окно с выбором ИС (источник данных)
+    // открываем модальное окно с выбором ИС (источник данных)
+    chooseDS() {
       this.$store.commit('setModalSearch', {
-        id: idDash,
+        id: this.idDash,
         status: true,
         elem: this.element,
       });
     },
+    // переключаем между режимами выбора данных и их отображением
     switchDS() {
-      // переключаем между режимами выбора данных и их отображением
       const status = !this.showElement;
       this.$store.commit('setSwitch', {
         idDash: this.idDash,
@@ -806,61 +879,14 @@ export default {
       }
       this.props.loading = event;
     },
+    // вызываем окно для удаления элемнета
     deleteDashBoard(props) {
-      // вызываем окно для удаления элемнета
       this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: this.element,
         name: props.name,
         page: this.dataPageFrom,
-      });
-    },
-    // нужен ли этот метод
-    getDataFromDB(searchID) {
-      // получение данных с indexindDB
-      let db = null;
-      const request = indexedDB.open('EVA', 1);
-      request.onerror = function (event) {
-        console.log('error: ', event);
-      };
-
-      request.onupgradeneeded = (event) => {
-        console.log('create');
-        db = event.target.result;
-        if (!db.objectStoreNames.contains('searches')) {
-          // if there's no "books" store
-          db.createObjectStore('searches'); // create it
-        }
-        request.onsuccess = () => {
-          db = request.result;
-          console.log(`successEvent: ${db}`);
-        };
-      };
-      return new Promise((resolve) => {
-        request.onsuccess = () => {
-          db = request.result;
-
-          const transaction = db.transaction('searches'); // (1)
-
-          // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches'); // (2)
-
-          const query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
-
-          query.onsuccess = () => {
-            // (4)
-            if (query.result) {
-              resolve(query.result);
-            } else {
-              resolve([]);
-            }
-          };
-
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
-          };
-        };
       });
     },
     openTitle() {
@@ -905,17 +931,14 @@ export default {
       this.$emit('SetLevel', level);
     },
     exportDataCSV() {
-      const searchId = this.$store.getters.getSearchID({
-        idDash: this.idDash,
-        id: this.element,
-      });
+      const searchId = this.$store.state[this.idDash][this.element].should;
       this.$emit('downloadData', searchId);
     },
     getData(searchID) {
       // асинхронная функция для получения даных с реста
       let db = null;
       const request = indexedDB.open('EVA', 1);
-      request.onerror = function (event) {
+      request.onerror = (event) => {
         console.log('error: ', event);
       };
       request.onupgradeneeded = (event) => {
@@ -945,17 +968,39 @@ export default {
               resolve([]);
             }
           };
-          query.onerror = function () {
+          query.onerror = () => {
             console.log('Ошибка', query.error);
           };
         };
       });
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     checkFilter() {
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'OnDataCompare',
-        element: this.element,
       });
       let data = [];
       let incl = false;
@@ -993,12 +1038,9 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     if (notArr.length !== 0) {
-                      if (!notArr.includes(String(itemFil[event.column]))) {
-                        return itemFil;
-                      }
-                    } else if (event.row.includes(String(itemFil[event.column]))) {
-                      return itemFil;
+                      return !notArr.includes(String(itemFil[event.column])) ? itemFil : false;
                     }
+                    return event.row.includes(String(itemFil[event.column])) ? itemFil : false;
                   });
                 } else {
                   data = data.filter((itemFil) => {
@@ -1017,9 +1059,7 @@ export default {
                         }
                       });
                     }
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
@@ -1034,9 +1074,7 @@ export default {
                         incl = false;
                       }
                     });
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
@@ -1051,19 +1089,14 @@ export default {
                         incl = false;
                       }
                     });
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
               case 'in':
                 if (event.column !== '') {
-                  data = data.filter((itemFil) => {
-                    if (event.row.includes(String(itemFil[event.column]))) {
-                      return itemFil;
-                    }
-                  });
+                  data = data.filter((itemFil) => !!event.row
+                    .includes(String(itemFil[event.column])));
                 } else {
                   data = data.filter((itemFil) => {
                     incl = false;
@@ -1072,9 +1105,7 @@ export default {
                         incl = true;
                       }
                     });
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
                 break;
@@ -1082,14 +1113,12 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = false;
-                    let min; let
-                      max;
+                    let min;
+                    let max;
                     if (parseFloat(event.row[0]) > parseFloat(event.row[1])) {
-                      max = event.row[0];
-                      min = event.row[1];
+                      [max, min] = event.row;
                     } else {
-                      max = event.row[1];
-                      min = event.row[0];
+                      [min, max] = event.row;
                     }
                     if (
                       parseFloat(itemFil[event.column]) > min
@@ -1097,41 +1126,50 @@ export default {
                     ) {
                       incl = true;
                     }
-                    if (incl) {
-                      return itemFil;
-                    }
+                    return incl;
                   });
                 }
+                break;
+              default:
                 break;
             }
           }
           if (this.searchData.length === 0) {
             this.searchData = [...this.searchData, ...data];
-          } else {
             // если в массив результирующем уже что-то было, то надо добавить только новые элементы
+          } else {
+            // пробегаемся по все мотфильтрвоанным элементам
             data.forEach((itemData) => {
-              // пробегаемся по все мотфильтрвоанным элементам
-              let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
-              const keys = Object.keys(itemData); // ключи объекта внутри фильтрованного массива
+              // переменная которая скажет встречается ли такая строка уже в выборке
+              let equal = false;
+              // ключи объекта внутри фильтрованного массива
+              const keys = Object.keys(itemData);
+              // пробегаемся пов сем отфильтрованным данным
               this.searchData.forEach((itemDataRest) => {
-                // пробегаемся пов сем отфильтрованным данным
-                let equalRest = true; // переменная которая скажет полностью совпал объект внутри результирующего массива
+                // переменная которая скажет полностью совпал объект внутри результирующего массива
+                let equalRest = true;
+                // пробегаемся по кажлому полю в объекте
                 keys.forEach((key) => {
-                  // пробегаемся по кажлому полю в объекте
+                  // если значения поля из только что отфильтрованного массива,
+                  // не равно значени в уже до этого отфильтрованном массиве,
+                  // то значит что строка не полностью совпала, а значит строки не равны
                   if (itemData[key] !== itemDataRest[key]) {
-                    // если значения поля из только что отфильтрованного массива, не равно значени в уже до
-                    // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
-                    equalRest = false; // поэтому присваиваем переменной значение мол строки отличаются
+                    // поэтому присваиваем переменной значение мол строки отличаются
+                    equalRest = false;
                   }
                 });
+                // а вот если строка в только
+                // что отфлильтрованном массиве полностью совпала
+                // со строкой в уже до этого отфильтрованном
                 if (equalRest) {
-                  // а вот если строка в только что отфлильтрованном массиве полностью совпала со строкой в уже до этого отфильтрованном
-                  equal = true; // то присваиваем true переменной которай говорит что такая строка уже есть
+                  // то присваиваем true переменной которай говорит что такая строка уже есть
+                  equal = true;
                 }
               });
+              // и вот если такой строки все же нет
               if (!equal) {
-                // и вот если такой строки все же нет
-                this.searchData.push(itemData); // то смело добовляем ее в результирующий массив
+                // то смело добовляем ее в результирующий массив
+                this.searchData.push(itemData);
               }
             });
           }

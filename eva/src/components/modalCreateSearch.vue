@@ -219,13 +219,22 @@ export default {
     event: 'updateModalValue',
   },
   props: {
-    idDashFrom: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataSearchFrom: {
+      type: Object,
+      required: true,
+    },
+    createBtnFrom: {
+      type: String,
+      required: true,
+    },
     modalValue: {
       type: Boolean,
       default: false,
     },
-    dataSearchFrom: null,
-    createBtnFrom: null,
   },
   data() {
     return {
@@ -267,19 +276,22 @@ export default {
     dataSearch() {
       return this.dataSearchFrom;
     },
+    // получаем id страницы переданного от родителя
     idDash() {
-      // получаем id страницы переданного от родителя
       return this.idDashFrom;
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+    getSearches() {
+      return this.$store.state[this.idDash]?.searches || [];
     },
   },
   watch: {
     active(val) {
       // тут понимаем нужно ли открыть окно с созданием или нет
       if (val) {
-        this.setData()
+        this.setData();
       } else {
         this.isChanged = false;
       }
@@ -287,18 +299,18 @@ export default {
     dataSearchFrom() {
       this.currentSid = this.dataSearchFrom?.sid;
     },
-    tws(val) {
-      this.search.parametrs.tws = val;
+    tws() {
+      this.search.parametrs.tws = this.tws;
     },
-    twf(val) {
-      this.search.parametrs.twf = val;
+    twf() {
+      this.search.parametrs.twf = this.twf;
     },
   },
   mounted() {
     this.currentSid = this.dataSearchFrom?.sid;
   },
   methods: {
-    setData () {
+    setData() {
       this.search = JSON.parse(JSON.stringify(this.dataSearch));
       if (this.createBtnFrom === 'edit') {
         this.createBtn = 'Редактировать';
@@ -323,36 +335,40 @@ export default {
       if (this.search.sid && this.search.sid !== '' && this.search.original_otl) {
         if (
           typeof this.search.parametrs.tws === 'string'
-          && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000)
+          && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000, 10)
         ) {
           this.search.parametrs.tws = parseInt(
             new Date(this.search.parametrs.tws).getTime() / 1000,
+            10,
           );
         }
         if (
           typeof this.search.parametrs.twf === 'string'
-          && parseInt(new Date(this.search.parametrs.twf).getTime() / 1000)
+          && parseInt(new Date(this.search.parametrs.twf).getTime() / 1000, 10)
         ) {
           this.search.parametrs.twf = parseInt(
             new Date(this.search.parametrs.twf).getTime() / 1000,
+            10,
           );
         }
 
-        const searches = this.$store.getters.getSearches(this.idDash); // получаем все ИС
+        // получаем все ИС
+        const searches = this.getSearches;
         let j = -1;
+        // пробегаемся по всем ИС
         searches.forEach((item, i) => {
-          // пробегаемся по всем ИС
+          // и если ИС с таким id уже есть
           if (item.sid === this.currentSid) {
-            // и если ИС с таким id уже есть
-            j = i; // меняем переменную
+            // меняем переменную
+            j = i;
           } else if (item.sid === this.search.sid) {
             j = -100;
           }
         });
 
+        // если такой ИС уже есть вызовем сообщение с уточнением
         if (j !== -1) {
-          // если такой ИС уже есть вызовем сообщение с уточнением
-          if (this.cancelBtn === 'Отмена') {
+          if (this.cancelBtn === 'Отмена' && this.currentSid === this.search.sid) {
             this.errorMsg = 'Такой источник данных существует. Хотите заменить его?';
             this.createBtn = 'Да';
             this.cancelBtn = 'Нет';
@@ -368,16 +384,19 @@ export default {
             });
             this.cancelBtn = 'Отмена';
             this.errorMsgShow = false;
-            this.active = false; // и скрываем окно редактирования ИД
+            // и скрываем окно редактирования ИД
+            this.active = false;
           }
-        } else {
           // если нет
+        } else {
+          // отправляем в хранилище для создания
           this.$store.commit('setSearch', {
             search: this.search,
             idDash: this.idDash,
             reload: false,
-          }); // отправляем в хранилище для создания
-          this.active = false; // и скрываем окно редактирования ИС
+          });
+          // и скрываем окно редактирования ИС
+          this.active = false;
         }
       } else {
         this.errorMsg = 'Sid источника данных не может быть пустым';
@@ -390,21 +409,21 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n' + '|',
+        '\n|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n' + '|',
-        '\n' + '|',
+        '\n\n|',
+        '\n|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '|' + '\n',
+        '|\n',
         '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '| ' + '\n',
+        '| \n',
         '| ',
       );
     },
