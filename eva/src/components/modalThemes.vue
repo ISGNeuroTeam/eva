@@ -1,8 +1,12 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="modalPersistent"
     v-model="showModal"
-    persistent
-    width="400px"
+    width="400"
+    :theme="theme"
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    @cancelModal="closeModal"
   >
     <div class="themes-modal-wrapper">
       <v-card
@@ -29,7 +33,9 @@
             @click="mode = 'create'"
           >
             <path
-              d="M8.5348 0.514893L0.0498047 8.99989L8.5348 17.4849L9.9498 16.0709L2.8778 8.99989L9.9498 1.92889L8.5348 0.514893Z"
+              d="M8.5348 0.514893L0.0498047 8.99989L8.5348
+               17.4849L9.9498 16.0709L2.8778 8.99989L9.9498
+               1.92889L8.5348 0.514893Z"
               :fill="theme.$main_text"
             />
           </svg>
@@ -76,7 +82,7 @@
             <div
               :style="{ color: theme.$error_color }"
               class="btn"
-              @click="deleteTheme"
+              @click="openConfirmModal"
             >
               <v-icon
                 :color="theme.$error_color"
@@ -86,6 +92,15 @@
               </v-icon>
               Удалить
             </div>
+            <modal-delete />
+            <modal-confirm
+              v-model="isConfirmModal"
+              :theme="theme"
+              :modal-text="`Вы точно хотите удалить тему - <strong>${select}</strong>?`"
+              btn-confirm-text="Удалить"
+              btn-cancel-text="Отмена"
+              @result="deleteTheme"
+            />
           </div>
           <div
             v-if="admin"
@@ -118,6 +133,7 @@
             :color="theme.$primary_button"
             outlined
             hide-details
+            @input="isChanged = true"
           />
           <div class="helper-title">
             <p @click="mode = 'manual'">
@@ -165,6 +181,7 @@
                     <v-color-picker
                       v-model="row.value"
                       dot-size="17"
+                      @input="isChanged = true"
                     />
                   </v-menu>
                 </v-col>
@@ -202,7 +219,11 @@
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M16 18H2C0.89543 18 0 17.1046 0 16V2C0 0.89543 0.89543 0 2 0H16C17.1046 0 18 0.89543 18 2V16C18 17.1046 17.1046 18 16 18ZM2 2V16H16V2H2ZM15 14H3L6 10L7 11L10 7L15 14ZM5.5 8C4.67157 8 4 7.32843 4 6.5C4 5.67157 4.67157 5 5.5 5C6.32843 5 7 5.67157 7 6.5C7 7.32843 6.32843 8 5.5 8Z"
+                    d="M16 18H2C0.89543 18 0 17.1046 0 16V2C0 0.89543 0.89543 0 2
+                     0H16C17.1046 0 18 0.89543 18 2V16C18 17.1046 17.1046 18 16
+                     18ZM2 2V16H16V2H2ZM15 14H3L6 10L7 11L10 7L15 14ZM5.5 8C4.67157
+                     8 4 7.32843 4 6.5C4 5.67157 4.67157 5 5.5 5C6.32843 5 7 5.67157
+                     7 6.5C7 7.32843 6.32843 8 5.5 8Z"
                     :fill="theme.$secondary_text"
                   />
                 </svg>
@@ -306,7 +327,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -319,9 +340,20 @@ import {
 } from '@mdi/js';
 
 export default {
+  name: 'ModalThemes',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    show: Boolean,
-    admin: Boolean,
+    admin: {
+      type: Boolean,
+      required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -386,14 +418,76 @@ export default {
           value: '#8F8F9C',
         },
       ],
+      defaultFieldsValue: [
+        {
+          title: 'Основной фон',
+          propName: '$main_bg',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительный фон',
+          propName: '$secondary_bg',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Основные линии',
+          propName: '$main_border',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительные линии',
+          propName: '$secondary_border',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Основной текст',
+          propName: '$main_text',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Дополнительный текст',
+          propName: '$secondary_text',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Заголовки',
+          propName: '$title',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Иконки и акценты',
+          propName: '$accent_ui_color',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Взаимодейтсвия',
+          propName: '$primary_button',
+          value: '#8F8F9C',
+        },
+        {
+          title: 'Взаимодейтсвия (доп.)',
+          propName: '$primary_button_hover',
+          value: '#8F8F9C',
+        },
+      ],
       imagePreview: null,
       mode: 'select',
       error: false,
+      isChanged: false,
+      isConfirmModal: false,
     };
   },
   computed: {
-    showModal() {
-      return this.show;
+    currentThemeName() {
+      return this.$store.getters.getThemeTitle;
+    },
+    showModal: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -401,6 +495,7 @@ export default {
   },
   watch: {
     async select(selectedTheme) {
+      this.$refs.modalPersistent.focusOnModal();
       if (selectedTheme !== 'dark' && selectedTheme !== 'light') {
         const response = await fetch(`/api/theme?themeName=${selectedTheme}`);
         const themeData = await response.json();
@@ -408,24 +503,38 @@ export default {
         this.$store.commit('setTheme', content);
       } else this.$store.commit('setDefaultTheme', selectedTheme);
     },
+    showModal(val) {
+      if (!val) {
+        this.isChanged = false;
+        this.mode = 'select';
+      }
+    },
   },
   async created() {
-    await this.getThemeList();
+    await this.getThemeList().then(() => {
+      this.$set(this, 'select', this.currentThemeName);
+    });
   },
   methods: {
     resetForm() {
       this.newTitle = '';
       this.opacity = 1;
       this.imagePreview = null;
-      this.fields.forEach((field) => (field.value = '#8F8F9C'));
+      this.fields.forEach((field) => {
+        field.value = '#8F8F9C';
+      });
     },
     closeModal() {
-      this.$emit('closeModal');
       this.toSelectMode();
+      this.$nextTick(() => {
+        this.showModal = false;
+      });
     },
     toSelectMode() {
       this.mode = 'select';
       this.resetForm();
+      this.isChanged = false;
+      this.$refs.modalPersistent.focusOnModal();
     },
     editTheme() {
       const themeObject = this.$store.getters.getTheme;
@@ -440,7 +549,13 @@ export default {
       this.newTitle = themeTitle;
       this.mode = 'edit';
     },
-    async deleteTheme() {
+    openConfirmModal() {
+      this.isConfirmModal = true;
+    },
+    async deleteTheme(isConfirm) {
+      if (!isConfirm) {
+        return;
+      }
       try {
         await fetch('/api/theme/delete', {
           method: 'DELETE',
@@ -455,6 +570,7 @@ export default {
       }
     },
     uploadImage() {
+      this.isChanged = true;
       const image = this.$refs.imageInput.files[0];
       const reader = new FileReader();
       reader.readAsDataURL(image);
@@ -502,8 +618,12 @@ export default {
           const themeData = await res.json();
           const content = JSON.parse(themeData);
           this.$store.commit('setTheme', content);
+          this.$set(this, 'select', this.currentThemeName);
           this.mode = 'select';
-          await this.getThemeList();
+          await this.getThemeList().then(() => {
+            this.isChanged = false;
+            this.$refs.modalPersistent.focusOnModal();
+          });
         } catch (e) {
           console.log(e);
         }
@@ -515,7 +635,7 @@ export default {
       try {
         const response = await fetch('/api/themes');
         const themeTitles = await response.json();
-        const newThemeTitles = themeTitles.map((them) => (them = { title: them.name, ...them }));
+        const newThemeTitles = themeTitles.map((them) => ({ title: them.name, ...them }));
         this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
           { title: 'Светлая', name: 'light' }].concat(
           newThemeTitles,
