@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed passed properties to token
 - fixed dashTable.vue
 - fixed save dashboards
+- fixed log icon light up on error
 
 ## [1.84.0]
 
