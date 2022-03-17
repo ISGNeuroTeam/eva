@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added the ability to update tokens when executing a go event
+- reportsV2 timeline get data from backend
+- reportsV2 interesting get data from backend
 
 ### Fixed
 - Multiline. Moved the barplots to the background

@@ -13,6 +13,7 @@ import restAuth from './storeAuth/storeRest';
 import themes from '../js/themeSettings';
 import settings from '../js/componentsSettings';
 import { filterCompile } from '../components/dash-filter-panel/utils/filter-otl-compile';
+import dataResearch from './dataResearch/store';
 
 Vue.use(Vuex);
 
@@ -1834,6 +1835,7 @@ export default new Vuex.Store({
   modules: {
     auth,
     form,
+    dataResearch,
   },
   plugins: [createPersistedState()],
 });

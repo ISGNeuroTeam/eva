@@ -216,7 +216,7 @@ export default {
                       `Все данные из запроса ${searchFrom.sid} обработаны  успешно.&nbsp;&nbsp;status: ${res.status}`,
                     );
                     if (idDash === 'reports') {
-                      resolve({ data: resolveData, shema });
+                      resolve({ data: resolveData, shema, cid: result.cid });
                     } else {
                       resolve(resolveData);
                     }
