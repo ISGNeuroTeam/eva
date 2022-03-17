@@ -101,12 +101,14 @@ export default {
     isNoData() {
       return !this.data.length || this.data.error;
     },
-    options() {
+    dashStore() {
       const { id, idDash } = this;
+      return this.$store.state[idDash][id];
+    },
+    options() {
       return {
         ...this.defaultOptions,
-        // ...this.$store.getters.getOptions({ id, idDash }),
-        ...this.$store.state[idDash][id].options,
+        ...this.dashStore.options,
       };
     },
     colors() {
@@ -171,7 +173,7 @@ export default {
         .range(this.colors);
     },
     metricUnits() {
-      return this.$store.state[this.idDashFrom][this.idFrom].metrics || [];
+      return this.dashStore.metrics || [];
     },
     barplotMetrics() {
       const { united, metricsCustom, metricTypes, yAxesBinding } = this.options;
@@ -202,6 +204,7 @@ export default {
     metrics() {
       this.reRenderChart();
       const { id, idDash, metrics } = this;
+      // @todo: проверить и исправить данный метод как будет время
       this.$store.commit('setMetricsMulti', { id, idDash, metrics: [null, ...metrics] });
     },
     options: {
