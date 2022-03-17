@@ -180,7 +180,7 @@
               <v-icon
                 class="control-button theme--dark"
                 :color="
-                  $store.getters.getColorError
+                  getColorError
                     ? theme.$primary_button
                     : theme.$secondary_text
                 "
@@ -468,7 +468,7 @@
         :style="blockToolStyle"
       >
         <div
-          v-for="(tocken, i) in tockens"
+          v-for="(tocken, i) in tokens"
           :key="tocken.name"
           class="row-tocken"
           :style="{ color: theme.$main_text }"
@@ -846,27 +846,24 @@
         </div>
       </div>
       <modal-create-search
+        v-model="activeModal"
         :id-dash-from="idDash"
-        :modal-from="activeModal"
         :create-btn-from="createSearchBtn"
         :data-search-from="newSearch"
         @cancelModal="cancelModal"
       />
       <modal-themes
-        :show="paleteShow"
+        v-model="paleteShow"
         :admin="isAdmin"
-        @closeModal="paleteShow = false"
       />
       <modal-schedule
+        v-model="activeSchedule"
         :id-dash-from="idDash"
         :color-from="theme"
-        :modal-from="activeSchedule"
         :data-sid-from="scheduleSid"
-        @cancel="activeSchedule = false"
       />
       <modal-log
-        :modal-active="modalActive"
-        @cancelModal="modalActive = false"
+        v-model="modalActive"
       />
       <dash-settings
         :gear-from="gearShow"
@@ -875,10 +872,9 @@
         @changeMode="setEditMode"
       />
       <modal-paper
-        :active="modalPaper"
+        v-model="modalPaper"
         :sid="modalPaperSid"
         :id-dash="idDash"
-        @cancelModal="cancelModal"
       />
     </div>
 
@@ -928,10 +924,9 @@ import {
   mdiVariable,
 } from '@mdi/js';
 import EvaLogo from '../images/eva-logo.svg';
-
-import settings from '../js/componentsSettings.js';
-import DashFilterPanel from './dash-filter-panel/DashFilterPanel';
-import { globalTockens } from '@/constants/globalTockens';
+import settings from '../js/componentsSettings';
+import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
+import { globalTockens } from '../constants/globalTockens';
 
 export default {
   name: 'DashPanelBoard',
@@ -940,9 +935,14 @@ export default {
     DashFilterPanel,
   },
   props: {
-    idDashFrom: null,
-    inside: null,
-    horizontalCell: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    inside: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -1077,9 +1077,20 @@ export default {
       userPermissions: [],
       screenHeight: this.getScreenHeight(),
       allGroups: [],
+      tokens: [],
     };
   },
   computed: {
+    getColorError() {
+      if (!this.$store.state.logError) {
+        this.$store.commit('setState', [{
+          object: this.$store.state,
+          prop: 'logError',
+          value: false,
+        }]);
+      }
+      return this.$store.state.logError;
+    },
     idDash() {
       return this.idDashFrom;
     },
@@ -1093,16 +1104,19 @@ export default {
       // массив со всеми ИС на странице
       let searchesRes = [];
       if (this.idDash) {
-        const searches = this.$store.getters.getSearches(this.idDash);
-        searches.forEach((item) => {
-          this.$set(this.change, item.sid, false);
-        });
-        searchesRes = searches;
+        // const searches = this.$store.dispatch('getSearches', this.idDash);
+        const { searches } = this.$store.state[this.idDash];
+        if (searches) {
+          searches.forEach((item) => {
+            this.$set(this.change, item.sid, false);
+          });
+          searchesRes = searches;
+        }
       }
       return searchesRes;
     },
     name() {
-      return this.$store.getters.getName(this.idDash);
+      return this.$store.state[this.idDash].name;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -1111,43 +1125,59 @@ export default {
       return this.userPermissions.includes('admin_all')
         || this.userPermissions.includes('editdash');
     },
+    getEventFull() {
+      if (this.dashFromStore.eventFull) {
+        return this.dashFromStore.eventFull;
+      }
+      return '';
+    },
     textareaEv() {
-      const eventFull = this.$store.getters.getEventFull(this.idDash);
+      const eventFull = this.getEventFull;
       if (eventFull !== '') {
         this.setTextAreaEvent(eventFull);
       }
       return true;
     },
-    tockens() {
-      // получения всех токенов на страницы
-      const tockens = this.$store.getters.getTockens(this.idDash);
-
-      tockens.forEach((item) => {
-        this.tockensName[item.name] = item.name;
-        this.lookTockens.push({ show: false, color: this.theme.controls });
-      });
-      return tockens;
-    },
     elements() {
       // получение всех элемнета на странице
-      return this.$store.getters.getElements(this.idDash);
+      if (this.$store.state[this.idDash]?.elements) {
+        return this.$store.state[this.idDash].elements.filter(
+          (elem) => this.$store.state[this.idDash][elem]
+            .tab === this.$store.state[this.idDash].currentTab
+            || this.$store.state[this.idDash][elem].options.pinned,
+        );
+      }
+      return [];
     },
     actions() {
       // получение всех событий элемента на странице
-      return function (element) {
-        return this.$store.getters
-          .getActions({ elem: element, idDash: this.idDash })
-          .map((item) => item.name);
+      return (element) => {
+        if (this.$store.state[this.idDash][element]) {
+          return this.$store.state[this.idDash][element].actions.map((item) => item.name);
+        }
+        return [];
       };
     },
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
-      return function (element) {
-        return this.$store.getters.getCapture({
-          elem: element.elem,
-          action: element.action,
-          idDash: this.idDash,
-        });
+      return ({ elem, action }) => {
+        if (
+          this.dashFromStore
+          && this.dashFromStore[elem]
+        ) {
+          let j = Object.keys(this.dashFromStore[elem].actions)
+            .find((key) => this.dashFromStore[elem].actions[key].name === action);
+          Object.keys(this.dashFromStore[elem].actions).forEach((item) => {
+            if (this.dashFromStore[elem].actions[item].name === action) {
+              j = item;
+            }
+          });
+          if (j) {
+            return this.dashFromStore[elem].actions[j].capture;
+          }
+          return [];
+        }
+        return [];
       };
     },
     blockToolStyle() {
@@ -1162,6 +1192,47 @@ export default {
         (group) => group.dashs.includes(this.name) && group.users.includes(this.login),
       );
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    tokensFromStore() {
+      return this.dashFromStore.tockens || [];
+    },
+    getSizeGrid() {
+      if (!this.dashFromStore?.grid) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'grid',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.grid,
+            prop: 'vert',
+            value: '32',
+          },
+          {
+            object: this.dashFromStore.grid,
+            prop: 'hor',
+            value: '18',
+          },
+        ]);
+      }
+      return this.dashFromStore?.grid;
+    },
+  },
+  watch: {
+    tokensFromStore: {
+      deep: true,
+      handler(value) {
+        this.tokens = JSON.parse(JSON.stringify(value));
+      },
+    },
+  },
+  created() {
+    this.uploadTokens();
   },
   mounted() {
     this.getCookie();
@@ -1185,7 +1256,7 @@ export default {
         }
       }
     };
-    const eventFull = this.$store.getters.getEventFull(this.idDash);
+    const eventFull = this.getEventFull;
     if (eventFull !== '') {
       this.textarea_event = eventFull;
     }
@@ -1206,12 +1277,8 @@ export default {
     window.removeEventListener('resize', this.updateScreenHeight);
   },
   methods: {
-    setTextarea_event(eventFull) {
-      this.textarea_event = eventFull;
-    },
     getGroups() {
-      const response = this.$store.getters.getGroups();
-      response.then((res) => {
+      this.$store.dispatch('getGroups').then((res) => {
         this.allGroups = res;
       });
     },
@@ -1270,36 +1337,37 @@ export default {
           this.exit();
         }
       } else {
-        this.$router.push('/');
+        await this.$router.push('/');
       }
     },
+    // окно с редактированием search
     openEdit(id) {
-      // окно с редактированием search
-      this.openSearch(); // то открываем его
+      // то открываем его
+      this.openSearch();
 
+      // я так понимаю если на странице есть созданные ИС
       if (!this.change[id]) {
-        // я так понимаю если на странице есть созданные ИС
+        // то пробегаемся по всем ИС
         Object.keys(this.change).forEach((item) => {
-          // то пробегаемся по всем ИС
-          item === id
-            ? (this.change[item] = true)
-            : (this.change[item] = false); // если нашли выбронный ИС то меняем его статус
+          // если нашли выбронный ИС то меняем его статус
+          this.change[item] = item === id;
         });
-        const search = this.searches.filter((item) =>
-          // получаем только тот ИС который редактируется
-          item.sid === id)[0];
+        // получаем только тот ИС который редактируется
         // отстутствие отступов сделано специально  чтобы красивее смотрелось на фронте
+        const search = this.searches.filter((item) => item.sid === id)[0];
         this.newSearch = { ...search };
         this.activeModal = true;
         this.createSearchBtn = 'edit';
-      } else {
         // а если ИС нету
-        this.openSearch(); //  то закрываем окно редактирования
+      } else {
+        //  то закрываем окно редактирования
+        this.openSearch();
       }
     },
     // возможно стоит переделать под цикл или типа того. ПОДУМАТЬ НАД ЭТИМ!
+    // дальше будут фукнции отвечающие за переключение между разными инструментами,
+    // суть проста, если один открыт закрываем все остальные
     openProfile() {
-      // дальше будут фукнции отвечающие за переключение между разными инструментами, суть проста, если один открыт закрываем все остальные
       this.profile_elem = !this.profile_elem;
       this.openfilter = false;
       this.opentool = false;
@@ -1312,8 +1380,9 @@ export default {
       this.openevent = false;
       this.$emit('openProfile', this.profile_elem);
     },
+    // дальше будут фукнции отвечающие за переключение между разными инструментами,
+    // суть проста, если один открыт закрываем все остальные
     openSave() {
-      // дальше будут фукнции отвечающие за переключение между разными инструментами, суть проста, если один открыт закрываем все остальные
       this.errorSave = false;
       this.save_elem = !this.save_elem;
       this.opensave = !this.opensave;
@@ -1392,8 +1461,8 @@ export default {
       this.tocken_elem = false;
       this.opentocken = false;
     },
+    // собственно функция которая показывает или нет окно с редактируемым ИД
     openSearch() {
-      // собственно функция которая показывает или нет окно с редактируемым ИД
       this.opensearch = !this.opensearch;
       Object.keys(this.change).forEach((item) => {
         this.change[item] = false;
@@ -1427,13 +1496,11 @@ export default {
       }
     },
     saveTocken(index) {
-      // функция которая сохраняет токен в хранилище
-
       // проверяем не пустой ли токен
       if ((!this.newTockenName
-              && !Number.isInteger(index))
-          || (Number.isInteger(index)
-              && !this.tockensName[this.tockens[index].name].length)) {
+          && !Number.isInteger(index))
+        || (Number.isInteger(index)
+          && !this.tockensName[this.tokens[index].name].length)) {
         this.errorSaveToken = true;
         this.openwarning = true;
         const height = this.$refs.blockTocken.clientHeight;
@@ -1451,7 +1518,7 @@ export default {
       if ((!Number.isInteger(index)
               && globalTockens.includes(this.newTockenName.trim()))
           || (Number.isInteger(index)
-              && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
+              && globalTockens.includes(this.tockensName[this.tokens[index].name].trim()))) {
         this.errorSaveToken = true;
         this.openwarning = true;
         const height = this.$refs.blockTocken.clientHeight;
@@ -1465,20 +1532,21 @@ export default {
         return;
       }
 
-      // создаем объект нашего сохраняемого токена считывая имя элемент и остальные поля из нужно строки
+      // создаем объект нашего сохраняемого токена считывая имя элемент
+      // и остальные поля из нужно строки
       if (Number.isInteger(index)) {
         // редактирование
         this.tempTocken = {
-          name: this.tockensName[this.tockens[index].name],
-          elem: this.tockens[index].elem,
-          action: this.tockens[index].action,
-          capture: this.tockens[index].capture,
-          prefix: this.tockens[index].prefix,
-          sufix: this.tockens[index].sufix,
-          delimetr: this.tockens[index].delimetr,
-          defaultValue: this.tockens[index].defaultValue,
+          name: this.tockensName[this.tokens[index].name],
+          elem: this.tokens[index].elem,
+          action: this.tokens[index].action,
+          capture: this.tokens[index].capture,
+          prefix: this.tokens[index].prefix,
+          sufix: this.tokens[index].sufix,
+          delimetr: this.tokens[index].delimetr,
+          defaultValue: this.tokens[index].defaultValue,
           resetData: true, // сделать норм
-          onButton: this.tockens[index].onButton,
+          onButton: this.tokens[index].onButton,
         };
       } else {
         // создание нового
@@ -1497,7 +1565,7 @@ export default {
       }
       let j = -1;
 
-      this.tockens.forEach((item, i) => {
+      this.tokens.forEach((item, i) => {
         // затем пробегаемся по все мтокенам
         if (item.name === this.tempTocken.name) {
           // и смотрим есть ли у нас такой токен
@@ -1574,7 +1642,7 @@ export default {
 
       const id = this.index;
       const newName = this.tempTocken.name;
-      this.tempTocken.name = this.tockens[id].name;
+      this.tempTocken.name = this.tokens[id].name;
 
       this.$store.commit('createTockens', {
         idDash: this.idDash,
@@ -1604,9 +1672,10 @@ export default {
     },
     checkSid(sid) {
       let newSid = sid;
+      // если там больше 10 символов
       if (sid.length > 5) {
-        // если там больше 10 символов
-        newSid = `${sid.substring(0, 5)}...`; // обрезаем и добовляем троеточие
+        // обрезаем и добовляем троеточие
+        newSid = `${sid.substring(0, 5)}...`;
       }
       return newSid;
     },
@@ -1620,112 +1689,61 @@ export default {
     },
     exportSearch(sid) {
       this.$emit('downloadData', sid);
-      // let db = null;
-      //
-      // let request = indexedDB.open('EVA', 1);
-      //
-      // request.onerror = function (event) {
-      //   console.log('error: ', event);
-      // };
-      //
-      // request.onupgradeneeded = event => {
-      //   console.log('create');
-      //   db = event.target.result;
-      //   if (!db.objectStoreNames.contains('searches')) {
-      //     // if there's no "books" store
-      //     db.createObjectStore('searches'); // create it
-      //   }
-      //
-      //   request.onsuccess = event => {
-      //     db = request.result;
-      //     console.log('successEvent: ' + db);
-      //   };
-      // };
-      //
-      // let promise = new Promise((resolve, reject) => {
-      //   request.onsuccess = event => {
-      //     db = request.result;
-      //
-      //     let transaction = db.transaction('searches'); // (1)
-      //
-      //     // получить хранилище объектов для работы с ним
-      //     let searches = transaction.objectStore('searches'); // (2)
-      //
-      //     let query = searches.get(`${this.idDash}-${sid}`); // (3) return store.get('Ire Aderinokun');
-      //
-      //     query.onsuccess = event => {
-      //       // (4)
-      //       resolve(query.result);
-      //     };
-      //
-      //     query.onerror = function () {
-      //       console.log('Ошибка', query.error);
-      //     };
-      //   };
-      // });
-      //
-      // promise.then(res => {
-      //   let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
-      //   let keys = Object.keys(res[0]); // получаем ключи для заголовков столбцов
-      //   csvContent += encodeURIComponent(keys.join(',') + '\n'); // добавляем ключи в файл
-      //   csvContent += encodeURIComponent(
-      //     res.map(item => Object.values(item).join(',')).join('\n')
-      //   ); // добовляем все значения по ключам в файл
-      //   let link = this.$refs.blockCode.appendChild(document.createElement('a')); // создаем ссылку
-      //   link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
-      //   link.setAttribute('download', `${this.idDash}-${sid}.csv`); // указываем имя файла
-      //   link.click(); // жмем на скачку
-      //   link.remove(); // удаляем ссылку
-      // });
     },
-    // checkDataSearch: async function (sid) {
-    //   let response = await this.$store.getters.checkDataSearch(`${this.idDash}-${sid}`);
-    //   if (response) {
-    //     this.$set(this.disabledDS, sid, false);
-    //   } else {
-    //     this.$set(this.disabledDS, sid, true);
-    //   }
-    // },
+    // функция для перетаскивания нового элемнета на полотно
+    // (остальную область, ну вы поняли короче)
     dragTool(event) {
-      // функция для перетаскивания нового элемнета на полотно (остальную область, ну вы поняли короче)
-
+      // если пошло что-то не так
       if (event.which !== 1) {
-        // если пошло что-то не так
-        return; // то прекращаем функцию
+        // то прекращаем функцию
+        return;
       }
       let parent = '';
       let elem = '';
+      // если мы ухватились не за div
       if (event.target.nodeName !== 'div') {
-        // если мы ухватились не за div
         elem = event.target;
+        // то ка кбы всплываем вверх пока не уткнемся в элемнет с классом tool-one
         while (!elem.classList.contains('tool-one')) {
-          // то ка кбы всплываем вверх пока не уткнемся в элемнет с классом tool-one
           elem = elem.parentElement;
         }
-        parent = elem; // это будет наш родитель
-      } else {
+        // это будет наш родитель
+        parent = elem;
         // а если мы сразу попали как надо
-        parent = event.target.parentElement; // то присваиваем нужно нам родителя
+      } else {
+        // то присваиваем нужно нам родителя
+        parent = event.target.parentElement;
       }
 
-      const originCoord = parent.getBoundingClientRect(); // получаем координаты нашего элемента
-      const shiftX = event.pageX - originCoord.left; // это как бы расстояния от точки куда тыкнул пользователь до краев элемнета, это нужно чтобы красиво перемещать
-      const shiftY = event.pageY - (originCoord.top + pageYOffset);
-      const avatar = parent.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
-      document.body.appendChild(avatar); // и его уже добовляем в body
-      avatar.classList.add('avatar'); // даем ему класс
-      avatar.style.zIndex = 99; // делаем его выше всех
-      avatar.style.position = 'absolute'; // и относительно позиионируем
+      // получаем координаты нашего элемента
+      const originCoord = parent.getBoundingClientRect();
+      // это как бы расстояния от точки куда тыкнул пользователь до краев элемнета,
+      // это нужно чтобы красиво перемещать
+      const shiftX = event.pageX - originCoord.left;
+      const shiftY = event.pageY - (originCoord.top + window.pageYOffset);
+      // дальше мы создаем как бы клон нашего элемнета
+      const avatar = parent.cloneNode(true);
+      // и его уже добовляем в body
+      document.body.appendChild(avatar);
+      // даем ему класс
+      avatar.classList.add('avatar');
+      // делаем его выше всех
+      avatar.style.zIndex = 99;
+      // и относительно позиионируем
+      avatar.style.position = 'absolute';
 
-      document.onmousemove = (event) => {
-        // при движении мыши
-        avatar.style.left = `${event.pageX - shiftX}px`; // мы перемещаем на самом деле наш автар, а не сам объект
-        avatar.style.top = `${event.pageY - shiftY}px`;
-        this.avatar = avatar; // и храним объект нашего  аватара
+      // при движении мыши
+      document.onmousemove = (mouseMoveEvent) => {
+        // мы перемещаем на самом деле наш автар, а не сам объект
+        avatar.style.left = `${mouseMoveEvent.pageX - shiftX}px`;
+        avatar.style.top = `${mouseMoveEvent.pageY - shiftY}px`;
+        // и храним объект нашего  аватара
+        this.avatar = avatar;
       };
+      // при клике на элемент
       document.onclick = () => {
-        // при клике на элемент
-        avatar.remove(); // удаляем аватар из дерева dom
+        // удаляем аватар из дерева dom
+        avatar.remove();
       };
     },
     addDashBoard() {
@@ -1750,7 +1768,7 @@ export default {
           type[0].toUpperCase() + type.substring(1),
         );
 
-        const step = { ...this.$store.getters.getSizeGrid(this.idDash) };
+        const step = { ...this.getSizeGrid };
 
         step.vert = Math.round(window.innerWidth / Number(step.vert));
         step.hor = Math.round(window.innerHeight / Number(step.hor));
@@ -1791,22 +1809,33 @@ export default {
     calcGrid(top, left, step, action) {
       const size = {};
       let header;
-      screen.width > 1400 ? (header = 50) : (header = 40);
-      action === 'size' ? (header = 0) : false;
+      if (window.screen.width > 1400) {
+        header = 50;
+      } else {
+        header = 40;
+      }
+      if (action === 'size') {
+        header = 0;
+      }
       size.vert = Math.round(left / step.vert);
       // size.vert = leftCoord*step.vert;
       size.hor = Math.round((top - header) / step.hor);
       // size.hor = (topCoord*step.hor)+header;
       return size;
     },
-    // calcSizePx(size,key) {
-    //   return `${((size*100)/screen[key]).toFixed(1)}%`
-    // },
     checkPos(size) {
       const result = { top: 0, left: 0 };
       const { clientWidth } = document.querySelector('#app');
-      size.top < 50 ? (result.top = 70) : (result.top = size.top);
-      size.left < 0 ? (result.left = 20) : (result.left = size.left);
+      if (size.top < 50) {
+        result.top = 70;
+      } else {
+        result.top = size.top;
+      }
+      if (size.left < 0) {
+        result.left = 20;
+      } else {
+        result.left = size.left;
+      }
       if (size.left + size.width > clientWidth) {
         result.left = clientWidth - size.width - 20;
       } else if (result.left === 0) {
@@ -1842,7 +1871,12 @@ export default {
     setEvents() {
       if (this.textarea_event !== null && this.textarea_event !== '') {
         const events = this.textarea_event.split('\n');
-        let reg; let body; let bodyArray; let element; let doing; let
+        let reg;
+        let body;
+        let bodyArray;
+        let element;
+        let doing;
+        let
           originItem;
 
         if (events.length !== 0) {
@@ -1850,14 +1884,16 @@ export default {
             originItem = item;
             item = item.replace(/\s/g, '');
             if (item !== '') {
-              reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
+              // reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
+              reg = /^[\s+]?[\w]+\(/g;
               this.$set(
                 this.event,
                 'event',
                 reg.exec(item)[0].replace('(', ''),
               );
-              reg = new RegExp(/\(.+\)/, 'g');
-              body = reg.exec(item)[0];
+              // reg = new RegExp(/\(.+\)/, 'g');
+              reg = /\(.+\)/g;
+              [body] = reg.exec(item);
               body = body.slice(1, body.length - 1);
               bodyArray = body.split(',');
               bodyArray.forEach((elem, i) => {
@@ -1896,34 +1932,33 @@ export default {
                   this.$set(this.event, 'treshold', element[0]);
                   this.$set(this.event, 'color', element[1]);
                 } else {
-                  for (let i = 0; i < element.length; i++) {
-                    if (element[i].indexOf(']') !== -1) {
+                  element.forEach((elementItem, index) => {
+                    if (elementItem.indexOf(']') !== -1) {
                       this.$set(
                         this.event,
                         'treshold',
-                        element.slice(0, i + 1).join(','),
+                        element.slice(0, index + 1).join(','),
                       );
                       this.$set(
                         this.event,
                         'color',
-                        element.slice(i + 1, element.length).join(','),
+                        element.slice(index + 1, element.length).join(','),
                       );
-                      break;
                     }
-                  }
+                  });
                 }
               } else {
                 this.$set(this.event, 'element', element[0]); // click
                 if (element[1]) {
                   if (element[1].indexOf('[') !== -1) {
                     let j = -1;
-                    element.forEach((item, i) => {
-                      if (item.indexOf(']') !== -1) {
+                    element.forEach((elementItem, i) => {
+                      if (elementItem.indexOf(']') !== -1) {
                         j = i;
                       }
                     });
-                    let partelement = element[1];
-                    for (let i = 2; i < j + 1; i++) {
+                    let [, partelement] = element;
+                    for (let i = 2; i < j + 1; i += 1) {
                       partelement += `,${element[i]}`;
                     }
                     this.$set(this.event, 'partelement', partelement);
@@ -1934,11 +1969,12 @@ export default {
                   this.$set(this.event, 'partelement', 'empty');
                 }
               }
-              reg = new RegExp(/\w+\(.+\)/, 'g');
-              doing = reg.exec(body)[0];
+              // reg = new RegExp(/\w+\(.+\)/, 'g');
+              reg = /\w+\(.+\)/g;
+              [doing] = reg.exec(body);
               doing = doing.split('(');
               this.$set(this.event, 'action', doing[0]);
-              if (doing[0].toLowerCase() === 'set') {
+              if (doing[0].toLowerCase() === 'set'.toLowerCase()) {
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
                 this.$set(this.event, 'target', doing[0]);
@@ -1961,13 +1997,13 @@ export default {
                     this.$set(this.event, 'value', ['']);
                   }
                 }
-              } else if (doing[0].toLowerCase() === 'go') {
+              } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
                 /// go
-                // parse string: 109,tknUser,1,[tkn1,tkn2,tkn3])
-                doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
+                doing = doing[1].slice(0, doing[1].length - 1).split(',');
                 this.$set(this.event, 'target', doing[0]);
 
-                let prop; let
+                let prop;
+                let
                   value;
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
@@ -1982,14 +2018,7 @@ export default {
                 this.$set(this.event, 'prop', prop);
                 this.$set(this.event, 'tab', doing[2]);
                 this.$set(this.event, 'value', value);
-                if (doing[3]) {
-                  this.$set(
-                    this.event,
-                    'updateTokens',
-                    doing[3].match(/([\w-_]+)/g),
-                  );
-                }
-              } else if (doing[0].toLowerCase() === 'open') {
+              } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
                 // open
                 doing = doing[1].slice(0, doing[1].length - 1).split(',');
 
@@ -2006,12 +2035,17 @@ export default {
               ) {
                 // changeReport
 
-                doing = originItem.split(doing[0])[1];
-                doing = doing.replace(/\(/g, '').replace(/\)/g, '').split(',');
+                [, doing] = originItem.split(doing[0]);
+                doing = doing.replace(/\(/g, '')
+                  .replace(/\)/g, '')
+                  .split(',');
                 this.$set(this.event, 'sid', doing[0]);
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
-                  const files = doing.map((item) => item.replace('[', '').replace(']', ''));
+                  const files = doing.map(
+                    (file) => file.replace('[', '')
+                      .replace(']', ''),
+                  );
                   this.$set(this.event, 'file', files);
                 } else {
                   this.$set(this.event, 'file', [doing[1]]);
@@ -2067,8 +2101,8 @@ export default {
       }
     },
     saveDash() {
-      const dash = this.$store.getters.getDashboard(this.idDash);
-      const response = this.$store.getters.saveDashboard({
+      const dash = this.dashFromStore;
+      const response = this.$store.dispatch('saveDashboard', {
         id: this.idDash,
         body: JSON.stringify(dash),
       });
@@ -2077,12 +2111,12 @@ export default {
         if (res.status === 200) {
           this.colorErrorSave = this.theme.controls;
           this.msgErrorSave = 'Дашборд сохранен';
-          this.$store.getters['auth/putLog'](
+          this.$store.dispatch(
+            'auth/putLog',
             `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
               res.data.id
             }`,
           );
-          // console.log(res.data)
           this.updateDash({ data: res.data, dash });
         } else {
           this.colorErrorSave = this.theme.controlsActive;
@@ -2099,7 +2133,8 @@ export default {
         dash: { body: JSON.stringify(dash.dash), id: this.idDash },
         modified: dash.data.modified,
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
           this.idDash
         }`,
@@ -2116,6 +2151,17 @@ export default {
     },
     updateScreenHeight() {
       this.screenHeight = this.getScreenHeight();
+    },
+    uploadTokens() {
+      const tokens = this.$store.state[this.idDash].tockens
+        ? this.$store.state[this.idDash].tockens
+        : [];
+
+      tokens.forEach((item) => {
+        this.tockensName[item.name] = item.name;
+        this.lookTockens.push({ show: false, color: this.theme.controls });
+      });
+      this.tokens = JSON.parse(JSON.stringify(tokens));
     },
   },
 };

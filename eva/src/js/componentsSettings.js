@@ -348,10 +348,7 @@ export default {
       elem: 'checkbox-list',
       items() {
         // this is modalSettings context
-        return this.$store.getters.getAvailableTableTitles(
-          this.idDash,
-          this.element,
-        );
+        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
       default: [],
     },
@@ -367,10 +364,7 @@ export default {
       description: 'X axis',
       elem: 'select',
       items() {
-        return this.$store.getters.getAvailableTableTitles(
-          this.idDash,
-          this.element,
-        );
+        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
     {
@@ -395,10 +389,7 @@ export default {
       description: 'Y axis',
       elem: 'select',
       items() {
-        return this.$store.getters.getAvailableTableTitles(
-          this.idDash,
-          this.element,
-        );
+        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
     {
@@ -423,10 +414,7 @@ export default {
       description: 'Значение ячейки',
       elem: 'select',
       items() {
-        return this.$store.getters.getAvailableTableTitles(
-          this.idDash,
-          this.element,
-        );
+        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
     {
@@ -435,10 +423,7 @@ export default {
       description: 'metadata',
       elem: 'select',
       items() {
-        return this.$store.getters.getAvailableTableTitles(
-          this.idDash,
-          this.element,
-        );
+        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
     {
@@ -447,10 +432,7 @@ export default {
       description: 'Поле для ссылки Детали',
       elem: 'select',
       items() {
-        return this.$store.getters.getAvailableTableTitles(
-          this.idDash,
-          this.element,
-        );
+        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
 
