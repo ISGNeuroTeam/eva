@@ -178,7 +178,7 @@ export default {
     },
     modalFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     dataSidFrom: {
       type: [String, Number],

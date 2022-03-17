@@ -283,7 +283,7 @@ export default {
           && tokens[i].capture === 'zoom_level'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value,
             store: this.$store,
@@ -294,7 +294,7 @@ export default {
           && tokens[i].capture === 'top_left_point'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value: this.leftBottom[1],
             store: this.$store,
@@ -305,7 +305,7 @@ export default {
           && tokens[i].capture === 'bottom_right_point'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value: this.rightTop[1],
             store: this.$store,

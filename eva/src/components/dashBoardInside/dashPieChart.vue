@@ -102,14 +102,6 @@ export default {
       type: Number,
       required: true,
     }, // высота родительского компонента
-    activeElemFrom: {
-      type: String,
-      default: '',
-    }, // id активного элемента
-    dataReport: {
-      type: Boolean,
-      default: false,
-    }, // проверяет что элемент в исследовании данных
   },
   data() {
     return {
@@ -366,7 +358,7 @@ export default {
       if (this.dashOptions?.metricsRelation?.relations) {
         const metrics = this.dashOptions.metricsRelation.relations;
 
-        if (typeof this.dataRestFrom[0]?.[metrics[1]] === 'number') {
+        if (typeof this.dataRestFrom[0][metrics[1]] === 'number') {
           // если все-таки число
           this.nodata = false; // то убираем соощение о отсутствии данных
           if (this.dataRestFrom.length > 20) {
@@ -561,7 +553,7 @@ export default {
         if (tocken.elem === this.idFrom) {
           const value = this.dataRestFrom[pieIndex][tocken.capture];
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             value,
             idDash: this.idDashFrom,
             store: this.$store,

@@ -253,7 +253,7 @@ export default {
             value = null;
           }
           this.$store.commit('setTocken', {
-            tocken: token,
+            token,
             idDash: this.idDash,
             value,
           });

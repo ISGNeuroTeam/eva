@@ -68,7 +68,7 @@ export default {
   props: {
     modalFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {

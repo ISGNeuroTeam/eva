@@ -47,14 +47,16 @@
                       class="title-color"
                       :style="{ borderColor: group.color }"
                     />
-                    <div class="controls-group">
+                    <div
+                      v-if="editGroupPermission"
+                      class="controls-group"
+                    >
                       <v-tooltip
                         bottom
                         :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
-                            v-if="editGroupPermission"
                             class="edit control-group"
                             :color="theme.$primary_button"
                             v-on="on"
@@ -71,7 +73,6 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
-                            v-if="editGroupPermission"
                             class="delete control-group"
                             :color="theme.$primary_button"
                             v-on="on"
@@ -155,14 +156,16 @@
                       class="title-color"
                       :style="{ borderColor: curColor }"
                     />
-                    <div class="controls-group">
+                    <div
+                      v-if="editDashPermission"
+                      class="controls-group"
+                    >
                       <v-tooltip
                         bottom
                         :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
-                            v-if="editDashPermission"
                             class="edit control-group"
                             :color="theme.$primary_button"
                             v-on="on"
@@ -179,7 +182,6 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
-                            v-if="editDashPermission"
                             class="delete control-group"
                             :color="theme.$primary_button"
                             v-on="on"
@@ -244,6 +246,7 @@
     </v-main>
     <footer-bottom />
     <modal-exim
+      v-if="modalExim"
       v-model="modalExim"
       :cur-name="curName"
       :dashboards="allDashs"
@@ -251,6 +254,7 @@
       :element="element"
     />
     <modal-create
+      v-if="modalCreate"
       v-model="modalCreate"
       :action-from="actionBtn"
       :group-from="allGroups"
@@ -261,7 +265,6 @@
       :dash-from="dashFrom"
       :cur-group-from="curGroup"
       :group-flag-from="createGroupFlag"
-      @createGroup="createGroup($event)"
     />
     <modal-delete-main
       v-model="modalDelete"
@@ -296,7 +299,7 @@ export default {
       allGroups: [],
       allDashs: [],
       dashFrom: null,
-      groupFrom: null,
+      groupFrom: -1,
       editGroupPermission: false,
       editDashPermission: false,
       modalExim: false,

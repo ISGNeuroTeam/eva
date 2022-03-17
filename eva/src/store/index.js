@@ -128,11 +128,12 @@ export default new Vuex.Store({
       state[idDash][id].height = height;
     },
     setSearch(state, { idDash, reload, search }) {
-      const checkId = search.currentSid || search.sid;
+      const checkId = search.sid;
       search.status = 'empty';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
-          if (checkId === item.sid) {
+          if (checkId === item.sid || search.currentSid === item.sid) {
+            delete search.currentSid;
             Vue.set(state[idDash].searches, i, search);
           }
         });
@@ -190,7 +191,7 @@ export default new Vuex.Store({
       state[datasource.id][elem].should = true;
       // и перключить на вкладку с результатами
       state[datasource.id][elem].switch = true;
-      if (state[datasource.id].tockens) {
+      if (state[datasource.id].tockens?.length > 0) {
         state[datasource.id].tockens.forEach((item) => {
           if (item.elem === elem) {
             item.value = '';
@@ -437,6 +438,7 @@ export default new Vuex.Store({
         Vue.set(state, dashboard.id, {});
         Vue.set(state[dashboard.id], 'name', dashboard.name);
         Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
+        Vue.set(state[dashboard.id], 'currentTab', dashboard?.currentTab || 1);
         Vue.set(state[dashboard.id], 'modified', dashboard.modified);
         // TODO: убрать геттер из мутации
         getters({ id: dashboard.id, first: true });
@@ -619,19 +621,23 @@ export default new Vuex.Store({
     // создаем токен
     createTockens(state, { idDash, tocken }) {
       console.log('tockens.push');
+      let foundItem = null;
       //  проверяем есть ли такой токен уже
-      const foundIten = state[idDash].tockens
-        .find((item) => item.name === tocken.name);
-      if (foundIten) {
+      if (state[idDash]?.tockens) {
+        foundItem = state[idDash].tockens.find((item) => item.name === tocken.name);
+      } else {
+        Vue.set(state[idDash], 'tockens', []);
+      }
+      if (foundItem) {
         //  если такой токен уже есть
-        foundIten.name = tocken.name; // обновляем его данные
-        foundIten.elem = tocken.elem;
-        foundIten.action = tocken.action;
-        foundIten.capture = tocken.capture;
-        foundIten.prefix = tocken.prefix;
-        foundIten.sufix = tocken.sufix;
-        foundIten.delimetr = tocken.delimetr;
-        foundIten.defaultValue = tocken.defaultValue;
+        foundItem.name = tocken.name; // обновляем его данные
+        foundItem.elem = tocken.elem;
+        foundItem.action = tocken.action;
+        foundItem.capture = tocken.capture;
+        foundItem.prefix = tocken.prefix;
+        foundItem.sufix = tocken.sufix;
+        foundItem.delimetr = tocken.delimetr;
+        foundItem.defaultValue = tocken.defaultValue;
       } else {
         // а елси нету
         state[idDash].tockens.push(
@@ -742,7 +748,7 @@ export default new Vuex.Store({
       idDash, status, element, titles,
     }) {
       // если объект с натсройками модального окна натсроек еще нет
-      if (!state[idDash].modalSettings) {
+      if (!state[idDash]?.modalSettings) {
         // то создаем его сразу реактивным
         Vue.set(state[idDash], 'modalSettings', {});
         Vue.set(state[idDash].modalSettings, 'element', '');
@@ -891,6 +897,9 @@ export default new Vuex.Store({
       state[id].gridShow = item;
     },
     addNewTab(state, { idDash, tabID, tabName }) {
+      if (!state[idDash].tabList) {
+        Vue.set(state[idDash], 'tabList', []);
+      }
       state[idDash].tabList.push({
         id: tabID,
         name: tabName,

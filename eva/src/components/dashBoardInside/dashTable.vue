@@ -109,7 +109,7 @@
                 v-if="!excludeColumns.includes(colIndex)"
                 :key="colIndex"
                 class="text-start"
-                :class="{'d-none': !options.titles.includes(colIndex)}"
+                :class="{'d-none': options.titles && !options.titles.includes(colIndex)}"
                 :style="
                   (item.cellColor &&
                     item.cellColor[colIndex] &&
@@ -168,10 +168,6 @@ export default {
     dataReport: {
       type: Boolean,
       default: false,
-    },
-    activeElemFrom: {
-      type: String,
-      default: '',
     },
     dataModeFrom: {
       type: Boolean,
@@ -389,7 +385,6 @@ export default {
   methods: {
     getEvents({ event, partelement }) {
       let result = [];
-      console.log(this.$store.state[this.idDash]);
       if (!this.$store.state[this.idDash].events) {
         this.$store.commit('setState', [{
           object: this.$store.state[this.idDash],
@@ -540,7 +535,7 @@ export default {
       });
       prom.then((promData) => {
         this.props.hideFooter = promData.length <= 100;
-        this.createTitles(this.options?.titles);
+        this.createTitles(promData);
         this.createTockens(promData);
         if (this.props.justCreate) {
           this.selectRow();
@@ -646,7 +641,7 @@ export default {
               ) {
                 const value = event.target.textContent;
                 this.$store.commit('setTocken', {
-                  tocken: token,
+                  token,
                   idDash: this.idDash,
                   store: this.$store,
                   value,
