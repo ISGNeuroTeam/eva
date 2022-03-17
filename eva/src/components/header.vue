@@ -60,7 +60,7 @@
             <v-icon
               class="control-button theme--dark"
               :color="
-                getColorError
+                $store.getters.getColorError
                   ? theme.$primary_button
                   : theme.$secondary_text
               "
@@ -168,10 +168,7 @@ export default {
     EvaLogo,
   },
   props: {
-    inside: {
-      type: Boolean,
-      default: false,
-    },
+    inside: null,
   },
   data() {
     return {
@@ -215,24 +212,20 @@ export default {
     };
   },
   computed: {
-    getColorError() {
-      if (!this.$store.state.logError) {
-        this.$store.commit('setState', [{
-          object: this.$store.state,
-          prop: 'logError',
-          value: false,
-        }]);
-      }
-      return this.$store.state.logError;
-    },
     height() {
-      return window.screen.width < 1400 ? '50px' : '51px';
+      if (screen.width < 1400) {
+        return '50px';
+      }
+      return '51px';
     },
     theme() {
       return this.$store.getters.getTheme;
     },
     isAdmin() {
-      return !!(this.userPermissions && this.userPermissions.includes('admin_all'));
+      if (this.userPermissions && this.userPermissions.includes('admin_all')) {
+        return true;
+      }
+      return false;
     },
   },
   mounted() {
@@ -246,6 +239,7 @@ export default {
       this.paleteShow = !this.paleteShow;
     },
     async getCookie() {
+      // console.log(this.$jwt.hasToken())
       if (this.$jwt.hasToken()) {
         this.login = this.$jwt.decode().username;
         // let id = this.$jwt.decode().user_id;
@@ -259,7 +253,7 @@ export default {
           };
         });
 
-        if (response.status === 200) {
+        if (response.status == 200) {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект

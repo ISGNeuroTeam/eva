@@ -21,11 +21,10 @@
       <div
         class="DTPicker-elem"
         :style="{
-          boxShadow: `0 5px 5px -3px ${theme.$main_border},
-          0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
+          boxShadow: `0 5px 5px -3px ${theme.$main_border},0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
           background: theme.$main_bg,
           color: theme.$main_text,
-          border: `1px solid ${theme.$main_border}`
+          border: `1px solid ${theme.$main_border}`,
         }"
       >
         <div
@@ -39,7 +38,7 @@
             Последние
           </p>
           <v-text-field
-            v-model="lastEvery"
+            v-model="last.every"
             class="textarea-item"
             outlined
             :color="theme.$accent_ui_color"
@@ -164,7 +163,7 @@
       class="current-date"
       :style="{
         color: theme.$main_text,
-        border: `1px solid ${theme.$main_border}`
+        border: `1px solid ${theme.$main_border}`,
       }"
       :class="{ show_curent: show_curent }"
     >
@@ -178,18 +177,9 @@ import { mdiChevronDown, mdiChevronUp, mdiCheckBold } from '@mdi/js';
 
 export default {
   props: {
-    idFrom: {
-      type: String,
-      required: true,
-    },
-    idDashFrom: {
-      type: String,
-      required: true,
-    },
-    dataRestFrom: {
-      type: Array,
-      required: true,
-    },
+    idFrom: null,
+    idDashFrom: null,
+    dataRestFrom: null,
     DTPickerCustomShortcuts: {
       type: Array,
       default: function _default() {
@@ -245,18 +235,6 @@ export default {
     };
   },
   computed: {
-    lastEvery: {
-      get() {
-        return this.last.every;
-      },
-      set(every) {
-        this.$store.commit('setState', [{
-          object: this.last,
-          prop: 'every',
-          value: every,
-        }]);
-      },
-    },
     id() {
       return this.idFrom;
     },
@@ -269,33 +247,6 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
-    },
-    getPickerDate() {
-      if (!this.dashFromStore.date) {
-        this.$store.commit('setState', [
-          {
-            object: this.dashFromStore,
-            prop: 'date',
-            value: {
-              end: null,
-              endCus: null,
-              range: null,
-              start: null,
-              startCus: null,
-            },
-          },
-          {
-            object: this.dashFromStore,
-            prop: 'changeDate',
-            value: false,
-          },
-        ]);
-      }
-      // возвращаем либо новый созданный либо имеющийся
-      return this.dashFromStore.date;
-    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -307,9 +258,9 @@ export default {
     this.curDate = this.calcCurrentDate();
   },
   methods: {
-    onClose() {
+    onClose(){
       this.show_picker_elem = false;
-      this.$emit('setVissible', { element: this.id, overflow: 'scroll' });
+      this.$emit('setVissible', {element: this.id, overflow: 'scroll'});
 
       this.changeDate = !this.changeDate;
       this.arrow.direct = 'down';
@@ -317,8 +268,11 @@ export default {
       this.showCurrent();
       this.curDate = this.calcCurrentDate();
     },
-    calcCurrentDate() {
-      const data = this.getPickerDate;
+    calcCurrentDate () {
+      const data = this.$store.getters.getPickerDate({
+        idDash: this.idDash,
+        id: this.id,
+      });
       let current = '';
 
       if (data.start != null) {
@@ -364,8 +318,6 @@ export default {
             case 'hour':
               time = 'часов';
               break;
-            default:
-              break;
           }
           current = `Последние  ${data.last.every} ${time}`;
         }
@@ -377,21 +329,19 @@ export default {
     openHidden() {
       this.show_picker_elem = !this.show_picker_elem;
       if (this.arrow.direct === 'down') {
-        this.$emit('setVissible', { element: this.id, overflow: 'visible' });
+        this.$emit('setVissible', {element: this.id, overflow: 'visible'});
 
         this.arrow.direct = 'up';
         this.arrow.elem = this.up;
         this.show_curent = false;
       } else {
-        this.onClose();
+        this.onClose()
       }
     },
     customDate(elem) {
-      if (elem === 'begin') {
-        this.start_custom.color = 'controls';
-      } else {
-        this.end_custom.color = 'controls';
-      }
+      elem === 'begin'
+        ? (this.start_custom.color = 'controls')
+        : (this.end_custom.color = 'controls');
       this.setTocken('custom');
     },
     showCurrent() {
@@ -402,7 +352,7 @@ export default {
       this.$set(this.date, 'endCus', this.end_custom.value);
       this.$set(this.date, 'last', this.last);
       this.$store.commit('setPickerDate', {
-        date: JSON.parse(JSON.stringify(this.date)),
+        date: this.date,
         idDash: this.idDash,
         id: this.id,
       });
@@ -412,12 +362,7 @@ export default {
       this.setTocken('time');
     },
     setTime(time) {
-      // this.last.time = time;
-      this.$store.commit('setState', [{
-        object: this.last,
-        prop: 'time',
-        value: time,
-      }]);
+      this.last.time = time;
       Object.keys(this.color).forEach((item) => {
         this.color[item] = '$accent_ui_color';
       });
@@ -432,8 +377,8 @@ export default {
       let period = 0;
       switch (elem) {
         case 'dt':
-          this.startForStore = parseInt(new Date(this.start).getTime() / 1000, 10);
-          this.endForStore = parseInt(new Date(this.end).getTime() / 1000, 10);
+          this.startForStore = parseInt(new Date(this.start).getTime() / 1000);
+          this.endForStore = parseInt(new Date(this.end).getTime() / 1000);
           this.range = null;
           this.start_custom.value = null;
           this.end_custom.value = null;
@@ -447,11 +392,9 @@ export default {
         case 'range':
           this.startForStore = parseInt(
             new Date(this.range.start).getTime() / 1000,
-            10,
           );
           this.endForStore = parseInt(
             new Date(this.range.end).getTime() / 1000,
-            10,
           );
           this.start = null;
           this.end = null;
@@ -489,8 +432,6 @@ export default {
             case 'hour':
               period = Number(this.last.every) * 1000 * 3600;
               break;
-            default:
-              break;
           }
 
           this.startForStore = ((Date.now() - period) / 1000).toFixed(0);
@@ -501,22 +442,21 @@ export default {
           this.start_custom.value = null;
           this.end_custom.value = null;
           break;
-        default:
-          break;
       }
     },
     setDate() {
-      const tockens = this.$store.state[this.idDash].tockens || {};
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       const setTocken = (value) => {
         this.$store.commit('setTocken', {
-          token: tocken,
+          tocken,
           idDash: this.idDash,
           value,
           store: this.$store,
         });
       };
+
       Object.keys(tockens).forEach((i) => {
         tocken = {
           name: tockens[i].name,

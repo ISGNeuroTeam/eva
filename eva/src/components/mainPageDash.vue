@@ -32,35 +32,40 @@
                 class="groups-of-dash"
               >
                 <v-card
-                  v-for="(group, i) in allGroups"
-                  :key="group.id"
+                  v-for="i in allGroups.length"
+                  :key="i"
                   class="dash-group"
                   :ripple="false"
                   :style="{
                     background: theme.$main_bg,
                     color: theme.$main_text,
-                    borderColors: theme.$main_border
+                    borderColors: theme.$main_border,
                   }"
                 >
                   <v-card-title class="dash-group-title">
                     <div
                       class="title-color"
-                      :style="{ borderColor: group.color }"
+                      :style="{ borderColor: allGroups[i - 1].color }"
                     />
-                    <div
-                      v-if="editGroupPermission"
-                      class="controls-group"
-                    >
+                    <div class="controls-group">
                       <v-tooltip
                         bottom
                         :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
+                            v-if="editGroupPermission"
                             class="edit control-group"
                             :color="theme.$primary_button"
                             v-on="on"
-                            @click="editGroup(group.id)"
+                            @click="
+                              () => {
+                                modalCreateGroup = true;
+                                createGroupFlag = true;
+                                actionBtn = false;
+                                curGroup = i - 1;
+                              }
+                            "
                           >
                             {{ pencil }}
                           </v-icon>
@@ -73,10 +78,18 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
+                            v-if="editGroupPermission"
                             class="delete control-group"
                             :color="theme.$primary_button"
                             v-on="on"
-                            @click="deleteGroup(group.id, i)"
+                            @click="
+                              () => {
+                                (nameDelete = allGroups[i - 1].name),
+                                (modalDelete = true),
+                                (elemDelete = 'group'),
+                                (curGroup = i - 1);
+                              }
+                            "
                           >
                             {{ trash }}
                           </v-icon>
@@ -89,14 +102,14 @@
                     class="dash-group-text"
                     @click="
                       getDash({
-                        id: group.id,
-                        color: group.color,
-                        name: group.name,
+                        id: allGroups[i - 1].id,
+                        color: allGroups[i - 1].color,
+                        name: allGroups[i - 1].name,
                       })
                     "
                   >
                     <p class="group-text">
-                      {{ checkName(group.name) }}
+                      {{ checkName(allGroups[i - 1].name) }}
                     </p>
                   </v-card-text>
                 </v-card>
@@ -109,7 +122,14 @@
                   absolute
                   class="plus-icon"
                   right
-                  @click="createNewGroup"
+                  @click="
+                    () => {
+                      modalCreateGroup = true;
+                      createGroupFlag = true;
+                      actionBtn = true;
+                      curGroup = -1;
+                    }
+                  "
                 >
                   <v-icon>
                     {{ plus }}
@@ -141,8 +161,8 @@
                 class="groups-of-dash"
               >
                 <v-card
-                  v-for="(dash, i) in allDashs"
-                  :key="dash.id"
+                  v-for="i in allDashs.length"
+                  :key="i"
                   class="dash-group"
                   :ripple="false"
                   :style="{
@@ -156,20 +176,25 @@
                       class="title-color"
                       :style="{ borderColor: curColor }"
                     />
-                    <div
-                      v-if="editDashPermission"
-                      class="controls-group"
-                    >
+                    <div class="controls-group">
                       <v-tooltip
                         bottom
                         :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
+                            v-if="editDashPermission"
                             class="edit control-group"
                             :color="theme.$primary_button"
                             v-on="on"
-                            @click="editDashboard(curGroup, i)"
+                            @click="
+                              () => {
+                                modalCreateGroup = true;
+                                createGroupFlag = false;
+                                actionBtn = false;
+                                curGroup = i - 1;
+                              }
+                            "
                           >
                             {{ pencil }}
                           </v-icon>
@@ -182,10 +207,18 @@
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
+                            v-if="editDashPermission"
                             class="delete control-group"
                             :color="theme.$primary_button"
                             v-on="on"
-                            @click="deleteDashboard(dash.id)"
+                            @click="
+                              () => {
+                                (nameDelete = allDashs[i - 1].name),
+                                (modalDelete = true),
+                                (elemDelete = 'dash'),
+                                (curDash = i - 1);
+                              }
+                            "
                           >
                             {{ trash }}
                           </v-icon>
@@ -196,10 +229,10 @@
                   </v-card-title>
                   <v-card-text
                     class="dash-group-text"
-                    @click="goToDash(i)"
+                    @click="goToDash(i - 1)"
                   >
                     <p class="group-text">
-                      {{ checkName(dash.name) }}
+                      {{ checkName(allDashs[i - 1].name) }}
                     </p>
                   </v-card-text>
                 </v-card>
@@ -212,7 +245,14 @@
                   class="plus-icon"
                   absolute
                   right
-                  @click="createDashboard"
+                  @click="
+                    () => {
+                      modalCreateGroup = true;
+                      createGroupFlag = false;
+                      actionBtn = 'create';
+                      curGroup = curGroup;
+                    }
+                  "
                 >
                   <v-icon>
                     {{ plus }}
@@ -246,7 +286,6 @@
     </v-main>
     <footer-bottom />
     <modal-exim
-      v-if="modalExim"
       v-model="modalExim"
       :cur-name="curName"
       :dashboards="allDashs"
@@ -254,17 +293,16 @@
       :element="element"
     />
     <modal-create
-      v-if="modalCreate"
-      v-model="modalCreate"
+      v-model="modalCreateGroup"
       :action-from="actionBtn"
       :group-from="allGroups"
       :name-group-from="cookieName"
       :dashs-from="allDashs"
-      :is-edit="isEdit"
-      :data-from="groupFrom"
-      :dash-from="dashFrom"
+      :data-from="allGroups[curGroup]"
+      :dash-from="allDashs[curGroup]"
       :cur-group-from="curGroup"
       :group-flag-from="createGroupFlag"
+      @createGroup="createGroup($event)"
     />
     <modal-delete-main
       v-model="modalDelete"
@@ -298,17 +336,14 @@ export default {
       curDash: null,
       allGroups: [],
       allDashs: [],
-      dashFrom: null,
-      groupFrom: -1,
       editGroupPermission: false,
       editDashPermission: false,
       modalExim: false,
-      modalCreate: false,
+      modalCreateGroup: false,
       element: 'dash',
       createGroupFlag: false,
       nameDelete: '',
       modalDelete: false,
-      isEdit: false,
       elemDelete: '',
       actionBtn: '',
       cookieId: -1,
@@ -316,15 +351,18 @@ export default {
     };
   },
   computed: {
+    // adminRool: function() {
+    //   return this.adminRoot
+    // },
     theme() {
       return this.$store.getters.getTheme;
     },
   },
   watch: {
-    modalCreate(val) {
+    modalCreateGroup(val) {
       if (!val) {
         this.modalExim = false;
-        this.curGroup = -1;
+        this.curGroup = null;
         if (this.tab === 'tab-1') {
           this.getGroups();
         } else {
@@ -338,60 +376,15 @@ export default {
     document.title = 'EVA | Конструирование дашбордов';
   },
   methods: {
-    updateModalCreateFrom(dashIndex) {
-      this.groupFrom = this.allGroups.find((group) => group.id === this.curGroup) || this.curGroup;
-      this.dashFrom = this.actionBtn === 'create' ? null : this.allDashs[dashIndex];
-    },
-    deleteGroup(groupId, index) {
-      this.nameDelete = this.allGroups[index].name;
-      this.modalDelete = true;
-      this.elemDelete = 'group';
-      this.curGroup = groupId;
-    },
-    editGroup(groupId) {
-      this.isEdit = true;
-      this.modalCreate = true;
-      this.createGroupFlag = true;
-      this.actionBtn = false;
-      this.curGroup = groupId;
-      this.updateModalCreateFrom();
-    },
-    createNewGroup() {
-      this.modalCreate = true;
-      this.createGroupFlag = true;
-      this.actionBtn = true;
-      this.curGroup = -1;
-      this.updateModalCreateFrom();
-    },
-    deleteDashboard(dashId) {
-      this.nameDelete = this.allDashs.find((dash) => dash.id === dashId).name;
-      this.modalDelete = true;
-      this.elemDelete = 'dash';
-      this.curDash = dashId;
-    },
-    createDashboard() {
-      this.isEdit = false;
-      this.modalCreate = true;
-      this.createGroupFlag = false;
-      this.actionBtn = 'create';
-      this.updateModalCreateFrom();
-      // this.curGroup = curGroup;
-    },
-    editDashboard(groupId, dashIndex) {
-      this.isEdit = true;
-      this.modalCreate = true;
-      this.createGroupFlag = false;
-      this.actionBtn = false;
-      this.curGroup = groupId;
-      this.updateModalCreateFrom(dashIndex);
-    },
     getGroups() {
-      this.$store.dispatch('getGroups').then((res) => {
+      const response = this.$store.getters.getGroups();
+      response.then((res) => {
         this.allGroups = res;
       });
     },
     getDashs(id) {
-      this.$store.dispatch('getDashs', id).then((res) => {
+      const response = this.$store.getters.getDashs(id);
+      response.then((res) => {
         this.allDashs = res;
       });
     },
@@ -419,15 +412,16 @@ export default {
       }
     },
     closeModal() {
-      this.modalCreate = false;
+      this.modalCreateGroup = false;
       this.modalExim = false;
-      if (this.tab === 'tab-1') {
+      if (this.tab == 'tab-1') {
         this.getGroups();
       } else {
         this.getDashs(this.cookieId);
       }
     },
     goToDash(i) {
+      // this.$store.commit('setDash',{data: this.allDashs[i], getters: this.$store.getters.checkAlreadyDash});
       this.$router.push(`/dashboards/${this.allDashs[i].id}`);
     },
     deleteElem() {
@@ -435,20 +429,20 @@ export default {
       let response = null;
       let data = null;
       let id = -1;
-      if (this.elemDelete === 'group') {
+      if (this.elemDelete == 'group') {
         data = this.allGroups;
         id = this.curGroup;
       } else {
         data = this.allDashs;
         id = this.curDash;
       }
-      response = this.$store.dispatch('auth/deleteEssence', {
+      response = this.$store.getters['auth/deleteEssence']({
         essence: this.elemDelete,
-        id,
+        id: data[id].id,
       });
       response.then((res) => {
-        if (res.status === 200) {
-          if (this.elemDelete === 'group') {
+        if (res.status == 200) {
+          if (this.elemDelete == 'group') {
             this.getGroups();
           } else {
             this.getDashs(this.cookieId);
@@ -458,11 +452,15 @@ export default {
       this.$store.commit('deleteDashFromMain', data[id]);
     },
     checkCookie() {
-      const cookie = document.cookie.split(';').find((item) => item.indexOf('eva-dashPage') !== -1);
-      if (cookie) {
-        this.cookieId = JSON.parse(cookie.split('=')[1]).id;
-        this.cookieName = JSON.parse(cookie.split('=')[1]).name;
-        this.getDash(JSON.parse(cookie.split('=')[1]));
+      const cookie = document.cookie.split(';').filter((item) => {
+        if (item.indexOf('eva-dashPage') != -1) {
+          return item;
+        }
+      });
+      if (cookie.length != 0) {
+        this.cookieId = JSON.parse(cookie[0].split('=')[1]).id;
+        this.cookieName = JSON.parse(cookie[0].split('=')[1]).name;
+        this.getDash(JSON.parse(cookie[0].split('=')[1]));
       } else {
         this.getGroups();
       }

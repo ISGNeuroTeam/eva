@@ -4,6 +4,7 @@
     width="550"
     persistent
   >
+    <!--  <div class="create-modal-block" :class={create_warning:create_warning} > -->
     <div class="create-modal-form-block">
       <v-card>
         <v-card-text
@@ -66,6 +67,13 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <!-- <div class="warning-block" :style="{background:color.backElement}">
+                    <div class="warning-text"  :style="{color:color.text}">Такой DashBoard существует. Хотите заменить его?</div>
+                    <div class="btn-warning">
+                        <v-btn small :color="color.controls" class="warning-btn" @click="yesDashBoards">Да</v-btn>
+                        <v-btn small :color="color.controlsActive" class="warning-btn" @click="noDashBoards">Нет</v-btn>
+                    </div>
+        </div> -->
     </div>
   </v-dialog>
 </template>
@@ -73,10 +81,7 @@
 <script>
 export default {
   props: {
-    modalFrom: {
-      type: Boolean,
-      default: false,
-    },
+    modalFrom: null,
   },
   data() {
     return {
@@ -98,17 +103,17 @@ export default {
   },
   methods: {
     createBtn() {
-      if (this.options.name === '') {
+      if (this.options.name == '') {
         this.showwarning = true;
         this.warnText = 'Имя не может быть пустым';
         this.disapear();
-      } else if (!Number(this.options.rows) && Number(this.options.rows) !== 0) {
+      } else if (!Number(this.options.rows) && Number(this.options.rows) != 0) {
         this.showwarning = true;
         this.warnText = 'Количество строк должно быть числом';
         this.disapear();
       } else if (
         !Number(this.options.columns)
-        && Number(this.options.columns) !== 0
+        && Number(this.options.columns) != 0
       ) {
         this.showwarning = true;
         this.warnText = 'Количество столбцов должно быть числом';
@@ -117,6 +122,7 @@ export default {
         // this.$router.push({path:`/forms/create`, props: { options: 'hello'} });
         this.$store.commit('form/setCreateForm', this.options);
         this.$router.push('/forms/open?editable=true');
+        // console.log(this.options);
       }
     },
     disapear() {

@@ -97,22 +97,10 @@ export default {
   name: 'Heatmap',
   components: { DashHeatMapLinear },
   props: {
-    dataRestFrom: {
-      type: Array,
-      required: true,
-    },
-    options: {
-      type: Object,
-      required: true,
-    },
-    idFrom: {
-      type: String,
-      required: true,
-    },
-    idDashFrom: {
-      type: String,
-      required: true,
-    },
+    dataRestFrom: Array,
+    options: Object,
+    idFrom: null,
+    idDashFrom: null,
   },
   data: () => ({
     x: new Set(),
@@ -143,8 +131,10 @@ export default {
       return this.idDashFrom;
     },
     events() {
-      return this.getEvents({
+      return this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'OnDataCompare',
+        element: this.id,
       });
     },
     filteredData() {
@@ -240,7 +230,7 @@ export default {
         row = this.filteredData[x][y]?.row;
       }
 
-      this.$store.state[this.idDash].tockens.forEach((token) => {
+      this.$store.getters.getTockens(this.idDash).forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
           const { capture } = token;
@@ -253,77 +243,59 @@ export default {
             value = null;
           }
           this.$store.commit('setTocken', {
-            token,
+            tocken: token,
             idDash: this.idDash,
             value,
           });
         }
       });
     },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
     setClick(tokenValue) {
       if (this.detailValue) {
         const [first] = Object.keys(this.filteredData[tokenValue]);
         tokenValue = this.filteredData[tokenValue][first].row[this.detailValue];
       }
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'onclick',
+        element: this.id,
         partelement: 'empty',
       });
       if (events.length !== 0) {
         events.forEach((item) => {
           if (item.action === 'go') {
             item.value[0] = tokenValue;
-            this.$store.dispatch('letEventGo', {
+            this.$store.commit('letEventGo', {
               event: item,
               id: this.id,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
             });
+            // this.$router.push(`/dashboards/${item.target.toLowerCase()}`);
           }
         });
       }
     },
     chooseSort(dataFormat, sortType) {
-      let sort;
       if (dataFormat === 'Дата') {
         const up = (a, b) => new Date(a) - new Date(b);
         const down = (a, b) => new Date(b) - new Date(a);
 
-        sort = sortType === 'По возрастанию' ? up : down;
+        let sort;
+        if (sortType === 'По возрастанию') sort = up;
+        else sort = down;
         return sort;
       } if (dataFormat === 'Число') {
         const up = (a, b) => a - b;
         const down = (a, b) => b - a;
 
-        sort = sortType === 'По возрастанию' ? up : down;
+        let sort;
+        if (sortType === 'По возрастанию') sort = up;
+        else sort = down;
         return sort;
       }
-      return sort;
+      return undefined;
     },
 
     render() {

@@ -6,7 +6,7 @@ export default function isMarkerInsidePolygon(marker, poly) {
   let inside = false;
   let i = 0;
   let j = polyPoints.length - 1;
-  for (; i < polyPoints.length; j = i += 1) {
+  for (; i < polyPoints.length; j = i++) {
     const xi = polyPoints[i].lat;
     const yi = polyPoints[i].lng;
     const xj = polyPoints[j].lat;

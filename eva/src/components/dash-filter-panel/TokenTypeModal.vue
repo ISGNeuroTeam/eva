@@ -36,18 +36,9 @@
 export default {
   name: 'TokenTypeModal',
   props: {
-    idDash: {
-      type: String,
-      required: true,
-    },
-    temp: {
-      type: Object,
-      required: true,
-    },
-    editMode: {
-      type: Boolean,
-      required: true,
-    },
+    idDash: String,
+    temp: Object,
+    editMode: Boolean,
   },
   data() {
     return {
@@ -57,11 +48,14 @@ export default {
   },
   computed: {
     tokenNameList() {
-      return this.$store.state[this.idDash].tockens.map((tkn) => tkn.name);
+      return this.$store.getters.getTockens(this.idDash).map((tkn) => tkn.name);
     },
     theme() {
       return this.$store.getters.getTheme;
     },
+    // currentElem() {
+    //   return this.$store.getters.getTockens(this.idDash).find(token => token.name === this.currentToken).elem
+    // }
   },
   watch: {
     temp: {

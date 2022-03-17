@@ -13,7 +13,7 @@
             :style="{ background: color.backElement, color: color.text }"
           >
             <div
-              v-show="fileBlock === 1"
+              v-show="fileBlock == 1"
               class="buttons-file-block"
             >
               <v-btn
@@ -39,7 +39,7 @@
               </v-btn>
             </div>
             <div
-              v-show="fileBlock === 2"
+              v-show="fileBlock == 2"
               class="load-file-block"
             >
               <v-icon
@@ -77,7 +77,7 @@
               </v-btn>
             </div>
             <div
-              v-show="fileBlock === 3"
+              v-show="fileBlock == 3"
               class="get-file-block"
             >
               <v-icon
@@ -354,6 +354,7 @@ import {
   mdiPlus,
   mdiContentSave,
 } from '@mdi/js';
+// import  settings  from '../js/componentsSettings.js';
 
 export default {
   data() {
@@ -420,6 +421,33 @@ export default {
   },
 
   computed: {
+    // getDataRest:  function() {
+    //   if (this.shouldGet) {
+    //     console.log(this.getDataAsynchrony());
+    //   }
+    //   return 'done'
+    // },
+    // shouldGet: function() {  // понимаем нужно ли запрашивтаь данные с реста
+    //   return this.$store.getters.getShouldGet({id: 'table', idDash: 'reports'})
+    // },
+    // elements: function() {
+
+    //   this.$store.getters.getReportElement.forEach( (item,i) => {
+    //     this.$set(this.aboutElem,item,{});
+    //     if (i == 0) {
+    //       this.$set(this.aboutElem[item],'show',true);
+    //       this.$set(this.aboutElem[item],'color',this.color.controls);
+    //     } else {
+    //       this.$set(this.aboutElem[item],'show',false);
+    //       this.$set(this.aboutElem[item],'color',this.color.text);
+    //     }
+    //     this.$set(this.aboutElem[item],'tooltip',settings.reports[item].tooltip);
+    //     this.$set(this.aboutElem[item],'icon',settings.reports[item].icon);
+    //     this.$set(this.aboutElem[item],'key',i);
+    //   })
+    //   this.activeElem = 'table';
+    //   return this.$store.getters.getReportElement
+    // },
     dataReady() {
       if (this.steps['2'].complete && this.steps['3'].complete) {
         this.getPaper();
@@ -433,13 +461,25 @@ export default {
   mounted() {
     document.title = 'EVA | Конструирование отчетов';
     this.search = this.$store.getters.getPaperSearch;
-    if (this.search.original_otl !== '') {
+    if (this.search.original_otl != '') {
+      // this.getData();
       this.launchSearch();
     }
+    // this.calcSize();
+    // this.$refs.search.$el.addEventListener ("keypress", event =>{
+    //   if (event.ctrlKey && event.keyCode == 13) {
+    //     this.launchSearch();
+    //   }
+    // });
+    // this.$refs.report.addEventListener('click', event => {
+    //   if(!event.target.classList.contains('static-row')) {
+    //     this.showStatistic = false;
+    //   }
+    // })
 
-    if (window.screen.width > 1920) {
+    if (screen.width > 1920) {
       this.rowsCount = 14;
-    } else if (window.screen.width <= 1440) {
+    } else if (screen.width <= 1440) {
       this.rowsCount = 6;
     }
     // this.unitedData.color=  this.color.controls;
@@ -454,13 +494,13 @@ export default {
   },
   methods: {
     async setPaper() {
-      if (this.uploadFile === '') {
+      if (this.uploadFile == '') {
         this.message('Выберите файл');
       } else {
         const formData = new FormData();
         formData.append('file', this.uploadFile);
-        const result = await this.$store.dispatch('loadPaper', formData);
-        if (result.status === 'success') {
+        const result = await this.$store.getters.loadPaper(formData);
+        if (result.status == 'success') {
           this.message('Файл успшено загружен');
           this.setPaperBack();
         } else {
@@ -479,7 +519,7 @@ export default {
       }, 2000);
     },
     async choosePaper() {
-      if (this.selectedFile === '') {
+      if (this.selectedFile == '') {
         this.message('Выберите файл');
       } else {
         this.steps['2'].loading = false;
@@ -503,16 +543,21 @@ export default {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('cid', JSON.stringify(this.dispSid));
-      const result = await this.$store.dispatch('getPaper', formData);
+      const result = await this.$store.getters.getPaper(formData);
 
-      if (result.status === 'success') {
+      if (result.status == 'success') {
         this.steps['3'].loading = false;
         this.steps['4'].complete = true;
         this.steps['4'].text = 'Отчет готов';
         this.fileLink = result.file;
         this.disabledDownload = false;
         this.createVisPaper(result.html, result.names);
+        // this.downloadFile(JSON.parse(result).file)
+
+        // this.allFiles = JSON.parse(result).files;
       } else {
+        // this.errorMsg = "Список отчетов получить не удалось. Вернитесь назад и попробуйте снова.";
+        // this.showError = true;
         this.steps['3'].loading = false;
         this.steps['4'].error = [() => false];
         this.steps['4'].text = 'Ошибка обработки отчета';
@@ -528,9 +573,9 @@ export default {
       this.steps['4'].error = [];
       this.clearReady();
 
-      const result = await this.$store.dispatch('getAllPaper');
+      const result = await this.$store.getters.getAllPaper();
       try {
-        if (JSON.parse(result).status === 'success') {
+        if (JSON.parse(result).status == 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
@@ -546,14 +591,11 @@ export default {
     },
     downloadFile() {
       const namefile = this.fileLink.split('/')[2];
-      // создаем ссылку
       const link = this.$refs.stepper.$el.appendChild(
         document.createElement('a'),
-      );
-      // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('href', this.fileLink);
-      // указываем имя файла
-      link.setAttribute('download', namefile);
+      ); // создаем ссылку
+      link.setAttribute('href', this.fileLink); // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('download', namefile); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
@@ -566,13 +608,47 @@ export default {
     returnArrow() {
       this.fileBlock = 1;
       this.steps['3'].error = [];
-      if (this.selectedFile === '') {
+      if (this.selectedFile == '') {
         this.move = 2;
         this.steps['3'].text = 'Выбрать отчет';
         this.steps['2'].loading = false;
         this.steps['3'].complete = false;
       }
     },
+
+    // getData: function() {
+
+    //   this.steps['2'].complete = false;
+    //   this.steps['1'].loading = true;
+    //   this.steps['2'].text = 'Получаю данные об отчете';
+    //   this.move = 2;
+    //   this.clearReady();
+
+    //   let blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], { type: "text/javascript" }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
+
+    //   let blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+
+    //   let worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+
+    //   worker.onmessage = function(event) { // при успешном выполнении функции что передали в blob изначально сработает этот код
+
+    //     if (event.data.length != 0) {
+    //       this.data = event.data;
+    //       this.steps['2'].complete = true;
+    //       this.steps['1'].loading = false;
+    //       this.steps['2'].text = 'Данные об отчете получены';
+    //       this.steps['2'].error = [];
+    //     } else {
+    //       this.cancelSearch();
+    //     }
+
+    //     worker.terminate();
+
+    //   }.bind(this);
+
+    //   worker.postMessage(`papers-${this.search.sid}`);   // запускаем воркер на выполнение
+
+    // },
     async launchSearch() {
       this.steps['2'].complete = false;
       this.steps['1'].loading = true;
@@ -583,17 +659,17 @@ export default {
 
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
+      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
-      const response = await this.$store.dispatch('getDataApi', {
+      const response = await this.$store.getters.getDataApi({
         search: this.search,
         idDash: 'papers',
       });
       // вызывая метод в хранилище
 
-      if (!response || response.length === 0) {
+      if (!response || response.length == 0) {
         // если что-то пошло не так
 
         this.loading = false;
@@ -612,6 +688,21 @@ export default {
         this.steps['2'].error = [];
 
         console.log('data ready');
+
+        // let responseDB = this.$store.getters.putIntoDB(response, this.search.sid, 'papers');
+        // responseDB
+        //   .then(
+        //     result => {
+        //       this.loading = false;
+        //       this.$store.commit('setPaperSearch',this.search);
+        //       this.data = response;
+        //       this.steps['2'].complete = true;
+        //       this.steps['1'].loading = false;
+        //       this.steps['2'].text = 'Данные об отчете получены';
+        //       this.steps['2'].error = [];
+
+        //     },
+        //   );
       }
     },
     cancelSearch() {
@@ -623,21 +714,21 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n|',
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n|',
-        '\n|',
+        '\n\n' + '|',
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '|\n',
+        '|' + '\n',
         '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '| \n',
+        '| ' + '\n',
         '| ',
       );
     },
@@ -652,6 +743,58 @@ export default {
           0,
         );
     },
+    // getDataFromDb: function() {
+    //   return function(event)  {
+    //     let db = null;
+
+    //     let searchSid = event.data;
+
+    //     let request = indexedDB.open("EVA",1);
+
+    //     request.onerror = function(event) {
+    //       console.log("error: ",event);
+    //     };
+
+    //     request.onupgradeneeded = event => {
+    //       console.log('create');
+    //       db = event.target.result;
+    //       if (!db.objectStoreNames.contains('searches')) { // if there's no "books" store
+    //         db.createObjectStore('searches'); // create it
+    //       }
+
+    //       request.onsuccess = event => {
+    //         db = request.result;
+    //         console.log("successEvent: " + db);
+    //       };
+    //     }
+
+    //     request.onsuccess =  event => {
+
+    //       db = request.result;
+
+    //       let transaction = db.transaction("searches"); // (1)
+
+    //       // получить хранилище объектов для работы с ним
+    //       let searches = transaction.objectStore("searches"); // (2)
+
+    //       let query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+
+    //       query.onsuccess = event => { // (4)
+    //         if (query.result) {
+    //           self.postMessage(query.result);  // сообщение которое будет передаваться как результат выполнения функции
+    //         } else {
+    //           self.postMessage([]);  // сообщение которое будет передаваться как результат выполнения функции
+    //         }
+    //       };
+
+    //       query.onerror = function() {
+    //         console.log("Ошибка", query.error);
+    //       };
+
+    //     };
+
+    //   }
+    // },
     openSettings() {
       this.modal = true;
     },
@@ -663,8 +806,9 @@ export default {
       this.modal = false;
     },
     changeColor() {
-      if (document.querySelectorAll('.v-menu__content').length !== 0) {
+      if (document.querySelectorAll('.v-menu__content').length != 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
+          // item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
           item.style.background = this.color.back;
           item.style.color = this.color.text;
           item.style.border = `1px solid ${this.color.border}`;
@@ -674,7 +818,7 @@ export default {
     createVisPaper(html, names) {
       this.tabs = [];
       this.html = [];
-      if (names.length === 1) {
+      if (names.length == 1) {
         const img = `<img class="vis-image" src="data:image/png;base64,${html[0]}" />`;
         this.$refs.vis.innerHTML = img;
       } else if (names.length < 6) {

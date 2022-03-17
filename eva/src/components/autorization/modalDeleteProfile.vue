@@ -72,7 +72,7 @@ export default {
       }
     },
     deleteEssence() {
-      const response = this.$store.dispatch('auth/deleteEssence', {
+      const response = this.$store.getters['auth/deleteEssence']({
         id: this.dataFrom.id,
         essence: this.dataFrom.essence,
       });

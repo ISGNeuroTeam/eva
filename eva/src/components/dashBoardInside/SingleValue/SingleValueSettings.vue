@@ -82,11 +82,11 @@
               @click="settings.template = n"
             >
               <div
-                v-for="m in settings.metricCount"
-                :key="`item-${m}`"
+                v-for="n in settings.metricCount"
+                :key="`item-${n}`"
                 class="item"
-                :style="{ gridArea: `item-${m}` }"
-                v-text="m"
+                :style="{ gridArea: `item-${n}` }"
+                v-text="n"
               />
             </div>
           </div>
@@ -101,7 +101,6 @@
           />
         </div>
         <draggable
-          v-if="settings.metricOptions && settings.metricOptions.length > 0"
           v-model="settings.metricOptions"
           handle=".burger"
           @end="update()"
@@ -199,7 +198,9 @@
                   @input="isChanged = true"
                 >
                   <template v-slot:selection="{ item }">
-                    {{ item.title }}
+                    {{
+                      item.title
+                    }}
                   </template>
                   <template v-slot:item="{ item }">
                     <span
@@ -265,6 +266,7 @@
       </v-card-actions>
     </v-card>
   </modal-persistent>
+
 </template>
 
 <script>
@@ -276,13 +278,12 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from '@mdi/js';
-// eslint-disable-next-line camelcase
 import metricTitleIcons, { no_icon } from './metricTitleIcons';
 import './sass/checkboxGoogle.css';
 
 export default {
   name: 'SingleValueSettings',
-  components: {
+  comments: {
     draggable,
   },
   model: {
@@ -292,10 +293,7 @@ export default {
   props: {
     modalValue: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
-    updateCount: {
-      type: Function,
-      required: true,
-    },
+    updateCount: Function,
   },
   data: () => ({
     no_icon,
@@ -332,7 +330,7 @@ export default {
      * Data fornat: { <metricsNumber>: <availableTemplatesNumber> }.
      */
     templatesForMetrics: {
-      2: 2, 3: 6, 4: 7, 5: 4, 6: 2,
+      2: 2, 3: 6, 4: 7, 5: 5, 6: 2,
     },
     isChanged: false,
   }),
@@ -370,7 +368,7 @@ export default {
 
       if (metricCount > 0) {
         const max = metricCount <= 6 ? metricCount : 6;
-        for (let i = 0; i < max; i += 1) {
+        for (let i = 0; i < max; i++) {
           countList.push(i + 1);
         }
       }
@@ -386,7 +384,6 @@ export default {
     },
     receivedSettings(newValue) {
       const newSettings = JSON.parse(JSON.stringify(newValue));
-      // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
       this.settings = {
         ...newSettings,
         metricOptions: newSettings.metricOptions.sort(
@@ -454,9 +451,9 @@ export default {
 
     toggleAllMetrics(value = true) {
       const { metricOptions = [] } = this.settings;
-      metricOptions.forEach((metric) => {
+      for (const metric of metricOptions) {
         metric.expanded = value;
-      });
+      }
     },
   },
 };

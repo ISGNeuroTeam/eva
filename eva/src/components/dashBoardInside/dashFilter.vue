@@ -51,7 +51,7 @@ export default {
     shouldGet() {
       let should = false;
       if (this.id) {
-        should = this.$store.state[this.id.idDash][this.id.id].should;
+        should = this.$store.getters.getShouldGet(this.id);
       }
       return should;
     },

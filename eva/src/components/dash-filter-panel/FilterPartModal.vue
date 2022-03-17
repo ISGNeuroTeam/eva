@@ -104,26 +104,11 @@ export default {
     TokenTypeModal,
   },
   props: {
-    idDash: {
-      type: String,
-      required: true,
-    },
-    filterPart: {
-      type: Object,
-      required: true,
-    },
-    editPermission: {
-      type: Boolean,
-      required: true,
-    },
-    filterPartIndex: {
-      type: Number,
-      required: true,
-    },
-    editMode: {
-      type: Boolean,
-      required: true,
-    },
+    idDash: String,
+    filterPart: Object,
+    editPermission: Boolean,
+    filterPartIndex: Number,
+    editMode: Boolean,
   },
   data() {
     return {
@@ -146,9 +131,6 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
-    },
-    getTockens() {
-      return this.$store.state[this.idDash].tockens;
     },
   },
   watch: {
@@ -178,7 +160,8 @@ export default {
   methods: {
     saveFilterPartModal() {
       if (this.temp.filterPartType === 'token') {
-        const originToken = this.getTockens
+        const originToken = this.$store.getters
+          .getTockens(this.idDash)
           .find((tkn) => tkn.name === this.temp.token);
         if (originToken) {
           this.temp.token = originToken;

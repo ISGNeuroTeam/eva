@@ -221,7 +221,6 @@ class HTMLPopupSupport {
     this.labelModelParameter = labelModelParameter;
     this.div = div;
     this.graphComponent = graphComponent;
-    // eslint-disable-next-line no-underscore-dangle
     this._currentItem = null;
     this.dirty = false;
     // make the popup invisible
@@ -236,7 +235,6 @@ class HTMLPopupSupport {
    * @type {?(IEdge|INode)}
    */
   get currentItem() {
-    // eslint-disable-next-line no-underscore-dangle
     return this._currentItem;
   }
 
@@ -247,7 +245,9 @@ class HTMLPopupSupport {
    * @type {?(IEdge|INode)}
    */
   set currentItem(value) {
-    // eslint-disable-next-line no-underscore-dangle
+    // if (value === this._currentItem) {
+    //   return;
+    // }
     this._currentItem = value;
     if (value) {
       this.show();
@@ -326,8 +326,7 @@ class HTMLPopupSupport {
 
   /**
    * Changes the location of this pop-up to the location calculated by the
-   * {@link HTMLPopupSupport#labelModelParameter}.
-   * Currently, this implementation does not support rotated pop-ups.
+   * {@link HTMLPopupSupport#labelModelParameter}. Currently, this implementation does not support rotated pop-ups.
    */
   updateLocation() {
     if (!this.currentItem && !this.labelModelParameter) {
@@ -361,8 +360,7 @@ class HTMLPopupSupport {
    * @param {number} y The target y-coordinate of the pop-up.
    */
   setLocation(x, y) {
-    // Calculate the view coordinates since we have
-    // to place the div in the regular HTML coordinate space
+    // Calculate the view coordinates since we have to place the div in the regular HTML coordinate space
     const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
     this.div.style.setProperty(
       'transform',
@@ -388,22 +386,10 @@ export default {
   name: 'DashYGraph',
   props: {
     // переменные полученные от родителя
-    idFrom: {
-      type: String,
-      required: true,
-    }, // id элемнета (table, graph-2)
-    idDashFrom: {
-      type: String,
-      required: true,
-    }, // id дашборда
-    dataRestFrom: {
-      type: Array,
-      required: true,
-    }, // данные полученые после выполнения запроса
-    colorFrom: {
-      type: Object,
-      required: true,
-    }, // цветовые переменные
+    idFrom: null, // id элемнета (table, graph-2)
+    idDashFrom: null, // id дашборда
+    dataRestFrom: null, // данные полученые после выполнения запроса
+    colorFrom: null, // цветовые переменные
     loading: {
       type: Boolean,
       default: true,
@@ -453,7 +439,7 @@ export default {
     childrenNodes() {
       const node = this.currentNode;
       if (!node || !node.relation_id) return [];
-      // eslint-disable-next-line camelcase
+
       const relation_ids = [];
       this.dataRestFrom
         .filter((item) => `${item.id}` === `${node.id}`)
@@ -547,7 +533,7 @@ export default {
     },
     edgeStyle(color) {
       if (color === undefined) {
-        [color] = this.colors;
+        color = this.colors[0];
       }
       const key = `edgeStyle_${color}`;
       if (!this.edgeStyleList[key]) {
@@ -678,12 +664,9 @@ export default {
         zoomPolicy: StyleDecorationZoomPolicy.VIEW_COORDINATES,
       });
 
-      decorator.edgeDecorator.highlightDecorator
-        .setFactory(
-          (edge) => (edge.style instanceof BezierEdgeStyle
-            ? bezierEdgeStyleHighlight
-            : edgeStyleHighlight),
-        );
+      decorator.edgeDecorator.highlightDecorator.setFactory((edge) => (edge.style instanceof BezierEdgeStyle
+        ? bezierEdgeStyleHighlight
+        : edgeStyleHighlight));
     },
     initializeTooltips() {
       const { inputMode } = this.$graphComponent;
@@ -700,8 +683,7 @@ export default {
           return;
         }
 
-        // Use a rich HTML element as tooltip content.
-        // Alternatively, a plain string would do as well.
+        // Use a rich HTML element as tooltip content. Alternatively, a plain string would do as well.
         eventArgs.toolTip = this.createTooltipContent(eventArgs.item);
 
         // Indicate that the tooltip content has been set.
@@ -761,16 +743,17 @@ export default {
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST;
 
       // label label для nodes
-
-      /*
-      * TODO: У нода нет параметра лейбл, так что  свойство всегда ture,
-      *   а данная строка всегда возвращает undefined
-      */
-
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(
-        (nodeDataItem) => nodeDataItem.label,
+        (nodeDataItem) => {
+          if (nodeDataItem.label !== '-') {
+            /*
+             TODO: У нода нет параметра лейбл, так что  свойство всегда ture
+              а данная строка всегда возвращает undefined
+            */
+            return nodeDataItem.label;
+          }
+        },
       );
-
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST;
 
       // генерация edges
@@ -785,7 +768,6 @@ export default {
         if (edgeDataItem.label !== '-') {
           return edgeDataItem.label;
         }
-        return '';
       });
 
       this.$graphComponent.graph = graphBuilder.buildGraph();
@@ -825,30 +807,6 @@ export default {
         id: this.idFrom,
       });
     },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
     initMode() {
       const mode = new yfile.GraphEditorInputMode({
         allowGroupingOperations: false,
@@ -858,12 +816,12 @@ export default {
       });
       mode.addItemClickedListener((sender, args) => {
         if (args.item instanceof yfile.INode) {
-          const tokens = this.$store.state[this.idDashFrom].tockens;
+          const tokens = this.$store.getters.getTockens(this.idDashFrom);
           tokens.forEach((token) => {
             if (token.elem === this.idFrom && token.action === 'click') {
               const value = args.item.tag[token.capture];
               this.$store.commit('setTocken', {
-                token,
+                tocken: token,
                 idDash: this.idDashFrom,
                 store: this.$store,
                 value,
@@ -871,8 +829,10 @@ export default {
             }
           });
 
-          const events = this.getEvents({
+          const events = this.$store.getters.getEvents({
+            idDash: this.idDashFrom,
             event: 'onclick',
+            element: this.idFrom,
           });
 
           if (events.length !== 0) {
@@ -883,7 +843,7 @@ export default {
                   idDash: this.idDashFrom,
                 });
               } else if (item.action === 'go') {
-                this.$store.dispatch('letEventGo', {
+                this.$store.commit('letEventGo', {
                   event: item,
                   idDash: this.idDashFrom,
                   route: this.$router,
@@ -1005,7 +965,7 @@ export default {
 
       // get all divs in the pop-up
       const divs = edgePopup.div.getElementsByTagName('div');
-      for (let i = 0; i < divs.length; i += 1) {
+      for (let i = 0; i < divs.length; i++) {
         const div = divs.item(i);
         if (div.hasAttribute('data-id')) {
           // if div has a 'data-id' attribute, get content from the business data
@@ -1024,7 +984,7 @@ export default {
 
       // get all divs in the pop-up
       const divs = nodePopup.div.getElementsByTagName('div');
-      for (let i = 0; i < divs.length; i += 1) {
+      for (let i = 0; i < divs.length; i++) {
         const div = divs.item(i);
         if (div.hasAttribute('data-id')) {
           // if div has a 'data-id' attribute, get content from the business data
@@ -1034,9 +994,7 @@ export default {
       }
     },
     generateNodesEdges(dataRest) {
-      // eslint-disable-next-line no-underscore-dangle
       const _allNodes = [];
-      // eslint-disable-next-line no-underscore-dangle
       const _allEdges = [];
 
       dataRest.forEach((dataRestItem) => {
@@ -1050,7 +1008,7 @@ export default {
         }
         _allNodes.push(dataRestItem);
       });
-      // eslint-disable-next-line no-underscore-dangle
+
       const _nodesSource = Object.values(
         _allNodes.reduce((obj, item) => ({ ...obj, [item.id]: item }), {}),
       );

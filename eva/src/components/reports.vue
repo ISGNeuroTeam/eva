@@ -253,7 +253,7 @@
 import {
   mdiPlay, mdiSettings, mdiMerge, mdiPlus,
 } from '@mdi/js';
-import settings from '../js/componentsSettings';
+import settings from '../js/componentsSettings.js';
 
 export default {
   data() {
@@ -308,17 +308,26 @@ export default {
     },
   },
   computed: {
+    // getDataRest:  function() {
+    //   if (this.shouldGet) {
+    //     console.log(this.getDataAsynchrony());
+    //   }
+    //   return 'done'
+    // },
     theme() {
       return this.$store.getters.getTheme;
     },
-    // понимаем нужно ли запрашивтаь данные с реста
     shouldGet() {
-      return this.$store.state.reports.table.should;
+      // понимаем нужно ли запрашивтаь данные с реста
+      return this.$store.getters.getShouldGet({
+        id: 'table',
+        idDash: 'reports',
+      });
     },
     elements() {
       this.$store.getters.getReportElement.forEach((item, i) => {
         this.$set(this.aboutElem, item, {});
-        if (i === 0) {
+        if (i == 0) {
           this.$set(this.aboutElem[item], 'show', true);
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         } else {
@@ -340,7 +349,7 @@ export default {
   mounted() {
     document.title = 'EVA | Исследование данных';
     this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl !== '') {
+    if (this.search.original_otl != '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
         id: 'table',
@@ -349,7 +358,7 @@ export default {
     }
     this.calcSize();
     this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode === 13) {
+      if (event.ctrlKey && event.keyCode == 13) {
         this.launchSearch();
       }
     });
@@ -359,19 +368,29 @@ export default {
       }
     });
 
-    if (window.screen.width > 1920) {
+    if (screen.width > 1920) {
       this.rowsCount = 14;
-    } else if (window.screen.width <= 1440) {
+    } else if (screen.width <= 1440) {
       this.rowsCount = 6;
     }
     this.unitedData.color = this.theme.controls;
   },
   methods: {
-    workerOnMessage(worker) {
-      return (event) => {
+    getData() {
+      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
+        type: 'text/javascript',
+      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
+
+      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+
+      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+
+      worker.onmessage = function (event) {
+        // при успешном выполнении функции что передали в blob изначально сработает этот код
+
         let statistic = '';
         this.rows = [];
-        if (event.data.data.length !== 0) {
+        if (event.data.data.length != 0) {
           this.shema = event.data.shema;
           this.data = event.data.data;
 
@@ -385,41 +404,25 @@ export default {
         }
 
         worker.terminate();
-      };
-    },
-    getData() {
-      // создаем blob объект чтобы с его помощью использовать функцию для web worker
-      const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
-        type: 'text/javascript',
-      });
+      }.bind(this);
 
-      // создаем ссылку из нашего blob ресурса
-      const blobURL = window.URL.createObjectURL(blob);
-
-      // создаем новый worker и передаем ссылку на наш blob объект
-      const worker = new Worker(blobURL);
-
-      // при успешном выполнении функции что передали в blob изначально сработает этот код
-      worker.onmessage = this.workerOnMessage(worker);
-
-      // запускаем воркер на выполнение
-      worker.postMessage(`reports-${this.search.sid}`);
+      worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
     },
     async launchSearch() {
       this.search.sid = this.hashCode(this.search.original_otl);
 
-      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
+      this.$store.getters['auth/putLog'](`Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
       console.log('launch search');
-      // вызывая метод в хранилище
-      const response = await this.$store.dispatch('getDataApi', {
+      const response = await this.$store.getters.getDataApi({
         search: this.search,
         idDash: 'reports',
       });
+      // вызывая метод в хранилище
 
-      // если что-то пошло не так
-      if (!response.data || response.data.length === 0) {
+      if (!response.data || response.data.length == 0) {
+        // если что-то пошло не так
         this.loading = false;
         this.$store.commit('setErrorLogs', true);
         this.data = [];
@@ -428,19 +431,16 @@ export default {
         // если все нормально
         console.log('data ready');
 
-        const responseDB = this.$store.dispatch(
-          'putIntoDB',
-          {
-            result: response,
-            sid: this.search.sid,
-            idDash: 'reports',
-          },
+        const responseDB = this.$store.getters.putIntoDB(
+          response,
+          this.search.sid,
+          'reports',
         );
         responseDB.then(() => {
-          this.$store.dispatch('refreshElements', {
-            idDash: 'reports',
-            key: this.search.sid,
-          });
+          this.$store.getters.refreshElements(
+            'reports',
+            this.search.sid,
+          );
           this.loading = false;
           this.$store.commit('setReportSearch', this.search);
         });
@@ -449,22 +449,23 @@ export default {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n|',
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
-      this.search.original_otl = this.search.original_otl
-        .replaceAll(
-          '\n\n|',
-          '\n|',
-        ).replaceAll(
-          '|\n',
-          '| ',
-        ).replaceAll(
-          '| \n',
-          '| ',
-        );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '\n\n' + '|',
+        '\n' + '|',
+      );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '|' + '\n',
+        '| ',
+      );
+      this.search.original_otl = this.search.original_otl.replaceAll(
+        '| ' + '\n',
+        '| ',
+      );
     },
     setUsername(event) {
       this.search.parametrs.username = event;
@@ -478,21 +479,22 @@ export default {
         );
     },
     getDataFromDb() {
-      return (event) => {
+      return function (event) {
         let db = null;
 
         const searchSid = event.data;
 
         const request = indexedDB.open('EVA', 1);
 
-        request.onerror = (requestEvent) => {
-          console.log('error: ', requestEvent);
+        request.onerror = function (event) {
+          console.log('error: ', event);
         };
 
-        request.onupgradeneeded = (requestEvent) => {
+        request.onupgradeneeded = (event) => {
           console.log('create');
-          db = requestEvent.target.result;
+          db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
+            // if there's no "books" store
             db.createObjectStore('searches'); // create it
           }
 
@@ -505,30 +507,23 @@ export default {
         request.onsuccess = () => {
           db = request.result;
 
-          // (1)
-          const transaction = db.transaction('searches');
+          const transaction = db.transaction('searches'); // (1)
 
-          // (2)
           // получить хранилище объектов для работы с ним
-          const searches = transaction.objectStore('searches');
+          const searches = transaction.objectStore('searches'); // (2)
 
-          // (3) return store.get('Ire Aderinokun');
-          const query = searches.get(String(searchSid));
+          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
 
           query.onsuccess = () => {
             // (4)
             if (query.result) {
-              // сообщение которое будет передаваться как результат выполнения функции
-              // eslint-disable-next-line no-restricted-globals
-              self.postMessage(query.result);
+              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
             } else {
-              // сообщение которое будет передаваться как результат выполнения функции
-              // eslint-disable-next-line no-restricted-globals
-              self.postMessage([]);
+              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
             }
           };
 
-          query.onerror = () => {
+          query.onerror = function () {
             console.log('Ошибка', query.error);
           };
         };
@@ -541,9 +536,13 @@ export default {
       this.modal = false;
     },
     changeTab(elem) {
-      this.unitedShow = elem === 'multiLine';
+      if (elem == 'multiLine') {
+        this.unitedShow = true;
+      } else {
+        this.unitedShow = false;
+      }
       Object.keys(this.aboutElem).forEach((item) => {
-        if (item !== elem) {
+        if (item != elem) {
           this.$set(this.aboutElem[item], 'show', false);
           this.$set(this.aboutElem[item], 'color', this.theme.text);
         } else {
@@ -568,21 +567,21 @@ export default {
       });
     },
     createStatistic(key, data) {
-      const howMuch = {};
+      const how_much = {};
       const result = [];
       const { length } = data;
       data.forEach((item) => {
-        if (howMuch[item[key]]) {
-          howMuch[item[key]] += 1;
+        if (how_much[item[key]]) {
+          how_much[item[key]]++;
         } else {
-          howMuch[item[key]] = 1;
+          how_much[item[key]] = 1;
         }
       });
-      Object.keys(howMuch).forEach((item) => {
+      Object.keys(how_much).forEach((item) => {
         result.push({
           value: item,
-          count: howMuch[item],
-          '%': Math.round((howMuch[item] * 100) / length),
+          count: how_much[item],
+          '%': Math.round((how_much[item] * 100) / length),
         });
       });
 
@@ -597,7 +596,7 @@ export default {
     },
     openStatistic(statistic) {
       if (this.showStatistic) {
-        if (this.statisticKey === statistic.text) {
+        if (this.statisticKey == statistic.text) {
           this.showStatistic = false;
         } else {
           this.statisticKey = statistic.text;

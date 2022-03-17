@@ -53,10 +53,7 @@ import { filterCompile } from './utils/filter-otl-compile';
 export default {
   name: 'FilterPreviewModal',
   props: {
-    filter: {
-      type: Object,
-      required: true,
-    },
+    filter: Object,
   },
   data() {
     return {

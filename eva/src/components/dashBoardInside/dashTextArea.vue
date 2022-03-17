@@ -33,22 +33,10 @@ import { mdiMagnify } from '@mdi/js';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: {
-      type: String,
-      required: true,
-    }, // id элемнета (table, graph-2)
-    idDashFrom: {
-      type: String,
-      required: true,
-    }, // id дашборда
-    colorFrom: {
-      type: Object,
-      required: true,
-    }, // цветовые переменные
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
+    idFrom: null, // id элемнета (table, graph-2)
+    idDashFrom: null, // id дашборда
+    colorFrom: null, // цветовые переменные
+    heightFrom: null, // выоста родительского компонента
   },
   data() {
     return {
@@ -70,73 +58,33 @@ export default {
     },
     rows() {
       let rowsCount = 20;
-      if (window.screen.width < 1400) {
+      if (screen.width < 1400) {
         rowsCount = 15;
       }
-      if (window.screen.width > 1920) {
+      if (screen.width > 1920) {
         rowsCount = 25;
       }
       return Math.floor((this.heightFrom - 200) / rowsCount);
     },
     height() {
-      const otstup = window.screen.width < 1600 ? 45 : 55;
+      let otstup = 55;
+      if (screen.width < 1600) {
+        otstup = 45;
+      }
       return `${this.heightFrom - otstup}px`;
     },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
-    },
     searchBtn() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
       return options.searchBtn;
     },
     textAreaValue() {
-      return this.getTextArea;
-    },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
-    },
-    getTextArea() {
-      if (!this.dashFromStore.textarea) {
-        return '';
-      }
-      return this.dashFromStore.textarea;
+      return this.$store.getters.getTextArea({
+        idDash: this.idDash,
+        id: this.id,
+      });
     },
   },
   watch: {
@@ -146,7 +94,10 @@ export default {
   },
   mounted() {
     this.$emit('hideDS', this.id);
-    this.textarea = this.getTextArea;
+    this.textarea = this.$store.getters.getTextArea({
+      idDash: this.idDash,
+      id: this.id,
+    });
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -176,28 +127,26 @@ export default {
       this.setTocken();
     },
     setTocken() {
-      const { tockens } = this.$store.state[this.idDash];
-      if (tockens) {
-        let name = '';
-        Object.keys(tockens).forEach((i) => {
-          if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
-            name = tockens[i].name;
-          }
-        });
-        const textarea = this.textarea.replace(/\n/g, ' ');
-        const tocken = {
-          name,
-          action: 'accept',
-          capture: '',
-        };
+      const tockens = this.$store.getters.getTockens(this.idDash);
+      let name = '';
+      Object.keys(tockens).forEach((i) => {
+        if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
+          name = tockens[i].name;
+        }
+      });
+      const textarea = this.textarea.replace(/\n/g, ' ');
+      const tocken = {
+        name,
+        action: 'accept',
+        capture: '',
+      };
 
-        this.$store.commit('setTocken', {
-          tocken,
-          idDash: this.idDash,
-          value: textarea,
-          store: this.$store,
-        });
-      }
+      this.$store.commit('setTocken', {
+        tocken,
+        idDash: this.idDash,
+        value: textarea,
+        store: this.$store,
+      });
     },
   },
 };

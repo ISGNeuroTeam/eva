@@ -26,6 +26,12 @@ import screenshot from './plugins/screenshot';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import App from './App.vue';
 
+// TODO: на удаление
+// // подключаем Vue
+// window.Vue = require('vue');
+// // позволяет создавтаь асинхронные computed
+// window.Vue = Vue;
+
 // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.use(AsyncComputed);
 // подключаем стили для этого компонента

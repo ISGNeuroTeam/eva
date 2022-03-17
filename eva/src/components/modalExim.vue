@@ -100,26 +100,14 @@ export default {
     event: 'updateModalValue',
   },
   props: {
-    dashboards: {
-      type: Array,
-      default: () => ([]),
-    },
-    groups: {
-      type: Array,
-      default: () => ([]),
-    },
-    element: {
-      type: String,
-      required: true,
-    },
-    curName: {
-      type: String,
-      required: true,
-    },
     modalValue: {
       type: Boolean,
       default: false,
     },
+    dashboards: null,
+    groups: null,
+    element: null,
+    curName: null,
   },
   data() {
     return {
@@ -157,8 +145,6 @@ export default {
       },
     },
     theme() {
-      // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
-      // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
       return this.$store.getters.getTheme;
     },
   },
@@ -215,7 +201,7 @@ export default {
         });
       }
 
-      const response = await this.$store.dispatch('exportDash', {
+      const response = await this.$store.getters.exportDash({
         element: this.element,
         ids: ids.join(','),
       });
@@ -257,13 +243,12 @@ export default {
           } else {
             formData.append('body', this.file);
           }
-          await this.$store.dispatch('importDash', {
+          await this.$store.getters.importDash({
             element: this.element,
             formData,
           });
           try {
-            // тут проверяем может ли распарситься ответ от сервера
-            // let res = JSON.parse(response);
+            // let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';

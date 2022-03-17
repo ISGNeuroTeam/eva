@@ -59,14 +59,8 @@
 export default {
   name: 'ModalDelete',
   props: {
-    idDashFrom: {
-      type: String,
-      required: true,
-    },
-    dataPageFrom: {
-      type: String,
-      required: true,
-    },
+    idDashFrom: null,
+    dataPageFrom: null,
   },
   data() {
     return {
@@ -101,41 +95,12 @@ export default {
     dataPage() {
       return this.dataPageFrom;
     },
-    dashFromStore() {
-      return this.$store.state[this.idDash];
-    },
-    // получаем объект модального окна в котором храним тот элемнет что хотим удалить
-    getModalDelete() {
-      if (!this.dashFromStore.modalDelete) {
-        this.$store.commit('setState', [
-          {
-            object: this.dashFromStore,
-            prop: 'modalDelete',
-            value: {},
-          },
-          {
-            object: this.dashFromStore.modalDelete,
-            prop: 'active',
-            value: false,
-          },
-          {
-            object: this.dashFromStore.modalDelete,
-            prop: 'id',
-            value: '',
-          },
-          {
-            object: this.dashFromStore.modalDelete,
-            prop: 'name',
-            value: '',
-          },
-        ]);
-      }
-      return this.dashFromStore.modalDelete;
-    },
     active: {
       get() {
         if (this.idDash) {
-          return this.getModalDelete.active;
+          return this.$store.getters.getModalDelete({
+            id: this.idDash,
+          }).active;
         }
         return false;
       },
@@ -156,10 +121,9 @@ export default {
   },
   watch: {
     active() {
-      // если уже получили имя элемнета
       if (this.idDash) {
-        // то вызываем окно с удалением чего-либо
-        const modal = this.getModalDelete;
+        // если уже получили имя элемнета
+        const modal = this.$store.getters.getModalDelete({ id: this.idDash }); // то вызываем окно с удалением чего-либо
         this.setData(modal);
       }
     },
@@ -167,7 +131,7 @@ export default {
   created() {
     this.$store.commit('setModalDelete', {
       id: this.idDash,
-      active: false,
+      status: false,
       elem: '',
       name: '',
       page: this.dataPage,
@@ -203,7 +167,7 @@ export default {
       if (this.page === 'search') {
         const searchesId = [];
         searchesId.push(this.deleteName);
-        this.$store.dispatch('deleteFromDb', { ids: searchesId, idDash: this.idDash });
+        this.$store.getters.deleteFromDb(searchesId, this.idDash);
       }
       this.$store.commit('setModalDelete', {
         id: this.idDash,
@@ -213,10 +177,9 @@ export default {
         page: this.page,
       }); // и закрываем окно с удалением
     },
-    // кнопка отмены удаления
     cancelModal() {
-      // просто закрываем окно
-      this.active = false;
+      // кнопка отмены удаления
+      this.active = false; // просто закрываем окно
     },
     changeStyle() {
       if (this.active) {

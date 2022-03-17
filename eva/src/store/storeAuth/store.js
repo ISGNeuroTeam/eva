@@ -4,49 +4,9 @@ export default {
   namespaced: true,
   state: {},
   mutations: {},
-  actions: {
-    deleteLog: () => rest.deleteLog(),
-    getLog: (context, side) => rest.getLog(side),
-    saveLogIntoBack: ({ dispatch }) => {
-      const text = dispatch('getLog', 'back');
-      return text.then((res) => {
-        let newBack = res.split('<br>');
-        newBack.pop();
-        newBack.reverse();
-        newBack = newBack.join('<br>');
-        return rest.saveLogIntoBack(newBack);
-      });
-    },
-    putLog: (context, text) => rest.putLog(text),
-    deleteEssence: (context, data) => {
-      const localData = data;
-      switch (localData.essence) {
-        case 1:
-          localData.essence = 'user';
-          break;
-        case 2:
-          localData.essence = 'role';
-          break;
-        case 3:
-          localData.essence = 'permission';
-          break;
-        case 4:
-          localData.essence = 'group';
-          break;
-        case 5:
-          localData.essence = 'index';
-          break;
-        case 6:
-          localData.essence = 'dash';
-          break;
-        default:
-          break;
-      }
-      return rest.deleteEssence(localData);
-    },
-    setEssence: (context, data) => rest.setEssence(data),
-    getEssence: (context, { essence, id }) => rest.getEssence(essence, id),
-    getEssenceList: async (context, { role, create }) => {
+  actions: {},
+  getters: {
+    getEssenceList: () => async (role, create) => {
       let data;
       if (!create) {
         switch (role) {
@@ -73,6 +33,46 @@ export default {
       }
       return data;
     },
+    getEssence: () => (essence, id) => rest.getEssence(essence, id),
+    setEssence: () => (data) => rest.setEssence(data),
+    deleteEssence: () => (data) => {
+      const localData = data;
+      switch (localData.essence) {
+        case 1:
+          localData.essence = 'user';
+          break;
+        case 2:
+          localData.essence = 'role';
+          break;
+        case 3:
+          localData.essence = 'permission';
+          break;
+        case 4:
+          localData.essence = 'group';
+          break;
+        case 5:
+          localData.essence = 'index';
+          break;
+        case 6:
+          localData.essence = 'dash';
+          break;
+        default:
+          break;
+      }
+      return rest.deleteEssence(localData);
+    },
+    saveLogIntoBack: (state, getters) => () => {
+      const text = getters.getLog('back');
+      return text.then((res) => {
+        let newBack = res.split('<br>');
+        newBack.pop();
+        newBack.reverse();
+        newBack = newBack.join('<br>');
+        return rest.saveLogIntoBack(newBack);
+      });
+    },
+    putLog: () => (text) => rest.putLog(text),
+    getLog: () => (side) => rest.getLog(side),
+    deleteLog: () => () => rest.deleteLog(),
   },
-  getters: {},
 };

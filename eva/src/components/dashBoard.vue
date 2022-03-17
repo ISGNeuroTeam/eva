@@ -9,8 +9,7 @@
       class="dash-block"
       :style="{
         background: theme.$main_bg,
-        boxShadow: `0 3px 1px -2px ${theme.$main_border},
-        0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+        boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
       }"
     >
       <v-card-title
@@ -131,8 +130,7 @@
                   class="dash-block"
                   :style="{
                     background: theme.$main_bg,
-                    boxShadow: `0 3px 1px -2px ${theme.$main_border},
-                    0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
+                    boxShadow: `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`,
                   }"
                 >
                   <v-card-title
@@ -261,7 +259,6 @@
                     :height-from="fullScreenHeight"
                     :options="props.options"
                     :is-full-screen="true"
-                    :full-screen="true"
                     :table-per-page="tablePerPage"
                     :table-page="tablePage"
                     @hideDS="hideDS($event)"
@@ -478,47 +475,27 @@ import {
   mdiSettings,
   mdiTrashCanOutline,
 } from '@mdi/js';
-import settings from '../js/componentsSettings';
+import { mapGetters } from 'vuex';
+import settings from '../js/componentsSettings.js';
 
 export default {
   name: 'DashBoard',
   props: {
-    width: {
-      type: Number,
-      required: true,
-    },
-    height: {
-      type: Number,
-      required: true,
-    },
-    idDashFrom: {
-      type: String,
-      required: true,
-    },
-    dataElemFrom: {
-      type: String,
-      required: true,
-    },
+    width: null,
+    height: null,
+    idDashFrom: null,
+    dataElemFrom: null,
     dataModeFrom: {
       type: Boolean,
       required: true,
     },
-    dataPageFrom: {
-      type: String,
-      required: true,
-    },
+    dataPageFrom: null,
     loading: {
       type: Boolean,
       default: false,
     },
-    searchData: {
-      type: Array,
-      default: () => ([]),
-    },
-    dataSourseTitle: {
-      type: [String, Number],
-      default: -1,
-    },
+    searchData: Array,
+    dataSourseTitle: null,
     tooltipOpenDelay: {
       type: Number,
       default: 500,
@@ -596,28 +573,24 @@ export default {
     };
   },
   computed: {
-    getTockens() {
-      return this.$store.state[this.idDash].tockens;
-    },
+    ...mapGetters(['getTockens']),
     isMultiline() {
       return !!this.element?.includes('multiLine');
     },
     getSelfTockens() {
-      return this.getTockens || [];
+      return this.getTockens(this.idDash);
     },
     boardTitle() {
       if (!this.props || !this.props.name) {
         return this.element;
       }
       let { name } = this.props;
+      name
+      && this.getSelfTockens.forEach((token) => {
+        name = name.replaceAll(`$${token.name}$`, token.value);
+      });
 
-      if (name) {
-        this.getSelfTockens.forEach((token) => {
-          name = name.replaceAll(`$${token.name}$`, token.value);
-        });
-      }
-
-      if (name.indexOf('$evaTknLogin$') !== -1) {
+      if (name.indexOf('$evaTknLogin$') != -1) {
         if (this.$jwt.hasToken()) {
           name = name.replaceAll('$evaTknLogin$', this.$jwt.decode().username);
         }
@@ -625,7 +598,7 @@ export default {
       return name;
     },
     settingsIsOpened() {
-      return this.$store.state[this.idDash].modalSettings.status;
+      return this.$store.getters.getModalSettings(this.idDash).status;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -639,20 +612,12 @@ export default {
     dataMode() {
       this.changeOptions(this.dataModeFrom);
       if (!this.dataModeFrom) {
-        if (
-          this.element.split('-')[0] === 'button'
-          || this.element.split('-')[0] === 'csvg'
-          || this.element.split('-')[0] === 'tile'
-        ) {
-          this.setPropDisappear(false);
-        }
-      } else {
         this.setPropDisappear(true);
       }
       return this.dataModeFrom;
     },
-    // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
     currentElem() {
+      // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
       let nameElement = '';
       if (this.element) {
         const element = this.element.split('-')[0];
@@ -663,63 +628,35 @@ export default {
     elemIcon() {
       let element = '';
       if (this.element) {
-        [element] = this.element.split('-');
+        element = this.element.split('-')[0];
       }
       return element;
     },
-    // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
     showElement() {
-      return this.element ? this.$store.state[this.idDash][this.element].switch : false;
-    },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.element];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.element, idDash: this.idDash });
+      // понимаем нужно ли переключать элемент между выбором ИС и самими данными '
+      let show = false;
+      if (this.element) {
+        show = this.$store.getters.getSwitch({
+          idDash: this.idDash,
+          id: this.element,
+        });
       }
 
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
+      return show;
     },
     lastResult() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.element,
+      });
       return options.lastResult;
     },
     options() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.element,
+      });
+
       this.setOptionsItems(options);
 
       if (this.props.options.timeFormat) {
@@ -755,22 +692,19 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
-      setTimeout(() => {
-        this.disabledTooltip = to;
-      }, to ? 0 : 600);
+      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
     settingsIsOpened(to) {
-      setTimeout(() => {
-        this.disabledTooltip = to;
-      }, to ? 0 : 600);
+      setTimeout(() => (this.disabledTooltip = to), to ? 0 : 600);
     },
   },
   mounted() {
     this.props.icons = settings.icons;
-    // понимаем какая страница перед нами
-    this.page = this.$parent.$el.getAttribute('data-page');
-    // получаем имя этой страницы
-    this.props.name = this.$store.state[this.idDash][this.element].name_elem;
+    this.page = this.$parent.$el.getAttribute('data-page'); // понимаем какая страница перед нами
+    this.props.name = this.$store.getters.getNameDash({
+      idDash: this.idDash,
+      id: this.element,
+    }); // получаем имя этой страницы
     if (this.props.options.boxShadow) {
       this.props.optionsBoxShadow = this.theme.$primary_button;
     } else {
@@ -811,12 +745,12 @@ export default {
       this.fullScreenWidth = window.innerWidth * 0.8;
       this.fullScreenHeight = window.innerHeight * 0.8;
     },
-    updateSettings(localSettings) {
-      this.settings = JSON.parse(JSON.stringify(localSettings));
+    updateSettings(settings) {
+      this.settings = JSON.parse(JSON.stringify(settings));
     },
 
-    // изменяем имя элемнета
     editName(props) {
+      // изменяем имя элемнета
       props.edit = true;
       props.edit_icon = true;
 
@@ -826,16 +760,16 @@ export default {
         idDash: this.idDash,
       });
     },
-    // открываем модальное окно с выбором ИС (источник данных)
-    chooseDS() {
+    chooseDS(idDash) {
+      // открываем модальное окно с выбором ИС (источник данных)
       this.$store.commit('setModalSearch', {
-        id: this.idDash,
+        id: idDash,
         status: true,
         elem: this.element,
       });
     },
-    // переключаем между режимами выбора данных и их отображением
     switchDS() {
+      // переключаем между режимами выбора данных и их отображением
       const status = !this.showElement;
       this.$store.commit('setSwitch', {
         idDash: this.idDash,
@@ -863,14 +797,61 @@ export default {
       }
       this.props.loading = event;
     },
-    // вызываем окно для удаления элемнета
     deleteDashBoard(props) {
+      // вызываем окно для удаления элемнета
       this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: this.element,
         name: props.name,
         page: this.dataPageFrom,
+      });
+    },
+    // нужен ли этот метод
+    getDataFromDB(searchID) {
+      // получение данных с indexindDB
+      let db = null;
+      const request = indexedDB.open('EVA', 1);
+      request.onerror = function (event) {
+        console.log('error: ', event);
+      };
+
+      request.onupgradeneeded = (event) => {
+        console.log('create');
+        db = event.target.result;
+        if (!db.objectStoreNames.contains('searches')) {
+          // if there's no "books" store
+          db.createObjectStore('searches'); // create it
+        }
+        request.onsuccess = () => {
+          db = request.result;
+          console.log(`successEvent: ${db}`);
+        };
+      };
+      return new Promise((resolve) => {
+        request.onsuccess = () => {
+          db = request.result;
+
+          const transaction = db.transaction('searches'); // (1)
+
+          // получить хранилище объектов для работы с ним
+          const searches = transaction.objectStore('searches'); // (2)
+
+          const query = searches.get(String(searchID)); // (3) return store.get('Ire Aderinokun');
+
+          query.onsuccess = () => {
+            // (4)
+            if (query.result) {
+              resolve(query.result);
+            } else {
+              resolve([]);
+            }
+          };
+
+          query.onerror = function () {
+            console.log('Ошибка', query.error);
+          };
+        };
       });
     },
     openTitle() {
@@ -915,14 +896,17 @@ export default {
       this.$emit('SetLevel', level);
     },
     exportDataCSV() {
-      const searchId = this.$store.state[this.idDash][this.element].should;
+      const searchId = this.$store.getters.getSearchID({
+        idDash: this.idDash,
+        id: this.element,
+      });
       this.$emit('downloadData', searchId);
     },
     getData(searchID) {
       // асинхронная функция для получения даных с реста
       let db = null;
       const request = indexedDB.open('EVA', 1);
-      request.onerror = (event) => {
+      request.onerror = function (event) {
         console.log('error: ', event);
       };
       request.onupgradeneeded = (event) => {
@@ -952,39 +936,17 @@ export default {
               resolve([]);
             }
           };
-          query.onerror = () => {
+          query.onerror = function () {
             console.log('Ошибка', query.error);
           };
         };
       });
     },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
     checkFilter() {
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'OnDataCompare',
+        element: this.element,
       });
       let data = [];
       let incl = false;
@@ -1022,9 +984,12 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     if (notArr.length !== 0) {
-                      return !notArr.includes(String(itemFil[event.column])) ? itemFil : false;
+                      if (!notArr.includes(String(itemFil[event.column]))) {
+                        return itemFil;
+                      }
+                    } else if (event.row.includes(String(itemFil[event.column]))) {
+                      return itemFil;
                     }
-                    return event.row.includes(String(itemFil[event.column])) ? itemFil : false;
                   });
                 } else {
                   data = data.filter((itemFil) => {
@@ -1043,7 +1008,9 @@ export default {
                         }
                       });
                     }
-                    return incl;
+                    if (incl) {
+                      return itemFil;
+                    }
                   });
                 }
                 break;
@@ -1058,7 +1025,9 @@ export default {
                         incl = false;
                       }
                     });
-                    return incl;
+                    if (incl) {
+                      return itemFil;
+                    }
                   });
                 }
                 break;
@@ -1073,14 +1042,19 @@ export default {
                         incl = false;
                       }
                     });
-                    return incl;
+                    if (incl) {
+                      return itemFil;
+                    }
                   });
                 }
                 break;
               case 'in':
                 if (event.column !== '') {
-                  data = data.filter((itemFil) => !!event.row
-                    .includes(String(itemFil[event.column])));
+                  data = data.filter((itemFil) => {
+                    if (event.row.includes(String(itemFil[event.column]))) {
+                      return itemFil;
+                    }
+                  });
                 } else {
                   data = data.filter((itemFil) => {
                     incl = false;
@@ -1089,7 +1063,9 @@ export default {
                         incl = true;
                       }
                     });
-                    return incl;
+                    if (incl) {
+                      return itemFil;
+                    }
                   });
                 }
                 break;
@@ -1097,12 +1073,14 @@ export default {
                 if (event.column !== '') {
                   data = data.filter((itemFil) => {
                     incl = false;
-                    let min;
-                    let max;
+                    let min; let
+                      max;
                     if (parseFloat(event.row[0]) > parseFloat(event.row[1])) {
-                      [max, min] = event.row;
+                      max = event.row[0];
+                      min = event.row[1];
                     } else {
-                      [min, max] = event.row;
+                      max = event.row[1];
+                      min = event.row[0];
                     }
                     if (
                       parseFloat(itemFil[event.column]) > min
@@ -1110,50 +1088,41 @@ export default {
                     ) {
                       incl = true;
                     }
-                    return incl;
+                    if (incl) {
+                      return itemFil;
+                    }
                   });
                 }
-                break;
-              default:
                 break;
             }
           }
           if (this.searchData.length === 0) {
             this.searchData = [...this.searchData, ...data];
-            // если в массив результирующем уже что-то было, то надо добавить только новые элементы
           } else {
-            // пробегаемся по все мотфильтрвоанным элементам
+            // если в массив результирующем уже что-то было, то надо добавить только новые элементы
             data.forEach((itemData) => {
-              // переменная которая скажет встречается ли такая строка уже в выборке
-              let equal = false;
-              // ключи объекта внутри фильтрованного массива
-              const keys = Object.keys(itemData);
-              // пробегаемся пов сем отфильтрованным данным
+              // пробегаемся по все мотфильтрвоанным элементам
+              let equal = false; // переменная которая скажет встречается ли такая строка уже в выборке
+              const keys = Object.keys(itemData); // ключи объекта внутри фильтрованного массива
               this.searchData.forEach((itemDataRest) => {
-                // переменная которая скажет полностью совпал объект внутри результирующего массива
-                let equalRest = true;
-                // пробегаемся по кажлому полю в объекте
+                // пробегаемся пов сем отфильтрованным данным
+                let equalRest = true; // переменная которая скажет полностью совпал объект внутри результирующего массива
                 keys.forEach((key) => {
-                  // если значения поля из только что отфильтрованного массива,
-                  // не равно значени в уже до этого отфильтрованном массиве,
-                  // то значит что строка не полностью совпала, а значит строки не равны
+                  // пробегаемся по кажлому полю в объекте
                   if (itemData[key] !== itemDataRest[key]) {
-                    // поэтому присваиваем переменной значение мол строки отличаются
-                    equalRest = false;
+                    // если значения поля из только что отфильтрованного массива, не равно значени в уже до
+                    // этого отфильтрованном массиве, то значит что строка не полностью совпала, а значит строки не равны
+                    equalRest = false; // поэтому присваиваем переменной значение мол строки отличаются
                   }
                 });
-                // а вот если строка в только
-                // что отфлильтрованном массиве полностью совпала
-                // со строкой в уже до этого отфильтрованном
                 if (equalRest) {
-                  // то присваиваем true переменной которай говорит что такая строка уже есть
-                  equal = true;
+                  // а вот если строка в только что отфлильтрованном массиве полностью совпала со строкой в уже до этого отфильтрованном
+                  equal = true; // то присваиваем true переменной которай говорит что такая строка уже есть
                 }
               });
-              // и вот если такой строки все же нет
               if (!equal) {
-                // то смело добовляем ее в результирующий массив
-                this.searchData.push(itemData);
+                // и вот если такой строки все же нет
+                this.searchData.push(itemData); // то смело добовляем ее в результирующий массив
               }
             });
           }

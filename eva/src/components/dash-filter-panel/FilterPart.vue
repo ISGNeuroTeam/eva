@@ -12,9 +12,7 @@
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d="M5.99998 13.3334L2.66665 10.6667L5.99998
-               8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998
-               8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z"
+              d="M5.99998 13.3334L2.66665 10.6667L5.99998 8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998 8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z"
               :fill="theme.$main_text"
             />
           </svg>
@@ -79,10 +77,7 @@
             class="mr-1"
           >
             <path
-              d="M5.99998 13.3334L2.66665 10.6667L5.99998
-               8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998
-               8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333
-               5.33341L9.99998 8.00008Z"
+              d="M5.99998 13.3334L2.66665 10.6667L5.99998 8.00008V10.0001H14.6666V11.3334H5.99998V13.3334ZM9.99998 8.00008V6.00008H1.33331V4.66675H9.99998V2.66675L13.3333 5.33341L9.99998 8.00008Z"
               :fill="theme.$main_text"
             />
           </svg>
@@ -138,38 +133,18 @@ import {
   mdiPencil,
   mdiChevronDown,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'FilterPart',
   props: {
-    idDash: {
-      type: String,
-      required: true,
-    },
-    filterPart: {
-      type: Object,
-      required: true,
-    },
-    isFocused: {
-      type: Boolean,
-      required: true,
-    },
-    editPermission: {
-      type: Boolean,
-      required: true,
-    },
-    filterPartIndex: {
-      type: Number,
-      required: true,
-    },
-    filterIndex: {
-      type: Number,
-      required: true,
-    },
-    editMode: {
-      type: Boolean,
-      required: true,
-    },
+    idDash: String,
+    filterPart: Object,
+    isFocused: Boolean,
+    editPermission: Boolean,
+    filterPartIndex: Number,
+    filterIndex: Number,
+    editMode: Boolean,
   },
   data() {
     return {
@@ -191,8 +166,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['getTockens']),
     getDashTokens() {
-      return this.$store.state[this.idDash].tockens;
+      return this.getTockens(this.idDash);
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -207,13 +183,10 @@ export default {
     },
     elemName() {
       let name = this.elemRawName;
-
-      if (this.elemRawName) {
-        this.getDashTokens.forEach((token) => {
+      name
+        && this.getDashTokens.forEach((token) => {
           name = name.replaceAll(`$${token.name}$`, token.value);
         });
-      }
-
       return name || this.filterPart?.token?.name || 'Unknown';
     },
     operationManualTitle() {

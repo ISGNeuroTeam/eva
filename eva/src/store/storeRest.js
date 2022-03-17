@@ -10,12 +10,13 @@ export default {
       restAuth.putLog(
         `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
       );
+      return [];
     });
-    if (response && response.status === 200) {
+    if (response.status == 200) {
       // если получилось
 
       return response.json().then((answer) => {
-        if (answer.status !== 'success') {
+        if (answer.status != 'success') {
           restAuth.putLog(
             `Запрос ${searchFrom.sid} запустился с ошибкой.&nbsp;&nbsp;status: ${answer.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${answer.error}`,
           );
@@ -37,7 +38,7 @@ export default {
             // let i = 0;
 
             let timeOut = setTimeout(async function tick() {
-              if (status === 'failed') {
+              if (status == 'failed') {
                 result.push('failed');
                 clearTimeout(timeOut);
               }
@@ -68,14 +69,15 @@ export default {
                   result = [];
                   clearTimeout(timeOut);
                 });
-              // если запрос не прошел то вернем ответ с ошибкой
-              if (responseGet !== 200 && responseGet !== 0) {
+              if (responseGet != 200 && responseGet != 0) {
+                // если запрос не прошел то вернем ответ с ошибкой
                 status = 'failed';
                 result.push('failed');
                 clearTimeout(timeOut);
-                // если прошёл
+                // return resEvents;
               } else {
-                result = await resEvents.json().then((res) => {
+                // если прошёл
+                const dataEvents = await resEvents.json().then((res) => {
                   // переводим полученные данные из json в нормальный объект
                   restAuth.putLog(
                     `Запрос ${
@@ -88,14 +90,16 @@ export default {
                   console.log(status);
                   return res;
                 });
+                result = dataEvents;
               }
-              if (status === 'nocache' || status === 'notfound') {
+              if (status == 'nocache' || status == 'notfound') {
                 // УДАЛИТЬ
-                countNoCache += 1;
+                countNoCache++;
               }
+              // if (status == 'success' || i >100 || status == 'failed' || status == 'notfound' || status == 'nocache' ) {
               if (
-                status === 'success'
-                  || status === 'failed'
+                status == 'success'
+                  || status == 'failed'
                   || countNoCache > 10
               ) {
                 clearTimeout(timeOut);
@@ -103,23 +107,24 @@ export default {
               } else {
                 timeOut = setTimeout(tick, 2000);
               }
+              // i++;
             }, 0);
           });
 
-          cycle.then(async (cycleResult) => {
-            if (status === 'failed') {
+          cycle.then(async (result) => {
+            if (status == 'failed') {
               restAuth.putLog(
-                `Запрос ${searchFrom.sid} выполнился с ошибкой.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${cycleResult.error};`,
+                `Запрос ${searchFrom.sid} выполнился с ошибкой.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${result.error};`,
               );
               resolveMain([]);
-            } else if (status === 'notfound') {
+            } else if (status == 'notfound') {
               restAuth.putLog(
-                `Запрос ${searchFrom.sid} выполнился с ошибкой.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${cycleResult.error};`,
+                `Запрос ${searchFrom.sid} выполнился с ошибкой.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${result.error};`,
               );
               resolveMain([]);
-            } else if (status === 'nocache') {
+            } else if (status == 'nocache') {
               restAuth.putLog(
-                `Запрос ${searchFrom.sid} выполнился с ошибкой.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${cycleResult.error};`,
+                `Запрос ${searchFrom.sid} выполнился с ошибкой.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${result.error};`,
               );
               resolveMain([]);
             } else {
@@ -128,7 +133,7 @@ export default {
               );
 
               const dataResponse = await fetch(
-                `/api/getresult?cid=${cycleResult.cid}`,
+                `/api/getresult?cid=${result.cid}`,
               ).catch((error) => {
                 restAuth.putLog(
                   `Получить данные из запроса ${searchFrom.sid} не удалось.&nbsp;&nbsp;status: ${status}&nbsp;&nbsp;Ошибка: ${error};`,
@@ -142,7 +147,7 @@ export default {
 
               const allData = new Promise((resolve) => {
                 dataResponse.json().then(async (res) => {
-                  if (res.status === 'success') {
+                  if (res.status == 'success') {
                     restAuth.putLog(
                       `Данные из запроса ${
                         searchFrom.sid
@@ -151,7 +156,7 @@ export default {
 
                     let shema = null;
                     const promise = res.data_urls.map((item, i) => {
-                      if (item.indexOf('SCHEMA') !== -1) {
+                      if (item.indexOf('SCHEMA') != -1) {
                         shema = i;
                       }
                       return fetch(`/${item}`);
@@ -159,39 +164,38 @@ export default {
 
                     let resultProm = await Promise.all(promise);
 
-                    const dataProm = resultProm
-                      .map((prom, i) => new Promise((resultPromResolve) => {
-                        const allDataLocal = [];
+                    const dataProm = resultProm.map((prom, i) => new Promise((resolve) => {
+                      const allData = [];
 
-                        prom.text().then((dataitself) => {
-                          if (shema === i) {
-                            shema = dataitself;
-                          }
-                          // все это потому что там не совсем json,
-                          // а строка состоящая из строка в json
-                          dataitself.split('\n').forEach((dataPeace) => {
-                            if (dataPeace !== '') {
-                              try {
-                                allDataLocal.push(JSON.parse(dataPeace));
-                              } catch (error) {
-                                console.log(error);
-                              }
+                      prom.text().then((dataitself) => {
+                        if (shema == i) {
+                          shema = dataitself;
+                        }
+                        dataitself.split('\n').forEach((dataPeace) => {
+                          // все это потому что там не совсем json а строка состоящая из строка в json
+                          if (dataPeace != '') {
+                            try {
+                              allData.push(JSON.parse(dataPeace));
+                            } catch (error) {
+                              console.log(error);
                             }
-                          });
-                          resultPromResolve(allDataLocal);
+                          }
                         });
-                      }));
+                        resolve(allData);
+                      });
+                    }));
 
                     resultProm = await Promise.all(dataProm);
+
                     let resolveData = [];
 
                     resultProm.forEach((item) => {
-                      if (item.length !== 0) {
+                      if (item.length != 0) {
                         resolveData = [...item];
                       }
                     });
 
-                    if (shema != null && shema !== '') {
+                    if (shema != null && shema != '') {
                       const keys = shema.match(/`[^`.]+`/g).map((item) => item.replace(/`/g, ''));
                       const values = shema
                         .replace(/`[^`.]+`/g, '')
@@ -203,9 +207,9 @@ export default {
                       });
 
                       resolveData.forEach((item, i) => {
-                        const resolveDataItemKeys = Object.keys(item);
+                        const keys = Object.keys(item);
                         Object.keys(shema).forEach((itemSchem) => {
-                          if (!resolveDataItemKeys.includes(itemSchem)) {
+                          if (!keys.includes(itemSchem)) {
                             resolveData[i][itemSchem] = null;
                           }
                         });
@@ -215,7 +219,7 @@ export default {
                     restAuth.putLog(
                       `Все данные из запроса ${searchFrom.sid} обработаны  успешно.&nbsp;&nbsp;status: ${res.status}`,
                     );
-                    if (idDash === 'reports') {
+                    if (idDash == 'reports') {
                       resolve({ data: resolveData, shema });
                     } else {
                       resolve(resolveData);
@@ -228,8 +232,8 @@ export default {
                   }
                 });
               });
-              if (idDash === 'papers') {
-                resolveMain({ data: allData, sid: cycleResult.cid });
+              if (idDash == 'papers') {
+                resolveMain({ data: allData, sid: result.cid });
               } else {
                 resolveMain(allData);
               }
@@ -251,7 +255,7 @@ export default {
       );
       return [];
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .json()
@@ -283,7 +287,7 @@ export default {
       );
       return [];
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .json()
@@ -316,7 +320,7 @@ export default {
       return response;
     });
 
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .json()
@@ -348,7 +352,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -387,7 +391,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -423,7 +427,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -462,7 +466,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -495,7 +499,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .json()
@@ -533,7 +537,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -573,7 +577,7 @@ export default {
       return response;
     });
 
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
 
       await response
@@ -581,7 +585,7 @@ export default {
         .then((res) => {
           // переводим полученные данные из json в нормальный объект
           data = res;
-          if (data.status === 'success') {
+          if (data.status == 'success') {
             restAuth.putLog(
               `Отчет загружен успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
             );
@@ -613,7 +617,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -651,14 +655,14 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
         .then((res) => {
           // переводим полученные данные из json в нормальный объект
           result = JSON.parse(res);
-          if (result.status === 'success') {
+          if (result.status == 'success') {
             restAuth.putLog(
               `Отчет успешно получен.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
             );
@@ -691,7 +695,7 @@ export default {
       );
       return response;
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .text()
@@ -726,7 +730,7 @@ export default {
       );
       return [];
     });
-    if (response.status === 200) {
+    if (response.status == 200) {
       // если получилось
       await response
         .json()

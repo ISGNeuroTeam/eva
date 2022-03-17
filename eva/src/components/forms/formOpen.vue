@@ -16,7 +16,9 @@
               v-on="on"
               @click="toHome"
             >
-              {{ home }}
+              {{
+                home
+              }}
             </v-icon>
           </template>
           <span>На главную</span>
@@ -33,6 +35,7 @@
           <div class="title-form">
             {{ titleForm }}
           </div>
+          <!-- <div class="form-itself" :style="{gridTemplateRows : `repeat(${createForm.rows}, 1fr)`, gridTemplateColumns: `repeat(${createForm.columns}, 1fr)`}">-->
           <div class="form-itself">
             <grid-layout
               :layout.sync="grid"
@@ -65,7 +68,7 @@
                     <v-icon
                       class="icon-cell"
                       color="teal"
-                      :class="{ plusIcon: item.name === '' }"
+                      :class="{ plusIcon: item.name == '' }"
                       @click="openModal(item.i)"
                     >
                       {{ item.img }}
@@ -74,8 +77,9 @@
                       {{ checkName(item.name, item.w, item.h, item.img) }}
                     </div>
                   </div>
+                  <!-- <v-icon class="icon-select" v-if="editable=='true'" color="teal" @click="openModal(item.i)">{{pencil}}</v-icon>  -->
                   <v-icon
-                    v-if="editable === 'true'"
+                    v-if="editable == 'true'"
                     class="icon-gear"
                     color="teal"
                     @click="openModalSetting(item.i)"
@@ -87,7 +91,7 @@
             </grid-layout>
           </div>
           <div
-            v-if="editable === 'true'"
+            v-if="editable == 'true'"
             class="form-btn"
           >
             <v-btn
@@ -99,9 +103,10 @@
             >
               Сохранить
             </v-btn>
+            <!-- <v-btn small color="teal" class="create-form-btn" @click="openForm" :disabled="followDisabled">Перейти к редактированию</v-btn> -->
           </div>
           <div
-            v-if="editable === 'false'"
+            v-if="editable == 'false'"
             class="form-btn-not-editable"
           >
             <v-btn
@@ -157,89 +162,75 @@ export default {
       loading: true,
     };
   },
-  // осоновные параметры, которые часто меняются и которы следует отслеживать
   computed: {
-    // получаем объект шаблона из локального хранилища
+    // осоновные параметры, которые часто меняются и которы следует отслеживать
     createForm() {
+      // получаем объект шаблона из локального хранилища
       return this.$store.getters['form/getCreateForm'];
     },
     editable() {
       this.setDataEditable();
-      // возвращаем саму натсройку редактирования
-      return this.$route.query.editable;
+      return this.$route.query.editable; // возвращаем саму натсройку редактирования
     },
-    // получаем id шаблона
     idForm() {
+      // получаем id шаблона
       return this.$route.query.id;
     },
-    // получаем настройку редактирования кнопки Сохранить
     disabled() {
+      // получаем настройку редактирования кнопки Сохранить
       return this.$store.getters['form/getDisabled'];
     },
   },
   mounted() {
-    // если можно редактировать
-    if (this.editable === 'true') {
-      // получаем шаблон из локального хранилища
-      const form = this.createForm;
-      // выставляем название шаблона
-      this.titleForm = this.createForm.name;
-      // если шаблон был получен из базы данных
+    if (this.editable == 'true') {
+      // если можно редактировать
+      const form = this.createForm; // получаем шаблон из локального хранилища
+      this.titleForm = this.createForm.name; // выставляем название шаблона
       if (form.cells) {
-        // то заносим его в переменную для отрисовки
-        this.grid = form.cells;
-        // и выставляем правлиьное количество колонок,
-        // либо по умолчанию, либо то что пришло, умноженное на 4
-        this.columns = form.columns !== '' ? Number(form.columns) * 4 : 16;
-        // если шаблона нет в базе данных
+        // если шаблон был получен из базы данных
+        this.grid = form.cells; // то заносим его в переменную для отрисовки
+        form.columns != ''
+          ? (this.columns = Number(form.columns) * 4)
+          : (this.columns = 16); // и выставляем правлиьное количество колонок, либо по умолчанию, либо то что пришло, умноженное на 4
       } else {
-        // то создаем новый
-        this.setGrid(form);
+        // если шаблона нет в базе данных
+        this.setGrid(form); // то создаем новый
       }
-      // если редактировать запрещено
     } else {
-      // то просто получаем шаблон и отрисовываем его
-      this.getForm();
+      // если редактировать запрещено
+      this.getForm(); // то просто получаем шаблон и отрисовываем его
     }
   },
   methods: {
-    // получаем настройку сообщающию может ли пользователь редактировать шаблон или нет
     setDataEditable() {
-      // если редактировтаь шаблон нельзя
-      if (this.$route.query.editable === 'false') {
-        // то отключаем возможность редактирования
-        this.dargrsizeable = false;
-        // и меняем заголовок шаблона
-        this.title = 'Просмотр формы';
-        // если редактировать разрешено
+      // получаем настройку сообщающию может ли пользователь редактировать шаблон или нет
+      if (this.$route.query.editable == 'false') {
+        // если редактировтаь шаблон нельзя
+        this.dargrsizeable = false; // то отключаем возможность редактирования
+        this.title = 'Просмотр формы'; // и меняем заголовок шаблона
       } else {
-        // включаем настройку редактирования
-        this.dargrsizeable = true;
-        // отключаем загрузку
-        this.loading = false;
-        // меняем заголовок
-        this.title = 'Создать форму';
+        // если редактировать разрешено
+        this.dargrsizeable = true; // включаем настройку редактирования
+        this.loading = false; // отключаем загрузку
+        this.title = 'Создать форму'; // меняем заголовок
       }
     },
-    // метод перенаправляющий на главную страницу
     toHome() {
+      // метод перенаправляющий на главную страницу
       this.$router.push('/forms');
     },
-    // метод сохраняющий позицию и размер ячеек шаблона
     savePosSize() {
-      // записываем новую позицию и размер в локальное хранилище
-      this.$store.commit('form/setTemplate', this.grid);
+      // метод сохраняющий позицию и размер ячеек шаблона
+      this.$store.commit('form/setTemplate', this.grid); // записываем новую позицию и размер в локальное хранилище
     },
-    // сохраняем шаблон
     saveForm() {
-      // сохраняем шаблон в базу данных
-      this.$store.dispatch('form/saveTemplateForm');
-      // отключаем кнопку Сохранить
-      this.$store.commit('form/setDisabled', true);
+      // сохраняем шаблон
+      this.$store.commit('form/saveTemplateForm'); // сохраняем шаблон в базу данных
+      this.$store.commit('form/setDisabled', true); // отключаем кнопку Сохранить
     },
     deleteForm() {
       // функция удаления шаблона
-      // this.$store.dispatch("form/deleteTemplate",this.idForm);
+      // this.$store.commit("form/deleteTemplate",this.idForm);
     },
     checkName(name, w, h) {
       if (w < 4 || h < 3) {
@@ -247,77 +238,67 @@ export default {
       }
       return name;
     },
-    // функция срабатывающяя когда в модалки выбрали новый элемент
+    //    openForm: function() {
+    //        this.$router.push(`/forms/edit?editable=true&id=${this.createForm.name}&empty=false`);
+    //    },
     setElement(elem) {
-      // заносим имя
-      this.grid[this.elemKey].name = elem[0].name;
-      // и картинку нового элемента
-      this.grid[this.elemKey].img = elem[0].img;
-      // сохраняем шаблон в локальное хранилище
-      this.$store.commit('form/setTemplate', this.grid);
+      // функция срабатывающяя когда в модалки выбрали новый элемент
+      this.grid[this.elemKey].name = elem[0].name; // заносим имя
+      this.grid[this.elemKey].img = elem[0].img; // и картинку нового элемента
+      this.$store.commit('form/setTemplate', this.grid); // сохраняем шаблон в локальное хранилище
     },
-    // открываем модалку с выбором элементов
     openModal(key) {
-      // открываем модалку
-      this.modal = true;
-      // сохраняем id ячейки для дальнйшего использования
-      this.elemKey = key;
+      // открываем модалку с выбором элементов
+      // if (this.editable == 'true') {
+      this.modal = true; // открываем модалку
+      this.elemKey = key; // сохраняем id ячейки для дальнйшего использования
+      // }
     },
-    // открываем модалку с настройками ячейки
     openModalSetting(key) {
-      // открываем модалку
-      this.modalSettings = true;
-      // в объект натсроек заносим id ячейки
-      this.forSettingsForm.key = key;
-      // и имя элемнета в ячейке
-      this.forSettingsForm.name = this.grid[key].name;
-      // и сохраняем id ячейки еще в другую переменную
-      this.elemKey = key;
+      // открываем модалку с настройками ячейки
+      this.modalSettings = true; // открываем модалку
+      this.forSettingsForm.key = key; // в объект натсроек заносим id ячейки
+      this.forSettingsForm.name = this.grid[key].name; // и имя элемнета в ячейке
+      this.elemKey = key; // и сохраняем id ячейки еще в другую переменную
     },
-    // закрываем все открытые модалки
     closeModal() {
+      // закрываем все открытые модалки
       this.modal = false;
       this.modalSettings = false;
     },
-    // получаем шаблон из базы данных
     async getForm() {
-      // получаем собственно шаблон
-      const form = await this.$store.dispatch('form/getTemplate', this.idForm);
-      // находим максимальное значение среди всех значений х,
-      // чтобы понять сколько колонок у нас будет
+      // получаем шаблон из базы данных
+      const form = await this.$store.getters['form/getTemplate'](this.idForm); // получаем собственно шаблон
       const max = form.cells.reduce((last, next) => {
-        if (next.y === 0) {
+        // находим максимальное значение среди всех значений х, чтобы понять сколько колонок у нас будет
+        if (next.y == 0) {
           return last + next.w;
         }
         return last;
       }, 0);
-      // выставляем заголовок шаблона
-      this.titleForm = form.name;
-      // заносим структуру шаблона в переменную для отображения
-      this.grid = form.cells;
+      this.titleForm = form.name; // выставляем заголовок шаблона
+      this.grid = form.cells; // заносим структуру шаблона в переменную для отображения
       this.columns = max;
-      // отключаем загрузку
-      this.loading = false;
+      this.loading = false; // отключаем загрузку
     },
-    // создаем шаблон в первый раз
     setGrid() {
+      // создаем шаблон в первый раз
       let x = 0;
       let y = 0;
       this.grid = [];
-      // если число строк введено пользователем, то используем их, если нет ставим по умолчанию
-      this.rows = this.createForm.rows !== '' ? Number(this.createForm.rows) : 2;
-      // тоже самое с колонками
-      this.columns = this.createForm.columns !== '' ? Number(this.createForm.columns) : 4;
-      // пробегаемся по всем записям в объекте шаблоне
-      for (let i = 0; i < this.rows * this.columns; i += 1) {
-        // если х превысил количество х в строке
+      this.createForm.rows != ''
+        ? (this.rows = Number(this.createForm.rows))
+        : (this.rows = 2); // если число строк введено пользователем, то используем их, если нет ставим по умолчанию
+      this.createForm.columns != ''
+        ? (this.columns = Number(this.createForm.columns))
+        : (this.columns = 4); // тоже самое с колонками
+      for (let i = 0; i < this.rows * this.columns; i++) {
+        // пробегаемся по всем записям в объекте шаблоне
         if (x > this.columns * 4 - 4) {
-          // то сбрасываем условный счетчик колонок
-          x = 0;
-          // и переходим на следующию строку
-          y += 4;
+          // если х превысил количество х в строке
+          x = 0; // то сбрасываем условный счетчик колонок
+          y += 4; // и переходим на следующию строку
         }
-        // добовляем строку в объект шаблона
         this.$set(this.grid, i, {
           x,
           y,
@@ -326,12 +307,10 @@ export default {
           i: String(i),
           name: '',
           img: this.plus,
-        });
-        // после каждой итерации сдвигаем как бы указатель вправо на ширину колонки
-        x += 4;
+        }); // добовляем строку в объект шаблона
+        x += 4; // после каждой итерации сдвигаем как бы указатель вправо на ширину колонки
       }
-      // умножаем число колонок на 4 как бы разбивая каждую из них на четыре части
-      this.columns *= 4;
+      this.columns *= 4; // умножаем число колонок на 4 как бы разбивая каждую из них на четыре части
     },
   },
 };

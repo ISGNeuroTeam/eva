@@ -20,38 +20,14 @@ import * as d3 from 'd3';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: {
-      type: String,
-      required: true,
-    }, // id элемнета (table, graph-2)
-    idDashFrom: {
-      type: String,
-      required: true,
-    }, // id дашборда
-    dataRestFrom: {
-      type: Array,
-      required: true,
-    }, // данные полученые после выполнения запроса
-    colorFrom: {
-      type: Object,
-      required: true,
-    }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    },
-    heightFrom: {
-      type: Number,
-      required: true,
-    },
-    activeElemFrom: {
-      type: String,
-      required: true,
-    },
-    dataReport: {
-      type: Boolean,
-      required: true,
-    },
+    idFrom: null, // id элемнета (table, graph-2)
+    idDashFrom: null, // id дашборда
+    dataRestFrom: null, // данные полученые после выполнения запроса
+    colorFrom: null, // цветовые переменные
+    widthFrom: null,
+    heightFrom: null,
+    activeElemFrom: null,
+    dataReport: null,
   },
   data() {
     return {
@@ -107,6 +83,9 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
+    // dataRest: function() {
+    //   return this.dataRestFrom
+    // },
     color() {
       return this.colorFrom;
     },
@@ -116,6 +95,14 @@ export default {
     height() {
       return this.heightFrom;
     },
+    // prepareBarChart: function() {
+
+    //   if (this.width != 0 && this.height != 0 && this.dataRest.length > 0) {   // если размеры получены выше нуля и  если данные от родителя тоже пришли
+    //     this.getDataAsynchrony(); // вызываем функцию в которой будет происходить асинхронная отрисовка графика
+    //   }
+
+    //   return 'done'
+    // },
     change() {
       if (
         this.dataRestFrom
@@ -142,8 +129,7 @@ export default {
     },
   },
   mounted() {
-    //  В первый раз раскомментить чтобы создать события для элемнета,
-    //  а затем лучше закоментить чтобы каждый раз не обращаться к store
+    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -156,7 +142,7 @@ export default {
         // создаем promise чтобы затем отрисовать график асинхронно
 
         let otstupBottom = 55;
-        if (window.screen.width <= 1600) {
+        if (screen.width <= 1600) {
           otstupBottom = 30;
         }
 
@@ -187,7 +173,7 @@ export default {
       // let max = 0;
 
       let otstupTop = 20;
-      if (window.screen.width <= 1600) {
+      if (screen.width <= 1600) {
         otstupTop = 10;
       }
 
@@ -302,7 +288,11 @@ export default {
               .axisBottom(x)
               .tickFormat(d3.timeFormat('%d-%m-%Y '))
               .tickValues(
-                x.ticks().filter((item, i) => i % deliter === 0),
+                x.ticks().filter((item, i) => {
+                  if (i % deliter === 0) {
+                    return item;
+                  }
+                }),
               ),
           );
       } else {
@@ -312,7 +302,11 @@ export default {
           .attr('transform', `translate(0,${height})`)
           .call(
             d3.axisBottom(x).tickValues(
-              x.domain().filter((item, i) => i % deliter === 0),
+              x.domain().filter((item, i) => {
+                if (i % deliter === 0) {
+                  return item;
+                }
+              }),
             ),
           );
       }
@@ -428,32 +422,8 @@ export default {
           tooltip.style('opacity', '0').style('visibility', 'hidden');
         }); // при уводе мышки исчезает, только если это не точка выходящяя порог
     },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
     setClick(item) {
-      const { tockens } = this.$store.state[this.idDash];
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -464,7 +434,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            token: tocken,
+            tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,
@@ -472,21 +442,23 @@ export default {
         }
       });
 
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'onclick',
+        element: this.id,
         partelement: 'empty',
       });
 
       if (events.length !== 0) {
-        events.forEach((event) => {
-          if (event.action === 'set') {
+        events.forEach((item) => {
+          if (item.action === 'set') {
             this.$store.commit('letEventSet', {
               events,
               idDash: this.idDash,
             });
-          } else if (event.action === 'go') {
-            this.$store.dispatch('letEventGo', {
-              event,
+          } else if (item.action === 'go') {
+            this.$store.commit('letEventGo', {
+              event: item,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,

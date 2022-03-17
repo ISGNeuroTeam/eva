@@ -4,7 +4,7 @@
     class="block-of-elements"
   >
     <div
-      v-if="editable === 'true'"
+      v-if="editable == 'true'"
       class="element-block"
     >
       <v-textarea
@@ -47,6 +47,11 @@
           Только числовое значение
         </div>
       </div>
+      <!-- <v-radio-group   :mandatory="true" v-if="visionOpt.choose" name="radio"  v-model="value">
+                    <v-radio    class="radiobtn" color="teal"   ></v-radio>
+                </v-radio-group> -->
+      <!-- <v-switch :v-model="value" color="teal" class="form-switch"  :data-switch="switchbox" :data-id="idFrom" v-if="visionOpt.choose" @change="checkSwitch()"></v-switch> -->
+      <!-- <v-checkbox  v-model="value" color="teal" :data-checkbox="checkbox" v-if="visionOpt.choose" @update="checkRadio"></v-checkbox> -->
       <div
         v-if="visionOpt.choose"
         class="radiobtn-block"
@@ -58,9 +63,10 @@
       >
         <div class="radiobtn-circle" />
       </div>
+      <!-- <input type="radio" v-if="visionOpt.choose" name="radio" color="teal" class="radiobtn"  :value="value" v-model="value" > -->
     </div>
     <div
-      v-if="editable === 'false'"
+      v-if="editable == 'false'"
       class="element-block-not-editable"
     >
       <div
@@ -83,24 +89,12 @@
 <script>
 export default {
   props: {
-    nameFrom: {
-      type: String,
-      required: true,
-    },
-    idFrom: {
-      type: String,
-      required: true,
-    },
+    nameFrom: null,
+    idFrom: null,
+    nameFormFrom: null,
     radiosFrom: null,
-    // TODO: переделать на Boolean!!!
-    editable: {
-      type: String,
-      required: true,
-    },
-    heightFrom: {
-      type: Number,
-      required: true,
-    },
+    editable: null,
+    heightFrom: null,
   },
   data() {
     return {
@@ -117,31 +111,25 @@ export default {
       tooltip: null,
     };
   },
-  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
   computed: {
+    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
     radios() {
       this.setValue();
       return this.radiosFrom[this.idFrom];
-    },
-    getContent() {
-      if (this.$store.state.form.createForm.content) {
-        return this.$store.state.form.createForm.content[this.idFrom];
-      }
-      return 'empty';
     },
   },
 
   mounted() {
     const element = this.$store.getters['form/getFormLocal'];
-    let content = this.getContent;
-    if (content !== 'empty') {
-      if (content === 'True') {
+    let content = this.$store.getters['form/getContent'](this.idFrom);
+    if (content != 'empty') {
+      if (content == 'True') {
         content = true;
       }
-      if (content === 'False') {
+      if (content == 'False') {
         content = false;
       }
-      if (content === 'None') {
+      if (content == 'None') {
         content = '';
       }
       this.value = content;
@@ -159,7 +147,7 @@ export default {
       case 'Выбор одного варианта':
         this.visionOpt.choose = true;
         if (element[this.idFrom].options) {
-          if (element[this.idFrom].options.nameRadio) {
+          if (element[this.idFrom].options.nameRadio != '') {
             this.radioname = element[this.idFrom].options.nameRadio;
           } else {
             this.radioname = 'empty';
@@ -167,14 +155,18 @@ export default {
         } else {
           this.radioname = 'empty';
         }
+        //   if (element.options) {
+        //       this.selectElems = element.options.select.split(';');
+        //   }
         break;
       case 'Числовое поле':
         this.visionOpt.number = true;
-        break;
-      default:
+        //   if (element.options) {
+        //       this.selectElems = element.options.select.split(';');
+        //   }
         break;
     }
-    if (this.editable === 'false') {
+    if (this.editable == 'false') {
       setTimeout(() => {
         const blockell = this.$refs.elementBlock;
         const elemBlock = blockell.querySelector('.element-block-not-editable');
@@ -206,8 +198,43 @@ export default {
       }
     },
     checkRadio() {
+      // this.value == true ? this.value = false : this.value = true;
+      // if (this.value && this.radioname != this.idFrom){
       this.$emit('checkSwitch', { id: this.idFrom, name: this.radioname });
+      // } else {
+      //     this.setValue();
+      // }
     },
+    //  toolTipShow: function() {
+
+    //     let tooltip = null;
+    //     let elem = this.$refs.elementBlock.querySelector('.element-block-not-editable');
+
+    //     if (elem.parentElement.classList.contains('toobig')){
+    //          // console.log(event.target.getBoundingClientRect().left);
+    //          // console.log(event.clientX-30);
+    //          // this.tooltip.style=`left: ${event.target.getBoundingClientRect().left-30}px; top: ${event.target.getBoundingClientRect().top}px; opacity: 1; visibility: visible;`;
+    // //         //this.$emit('showTooltip',event);
+    // //         console.log(elem);
+    //      console.log('create');
+    //      tooltip = elem.cloneNode(true); // дальше мы создаем как бы клон нашего элемнета
+    //      tooltip.classList.add('tooltip'); // даем ему класс
+    //      tooltip.style.opacity="1";
+    //      elem.parentElement.parentElement.parentElement.appendChild(tooltip);  // и его уже добовляем в body
+    //      tooltip.parentElement.parentElement.style['z-index'] = "2";
+    //      this.tooltip = tooltip;
+
+    // //    console.log(tooltip);
+    //     }
+
+    //       if (tooltip != null) {
+    //             tooltip.addEventListener("mouseout", () => {
+    //                 console.log("delete");
+    //                 tooltip.remove();
+    //             });
+    //       }
+
+    // },
   },
 };
 </script>

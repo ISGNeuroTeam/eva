@@ -50,7 +50,7 @@
 
 <script>
 export default {
-  name: 'ModalConfirm',
+  name: 'modalConfirm',
   model: {
     prop: 'modalValue',
     event: 'updateModalValue',
@@ -62,7 +62,7 @@ export default {
     },
     btnConfirmText: {
       type: String,
-      default: 'Да',
+      default: 'Да'
     },
     btnCancelText: {
       type: String,

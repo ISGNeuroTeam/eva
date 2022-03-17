@@ -165,10 +165,7 @@ export default {
       activeDelete: false,
       createSome: false,
       colorRow: false,
-      keyFrom: {
-        type: Number,
-        required: true,
-      },
+      keyFrom: null,
       dataDelete: {},
       curItem: {},
       permission: true,
@@ -284,8 +281,7 @@ export default {
       }
     },
     async setData(role) {
-      const result = await this.$store.dispatch('auth/getEssenceList', { role, create: false });
-      return result;
+      return await this.$store.getters['auth/getEssenceList'](role, false);
     },
     setColorHover(i) {
       let table = {};
@@ -332,8 +328,6 @@ export default {
           break;
         case 5:
           text = '<p>Удалить индекс</p> ';
-          break;
-        default:
           break;
       }
       this.dataDelete.text = `${text} <span>${item.name}</span>`;

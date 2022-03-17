@@ -341,7 +341,10 @@ export default {
       elem: 'checkbox-list',
       items() {
         // this is modalSettings context
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element,
+        );
       },
       default: [],
     },
@@ -357,7 +360,10 @@ export default {
       description: 'X axis',
       elem: 'select',
       items() {
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element,
+        );
       },
     },
     {
@@ -382,7 +388,10 @@ export default {
       description: 'Y axis',
       elem: 'select',
       items() {
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element,
+        );
       },
     },
     {
@@ -407,7 +416,10 @@ export default {
       description: 'Значение ячейки',
       elem: 'select',
       items() {
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element,
+        );
       },
     },
     {
@@ -416,7 +428,10 @@ export default {
       description: 'metadata',
       elem: 'select',
       items() {
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element,
+        );
       },
     },
     {
@@ -425,7 +440,10 @@ export default {
       description: 'Поле для ссылки Детали',
       elem: 'select',
       items() {
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        return this.$store.getters.getAvailableTableTitles(
+          this.idDash,
+          this.element,
+        );
       },
     },
 
@@ -607,7 +625,7 @@ export default {
       ],
     },
   ],
-  reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
+  reporstElements: ['table', 'multiLine', 'piechart', 'graph', 'guntt', 'tile', 'csvg', 'ygraph', 'bush', 'map', 'heatmap', 'singleValue', 'tune'],
   reports: {
     table: {
       tooltip: 'Таблица',
@@ -659,7 +677,7 @@ export default {
     },
     tune: {
       tooltip: 'Ползунок',
-      icon: mdiNumeric,
+      icon: mdiTuneVertical,
     },
   },
 };

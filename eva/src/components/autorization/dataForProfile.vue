@@ -136,10 +136,6 @@ import { mdiMagnify } from '@mdi/js';
 
 export default {
   props: {
-    nameGroupFrom: {
-      type: String,
-      default: '',
-    },
     essence: {
       type: String,
       required: true,
@@ -157,8 +153,12 @@ export default {
       required: true,
     },
     dataFrom: {
-      type: [Promise, Object],
+      type: [Object, Promise],
       required: true,
+    },
+    nameGroupFrom: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -440,10 +440,7 @@ export default {
       this.getData();
     },
     translateToObj(array) {
-      if (array?.length > 0) {
-        return array.map((item) => ({ name: item }));
-      }
-      return [];
+      return array.map((item) => ({ name: item }));
     },
     deleteSelected(subj) {
       const { essence } = this;

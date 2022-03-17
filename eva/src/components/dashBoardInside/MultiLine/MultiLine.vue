@@ -44,43 +44,16 @@ import * as d3 from 'd3';
 export default {
   name: 'DashMultiLine',
   props: {
-    idFrom: {
-      type: String,
-      required: true,
-    },
-    idDashFrom: {
-      type: String,
-      required: true,
-    },
-    widthFrom: {
-      type: Number,
-      required: true,
-    },
-    heightFrom: {
-      type: Number,
-      required: true,
-    },
-    dataRestFrom: {
-      type: Array,
-      required: true,
-    },
-    dataModeFrom: {
-      type: Boolean,
-      required: true,
-    },
-    isFullScreen: {
-      type: Boolean,
-      required: true,
-    },
+    idFrom: String,
+    idDashFrom: String,
+    widthFrom: Number,
+    heightFrom: Number,
+    dataRestFrom: Array,
+    dataModeFrom: Boolean,
+    isFullScreen: Boolean,
     /** Props from Reports page. */
-    dataReport: {
-      type: Boolean,
-      required: true,
-    },
-    activeElemFrom: {
-      type: String,
-      required: true,
-    },
+    dataReport: Boolean,
+    activeElemFrom: String,
   },
   data: () => ({
     metrics: [],
@@ -149,56 +122,16 @@ export default {
         this.theme.$sea,
       ];
     },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
-      }
 
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
-    },
     strokeWidth() {
-      const { strokeWidth } = this.getOptions;
+      const { id, idDash } = this;
+      const { strokeWidth } = this.$store.getters.getOptions({ id, idDash });
       return strokeWidth ? Number(strokeWidth) : 1.5;
     },
 
     linkOptions() {
-      return this.getOptions;
+      const { id, idDash } = this;
+      return this.$store.getters.getOptions({ id, idDash });
     },
 
     change() {
@@ -226,9 +159,6 @@ export default {
     isOverlayBarplot() {
       return this.barplotstyle === 'overlay';
     },
-    getTockens() {
-      return this.$store.state[this.idDash].tockens;
-    },
   },
   watch: {
     linkOptions: {
@@ -247,16 +177,6 @@ export default {
     this.$store.commit('setActions', { id, idDash, actions });
   },
   methods: {
-    getMetricsMulti() {
-      if (!this.dashFromStore.metrics) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore,
-          prop: 'metrics',
-          value: [],
-        }]);
-      }
-      return this.dashFromStore.metrics;
-    },
     async setLegendItems(items = []) {
       const list = items.map((name, i) => ({
         name,
@@ -284,21 +204,19 @@ export default {
 
     getDataAsynchrony() {
       if (this.dataRestFrom.error) {
-        this.showErrorMessage(this.dataRestFrom.error);
-        return;
+        return this.showErrorMessage(this.dataRestFrom.error);
       }
 
       const firstDataRow = this.dataRestFrom[0];
-      let rowValue;
-      let firstDataRowKeys;
-      if (firstDataRow) {
-        firstDataRowKeys = Object.keys(firstDataRow);
-        rowValue = firstDataRow[firstDataRowKeys[0]];
-      }
+      const firstDataRowKeys = Object.keys(firstDataRow);
+      const rowValue = firstDataRow[firstDataRowKeys[0]];
 
       this.setNoData(false);
 
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        id: this.id,
+        idDash: this.idDash,
+      });
 
       const {
         metrics,
@@ -309,13 +227,10 @@ export default {
         isDataAlwaysShow = false,
         xAxisCaptionRotate = 0,
         barplotBarWidth = 0,
-        // eslint-disable-next-line camelcase
         type_line,
         timeFormat,
         color,
-        // eslint-disable-next-line camelcase
         conclusion_count,
-        // eslint-disable-next-line camelcase
         replace_count,
         barplotstyle = 'divided',
         axesCount,
@@ -332,10 +247,9 @@ export default {
       this.stringOX = stringOX;
 
       if (!this.stringOX && typeof rowValue !== 'number') {
-        this.showErrorMessage(
+        return this.showErrorMessage(
           'К сожалению, тип данных string не подходят к этому типу графика. Чтобы построить график, вы можете изменить значение "Ось X - строки" на "true" в настройках.',
         );
-        return;
       }
       if (this.stringOX) {
         this.isTime = false;
@@ -351,9 +265,6 @@ export default {
       const metricOptions = metrics ? [...metrics] : [];
 
       const render = () => {
-        // скрываем посказки при зуме
-        this.hideGraphTooltip();
-
         this.renderSVG(
           lastDot,
           isDataAlwaysShow,
@@ -368,8 +279,7 @@ export default {
       };
 
       if (this.legendList.length > 0) {
-        render();
-        return;
+        return render();
       }
 
       const metricList = firstDataRowKeys.filter(
@@ -377,10 +287,9 @@ export default {
       );
 
       if (metricList.length <= 0) {
-        this.showErrorMessage(
+        return this.showErrorMessage(
           'Данные не подходят для построения графика',
         );
-        return;
       }
 
       this.metrics = [...metricList];
@@ -393,7 +302,7 @@ export default {
     setClick(point, actionName) {
       const { id, idDash } = this;
       const store = this.$store;
-      const tokens = this.getTockens;
+      const tokens = this.$store.getters.getTockens(this.idDash);
 
       for (const {
         elem, action, name, capture,
@@ -408,14 +317,16 @@ export default {
           };
           const value = values[capture];
 
-          [tocken.filterParam] = Object.keys(this.dataRestFrom[0]);
+          tocken.filterParam = Object.keys(this.dataRestFrom[0])[0];
           this.$store.commit('setTocken', {
-            token: tocken, value, idDash, store,
+            tocken, value, idDash, store,
           });
         }
       }
 
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash,
+        element: id,
         event: 'onclick',
         partelement: 'point',
       });
@@ -432,30 +343,6 @@ export default {
           });
         }
       }
-    },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
     },
 
     checkExtraDot() {
@@ -626,7 +513,7 @@ export default {
       // this.zoom(x, yValue, selectRange, id)
     },
 
-    zoom(x, yValue, selectRange, id) {
+    zoom(x, yValue, selectRange = [], id) {
       const [rangeStart, rangeEnd] = selectRange;
 
       x.domain([x.invert(rangeStart), x.invert(rangeEnd)]);
@@ -759,7 +646,7 @@ export default {
         .duration(duration)
         .attr(
           'transform',
-          (d, j) => `translate(${dotLabelPos[j].x - 5}, ${dotLabelPos[j].y - 5})`,
+          (d, i) => `translate(${dotLabelPos[i].x - 5}, ${dotLabelPos[i].y - 5})`,
         );
 
       if (lastDotPos !== null) {
@@ -817,8 +704,6 @@ export default {
             .style('text-anchor', 'end')
             .attr('transform', 'rotate(-90) translate(-10, -13)');
           break;
-        default:
-          break;
       }
 
       return d3.max(captions.nodes().map((node) => node.getBBox().width));
@@ -830,13 +715,13 @@ export default {
       barplotBarWidth,
       metricOptions,
       yAxesBinding,
-      typeLine,
+      type_line,
       color = {},
       conclusion_count = {},
       replace_count = {},
     ) {
-      if (typeLine === undefined) {
-        typeLine = {};
+      if (type_line === undefined) {
+        type_line = {};
       }
 
       let hasBarplots = false;
@@ -854,7 +739,7 @@ export default {
       }
 
       this.clearSvgContainer();
-      const barWidth = parseInt(barplotBarWidth, 10) || 0;
+      const barWidth = parseInt(barplotBarWidth) || 0;
 
       hasBarplots = this.isAccumulationBarplot;
       if (!this.isUnitedMode) {
@@ -882,17 +767,14 @@ export default {
         if (type === 'double') {
           return '1, 3, 6, 3';
         }
-        // TODO: стрелочная функия должна чтото возвращать
-        return '1, 3, 6, 3';
       };
 
       const metricNamesCount = this.metricNames.length;
 
       if (metricNamesCount <= 0) {
-        this.showErrorMessage(
+        return this.showErrorMessage(
           'Ни одной метрики не найдено. Проверьте корректность данных.',
         );
-        return;
       }
 
       const { svgContainer, legendContainer } = this.$refs;
@@ -937,7 +819,7 @@ export default {
           .padding([0.1])
           .domain(groups);
 
-        if (parseInt(barplotBarWidth, 10)) {
+        if (parseInt(barplotBarWidth)) {
           x.padding([(x.bandwidth() - barplotBarWidth) / x.bandwidth()]).domain(
             groups,
           );
@@ -953,8 +835,8 @@ export default {
               .sort(),
           );
       } else {
-        const localBarWidth = parseInt(barplotBarWidth, 10) || 0;
-        const barOffset = (localBarWidth / 2) * 1.5;
+        const barWidth = parseInt(barplotBarWidth) || 0;
+        const barOffset = (barWidth / 2) * 1.5;
 
         if (hasBarplots) {
           x = d3
@@ -1031,6 +913,10 @@ export default {
         this.xAxis.attr('transform', `translate(0, ${this.height})`);
       }
 
+      this.brush = this.svg.append('g').attr('class', 'brush');
+
+      this.barplot = this.svg.append('g').attr('class', 'barplot');
+
       this.line = this.isUnitedMode
         ? this.svg.append('g').attr('clip-path', `url(#${clipPathID})`)
         : [];
@@ -1039,6 +925,18 @@ export default {
 
       const tooltip = d3.select(svgContainer).select('.graph-tooltip');
       const [tooltipBlock] = tooltip.nodes();
+
+      const lineDot = this.svg
+        .append('g')
+        .append('line')
+        .attr('class', 'line-dot')
+        .attr('x1', 0)
+        .attr('y1', 20)
+        .attr('x2', 0)
+        .attr('y2', this.height)
+        .attr('opacity', 0)
+        .attr('stroke', this.theme.$main_text)
+        .attr('stroke-dasharray', '3 3');
 
       const putLabel = (...args) => this.putLabelDot(x, ...args);
       const createAnnotation = (...args) => this.createAnnotationLine(x, ...args);
@@ -1053,10 +951,8 @@ export default {
       );
 
       const dataRestLength = this.dataRestFrom.length;
-      const minMetricsValues = this.metricNames
-        .map((item) => d3.min(this.dataRestFrom, (d) => d[item]));
-      const maxMetricsValues = this.metricNames
-        .map((item) => d3.max(this.dataRestFrom, (d) => d[item]));
+      const minMetricsValues = this.metricNames.map((item) => d3.min(this.dataRestFrom, (d) => d[item]));
+      const maxMetricsValues = this.metricNames.map((item) => d3.max(this.dataRestFrom, (d) => d[item]));
 
       const dataRest = [...this.dataRestFrom];
 
@@ -1075,282 +971,152 @@ export default {
           (name) => yAxesBinding.metricTypes[name] === 'barplot',
         );
 
-        const metricNames = this.isAccumulationBarplot ? this.metricNames.filter((x, i) => i === 0) : this.metricNames;
+        if (this.isAccumulationBarplot) {
+          this.renderAccumulationBarplot(x, barplotBarWidth);
+        } else {
+          this.metricNames.forEach((metricName, metricIndex) => {
+            const isBarplotMetric = yAxesBinding.metricTypes[metricName] === 'barplot';
+            const minVal = isBarplotMetric ? 0 : minMetricsValues[metricIndex];
+            const maxVal = barplotMetrics.length
+              ? maxAllY
+              : maxMetricsValues[metricIndex];
 
-        metricNames.forEach((metricName, metricIndex) => {
-          const isBarplotMetric = yAxesBinding.metricTypes[metricName] === 'barplot';
-          const minVal = isBarplotMetric ? 0 : minMetricsValues[metricIndex];
-          const maxVal = barplotMetrics.length
-            ? maxAllY
-            : maxMetricsValues[metricIndex];
+            const extra = (val) => Math.abs((val * 10) / 100);
 
-          const extra = (val) => Math.abs((val * 10) / 100);
+            const yScale = d3
+              .scaleLinear()
+              .range([this.height, 20])
+              .domain([minVal - extra(minVal), maxVal + extra(maxVal)]);
 
-          const yScale = d3
-            .scaleLinear()
-            .range([this.height, 20])
-            .domain([minVal - extra(minVal), maxVal + extra(maxVal)]);
+            yScales.push(yScale);
 
-          yScales.push(yScale);
+            const yAxisClass = `yAxis-${metricName}`;
 
-          const yAxisClass = `yAxis-${metricName}`;
-
-          const yDomainArr = [
-            Math.round(minVal - extra(minVal)),
-            Math.round(
-              (maxVal - minVal + 2 * extra(maxVal)) / 3
+            const yDomainArr = [
+              Math.round(minVal - extra(minVal)),
+              Math.round(
+                (maxVal - minVal + 2 * extra(maxVal)) / 3
                   + minVal
                   - extra(minVal),
-            ),
-            Math.round(
-              ((maxVal - minVal + 2 * extra(maxVal)) / 3) * 2
+              ),
+              Math.round(
+                ((maxVal - minVal + 2 * extra(maxVal)) / 3) * 2
                   + minVal
                   - extra(minVal),
-            ),
-            Math.round(maxVal + extra(maxVal)),
-          ];
-          const yRangeArr = [
-            this.height,
-            ((this.height - 20) / 3) * 2 + 20,
-            (this.height - 20) / 3 + 20,
-            20,
-          ];
+              ),
+              Math.round(maxVal + extra(maxVal)),
+            ];
+            const yRangeArr = [
+              this.height,
+              ((this.height - 20) / 3) * 2 + 20,
+              (this.height - 20) / 3 + 20,
+              20,
+            ];
 
-          const yScal = d3.scaleOrdinal().domain(yDomainArr).range(yRangeArr);
+            const yScal = d3.scaleOrdinal().domain(yDomainArr).range(yRangeArr);
 
-          const subgroups = [...this.metricNames];
-
-          // stack the data? --> stack per subgroup
-          const stackedData = d3.stack().keys(subgroups)(this.dataRestFrom);
-
-          // Add Y axis
-          let maxY = [];
-          for (let i = 0; i < stackedData.length; i++) {
-            maxY.push(Math.max(...stackedData[i].map((item) => item[1])));
-          }
-          maxY = Math.max(...maxY);
-          const y = d3
-            .scaleLinear()
-            .domain([0, maxY * 1.05])
-            .range([this.height, 0]);
-
-          if (
-            yAxesBinding.axesCount === 1
+            if (
+              yAxesBinding.axesCount === 1
               || yAxesBinding.metrics[metricName] === 'left'
-          ) {
-            let translateY;
-            if (numberLeft === 0) {
-              translateY = 0;
-            } else if (numberLeft % 2 !== 0) {
-              translateY = ((numberLeft + 1) / 2) * 10;
-            } else {
-              translateY = -(numberLeft / 2) * 10;
-            }
-
-            if (!this.isAccumulationBarplot) {
+            ) {
+              let translateY;
+              if (numberLeft === 0) {
+                translateY = 0;
+              } else if (numberLeft % 2 !== 0) {
+                translateY = ((numberLeft + 1) / 2) * 10;
+              } else {
+                translateY = -(numberLeft / 2) * 10;
+              }
               this.svg
                 .append('g')
                 .attr('transform', `translate(0, ${translateY})`)
                 .attr('class', yAxisClass)
                 .call(d3.axisLeft(yScal));
+
+              if (numberLeft !== 0) {
+                this.svg
+                  .selectAll(`g.${yAxisClass} g.tick line`)
+                  .style('visibility', 'hidden');
+                this.svg
+                  .selectAll(`g.${yAxisClass} .domain`)
+                  .style('visibility', 'hidden');
+              } else {
+                this.svg
+                  .selectAll(`g.${yAxisClass} g.tick`)
+                  .append('line')
+                  .attr('class', 'grid-line-y')
+                  .attr('x1', 0)
+                  .attr('y1', 0)
+                  .attr('x2', this.width)
+                  .attr('y2', 0)
+                  .attr('stroke', this.theme.$main_text)
+                  .style('opacity', 0.3);
+              }
+              numberLeft++;
             } else {
+              let translateY;
+              if (numberRight === 0) {
+                translateY = 0;
+              } else if (numberRight % 2 !== 0) {
+                translateY = ((numberRight + 1) / 2) * 10;
+              } else {
+                translateY = -(numberRight / 2) * 10;
+              }
               this.svg
                 .append('g')
-                .attr('transform', `translate(0, ${translateY})`)
+                .attr('transform', `translate( ${this.width}, ${translateY})`)
                 .attr('class', yAxisClass)
-                .call(d3.axisLeft(y));
-            }
-
-            if (numberLeft !== 0) {
-              this.svg
-                .selectAll(`g.${yAxisClass} g.tick line`)
-                .style('visibility', 'hidden');
-              this.svg
-                .selectAll(`g.${yAxisClass} .domain`)
-                .style('visibility', 'hidden');
-            } else {
-              this.svg
-                .selectAll(`g.${yAxisClass} g.tick`)
-                .append('line')
-                .attr('class', 'grid-line-y')
-                .attr('x1', 0)
-                .attr('y1', 0)
-                .attr('x2', this.width)
-                .attr('y2', 0)
-                .attr('stroke', this.theme.$main_text)
-                .style('opacity', 0.3);
-            }
-            numberLeft++;
-          } else {
-            let translateY;
-            if (numberRight === 0) {
-              translateY = 0;
-            } else if (numberRight % 2 !== 0) {
-              translateY = ((numberRight + 1) / 2) * 10;
-            } else {
-              translateY = -(numberRight / 2) * 10;
+                .call(d3.axisRight(yScal));
+              if (numberRight !== 0) {
+                this.svg
+                  .selectAll(`g.${yAxisClass} g.tick line`)
+                  .style('visibility', 'hidden');
+                this.svg
+                  .selectAll(`g.${yAxisClass} .domain`)
+                  .style('visibility', 'hidden');
+              } else {
+                this.svg
+                  .selectAll(`g.${yAxisClass} g.tick`)
+                  .append('line')
+                  .attr('class', 'grid-line-y')
+                  .attr('x1', 0)
+                  .attr('y1', 0)
+                  .attr('x2', -this.width)
+                  .attr('y2', 0)
+                  .attr('stroke', this.theme.$main_text)
+                  .style('opacity', 0.3);
+              }
+              numberRight++;
             }
 
             this.svg
-              .append('g')
-              .attr('transform', `translate( ${this.width}, ${translateY})`)
-              .attr('class', yAxisClass)
-              .call(d3.axisRight(yScal));
-            if (numberRight !== 0) {
-              this.svg
-                .selectAll(`g.${yAxisClass} g.tick line`)
-                .style('visibility', 'hidden');
-              this.svg
-                .selectAll(`g.${yAxisClass} .domain`)
-                .style('visibility', 'hidden');
-            } else {
-              this.svg
-                .selectAll(`g.${yAxisClass} g.tick`)
-                .append('line')
-                .attr('class', 'grid-line-y')
-                .attr('x1', 0)
-                .attr('y1', 0)
-                .attr('x2', -this.width)
-                .attr('y2', 0)
-                .attr('stroke', this.theme.$main_text)
-                .style('opacity', 0.3);
-            }
-            numberRight++;
-          }
+              .selectAll(`g.${yAxisClass} g.tick text`)
+              .attr('fill', this.legendColors[metricIndex]);
 
-          this.svg
-            .selectAll(`g.${yAxisClass} g.tick text`)
-            .attr('fill', this.legendColors[metricIndex]);
+            if (yAxesBinding.metricTypes[metricName] === 'barplot') {
+              const thisMetrics = [...this.metrics];
+              let allDotHover = [];
 
-          if (metricIndex === 0) {
-            this.brush = this.svg.append('g').attr('class', 'brush');
+              const barPostfix = this.isFullScreen ? '-full' : '';
+              const getBarID = (i) => `bar--${this.id}--${metricName}--${i}--${barPostfix}`;
+              let barWidth = parseInt(barplotBarWidth);
+              if (!barplotBarWidth || barWidth <= 0) {
+                barWidth = d3
+                  .scaleBand()
+                  .range([0, this.width])
+                  .domain(
+                    this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
+                  )
+                  .bandwidth();
+              }
 
-            this.barplot = this.svg.append('g').attr('class', 'barplot');
-          }
-
-          const lineDot = this.svg
-            .append('g')
-            .append('line')
-            .attr('class', 'line-dot')
-            .attr('x1', 0)
-            .attr('y1', 20)
-            .attr('x2', 0)
-            .attr('y2', this.height)
-            .attr('opacity', 0)
-            .attr('stroke', this.theme.$main_text)
-            .attr('stroke-dasharray', '3 3');
-
-          if (yAxesBinding.metricTypes[metricName] === 'barplot') {
-            const thisMetrics = [...this.metrics];
-            let allDotHover = [];
-
-            const barPostfix = this.isFullScreen ? '-full' : '';
-            const getBarID = (i) => `bar--${this.id}--${metricName}--${i}--${barPostfix}`;
-            let barWidth = parseInt(barplotBarWidth);
-            if (!barplotBarWidth || barWidth <= 0) {
-              barWidth = d3
-                .scaleBand()
-                .range([0, this.width])
-                .domain(
-                  this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
-                )
-                .bandwidth();
-              barWidth -= 8;
-            }
-
-            let dividedBarplotPos = 0;
-
-            if ((this.isDividedBarplot && this.metricNames.length)) {
-              barWidth /= barplotMetrics.length;
-              dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth
+              let dividedBarplotPos = 0;
+              if (this.isDividedBarplot && this.metricNames.length) {
+                barWidth /= barplotMetrics.length;
+                dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth
                   - ((barplotMetrics.length - 1) / 2) * barWidth;
-            }
+              }
 
-            if (this.isAccumulationBarplot) {
-              barWidth = x.bandwidth();
-              dividedBarplotPos = barplotMetrics.indexOf(metricName) * barWidth
-                  - ((barplotMetrics.length - 1) / 2) * barWidth;
-
-              const colorItem = d3.scaleOrdinal().domain(subgroups).range(this.legendColors);
-
-              this.barplot
-                .append('g')
-                .selectAll('g')
-                .data(stackedData)
-                .enter()
-                .append('g')
-                .attr('fill', (d) => colorItem(d.key))
-                .selectAll('rect')
-                .data((d) => d)
-                .enter()
-                .append('rect')
-                .attr('x', (d) => x(this.isTime ? d.data[this.xMetric] * 1000 : d.data[this.xMetric]) + dividedBarplotPos)
-                .attr('y', (d) => y(d[1]))
-                .attr('height', (d) => y(d[0]) - y(d[1]))
-                .attr('width', x.bandwidth())
-                .attr('transform', function () {
-                  const translate = this.width.baseVal.value / 2;
-                  return `translate(-${translate}, 0)`;
-                })
-                .on('mouseenter', function (d) {
-                  const rectX = +d3.select(this).attr('x');
-
-                  const values = d.data;
-                  const date = new Date(values[this.xMetric] * this.secondTransf);
-                  const xVal = !this.isTime
-                    ? values[this.xMetric]
-                    : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
-                  tooltip.html(
-                    thisMetrics.reduce((prev, cur) => {
-                      const value = cur === this.xMetric ? xVal : values[cur];
-                      return `${prev}<p><span>${cur}</span>: ${value}</p>`;
-                    }, ''),
-                  );
-                  tooltip.style('opacity', 1).style('visibility', 'visible');
-
-                  lineDot
-                    .attr('x1', rectX)
-                    .attr('x2', rectX)
-                    .attr('opacity', 0.7);
-                  tooltip.style('opacity', 1).style('visibility', 'visible');
-                })
-                .on('mousemove', () => {
-                  const { offsetX, offsetY } = d3.event;
-                  const tooltipWidth = tooltipBlock.offsetWidth;
-                  const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
-
-                  if (brushObj.mouseDown) brushObj.selectionMove();
-
-                  let left = offsetX + 20;
-                  let top = offsetY - tooltipHalfHeight;
-
-                  if (this.isFullScreen) {
-                    left = offsetX - 50;
-                  } else if (left + tooltipWidth > width + margin.left + 15 && !this.isFullScreen) {
-                    left = left - tooltipWidth - 20;
-                  }
-
-                  if (top + tooltipHalfHeight > height) {
-                    top -= tooltipHalfHeight;
-                  }
-
-                  tooltip.style('left', `${left}px`).style('top', `${top}px`);
-                })
-                .on('mouseleave', function () {
-                  if (!this.getAttribute('data-last-bar')) {
-                    allDotHover.forEach((dot) => {
-                      if (extraDot.indexOf(dot.__data__) === -1) {
-                        dot.style.opacity = 0;
-                      }
-                      if (dot.getAttribute('data-with-caption')) {
-                        dot.style.opacity = 1;
-                      }
-                    });
-                  }
-                  lineDot.attr('opacity', 0);
-                  tooltip.style('opacity', 0).style('visibility', 'hidden');
-                });
-            } else {
               this.barplot
                 .selectAll(`bar-${metricName}`)
                 .data(this.dataRestFrom)
@@ -1419,32 +1185,32 @@ export default {
                     .filter((dot) => {
                       if (
                         dot.classList.contains('dot')
-                              && dot.__data__[xMetric]
-                              === d[xMetric] * secondTransf
-                              && dot.__data__[dot.getAttribute('metric')] !== null
+                        && dot.__data__[xMetric]
+                          === d[xMetric] * secondTransf
+                        && dot.__data__[dot.getAttribute('metric')] !== null
                       ) {
                         dot.style.opacity = 1;
                         return dot;
                       }
                     });
+
                   lineDot
                     .attr('x1', rectX)
                     .attr('x2', rectX)
                     .attr('opacity', 0.7);
                   tooltip.style('opacity', 1).style('visibility', 'visible');
                 })
-                .on('mousemove', function () {
+                .on('mousemove', () => {
                   const { offsetX, offsetY } = d3.event;
                   const tooltipWidth = tooltipBlock.offsetWidth;
                   const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
 
                   if (brushObj.mouseDown) brushObj.selectionMove();
+
                   let left = offsetX + 20;
                   let top = offsetY - tooltipHalfHeight;
 
-                  if (this.isFullScreen) {
-                    left = offsetX - 50;
-                  } else if (left + tooltipWidth > width + margin.left + 15 && !this.isFullScreen) {
+                  if (left + tooltipWidth > width + margin.left + 15) {
                     left = left - tooltipWidth - 20;
                   }
 
@@ -1457,7 +1223,6 @@ export default {
                 .on('mouseleave', function () {
                   if (!this.getAttribute('data-last-bar')) {
                     allDotHover.forEach((dot) => {
-                      // eslint-disable-next-line no-underscore-dangle
                       if (extraDot.indexOf(dot.__data__) === -1) {
                         dot.style.opacity = 0;
                       }
@@ -1470,272 +1235,262 @@ export default {
                   tooltip.style('opacity', 0).style('visibility', 'hidden');
                 });
             }
-          }
 
-          if (
-            yAxesBinding.metricTypes[metricName] === 'linechart'
+            if (
+              yAxesBinding.metricTypes[metricName] === 'linechart'
               || yAxesBinding.metricTypes[metricName] === undefined
-          ) {
-            const linesWithBreak = [];
-            let dotDate;
-            let nullValue = -1;
-            let allDotHover = [];
-            let onelinesWithBreak = [];
+            ) {
+              const linesWithBreak = [];
+              let dotDate;
+              let nullValue = -1;
+              let allDotHover = [];
+              let onelinesWithBreak = [];
 
-            extraDot.forEach((item, j) => {
-              if (metricName === item.column) nullValue = j;
-            });
-
-            if (nullValue !== -1) {
-              dotDate = [extraDot[nullValue]];
-            } else {
-              this.dataRestFrom.forEach((line) => {
-                if (!Number(line[metricName]) && line[metricName] !== 0) {
-                  if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
-                  linesWithBreak.push(onelinesWithBreak);
-                  onelinesWithBreak = [];
-                } else {
-                  onelinesWithBreak.push(line);
-                }
+              extraDot.forEach((item, j) => {
+                if (metricName === item.column) nullValue = j;
               });
 
-              if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
-
-              linesWithBreak.push(onelinesWithBreak);
-              this.allLinesWithBreak.push(linesWithBreak);
-
-              linesWithBreak.forEach((lineItself, lineIndex) => {
-                this.line
-                  .append('path')
-                  .datum(lineItself)
-                  .attr('class', `line-${metricIndex}-${lineIndex}`)
-                  .attr('fill', color[metricName] || 'none')
-                  .attr(
-                    'stroke',
-                    color[metricName] || this.legendColors[metricIndex],
-                  )
-                  .attr('stroke-width', this.strokeWidth)
-                  .style(
-                    'stroke-dasharray',
-                    getStyleLine(typeLine[metricName]),
-                  )
-                  .attr(
-                    'd',
-                    d3
-                      .line()
-                      .x((d) => (this.isTime
-                        ? x(d[xMetric] * this.secondTransf)
-                        : x(d[xMetric])))
-                      .y((d) => yScale(d[metricName])),
-                  );
-              });
-
-              dotDate = this.dataRestFrom;
-            }
-
-            this.svg
-              .append('g')
-              .selectAll('dot')
-              .data(dotDate)
-              .enter()
-              .append('circle')
-              .attr('class', `dot dot-${metricIndex} ${this.isFullScreen ? 'full' : ''}`)
-              .attr('cx', (d) => (this.isTime
-                ? x(d[xMetric] * this.secondTransf)
-                : x(d[xMetric])))
-              .attr('cy', (d) => yScale(d[metricName]))
-              .attr('r', 5)
-              .attr('metric', metricName)
-              .attr('fill', this.legendColors[metricIndex])
-              .style('opacity', function (d, j) {
-                let opacity = nullValue !== -1 ? 1 : 0;
-
-                const count = Number(conclusion_count[metricName]);
-                const replaceCount = Number(replace_count[metricName]);
-
-                let hasTooltip = true;
-                const isNumber = typeof count === 'number';
-                if (isNumber && count > 1) {
-                  hasTooltip = j % count === 0;
-                }
-                if (isNumber && count <= 0) {
-                  hasTooltip = false;
-                }
-
-                mustSee.forEach((item) => {
-                  if (item[metricName] === d[metricName]) opacity = 1;
-                });
-
-                const setLabel = (attr, classText, metricText) => {
-                  putLabel(
-                    attr,
-                    classText,
-                    d,
-                    yScale(d[metricName]) - 5,
-                    metricText,
-                    this,
-                    'line',
-                    brushObj,
-                    replaceCount,
-                  );
-                };
-
-                if (
-                  isDataAlwaysShow
-                    && isDataAlwaysShow === 'data'
-                    && hasTooltip
-                ) {
-                  opacity = 1;
-                  setLabel(
-                    'data-always-dot',
-                    `data-always-dot-text-${metricName}`,
-                    metricName,
-                  );
-                }
-
-                if (
-                  isDataAlwaysShow
-                    && isDataAlwaysShow === 'caption'
-                    && hasTooltip
-                ) {
-                  opacity = 1;
-                  setLabel(
-                    'data-always-dot',
-                    `data-always-dot-text-${metricName}`,
-                    `_${metricName}_caption`,
-                  );
-                }
-
-                if (isLastDotShow && j === dataRestLength - 1) {
-                  opacity = 1;
-                  setLabel(
-                    'data-last-dot',
-                    `last-dot-text-${metricName}`,
-                    metricName,
-                  );
-                }
-
-                annotationList.forEach((annotation, i) => {
-                  if (d[annotation]) {
-                    createAnnotation(
-                      d,
-                      annotation,
-                      metricNamesCount + 1 + i,
-                      tooltip,
-                    );
+              if (nullValue !== -1) {
+                dotDate = [extraDot[nullValue]];
+              } else {
+                this.dataRestFrom.forEach((line) => {
+                  if (!Number(line[metricName]) && line[metricName] !== 0) {
+                    if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
+                    linesWithBreak.push(onelinesWithBreak);
+                    onelinesWithBreak = [];
+                  } else {
+                    onelinesWithBreak.push(line);
                   }
                 });
 
-                return opacity;
-              })
-              .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
-              .on('mouseup', () => brushObj.selectionUp())
-              .on('mousedown', () => brushObj.selectionDown())
-              .on('mouseenter', function (d) {
-                const date = new Date(d[xMetric] * secondTransf);
-                let day = date.getDate();
-                let month = date.getMonth() + 1;
-                const year = date.getFullYear();
-                if (day < 10) day = `0${day}`;
-                if (month < 10) month = `0${month}`;
+                if (onelinesWithBreak.length === 1) mustSee.push(onelinesWithBreak[0]);
 
-                const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric];
-                tooltip.html(
-                  Object.keys(d).reduce((prev, cur) => {
-                    let value = '';
-                    if (cur === xMetric) value = xVal;
-                    else if (cur.indexOf('annotation') === -1) value = d[cur];
-                    return `${prev}<p><span>${cur}</span>:: ${value}</p>`;
-                  }, ''),
-                );
+                linesWithBreak.push(onelinesWithBreak);
+                this.allLinesWithBreak.push(linesWithBreak);
 
-                const cx = d3.select(this).attr('cx');
-                const cy = d3.select(this).attr('cy');
-
-                // const classDot = d3.select(this).attr('class')
-                //     .split(' ')
-                //     .find((item) => item === 'full');
-
-                const [mouseX, mouseY] = d3.mouse(this);
-                const diffX = Math.ceil(mouseX) - d3.event.offsetX;
-                const diffY = Math.ceil(mouseY) - d3.event.offsetY;
-
-                const tooltipWidth = tooltipBlock.offsetWidth;
-                const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
-
-                let left = cx - diffX + 20;
-                let top = cy - diffY - tooltipHalfHeight;
-
-                if (left + tooltipWidth > width - diffX) {
-                  left = left - tooltipWidth - 25;
-                }
-                // if (classDot) {
-                //   left = left - tooltipWidth - 25 + 150;
-                // } else {
-                //   left = left - tooltipWidth - 25;
-                // }
-
-                if (top + tooltipHalfHeight > height) {
-                  top -= tooltipHalfHeight;
-                }
-
-                tooltip.style('left', `${left}px`).style('top', `${top}px`);
-
-                allDotHover = svg
-                  .selectAll('circle')
-                  .nodes()
-                  .filter((dot) => {
-                    if (
-                      dot.classList.contains('dot')
-                        && dot.__data__[dot.getAttribute('metric')] !== null
-                        && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
-                    ) {
-                      dot.style.opacity = 1;
-                      return dot;
-                    }
-                  });
-
-                this.style.opacity = 1;
-                lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
-                tooltip.style('opacity', 1).style('visibility', 'visible');
-              })
-              .on('mousemove', () => {
-                if (brushObj.mouseDown) brushObj.selectionMove();
-              })
-              .on('mouseleave', function (d) {
-                let opacity = 1;
-
-                if (!this.getAttribute('data-last-dot')) {
-                  allDotHover.forEach((dot) => {
-                    if (extraDot.indexOf(dot.__data__) === -1) {
-                      dot.style.opacity = 0;
-                    }
-                    if (
-                      dot.getAttribute('data-with-caption')
-                        || dot.getAttribute('data-always-dot')
-                    ) {
-                      dot.style.opacity = 1;
-                    }
-                  });
-                  opacity = nullValue === -1 ? 0 : opacity;
-                }
-
-                if (
-                  this.getAttribute('data-with-caption')
-                    || this.getAttribute('data-always-dot')
-                ) opacity = 1;
-
-                mustSee.forEach((item) => {
-                  if (item[metricName] === d[metricName]) opacity = 1;
+                linesWithBreak.forEach((lineItself, lineIndex) => {
+                  this.line
+                    .append('path')
+                    .datum(lineItself)
+                    .attr('class', `line-${metricIndex}-${lineIndex}`)
+                    .attr('fill', color[metricName] || 'none')
+                    .attr(
+                      'stroke',
+                      color[metricName] || this.legendColors[metricIndex],
+                    )
+                    .attr('stroke-width', this.strokeWidth)
+                    .style(
+                      'stroke-dasharray',
+                      getStyleLine(type_line[metricName]),
+                    )
+                    .attr(
+                      'd',
+                      d3
+                        .line()
+                        .x((d) => (this.isTime
+                          ? x(d[xMetric] * this.secondTransf)
+                          : x(d[xMetric])))
+                        .y((d) => yScale(d[metricName])),
+                    );
                 });
 
-                this.style.opacity = opacity;
-                lineDot.attr('opacity', 0);
-                tooltip.style('opacity', 0).style('visibility', 'hidden');
-              });
-          }
-        });
-        // }
+                dotDate = this.dataRestFrom;
+              }
+
+              this.svg
+                .append('g')
+                .selectAll('dot')
+                .data(dotDate)
+                .enter()
+                .append('circle')
+                .attr('class', `dot dot-${metricIndex}`)
+                .attr('cx', (d) => (this.isTime
+                  ? x(d[xMetric] * this.secondTransf)
+                  : x(d[xMetric])))
+                .attr('cy', (d) => yScale(d[metricName]))
+                .attr('r', 5)
+                .attr('metric', metricName)
+                .attr('fill', this.legendColors[metricIndex])
+                .style('opacity', function (d, j) {
+                  let opacity = nullValue !== -1 ? 1 : 0;
+
+                  const count = Number(conclusion_count[metricName]);
+                  const replaceCount = Number(replace_count[metricName]);
+
+                  let hasTooltip = true;
+                  const isNumber = typeof count === 'number';
+                  if (isNumber && count > 1) {
+                    hasTooltip = j % count === 0;
+                  }
+                  if (isNumber && count <= 0) {
+                    hasTooltip = false;
+                  }
+
+                  mustSee.forEach((item) => {
+                    if (item[metricName] === d[metricName]) opacity = 1;
+                  });
+
+                  const setLabel = (attr, classText, metricText) => {
+                    putLabel(
+                      attr,
+                      classText,
+                      d,
+                      yScale(d[metricName]) - 5,
+                      metricText,
+                      this,
+                      'line',
+                      brushObj,
+                      replaceCount,
+                    );
+                  };
+
+                  if (
+                    isDataAlwaysShow
+                    && isDataAlwaysShow === 'data'
+                    && hasTooltip
+                  ) {
+                    opacity = 1;
+                    setLabel(
+                      'data-always-dot',
+                      `data-always-dot-text-${metricName}`,
+                      metricName,
+                    );
+                  }
+
+                  if (
+                    isDataAlwaysShow
+                    && isDataAlwaysShow === 'caption'
+                    && hasTooltip
+                  ) {
+                    opacity = 1;
+                    setLabel(
+                      'data-always-dot',
+                      `data-always-dot-text-${metricName}`,
+                      `_${metricName}_caption`,
+                    );
+                  }
+
+                  if (isLastDotShow && j === dataRestLength - 1) {
+                    opacity = 1;
+                    setLabel(
+                      'data-last-dot',
+                      `last-dot-text-${metricName}`,
+                      metricName,
+                    );
+                  }
+
+                  annotationList.forEach((annotation, i) => {
+                    if (d[annotation]) {
+                      createAnnotation(
+                        d,
+                        annotation,
+                        metricNamesCount + 1 + i,
+                        tooltip,
+                      );
+                    }
+                  });
+
+                  return opacity;
+                })
+                .on('click', (d) => this.setClick({ x: d[xMetric], y: d[metricName] }, 'click'))
+                .on('mouseup', () => brushObj.selectionUp())
+                .on('mousedown', () => brushObj.selectionDown())
+                .on('mouseenter', function (d) {
+                  const date = new Date(d[xMetric] * secondTransf);
+                  let day = date.getDate();
+                  let month = date.getMonth() + 1;
+                  const year = date.getFullYear();
+                  if (day < 10) day = `0${day}`;
+                  if (month < 10) month = `0${month}`;
+
+                  const xVal = isTime ? `${day}-${month}-${year}` : d[xMetric];
+                  tooltip.html(
+                    Object.keys(d).reduce((prev, cur) => {
+                      let value = '';
+                      if (cur === xMetric) value = xVal;
+                      else if (cur.indexOf('annotation') === -1) value = d[cur];
+                      return `${prev}<p><span>${cur}</span>:: ${value}</p>`;
+                    }, ''),
+                  );
+
+                  const cx = d3.select(this).attr('cx');
+                  const cy = d3.select(this).attr('cy');
+
+                  const [mouseX, mouseY] = d3.mouse(this);
+                  const diffX = Math.ceil(mouseX) - d3.event.offsetX;
+                  const diffY = Math.ceil(mouseY) - d3.event.offsetY;
+
+                  const tooltipWidth = tooltipBlock.offsetWidth;
+                  const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
+
+                  let left = cx - diffX + 20;
+                  let top = cy - diffY - tooltipHalfHeight;
+
+                  if (left + tooltipWidth > width - diffX) {
+                    left = left - tooltipWidth - 25;
+                  }
+
+                  if (top + tooltipHalfHeight > height) {
+                    top -= tooltipHalfHeight;
+                  }
+
+                  tooltip.style('left', `${left}px`).style('top', `${top}px`);
+
+                  allDotHover = svg
+                    .selectAll('circle')
+                    .nodes()
+                    .filter((dot) => {
+                      if (
+                        dot.classList.contains('dot')
+                        && dot.__data__[dot.getAttribute('metric')] !== null
+                        && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
+                      ) {
+                        dot.style.opacity = 1;
+                        return dot;
+                      }
+                    });
+
+                  this.style.opacity = 1;
+                  lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
+                  tooltip.style('opacity', 1).style('visibility', 'visible');
+                })
+                .on('mousemove', () => {
+                  if (brushObj.mouseDown) brushObj.selectionMove();
+                })
+                .on('mouseleave', function (d) {
+                  let opacity = 1;
+
+                  if (!this.getAttribute('data-last-dot')) {
+                    allDotHover.forEach((dot) => {
+                      if (extraDot.indexOf(dot.__data__) === -1) {
+                        dot.style.opacity = 0;
+                      }
+                      if (
+                        dot.getAttribute('data-with-caption')
+                        || dot.getAttribute('data-always-dot')
+                      ) {
+                        dot.style.opacity = 1;
+                      }
+                    });
+                    opacity = nullValue === -1 ? 0 : opacity;
+                  }
+
+                  if (
+                    this.getAttribute('data-with-caption')
+                    || this.getAttribute('data-always-dot')
+                  ) opacity = 1;
+
+                  mustSee.forEach((item) => {
+                    if (item[metricName] === d[metricName]) opacity = 1;
+                  });
+
+                  this.style.opacity = opacity;
+                  lineDot.attr('opacity', 0);
+                  tooltip.style('opacity', 0).style('visibility', 'hidden');
+                });
+            }
+          });
+        }
 
         const sortedBars = bars.sort((a, b) => a.height - b.height);
 
@@ -1812,7 +1567,7 @@ export default {
           brushObj.selections = this.brush.selectAll('.selection').nodes();
           brushObj.selections.forEach((sel) => sel.remove());
         };
-        return;
+        return null;
       }
 
       const step = ((this.height - 20) / metricNamesCount).toFixed(5);
@@ -1845,30 +1600,24 @@ export default {
             .attr('y2', step * metricIndex + 20)
             .attr('opacity', 0.3)
             .attr('stroke', color[metric] || this.theme.$main_text)
-            .style('stroke-dasharray', getStyleLine(typeLine[metric]));
+            .style('stroke-dasharray', getStyleLine(type_line[metric]));
         }
 
         const foundOptions = metricOptions.find((o) => o.name === metric);
         const options = foundOptions || {};
         const optionsKeys = Object.keys(options);
 
-        let minY;
-        if (optionsKeys.length === 0) {
-          minY = minMetricsValues[metricIndex];
-        } else {
-          minY = options.manual
+        const minY = optionsKeys.length === 0
+          ? minMetricsValues[metricIndex]
+          : options.manual
             ? minMetricsValues[metricIndex]
             : parseFloat(options.lowborder);
-        }
 
-        let maxY;
-        if (optionsKeys.length === 0) {
-          maxY = maxMetricsValues[metricIndex];
-        } else {
-          maxY = options.manual
+        const maxY = optionsKeys.length === 0
+          ? maxMetricsValues[metricIndex]
+          : options.manual
             ? maxMetricsValues[metricIndex]
             : parseFloat(options.upborder);
-        }
 
         const maxYTop = maxY + 0.1 * Math.abs(maxY);
         const minYBottom = minY - 0.1 * Math.abs(minY);
@@ -1884,16 +1633,16 @@ export default {
             .range([yRangeStart, startY[metricIndex]]),
         );
 
-        let tickValues;
-        if (minYBottom === maxYTop) {
-          tickValues = [minYBottom];
-        } else {
-          tickValues = minYBottom < 0
+        const tickValues = minYBottom === maxYTop
+          ? [minYBottom]
+          : minYBottom < 0
             ? [minYBottom, 0, maxYTop]
             : [minYBottom, maxYTop];
-        }
 
-        const metricUnits = this.getMetricsMulti();
+        const metricUnits = this.$store.getters.getMetricsMulti({
+          id: this.id,
+          idDash: this.idDash,
+        });
 
         this.svg
           .append('g')
@@ -1903,7 +1652,7 @@ export default {
               .axisLeft(y[metricIndex])
               .tickValues(tickValues)
               .tickFormat(
-                (z) => `${z} ${
+                (x) => `${x} ${
                   metricUnits[metricIndex]
                     ? metricUnits[metricIndex].units
                     : ''
@@ -1911,7 +1660,7 @@ export default {
               ),
           )
           .selectAll('.tick > text')
-          .each(() => {
+          .each(function () {
             const w = this.getBBox().width;
             if (w > maxLength) maxLength = w;
           });
@@ -1923,18 +1672,13 @@ export default {
           .select('text')
           .nodes();
         textNodes.forEach((node, i) => {
-          let value;
-          if (textNodes.length > 1) {
-            if (i === 0) {
-              value = -5;
-            } else {
-              value = i === textNodes.length - 1
+          const value = textNodes.length > 1
+            ? i === 0
+              ? -5
+              : i === textNodes.length - 1
                 ? 5
-                : 0;
-            }
-          } else {
-            value = 5;
-          }
+                : 0
+            : 5;
           node.style.transform = `translateY(${value}px)`;
         });
 
@@ -1987,7 +1731,7 @@ export default {
                 .attr('fill', color[metric] || 'none')
                 .attr('stroke', color[metric] || this.legendColors[metricIndex])
                 .attr('stroke-width', this.strokeWidth)
-                .style('stroke-dasharray', getStyleLine(typeLine[metric]))
+                .style('stroke-dasharray', getStyleLine(type_line[metric]))
                 .attr(
                   'd',
                   d3
@@ -2009,7 +1753,7 @@ export default {
                 .attr('opacity', '.3')
                 .attr('stroke', color[metric] || this.theme.$main_text)
                 .attr('stroke-dasharray', '3 3')
-                .style('stroke-dasharray', getStyleLine(typeLine[metric]));
+                .style('stroke-dasharray', getStyleLine(type_line[metric]));
             }
           }
 
@@ -2030,7 +1774,7 @@ export default {
           .attr('r', 5)
           .attr('metric', metric)
           .attr('fill', color[metric] || this.legendColors[metricIndex])
-          .style('stroke-dasharray', getStyleLine(typeLine[metric]))
+          .style('stroke-dasharray', getStyleLine(type_line[metric]))
           .style('opacity', function (d, j) {
             let opacity = nullValue !== -1 ? 1 : 0;
 
@@ -2142,10 +1886,16 @@ export default {
             allDotHover = svg
               .selectAll('circle')
               .nodes()
-              .filter((dot) => dot.classList.contains('dot')
-              // eslint-disable-next-line no-underscore-dangle
+              .filter((dot) => {
+                if (
+                  dot.classList.contains('dot')
                   && dot.__data__[dot.getAttribute('metric')] !== null
-                  && dot.getAttribute('cx') === x(d[xMetric] * secondTransf));
+                  && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
+                ) {
+                  dot.style.opacity = 1;
+                  return dot;
+                }
+              });
 
             this.style.opacity = 1;
             lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
@@ -2154,12 +1904,11 @@ export default {
           .on('mousemove', () => {
             if (brushObj.mouseDown) brushObj.selectionMove();
           })
-          .on('mouseleave', (d) => {
+          .on('mouseleave', function (d) {
             let opacity = 1;
 
             if (!this.getAttribute('data-last-dot')) {
               allDotHover.forEach((dot) => {
-                // eslint-disable-next-line no-underscore-dangle
                 if (extraDot.indexOf(dot.__data__) === -1) {
                   dot.style.opacity = 0;
                 }
@@ -2275,7 +2024,7 @@ export default {
 
         // }
         if (optionsKeys.length > 0 && options.type === 'Bar chart') {
-          let localAllDotHover = [];
+          let allDotHover = [];
 
           x = this.isTime
             ? d3
@@ -2291,9 +2040,7 @@ export default {
               .scaleBand()
               .range([0, this.width])
               .domain(
-                this.dataRestFrom.map((d) => (this.isTime
-                  ? d[xMetric] * this.secondTransf
-                  : d[xMetric])),
+                this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
               );
 
           this.svg
@@ -2302,16 +2049,16 @@ export default {
             .style('opacity', 0)
             .call(d3.axisBottom(x));
 
-          const localCutData = this.dataRestFrom.filter(
+          const cutData = this.dataRestFrom.filter(
             (item) => item[options.name] >= minY && item[options.name] <= maxY,
           );
 
-          const localThisMetrics = [...this.metrics];
+          const thisMetrics = [...this.metrics];
           const isNegative = minY < 0;
 
           this.line[metricIndex]
             .selectAll(`bar-${metricIndex}`)
-            .data(localCutData)
+            .data(cutData)
             .enter()
             .append('rect')
             .attr('x', (d) => (this.isTime ? x(d[xMetric] * this.secondTransf) : x(d[xMetric])))
@@ -2333,15 +2080,13 @@ export default {
                   .scaleBand()
                   .range([0, this.width])
                   .domain(
-                    this.dataRestFrom.map((d) => (this.isTime
-                      ? d[xMetric] * this.secondTransf
-                      : d[xMetric])),
+                    this.dataRestFrom.map((d) => (this.isTime ? d[xMetric] * this.secondTransf : d[xMetric])),
                   )
                   .bandwidth();
               }
               return barplotBarWidth;
             })
-            .attr('height', (d, j) => {
+            .attr('height', function (d, j) {
               const setLabel = (attr, classText, metricText) => {
                 putLabel(
                   attr,
@@ -2354,7 +2099,7 @@ export default {
                 );
               };
 
-              if (isLastDotShow && j === localCutData.length - 1) {
+              if (isLastDotShow && j === cutData.length - 1) {
                 setLabel('data-last-bar', 'last-bar-text', options.name);
               }
 
@@ -2372,14 +2117,14 @@ export default {
                 ? Math.abs(y[metricIndex](d[options.name]) - y[metricIndex](0))
                 : startY[metricIndex + 1] - y[metricIndex](d[options.name]);
             })
-            .attr('transform', (d, j) => {
+            .attr('transform', function (d, j) {
               const w = this.width.baseVal.value;
               let translate = j === 0 ? 0 : w / 2;
               if (j === dataRest.length - 1) translate = w;
               return `translate(-${translate}, 0)`;
             })
             .on('click', (d) => this.setClick({ x: d[xMetric], y: d[options.name] }, 'click'))
-            .on('mouseenter', (d) => {
+            .on('mouseenter', function (d) {
               const date = new Date(d[xMetric] * secondTransf);
               let day = date.getDate();
               if (day < 10) day = `0${day}`;
@@ -2390,7 +2135,7 @@ export default {
               const xVal = !isTime ? d[xMetric] : `${day}-${month}-${year}`;
 
               tooltip.html(
-                localThisMetrics.reduce((prev, cur) => {
+                thisMetrics.reduce((prev, cur) => {
                   const value = cur === xMetric ? xVal : d[cur];
                   return `${prev}<p><span>${cur}</span>: ${value}</p>`;
                 }, ''),
@@ -2398,14 +2143,19 @@ export default {
 
               const rectX = +d3.select(this).attr('x');
 
-              localAllDotHover = svg
+              allDotHover = svg
                 .selectAll('circle')
                 .nodes()
-                .filter((dot) => dot.classList.contains('dot')
-                // eslint-disable-next-line no-underscore-dangle
+                .filter((dot) => {
+                  if (
+                    dot.classList.contains('dot')
                     && dot.__data__[xMetric] === d[xMetric] * secondTransf
-                // eslint-disable-next-line no-underscore-dangle
-                    && dot.__data__[dot.getAttribute('metric')] !== null);
+                    && dot.__data__[dot.getAttribute('metric')] !== null
+                  ) {
+                    dot.style.opacity = 1;
+                    return dot;
+                  }
+                });
 
               lineDot.attr('x1', rectX).attr('x2', rectX).attr('opacity', 0.7);
               tooltip.style('opacity', 1).style('visibility', 'visible');
@@ -2428,10 +2178,9 @@ export default {
 
               tooltip.style('left', `${left}px`).style('top', `${top}px`);
             })
-            .on('mouseleave', () => {
+            .on('mouseleave', function () {
               if (!this.getAttribute('data-last-bar')) {
-                localAllDotHover.forEach((dot) => {
-                  // eslint-disable-next-line no-underscore-dangle
+                allDotHover.forEach((dot) => {
                   if (extraDot.indexOf(dot.__data__) === -1) {
                     dot.style.opacity = 0;
                   }
@@ -2448,10 +2197,69 @@ export default {
 
       this.svg.attr('transform', `translate(${maxLength + 15}, ${margin.top})`);
     },
-    hideGraphTooltip() {
+
+    renderAccumulationBarplot(x) {
+      // List of subgroups = header of the csv files = soil condition here
+      const subgroups = [...this.metricNames];
+
+      // stack the data? --> stack per subgroup
+      const stackedData = d3.stack().keys(subgroups)(this.dataRestFrom);
+
+      // Add Y axis
+      let maxY = [];
+      for (let i = 0; i < stackedData.length; i++) {
+        maxY.push(Math.max(...stackedData[i].map((item) => item[1])));
+      }
+      maxY = Math.max(...maxY);
+      const y = d3
+        .scaleLinear()
+        .domain([0, maxY * 1.05])
+        .range([this.height, 0]);
+      this.svg.append('g').call(d3.axisLeft(y));
+
+      // color palette = one color per subgroup
+      const color = d3.scaleOrdinal().domain(subgroups).range(this.legendColors);
+
       const { svgContainer } = this.$refs;
       const tooltip = d3.select(svgContainer).select('.graph-tooltip');
-      tooltip.style('opacity', 0).style('visibility', 'hidden');
+      const thisMetrics = [...this.metrics];
+      this.svg
+        .append('g')
+        .selectAll('g')
+        .data(stackedData)
+        .enter()
+        .append('g')
+        .attr('fill', (d) => color(d.key))
+        .selectAll('rect')
+        .data((d) => d)
+        .enter()
+        .append('rect')
+        .attr('x', (d) => x(this.isTime ? d.data[this.xMetric] * 1000 : d.data[this.xMetric]))
+        .attr('y', (d) => y(d[1]))
+        .attr('height', (d) => y(d[0]) - y(d[1]))
+        .attr('width', x.bandwidth())
+        .on('mouseover', function (d) {
+          const values = d.data;
+          const date = new Date(values[this.xMetric] * this.secondTransf);
+          const xVal = !this.isTime
+            ? values[this.xMetric]
+            : `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+          tooltip.html(
+            thisMetrics.reduce((prev, cur) => {
+              const value = cur === this.xMetric ? xVal : values[cur];
+              return `${prev}<p><span>${cur}</span>: ${value}</p>`;
+            }, ''),
+          );
+          tooltip.style('opacity', 1).style('visibility', 'visible');
+        })
+        .on('mousemove', function () {
+          tooltip
+            .style('left', `${d3.mouse(this)[0] + 90}px`)
+            .style('top', `${d3.mouse(this)[1]}px`);
+        })
+        .on('mouseleave', () => {
+          tooltip.style('opacity', 0).style('visibility', 'hidden');
+        });
     },
   },
 };

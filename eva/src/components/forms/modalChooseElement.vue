@@ -55,21 +55,28 @@
           </v-btn>
         </v-card-actions>
       </v-card>
+      <!-- <div class="warning-block" :style="{background:color.backElement}">
+                    <div class="warning-text"  :style="{color:color.text}">Такой DashBoard существует. Хотите заменить его?</div>
+                    <div class="btn-warning">
+                        <v-btn small :color="color.controls" class="warning-btn" @click="yesDashBoards">Да</v-btn>
+                        <v-btn small :color="color.controlsActive" class="warning-btn" @click="noDashBoards">Нет</v-btn>
+                    </div>
+        </div> -->
     </div>
   </v-dialog>
 </template>
 
 <script>
 import {
-  mdiFormatListBulleted, mdiFormatTextVariant, mdiNumeric, mdiRadioboxMarked,
+  mdiFormatTextVariant,
+  mdiNumeric,
+  mdiFormatListBulleted,
+  mdiRadioboxMarked,
 } from '@mdi/js';
 
 export default {
   props: {
-    modalFrom: {
-      type: Boolean,
-      default: false,
-    },
+    modalFrom: null,
   },
   data() {
     return {
@@ -82,8 +89,8 @@ export default {
       choose: {},
     };
   },
-  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
   computed: {
+    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
     modal() {
       return this.modalFrom;
     },
@@ -93,21 +100,28 @@ export default {
       this.$emit('setElement', this.choose);
       this.cancelModal();
     },
-    // функция для выбора одного элемента из списка
     selectElem(event) {
+      // функция для выбора одного элемента из списка
+
       let elem = event.target;
 
       while (!elem.classList.contains('element')) {
         elem = event.target.parentElement;
       }
-      // пробегаемся по всем элементам
-      // и отключаем  обводку
       this.$refs.elemBlock.childNodes.forEach((item) => {
-        item.style = 'box-shadow: none';
+        // пробегаемся по всем элементам
+        item.style = 'box-shadow: none'; // и отключаем  обводку
       });
       elem.style = 'box-shadow: 0px 0px 4px 3px  #FF6D70';
       const name = elem.querySelector('.element-name').textContent;
-      this.choose = this.elements.filter((item) => item.name === name);
+      const result = this.elements.filter((item) => item.name == name);
+      this.choose = result;
+      //   let elem = event.target.parentElement; // получаем родителя в котором находятся все элементы
+      //   elem.parentElement.childNodes.forEach( item => {  // пробегаемся по всем элементам
+      //       item.style = 'box-shadow: none';  // и отключаем  обводку
+      //   });
+      //   this.currentId = elem.querySelector('.search-id').innerHTML; // затем получаем текст всего ИС который выбрали
+      //   elem.style = `box-shadow: 0px 0px 4px 3px  ${this.color.controlsActive}`;  // и делаем ему обводку
     },
     cancelModal() {
       this.$emit('hideForm');

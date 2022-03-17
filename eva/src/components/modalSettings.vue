@@ -5,7 +5,7 @@
     :is-confirm="isChanged"
     :persistent="isChanged"
     :theme="theme"
-    @cancelModal="checkOnCancel"
+    @cancelModal="cancelModal"
   >
     <div class="settings-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -644,7 +644,7 @@
                   () => {
                     colorsPie.nametheme =
                       colorsPie.theme === 'custom' ? '' : colorsPie.theme;
-                    colorsPie.colors = themes[colorsPie.theme].join(' ');
+                    colorsPie.colors = themes[colorsPie.theme].join(',');
                   }
                 "
                 @input="isChanged = true"
@@ -960,23 +960,12 @@
 
 <script>
 import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
-import settings from '../js/componentsSettings';
+import settings from '../js/componentsSettings.js';
 
 export default {
   name: 'ModalSettings',
-  model: {
-    prop: 'modalValue',
-    event: 'changeModalValue',
-  },
   props: {
-    modalValue: {
-      type: Boolean,
-      default: false,
-    },
-    idDashFrom: {
-      type: String,
-      required: true,
-    },
+    idDashFrom: null,
   },
   data() {
     return {
@@ -1023,42 +1012,13 @@ export default {
     };
   },
   computed: {
-    dashFromStore() {
-      return this.$store.state[this.idDash];
-    },
-    // получаем объект с настройками моадлки натсроек
-    getModalSettings() {
-      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
-        this.$store.commit('setState', [
-          {
-            object: this.dashFromStore,
-            prop: 'modalSettings',
-            value: {},
-          },
-        ]);
-        this.$store.commit('setState', [
-          {
-            object: this.dashFromStore.modalSettings,
-            prop: 'element',
-            value: '',
-          },
-          {
-            object: this.dashFromStore.modalSettings,
-            prop: 'status',
-            value: false,
-          },
-        ]);
-      }
-      return this.dashFromStore.modalSettings;
-    },
     active: {
       get() {
-        return this.dashFromStore.modalSettings.status;
+        return this.$store.getters.getModalSettings(this.idDash).status;
       },
       set(value) {
-        this.$store.commit('setModalSettings', {
-          idDash: this.idDash,
-          element: this.element,
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
           status: value,
         });
       },
@@ -1078,37 +1038,21 @@ export default {
       if (!this.element) {
         return [];
       }
-      const [elem] = this.element.split('-');
-      if (elem) {
-        return this.optionsByComponents[elem] || [];
-      }
-      return [];
+      const elem = this.element.split('-')[0];
+      return elem ? this.optionsByComponents[elem] || [] : [];
     },
     changeComponent() {
       return `${this.idDash}-${this.element}`;
     },
     element() {
-      return this.getModalSettings.element;
+      return this.$store.getters.getModalSettings(this.idDash).element;
     },
     // поля элемента данных
     titles() {
-      return this.elementFromStore?.availableTableTitles;
-    },
-    elementFromStore() {
-      return this.$store.state[this.idDash][this.element];
-    },
-    getSelectedTableTitles() {
-      return this.elementFromStore?.selectedTableTitles;
-    },
-    getMetricsMulti() {
-      if (!this.elementFromStore.metrics) {
-        this.$store.commit('setState', [{
-          object: this.elementFromStore,
-          prop: 'metrics',
-          value: [],
-        }]);
-      }
-      return this.elementFromStore.metrics;
+      return this.$store.getters.getAvailableTableTitles(
+        this.idDash,
+        this.element,
+      );
     },
   },
   watch: {
@@ -1121,9 +1065,12 @@ export default {
       },
     },
   },
-  created() {
+  mounted() {
     this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
-    this.metricsName = this.getMetricsMulti;
+    this.metricsName = this.$store.getters.getMetricsMulti({
+      idDash: this.idDash,
+      id: this.element,
+    });
     this.loadComponentsSettings();
     this.prepareOptions();
   },
@@ -1173,8 +1120,8 @@ export default {
       };
       this.isChanged = true;
     },
-    // отправляем настройки в хранилище
-    async setOptions() {
+    setOptions: async function () {
+      // отправляем настройки в хранилище
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1192,6 +1139,7 @@ export default {
         this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
       }
       if (this.element.indexOf('piechart') !== -1) {
+        this.$set(this.options, 'metricsRelation', { ...this.metricsRelation });
         this.options.metricsRelation = JSON.parse(
           JSON.stringify(this.metricsRelation),
         );
@@ -1201,7 +1149,7 @@ export default {
             this.$set(
               this.themes,
               this.colorsPie.nametheme,
-              this.colorsPie.colors.split(' '),
+              this.colorsPie.colors.split(',')
             );
             if (
               this.colorsPie.theme !== 'custom'
@@ -1232,7 +1180,7 @@ export default {
         color: this.color,
         updated: Date.now(),
       };
-      this.$store.dispatch('saveSettingsToPath', {
+      await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
         options,
@@ -1242,22 +1190,20 @@ export default {
       }
       this.cancelModal();
     },
-    cancelModal() {
-      this.active = false;
-      this.checkOnCancel();
-    },
     // если нажали на отмену создания
-    checkOnCancel() {
+    cancelModal() {
+      this.$store.dispatch('closeModalSettings', { path: this.idDash });
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
         this.them = {};
         this.options.themes = this.themes;
         this.isDelete = false;
+        // this.setOptions();
       }
     },
     checkEsc(event) {
       if (event.code === 'Escape') {
-        this.checkOnCancel();
+        this.cancelModal();
       }
     },
     checkOptions(option, relation) {
@@ -1285,7 +1231,7 @@ export default {
       }
       return this.optionsItems.includes(option);
     },
-    addIntoTooltip(item) {
+    addIntoTooltip: function (item) {
       this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.push('');
@@ -1295,7 +1241,7 @@ export default {
         this.tooltip.buttons.push({ name: '', id: '' });
       }
     },
-    addMetrics() {
+    addMetrics: function () {
       this.isChanged = true;
       const arr = JSON.parse(JSON.stringify(this.metrics));
       arr.push({
@@ -1307,7 +1253,7 @@ export default {
       });
       this.$set(this, 'metrics', arr);
     },
-    deleteFromTooltip(item, i) {
+    deleteFromTooltip: function (item, i) {
       this.isChanged = true;
       if (item === 'text') {
         this.tooltip.texts.splice(i, 1);
@@ -1320,13 +1266,6 @@ export default {
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
-    getSettingsByPath() {
-      this.$store.commit('prepareSettingsStore', {
-        path: this.idDash,
-        element: this.element,
-      });
-      return this.$store.state[this.idDash][this.element]?.options || {};
-    },
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
@@ -1337,7 +1276,6 @@ export default {
         });
       }
     },
-    //  понимает какие опции нужно вывести
     async prepareOptions() {
       await this.$store.dispatch('getSettingsByPath', {
         path: this.idDash,
@@ -1387,12 +1325,14 @@ export default {
               this.metricUnits[metric.name] = metric.units;
               //
               if (
-                options.yAxesBinding
-                && options.yAxesBinding.metrics
-                && options.yAxesBinding.metricTypes
+                options.yAxesBinding &&
+                options.yAxesBinding.metrics &&
+                options.yAxesBinding.metricTypes
               ) {
-                this.multilineYAxesBinding.metrics[metric.name] = options.yAxesBinding.metrics[metric.name];
-                this.multilineYAxesBinding.metricTypes[metric.name] = options.yAxesBinding.metricTypes[metric.name];
+                this.multilineYAxesBinding.metrics[metric.name] =
+                  options.yAxesBinding.metrics[metric.name];
+                this.multilineYAxesBinding.metricTypes[metric.name] =
+                  options.yAxesBinding.metricTypes[metric.name];
               } else {
                 this.multilineYAxesBinding.metrics[metric.name] = 'left';
                 this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
@@ -1438,27 +1378,34 @@ export default {
                 let val = options[item];
                 if (!val) {
                   // old settings
-                  const oldVal = this.getSelectedTableTitles;
+                  let oldVal = this.$store.getters.getSelectedTableTitles(
+                    this.idDash,
+                    this.element
+                  );
                   if (oldVal) {
                     val = oldVal;
                   }
                 }
                 // если не выбраны заголовки то выделить все имеющиеся
                 if (val.length === 0) {
-                  const allTitles = this.titles;
+                  let allTitles = this.$store.getters.getAvailableTableTitles(
+                    this.idDash,
+                    this.element
+                  );
                   if (allTitles.length) {
                     val = [...allTitles];
                   }
                 }
                 localOptions[item] = val || [];
               } else {
-                const val = options[item] !== null && typeof options[item] === 'object'
-                  ? { ...options[item] }
-                  : options[item];
+                let val =
+                  options[item] !== null && typeof options[item] === 'object'
+                    ? { ...options[item] }
+                    : options[item];
                 localOptions[item] = val;
               }
             } else {
-              const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+              let propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;
               } else if (item === 'showlegend') {
@@ -1467,7 +1414,7 @@ export default {
                 localOptions[item] = 'right';
               } else {
                 const field = settings.optionFields.find(
-                  (field) => field.option === item,
+                  (field) => field.option === item
                 );
                 if (field && field.default !== undefined) {
                   localOptions[item] = field.default;
@@ -1479,7 +1426,6 @@ export default {
         if (!localOptions?.change) {
           localOptions.change = false;
         }
-
         localOptions = { ...this.loadComponentsSettings(), ...localOptions };
         this.$set(this, 'options', localOptions);
       });
@@ -1488,11 +1434,10 @@ export default {
       const nextTheme = this.defaultThemes[0];
       this.$set(this.colorsPie, 'theme', nextTheme);
       this.$set(this.colorsPie, 'nametheme', nextTheme);
-      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(' '));
+      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(','));
       this.$set(this.options, 'colorsPie', this.colorsPie);
       this.$set(this.options, 'themes', this.themes);
       delete this.themes[theme];
-      this.isDelete = true;
     },
     deleteTheme() {
       this.options.colorsPie = this.colorsPie;

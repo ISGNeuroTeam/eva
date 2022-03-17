@@ -311,38 +311,45 @@ export default {
   mounted() {
     document.title = 'EVA | Исследование данных';
     this.search = this.$store.getters.getReportSearch;
-    if (this.search.original_otl !== '') {
+    if (this.search.original_otl != '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
         id: 'table',
         status: true,
       });
     }
+    // this.calcSize();
     this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode === 13) {
+      if (event.ctrlKey && event.keyCode == 13) {
         this.launchSearch();
       }
     });
+    this.$refs.report.addEventListener('click', (event) => {
+      if (!event.target.classList.contains('static-row')) {
+        this.showStatistic = false;
+      }
+    });
+    this.unitedData.color = this.theme.controls;
   },
   methods: {
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',
-        '\n|',
+        '\n' + '|',
       );
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '\n\n|',
-        '\n|',
+        '\n\n' + '|',
+        '\n' + '|',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '|\n',
+        '|' + '\n',
         '| ',
       );
       this.search.original_otl = this.search.original_otl.replaceAll(
-        '| \n',
+        '| ' + '\n',
         '| ',
       );
     },

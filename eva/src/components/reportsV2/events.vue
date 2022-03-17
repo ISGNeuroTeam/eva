@@ -25,7 +25,9 @@
               :color="theme.$main_text"
               @click="expand(!isExpanded)"
             >
-              {{ isExpanded ? mdiChevronDown : mdiChevronRight }}
+              {{
+                isExpanded ? mdiChevronDown : mdiChevronRight
+              }}
             </v-icon>
           </td>
           <td class="text-xs-right">
@@ -33,27 +35,34 @@
           </td>
           <td class="text-xs-right">
             {{ item.inputCount }}
+            <!--            <br />-->
+            <!--            <div v-if="isExpanded">-->
+            <!--              <div v-for="(value, name) in item.inputCount">-->
+            <!--                <span v-if="name != '_time'" :style="{color: theme.$raspberry}">{{ name }}: </span>-->
+            <!--                <span v-if="name != '_time'" :style="{color: theme.$forest}">{{ value }}</span>-->
+            <!--              </div>-->
+            <!--            </div>-->
           </td>
         </tr>
       </template>
 
-      <template v-slot:expanded-item="elem">
+      <template v-slot:expanded-item="{ headers, item }">
         <td
-          :colspan="elem.headers.length"
+          :colspan="headers.length"
           class="collapse-row"
         >
           <div style="margin-left: 216px">
             <div
-              v-for="(value, name) in elem.item.inputCount"
+              v-for="(value, name) in item.inputCount"
               :key="name"
             >
               <span
-                v-if="name !== '_time'"
+                v-if="name != '_time'"
                 :style="{ color: theme.$raspberry }"
               >{{ name }}:
               </span>
               <span
-                v-if="name !== '_time'"
+                v-if="name != '_time'"
                 :style="{ color: theme.$forest }"
               >{{
                 value
@@ -86,10 +95,7 @@ import {
 
 export default {
   props: {
-    data: {
-      type: Array,
-      default: () => ([]),
-    },
+    data: Array,
   },
   data() {
     return {
@@ -131,13 +137,13 @@ export default {
           year: 'numeric',
         };
         dataset.push({
-          // eslint-disable-next-line no-underscore-dangle
           time: new Date(item._time * 1000).toLocaleString('ru', options),
           inputCount: item,
           id,
         });
-        id += 1;
+        id++;
       });
+      console.log(dataset);
       return dataset;
     },
   },
@@ -166,6 +172,9 @@ export default {
       border-bottom: none !important
   td
     font-size: 13px !important
+    //border-bottom: none !important
+    &:last-child
+      //border-bottom: none !important
   tr:hover
     color: $main_bg
     background-color: $accent_ui_color !important

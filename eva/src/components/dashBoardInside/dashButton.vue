@@ -47,30 +47,12 @@
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: {
-      type: String,
-      required: true,
-    }, // id элемнета (table, graph-2)
-    idDashFrom: {
-      type: String,
-      required: true,
-    }, // id дашборда
-    colorFrom: {
-      type: Object,
-      required: true,
-    }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
-    dataModeFrom: {
-      type: Boolean,
-      required: true,
-    },
+    idFrom: null, // id элемнета (table, graph-2)
+    idDashFrom: null, // id дашборда
+    colorFrom: null, // цветовые переменные
+    widthFrom: null, // ширина родительского компонента
+    heightFrom: null, // выоста родительского компонента
+    dataModeFrom: null,
   },
   data() {
     return {
@@ -104,52 +86,15 @@ export default {
       }
       return 0;
     },
-    dashFromStore() {
-      return this.$store.state[this.idDash][this.id];
-    },
-    getOptions() {
-      if (!this.idDash) {
-        return [];
-      }
-      if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
-      return this.dashFromStore.options;
-    },
     fontSize() {
-      const { fontSize } = this.getOptions;
-      return fontSize ? fontSize.split('px')[0] : '30';
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
+      if (options.fontSize) {
+        return options.fontSize.split('px')[0];
+      }
+      return '30';
     },
     underlineWidth() {
       let width = 30;
@@ -163,7 +108,10 @@ export default {
       return width;
     },
     updatedOptions() {
-      return this.getOptions;
+      return this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
     },
   },
   watch: {
@@ -186,7 +134,10 @@ export default {
   },
   methods: {
     updateOptionsData() {
-      const options = this.getOptions;
+      const options = this.$store.getters.getOptions({
+        idDash: this.idDash,
+        id: this.id,
+      });
       if (options.color) {
         this.optionsData.colorText = options.color;
       } else {
@@ -210,21 +161,21 @@ export default {
     },
     actionOpen(targetLink, header, widthPersent, heightPersent) {
       // размер нового окна
-      const width = window.screen.width * widthPersent;
-      const height = window.screen.height * heightPersent;
+      const _width = screen.width * widthPersent;
+      const _height = screen.height * heightPersent;
 
       // устанавливаем положение нового окна.
-      const left = (window.screen.width - window.screen.width * widthPersent) / 2;
-      const top = (window.screen.height - window.screen.height * heightPersent) / 3;
+      const _left = (screen.width - screen.width * widthPersent) / 2;
+      const _top = (screen.height - screen.height * heightPersent) / 3;
 
       // адрес перехода
-      const link = `${window.location.origin}/dashboards/${targetLink}${
+      const _link = `${window.location.origin}/dashboards/${targetLink}${
         header === 'false' || header === '0' ? '?header=false' : ''
       }`;
       window.open(
-        link,
+        _link,
         '',
-        `width=${width}, height=${height}, top=${top}, left=${left}`,
+        `width=${_width}, height=${_height}, top=${_top}, left=${_left}`,
       );
     },
     createReport(item, type) {
@@ -235,32 +186,8 @@ export default {
         this.getData(sid, '', type);
       });
     },
-    getEvents({ event, partelement }) {
-      let result = [];
-      if (!this.$store.state[this.idDash].events) {
-        this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
-          prop: 'events',
-          value: [],
-        }]);
-        return [];
-      }
-      if (partelement) {
-        result = this.$store.state[this.idDash].events.filter((item) => (
-          item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
-        ));
-      } else {
-        result = this.$store.state[this.idDash].events.filter(
-          (item) => item.event === event
-            && item.target === this.id,
-        );
-      }
-      return result;
-    },
     setClick() {
-      const { tockens } = this.$store.state[this.idDash];
+      const tockens = this.$store.getters.getTockens(this.idDash);
       let tocken = {};
       let value = false;
 
@@ -285,12 +212,10 @@ export default {
             case false:
               value = true;
               break;
-            default:
-              break;
           }
 
           this.$store.commit('setTocken', {
-            token: tocken,
+            tocken,
             idDash: this.idDash,
             value,
             store: this.$store,
@@ -298,8 +223,10 @@ export default {
         }
       });
 
-      const events = this.getEvents({
+      const events = this.$store.getters.getEvents({
+        idDash: this.idDash,
         event: 'onclick',
+        element: this.id,
         partelement: 'empty',
       });
       if (events.length !== 0) {
@@ -354,7 +281,7 @@ export default {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('data', JSON.stringify(data));
-      const result = await this.$store.dispatch('getPaper', formData);
+      const result = await this.$store.getters.getPaper(formData);
       try {
         if (result.status === 'success') {
           this.$emit('setLoading', false);
@@ -363,10 +290,8 @@ export default {
           return false;
         }
       } catch (error) {
-
         // this.message(`Ошибка: ${error}`);
       }
-      return false;
     },
     getSearch(search, sid) {
       let csvContent = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла
@@ -384,19 +309,16 @@ export default {
       link.remove(); // удаляем ссылку
     },
     getData(sid, file, type) {
-      // создаем blob объект чтобы с его помощью использовать функцию для web worker
       const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
-      });
+      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
 
-      // создаем ссылку из нашего blob ресурса
-      const blobURL = window.URL.createObjectURL(blob);
+      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
 
-      // создаем новый worker и передаем ссылку на наш blob объект
-      const worker = new Worker(blobURL);
+      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
 
-      // при успешном выполнении функции что передали в blob изначально сработает этот код
       worker.onmessage = function (event) {
+        // при успешном выполнении функции что передали в blob изначально сработает этот код
         if (event.data.length !== 0) {
           // this.data = event.data;
           if (type === 'report') {
@@ -415,10 +337,10 @@ export default {
       worker.postMessage(`${this.idDash}-${sid}`); // запускаем воркер на выполнение
     },
     getDataFromDb() {
-      return function ({ data }) {
+      return function (event) {
         let db = null;
 
-        const searchSid = data;
+        const searchSid = event.data;
 
         const request = indexedDB.open('EVA', 1);
 
@@ -447,11 +369,9 @@ export default {
           query.onsuccess = () => {
             // (4)
             if (query.result) {
-              // сообщение которое будет передаваться как результат выполнения функции
-              self.postMessage(query.result);
+              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
             } else {
-              // сообщение которое будет передаваться как результат выполнения функции
-              self.postMessage([]);
+              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
             }
           };
         };
