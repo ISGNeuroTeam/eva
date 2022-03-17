@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed Piechart. Custom themes color set reset
 - fixed gis
 - fixed multiline
+- fixed piechart chunk selection syncing
 
 ## [1.84.0]
 
