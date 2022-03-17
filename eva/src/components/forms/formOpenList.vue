@@ -76,83 +76,103 @@ export default {
     };
   },
   computed: {
+    // id шаблона
     idForm() {
-      // id шаблона
       return this.$route.params.id;
     },
+    // имя шаблона
     nameForm() {
-      // имя шаблона
       return this.$route.query.name;
     },
   },
   mounted() {
-    this.getForms(this.idForm); // при обновлениии страницы получаем список всех форм по новой
+    // при обновлениии страницы получаем список всех форм по новой
+    this.getForms(this.idForm);
   },
   methods: {
+    // получаем список всех форм данного шаблона
     async getForms(id) {
-      // получаем список всех форм данного шаблона
-      const forms = await this.$store.getters['form/getAllForm'](id); // собственно сам список
-      this.forms = forms; // заносим список в переменную
-      this.loading = false; // отключаем загрузку
+      const forms = await this.$store.dispatch('form/getAllForm', id); // собственно сам список
+      // заносим список в переменную
+      this.forms = forms;
+      // отключаем загрузку
+      this.loading = false;
     },
+    // получаем структуру шаблона
     async getTemplate(idForm) {
-      // получаем структуру шаблона
-      const form = await this.$store.getters['form/getTemplate'](idForm);
+      const form = await this.$store.dispatch('form/getTemplate', idForm);
       return form;
     },
+    // получаем контент конкретной формы
     async getAllContent(ids) {
-      // получаем контент конкретной формы
-      const form = await this.$store.getters['form/getFormContent'](ids);
+      const form = await this.$store.dispatch('form/getFormContent', ids);
       return form;
     },
+    // открываем уже существующию форму
     async openForm(name, event) {
-      // открываем уже существующию форму
-      let element = event.target.parentElement; // получаем родителя элемента на который щелкнули
+      // получаем родителя элемента на который щелкнули
+      let element = event.target.parentElement;
+      // и пока не "всплывем" до нужного нам родителя
       while (!element.classList.contains('v-list-item')) {
-        // и пока не "всплывем" до нужного нам родителя
-        element = element.parentElement; // обновляем переменную в которой будет нужный нам элемент
+        // обновляем переменную в которой будет нужный нам элемент
+        element = element.parentElement;
       }
-      element = element.querySelector('.loading-bar'); // ищем внутри нашего родителя нужный блок
-      element.classList.add('loading'); // и добовляем ему видимость загрузки
-      const form = await this.getTemplate(this.idForm); // получаем шаблон из базы данных
-      this.$store.commit('form/setTemplate', form.cells); // и заносим его в локальное хранилище
+      // ищем внутри нашего родителя нужный блок
+      element = element.querySelector('.loading-bar');
+      // и добовляем ему видимость загрузки
+      element.classList.add('loading');
+      // получаем шаблон из базы данных
+      const form = await this.getTemplate(this.idForm);
+      // и заносим его в локальное хранилище
+      this.$store.commit('form/setTemplate', form.cells);
+      // получаем контент из базы данных
       const content = await this.getAllContent({
         idTemplate: this.idForm,
         idForm: name[0],
-      }); // получаем контент из базы данных
-      content.splice(content.length - 2, 2); // отсекаем два послдених значения ибо это передается мета информация вроде id формы
-      const contentObj = {}; // но нам нужно сохранить в локальное хранилище объект, а не массив
+      });
+      // отсекаем два послдених значения ибо это передается мета информация вроде id формы
+      content.splice(content.length - 2, 2);
+      // но нам нужно сохранить в локальное хранилище объект, а не массив
+      const contentObj = {};
+      // пробегаемся по всему массиву
       content.forEach((item, i) => {
-        // пробегаемся по всему массиву
         if (Number(item)) {
           contentObj[i] = Number(item);
         } else {
           contentObj[i] = item;
         }
       });
-      this.$store.commit('form/setAllContent', contentObj); // заносим контент в локальное хранилище
-      element.classList.remove('loading'); // удаляем класс с загрузкой
+      // заносим контент в локальное хранилище
+      this.$store.commit('form/setAllContent', contentObj);
+      // удаляем класс с загрузкой
+      element.classList.remove('loading');
+      // переходим на страницу редактирования формы
       this.$router.push(
         `/forms/edit?editable=false&id=${this.idForm}&nameForm=${name[1]}`,
-      ); // переходим на страницу редактирования формы
+      );
     },
+    // мтеод создающий новую форму
     async createFormTemplate(event) {
-      // мтеод создающий новую форму
       let formBlock = event.target;
       while (!formBlock.classList.contains('form-block')) {
         formBlock = formBlock.parentElement;
       }
       const loading = formBlock.querySelector('.loading-bar');
       loading.classList.add('loading');
-      const form = await this.getTemplate(this.idForm); // получаем структуру формы
+      // получаем структуру формы
+      const form = await this.getTemplate(this.idForm);
 
-      this.$store.commit('form/setTemplate', form.cells); // и заносим его в локальное хранилище
-      this.$store.commit('form/setAllContent', 'empty'); // в контент заносим пустое значение
-      this.$store.commit('form/setDisabled', false); // включаем кнопку сохранить
+      // и заносим его в локальное хранилище
+      this.$store.commit('form/setTemplate', form.cells);
+      // в контент заносим пустое значение
+      this.$store.commit('form/setAllContent', 'empty');
+      // включаем кнопку сохранить
+      this.$store.commit('form/setDisabled', false);
       loading.classList.remove('loading');
+      // и переходим на страницу редактирования
       this.$router.push(
         `/forms/edit?editable=true&id=${this.idForm}&nameForm=Новая форма`,
-      ); // и переходим на страницу редактирования
+      );
     },
   },
 };

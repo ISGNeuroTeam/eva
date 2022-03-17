@@ -14,11 +14,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
+- Added blocking of the scheduler application button
 - fixed piechart color rgb
 - fixed gis settings styles
 - fixed calendar in data source
+- fixed creating/editing dashboards/groups
 - fixed guntt disappears data when navigating through tabs
-- fixed expand to full screen not available in Component View Protocol
+- fixed multiline tooltip display on fullscreen not working
+- fixed styles theme
+- fixed gis icons
+- Fixed template for metrics
+- fixed dashboard creation
+- fixed columns in the table are not hidden
+- fixed multiline settings and design improvements
+- fixed additional message about existing data source when renaming
+- fixed multiline label
+- fixed heatmap. Transition by event to tabs.
+- fixed renaming with data source replacement
+- fixed passed properties to token
+- fixed dashTable.vue
+- fixed save dashboards
+- fixed log icon light up on error
+- fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
 
 ## [1.84.0]
 
