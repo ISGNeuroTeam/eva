@@ -549,11 +549,9 @@ export default {
             });
           }
           moveTooltip(tooltipMargin);
-          setTimeout(() => {
-            tooltipBlock.innerHTML = tooltip;
-            tooltipBlock.style.opacity = '0.9';
-            tooltipBlock.style.visibility = 'visible';
-          }, 150);
+          tooltipBlock.innerHTML = tooltip;
+          tooltipBlock.style.opacity = '0.9';
+          tooltipBlock.style.visibility = 'visible';
         })
         .on('mousemove', () => {
           moveTooltip(tooltipMargin);
