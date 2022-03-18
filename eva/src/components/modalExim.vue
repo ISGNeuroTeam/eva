@@ -2,7 +2,8 @@
   <v-dialog
     v-model="active"
     width="500"
-    persistent
+    @click:outside="closeModal"
+    @keydown.esc="closeModal"
   >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -93,12 +94,32 @@
 import { mdiFileOutline, mdiFormatListBulleted } from '@mdi/js';
 
 export default {
+  name: 'ModalExim',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    active: null,
-    dashboards: null,
-    groups: null,
-    element: null,
-    curName: null,
+    dashboards: {
+      type: Array,
+      default: () => ([]),
+    },
+    groups: {
+      type: Array,
+      default: () => ([]),
+    },
+    element: {
+      type: String,
+      required: true,
+    },
+    curName: {
+      type: String,
+      required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -127,11 +148,18 @@ export default {
     };
   },
   computed: {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
     theme() {
-      const currentTheme = this.$store.getters.getTheme;
       // document.documentElement.style.setProperty('--main_bg', currentTheme.$main_bg);
       // document.documentElement.style.setProperty('--text_color', currentTheme.$main_text);
-      return currentTheme;
+      return this.$store.getters.getTheme;
     },
   },
   watch: {
@@ -148,7 +176,7 @@ export default {
     selected(selected) {
       if (selected.includes('Выбрать все')) {
         let list = [];
-        if (this.element == 'dash') {
+        if (this.element === 'dash') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
@@ -159,7 +187,7 @@ export default {
         this.elements[this.element] = list;
       } else if (selected.includes('Очистить все')) {
         let list = [];
-        if (this.element == 'dashs') {
+        if (this.element === 'dashs') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
@@ -173,7 +201,7 @@ export default {
   methods: {
     async exportDash() {
       const ids = [];
-      if (this.element == 'dash') {
+      if (this.element === 'dash') {
         this.dashboards.forEach((item) => {
           if (this.selected.includes(item.name)) {
             ids.push(item.id);
@@ -187,11 +215,11 @@ export default {
         });
       }
 
-      const response = await this.$store.getters.exportDash({
+      const response = await this.$store.dispatch('exportDash', {
         element: this.element,
         ids: ids.join(','),
       });
-      if (response == '') {
+      if (response === '') {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
         this.msgExp.opacity = '1';
@@ -206,15 +234,15 @@ export default {
       }, 2000);
     },
     async importDash() {
-      if (this.file == '' || this.file == undefined) {
+      if (this.file === '' || this.file === undefined) {
         this.msgImp.text = 'Выберите файл для импорта';
         this.msgImp.color = 'controlsActive';
         this.msgImp.opacity = '1';
       } else {
         let extantion = this.file.name.split('.');
         extantion = extantion[extantion.length - 1];
-        if (extantion != this.element) {
-          if (this.element == 'group') {
+        if (extantion !== this.element) {
+          if (this.element === 'group') {
             this.msgImp.text = 'Выберите файл c группами';
           } else {
             this.msgImp.text = 'Выберите файл c дашбордами';
@@ -223,18 +251,19 @@ export default {
           this.msgImp.opacity = '1';
         } else {
           const formData = new FormData();
-          if (this.element == 'dash') {
+          if (this.element === 'dash') {
             formData.append('group', this.curName);
             formData.append('body', this.file);
           } else {
             formData.append('body', this.file);
           }
-          await this.$store.getters.importDash({
+          await this.$store.dispatch('importDash', {
             element: this.element,
             formData,
           });
           try {
-            // let res = JSON.parse(response); // тут проверяем может ли распарситься ответ от сервера
+            // тут проверяем может ли распарситься ответ от сервера
+            // let res = JSON.parse(response);
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';
@@ -256,7 +285,7 @@ export default {
       link.remove();
     },
     closeModal() {
-      this.$emit('closeModal');
+      this.active = false;
     },
     // changeColor: function() {
     //   document.querySelectorAll('.v-menu__content').forEach( item => {
