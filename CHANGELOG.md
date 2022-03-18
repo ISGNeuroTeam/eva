@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed piechart chunk selection syncing
 - fixed dashSelect
 - refactoring a multiline
+- fixed data is not disaplayed after renaming data sources
 
 ## [1.84.0]
 

@@ -572,14 +572,13 @@ export default new Vuex.Store({
         || modalsetting.page === 'search'
       ) {
         // если удаляем элемент то его характеристики заносим в объект моадльного окна
-
-        state[modalsetting.id].modalDelete.active = modalsetting.status;
-        state[modalsetting.id].modalDelete.id = modalsetting.elem;
-        state[modalsetting.id].modalDelete.name = modalsetting.name;
+        Vue.set(state[modalsetting.id].modalDelete, 'active', modalsetting.status);
+        Vue.set(state[modalsetting.id].modalDelete, 'id', modalsetting.elem);
+        Vue.set(state[modalsetting.id].modalDelete, 'name', modalsetting.name);
         if (!modalsetting.status) {
-          state[modalsetting.id].modalDelete.page = '';
+          Vue.set(state[modalsetting.id].modalDelete, 'page', '');
         } else {
-          state[modalsetting.id].modalDelete.page = modalsetting.page;
+          Vue.set(state[modalsetting.id].modalDelete, 'page', modalsetting.page);
         }
       }
     },
@@ -1151,7 +1150,28 @@ export default new Vuex.Store({
       // отправляем в файл storeRest.js
       return rest.rest(formData, searchForRest, restAuth, idDash);
     },
-    checkAlreadyDash({ state, commit }, { id, first }) {
+    createSearchesId({ state }, payload) {
+      const data = payload?.bodyData || state[payload?.id];
+      // Начальное значение id
+      let newSearchId = 0;
+      // Создаем уникальные id
+      const checkAllSearch = (searchId = 0) => {
+        if (data.searches.find((searchEl) => searchEl?.id === searchId)) {
+          checkAllSearch(searchId + 1);
+        } else {
+          newSearchId = searchId;
+        }
+      };
+      // Присваиваем
+      data.searches.forEach((el) => {
+        if (!(el?.id >= 0)) {
+          checkAllSearch();
+          el.id = newSearchId;
+        }
+      });
+      return data.searches;
+    },
+    checkAlreadyDash({ state, commit, dispatch }, { id, first }) {
       return new Promise((resolve) => {
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
@@ -1165,11 +1185,22 @@ export default new Vuex.Store({
                 },
               ]);
               if (stateFrom.body !== '') {
+                // Берем объект с данными дашборда
+                const bodyData = JSON.parse(stateFrom.body);
+                // Проверяем есть ли там источники данных
+                if (bodyData?.searches?.length > 0) {
+                  dispatch('createSearchesId', {
+                    bodyData,
+                    id,
+                  }).then((response) => {
+                    bodyData.searches = response;
+                  });
+                }
                 commit('setState', [
                   {
                     object: state,
                     prop: id,
-                    value: JSON.parse(stateFrom.body),
+                    value: bodyData,
                   },
                 ]);
               }
@@ -1253,6 +1284,17 @@ export default new Vuex.Store({
             });
 
             if (state[id].searches) {
+              if (state[id].searches?.length > 0) {
+                dispatch('createSearchesId', { id }).then((response) => {
+                  commit('setState', [
+                    {
+                      object: state[id],
+                      prop: 'searches',
+                      value: response,
+                    },
+                  ]);
+                });
+              }
               state[id].searches.forEach((search) => {
                 commit('setState', [
                   {
