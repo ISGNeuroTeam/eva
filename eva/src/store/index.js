@@ -1726,11 +1726,15 @@ export default new Vuex.Store({
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
+      const lastEl = state[id]?.tabList
+        .find((el) => el.id.toString() === event.event.tab);
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}/1`);
         } else if (!event.event.tab) {
           event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+        } else {
+          event.route.push(`/dashboards/${id}/${lastEl.id}`);
         }
       } else if (!isTabMode) {
         window.open(`/dashboards/${id}/1`);
