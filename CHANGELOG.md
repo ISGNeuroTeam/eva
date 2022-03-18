@@ -9,14 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added the ability to update tokens when executing a go event
+- reportsV2 timeline get data from backend
+- reportsV2 interesting get data from backend
 
 ### Fixed
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
+- Added blocking of the scheduler application button
 - fixed piechart color rgb
 - fixed gis settings styles
 - fixed calendar in data source
+- fixed creating/editing dashboards/groups
+- fixed guntt disappears data when navigating through tabs
+- fixed multiline tooltip display on fullscreen not working
+- fixed styles theme
+- fixed gis icons
+- Fixed template for metrics
+- fixed dashboard creation
+- fixed columns in the table are not hidden
+- fixed multiline settings and design improvements
+- fixed additional message about existing data source when renaming
+- fixed multiline label
+- fixed heatmap. Transition by event to tabs.
+- fixed renaming with data source replacement
+- fixed passed properties to token
+- fixed dashTable.vue
+- fixed save dashboards
+- fixed log icon light up on error
+- fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
+- fixed piechart chunk selection syncing
+- fixed dashSelect
+- refactoring a multiline
 - fixed guntt hints
 
 ## [1.84.0]
@@ -25,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiple tokens
 
 ### Fixed
+- Fixed persistent modal
 - fixed filters. name and content
 - fixed visible zoom button
 - fixed setting the title breaks the scrolling of the component
@@ -59,6 +86,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed button hints
 - fixed switching between filter types
 - fixed cell size in tile visualization
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes

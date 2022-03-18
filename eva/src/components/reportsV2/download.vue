@@ -8,9 +8,7 @@
       :style="{ color: theme.$main_text }"
       class="download-icon"
     >
-      {{
-        mdiDownload
-      }}
+      {{ mdiDownload }}
     </v-icon>
     <span
       class="download-btn-text"
@@ -26,7 +24,10 @@ import { mdiDownload } from '@mdi/js';
 
 export default {
   props: {
-    data: Array,
+    data: {
+      type: Array,
+      default: () => ([]),
+    },
   },
   data() {
     return {
