@@ -4,7 +4,7 @@
     :style="{ backgroundColor: theme.$secondary_bg }"
   >
     <header-top :inside="false" />
-    <v-content>
+    <v-main>
       <v-container class="main-container container-product">
         <div class="product-block">
           <v-card
@@ -94,7 +94,7 @@
           </v-card>
         </div>
       </v-container>
-    </v-content>
+    </v-main>
     <footer-bottom />
   </v-app>
 </template>
