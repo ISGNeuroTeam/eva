@@ -2,6 +2,9 @@
 
 E.V.A (evolution vizualization application) is an app for create different dashboard and add them some logic communication between each other.
 
+## Requirements
+- Nodejs: v14.19.0
+
 ## Getting Started
 
 Follow inside folder "src"

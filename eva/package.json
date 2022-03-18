@@ -5,6 +5,9 @@
   "author": "Fred",
   "license": "ISC",
   "private": true,
+  "engines" : {
+    "node" : "14.19.0"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
