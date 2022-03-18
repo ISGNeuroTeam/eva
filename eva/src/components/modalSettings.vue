@@ -1224,7 +1224,6 @@ export default {
 
       const options = {
         ...this.options,
-        metricsCustom: this.metrics,
         conclusion_count: this.conclusion_count,
         metrics: this.metrics,
         replace_count: this.replace_count,

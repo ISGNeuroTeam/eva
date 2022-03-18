@@ -105,6 +105,10 @@ export default {
       const { id, idDash } = this;
       return this.$store.state[idDash][id];
     },
+    tokensStore() {
+      const { idDash } = this;
+      return this.$store.state[idDash].tockens;
+    },
     options() {
       return {
         ...this.defaultOptions,
@@ -176,10 +180,10 @@ export default {
       return this.dashStore.metrics || [];
     },
     barplotMetrics() {
-      const { united, metricsCustom, metricTypes, yAxesBinding } = this.options;
+      const { united, metrics, metricTypes, yAxesBinding } = this.options;
       if (!united) {
-        if (metricsCustom) {
-          return metricsCustom
+        if (metrics) {
+          return metrics
             .filter((item) => item.type === 'Bar chart')
             .map((item) => item.name);
         }
@@ -223,7 +227,22 @@ export default {
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
   },
   methods: {
-    prepareOldOptions() {
+    eventStore({ event, partelement }) {
+      const { idDash } = this;
+      let result = [];
+      if (partelement) {
+        result = this.$store.state[idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
     },
     reRenderChart() {
       this.clearSvgContainer();
@@ -492,9 +511,10 @@ export default {
 
         const metricType = this.getMetricType(metric);
 
-        let bandwidth; let xSubgroup; let barWidth = 1;
+        let bandwidth; let xSubgroup;
 
         // подгонка отступов на оси x
+        let barWidth = 1;
         if (this.barplotMetrics.length) {
           barWidth = d3.max(this.barplotMetrics.map((name) => this.x[name].bandwidth()));
           this.lineChartMetrics.forEach((name) => {
@@ -521,7 +541,7 @@ export default {
               if (!isAddedBarplots && this.barplotMetrics.length > 0) {
                 isAddedBarplots = true;
 
-                if (barplotstyle === 'accumulation') { // stacked
+                if (['accumulation', 'overlay'].includes(barplotstyle)) {
                   const stackedData = d3.stack()
                     .keys(this.barplotMetrics)(data);
 
@@ -537,7 +557,9 @@ export default {
                     .enter()
                     .append('rect')
                     .attr('x', (d) => this.x[metric](d.data[this.xMetric]) + xBarOffset)
-                    .attr('y', (d) => this.y[metric](d[1]))
+                    .attr('y', (d) => ((barplotstyle === 'overlay')
+                      ? this.y[metric](d[1] - d[0])
+                      : this.y[metric](d[1])))
                     .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
                     .attr('width', barplotBarWidth && (barWidth >= barplotBarWidth)
                       ? barplotBarWidth
@@ -829,10 +851,10 @@ export default {
 
     getMetricType(metric) {
       const {
-        united, metricsCustom, metricTypes, yAxesBinding,
+        united, metrics, metricTypes, yAxesBinding,
       } = this.options;
-      if (!united && metricsCustom) {
-        const metricType = metricsCustom
+      if (!united && metrics) {
+        const metricType = metrics
           .find((item) => item.name === metric)?.type;
         return (metricType === 'Bar chart') ? 'barplot' : 'linechart';
       }
@@ -874,7 +896,7 @@ export default {
 
     setClick(point, actionName) {
       const { id, idDash } = this;
-      const tokens = this.$store.getters.getTockens(this.idDash)
+      const tokens = this.tokensStore
         .filter(({ elem, action }) => (elem === id && action === actionName));
       const values = {
         pointX: point.x,
@@ -895,9 +917,8 @@ export default {
           idDash,
         });
       });
-      const events = this.$store.getters.getEvents({
+      const events = this.eventStore({
         idDash,
-        element: id,
         event: 'onclick',
         partelement: 'point',
       });
