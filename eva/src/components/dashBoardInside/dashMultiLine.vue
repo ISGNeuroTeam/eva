@@ -160,14 +160,20 @@ export default {
       return this.dataRestFrom;
     },
     box() {
-      const { margin, marginOffset } = this;
+      const {
+        widthFrom, heightFrom, margin, marginOffset,
+      } = this;
+      let minHeight = heightFrom;
+      if (heightFrom < 100) {
+        minHeight = 500;
+      }
       return {
         margin,
         marginOffset,
         marginOffsetX: marginOffset.left + marginOffset.right,
-        width: this.widthFrom - margin.left - margin.right
+        width: widthFrom - margin.left - margin.right
           - marginOffset.left - marginOffset.right,
-        height: this.heightFrom - margin.top - margin.bottom
+        height: minHeight - margin.top - margin.bottom
           - marginOffset.bottom - marginOffset.top - 60,
       };
     },
