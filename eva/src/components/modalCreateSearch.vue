@@ -332,7 +332,7 @@ export default {
       }
     },
     addSearch() {
-      if (this.search.sid && this.search.sid !== '') {
+      if (this.search.sid && this.search.sid !== '' && this.search.original_otl) {
         if (
           typeof this.search.parametrs.tws === 'string'
           && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000, 10)
