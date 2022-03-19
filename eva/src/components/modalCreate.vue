@@ -369,12 +369,6 @@ export default {
     },
   },
   watch: {
-    active(val) {
-      this.resetModal(this.modalValue);
-      if (val) {
-        this.setData();
-      }
-    },
     pickedColor(color) {
       if (this.colorInputMode === 'custom') this.setGroupColor(color);
     },
@@ -419,6 +413,12 @@ export default {
         }
       },
     },
+  },
+  created() {
+    this.resetModal(this.modalValue);
+    if (this.active) {
+      this.setData();
+    }
   },
   mounted() {
     this.create_warning = false; // выключаем все предупреждения что были включены
