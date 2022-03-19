@@ -305,11 +305,55 @@ export default {
       },
     },
     dataRestFrom() {
+      this.getDataRestFrom();
+    },
+    dataModeFrom(dataMode) {
+      if (dataMode) {
+        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
+      } else {
+        this.otstupBottom = 10;
+      }
+    },
+    widthFrom() {
+      this.checkSize();
+    },
+    heightFrom() {
+      this.checkSize();
+    },
+    captures(captures) {
+      this.actions[0].capture = captures;
+      this.$store.commit('setActions', {
+        actions: this.actions,
+        idDash: this.idDash,
+        id: this.id,
+      });
+    },
+  },
+  mounted() {
+    if (this.$refs.svgBlock) {
+      this.getDataRestFrom();
+
+      this.$refs.svgBlock.addEventListener('keydown', (event) => {
+        if (event.key === 'Control') {
+          this.tooltipPress = !this.tooltipPress;
+          if (!this.tooltipPress) {
+            this.tooltipShow = false;
+            this.linkCanvasShow = false;
+          } else {
+            this.tooltipShow = true;
+            this.linkCanvasShow = true;
+          }
+        }
+      });
+    }
+  },
+  methods: {
+    getDataRestFrom() {
       if (
         this.dataRestFrom
-        && Object.keys(this.dataRestFrom).length !== 0
-        && this.dataRestFrom[0].svg_filename
-        && this.dataRestFrom[0].svg_filename !== ''
+          && Object.keys(this.dataRestFrom).length !== 0
+          && this.dataRestFrom[0].svg_filename
+          && this.dataRestFrom[0].svg_filename !== ''
       ) {
         if (this.dataReport) {
           if (this.activeElemFrom === this.id) {
@@ -337,45 +381,6 @@ export default {
         this.otstupBottom = 30;
       }
     },
-    dataModeFrom(dataMode) {
-      if (dataMode) {
-        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
-      } else {
-        this.otstupBottom = 10;
-      }
-    },
-    widthFrom() {
-      this.checkSize();
-    },
-    heightFrom() {
-      this.checkSize();
-    },
-    captures(captures) {
-      this.actions[0].capture = captures;
-      this.$store.commit('setActions', {
-        actions: this.actions,
-        idDash: this.idDash,
-        id: this.id,
-      });
-    },
-  },
-  mounted() {
-    if (this.$refs.svgBlock) {
-      this.$refs.svgBlock.addEventListener('keydown', (event) => {
-        if (event.key === 'Control') {
-          this.tooltipPress = !this.tooltipPress;
-          if (!this.tooltipPress) {
-            this.tooltipShow = false;
-            this.linkCanvasShow = false;
-          } else {
-            this.tooltipShow = true;
-            this.linkCanvasShow = true;
-          }
-        }
-      });
-    }
-  },
-  methods: {
     async getSvg(svg) {
       this.$emit('setLoading', true);
       const response = await this.$store.dispatch('setSvg', svg);

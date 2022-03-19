@@ -392,7 +392,7 @@ export default {
     },
     currentTab() {
       if (this.loadingDash || !this.$store.state[this.idDash].currentTab) {
-        return 0;
+        return 1;
       }
       return this.$store.state[this.idDash].currentTab;
     },
