@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - refactoring a multiline
 - fixed guntt hints
 - fixed an empty data source will load indefinitely
+- fixed activate tabs in new dashboards
 
 ## [1.84.0]
 
