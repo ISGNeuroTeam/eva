@@ -61,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed searching by bool type
 - fixed fullscreen improvements tune
 - fixed removed all download buttons for components
+- fixed confirmation window adjustment
 
 ## [1.83.1]
 
