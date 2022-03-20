@@ -18,6 +18,7 @@
       <v-item-group
         v-model="currentTab"
         mandatory
+        @change="$emit('changeTab')"
       >
         <v-item
           v-for="(item, index) in typeMap"
@@ -52,10 +53,12 @@
         :id-dash="idDash"
         :temp="temp"
         :edit-mode="editMode"
+        @isChanged="$emit('isChanged', $event)"
       />
       <v-switch
         v-model="temp.invertMatches"
         :color="theme.$primary_button"
+        @change="$emit('isChanged', true)"
       >
         <h5
           slot="label"
@@ -101,11 +104,26 @@ export default {
     TokenTypeModal,
   },
   props: {
-    idDash: String,
-    filterPart: Object,
-    editPermission: Boolean,
-    filterPartIndex: Number,
-    editMode: Boolean,
+    idDash: {
+      type: String,
+      required: true,
+    },
+    filterPart: {
+      type: Object,
+      required: true,
+    },
+    editPermission: {
+      type: Boolean,
+      required: true,
+    },
+    filterPartIndex: {
+      type: Number,
+      required: true,
+    },
+    editMode: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -128,6 +146,9 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
+    },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
     },
   },
   watch: {
@@ -157,8 +178,7 @@ export default {
   methods: {
     saveFilterPartModal() {
       if (this.temp.filterPartType === 'token') {
-        const originToken = this.$store.getters
-          .getTockens(this.idDash)
+        const originToken = this.getTockens
           .find((tkn) => tkn.name === this.temp.token);
         if (originToken) {
           this.temp.token = originToken;

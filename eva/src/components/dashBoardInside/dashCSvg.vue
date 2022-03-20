@@ -140,17 +140,50 @@ import { mdiFileImageOutline, mdiUpload } from '@mdi/js';
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // выоста родительского компонента
-    tooltipFrom: null, // объект тултипа
-    dataModeFrom: null, // выключена ли шапка или включена
-    activeElemFrom: null,
-    dataReport: null,
-    isFullScreen: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // выоста родительского компонента
+    tooltipFrom: {
+      type: Object,
+      required: true,
+    }, // объект тултипа
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    }, // выключена ли шапка или включена
+    activeElemFrom: {
+      type: String,
+      required: true,
+    },
+    dataReport: {
+      type: Boolean,
+      required: true,
+    },
+    isFullScreen: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -210,18 +243,54 @@ export default {
       }
       return this.color.controlsActive;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     updatedOptions() {
-      return this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      return this.getOptions;
     },
     options() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
-      return options.change;
+      return this.getOptions.change;
     },
   },
   watch: {
@@ -230,49 +299,17 @@ export default {
       deep: true,
       handler() {
         if (this.tooltipFrom.buttons) {
-          this.captures = this.tooltipFrom.buttons.map((item) => item.id);
+          // TODO: эта строка вызывает бесконечный цыкл, и наглухо вешает сайт
+          // this.captures = this.tooltipFrom.buttons.map((item) => item.id);
         }
       },
     },
     dataRestFrom() {
-      if (
-        this.dataRestFrom
-        && Object.keys(this.dataRestFrom).length !== 0
-        && this.dataRestFrom[0].svg_filename
-        && this.dataRestFrom[0].svg_filename !== ''
-      ) {
-        if (this.dataReport) {
-          if (this.activeElemFrom === this.id) {
-            this.dataFrom = this.dataRestFrom[0];
-            this.getSvg(this.dataRestFrom[0].svg_filename);
-            this.$store.commit('setActions', {
-              actions: this.actions,
-              idDash: this.idDash,
-              id: this.id,
-            });
-          } else {
-            this.svg = '';
-          }
-        } else {
-          this.dataFrom = this.dataRestFrom[0];
-          this.getSvg(this.dataRestFrom[0].svg_filename);
-          this.$store.commit('setActions', {
-            actions: this.actions,
-            idDash: this.idDash,
-            id: this.id,
-          });
-        }
-      }
-      if (screen.width <= 1600) {
-        this.otstupBottom = 30;
-      }
+      this.getDataRestFrom();
     },
     dataModeFrom(dataMode) {
       if (dataMode) {
-        this.otstupBottom = 45;
-        if (screen.width <= 1600) {
-          this.otstupBottom = 30;
-        }
+        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
       } else {
         this.otstupBottom = 10;
       }
@@ -294,6 +331,8 @@ export default {
   },
   mounted() {
     if (this.$refs.svgBlock) {
+      this.getDataRestFrom();
+
       this.$refs.svgBlock.addEventListener('keydown', (event) => {
         if (event.key === 'Control') {
           this.tooltipPress = !this.tooltipPress;
@@ -309,9 +348,42 @@ export default {
     }
   },
   methods: {
+    getDataRestFrom() {
+      if (
+        this.dataRestFrom
+          && Object.keys(this.dataRestFrom).length !== 0
+          && this.dataRestFrom[0].svg_filename
+          && this.dataRestFrom[0].svg_filename !== ''
+      ) {
+        if (this.dataReport) {
+          if (this.activeElemFrom === this.id) {
+            [this.dataFrom] = this.dataRestFrom;
+            this.getSvg(this.dataRestFrom[0].svg_filename);
+            this.$store.commit('setActions', {
+              actions: this.actions,
+              idDash: this.idDash,
+              id: this.id,
+            });
+          } else {
+            this.svg = '';
+          }
+        } else {
+          [this.dataFrom] = this.dataRestFrom;
+          this.getSvg(this.dataRestFrom[0].svg_filename);
+          this.$store.commit('setActions', {
+            actions: this.actions,
+            idDash: this.idDash,
+            id: this.id,
+          });
+        }
+      }
+      if (window.screen.width <= 1600) {
+        this.otstupBottom = 30;
+      }
+    },
     async getSvg(svg) {
       this.$emit('setLoading', true);
-      const response = await this.$store.getters.getSvg(svg);
+      const response = await this.$store.dispatch('setSvg', svg);
       if (response !== '') {
         this.$emit('setLoading', false);
         this.svg = response;
@@ -325,6 +397,7 @@ export default {
       }
     },
     checkSize() {
+      // TODO: для чего здесь эта строка?
       this.$refs.csvg;
       if (this.svg !== 'Нет данных для отображения' && this.svg !== '') {
         let timeOut = setTimeout(
@@ -346,60 +419,68 @@ export default {
       }
     },
     async checkCapture() {
-      const captures = this.prepareCapture(); // получаем объект свойства элементов из данных
+      // получаем объект свойства элементов из данных
+      const captures = this.prepareCapture();
       let elem = '';
       let timeOut = setTimeout(
+        // запускаем цикл повторений, ибо нам надо удостовериться что свг уже отрисовался
         function tick() {
-          // запускаем цикл повторений, ибо нам надо удостовериться что свг уже отрисовался
-
+          // и если уже отрисовался
           if (this.$refs.csvg.querySelector('svg') != null) {
-            // и если уже отрисовался
-            clearTimeout(timeOut); // прекращаем цикл
+            // прекращаем цикл
+            clearTimeout(timeOut);
 
+            // прбегаемся по  элементам
             Object.keys(captures).forEach((item) => {
-              // прбегаемся по  элементам
+              // получаем элемент для которого нужно проверить свойства
               elem = this.$refs.csvg
                 .querySelector('svg')
-                .querySelector(`#${item}`); // получаем элемент для которого нужно проверить свойства
+                .querySelector(`#${item}`);
 
+              // если данный элемнет вообще существует
               if (elem) {
-                // если данный элемнет вообще существует
+                // пробегаемя по его свойствам
                 Object.keys(captures[item]).forEach((capture) => {
-                  // пробегаемя по его свойствам
-
+                  // если свойство не id и не название файла, потмоу что они нам не интересны
                   if (capture !== 'id' && capture !== 'svg_filename') {
-                    // если свойство не id и не название файла, потмоу что они нам не интересны
+                    // так же проверяем что свойство не равно null (не пустое)
                     if (captures[item][capture] != null) {
-                      // так же проверяем что свойство не равно null (не пустое)
+                      // если в специальном объекте с только изменившимся свойствами
+                      // нет еще этого элемента
                       if (!this.svgChanges[item]) {
-                        // если в специальном объекте с только изменившимся свойствами нет еще этого элемента
-                        this.svgChanges[item] = {}; // создаем его
+                        // создаем его
+                        this.svgChanges[item] = {};
                       }
+                      // если у созданного элемнета нет еще такого свойства,
+                      // то есть впервые оно изменилось
                       if (!this.svgChanges[item][capture]) {
-                        // если у созданного элемнета нет еще такого свойства ()то есть впервые оно изменилось
+                        // то сперва проверяем текст ли это
                         if (capture === 'tag_value') {
-                          // то сперва проверяем текст ли это
-                          this.svgChanges[item][capture] = elem.innerHTML; // и если текст то заносим в наш объект с измененными данными
+                          // и если текст то заносим в наш объект с измененными данными
                           // значение которое было изначально
-                          elem.innerHTML = captures[item][capture]; // и потом уже в самой свг обновляем значение на то, что пришло из данных
-                        } else {
-                          // а если не еткст а другие свойства
-                          this.svgChanges[item][capture] = elem.getAttribute(capture); // делаем тоже самое, заносим значение по умолчанию
-                          elem.setAttribute(capture, captures[item][capture]); // а в самой свг меняем не значение из данных
-                        }
-                      } else {
-                        // если значенеи по умолчанию уже занесено у нас в объект с изменениями
-                        if (capture === 'tag_value') {
-                          // то делаем тоже самое, толко не трогаем по умолчанию, меняем лишь значение в самой свг
+                          this.svgChanges[item][capture] = elem.innerHTML;
+                          // и потом уже в самой свг обновляем значение на то, что пришло из данных
                           elem.innerHTML = captures[item][capture];
+                          // а если не еткст а другие свойства
                         } else {
+                          // делаем тоже самое, заносим значение по умолчанию
+                          this.svgChanges[item][capture] = elem.getAttribute(capture);
+                          // а в самой свг меняем не значение из данных
                           elem.setAttribute(capture, captures[item][capture]);
                         }
+                        // если значенеи по умолчанию уже занесено у нас в объект с изменениями
+                      } else if (capture === 'tag_value') {
+                        // то делаем тоже самое, толко не трогаем по умолчанию,
+                        // меняем лишь значение в самой свг
+                        elem.innerHTML = captures[item][capture];
+                      } else {
+                        elem.setAttribute(capture, captures[item][capture]);
                       }
                     } else {
                       // если значение пришло пустое
                       if (!this.svgChanges[item]) {
-                        // то все ранво првоеряем есть ли такой элемент в нашем объекте с изменениями
+                        // то все ранво првоеряем есть ли такой элемент
+                        // в нашем объекте с изменениями
                         this.svgChanges[item] = {};
                       }
                       if (this.svgChanges[item][capture]) {
@@ -418,21 +499,23 @@ export default {
                   }
                 });
 
-                // осталось проверить не удалилось ли какое-то значение из данных вообще, а до этого оно было
+                // осталось проверить не удалилось ли какое-то значение из данных вообще,
+                // а до этого оно было
+                // для этого пробегаемся по всему объекту с изменениями
                 Object.keys(this.svgChanges[item]).forEach((change) => {
-                  // для этого пробегаемся по всему объекту с изменениями
+                  // если в измененном объекте есть значение а в данных его нет
                   if (!Object.keys(captures[item]).includes(change)) {
-                    // если в измененном объекте есть значение а в данных его нет
-                    elem.setAttribute(change, this.svgChanges[item][change]); // то значение этого свойства выставим по умолчанию
+                    // то значение этого свойства выставим по умолчанию
+                    elem.setAttribute(change, this.svgChanges[item][change]);
                   }
                 });
               }
             });
             // теперь проверим может какой-то элемент менялся, а тепреь вообще не пришел в данных
+            // для этого пробегаемся по всему объекту с изменениями
             Object.keys(this.svgChanges).forEach((change) => {
-              // для этого пробегаемся по всему объекту с изменениями
+              // если в измененном объекте есть значение а в данных его нет
               if (!Object.keys(captures).includes(change)) {
-                // если в измененном объекте есть значение а в данных его нет
                 elem = this.$refs.csvg
                   .querySelector('svg')
                   .querySelector(`#${change}`);
@@ -440,21 +523,23 @@ export default {
                   if (defChange === 'tag_value') {
                     elem.innerHTML = this.svgChanges[change][defChange];
                   } else {
+                    // то значение этого свойства выставим по умолчанию
                     elem.setAttribute(
                       defChange,
                       this.svgChanges[change][defChange],
-                    ); // то значение этого свойства выставим по умолчанию
+                    );
                   }
                 });
               }
             });
-          } else {
             // если свг еще не отрисовался
+          } else {
             timeOut = setTimeout(tick, 100); // прсото повторяем цикл
           }
+          // здесь забайндил this чтобы он был доступен изнутри
         }.bind(this),
         0,
-      ); // здесь забайндил this чтобы он был доступен изнутри
+      );
     },
     prepareCapture() {
       const captures = {};
@@ -464,7 +549,7 @@ export default {
       return captures;
     },
     checkTokenInTooltip(text) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let reg = '';
       Object.values(tockens).forEach((item) => {
         if (text.indexOf(item.name) !== -1) {
@@ -479,7 +564,7 @@ export default {
         const formData = new FormData();
         formData.append('file', this.file);
 
-        const response = await this.$store.getters.setSvg(formData);
+        const response = await this.$store.dispatch('setSvg', formData);
         try {
           if (JSON.parse(response).status === 'ok') {
             this.answerColor = this.color.controls;
@@ -498,8 +583,32 @@ export default {
         this.answerShow = false;
       }, 2000);
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setClick(token, item) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
       const id = this.$refs.tooltip.getAttribute('data-id');
 
@@ -513,14 +622,14 @@ export default {
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           if (item === 'object') {
             this.$store.commit('setTocken', {
-              tocken,
+              token: tocken,
               idDash: this.idDash,
               value: token,
               store: this.$store,
             });
           } else if (tockens[i].capture === token) {
             this.$store.commit('setTocken', {
-              tocken,
+              token: tocken,
               idDash: this.idDash,
               value: id,
               store: this.$store,
@@ -530,23 +639,21 @@ export default {
       });
 
       if (item === 'object') {
-        const events = this.$store.getters.getEvents({
-          idDash: this.idDash,
+        const events = this.getEvents({
           event: 'onclick',
-          element: this.id,
           partelement: 'empty',
         });
 
         if (events.length !== 0) {
-          events.forEach((item) => {
-            if (item.action === 'set') {
+          events.forEach((event) => {
+            if (event.action === 'set') {
               this.$store.commit('letEventSet', {
                 events,
                 idDash: this.idDash,
               });
-            } else if (item.action === 'go') {
+            } else if (event.action === 'go') {
               this.$store.commit('letEventGo', {
-                event: item,
+                event,
                 idDash: this.idDash,
                 route: this.$router,
                 store: this.$store,
@@ -557,7 +664,7 @@ export default {
       }
     },
     setOver(token) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -568,7 +675,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: token,
             store: this.$store,
@@ -601,6 +708,8 @@ export default {
           context.lineTo(20, 50);
           context.lineTo(30, 50);
           break;
+        default:
+          break;
       }
       context.strokeStyle = this.color.text;
       context.stroke();
@@ -620,10 +729,12 @@ export default {
       let direction = 'normal';
 
       if (id && id.indexOf('overlay') !== -1) {
-        token = id.split('overlay_')[1];
+        [token] = id.split('overlay_');
         this.$refs.tooltip.setAttribute('data-id', token);
 
-        this.tooltipOptions === false ? (this.idTooltip = token) : false;
+        if (this.tooltipOptions === false) {
+          this.idTooltip = token;
+        }
 
         // выходит справа
         if (event.offsetX + 40 + tooltipSize.width > csvgSize.width) {
@@ -666,7 +777,7 @@ export default {
       let token = '';
       const id = event.target.getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
-        token = id.split('overlay_')[1];
+        [token] = id.split('overlay_');
         this.setClick(token, 'object');
       }
     },
