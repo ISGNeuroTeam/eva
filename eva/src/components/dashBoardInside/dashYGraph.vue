@@ -444,6 +444,9 @@ export default {
       }
       return '60px';
     },
+    idDash() {
+      return this.idDashFrom;
+    },
     parentNodes() {
       if (!this.currentNode || !this.currentNode.id) return [];
       return this.dataRestFrom

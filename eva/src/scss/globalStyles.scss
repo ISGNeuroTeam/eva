@@ -25,7 +25,7 @@
   .v-data-table-header th {
     white-space: nowrap
   }
-  
+
   .dash-layout {
     .dash-block {
       width: 100%;
@@ -36,7 +36,7 @@
       box-shadow: none !important;
     }
   }
-  
+
   .v-tabs {
     background: inherit !important;
     .v-tabs-bar {
@@ -44,10 +44,25 @@
       .v-tab {
         color: inherit !important;
       }
-  
+
     }
     .v-tabs-items {
       background: inherit !important;
+    }
+  }
+  .theme--light.v-data-table {
+    .v-data-table__wrapper {
+      table {
+        tbody {
+          tr {
+            transition: all 0.4s ease;
+
+            &:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+              color: #3C3B45;
+            }
+          }
+        }
+      }
     }
   }
 }
