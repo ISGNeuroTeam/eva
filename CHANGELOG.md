@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed gis
 - fixed multiline
 - fixed unable to create new components
+- fixed dash tune
 
 ## [1.84.0]
 
