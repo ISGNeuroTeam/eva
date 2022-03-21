@@ -51,7 +51,10 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    // sizeTileFrom: null, // размер плиток
+    sizeTileFrom: {
+      type: Object,
+      required: true,
+    }, // размер плиток
     heightFrom: {
       type: Number,
       required: true,
@@ -135,9 +138,11 @@ export default {
       }
     },
     captures(captures) {
-      this.actions[0].capture = captures;
+      const localActions = JSON.parse(JSON.stringify(this.actions));
+      localActions[0].capture = captures;
+      // this.actions[0].capture = captures;
       this.$store.commit('setActions', {
-        actions: this.actions,
+        actions: localActions,
         idDash: this.idDash,
         id: this.id,
       });

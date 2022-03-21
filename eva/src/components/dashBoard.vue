@@ -68,10 +68,10 @@
             >
               [ {{ element }} ]
               <span
-                v-if="dataSourseTitle !== -1"
+                v-if="dataSourceId !== ''"
                 class="ml-1"
               >
-                {{ dataSourseTitle }}
+                {{ dataSourceTitle }}
               </span>
             </div>
             <div
@@ -171,10 +171,10 @@
                         >
                           [ {{ element }} ]
                           <span
-                            v-if="dataSourseTitle !== -1"
+                            v-if="dataSourceId !== ''"
                             class="ml-1"
                           >
-                            {{ dataSourseTitle }}
+                            {{ dataSourceTitle }}
                           </span>
                         </div>
                         <div
@@ -522,9 +522,9 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    dataSourseTitle: {
+    dataSourceId: {
       type: [String, Number],
-      default: -1,
+      default: '',
     },
     tooltipOpenDelay: {
       type: Number,
@@ -601,6 +601,8 @@ export default {
       fullScreenWidth: 0.8 * window.innerWidth,
       fullScreenHeight: 0.8 * window.innerHeight,
       selectedPieIndex: -1,
+      tuneValue: '',
+      tuneSliderValue: '',
     };
   },
   computed: {
@@ -750,6 +752,12 @@ export default {
     },
     searchingData() {
       return this.searchData.length > 0;
+    },
+    dataSourceTitle() {
+      return this.$store.state[this.idDash]?.searches?.length > 0
+        ? this.$store.state[this.idDash]?.searches
+          .find((element) => element?.id === this.dataSourceId)?.sid
+        : '';
     },
   },
   watch: {
@@ -1174,7 +1182,7 @@ export default {
       this.$emit('SetRange', range);
     },
     resetRange() {
-      this.$emit('ResetRange', this.dataSourseTitle);
+      this.$emit('ResetRange', this.dataSourceId);
     },
   },
 };

@@ -521,7 +521,7 @@ export default new Vuex.Store({
         }
       }
       state[idDash][id] = data;
-      state[idDash][id].tab = state[idDash].currentTab;
+      state[idDash][id].tab = state[idDash].currentTab || 1;
       state[idDash].elements.push(id);
     },
     // удаляем элемент с помощью модального окна
@@ -573,14 +573,13 @@ export default new Vuex.Store({
         || modalsetting.page === 'search'
       ) {
         // если удаляем элемент то его характеристики заносим в объект моадльного окна
-
-        state[modalsetting.id].modalDelete.active = modalsetting.status;
-        state[modalsetting.id].modalDelete.id = modalsetting.elem;
-        state[modalsetting.id].modalDelete.name = modalsetting.name;
+        Vue.set(state[modalsetting.id].modalDelete, 'active', modalsetting.status);
+        Vue.set(state[modalsetting.id].modalDelete, 'id', modalsetting.elem);
+        Vue.set(state[modalsetting.id].modalDelete, 'name', modalsetting.name);
         if (!modalsetting.status) {
-          state[modalsetting.id].modalDelete.page = '';
+          Vue.set(state[modalsetting.id].modalDelete, 'page', '');
         } else {
-          state[modalsetting.id].modalDelete.page = modalsetting.page;
+          Vue.set(state[modalsetting.id].modalDelete, 'page', modalsetting.page);
         }
       }
     },
@@ -911,17 +910,18 @@ export default new Vuex.Store({
       state[idDash].currentTab = tab;
     },
     deleteDashTab(state, { idDash, tabID }) {
-      const tempArr = state[idDash].elements.filter((elem) => {
-        if (state[idDash][elem].tab === tabID) {
-          delete state[idDash][elem];
-          return true;
-        }
-        return false;
-      });
-      state[idDash].elements = state[idDash].elements.filter(
-        (elem) => !tempArr.includes(elem),
-      );
-
+      if (state[idDash]?.elements && state[idDash].elements?.length > 0) {
+        const tempArr = state[idDash].elements.filter((elem) => {
+          if (state[idDash][elem].tab === tabID) {
+            delete state[idDash][elem];
+            return true;
+          }
+          return false;
+        });
+        state[idDash].elements = state[idDash].elements.filter(
+          (elem) => !tempArr.includes(elem),
+        );
+      }
       state[idDash].tabList = state[idDash].tabList.filter(
         (tab) => tab.id !== tabID,
       );
@@ -1152,7 +1152,28 @@ export default new Vuex.Store({
       // отправляем в файл storeRest.js
       return rest.rest(formData, searchForRest, restAuth, idDash);
     },
-    checkAlreadyDash({ state, commit }, { id, first }) {
+    createSearchesId({ state }, payload) {
+      const data = payload?.bodyData || state[payload?.id];
+      // Начальное значение id
+      let newSearchId = 0;
+      // Создаем уникальные id
+      const checkAllSearch = (searchId = 0) => {
+        if (data.searches.find((searchEl) => searchEl?.id === searchId)) {
+          checkAllSearch(searchId + 1);
+        } else {
+          newSearchId = searchId;
+        }
+      };
+      // Присваиваем
+      data.searches.forEach((el) => {
+        if (!(el?.id >= 0)) {
+          checkAllSearch();
+          el.id = newSearchId;
+        }
+      });
+      return data.searches;
+    },
+    checkAlreadyDash({ state, commit, dispatch }, { id, first }) {
       return new Promise((resolve) => {
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
@@ -1189,6 +1210,15 @@ export default new Vuex.Store({
                   object: state[id],
                   prop: 'modified',
                   value: stateFrom.modified,
+                },
+              ]);
+            }
+            if (!state[id]?.tabList) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'tabList',
+                  value: [{ id: 1, name: 'Без названия' }],
                 },
               ]);
             }
@@ -1254,6 +1284,36 @@ export default new Vuex.Store({
             });
 
             if (state[id].searches) {
+              if (state[id].searches?.length > 0) {
+                dispatch('createSearchesId', { id }).then((response) => {
+                  commit('setState', [
+                    {
+                      object: state[id],
+                      prop: 'searches',
+                      value: response,
+                    },
+                  ]);
+                });
+                // TODO: Временно
+                //  Нужно для замены строковых id источникка данных
+                //  элемента визуализации на числовой
+                if (state[id]?.elements?.length > 0) {
+                  state[id].elements.forEach((element) => {
+                    if (typeof state[id][element]?.search === 'string') {
+                      let searchValue = '';
+                      searchValue = state[id].searches
+                        .find((searchEl) => searchEl.sid === state[id][element].search).id;
+                      commit('setState', [
+                        {
+                          object: state[id][element],
+                          prop: 'search',
+                          value: searchValue,
+                        },
+                      ]);
+                    }
+                  });
+                }
+              }
               state[id].searches.forEach((search) => {
                 commit('setState', [
                   {
@@ -1487,9 +1547,8 @@ export default new Vuex.Store({
     actionGetElementSelected({ state, commit }, element) {
       const selected = state[element.idDash][element.id]?.selected;
       if (!selected) {
-        commit('createElementSelected', { ...element });
+        commit('setSelected', { ...element });
       }
-      commit('setElementSelected', { ...element });
       return state[element.idDash][element.id]?.selected;
     },
 
