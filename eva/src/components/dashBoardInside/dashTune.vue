@@ -248,6 +248,9 @@ export default {
         }
       });
     },
+    percentValue() {
+      this.detectSliderValue(this.values);
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -255,6 +258,7 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom,
     });
+    console.log('mounted');
     this.$nextTick(() => {
       this.circularSizeNew();
       this.loadSelectedValue();
@@ -316,14 +320,15 @@ export default {
       }).then((selected) => {
         if (selected) {
           this.dataField = selected?.elem || null;
-          this.value = selected?.elemDeep || '';
+          this.value = selected?.elemDeep !== '' ? selected?.elemDeep : '';
         }
       });
       this.detectSliderValue();
     },
     detectSliderValue(values = this.values) {
       this.sliderValue = values.findIndex((item) => item === this.value);
-      if (this.value === '' && values.length) {
+      if (this.value === '' && values?.length > 0) {
+        console.log('values[this.sliderValue]', values[this.sliderValue]);
         this.value = values[this.sliderValue];
       }
     },
