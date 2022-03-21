@@ -765,20 +765,23 @@ export default {
 
       // отступы для текста осей
       const { xAxisCaptionRotate } = this.options;
-      const xTextMaxHeight = d3.max(
-        this.svg.selectAll('.myXaxis text')
-          .nodes()
-          .map((item) => {
-            const box = item.getBBox();
-            if ([90, -90].includes(xAxisCaptionRotate)) {
-              return box.width;
-            } if ([45, -45].includes(xAxisCaptionRotate)) {
-              return box.width * 0.75;
-            }
-            return box.height;
-          }),
-      );
-      this.marginOffset.bottom = xTextMaxHeight + 5;
+
+      this.$nextTick(() => {
+        const xTextMaxHeight = d3.max(
+          this.svg.selectAll('.myXaxis text')
+            .nodes()
+            .map((item) => {
+              const box = item.getBBox();
+              if ([90, -90].includes(xAxisCaptionRotate)) {
+                return box.width;
+              } if ([45, -45].includes(xAxisCaptionRotate)) {
+                return box.width * 0.75;
+              }
+              return box.height;
+            }),
+        );
+        this.marginOffset.bottom = xTextMaxHeight + 5;
+      });
 
       // ось Y
       this.marginOffset.left = d3.max(

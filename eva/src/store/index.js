@@ -910,17 +910,18 @@ export default new Vuex.Store({
       state[idDash].currentTab = tab;
     },
     deleteDashTab(state, { idDash, tabID }) {
-      const tempArr = state[idDash].elements.filter((elem) => {
-        if (state[idDash][elem].tab === tabID) {
-          delete state[idDash][elem];
-          return true;
-        }
-        return false;
-      });
-      state[idDash].elements = state[idDash].elements.filter(
-        (elem) => !tempArr.includes(elem),
-      );
-
+      if (state[idDash]?.elements && state[idDash].elements?.length > 0) {
+        const tempArr = state[idDash].elements.filter((elem) => {
+          if (state[idDash][elem].tab === tabID) {
+            delete state[idDash][elem];
+            return true;
+          }
+          return false;
+        });
+        state[idDash].elements = state[idDash].elements.filter(
+          (elem) => !tempArr.includes(elem),
+        );
+      }
       state[idDash].tabList = state[idDash].tabList.filter(
         (tab) => tab.id !== tabID,
       );
@@ -1209,6 +1210,15 @@ export default new Vuex.Store({
                   object: state[id],
                   prop: 'modified',
                   value: stateFrom.modified,
+                },
+              ]);
+            }
+            if (!state[id]?.tabList) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'tabList',
+                  value: [{ id: 1, name: 'Без названия' }],
                 },
               ]);
             }

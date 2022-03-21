@@ -60,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed fix color styles and ygraph tooltip
 - fixed unable to create new components
 - fixed dash tune
+- fixed default tab are not created
 
 ## [1.84.0]
 
