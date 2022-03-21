@@ -353,7 +353,7 @@ export default {
         .filter(
           (elem) => this.dashFromStore[elem].tab
                 === this.currentTab
-                || this.dashFromStore[elem].options.pinned,
+                || this.dashFromStore[elem].options?.pinned,
         )
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
