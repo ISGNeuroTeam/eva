@@ -248,10 +248,12 @@
     <modal-exim
       v-if="modalExim"
       v-model="modalExim"
-      :cur-name="curName"
+      :cur-name="curName || ''"
       :dashboards="allDashs"
       :groups="allGroups"
       :element="element"
+      @update:dashboards="getDashs(cookieId)"
+      @update:groups="getGroups"
     />
     <modal-create
       v-if="modalCreate"

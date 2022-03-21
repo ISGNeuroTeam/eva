@@ -301,7 +301,7 @@ export default {
             });
             table.addEventListener('mouseout', (event) => {
               if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style = `background: transparent !important;color:${this.theme.$main_text}`;
+                event.target.parentElement.style = 'background: transparent !important;';
               }
             });
           } else {
