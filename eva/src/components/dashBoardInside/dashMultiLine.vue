@@ -186,7 +186,9 @@ export default {
       return this.dashStore.metrics || [];
     },
     barplotMetrics() {
-      const { united, metrics, metricTypes, yAxesBinding } = this.options;
+      const {
+        united, metrics, metricTypes, yAxesBinding,
+      } = this.options;
       if (!united) {
         if (metrics) {
           return metrics
@@ -315,7 +317,7 @@ export default {
             this.x[metric] = d3.scaleBand()
               .domain(groups)
               .range([0, width])
-              .padding(0.3);
+              .padding(0.5);
             break;
           default:
             this.x[metric] = d3.scaleLinear()
@@ -328,7 +330,7 @@ export default {
 
         this.xAxis = d3.axisBottom()
           .scale(this.x[metric])
-          .ticks(5)
+          .ticks(this.data.length > 10 ? 5 : null)
           .tickFormat(this.tickFormat);
 
         let maxYMetric = united && metricType === 'barplot'
@@ -448,22 +450,20 @@ export default {
     },
     zoomChart() {
       const { selection } = d3.event;
-      const { invert } = this.xZoom;
-      if (selection) {
-        this.metrics.forEach((metric) => {
-          const range = [
-            invert(selection[0]),
-            invert(selection[1]),
-          ];
-          this.x[metric].domain(range);
-          this.line.select('.brush').call(this.brush.move, null);
-          this.$emit('SetRange', {
-            range,
-            xMetric: this.xMetric,
-            zoomForAll: this.isZoomForAll,
-          });
-          this.setClick(range, 'select');
+      if (selection && this.xZoom) {
+        const { invert } = this.xZoom;
+        const range = [
+          invert(selection[0]),
+          invert(selection[1]),
+        ];
+        this.xZoom.domain(range);
+        this.line.select('.brush').call(this.brush.move, null);
+        this.$emit('SetRange', {
+          range,
+          xMetric: this.xMetric,
+          zoomForAll: this.isZoomForAll,
         });
+        this.setClick(range, 'select');
       }
     },
     updateData(data = this.data) {
@@ -520,13 +520,14 @@ export default {
         let bandwidth; let xSubgroup;
 
         // подгонка отступов на оси x
-        let barWidth = 1;
+        let barWidth = 0;
         if (this.barplotMetrics.length) {
           barWidth = d3.max(this.barplotMetrics.map((name) => this.x[name].bandwidth()));
+          const lineOffset = barWidth * 1.5;
           this.lineChartMetrics.forEach((name) => {
             this.x[name].range([
-              barWidth,
-              this.box.width - barWidth,
+              lineOffset,
+              this.box.width - lineOffset,
             ]);
           });
         }
@@ -911,14 +912,14 @@ export default {
         end: point[1],
       };
       tokens.forEach(({ action, name, capture }) => {
-        const tocken = {
+        const token = {
           name,
           action,
           capture,
-          filterParam: Object.keys(this.dataRestFrom[0])[0],
+          filterParam: this.xMetric,
         };
         this.$store.commit('setTocken', {
-          tocken,
+          token,
           value: values[capture],
           idDash,
         });
