@@ -949,7 +949,7 @@
       <modal-confirm
         v-model="isConfirmModal"
         :theme="theme"
-        :modal-text="`Уверенны, что хотите удалить вариант отображения ?`"
+        :modal-text="`Вы точно хотите удалить вариант отображения ?`"
         btn-confirm-text="Удалить"
         btn-cancel-text="Отмена"
         @result="deleteMetrics(deleteMetricId)"
@@ -1224,7 +1224,6 @@ export default {
 
       const options = {
         ...this.options,
-        metricsCustom: this.metrics,
         conclusion_count: this.conclusion_count,
         metrics: this.metrics,
         replace_count: this.replace_count,

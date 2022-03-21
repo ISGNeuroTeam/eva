@@ -114,7 +114,7 @@ export default {
     },
     curName: {
       type: String,
-      required: true,
+      default: '',
     },
     modalValue: {
       type: Boolean,
@@ -163,17 +163,8 @@ export default {
     },
   },
   watch: {
-    dashboards() {
-      const list = this.dashboards.map((item) => item.name);
-      list.unshift('Выбрать все');
-      this.elements.dash = list;
-    },
-    groups() {
-      const list = this.groups.map((item) => item.name);
-      list.unshift('Выбрать все');
-      this.elements.group = list;
-    },
     selected(selected) {
+      console.log('selected');
       if (selected.includes('Выбрать все')) {
         let list = [];
         if (this.element === 'dash') {
@@ -184,7 +175,7 @@ export default {
         this.selected = list;
         list = [...[], ...list];
         list.unshift('Очистить все');
-        this.elements[this.element] = list;
+        this.$set(this.elements, this.element, list);
       } else if (selected.includes('Очистить все')) {
         let list = [];
         if (this.element === 'dashs') {
@@ -194,11 +185,29 @@ export default {
         }
         this.selected = [];
         list.unshift('Выбрать все');
-        this.elements[this.element] = list;
+        this.$set(this.elements, this.element, list);
       }
     },
   },
+  created() {
+    if (this.element === 'group') {
+      this.updateLocalGroupList();
+    }
+    if (this.element === 'dash') {
+      this.updateLocalDashboardsList();
+    }
+  },
   methods: {
+    updateLocalDashboardsList() {
+      const list = this.dashboards.map((item) => item.name);
+      list.unshift('Выбрать все');
+      this.$set(this.elements, 'dash', list);
+    },
+    updateLocalGroupList() {
+      const list = this.groups.map((item) => item.name);
+      list.unshift('Выбрать все');
+      this.$set(this.elements, 'group', list);
+    },
     async exportDash() {
       const ids = [];
       if (this.element === 'dash') {
@@ -260,6 +269,13 @@ export default {
           await this.$store.dispatch('importDash', {
             element: this.element,
             formData,
+          }).then(() => {
+            if (this.element === 'dash') {
+              this.$emit('update:dashboards');
+            }
+            if (this.element === 'group') {
+              this.$emit('update:groups');
+            }
           });
           try {
             // тут проверяем может ли распарситься ответ от сервера

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added visualisations to datа research 2.0.
 
 ### Fixed
+- fixed group edit and dash edit modal
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
@@ -48,6 +49,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added tab deletion confirmation
 - Added closing confirmation by "Esc\Click-outside"
 - Fixed change tracking in "modal-settings" fields
+- fixed guntt hints
+- fixed an empty data source will load indefinitely
+- fixed activate tabs in new dashboards
+- fixed dashboards\groups are not imported\exported
+- fixed piechart positionlegend
+- fixed data is not disaplayed after renaming data sources
 
 ## [1.84.0]
 

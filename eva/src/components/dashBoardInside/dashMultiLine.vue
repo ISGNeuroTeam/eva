@@ -105,6 +105,10 @@ export default {
       const { id, idDash } = this;
       return this.$store.state[idDash][id];
     },
+    tokensStore() {
+      const { idDash } = this;
+      return this.$store.state[idDash].tockens;
+    },
     options() {
       return {
         ...this.defaultOptions,
@@ -156,14 +160,20 @@ export default {
       return this.dataRestFrom;
     },
     box() {
-      const { margin, marginOffset } = this;
+      const {
+        widthFrom, heightFrom, margin, marginOffset,
+      } = this;
+      let minHeight = heightFrom;
+      if (heightFrom < 100) {
+        minHeight = 500;
+      }
       return {
         margin,
         marginOffset,
         marginOffsetX: marginOffset.left + marginOffset.right,
-        width: this.widthFrom - margin.left - margin.right
+        width: widthFrom - margin.left - margin.right
           - marginOffset.left - marginOffset.right,
-        height: this.heightFrom - margin.top - margin.bottom
+        height: minHeight - margin.top - margin.bottom
           - marginOffset.bottom - marginOffset.top - 60,
       };
     },
@@ -176,10 +186,12 @@ export default {
       return this.dashStore.metrics || [];
     },
     barplotMetrics() {
-      const { united, metricsCustom, metricTypes, yAxesBinding } = this.options;
+      const {
+        united, metrics, metricTypes, yAxesBinding,
+      } = this.options;
       if (!united) {
-        if (metricsCustom) {
-          return metricsCustom
+        if (metrics) {
+          return metrics
             .filter((item) => item.type === 'Bar chart')
             .map((item) => item.name);
         }
@@ -223,7 +235,22 @@ export default {
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
   },
   methods: {
-    prepareOldOptions() {
+    eventStore({ event, partelement }) {
+      const { idDash } = this;
+      let result = [];
+      if (partelement) {
+        result = this.$store.state[idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
     },
     reRenderChart() {
       this.clearSvgContainer();
@@ -290,7 +317,7 @@ export default {
             this.x[metric] = d3.scaleBand()
               .domain(groups)
               .range([0, width])
-              .padding(0.3);
+              .padding(0.5);
             break;
           default:
             this.x[metric] = d3.scaleLinear()
@@ -303,7 +330,7 @@ export default {
 
         this.xAxis = d3.axisBottom()
           .scale(this.x[metric])
-          .ticks(5)
+          .ticks(this.data.length > 10 ? 5 : null)
           .tickFormat(this.tickFormat);
 
         let maxYMetric = united && metricType === 'barplot'
@@ -423,22 +450,20 @@ export default {
     },
     zoomChart() {
       const { selection } = d3.event;
-      const { invert } = this.xZoom;
-      if (selection) {
-        this.metrics.forEach((metric) => {
-          const range = [
-            invert(selection[0]),
-            invert(selection[1]),
-          ];
-          this.x[metric].domain(range);
-          this.line.select('.brush').call(this.brush.move, null);
-          this.$emit('SetRange', {
-            range,
-            xMetric: this.xMetric,
-            zoomForAll: this.isZoomForAll,
-          });
-          this.setClick(range, 'select');
+      if (selection && this.xZoom) {
+        const { invert } = this.xZoom;
+        const range = [
+          invert(selection[0]),
+          invert(selection[1]),
+        ];
+        this.xZoom.domain(range);
+        this.line.select('.brush').call(this.brush.move, null);
+        this.$emit('SetRange', {
+          range,
+          xMetric: this.xMetric,
+          zoomForAll: this.isZoomForAll,
         });
+        this.setClick(range, 'select');
       }
     },
     updateData(data = this.data) {
@@ -492,15 +517,17 @@ export default {
 
         const metricType = this.getMetricType(metric);
 
-        let bandwidth; let xSubgroup; let barWidth = 1;
+        let bandwidth; let xSubgroup;
 
         // подгонка отступов на оси x
+        let barWidth = 0;
         if (this.barplotMetrics.length) {
           barWidth = d3.max(this.barplotMetrics.map((name) => this.x[name].bandwidth()));
+          const lineOffset = barWidth * 1.5;
           this.lineChartMetrics.forEach((name) => {
             this.x[name].range([
-              barWidth,
-              this.box.width - barWidth,
+              lineOffset,
+              this.box.width - lineOffset,
             ]);
           });
         }
@@ -521,7 +548,7 @@ export default {
               if (!isAddedBarplots && this.barplotMetrics.length > 0) {
                 isAddedBarplots = true;
 
-                if (barplotstyle === 'accumulation') { // stacked
+                if (['accumulation', 'overlay'].includes(barplotstyle)) {
                   const stackedData = d3.stack()
                     .keys(this.barplotMetrics)(data);
 
@@ -537,7 +564,9 @@ export default {
                     .enter()
                     .append('rect')
                     .attr('x', (d) => this.x[metric](d.data[this.xMetric]) + xBarOffset)
-                    .attr('y', (d) => this.y[metric](d[1]))
+                    .attr('y', (d) => ((barplotstyle === 'overlay')
+                      ? this.y[metric](d[1] - d[0])
+                      : this.y[metric](d[1])))
                     .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
                     .attr('width', barplotBarWidth && (barWidth >= barplotBarWidth)
                       ? barplotBarWidth
@@ -829,10 +858,10 @@ export default {
 
     getMetricType(metric) {
       const {
-        united, metricsCustom, metricTypes, yAxesBinding,
+        united, metrics, metricTypes, yAxesBinding,
       } = this.options;
-      if (!united && metricsCustom) {
-        const metricType = metricsCustom
+      if (!united && metrics) {
+        const metricType = metrics
           .find((item) => item.name === metric)?.type;
         return (metricType === 'Bar chart') ? 'barplot' : 'linechart';
       }
@@ -874,7 +903,7 @@ export default {
 
     setClick(point, actionName) {
       const { id, idDash } = this;
-      const tokens = this.$store.getters.getTockens(this.idDash)
+      const tokens = this.tokensStore
         .filter(({ elem, action }) => (elem === id && action === actionName));
       const values = {
         pointX: point.x,
@@ -883,21 +912,20 @@ export default {
         end: point[1],
       };
       tokens.forEach(({ action, name, capture }) => {
-        const tocken = {
+        const token = {
           name,
           action,
           capture,
-          filterParam: Object.keys(this.dataRestFrom[0])[0],
+          filterParam: this.xMetric,
         };
         this.$store.commit('setTocken', {
-          tocken,
+          token,
           value: values[capture],
           idDash,
         });
       });
-      const events = this.$store.getters.getEvents({
+      const events = this.eventStore({
         idDash,
-        element: id,
         event: 'onclick',
         partelement: 'point',
       });

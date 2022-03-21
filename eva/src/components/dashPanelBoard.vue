@@ -307,7 +307,7 @@
             <div
               class="loading-bar"
               :style="{ background: theme.$accent_ui_color }"
-              :class="{ loading: search.status === 'pending' }"
+              :class="{ loading: search.status === 'pending' && search.original_otl !== null }"
             />
           </div>
           <v-tooltip
@@ -1612,6 +1612,7 @@ export default {
       }); // просто отправляем информацию об удаляемом токене в хранилище
     },
     deleteSearch(id) {
+      console.log(id);
       // тоже саоме для удаления ИС
       this.$store.commit('setModalDelete', {
         id: this.idDash,

@@ -44,6 +44,10 @@
       <div
         ref="legends"
         class="legend-block-pie"
+        :class="dashOptions.positionlegend === 'top'
+          || dashOptions.positionlegend === 'bottom'
+          ? 'legend-block-pie__horizontally'
+          : 'legend-block-pie__vertically'"
       >
         <div
           v-for="(item, idx) in legends"
@@ -106,6 +110,10 @@ export default {
       type: Number,
       default: -1,
     }, // индекс активного элемента
+    isFullScreen: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -237,20 +245,29 @@ export default {
   watch: {
     'dashOptions.colorsPie': {
       handler(val, old) {
-        if (val !== old) {
-          const graphics = d3
-            .select(this.$refs.piechartItself)
-            .selectAll('svg')
-            .nodes();
-          if (graphics.length !== 0) {
-            graphics[0].remove();
-            this.createPieChartDash();
-          } else {
-            this.createPieChartDash();
-          }
+        if (val && val !== old) {
+          this.changePieChart();
         }
       },
       deep: true,
+    },
+    'dashOptions.positionlegend': {
+      handler(val, old) {
+        if (val && val !== old) {
+          this.changePieChart();
+        }
+      },
+      deep: true,
+    },
+    widthFrom(val, old) {
+      if (val !== old) {
+        this.changePieChart();
+      }
+    },
+    heightFrom(val, old) {
+      if (val !== old) {
+        this.changePieChart();
+      }
     },
     selectedPieIndex(newVal) {
       if (newVal !== null) this.setToken(newVal);
@@ -580,6 +597,18 @@ export default {
           });
         }
       });
+    },
+    changePieChart() {
+      const graphics = d3
+        .select(this.$refs.piechartItself)
+        .selectAll('svg')
+        .nodes();
+      if (graphics.length !== 0) {
+        graphics[0].remove();
+        this.createPieChartDash();
+      } else {
+        this.createPieChartDash();
+      }
     },
   },
 };

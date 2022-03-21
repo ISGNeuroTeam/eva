@@ -27,8 +27,8 @@
       ref="tooltip"
       class="tooltipGuntt"
       :style="{
-        backgroundColor: colorFrom.backElement,
-        border: `1px solid ${colorFrom.text}`,
+        backgroundColor: colorFrom.$secondary_bg,
+        border: `1px solid ${colorFrom.$main_text}`,
       }"
     />
     <div
@@ -531,10 +531,10 @@ export default {
       }
 
       function moveTooltip(offsetX) {
-        const localX = d3.event.offsetY - 50;
-        const y = d3.event.offsetX + offsetX;
-        tooltipBlock.style.top = `${localX}px`;
-        tooltipBlock.style.left = `${y}px`;
+        const localY = d3.event.offsetY;
+        const localX = d3.event.offsetX + offsetX;
+        tooltipBlock.style.top = `${localY}px`;
+        tooltipBlock.style.left = `${localX}px`;
       }
 
       lines
@@ -549,7 +549,6 @@ export default {
             });
           }
           moveTooltip(tooltipMargin);
-
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';

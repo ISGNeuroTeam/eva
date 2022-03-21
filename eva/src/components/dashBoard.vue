@@ -68,10 +68,10 @@
             >
               [ {{ element }} ]
               <span
-                v-if="dataSourseTitle !== -1"
+                v-if="dataSourceId !== ''"
                 class="ml-1"
               >
-                {{ dataSourseTitle }}
+                {{ dataSourceTitle }}
               </span>
             </div>
             <div
@@ -171,10 +171,10 @@
                         >
                           [ {{ element }} ]
                           <span
-                            v-if="dataSourseTitle !== -1"
+                            v-if="dataSourceId !== ''"
                             class="ml-1"
                           >
-                            {{ dataSourseTitle }}
+                            {{ dataSourceTitle }}
                           </span>
                         </div>
                         <div
@@ -522,9 +522,9 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    dataSourseTitle: {
+    dataSourceId: {
       type: [String, Number],
-      default: -1,
+      default: '',
     },
     tooltipOpenDelay: {
       type: Number,
@@ -646,17 +646,8 @@ export default {
     },
     dataMode() {
       this.changeOptions(this.dataModeFrom);
-      if (!this.dataModeFrom) {
-        if (
-          this.element.split('-')[0] === 'button'
-          || this.element.split('-')[0] === 'csvg'
-          || this.element.split('-')[0] === 'tile'
-        ) {
-          this.setPropDisappear(false);
-        }
-      } else {
-        this.setPropDisappear(true);
-      }
+      this.setPropDisappear(true);
+
       return this.dataModeFrom;
     },
     // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
@@ -759,6 +750,12 @@ export default {
     },
     searchingData() {
       return this.searchData.length > 0;
+    },
+    dataSourceTitle() {
+      return this.$store.state[this.idDash]?.searches?.length > 0
+        ? this.$store.state[this.idDash]?.searches
+          .find((element) => element?.id === this.dataSourceId)?.sid
+        : '';
     },
   },
   watch: {
@@ -1183,7 +1180,7 @@ export default {
       this.$emit('SetRange', range);
     },
     resetRange() {
-      this.$emit('ResetRange', this.dataSourseTitle);
+      this.$emit('ResetRange', this.dataSourceId);
     },
   },
 };

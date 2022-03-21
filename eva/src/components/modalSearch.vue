@@ -81,7 +81,7 @@ export default {
   },
   data() {
     return {
-      currentId: 0,
+      currentId: '',
       isChanged: false,
     };
   },
@@ -121,11 +121,17 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    currentSearch() {
+      if (this.searches?.length > 0) {
+        return this.searches.find((search) => search?.id === this.currentId)?.sid;
+      }
+      return '';
+    },
   },
   watch: {
     active() {
       this.isChanged = false;
-      this.currentId = 0;
+      this.currentId = '';
     },
     currentId() {
       this.isChanged = true;
@@ -139,7 +145,7 @@ export default {
     //  если нажали на кнопку согласия
     startDS() {
       // проверяем выбран ли хоть один ИС
-      if (this.currentId !== 0) {
+      if (this.currentId !== '') {
         // отправляем данные  в хранилище чтобы укзаать элемнету
         // что он должен ссылаться на выбранный ИС
         this.$store.commit('setDataSource', {
@@ -167,7 +173,7 @@ export default {
         item.style = 'box-shadow: none';
       });
       // затем получаем текст всего ИС который выбрали
-      this.currentId = search.sid;
+      this.currentId = search.id;
       // и делаем ему обводку
       elem.style = `box-shadow: 0px 0px 4px 3px  ${this.theme.$accent_ui_color}`;
     },

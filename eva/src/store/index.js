@@ -441,6 +441,7 @@ export default new Vuex.Store({
         Vue.set(state[dashboard.id], 'idgroup', dashboard.idgroup);
         Vue.set(state[dashboard.id], 'currentTab', dashboard?.currentTab || 1);
         Vue.set(state[dashboard.id], 'modified', dashboard.modified);
+        Vue.set(state[dashboard.id], 'tabs', false);
         // TODO: убрать геттер из мутации
         getters({ id: dashboard.id, first: true });
       }
@@ -572,14 +573,13 @@ export default new Vuex.Store({
         || modalsetting.page === 'search'
       ) {
         // если удаляем элемент то его характеристики заносим в объект моадльного окна
-
-        state[modalsetting.id].modalDelete.active = modalsetting.status;
-        state[modalsetting.id].modalDelete.id = modalsetting.elem;
-        state[modalsetting.id].modalDelete.name = modalsetting.name;
+        Vue.set(state[modalsetting.id].modalDelete, 'active', modalsetting.status);
+        Vue.set(state[modalsetting.id].modalDelete, 'id', modalsetting.elem);
+        Vue.set(state[modalsetting.id].modalDelete, 'name', modalsetting.name);
         if (!modalsetting.status) {
-          state[modalsetting.id].modalDelete.page = '';
+          Vue.set(state[modalsetting.id].modalDelete, 'page', '');
         } else {
-          state[modalsetting.id].modalDelete.page = modalsetting.page;
+          Vue.set(state[modalsetting.id].modalDelete, 'page', modalsetting.page);
         }
       }
     },
@@ -1151,7 +1151,28 @@ export default new Vuex.Store({
       // отправляем в файл storeRest.js
       return rest.rest(formData, searchForRest, restAuth, idDash);
     },
-    checkAlreadyDash({ state, commit }, { id, first }) {
+    createSearchesId({ state }, payload) {
+      const data = payload?.bodyData || state[payload?.id];
+      // Начальное значение id
+      let newSearchId = 0;
+      // Создаем уникальные id
+      const checkAllSearch = (searchId = 0) => {
+        if (data.searches.find((searchEl) => searchEl?.id === searchId)) {
+          checkAllSearch(searchId + 1);
+        } else {
+          newSearchId = searchId;
+        }
+      };
+      // Присваиваем
+      data.searches.forEach((el) => {
+        if (!(el?.id >= 0)) {
+          checkAllSearch();
+          el.id = newSearchId;
+        }
+      });
+      return data.searches;
+    },
+    checkAlreadyDash({ state, commit, dispatch }, { id, first }) {
       return new Promise((resolve) => {
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
@@ -1253,6 +1274,36 @@ export default new Vuex.Store({
             });
 
             if (state[id].searches) {
+              if (state[id].searches?.length > 0) {
+                dispatch('createSearchesId', { id }).then((response) => {
+                  commit('setState', [
+                    {
+                      object: state[id],
+                      prop: 'searches',
+                      value: response,
+                    },
+                  ]);
+                });
+                // TODO: Временно
+                //  Нужно для замены строковых id источникка данных
+                //  элемента визуализации на числовой
+                if (state[id]?.elements?.length > 0) {
+                  state[id].elements.forEach((element) => {
+                    if (typeof state[id][element]?.search === 'string') {
+                      let searchValue = '';
+                      searchValue = state[id].searches
+                        .find((searchEl) => searchEl.sid === state[id][element].search).id;
+                      commit('setState', [
+                        {
+                          object: state[id][element],
+                          prop: 'search',
+                          value: searchValue,
+                        },
+                      ]);
+                    }
+                  });
+                }
+              }
               state[id].searches.forEach((search) => {
                 commit('setState', [
                   {
@@ -1726,11 +1777,15 @@ export default new Vuex.Store({
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
+      const lastEl = state[id]?.tabList
+        .find((el) => el.id.toString() === event.event.tab);
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}/1`);
         } else if (!event.event.tab) {
           event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+        } else {
+          event.route.push(`/dashboards/${id}/${lastEl.id}`);
         }
       } else if (!isTabMode) {
         window.open(`/dashboards/${id}/1`);

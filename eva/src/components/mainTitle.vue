@@ -78,7 +78,7 @@
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
             :search-data="getElementData(elem)"
-            :data-sourse-title="elem.search"
+            :data-source-id="elem.search"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
@@ -126,7 +126,7 @@
         class="tab-panel"
       >
         <div
-          v-for="tab in tabs"
+          v-for="(tab, tabIndex) in tabs"
           :key="tab.id"
           :class="{
             active: currentTab === tab.id,
@@ -174,7 +174,7 @@
               height="13"
               viewBox="0 0 8 8"
               xmlns="http://www.w3.org/2000/svg"
-              @click.stop="confirmDeleteTab(tab.id)"
+              @click.stop="confirmDeleteTab(tabIndex)"
             >
               <path
                 d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719
@@ -259,6 +259,7 @@
 
 <script>
 export default {
+  name: 'MainTitle',
   data() {
     return {
       page: 'dash',
@@ -289,11 +290,12 @@ export default {
       zoomedSearch: [],
       isConfirmModal: false,
       deleteTabId: '',
+      deleteTabName: '',
     };
   },
   computed: {
     modalText() {
-      return `Уверенны, что хотите удалить вкладку - <strong>${this.deleteTabId}</strong> ?`;
+      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
     },
     dashFromStore() {
       return this.$store.state[this.idDash];
@@ -350,7 +352,7 @@ export default {
       return this.dashFromStore.elements
         .filter(
           (elem) => this.dashFromStore[elem].tab
-                === this.dashFromStore.currentTab
+                === this.currentTab
                 || this.dashFromStore[elem].options.pinned,
         )
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
@@ -362,59 +364,59 @@ export default {
       return this.$store.getters.getTheme;
     },
     gridShow() {
-      if (this.loadingDash || !this.$store.state[this.idDash].grid) {
+      if (this.loadingDash || !this.dashFromStore.grid) {
         return false;
       }
-      return this.$store.state[this.idDash].gridShow === 'true';
+      return this.dashFromStore.gridShow === 'true';
     },
     getSizeGrid() {
-      if (this.loadingDash || !this.$store.state[this.idDash].grid) {
+      if (this.loadingDash || !this.dashFromStore.grid) {
         return { hor: '18', vert: '32' };
       }
-      return this.$store.state[this.idDash].grid;
+      return this.dashFromStore.grid;
     },
     tabs() {
-      if (this.loadingDash || !this.$store.state[this.idDash].tabList) {
+      if (this.loadingDash || !this.dashFromStore.tabList) {
         return [];
       }
-      return this.$store.state[this.idDash].tabList;
+      return this.dashFromStore.tabList;
     },
     tabsMoreOne() {
       return this.tabs.length > 1;
     },
     showTabs() {
-      if (this.loadingDash || !this.$store.state[this.idDash].tabs) {
+      if (this.loadingDash || !this.dashFromStore.tabs) {
         return false;
       }
-      return this.$store.state[this.idDash].tabs;
+      return this.dashFromStore.tabs;
     },
     currentTab() {
-      if (this.loadingDash || !this.$store.state[this.idDash].currentTab) {
-        return 0;
+      if (this.loadingDash || !this.dashFromStore.currentTab) {
+        return 1;
       }
-      return this.$store.state[this.idDash].currentTab;
+      return this.dashFromStore.currentTab;
     },
     searches() {
       if (this.loadingDash) {
         return [];
       }
-      if (!this.$store.state[this.idDash].searches) {
+      if (!this.dashFromStore.searches) {
         this.$store.commit('setState', [{
-          object: this.$store.state[this.idDash],
+          object: this.dashFromStore,
           prop: 'searches',
           value: [],
         }]);
       }
-      return this.$store.state[this.idDash].searches;
+      return this.dashFromStore.searches;
     },
     tokens() {
-      if (this.loadingDash || !this.$store.state[this.idDash].tockens) {
+      if (this.loadingDash || !this.dashFromStore.tockens) {
         return [];
       }
-      return this.$store.state[this.idDash].tockens;
+      return this.dashFromStore.tockens;
     },
     getGrid() {
-      return this.$store.state[this.idDash]?.grid || {
+      return this.dashFromStore?.grid || {
         vert: 32,
         hor: 18,
       };
@@ -479,16 +481,11 @@ export default {
         });
       },
     },
-    isConfirmModal(val) {
-      if (!val) {
-        this.deleteTabId = '';
-      }
-    },
   },
   async mounted() {
     await this.checkAlreadyDash();
     this.loadingDash = false;
-    document.title = `EVA | ${this.$store.state[this.idDash].name}`;
+    document.title = `EVA | ${this.dashFromStore.name}`;
     if (this.$route.params.tabId) {
       this.clickTab(Number(this.$route.params.tabId));
     }
@@ -501,6 +498,9 @@ export default {
     window.onresize = this.checkTabOverflow;
   },
   methods: {
+    getElementSourceId(searchId) {
+      return this.searches.find((search) => search.id === searchId)?.id || '';
+    },
     exportDataCSV(searchName) {
       const searchData = this.dataObject[searchName].data;
       // задаем кодировку csv файла
@@ -548,13 +548,16 @@ export default {
         }
       }, 0);
     },
+    getSearchName(elem) {
+      return this.searches.find((element) => element?.id === elem.search)?.sid || '';
+    },
     checkLoading(elem) {
-      if (elem.search === -1) return false;
-      return this.dataObject[elem.search]?.loading;
+      if (this.getSearchName(elem) === '') return false;
+      return this.dataObject[this.getSearchName(elem)]?.loading;
     },
     getElementData(elem) {
-      if (elem.search === -1) return [];
-      return this.dataObject[elem.search]?.data;
+      if (this.getSearchName(elem) === '') return [];
+      return this.dataObject[this.getSearchName(elem)]?.data;
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
@@ -577,9 +580,16 @@ export default {
       }
       this.checkTabOverflow();
     },
-    confirmDeleteTab(tabId) {
+    confirmDeleteTab(tabIndex) {
+      this.deleteTabName = '';
+      this.deleteTabId = '';
+      this.deleteTabId = this.tabs[tabIndex].id;
+      if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
+        this.deleteTabName = this.tabs[tabIndex].name;
+      } else {
+        this.deleteTabName = '';
+      }
       this.isConfirmModal = true;
-      this.deleteTabId = tabId;
     },
     deleteTab(isConfirm) {
       if (isConfirm) {
@@ -710,13 +720,13 @@ export default {
       });
     },
     setRange(range, elem) {
-      if (range.zoomForAll && !this.zoomedSearch.includes(elem.search)) {
-        this.zoomedSearch.push(elem.search);
+      if (range.zoomForAll && !this.zoomedSearch.includes(this.getSearchName(elem))) {
+        this.zoomedSearch.push(this.getSearchName(elem));
       }
       const elements = range.zoomForAll ? this.elements : [elem];
       elements.forEach((element) => {
-        this.dataObject[element.search].data = this.sliceRange(
-          this.dataObject[element.search].data,
+        this.dataObject[this.getSearchName(element)].data = this.sliceRange(
+          this.dataObject[this.getSearchName(element)].data,
           range,
         );
       });
@@ -730,7 +740,7 @@ export default {
         elements.push({ search: dataSourseTitle });
       }
       elements.forEach((elem) => {
-        this.dataObject[elem.search].data = this.dataObjectConst[elem.search].data;
+        this.dataObject[this.getSearchName(elem)].data = this.dataObjectConst[this.getSearchName(elem)].data;
       });
     },
   },
