@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed dashboards\groups are not imported\exported
 - fixed piechart positionlegend
 - fixed data is not disaplayed after renaming data sources
+- fixed create dashboard visualisation
 
 ## [1.84.0]
 
