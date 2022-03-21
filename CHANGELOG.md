@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added the ability to update tokens when executing a go event
+- reportsV2 timeline get data from backend
+- reportsV2 interesting get data from backend
 
 ### Fixed
+- fixed group edit and dash edit modal
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
@@ -38,6 +41,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed Piechart. Custom themes color set reset
 - fixed gis
 - fixed multiline
+- fixed piechart chunk selection syncing
+- fixed dashSelect
+- refactoring a multiline
+- fixed guntt hints
+- fixed an empty data source will load indefinitely
+- fixed activate tabs in new dashboards
+- fixed dashboards\groups are not imported\exported
+- fixed piechart positionlegend
+- fixed data is not disaplayed after renaming data sources
+- fixed create dashboard visualisation
+- fixed fix color styles and ygraph tooltip
 - fixed unable to create new components
 - fixed dash tune
 
@@ -55,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed searching by bool type
 - fixed fullscreen improvements tune
 - fixed removed all download buttons for components
+- fixed confirmation window adjustment
 
 ## [1.83.1]
 

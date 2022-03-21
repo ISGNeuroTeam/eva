@@ -20,7 +20,7 @@
             @launchSearch="launchSearch($event)"
           />
           <timeline
-            v-show="data.length > 0"
+            v-if="getTimeline.length > 0"
             class="timeline component-block"
             :data="data"
           >
@@ -49,7 +49,7 @@
                 cols="2"
                 class="pr-0"
               >
-                <intresting
+                <interesting
                   class="intresting component-block"
                   :rows="rows"
                 />
@@ -97,6 +97,7 @@
 import {
   mdiPlay, mdiSettings, mdiMerge, mdiPlus,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 import settings from '../../js/componentsSettings';
 import newSearch from './newSearch.vue';
 import timeline from './timeline.vue';
@@ -105,12 +106,12 @@ import download from './download.vue';
 import events from './events.vue';
 import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
-import intresting from './intresting.vue';
+import Interesting from './interesting.vue';
 
 export default {
   components: {
     newSearch,
-    intresting,
+    Interesting,
     events,
     timeline,
     statistic,
@@ -173,6 +174,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters('dataResearch', ['getTimeline']),
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -279,14 +281,14 @@ export default {
 
       this.loading = true;
       console.log('launch search');
-      console.log(this.search);
       const response = await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
       });
-      // вызывая метод в хранилище
+      await this.$store.dispatch('dataResearch/fetchTimeline', response.cid);
+      await this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
 
-      console.log(response);
+      // вызывая метод в хранилище
       if (!response?.data || response.data.length === 0) {
         // если что-то пошло не так
         this.loading = false;
