@@ -406,7 +406,7 @@ export default {
   },
   computed: {
     modalText() {
-      return `Уверенны, что хотите удалить фильтр - <strong>${this.deleteFilterInfo.id}</strong> ?`;
+      return `Вы точно хотите удалить фильтр - <strong>${this.deleteFilterInfo.id}</strong> ?`;
     },
     theme() {
       return this.$store.getters.getTheme;
