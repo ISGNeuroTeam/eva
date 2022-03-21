@@ -521,7 +521,7 @@ export default new Vuex.Store({
         }
       }
       state[idDash][id] = data;
-      state[idDash][id].tab = state[idDash].currentTab;
+      state[idDash][id].tab = state[idDash].currentTab || 1;
       state[idDash].elements.push(id);
     },
     // удаляем элемент с помощью модального окна
@@ -1537,9 +1537,8 @@ export default new Vuex.Store({
     actionGetElementSelected({ state, commit }, element) {
       const selected = state[element.idDash][element.id]?.selected;
       if (!selected) {
-        commit('createElementSelected', { ...element });
+        commit('setSelected', { ...element });
       }
-      commit('setElementSelected', { ...element });
       return state[element.idDash][element.id]?.selected;
     },
 
