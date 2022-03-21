@@ -81,8 +81,6 @@
               }`"
               @click="setSettingTemplate(n)"
             >
-              {{ settings.template }}
-              {{ n }}
               <div
                 v-for="m in settings.metricCount"
                 :key="`item-${m}`"
@@ -307,7 +305,9 @@ export default {
     mdiChevronUp,
     mdiChevronDown,
     /** Local settings object based on receivedSettings props. */
-    settings: {},
+    settings: {
+      template: 1,
+    },
     /** Font size select items. */
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
@@ -397,6 +397,7 @@ export default {
           metricOptions: newSettings.metricOptions.sort(
             (a, b) => a.listOrder - b.listOrder,
           ),
+          template: this.settings.template || 1,
         },
       );
       // this.settings = {
@@ -414,10 +415,7 @@ export default {
   },
   methods: {
     setSettingTemplate(n) {
-      console.log(n);
-      console.log('this.settings', this.settings);
       this.$set(this.settings, 'template', n);
-      console.log('this.settings', this.settings);
     },
     changeColorData(metric, color) {
       if (color.name !== 'range' || (color.name === 'range' && metric.metadata)) metric.color = color.name;
@@ -432,6 +430,7 @@ export default {
           {
             ...JSON.parse(JSON.stringify(this.settings)),
             showTitle: !this.settings.showTitle,
+            template: this.settings.template || 1,
           },
         );
         // this.settings = {
@@ -454,8 +453,18 @@ export default {
     },
 
     handleChangeCount(count) {
-      this.settings.template = 1;
-      this.settings.metricCount = count;
+      this.$set(
+        this.settings,
+        'template',
+        1,
+      );
+      this.$set(
+        this.settings,
+        'metricCount',
+        count,
+      );
+      // this.settings.template = 1;
+      // this.settings.metricCount = count;
     },
 
     update() {
@@ -467,7 +476,10 @@ export default {
         this.$set(
           this,
           'settings',
-          JSON.parse(JSON.stringify(this.receivedSettings)),
+          {
+            ...JSON.parse(JSON.stringify(this.receivedSettings)),
+            template: this.settings.template || 1,
+          },
         );
         // this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
       }

@@ -601,6 +601,8 @@ export default {
       fullScreenWidth: 0.8 * window.innerWidth,
       fullScreenHeight: 0.8 * window.innerHeight,
       selectedPieIndex: -1,
+      tuneValue: '',
+      tuneSliderValue: '',
     };
   },
   computed: {
