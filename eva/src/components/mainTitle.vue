@@ -126,7 +126,7 @@
         class="tab-panel"
       >
         <div
-          v-for="tab in tabs"
+          v-for="(tab, tabIndex) in tabs"
           :key="tab.id"
           :class="{
             active: currentTab === tab.id,
@@ -174,7 +174,7 @@
               height="13"
               viewBox="0 0 8 8"
               xmlns="http://www.w3.org/2000/svg"
-              @click.stop="confirmDeleteTab(tab.id)"
+              @click.stop="confirmDeleteTab(tabIndex)"
             >
               <path
                 d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719
@@ -259,6 +259,7 @@
 
 <script>
 export default {
+  name: 'MainTitle',
   data() {
     return {
       page: 'dash',
@@ -289,11 +290,12 @@ export default {
       zoomedSearch: [],
       isConfirmModal: false,
       deleteTabId: '',
+      deleteTabName: '',
     };
   },
   computed: {
     modalText() {
-      return `Уверенны, что хотите удалить вкладку - <strong>${this.deleteTabId}</strong> ?`;
+      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
     },
     dashFromStore() {
       return this.$store.state[this.idDash];
@@ -390,7 +392,7 @@ export default {
     },
     currentTab() {
       if (this.loadingDash || !this.$store.state[this.idDash].currentTab) {
-        return 0;
+        return 1;
       }
       return this.$store.state[this.idDash].currentTab;
     },
@@ -478,11 +480,6 @@ export default {
           }
         });
       },
-    },
-    isConfirmModal(val) {
-      if (!val) {
-        this.deleteTabId = '';
-      }
     },
   },
   async mounted() {
@@ -577,9 +574,16 @@ export default {
       }
       this.checkTabOverflow();
     },
-    confirmDeleteTab(tabId) {
+    confirmDeleteTab(tabIndex) {
+      this.deleteTabName = '';
+      this.deleteTabId = '';
+      this.deleteTabId = this.tabs[tabIndex].id;
+      if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
+        this.deleteTabName = this.tabs[tabIndex].name;
+      } else {
+        this.deleteTabName = '';
+      }
       this.isConfirmModal = true;
-      this.deleteTabId = tabId;
     },
     deleteTab(isConfirm) {
       if (isConfirm) {
