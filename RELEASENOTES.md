@@ -40,6 +40,12 @@
 - Added tab deletion confirmation
 - Added closing confirmation by "Esc\Click-outside"
 - Fixed change tracking in "modal-settings" fields
+- fixed guntt hints
+- fixed an empty data source will load indefinitely
+- fixed activate tabs in new dashboards
+- fixed dashboards\groups are not imported\exported
+- fixed piechart positionlegend
+- fixed data is not disaplayed after renaming data sources
 
 # [1.84.0] - Fixed dashboard filters, multiple tokens
 
