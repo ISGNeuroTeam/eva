@@ -281,7 +281,6 @@ export default {
 
       this.loading = true;
       console.log('launch search');
-      console.log(this.search);
       const response = await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
