@@ -36,4 +36,18 @@
       box-shadow: none !important;
     }
   }
+  
+  .v-tabs {
+    background: inherit !important;
+    .v-tabs-bar {
+      background: inherit !important;
+      .v-tab {
+        color: inherit !important;
+      }
+  
+    }
+    .v-tabs-items {
+      background: inherit !important;
+    }
+  }
 }

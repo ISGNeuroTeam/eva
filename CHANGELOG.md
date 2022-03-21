@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed guntt hints
 - fixed an empty data source will load indefinitely
 - fixed activate tabs in new dashboards
+- fixed piechart positionlegend
 - fixed data is not disaplayed after renaming data sources
 
 ## [1.84.0]
