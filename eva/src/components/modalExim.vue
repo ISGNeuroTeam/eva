@@ -51,7 +51,7 @@
           <v-file-input
             :prepend-icon="fileImg"
             :color="theme.$accent_ui_color"
-            :style="{ color: theme.text, fill: theme.text }"
+            :style="{ color: theme.$main_text, fill: theme.$main_text }"
             class="file-itself"
             hide-details
             outlined
