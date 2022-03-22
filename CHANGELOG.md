@@ -61,6 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed unable to create new components
 - fixed dash tune
 - fixed default tab are not created
+- fixed multiselect refinement
+- fixed multiselect placing data on multiple lines
 
 ## [1.84.0]
 
