@@ -52,7 +52,7 @@
             small
             :color="theme.$primary_button"
             class="log-btn"
-            @click="cancelModal"
+            @click="confirmCloseModal"
           >
             Закрыть
           </v-btn>
@@ -108,10 +108,14 @@ export default {
     },
   },
   methods: {
+    confirmCloseModal() {
+      this.$refs.persistentModal.openConfirmModal();
+    },
     cancelModal() {
       if (this.isChanged) {
-        this.clearLog('Восстановить');
+        this.clearLog(this.clear);
       }
+      this.clear = 'Очистить';
       this.active = false;
     },
     async getLog() {
