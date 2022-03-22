@@ -6,7 +6,7 @@
     :is-confirm="isChanged"
     :persistent="isChanged"
     width="90%"
-    @cancelModal="cancelModal"
+    @cancelModal="cancelModal(isChanged)"
   >
     <v-card
       class="log-block"
@@ -100,15 +100,18 @@ export default {
     },
   },
   watch: {
-    active() {
-      if (this.modalValue) {
+    active(value) {
+      if (value) {
+        this.isChanged = false;
         this.getLog();
       }
     },
   },
   methods: {
     cancelModal() {
-      this.clearLog('Восстановить');
+      if (this.isChanged) {
+        this.clearLog('Восстановить');
+      }
       this.active = false;
     },
     async getLog() {
@@ -169,6 +172,7 @@ export default {
       if (response.status === 200) {
         this.msgError = 'Лог сохранен успешно';
         this.colorError = 'teal';
+        this.isChanged = false;
         hide();
       } else {
         this.msgError = 'Не получилось. Попробуйте еще раз.';
@@ -187,7 +191,7 @@ export default {
           this.clear = 'Восстановить';
         }
       } else {
-        this.isChanged = false;
+        this.isChanged = true;
         this.text = this.restore;
         this.clear = 'Очистить';
         await this.$store.dispatch('auth/putLog', this.text);
