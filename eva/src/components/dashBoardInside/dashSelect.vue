@@ -190,7 +190,6 @@ export default {
       if (this.dataRestFrom != null) {
         data = this.dataRestFrom;
       }
-      console.log('dataRestFrom', this.dataRestFrom);
       return data;
     },
     theme() {
@@ -319,7 +318,6 @@ export default {
       }
     },
     dataReady(dataReady) {
-      console.log('dataReady', dataReady);
       let data = [];
       if (dataReady.length > 0) {
         data = Object.keys(dataReady);
@@ -432,10 +430,9 @@ export default {
 
       this.topArray = sorted([...selected]);
       this.bottomArray = sorted([...data]);
-      console.log('this.topArray', this.topArray);
-      console.log('this.bottomArray', this.bottomArray);
+
       data = [...this.topArray, ...this.bottomArray];
-      console.log('data', data);
+
       return data;
     },
     setTocken() {
@@ -446,8 +443,8 @@ export default {
         id: this.id,
       });
       const { tockens } = this.$store.state[this.idDash];
-
       const tockensToUpdate = [];
+
       let curTocken = {};
       const data = this.dataReady;
       Object.keys(tockens).forEach((i) => {
