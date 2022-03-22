@@ -298,7 +298,10 @@ export default {
       return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
     },
     dashFromStore() {
-      return this.$store.state[this.idDash];
+      if (this.idDash) {
+        return this.$store.state[this.idDash];
+      }
+      return null;
     },
     // получаем объект с настройками моадлки натсроек
     getModalSettings() {

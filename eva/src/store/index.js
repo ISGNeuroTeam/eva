@@ -1268,10 +1268,14 @@ export default new Vuex.Store({
                   prop: 'tabList',
                   value: [{ id: 1, name: 'Без названия' }],
                 },
+              ]);
+            }
+            if (typeof state[id].tabs === 'undefined') {
+              commit('setState', [
                 {
                   object: state[id],
-                  prop: 'tab',
-                  value: stateFrom.body !== '' ? JSON.parse(stateFrom.body).tab : false,
+                  prop: 'tabs',
+                  value: false,
                 },
               ]);
             }
