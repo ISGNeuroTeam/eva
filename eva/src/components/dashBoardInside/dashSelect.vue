@@ -124,13 +124,31 @@ import {
 
 export default {
   props: {
-    idFrom: null,
-    idDashFrom: null,
-    dataRestFrom: null,
-    colorFrom: null,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    colorFrom: {
+      type: Object,
+      required: true,
+    },
     dataLoadingFrom: null,
-    widthFrom: null,
-    dataModeFrom: null,
+    widthFrom: {
+      type: Number,
+      required: true,
+    },
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
@@ -180,11 +198,48 @@ export default {
     widthInput() {
       return `${this.widthFrom - 70}px`;
     },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     multiple() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const options = this.getOptions;
       if (options.multiple) {
         return options.multiple;
       }
@@ -211,32 +266,45 @@ export default {
       }
       return res;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getSelected() {
+      if (!this.dashFromStore.selected) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'selected',
+          value: {
+            elem: '',
+            elemlink: '',
+            elemDeep: '',
+          },
+        }]);
+      }
+
+      return this.dashFromStore.selected;
+    },
     selectedElem() {
-      return this.$store.getters.getSelected({
-        idDash: this.idDash,
-        id: this.id,
-      }).elem;
+      return this.getSelected.elem;
     },
     selectedElemLink() {
-      return this.$store.getters.getSelected({
-        idDash: this.idDash,
-        id: this.id,
-      }).elemlink;
+      return this.getSelected.elemlink;
     },
     selectedElemDeep() {
-      return this.$store.getters.getSelected({
-        idDash: this.idDash,
-        id: this.id,
-      }).elemDeep;
+      return this.getSelected.elemDeep;
     },
     dataLoading() {
       return this.dataLoadingFrom;
     },
   },
   watch: {
-    selectedElemDeep() {
-      if (this.selectedElemDeep.elemDeep === '') {
-        this.elemDeep[String(this.multiple)] = String(this.multiple) === 'true' ? [] : '';
+    selectedElemDeep(val) {
+      if (val.elemDeep === '') {
+        this.$store.commit('setState', [{
+          object: this.elemDeep,
+          prop: String(this.multiple),
+          value: String(this.multiple) === 'true' ? [] : '',
+        }]);
       }
     },
     selectedElemLink() {
@@ -263,9 +331,13 @@ export default {
           }
         }
         this.dataFromRest = data;
-        for (const action of this.actions) {
-          action.capture = data;
-        }
+        this.actions.forEach((action) => {
+          this.$store.commit('setState', [{
+            object: action,
+            prop: 'capture',
+            value: data,
+          }]);
+        });
       }
     },
   },
@@ -275,13 +347,14 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
-    const selected = this.$store.getters.getSelected({
-      idDash: this.idDash,
-      id: this.id,
-    });
+    const selected = this.getSelected;
     if (selected) {
-      selected.elem ? (this.elem = selected.elem) : false;
-      selected.elemlink ? (this.elemlink = selected.elemlink) : false;
+      if (selected.elem) {
+        this.elem = selected.elem;
+      }
+      if (selected.elemlink) {
+        this.elemlink = selected.elemlink;
+      }
       if (
         this.elem !== 'Выберите элемент'
         && this.elemlink !== 'Выберите связанный столбец данных'
@@ -317,6 +390,8 @@ export default {
             id: this.id,
           });
           break;
+        default:
+          break;
       }
       if (
         this.elem !== 'Выберите элемент'
@@ -346,15 +421,11 @@ export default {
     },
     filterSelect(res, selected) {
       let data = [...[], ...res];
-      data = data.filter((elem) => {
-        if (!selected.includes(elem)) {
-          return elem;
-        }
-      });
+      data = data.filter((elem) => !selected.includes(elem));
 
-      function sorted(data) {
-        data = Number(data[0]) ? data.sort((a, b) => a - b) : data.sort();
-        return data;
+      function sorted(sortData) {
+        sortData = Number(sortData[0]) ? sortData.sort((a, b) => a - b) : sortData.sort();
+        return sortData;
       }
 
       this.topArray = sorted([...selected]);
@@ -371,9 +442,9 @@ export default {
         idDash: this.idDash,
         id: this.id,
       });
-      const tockens = this.$store.getters.getTockens(this.idDash);
-
+      const { tockens } = this.$store.state[this.idDash];
       const tockensToUpdate = [];
+
       let curTocken = {};
       const data = this.dataReady;
       Object.keys(tockens).forEach((i) => {
@@ -385,7 +456,7 @@ export default {
       let value = null;
       if (String(this.multiple) === 'true') {
         value = [...[], ...this.elemDeep[String(this.multiple)]];
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i += 1) {
           value.forEach((deep, j) => {
             if (data[i][this.elem] === deep) {
               value[j] = data[i][this.elemlink];
@@ -393,7 +464,7 @@ export default {
           });
         }
       } else {
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
             value = [data[i][this.elemlink]];
             break;
@@ -409,7 +480,7 @@ export default {
       }
       if (curTocken.delimetr && curTocken.delimetr !== '') {
         value = value.join(curTocken.delimetr);
-      } else {
+      } else if (value) {
         value = value.join(',');
       }
 

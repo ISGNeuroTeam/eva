@@ -165,7 +165,10 @@ export default {
       activeDelete: false,
       createSome: false,
       colorRow: false,
-      keyFrom: null,
+      keyFrom: {
+        type: Number,
+        required: true,
+      },
       dataDelete: {},
       curItem: {},
       permission: true,
@@ -281,7 +284,8 @@ export default {
       }
     },
     async setData(role) {
-      return await this.$store.getters['auth/getEssenceList'](role, false);
+      const result = await this.$store.dispatch('auth/getEssenceList', { role, create: false });
+      return result;
     },
     setColorHover(i) {
       let table = {};
@@ -297,7 +301,7 @@ export default {
             });
             table.addEventListener('mouseout', (event) => {
               if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style = `background: transparent !important;color:${this.theme.$main_text}`;
+                event.target.parentElement.style = 'background: transparent !important;';
               }
             });
           } else {
@@ -328,6 +332,8 @@ export default {
           break;
         case 5:
           text = '<p>Удалить индекс</p> ';
+          break;
+        default:
           break;
       }
       this.dataDelete.text = `${text} <span>${item.name}</span>`;

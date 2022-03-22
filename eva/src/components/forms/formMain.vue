@@ -58,11 +58,11 @@
           </v-card>
         </div>
         <div
-          v-if="permission == 'admin'"
+          v-if="permission === 'admin'"
           class="divider"
         />
         <div
-          v-if="permission == 'admin'"
+          v-if="permission === 'admin'"
           class="main-form"
         >
           <v-card
@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { mdiPlusCircleOutline, mdiHardHat, mdiHatFedora } from '@mdi/js';
+import { mdiHardHat, mdiHatFedora, mdiPlusCircleOutline } from '@mdi/js';
 
 export default {
   data() {
@@ -103,48 +103,50 @@ export default {
       loading: true,
     };
   },
+  // осоновные параметры, которые чатсо меняются и которы следует отслеживать
   computed: {
-    // осоновные параметры, которые чатсо меняются и которы следует отслеживать
+    // позволяет понять в режима администратора вошли или пользователя
     permission() {
-      // позволяет понять в режима администратора вошли или пользователя
       return this.$route.params.id;
     },
   },
   mounted() {
+    // если страница не главная, а уже выбран какой-то режим
     if (this.permission) {
-      // если страница не главная, а уже выбран какой-то режим
-      this.getForms(); // нужно получить список всех форм
+      // нужно получить список всех форм
+      this.getForms();
     }
   },
   methods: {
+    // метод который получает список всех шаблонов из базы данных
     async getForms() {
-      // метод который получает список всех шаблонов из базы данных
-      const forms = await this.$store.getters['form/getAllTemplates']; // получаем список
-      this.forms = forms; // и заносим его в переменную
-      this.loading = false; // отключаем блок с загрузкой
+      // получаем список и заносим его в переменную
+      this.forms = await this.$store.dispatch('form/getAllTemplates');
+      // отключаем блок с загрузкой
+      this.loading = false;
     },
+    // открываем модалку с созданием нового шаблона
     createForm() {
-      // открываем модалку с созданием нового шаблона
       this.modal = !this.modal;
     },
+    // открываем существующий шаблон
     openForm(name, permission) {
-      // открываем существующий шаблон
-      if (permission == 'admin') {
-        // если открывает администратор
-        this.$router.push(`/forms/open?editable=false&id=${name[0]}`); //  то октрываем сам шаблон для просмотра
-      } else {
+      // если открывает администратор
+      if (permission === 'admin') {
+        //  то октрываем сам шаблон для просмотра
+        this.$router.push(`/forms/open?editable=false&id=${name[0]}`);
         // если пользователь
-        this.$router.push(`/forms/openlist/${name[0]}?name=${name[1]}`); // то откроется список форм данного шаблона
+      } else {
+        // то откроется список форм данного шаблона
+        this.$router.push(`/forms/openlist/${name[0]}?name=${name[1]}`);
       }
     },
-    //    openFormUser: function(name){  //
-    //        this.template = false;
-    //        this.templateName = name;
-    //    },
+    // понимаем какой режим нужно отобразить
     openMainRole(role) {
-      // понимаем какой режим нужно отобразить
-      this.getForms(); // в любом случае забираем список форм из базы данных
-      this.$router.push(`/forms/${role}`); // и отображаем нужный режим
+      // в любом случае забираем список форм из базы данных
+      this.getForms();
+      // и отображаем нужный режим
+      this.$router.push(`/forms/${role}`);
     },
   },
 };

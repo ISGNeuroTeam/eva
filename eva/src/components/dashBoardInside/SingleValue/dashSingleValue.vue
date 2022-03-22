@@ -58,7 +58,7 @@
       </div>
     </div>
     <SingleValueSettings
-      :is-open="isSettingsComponentOpen"
+      v-model="isSettingsComponentOpen"
       :received-settings="providedSettings"
       :update-count="updateCount"
       :default-settings="defaultSettings"
@@ -70,19 +70,37 @@
 
 <script>
 import { mdiSettings } from '@mdi/js';
-import SingleValueSettings from './SingleValueSettings';
+import SingleValueSettings from './SingleValueSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
 
 export default {
   name: 'SingleValue',
   components: { SingleValueSettings },
   props: {
-    idFrom: String,
-    idDashFrom: String,
-    dataRestFrom: Array,
-    dataModeFrom: Boolean,
-    updateSettings: Function,
-    currentSettings: Object,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    },
+    updateSettings: {
+      type: Function,
+      required: true,
+    },
+    currentSettings: {
+      type: Object,
+      required: true,
+    },
   },
   data: () => ({
     mdiSettings,
@@ -116,12 +134,54 @@ export default {
     metricTemplateClass() {
       return `metric-${this.metricCount} v-${this.template}`;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
+    getOptions() {
+      if (!this.idFrom) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDashFrom });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
   },
   watch: {
     dataRestFrom() {
-      const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(
-        JSON.stringify(this.$store.getters.getOptions({ id, idDash })),
+        JSON.stringify(this.getOptions),
       );
       this.setVisual(
         this.currentSettings.metricOptions?.length
@@ -149,7 +209,7 @@ export default {
       }
       const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
-        ranges[key] = ranges[key].split(':').map(Number);
+        ranges[key] = `${ranges[key]}`.split(':').map(Number);
       });
 
       if (metric.color === 'range') {
@@ -174,9 +234,8 @@ export default {
       return '#5980f8';
     },
     init(settings, up) {
-      const { idFrom: id, idDashFrom: idDash } = this;
       const options = JSON.parse(
-        JSON.stringify(this.$store.getters.getOptions({ id, idDash })),
+        JSON.stringify(this.getOptions),
       );
       if (!options.settings && !settings) {
         options.settings = {
@@ -197,13 +256,12 @@ export default {
         settings: settings || options.settings,
       };
       this.template = template;
-      this.isHeaderOpen = !!settings.showTitle;
+      this.isHeaderOpen = !!settings?.showTitle;
       this.metricCount = this.metricCount || metricCount;
       this.updateVisual(settings || options.settings);
     },
     updateCount(count) {
-      const { idFrom: id, idDashFrom: idDash } = this;
-      const options = { ...this.$store.getters.getOptions({ id, idDash }) };
+      const options = { ...this.getOptions };
       this.metricCount = count;
 
       const newSettings = {
@@ -222,46 +280,48 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
-      for (const [index, data] of this.dataRestFrom.entries()) {
+      this.dataRestFrom.forEach((data, index) => {
         const {
-          metric, value, id, metadata,
+          metric, value, metadata,
         } = data;
+        const id = index + 1;
         if (metric === '_title') {
           this.titleToken = String(value);
-          continue;
-        }
-        let range = metadata;
+        } else {
+          let range = metadata;
 
-        if (!metadata || typeof metadata !== 'string') {
-          range = null;
+          if (!metadata || typeof metadata !== 'string') {
+            range = null;
+          }
+          const startId = `${metric}_${id}`;
+          const metricCurrent = metricOptionsCurrent?.find(
+            (m) => m.startId === startId,
+          );
+          const defaultMetricOption = {
+            id: metricCurrent?.id || id,
+            startId: metricCurrent?.startId || startId,
+            metadata,
+            title: metric || data.phase,
+            color: metricCurrent?.color || 'main',
+            icon: metricCurrent?.icon || 'no_icon',
+            fontSize: metricCurrent?.fontSize || 54,
+            fontWeight: metricCurrent?.fontWeight || 400,
+            listOrder:
+              metricCurrent?.listOrder === undefined
+                ? index
+                : metricCurrent?.listOrder,
+            ...metricCurrent,
+          };
+          metricList.push({ value, ...defaultMetricOption });
+          metricOptions.push({
+            id,
+            range,
+            expanded: false,
+            ...defaultMetricOption,
+          });
         }
-        const startId = `${metric}_${id}`;
-        const metricCurrent = metricOptionsCurrent?.find(
-          (m) => m.startId === startId,
-        );
-        const defaultMetricOption = {
-          id: metricCurrent?.id || id,
-          startId: metricCurrent?.startId || startId,
-          metadata,
-          title: metric || data.phase,
-          color: metricCurrent?.color || 'main',
-          icon: metricCurrent?.icon || 'no_icon',
-          fontSize: metricCurrent?.fontSize || 54,
-          fontWeight: metricCurrent?.fontWeight || 400,
-          listOrder:
-            metricCurrent?.listOrder === undefined
-              ? index
-              : metricCurrent?.listOrder,
-          ...metricCurrent,
-        };
-        metricList.push({ value, ...defaultMetricOption });
-        metricOptions.push({
-          id,
-          range,
-          expanded: false,
-          ...defaultMetricOption,
-        });
-      }
+      });
+
       if (
         this.dataRestFrom.length === 6
         && !this.dataRestFrom.find((i) => i.metric === '_title')
@@ -310,22 +370,29 @@ export default {
       this.options.settings = newSettings;
 
       /** Updated local metricList array. */
-      const newMetricList = [];
-      for (const [index, updatedMetric] of metricOptions.entries()) {
-        const {
-          icon, title, color, fontSize, fontWeight,
-        } = updatedMetric;
-        const metric = this.metricList.find((m) => m.id === updatedMetric.id);
-        if (metric) {
-          metric.icon = icon;
-          metric.title = title;
-          metric.color = color;
-          metric.fontSize = fontSize;
-          metric.fontWeight = fontWeight;
-          metric.listOrder = index;
-          newMetricList[index] = metric;
-        }
-      }
+      const newMetricList = metricOptions
+        .reduce((acc, updatedMetric, index) => {
+          const {
+            icon, title, color, fontSize, fontWeight,
+          } = updatedMetric;
+          const metric = this.metricList.find((m) => m.id === updatedMetric.id);
+          if (metric) {
+            return [
+              ...acc,
+              {
+                ...metric,
+                icon,
+                title,
+                color,
+                fontSize,
+                fontWeight,
+                listOrder: index,
+              },
+            ];
+          }
+          return acc;
+        }, []);
+
       this.metricList = [...newMetricList];
       this.providedSettings = { ...newSettings };
 
@@ -336,7 +403,7 @@ export default {
       });
 
       if (this.updateSettings) this.updateSettings(newSettings);
-      this.update++;
+      this.update += 1;
     },
 
     closeSettings() {

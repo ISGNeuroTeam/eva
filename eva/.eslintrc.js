@@ -13,7 +13,7 @@ module.exports = {
 
   extends: [
     // 'eslint:recommended',
-    'plugin:vue/strongly-recommended',
+    'plugin:vue/recommended',
     'airbnb-base',
   ],
   plugins: [
@@ -23,11 +23,17 @@ module.exports = {
   ],
 
   rules: {
+    'import/extensions': 'off',
+    'import/prefer-default-export': 'off',
+    'import/no-unresolved': 'off',
+    'no-bitwise': 'off',
+    'no-param-reassign': 'off',
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-unused-vars': 'warn',
     'no-undef': 'error',
     'no-case-declarations': 'error',
+    'vue/no-v-html': 'off',
     'vue/no-side-effects-in-computed-properties': 'error',
     'no-useless-escape': 'error',
     'vue/no-dupe-keys': 'error',
