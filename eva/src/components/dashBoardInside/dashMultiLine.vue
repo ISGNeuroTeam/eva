@@ -281,7 +281,7 @@ export default {
 
       const {
         barplotstyle, color, united, yFromZero, axesCount,
-        metricsAxis,
+        metricsAxis, isDataAlwaysShow,
       } = this.options;
 
       this.x = {};
@@ -321,7 +321,7 @@ export default {
             break;
           default:
             this.x[metric] = d3.scaleLinear()
-              .range([0, width]);
+              .range([(isDataAlwaysShow ? 50 : 0), width]);
             break;
         }
         this.xZoom = d3.scaleLinear().range([0, width]);
@@ -473,7 +473,7 @@ export default {
       const {
         // eslint-disable-next-line camelcase
         type_line, color, united, barplotBarWidth, barplotstyle,
-        strokeWidth,
+        strokeWidth, isDataAlwaysShow,
       } = this.options;
 
       this.metrics.forEach((metric) => {
@@ -688,7 +688,7 @@ export default {
             .data(this.data)
             .enter()
             .append('circle')
-            .attr('class', `dot dot-${metric}`)
+            .attr('class', `dot dot-${metric} ${(isDataAlwaysShow ? 'dot-show' : '')}`)
             .attr('cx', (d) => this.x[metric](d[this.xMetric]))
             .attr('cy', (d) => this.y[metric](d[metric]))
             .attr('r', 5)
@@ -706,6 +706,30 @@ export default {
                 .attr('x1', lineXPos)
                 .attr('x2', lineXPos);
             });
+
+          if (isDataAlwaysShow) {
+            this.svg
+              .append('g')
+              .selectAll('dot')
+              .data(this.data)
+              .enter()
+              .append('text')
+              .attr('transform', 'translate(-5, -5)')
+              .attr('font-size', '11')
+              .attr('text-anchor', 'end')
+              .attr('fill', this.theme.$main_text)
+              .text((d) => {
+                const fieldName = isDataAlwaysShow === 'data'
+                  ? metric
+                  : `_${metric}_caption`;
+                const val = d[(d[fieldName] === undefined ? metric : fieldName)];
+                return (val % 1) // is float
+                  ? Number.parseFloat(d[metric]).toFixed(2)
+                  : d[metric];
+              })
+              .attr('x', (d) => this.x[metric](d[this.xMetric]))
+              .attr('y', (d) => this.y[metric](d[metric]));
+          }
         }
       });
     },
@@ -979,6 +1003,8 @@ export default {
     opacity: 0
     cursor: pointer
     &:hover
+      opacity: 1
+    &.dot-show
       opacity: 1
 
   .graph-tooltip
