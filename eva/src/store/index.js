@@ -907,7 +907,7 @@ export default new Vuex.Store({
       });
     },
     changeCurrentTab(state, { idDash, tab }) {
-      state[idDash].currentTab = tab;
+      Vue.set(state[idDash], 'currentTab', tab);
     },
     deleteDashTab(state, { idDash, tabID }) {
       if (state[idDash]?.elements && state[idDash].elements?.length > 0) {
