@@ -1213,15 +1213,6 @@ export default new Vuex.Store({
                 },
               ]);
             }
-            if (!state[id]?.tabList) {
-              commit('setState', [
-                {
-                  object: state[id],
-                  prop: 'tabList',
-                  value: [{ id: 1, name: 'Без названия' }],
-                },
-              ]);
-            }
             if (stateFrom.modified > state[id].modified) {
               resolve({
                 status: 'exist',
@@ -1270,7 +1261,20 @@ export default new Vuex.Store({
                 }
               });
             }
-
+            if (!state[id]?.tabList || state[id]?.tabList?.length === 0) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'tabList',
+                  value: [{ id: 1, name: 'Без названия' }],
+                },
+                {
+                  object: state[id],
+                  prop: 'tab',
+                  value: stateFrom.body !== '' ? JSON.parse(stateFrom.body).tab : false,
+                },
+              ]);
+            }
             state[id].filters?.forEach((filter) => {
               if (filter.idDash !== id) {
                 commit('setState', [

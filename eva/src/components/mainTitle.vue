@@ -385,10 +385,10 @@ export default {
       return this.tabs.length > 1;
     },
     showTabs() {
-      if (this.loadingDash || !this.dashFromStore.tabs) {
+      if (this.loadingDash || !this.dashFromStore) {
         return false;
       }
-      return this.dashFromStore.tabs;
+      return this.dashFromStore?.tabs;
     },
     currentTab() {
       if (this.loadingDash || !this.dashFromStore.currentTab) {
