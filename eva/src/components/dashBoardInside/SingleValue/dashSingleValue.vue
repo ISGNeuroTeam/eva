@@ -47,9 +47,13 @@
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
+            display: ${metric.value.split(',').length > 1 ? 'flex' : 'block'};
             `"
         >
-          <span v-text="metric.value" />
+          <span
+            v-for="(value, inx) in metric.value.split(',')"
+            v-text="value + (inx !== metric.value.split(',').length -1 ? ', ' : '') "
+          />
         </span>
       </div>
     </div>
@@ -205,7 +209,7 @@ export default {
       }
       const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
-        ranges[key] = ranges[key].split(':').map(Number);
+        ranges[key] = `${ranges[key]}`.split(':').map(Number);
       });
 
       if (metric.color === 'range') {
@@ -278,8 +282,9 @@ export default {
       const metricOptions = [];
       this.dataRestFrom.forEach((data, index) => {
         const {
-          metric, value, id, metadata,
+          metric, value, metadata,
         } = data;
+        const id = index + 1;
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
@@ -387,25 +392,6 @@ export default {
           }
           return acc;
         }, []);
-
-      // TODO: оставил старый цикл так как не уверен,
-      //  что все предусмотрул в новой реализации
-
-      // metricOptions.forEach((updatedMetric, index) => {
-      //   const {
-      //     icon, title, color, fontSize, fontWeight,
-      //   } = updatedMetric;
-      //   const metric = this.metricList.find((m) => m.id === updatedMetric.id);
-      //   if (metric) {
-      //     metric.icon = icon;
-      //     metric.title = title;
-      //     metric.color = color;
-      //     metric.fontSize = fontSize;
-      //     metric.fontWeight = fontWeight;
-      //     metric.listOrder = index;
-      //     newMetricList[index] = metric;
-      //   }
-      // });
 
       this.metricList = [...newMetricList];
       this.providedSettings = { ...newSettings };
