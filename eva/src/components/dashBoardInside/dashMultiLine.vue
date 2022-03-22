@@ -479,7 +479,7 @@ export default {
       const {
         // eslint-disable-next-line camelcase
         type_line, color, united, barplotstyle,
-        strokeWidth, isDataAlwaysShow, lastResult,
+        strokeWidth, isDataAlwaysShow, lastDot,
       } = this.options;
       let barplotBarWidth = +this.options.barplotBarWidth || 0;
 
@@ -717,7 +717,7 @@ export default {
             .append('circle')
             .attr('class', (d, i) => {
               const textToRight = (i === this.data.length - 1);
-              const showDot = isDataAlwaysShow || (lastResult && textToRight);
+              const showDot = isDataAlwaysShow || (lastDot && textToRight);
               return `dot dot-${metric} ${(showDot ? 'dot-show' : '')}`;
             })
             .attr('cx', (d) => this.x[metric](d[this.xMetric]))
@@ -740,7 +740,7 @@ export default {
         }
 
         // рисуем текст у вершин
-        if (isDataAlwaysShow || lastResult) {
+        if (isDataAlwaysShow || lastDot) {
           const isLine = (metricType === 'linechart' || !metricType);
           this.svg
             .append('g')
