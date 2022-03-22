@@ -71,7 +71,7 @@ export default {
         { name: 'select', capture: ['start', 'end'] },
       ],
       margin: {
-        top: 15, right: 10, bottom: 5, left: 30,
+        top: 15, right: 10, bottom: 10, left: 30,
       },
       marginOffset: {
         top: 0, right: 0, bottom: 0, left: 0,
@@ -272,7 +272,7 @@ export default {
       this.svg = d3.select(this.$refs.svgContainer)
         .append('svg')
         .attr('width', width + margin.left + marginOffsetX + margin.right)
-        .attr('height', height + margin.top + margin.bottom + marginOffset.bottom)
+        .attr('height', height + margin.top + margin.bottom + marginOffset.bottom - 10)
         .append('g')
         .attr(
           'transform',
@@ -472,9 +472,10 @@ export default {
       }
       const {
         // eslint-disable-next-line camelcase
-        type_line, color, united, barplotBarWidth, barplotstyle,
+        type_line, color, united, barplotstyle,
         strokeWidth, isDataAlwaysShow,
       } = this.options;
+      const barplotBarWidth = +this.options.barplotBarWidth || 0;
 
       this.metrics.forEach((metric) => {
         const metricType = this.getMetricType(metric);
