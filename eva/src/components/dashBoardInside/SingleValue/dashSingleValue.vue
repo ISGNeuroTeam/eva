@@ -47,9 +47,13 @@
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
+            display: ${metric.value.split(',').length > 1 ? 'flex' : 'block'};
             `"
         >
-          <span v-text="metric.value" />
+          <span
+            v-for="(value, inx) in metric.value.split(',')"
+            v-text="value + (inx !== metric.value.split(',').length -1 ? ', ' : '') "
+          />
         </span>
       </div>
     </div>
