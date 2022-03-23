@@ -1503,10 +1503,12 @@ export default {
             return x.elem === this.tockens[index].elem
                 && x.action === this.tockens[index].action
                 && x.capture === this.tockens[index].capture;
-          } return x.elem === this.newElem
+          }
+          return x.elem === this.newElem
               && x.action === this.newAction
               && x.capture === this.newCapture;
         });
+
         if (filterTockens.length > 0) {
           this.errorSaveToken = true;
           this.openwarning = true;

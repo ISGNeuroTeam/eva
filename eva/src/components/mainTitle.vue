@@ -355,8 +355,8 @@ export default {
       return this.dashFromStore.elements
         .filter(
           (elem) => this.dashFromStore[elem].tab
-                === this.currentTab
-                || this.dashFromStore[elem].options?.pinned,
+            === this.currentTab
+            || this.dashFromStore[elem].options?.pinned,
         )
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
@@ -743,7 +743,8 @@ export default {
         elements.push({ search: dataSourseTitle });
       }
       elements.forEach((elem) => {
-        this.dataObject[this.getSearchName(elem)].data = this.dataObjectConst[this.getSearchName(elem)].data;
+        this.dataObject[this.getSearchName(elem)]
+          .data = this.dataObjectConst[this.getSearchName(elem)].data;
       });
     },
   },
