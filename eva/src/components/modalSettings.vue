@@ -1443,13 +1443,6 @@ export default {
                     val = oldVal;
                   }
                 }
-                // если не выбраны заголовки то выделить все имеющиеся
-                if (val.length === 0) {
-                  const allTitles = this.titles;
-                  if (allTitles.length) {
-                    val = [...allTitles];
-                  }
-                }
                 localOptions[item] = val || [];
               } else {
                 const val = options[item] !== null && typeof options[item] === 'object'
@@ -1465,10 +1458,26 @@ export default {
                 localOptions[item] = true;
               } else if (item === 'positionlegend') {
                 localOptions[item] = 'right';
+              } else if (item === 'titles') {
+                let val = options[item];
+                if (!val) {
+                  // old settings
+                  const oldVal = this.getSelectedTableTitles;
+                  if (oldVal) {
+                    val = oldVal;
+                  }
+                }
+                // если не выбраны заголовки то выделить все имеющиеся
+                if (val.length === 0) {
+                  const allTitles = this.titles;
+                  if (allTitles.length) {
+                    val = [...allTitles];
+                  }
+                }
+                localOptions[item] = val || [];
               } else {
-                const field = settings.optionFields.find(
-                  (field) => field.option === item,
-                );
+                const field = settings.optionFields
+                  .find((fieldItem) => fieldItem.option === item);
                 if (field && field.default !== undefined) {
                   localOptions[item] = field.default;
                 }
