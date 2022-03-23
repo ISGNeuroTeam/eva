@@ -227,7 +227,7 @@ export default {
   },
   mounted() {
     this.dataRestFromWatch();
-    this.$emit('setVissible', { element: this.id, overflow: 'visible' });
+    this.$emit('setVissible', { element: this.id, overflow: 'hidden' });
   },
   methods: {
     hiddenTooltip() {
@@ -521,7 +521,7 @@ export default {
       // Tooltip
 
       const tooltipBlock = this.$refs.tooltip;
-      const tooltipMargin = this.$attrs['is-full-screen'] ? 170 : 30;
+      const tooltipMargin = this.$attrs['is-full-screen'] ? 200 : 30;
 
       function transformDescription(text) {
         let rows = text.split('\\n');
