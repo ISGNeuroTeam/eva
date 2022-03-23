@@ -800,11 +800,9 @@ export default {
         );
 
       if (left > this.widthFrom / 2) {
-        pos.right = width - left
-          + marginOffset.right;
+        pos.right = width - left + offset;
       } else {
-        pos.left = left
-          + marginOffset.left;
+        pos.left = left + offset;
       }
 
       if (top > height / 2) {
