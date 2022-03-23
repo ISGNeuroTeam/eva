@@ -170,7 +170,7 @@ export default {
     }, // объект тултипа
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     }, // выключена ли шапка или включена
     activeElemFrom: {
       type: String,
@@ -182,7 +182,7 @@ export default {
     },
     isFullScreen: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {

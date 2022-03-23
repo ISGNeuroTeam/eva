@@ -601,7 +601,6 @@ export default {
                         .attr('x2', lineXPos);
                     });
                 } else {
-
                   if (!barplotBarWidth) {
                     barplotBarWidth = barWidth;
                   }

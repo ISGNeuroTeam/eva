@@ -251,7 +251,9 @@ export default {
         data = Object.keys(this.dataReady);
         if (Object.keys(this.dataReady).length !== 0) {
           if (!this.dataReady.error) {
-            data = Object.keys(this.dataReady[0]).filter((item) => !this.dataReady.map((x) => x[item]).every((x) => x === null));
+            data = Object.keys(this.dataReady[0])
+              .filter((item) => !this.dataReady
+                .map((x) => x[item]).every((x) => x === null));
           }
         }
       }
@@ -457,12 +459,16 @@ export default {
 
       if (String(this.multiple) === 'true') {
         this.elemDeep[String(this.multiple)].forEach((elem) => {
-          value = [...value, ...data.filter((x) => elem === x[this.elem]).map((x) => x[this.elemlink]).reduce((a, b) => {
-            if (a.includes(b)) {
-              return a;
-            }
-            return [...a, b];
-          }, [])];
+          value = [
+            ...value,
+            ...data.filter((x) => elem === x[this.elem])
+              .map((x) => x[this.elemlink])
+              .reduce((a, b) => {
+                if (a.includes(b)) {
+                  return a;
+                }
+                return [...a, b];
+              }, [])];
         });
       } else {
         value = [...[], ...this.elemDeep[String(this.multiple)]];

@@ -1500,8 +1500,13 @@ export default {
 
       const filterTockens = this.tockens.filter((x) => {
         if (index) {
-          return x.elem === this.tockens[index].elem && x.action === this.tockens[index].action && x.capture === this.tockens[index].capture;
-        } return x.elem === this.newElem && x.action === this.newAction && x.capture === this.newCapture;
+          return x.elem === this.tockens[index].elem
+            && x.action === this.tockens[index].action
+            && x.capture === this.tockens[index].capture;
+        }
+        return x.elem === this.newElem
+          && x.action === this.newAction
+          && x.capture === this.newCapture;
       });
 
       if (filterTockens.length > 0) {
