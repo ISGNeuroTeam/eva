@@ -139,7 +139,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-
       if (!this.dashFromStore?.options.pinned) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -169,7 +168,6 @@ export default {
           value: false,
         }]);
       }
-
       return this.dashFromStore.options;
     },
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
@@ -392,7 +390,6 @@ export default {
 
       if (this.dashOptions?.metricsRelation?.relations) {
         const metrics = this.dashOptions.metricsRelation.relations;
-
         if (typeof this.dataRestFrom[0]?.[metrics[1]] === 'number') {
           // если все-таки число
           this.nodata = false; // то убираем соощение о отсутствии данных

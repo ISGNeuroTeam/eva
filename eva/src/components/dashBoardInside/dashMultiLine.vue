@@ -71,7 +71,7 @@ export default {
         { name: 'select', capture: ['start', 'end'] },
       ],
       margin: {
-        top: 15, right: 10, bottom: 5, left: 30,
+        top: 15, right: 10, bottom: 10, left: 30,
       },
       marginOffset: {
         top: 0, right: 0, bottom: 0, left: 0,
@@ -158,6 +158,9 @@ export default {
     },
     data() {
       return this.dataRestFrom;
+    },
+    lastDataItem() {
+      return this.dataRestFrom[this.dataRestFrom.length - 1];
     },
     box() {
       const {
@@ -272,7 +275,7 @@ export default {
       this.svg = d3.select(this.$refs.svgContainer)
         .append('svg')
         .attr('width', width + margin.left + marginOffsetX + margin.right)
-        .attr('height', height + margin.top + margin.bottom + marginOffset.bottom)
+        .attr('height', height + margin.top + margin.bottom + marginOffset.bottom - 10)
         .append('g')
         .attr(
           'transform',
@@ -281,7 +284,7 @@ export default {
 
       const {
         barplotstyle, color, united, yFromZero, axesCount,
-        metricsAxis,
+        metricsAxis, isDataAlwaysShow,
       } = this.options;
 
       this.x = {};
@@ -409,8 +412,11 @@ export default {
       });
 
       // Add a clipPath: everything out of this area won't be drawn.
+      const clipPathID = this.isFullScreen
+        ? `clip-${this.id}-full`
+        : `clip-${this.id}`;
       this.clip = this.svg.append('defs').append('svg:clipPath')
-        .attr('id', 'clip')
+        .attr('id', clipPathID)
         .append('svg:rect')
         .attr('width', width)
         .attr('height', height)
@@ -424,7 +430,7 @@ export default {
 
       // Create the line variable: where both the line and the brush take place
       this.line = this.svg.append('g')
-        .attr('clip-path', 'url(#clip)');
+        .attr('clip-path', `url(#${clipPathID})`);
 
       this.bars = this.svg.append('g')
         .attr('class', 'barplot');
@@ -472,9 +478,10 @@ export default {
       }
       const {
         // eslint-disable-next-line camelcase
-        type_line, color, united, barplotBarWidth, barplotstyle,
-        strokeWidth,
+        type_line, color, united, barplotstyle,
+        strokeWidth, isDataAlwaysShow, lastDot,
       } = this.options;
+      let barplotBarWidth = +this.options.barplotBarWidth || 0;
 
       this.metrics.forEach((metric) => {
         const metricType = this.getMetricType(metric);
@@ -510,6 +517,9 @@ export default {
       let isAddedBarplots = false;
 
       this.metrics.forEach((metric, i) => {
+        if (!this.x[metric]) {
+          return;
+        }
         const currentColor = (color && color[metric]) ? color[metric] : this.color(metric);
         // Create a update selection: bind to the new data
         this.line = this.svg.selectAll(`.line-${metric}`)
@@ -520,9 +530,12 @@ export default {
         let bandwidth; let xSubgroup;
 
         // подгонка отступов на оси x
-        let barWidth = 0;
+        let barWidth = barplotBarWidth;
         if (this.barplotMetrics.length) {
-          barWidth = d3.max(this.barplotMetrics.map((name) => this.x[name].bandwidth()));
+          barWidth = d3.max(
+            this.barplotMetrics
+              .map((name) => this.x[name].bandwidth()),
+          );
           const lineOffset = barWidth * 1.5;
           this.lineChartMetrics.forEach((name) => {
             this.x[name].range([
@@ -531,17 +544,22 @@ export default {
             ]);
           });
         }
+        if (barplotBarWidth === 0) {
+          barplotBarWidth = barWidth;
+        }
 
         switch (metricType) {
           case 'barplot':
-            bandwidth = this.x[metric].bandwidth();
+            bandwidth = barplotBarWidth * 2;
 
             // Another scale for subgroup position?
             xSubgroup = d3.scaleBand()
               .domain(this.barplotMetrics)
               .range([0, bandwidth]);
 
-            barWidth = xSubgroup.bandwidth(); // this.x[metric].bandwidth()
+            if (barWidth === 0) {
+              barWidth = xSubgroup.bandwidth(); // this.x[metric].bandwidth()
+            }
 
             if (united) {
               // draw grouped barplots
@@ -552,7 +570,6 @@ export default {
                   const stackedData = d3.stack()
                     .keys(this.barplotMetrics)(data);
 
-                  const xBarOffset = (united ? (barWidth / 2) : 0);
                   this.bars.append('g')
                     .selectAll('g')
                     .data(stackedData)
@@ -563,14 +580,12 @@ export default {
                     .data((d) => d)
                     .enter()
                     .append('rect')
-                    .attr('x', (d) => this.x[metric](d.data[this.xMetric]) + xBarOffset)
+                    .attr('x', (d) => this.x[metric](d.data[this.xMetric]) + (barWidth - barplotBarWidth) / 2)
                     .attr('y', (d) => ((barplotstyle === 'overlay')
                       ? this.y[metric](d[1] - d[0])
                       : this.y[metric](d[1])))
                     .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
-                    .attr('width', barplotBarWidth && (barWidth >= barplotBarWidth)
-                      ? barplotBarWidth
-                      : barWidth)
+                    .attr('width', barplotBarWidth)
                     .on('click', (d) => this.setClick({
                       x: d.data[this.xMetric],
                       y: d[1] - d[0],
@@ -580,18 +595,30 @@ export default {
                     .on('mousemove', (d) => {
                       this.updateTooltip(d.data);
                       const lineXPos = this.x[metric](d.data[this.xMetric])
-                        + (barWidth);
+                        + (barWidth / 2);
                       this.lineDot
                         .attr('x1', lineXPos)
                         .attr('x2', lineXPos);
                     });
                 } else {
+                  if (!barplotBarWidth) {
+                    barplotBarWidth = barWidth;
+                  }
+
+                  xSubgroup = d3.scaleBand()
+                    .domain(this.barplotMetrics)
+                    .range([0, barplotBarWidth]);
+
                   this.bars
                     .selectAll('g')
                     .data(data)
                     .enter()
                     .append('g')
-                    .attr('transform', (d) => `translate(${this.x[metric](d[this.xMetric])},0)`)
+                    .attr('transform', (d) => {
+                      const xOffset = this.x[metric](d[this.xMetric])
+                        + (barWidth - barplotBarWidth) / 2;
+                      return `translate(${xOffset},0)`;
+                    })
                     .selectAll('rect')
                     .data((d) => this.barplotMetrics.map((key) => ({
                       key,
@@ -602,9 +629,7 @@ export default {
                     .append('rect')
                     .attr('x', (d) => xSubgroup(d.key))
                     .attr('y', (d) => this.y[metric](d.value))
-                    .attr('width', barWidth >= barplotBarWidth
-                      ? (barplotBarWidth || xSubgroup.bandwidth())
-                      : barWidth)
+                    .attr('width', xSubgroup.bandwidth())
                     .attr('height', (d) => {
                       const varHeight = this.box.height - this.y[metric](d.value);
                       return united
@@ -622,7 +647,8 @@ export default {
                     .on('mousemove', (d) => {
                       this.updateTooltip(d.data);
                       const lineXPos = this.x[metric](d.data[this.xMetric])
-                        + bandwidth / 2;
+                        + barplotBarWidth / 2
+                        + (barWidth - barplotBarWidth) / 2;
                       this.lineDot
                         .attr('x1', lineXPos)
                         .attr('x2', lineXPos);
@@ -636,9 +662,9 @@ export default {
                 .enter()
                 .append('rect')
                 .attr('class', `line-${metric}`)
-                .attr('x', (d) => this.x[metric](d[this.xMetric])) // - barWidth
+                .attr('x', (d) => this.x[metric](d[this.xMetric]) + (barWidth - barplotBarWidth) / 2)
                 .attr('y', (d) => this.y[metric](d[metric]))
-                .attr('width', barWidth)
+                .attr('width', barplotBarWidth)
                 .attr('height', (d) => {
                   const varHeight = this.box.height - this.y[metric](d[metric]);
                   return united
@@ -688,7 +714,11 @@ export default {
             .data(this.data)
             .enter()
             .append('circle')
-            .attr('class', `dot dot-${metric}`)
+            .attr('class', (d, i) => {
+              const textToRight = (i === this.data.length - 1);
+              const showDot = isDataAlwaysShow || (lastDot && textToRight);
+              return `dot dot-${metric} ${(showDot ? 'dot-show' : '')}`;
+            })
             .attr('cx', (d) => this.x[metric](d[this.xMetric]))
             .attr('cy', (d) => this.y[metric](d[metric]))
             .attr('r', 5)
@@ -707,14 +737,57 @@ export default {
                 .attr('x2', lineXPos);
             });
         }
+
+        // рисуем текст у вершин
+        if (isDataAlwaysShow || lastDot) {
+          const isLine = (metricType === 'linechart' || !metricType);
+          this.svg
+            .append('g')
+            .selectAll('dot')
+            .data(isDataAlwaysShow ? this.data : [this.lastDataItem])
+            .enter()
+            .append('text')
+            .attr('transform', (d, i) => {
+              const textToRight = (i === 0);
+              return `translate(${isLine ? (textToRight ? 5 : -5) : (barWidth / 2)}, -5)`;
+            })
+            .attr('font-size', '11')
+            .attr('text-anchor', (d, i) => {
+              const textToRight = (i === 0);
+              return isLine ? (textToRight ? 'start' : 'end') : 'middle';
+            })
+            .attr('fill', this.theme.$main_text)
+            .text((d) => {
+              const fieldName = (isDataAlwaysShow === 'data')
+                ? metric
+                : `_${metric}_caption`;
+              if (isDataAlwaysShow === 'caption' && d[fieldName] !== undefined) {
+                return d[fieldName];
+              }
+              const val = d[metric];
+              return (val % 1) // is float
+                ? Number.parseFloat(val).toFixed(2)
+                : val;
+            })
+            .attr('x', (d) => this.x[metric](d[this.xMetric]))
+            .attr('y', (d) => this.y[metric](d[metric]));
+        }
       });
     },
     updateTooltip(d) {
       const [left, top] = d3.mouse(this.$refs.svgContainer);
+      const {
+        marginOffset, height,
+      } = this.box;
+      const offset = 10;
+      const pos = {
+        top: null,
+        right: null,
+        bottom: null,
+        left: null,
+      };
+      const width = this.$refs.svgContainer.offsetWidth;
       this.tooltip
-        .style('right', 'auto')
-        .style('left', `${left + 30}px`)
-        .style('top', `${top}px`)
         .html(
           this.firstDataRowMetricList.reduce((prev, cur) => {
             let value = d[cur];
@@ -724,14 +797,25 @@ export default {
             return `${prev}<p><span>${cur}</span>: ${value}</p>`;
           }, ''),
         );
-      const lineXPos = left + (2.5) - this.box.marginOffset.left;
-      const { offsetWidth } = this.tooltip.node();
-      if (lineXPos + offsetWidth + 20 > this.box.width) {
-        const rightPos = this.box.width - this.box.marginOffset.right - lineXPos + offsetWidth;
-        this.tooltip
-          .style('left', 'auto')
-          .style('right', `${rightPos}px`);
+
+      if (left > this.widthFrom / 2) {
+        pos.right = width - left + offset;
+      } else {
+        pos.left = left + offset;
       }
+
+      if (top > height / 2) {
+        pos.bottom = height - top
+          + marginOffset.bottom + offset;
+      } else {
+        pos.top = top + offset
+          + marginOffset.top;
+      }
+
+      Object.keys(pos).forEach((key) => {
+        const val = pos[key] === null ? 'auto' : `${pos[key]}px`;
+        this.tooltip.style(key, val);
+      });
     },
     setXAxisCaptionsRotate() {
       const rotateParams = {
@@ -974,11 +1058,16 @@ export default {
     .text
       font-size: 14px
 
+.svg-container
+  position: relative
+
 .svg-container::v-deep
   .dot
     opacity: 0
     cursor: pointer
     &:hover
+      opacity: 1
+    &.dot-show
       opacity: 1
 
   .graph-tooltip

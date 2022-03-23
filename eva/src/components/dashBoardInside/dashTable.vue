@@ -109,7 +109,11 @@
                 v-if="!excludeColumns.includes(colIndex)"
                 :key="colIndex"
                 class="text-start"
-                :class="{'d-none': options.titles && !options.titles.includes(colIndex)}"
+                :class="{
+                  'd-none': options
+                    && options.titles
+                    && !options.titles.includes(colIndex)
+                }"
                 :style="
                   (item.cellColor &&
                     item.cellColor[colIndex] &&
@@ -171,7 +175,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     colorFrom: {
       type: Object,
@@ -179,7 +183,7 @@ export default {
     },
     options: {
       type: Object,
-      required: true,
+      default: null,
     },
   },
   data() {

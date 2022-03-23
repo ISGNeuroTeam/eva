@@ -61,7 +61,7 @@ export default {
     }, // высота родительского элемента
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     }, // включена ли шапка
     // activeElemFrom: null,
     // dataReport: null,
@@ -226,6 +226,8 @@ export default {
       }
     },
     checkName(name) {
+      console.log(this.dataTile);
+      console.log('name', name);
       return name.replace('\\n', '<br>');
     },
     setSize(sizeFrom) {
