@@ -267,7 +267,6 @@ export default {
           temp = temp.filter((el) => sort(el[key]));
         }
       });
-
       return temp;
     },
     events() {
@@ -321,7 +320,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
       }
-
       if (!this.dashFromStore?.options.pinned) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -329,7 +327,6 @@ export default {
           value: false,
         }]);
       }
-
       if (!this.dashFromStore.options.lastDot) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -351,7 +348,6 @@ export default {
           value: false,
         }]);
       }
-
       return this.dashFromStore.options;
     },
     lastResult() {
@@ -400,13 +396,13 @@ export default {
       if (partelement) {
         result = this.$store.state[this.idDash].events.filter((item) => (
           item.event === event
-          && item.element === this.id
-          && item.partelement === partelement
+            && item.element === this.id
+            && item.partelement === partelement
         ));
       } else {
         result = this.$store.state[this.idDash].events.filter(
           (item) => item.event === event
-            && item.target === this.id,
+                && item.target === this.id,
         );
       }
       return result;
@@ -414,7 +410,6 @@ export default {
     chooseSort(dataFormat, sortType, value) {
       if (dataFormat === 'date') {
         let sort;
-
         if (sortType === '>') {
           sort = (el) => {
             const elDate = this.parseDate(el);
@@ -487,7 +482,6 @@ export default {
       this.typedTitles = { ...this.typedTitles };
       this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
       // make filter objects
-
       // make title: type object
     },
     getType(title) {
@@ -519,8 +513,8 @@ export default {
       const mydate = new Date(+parts[2], +parts[1] - 1, +parts[0]);
       if (
         +parts[2] === mydate.getYear()
-        && +parts[1] - 1 === mydate.getMonth()
-        && +parts[0] === mydate.getDate()
+          && +parts[1] - 1 === mydate.getMonth()
+          && +parts[0] === mydate.getDate()
       ) {
         result = 0;
       } else {
@@ -545,7 +539,6 @@ export default {
           this.selectRow();
           this.props.justCreate = false;
         }
-
         this.props.nodata = false;
         this.props.itemsForTable = promData;
       });
@@ -558,9 +551,9 @@ export default {
           value: x,
           sortable: true,
           align:
-            this.options.titles.length === 0 || this.options.titles.includes(x)
-              ? undefined
-              : ' d-none',
+              this.options.titles.length === 0 || this.options.titles.includes(x)
+                ? undefined
+                : ' d-none',
         }));
       } else if (result && result.length) {
         this.props.titles = Object.keys(result[0]).reduce((titles, item) => {
@@ -606,7 +599,7 @@ export default {
       } else {
         this.eventRows = this.$store.state[this.idDash].events.filter(
           (item) => item.event === 'OnDataCompare'
-            && item.target === this.id,
+                && item.target === this.id,
         );
       }
     },
@@ -626,22 +619,18 @@ export default {
                 });
               event.target.parentElement.classList.add('selected');
             }
-
             const headers = Array.from(
               this.$refs.table.$el.querySelector('thead tr').childNodes,
             ).map((item) => item.textContent);
-
             const cellRowIndex = Array.from(
               event.target.parentElement.childNodes,
             ).findIndex((item) => item === event.target);
-
             const tokens = this.$store.state[this.idDash].tockens;
-
             tokens.forEach((token) => {
               if (
                 token.elem === this.id
-                && token.action === 'click'
-                && headers[cellRowIndex] === token.capture
+                    && token.action === 'click'
+                    && headers[cellRowIndex] === token.capture
               ) {
                 const value = event.target.textContent;
                 this.$store.commit('setTocken', {
@@ -652,12 +641,10 @@ export default {
                 });
               }
             });
-
             const events = this.getEvents({
               event: 'onclick',
               partelement: 'row',
             });
-
             if (events.length !== 0) {
               events.forEach((item) => {
                 if (item.action === 'set') {
@@ -681,7 +668,6 @@ export default {
   },
 };
 </script>
-
 <style lang="scss">
 @import '../../sass/dashTable.sass';
 </style>

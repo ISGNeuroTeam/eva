@@ -298,7 +298,10 @@ export default {
       return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
     },
     dashFromStore() {
-      return this.$store.state[this.idDash];
+      if (this.idDash) {
+        return this.$store.state[this.idDash];
+      }
+      return null;
     },
     // получаем объект с настройками моадлки натсроек
     getModalSettings() {
@@ -353,7 +356,7 @@ export default {
         .filter(
           (elem) => this.dashFromStore[elem].tab
             === this.currentTab
-            || this.dashFromStore[elem].options.pinned,
+            || this.dashFromStore[elem].options?.pinned,
         )
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
@@ -385,10 +388,10 @@ export default {
       return this.tabs.length > 1;
     },
     showTabs() {
-      if (this.loadingDash || !this.dashFromStore.tabs) {
+      if (this.loadingDash || !this.dashFromStore) {
         return false;
       }
-      return this.dashFromStore.tabs;
+      return this.dashFromStore?.tabs;
     },
     currentTab() {
       if (this.loadingDash || !this.dashFromStore.currentTab) {
@@ -740,7 +743,8 @@ export default {
         elements.push({ search: dataSourseTitle });
       }
       elements.forEach((elem) => {
-        this.dataObject[this.getSearchName(elem)].data = this.dataObjectConst[this.getSearchName(elem)].data;
+        this.dataObject[this.getSearchName(elem)]
+          .data = this.dataObjectConst[this.getSearchName(elem)].data;
       });
     },
   },

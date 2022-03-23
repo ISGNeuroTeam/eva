@@ -47,9 +47,14 @@
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
+            display: ${metric.value.split(',').length > 1 ? 'flex' : 'block'};
             `"
         >
-          <span v-text="metric.value" />
+          <span
+            v-for="(value, inx) in metric.value.split(',')"
+            :key="inx"
+            v-text="value + (inx !== metric.value.split(',').length -1 ? ', ' : '') "
+          />
         </span>
       </div>
     </div>
@@ -203,6 +208,7 @@ export default {
       if (!metric.metadata) {
         return undefined;
       }
+      // eslint-disable-next-line no-eval
       const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
         ranges[key] = `${ranges[key]}`.split(':').map(Number);

@@ -500,7 +500,7 @@ export default new Vuex.Store({
         }
       }
       state[idDash][id] = data;
-      state[idDash][id].tab = state[idDash].currentTab;
+      state[idDash][id].tab = state[idDash].currentTab || 1;
       state[idDash].elements.push(id);
     },
     // удаляем элемент с помощью модального окна
@@ -888,20 +888,21 @@ export default new Vuex.Store({
       });
     },
     changeCurrentTab(state, { idDash, tab }) {
-      state[idDash].currentTab = tab;
+      Vue.set(state[idDash], 'currentTab', tab);
     },
     deleteDashTab(state, { idDash, tabID }) {
-      const tempArr = state[idDash].elements.filter((elem) => {
-        if (state[idDash][elem].tab === tabID) {
-          delete state[idDash][elem];
-          return true;
-        }
-        return false;
-      });
-      state[idDash].elements = state[idDash].elements.filter(
-        (elem) => !tempArr.includes(elem),
-      );
-
+      if (state[idDash]?.elements && state[idDash].elements?.length > 0) {
+        const tempArr = state[idDash].elements.filter((elem) => {
+          if (state[idDash][elem].tab === tabID) {
+            delete state[idDash][elem];
+            return true;
+          }
+          return false;
+        });
+        state[idDash].elements = state[idDash].elements.filter(
+          (elem) => !tempArr.includes(elem),
+        );
+      }
       state[idDash].tabList = state[idDash].tabList.filter(
         (tab) => tab.id !== tabID,
       );
@@ -1241,7 +1242,24 @@ export default new Vuex.Store({
                 }
               });
             }
-
+            if (!state[id]?.tabList || state[id]?.tabList?.length === 0) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'tabList',
+                  value: [{ id: 1, name: 'Без названия' }],
+                },
+              ]);
+            }
+            if (typeof state[id].tabs === 'undefined') {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'tabs',
+                  value: false,
+                },
+              ]);
+            }
             state[id].filters?.forEach((filter) => {
               if (filter.idDash !== id) {
                 commit('setState', [
@@ -1518,9 +1536,8 @@ export default new Vuex.Store({
     actionGetElementSelected({ state, commit }, element) {
       const selected = state[element.idDash][element.id]?.selected;
       if (!selected) {
-        commit('createElementSelected', { ...element });
+        commit('setSelected', { ...element });
       }
-      commit('setElementSelected', { ...element });
       return state[element.idDash][element.id]?.selected;
     },
 
