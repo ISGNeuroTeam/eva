@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed default tab are not created
 - fixed multiselect refinement
 - fixed multiselect placing data on multiple lines
+- fixed add token 
 
 ## [1.84.0]
 
