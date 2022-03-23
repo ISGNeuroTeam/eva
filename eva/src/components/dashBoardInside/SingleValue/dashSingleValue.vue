@@ -41,13 +41,14 @@
           />
         </span>
         <span
+          v-if="metric.value"
           class="metric-value"
           :class="`color-${metric.color}`"
           :style="`
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
-            display: ${metric.value.split(',').length > 1 ? 'flex' : 'block'};
+            display: ${metric.value && metric.value.split(',').length > 1 ? 'flex' : 'block'};
             `"
         >
           <span
