@@ -369,6 +369,11 @@ export default {
     },
   },
   watch: {
+    active(val) {
+      if (!val) {
+        this.isChanged = false;
+      }
+    },
     pickedColor(color) {
       if (this.colorInputMode === 'custom') this.setGroupColor(color);
     },
@@ -725,7 +730,7 @@ export default {
         this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
-      this.isChanged = true;
+      this.isChanged = !event.data.includes(this.nameGroupFrom) || event.data.length > 1;
     },
   },
 };
