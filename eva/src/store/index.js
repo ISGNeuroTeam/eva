@@ -42,36 +42,13 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      Vue.set(
-        state[idDash][id].options,
-        'change',
-        false,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'visible',
-        true,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'level',
-        1,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'boxShadow',
-        false,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'lastResult',
-        false,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'searchBtn',
-        false,
-      );
+      console.log('state[idDash][id].options1', state[idDash][id].options);
+      state[idDash][id].options.change = false;
+      state[idDash][id].options.visible = true;
+      state[idDash][id].options.level = 1;
+      state[idDash][id].options.boxShadow = false;
+      state[idDash][id].options.lastResult = false;
+      state[idDash][id].options.searchBtn = false;
     },
     // проверяет и создает объект в хранилище для настроек
     // path - это idDash либо произвольное место хранения настроек например research
@@ -96,7 +73,8 @@ export default new Vuex.Store({
           };
         }
         if (!state[localPath][element].options) {
-          state[localPath][element].options = {};
+          // state[localPath][element].options = {};
+          Vue.set(state[localPath][element], 'options', {});
         }
       } else {
         if (!state[localPath].modalSettings) {
@@ -106,7 +84,8 @@ export default new Vuex.Store({
           };
         }
         if (!state[localPath].options) {
-          state[localPath].options = {};
+          Vue.set(state[localPath], 'options', {});
+          // state[localPath].options = {};
         }
       }
     },
@@ -396,7 +375,7 @@ export default new Vuex.Store({
     },
     setReportSearch(state, search) {
       Vue.set(state.reports.searches, search.sid, search);
-      state.reports.table.search = search.sid;
+      Vue.set(state.reports.table, 'search', search.sid);
     },
     setPaperSearch(state, search) {
       Vue.set(state.papers.searches, search.sid, search);
@@ -714,11 +693,12 @@ export default new Vuex.Store({
         }
       });
       if (titles) {
-        state[idDash][id].selectedTableTitles = titles;
+        Vue.set(state[idDash][id], 'selectedTableTitles', titles);
       }
     },
     updateOptions(state, { idDash, idElement, options }) {
-      state[idDash][idElement].options = options;
+      // state[idDash][idElement].options = options;
+      Vue.set(state[idDash][idElement], 'options', options);
     },
     // метод который обновляет какое-либо свойство у элемнета
     letEventSet(state, events) {
@@ -726,9 +706,9 @@ export default new Vuex.Store({
         // если опций еще нет
         if (!state[events.idDash][item.target].options) {
           // то создаем объект опций с плем change по умолчанию
-          state[events.idDash][item.target].options = {
+          Vue.set(state[events.idDash][item.target], 'options', {
             change: false,
-          };
+          });
         }
         // переводи строковое значение в bolean
         if (item.value === 'true') {
@@ -832,9 +812,17 @@ export default new Vuex.Store({
       const localName = name[0].toUpperCase() + name.slice(1);
       restAuth.putLog(`Удален дашборд ${localName} с id ${id}`);
     },
+    // TODO: избавится от этого метода, он вычищает не только root,
+    //  но и все отсальные модули
     clearState(state) {
+      const exclude = [
+        'auth',
+        'dataResearch',
+        'form',
+        'theme',
+      ];
       Object.keys(state).forEach((key) => {
-        if (key !== 'theme') {
+        if (!exclude.includes(key)) {
           delete state[key];
         }
       });
@@ -862,16 +850,17 @@ export default new Vuex.Store({
       });
     },
     setMetricsPie(state, { metrics, idDash, id }) {
+      Vue.set(state[idDash][id], 'options', state[idDash][id].options);
       const localMetrics = [...[], ...metrics];
       if (!state[idDash][id].options.metricsRelation) {
-        state[idDash][id].options.metricsRelation = {};
-        state[idDash][id].options.metricsRelation.relations = localMetrics;
-        state[idDash][id].options.metricsRelation.namesMetric = [
+        Vue.set(state[idDash][id].options, 'metricsRelation', {});
+        Vue.set(state[idDash][id].options.metricsRelation, 'relations', localMetrics);
+        Vue.set(state[idDash][id].options.metricsRelation, 'namesMetric', [
           'Категория',
           'Процентное соотношение',
-        ];
+        ]);
       }
-      state[idDash][id].options.metricsRelation.metrics = localMetrics;
+      Vue.set(state[idDash][id].options.metricsRelation, 'metrics', localMetrics);
     },
     setThemePie(state, dash) {
       const localThemes = { ...{}, ...dash.themes };
@@ -907,7 +896,7 @@ export default new Vuex.Store({
       });
     },
     changeCurrentTab(state, { idDash, tab }) {
-      state[idDash].currentTab = tab;
+      Vue.set(state[idDash], 'currentTab', tab);
     },
     deleteDashTab(state, { idDash, tabID }) {
       if (state[idDash]?.elements && state[idDash].elements?.length > 0) {
@@ -1027,9 +1016,11 @@ export default new Vuex.Store({
         }
       });
     },
-    updateSearchStatus: (state, { idDash, sid, status }) => {
+    updateSearchStatus: (state, {
+      idDash, sid, status, id,
+    }) => {
       const search = state[idDash].searches.find(
-        (searchItem) => searchItem.sid === sid,
+        (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
       Vue.set(search, 'status', status);
     },
@@ -1267,6 +1258,15 @@ export default new Vuex.Store({
                   object: state[id],
                   prop: 'tabList',
                   value: [{ id: 1, name: 'Без названия' }],
+                },
+              ]);
+            }
+            if (!state[id]?.currentTab) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'currentTab',
+                  value: 1,
                 },
               ]);
             }
