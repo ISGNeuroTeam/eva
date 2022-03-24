@@ -451,6 +451,10 @@ export default {
       // Add brushing
       this.brush = d3.brushX()
         .extent([[0, 0], [width, height]])
+        .on('start', () => {
+          this.hideTooltip();
+          this.tooltipHide = true;
+        })
         .on('end', this.zoomChart);
 
       // Create the line variable: where both the line and the brush take place
@@ -487,6 +491,7 @@ export default {
         .attr('stroke-dasharray', '3 3');
     },
     zoomChart() {
+      this.tooltipHide = false;
       const { selection } = d3.event;
       const { stringOX } = this.options;
       if (selection && this.xZoom) {
@@ -506,6 +511,7 @@ export default {
         });
         this.setClick(range, 'select');
       }
+      this.hideTooltip();
     },
     updateData(data = this.data) {
       if (!this.x) {
@@ -981,6 +987,7 @@ export default {
     },
 
     showTooltip() {
+      if (this.tooltipHide) return;
       this.tooltip.style('opacity', 1);
       this.lineDot.style('opacity', 0.7);
     },
