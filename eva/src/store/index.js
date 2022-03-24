@@ -812,9 +812,17 @@ export default new Vuex.Store({
       const localName = name[0].toUpperCase() + name.slice(1);
       restAuth.putLog(`Удален дашборд ${localName} с id ${id}`);
     },
+    // TODO: избавится от этого метода, он вычищает не только root,
+    //  но и все отсальные модули
     clearState(state) {
+      const exclude = [
+        'auth',
+        'dataResearch',
+        'form',
+        'theme',
+      ];
       Object.keys(state).forEach((key) => {
-        if (key !== 'theme') {
+        if (!exclude.includes(key)) {
           delete state[key];
         }
       });
@@ -1008,9 +1016,11 @@ export default new Vuex.Store({
         }
       });
     },
-    updateSearchStatus: (state, { idDash, sid, status }) => {
+    updateSearchStatus: (state, {
+      idDash, sid, status, id,
+    }) => {
       const search = state[idDash].searches.find(
-        (searchItem) => searchItem.sid === sid,
+        (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
       Vue.set(search, 'status', status);
     },
