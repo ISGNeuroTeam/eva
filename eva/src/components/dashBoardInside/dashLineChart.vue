@@ -60,11 +60,11 @@ export default {
     dataLoadingFrom: null,
     activeElemFrom: {
       type: String,
-      required: false,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: false,
+      default: false,
     },
   },
   data() {
