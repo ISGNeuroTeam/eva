@@ -1330,7 +1330,6 @@ export default {
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
-          item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
           item.style.background = this.theme.$main_bg;
           item.style.color = this.theme.$main_text;
           item.style.border = `1px solid ${this.theme.$main_border}`;
