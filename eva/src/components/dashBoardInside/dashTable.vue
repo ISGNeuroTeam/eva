@@ -5,7 +5,7 @@
   >
     <div class="v-data-table--container">
       <v-data-table
-        v-show="!props.nodata"
+        v-if="!props.nodata || isVisibleTitles"
         ref="table"
         v-model="props.input"
         class="dash-table report-table"
@@ -131,7 +131,7 @@
       </v-data-table>
     </div>
     <div
-      v-show="props.nodata"
+      v-show="props.nodata || !isVisibleTitles"
       class="no-data-table"
     >
       {{ props.message }}
@@ -143,6 +143,7 @@
 import { mdiMagnify } from '@mdi/js';
 
 export default {
+  name: 'DashTable',
   props: {
     tablePerPage: {
       type: Number,
@@ -353,6 +354,12 @@ export default {
     lastResult() {
       return this.getOptions.lastResult;
     },
+    isVisibleTitles() {
+      return this.props?.titles?.length > 0
+        ? this.props?.titles
+          .filter((item) => typeof item.align === 'undefined')?.length > 0
+        : false;
+    },
   },
   watch: {
     options: {
@@ -373,6 +380,11 @@ export default {
     events() {
       this.setEventColor();
     },
+    isVisibleTitles() {
+      if (!this.isVisibleTitles) {
+        this.props.message = 'Данные не отображаются из-за настроек';
+      }
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -381,6 +393,9 @@ export default {
       id: this.id,
     });
     this.setEventColor();
+    if (!this.isVisibleTitles) {
+      this.props.message = 'Данные не отображаются из-за настроек';
+    }
   },
   methods: {
     getEvents({ event, partelement }) {
@@ -551,7 +566,7 @@ export default {
           value: x,
           sortable: true,
           align:
-              this.options.titles.length === 0 || this.options.titles.includes(x)
+              this.options.titles.includes(x)
                 ? undefined
                 : ' d-none',
         }));
