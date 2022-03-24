@@ -1,9 +1,12 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="active"
     width="500"
-    @click:outside="closeModal"
-    @keydown.esc="closeModal"
+    :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="closeModal"
   >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -87,7 +90,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -145,6 +148,7 @@ export default {
         dash: [],
       },
       selected: [],
+      isChanged: false,
     };
   },
   computed: {
@@ -164,7 +168,7 @@ export default {
   },
   watch: {
     selected(selected) {
-      console.log('selected');
+      this.isChanged = true;
       if (selected.includes('Выбрать все')) {
         let list = [];
         if (this.element === 'dash') {
@@ -187,6 +191,9 @@ export default {
         list.unshift('Выбрать все');
         this.$set(this.elements, this.element, list);
       }
+    },
+    file() {
+      this.isChanged = true;
     },
   },
   created() {
