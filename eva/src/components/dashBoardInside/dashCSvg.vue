@@ -174,11 +174,11 @@ export default {
     }, // выключена ли шапка или включена
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     isFullScreen: {
       type: Boolean,

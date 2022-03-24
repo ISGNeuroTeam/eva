@@ -438,7 +438,7 @@ export default {
           y: 74.35169122692963,
         },
         showLegend: true,
-        mode: '',
+        mode: [],
         search: '',
       },
     };
@@ -530,7 +530,7 @@ export default {
         options: initOptions,
       });
     } else {
-      this.options = options;
+      this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
     }
 
     this.searches = this.loadDataForPipe();
@@ -553,9 +553,13 @@ export default {
     },
     updatePipeDataSource(e) {
       const set = new Set(e);
-      set.delete(this.options.mode[0]);
+      if (this.options.mode) {
+        set.delete(this.options.mode[0]);
+      }
       this.options.mode = Array.from(set);
-      this.$emit('updatePipeDataSource', this.options.search);
+      if (this.options.search) {
+        this.$emit('updatePipeDataSource', this.options.search);
+      }
     },
     loadDataForPipe() {
       return this.$store.state[this.idDashFrom].searches;
