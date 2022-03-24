@@ -1790,7 +1790,7 @@ export default new Vuex.Store({
           }
         });
       });
-
+      let newCurrentTabValue = 1;
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
@@ -1798,17 +1798,26 @@ export default new Vuex.Store({
         .find((el) => el.id.toString() === event.event.tab);
       if (!options?.openNewScreen) {
         if (!isTabMode) {
-          event.route.push(`/dashboards/${id}/1`);
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = 1;
         } else if (!event.event.tab) {
-          event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = currentTab || 1;
         } else {
-          event.route.push(`/dashboards/${id}/${lastEl.id}`);
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = lastEl?.id || 1;
         }
       } else if (!isTabMode) {
-        window.open(`/dashboards/${id}/1`);
+        window.open(`/dashboards/${id}`);
+        newCurrentTabValue = 1;
       } else if (!event.event.tab) {
-        window.open(`/dashboards/${id}/${currentTab || ''}`);
+        window.open(`/dashboards/${id}`);
+        newCurrentTabValue = currentTab || 1;
       }
+      commit('changeCurrentTab', {
+        idDash: id,
+        tab: newCurrentTabValue,
+      });
       const { searches } = state[id];
 
       if (searches) {
