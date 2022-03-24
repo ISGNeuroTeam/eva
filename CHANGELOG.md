@@ -64,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - improvements handling window closing
 - fixed dropdown lists
 - fixed table columns not hiding
+- fixed handling deletion of tabs
 
 ## [1.84.0]
 
