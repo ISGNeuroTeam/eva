@@ -76,11 +76,11 @@ export default {
     }, // настройки родительского компонента
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {

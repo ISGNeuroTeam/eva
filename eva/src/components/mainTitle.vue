@@ -441,8 +441,8 @@ export default {
       handler(searches) {
         if (this.firstLoad) {
           searches.forEach((search) => {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.sid, {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
               data: [],
               loading: true,
             });
@@ -451,14 +451,15 @@ export default {
         }
         searches.forEach((search) => {
           if (search.status === 'empty') {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.sid, {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
               data: [],
               loading: true,
             });
             this.$store.commit('updateSearchStatus', {
               idDash: this.idDash,
               sid: search.sid,
+              id: search.id,
               status: 'pending',
             });
             this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
@@ -473,12 +474,13 @@ export default {
                 this.$store.commit('updateSearchStatus', {
                   idDash: this.idDash,
                   sid: search.sid,
+                  id: search.id,
                   status: res.length ? 'downloaded' : 'nodata',
                 });
-                this.$set(this.dataObject[search.sid], 'data', res);
-                this.$set(this.dataObject[search.sid], 'loading', false);
-                this.$set(this.dataObjectConst[search.sid], 'data', res);
-                this.$set(this.dataObjectConst[search.sid], 'loading', false);
+                this.$set(this.dataObject[search.id], 'data', res);
+                this.$set(this.dataObject[search.id], 'loading', false);
+                this.$set(this.dataObjectConst[search.id], 'data', res);
+                this.$set(this.dataObjectConst[search.id], 'loading', false);
               });
           }
         });
@@ -556,11 +558,11 @@ export default {
     },
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
-      return this.dataObject[this.getSearchName(elem)]?.loading;
+      return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
       if (this.getSearchName(elem) === '') return [];
-      return this.dataObject[this.getSearchName(elem)]?.data;
+      return this.dataObject[elem.search]?.data;
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
@@ -728,8 +730,8 @@ export default {
       }
       const elements = range.zoomForAll ? this.elements : [elem];
       elements.forEach((element) => {
-        this.dataObject[this.getSearchName(element)].data = this.sliceRange(
-          this.dataObject[this.getSearchName(element)].data,
+        this.dataObject[element.search].data = this.sliceRange(
+          this.dataObject[element.search].data,
           range,
         );
       });
@@ -743,8 +745,8 @@ export default {
         elements.push({ search: dataSourseTitle });
       }
       elements.forEach((elem) => {
-        this.dataObject[this.getSearchName(elem)]
-          .data = this.dataObjectConst[this.getSearchName(elem)].data;
+        this.dataObject[elem.search]
+          .data = this.dataObjectConst[elem.search].data;
       });
     },
   },
