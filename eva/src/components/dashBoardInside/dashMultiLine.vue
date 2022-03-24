@@ -4,7 +4,9 @@
       <span>{{ errorMessage }}</span>
     </div>
     <div v-else>
-      <div class="legend">
+      <div
+        ref="legend"
+        class="legend">
         <div
           v-for="item in legendItems"
           :key="item.name"
@@ -923,6 +925,7 @@ export default {
             }),
         );
         this.marginOffset.bottom = xTextMaxHeight + 5;
+        this.marginOffset.top = this.$refs.legend.offsetHeight || 0;
       });
 
       // ось Y
