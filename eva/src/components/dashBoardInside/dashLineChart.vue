@@ -60,11 +60,11 @@ export default {
     dataLoadingFrom: null,
     activeElemFrom: {
       type: String,
-      required: true,
+      required: false,
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      required: false,
     },
   },
   data() {
@@ -178,6 +178,9 @@ export default {
     },
     getTockens() {
       return this.$store.state[this.idDash].tockens;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
     },
   },
   mounted() {
@@ -733,7 +736,7 @@ export default {
         .enter()
         .append('circle')
         .attr('cx', (d) => x(d[xMetric] * secondTransf))
-        .attr('cy', (d, i) => {
+        .attr('cy', function (d, i) {
           // поэтому сперва по умолчанию красив в цвет графика
           this.setAttribute('fill', colors[0]);
           // и делаем точки прозрачными
