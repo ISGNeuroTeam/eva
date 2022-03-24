@@ -43,7 +43,7 @@ export default {
     }, // id дашборда
     dataRestFrom: {
       type: Array,
-      required: true,
+      default: () => ([]),
     }, // данные полученые после выполнения запроса
     colorFrom: {
       type: Object,
@@ -159,6 +159,12 @@ export default {
     },
   },
   watch: {
+    options: {
+      handler() {
+        this.reDrawMap(this.dataRestFrom);
+      },
+      deep: true,
+    },
     mapStyleSize() {
       // eslint-disable-next-line no-underscore-dangle
       this.map._onResize();
@@ -509,24 +515,26 @@ export default {
 
     generateClusterPositionItems() {
       this.clusterPositionItems = null;
-      Object.entries(this.library.objects).forEach((object) => {
-        if (object[1].image) {
-          const tmpObject = { ...object[1], id: Number(object[0]) };
-          this.clusterPositionItems = [tmpObject];
-        }
-      });
-
-      if (!this.clusterPosition) {
-        // пустые значения
+      if (this.library?.objects) {
         Object.entries(this.library.objects).forEach((object) => {
           if (object[1].image) {
-            if (this.clusterPosition === null) {
-              this.clusterPosition = [Number(object[0])];
-            } else {
-              this.clusterPosition.push(Number(object[0]));
-            }
+            const tmpObject = { ...object[1], id: Number(object[0]) };
+            this.clusterPositionItems = [tmpObject];
           }
         });
+
+        if (!this.clusterPosition) {
+        // пустые значения
+          Object.entries(this.library.objects).forEach((object) => {
+            if (object[1].image) {
+              if (this.clusterPosition === null) {
+                this.clusterPosition = [Number(object[0])];
+              } else {
+                this.clusterPosition.push(Number(object[0]));
+              }
+            }
+          });
+        }
       }
     },
 
@@ -561,18 +569,27 @@ export default {
 
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i += 1) {
-        const lib = this.library.objects[dataRest[i].type]; // choosing drawing type for each object
-        if (lib) {
-          if (dataRest[i].ID === '1') {
-            const point = dataRest[i].coordinates.split(':');
-            const coord = point[1].split(',');
-            this.startingPoint = [coord[0], coord[1]];
-          }
-          if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
-            this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
-          }
-          if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
-            this.addLine(dataRest[i], lib);
+        if (
+          !!dataRest
+          && dataRest[i]?.type
+          && this.library.objects
+          && this.library.objects[dataRest[i].type]
+        ) {
+          // choosing drawing type for each object
+          const lib = this.library.objects[dataRest[i].type];
+          if (lib) {
+            if (dataRest[i].ID === '1') {
+              const point = dataRest[i].coordinates.split(':');
+              const coord = point[1].split(',');
+
+              this.startingPoint = [coord[0], coord[1]];
+            }
+            if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
+              this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
+            }
+            if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
+              this.addLine(dataRest[i], lib);
+            }
           }
         }
       }

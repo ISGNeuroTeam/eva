@@ -247,7 +247,8 @@ export default {
         if (event.data.data.length !== 0) {
           // console.log('event.data.data.length != 0');
           this.shema = event.data.shema;
-          this.data = event.data.data;
+          // this.data = event.data.data;
+          this.$set(this, 'data', event.data.data);
 
           Object.keys(this.shema).forEach((item, i) => {
             localStatistic = this.createStatistic(item, event.data.data);
@@ -474,9 +475,10 @@ export default {
       this.modal = false;
     },
     setRange(range) {
-      this.data = this.data.filter(
+      const data = this.data.filter(
         (item) => item.day > range[0] && item.day < range[1],
       );
+      this.$set(this, 'data', data);
     },
     ResetRange() {
       // console.log('resetRange');

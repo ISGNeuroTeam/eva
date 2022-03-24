@@ -930,7 +930,7 @@ export default {
       this.$emit('SetLevel', level);
     },
     exportDataCSV() {
-      const searchId = this.$store.state[this.idDash][this.element].should;
+      const searchId = this.$store.state[this.idDash][this.element].search;
       this.$emit('downloadData', searchId);
     },
     getData(searchID) {

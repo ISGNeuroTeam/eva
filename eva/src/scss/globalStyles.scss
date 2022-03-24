@@ -60,17 +60,16 @@
 
   .v-card__title .header {
     background: inherit !important;
+  }
+  .theme--light.v-data-table {
+    .v-data-table__wrapper {
+      table {
+        tbody {
+          tr {
+            transition: all 0.4s ease;
 
-    .theme--light.v-data-table {
-      .v-data-table__wrapper {
-        table {
-          tbody {
-            tr {
-              transition: all 0.4s ease;
-
-              &:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
-                color: #3C3B45;
-              }
+            &:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+              color: #3C3B45;
             }
           }
         }
