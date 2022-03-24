@@ -1251,6 +1251,15 @@ export default new Vuex.Store({
                 },
               ]);
             }
+            if (!state[id]?.currentTab) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'currentTab',
+                  value: 1,
+                },
+              ]);
+            }
             if (typeof state[id].tabs === 'undefined') {
               commit('setState', [
                 {

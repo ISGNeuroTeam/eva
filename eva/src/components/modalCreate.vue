@@ -369,11 +369,16 @@ export default {
     },
   },
   watch: {
+    active(val) {
+      if (!val) {
+        this.isChanged = false;
+      }
+    },
     pickedColor(color) {
       if (this.colorInputMode === 'custom') this.setGroupColor(color);
     },
     // проверяем изменилось ли что-то в основных полях
-    'newDash.name': {
+    'newElement.name': {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
@@ -382,7 +387,7 @@ export default {
         }
       },
     },
-    'newDash.id': {
+    'newElement.id': {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
@@ -391,22 +396,13 @@ export default {
         }
       },
     },
-    'newGroup.name': {
-      handler(val, oldVal) {
-        if (this.dataFrom) {
-          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
-        } else {
-          this.isChanged = val !== oldVal;
-        }
-      },
-    },
-    'newGroup.color': {
+    'newElement.color': {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = !!(
             val !== '#FFA9A4'
-            && oldVal
-            && val !== this.dataFrom?.color
+              && oldVal
+              && val !== this.dataFrom?.color
           );
         } else {
           this.isChanged = !!(val !== '#FFA9A4' && oldVal);
