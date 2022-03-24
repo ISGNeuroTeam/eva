@@ -169,7 +169,7 @@ export default {
       return this.dataRestFrom;
     },
     lastDataItem() {
-      return this.dataRestFrom[this.dataRestFrom.length - 1];
+      return this.data[this.dataRestFrom.length - 1];
     },
     box() {
       const {
