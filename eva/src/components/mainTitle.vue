@@ -507,6 +507,10 @@ export default {
       return this.searches.find((search) => search.id === searchId)?.id || '';
     },
     exportDataCSV(searchName) {
+      console.log(searchName);
+      console.log(this.dataObject);
+      console.log(this.dataObject[searchName]);
+      console.log(this.dataObject[searchName].data);
       const searchData = this.dataObject[searchName].data;
       // задаем кодировку csv файла
       let csvContent = 'data:text/csv;charset=utf-8,';
