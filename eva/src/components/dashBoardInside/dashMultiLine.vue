@@ -329,27 +329,27 @@ export default {
           ])
           .range([0, width]);
 
-        switch (metricType) {
-          case 'barplot':
-            if (stringOX) {
-              this.x[metric] = d3.scaleBand()
-                .domain(groups)
-                .padding(0.1);
-            } else {
-              this.x[metric] = d3.scaleTime()
-                .domain([
-                  d3.min(this.data.map((item) => item[this.xMetric])),
-                  d3.max(this.data.map((item) => item[this.xMetric])),
-                ]);
-            }
-            this.x[metric].range([0, width]);
-            break;
-          default:
-            this.x[metric] = stringOX ? d3.scaleLinear() : d3.scaleTime();
-            this.x[metric]
-              .domain(this.data.map((item) => item[this.xMetric]))
-              .range([0, width]);
-            break;
+        if (metricType === 'barplot') {
+          if (stringOX) {
+            this.x[metric] = d3.scaleBand()
+              .domain(groups)
+              .padding(0.1);
+          } else {
+            this.x[metric] = d3.scaleTime()
+              .domain([
+                d3.min(this.data.map((item) => item[this.xMetric])),
+                d3.max(this.data.map((item) => item[this.xMetric])),
+              ]);
+          }
+          this.x[metric].range([0, width]);
+        } else {
+          const [first] = this.dataRestFrom;
+          this.x[metric] = (stringOX || !this.isTimestamp(first[this.xMetric]))
+            ? d3.scaleLinear()
+            : d3.scaleTime();
+          this.x[metric]
+            .domain(this.data.map((item) => item[this.xMetric]))
+            .range([0, width]);
         }
 
         const yAxisClass = `yAxis-${i}`;
@@ -728,7 +728,9 @@ export default {
         .append('circle')
         .attr('class', (d, i) => {
           const textToRight = (i === this.data.length - 1);
-          const showDot = isDataAlwaysShow || (lastDot && textToRight);
+          const showDot = isDataAlwaysShow
+            || (lastDot && textToRight)
+            || data.length === 1;
           return `dot dot-${metric} ${(showDot ? 'dot-show' : '')}`;
         })
         .attr('cx', (d) => this.xZoom(d[this.xMetric]))
@@ -825,6 +827,9 @@ export default {
             .attr('stroke', currentColor)
             .attr('stroke-width', strokeWidth)
             .style('stroke-dasharray', this.getStyleLine(typeLine[metric]));
+          if (line.length === 1) {
+            this.updateLineDots(line, metric);
+          }
         });
     },
     updateTooltip(d) {
