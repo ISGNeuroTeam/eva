@@ -493,14 +493,14 @@ export default {
       }
 
       tockensToUpdate.forEach((item) => {
-        const tocken = {
+        const token = {
           name: item.name,
           action: 'change',
           capture: item.capture,
         };
         if (item.name !== '') {
           this.$store.commit('setTocken', {
-            tocken,
+            token,
             idDash: this.idDash,
             value,
           });
