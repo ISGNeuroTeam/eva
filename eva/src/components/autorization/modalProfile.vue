@@ -124,6 +124,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="isChanged = $event"
           />
         </div>
 
@@ -151,6 +152,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="isChanged = $event"
           />
         </div>
 
@@ -178,6 +180,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="isChanged = $event"
           />
         </div>
         <div
@@ -211,6 +214,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="isChanged = $event"
           />
         </div>
         <div
@@ -236,6 +240,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="isChanged = $event"
           />
         </div>
       </v-card-text>
