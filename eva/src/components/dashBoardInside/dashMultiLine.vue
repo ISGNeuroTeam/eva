@@ -396,10 +396,11 @@ export default {
             maxYMetric += Math.abs(maxYMetric) * 0.1;
             if (metricType === 'linechart') {
               minYMetric -= Math.abs(minYMetric) * 0.1;
-            } else {
-              maxYMetric += Math.abs(maxYMetric) * 0.1;
             }
           }
+        }
+        if (metricType === 'barplot') {
+          maxYMetric += Math.abs(maxYMetric) * 0.1;
         }
 
         this.y[metric] = d3.scaleLinear()
@@ -463,9 +464,8 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick:last-of-type text`)
             .attr('transform', `translate(0, ${offsetYText})`);
         }
-
-        this.renderHorizontalLines();
       });
+      this.renderHorizontalLines();
 
       // Add a clipPath: everything out of this area won't be drawn.
       const clipPathID = this.isFullScreen
