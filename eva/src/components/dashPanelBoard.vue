@@ -1500,7 +1500,7 @@ export default {
 
       if (this.tokens?.length > 0) {
         const filterTockens = this.tokens.filter((x) => {
-          if (!Number.isNaN(index)) {
+          if (!Number.isNaN(index) && index !== undefined) {
             return x.elem === this.tokens[index].elem
                 && x.action === this.tokens[index].action
                 && x.capture === this.tokens[index].capture
