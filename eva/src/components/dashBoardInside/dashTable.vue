@@ -5,7 +5,7 @@
   >
     <div class="v-data-table--container">
       <v-data-table
-        v-if="!props.nodata || isVisibleTitles"
+        v-show="!props.nodata && isVisibleTitles"
         ref="table"
         v-model="props.input"
         class="dash-table report-table"
