@@ -744,7 +744,26 @@ export default {
 
         // рисуем текст у вершин
         if (isDataAlwaysShow || lastDot) {
-          this.renderPeakTexts(metric, metricType);
+          const textData = isDataAlwaysShow ? this.data : [this.lastDataItem];
+          this.renderPeakTexts(metric, metricType, textData);
+        } else {
+          // добавляем captions
+          const captionMetrics = Object.keys(this.firstDataRow)
+            .filter((m, _, all) => all.includes(`_${m}_caption`));
+          if (captionMetrics.length) {
+            const captionData = this.data
+              .map((d) => {
+                const result = {
+                  [xMetric]: d[xMetric],
+                };
+                captionMetrics.forEach((name) => {
+                  result[name] = d[`_${name}_caption`];
+                });
+                return result;
+              })
+              .filter((d) => d[metric] !== null);
+            this.renderPeakTexts(metric, metricType, captionData);
+          }
         }
       });
     },
@@ -788,13 +807,13 @@ export default {
         ? color[metric]
         : this.color(metric);
     },
-    renderPeakTexts(metric, metricType) {
+    renderPeakTexts(metric, metricType, data) {
       const { isDataAlwaysShow } = this.options;
       const isLine = (metricType === 'linechart');
       this.svg
         .append('g')
         .selectAll('dot')
-        .data(isDataAlwaysShow ? this.data : [this.lastDataItem])
+        .data(data)
         .enter()
         .append('text')
         .attr('transform', (d, i) => {
