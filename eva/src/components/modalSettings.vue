@@ -1390,8 +1390,10 @@ export default {
                 && options.yAxesBinding.metrics
                 && options.yAxesBinding.metricTypes
               ) {
-                this.multilineYAxesBinding.metrics[metric.name] = options.yAxesBinding.metrics[metric.name];
-                this.multilineYAxesBinding.metricTypes[metric.name] = options.yAxesBinding.metricTypes[metric.name];
+                this.multilineYAxesBinding
+                  .metrics[metric.name] = options.yAxesBinding.metrics[metric.name];
+                this.multilineYAxesBinding
+                  .metricTypes[metric.name] = options.yAxesBinding.metricTypes[metric.name];
               } else {
                 this.multilineYAxesBinding.metrics[metric.name] = 'left';
                 this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
