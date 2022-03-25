@@ -103,6 +103,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // высота родительского компонента
   },
   data() {
     return {
@@ -251,6 +259,18 @@ export default {
     percentValue() {
       this.detectSliderValue(this.values);
     },
+    widthFrom(val, old) {
+      if (val > old) {
+        this.circularSize = (val + this.heightFrom) / 4;
+      } else {
+        this.circularSize = (val + this.heightFrom) / 4;
+      }
+    },
+    heightFrom(height) {
+      if (height < this.circularSize) {
+        this.circularSize = height / 2;
+      }
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -258,7 +278,6 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom,
     });
-    console.log('mounted');
     this.$nextTick(() => {
       this.circularSizeNew();
       this.loadSelectedValue();
