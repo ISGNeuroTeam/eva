@@ -1803,7 +1803,7 @@ export default new Vuex.Store({
         } else if (!event.event.tab) {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = currentTab || 1;
-        } else if (event.event.tab.indexOf('+') > 0 && state[id].tabList.length > 0) {
+        } else if (event.event.tab > state[id].tabList.length) {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = state[id].tabList.length;
         } else {
