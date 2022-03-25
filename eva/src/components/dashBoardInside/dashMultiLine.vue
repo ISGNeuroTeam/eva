@@ -746,26 +746,30 @@ export default {
         if (isDataAlwaysShow || lastDot) {
           const textData = isDataAlwaysShow ? this.data : [this.lastDataItem];
           this.renderPeakTexts(metric, metricType, textData);
-        } else {
-          // добавляем captions
-          const captionMetrics = Object.keys(this.firstDataRow)
-            .filter((m, _, all) => all.includes(`_${m}_caption`));
-          if (captionMetrics.length) {
-            const captionData = this.data
-              .map((d) => {
-                const result = {
-                  [xMetric]: d[xMetric],
-                };
-                captionMetrics.forEach((name) => {
-                  result[name] = d[`_${name}_caption`];
-                });
-                return result;
-              })
-              .filter((d) => d[metric] !== null);
-            this.renderPeakTexts(metric, metricType, captionData);
-          }
         }
       });
+
+      // добавляем captions
+      if (this.xZoom && !isDataAlwaysShow) {
+        const captionMetrics = Object.keys(this.firstDataRow)
+          .filter((m, _, all) => all.includes(`_${m}_caption`));
+        if (captionMetrics.length) {
+          const captionData = this.data
+            .map((d) => {
+              const result = {
+                [xMetric]: d[xMetric],
+              };
+              captionMetrics.forEach((name) => {
+                result[name] = d[`_${name}_caption`];
+              });
+              return result;
+            });
+          captionMetrics.forEach((name) => {
+            const metricType = this.getMetricType(name);
+            this.renderPeakTexts(name, metricType, captionData);
+          });
+        }
+      }
     },
     updateLineDots(data, metric) {
       const { isDataAlwaysShow, lastDot } = this.options;
