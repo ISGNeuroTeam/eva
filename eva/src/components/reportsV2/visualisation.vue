@@ -50,26 +50,28 @@
         :style="{ background: theme.$primary_button }"
       />
     </v-card-title>
-
-    <v-card-text
-      :is="`dash-${i}`"
+    <template
       v-for="i in elements"
-      v-show="aboutElem[i].show"
-      :key="i"
-      :id-from="i"
-      :color-from="theme"
-      :active-elem-from="activeElem"
-      id-dash-from="reports"
-      :width-from="size.width"
-      :height-from="size.height"
-      :time-format-from="''"
-      :size-tile-from="{ width: '', height: '' }"
-      :search-rep="true"
-      :tooltip-from="tooltipSvg"
-      :should-get="shouldGet"
-      :data-report="true"
-      :data-rest-from="data"
-    />
+    >
+      <v-card-text
+        :is="`dash-${i}`"
+        v-if="aboutElem[i].show"
+        :key="i"
+        :id-from="i"
+        :color-from="theme"
+        :active-elem-from="activeElem"
+        id-dash-from="reports"
+        :width-from="size.width"
+        :height-from="size.height"
+        :time-format-from="''"
+        :size-tile-from="{ width: '', height: '' }"
+        :search-rep="true"
+        :tooltip-from="tooltipSvg"
+        :should-get="shouldGet"
+        :data-report="true"
+        :data-rest-from="data"
+      />
+    </template>
   </div>
 </template>
 
@@ -79,19 +81,29 @@ import settings from '../../js/componentsSettings';
 
 export default {
   props: {
-    data: Array,
+    data: {
+      type: Array,
+      default: () => ([]),
+    },
     // size: {},
-    shouldGet: null,
+    shouldGet: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return {
+      menuDropdown: false,
       aboutElem: {},
       activeElem: 'table',
       tooltipSvg: { texts: [], links: [], buttons: [] },
       mdiRefresh,
       mdiMagnify,
       mdiChevronDown,
-      size: {},
+      size: {
+        width: 500,
+        height: 500,
+      },
     };
   },
   computed: {
@@ -120,6 +132,11 @@ export default {
       return this.$store.getters.getReportElement;
     },
   },
+  watch: {
+    activeElem() {
+      this.calcSize();
+    },
+  },
   mounted() {
     this.calcSize();
   },
@@ -140,7 +157,11 @@ export default {
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
-      this.size.height = Math.round(size.height) - 66;
+      if (Math.round(size.height) - 66 < 500) {
+        this.size.height = 500;
+      } else {
+        this.size.height = Math.round(size.height) - 66;
+      }
     },
     setActiveElem(elemName) {
       this.activeElem = elemName;

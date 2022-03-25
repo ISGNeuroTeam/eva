@@ -74,17 +74,35 @@
 
 <script>
 import { mdiMinus, mdiPlus } from '@mdi/js';
-import { mapActions, mapGetters, mapMutations } from 'vuex';
+import { mapActions, mapMutations } from 'vuex';
 
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    dataModeFrom: null, // включена ли шапка
-    loading: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    dataModeFrom: {
+      type: Boolean,
+      required: true,
+    }, // включена ли шапка
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -107,7 +125,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['getElementSelected', 'getElement']),
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
         ? this.$attrs.heightFrom
@@ -117,10 +134,17 @@ export default {
     isFullScreen() {
       return this.$attrs['is-full-screen'];
     },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
+    getElementSelected() {
+      return this.dashFromStore?.selected;
+    },
     storedElement() {
+      // TODO: разобраться для чего это здесь
+      // eslint-disable-next-line no-unused-expressions
       this.isFullScreen; // << dont remove
-      const { idDashFrom, idFrom } = this;
-      return this.$store.getters.getElement(idDashFrom, idFrom);
+      return this.dashFromStore;
     },
     needSetField() {
       return !this.dataField && !this.loading;
@@ -135,7 +159,7 @@ export default {
       const list = this.dataRestFrom
         .map((row) => {
           const num = Number.parseFloat(row[this.dataField]);
-          return isNaN(num) ? 0 : num;
+          return Number.isNaN(num) ? 0 : num;
         })
         .sort((a, b) => a - b);
       return list.filter((item, pos) => list.indexOf(item) === pos); // filter duplicates
@@ -168,7 +192,7 @@ export default {
       return Object.keys(this.dataRestFrom[0]).filter((key) => key[0] !== '_');
     },
     changedInputData() {
-      return this.$store.state.store[this.idDashFrom][this.idFrom]?.switch;
+      return this.$store.state[this.idDashFrom][this.idFrom]?.switch;
     },
   },
   watch: {
@@ -207,20 +231,25 @@ export default {
           (key) => key[0] !== '_',
         );
         if (keys.length === 1) {
-          this.dataField = keys[0];
+          [this.dataField] = keys;
         }
       }
     },
     dataField(value) {
       this.$nextTick(() => {
-        /* value !== '' && */ this.$store.commit('setSelected', {
-          element: 'elem',
-          idDash: this.idDashFrom,
-          id: this.idFrom,
-          value,
-        });
-        this.changeValue();
+        if (typeof value !== 'undefined') {
+          this.$store.commit('setSelected', {
+            element: 'elem',
+            idDash: this.idDashFrom,
+            id: this.idFrom,
+            value,
+          });
+          this.changeValue();
+        }
       });
+    },
+    percentValue() {
+      this.detectSliderValue(this.values);
     },
   },
   mounted() {
@@ -229,6 +258,7 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom,
     });
+    console.log('mounted');
     this.$nextTick(() => {
       this.circularSizeNew();
       this.loadSelectedValue();
@@ -238,7 +268,7 @@ export default {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
     circularSizeNew() {
-      if (this.$attrs['is-full-screen']){
+      if (this.$attrs['is-full-screen']) {
         this.circularWidth = 40;
         this.circularSize = 450;
       } else {
@@ -265,14 +295,14 @@ export default {
         element: 'elemDeep',
         idDash: this.idDashFrom,
         id: this.idFrom,
-        value: this.value,
+        value: this.value || 0,
       });
     },
     setToken() {
-      this.$store.getters.getTockens(this.idDashFrom).forEach((token) => {
+      this.$store.state[this.idDashFrom]?.tockens?.forEach((token) => {
         if (token.elem === this.idFrom && token.action === 'change') {
           this.$store.commit('setTocken', {
-            tocken: {
+            token: {
               name: token.name,
               action: 'change',
               capture: '',
@@ -289,15 +319,16 @@ export default {
         id: this.idFrom,
       }).then((selected) => {
         if (selected) {
-          this.dataField = selected.elem;
-          this.value = selected.elemDeep;
+          this.dataField = selected?.elem || null;
+          this.value = selected?.elemDeep !== '' ? selected?.elemDeep : '';
         }
-        this.detectSliderValue();
       });
+      this.detectSliderValue();
     },
     detectSliderValue(values = this.values) {
       this.sliderValue = values.findIndex((item) => item === this.value);
-      if (this.value === '' && values.length) {
+      if (this.value === '' && values?.length > 0) {
+        console.log('values[this.sliderValue]', values[this.sliderValue]);
         this.value = values[this.sliderValue];
       }
     },

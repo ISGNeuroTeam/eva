@@ -35,15 +35,36 @@
 export default {
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    sizeTileFrom: null, // размер плиток
-    heightFrom: null, // высота родительского элемента
-    dataModeFrom: null, // включена ли шапка
-    activeElemFrom: null,
-    dataReport: null,
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    sizeTileFrom: {
+      type: Object,
+      required: true,
+    }, // размер плиток
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // высота родительского элемента
+    dataModeFrom: {
+      type: Boolean,
+      default: false,
+    }, // включена ли шапка
+    // activeElemFrom: null,
+    // dataReport: null,
   },
   data() {
     return {
@@ -70,7 +91,7 @@ export default {
       let otstup;
       if (this.dataModeFrom) {
         otstup = 50;
-        if (screen.width <= 1600) {
+        if (window.screen.width <= 1600) {
           otstup = 35;
         }
       } else {
@@ -117,16 +138,19 @@ export default {
       }
     },
     captures(captures) {
-      this.actions[0].capture = captures;
+      const localActions = JSON.parse(JSON.stringify(this.actions));
+      localActions[0].capture = captures;
+      // this.actions[0].capture = captures;
       this.$store.commit('setActions', {
-        actions: this.actions,
+        actions: localActions,
         idDash: this.idDash,
         id: this.id,
       });
     },
   },
   mounted() {
-    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
+    //  В первый раз раскомментить чтобы создать события для элемнета,
+    //  а затем лучше закоментить чтобы каждый раз не обращаться к store
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -134,8 +158,32 @@ export default {
     });
   },
   methods: {
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setClick(item) {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -146,7 +194,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,
@@ -154,23 +202,21 @@ export default {
         }
       });
 
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onclick',
-        element: this.id,
         partelement: 'empty',
       });
 
       if (events.length !== 0) {
-        events.forEach((item) => {
-          if (item.action === 'set') {
+        events.forEach((event) => {
+          if (event.action === 'set') {
             this.$store.commit('letEventSet', {
               events,
               idDash: this.idDash,
             });
-          } else if (item.action === 'go') {
-            this.$store.commit('letEventGo', {
-              event: item,
+          } else if (event.action === 'go') {
+            this.$store.dispatch('letEventGo', {
+              event,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
@@ -180,6 +226,8 @@ export default {
       }
     },
     checkName(name) {
+      console.log(this.dataTile);
+      console.log('name', name);
       return name.replace('\\n', '<br>');
     },
     setSize(sizeFrom) {

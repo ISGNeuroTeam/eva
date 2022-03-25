@@ -1,8 +1,11 @@
 <template>
-  <v-dialog
+  <modal-persistent
     v-model="active"
     width="500"
-    persistent
+    :persistent="isChanged"
+    :is-confirm="isChanged"
+    :theme="theme"
+    @cancelModal="cancelModal"
   >
     <div
       ref="paperBlock"
@@ -27,6 +30,7 @@
             hide-details
             class="file-get-itself"
             label="Выбрать отчет"
+            @input="isChanged = true"
           />
           <div class="error-block">
             <div
@@ -70,17 +74,31 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 import { mdiSettings } from '@mdi/js';
 
 export default {
+  name: 'ModalPaper',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    active: null,
-    sid: null,
-    idDash: null,
+    sid: {
+      type: String,
+      required: true,
+    },
+    idDash: {
+      type: String,
+      required: true,
+    },
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -91,9 +109,18 @@ export default {
       errorMsg: 'Ошибка',
       gear: mdiSettings,
       loadingShow: false,
+      isChanged: false,
     };
   },
   computed: {
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -103,6 +130,8 @@ export default {
       if (this.active) {
         this.getAllPapers();
         this.getData();
+      } else {
+        this.isChanged = false;
       }
     },
   },
@@ -110,13 +139,13 @@ export default {
     cancelModal() {
       this.selectedFile = '';
       this.data = [];
-      this.$emit('cancelModal');
+      this.active = false;
     },
     async startPaper() {
-      if (this.selectedFile == '') {
+      if (this.selectedFile === '') {
         this.message('Выберит файл');
       } else {
-        this.getPaper();
+        await this.getPaper();
       }
     },
     downloadFile(fileLink) {
@@ -133,12 +162,12 @@ export default {
       const formData = new FormData();
       formData.append('file', this.selectedFile);
       formData.append('data', JSON.stringify(this.data));
-      const result = await this.$store.getters.getPaper(formData);
+      const result = await this.$store.dispatch('getPaper', formData);
       try {
-        if (result.status == 'success') {
+        if (result.status === 'success') {
           this.downloadFile(result.file);
+          this.isChanged = false;
           this.loadingShow = false;
-          // this.showError = false;
         } else {
           this.errorMsg = 'Отчет сформировать не удалось. Вернитесь назад и попробуйте снова.';
           this.showError = true;
@@ -150,9 +179,9 @@ export default {
       }
     },
     async getAllPapers() {
-      const result = await this.$store.getters.getAllPaper();
+      const result = await this.$store.dispatch('getAllPaper');
       try {
-        if (JSON.parse(result).status == 'success') {
+        if (JSON.parse(result).status === 'success') {
           this.allFiles = JSON.parse(result).files;
           this.showError = false;
         } else {
@@ -171,9 +200,8 @@ export default {
       }, 2000);
     },
     changeColor() {
-      if (document.querySelectorAll('.v-menu__content').length != 0) {
+      if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
-          item.style.boxShadow = `0 5px 5px -3px ${this.color.border},0 8px 10px 1px ${this.color.border},0 3px 14px 2px ${this.color.border}`;
           item.style.background = this.color.back;
           item.style.color = this.color.text;
           item.style.border = `1px solid ${this.color.border}`;
@@ -181,18 +209,20 @@ export default {
       }
     },
     getData() {
+      // создаем blob объект чтобы с его помощью использовать функцию для web worker
       const blob = new Blob([`onmessage=${this.getDataFromDb().toString()}`], {
         type: 'text/javascript',
-      }); // создаем blob объект чтобы с его помощью использовать функцию для web worker
+      });
 
-      const blobURL = window.URL.createObjectURL(blob); // создаем ссылку из нашего blob ресурса
+      // создаем ссылку из нашего blob ресурса
+      const blobURL = window.URL.createObjectURL(blob);
 
-      const worker = new Worker(blobURL); // создаем новый worker и передаем ссылку на наш blob объект
+      // создаем новый worker и передаем ссылку на наш blob объект
+      const worker = new Worker(blobURL);
 
+      // при успешном выполнении функции что передали в blob изначально сработает этот код
       worker.onmessage = function (event) {
-        // при успешном выполнении функции что передали в blob изначально сработает этот код
-
-        if (event.data.length != 0) {
+        if (event.data.length !== 0) {
           this.data = event.data;
         } else {
           this.errorMsg = 'Получить данные для отчета не удалось.';
@@ -205,28 +235,27 @@ export default {
       worker.postMessage(`${this.idDash}-${this.sid}`); // запускаем воркер на выполнение
     },
     getDataFromDb() {
-      return function (event) {
+      return (event) => {
         let db = null;
 
         const searchSid = event.data;
 
         const request = indexedDB.open('EVA', 1);
 
-        request.onerror = function (event) {
-          console.log('error: ', event);
+        request.onerror = (error) => {
+          console.error('error: ', error);
         };
 
-        request.onupgradeneeded = (event) => {
-          console.log('create');
-          db = event.target.result;
+        request.onupgradeneeded = (onUpgradeNeededEvent) => {
+          // console.log('create');
+          db = onUpgradeNeededEvent.target.result;
           if (!db.objectStoreNames.contains('searches')) {
-            // if there's no "books" store
             db.createObjectStore('searches'); // create it
           }
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`successEvent: ${db}`);
+            // console.log(`successEvent: ${db}`);
           };
         };
 
@@ -238,19 +267,22 @@ export default {
           // получить хранилище объектов для работы с ним
           const searches = transaction.objectStore('searches'); // (2)
 
-          const query = searches.get(String(searchSid)); // (3) return store.get('Ire Aderinokun');
+          // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(String(searchSid));
 
+          // (4)
           query.onsuccess = () => {
-            // (4)
             if (query.result) {
-              self.postMessage(query.result); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage(query.result);
             } else {
-              self.postMessage([]); // сообщение которое будет передаваться как результат выполнения функции
+              // сообщение которое будет передаваться как результат выполнения функции
+              self.postMessage([]);
             }
           };
 
-          query.onerror = function () {
-            console.log('Ошибка', query.error);
+          query.onerror = () => {
+            console.error('Ошибка', query.error);
           };
         };
       };

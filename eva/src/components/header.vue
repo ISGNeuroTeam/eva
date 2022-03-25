@@ -60,7 +60,7 @@
             <v-icon
               class="control-button theme--dark"
               :color="
-                $store.getters.getColorError
+                getColorError
                   ? theme.$primary_button
                   : theme.$secondary_text
               "
@@ -139,13 +139,11 @@
     </div>
 
     <modal-log
-      :modal-active="modalActive"
-      @cancelModal="modalActive = false"
+      v-model="modalActive"
     />
     <modal-themes
-      :show="paleteShow"
+      v-model="paleteShow"
       :admin="isAdmin"
-      @closeModal="paleteShow = false"
     />
   </div>
 </template>
@@ -170,7 +168,10 @@ export default {
     EvaLogo,
   },
   props: {
-    inside: null,
+    inside: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -214,20 +215,24 @@ export default {
     };
   },
   computed: {
-    height() {
-      if (screen.width < 1400) {
-        return '50px';
+    getColorError() {
+      if (!this.$store.state.logError) {
+        this.$store.commit('setState', [{
+          object: this.$store.state,
+          prop: 'logError',
+          value: false,
+        }]);
       }
-      return '51px';
+      return this.$store.state.logError;
+    },
+    height() {
+      return window.screen.width < 1400 ? '50px' : '51px';
     },
     theme() {
       return this.$store.getters.getTheme;
     },
     isAdmin() {
-      if (this.userPermissions && this.userPermissions.includes('admin_all')) {
-        return true;
-      }
-      return false;
+      return !!(this.userPermissions && this.userPermissions.includes('admin_all'));
     },
   },
   mounted() {
@@ -241,21 +246,20 @@ export default {
       this.paleteShow = !this.paleteShow;
     },
     async getCookie() {
-      // console.log(this.$jwt.hasToken())
       if (this.$jwt.hasToken()) {
         this.login = this.$jwt.decode().username;
         // let id = this.$jwt.decode().user_id;
         let permissions = [];
 
         const response = await fetch('/api/user/permissions').catch((error) => {
-          console.log(error);
+          console.error(error);
           return {
             status: 300,
             result: 'Post не создался, возможно из-за неточностей в запросе',
           };
         });
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект

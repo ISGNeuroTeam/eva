@@ -36,7 +36,7 @@ $metric-header-height: 40px
   -webkit-text-fill-color: transparent
 
 .dialog-content::v-deep
-  background-color: $main_bg
+  background-color: $main_bg !important
 
   .header
     min-height: $header-height
@@ -76,7 +76,7 @@ $metric-header-height: 40px
       color: $secondary_text
 
   .content
-    color: $main_text
+    color: $main_text !important
     background-color: $secondary_bg
 
     &::-webkit-scrollbar
@@ -270,6 +270,9 @@ $metric-header-height: 40px
           user-select: none
           @include text-truncated()
 
+          &.disabled
+            opacity: 0.5
+            cursor: auto
           &.selected
             color: $accent_ui_color
             border: 1px solid $accent_ui_color

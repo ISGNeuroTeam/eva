@@ -127,7 +127,7 @@
     </v-content>
     <footer-bottom />
     <modal-profile
-      :active-from="activeModal"
+      v-model="activeModal"
       :create="createSome"
       :key-from="keyFrom"
       :cur-item-from="curItem"
@@ -165,7 +165,7 @@ export default {
       activeDelete: false,
       createSome: false,
       colorRow: false,
-      keyFrom: null,
+      keyFrom: '',
       dataDelete: {},
       curItem: {},
       permission: true,
@@ -193,8 +193,9 @@ export default {
     editUser(act, item, key) {
       this.user = act === 'create' ? {} : item;
       this.createSome = act === 'create';
-
-      this.curItem = item;
+      if (item) {
+        this.curItem = item;
+      }
       this.keyFrom = key;
 
       if (act !== 'create') {
@@ -281,7 +282,8 @@ export default {
       }
     },
     async setData(role) {
-      return await this.$store.getters['auth/getEssenceList'](role, false);
+      const result = await this.$store.dispatch('auth/getEssenceList', { role, create: false });
+      return result;
     },
     setColorHover(i) {
       let table = {};
@@ -297,7 +299,7 @@ export default {
             });
             table.addEventListener('mouseout', (event) => {
               if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style = `background: transparent !important;color:${this.theme.$main_text}`;
+                event.target.parentElement.style = 'background: transparent !important;';
               }
             });
           } else {
@@ -329,16 +331,20 @@ export default {
         case 5:
           text = '<p>Удалить индекс</p> ';
           break;
+        default:
+          break;
       }
       this.dataDelete.text = `${text} <span>${item.name}</span>`;
       this.dataDelete.id = item.id;
       this.dataDelete.essence = i;
       this.activeDelete = true;
     },
-    closeModal() {
+    closeModal(isClearChanges = true) {
       this.activeDelete = false;
       this.activeModal = false;
-      this.getData(`tab-${this.keyFrom}`);
+      if (!isClearChanges) {
+        this.getData(`tab-${this.keyFrom}`);
+      }
     },
   },
 };

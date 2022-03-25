@@ -58,9 +58,18 @@ import { mdiFileOutline } from '@mdi/js';
 
 export default {
   props: {
-    color: null,
-    openexim: null,
-    idDash: null,
+    color: {
+      type: Object,
+      required: true,
+    },
+    openexim: {
+      type: Boolean,
+      required: true,
+    },
+    idDash: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
@@ -81,7 +90,7 @@ export default {
   computed: {},
   methods: {
     async exportDash() {
-      const response = await this.$store.getters.exportDash(this.idDash);
+      const response = await this.$store.dispatch('exportDash', this.idDash);
       if (response.status != 200) {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
@@ -97,12 +106,12 @@ export default {
       }, 2000);
     },
     async importDash() {
-      if (this.file == '' || this.file == undefined) {
+      if (this.file === '' || this.file === undefined) {
         this.msgImp.text = 'Выберите файл для импорта';
         this.msgImp.color = 'controlsActive';
         this.msgImp.opacity = '1';
       } else {
-        const response = await this.$store.getters.importDash({
+        const response = await this.$store.dispatch('importDash', {
           idDash: this.idDash,
           file: this.file,
         });
@@ -131,12 +140,12 @@ export default {
           dash: { id: this.idDash, body: reader.result },
           modified: '',
         });
-        this.$store.getters['auth/putLog'](`Импортирован дашборд ${this.idDash}`);
+        this.$store.dispatch('auth/putLog', `Импортирован дашборд ${this.idDash}`);
         this.$emit('closeExim');
       };
 
       reader.onerror = function () {
-        console.log(reader.error);
+        console.error(reader.error);
       };
     },
     downloadDash(url) {

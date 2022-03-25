@@ -55,12 +55,30 @@ export default {
   name: 'DashBush',
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
-    widthFrom: null, // ширина родительского компонента
-    heightFrom: null, // выоста родительского компонента
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // выоста родительского компонента
   },
   data() {
     return {
@@ -81,10 +99,7 @@ export default {
   computed: {
     top() {
       // для ряда управляющих иконок
-      if (document.body.clientWidth <= 1600) {
-        return '50px';
-      }
-      return '60px';
+      return document.body.clientWidth <= 1600 ? '50px' : '60px';
     },
     widthPanel() {
       return `${this.widthFrom / 10}px`;
@@ -92,11 +107,14 @@ export default {
     heightPanel() {
       return `${this.heightFrom}px`;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom];
+    },
+    getDragRes() {
+      return this.dashFromStore.dragRes;
+    },
     dragRes() {
-      const dragRes = this.$store.getters.getDragRes({
-        idDash: this.idDashFrom,
-        id: this.idFrom,
-      });
+      const dragRes = this.getDragRes;
       return dragRes === 'true';
     },
     containerWidth() {
@@ -116,6 +134,17 @@ export default {
       }
     },
     dataRestFrom(_dataRest) {
+      this.drawGraph(_dataRest);
+    },
+  },
+  async mounted() {
+    await this.createGraph();
+    if (this.dataRestFrom.length > 0) {
+      this.drawGraph(this.dataRestFrom);
+    }
+  },
+  methods: {
+    drawGraph(_dataRest) {
       // очистка графа
       this.$graphComponent.graph.clear();
       // библиотека
@@ -136,11 +165,6 @@ export default {
         this.applyLayout();
       }
     },
-  },
-  mounted() {
-    this.createGraph();
-  },
-  methods: {
     clickViewMode() {
       this.isViewMode = false;
       this.$graphComponent.inputMode = new yfile.GraphEditorInputMode({
@@ -152,74 +176,72 @@ export default {
       this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
     },
     generateElementConfig(dataRest) {
-      const _tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
+      const tmp = dataRest[dataRest.length - 1]?.ID?.replaceAll("'", '"');
       try {
-        this.elementConfig = JSON.parse(_tmp);
+        this.elementConfig = JSON.parse(tmp);
       } catch {
         this.jsonError = true;
       }
     },
     getMaxElementWidth() {
-      const _index = Object.keys(this.elementConfig.library.primitives)[0];
-      let _max = this.elementConfig.library.primitives[_index].width;
+      const index = Object.keys(this.elementConfig.library.primitives)[0];
+      let max = this.elementConfig.library.primitives[index].width;
       Object.values(this.elementConfig.library.primitives).forEach((pr) => {
-        if (pr.width > _max) {
-          _max = pr.width;
+        if (pr.width > max) {
+          max = pr.width;
         }
       });
-      this.maxElementWidth = _max;
+      this.maxElementWidth = max;
     },
     getMaxEdgeWidth() {
-      const _index = Object.keys(this.elementConfig.library.egdes)[0];
-      let _max = this.elementConfig.library.egdes[_index].width;
+      const index = Object.keys(this.elementConfig.library.egdes)[0];
+      let max = this.elementConfig.library.egdes[index].width;
       Object.values(this.elementConfig.library.egdes).forEach((edge) => {
-        if (edge.width > _max) {
-          _max = edge.width;
+        if (edge.width > max) {
+          max = edge.width;
         }
       });
-      this.maxEdgeWidth = _max;
+      this.maxEdgeWidth = max;
     },
     drawNodes() {
       // для нод на графе, скрытая переменная yfile
       this.$graphNodes = null;
 
       this.nodesSource.forEach((node, index) => {
-        let _node;
-        let _imgSource;
+        let localNode;
+        let imgSource;
         if (this.nodesSource[index].anomaly === true) {
-          _imgSource = this.elementConfig.library.primitives[this.nodesSource[index].type]
-            .image_on;
-          _node = this.$graphComponent.graph.createNodeAt({
+          imgSource = this.elementConfig.library
+            .primitives[this.nodesSource[index].type].image_on;
+          localNode = this.$graphComponent.graph.createNodeAt({
             location: node.point,
-            style: new yfile.ImageNodeStyle(`/svg/warning_${_imgSource}`),
+            style: new yfile.ImageNodeStyle(`/svg/warning_${imgSource}`),
             labels: [this.nodesSource[index].label],
           });
         } else {
           if (this.nodesSource[index].status === true) {
-            _imgSource = this.elementConfig.library.primitives[
-              this.nodesSource[index].type
-            ].image_on;
+            imgSource = this.elementConfig.library
+              .primitives[this.nodesSource[index].type].image_on;
           } else {
-            _imgSource = this.elementConfig.library.primitives[
-              this.nodesSource[index].type
-            ].image_off;
+            imgSource = this.elementConfig.library
+              .primitives[this.nodesSource[index].type].image_off;
           }
-          _node = this.$graphComponent.graph.createNodeAt({
+          localNode = this.$graphComponent.graph.createNodeAt({
             location: node.point,
-            style: new yfile.ImageNodeStyle(`/svg/${_imgSource}`),
+            style: new yfile.ImageNodeStyle(`/svg/${imgSource}`),
             labels: [this.nodesSource[index].label],
           });
         }
 
-        this.setNodeSize(_node, this.nodesSource[index].type);
+        this.setNodeSize(localNode, this.nodesSource[index].type);
         // для дальнейшего рисования edges
         // через tag передаётся id
-        _node.tag = this.nodesSource[index].id;
+        localNode.tag = this.nodesSource[index].id;
         if (this.$graphNodes) {
-          this.$graphNodes.push(_node);
+          this.$graphNodes.push(localNode);
         } else {
           this.$graphNodes = [];
-          this.$graphNodes.push(_node);
+          this.$graphNodes.push(localNode);
         }
       });
     },
@@ -233,21 +255,21 @@ export default {
     },
     drawEdges() {
       this.edgesSource.forEach((edge) => {
-        let _fNode = null;
-        let _tNode = null;
+        let fNode = null;
+        let tNode = null;
         this.$graphNodes.forEach((gNode) => {
           if (gNode.tag === edge.fromNode) {
-            _fNode = gNode;
+            fNode = gNode;
           }
           if (gNode.tag === edge.toNode) {
-            _tNode = gNode;
+            tNode = gNode;
           }
         });
-        const _edge = this.$graphComponent.graph.createEdge(_fNode, _tNode);
+        const newEdge = this.$graphComponent.graph.createEdge(fNode, tNode);
         // применяем этот стиль -- this.elementConfig.library.egdes[edge.style]
         // стилизуем нарисованный edge
         this.$graphComponent.graph.setStyle(
-          _edge,
+          newEdge,
           new yfile.PolylineEdgeStyle({
             stroke: `${this.elementConfig.library.egdes[edge.style].width}px ${
               this.elementConfig.library.egdes[edge.style].color
@@ -271,15 +293,15 @@ export default {
       bridgeManager.addObstacleProvider(new yfile.GraphObstacleProvider());
     },
     generateEdges(dataRest) {
-      const _allEdges = [];
+      const allEdges = [];
       // в последней строке доступы
-      for (let i = 0; i < dataRest.length - 1; i++) {
+      for (let i = 0; i < dataRest.length - 1; i += 1) {
         if (dataRest[i].edges) {
-          const _tmpEdge = JSON.parse(dataRest[i].edges.replaceAll("'", '"'));
-          Object.keys(_tmpEdge).forEach((key) => {
+          const tmpEdge = JSON.parse(dataRest[i].edges.replaceAll("'", '"'));
+          Object.keys(tmpEdge).forEach((key) => {
             // прохожу по всем ключам-разного типа
-            _tmpEdge[key].forEach((edge) => {
-              _allEdges.push({
+            tmpEdge[key].forEach((edge) => {
+              allEdges.push({
                 fromNode: Number(dataRest[i].ID),
                 toNode: Number(edge),
                 style: key, // стиль
@@ -290,43 +312,43 @@ export default {
       }
 
       // уникальная связь
-      this.edgesSource = this.uniqEdges(_allEdges);
+      this.edgesSource = this.uniqEdges(allEdges);
       // sort TODO!!
-      const _sort = [];
+      const sort = [];
       this.edgesSource.forEach((edge) => {
         if (edge.style === 'oil') {
-          _sort.unshift(edge);
+          sort.unshift(edge);
         } else {
-          _sort.push(edge);
+          sort.push(edge);
         }
       });
-      this.edgesSource = _sort;
+      this.$set(this, 'edgesSource', sort);
     },
 
     uniqEdges(allEdges) {
-      const _acc = [];
-      for (let i = 0; i < allEdges.length; i++) {
-        let _isUniq = true;
-        for (let j = 0; j < _acc.length; j++) {
+      const acc = [];
+      for (let i = 0; i < allEdges.length; i += 1) {
+        let isUniq = true;
+        for (let j = 0; j < acc.length; j += 1) {
           if (
-            _acc[j].style === allEdges[i].style
-            && _acc[j].fromNode === allEdges[i].toNode
-            && _acc[j].toNode === allEdges[i].fromNode
+            acc[j].style === allEdges[i].style
+            && acc[j].fromNode === allEdges[i].toNode
+            && acc[j].toNode === allEdges[i].fromNode
           ) {
-            _isUniq = false;
+            isUniq = false;
           }
         }
-        if (_isUniq) {
-          _acc.push(allEdges[i]);
+        if (isUniq) {
+          acc.push(allEdges[i]);
         }
       }
-      return _acc;
+      return acc;
     },
     generateNodes(dataRest) {
-      const _allNodes = [];
+      const allNodes = [];
       // в последней строке доступы
-      for (let i = 0; i < dataRest.length - 1; i++) {
-        _allNodes.push({
+      for (let i = 0; i < dataRest.length - 1; i += 1) {
+        allNodes.push({
           id: Number(dataRest[i].ID),
           point: new yfile.Point(
             dataRest[i].object_coordinate_X * this.containerWidth
@@ -339,11 +361,11 @@ export default {
           anomaly: dataRest[i].anomaly,
         });
       }
-      this.nodesSource = _allNodes;
+      this.nodesSource = allNodes;
     },
 
-    createGraph() {
-      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+    async createGraph() {
+      this.$graphComponent = await new yfile.GraphComponent(this.$refs.graph);
       if (this.dragRes) {
         this.$graphComponent.inputMode = null;
       } else {
@@ -365,7 +387,9 @@ export default {
 
       // положение label относительно ноды
       const labelModel = new yfile.ExteriorLabelModel({ insets: 4 });
-      this.$graphComponent.graph.nodeDefaults.labels.layoutParameter = labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH);
+      this.$graphComponent
+        .graph.nodeDefaults.labels
+        .layoutParameter = labelModel.createParameter(yfile.ExteriorLabelModelPosition.SOUTH);
     },
   },
 };

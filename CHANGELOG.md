@@ -5,6 +5,74 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.85.0]
+
+### Added
+- added the ability to update tokens when executing a go event
+- reportsV2 timeline get data from backend
+- reportsV2 interesting get data from backend
+- added visualisations to datа research 2.0.
+
+### Fixed
+- fix first search id
+- fix bush drawing
+- fix single value template reactivity
+- fix SR2 visualisation
+- fixed group edit and dash edit modal
+- Multiline. Moved the barplots to the background
+- fixed single value metadata and ranges if the boundaries coincide - incorrect processing
+- SingleValue Color setting for indicators via the Ranges button
+- Added blocking of the scheduler application button
+- fixed piechart color rgb
+- fixed gis settings styles
+- fixed calendar in data source
+- fixed creating/editing dashboards/groups
+- fixed guntt disappears data when navigating through tabs
+- fixed multiline tooltip display on fullscreen not working
+- fixed styles theme
+- fixed gis icons
+- Fixed template for metrics
+- fixed dashboard creation
+- fixed columns in the table are not hidden
+- fixed multiline settings and design improvements
+- fixed additional message about existing data source when renaming
+- fixed multiline label
+- fixed heatmap. Transition by event to tabs.
+- fixed renaming with data source replacement
+- fixed passed properties to token
+- fixed dashTable.vue
+- fixed save dashboards
+- fixed log icon light up on error
+- fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
+- fixed piechart chunk selection syncing
+- fixed dashSelect
+- refactoring a multiline
+- Fixed persistent modal
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
+- fixed guntt hints
+- fixed an empty data source will load indefinitely
+- fixed activate tabs in new dashboards
+- fixed dashboards\groups are not imported\exported
+- fixed piechart positionlegend
+- fixed data is not disaplayed after renaming data sources
+- fixed create dashboard visualisation
+- fixed fix color styles and ygraph tooltip
+- fixed unable to create new components
+- fixed dash tune
+- fixed default tab are not created
+- fixed multiselect refinement
+- fixed multiselect placing data on multiple lines
+- fixed add token 
+- improvements handling window closing
+- fixed dropdown lists
+- fixed table columns not hiding
+- fixed handling deletion of tabs
+- fixed bugs in "modal-delete"
+
 ## [1.84.0]
 
 ### Added
@@ -17,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed guntt full screen improvements.
 - fixed searching by bool type
 - fixed fullscreen improvements tune
+- fixed removed all download buttons for components
 
 ## [1.83.1]
 

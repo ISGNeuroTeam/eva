@@ -41,12 +41,27 @@
 <script>
 export default {
   props: {
-    idFrom: null,
-    idDashFrom: null,
-    dataRestFrom: null,
+    idFrom: {
+      type: String,
+      required: true,
+    },
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    },
     dataLoadingFrom: null,
-    widthFrom: null,
-    colorFrom: null,
+    widthFrom: {
+      type: Number,
+      required: true,
+    },
+    colorFrom: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -81,18 +96,55 @@ export default {
       }
       return null;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
+    },
+    getOptions() {
+      if (!this.idDash) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.id, idDash: this.idDash });
+      }
+
+      if (!this.dashFromStore?.options.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore.options.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+
+      return this.dashFromStore.options;
+    },
     subnumber() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const options = this.getOptions;
       return options.subnumber;
     },
     fontSize() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const options = this.getOptions;
       if (options.fontSize) {
         return options.fontSize.split('px')[0];
       }
@@ -103,10 +155,7 @@ export default {
     },
 
     color() {
-      const options = this.$store.getters.getOptions({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const options = this.getOptions;
       let color = this.colorFrom.controls;
       if (options.color) {
         color = options.color;
@@ -121,7 +170,8 @@ export default {
   },
   mounted() {
     this.setNoMsg(this.dataRestFrom);
-    //  В первый раз раскомментить чтобы создать события для элемнета, а затем лучше закоментить чтобы каждый раз не обращаться к store
+    //  В первый раз раскомментить чтобы создать события для элемнета,
+    //  а затем лучше закоментить чтобы каждый раз не обращаться к store
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -132,13 +182,34 @@ export default {
     setNoMsg(dataRestFrom) {
       this.noMsg = !(dataRestFrom && dataRestFrom.length > 0);
     },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
     setEventCompareColor(number) {
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'OnDataCompare',
-        element: this.id,
       });
-
       let flag = -1;
       let frontier;
       events.forEach((item) => {
@@ -174,7 +245,8 @@ export default {
             ) {
               flag = 0;
             }
-
+            break;
+          default:
             break;
         }
         if (flag !== -1) {
@@ -196,10 +268,8 @@ export default {
 
     setEventColor(number) {
       this.setEventCompareColor(number);
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onValueCompare',
-        element: this.id,
       });
       let treshold; let color; let
         value;
@@ -207,8 +277,8 @@ export default {
       events.forEach((item) => {
         treshold = item.treshold.replace('[', '').replace(']', '').split(',');
         color = item.color.replace('[', '').replace(']', '').split(',');
-        treshold.forEach((item, i) => {
-          if (number > Number(item)) {
+        treshold.forEach((tresholdItem, i) => {
+          if (number > Number(tresholdItem)) {
             value = color[i];
           }
         });
@@ -226,7 +296,7 @@ export default {
       });
     },
     setClick() {
-      const tockens = this.$store.getters.getTockens(this.idDash);
+      const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
       Object.keys(tockens).forEach((i) => {
@@ -237,7 +307,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: this.number,
             store: this.$store,
@@ -245,10 +315,8 @@ export default {
         }
       });
 
-      const events = this.$store.getters.getEvents({
-        idDash: this.idDash,
+      const events = this.getEvents({
         event: 'onclick',
-        element: this.id,
         partelement: 'empty',
       });
       if (events.length !== 0) {
@@ -259,7 +327,7 @@ export default {
               idDash: this.idDash,
             });
           } else if (item.action === 'go') {
-            this.$store.commit('letEventGo', {
+            this.$store.dispatch('letEventGo', {
               event: item,
               idDash: this.idDash,
               route: this.$router,

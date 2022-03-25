@@ -205,14 +205,205 @@ const labelFontBOLD = new yfile.Font({
   fontWeight: 'BOLD',
 });
 
+class HTMLPopupSupport {
+  /**
+   * Initializes a new HTMLPopupSupport instance for the given graph component, pop-up container
+   * div, and pop-up placement parameter.
+   * @param {!GraphComponent} graphComponent The GraphComponent
+   * that displays the nodes and edges for which pop-ups
+   * will be shown.
+   * @param {!HTMLElement} div The HTMLDivElement that is
+   * used as parent element for the pop-up element.
+   * @param {!ILabelModelParameter} labelModelParameter The placement
+   * parameter that determines the pop-up location.
+   */
+  constructor(graphComponent, div, labelModelParameter) {
+    this.labelModelParameter = labelModelParameter;
+    this.div = div;
+    this.graphComponent = graphComponent;
+    // eslint-disable-next-line no-underscore-dangle
+    this._currentItem = null;
+    this.dirty = false;
+    // make the popup invisible
+    div.style.opacity = '0';
+    div.style.display = 'none';
+
+    this.registerListeners();
+  }
+
+  /**
+   * Gets the node or edge to display information for.
+   * @type {?(IEdge|INode)}
+   */
+  get currentItem() {
+    // eslint-disable-next-line no-underscore-dangle
+    return this._currentItem;
+  }
+
+  /**
+   * Sets the node or edge to display information for.
+   * Setting this property to a value other than null shows the pop-up.
+   * Setting the property to null hides the pop-up.
+   * @type {?(IEdge|INode)}
+   */
+  set currentItem(value) {
+    // eslint-disable-next-line no-underscore-dangle
+    this._currentItem = value;
+    if (value) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  }
+
+  /**
+   * Registers viewport, node bounds changes, and visual tree listeners to the support's associated
+   * graph component.
+   */
+  registerListeners() {
+    // Adds listener for viewport changes
+    this.graphComponent.addViewportChangedListener(() => {
+      if (this.currentItem) {
+        this.dirty = true;
+      }
+    });
+
+    // Adds listeners for node bounds changes
+    this.graphComponent.graph.addNodeLayoutChangedListener((node) => {
+      const item = this.currentItem;
+      if (
+        item
+        && (item === node || HTMLPopupSupport.isEdgeConnectedTo(item, node))
+      ) {
+        this.dirty = true;
+      }
+    });
+
+    // Adds listener for updates of the visual tree
+    this.graphComponent.addUpdatedVisualListener(() => {
+      if (this.currentItem && this.dirty) {
+        this.dirty = false;
+        this.updateLocation();
+      }
+    });
+  }
+
+  /**
+   * Makes this pop-up visible.
+   */
+  show() {
+    this.div.style.display = 'block';
+    setTimeout(() => {
+      this.div.style.opacity = '1';
+    }, 0);
+    this.updateLocation();
+  }
+
+  /**
+   * Hides this pop-up.
+   */
+  hide() {
+    const parent = this.div.parentNode;
+    const popupClone = this.div.cloneNode(true);
+    popupClone.setAttribute(
+      'class',
+      `${popupClone.getAttribute('class')} popupContentClone`,
+    );
+    parent.appendChild(popupClone);
+    // fade the clone out, then remove it from the DOM. Both actions need to be timed.
+    setTimeout(() => {
+      popupClone.setAttribute(
+        'style',
+        `${popupClone.getAttribute('style')} opacity: 0;`,
+      );
+      setTimeout(() => {
+        parent.removeChild(popupClone);
+      }, 300);
+    }, 0);
+    this.div.style.opacity = '0';
+    this.div.style.display = 'none';
+  }
+
+  /**
+   * Changes the location of this pop-up to the location calculated by the
+   * {@link HTMLPopupSupport#labelModelParameter}.
+   * Currently, this implementation does not support rotated pop-ups.
+   */
+  updateLocation() {
+    if (!this.currentItem && !this.labelModelParameter) {
+      return;
+    }
+    const width = this.div.clientWidth;
+    const height = this.div.clientHeight;
+    const { zoom } = this.graphComponent;
+
+    const dummyLabel = new SimpleLabel(
+      this.currentItem,
+      '',
+      this.labelModelParameter,
+    );
+    if (this.labelModelParameter.supports(dummyLabel)) {
+      dummyLabel.preferredSize = new Size(width / zoom, height / zoom);
+      const newLayout = this.labelModelParameter.model.getGeometry(
+        dummyLabel,
+        this.labelModelParameter,
+      );
+      this.setLocation(
+        newLayout.anchorX,
+        newLayout.anchorY - (height + 10) / zoom,
+      );
+    }
+  }
+
+  /**
+   * Sets the location of this pop-up to the given world coordinates.
+   * @param {number} x The target x-coordinate of the pop-up.
+   * @param {number} y The target y-coordinate of the pop-up.
+   */
+  setLocation(x, y) {
+    // Calculate the view coordinates since we have
+    // to place the div in the regular HTML coordinate space
+    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
+    this.div.style.setProperty(
+      'transform',
+      `translate(${viewPoint.x}px, ${viewPoint.y}px)`,
+    );
+  }
+
+  /**
+   * Determines if the given item is an IEdge connected to the given node.
+   * @param {!IModelItem} item
+   * @param {!INode} node
+   * @returns {boolean}
+   */
+  static isEdgeConnectedTo(item, node) {
+    return (
+      item instanceof IEdge
+      && (item.sourcePort.owner === node || item.targetPort.owner === node)
+    );
+  }
+}
+
 export default {
   name: 'DashYGraph',
   props: {
     // переменные полученные от родителя
-    idFrom: null, // id элемнета (table, graph-2)
-    idDashFrom: null, // id дашборда
-    dataRestFrom: null, // данные полученые после выполнения запроса
-    colorFrom: null, // цветовые переменные
+    idFrom: {
+      type: String,
+      required: true,
+    }, // id элемнета (table, graph-2)
+    idDashFrom: {
+      type: String,
+      required: true,
+    }, // id дашборда
+    dataRestFrom: {
+      type: Array,
+      required: true,
+    }, // данные полученые после выполнения запроса
+    colorFrom: {
+      type: Object,
+      required: true,
+    }, // цветовые переменные
     loading: {
       type: Boolean,
       default: true,
@@ -253,6 +444,9 @@ export default {
       }
       return '60px';
     },
+    idDash() {
+      return this.idDashFrom;
+    },
     parentNodes() {
       if (!this.currentNode || !this.currentNode.id) return [];
       return this.dataRestFrom
@@ -262,7 +456,7 @@ export default {
     childrenNodes() {
       const node = this.currentNode;
       if (!node || !node.relation_id) return [];
-
+      // eslint-disable-next-line camelcase
       const relation_ids = [];
       this.dataRestFrom
         .filter((item) => `${item.id}` === `${node.id}`)
@@ -327,7 +521,7 @@ export default {
     changeInputMode() {
       // меняем режим графика
       if (this.isEditor) {
-        this.$graphComponent.inputMode = null;
+        this.$graphComponent.inputMode = this.initMode();
       } else {
         this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
       }
@@ -356,7 +550,7 @@ export default {
     },
     edgeStyle(color) {
       if (color === undefined) {
-        color = this.colors[0];
+        [color] = this.colors;
       }
       const key = `edgeStyle_${color}`;
       if (!this.edgeStyleList[key]) {
@@ -487,9 +681,12 @@ export default {
         zoomPolicy: StyleDecorationZoomPolicy.VIEW_COORDINATES,
       });
 
-      decorator.edgeDecorator.highlightDecorator.setFactory((edge) => (edge.style instanceof BezierEdgeStyle
-        ? bezierEdgeStyleHighlight
-        : edgeStyleHighlight));
+      decorator.edgeDecorator.highlightDecorator
+        .setFactory(
+          (edge) => (edge.style instanceof BezierEdgeStyle
+            ? bezierEdgeStyleHighlight
+            : edgeStyleHighlight),
+        );
     },
     initializeTooltips() {
       const { inputMode } = this.$graphComponent;
@@ -506,7 +703,8 @@ export default {
           return;
         }
 
-        // Use a rich HTML element as tooltip content. Alternatively, a plain string would do as well.
+        // Use a rich HTML element as tooltip content.
+        // Alternatively, a plain string would do as well.
         eventArgs.toolTip = this.createTooltipContent(eventArgs.item);
 
         // Indicate that the tooltip content has been set.
@@ -556,9 +754,6 @@ export default {
         data: this.nodesSource, // .slice(0,10),
         id: 'id',
         tag: (item) => item
-        // return item.name.toLowerCase()==='start'|| item.name.toLowerCase()==='finish' ?
-        // item.name :
-        // item.color
         ,
       });
 
@@ -569,17 +764,16 @@ export default {
       nodeNameCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.NORTH_EAST;
 
       // label label для nodes
+
+      /*
+      * TODO: У нода нет параметра лейбл, так что  свойство всегда ture,
+      *   а данная строка всегда возвращает undefined
+      */
+
       const nodeLabelCreator = this.$nodesSource.nodeCreator.createLabelBinding(
-        (nodeDataItem) => {
-          if (nodeDataItem.label !== '-') {
-            /*
-             TODO: У нода нет параметра лейбл, так что  свойство всегда ture
-              а данная строка всегда возвращает undefined
-            */
-            return nodeDataItem.label;
-          }
-        },
+        (nodeDataItem) => nodeDataItem.label,
       );
+
       nodeLabelCreator.defaults.layoutParameter = yfile.ExteriorLabelModel.EAST;
 
       // генерация edges
@@ -594,6 +788,7 @@ export default {
         if (edgeDataItem.label !== '-') {
           return edgeDataItem.label;
         }
+        return '';
       });
 
       this.$graphComponent.graph = graphBuilder.buildGraph();
@@ -624,19 +819,41 @@ export default {
     },
     createTockens(result) {
       const captures = Object.keys(result[0]);
-      this.actions.forEach((item, i) => {
-        this.$set(this.actions[i], 'capture', captures);
+      const localActions = JSON.parse(JSON.stringify(this.actions));
+      localActions.forEach((item, i) => {
+        this.$set(localActions[i], 'capture', captures);
       });
       this.$store.commit('setActions', {
-        actions: JSON.parse(JSON.stringify(this.actions)),
+        actions: JSON.parse(JSON.stringify(localActions)),
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
     },
-    createGraph() {
-      this.labelStyleList = {}; // варианты labelStyle
-      this.edgeStyleList = {};
-      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+          && item.element === this.id
+          && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+            && item.target === this.id,
+        );
+      }
+      return result;
+    },
+    initMode() {
       const mode = new yfile.GraphEditorInputMode({
         allowGroupingOperations: false,
         allowAddLabel: false,
@@ -645,12 +862,12 @@ export default {
       });
       mode.addItemClickedListener((sender, args) => {
         if (args.item instanceof yfile.INode) {
-          const tokens = this.$store.getters.getTockens(this.idDashFrom);
+          const tokens = this.$store.state[this.idDashFrom].tockens;
           tokens.forEach((token) => {
             if (token.elem === this.idFrom && token.action === 'click') {
               const value = args.item.tag[token.capture];
               this.$store.commit('setTocken', {
-                tocken: token,
+                token,
                 idDash: this.idDashFrom,
                 store: this.$store,
                 value,
@@ -658,10 +875,8 @@ export default {
             }
           });
 
-          const events = this.$store.getters.getEvents({
-            idDash: this.idDashFrom,
+          const events = this.getEvents({
             event: 'onclick',
-            element: this.idFrom,
           });
 
           if (events.length !== 0) {
@@ -672,7 +887,7 @@ export default {
                   idDash: this.idDashFrom,
                 });
               } else if (item.action === 'go') {
-                this.$store.commit('letEventGo', {
+                this.$store.dispatch('letEventGo', {
                   event: item,
                   idDash: this.idDashFrom,
                   route: this.$router,
@@ -685,7 +900,7 @@ export default {
       });
 
       mode.itemHoverInputMode.enabled = true;
-      mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE | GraphItemTypes.NODE;
+      mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE || GraphItemTypes.NODE;
       mode.itemHoverInputMode.discardInvalidItems = false;
       mode.itemHoverInputMode.addHoveredItemChangedListener((sender, e) => {
         const manager = this.$graphComponent.highlightIndicatorManager;
@@ -698,9 +913,9 @@ export default {
           manager.addHighlight(newItem);
           if (newItem instanceof INode) {
             // and if it's a node, we highlight all adjacent edges, too
-            for (const edge of this.$graphComponent.graph.edgesAt(newItem)) {
+            this.$graphComponent.graph.edgesAt(newItem).forEach((edge) => {
               manager.addHighlight(edge);
-            }
+            });
           } else if (newItem instanceof IEdge) {
             // if it's an edge - we highlight the adjacent nodes
             manager.addHighlight(newItem.sourceNode);
@@ -708,18 +923,21 @@ export default {
           }
         }
       });
-
-      this.$graphComponent.inputMode = mode;
+      // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
+      mode.addCanvasClickedListener(() => {
+        this.$graphComponent.currentItem = null;
+      });
+      return mode;
+    },
+    createGraph() {
+      this.labelStyleList = {}; // варианты labelStyle
+      this.edgeStyleList = {};
+      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+      this.$graphComponent.inputMode = this.initMode();
 
       this.initializeDefaultStyles();
       this.initializeTooltips();
       this.initializePopups();
-
-      // убираем надпись о license
-      // document.querySelectorAll('.yfiles-svgpanel').forEach(item=>{
-      //   item.children[1].style.opacity = 0
-      //   item.children[2].style.opacity = 0
-      // })
     },
     initializePopups() {
       // Creates a label model parameter that is used to position the node pop-up
@@ -747,7 +965,7 @@ export default {
       const { inputMode } = this.$graphComponent;
 
       // The pop-up is shown for the currentItem thus nodes and edges should be focusable
-      inputMode.focusableItems = GraphItemTypes.NODE | GraphItemTypes.EDGE;
+      inputMode.focusableItems = GraphItemTypes.NODE || GraphItemTypes.EDGE;
 
       // Register a listener that shows the pop-up for the currentItem
       this.$graphComponent.addCurrentItemChangedListener(() => {
@@ -771,11 +989,6 @@ export default {
         }
       });
 
-      // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
-      inputMode.addCanvasClickedListener(() => {
-        this.$graphComponent.currentItem = null;
-      });
-
       // On press of the ESCAPE key, set currentItem to <code>null</code> to hide the pop-ups
       inputMode.keyboardInputMode.addKeyBinding(
         Key.ESCAPE,
@@ -796,7 +1009,7 @@ export default {
 
       // get all divs in the pop-up
       const divs = edgePopup.div.getElementsByTagName('div');
-      for (let i = 0; i < divs.length; i++) {
+      for (let i = 0; i < divs.length; i += 1) {
         const div = divs.item(i);
         if (div.hasAttribute('data-id')) {
           // if div has a 'data-id' attribute, get content from the business data
@@ -815,7 +1028,7 @@ export default {
 
       // get all divs in the pop-up
       const divs = nodePopup.div.getElementsByTagName('div');
-      for (let i = 0; i < divs.length; i++) {
+      for (let i = 0; i < divs.length; i += 1) {
         const div = divs.item(i);
         if (div.hasAttribute('data-id')) {
           // if div has a 'data-id' attribute, get content from the business data
@@ -825,7 +1038,9 @@ export default {
       }
     },
     generateNodesEdges(dataRest) {
+      // eslint-disable-next-line no-underscore-dangle
       const _allNodes = [];
+      // eslint-disable-next-line no-underscore-dangle
       const _allEdges = [];
 
       dataRest.forEach((dataRestItem) => {
@@ -839,7 +1054,7 @@ export default {
         }
         _allNodes.push(dataRestItem);
       });
-
+      // eslint-disable-next-line no-underscore-dangle
       const _nodesSource = Object.values(
         _allNodes.reduce((obj, item) => ({ ...obj, [item.id]: item }), {}),
       );
@@ -851,180 +1066,6 @@ export default {
     },
   },
 };
-
-class HTMLPopupSupport {
-  /**
-   * Initializes a new HTMLPopupSupport instance for the given graph component, pop-up container
-   * div, and pop-up placement parameter.
-   * @param {!GraphComponent} graphComponent The GraphComponent that displays the nodes and edges for which pop-ups
-   * will be shown.
-   * @param {!HTMLElement} div The HTMLDivElement that is used as parent element for the pop-up element.
-   * @param {!ILabelModelParameter} labelModelParameter The placement parameter that determines the pop-up location.
-   */
-  constructor(graphComponent, div, labelModelParameter) {
-    this.labelModelParameter = labelModelParameter;
-    this.div = div;
-    this.graphComponent = graphComponent;
-    this._currentItem = null;
-    this.dirty = false;
-    // make the popup invisible
-    div.style.opacity = '0';
-    div.style.display = 'none';
-
-    this.registerListeners();
-  }
-
-  /**
-   * Gets the node or edge to display information for.
-   * @type {?(IEdge|INode)}
-   */
-  get currentItem() {
-    return this._currentItem;
-  }
-
-  /**
-   * Sets the node or edge to display information for.
-   * Setting this property to a value other than null shows the pop-up.
-   * Setting the property to null hides the pop-up.
-   * @type {?(IEdge|INode)}
-   */
-  set currentItem(value) {
-    if (value === this._currentItem) {
-      return;
-    }
-    this._currentItem = value;
-    if (value) {
-      this.show();
-    } else {
-      this.hide();
-    }
-  }
-
-  /**
-   * Registers viewport, node bounds changes, and visual tree listeners to the support's associated
-   * graph component.
-   */
-  registerListeners() {
-    // Adds listener for viewport changes
-    this.graphComponent.addViewportChangedListener(() => {
-      if (this.currentItem) {
-        this.dirty = true;
-      }
-    });
-
-    // Adds listeners for node bounds changes
-    this.graphComponent.graph.addNodeLayoutChangedListener((node) => {
-      const item = this.currentItem;
-      if (
-        item
-        && (item === node || HTMLPopupSupport.isEdgeConnectedTo(item, node))
-      ) {
-        this.dirty = true;
-      }
-    });
-
-    // Adds listener for updates of the visual tree
-    this.graphComponent.addUpdatedVisualListener(() => {
-      if (this.currentItem && this.dirty) {
-        this.dirty = false;
-        this.updateLocation();
-      }
-    });
-  }
-
-  /**
-   * Makes this pop-up visible.
-   */
-  show() {
-    this.div.style.display = 'block';
-    setTimeout(() => {
-      this.div.style.opacity = '1';
-    }, 0);
-    this.updateLocation();
-  }
-
-  /**
-   * Hides this pop-up.
-   */
-  hide() {
-    const parent = this.div.parentNode;
-    const popupClone = this.div.cloneNode(true);
-    popupClone.setAttribute(
-      'class',
-      `${popupClone.getAttribute('class')} popupContentClone`,
-    );
-    parent.appendChild(popupClone);
-    // fade the clone out, then remove it from the DOM. Both actions need to be timed.
-    setTimeout(() => {
-      popupClone.setAttribute(
-        'style',
-        `${popupClone.getAttribute('style')} opacity: 0;`,
-      );
-      setTimeout(() => {
-        parent.removeChild(popupClone);
-      }, 300);
-    }, 0);
-    this.div.style.opacity = '0';
-    this.div.style.display = 'none';
-  }
-
-  /**
-   * Changes the location of this pop-up to the location calculated by the
-   * {@link HTMLPopupSupport#labelModelParameter}. Currently, this implementation does not support rotated pop-ups.
-   */
-  updateLocation() {
-    if (!this.currentItem && !this.labelModelParameter) {
-      return;
-    }
-    const width = this.div.clientWidth;
-    const height = this.div.clientHeight;
-    const { zoom } = this.graphComponent;
-
-    const dummyLabel = new SimpleLabel(
-      this.currentItem,
-      '',
-      this.labelModelParameter,
-    );
-    if (this.labelModelParameter.supports(dummyLabel)) {
-      dummyLabel.preferredSize = new Size(width / zoom, height / zoom);
-      const newLayout = this.labelModelParameter.model.getGeometry(
-        dummyLabel,
-        this.labelModelParameter,
-      );
-      this.setLocation(
-        newLayout.anchorX,
-        newLayout.anchorY - (height + 10) / zoom,
-      );
-    }
-  }
-
-  /**
-   * Sets the location of this pop-up to the given world coordinates.
-   * @param {number} x The target x-coordinate of the pop-up.
-   * @param {number} y The target y-coordinate of the pop-up.
-   */
-  setLocation(x, y) {
-    // Calculate the view coordinates since we have to place the div in the regular HTML coordinate space
-    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
-    this.div.style.setProperty(
-      'transform',
-      `translate(${viewPoint.x}px, ${viewPoint.y}px)`,
-    );
-  }
-
-  /**
-   * Determines if the given item is an IEdge connected to the given node.
-   * @param {!IModelItem} item
-   * @param {!INode} node
-   * @returns {boolean}
-   */
-  static isEdgeConnectedTo(item, node) {
-    return (
-      item instanceof IEdge
-      && (item.sourcePort.owner === node || item.targetPort.owner === node)
-    );
-  }
-}
 </script>
 
 <style lang="css">

@@ -19,7 +19,7 @@
           :style="{ color: theme.$main_text }"
         >
           <div
-            v-for="item in rows"
+            v-for="item in getInteresting"
             :key="item.id"
             class="interesting-row"
           >
@@ -35,9 +35,7 @@
                   v-on="on"
                 >
                   <span class="interesting-row-name">{{ item.text }} </span>
-                  <span class="interesting-row-number">{{
-                    item.totalCount
-                  }}</span>
+                  <span class="interesting-row-number">{{ item.totalCount }}</span>
                 </div>
               </template>
               <v-card class="action-popup">
@@ -77,11 +75,10 @@ import {
   mdiChevronRight,
   mdiChevronDown,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 
 export default {
-  props: {
-    rows: Array,
-  },
+  name: 'Interesting',
   data() {
     return {
       mdiRefresh,
@@ -93,6 +90,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('dataResearch', ['getInteresting']),
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -109,11 +107,12 @@ export default {
           year: 'numeric',
         };
         dataset.push({
+          // eslint-disable-next-line no-underscore-dangle
           time: new Date(item._time * 1000).toLocaleString('ru', options),
           inputCount: item,
         });
       });
-      console.log(dataset);
+      // console.log(dataset);
       return dataset;
     },
   },
@@ -121,7 +120,7 @@ export default {
   methods: {
     openStatistic(statistic) {
       if (this.showStatistic) {
-        if (this.statisticKey == statistic.text) {
+        if (this.statisticKey === statistic.text) {
           // this.showStatistic = false;
         } else {
           this.statisticKey = statistic.text;
@@ -136,7 +135,7 @@ export default {
   },
 };
 </script>
-
+<!-- eslint-disable -->
 <style lang="sass">
 @import './../../sass/_colors'
 .interesting

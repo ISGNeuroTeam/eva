@@ -29,7 +29,7 @@ export default {
     const response = await fetch(
       `http://${host}/formbuilder/listFormTemplates`,
     ).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
     return response.json();
   },
@@ -37,7 +37,7 @@ export default {
     const response = await fetch(
       `http://${host}/formbuilder/getFormTemplate?id=${id}`,
     ).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
     return response.json();
   },
@@ -45,7 +45,7 @@ export default {
     const response = await fetch(
       `http://${host}/formbuilder/listForms?id=${id}`,
     ).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
     return response.json();
   },
@@ -53,7 +53,7 @@ export default {
     const response = await fetch(
       `http://${host}/formbuilder/getFormData?form_id=${ids.idForm}&template_id=${ids.idTemplate}`,
     ).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
     return response.json();
   },
@@ -61,7 +61,7 @@ export default {
     const response = await fetch(
       `http://${host}/formbuilder/getFormData?id=${id}`,
     ).catch((error) => {
-      console.log(error);
+      console.error(error);
     });
     return response.json();
   },

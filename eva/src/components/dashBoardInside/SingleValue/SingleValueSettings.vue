@@ -1,10 +1,13 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="isOpen"
-    persistent
-    scrollable
+    :theme="theme"
     width="560"
-    @click:outside="close"
+    scrollable
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="close"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
@@ -33,6 +36,7 @@
             outlined
             hide-details
             class="input-element"
+            @input="isChanged = true"
           />
           <br>
           <label class="checkbox-google">
@@ -58,6 +62,7 @@
             menu-props="offsetY"
             class="input-element"
             @change="handleChangeCount"
+            @input="isChanged = true"
           />
         </div>
 
@@ -74,14 +79,14 @@
               :class="`metric-${settings.metricCount} v-${n} ${
                 n === settings.template ? 'selected' : ''
               }`"
-              @click="settings.template = n"
+              @click="setSettingTemplate(n)"
             >
               <div
-                v-for="n in settings.metricCount"
-                :key="`item-${n}`"
+                v-for="m in settings.metricCount"
+                :key="`item-${m}`"
                 class="item"
-                :style="{ gridArea: `item-${n}` }"
-                v-text="n"
+                :style="{ gridArea: `item-${m}` }"
+                v-text="m"
               />
             </div>
           </div>
@@ -96,13 +101,14 @@
           />
         </div>
         <draggable
+          v-if="settings.metricOptions && settings.metricOptions.length > 0"
           v-model="settings.metricOptions"
           handle=".burger"
           @end="update()"
         >
           <div
             v-for="(metric, i) in settings.metricOptions"
-            :key="`metric-${metric.id}`"
+            :key="`metric-${metric.listOrder}`"
             class="metric-section"
             :class="{ expanded: metric.expanded }"
           >
@@ -139,6 +145,7 @@
                 outlined
                 hide-details
                 class="input-element"
+                @input="isChanged = true"
               />
             </div>
 
@@ -149,7 +156,7 @@
                   title="Без иконки"
                   class="icon"
                   :class="{ selected: no_icon.id === metric.icon }"
-                  @click="metric.icon = no_icon.id"
+                  @click="metric.icon = no_icon.id; isChanged = true"
                   v-html="no_icon.svg"
                 />
                 <div
@@ -157,7 +164,7 @@
                   :key="icon.id"
                   class="icon"
                   :class="{ selected: icon.id === metric.icon }"
-                  @click="metric.icon = icon.id"
+                  @click="metric.icon = icon.id; isChanged = true"
                   v-html="icon.svg"
                 />
               </div>
@@ -175,6 +182,7 @@
                   hide-details
                   menu-props="offsetY"
                   class="input-element"
+                  @input="isChanged = true"
                 />
               </div>
               <div class="content-section pa-0">
@@ -188,11 +196,10 @@
                   hide-details
                   menu-props="offsetY"
                   class="input-element"
+                  @input="isChanged = true"
                 >
                   <template v-slot:selection="{ item }">
-                    {{
-                      item.title
-                    }}
+                    {{ item.title }}
                   </template>
                   <template v-slot:item="{ item }">
                     <span
@@ -215,7 +222,7 @@
                   :key="color.name"
                   class="color-select"
                   :class="{ selected: metric.color === color.name }"
-                  @click="metric.color = color.name"
+                  @click="metric.color = color.name; isChanged = true"
                 >
                   <div
                     v-if="color.colorGrad"
@@ -257,7 +264,7 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -269,18 +276,26 @@ import {
   mdiChevronUp,
   mdiChevronDown,
 } from '@mdi/js';
+// eslint-disable-next-line camelcase
 import metricTitleIcons, { no_icon } from './metricTitleIcons';
 import './sass/checkboxGoogle.css';
 
 export default {
   name: 'SingleValueSettings',
-  comments: {
+  components: {
     draggable,
   },
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    isOpen: { type: Boolean, default: false },
+    modalValue: { type: Boolean, default: false },
     receivedSettings: { type: Object, default: () => ({}) },
-    updateCount: Function,
+    updateCount: {
+      type: Function,
+      required: true,
+    },
   },
   data: () => ({
     no_icon,
@@ -290,7 +305,9 @@ export default {
     mdiChevronUp,
     mdiChevronDown,
     /** Local settings object based on receivedSettings props. */
-    settings: {},
+    settings: {
+      template: 1,
+    },
     /** Font size select items. */
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
@@ -317,10 +334,20 @@ export default {
      * Data fornat: { <metricsNumber>: <availableTemplatesNumber> }.
      */
     templatesForMetrics: {
-      2: 2, 3: 6, 4: 7, 5: 5, 6: 2,
+      2: 2, 3: 6, 4: 7, 5: 4, 6: 2,
     },
+    isChanged: false,
   }),
   computed: {
+    isOpen: {
+      get() {
+        return this.modalValue;
+      },
+      set(val) {
+        this.$emit('updateModalValue', val);
+      },
+    },
+
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -334,18 +361,18 @@ export default {
     },
 
     isAllMetricsExpanded() {
-      const { metricOptions = [] } = this.settings;
+      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
       return metricOptions.every((m) => m.expanded === true);
     },
 
     metricCountList() {
-      const { metricOptions = [] } = this.settings;
+      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
       const metricCount = metricOptions.length;
       const countList = [];
 
       if (metricCount > 0) {
         const max = metricCount <= 6 ? metricCount : 6;
-        for (let i = 0; i < max; i++) {
+        for (let i = 0; i < max; i += 1) {
           countList.push(i + 1);
         }
       }
@@ -354,29 +381,62 @@ export default {
     },
   },
   watch: {
+    isOpen(val) {
+      if (!val) {
+        this.isChanged = false;
+      }
+    },
     receivedSettings(newValue) {
       const newSettings = JSON.parse(JSON.stringify(newValue));
-      this.settings = {
-        ...newSettings,
-        metricOptions: newSettings.metricOptions.sort(
-          (a, b) => a.listOrder - b.listOrder,
-        ),
-      };
+      // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
+      this.$set(
+        this,
+        'settings',
+        {
+          ...newSettings,
+          metricOptions: newSettings.metricOptions.sort(
+            (a, b) => a.listOrder - b.listOrder,
+          ),
+          template: this.settings.template || 1,
+        },
+      );
+      // this.settings = {
+      //   ...newSettings,
+      //   metricOptions: newSettings.metricOptions.sort(
+      //     (a, b) => a.listOrder - b.listOrder,
+      //   ),
+      // };
     },
-    settings(old, newSet) {
+    settings(newSet, old) {
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
         this.updateCount(this.settings.metricCount);
       }
     },
   },
   methods: {
+    setSettingTemplate(n) {
+      this.$set(this.settings, 'template', n);
+    },
+    changeColorData(metric, color) {
+      if (color.name !== 'range' || (color.name === 'range' && metric.metadata)) metric.color = color.name;
+    },
     getFamily() {},
     handleChangeShowTitle() {
       if (this.settings) {
-        this.settings = {
-          ...JSON.parse(JSON.stringify(this.settings)),
-          showTitle: !this.settings.showTitle,
-        };
+        this.isChanged = true;
+        this.$set(
+          this,
+          'settings',
+          {
+            ...JSON.parse(JSON.stringify(this.settings)),
+            showTitle: !this.settings.showTitle,
+            template: this.settings.template || 1,
+          },
+        );
+        // this.settings = {
+        //   ...JSON.parse(JSON.stringify(this.settings)),
+        //   showTitle: !this.settings.showTitle,
+        // };
       }
     },
 
@@ -388,13 +448,23 @@ export default {
     },
 
     save() {
-      this.$emit('save', { ...this.settings });
+      this.$emit('save', { ...JSON.parse(JSON.stringify(this.settings)) });
       this.close(true);
     },
 
     handleChangeCount(count) {
-      this.settings.template = 1;
-      this.settings.metricCount = count;
+      this.$set(
+        this.settings,
+        'template',
+        1,
+      );
+      this.$set(
+        this.settings,
+        'metricCount',
+        count,
+      );
+      // this.settings.template = 1;
+      // this.settings.metricCount = count;
     },
 
     update() {
@@ -403,7 +473,15 @@ export default {
 
     close(save = false) {
       if (!save || typeof save === 'object') {
-        this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
+        this.$set(
+          this,
+          'settings',
+          {
+            ...JSON.parse(JSON.stringify(this.receivedSettings)),
+            template: this.settings.template || 1,
+          },
+        );
+        // this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
       }
       this.toggleAllMetrics(false);
       this.$emit('close');
@@ -418,10 +496,11 @@ export default {
     },
 
     toggleAllMetrics(value = true) {
-      const { metricOptions = [] } = this.settings;
-      for (const metric of metricOptions) {
+      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
+      metricOptions.forEach((metric) => {
         metric.expanded = value;
-      }
+      });
+      this.$set(this.settings, 'metricOptions', metricOptions);
     },
   },
 };

@@ -62,8 +62,10 @@
             class="overlay-grid"
             :data-grid="true"
             :style="{
-              background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
-            rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px) repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
+              background: `linear-gradient(-90deg, ${theme.$main_text} 1px, transparent 1px)
+                repeat scroll 0% 0% / ${verticalCell}px ${verticalCell}px,
+                rgba(0, 0, 0, 0) linear-gradient(${theme.$main_text} 1px, transparent 1px)
+                repeat scroll 0% 0% / ${horizontalCell}px ${horizontalCell}px`,
             }"
           />
           <move-able
@@ -76,7 +78,7 @@
             :horizontal-cell="horizontalCell"
             :vertical-cell="verticalCell"
             :search-data="getElementData(elem)"
-            :data-sourse-title="elem.search"
+            :data-source-id="elem.search"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
@@ -92,6 +94,7 @@
             :id-dash-from="idDash"
           />
           <modal-settings
+            v-if="activeSettingModal"
             :color-from="theme"
             :id-dash-from="idDash"
           />
@@ -123,7 +126,7 @@
         class="tab-panel"
       >
         <div
-          v-for="tab in tabs"
+          v-for="(tab, tabIndex) in tabs"
           :key="tab.id"
           :class="{
             active: currentTab === tab.id,
@@ -153,7 +156,14 @@
               @click.stop="enterEditMode(tab)"
             >
               <path
-                d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524 2.61022L10.2157 3.84688L10.2152 3.84747Z"
+                d="M1.57833 11.0044C1.41469 11.0041 1.2587 10.9351 1.14841 10.8142C1.03609
+                 10.6943 0.980275 10.5322 0.994996 10.3686L1.13791 8.79705L7.74008
+                 2.19722L9.80333 4.25988L3.20291 10.8591L1.63141 11.0021C1.61333 11.0038
+                 1.59525 11.0044 1.57833 11.0044ZM10.2152 3.84747L8.1525 1.7848L9.38975
+                 0.547549C9.49916 0.438012 9.64763 0.376465 9.80246 0.376465C9.95728
+                 0.376465 10.1057 0.438012 10.2152 0.547549L11.4524 1.7848C11.562 1.89421
+                 11.6235 2.04269 11.6235 2.19751C11.6235 2.35233 11.562 2.5008 11.4524
+                 2.61022L10.2157 3.84688L10.2152 3.84747Z"
                 :fill="theme.$main_border"
               />
             </svg>
@@ -164,10 +174,13 @@
               height="13"
               viewBox="0 0 8 8"
               xmlns="http://www.w3.org/2000/svg"
-              @click.stop="deleteTab(tab.id)"
+              @click.stop="confirmDeleteTab(tabIndex)"
             >
               <path
-                d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843 7.77129L4 4.94286Z"
+                d="M4 4.94286L1.17157 7.77129L0.228763 6.82848L3.05719
+                 4.00005L0.228763 1.17163L1.17157 0.228817L4 3.05724L6.82843
+                 0.228817L7.77124 1.17163L4.94281 4.00005L7.77124 6.82848L6.82843
+                 7.77129L4 4.94286Z"
                 :fill="theme.$main_border"
               />
             </svg>
@@ -189,7 +202,9 @@
               @click.stop.prevent="editTabName"
             >
               <path
-                d="M7.9375 14.7142L3.8125 10.5892L4.99083 9.41089L7.93875 12.3555L7.9375 12.3567L15.0083 5.28589L16.1867 6.46422L9.11583 13.5359L7.93833 14.7134L7.9375 14.7142Z"
+                d="M7.9375 14.7142L3.8125 10.5892L4.99083 9.41089L7.93875
+                 12.3555L7.9375 12.3567L15.0083 5.28589L16.1867 6.46422L9.11583
+                 13.5359L7.93833 14.7134L7.9375 14.7142Z"
                 :fill="theme.$main_border"
               />
             </svg>
@@ -231,15 +246,24 @@
         </svg>
       </div>
     </div>
+    <modal-confirm
+      v-model="isConfirmModal"
+      :theme="theme"
+      :modal-text="modalText"
+      btn-confirm-text="Удалить"
+      btn-cancel-text="Отмена"
+      @result="deleteTab"
+    />
   </v-app>
 </template>
 
 <script>
 export default {
+  name: 'MainTitle',
   data() {
     return {
       page: 'dash',
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE == 'true',
+      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       showSetting: false,
       rotate: '',
       openProfile: false,
@@ -264,18 +288,77 @@ export default {
       leftDots: true,
       rightDots: true,
       zoomedSearch: [],
+      isConfirmModal: false,
+      deleteTabId: '',
+      deleteTabName: '',
     };
   },
   computed: {
+    modalText() {
+      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId + 1}</strong> ?`;
+    },
+    dashFromStore() {
+      if (this.idDash) {
+        return this.$store.state[this.idDash];
+      }
+      return null;
+    },
+    // получаем объект с настройками моадлки натсроек
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
+    activeSettingModal: {
+      get() {
+        return this.getModalSettings.status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
     idDash() {
       // получаем id страницы от родителя
       return this.$route.params.id;
     },
     elements() {
       // получаем название элемента  от родителя
-      return this.loadingDash
-        ? []
-        : this.$store.getters.getElementsWithSearches(this.idDash);
+      // return this.loadingDash
+      //   ? []
+      //   : this.$store.getters.getElementsWithSearches(this.idDash);
+
+      if (this.loadingDash || !this.dashFromStore?.elements) {
+        return [];
+      }
+      return this.dashFromStore.elements
+        .filter(
+          (elem) => this.dashFromStore[elem].tab
+            === this.currentTab
+            || this.dashFromStore[elem].options?.pinned,
+        )
+        .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
     headerTop() {
       return 0;
@@ -284,42 +367,62 @@ export default {
       return this.$store.getters.getTheme;
     },
     gridShow() {
-      return this.loadingDash
-        ? false
-        : this.$store.getters.getGridShow(this.idDash) === 'true';
+      if (this.loadingDash || !this.dashFromStore.grid) {
+        return false;
+      }
+      return this.dashFromStore.gridShow === 'true';
     },
     getSizeGrid() {
-      return this.loadingDash
-        ? { hor: '18', vert: '32' }
-        : this.$store.getters.getSizeGrid(this.idDash);
+      if (this.loadingDash || !this.dashFromStore.grid) {
+        return { hor: '18', vert: '32' };
+      }
+      return this.dashFromStore.grid;
     },
     tabs() {
-      return this.loadingDash
-        ? []
-        : this.$store.getters.getDashTabs(this.idDash);
+      if (this.loadingDash || !this.dashFromStore.tabList) {
+        return [];
+      }
+      return this.dashFromStore.tabList;
     },
     tabsMoreOne() {
       return this.tabs.length > 1;
     },
     showTabs() {
-      return this.loadingDash
-        ? false
-        : this.$store.getters.getShowTabs(this.idDash);
+      if (this.loadingDash || !this.dashFromStore) {
+        return false;
+      }
+      return this.dashFromStore?.tabs;
     },
     currentTab() {
-      return this.loadingDash
-        ? 0
-        : this.$store.getters.getCurrentDashTab(this.idDash);
+      if (this.loadingDash || !this.dashFromStore.currentTab) {
+        return 1;
+      }
+      return this.dashFromStore.currentTab;
     },
     searches() {
-      return this.loadingDash
-        ? []
-        : this.$store.getters.getSearches(this.idDash);
+      if (this.loadingDash) {
+        return [];
+      }
+      if (!this.dashFromStore.searches) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'searches',
+          value: [],
+        }]);
+      }
+      return this.dashFromStore.searches;
     },
     tokens() {
-      return this.loadingDash
-        ? []
-        : this.$store.getters.getTockens(this.idDash);
+      if (this.loadingDash || !this.dashFromStore.tockens) {
+        return [];
+      }
+      return this.dashFromStore.tockens;
+    },
+    getGrid() {
+      return this.dashFromStore?.grid || {
+        vert: 32,
+        hor: 18,
+      };
     },
   },
   watch: {
@@ -336,45 +439,48 @@ export default {
     searches: {
       deep: true,
       handler(searches) {
-        function findOnButtonTokens(tokens) {
-          return tokens.filter((el) => el.onButton);
-        }
-        const onButton = findOnButtonTokens(this.tokens);
-        console.log(onButton);
         if (this.firstLoad) {
           searches.forEach((search) => {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.sid, {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
               data: [],
               loading: true,
             });
           });
           this.firstLoad = false;
         }
-        searches.map((search) => {
+        searches.forEach((search) => {
           if (search.status === 'empty') {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.sid, {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
               data: [],
               loading: true,
             });
             this.$store.commit('updateSearchStatus', {
               idDash: this.idDash,
               sid: search.sid,
+              id: search.id,
               status: 'pending',
             });
-            this.$store.getters
-              .getDataApi({ search, idDash: this.idDash })
+            this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
               .then((res) => {
+                if (res?.length === 0) {
+                  this.$store.commit('setState', [{
+                    object: this.$store.state,
+                    prop: 'logError',
+                    value: true,
+                  }]);
+                }
                 this.$store.commit('updateSearchStatus', {
                   idDash: this.idDash,
                   sid: search.sid,
+                  id: search.id,
                   status: res.length ? 'downloaded' : 'nodata',
                 });
-                this.$set(this.dataObject[search.sid], 'data', res);
-                this.$set(this.dataObject[search.sid], 'loading', false);
-                this.$set(this.dataObjectConst[search.sid], 'data', res);
-                this.$set(this.dataObjectConst[search.sid], 'loading', false);
+                this.$set(this.dataObject[search.id], 'data', res);
+                this.$set(this.dataObject[search.id], 'loading', false);
+                this.$set(this.dataObjectConst[search.id], 'data', res);
+                this.$set(this.dataObjectConst[search.id], 'loading', false);
               });
           }
         });
@@ -384,7 +490,7 @@ export default {
   async mounted() {
     await this.checkAlreadyDash();
     this.loadingDash = false;
-    document.title = `EVA | ${this.$store.getters.getName(this.idDash)}`;
+    document.title = `EVA | ${this.dashFromStore.name}`;
     if (this.$route.params.tabId) {
       this.clickTab(Number(this.$route.params.tabId));
     }
@@ -397,23 +503,38 @@ export default {
     window.onresize = this.checkTabOverflow;
   },
   methods: {
+    getElementSourceId(searchId) {
+      return this.searches.find((search) => search.id === searchId)?.id || '';
+    },
     exportDataCSV(searchName) {
+      console.log(searchName);
+      console.log(this.dataObject);
+      console.log(this.dataObject[searchName]);
+      console.log(this.dataObject[searchName].data);
       const searchData = this.dataObject[searchName].data;
-      let csvContent = 'data:text/csv;charset=utf-8,'; // задаем кодировку csv файла
+      // задаем кодировку csv файла
+      let csvContent = 'data:text/csv;charset=utf-8,';
 
       if (searchData.length) {
-        const keys = Object.keys(searchData[0]); // получаем ключи для заголовков столбцов
-        csvContent += encodeURIComponent(`${keys.join(',')}\n`); // добавляем ключи в файл
+        // получаем ключи для заголовков столбцов
+        const keys = Object.keys(searchData[0]);
+        // добавляем ключи в файл
+        csvContent += encodeURIComponent(`${keys.join(',')}\n`);
       }
       csvContent += encodeURIComponent(
         searchData.map((item) => Object.values(item).join(',')).join('\n'),
       );
 
-      const link = document.createElement('a'); // создаем ссылку
-      link.setAttribute('href', csvContent); // указываем ссылке что надо скачать наш файл csv
-      link.setAttribute('download', `${this.idDash}-${searchName}.csv`); // указываем имя файла
-      link.click(); // жмем на скачку
-      link.remove(); // удаляем ссылку
+      // создаем ссылку
+      const link = document.createElement('a');
+      // указываем ссылке что надо скачать наш файл csv
+      link.setAttribute('href', csvContent);
+      // указываем имя файла
+      link.setAttribute('download', `${this.idDash}-${searchName}.csv`);
+      // жмем на скачку
+      link.click();
+      // удаляем ссылку
+      link.remove();
     },
     scroll(event) {
       event.preventDefault();
@@ -427,32 +548,39 @@ export default {
     checkTabOverflow() {
       setTimeout(() => {
         const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel'];
-        scrollLeft > 0 ? (this.leftDots = true) : (this.leftDots = false);
+        this.leftDots = scrollLeft > 0;
         if (clientWidth < scrollWidth) {
           this.rightDots = clientWidth + scrollLeft < scrollWidth + 5
             && clientWidth + scrollLeft < scrollWidth - 5;
-        } else this.rightDots = false;
+        } else {
+          this.rightDots = false;
+        }
       }, 0);
     },
+    getSearchName(elem) {
+      return this.searches.find((element) => element?.id === elem.search)?.sid || '';
+    },
     checkLoading(elem) {
-      if (elem.search === -1) return false;
+      if (this.getSearchName(elem) === '') return false;
       return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
-      if (elem.search === -1) return [];
+      if (this.getSearchName(elem) === '') return [];
       return this.dataObject[elem.search]?.data;
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
         this.$store.commit('changeCurrentTab', {
           idDash: this.idDash,
-          tab: tabID,
+          tab: this.tabs.find((tab) => tabID === tab.id) ? tabID : 1,
         });
       }
     },
     addNewTab() {
       if (!this.tabEditMode) {
-        const tabID = [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1;
+        const tabID = this.tabs?.length > 0
+          ? [...this.tabs].sort((a, b) => b.id - a.id)[0].id + 1
+          : 1;
         this.$store.commit('addNewTab', {
           idDash: this.idDash,
           tabID,
@@ -461,11 +589,24 @@ export default {
       }
       this.checkTabOverflow();
     },
-    deleteTab(tabID) {
-      if (this.tabsMoreOne && !this.tabEditMode) {
-        this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID });
+    confirmDeleteTab(tabIndex) {
+      this.deleteTabName = '';
+      this.deleteTabId = '';
+      this.deleteTabId = tabIndex;
+      if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
+        this.deleteTabName = this.tabs[tabIndex].name;
+      } else {
+        this.deleteTabName = '';
       }
-      this.checkTabOverflow();
+      this.isConfirmModal = true;
+    },
+    deleteTab(isConfirm) {
+      if (isConfirm) {
+        if (this.tabsMoreOne && !this.tabEditMode) {
+          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.tabs[this.deleteTabId].id });
+        }
+        this.checkTabOverflow();
+      }
     },
     enterEditMode(tab) {
       if (!this.tabEditMode && !this.editableTabID) {
@@ -507,7 +648,8 @@ export default {
         dash: this.alreadyDash,
         modified: this.alreadyDash.modified,
       });
-      this.$store.getters['auth/putLog'](
+      this.$store.dispatch(
+        'auth/putLog',
         `Обновлен дашборд ${this.toHichName(this.alreadyDash?.name)} с id ${
           this.alreadyDash.id
         }`,
@@ -518,8 +660,9 @@ export default {
       return name[0].toUpperCase() + name.slice(1);
     },
     async checkAlreadyDash() {
-      const response = await this.$store.getters.checkAlreadyDash(
-        this.$route.params.id,
+      const response = await this.$store.dispatch(
+        'checkAlreadyDash',
+        { id: this.$route.params.id },
       );
       if (response.status === 'exist') {
         this.alreadyShow = true;
@@ -536,13 +679,11 @@ export default {
       this.startClientWidth = document.body.clientWidth;
     },
     calcSizeCell() {
-      // размер ячейки
-      const grid = this.$store.getters.getSizeGrid(this.idDash);
       this.verticalCell = Number(
-        (this.startClientWidth / grid.vert).toFixed(1),
+        (this.startClientWidth / this.getGrid.vert).toFixed(1),
       );
       this.horizontalCell = Number(
-        (this.startClientHeight / grid.hor).toFixed(1),
+        (this.startClientHeight / this.getGrid.hor).toFixed(1),
       );
     },
     addScrollListener() {
@@ -581,24 +722,20 @@ export default {
         const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
         const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
 
-        if (
-          (item[range.xMetric] <= range.range[0]
+        return (item[range.xMetric] <= range.range[0]
             && arr[idxArrFirst]?.[range.xMetric] >= range.range[1])
           || (item[range.xMetric] >= range.range[1]
-            && arr[idxArrSecond]?.[range.xMetric] <= range.range[0])
-        ) {
-          return true;
-        }
+            && arr[idxArrSecond]?.[range.xMetric] <= range.range[0]);
       });
     },
     setRange(range, elem) {
-      if (range.zoomForAll && !this.zoomedSearch.includes(elem.search)) {
-        this.zoomedSearch.push(elem.search);
+      if (range.zoomForAll && !this.zoomedSearch.includes(this.getSearchName(elem))) {
+        this.zoomedSearch.push(this.getSearchName(elem));
       }
       const elements = range.zoomForAll ? this.elements : [elem];
-      elements.forEach((elem) => {
-        this.dataObject[elem.search].data = this.sliceRange(
-          this.dataObject[elem.search].data,
+      elements.forEach((element) => {
+        this.dataObject[element.search].data = this.sliceRange(
+          this.dataObject[element.search].data,
           range,
         );
       });
@@ -612,7 +749,8 @@ export default {
         elements.push({ search: dataSourseTitle });
       }
       elements.forEach((elem) => {
-        this.dataObject[elem.search].data = this.dataObjectConst[elem.search].data;
+        this.dataObject[elem.search]
+          .data = this.dataObjectConst[elem.search].data;
       });
     },
   },

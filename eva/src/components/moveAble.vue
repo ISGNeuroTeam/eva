@@ -29,7 +29,7 @@
       :data-elem-from="id"
       :loading="loading"
       :search-data="searchData"
-      :data-sourse-title="dataSourseTitle"
+      :data-source-id="dataSourceId"
       @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
@@ -46,17 +46,38 @@ export default {
       type: Boolean,
       required: true,
     },
-    idDashFrom: null,
-    dataElem: null,
-    dataPageFrom: null,
-    verticalCell: null,
-    horizontalCell: null,
+    idDashFrom: {
+      type: String,
+      required: true,
+    },
+    dataElem: {
+      type: String,
+      required: true,
+    },
+    dataPageFrom: {
+      type: String,
+      required: true,
+    },
+    verticalCell: {
+      type: Number,
+      required: true,
+    },
+    horizontalCell: {
+      type: Number,
+      required: true,
+    },
     loading: {
       type: Boolean,
       default: false,
     },
-    searchData: Array,
-    dataSourseTitle: null,
+    searchData: {
+      type: Array,
+      default: () => ([]),
+    },
+    dataSourceId: {
+      type: [String, Number],
+      default: '',
+    },
   },
   data() {
     return {
@@ -88,10 +109,15 @@ export default {
     dataMod() {
       return this.dataModeFrom;
     },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    getDragRes() {
+      return this.dashFromStore.dragRes;
+    },
     dragRes() {
-      let dragRes = this.$store.getters.getDragResize(this.idDash);
-      dragRes === 'true' ? (dragRes = true) : (dragRes = false);
-      return dragRes;
+      const dragRes = this.getDragRes;
+      return dragRes === 'true';
     },
     headerTop() {
       if (document.body.clientWidth <= 1400) {
@@ -108,9 +134,6 @@ export default {
         }
       },
     },
-    // top(val) {
-    //   if (val <= this.headerTop) val = this.headerTop;
-    // },
     left() {
       const { clientWidth } = document.querySelector('#app');
       if (this.left < 0) this.left = 0;
@@ -119,12 +142,12 @@ export default {
       }
     },
     verticalCell() {
-      this.reload++;
+      this.reload += 1;
       this.createGrid();
       this.drawElement();
     },
     horizontalCell() {
-      this.reload++;
+      this.reload += 1;
       this.createGrid();
       this.drawElement();
     },
@@ -139,18 +162,18 @@ export default {
   },
   methods: {
     drawElement() {
-      const pos = this.$store.getters.getPosDash({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const pos = {
+        top: this.$store.state[this.idDash][this.id].top,
+        left: this.$store.state[this.idDash][this.id].left,
+      };
 
       this.left = pos.left * this.verticalCell;
       this.top = pos.top * this.horizontalCell;
 
-      const size = this.$store.getters.getSizeDash({
-        idDash: this.idDash,
-        id: this.id,
-      });
+      const size = {
+        width: this.$store.state[this.idDash][this.id].width,
+        height: this.$store.state[this.idDash][this.id].height,
+      };
 
       const width = size.width * this.verticalCell;
       const height = size.height * this.horizontalCell;
@@ -160,7 +183,7 @@ export default {
     },
     onActivated() {
       const testElements = document.getElementsByClassName('vdr');
-      for (let i = 0; i < testElements.length; i++) {
+      for (let i = 0; i < testElements.length; i += 1) {
         if (Number(testElements[i].style.zIndex) > this.maxZIndex) {
           this.maxZIndex = Number(testElements[i].style.zIndex);
         }
