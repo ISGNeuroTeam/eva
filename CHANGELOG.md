@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added visualisations to datа research 2.0.
 
 ### Fixed
+- fix first search id
 - fix bush drawing
 - fix single value template reactivity
 - fix SR2 visualisation
