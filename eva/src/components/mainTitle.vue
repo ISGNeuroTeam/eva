@@ -295,7 +295,7 @@ export default {
   },
   computed: {
     modalText() {
-      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
+      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId + 1}</strong> ?`;
     },
     dashFromStore() {
       if (this.idDash) {
@@ -592,7 +592,7 @@ export default {
     confirmDeleteTab(tabIndex) {
       this.deleteTabName = '';
       this.deleteTabId = '';
-      this.deleteTabId = this.tabs[tabIndex].id;
+      this.deleteTabId = tabIndex;
       if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
         this.deleteTabName = this.tabs[tabIndex].name;
       } else {
@@ -603,7 +603,7 @@ export default {
     deleteTab(isConfirm) {
       if (isConfirm) {
         if (this.tabsMoreOne && !this.tabEditMode) {
-          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.deleteTabId });
+          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.tabs[this.deleteTabId].id });
         }
         this.checkTabOverflow();
       }
