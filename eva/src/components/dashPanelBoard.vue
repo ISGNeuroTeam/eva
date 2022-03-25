@@ -1497,25 +1497,31 @@ export default {
     },
     saveTocken(index) {
       // функция которая сохраняет токен в хранилище
+      if (this.tockens?.length > 0) {
+        const filterTockens = this.tockens.filter((x) => {
+          if (index) {
+            return x.elem === this.tockens[index].elem
+                && x.action === this.tockens[index].action
+                && x.capture === this.tockens[index].capture;
+          }
+          return x.elem === this.newElem
+              && x.action === this.newAction
+              && x.capture === this.newCapture;
+        });
 
-      const filterTockens = this.tockens.filter((x) => {
-        if (!Number.isNaN(index)) {
-          return x.elem === this.tockens[index].elem && x.action === this.tockens[index].action && x.capture === this.tockens[index].capture;
-        } return x.elem === this.newElem && x.action === this.newAction && x.capture === this.newCapture;
-      });
+        if (filterTockens.length > 0) {
+          this.errorSaveToken = true;
+          this.openwarning = true;
+          const height = this.$refs.blockTocken.clientHeight;
 
-      if (filterTockens.length > 0) {
-        this.errorSaveToken = true;
-        this.openwarning = true;
-        const height = this.$refs.blockTocken.clientHeight;
+          this.otstupBottom = height + 55;
+          this.msgWarn = 'Токен с такими опциями уже существует.';
 
-        this.otstupBottom = height + 55;
-        this.msgWarn = 'Токен с такими опциями уже существует.';
-
-        setTimeout(() => {
-          this.openwarning = false;
-        }, 2000);
-        return;
+          setTimeout(() => {
+            this.openwarning = false;
+          }, 2000);
+          return;
+        }
       }
 
       // проверяем не пустой ли токен
@@ -1621,6 +1627,7 @@ export default {
         this.newTockenDop = {
           defaultValue: '*',
         };
+        this.uploadTokens();
       }
     },
     deleteTocken(name) {
@@ -1634,7 +1641,6 @@ export default {
       }); // просто отправляем информацию об удаляемом токене в хранилище
     },
     deleteSearch(id) {
-      console.log(id);
       // тоже саоме для удаления ИС
       this.$store.commit('setModalDelete', {
         id: this.idDash,
@@ -2116,7 +2122,6 @@ export default {
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
-          item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
           item.style.background = this.theme.back;
           item.style.color = this.theme.text;
           item.style.border = `1px solid ${this.theme.border}`;

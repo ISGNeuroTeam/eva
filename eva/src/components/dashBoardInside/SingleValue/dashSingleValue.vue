@@ -41,18 +41,24 @@
           />
         </span>
         <span
+          v-if="metric.value"
           class="metric-value"
           :class="`color-${metric.color}`"
           :style="`
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
-            display: ${metric.value.split(',').length > 1 ? 'flex' : 'block'};
+            display: ${
+            metric.value
+            && metric.value.toString(10).split(',').length > 1
+              ? 'flex'
+              : 'block'};
             `"
         >
           <span
-            v-for="(value, inx) in metric.value.split(',')"
-            v-text="value + (inx !== metric.value.split(',').length -1 ? ', ' : '') "
+            v-for="(value, inx) in metric.value.toString(10).split(',')"
+            :key="inx"
+            v-text="value + (inx !== metric.value.toString(10).split(',').length -1 ? ', ' : '') "
           />
         </span>
       </div>
@@ -207,6 +213,7 @@ export default {
       if (!metric.metadata) {
         return undefined;
       }
+      // eslint-disable-next-line no-eval
       const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
         ranges[key] = `${ranges[key]}`.split(':').map(Number);

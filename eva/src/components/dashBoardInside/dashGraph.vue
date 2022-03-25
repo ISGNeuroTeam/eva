@@ -114,7 +114,7 @@ export default {
     },
     searchRep: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
