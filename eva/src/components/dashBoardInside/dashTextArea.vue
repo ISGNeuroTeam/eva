@@ -179,20 +179,20 @@ export default {
       const { tockens } = this.$store.state[this.idDash];
       if (tockens) {
         let name = '';
-        Object.keys(tockens).forEach((i) => {
-          if (tockens[i].elem === this.id && tockens[i].action === 'accept') {
-            name = tockens[i].name;
+        tockens.forEach((token) => {
+          if (token.elem === this.id && token.action === 'accept') {
+            name = token.name;
           }
         });
+
         const textarea = this.textarea.replace(/\n/g, ' ');
-        const tocken = {
+        const token = {
           name,
           action: 'accept',
           capture: '',
         };
-
         this.$store.commit('setTocken', {
-          tocken,
+          token,
           idDash: this.idDash,
           value: textarea,
           store: this.$store,
