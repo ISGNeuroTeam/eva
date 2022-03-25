@@ -618,6 +618,7 @@ export default new Vuex.Store({
         foundItem.sufix = tocken.sufix;
         foundItem.delimetr = tocken.delimetr;
         foundItem.defaultValue = tocken.defaultValue;
+        foundItem.onButton = tocken.onButton;
       } else {
         // а елси нету
         state[idDash].tockens.push(
@@ -632,6 +633,7 @@ export default new Vuex.Store({
             delimetr: tocken.delimetr,
             defaultValue: tocken.defaultValue,
             value: '',
+            onButton: tocken.onButton,
           },
         );
       }
