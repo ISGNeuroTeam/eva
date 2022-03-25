@@ -264,8 +264,11 @@ export default {
       if (this.dataReady.length > 0) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
+        this.elemDeep[String(this.multiple)] = this.elemDeep[String(this.multiple)].filter((elem) => res.includes(elem));
+
         res = this.filterSelect(res, this.elemDeep.true);
       }
+
       return res;
     },
     dashFromStore() {
