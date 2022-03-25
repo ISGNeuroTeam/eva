@@ -601,6 +601,7 @@ export default new Vuex.Store({
     // создаем токен
     createTockens(state, { idDash, tocken }) {
       console.log('tockens.push');
+      console.log(tocken);
       let foundItem = null;
       //  проверяем есть ли такой токен уже
       if (state[idDash]?.tockens) {
@@ -618,6 +619,7 @@ export default new Vuex.Store({
         foundItem.sufix = tocken.sufix;
         foundItem.delimetr = tocken.delimetr;
         foundItem.defaultValue = tocken.defaultValue;
+        foundItem.onButton = tocken.onButton;
       } else {
         // а елси нету
         state[idDash].tockens.push(
@@ -632,6 +634,7 @@ export default new Vuex.Store({
             delimetr: tocken.delimetr,
             defaultValue: tocken.defaultValue,
             value: '',
+            onButton: tocken.onButton,
           },
         );
       }
