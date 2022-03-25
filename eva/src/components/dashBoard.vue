@@ -791,6 +791,14 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
     });
+
+    if (this.element.includes('textarea') || this.element.includes('button')) {
+      this.$store.commit('setSwitch', {
+        idDash: this.idDash,
+        status: true,
+        id: this.element,
+      });
+    }
   },
   methods: {
     changeSelectedPie(val) {
