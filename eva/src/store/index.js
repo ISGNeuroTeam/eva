@@ -808,7 +808,9 @@ export default new Vuex.Store({
       }
     },
     deleteDashFromMain(state, { id, name }) {
-      delete state[id];
+      if (id && state[id]) {
+        delete state[id];
+      }
       const localName = name[0].toUpperCase() + name.slice(1);
       restAuth.putLog(`Удален дашборд ${localName} с id ${id}`);
     },

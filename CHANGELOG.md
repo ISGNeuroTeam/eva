@@ -66,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed dropdown lists
 - fixed table columns not hiding
 - fixed handling deletion of tabs
+- fixed bugs in "modal-delete"
 
 ## [1.84.0]
 
