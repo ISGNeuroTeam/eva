@@ -217,7 +217,7 @@ export default {
   },
   computed: {
     eventedTableData() {
-      const items = [...this.filteredTableData].map((item, index) => ({
+      let items = [...this.filteredTableData].map((item, index) => ({
         ...item,
         rowIndex: index,
       }));
@@ -255,6 +255,15 @@ export default {
           });
         }
       });
+
+      items = items.map((x) => {
+        const obj = {};
+        this.props.titles.forEach((title) => {
+          obj[title.value] = x[title.value];
+        });
+        return obj;
+      });
+
       return items;
     },
     filteredTableData() {

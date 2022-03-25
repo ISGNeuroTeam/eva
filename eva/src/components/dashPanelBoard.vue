@@ -1497,12 +1497,14 @@ export default {
     },
     saveTocken(index) {
       // функция которая сохраняет токен в хранилище
-      if (this.tockens?.length > 0) {
-        const filterTockens = this.tockens.filter((x) => {
-          if (index) {
-            return x.elem === this.tockens[index].elem
-                && x.action === this.tockens[index].action
-                && x.capture === this.tockens[index].capture;
+
+      if (this.tokens?.length > 0) {
+        const filterTockens = this.tokens.filter((x) => {
+          if (!Number.isNaN(index)) {
+            return x.elem === this.tokens[index].elem
+                && x.action === this.tokens[index].action
+                && x.capture === this.tokens[index].capture
+                && x.name !== this.tokens[index].name;
           }
           return x.elem === this.newElem
               && x.action === this.newAction
