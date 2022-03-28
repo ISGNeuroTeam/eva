@@ -134,6 +134,17 @@ export default {
       }
     },
     dataRestFrom(_dataRest) {
+      this.drawGraph(_dataRest);
+    },
+  },
+  async mounted() {
+    await this.createGraph();
+    if (this.dataRestFrom.length > 0) {
+      this.drawGraph(this.dataRestFrom);
+    }
+  },
+  methods: {
+    drawGraph(_dataRest) {
       // очистка графа
       this.$graphComponent.graph.clear();
       // библиотека
@@ -154,11 +165,6 @@ export default {
         this.applyLayout();
       }
     },
-  },
-  mounted() {
-    this.createGraph();
-  },
-  methods: {
     clickViewMode() {
       this.isViewMode = false;
       this.$graphComponent.inputMode = new yfile.GraphEditorInputMode({
@@ -316,7 +322,7 @@ export default {
           sort.push(edge);
         }
       });
-      this.edgesSource = sort;
+      this.$set(this, 'edgesSource', sort);
     },
 
     uniqEdges(allEdges) {
@@ -358,8 +364,8 @@ export default {
       this.nodesSource = allNodes;
     },
 
-    createGraph() {
-      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+    async createGraph() {
+      this.$graphComponent = await new yfile.GraphComponent(this.$refs.graph);
       if (this.dragRes) {
         this.$graphComponent.inputMode = null;
       } else {

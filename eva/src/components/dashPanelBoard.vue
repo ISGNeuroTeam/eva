@@ -1321,7 +1321,7 @@ export default {
         this.login = this.$jwt.decode().username;
 
         const response = await fetch('/api/user/permissions').catch((error) => {
-          console.log(error);
+          console.error(error);
           return {
             status: 300,
             result: 'Post не создался, возможно из-за неточностей в запросе',
@@ -2122,7 +2122,6 @@ export default {
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
-          item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
           item.style.background = this.theme.back;
           item.style.color = this.theme.text;
           item.style.border = `1px solid ${this.theme.border}`;

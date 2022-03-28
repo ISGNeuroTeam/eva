@@ -48,13 +48,17 @@
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
-            display: ${metric.value && metric.value.split(',').length > 1 ? 'flex' : 'block'};
+            display: ${
+            metric.value
+            && metric.value.toString(10).split(',').length > 1
+              ? 'flex'
+              : 'block'};
             `"
         >
           <span
-            v-for="(value, inx) in metric.value.split(',')"
+            v-for="(value, inx) in metric.value.toString(10).split(',')"
             :key="inx"
-            v-text="value + (inx !== metric.value.split(',').length -1 ? ', ' : '') "
+            v-text="value + (inx !== metric.value.toString(10).split(',').length -1 ? ', ' : '') "
           />
         </span>
       </div>

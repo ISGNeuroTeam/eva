@@ -1,3 +1,25 @@
+# [1.85.0] - Token update when executing a go event, visualisations in data research, multiline
+
+### New
+- Added the ability to update tokens when executing a go event
+- Visualisations in datа research 2.0.
+- Added tab deletion confirmation
+
+### Fixed
+- The operation of the multiline component has been updated.
+- Updated styles in the GIS component.
+- Single value metadata and ranges if the boundaries coincide - incorrect processing
+- SingleValue Color setting for indicators via the Ranges button
+- Piechart color rgb and legend position
+- Calendar in data source
+- Problems with hiding columns in the table.
+- Fixed problems with creating and editing dashboards and groups.
+- Fixed a problem with renaming data sources.
+- Fixed switching by event to tabs in the heat map.
+- Fixed the theme of styles
+- Fixed synchronization of selection of pie chart fragments
+
+
 # [1.84.0] - Fixed dashboard filters, multiple tokens
 
 ### New
