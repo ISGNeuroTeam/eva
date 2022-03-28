@@ -5,10 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unrelise]
-
+## [Unrealese]
 ### Fixed
-- fixed reportsV2: mutate vuex store state outside mutation 
+- fixed White areas in SingleValue
+- fixed modal-confirm in modal-profile and modal-create
+- fixed Multiselect. Extra data from the previous request remains in the new select
+- fixed Remove display of "Select Data Source" button right after creation
+- fixed Incorrect list in export dashboard list
+- fixed reportsV2: mutate vuex store state outside mutation
+
 
 ## [1.85.0]
 

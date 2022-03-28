@@ -42,7 +42,6 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      console.log('state[idDash][id].options1', state[idDash][id].options);
       state[idDash][id].options.change = false;
       state[idDash][id].options.visible = true;
       state[idDash][id].options.level = 1;
