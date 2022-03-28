@@ -242,7 +242,7 @@ export default {
     return {
       twf: '',
       search: {
-        parameters: {
+        parametrs: {
           tws: 0,
           twf: 0,
         },
@@ -308,9 +308,11 @@ export default {
       }
     },
   },
+  created() {
+    this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
+  },
   mounted() {
     document.title = 'EVA | Исследование данных';
-    this.search = this.$store.getters.getReportSearch;
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
@@ -350,7 +352,7 @@ export default {
       this.search.original_otl = '';
     },
     async launchSearch() {
-      this.$emit('launchSearch', this.search);
+      this.$emit('launchSearch', JSON.parse(JSON.stringify(this.search)));
     },
     hashCode(otl) {
       return otl
@@ -405,8 +407,8 @@ export default {
         twf = temp;
         this.sortDates();
       }
-      this.search.parametrs.tws = tws;
-      this.search.parametrs.twf = twf;
+      this.$set(this.search.parametrs, 'tws', tws);
+      this.$set(this.search.parametrs, 'twf', twf);
       this.menuCalendar = false;
       this.menuDropdown = false;
     },
