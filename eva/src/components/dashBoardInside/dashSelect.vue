@@ -413,9 +413,6 @@ export default {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
-        console.log('...this.topArray, ...Array.from(new Set(this.bottomArray))', ...this.topArray, ...Array.from(new Set(this.bottomArray)));
-        console.log('this.topArray', this.topArray);
-        console.log('this.this.bottomArray', this.bottomArray);
         this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
       } else {
         this.chooseText = 'Выбрать все';
