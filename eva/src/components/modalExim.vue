@@ -182,7 +182,7 @@ export default {
         this.$set(this.elements, this.element, list);
       } else if (selected.includes('Очистить все')) {
         let list = [];
-        if (this.element === 'dashs') {
+        if (this.element === 'dash') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
