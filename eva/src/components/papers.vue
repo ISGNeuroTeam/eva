@@ -586,7 +586,7 @@ export default {
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
-      console.log('launch search');
+      // console.log('launch search');
       const response = await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'papers',
@@ -611,7 +611,7 @@ export default {
         this.steps['2'].text = 'Запрос сформирован';
         this.steps['2'].error = [];
 
-        console.log('data ready');
+        // console.log('data ready');
       }
     },
     cancelSearch() {

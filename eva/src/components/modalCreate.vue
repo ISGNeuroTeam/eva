@@ -143,6 +143,7 @@
               :create="actionFrom"
               :active-from="modalValue"
               @changeData="changeDataEvent"
+              @update:is-changed="isChanged = $event"
             />
           </div>
           <div
@@ -210,6 +211,7 @@
               :color-from="theme"
               :active-from="modalValue"
               @changeData="changeDataEvent"
+              @update:is-changed="isChanged = $event"
             />
           </div>
           <div

@@ -946,10 +946,10 @@ export default {
       let db = null;
       const request = indexedDB.open('EVA', 1);
       request.onerror = (event) => {
-        console.log('error: ', event);
+        console.error('error: ', event);
       };
       request.onupgradeneeded = (event) => {
-        console.log('create');
+        // console.log('create');
         db = event.target.result;
         if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
@@ -957,7 +957,7 @@ export default {
         }
         request.onsuccess = () => {
           db = request.result;
-          console.log(`successEvent: ${db}`);
+          // console.log(`successEvent: ${db}`);
         };
       };
       return new Promise((resolve) => {
@@ -976,7 +976,7 @@ export default {
             }
           };
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            console.error('Ошибка', query.error);
           };
         };
       });
