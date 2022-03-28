@@ -256,7 +256,6 @@ export default {
         this.msgImp.opacity = '1';
       } else {
         let extantion = this.file.name.split('.');
-        console.log(this.file, extantion !== this.element);
         extantion = extantion[extantion.length - 1];
         if (extantion !== this.element) {
           if (this.element === 'group') {

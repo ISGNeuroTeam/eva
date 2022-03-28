@@ -122,7 +122,6 @@ export default {
     return response;
   },
   saveLogIntoBack(text) {
-    console.log(text);
     return putLogIntoBack(text);
   },
 

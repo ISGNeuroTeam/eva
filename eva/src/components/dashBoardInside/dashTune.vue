@@ -258,7 +258,6 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom,
     });
-    console.log('mounted');
     this.$nextTick(() => {
       this.circularSizeNew();
       this.loadSelectedValue();
@@ -328,7 +327,6 @@ export default {
     detectSliderValue(values = this.values) {
       this.sliderValue = values.findIndex((item) => item === this.value);
       if (this.value === '' && values?.length > 0) {
-        console.log('values[this.sliderValue]', values[this.sliderValue]);
         this.value = values[this.sliderValue];
       }
     },

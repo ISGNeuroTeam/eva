@@ -160,9 +160,7 @@ export default {
   },
   asyncComputed: {
     async static_rows() {
-      console.log(this.shouldGet);
       if (this.shouldGet) {
-        console.log('this.shouldGet === true');
         this.getData();
       }
       this.$store.commit('setShould', {
@@ -245,7 +243,6 @@ export default {
         let localStatistic = '';
         this.rows = [];
         if (event.data.data.length !== 0) {
-          console.log('event.data.data.length != 0');
           this.shema = event.data.shema;
           // this.data = event.data.data;
           this.$set(this, 'data', event.data.data);
