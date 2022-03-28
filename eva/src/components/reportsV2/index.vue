@@ -244,7 +244,6 @@ export default {
       worker.onmessage = function (event) {
         let localStatistic = '';
         this.rows = [];
-        console.log('event.data', event.data);
         if (event.data.data.length !== 0) {
           // console.log('event.data.data.length != 0');
           this.shema = event.data.shema;
@@ -292,7 +291,6 @@ export default {
       await this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
 
       // вызывая метод в хранилище
-      console.log('response?.data ', response);
       if (!response?.data || response.data.length === 0) {
         // если что-то пошло не так
         this.loading = false;

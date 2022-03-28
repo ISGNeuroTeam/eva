@@ -261,7 +261,6 @@ export default {
     filteredTableData() {
       let temp = this.dataRestFrom;
       if (!temp) return [];
-      console.log('this.filters', this.filters);
       Object.keys(this.filters).forEach((key) => {
         let sort;
         const type = this.getType(key);
@@ -270,7 +269,6 @@ export default {
           temp = temp.filter((el) => sort(el[key]));
         }
       });
-      console.log('');
       return temp;
     },
     events() {
@@ -374,6 +372,8 @@ export default {
     dataRestFrom: {
       deep: true,
       handler(val) {
+        this.filters = {};
+        this.filtersForTypedTitles = { };
         if (val && val.length) {
           this.indexTitles(val);
         }
@@ -390,12 +390,14 @@ export default {
     },
   },
   mounted() {
-    console.log('mounted table');
     this.$store.commit('setActions', {
       actions: JSON.parse(JSON.stringify(this.props.actions)),
       idDash: this.idDash,
       id: this.id,
     });
+    if (this.dataRestFrom && this.dataRestFrom.length > 0) {
+      this.indexTitles(this.dataRestFrom);
+    }
     this.setEventColor();
     if (!this.isVisibleTitles) {
       this.props.message = 'Данные не отображаются из-за настроек';
@@ -489,7 +491,6 @@ export default {
       this.props.nodata = true;
     },
     indexTitles(oldVal) {
-      console.log('oldVal', oldVal);
       let type = 'no';
       Object.keys(oldVal[0]).forEach((key) => {
         if (this.checkForDate(oldVal[0][key])) type = 'date';
@@ -500,9 +501,7 @@ export default {
         this.filtersForTypedTitles[key] = { action: '', value: '' };
       });
       this.typedTitles = { ...this.typedTitles };
-      console.log('this.typedTitles', this.typedTitles);
-      // this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
-      console.log('filtersForTypedTitles', this.filtersForTypedTitles);
+      this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
       // make filter objects
       // make title: type object
     },
@@ -545,7 +544,6 @@ export default {
       return result;
     },
     getDataAsynchrony(data) {
-      console.log('getDataAsynchrony');
       // this.filter/s = {};
       const prom = new Promise((resolve) => {
         if (data.error) {
