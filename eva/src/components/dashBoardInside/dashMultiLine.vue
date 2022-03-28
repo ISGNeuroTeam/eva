@@ -809,8 +809,8 @@ export default {
         });
     },
     getCurrentMetricColor(metric) {
-      const { color } = this.options;
-      return (color && color[metric])
+      const { color, united } = this.options;
+      return (!united && color && color[metric])
         ? color[metric]
         : this.color(metric);
     },
@@ -851,7 +851,7 @@ export default {
     renderLines(data, metric) {
       const {
         // eslint-disable-next-line camelcase
-        strokeWidth, type_line,
+        strokeWidth, type_line, united,
       } = this.options;
       // eslint-disable-next-line camelcase
       const typeLine = type_line || {};
@@ -886,7 +886,10 @@ export default {
             .attr('fill', 'none')
             .attr('stroke', currentColor)
             .attr('stroke-width', strokeWidth)
-            .style('stroke-dasharray', this.getStyleLine(typeLine[metric]));
+            .style(
+              'stroke-dasharray',
+              this.getStyleLine(!united ? typeLine[metric] : null),
+            );
           if (line.length === 1) {
             this.updateLineDots(line, metric);
           }
