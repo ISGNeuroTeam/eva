@@ -256,6 +256,7 @@ export default {
         this.msgImp.opacity = '1';
       } else {
         let extantion = this.file.name.split('.');
+        console.log(this.file, extantion !== this.element);
         extantion = extantion[extantion.length - 1];
         if (extantion !== this.element) {
           if (this.element === 'group') {
@@ -269,10 +270,8 @@ export default {
           const formData = new FormData();
           if (this.element === 'dash') {
             formData.append('group', this.curName);
-            formData.append('body', this.file);
-          } else {
-            formData.append('body', this.file);
           }
+          formData.append('body', this.file);
           await this.$store.dispatch('importDash', {
             element: this.element,
             formData,
