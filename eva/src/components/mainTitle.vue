@@ -295,7 +295,7 @@ export default {
   },
   computed: {
     modalText() {
-      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
+      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId + 1}</strong> ?`;
     },
     dashFromStore() {
       if (this.idDash) {
@@ -355,8 +355,8 @@ export default {
       return this.dashFromStore.elements
         .filter(
           (elem) => this.dashFromStore[elem].tab
-                === this.currentTab
-                || this.dashFromStore[elem].options?.pinned,
+            === this.currentTab
+            || this.dashFromStore[elem].options?.pinned,
         )
         .map((elem) => ({ elem, search: this.dashFromStore[elem].search }));
     },
@@ -441,8 +441,8 @@ export default {
       handler(searches) {
         if (this.firstLoad) {
           searches.forEach((search) => {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.sid, {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
               data: [],
               loading: true,
             });
@@ -451,14 +451,15 @@ export default {
         }
         searches.forEach((search) => {
           if (search.status === 'empty') {
-            this.$set(this.dataObject, search.sid, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.sid, {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
               data: [],
               loading: true,
             });
             this.$store.commit('updateSearchStatus', {
               idDash: this.idDash,
               sid: search.sid,
+              id: search.id,
               status: 'pending',
             });
             this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
@@ -473,12 +474,13 @@ export default {
                 this.$store.commit('updateSearchStatus', {
                   idDash: this.idDash,
                   sid: search.sid,
+                  id: search.id,
                   status: res.length ? 'downloaded' : 'nodata',
                 });
-                this.$set(this.dataObject[search.sid], 'data', res);
-                this.$set(this.dataObject[search.sid], 'loading', false);
-                this.$set(this.dataObjectConst[search.sid], 'data', res);
-                this.$set(this.dataObjectConst[search.sid], 'loading', false);
+                this.$set(this.dataObject[search.id], 'data', res);
+                this.$set(this.dataObject[search.id], 'loading', false);
+                this.$set(this.dataObjectConst[search.id], 'data', res);
+                this.$set(this.dataObjectConst[search.id], 'loading', false);
               });
           }
         });
@@ -505,6 +507,10 @@ export default {
       return this.searches.find((search) => search.id === searchId)?.id || '';
     },
     exportDataCSV(searchName) {
+      console.log(searchName);
+      console.log(this.dataObject);
+      console.log(this.dataObject[searchName]);
+      console.log(this.dataObject[searchName].data);
       const searchData = this.dataObject[searchName].data;
       // задаем кодировку csv файла
       let csvContent = 'data:text/csv;charset=utf-8,';
@@ -556,11 +562,11 @@ export default {
     },
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
-      return this.dataObject[this.getSearchName(elem)]?.loading;
+      return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
       if (this.getSearchName(elem) === '') return [];
-      return this.dataObject[this.getSearchName(elem)]?.data;
+      return this.dataObject[elem.search]?.data;
     },
     clickTab(tabID) {
       if (!this.tabEditMode) {
@@ -586,7 +592,7 @@ export default {
     confirmDeleteTab(tabIndex) {
       this.deleteTabName = '';
       this.deleteTabId = '';
-      this.deleteTabId = this.tabs[tabIndex].id;
+      this.deleteTabId = tabIndex;
       if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
         this.deleteTabName = this.tabs[tabIndex].name;
       } else {
@@ -597,7 +603,7 @@ export default {
     deleteTab(isConfirm) {
       if (isConfirm) {
         if (this.tabsMoreOne && !this.tabEditMode) {
-          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.deleteTabId });
+          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.tabs[this.deleteTabId].id });
         }
         this.checkTabOverflow();
       }
@@ -728,8 +734,8 @@ export default {
       }
       const elements = range.zoomForAll ? this.elements : [elem];
       elements.forEach((element) => {
-        this.dataObject[this.getSearchName(element)].data = this.sliceRange(
-          this.dataObject[this.getSearchName(element)].data,
+        this.dataObject[element.search].data = this.sliceRange(
+          this.dataObject[element.search].data,
           range,
         );
       });
@@ -743,7 +749,8 @@ export default {
         elements.push({ search: dataSourseTitle });
       }
       elements.forEach((elem) => {
-        this.dataObject[this.getSearchName(elem)].data = this.dataObjectConst[this.getSearchName(elem)].data;
+        this.dataObject[elem.search]
+          .data = this.dataObjectConst[elem.search].data;
       });
     },
   },

@@ -819,11 +819,12 @@ export default {
     },
     createTockens(result) {
       const captures = Object.keys(result[0]);
-      this.actions.forEach((item, i) => {
-        this.$set(this.actions[i], 'capture', captures);
+      const localActions = JSON.parse(JSON.stringify(this.actions));
+      localActions.forEach((item, i) => {
+        this.$set(localActions[i], 'capture', captures);
       });
       this.$store.commit('setActions', {
-        actions: JSON.parse(JSON.stringify(this.actions)),
+        actions: JSON.parse(JSON.stringify(localActions)),
         idDash: this.idDashFrom,
         id: this.idFrom,
       });

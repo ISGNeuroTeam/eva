@@ -4,7 +4,9 @@
       <span>{{ errorMessage }}</span>
     </div>
     <div v-else>
-      <div class="legend">
+      <div
+        ref="legend"
+        class="legend">
         <div
           v-for="item in legendItems"
           :key="item.name"
@@ -71,7 +73,7 @@ export default {
         { name: 'select', capture: ['start', 'end'] },
       ],
       margin: {
-        top: 15, right: 10, bottom: 5, left: 30,
+        top: 15, right: 10, bottom: 10, left: 30,
       },
       marginOffset: {
         top: 0, right: 0, bottom: 0, left: 0,
@@ -133,7 +135,7 @@ export default {
       ];
     },
     firstDataRow() {
-      return this.data[0] || {};
+      return this.dataRestFrom[0] || {};
     },
     firstDataRowMetricList() {
       return Object.keys(this.firstDataRow).filter(
@@ -157,7 +159,19 @@ export default {
       return xMetric;
     },
     data() {
+      const [first] = this.dataRestFrom;
+      const isTimestamp = first && this.isTimestamp(first[this.xMetric]);
+      if (!this.options.stringOX && isTimestamp) {
+        return this.dataRestFrom
+          .map((item) => ({
+            ...item,
+            [this.xMetric]: new Date(item[this.xMetric] * 1000),
+          }));
+      }
       return this.dataRestFrom;
+    },
+    lastDataItem() {
+      return this.data[this.dataRestFrom.length - 1];
     },
     box() {
       const {
@@ -187,7 +201,7 @@ export default {
     },
     barplotMetrics() {
       const {
-        united, metrics, metricTypes, yAxesBinding,
+        united, metrics, metricTypes, yAxesBinding = {},
       } = this.options;
       if (!united) {
         if (metrics) {
@@ -272,7 +286,7 @@ export default {
       this.svg = d3.select(this.$refs.svgContainer)
         .append('svg')
         .attr('width', width + margin.left + marginOffsetX + margin.right)
-        .attr('height', height + margin.top + margin.bottom + marginOffset.bottom)
+        .attr('height', height + margin.top + margin.bottom + marginOffset.bottom - 10)
         .append('g')
         .attr(
           'transform',
@@ -280,8 +294,8 @@ export default {
         );
 
       const {
-        barplotstyle, color, united, yFromZero, axesCount,
-        metricsAxis,
+        barplotstyle, united, yFromZero, axesCount,
+        metricsAxis, stringOX, metrics = [],
       } = this.options;
 
       this.x = {};
@@ -290,7 +304,10 @@ export default {
         .attr('class', 'myXaxis');
 
       // Initialize an Y axis
-      let allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+      let allMaxYMetric;
+      if (united) {
+        allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+      }
 
       // максимум для accumulation barplot
       if (barplotstyle === 'accumulation') {
@@ -305,28 +322,42 @@ export default {
         : (this.box.height / this.metrics.length);
 
       this.metrics.forEach((metric, i) => {
-        const currentColor = (color && color[metric])
-          ? color[metric]
-          : this.color(metric);
+        const currentColor = this.getCurrentMetricColor(metric);
         const metricType = this.getMetricType(metric);
         const groups = d3.map(this.data, (d) => d[this.xMetric]).keys();
 
         // x
-        switch (metricType) {
-          case 'barplot':
+        this.xZoom = d3.scaleTime()
+          .domain([
+            d3.min(this.data.map((item) => item[this.xMetric])),
+            d3.max(this.data.map((item) => item[this.xMetric])),
+          ])
+          .range([0, width]);
+
+        if (metricType === 'barplot') {
+          if (stringOX) {
             this.x[metric] = d3.scaleBand()
               .domain(groups)
-              .range([0, width])
-              .padding(0.5);
-            break;
-          default:
-            this.x[metric] = d3.scaleLinear()
-              .range([0, width]);
-            break;
+              .padding(0.1);
+          } else {
+            this.x[metric] = d3.scaleTime()
+              .domain([
+                d3.min(this.data.map((item) => item[this.xMetric])),
+                d3.max(this.data.map((item) => item[this.xMetric])),
+              ]);
+          }
+          this.x[metric].range([0, width]);
+        } else {
+          const [first] = this.dataRestFrom;
+          this.x[metric] = (stringOX || !this.isTimestamp(first[this.xMetric]))
+            ? d3.scaleLinear()
+            : d3.scaleTime();
+          this.x[metric]
+            .domain(this.data.map((item) => item[this.xMetric]))
+            .range([0, width]);
         }
-        this.xZoom = d3.scaleLinear().range([0, width]);
 
-        const yAxisClass = `yAxis-${metric}`;
+        const yAxisClass = `yAxis-${i}`;
 
         this.xAxis = d3.axisBottom()
           .scale(this.x[metric])
@@ -339,9 +370,38 @@ export default {
 
         maxYMetric = Math.ceil(maxYMetric * 10) / 10;
 
-        const minYMetric = (yFromZero || metricType === 'barplot')
+        let minYMetric = (yFromZero || metricType === 'barplot')
           ? 0
           : d3.min(this.data, (d) => d[metric]);
+
+        // гринаци оси Y
+        if (!united) {
+          const opt = metrics.find((d) => d.name === metric) || {};
+
+          // если у метрики только одно значение
+          if (maxYMetric === minYMetric) {
+            maxYMetric = maxYMetric % 1 === 0
+              ? maxYMetric += 1
+              : Math.ceil(maxYMetric);
+            minYMetric = minYMetric % 1 === 0
+              ? minYMetric -= 1
+              : Math.floor(minYMetric);
+          } else {
+            if (opt.manual && opt.upborder) {
+              maxYMetric = +opt.upborder;
+            }
+            if (opt.manual && opt.lowborder !== undefined) {
+              minYMetric = +opt.lowborder;
+            }
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            if (metricType === 'linechart') {
+              minYMetric -= Math.abs(minYMetric) * 0.1;
+            }
+          }
+        }
+        if (metricType === 'barplot') {
+          maxYMetric += Math.abs(maxYMetric) * 0.1;
+        }
 
         this.y[metric] = d3.scaleLinear()
           .range(united ? [yHeight, 0] : [yHeight + yHeight * i, yHeight * i])
@@ -404,13 +464,17 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick:last-of-type text`)
             .attr('transform', `translate(0, ${offsetYText})`);
         }
-
-        this.renderHorizontalLines();
       });
+      this.renderHorizontalLines();
 
       // Add a clipPath: everything out of this area won't be drawn.
-      this.clip = this.svg.append('defs').append('svg:clipPath')
-        .attr('id', 'clip')
+      const clipPathID = this.isFullScreen
+        ? `clip-${this.id}-full`
+        : `clip-${this.id}`;
+
+      this.clip = this.svg.append('defs')
+        .append('svg:clipPath')
+        .attr('id', clipPathID)
         .append('svg:rect')
         .attr('width', width)
         .attr('height', height)
@@ -420,14 +484,25 @@ export default {
       // Add brushing
       this.brush = d3.brushX()
         .extent([[0, 0], [width, height]])
+        .on('start', () => {
+          this.hideTooltip();
+          this.tooltipHide = true;
+        })
         .on('end', this.zoomChart);
 
       // Create the line variable: where both the line and the brush take place
       this.line = this.svg.append('g')
-        .attr('clip-path', 'url(#clip)');
+        .attr('clip-path', `url(#${clipPathID})`);
+
+      this.lines = {};
+      this.metrics.forEach((metric) => {
+        this.lines[metric] = this.svg.append('g')
+          .attr('clip-path', `url(#${clipPathID})`);
+      });
 
       this.bars = this.svg.append('g')
-        .attr('class', 'barplot');
+        .attr('class', 'barplot')
+        .attr('clip-path', `url(#${clipPathID})`);
 
       // Add the brushing
       this.line
@@ -449,13 +524,17 @@ export default {
         .attr('stroke-dasharray', '3 3');
     },
     zoomChart() {
+      this.tooltipHide = false;
       const { selection } = d3.event;
+      const { stringOX } = this.options;
       if (selection && this.xZoom) {
         const { invert } = this.xZoom;
-        const range = [
-          invert(selection[0]),
-          invert(selection[1]),
-        ];
+        const range = selection.map((point) => {
+          const column = invert(point);
+          return (column instanceof Date)
+            ? column.getTime() / (stringOX ? 1 : 1000)
+            : column;
+        });
         this.xZoom.domain(range);
         this.line.select('.brush').call(this.brush.move, null);
         this.$emit('SetRange', {
@@ -465,83 +544,69 @@ export default {
         });
         this.setClick(range, 'select');
       }
+      this.hideTooltip();
     },
     updateData(data = this.data) {
       if (!this.x) {
         this.x = {};
       }
+
+      const { xMetric, xZoom } = this;
       const {
-        // eslint-disable-next-line camelcase
-        type_line, color, united, barplotBarWidth, barplotstyle,
-        strokeWidth,
+        color, united, barplotstyle, isDataAlwaysShow, lastDot,
       } = this.options;
 
-      this.metrics.forEach((metric) => {
-        const metricType = this.getMetricType(metric);
-        if (!this.x[metric]) {
-          return;
-        }
-
-        // update the X axis:
-        const mainDomain = [
-          d3.min(data, (d) => d[this.xMetric]),
-          d3.max(data, (d) => d[this.xMetric]),
-        ];
-        switch (metricType) {
-          case 'barplot':
-            this.x[metric].domain(data.map((d) => (d[this.xMetric])).sort());
-            break;
-          default:
-            this.x[metric].domain(mainDomain);
-            break;
-        }
-        this.xZoom.domain(mainDomain);
-
-        this.svg.selectAll('.myXaxis').call(this.xAxis);
-        this.setXAxisCaptionsRotate();
-      });
+      this.metrics
+        .filter((metric) => this.x[metric])
+        .forEach((metric) => {
+          // update the X axis:
+          const mainDomain = [
+            d3.min(data, (d) => d[xMetric]),
+            d3.max(data, (d) => d[xMetric]),
+          ];
+          this.x[metric].domain(mainDomain);
+          xZoom.domain(mainDomain);
+          this.svg.selectAll('.myXaxis').call(this.xAxis);
+          this.setXAxisCaptionsRotate();
+        });
 
       this.createVerticalGridLines();
 
       // create the Y axis
-      // eslint-disable-next-line camelcase
-      const typeLine = type_line || {};
-
       let isAddedBarplots = false;
 
       this.metrics.forEach((metric, i) => {
-        const currentColor = (color && color[metric]) ? color[metric] : this.color(metric);
+        if (!this.x[metric]) {
+          return;
+        }
+        const currentColor = this.getCurrentMetricColor(metric);
         // Create a update selection: bind to the new data
         this.line = this.svg.selectAll(`.line-${metric}`)
-          .data([data], (d) => d[this.xMetric]);
+          .data([data], (d) => d[xMetric]);
 
         const metricType = this.getMetricType(metric);
 
-        let bandwidth; let xSubgroup;
+        let xSubgroup;
 
-        // подгонка отступов на оси x
-        let barWidth = 0;
+        const currentBarWidth = this.getCurrentBarWidth();
+
         if (this.barplotMetrics.length) {
-          barWidth = d3.max(this.barplotMetrics.map((name) => this.x[name].bandwidth()));
-          const lineOffset = barWidth * 1.5;
-          this.lineChartMetrics.forEach((name) => {
-            this.x[name].range([
-              lineOffset,
-              this.box.width - lineOffset,
-            ]);
-          });
+          // @todo: check it tomorrow
+          const lineOffset = currentBarWidth / 2;
+          const range = [
+            lineOffset,
+            this.box.width - lineOffset,
+          ];
+          this.xZoom.range(range);
+          this.x[metric].range(range);
         }
 
         switch (metricType) {
           case 'barplot':
-            bandwidth = this.x[metric].bandwidth();
-
             // Another scale for subgroup position?
             xSubgroup = d3.scaleBand()
               .domain(this.barplotMetrics)
-              .range([0, bandwidth]);
-
-            barWidth = xSubgroup.bandwidth(); // this.x[metric].bandwidth()
+              .range([0, currentBarWidth]);
 
             if (united) {
               // draw grouped barplots
@@ -552,7 +617,6 @@ export default {
                   const stackedData = d3.stack()
                     .keys(this.barplotMetrics)(data);
 
-                  const xBarOffset = (united ? (barWidth / 2) : 0);
                   this.bars.append('g')
                     .selectAll('g')
                     .data(stackedData)
@@ -563,35 +627,39 @@ export default {
                     .data((d) => d)
                     .enter()
                     .append('rect')
-                    .attr('x', (d) => this.x[metric](d.data[this.xMetric]) + xBarOffset)
+                    .attr('x', (d) => xZoom(d.data[xMetric]) - currentBarWidth / 2)
                     .attr('y', (d) => ((barplotstyle === 'overlay')
                       ? this.y[metric](d[1] - d[0])
                       : this.y[metric](d[1])))
                     .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
-                    .attr('width', barplotBarWidth && (barWidth >= barplotBarWidth)
-                      ? barplotBarWidth
-                      : barWidth)
+                    .attr('width', currentBarWidth)
                     .on('click', (d) => this.setClick({
-                      x: d.data[this.xMetric],
+                      x: d.data[xMetric],
                       y: d[1] - d[0],
                     }, 'click'))
                     .on('mouseenter', this.showTooltip)
                     .on('mouseleave', this.hideTooltip)
                     .on('mousemove', (d) => {
                       this.updateTooltip(d.data);
-                      const lineXPos = this.x[metric](d.data[this.xMetric])
-                        + (barWidth);
+                      const lineXPos = xZoom(d.data[xMetric]);
                       this.lineDot
                         .attr('x1', lineXPos)
                         .attr('x2', lineXPos);
                     });
                 } else {
+                  xSubgroup = d3.scaleBand()
+                    .domain(this.barplotMetrics)
+                    .range([0, currentBarWidth]);
+
                   this.bars
                     .selectAll('g')
                     .data(data)
                     .enter()
                     .append('g')
-                    .attr('transform', (d) => `translate(${this.x[metric](d[this.xMetric])},0)`)
+                    .attr('transform', (d) => {
+                      const xOffset = xZoom(d[this.xMetric]);
+                      return `translate(${xOffset},0)`;
+                    })
                     .selectAll('rect')
                     .data((d) => this.barplotMetrics.map((key) => ({
                       key,
@@ -600,11 +668,9 @@ export default {
                     })))
                     .enter()
                     .append('rect')
-                    .attr('x', (d) => xSubgroup(d.key))
+                    .attr('x', (d) => xSubgroup(d.key) - currentBarWidth / 2)
                     .attr('y', (d) => this.y[metric](d.value))
-                    .attr('width', barWidth >= barplotBarWidth
-                      ? (barplotBarWidth || xSubgroup.bandwidth())
-                      : barWidth)
+                    .attr('width', xSubgroup.bandwidth())
                     .attr('height', (d) => {
                       const varHeight = this.box.height - this.y[metric](d.value);
                       return united
@@ -621,8 +687,7 @@ export default {
                     .on('mouseleave', this.hideTooltip)
                     .on('mousemove', (d) => {
                       this.updateTooltip(d.data);
-                      const lineXPos = this.x[metric](d.data[this.xMetric])
-                        + bandwidth / 2;
+                      const lineXPos = this.xZoom(d.data[this.xMetric]);
                       this.lineDot
                         .attr('x1', lineXPos)
                         .attr('x2', lineXPos);
@@ -632,13 +697,15 @@ export default {
             } else {
               // overview
               this.line
-                .data(data)
+                .data(data
+                  // тут убираю бары с 0 высотой
+                  .filter((d) => this.box.height !== this.y[metric](d[metric])))
                 .enter()
                 .append('rect')
                 .attr('class', `line-${metric}`)
-                .attr('x', (d) => this.x[metric](d[this.xMetric])) // - barWidth
+                .attr('x', (d) => this.x[metric](d[this.xMetric]) - currentBarWidth / 2)
                 .attr('y', (d) => this.y[metric](d[metric]))
-                .attr('width', barWidth)
+                .attr('width', currentBarWidth)
                 .attr('height', (d) => {
                   const varHeight = this.box.height - this.y[metric](d[metric]);
                   return united
@@ -656,82 +723,214 @@ export default {
                 .on('mouseleave', this.hideTooltip)
                 .on('mousemove', (d) => {
                   this.updateTooltip(d);
-                  const lineXPos = this.x[metric](d[this.xMetric])
-                    + barWidth / 2;
+                  const lineXPos = this.x[metric](d[this.xMetric]);
                   this.lineDot
                     .attr('x1', lineXPos)
                     .attr('x2', lineXPos);
                 });
             }
+
             break;
           default:
-            // Updata the line
-            this.line
-              .enter()
-              .append('path')
-              .attr('class', `line-${metric}`)
-              .merge(this.line)
-              .attr('d', d3.line()
-                .x((d) => this.x[metric](d[this.xMetric]))
-                .y((d) => this.y[metric](d[metric])))
-              .attr('fill', 'none')
-              .attr('stroke', currentColor)
-              .attr('stroke-width', strokeWidth)
-              .style('stroke-dasharray', this.getStyleLine(typeLine[metric]));
+            // рисуем линии
+            this.renderLines(data, metric);
             break;
         }
 
-        if (metricType === 'linechart' || !metricType) {
-          this.svg
-            .append('g')
-            .selectAll('dot')
-            .data(this.data)
-            .enter()
-            .append('circle')
-            .attr('class', `dot dot-${metric}`)
-            .attr('cx', (d) => this.x[metric](d[this.xMetric]))
-            .attr('cy', (d) => this.y[metric](d[metric]))
-            .attr('r', 5)
-            .attr('fill', currentColor)
-            .on('click', (d) => this.setClick({
-              x: d[this.xMetric],
-              y: d[metric],
-            }, 'click'))
-            .on('mouseenter', this.showTooltip)
-            .on('mouseleave', this.hideTooltip)
-            .on('mousemove', (d) => {
-              this.updateTooltip(d);
-              const lineXPos = this.x[metric](d[this.xMetric]);
-              this.lineDot
-                .attr('x1', lineXPos)
-                .attr('x2', lineXPos);
-            });
+        // рисуем точки на линии
+        if (metricType === 'linechart') {
+          this.updateLineDots(data, metric);
+        }
+
+        // рисуем текст у вершин
+        if (isDataAlwaysShow || lastDot) {
+          const textData = isDataAlwaysShow ? this.data : [this.lastDataItem];
+          this.renderPeakTexts(metric, metricType, textData);
         }
       });
+
+      // добавляем captions
+      if (this.xZoom && !isDataAlwaysShow) {
+        const captionMetrics = Object.keys(this.firstDataRow)
+          .filter((m, _, all) => all.includes(`_${m}_caption`));
+        if (captionMetrics.length) {
+          const captionData = this.data
+            .map((d) => {
+              const result = {
+                [xMetric]: d[xMetric],
+              };
+              captionMetrics.forEach((name) => {
+                result[name] = d[`_${name}_caption`];
+              });
+              return result;
+            });
+          captionMetrics.forEach((name) => {
+            const metricType = this.getMetricType(name);
+            this.renderPeakTexts(name, metricType, captionData);
+          });
+        }
+      }
+    },
+    updateLineDots(data, metric) {
+      const { isDataAlwaysShow, lastDot } = this.options;
+      const currentColor = this.getCurrentMetricColor(metric);
+      this.svg
+        .append('g')
+        .selectAll('dot')
+        .data(data.filter((d) => d[metric] !== null))
+        .enter()
+        .append('circle')
+        .attr('class', (d, i) => {
+          const textToRight = (i === this.data.length - 1);
+          const showDot = isDataAlwaysShow
+            || (lastDot && textToRight)
+            || data.length === 1;
+          return `dot dot-${metric} ${(showDot ? 'dot-show' : '')}`;
+        })
+        .attr('cx', (d) => this.xZoom(d[this.xMetric]))
+        .attr('cy', (d) => this.y[metric](d[metric]))
+        .attr('r', 5)
+        .attr('fill', currentColor)
+        .on('click', (d) => this.setClick({
+          x: d[this.xMetric],
+          y: d[metric],
+        }, 'click'))
+        .on('mouseenter', this.showTooltip)
+        .on('mouseleave', this.hideTooltip)
+        .on('mousemove', (d) => {
+          this.updateTooltip(d);
+          const lineXPos = this.xZoom(d[this.xMetric]);
+          this.lineDot
+            .attr('x1', lineXPos)
+            .attr('x2', lineXPos);
+        });
+    },
+    getCurrentMetricColor(metric) {
+      const { color } = this.options;
+      return (color && color[metric])
+        ? color[metric]
+        : this.color(metric);
+    },
+    renderPeakTexts(metric, metricType, data) {
+      const { isDataAlwaysShow } = this.options;
+      const isLine = (metricType === 'linechart');
+      this.svg
+        .append('g')
+        .selectAll('dot')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr('transform', (d, i) => {
+          const textToRight = (i === 0);
+          return `translate(${isLine ? (textToRight ? 5 : -5) : 0}, -5)`;
+        })
+        .attr('font-size', '11')
+        .attr('text-anchor', (d, i) => {
+          const textToRight = (i === 0);
+          return isLine ? (textToRight ? 'start' : 'end') : 'start';
+        })
+        .attr('fill', this.theme.$main_text)
+        .text((d) => {
+          const fieldName = (isDataAlwaysShow === 'data')
+            ? metric
+            : `_${metric}_caption`;
+          if (isDataAlwaysShow === 'caption' && d[fieldName] !== undefined) {
+            return d[fieldName];
+          }
+          const val = d[metric];
+          return (val % 1) // is float
+            ? Number.parseFloat(val).toFixed(2)
+            : val;
+        })
+        .attr('x', (d) => this.xZoom(d[this.xMetric]))
+        .attr('y', (d) => this.y[metric](d[metric]));
+    },
+    renderLines(data, metric) {
+      const {
+        // eslint-disable-next-line camelcase
+        strokeWidth, type_line,
+      } = this.options;
+      // eslint-disable-next-line camelcase
+      const typeLine = type_line || {};
+      const currentColor = this.getCurrentMetricColor(metric);
+      // разбиваем линию на отрезки по пустым ячейкам
+      let line = [];
+      data
+        .reduce((prev, cur, currentIndex, arr) => {
+          if (cur[metric] === null) {
+            prev.push(line);
+            line = [];
+          } else {
+            line.push(cur);
+          }
+          if (currentIndex === arr.length - 1) {
+            prev.push(line);
+          }
+          return prev;
+        }, [])
+        // eslint-disable-next-line no-shadow
+        .forEach((line, i) => {
+          if (line.length === 0) {
+            return;
+          }
+          this.lines[metric]
+            .append('path')
+            .datum(line)
+            .attr('class', `test line-${metric}-${i}`)
+            .attr('d', d3.line()
+              .x((d) => this.xZoom(d[this.xMetric]))
+              .y((d) => this.y[metric](d[metric])))
+            .attr('fill', 'none')
+            .attr('stroke', currentColor)
+            .attr('stroke-width', strokeWidth)
+            .style('stroke-dasharray', this.getStyleLine(typeLine[metric]));
+          if (line.length === 1) {
+            this.updateLineDots(line, metric);
+          }
+        });
     },
     updateTooltip(d) {
       const [left, top] = d3.mouse(this.$refs.svgContainer);
+      const {
+        marginOffset, height,
+      } = this.box;
+      const offset = 10;
+      const pos = {
+        top: null,
+        right: null,
+        bottom: null,
+        left: null,
+      };
+      const width = this.$refs.svgContainer.offsetWidth;
       this.tooltip
-        .style('right', 'auto')
-        .style('left', `${left + 30}px`)
-        .style('top', `${top}px`)
         .html(
           this.firstDataRowMetricList.reduce((prev, cur) => {
             let value = d[cur];
-            if (!this.options.stringOX && cur === this.xMetric && this.isTimestamp(value)) {
+            if (!this.options.stringOX && cur === this.xMetric) {
               value = this.tickFormat(value);
             }
             return `${prev}<p><span>${cur}</span>: ${value}</p>`;
           }, ''),
         );
-      const lineXPos = left + (2.5) - this.box.marginOffset.left;
-      const { offsetWidth } = this.tooltip.node();
-      if (lineXPos + offsetWidth + 20 > this.box.width) {
-        const rightPos = this.box.width - this.box.marginOffset.right - lineXPos + offsetWidth;
-        this.tooltip
-          .style('left', 'auto')
-          .style('right', `${rightPos}px`);
+
+      if (left > this.widthFrom / 2) {
+        pos.right = width - left + offset;
+      } else {
+        pos.left = left + offset;
       }
+
+      if (top > height / 2) {
+        pos.bottom = height - top
+          + marginOffset.bottom + offset;
+      } else {
+        pos.top = top + offset
+          + marginOffset.top;
+      }
+
+      Object.keys(pos).forEach((key) => {
+        const val = pos[key] === null ? 'auto' : `${pos[key]}px`;
+        this.tooltip.style(key, val);
+      });
     },
     setXAxisCaptionsRotate() {
       const rotateParams = {
@@ -781,6 +980,7 @@ export default {
             }),
         );
         this.marginOffset.bottom = xTextMaxHeight + 5;
+        this.marginOffset.top = this.$refs.legend.offsetHeight || 0;
       });
 
       // ось Y
@@ -812,7 +1012,7 @@ export default {
     // форматируем ось Y
     yTickFormat(y, metric) {
       const { units } = this.metricUnits
-        .find((item) => item.name === metric) || {};
+        .find((item) => item.name === metric) || { units: '' };
       const rounderValue = y.toFixed
         ? Number.parseFloat(y.toFixed(5))
         : y;
@@ -821,9 +1021,9 @@ export default {
 
     // форматируем ось X
     tickFormat(d) {
-      const { timeFormat, stringOX } = this.options;
-      if (!stringOX && this.isTimestamp(d)) {
-        return d3.timeFormat(timeFormat || '%Y-%m-%d %H:%M:%S')(d * 1000);
+      const { timeFormat } = this.options;
+      if (d instanceof Date) {
+        return d3.timeFormat(timeFormat || '%Y-%m-%d %H:%M:%S')(d);
       }
       return d;
     },
@@ -850,6 +1050,7 @@ export default {
     },
 
     showTooltip() {
+      if (this.tooltipHide) return;
       this.tooltip.style('opacity', 1);
       this.lineDot.style('opacity', 0.7);
     },
@@ -872,7 +1073,7 @@ export default {
         return metricTypes[metric] || 'linechart';
       }
       if (yAxesBinding && yAxesBinding.metricTypes[metric]) {
-        return yAxesBinding.metricTypes[metric];
+        return yAxesBinding.metricTypes[metric] || 'linechart';
       }
       return 'linechart';
     },
@@ -945,6 +1146,13 @@ export default {
         }
       });
     },
+    getCurrentBarWidth() {
+      let maxBarWidth = (this.box.width / this.data.length) * 0.9;
+      if (maxBarWidth < 1) {
+        maxBarWidth = 1;
+      }
+      return +this.options.barplotBarWidth || maxBarWidth;
+    },
   },
 };
 </script>
@@ -974,11 +1182,16 @@ export default {
     .text
       font-size: 14px
 
+.svg-container
+  position: relative
+
 .svg-container::v-deep
   .dot
     opacity: 0
     cursor: pointer
     &:hover
+      opacity: 1
+    &.dot-show
       opacity: 1
 
   .graph-tooltip

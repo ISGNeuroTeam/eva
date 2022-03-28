@@ -252,7 +252,7 @@ export default {
         let permissions = [];
 
         const response = await fetch('/api/user/permissions').catch((error) => {
-          console.log(error);
+          console.error(error);
           return {
             status: 300,
             result: 'Post не создался, возможно из-за неточностей в запросе',

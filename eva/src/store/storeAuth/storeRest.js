@@ -122,7 +122,7 @@ export default {
     return response;
   },
   saveLogIntoBack(text) {
-    console.log(text);
+    // console.log(text);
     return putLogIntoBack(text);
   },
 
@@ -163,7 +163,7 @@ export default {
 
         // если не поулчилось, сообщим об этом
         front.onerror = () => {
-          console.log('Ошибка', front.error);
+          console.error('Ошибка', front.error);
         };
 
         // дальше получаем то что лежит по ключу back то есть тот лог что будем отдавать на бэк
@@ -179,7 +179,7 @@ export default {
 
           // если не поулчилось, сразу сообщим об этом
           backPut.onerror = () => {
-            console.log('Ошибка', backPut.error);
+            console.error('Ошибка', backPut.error);
           };
 
           // а если положии успешно то идем дальше
@@ -221,14 +221,14 @@ export default {
 
             count.onerror = () => {
               // а если счетчик получить не удалось то  сообщим об этом
-              console.log('Ошибка', count.error);
+              console.error('Ошибка', count.error);
             };
           };
         };
 
         // еслиданные по ключу back поулчить не удалось , сообщим об этом
         back.onerror = () => {
-          console.log('Ошибка', back.error);
+          console.error('Ошибка', back.error);
         };
       }
 
@@ -258,7 +258,7 @@ export default {
 
         // если получить данные не удалось  - сообщим об этом
         query.onerror = () => {
-          console.log('Ошибка', query.error);
+          console.error('Ошибка', query.error);
         };
       }
 
@@ -267,12 +267,12 @@ export default {
 
       // сразу отлавливаем если есть ошибка при соеденении с бд
       request.onerror = (event) => {
-        console.log('error:', event);
+        console.error('error:', event);
       };
 
       // если база только создалась
       request.onupgradeneeded = (event) => {
-        console.log('create');
+        console.error('create');
         // собственно помещаем объект базы данных в переменную, что заготовили ранее
         db = event.target.result;
         // если там еще нет таблицы с логами (а по идее нет, но на всякий случай проверим)
@@ -308,7 +308,7 @@ export default {
 
       // если успешно соеденились с бд
       request.onerror = () => {
-        console.log('Ошибка', request.error);
+        console.error('Ошибка', request.error);
       };
     });
   },
@@ -318,11 +318,11 @@ export default {
     const request = indexedDB.open('EVA', 1);
 
     request.onerror = (event) => {
-      console.log('error: ', event);
+      console.error('error: ', event);
     };
 
     request.onupgradeneeded = (event) => {
-      console.log('create');
+      // console.log('create');
       db = event.target.result;
       if (!db.objectStoreNames.contains('logs')) {
         db.createObjectStore('logs');
@@ -330,7 +330,7 @@ export default {
 
       request.onsuccess = () => {
         db = request.result;
-        console.log(`successEvent: ${db}`);
+        // console.log(`successEvent: ${db}`);
       };
     };
 
@@ -353,7 +353,7 @@ export default {
           }
         };
         query.onerror = () => {
-          console.log('Ошибка', query.error);
+          console.error('Ошибка', query.error);
         };
       };
     });
@@ -378,11 +378,11 @@ export default {
       }
 
       request.onerror = (event) => {
-        console.log('error:', event);
+        console.error('error:', event);
       };
 
       request.onupgradeneeded = (event) => {
-        console.log('create');
+        // console.log('create');
         db = event.target.result;
         if (!db.objectStoreNames.contains('logs')) {
           db.createObjectStore('logs'); // create it

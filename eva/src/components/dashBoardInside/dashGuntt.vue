@@ -76,11 +76,11 @@ export default {
     }, // настройки родительского компонента
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -227,7 +227,7 @@ export default {
   },
   mounted() {
     this.dataRestFromWatch();
-    this.$emit('setVissible', { element: this.id, overflow: 'visible' });
+    this.$emit('setVissible', { element: this.id, overflow: 'hidden' });
   },
   methods: {
     hiddenTooltip() {
@@ -285,7 +285,7 @@ export default {
         this.actions[0].capture = Object.keys(dataRest[0]);
 
         if (
-          this.$store.state[this.idDash][this.idFrom].actions.length
+          this.$store.state[this.idDash][this.idFrom].actions?.length
           !== this.actions.length
         ) {
           this.$store.commit('setActions', {
@@ -521,7 +521,7 @@ export default {
       // Tooltip
 
       const tooltipBlock = this.$refs.tooltip;
-      const tooltipMargin = this.$attrs['is-full-screen'] ? 170 : 30;
+      const tooltipMargin = this.$attrs['is-full-screen'] ? 200 : 30;
 
       function transformDescription(text) {
         let rows = text.split('\\n');

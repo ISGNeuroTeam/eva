@@ -42,36 +42,13 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      Vue.set(
-        state[idDash][id].options,
-        'change',
-        false,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'visible',
-        true,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'level',
-        1,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'boxShadow',
-        false,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'lastResult',
-        false,
-      );
-      Vue.set(
-        state[idDash][id].options,
-        'searchBtn',
-        false,
-      );
+      console.log('state[idDash][id].options1', state[idDash][id].options);
+      state[idDash][id].options.change = false;
+      state[idDash][id].options.visible = true;
+      state[idDash][id].options.level = 1;
+      state[idDash][id].options.boxShadow = false;
+      state[idDash][id].options.lastResult = false;
+      state[idDash][id].options.searchBtn = false;
     },
     // проверяет и создает объект в хранилище для настроек
     // path - это idDash либо произвольное место хранения настроек например research
@@ -96,7 +73,8 @@ export default new Vuex.Store({
           };
         }
         if (!state[localPath][element].options) {
-          state[localPath][element].options = {};
+          // state[localPath][element].options = {};
+          Vue.set(state[localPath][element], 'options', {});
         }
       } else {
         if (!state[localPath].modalSettings) {
@@ -106,7 +84,8 @@ export default new Vuex.Store({
           };
         }
         if (!state[localPath].options) {
-          state[localPath].options = {};
+          Vue.set(state[localPath], 'options', {});
+          // state[localPath].options = {};
         }
       }
     },
@@ -396,7 +375,7 @@ export default new Vuex.Store({
     },
     setReportSearch(state, search) {
       Vue.set(state.reports.searches, search.sid, search);
-      state.reports.table.search = search.sid;
+      Vue.set(state.reports.table, 'search', search.sid);
     },
     setPaperSearch(state, search) {
       Vue.set(state.papers.searches, search.sid, search);
@@ -621,7 +600,7 @@ export default new Vuex.Store({
     // TODO createTockens vs setTocken
     // создаем токен
     createTockens(state, { idDash, tocken }) {
-      console.log('tockens.push');
+      // console.log('tockens.push');
       let foundItem = null;
       //  проверяем есть ли такой токен уже
       if (state[idDash]?.tockens) {
@@ -639,6 +618,7 @@ export default new Vuex.Store({
         foundItem.sufix = tocken.sufix;
         foundItem.delimetr = tocken.delimetr;
         foundItem.defaultValue = tocken.defaultValue;
+        foundItem.onButton = tocken.onButton;
       } else {
         // а елси нету
         state[idDash].tockens.push(
@@ -653,6 +633,7 @@ export default new Vuex.Store({
             delimetr: tocken.delimetr,
             defaultValue: tocken.defaultValue,
             value: '',
+            onButton: tocken.onButton,
           },
         );
       }
@@ -714,11 +695,12 @@ export default new Vuex.Store({
         }
       });
       if (titles) {
-        state[idDash][id].selectedTableTitles = titles;
+        Vue.set(state[idDash][id], 'selectedTableTitles', titles);
       }
     },
     updateOptions(state, { idDash, idElement, options }) {
-      state[idDash][idElement].options = options;
+      // state[idDash][idElement].options = options;
+      Vue.set(state[idDash][idElement], 'options', options);
     },
     // метод который обновляет какое-либо свойство у элемнета
     letEventSet(state, events) {
@@ -726,9 +708,9 @@ export default new Vuex.Store({
         // если опций еще нет
         if (!state[events.idDash][item.target].options) {
           // то создаем объект опций с плем change по умолчанию
-          state[events.idDash][item.target].options = {
+          Vue.set(state[events.idDash][item.target], 'options', {
             change: false,
-          };
+          });
         }
         // переводи строковое значение в bolean
         if (item.value === 'true') {
@@ -828,13 +810,23 @@ export default new Vuex.Store({
       }
     },
     deleteDashFromMain(state, { id, name }) {
-      delete state[id];
+      if (id && state[id]) {
+        delete state[id];
+      }
       const localName = name[0].toUpperCase() + name.slice(1);
       restAuth.putLog(`Удален дашборд ${localName} с id ${id}`);
     },
+    // TODO: избавится от этого метода, он вычищает не только root,
+    //  но и все отсальные модули
     clearState(state) {
+      const exclude = [
+        'auth',
+        'dataResearch',
+        'form',
+        'theme',
+      ];
       Object.keys(state).forEach((key) => {
-        if (key !== 'theme') {
+        if (!exclude.includes(key)) {
           delete state[key];
         }
       });
@@ -862,16 +854,17 @@ export default new Vuex.Store({
       });
     },
     setMetricsPie(state, { metrics, idDash, id }) {
+      Vue.set(state[idDash][id], 'options', state[idDash][id].options);
       const localMetrics = [...[], ...metrics];
       if (!state[idDash][id].options.metricsRelation) {
-        state[idDash][id].options.metricsRelation = {};
-        state[idDash][id].options.metricsRelation.relations = localMetrics;
-        state[idDash][id].options.metricsRelation.namesMetric = [
+        Vue.set(state[idDash][id].options, 'metricsRelation', {});
+        Vue.set(state[idDash][id].options.metricsRelation, 'relations', localMetrics);
+        Vue.set(state[idDash][id].options.metricsRelation, 'namesMetric', [
           'Категория',
           'Процентное соотношение',
-        ];
+        ]);
       }
-      state[idDash][id].options.metricsRelation.metrics = localMetrics;
+      Vue.set(state[idDash][id].options.metricsRelation, 'metrics', localMetrics);
     },
     setThemePie(state, dash) {
       const localThemes = { ...{}, ...dash.themes };
@@ -907,7 +900,7 @@ export default new Vuex.Store({
       });
     },
     changeCurrentTab(state, { idDash, tab }) {
-      state[idDash].currentTab = tab;
+      Vue.set(state[idDash], 'currentTab', tab);
     },
     deleteDashTab(state, { idDash, tabID }) {
       if (state[idDash]?.elements && state[idDash].elements?.length > 0) {
@@ -1027,9 +1020,11 @@ export default new Vuex.Store({
         }
       });
     },
-    updateSearchStatus: (state, { idDash, sid, status }) => {
+    updateSearchStatus: (state, {
+      idDash, sid, status, id,
+    }) => {
       const search = state[idDash].searches.find(
-        (searchItem) => searchItem.sid === sid,
+        (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
       Vue.set(search, 'status', status);
     },
@@ -1270,6 +1265,15 @@ export default new Vuex.Store({
                 },
               ]);
             }
+            if (!state[id]?.currentTab) {
+              commit('setState', [
+                {
+                  object: state[id],
+                  prop: 'currentTab',
+                  value: 1,
+                },
+              ]);
+            }
             if (typeof state[id].tabs === 'undefined') {
               commit('setState', [
                 {
@@ -1373,7 +1377,7 @@ export default new Vuex.Store({
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            // console.log('Ошибка', query.error);
           };
         }
         let db = null;
@@ -1381,11 +1385,11 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          // console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('create');
+          // console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
@@ -1395,7 +1399,7 @@ export default new Vuex.Store({
           request.onsuccess = () => {
             db = request.result;
             // this.alreadyDB = request.result;
-            console.log(`success: ${db}`);
+            // console.log(`success: ${db}`);
 
             setTransaction(db);
           };
@@ -1426,7 +1430,7 @@ export default new Vuex.Store({
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            // console.log('Ошибка', query.error);
           };
         }
 
@@ -1436,11 +1440,11 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          // console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('create');
+          // console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
@@ -1449,7 +1453,7 @@ export default new Vuex.Store({
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`success: ${db}`);
+            // console.log(`success: ${db}`);
 
             setTransaction(db, result, key, idDash);
           };
@@ -1512,7 +1516,7 @@ export default new Vuex.Store({
       const request = indexedDB.open('EVA', 1);
 
       request.onerror = () => {
-        console.log('error: ');
+        // console.log('error: ');
       };
 
       request.onsuccess = () => {
@@ -1790,7 +1794,7 @@ export default new Vuex.Store({
           }
         });
       });
-
+      let newCurrentTabValue = 1;
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
@@ -1798,17 +1802,29 @@ export default new Vuex.Store({
         .find((el) => el.id.toString() === event.event.tab);
       if (!options?.openNewScreen) {
         if (!isTabMode) {
-          event.route.push(`/dashboards/${id}/1`);
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = 1;
         } else if (!event.event.tab) {
-          event.route.push(`/dashboards/${id}/${currentTab || ''}`);
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = currentTab || 1;
+        } else if (event.event.tab > state[id].tabList.length) {
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = state[id].tabList.length;
         } else {
-          event.route.push(`/dashboards/${id}/${lastEl.id}`);
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = lastEl?.id || 1;
         }
       } else if (!isTabMode) {
-        window.open(`/dashboards/${id}/1`);
+        window.open(`/dashboards/${id}`);
+        newCurrentTabValue = 1;
       } else if (!event.event.tab) {
-        window.open(`/dashboards/${id}/${currentTab || ''}`);
+        window.open(`/dashboards/${id}`);
+        newCurrentTabValue = currentTab || 1;
       }
+      commit('changeCurrentTab', {
+        idDash: id,
+        tab: newCurrentTabValue,
+      });
       const { searches } = state[id];
 
       if (searches) {
