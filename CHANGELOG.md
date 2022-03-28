@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed modal-confirm in modal-profile and modal-create
+- Remove display of "Select Data Source" button right after creation
+
 
 ## [1.85.0]
 
