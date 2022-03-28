@@ -407,6 +407,8 @@ export default {
         } else {
           if (searches?.length > 0) {
             this.checkAllSearchId();
+          } else {
+            this.$set(this.search, 'id', 0);
           }
           // отправляем в хранилище для создания
           this.$store.commit('setSearch', {

@@ -5,7 +5,7 @@
   >
     <div class="v-data-table--container">
       <v-data-table
-        v-if="!props.nodata || isVisibleTitles"
+        v-show="!props.nodata && isVisibleTitles"
         ref="table"
         v-model="props.input"
         class="dash-table report-table"
@@ -104,26 +104,26 @@
             :key="title + item.rowIndex"
             :style="item.rowColor && `background-color: ${item.rowColor}`"
           >
-            <template v-for="(col, colIndex) in item">
+            <template v-for="({text}, colIndex) in props.titles">
               <td
-                v-if="!excludeColumns.includes(colIndex)"
+                v-if="!excludeColumns.includes(text)"
                 :key="colIndex"
                 class="text-start"
                 :class="{
                   'd-none': options
                     && options.titles
-                    && !options.titles.includes(colIndex)
+                    && !options.titles.includes(text)
                 }"
                 :style="
                   (item.cellColor &&
-                    item.cellColor[colIndex] &&
-                    `background-color: ${item.cellColor[colIndex]}`) ||
+                    item.cellColor[text] &&
+                    `background-color: ${item.cellColor[text]}`) ||
                     (item.columnColor &&
-                      item.columnColor[colIndex] &&
-                      `background-color: ${item.columnColor[colIndex]}`)
+                      item.columnColor[text] &&
+                      `background-color: ${item.columnColor[text]}`)
                 "
               >
-                {{ col }}
+                {{ item[text] }}
               </td>
             </template>
           </tr>

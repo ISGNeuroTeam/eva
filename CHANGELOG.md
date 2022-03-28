@@ -7,12 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Fixed
+- fixed modal-confirm in modal-profile and modal-create
+
+## [1.85.0]
+
 ### Added
 - added the ability to update tokens when executing a go event
 - reportsV2 timeline get data from backend
 - reportsV2 interesting get data from backend
+- added visualisations to datа research 2.0.
 
 ### Fixed
+- fix first search id
 - fix bush drawing
 - fix single value template reactivity
 - fix SR2 visualisation
@@ -47,6 +54,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed piechart chunk selection syncing
 - fixed dashSelect
 - refactoring a multiline
+- Fixed persistent modal
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 - fixed guntt hints
 - fixed an empty data source will load indefinitely
 - fixed activate tabs in new dashboards
@@ -64,7 +75,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - improvements handling window closing
 - fixed dropdown lists
 - fixed table columns not hiding
-- fixed modal-confirm in modal-profile and modal-create
+- fixed handling deletion of tabs
+- fixed bugs in "modal-delete"
 
 ## [1.84.0]
 
@@ -72,7 +84,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiple tokens
 
 ### Fixed
-- Fixed persistent modal
 - fixed filters. name and content
 - fixed visible zoom button
 - fixed setting the title breaks the scrolling of the component
@@ -80,7 +91,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed searching by bool type
 - fixed fullscreen improvements tune
 - fixed removed all download buttons for components
-- fixed confirmation window adjustment
 
 ## [1.83.1]
 
@@ -108,9 +118,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed button hints
 - fixed switching between filter types
 - fixed cell size in tile visualization
-- Added tab deletion confirmation
-- Added closing confirmation by "Esc\Click-outside"
-- Fixed change tracking in "modal-settings" fields
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes

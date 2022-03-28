@@ -278,7 +278,6 @@ export default {
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
-      console.log('launch search');
       const response = await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
@@ -295,7 +294,6 @@ export default {
         this.rows = [];
       } else {
         // если все нормально
-        console.log('data ready');
 
         const responseDB = this.$store.dispatch(
           'putIntoDB',
@@ -356,11 +354,10 @@ export default {
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (requestEvent) => {
-          console.log('error: ', requestEvent);
+          console.error('error: ', requestEvent);
         };
 
         request.onupgradeneeded = (requestEvent) => {
-          console.log('create');
           db = requestEvent.target.result;
           // if there's no "books" store
           if (!db.objectStoreNames.contains('searches')) {
@@ -369,7 +366,6 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`successEvent: ${db}`);
           };
         };
 
@@ -395,7 +391,7 @@ export default {
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            console.error('Ошибка', query.error);
           };
         };
       };
@@ -420,7 +416,6 @@ export default {
       });
     },
     changeUnited() {
-      console.log('changeUnited');
       if (!this.unitedData.united) {
         this.unitedData.united = true;
         this.unitedData.color = this.theme.controlsActive;
@@ -477,7 +472,7 @@ export default {
       this.$set(this, 'data', data);
     },
     ResetRange() {
-      console.log('resetRange');
+      // console.log('resetRange');
     },
   },
 };

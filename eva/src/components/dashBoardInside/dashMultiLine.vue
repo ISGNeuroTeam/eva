@@ -4,7 +4,9 @@
       <span>{{ errorMessage }}</span>
     </div>
     <div v-else>
-      <div class="legend">
+      <div
+        ref="legend"
+        class="legend">
         <div
           v-for="item in legendItems"
           :key="item.name"
@@ -169,7 +171,7 @@ export default {
       return this.dataRestFrom;
     },
     lastDataItem() {
-      return this.dataRestFrom[this.dataRestFrom.length - 1];
+      return this.data[this.dataRestFrom.length - 1];
     },
     box() {
       const {
@@ -293,7 +295,7 @@ export default {
 
       const {
         barplotstyle, united, yFromZero, axesCount,
-        metricsAxis, stringOX,
+        metricsAxis, stringOX, metrics = [],
       } = this.options;
 
       this.x = {};
@@ -302,7 +304,10 @@ export default {
         .attr('class', 'myXaxis');
 
       // Initialize an Y axis
-      let allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+      let allMaxYMetric;
+      if (united) {
+        allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+      }
 
       // максимум для accumulation barplot
       if (barplotstyle === 'accumulation') {
@@ -329,27 +334,27 @@ export default {
           ])
           .range([0, width]);
 
-        switch (metricType) {
-          case 'barplot':
-            if (stringOX) {
-              this.x[metric] = d3.scaleBand()
-                .domain(groups)
-                .padding(0.1);
-            } else {
-              this.x[metric] = d3.scaleTime()
-                .domain([
-                  d3.min(this.data.map((item) => item[this.xMetric])),
-                  d3.max(this.data.map((item) => item[this.xMetric])),
-                ]);
-            }
-            this.x[metric].range([0, width]);
-            break;
-          default:
-            this.x[metric] = stringOX ? d3.scaleLinear() : d3.scaleTime();
-            this.x[metric]
-              .domain(this.data.map((item) => item[this.xMetric]))
-              .range([0, width]);
-            break;
+        if (metricType === 'barplot') {
+          if (stringOX) {
+            this.x[metric] = d3.scaleBand()
+              .domain(groups)
+              .padding(0.1);
+          } else {
+            this.x[metric] = d3.scaleTime()
+              .domain([
+                d3.min(this.data.map((item) => item[this.xMetric])),
+                d3.max(this.data.map((item) => item[this.xMetric])),
+              ]);
+          }
+          this.x[metric].range([0, width]);
+        } else {
+          const [first] = this.dataRestFrom;
+          this.x[metric] = (stringOX || !this.isTimestamp(first[this.xMetric]))
+            ? d3.scaleLinear()
+            : d3.scaleTime();
+          this.x[metric]
+            .domain(this.data.map((item) => item[this.xMetric]))
+            .range([0, width]);
         }
 
         const yAxisClass = `yAxis-${i}`;
@@ -365,9 +370,38 @@ export default {
 
         maxYMetric = Math.ceil(maxYMetric * 10) / 10;
 
-        const minYMetric = (yFromZero || metricType === 'barplot')
+        let minYMetric = (yFromZero || metricType === 'barplot')
           ? 0
           : d3.min(this.data, (d) => d[metric]);
+
+        // гринаци оси Y
+        if (!united) {
+          const opt = metrics.find((d) => d.name === metric) || {};
+
+          // если у метрики только одно значение
+          if (maxYMetric === minYMetric) {
+            maxYMetric = maxYMetric % 1 === 0
+              ? maxYMetric += 1
+              : Math.ceil(maxYMetric);
+            minYMetric = minYMetric % 1 === 0
+              ? minYMetric -= 1
+              : Math.floor(minYMetric);
+          } else {
+            if (opt.manual && opt.upborder) {
+              maxYMetric = +opt.upborder;
+            }
+            if (opt.manual && opt.lowborder !== undefined) {
+              minYMetric = +opt.lowborder;
+            }
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            if (metricType === 'linechart') {
+              minYMetric -= Math.abs(minYMetric) * 0.1;
+            }
+          }
+        }
+        if (metricType === 'barplot') {
+          maxYMetric += Math.abs(maxYMetric) * 0.1;
+        }
 
         this.y[metric] = d3.scaleLinear()
           .range(united ? [yHeight, 0] : [yHeight + yHeight * i, yHeight * i])
@@ -430,9 +464,8 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick:last-of-type text`)
             .attr('transform', `translate(0, ${offsetYText})`);
         }
-
-        this.renderHorizontalLines();
       });
+      this.renderHorizontalLines();
 
       // Add a clipPath: everything out of this area won't be drawn.
       const clipPathID = this.isFullScreen
@@ -553,7 +586,7 @@ export default {
 
         const metricType = this.getMetricType(metric);
 
-        let bandwidth; let xSubgroup;
+        let xSubgroup;
 
         const currentBarWidth = this.getCurrentBarWidth();
 
@@ -570,8 +603,6 @@ export default {
 
         switch (metricType) {
           case 'barplot':
-            bandwidth = currentBarWidth * 2;
-
             // Another scale for subgroup position?
             xSubgroup = d3.scaleBand()
               .domain(this.barplotMetrics)
@@ -713,9 +744,32 @@ export default {
 
         // рисуем текст у вершин
         if (isDataAlwaysShow || lastDot) {
-          this.renderPeakTexts(metric, metricType);
+          const textData = isDataAlwaysShow ? this.data : [this.lastDataItem];
+          this.renderPeakTexts(metric, metricType, textData);
         }
       });
+
+      // добавляем captions
+      if (this.xZoom && !isDataAlwaysShow) {
+        const captionMetrics = Object.keys(this.firstDataRow)
+          .filter((m, _, all) => all.includes(`_${m}_caption`));
+        if (captionMetrics.length) {
+          const captionData = this.data
+            .map((d) => {
+              const result = {
+                [xMetric]: d[xMetric],
+              };
+              captionMetrics.forEach((name) => {
+                result[name] = d[`_${name}_caption`];
+              });
+              return result;
+            });
+          captionMetrics.forEach((name) => {
+            const metricType = this.getMetricType(name);
+            this.renderPeakTexts(name, metricType, captionData);
+          });
+        }
+      }
     },
     updateLineDots(data, metric) {
       const { isDataAlwaysShow, lastDot } = this.options;
@@ -723,12 +777,14 @@ export default {
       this.svg
         .append('g')
         .selectAll('dot')
-        .data(data)
+        .data(data.filter((d) => d[metric] !== null))
         .enter()
         .append('circle')
         .attr('class', (d, i) => {
           const textToRight = (i === this.data.length - 1);
-          const showDot = isDataAlwaysShow || (lastDot && textToRight);
+          const showDot = isDataAlwaysShow
+            || (lastDot && textToRight)
+            || data.length === 1;
           return `dot dot-${metric} ${(showDot ? 'dot-show' : '')}`;
         })
         .attr('cx', (d) => this.xZoom(d[this.xMetric]))
@@ -755,13 +811,13 @@ export default {
         ? color[metric]
         : this.color(metric);
     },
-    renderPeakTexts(metric, metricType) {
+    renderPeakTexts(metric, metricType, data) {
       const { isDataAlwaysShow } = this.options;
       const isLine = (metricType === 'linechart');
       this.svg
         .append('g')
         .selectAll('dot')
-        .data(isDataAlwaysShow ? this.data : [this.lastDataItem])
+        .data(data)
         .enter()
         .append('text')
         .attr('transform', (d, i) => {
@@ -814,6 +870,9 @@ export default {
         }, [])
         // eslint-disable-next-line no-shadow
         .forEach((line, i) => {
+          if (line.length === 0) {
+            return;
+          }
           this.lines[metric]
             .append('path')
             .datum(line)
@@ -825,6 +884,9 @@ export default {
             .attr('stroke', currentColor)
             .attr('stroke-width', strokeWidth)
             .style('stroke-dasharray', this.getStyleLine(typeLine[metric]));
+          if (line.length === 1) {
+            this.updateLineDots(line, metric);
+          }
         });
     },
     updateTooltip(d) {
@@ -918,6 +980,7 @@ export default {
             }),
         );
         this.marginOffset.bottom = xTextMaxHeight + 5;
+        this.marginOffset.top = this.$refs.legend.offsetHeight || 0;
       });
 
       // ось Y
