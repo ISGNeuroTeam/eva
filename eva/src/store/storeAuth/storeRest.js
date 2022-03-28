@@ -122,7 +122,6 @@ export default {
     return response;
   },
   saveLogIntoBack(text) {
-    // console.log(text);
     return putLogIntoBack(text);
   },
 
@@ -272,7 +271,7 @@ export default {
 
       // если база только создалась
       request.onupgradeneeded = (event) => {
-        console.error('create');
+        // console.log('create');
         // собственно помещаем объект базы данных в переменную, что заготовили ранее
         db = event.target.result;
         // если там еще нет таблицы с логами (а по идее нет, но на всякий случай проверим)
