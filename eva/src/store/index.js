@@ -600,7 +600,7 @@ export default new Vuex.Store({
     // TODO createTockens vs setTocken
     // создаем токен
     createTockens(state, { idDash, tocken }) {
-      console.log('tockens.push');
+      // console.log('tockens.push');
       let foundItem = null;
       //  проверяем есть ли такой токен уже
       if (state[idDash]?.tockens) {
@@ -618,6 +618,7 @@ export default new Vuex.Store({
         foundItem.sufix = tocken.sufix;
         foundItem.delimetr = tocken.delimetr;
         foundItem.defaultValue = tocken.defaultValue;
+        foundItem.onButton = tocken.onButton;
       } else {
         // а елси нету
         state[idDash].tockens.push(
@@ -632,6 +633,7 @@ export default new Vuex.Store({
             delimetr: tocken.delimetr,
             defaultValue: tocken.defaultValue,
             value: '',
+            onButton: tocken.onButton,
           },
         );
       }
@@ -808,7 +810,9 @@ export default new Vuex.Store({
       }
     },
     deleteDashFromMain(state, { id, name }) {
-      delete state[id];
+      if (id && state[id]) {
+        delete state[id];
+      }
       const localName = name[0].toUpperCase() + name.slice(1);
       restAuth.putLog(`Удален дашборд ${localName} с id ${id}`);
     },
@@ -1310,7 +1314,7 @@ export default new Vuex.Store({
                     if (typeof state[id][element]?.search === 'string') {
                       let searchValue = '';
                       searchValue = state[id].searches
-                        .find((searchEl) => searchEl.id === state[id][element].search).id;
+                        .find((searchEl) => searchEl.sid === state[id][element].search).id;
                       commit('setState', [
                         {
                           object: state[id][element],
@@ -1373,7 +1377,7 @@ export default new Vuex.Store({
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            // console.log('Ошибка', query.error);
           };
         }
         let db = null;
@@ -1381,11 +1385,11 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          // console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('create');
+          // console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
@@ -1395,7 +1399,7 @@ export default new Vuex.Store({
           request.onsuccess = () => {
             db = request.result;
             // this.alreadyDB = request.result;
-            console.log(`success: ${db}`);
+            // console.log(`success: ${db}`);
 
             setTransaction(db);
           };
@@ -1426,7 +1430,7 @@ export default new Vuex.Store({
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            // console.log('Ошибка', query.error);
           };
         }
 
@@ -1436,11 +1440,11 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          // console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('create');
+          // console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
@@ -1449,7 +1453,7 @@ export default new Vuex.Store({
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`success: ${db}`);
+            // console.log(`success: ${db}`);
 
             setTransaction(db, result, key, idDash);
           };
@@ -1512,7 +1516,7 @@ export default new Vuex.Store({
       const request = indexedDB.open('EVA', 1);
 
       request.onerror = () => {
-        console.log('error: ');
+        // console.log('error: ');
       };
 
       request.onsuccess = () => {

@@ -243,11 +243,11 @@ export default {
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (error) => {
-          console.log('error: ', error);
+          console.error('error: ', error);
         };
 
         request.onupgradeneeded = (onUpgradeNeededEvent) => {
-          console.log('create');
+          // console.log('create');
           db = onUpgradeNeededEvent.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             db.createObjectStore('searches'); // create it
@@ -255,7 +255,7 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`successEvent: ${db}`);
+            // console.log(`successEvent: ${db}`);
           };
         };
 
@@ -282,7 +282,7 @@ export default {
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            console.error('Ошибка', query.error);
           };
         };
       };

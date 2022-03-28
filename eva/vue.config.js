@@ -11,6 +11,7 @@ module.exports = {
       .use('vue-svg-loader')
       .loader('vue-svg-loader');
   },
+  productionSourceMap: false,
   lintOnSave: true,
   transpileDependencies: ['vuetify'],
   pages: {

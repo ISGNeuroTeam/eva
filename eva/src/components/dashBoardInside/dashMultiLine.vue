@@ -295,7 +295,7 @@ export default {
 
       const {
         barplotstyle, united, yFromZero, axesCount,
-        metricsAxis, stringOX,
+        metricsAxis, stringOX, metrics = [],
       } = this.options;
 
       this.x = {};
@@ -304,7 +304,10 @@ export default {
         .attr('class', 'myXaxis');
 
       // Initialize an Y axis
-      let allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+      let allMaxYMetric;
+      if (united) {
+        allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+      }
 
       // максимум для accumulation barplot
       if (barplotstyle === 'accumulation') {
@@ -367,9 +370,38 @@ export default {
 
         maxYMetric = Math.ceil(maxYMetric * 10) / 10;
 
-        const minYMetric = (yFromZero || metricType === 'barplot')
+        let minYMetric = (yFromZero || metricType === 'barplot')
           ? 0
           : d3.min(this.data, (d) => d[metric]);
+
+        // гринаци оси Y
+        if (!united) {
+          const opt = metrics.find((d) => d.name === metric) || {};
+
+          // если у метрики только одно значение
+          if (maxYMetric === minYMetric) {
+            maxYMetric = maxYMetric % 1 === 0
+              ? maxYMetric += 1
+              : Math.ceil(maxYMetric);
+            minYMetric = minYMetric % 1 === 0
+              ? minYMetric -= 1
+              : Math.floor(minYMetric);
+          } else {
+            if (opt.manual && opt.upborder) {
+              maxYMetric = +opt.upborder;
+            }
+            if (opt.manual && opt.lowborder !== undefined) {
+              minYMetric = +opt.lowborder;
+            }
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            if (metricType === 'linechart') {
+              minYMetric -= Math.abs(minYMetric) * 0.1;
+            }
+          }
+        }
+        if (metricType === 'barplot') {
+          maxYMetric += Math.abs(maxYMetric) * 0.1;
+        }
 
         this.y[metric] = d3.scaleLinear()
           .range(united ? [yHeight, 0] : [yHeight + yHeight * i, yHeight * i])
@@ -432,9 +464,8 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick:last-of-type text`)
             .attr('transform', `translate(0, ${offsetYText})`);
         }
-
-        this.renderHorizontalLines();
       });
+      this.renderHorizontalLines();
 
       // Add a clipPath: everything out of this area won't be drawn.
       const clipPathID = this.isFullScreen
@@ -555,7 +586,7 @@ export default {
 
         const metricType = this.getMetricType(metric);
 
-        let bandwidth; let xSubgroup;
+        let xSubgroup;
 
         const currentBarWidth = this.getCurrentBarWidth();
 
@@ -572,8 +603,6 @@ export default {
 
         switch (metricType) {
           case 'barplot':
-            bandwidth = currentBarWidth * 2;
-
             // Another scale for subgroup position?
             xSubgroup = d3.scaleBand()
               .domain(this.barplotMetrics)
@@ -715,9 +744,32 @@ export default {
 
         // рисуем текст у вершин
         if (isDataAlwaysShow || lastDot) {
-          this.renderPeakTexts(metric, metricType);
+          const textData = isDataAlwaysShow ? this.data : [this.lastDataItem];
+          this.renderPeakTexts(metric, metricType, textData);
         }
       });
+
+      // добавляем captions
+      if (this.xZoom && !isDataAlwaysShow) {
+        const captionMetrics = Object.keys(this.firstDataRow)
+          .filter((m, _, all) => all.includes(`_${m}_caption`));
+        if (captionMetrics.length) {
+          const captionData = this.data
+            .map((d) => {
+              const result = {
+                [xMetric]: d[xMetric],
+              };
+              captionMetrics.forEach((name) => {
+                result[name] = d[`_${name}_caption`];
+              });
+              return result;
+            });
+          captionMetrics.forEach((name) => {
+            const metricType = this.getMetricType(name);
+            this.renderPeakTexts(name, metricType, captionData);
+          });
+        }
+      }
     },
     updateLineDots(data, metric) {
       const { isDataAlwaysShow, lastDot } = this.options;
@@ -725,7 +777,7 @@ export default {
       this.svg
         .append('g')
         .selectAll('dot')
-        .data(data)
+        .data(data.filter((d) => d[metric] !== null))
         .enter()
         .append('circle')
         .attr('class', (d, i) => {
@@ -759,13 +811,13 @@ export default {
         ? color[metric]
         : this.color(metric);
     },
-    renderPeakTexts(metric, metricType) {
+    renderPeakTexts(metric, metricType, data) {
       const { isDataAlwaysShow } = this.options;
       const isLine = (metricType === 'linechart');
       this.svg
         .append('g')
         .selectAll('dot')
-        .data(isDataAlwaysShow ? this.data : [this.lastDataItem])
+        .data(data)
         .enter()
         .append('text')
         .attr('transform', (d, i) => {
@@ -818,6 +870,9 @@ export default {
         }, [])
         // eslint-disable-next-line no-shadow
         .forEach((line, i) => {
+          if (line.length === 0) {
+            return;
+          }
           this.lines[metric]
             .append('path')
             .datum(line)

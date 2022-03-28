@@ -145,7 +145,7 @@ export default {
       };
 
       reader.onerror = function () {
-        console.log(reader.error);
+        console.error(reader.error);
       };
     },
     downloadDash(url) {
