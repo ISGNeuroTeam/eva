@@ -600,8 +600,7 @@ export default new Vuex.Store({
     // TODO createTockens vs setTocken
     // создаем токен
     createTockens(state, { idDash, tocken }) {
-      console.log('tockens.push');
-      console.log(tocken);
+      // console.log('tockens.push');
       let foundItem = null;
       //  проверяем есть ли такой токен уже
       if (state[idDash]?.tockens) {
@@ -1378,7 +1377,7 @@ export default new Vuex.Store({
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            // console.log('Ошибка', query.error);
           };
         }
         let db = null;
@@ -1386,11 +1385,11 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          // console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('create');
+          // console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
@@ -1400,7 +1399,7 @@ export default new Vuex.Store({
           request.onsuccess = () => {
             db = request.result;
             // this.alreadyDB = request.result;
-            console.log(`success: ${db}`);
+            // console.log(`success: ${db}`);
 
             setTransaction(db);
           };
@@ -1431,7 +1430,7 @@ export default new Vuex.Store({
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            // console.log('Ошибка', query.error);
           };
         }
 
@@ -1441,11 +1440,11 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          // console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
-          console.log('create');
+          // console.log('create');
           db = event.target.result;
           if (!db.objectStoreNames.contains('searches')) {
             // if there's no "books" store
@@ -1454,7 +1453,7 @@ export default new Vuex.Store({
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`success: ${db}`);
+            // console.log(`success: ${db}`);
 
             setTransaction(db, result, key, idDash);
           };
@@ -1517,7 +1516,7 @@ export default new Vuex.Store({
       const request = indexedDB.open('EVA', 1);
 
       request.onerror = () => {
-        console.log('error: ');
+        // console.log('error: ');
       };
 
       request.onsuccess = () => {
@@ -1808,6 +1807,9 @@ export default new Vuex.Store({
         } else if (!event.event.tab) {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = currentTab || 1;
+        } else if (event.event.tab > state[id].tabList.length) {
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = state[id].tabList.length;
         } else {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = lastEl?.id || 1;

@@ -566,7 +566,7 @@ export default {
         await this.getThemeList();
         this.select = 'dark';
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     },
     uploadImage() {
@@ -593,7 +593,7 @@ export default {
               }),
             });
           } catch (e) {
-            console.log(e);
+            console.error(e);
           }
         }
         const themeObject = {
@@ -625,7 +625,7 @@ export default {
             this.$refs.modalPersistent.focusOnModal();
           });
         } catch (e) {
-          console.log(e);
+          console.error(e);
         }
       } else {
         this.error = true;
@@ -641,7 +641,7 @@ export default {
           newThemeTitles,
         );
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     },
   },
