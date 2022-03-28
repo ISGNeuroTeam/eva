@@ -227,6 +227,9 @@ export default {
     box() {
       this.reRenderChart();
     },
+    theme() {
+      this.reRenderChart();
+    },
     metrics() {
       this.reRenderChart();
       const { id, idDash, metrics } = this;
