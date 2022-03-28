@@ -68,8 +68,15 @@
           tr {
             transition: all 0.4s ease;
 
-            &:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
-              color: #3C3B45;
+            &:hover {
+              background-color: var(--main_text) !important;
+              &:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+                color: var(--main_bg) !important;
+              }
+            }
+            &.v-data-table__selected {
+              background-color: var(--main_text) !important;
+              color: var(--main_bg) !important;
             }
           }
         }

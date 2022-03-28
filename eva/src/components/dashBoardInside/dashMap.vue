@@ -233,7 +233,6 @@ export default {
         search: event,
         idDash: this.idDash,
       });
-      // console.log('response', response);
       // вызывая метод в хранилище
       if (response.length === 0) {
         // если что-то пошло не так
@@ -269,7 +268,6 @@ export default {
     async loadDataForPipe(search) {
       this.pipelineData = await this.getDataFromRest(search);
       const allPipes = {};
-      // console.log('pipelineData', this.pipelineData);
       this.pipelineData.forEach((x) => {
         if (!allPipes[x.ID]) {
           allPipes[x.ID] = [];
