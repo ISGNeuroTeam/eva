@@ -8,7 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 ### Fixed
-- Incorrect list in export dashboard list
+- fixed modal-confirm in modal-profile and modal-create
+- fixed Remove display of "Select Data Source" button right after creation
+- fixed Incorrect list in export dashboard list
 
 
 ## [1.85.0]
