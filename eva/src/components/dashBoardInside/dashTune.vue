@@ -2,7 +2,7 @@
   <div
     ref="container"
     class="dash-map"
-    :class="{ 'full-screen': isFullScreen }"
+    :class="{ 'full-screen': isFullScreen || circularResize }"
     :style="{ zoom: needSetField ? 1 : htmlZoom }"
   >
     <div v-if="needSetField">
@@ -130,6 +130,7 @@ export default {
       sliderValue: 0,
       dataField: null, // поле с данными
       value: '',
+      circularResize: false,
     };
   },
   computed: {
@@ -259,16 +260,15 @@ export default {
     percentValue() {
       this.detectSliderValue(this.values);
     },
-    widthFrom(val, old) {
-      if (val > old) {
-        this.circularSize = (val + this.heightFrom) / 4;
-      } else {
-        this.circularSize = (val + this.heightFrom) / 4;
-      }
+    widthFrom(val) {
+      this.circularSize = (val + this.heightFrom) / 4;
+      this.circularWidth = val / 2 / 10;
+      this.circularResize = this.circularSize > 300;
     },
     heightFrom(height) {
       if (height < this.circularSize) {
         this.circularSize = height / 2;
+        this.circularResize = this.circularSize > 300;
       }
     },
   },
