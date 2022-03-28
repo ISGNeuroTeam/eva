@@ -85,7 +85,7 @@ export default {
                     }&nbsp;&nbsp;url: ${decodeURIComponent(resEvents.url)}`,
                   );
                   status = res.status;
-                  // console.log(status);
+                  console.log(status);
                   return res;
                 });
               }

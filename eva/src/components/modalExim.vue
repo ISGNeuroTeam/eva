@@ -182,7 +182,7 @@ export default {
         this.$set(this.elements, this.element, list);
       } else if (selected.includes('Очистить все')) {
         let list = [];
-        if (this.element === 'dashs') {
+        if (this.element === 'dash') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
@@ -269,10 +269,8 @@ export default {
           const formData = new FormData();
           if (this.element === 'dash') {
             formData.append('group', this.curName);
-            formData.append('body', this.file);
-          } else {
-            formData.append('body', this.file);
           }
+          formData.append('body', this.file);
           await this.$store.dispatch('importDash', {
             element: this.element,
             formData,

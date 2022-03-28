@@ -221,8 +221,11 @@
                   v-for="color in colorsList"
                   :key="color.name"
                   class="color-select"
-                  :class="{ selected: metric.color === color.name }"
-                  @click="metric.color = color.name; isChanged = true"
+                  :class="{
+                    selected: metric.color === color.name,
+                    disabled: color.name ==='range' && !metric.metadata
+                  }"
+                  @click="onChangeColor(metric, color)"
                 >
                   <div
                     v-if="color.colorGrad"
@@ -414,6 +417,11 @@ export default {
     },
   },
   methods: {
+    onChangeColor(metric, color) {
+      if (color.name === 'range' && !metric.metadata) return;
+      metric.color = color.name;
+      this.isChanged = true;
+    },
     setSettingTemplate(n) {
       this.$set(this.settings, 'template', n);
     },
