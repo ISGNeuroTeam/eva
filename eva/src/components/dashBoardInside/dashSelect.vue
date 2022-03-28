@@ -261,9 +261,9 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      if (this.dataReady.length > 0) {
+      if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
         const data = this.dataReady;
-        res = Object.values(data).map((item) => item[this.elem]);
+        res = Object.values(data).map((item) => item[this.elem]).filter((x) => x !== null || x !== undefined);
         res = this.filterSelect(res, this.elemDeep.true);
       }
       return res;

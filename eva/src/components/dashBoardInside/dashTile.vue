@@ -226,8 +226,6 @@ export default {
       }
     },
     checkName(name) {
-      console.log(this.dataTile);
-      console.log('name', name);
       return name.replace('\\n', '<br>');
     },
     setSize(sizeFrom) {
