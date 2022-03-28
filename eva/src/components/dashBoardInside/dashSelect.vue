@@ -263,7 +263,7 @@ export default {
       let res = [];
       if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
         const data = this.dataReady;
-        res = Object.values(data).map((item) => item[this.elem]).filter((x) => !!x);
+        res = Object.values(data).map((item) => item[this.elem]).filter((x) => x !== null || x !== undefined);
         res = this.filterSelect(res, this.elemDeep.true);
       }
       return res;
@@ -413,6 +413,9 @@ export default {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
+        console.log('...this.topArray, ...Array.from(new Set(this.bottomArray))', ...this.topArray, ...Array.from(new Set(this.bottomArray)));
+        console.log('this.topArray', this.topArray);
+        console.log('this.this.bottomArray', this.bottomArray);
         this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
       } else {
         this.chooseText = 'Выбрать все';
