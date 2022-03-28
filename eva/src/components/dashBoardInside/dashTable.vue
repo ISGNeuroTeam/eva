@@ -217,6 +217,7 @@ export default {
   },
   computed: {
     eventedTableData() {
+      // this.filters = {};
       const items = [...this.filteredTableData].map((item, index) => ({
         ...item,
         rowIndex: index,
@@ -260,6 +261,7 @@ export default {
     filteredTableData() {
       let temp = this.dataRestFrom;
       if (!temp) return [];
+      console.log('this.filters', this.filters);
       Object.keys(this.filters).forEach((key) => {
         let sort;
         const type = this.getType(key);
@@ -268,6 +270,7 @@ export default {
           temp = temp.filter((el) => sort(el[key]));
         }
       });
+      console.log('');
       return temp;
     },
     events() {
@@ -387,6 +390,7 @@ export default {
     },
   },
   mounted() {
+    console.log('mounted table');
     this.$store.commit('setActions', {
       actions: JSON.parse(JSON.stringify(this.props.actions)),
       idDash: this.idDash,
@@ -485,6 +489,7 @@ export default {
       this.props.nodata = true;
     },
     indexTitles(oldVal) {
+      console.log('oldVal', oldVal);
       let type = 'no';
       Object.keys(oldVal[0]).forEach((key) => {
         if (this.checkForDate(oldVal[0][key])) type = 'date';
@@ -495,7 +500,9 @@ export default {
         this.filtersForTypedTitles[key] = { action: '', value: '' };
       });
       this.typedTitles = { ...this.typedTitles };
-      this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
+      console.log('this.typedTitles', this.typedTitles);
+      // this.filtersForTypedTitles = { ...this.filtersForTypedTitles };
+      console.log('filtersForTypedTitles', this.filtersForTypedTitles);
       // make filter objects
       // make title: type object
     },
@@ -538,6 +545,8 @@ export default {
       return result;
     },
     getDataAsynchrony(data) {
+      console.log('getDataAsynchrony');
+      // this.filter/s = {};
       const prom = new Promise((resolve) => {
         if (data.error) {
           this.props.message = data.error;

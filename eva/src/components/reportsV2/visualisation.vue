@@ -143,6 +143,7 @@ export default {
   methods: {
     changeTab(elem) {
       this.unitedShow = elem === 'multiLine';
+      console.log('this.aboutElem', this.aboutElem);
       Object.keys(this.aboutElem).forEach((item) => {
         if (item !== elem) {
           this.$set(this.aboutElem[item], 'show', false);
