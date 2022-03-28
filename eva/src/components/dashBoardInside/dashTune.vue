@@ -115,8 +115,6 @@ export default {
   data() {
     return {
       vertical: true,
-      circularSize: 190,
-      circularWidth: 20,
       icons: {
         plus: mdiPlus,
         minus: mdiMinus,
@@ -130,10 +128,18 @@ export default {
       sliderValue: 0,
       dataField: null, // поле с данными
       value: '',
-      circularResize: false,
     };
   },
   computed: {
+    circularSize() {
+      return (this.widthFrom + this.heightFrom) / 4;
+    },
+    circularWidth() {
+      return this.widthFrom / 2 / 10;
+    },
+    circularResize() {
+      return this.circularSize > 300;
+    },
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
         ? this.$attrs.heightFrom
@@ -260,15 +266,9 @@ export default {
     percentValue() {
       this.detectSliderValue(this.values);
     },
-    widthFrom(val) {
-      this.circularSize = (val + this.heightFrom) / 4;
-      this.circularWidth = val / 2 / 10;
-      this.circularResize = this.circularSize > 300;
-    },
     heightFrom(height) {
       if (height < this.circularSize) {
         this.circularSize = height / 2;
-        this.circularResize = this.circularSize > 300;
       }
     },
   },
@@ -290,9 +290,6 @@ export default {
       if (this.$attrs['is-full-screen']) {
         this.circularWidth = 40;
         this.circularSize = 450;
-      } else {
-        this.circularWidth = 20;
-        this.circularSize = 190;
       }
     },
     addValue(val) {
