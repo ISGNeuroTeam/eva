@@ -46,6 +46,9 @@
         ref="search"
         v-model="search.original_otl"
         class="textarea"
+        :style="{
+          color: 'red'
+        }"
         placeholder="Введите запрос"
         spellcheck="false"
         auto-grow
@@ -534,4 +537,8 @@ export default {
     width: 20px
 .v-picker__title
   display: none
+
+.theme--light.v-input input, .theme--light.v-input textarea
+    color: $secondary_text
+
 </style>
