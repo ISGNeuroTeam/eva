@@ -4,46 +4,65 @@
     class="visualisation"
     :style="{ background: theme.$main_bg, color: theme.$main_text }"
   >
-    <v-menu
-      v-model="menuDropdown"
-      offset-y
-      max-width="160"
-      class="select"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <div
-          v-bind="attrs"
-          v-on="on"
-        >
-          {{ aboutElem[activeElem].tooltip }}
-          <v-icon>{{ mdiChevronDown }}</v-icon>
-        </div>
-      </template>
-      <div style="min-height: 40px">
-        <v-tooltip
-          v-for="i in elements"
-          :key="aboutElem[i].key"
-          bottom
-          :color="theme.$accent_ui_color"
-          @click="changeTab(i)"
-        >
-          <template
-            v-slot:activator="{ on }"
-            class="p-5"
+    <div class="header-settings">
+      <v-menu
+        v-model="menuDropdown"
+        offset-y
+        max-width="160"
+        class="select"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <div
+            v-bind="attrs"
+            v-on="on"
           >
-            <v-icon
-              class="title-icon"
-              :color="aboutElem[i].color"
-              v-on="on"
-              @click="changeTab(i)"
+            {{ aboutElem[activeElem].tooltip }}
+            <v-icon>{{ mdiChevronDown }}</v-icon>
+          </div>
+        </template>
+        <div style="min-height: 40px">
+          <v-tooltip
+            v-for="i in elements"
+            :key="aboutElem[i].key"
+            bottom
+            :color="theme.$accent_ui_color"
+            @click="changeTab(i)"
+          >
+            <template
+              v-slot:activator="{ on }"
+              class="p-5"
             >
-              {{ aboutElem[i].icon }}
-            </v-icon>
-          </template>
-          <span>{{ aboutElem[i].tooltip }}</span>
-        </v-tooltip>
-      </div>
-    </v-menu>
+              <v-icon
+                class="title-icon"
+                :color="aboutElem[i].color"
+                v-on="on"
+                @click="changeTab(i)"
+              >
+                {{ aboutElem[i].icon }}
+              </v-icon>
+            </template>
+            <span>{{ aboutElem[i].tooltip }}</span>
+          </v-tooltip>
+        </div>
+      </v-menu>
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
+        :open-delay="tooltipOpenDelay"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon
+            class="option"
+            :color="theme.$main_border"
+            v-on="on"
+            @click="switchOP"
+          >
+            {{ mdiSettings }}
+          </v-icon>
+        </template>
+        <span>Настройки</span>
+      </v-tooltip>
+    </div>
     <v-card-title class="title-vis">
       <div
         class="divider-tab"
@@ -72,11 +91,18 @@
         :data-rest-from="data"
       />
     </template>
+    <modal-settings
+      v-if="activeSettingModal"
+      :color-from="theme"
+      :id-dash-from="idDash"
+    />
   </div>
 </template>
 
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronDown } from '@mdi/js';
+import {
+  mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings,
+} from '@mdi/js';
 import settings from '../../js/componentsSettings';
 
 export default {
@@ -90,9 +116,14 @@ export default {
       type: Boolean,
       required: true,
     },
+    tooltipOpenDelay: {
+      type: Number,
+      default: 500,
+    },
   },
   data() {
     return {
+      modalSettings: false,
       menuDropdown: false,
       aboutElem: {},
       activeElem: 'table',
@@ -100,6 +131,7 @@ export default {
       mdiRefresh,
       mdiMagnify,
       mdiChevronDown,
+      mdiSettings,
       size: {
         width: 500,
         height: 500,
@@ -107,6 +139,39 @@ export default {
     };
   },
   computed: {
+    idDash() {
+      return 'reports';
+    },
+    dashFromStore() {
+      if (this.idDash) {
+        return this.$store.state[this.idDash];
+      }
+      return null;
+    },
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -141,6 +206,25 @@ export default {
     this.calcSize();
   },
   methods: {
+    activeSettingModal: {
+      get() {
+        console.log('this.getModalSettings.status', this.getModalSettings.status);
+        return this.getModalSettings.status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
+    switchOP() {
+      this.$store.dispatch('openModalSettings', {
+        path: this.idDash,
+        element: this.activeElem,
+        titles: this.data[0] ? Object.keys(this.data[0]) : [],
+      });
+    },
     changeTab(elem) {
       this.unitedShow = elem === 'multiLine';
       Object.keys(this.aboutElem).forEach((item) => {
@@ -176,5 +260,9 @@ export default {
   flex-grow: 1;
   position: relative;
   width: 100%;
+}
+.header-settings{
+  display: flex;
+  justify-content: space-between;
 }
 </style>
