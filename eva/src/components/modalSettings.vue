@@ -1319,6 +1319,32 @@ export default {
     },
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
+      const metricNames = this.metrics.map((item) => item.name);
+
+      // clear colors
+      if (this.color) {
+        Object.keys(this.color).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.color[name];
+          }
+        });
+      }
+
+      // clear metricTypes
+      if (this.multilineYAxesBinding.metricTypes) {
+        Object.keys(this.multilineYAxesBinding.metricTypes).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.multilineYAxesBinding.metricTypes[name];
+          }
+        });
+      }
+      if (this.type_line) {
+        Object.keys(this.type_line).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.type_line[name];
+          }
+        });
+      }
     },
     getSettingsByPath() {
       this.$store.commit('prepareSettingsStore', {
