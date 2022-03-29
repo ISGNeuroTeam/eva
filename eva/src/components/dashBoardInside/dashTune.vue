@@ -97,7 +97,7 @@ export default {
     }, // цветовые переменные
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     }, // включена ли шапка
     loading: {
       type: Boolean,
@@ -225,14 +225,18 @@ export default {
         this.value = this.values[value];
       }
     },
-    dataRestFrom(dataRestFrom) {
-      if (!this.dataField && dataRestFrom.length) {
-        const keys = Object.keys(dataRestFrom[0]).filter(
-          (key) => key[0] !== '_',
-        );
-        if (keys.length === 1) {
-          [this.dataField] = keys;
-        }
+    dataRestFrom(newVal, oldVal) {
+      if (newVal.length > 0 && oldVal.length > 0) {
+        // TODO: оставил так как не уверен что данное решение верное
+        // if (!this.dataField) {
+        //   const keys = Object.keys(dataRestFrom[0]).filter(
+        //     (key) => key[0] !== '_',
+        //   );
+        //   if (keys.length === 1) {
+        //     [this.dataField] = keys;
+        //   }
+        // }
+        this.dataField = '';
       }
     },
     dataField(value) {
