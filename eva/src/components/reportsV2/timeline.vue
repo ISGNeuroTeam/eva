@@ -99,7 +99,7 @@ import { mapGetters } from 'vuex';
 import moment from 'moment';
 
 const timelineEnum = {
-  min: 1,
+  min: 0,
   hour: 1,
   day: 2,
   month: 3,
@@ -143,7 +143,6 @@ export default {
         day: 'DD MMMM YYYY',
         month: 'MMMM YYYY',
       };
-
       return this.getTimeline[timelineEnum[this.select.value]]
         .reduce((acc, { time, value }) => ({
           ...acc,
@@ -157,6 +156,7 @@ export default {
   watch: {
     getPreparedTimeLine: {
       handler(newVal) {
+        console.log(newVal);
         this.clearSVG(newVal);
       },
       deep: true,
@@ -262,7 +262,6 @@ export default {
         .style('z-index', 10)
         .style('visibility', 'hidden')
         .text('Simple text');
-
       gs.append('rect')
         .attr('x', (d, i) => xScale(i) + rectPadding / 2)
         .attr('y', (d) => yScale(d.value))
@@ -270,8 +269,8 @@ export default {
         .attr('height', (d) => height - marge.top - marge.bottom - yScale(d.value))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
-          tooltip.html(`Событий (${d.value})<br>${d.time}`);
-          tooltip.style('display', 'block');
+          // eslint-disable-next-line no-useless-concat
+          tooltip.html(`Событий (${d.value})` + `<br>${d.time}`);
           return tooltip.style('visibility', 'visible');
         })
         .on('mousemove', () => tooltip
