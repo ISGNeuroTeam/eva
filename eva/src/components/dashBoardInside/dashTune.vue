@@ -2,7 +2,7 @@
   <div
     ref="container"
     class="dash-map"
-    :class="{ 'full-screen': isFullScreen || circularResize }"
+    :class="{ 'full-screen': isFullScreen || circularResize, 'min-size': minSize }"
     :style="{ zoom: needSetField ? 1 : htmlZoom }"
   >
     <div v-if="needSetField">
@@ -17,8 +17,8 @@
     </div>
     <div
       v-else
-      class="flex flex-grow-1 justify-center align-center mt-6"
-      :class="{ row: vertical }"
+      class="flex flex-grow-1 justify-center align-center"
+      :class="{ row: vertical, 'mt-6': !minSize}"
     >
       <div class="flex-grow-0">
         <v-slider
@@ -132,13 +132,16 @@ export default {
   },
   computed: {
     circularSize() {
-      return (this.widthFrom + this.heightFrom) / 4;
+      return (this.widthFrom + this.heightFrom) / 5;
     },
     circularWidth() {
       return this.widthFrom / 2 / 10;
     },
     circularResize() {
       return this.circularSize > 300;
+    },
+    minSize() {
+      return this.widthFrom < 257 || this.heightFrom < 250;
     },
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
@@ -268,7 +271,7 @@ export default {
     },
     heightFrom(height) {
       if (height < this.circularSize) {
-        this.circularSize = height / 2;
+        this.circularSize = height / 5;
       }
     },
   },
@@ -377,4 +380,16 @@ export default {
       font-size: 62px !important
     .v-size--default
       padding: 25px 48px
+  &.min-size
+    min-width: 210px
+    .slider-vertical
+      padding-right: 10px
+      .v-slider--vertical
+        min-height: 120px
+    .v-btn:not(.v-btn--round).v-size--default
+      height: 26px
+      min-width: 47px
+      padding: 0 6px
+    .text-h4
+      font-size: 1.125rem !important
 </style>
