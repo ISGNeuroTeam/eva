@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed range selection on a multiline dash
 - Redrawing a dash multiline when changing the main theme
 - Fixed a metric styles bug in "united" option on the dash multiline
+- Fixed the text color on the Y-axis of multiline text.
 
 ## [1.85.0]
 

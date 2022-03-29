@@ -467,6 +467,10 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick:last-of-type text`)
             .attr('transform', `translate(0, ${offsetYText})`);
         }
+        this.svg
+          .selectAll(`g.${yAxisClass} g.tick text`)
+          .attr('stroke', 'none')
+          .attr('fill', united ? currentColor : this.theme.$main_text);
       });
       this.renderHorizontalLines();
 
