@@ -713,12 +713,16 @@ export default {
               .style('opacity', '1')
               .style('visibility', 'visible')
               .html(`<p>${d[item]}</p>`)
+              // eslint-disable-next-line no-restricted-globals
               .style('top', `${event.layerY - 30}px`)
               .style('right', 'auto')
+              // eslint-disable-next-line no-restricted-globals
               .style('left', `${event.layerX + 20}px`);
+            // eslint-disable-next-line no-restricted-globals
             if (event.layerX + 100 > width) {
               tooltip
                 .style('left', 'auto')
+                // eslint-disable-next-line no-restricted-globals
                 .style('right', `${width - event.layerX + 110}px`);
             }
           }) // при наведении мышки точка появляется
@@ -811,12 +815,16 @@ export default {
               `<p><span>${xMetric}</span> : ${localX}</p>
             <p><span>${metricsName[0]}</span> : ${d[metricsName[0]]}</p>`,
             )
+            // eslint-disable-next-line no-restricted-globals
             .style('top', `${event.layerY - 30}px`)
             .style('right', 'auto')
+            // eslint-disable-next-line no-restricted-globals
             .style('left', `${event.layerX + 20}px`);
+          // eslint-disable-next-line no-restricted-globals
           if (event.layerX + 100 > width) {
             tooltip
               .style('left', 'auto')
+              // eslint-disable-next-line no-restricted-globals
               .style('right', `${width - event.layerX + 110}px`);
           }
 

@@ -440,9 +440,9 @@ export default {
       // сперва первый раз просто выполняем серч
       this.executeSearch(searches, sid, schedule);
       // а затем уже выполняем его в цикле
-      const intervalID = (this.timers[sid] = setInterval(() => {
+      this.timers[sid] = setInterval(() => {
         this.executeSearch(searches, sid, schedule);
-      }, curTime));
+      }, curTime);
 
       this.$store.commit('setSchedule', {
         idDash: this.idDash,
@@ -451,7 +451,7 @@ export default {
         time: this.time,
         everyLast: this.everyLast,
         timeLast: this.timeLast,
-        schedulerID: intervalID,
+        schedulerID: this.timers[sid],
       });
       this.cancel();
     },

@@ -386,9 +386,11 @@ export default {
           query.onsuccess = () => {
             if (query.result) {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage(query.result);
             } else {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage([]);
             }
           };
