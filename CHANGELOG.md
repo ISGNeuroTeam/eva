@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
 
 ### Fixed
+- fixed and disabled eslint errors
 - fixed White areas in SingleValue
 - fixed modal-confirm in modal-profile and modal-create
 - fixed Multiselect. Extra data from the previous request remains in the new select
