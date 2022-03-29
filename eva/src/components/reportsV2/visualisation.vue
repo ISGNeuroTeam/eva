@@ -79,6 +79,7 @@
         :id-from="i"
         :color-from="theme"
         :active-elem-from="activeElem"
+        :options="getOptions"
         id-dash-from="reports"
         :width-from="size.width"
         :height-from="size.height"
@@ -123,6 +124,12 @@ export default {
   },
   data() {
     return {
+      options: {
+        visible: true,
+        change: false,
+        level: 1,
+        boxShadow: false,
+      },
       modalSettings: false,
       menuDropdown: false,
       aboutElem: {},
@@ -139,6 +146,9 @@ export default {
     };
   },
   computed: {
+    getOptions() {
+      return this.$store.state[this.idDash][this.activeElem].options;
+    },
     idDash() {
       return 'reports';
     },
@@ -208,7 +218,6 @@ export default {
   methods: {
     activeSettingModal: {
       get() {
-        console.log('this.getModalSettings.status', this.getModalSettings.status);
         return this.getModalSettings.status;
       },
       set(value) {
