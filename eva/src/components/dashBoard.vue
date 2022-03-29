@@ -508,7 +508,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     dataPageFrom: {
       type: String,

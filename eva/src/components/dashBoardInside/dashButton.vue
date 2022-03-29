@@ -69,7 +69,7 @@ export default {
     }, // выоста родительского компонента
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -448,9 +448,11 @@ export default {
             // (4)
             if (query.result) {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage(query.result);
             } else {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage([]);
             }
           };
