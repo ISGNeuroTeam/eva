@@ -134,7 +134,9 @@ export default {
       }
     },
     dataRestFrom(_dataRest) {
-      this.drawGraph(_dataRest);
+      if (_dataRest.length > 0) {
+        this.drawGraph(_dataRest);
+      }
     },
   },
   async mounted() {
