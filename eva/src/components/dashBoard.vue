@@ -762,14 +762,18 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
+      const refNameComponent = `${to ? 'dashBoardInsideFull' : 'dashBoardInside'}`;
       if (this.dataElemFrom === 'piechart') {
         this.$nextTick(() => {
-          this.$refs[`${to ? 'dashBoardInsideFull' : 'dashBoardInside'}`].setActiveLegendLine(this.selectedPieIndex);
+          this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
         });
       }
       setTimeout(() => {
         this.disabledTooltip = to;
       }, to ? 0 : 600);
+      this.$nextTick(() => {
+        this.$refs[refNameComponent].$emit('fullScreenMode', to);
+      });
     },
     settingsIsOpened(to) {
       setTimeout(() => {

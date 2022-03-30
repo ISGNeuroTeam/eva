@@ -253,6 +253,11 @@ export default {
     this.updateData(this.data);
     this.testN = 0;
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
+    this.$on('fullScreenMode', (isFull) => {
+      if (isFull) {
+        this.reRenderChart();
+      }
+    });
   },
   methods: {
     eventStore({ event, partelement }) {
@@ -563,7 +568,7 @@ export default {
 
       const { xMetric, xZoom } = this;
       const {
-        color, united, barplotstyle, isDataAlwaysShow, lastDot,
+        united, barplotstyle, isDataAlwaysShow, lastDot,
       } = this.options;
 
       this.metrics
@@ -641,7 +646,10 @@ export default {
                     .attr('y', (d) => ((barplotstyle === 'overlay')
                       ? this.y[metric](d[1] - d[0])
                       : this.y[metric](d[1])))
-                    .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
+                    .attr('height', (d) => {
+                      const height = this.y[metric](d[0]) - this.y[metric](d[1]);
+                      return height > 0 ? height : 0;
+                    })
                     .attr('width', currentBarWidth)
                     .on('click', (d) => this.setClick({
                       x: d.data[xMetric],
@@ -683,10 +691,11 @@ export default {
                     .attr('width', xSubgroup.bandwidth())
                     .attr('height', (d) => {
                       const varHeight = this.box.height - this.y[metric](d.value);
-                      return united
+                      const height = united
                         ? varHeight
                         : varHeight - (this.box.height / this.metrics.length)
                           * (this.metrics.length - (i + 1));
+                      return height > 0 ? height : 0;
                     })
                     .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .on('click', (d) => this.setClick({
@@ -718,10 +727,11 @@ export default {
                 .attr('width', currentBarWidth)
                 .attr('height', (d) => {
                   const varHeight = this.box.height - this.y[metric](d[metric]);
-                  return united
+                  const height = united
                     ? varHeight
                     : varHeight - (this.box.height / this.metrics.length)
                       * (this.metrics.length - (i + 1));
+                  return height > 0 ? height : 0;
                 })
                 .attr('fill', currentColor)
                 .attr('stroke', currentColor)
