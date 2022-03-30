@@ -46,6 +46,8 @@
         ref="search"
         v-model="search.original_otl"
         class="textarea"
+        :color="theme.$main_text"
+        :style="{ color: `${theme.$main_text} !important` }"
         placeholder="Введите запрос"
         spellcheck="false"
         auto-grow
