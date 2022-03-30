@@ -84,7 +84,10 @@
         :width-from="size.width"
         :height-from="size.height"
         :time-format-from="''"
-        :size-tile-from="{ width: getOptions.widthTile, height: getOptions.heightTile }"
+        :size-tile-from="{
+          width: getOptions ? getOptions.widthTile : '',
+          height: getOptions ? getOptions.heightTile : ''
+        }"
         :search-rep="true"
         :tooltip-from="tooltipSvg"
         :should-get="shouldGet"
@@ -147,7 +150,6 @@ export default {
   },
   computed: {
     getOptions() {
-      console.log('this.$store.state[this.idDash][this.activeElem].options', this.$store.state[this.idDash][this.activeElem].options);
       return this.$store.state[this.idDash][this.activeElem].options;
     },
     idDash() {
