@@ -268,7 +268,7 @@ export default {
 
 <style lang="scss">
 .visualisation {
-  //height: 600px;
+  min-height: 250px;
   flex-grow: 1;
   position: relative;
   width: 100%;
