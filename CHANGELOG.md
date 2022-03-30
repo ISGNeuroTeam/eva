@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- logout form all browser tabs
 
 ### Fixed
 - fixed and disabled eslint errors

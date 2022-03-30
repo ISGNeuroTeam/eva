@@ -22,6 +22,15 @@ export default {
       return styleObject;
     },
   },
+  mounted() {
+    // TODO: временный костыль
+    // Синхронизация логаута на всех вкладках браузера
+    window.onstorage = (event) => {
+      if (!(event?.newValue && event?.oldValue) && (this.$route.fullPath !== '/')) {
+        this.$router.push('/');
+      }
+    };
+  },
   methods: {
     hexToRGB(h) {
       let r = 0;
