@@ -255,15 +255,6 @@ export default {
           });
         }
       });
-
-      items = items.map((x) => {
-        const obj = {};
-        this.props.titles.forEach((title) => {
-          obj[title.value] = x[title.value];
-        });
-        return obj;
-      });
-
       return items;
     },
     filteredTableData() {
@@ -380,6 +371,8 @@ export default {
     dataRestFrom: {
       deep: true,
       handler(val) {
+        this.filters = {};
+        this.filtersForTypedTitles = { };
         if (val && val.length) {
           this.indexTitles(val);
         }
@@ -401,6 +394,9 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+    if (this.dataRestFrom && this.dataRestFrom.length > 0) {
+      this.indexTitles(this.dataRestFrom);
+    }
     this.setEventColor();
     if (!this.isVisibleTitles) {
       this.props.message = 'Данные не отображаются из-за настроек';

@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: mutate vuex store state outside mutation
 - fixed reportsV2: display of columns from table settings does not work
 - fixed reportsV2: style theme
-
+- fixed reportsV2: old filters apply to new queries
 
 ## [1.85.0]
 
