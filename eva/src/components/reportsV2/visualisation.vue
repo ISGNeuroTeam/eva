@@ -173,6 +173,8 @@ export default {
 <style lang="scss">
 .visualisation {
   //height: 600px;
+  flex-grow: 1;
+  position: relative;
   width: 100%;
 }
 </style>

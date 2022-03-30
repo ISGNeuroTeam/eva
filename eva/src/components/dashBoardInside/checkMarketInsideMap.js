@@ -6,6 +6,8 @@ export default function isMarkerInsidePolygon(marker, poly) {
   let inside = false;
   let i = 0;
   let j = polyPoints.length - 1;
+  // TODO: разобраться с j = i += 1
+  // eslint-disable-next-line no-multi-assign
   for (; i < polyPoints.length; j = i += 1) {
     const xi = polyPoints[i].lat;
     const yi = polyPoints[i].lng;

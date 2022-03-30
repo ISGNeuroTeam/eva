@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Added
+- added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+
 ### Fixed
+- fixed and disabled eslint errors
 - fixed White areas in SingleValue
 - fixed modal-confirm in modal-profile and modal-create
 - fixed Multiselect. Extra data from the previous request remains in the new select
@@ -17,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Redrawing a dash multiline when changing the main theme
 - Fixed a metric styles bug in "united" option on the dash multiline
 - Fixed the text color on the Y-axis of multiline text.
+- fixed reportsV2: mutate vuex store state outside mutation
+
 
 ## [1.85.0]
 
