@@ -394,7 +394,7 @@ export default {
             if (opt.manual && opt.upborder) {
               maxYMetric = +opt.upborder;
             }
-            if (opt.manual && opt.lowborder !== undefined) {
+            if (opt.manual && opt.lowborder) {
               minYMetric = +opt.lowborder;
             }
             maxYMetric += Math.abs(maxYMetric) * 0.1;

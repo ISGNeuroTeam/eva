@@ -302,7 +302,10 @@
             >
               <v-select
                 v-model="metrics[i - 1].name"
-                :items="metricsName.map((el) => el.name)"
+                :items="metricsName.map((el) => el.name)
+                  .filter((name) =>
+                    name === metrics[i - 1].name || !printedUnitedMetrics.includes(name)
+                  )"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
                 hide-details
@@ -952,7 +955,7 @@
         :modal-text="`Вы точно хотите удалить вариант отображения ?`"
         btn-confirm-text="Удалить"
         btn-cancel-text="Отмена"
-        @result="deleteMetrics(deleteMetricId)"
+        @result="(confirm) => { confirm && deleteMetrics(deleteMetricId) }"
       />
     </div>
   </modal-persistent>
@@ -1023,6 +1026,9 @@ export default {
     };
   },
   computed: {
+    printedUnitedMetrics() {
+      return this.metrics.map((item) => item.name);
+    },
     dashFromStore() {
       return this.$store.state[this.idDash];
     },
@@ -1175,6 +1181,7 @@ export default {
     },
     // отправляем настройки в хранилище
     async setOptions() {
+      this.prepareUnitedSettingsBeforeSave();
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1319,6 +1326,8 @@ export default {
     },
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
+    },
+    prepareUnitedSettingsBeforeSave() {
       const metricNames = this.metrics.map((item) => item.name);
 
       // clear colors
