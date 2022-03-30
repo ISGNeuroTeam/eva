@@ -156,7 +156,6 @@ export default {
   watch: {
     getPreparedTimeLine: {
       handler(newVal) {
-        console.log(newVal);
         this.clearSVG(newVal);
       },
       deep: true,
@@ -269,8 +268,8 @@ export default {
         .attr('height', (d) => height - marge.top - marge.bottom - yScale(d.value))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
-          // eslint-disable-next-line no-useless-concat
-          tooltip.html(`Событий (${d.value})` + `<br>${d.time}`);
+          tooltip.html(`Событий (${d.value})<br>${d.time}`);
+          tooltip.style('display', 'block');
           return tooltip.style('visibility', 'visible');
         })
         .on('mousemove', () => tooltip
