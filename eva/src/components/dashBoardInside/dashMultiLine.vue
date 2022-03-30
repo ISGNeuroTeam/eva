@@ -149,11 +149,13 @@ export default {
       return metrics;
     },
     legendItems() {
-      const { color } = this.options;
-      return this.metrics.map((name) => ({
-        name,
-        color: (color && color[name]) ? color[name] : this.color(name),
-      }));
+      return this.metrics.map((name) => {
+        const color = this.getCurrentMetricColor(name);
+        return {
+          name,
+          color,
+        };
+      });
     },
     xMetric() {
       const [xMetric] = this.firstDataRowMetricList;
@@ -630,7 +632,7 @@ export default {
                     .data(stackedData)
                     .enter()
                     .append('g')
-                    .attr('fill', (d) => ((color && color[d.key]) ? color[d.key] : this.color(d.key)))
+                    .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .selectAll('rect')
                     .data((d) => d)
                     .enter()
@@ -686,7 +688,7 @@ export default {
                         : varHeight - (this.box.height / this.metrics.length)
                           * (this.metrics.length - (i + 1));
                     })
-                    .attr('fill', (d) => ((color && color[d.key]) ? color[d.key] : this.color(d.key)))
+                    .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .on('click', (d) => this.setClick({
                       x: d.data[this.xMetric],
                       y: d.value,
