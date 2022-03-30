@@ -97,7 +97,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     updateSettings: {
       type: Function,

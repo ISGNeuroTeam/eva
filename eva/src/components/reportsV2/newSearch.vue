@@ -46,6 +46,8 @@
         ref="search"
         v-model="search.original_otl"
         class="textarea"
+        :color="theme.$main_text"
+        :style="{ color: `${theme.$main_text} !important` }"
         placeholder="Введите запрос"
         spellcheck="false"
         auto-grow
@@ -536,4 +538,11 @@ export default {
     width: 20px
 .v-picker__title
   display: none
+
+.theme--light.v-input input,
+.theme--light.v-input textarea,
+.theme--light.v-input textarea::placeholder
+    color: $secondary_text
+.v-input__slot fieldset
+  color: $secondary_text !important
 </style>
