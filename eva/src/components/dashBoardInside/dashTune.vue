@@ -132,16 +132,20 @@ export default {
   },
   computed: {
     circularSize() {
-      return (this.widthFrom + this.heightFrom) / 5;
+      if (this.widthFrom < this.heightFrom) {
+        return this.widthFrom - 90;
+      } else {
+        return this.heightFrom - 147;
+      }
     },
     circularWidth() {
       return this.widthFrom / 2 / 10;
     },
     circularResize() {
-      return this.circularSize > 300;
+      return this.circularSize > 400 && this.heightFrom > 775 && this.widthFrom > 775;
     },
     minSize() {
-      return this.widthFrom < 257 || this.heightFrom < 250;
+      return this.widthFrom < 300 || this.heightFrom < 300;
     },
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
@@ -269,11 +273,11 @@ export default {
     percentValue() {
       this.detectSliderValue(this.values);
     },
-    heightFrom(height) {
-      if (height < this.circularSize) {
-        this.circularSize = height / 5;
-      }
-    },
+    // heightFrom(height) {
+    //   if (height < this.circularSize) {
+    //     this.circularSize = height / 5;
+    //   }
+    // },
   },
   mounted() {
     this.$store.commit('setActions', {
