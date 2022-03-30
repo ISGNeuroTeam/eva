@@ -84,7 +84,7 @@
         :width-from="size.width"
         :height-from="size.height"
         :time-format-from="''"
-        :size-tile-from="{ width: '', height: '' }"
+        :size-tile-from="{ width: getOptions.widthTile, height: getOptions.heightTile }"
         :search-rep="true"
         :tooltip-from="tooltipSvg"
         :should-get="shouldGet"
@@ -147,6 +147,7 @@ export default {
   },
   computed: {
     getOptions() {
+      console.log('this.$store.state[this.idDash][this.activeElem].options', this.$store.state[this.idDash][this.activeElem].options);
       return this.$store.state[this.idDash][this.activeElem].options;
     },
     idDash() {
@@ -225,11 +226,11 @@ export default {
   },
   mounted() {
     this.calcSize();
-    if (!this.dashFromStore.options) {
-      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
-    }
   },
   methods: {
+    setOptions() {
+      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+    },
     switchOP() {
       this.$store.dispatch('openModalSettings', {
         path: this.idDash,
@@ -249,6 +250,7 @@ export default {
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         }
       });
+      this.setOptions();
     },
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
