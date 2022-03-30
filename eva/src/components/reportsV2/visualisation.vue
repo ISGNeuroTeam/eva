@@ -182,6 +182,17 @@ export default {
       }
       return this.dashFromStore.modalSettings;
     },
+    activeSettingModal: {
+      get() {
+        return this.getModalSettings.status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -214,19 +225,11 @@ export default {
   },
   mounted() {
     this.calcSize();
+    if (!this.dashFromStore.options) {
+      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+    }
   },
   methods: {
-    activeSettingModal: {
-      get() {
-        return this.getModalSettings.status;
-      },
-      set(value) {
-        this.$store.dispatch('closeModalSettings', {
-          path: this.idDash,
-          status: value,
-        });
-      },
-    },
     switchOP() {
       this.$store.dispatch('openModalSettings', {
         path: this.idDash,
