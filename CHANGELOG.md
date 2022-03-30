@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrealese]
+
+### Added
+- added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+
+### Fixed
+- fixed and disabled eslint errors
+- fixed White areas in SingleValue
+- fixed modal-confirm in modal-profile and modal-create
+- fixed Multiselect. Extra data from the previous request remains in the new select
+- fixed Remove display of "Select Data Source" button right after creation
+- fixed Incorrect list in export dashboard list
+- fixed reportsV2: mutate vuex store state outside mutation
+- fixed reportsV2: display of columns from table settings does not work
+- fixed reportsV2: style theme
+- fixed reportsV2: old filters apply to new queries
+
 ## [1.85.0]
 
 ### Added

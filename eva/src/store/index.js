@@ -42,7 +42,6 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      console.log('state[idDash][id].options1', state[idDash][id].options);
       state[idDash][id].options.change = false;
       state[idDash][id].options.visible = true;
       state[idDash][id].options.level = 1;
@@ -1385,7 +1384,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          // console.log('error:', event);
+          console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
@@ -1440,7 +1439,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          // console.log('error:', event);
+          console.log('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
@@ -1807,6 +1806,9 @@ export default new Vuex.Store({
         } else if (!event.event.tab) {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = currentTab || 1;
+        } else if (event.event.tab > state[id].tabList.length) {
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = state[id].tabList.length;
         } else {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = lastEl?.id || 1;

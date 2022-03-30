@@ -12,6 +12,9 @@
         color: inherit !important;
       }
     }
+    .theme--light.v-icon {
+      color: inherit !important;
+    }
 
     .v-list {
       color: var(--main_text);
@@ -68,12 +71,42 @@
           tr {
             transition: all 0.4s ease;
 
-            &:hover:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
-              color: #3C3B45;
+            &:hover {
+              background-color: var(--main_text) !important;
+              &:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+                color: var(--main_bg) !important;
+              }
+            }
+            &.v-data-table__selected {
+              background-color: var(--main_text) !important;
+              color: var(--main_bg) !important;
             }
           }
         }
       }
     }
   }
+  // Стилизация textarea
+  .theme--light.v-input input, .theme--light.v-input textarea {
+    color: var(--main_text);
+    &::-webkit-input-placeholder {
+      color: var(--main_text);
+    }
+    &::-moz-placeholder {
+      color: var(--main_text);
+    }
+    &::-ms-input-placeholder {
+      color: var(--main_text);
+    }
+  }
+  .theme--light {
+    .v-text-field--outlined {
+      &:not(.v-input--is-focused) {
+        &:not(.v-input--has-state) > .v-input__control > .v-input__slot fieldset {
+          color: var(--main_text);
+        }
+      }
+    }
+  }
+  //_____________
 }

@@ -44,7 +44,7 @@ export default {
   props: {
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     idDashFrom: {
       type: String,
