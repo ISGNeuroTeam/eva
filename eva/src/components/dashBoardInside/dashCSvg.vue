@@ -398,6 +398,7 @@ export default {
     },
     checkSize() {
       // TODO: для чего здесь эта строка?
+      // eslint-disable-next-line no-unused-expressions
       this.$refs.csvg;
       if (this.svg !== 'Нет данных для отображения' && this.svg !== '') {
         let timeOut = setTimeout(

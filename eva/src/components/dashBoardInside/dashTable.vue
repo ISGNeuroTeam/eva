@@ -217,8 +217,7 @@ export default {
   },
   computed: {
     eventedTableData() {
-      // this.filters = {};
-      const items = [...this.filteredTableData].map((item, index) => ({
+      let items = [...this.filteredTableData].map((item, index) => ({
         ...item,
         rowIndex: index,
       }));
@@ -544,7 +543,6 @@ export default {
       return result;
     },
     getDataAsynchrony(data) {
-      // this.filter/s = {};
       const prom = new Promise((resolve) => {
         if (data.error) {
           this.props.message = data.error;

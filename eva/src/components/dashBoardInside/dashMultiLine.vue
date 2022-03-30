@@ -6,7 +6,8 @@
     <div v-else>
       <div
         ref="legend"
-        class="legend">
+        class="legend"
+      >
         <div
           v-for="item in legendItems"
           :key="item.name"
@@ -822,12 +823,24 @@ export default {
         .append('text')
         .attr('transform', (d, i) => {
           const textToRight = (i === 0);
-          return `translate(${isLine ? (textToRight ? 5 : -5) : 0}, -5)`;
+          let translate = 0;
+          if (isLine) {
+            if (textToRight) {
+              translate = 5;
+            } else {
+              translate = -5;
+            }
+          }
+          return `translate(${translate}, -5)`;
         })
         .attr('font-size', '11')
         .attr('text-anchor', (d, i) => {
           const textToRight = (i === 0);
-          return isLine ? (textToRight ? 'start' : 'end') : 'start';
+          let anchor = 'start';
+          if (isLine) {
+            anchor = textToRight ? 'start' : 'end';
+          }
+          return anchor;
         })
         .attr('fill', this.theme.$main_text)
         .text((d) => {
