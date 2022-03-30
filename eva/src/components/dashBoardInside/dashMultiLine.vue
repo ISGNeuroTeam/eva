@@ -260,7 +260,7 @@ export default {
     });
   },
   methods: {
-    eventStore({ event, partelement }) {
+    eventsStore({ event, partelement }) {
       const { idDash } = this;
       let result = [];
       if (partelement) {
@@ -509,15 +509,15 @@ export default {
       this.line = this.svg.append('g')
         .attr('clip-path', `url(#${clipPathID})`);
 
+      this.bars = this.svg.append('g')
+        .attr('class', 'barplot')
+        .attr('clip-path', `url(#${clipPathID})`);
+
       this.lines = {};
       this.metrics.forEach((metric) => {
         this.lines[metric] = this.svg.append('g')
           .attr('clip-path', `url(#${clipPathID})`);
       });
-
-      this.bars = this.svg.append('g')
-        .attr('class', 'barplot')
-        .attr('clip-path', `url(#${clipPathID})`);
 
       // Add the brushing
       this.line
@@ -1163,7 +1163,7 @@ export default {
           idDash,
         });
       });
-      const events = this.eventStore({
+      const events = this.eventsStore({
         idDash,
         event: 'onclick',
         partelement: 'point',
