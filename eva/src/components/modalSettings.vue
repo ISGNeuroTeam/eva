@@ -1347,7 +1347,7 @@ export default {
           }
         });
       }
-      if (this.type_line) {
+      if (this.type_line && typeof this.type_line === 'object') {
         Object.keys(this.type_line).forEach((name) => {
           if (!metricNames.includes(name)) {
             delete this.type_line[name];
