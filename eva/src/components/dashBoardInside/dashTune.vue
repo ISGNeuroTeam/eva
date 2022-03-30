@@ -132,14 +132,18 @@ export default {
   },
   computed: {
     circularSize() {
-      if (this.widthFrom < this.heightFrom) {
-        return this.widthFrom - 90;
+      if (this.widthFrom > 200 && this.heightFrom > 200) {
+        if (this.widthFrom < this.heightFrom) {
+          return this.widthFrom - 120;
+        } else {
+          return this.heightFrom - 147;
+        }
       } else {
-        return this.heightFrom - 147;
+        return 60;
       }
     },
     circularWidth() {
-      return this.widthFrom / 2 / 10;
+      return this.circularSize / 10;
     },
     circularResize() {
       return this.circularSize > 400 && this.heightFrom > 775 && this.widthFrom > 775;
@@ -273,11 +277,6 @@ export default {
     percentValue() {
       this.detectSliderValue(this.values);
     },
-    // heightFrom(height) {
-    //   if (height < this.circularSize) {
-    //     this.circularSize = height / 5;
-    //   }
-    // },
   },
   mounted() {
     this.$store.commit('setActions', {
