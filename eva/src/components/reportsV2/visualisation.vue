@@ -176,5 +176,8 @@ export default {
   flex-grow: 1;
   position: relative;
   width: 100%;
+  .theme--light.v-icon {
+    color: inherit !important;
+  }
 }
 </style>
