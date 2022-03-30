@@ -538,7 +538,10 @@ export default {
 .v-picker__title
   display: none
 
-.theme--light.v-input input, .theme--light.v-input textarea
+.theme--light.v-input input,
+.theme--light.v-input textarea,
+.theme--light.v-input textarea::placeholder
     color: $secondary_text
-
+.v-input__slot fieldset
+  color: $secondary_text !important
 </style>
