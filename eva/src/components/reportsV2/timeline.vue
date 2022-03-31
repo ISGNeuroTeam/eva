@@ -99,7 +99,7 @@ import { mapGetters } from 'vuex';
 import moment from 'moment';
 
 const timelineEnum = {
-  min: 1,
+  min: 0,
   hour: 1,
   day: 2,
   month: 3,
@@ -143,7 +143,6 @@ export default {
         day: 'DD MMMM YYYY',
         month: 'MMMM YYYY',
       };
-
       return this.getTimeline[timelineEnum[this.select.value]]
         .reduce((acc, { time, value }) => ({
           ...acc,
@@ -262,7 +261,6 @@ export default {
         .style('z-index', 10)
         .style('visibility', 'hidden')
         .text('Simple text');
-
       gs.append('rect')
         .attr('x', (d, i) => xScale(i) + rectPadding / 2)
         .attr('y', (d) => yScale(d.value))
