@@ -1384,7 +1384,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          console.error('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
