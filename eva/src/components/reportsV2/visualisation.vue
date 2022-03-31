@@ -2,7 +2,10 @@
   <div
     ref="vis"
     class="visualisation"
-    :style="{ background: theme.$main_bg, color: theme.$main_text }"
+    :style="{
+      background: theme.$main_bg,
+      color: theme.$main_text,
+      minHeight: activeElem ==='bush' ? '400px' : undefined }"
   >
     <div class="header-settings">
       <v-menu
@@ -272,7 +275,6 @@ export default {
 
 <style lang="scss">
 .visualisation {
-  //height: 600px;
   flex-grow: 1;
   position: relative;
   width: 100%;
