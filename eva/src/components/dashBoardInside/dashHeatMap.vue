@@ -192,7 +192,6 @@ export default {
       });
     },
     dataRestFrom() {
-      console.log('dataRestFrom', this.dataRestFrom);
       if (this.dataRestFrom && this.dataRestFrom[0]) {
         const fields = Object.keys(this.dataRestFrom[0]);
         this.$store.commit('setOptions', {
@@ -227,7 +226,6 @@ export default {
   },
 
   mounted() {
-    console.log('dataRestFrom == dataRestFrom', this.dataRestFrom);
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
