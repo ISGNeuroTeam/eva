@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: old filters apply to new queries
 - fixed bush. reloading Data Source
 - fixed reportsV2: timeline change col
+- fixed reportsV2: Incorrect display of the graph and non-working control buttons 
 
 
 ## [1.85.0]

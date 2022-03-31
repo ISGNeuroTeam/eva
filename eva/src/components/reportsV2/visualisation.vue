@@ -90,6 +90,7 @@
         :should-get="shouldGet"
         :data-report="true"
         :data-rest-from="data"
+        :loading="loading"
       />
     </template>
     <modal-settings
@@ -120,6 +121,10 @@ export default {
     tooltipOpenDelay: {
       type: Number,
       default: 500,
+    },
+    loading: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {
