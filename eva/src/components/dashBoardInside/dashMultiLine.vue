@@ -149,11 +149,13 @@ export default {
       return metrics;
     },
     legendItems() {
-      const { color } = this.options;
-      return this.metrics.map((name) => ({
-        name,
-        color: (color && color[name]) ? color[name] : this.color(name),
-      }));
+      return this.metrics.map((name) => {
+        const color = this.getCurrentMetricColor(name);
+        return {
+          name,
+          color,
+        };
+      });
     },
     xMetric() {
       const [xMetric] = this.firstDataRowMetricList;
@@ -228,6 +230,9 @@ export default {
     box() {
       this.reRenderChart();
     },
+    theme() {
+      this.reRenderChart();
+    },
     metrics() {
       this.reRenderChart();
       const { id, idDash, metrics } = this;
@@ -248,9 +253,14 @@ export default {
     this.updateData(this.data);
     this.testN = 0;
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
+    this.$on('fullScreenMode', (isFull) => {
+      if (isFull) {
+        this.reRenderChart();
+      }
+    });
   },
   methods: {
-    eventStore({ event, partelement }) {
+    eventsStore({ event, partelement }) {
       const { idDash } = this;
       let result = [];
       if (partelement) {
@@ -286,7 +296,7 @@ export default {
       // append the svg object to the body of the page
       this.svg = d3.select(this.$refs.svgContainer)
         .append('svg')
-        .attr('width', width + margin.left + marginOffsetX + margin.right)
+        .attr('width', width + marginOffsetX)
         .attr('height', height + margin.top + margin.bottom + marginOffset.bottom - 10)
         .append('g')
         .attr(
@@ -365,7 +375,7 @@ export default {
           .ticks(this.data.length > 10 ? 5 : null)
           .tickFormat(this.tickFormat);
 
-        let maxYMetric = united && metricType === 'barplot'
+        let maxYMetric = (united && metricType === 'barplot')
           ? allMaxYMetric
           : d3.max(this.data, (d) => d[metric]);
 
@@ -391,7 +401,7 @@ export default {
             if (opt.manual && opt.upborder) {
               maxYMetric = +opt.upborder;
             }
-            if (opt.manual && opt.lowborder !== undefined) {
+            if (opt.manual && opt.lowborder) {
               minYMetric = +opt.lowborder;
             }
             maxYMetric += Math.abs(maxYMetric) * 0.1;
@@ -465,6 +475,10 @@ export default {
             .selectAll(`g.${yAxisClass} g.tick:last-of-type text`)
             .attr('transform', `translate(0, ${offsetYText})`);
         }
+        this.svg
+          .selectAll(`g.${yAxisClass} g.tick text`)
+          .attr('stroke', 'none')
+          .attr('fill', united ? currentColor : this.theme.$main_text);
       });
       this.renderHorizontalLines();
 
@@ -495,15 +509,15 @@ export default {
       this.line = this.svg.append('g')
         .attr('clip-path', `url(#${clipPathID})`);
 
+      this.bars = this.svg.append('g')
+        .attr('class', 'barplot')
+        .attr('clip-path', `url(#${clipPathID})`);
+
       this.lines = {};
       this.metrics.forEach((metric) => {
         this.lines[metric] = this.svg.append('g')
           .attr('clip-path', `url(#${clipPathID})`);
       });
-
-      this.bars = this.svg.append('g')
-        .attr('class', 'barplot')
-        .attr('clip-path', `url(#${clipPathID})`);
 
       // Add the brushing
       this.line
@@ -554,7 +568,7 @@ export default {
 
       const { xMetric, xZoom } = this;
       const {
-        color, united, barplotstyle, isDataAlwaysShow, lastDot,
+        united, barplotstyle, isDataAlwaysShow, lastDot,
       } = this.options;
 
       this.metrics
@@ -623,7 +637,7 @@ export default {
                     .data(stackedData)
                     .enter()
                     .append('g')
-                    .attr('fill', (d) => ((color && color[d.key]) ? color[d.key] : this.color(d.key)))
+                    .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .selectAll('rect')
                     .data((d) => d)
                     .enter()
@@ -632,7 +646,10 @@ export default {
                     .attr('y', (d) => ((barplotstyle === 'overlay')
                       ? this.y[metric](d[1] - d[0])
                       : this.y[metric](d[1])))
-                    .attr('height', (d) => this.y[metric](d[0]) - this.y[metric](d[1]))
+                    .attr('height', (d) => {
+                      const height = this.y[metric](d[0]) - this.y[metric](d[1]);
+                      return Math.abs(height);
+                    })
                     .attr('width', currentBarWidth)
                     .on('click', (d) => this.setClick({
                       x: d.data[xMetric],
@@ -674,12 +691,13 @@ export default {
                     .attr('width', xSubgroup.bandwidth())
                     .attr('height', (d) => {
                       const varHeight = this.box.height - this.y[metric](d.value);
-                      return united
+                      const height = united
                         ? varHeight
                         : varHeight - (this.box.height / this.metrics.length)
                           * (this.metrics.length - (i + 1));
+                      return Math.abs(height);
                     })
-                    .attr('fill', (d) => ((color && color[d.key]) ? color[d.key] : this.color(d.key)))
+                    .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .on('click', (d) => this.setClick({
                       x: d.data[this.xMetric],
                       y: d.value,
@@ -709,13 +727,13 @@ export default {
                 .attr('width', currentBarWidth)
                 .attr('height', (d) => {
                   const varHeight = this.box.height - this.y[metric](d[metric]);
-                  return united
+                  const height = united
                     ? varHeight
                     : varHeight - (this.box.height / this.metrics.length)
                       * (this.metrics.length - (i + 1));
+                  return Math.abs(height);
                 })
                 .attr('fill', currentColor)
-                .attr('stroke', currentColor)
                 .on('click', (d) => this.setClick({
                   x: d[this.xMetric],
                   y: d[metric],
@@ -807,8 +825,8 @@ export default {
         });
     },
     getCurrentMetricColor(metric) {
-      const { color } = this.options;
-      return (color && color[metric])
+      const { color, united } = this.options;
+      return (!united && color && color[metric])
         ? color[metric]
         : this.color(metric);
     },
@@ -861,7 +879,7 @@ export default {
     renderLines(data, metric) {
       const {
         // eslint-disable-next-line camelcase
-        strokeWidth, type_line,
+        strokeWidth, type_line, united,
       } = this.options;
       // eslint-disable-next-line camelcase
       const typeLine = type_line || {};
@@ -896,7 +914,10 @@ export default {
             .attr('fill', 'none')
             .attr('stroke', currentColor)
             .attr('stroke-width', strokeWidth)
-            .style('stroke-dasharray', this.getStyleLine(typeLine[metric]));
+            .style(
+              'stroke-dasharray',
+              this.getStyleLine(!united ? typeLine[metric] : null),
+            );
           if (line.length === 1) {
             this.updateLineDots(line, metric);
           }
@@ -1141,7 +1162,7 @@ export default {
           idDash,
         });
       });
-      const events = this.eventStore({
+      const events = this.eventsStore({
         idDash,
         event: 'onclick',
         partelement: 'point',
