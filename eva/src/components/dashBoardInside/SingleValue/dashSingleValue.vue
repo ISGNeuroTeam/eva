@@ -24,7 +24,7 @@
       :class="metricTemplateClass"
     >
       <div
-        v-for="(metric, idx) in dataToRender"
+        v-for="(metric, idx) in metricsForRender"
         :key="`metric-${metric.id}`"
         class="item"
         :style="{ gridArea: `item-${idx + 1}` }"
@@ -127,7 +127,7 @@ export default {
       return this.$store.getters.getTheme;
     },
 
-    dataToRender() {
+    metricsForRender() {
       return [...this.metricList].slice(0, this.metricCount);
     },
 
