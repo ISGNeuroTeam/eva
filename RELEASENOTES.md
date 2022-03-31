@@ -1,3 +1,29 @@
+# [1.86.0] - Data research 2.0, multiline fixes
+
+### Added
+- Visualisations in Data research 2.0 (ygraph, bush, map, heatmap, singleValue, tune)
+- Visualization settings in Data research 2.0
+
+### Fixed
+- Range selection on the multiline dash
+- Redrawing the dash multiline when changing the main theme
+- A metric styles bug in "united" option on the dash multiline
+- The text color on the Y-axis of the dash multiline
+- The problem of cropping the axis text in full-screen multiline mode
+- The histograms have been moved beyond the lines on the dash multiline
+- internal mechanisms of Data research 2.0
+- Graphic design of Data research 2.0
+- Old filters apply to new queries in Data research 2.0
+- The timeline change column in Data research 2.0
+- Data research 2.0: some visualizations are not displayed immediately after selection
+- White areas in SingleValue
+- Operation of modal windows for creating, confirming and working with the profile
+- Data from the previous query was saved in a new selection in Multiselect
+- Fixed removal of the display of the "Select data source" button immediately after creation
+- Incorrect list in export dashboard list
+- Reloading the bush dash when Data Source changes
+
+
 # [1.85.0] - Token update when executing a go event, visualisations in data research, multiline
 
 ### New
