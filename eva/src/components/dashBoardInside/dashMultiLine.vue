@@ -296,7 +296,7 @@ export default {
       // append the svg object to the body of the page
       this.svg = d3.select(this.$refs.svgContainer)
         .append('svg')
-        .attr('width', width + margin.left + marginOffsetX + margin.right)
+        .attr('width', width + marginOffsetX)
         .attr('height', height + margin.top + margin.bottom + marginOffset.bottom - 10)
         .append('g')
         .attr(
@@ -375,7 +375,7 @@ export default {
           .ticks(this.data.length > 10 ? 5 : null)
           .tickFormat(this.tickFormat);
 
-        let maxYMetric = united && metricType === 'barplot'
+        let maxYMetric = (united && metricType === 'barplot')
           ? allMaxYMetric
           : d3.max(this.data, (d) => d[metric]);
 
@@ -648,7 +648,7 @@ export default {
                       : this.y[metric](d[1])))
                     .attr('height', (d) => {
                       const height = this.y[metric](d[0]) - this.y[metric](d[1]);
-                      return height > 0 ? height : 0;
+                      return Math.abs(height);
                     })
                     .attr('width', currentBarWidth)
                     .on('click', (d) => this.setClick({
@@ -695,7 +695,7 @@ export default {
                         ? varHeight
                         : varHeight - (this.box.height / this.metrics.length)
                           * (this.metrics.length - (i + 1));
-                      return height > 0 ? height : 0;
+                      return Math.abs(height);
                     })
                     .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .on('click', (d) => this.setClick({
@@ -731,10 +731,9 @@ export default {
                     ? varHeight
                     : varHeight - (this.box.height / this.metrics.length)
                       * (this.metrics.length - (i + 1));
-                  return height > 0 ? height : 0;
+                  return Math.abs(height);
                 })
                 .attr('fill', currentColor)
-                .attr('stroke', currentColor)
                 .on('click', (d) => this.setClick({
                   x: d[this.xMetric],
                   y: d[metric],

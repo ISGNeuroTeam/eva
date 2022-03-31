@@ -988,7 +988,7 @@ export default {
       conclusion_count: {},
       replace_count: {},
       options: {},
-      type_line: 'solid',
+      type_line: {},
       color: {},
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,

@@ -762,7 +762,7 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
-      const refNameComponent = `${to ? 'dashBoardInsideFull' : 'dashBoardInside'}`;
+      const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
       if (this.dataElemFrom === 'piechart') {
         this.$nextTick(() => {
           this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
