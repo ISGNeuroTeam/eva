@@ -501,7 +501,7 @@ export default {
               j = i;
             }
           });
-          return j * barHeight;
+          return j * barHeight - (j === 0 ? 1 : 0);
         })
         .attr('width', (d) => x(Date.parse(d.end_date)) - x(Date.parse(d.start_date)))
         .attr('height', barHeight)

@@ -231,10 +231,50 @@ export default {
   },
   mounted() {
     this.calcSize();
+    this.setOptions();
   },
   methods: {
     setOptions() {
-      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+      if (!this.idDash) {
+        return;
+      }
+
+      if (this.data[0] && !this.dashFromStore[this.activeElem]?.metrics && this.activeElem === 'multiline') {
+        this.$store.commit('setMetricsMulti', { id: this.activeElem, idDash: this.idDash, metrics: Object.keys(this.data[0]) });
+      }
+
+      if (!this.dashFromStore[this.activeElem].options) {
+        this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore[this.activeElem]?.options?.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
     },
     switchOP() {
       this.$store.dispatch('openModalSettings', {
