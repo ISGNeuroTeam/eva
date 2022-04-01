@@ -9,7 +9,7 @@
           class="scale-btn"
           text
           small
-          @click="plusScale()"
+          @click="plusScale"
         >
           <v-icon
             :color="theme.$main_text"
@@ -23,7 +23,7 @@
           class="scale-btn"
           text
           small
-          @click="minusScale()"
+          @click="minusScale"
         >
           <v-icon
             :color="theme.$main_text"
@@ -176,6 +176,7 @@ export default {
       } else {
         this.numberInTimeline -= 5;
       }
+      this.clearSVG(this.getPreparedTimeLine);
     },
     minusScale() {
       if (this.numberInTimeline > 45) {
@@ -183,6 +184,7 @@ export default {
       } else {
         this.numberInTimeline += 5;
       }
+      this.clearSVG(this.getPreparedTimeLine);
     },
     refreshScale() {
       this.numberInTimeline = 25;
@@ -295,20 +297,20 @@ export default {
   .select
     max-width: 180px
     .v-select__selection
-      color: $main_text
+      color: $main_text !important
     .v-input__slot:before
-      border-color: $main_text
+      border-color: $main_text !important
     .v-input__append-inner
       margin-bottom: 5px
   .scale-btn
     .scale-btn-text
       text-transform: capitalize
-      color: $main_text
+      color: $main_text !important
       font-weight: normal
 .v-list
   background-color: $main_bg !important
   .v-list-item
-    background-color: $main_bg
+    background-color: $main_bg !important
 
 .container-chart
   margin: auto

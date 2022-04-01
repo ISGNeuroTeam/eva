@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- Added display of a message about the lack of data on the visualization "tile"
 
 ### Fixed
 - fixed and disabled eslint errors
@@ -31,6 +32,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: timeline change col
 - fixed reportsV2: visualization settings not working tile
 - fixed reportsV2: some visualizations are not displayed immediately after selection
+- Fixed the color of the number of lines per page.
+- Fixed color and layout in the dropdown menu on the "statistics" tab.
+- Fixed zoom buttons on the timeline.
 
 ## [1.85.0]
 

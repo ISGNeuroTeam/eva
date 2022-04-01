@@ -481,7 +481,7 @@ export default {
                   height: 28px
                   width: 28px
                   .v-btn__content
-                    color: $main_text
+                    color: $main_text !important
                     font-weight: 400
                     font-size: 14px
                 .accent
