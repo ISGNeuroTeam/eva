@@ -2,7 +2,10 @@
   <div
     ref="vis"
     class="visualisation"
-    :style="{ background: theme.$main_bg, color: theme.$main_text }"
+    :style="{
+      background: theme.$main_bg,
+      color: theme.$main_text,
+      minHeight: activeElem ==='bush' ? '400px' : undefined }"
   >
     <div class="header-settings">
       <v-menu
@@ -84,7 +87,10 @@
         :width-from="size.width"
         :height-from="size.height"
         :time-format-from="''"
-        :size-tile-from="{ width: '', height: '' }"
+        :size-tile-from="{
+          width: getOptions ? getOptions.widthTile : '',
+          height: getOptions ? getOptions.heightTile : ''
+        }"
         :search-rep="true"
         :tooltip-from="tooltipSvg"
         :should-get="shouldGet"
@@ -230,11 +236,11 @@ export default {
   },
   mounted() {
     this.calcSize();
-    if (!this.dashFromStore.options) {
-      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
-    }
   },
   methods: {
+    setOptions() {
+      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+    },
     switchOP() {
       this.$store.dispatch('openModalSettings', {
         path: this.idDash,
@@ -254,6 +260,7 @@ export default {
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         }
       });
+      this.setOptions();
     },
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
@@ -273,7 +280,6 @@ export default {
 
 <style lang="scss">
 .visualisation {
-  //height: 600px;
   flex-grow: 1;
   position: relative;
   width: 100%;

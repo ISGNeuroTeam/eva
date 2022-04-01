@@ -70,7 +70,7 @@ const routes = [
     },
   },
   {
-    name: 'Дашборд',
+    name: 'Дашборд tab',
     path: '/dashboards/:id/:tabId', // если страница дашборда
     component: () => import('../components/mainTitle.vue'),
     props: true,

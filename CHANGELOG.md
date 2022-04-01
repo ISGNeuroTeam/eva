@@ -17,12 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed Multiselect. Extra data from the previous request remains in the new select
 - fixed Remove display of "Select Data Source" button right after creation
 - fixed Incorrect list in export dashboard list
+- Fixed range selection on a multiline dash
+- Redrawing a dash multiline when changing the main theme
+- Fixed a metric styles bug in "united" option on the dash multiline
+- Fixed the text color on the Y-axis of multiline text.
 - fixed reportsV2: mutate vuex store state outside mutation
+- fixed the problem of cropping the axis text in full-screen multiline mode
+- histograms move beyond the lines on multilines
 - fixed reportsV2: display of columns from table settings does not work
 - fixed reportsV2: style theme
 - fixed reportsV2: old filters apply to new queries
 - fixed bush. reloading Data Source
 - fixed reportsV2: timeline change col
+- fixed reportsV2: visualization settings not working tile
+- fixed reportsV2: some visualizations are not displayed immediately after selection
+- fixed a visual bug in the single value dash
 - fixed reportsV2: Incorrect display of the graph and non-working control buttons 
 
 
