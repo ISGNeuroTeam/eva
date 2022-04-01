@@ -677,7 +677,7 @@ export default {
   position: absolute
   /* left: 0px; */
   right: 0
-  z-index: 1000000
+  z-index: 400
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
