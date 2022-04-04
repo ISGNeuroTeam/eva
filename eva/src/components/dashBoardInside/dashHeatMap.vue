@@ -231,6 +231,19 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+
+    if (this.idDash === 'reports') {
+      if (this.dataRestFrom && this.dataRestFrom[0]) {
+        const fields = Object.keys(this.dataRestFrom[0]);
+        this.$store.commit('setOptions', {
+          id: this.idFrom,
+          idDash: this.idDashFrom,
+          options: {},
+          titles: fields,
+        });
+      }
+      this.render();
+    }
   },
 
   methods: {
@@ -241,8 +254,8 @@ export default {
         val = this.filteredData[x][y]?.value;
         row = this.filteredData[x][y]?.row;
       }
-
-      this.$store.state[this.idDash].tockens.forEach((token) => {
+      const tokens = this.$store.state[this.idDash]?.tockens || [];
+      tokens.forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
           const { capture } = token;
