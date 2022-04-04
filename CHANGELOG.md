@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed a visual bug in the single value dash
 - fixed reportsV2: map display, settings, styles
 - fixed reportsV2: Incorrect display of the graph and non-working control buttons 
+- fixed resizing movable visualisation
 
 ## [1.85.0]
 
