@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed color and layout in the dropdown menu on the "statistics" tab.
 - Fixed zoom buttons on the timeline.
 - Fixed styles on v-select\v-label\v-input
+- Fixed timeline zoom
 
 ## [1.85.0]
 

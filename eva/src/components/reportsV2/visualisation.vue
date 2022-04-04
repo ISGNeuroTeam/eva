@@ -100,6 +100,8 @@
         :update-settings="updateSettings"
         :data-mode-from="dataMode"
         :loading="loading"
+        :selected-pie-index="selectedPieIndex"
+        @changeSelectPie="changeSelectedPie"
       />
     </template>
     <modal-settings
@@ -165,6 +167,7 @@ export default {
         showTitle: true,
       },
       disappear: true,
+      selectedPieIndex: -1,
     };
   },
   computed: {
@@ -259,7 +262,6 @@ export default {
       this.disappear = val;
     },
     changeOptions(mode) {
-      debugger;
       const { level } = this.options;
       let opacity = 1;
       if (mode) {
@@ -312,6 +314,9 @@ export default {
     },
     setActiveElem(elemName) {
       this.activeElem = elemName;
+    },
+    changeSelectedPie(val) {
+      this.selectedPieIndex = val;
     },
   },
 };

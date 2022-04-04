@@ -143,6 +143,8 @@ export default {
         day: 'DD MMMM YYYY',
         month: 'MMMM YYYY',
       };
+      const test = this.getTimeline[timelineEnum[this.select.value]].map(({ time }) => moment.unix(time).format(timeLineFormats[this.select.value])).sort();
+      console.log(test);
       return this.getTimeline[timelineEnum[this.select.value]]
         .reduce((acc, { time, value }) => ({
           ...acc,
@@ -171,23 +173,20 @@ export default {
       this.select = item;
     },
     plusScale() {
-      if (this.numberInTimeline < 10) {
-        this.numberInTimeline = 5;
-      } else {
+      if (this.numberInTimeline > 5) {
         this.numberInTimeline -= 5;
+        this.clearSVG(this.getPreparedTimeLine);
       }
-      this.clearSVG(this.getPreparedTimeLine);
     },
     minusScale() {
-      if (this.numberInTimeline > 45) {
-        this.numberInTimeline = 50;
-      } else {
+      if (this.numberInTimeline < 50) {
         this.numberInTimeline += 5;
+        this.clearSVG(this.getPreparedTimeLine);
       }
-      this.clearSVG(this.getPreparedTimeLine);
     },
     refreshScale() {
       this.numberInTimeline = 25;
+      this.clearSVG(this.getPreparedTimeLine);
     },
     clearSVG(dataset) {
       d3.select('.block-tooltip')
@@ -217,6 +216,7 @@ export default {
         .append('g')
         .attr('transform', `translate(${marge.top},${marge.left})`);
       let dataForSvg = [];
+      console.log(Object.keys(dataset).length);
       dataForSvg = Object.keys(dataset).reduce((acc, dataItem) => [
         ...acc,
         {
@@ -224,7 +224,13 @@ export default {
           value: dataset[dataItem],
         },
       ], []);
+      console.group();
+      console.log(dataForSvg.length);
+      console.log(this.numberInTimeline);
+      console.log(dataForSvg.length - this.numberInTimeline);
+      console.groupEnd();
       dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline);
+      // console.log('dataForSvg after', dataForSvg);
       let maxY = dataForSvg[0].value;
       dataForSvg.forEach((element) => {
         if (element.value > maxY) {
@@ -265,9 +271,9 @@ export default {
         .text('Simple text');
       gs.append('rect')
         .attr('x', (d, i) => xScale(i) + rectPadding / 2)
-        .attr('y', (d) => yScale(d.value))
+        .attr('y', (d) => (d.value === 0 || yScale(d.value) < 49 ? yScale(d.value) : 48))
         .attr('width', () => xScale.step() - rectPadding)
-        .attr('height', (d) => height - marge.top - marge.bottom - yScale(d.value))
+        .attr('height', (d) => height - marge.top - marge.bottom - (d.value === 0 || yScale(d.value) < 49 ? yScale(d.value) : 48))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
           tooltip.html(`Событий (${d.value})<br>${d.time}`);

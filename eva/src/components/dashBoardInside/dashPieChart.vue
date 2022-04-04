@@ -582,18 +582,19 @@ export default {
     },
     setToken(pieIndex) {
       const tokens = this.$store.state[this.idDashFrom].tockens;
-
-      tokens.forEach((tocken) => {
-        if (tocken.elem === this.idFrom) {
-          const value = this.dataRestFrom[pieIndex][tocken.capture];
-          this.$store.commit('setTocken', {
-            token: tocken,
-            value,
-            idDash: this.idDashFrom,
-            store: this.$store,
-          });
-        }
-      });
+      if (tokens?.length > 0) {
+        tokens.forEach((tocken) => {
+          if (tocken.elem === this.idFrom) {
+            const value = this.dataRestFrom[pieIndex][tocken.capture];
+            this.$store.commit('setTocken', {
+              token: tocken,
+              value,
+              idDash: this.idDashFrom,
+              store: this.$store,
+            });
+          }
+        });
+      }
     },
     changePieChart() {
       const graphics = d3
