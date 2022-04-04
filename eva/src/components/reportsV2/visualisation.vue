@@ -259,7 +259,6 @@ export default {
       this.disappear = val;
     },
     changeOptions(mode) {
-      debugger;
       const { level } = this.options;
       let opacity = 1;
       if (mode) {
