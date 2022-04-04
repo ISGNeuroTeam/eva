@@ -99,6 +99,7 @@
         :current-settings="settings"
         :update-settings="updateSettings"
         :data-mode-from="dataMode"
+        :loading="loading"
       />
     </template>
     <modal-settings
@@ -129,6 +130,10 @@ export default {
     tooltipOpenDelay: {
       type: Number,
       default: 500,
+    },
+    loading: {
+      type: Boolean,
+      default: true,
     },
   },
   data() {

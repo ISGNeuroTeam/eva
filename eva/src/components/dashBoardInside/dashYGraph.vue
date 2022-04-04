@@ -862,7 +862,7 @@ export default {
       });
       mode.addItemClickedListener((sender, args) => {
         if (args.item instanceof yfile.INode) {
-          const tokens = this.$store.state[this.idDashFrom].tockens;
+          const tokens = this.$store.state[this.idDashFrom]?.tockens || [];
           tokens.forEach((token) => {
             if (token.elem === this.idFrom && token.action === 'click') {
               const value = args.item.tag[token.capture];
