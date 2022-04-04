@@ -25,9 +25,10 @@ export default {
   mounted() {
     // TODO: временный костыль
     // Синхронизация логаута на всех вкладках браузера
-    window.onstorage = (event) => {
-      if (!(event?.newValue && event?.oldValue) && (this.$route.fullPath !== '/')) {
+    window.onstorage = () => {
+      if (!document.cookie && (this.$route.fullPath !== '/')) {
         this.$router.push('/');
+        document.title = 'EVA';
       }
     };
   },
