@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed the color of the number of lines per page.
 - Fixed color and layout in the dropdown menu on the "statistics" tab.
 - Fixed zoom buttons on the timeline.
+- Fixed styles on v-select\v-label\v-input
 
 ## [1.85.0]
 

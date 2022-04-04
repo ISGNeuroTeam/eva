@@ -73,7 +73,7 @@
         table {
           tbody {
             tr {
-              transition: all 0.4s ease;
+              transition: all 0.3s ease-in-out;
 
               &:hover {
                 background-color: var(--main_text) !important;
@@ -109,6 +109,24 @@
       &::-ms-input-placeholder {
         color: var(--main_text);
       }
+    }
+    & > * {
+      color: var(--main_text) !important;
+      caret-color: var(--main_text) !important;
+      border-color: var(--secondary_bg) !important;
+    }
+    .v-text-field > .v-input__control > .v-input__slot:before {
+      caret-color: inherit !important;
+      color: inherit !important;
+      border-color: inherit !important;
+    }
+    &.primary--text {
+      color: var(--main_text) !important;
+      caret-color: var(--main_text) !important;
+      border-color: var(--secondary_bg) !important;
+    }
+    &.v-label {
+      color: var(--main_text) !important;
     }
   }
 }
