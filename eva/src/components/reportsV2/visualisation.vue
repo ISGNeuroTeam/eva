@@ -283,6 +283,8 @@ export default {
   flex-grow: 1;
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
   .theme--light.v-icon {
     color: inherit !important;
   }

@@ -32,8 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: visualization settings not working tile
 - fixed reportsV2: some visualizations are not displayed immediately after selection
 - fixed a visual bug in the single value dash
+- fixed reportsV2: map display, settings, styles
 - fixed reportsV2: Incorrect display of the graph and non-working control buttons 
-
 
 ## [1.85.0]
 
