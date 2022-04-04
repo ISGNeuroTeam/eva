@@ -79,6 +79,7 @@
               class="visualisation component-block"
               :data="data"
               :should-get="shouldGet"
+              :loading="loading"
             />
           </keep-alive>
         </div>
