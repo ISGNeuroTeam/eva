@@ -96,6 +96,9 @@
         :should-get="shouldGet"
         :data-report="true"
         :data-rest-from="data"
+        :current-settings="settings"
+        :update-settings="updateSettings"
+        :data-mode-from="dataMode"
       />
     </template>
     <modal-settings
@@ -130,11 +133,15 @@ export default {
   },
   data() {
     return {
+      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       options: {
         visible: true,
         change: false,
         level: 1,
         boxShadow: false,
+      },
+      differentOptions: {
+        visible: true,
       },
       modalSettings: false,
       menuDropdown: false,
@@ -149,9 +156,19 @@ export default {
         width: 500,
         height: 500,
       },
+      settings: {
+        showTitle: true,
+      },
+      disappear: true,
     };
   },
   computed: {
+    dataMode() {
+      this.changeOptions(this.mode);
+      this.setPropDisappear(true);
+
+      return this.mode;
+    },
     getOptions() {
       return this.$store.state[this.idDash][this.activeElem].options;
     },
@@ -233,6 +250,28 @@ export default {
     this.calcSize();
   },
   methods: {
+    setPropDisappear(val) {
+      this.disappear = val;
+    },
+    changeOptions(mode) {
+      debugger;
+      const { level } = this.options;
+      let opacity = 1;
+      if (mode) {
+        this.differentOptions.visible = true;
+      } else if (!this.options.visible) {
+        this.differentOptions.visible = false;
+        opacity = 0;
+      } else {
+        this.differentOptions.visible = true;
+        opacity = 1;
+      }
+      this.$emit('SetOpacity', opacity);
+      this.$emit('SetLevel', level);
+    },
+    updateSettings(localSettings) {
+      this.settings = JSON.parse(JSON.stringify(localSettings));
+    },
     setOptions() {
       this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
     },
