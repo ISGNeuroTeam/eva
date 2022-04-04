@@ -29,7 +29,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               rounded
-              :style="`background: ${theme.$secondary_bg}`"
+              :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
               v-bind="attrs"
               v-on="on"
             >
@@ -401,7 +401,6 @@ export default {
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
       currentTile: {},
-      searches: [],
       tileLayers: [
         {
           name: 'Заданная в настройках',
@@ -502,6 +501,12 @@ export default {
 
       return this.dashFromStore.options;
     },
+    searches() {
+      if (typeof this.$store.state[this.idDashFrom].searches === 'object') {
+        return Object.values(this.$store.state[this.idDashFrom].searches);
+      }
+      return this.$store.state[this.idDashFrom]?.searches || [];
+    },
   },
   watch: {
     options: {
@@ -532,8 +537,6 @@ export default {
     } else {
       this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
     }
-
-    this.searches = this.loadDataForPipe();
   },
   methods: {
     onClickChoosingCoordinates() {
@@ -560,9 +563,6 @@ export default {
       if (this.options.search) {
         this.$emit('updatePipeDataSource', this.options.search);
       }
-    },
-    loadDataForPipe() {
-      return this.$store.state[this.idDashFrom].searches;
     },
     closeLegend() {
       this.options.showLegend = false;
