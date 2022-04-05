@@ -829,6 +829,7 @@ export default new Vuex.Store({
           delete state[key];
         }
       });
+      window.localStorage.clear();
     },
     setMetricsMulti(state, { metrics, idDash, id }) {
       const localMetrics = metrics.map((metric) => ({ name: metric, units: '' }));

@@ -1181,7 +1181,7 @@ export default {
     },
     // отправляем настройки в хранилище
     async setOptions() {
-      this.prepareUnitedSettingsBeforeSave();
+      // this.prepareUnitedSettingsBeforeSave();
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1239,7 +1239,7 @@ export default {
         color: this.color,
         updated: Date.now(),
       };
-      this.$store.dispatch('saveSettingsToPath', {
+      await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
         options,
