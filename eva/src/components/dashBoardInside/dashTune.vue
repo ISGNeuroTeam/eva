@@ -132,9 +132,12 @@ export default {
   },
   computed: {
     circularSize() {
+      if (this.widthFrom > 775 && this.heightFrom > 775) {
+        return this.heightFrom - 177;
+      }
       if (this.widthFrom > 200 && this.heightFrom > 200) {
         if (this.widthFrom < this.heightFrom) {
-          return this.widthFrom - 120;
+          return this.widthFrom - 147;
         } else {
           return this.heightFrom - 147;
         }
@@ -362,6 +365,10 @@ export default {
 .dash-map
   color: var(--main_text) !important
   min-width: 360px
+  height: calc(100% - 50px)
+  display: flex
+  justify-content: center
+  align-items: center
 
   .v-input__append-inner
     margin-top: 16px
@@ -388,7 +395,7 @@ export default {
     .slider-vertical
       padding-right: 10px
       .v-slider--vertical
-        min-height: 120px
+        min-height: 105px
     .v-btn:not(.v-btn--round).v-size--default
       height: 26px
       min-width: 47px
