@@ -44,7 +44,7 @@ export default {
   props: {
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     idDashFrom: {
       type: String,
@@ -250,7 +250,7 @@ export default {
   box-sizing: border-box;
   outline: none;
   border-radius: 4px;
-  transition: transform ease 0.3s;
+  transition: all 0.1s linear;
 }
 .vdr.active {
   outline-color: inherit;

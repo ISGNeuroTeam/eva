@@ -39,10 +39,10 @@ export default {
       await fetch(
         `/api/getinterestingfields?cid=${cid}`,
       ).catch((error) => {
-        console.log(error);
+        console.error(error);
       }).then((data) => {
         data.json().then((interesting) => {
-          console.log('Interesting', interesting);
+          // console.log('Interesting', interesting);
           commit('SET_INTERESTING', interesting);
         });
         // console.log(data);

@@ -508,7 +508,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     dataPageFrom: {
       type: String,
@@ -762,14 +762,18 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
+      const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
       if (this.dataElemFrom === 'piechart') {
         this.$nextTick(() => {
-          this.$refs[`${to ? 'dashBoardInsideFull' : 'dashBoardInside'}`].setActiveLegendLine(this.selectedPieIndex);
+          this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
         });
       }
       setTimeout(() => {
         this.disabledTooltip = to;
       }, to ? 0 : 600);
+      this.$nextTick(() => {
+        this.$refs[refNameComponent].$emit('fullScreenMode', to);
+      });
     },
     settingsIsOpened(to) {
       setTimeout(() => {
@@ -791,6 +795,14 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
     });
+
+    if (this.element.includes('textarea') || this.element.includes('button')) {
+      this.$store.commit('setSwitch', {
+        idDash: this.idDash,
+        status: true,
+        id: this.element,
+      });
+    }
   },
   methods: {
     changeSelectedPie(val) {
@@ -938,10 +950,10 @@ export default {
       let db = null;
       const request = indexedDB.open('EVA', 1);
       request.onerror = (event) => {
-        console.log('error: ', event);
+        console.error('error: ', event);
       };
       request.onupgradeneeded = (event) => {
-        console.log('create');
+        // console.log('create');
         db = event.target.result;
         if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
@@ -949,7 +961,7 @@ export default {
         }
         request.onsuccess = () => {
           db = request.result;
-          console.log(`successEvent: ${db}`);
+          // console.log(`successEvent: ${db}`);
         };
       };
       return new Promise((resolve) => {
@@ -968,7 +980,7 @@ export default {
             }
           };
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            console.error('Ошибка', query.error);
           };
         };
       });

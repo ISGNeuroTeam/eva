@@ -124,6 +124,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
 
@@ -151,6 +152,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
 
@@ -178,6 +180,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
         <div
@@ -200,6 +203,7 @@
           <v-color-picker
             v-model="curItem.color"
             class="colorPicker"
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(group.tab)"
@@ -211,6 +215,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
         <div
@@ -225,6 +230,7 @@
             outlined
             hide-details
             clearable
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(index.tab)"
@@ -236,6 +242,7 @@
             :create="create"
             :active-from="active"
             @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
       </v-card-text>

@@ -8,9 +8,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrealese]
 
 ### Added
+- added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- logout form all browser tabs
+
+### Fixed
+- add settings for singleValue in reportsV2
+- fixed reportsV2 heat map visualisation
+- fixed and disabled eslint errors
+- fixed White areas in SingleValue
+- fixed modal-confirm in modal-profile and modal-create
+- fixed Multiselect. Extra data from the previous request remains in the new select
+- fixed Remove display of "Select Data Source" button right after creation
+- fixed Incorrect list in export dashboard list
+- Fixed range selection on a multiline dash
+- Redrawing a dash multiline when changing the main theme
+- Fixed a metric styles bug in "united" option on the dash multiline
+- Fixed the text color on the Y-axis of multiline text.
+- fixed reportsV2: mutate vuex store state outside mutation
+- fixed the problem of cropping the axis text in full-screen multiline mode
+- histograms move beyond the lines on multilines
+- fixed reportsV2: display of columns from table settings does not work
+- fixed reportsV2: style theme
+- fixed reportsV2: old filters apply to new queries
+- fixed bush. reloading Data Source
+- fixed reportsV2: timeline change col
+- fixed reportsV2: visualization settings not working tile
+- fixed reportsV2: some visualizations are not displayed immediately after selection
+- fixed a visual bug in the single value dash
+- fixed reportsV2: map display, settings, styles
+- fixed reportsV2: Incorrect display of the graph and non-working control buttons 
+- fixed resizing movable visualisation
+- fixed tune resize
+
+## [1.85.0]
+
+### Added
 - added the ability to update tokens when executing a go event
 - reportsV2 timeline get data from backend
 - reportsV2 interesting get data from backend
+- added visualisations to datа research 2.0.
 
 ### Fixed
 - fix first search id
@@ -48,6 +84,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed piechart chunk selection syncing
 - fixed dashSelect
 - refactoring a multiline
+- Fixed persistent modal
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
 - fixed guntt hints
 - fixed an empty data source will load indefinitely
 - fixed activate tabs in new dashboards
@@ -65,7 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - improvements handling window closing
 - fixed dropdown lists
 - fixed table columns not hiding
-- fixed tune resize
+- fixed handling deletion of tabs
+- fixed bugs in "modal-delete"
 
 ## [1.84.0]
 
@@ -73,7 +114,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiple tokens
 
 ### Fixed
-- Fixed persistent modal
 - fixed filters. name and content
 - fixed visible zoom button
 - fixed setting the title breaks the scrolling of the component
@@ -81,7 +121,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed searching by bool type
 - fixed fullscreen improvements tune
 - fixed removed all download buttons for components
-- fixed confirmation window adjustment
 
 ## [1.83.1]
 
@@ -109,9 +148,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed button hints
 - fixed switching between filter types
 - fixed cell size in tile visualization
-- Added tab deletion confirmation
-- Added closing confirmation by "Esc\Click-outside"
-- Fixed change tracking in "modal-settings" fields
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes

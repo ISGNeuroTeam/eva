@@ -457,7 +457,9 @@ export default {
           }
         }
       });
-      this.$store.commit('deleteDashFromMain', data[id]);
+      if (data?.length > 0) {
+        this.$store.commit('deleteDashFromMain', [...data].find((dash) => dash.id === id));
+      }
     },
     checkCookie() {
       const cookie = document.cookie.split(';').find((item) => item.indexOf('eva-dashPage') !== -1);

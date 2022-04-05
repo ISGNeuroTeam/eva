@@ -295,7 +295,7 @@ export default {
   },
   computed: {
     modalText() {
-      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId}</strong> ?`;
+      return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId + 1}</strong> ?`;
     },
     dashFromStore() {
       if (this.idDash) {
@@ -507,10 +507,6 @@ export default {
       return this.searches.find((search) => search.id === searchId)?.id || '';
     },
     exportDataCSV(searchName) {
-      console.log(searchName);
-      console.log(this.dataObject);
-      console.log(this.dataObject[searchName]);
-      console.log(this.dataObject[searchName].data);
       const searchData = this.dataObject[searchName].data;
       // задаем кодировку csv файла
       let csvContent = 'data:text/csv;charset=utf-8,';
@@ -538,6 +534,7 @@ export default {
     },
     scroll(event) {
       event.preventDefault();
+      // eslint-disable-next-line operator-assignment
       this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY;
       this.checkTabOverflow();
     },
@@ -592,7 +589,7 @@ export default {
     confirmDeleteTab(tabIndex) {
       this.deleteTabName = '';
       this.deleteTabId = '';
-      this.deleteTabId = this.tabs[tabIndex].id;
+      this.deleteTabId = tabIndex;
       if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
         this.deleteTabName = this.tabs[tabIndex].name;
       } else {
@@ -603,7 +600,7 @@ export default {
     deleteTab(isConfirm) {
       if (isConfirm) {
         if (this.tabsMoreOne && !this.tabEditMode) {
-          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.deleteTabId });
+          this.$store.commit('deleteDashTab', { idDash: this.idDash, tabID: this.tabs[this.deleteTabId].id });
         }
         this.checkTabOverflow();
       }
@@ -707,25 +704,11 @@ export default {
       });
     },
     sliceRange(arr, range) {
-      return arr.filter((item, idx) => {
-        if (
-          (item[range.xMetric] >= range.range[0]
-            && item[range.xMetric] <= range.range[1])
-          || (arr[idx - 1]?.[range.xMetric] >= range.range[0]
-            && arr[idx - 1]?.[range.xMetric] <= range.range[1])
-          || (arr[idx + 1]?.[range.xMetric] >= range.range[0]
-            && arr[idx + 1]?.[range.xMetric] <= range.range[1])
-        ) {
-          return true;
-        }
-
-        const idxArrFirst = range.range[0] > range.range[1] ? idx + 1 : idx - 1;
-        const idxArrSecond = range.range[0] > range.range[1] ? idx - 1 : idx + 1;
-
-        return (item[range.xMetric] <= range.range[0]
-            && arr[idxArrFirst]?.[range.xMetric] >= range.range[1])
-          || (item[range.xMetric] >= range.range[1]
-            && arr[idxArrSecond]?.[range.xMetric] <= range.range[0]);
+      const { xMetric } = range;
+      const [start, end] = range.range;
+      return arr.filter((item) => {
+        const xValue = item[xMetric];
+        return (xValue >= start && xValue <= end);
       });
     },
     setRange(range, elem) {

@@ -6,7 +6,7 @@ export default {
       body: formData,
       // mode: 'no-cors'
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
       restAuth.putLog(
         `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
       );
@@ -60,7 +60,7 @@ export default {
                   return data.status;
                 })
                 .catch((error) => {
-                  console.log(error);
+                  console.error(error);
                   restAuth.putLog(
                     `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
                   );
@@ -174,7 +174,7 @@ export default {
                               try {
                                 allDataLocal.push(JSON.parse(dataPeace));
                               } catch (error) {
-                                console.log(error);
+                                console.error(error);
                               }
                             }
                           });
