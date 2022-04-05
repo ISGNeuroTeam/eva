@@ -282,8 +282,18 @@ export default {
         return;
       }
 
-      if (this.data[0] && !this.dashFromStore[this.activeElem]?.metrics && this.activeElem === 'multiline') {
-        this.$store.commit('setMetricsMulti', { id: this.activeElem, idDash: this.idDash, metrics: Object.keys(this.data[0]) });
+      if (this.data[0]
+          && (!this.dashFromStore[this.activeElem]?.metrics
+              || !this.dashFromStore[this.activeElem]?.metrics.length)
+          && this.activeElem === 'multiLine') {
+        this.$store.commit(
+          'setMetricsMulti',
+          {
+            id: this.activeElem,
+            idDash: this.idDash,
+            metrics: Object.keys(this.data[0]),
+          },
+        );
       }
 
       if (!this.dashFromStore[this.activeElem].options) {
