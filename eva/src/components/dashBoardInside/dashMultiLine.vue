@@ -315,9 +315,10 @@ export default {
         .attr('class', 'myXaxis');
 
       // Initialize an Y axis
-      let allMaxYMetric;
+      let allMaxYMetric; let allMinYMetric;
       if (united) {
         allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+        allMinYMetric = d3.min(this.metrics.map((metric) => d3.min(this.data, (d) => d[metric])));
       }
 
       // максимум для accumulation barplot
@@ -325,6 +326,9 @@ export default {
         const maxY = this.barplotMetrics
           .map((metric) => Math.max(...this.data.map((item) => item[metric])));
         allMaxYMetric = maxY.reduce((max, a) => max + a, 0);
+        const minY = this.barplotMetrics
+          .map((metric) => Math.min(...this.data.map((item) => item[metric])));
+        allMinYMetric = minY.reduce((min, a) => min - a, 0);
       }
 
       this.y = {};
@@ -382,7 +386,7 @@ export default {
         maxYMetric = Math.ceil(maxYMetric * 10) / 10;
 
         let minYMetric = (yFromZero || metricType === 'barplot')
-          ? 0
+          ? (allMinYMetric || 0)
           : d3.min(this.data, (d) => d[metric]);
 
         // гринаци оси Y
@@ -433,6 +437,17 @@ export default {
             tickValues.push(0);
           }
           tickValues.push(maxYMetric);
+        }
+
+        if (united) {
+          tickValues = tickValues.sort().reduce((a, b) => {
+            const result = [...a];
+            if (result.length > 0 && a[result.length - 1] < 0 && b > 0) {
+              result.push(0);
+            }
+            result.push(b);
+            return result;
+          }, []);
         }
 
         // y оси
@@ -638,6 +653,7 @@ export default {
                     .enter()
                     .append('g')
                     .attr('fill', (d) => this.getCurrentMetricColor(d.key))
+                    //.attr('fill', 'rgba(0,0,0,.3)')
                     .selectAll('rect')
                     .data((d) => d)
                     .enter()
@@ -687,15 +703,24 @@ export default {
                     .enter()
                     .append('rect')
                     .attr('x', (d) => xSubgroup(d.key) - currentBarWidth / 2)
-                    .attr('y', (d) => this.y[metric](d.value))
+                    .attr('y', (d) => {
+                      if (d.value < 0) {
+                        const height = this.y[metric](d.value) - this.y[metric](0);
+                        return this.y[metric](d.value) - height;
+                      }
+                      return this.y[metric](d.value);
+                    })
                     .attr('width', xSubgroup.bandwidth())
                     .attr('height', (d) => {
                       const varHeight = this.box.height - this.y[metric](d.value);
-                      const height = united
-                        ? varHeight
-                        : varHeight - (this.box.height / this.metrics.length)
+                      if (united) {
+                        if (d.value < 0) {
+                          return this.y[metric](d.value) - this.y[metric](0);
+                        }
+                        return this.y[metric](0) - this.y[metric](d.value);
+                      }
+                      return varHeight - (this.box.height / this.metrics.length)
                           * (this.metrics.length - (i + 1));
-                      return Math.abs(height);
                     })
                     .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .on('click', (d) => this.setClick({
