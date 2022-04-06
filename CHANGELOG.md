@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- logout form all browser tabs
 
 ### Fixed
 - add settings for singleValue in reportsV2
@@ -36,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed a visual bug in the single value dash
 - fixed reportsV2: map display, settings, styles
 - fixed reportsV2: Incorrect display of the graph and non-working control buttons 
+- fixed resizing movable visualisation
+- fixed tune resize
 
 ## [1.85.0]
 
