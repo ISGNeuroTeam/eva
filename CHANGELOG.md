@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: Incorrect display of the graph and non-working control buttons 
 - fixed resizing movable visualisation
 - fixed tune resize
+- fixed updating and undoing filter parts changes
 
 ## [1.85.0]
 

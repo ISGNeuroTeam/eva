@@ -585,7 +585,7 @@ export default {
 
       tokens.forEach((tocken) => {
         if (tocken.elem === this.idFrom) {
-          const value = this.dataRestFrom[pieIndex][tocken.capture];
+          const value = ` ${this.dataRestFrom[pieIndex][tocken.capture]} `;
           this.$store.commit('setTocken', {
             token: tocken,
             value,
