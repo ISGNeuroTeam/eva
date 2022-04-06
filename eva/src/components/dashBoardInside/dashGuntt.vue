@@ -493,7 +493,7 @@ export default {
         .append('rect')
         .attr('rx', 3)
         .attr('ry', 3)
-        .attr('x', (d) => x(Date.parse(d.start_date)))
+        .attr('x', (d, index) => x(Date.parse(d.start_date)) - (index % 2 === 0 ? 1 : 0))
         .attr('y', (d) => {
           let j = -1;
           ids.forEach((item, i) => {
