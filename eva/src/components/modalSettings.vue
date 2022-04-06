@@ -685,7 +685,41 @@
                 :class="{ disabled: !colorsPie.nametheme }"
                 hide-details
                 @input="isChanged = true"
-              />
+              >
+                <template #append>
+                  <v-menu
+                    top
+                    transition="scale-transition"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        size="16"
+                        :style="{
+                          color: theme.$main_text,
+                          background: 'transparent',
+                          borderColor: theme.$main_border,
+                        }"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ dropper }}
+                      </v-icon>
+                    </template>
+                    <v-color-picker
+                      v-model="colorPicker"
+                      dot-size="25"
+                      hide-canvas
+                      hide-inputs
+                      hide-mode-switch
+                      hide-sliders
+                      mode="hexa"
+                      show-swatches
+                      swatches-max-height="200"
+                      @input="addColor"
+                    />
+                  </v-menu>
+                </template>
+              </v-text-field>
               <v-tooltip
                 v-if="!defaultThemes.includes(colorsPie.theme)"
                 bottom
@@ -962,7 +996,7 @@
 </template>
 
 <script>
-import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
+import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
 
 export default {
@@ -993,6 +1027,7 @@ export default {
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
+      dropper: mdiEyedropper,
       tooltip: {
         texts: [],
         links: [],
@@ -1023,6 +1058,7 @@ export default {
       them: {},
       isConfirmModal: false,
       deleteMetricId: '',
+      colorPicker: '',
     };
   },
   computed: {
@@ -1137,6 +1173,14 @@ export default {
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
+    },
+    addColor() {
+      if (this.colorsPie.colors === '') {
+        this.colorsPie.colors += `${this.colorPicker}`;
+      } else {
+        this.colorsPie.colors += ` ${this.colorPicker}`;
+      }
+      this.colorPicker = '';
     },
     loadComponentsSettings() {
       const localOptions = {};
