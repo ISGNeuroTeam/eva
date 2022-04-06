@@ -5,17 +5,25 @@
   >
     <div
       v-if="error"
-      key="error-message"
+      :key="`error-message-${idDashFrom}`"
       class="error-message"
     >
       {{ error }}
     </div>
     <div
       v-show="!error"
-      key="mapContainer"
+      :key="`mapContainer-${idDashFrom}`"
       ref="map"
       class="mapContainer"
       :style="mapStyleSize"
+    />
+    <dash-map-user-settings-new
+      v-if="map"
+      :modal-value="modalSettingsValue"
+      :map="map"
+      :id-dash-from="idDashFrom"
+      :id-element="idFrom"
+      @update:modalValue="updateModalValue"
     />
   </div>
 </template>
@@ -29,10 +37,14 @@ import Vue from 'vue';
 import * as turf from '@turf/turf';
 import * as utils from 'leaflet-geometryutil';
 import vuetify from '../../plugins/vuetify';
-import dashMapUserSettings from './dashMapUserSettings.vue';
+import DashMapUserSettingsContainer from './dashMapUserSettings/DashMapUserSettingsContainer.vue';
+import dashMapUserSettingsNew from './dashMapUserSettings/dashMapUserSettings.vue';
 import store from '../../store/index'; // подключаем файл с настройками хранилища Vuex
 
 export default {
+  components: {
+    dashMapUserSettingsNew,
+  },
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -66,6 +78,7 @@ export default {
   },
   data() {
     return {
+      modalSettingsValue: false,
       actions: [
         { name: 'refresh', capture: [] },
         { name: 'button', capture: [] },
@@ -113,7 +126,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-
       if (!this.dashFromStore?.options.pinned) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -121,7 +133,6 @@ export default {
           value: false,
         }]);
       }
-
       if (!this.dashFromStore.options.lastDot) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -197,6 +208,9 @@ export default {
     }
   },
   methods: {
+    updateModalValue() {
+      this.modalSettingsValue = !this.modalSettingsValue;
+    },
     init() {
       this.initMap();
       this.initTheme();
@@ -364,7 +378,7 @@ export default {
 
     initSettings() {
       if (this.isSettings) return;
-      const ComponentClass = Vue.extend(dashMapUserSettings);
+      const ComponentClass = Vue.extend(DashMapUserSettingsContainer);
       const test = new ComponentClass({
         propsData: {
           idDashFrom: this.idDashFrom,
@@ -374,7 +388,9 @@ export default {
         vuetify,
         store,
       });
-      test.$on('updatePipeDataSource', (e) => this.loadDataForPipe(e));
+      test.$on('openSettingsModal', () => {
+        this.modalSettingsValue = true;
+      });
       test.$mount();
 
       const element = this.$refs.map.getElementsByClassName(
@@ -463,9 +479,9 @@ export default {
     },
     getOSM() {
       const options = this.getOptions;
-      if (options.selectedLayer) {
+      if (options?.selectedLayer?.tile) {
         this.osmserver = options.selectedLayer;
-      } else if (options.osmserver) {
+      } else if (options?.osmserver) {
         this.osmserver = options.osmserver;
       } else {
         this.error = 'Введите osm server';
