@@ -151,7 +151,7 @@ export default {
   .interesting-row-number
     font-size: 12px
     line-height: 15px
-    color: $main_text
+    color: $main_text !important
 
 .interesting-popup
   width: 400px
@@ -167,7 +167,7 @@ export default {
   .action-popup-title
     padding: 5px 10px 5px 10px
     background-color: $main_bg
-    color: $main_text
+    color: $main_text !important
     font-weight: bold
   .v-data-table-header
     th

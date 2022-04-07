@@ -148,13 +148,13 @@ export default {
 @import './../../sass/_colors'
 .events
   .collapse-row
-    border-bottom: 1px solid $main-border
+    border-bottom: 1px solid $main-border !important
   .v-data-footer
     border-top: none !important
     .v-icon
-      color: $main_text
+      color: $main_text !important
     .v-select__selections
-      color: $main_text
+      color: $main_text !important
     .v-input__slot:before
       border-color: $main_text !important
   .v-data-table-header
@@ -167,6 +167,6 @@ export default {
   td
     font-size: 13px !important
   tr:hover
-    color: $main_bg
+    color: $main_bg !important
     background-color: $accent_ui_color !important
 </style>

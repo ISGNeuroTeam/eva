@@ -64,49 +64,74 @@
   .v-card__title .header {
     background: inherit !important;
   }
-  .theme--light.v-data-table {
-    .v-data-table__wrapper {
-      table {
-        tbody {
-          tr {
-            transition: all 0.4s ease;
+  .theme--light {
+    &.v-select .v-select__selections {
+      color: var(--main_text)
+    }
+    &.v-data-table {
+      .v-data-table__wrapper {
+        table {
+          tbody {
+            tr {
+              transition: all 0.3s ease-in-out;
 
-            &:hover {
-              background-color: var(--main_text) !important;
-              &:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+              &:hover {
+                background-color: var(--main_text) !important;
+                &:not(.v-data-table__expanded__content):not(.v-data-table__empty-wrapper) {
+                  color: var(--main_bg) !important;
+                }
+              }
+              &.v-data-table__selected {
+                background-color: var(--main_text) !important;
                 color: var(--main_bg) !important;
               }
-            }
-            &.v-data-table__selected {
-              background-color: var(--main_text) !important;
-              color: var(--main_bg) !important;
             }
           }
         }
       }
     }
-  }
-  // Стилизация textarea
-  .theme--light.v-input input, .theme--light.v-input textarea {
-    color: var(--main_text);
-    &::-webkit-input-placeholder {
-      color: var(--main_text);
-    }
-    &::-moz-placeholder {
-      color: var(--main_text);
-    }
-    &::-ms-input-placeholder {
-      color: var(--main_text);
-    }
-  }
-  .theme--light {
-    .v-text-field--outlined {
+    &.v-text-field--outlined {
       &:not(.v-input--is-focused) {
         &:not(.v-input--has-state) > .v-input__control > .v-input__slot fieldset {
           color: var(--main_text);
         }
       }
     }
+    // Стилизация textarea
+    &.v-input input, .v-input textarea {
+      color: var(--main_text);
+      &::-webkit-input-placeholder {
+        color: var(--main_text);
+      }
+      &::-moz-placeholder {
+        color: var(--main_text);
+      }
+      &::-ms-input-placeholder {
+        color: var(--main_text);
+      }
+    }
+    & > * {
+      color: var(--main_text) !important;
+      caret-color: var(--main_text) !important;
+      border-color: var(--secondary_bg) !important;
+    }
+    .v-tooltip__content {
+      color: #FFFFFF !important;
+      border: 2px solid rgb(43, 104, 177) !important;
+      background-color: rgb(43, 104, 177) !important;
+    }
+    .v-text-field > .v-input__control > .v-input__slot:before {
+      caret-color: inherit !important;
+      color: inherit !important;
+      border-color: inherit !important;
+    }
+    &.primary--text {
+      color: var(--main_text) !important;
+      caret-color: var(--main_text) !important;
+      border-color: var(--secondary_bg) !important;
+    }
+    &.v-label {
+      color: var(--main_text) !important;
+    }
   }
-  //_____________
 }
