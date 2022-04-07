@@ -15,6 +15,26 @@ export default {
     },
     addNotifications(state, payload) {
       const time = moment().unix();
+      const ttl = 10e3;
+      const currentItems = state.notifications.filter((item) => item.time > (time - ttl));
+      const existsNotificationsIds = currentItems.map((item) => item.code);
+
+      const newNotification = payload
+        .filter((item) => !existsNotificationsIds.includes(item.code))
+        .map((item) => ({
+          ...item,
+          time,
+          show: false,
+          message: messages[item.code],
+        }));
+
+      state.notifications = [
+        ...currentItems,
+        ...newNotification,
+      ];
+
+      return;
+
       const notifications = payload.reduce((acc, item, index) => {
         let idItemToReplace = -1;
         const foundItem = state.notifications.find((test) => {
