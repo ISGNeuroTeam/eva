@@ -941,7 +941,7 @@ export default new Vuex.Store({
       Object.keys(filter.parts).forEach((key) => {
         state[filter.idDash].stashedFilterParts.push({
           ...filter.parts[key],
-          values: filter.parts[key].values ? Object.values(filter.parts[key]) : [],
+          values: filter.parts[key].values ? [...filter.parts[key].values] : [],
         });
       });
     },
