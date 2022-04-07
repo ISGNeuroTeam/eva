@@ -143,8 +143,6 @@ export default {
         day: 'DD MMMM YYYY',
         month: 'MMMM YYYY',
       };
-      const test = this.getTimeline[timelineEnum[this.select.value]].map(({ time }) => moment.unix(time).format(timeLineFormats[this.select.value])).sort();
-      console.log(test);
       return this.getTimeline[timelineEnum[this.select.value]]
         .reduce((acc, { time, value }) => ({
           ...acc,
@@ -216,7 +214,6 @@ export default {
         .append('g')
         .attr('transform', `translate(${marge.top},${marge.left})`);
       let dataForSvg = [];
-      console.log(Object.keys(dataset).length);
       dataForSvg = Object.keys(dataset).reduce((acc, dataItem) => [
         ...acc,
         {
@@ -224,13 +221,7 @@ export default {
           value: dataset[dataItem],
         },
       ], []);
-      console.group();
-      console.log(dataForSvg.length);
-      console.log(this.numberInTimeline);
-      console.log(dataForSvg.length - this.numberInTimeline);
-      console.groupEnd();
       dataForSvg = dataForSvg.slice(dataForSvg.length - this.numberInTimeline);
-      // console.log('dataForSvg after', dataForSvg);
       let maxY = dataForSvg[0].value;
       dataForSvg.forEach((element) => {
         if (element.value > maxY) {
