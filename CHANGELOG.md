@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- Added display of a message about the lack of data on the visualization "tile"
 - logout form all browser tabs
 
 ### Fixed
@@ -40,6 +41,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed resizing movable visualisation
 - fixed tune resize
 - fixed updating and undoing filter parts changes
+- Fixed the color of the number of lines per page.
+- Fixed color and layout in the dropdown menu on the "statistics" tab.
+- Fixed zoom buttons on the timeline.
+- Fixed styles on v-select\v-label\v-input
+- Fixed timeline zoom
 
 ## [1.85.0]
 

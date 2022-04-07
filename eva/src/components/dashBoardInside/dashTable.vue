@@ -34,6 +34,7 @@
             :key="`${header.value + value}menu`"
             z-index="100000"
             offset-y
+            content-class="dash-table__menu"
             :close-on-content-click="false"
           >
             <template v-slot:activator="{ on, attrs }">
@@ -62,7 +63,6 @@
                 />
               </v-col>
             </v-row>
-
             <v-row v-else-if="value === 'none'">
               <v-col cols="12">
                 <v-select
@@ -74,7 +74,6 @@
                 />
               </v-col>
             </v-row>
-
             <v-row v-else>
               <v-col cols="12">
                 <v-text-field
@@ -217,7 +216,7 @@ export default {
   },
   computed: {
     eventedTableData() {
-      let items = [...this.filteredTableData].map((item, index) => ({
+      const items = [...this.filteredTableData].map((item, index) => ({
         ...item,
         rowIndex: index,
       }));
