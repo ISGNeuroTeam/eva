@@ -14,6 +14,7 @@ import themes from '../js/themeSettings';
 import settings from '../js/componentsSettings';
 import { filterCompile } from '../components/dash-filter-panel/utils/filter-otl-compile';
 import dataResearch from './dataResearch/store';
+import notify from './storeNotify/store';
 
 Vue.use(Vuex);
 
@@ -823,6 +824,7 @@ export default new Vuex.Store({
         'dataResearch',
         'form',
         'theme',
+        'notify',
       ];
       Object.keys(state).forEach((key) => {
         if (!exclude.includes(key)) {
@@ -1924,6 +1926,7 @@ export default new Vuex.Store({
     auth,
     form,
     dataResearch,
+    notify,
   },
   plugins: [createPersistedState()],
 });

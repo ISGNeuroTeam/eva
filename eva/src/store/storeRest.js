@@ -1,3 +1,5 @@
+import store from '.';
+
 export default {
   async rest(formData, searchFrom, restAuth, idDash) {
     const response = await fetch('/api/makejob', {
@@ -85,6 +87,9 @@ export default {
                     }&nbsp;&nbsp;url: ${decodeURIComponent(resEvents.url)}`,
                   );
                   status = res.status;
+                  if (res?.notifications) {
+                    store.commit('notify/addNotifications', res?.notifications);
+                  }
                   console.log(status);
                   return res;
                 });
