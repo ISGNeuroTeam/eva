@@ -3,6 +3,7 @@
 ### Added
 - Visualisations in Data research 2.0 (ygraph, bush, map, heatmap, singleValue, tune)
 - Visualization settings in Data research 2.0
+- Logout form all browser tabs
 
 ### Fixed
 - Range selection on the multiline dash
@@ -22,6 +23,9 @@
 - Fixed removal of the display of the "Select data source" button immediately after creation
 - Incorrect list in export dashboard list
 - Reloading the bush dash when Data Source changes
+- Resizing movable visualisation
+- Tune resizing
+- Updating and undoing filter parts changes
 
 
 # [1.85.0] - Token update when executing a go event, visualisations in data research, multiline
