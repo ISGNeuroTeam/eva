@@ -273,7 +273,7 @@ export default {
     {
       option: 'osmserver',
       description:
-        'Сервер для набора tile Пример:\nhttp://192.168.4.209/osm/{z}/{x}/{y}.png',
+        'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
     },
 
