@@ -115,6 +115,11 @@
       caret-color: var(--main_text) !important;
       border-color: var(--secondary_bg) !important;
     }
+    .v-tooltip__content {
+      color: #FFFFFF !important;
+      border: 2px solid rgb(43, 104, 177) !important;
+      background-color: rgb(43, 104, 177) !important;
+    }
     .v-text-field > .v-input__control > .v-input__slot:before {
       caret-color: inherit !important;
       color: inherit !important;
