@@ -4,6 +4,7 @@
 - Visualisations in Data research 2.0 (ygraph, bush, map, heatmap, singleValue, tune)
 - Visualization settings in Data research 2.0
 - Logout form all browser tabs
+- Added display of a message about the lack of data on the visualization "tile"
 
 ### Fixed
 - Range selection on the multiline dash
@@ -26,6 +27,11 @@
 - Resizing movable visualisation
 - Tune resizing
 - Updating and undoing filter parts changes
+- Fixed the color of the number of lines per page.
+- Fixed color and layout in the dropdown menu on the "statistics" tab.
+- Fixed zoom buttons on the timeline.
+- Fixed styles on v-select\v-label\v-input
+- Fixed timeline zoom
 
 
 # [1.85.0] - Token update when executing a go event, visualisations in data research, multiline
