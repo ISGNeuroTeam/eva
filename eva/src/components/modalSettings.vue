@@ -690,6 +690,7 @@
                   <v-menu
                     top
                     transition="scale-transition"
+                    :close-on-content-click="false"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon
