@@ -30,8 +30,7 @@
 - Fixed the color of the number of lines per page.
 - Fixed color and layout in the dropdown menu on the "statistics" tab.
 - Fixed zoom buttons on the timeline.
-- Fixed styles on v-select\v-label\v-input
-- Fixed timeline zoom
+- Fixed styles in form elements
 
 
 # [1.85.0] - Token update when executing a go event, visualisations in data research, multiline
