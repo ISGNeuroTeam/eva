@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed zoom buttons on the timeline.
 - Fixed styles on v-select\v-label\v-input
 - Fixed timeline zoom
+- fixed maps tooltip
 
 ## [1.85.0]
 
