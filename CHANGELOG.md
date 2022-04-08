@@ -7,10 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
-### Added
-- added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+### Fixed
+- fixed the display of histograms with negative values on a multiline dash
+
+
+## [1.86.1]
 
 ### Fixed
+- Fixed theme styles
+
+
+## [1.86.0]
+
+### Added
+- added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- Added display of a message about the lack of data on the visualization "tile"
+- logout form all browser tabs
+
+### Fixed
+- add settings for singleValue in reportsV2
+- fixed reportsV2 heat map visualisation
 - fixed and disabled eslint errors
 - fixed White areas in SingleValue
 - fixed modal-confirm in modal-profile and modal-create
@@ -32,7 +48,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: visualization settings not working tile
 - fixed reportsV2: some visualizations are not displayed immediately after selection
 - fixed a visual bug in the single value dash
-- fixed the display of histograms with negative values on a multiline dash
+- fixed reportsV2: map display, settings, styles
+- fixed reportsV2: Incorrect display of the graph and non-working control buttons 
+- fixed resizing movable visualisation
+- fixed tune resize
+- fixed updating and undoing filter parts changes
+- Fixed the color of the number of lines per page.
+- Fixed color and layout in the dropdown menu on the "statistics" tab.
+- Fixed zoom buttons on the timeline.
+- Fixed styles on v-select\v-label\v-input
+- Fixed timeline zoom
 
 ## [1.85.0]
 

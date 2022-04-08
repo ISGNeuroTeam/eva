@@ -636,17 +636,17 @@ $filter-container-height: 60px
 
       &.v-text-field--outlined
         input
-          color: $main_text
-          caret-color: $accent_ui_color
+          color: $main_text !important
+          caret-color: $accent_ui_color !important
           font-size: 15px
 
         fieldset
-          border: 1px solid $main_border
+          border: 1px solid $main_border !important
           transition: border-color .3s
 
         &.v-input--is-focused
           fieldset
-            border-color: $accent_ui_color
+            border-color: $accent_ui_color !important
 
   .filter-row
     position: relative
@@ -697,7 +697,7 @@ $filter-container-height: 60px
         align-self: center
         min-width: 80px
         max-width: 200px
-        color: $main_text
+        color: $main_text !important
         white-space: nowrap
         overflow: hidden
         text-overflow: ellipsis

@@ -1258,7 +1258,7 @@ export default {
     background-color: $secondary_bg
     border: 1px solid $main_border
     border-radius: 4px
-    color: $main_text
+    color: $main_text !important
     padding: 5px 5px
     font-size: 12px
     white-space: nowrap

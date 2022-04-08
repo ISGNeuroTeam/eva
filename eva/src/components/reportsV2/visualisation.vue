@@ -96,6 +96,12 @@
         :should-get="shouldGet"
         :data-report="true"
         :data-rest-from="data"
+        :current-settings="settings"
+        :update-settings="updateSettings"
+        :data-mode-from="dataMode"
+        :loading="loading"
+        :selected-pie-index="selectedPieIndex"
+        @changeSelectPie="changeSelectedPie"
       />
     </template>
     <modal-settings
@@ -127,14 +133,22 @@ export default {
       type: Number,
       default: 500,
     },
+    loading: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
+      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       options: {
         visible: true,
         change: false,
         level: 1,
         boxShadow: false,
+      },
+      differentOptions: {
+        visible: true,
       },
       modalSettings: false,
       menuDropdown: false,
@@ -149,9 +163,20 @@ export default {
         width: 500,
         height: 500,
       },
+      settings: {
+        showTitle: true,
+      },
+      disappear: true,
+      selectedPieIndex: -1,
     };
   },
   computed: {
+    dataMode() {
+      this.changeOptions(this.mode);
+      this.setPropDisappear(true);
+
+      return this.mode;
+    },
     getOptions() {
       return this.$store.state[this.idDash][this.activeElem].options;
     },
@@ -233,6 +258,27 @@ export default {
     this.calcSize();
   },
   methods: {
+    setPropDisappear(val) {
+      this.disappear = val;
+    },
+    changeOptions(mode) {
+      const { level } = this.options;
+      let opacity = 1;
+      if (mode) {
+        this.differentOptions.visible = true;
+      } else if (!this.options.visible) {
+        this.differentOptions.visible = false;
+        opacity = 0;
+      } else {
+        this.differentOptions.visible = true;
+        opacity = 1;
+      }
+      this.$emit('SetOpacity', opacity);
+      this.$emit('SetLevel', level);
+    },
+    updateSettings(localSettings) {
+      this.settings = JSON.parse(JSON.stringify(localSettings));
+    },
     setOptions() {
       this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
     },
@@ -269,6 +315,9 @@ export default {
     setActiveElem(elemName) {
       this.activeElem = elemName;
     },
+    changeSelectedPie(val) {
+      this.selectedPieIndex = val;
+    },
   },
 };
 </script>
@@ -278,6 +327,8 @@ export default {
   flex-grow: 1;
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
   .theme--light.v-icon {
     color: inherit !important;
   }
