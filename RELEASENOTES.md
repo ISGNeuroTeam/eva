@@ -1,3 +1,8 @@
+# [1.86.1]
+
+### Fixed
+- Fixed theme styles
+
 # [1.86.0] - Data research 2.0, multiline fixes
 
 ### Added
