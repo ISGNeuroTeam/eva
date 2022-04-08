@@ -42,7 +42,6 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      console.log('state[idDash][id].options1', state[idDash][id].options);
       state[idDash][id].options.change = false;
       state[idDash][id].options.visible = true;
       state[idDash][id].options.level = 1;
@@ -830,6 +829,7 @@ export default new Vuex.Store({
           delete state[key];
         }
       });
+      window.localStorage.clear();
     },
     setMetricsMulti(state, { metrics, idDash, id }) {
       const localMetrics = metrics.map((metric) => ({ name: metric, units: '' }));
@@ -941,7 +941,7 @@ export default new Vuex.Store({
       Object.keys(filter.parts).forEach((key) => {
         state[filter.idDash].stashedFilterParts.push({
           ...filter.parts[key],
-          values: filter.parts[key].values ? [...filter.parts[key]] : [],
+          values: filter.parts[key].values ? [...filter.parts[key].values] : [],
         });
       });
     },
@@ -970,7 +970,7 @@ export default new Vuex.Store({
           if (part2.values && part1.values) {
             return part2.values.length - part1.values.length;
           } if (!part2.values) {
-            return -1;
+            return 0;
           }
           return 1;
         },
@@ -1385,7 +1385,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          // console.log('error:', event);
+          console.error('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
@@ -1440,7 +1440,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          // console.log('error:', event);
+          console.error('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
@@ -1807,6 +1807,9 @@ export default new Vuex.Store({
         } else if (!event.event.tab) {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = currentTab || 1;
+        } else if (event.event.tab > state[id].tabList.length) {
+          event.route.push(`/dashboards/${id}`);
+          newCurrentTabValue = state[id].tabList.length;
         } else {
           event.route.push(`/dashboards/${id}`);
           newCurrentTabValue = lastEl?.id || 1;

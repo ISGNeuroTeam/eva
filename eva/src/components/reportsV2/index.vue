@@ -79,6 +79,7 @@
               class="visualisation component-block"
               :data="data"
               :should-get="shouldGet"
+              :loading="loading"
             />
           </keep-alive>
         </div>
@@ -123,7 +124,10 @@ export default {
     return {
       tab: 0,
       search: {
-        parametrs: {},
+        parametrs: {
+          tws: 0,
+          twf: 0,
+        },
       },
       limit: 1000,
       play: mdiPlay,
@@ -160,9 +164,7 @@ export default {
   },
   asyncComputed: {
     async static_rows() {
-      // console.log(this.shouldGet);
       if (this.shouldGet) {
-        // console.log('this.shouldGet === true');
         this.getData();
       }
       this.$store.commit('setShould', {
@@ -209,7 +211,7 @@ export default {
   },
   mounted() {
     document.title = 'EVA | Исследование данных';
-    this.search = this.$store.getters.getReportSearch;
+    this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
@@ -245,7 +247,6 @@ export default {
         let localStatistic = '';
         this.rows = [];
         if (event.data.data.length !== 0) {
-          // console.log('event.data.data.length != 0');
           this.shema = event.data.shema;
           // this.data = event.data.data;
           this.$set(this, 'data', event.data.data);
@@ -273,51 +274,48 @@ export default {
       worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
     },
     async launchSearch(search) {
-      this.search.original_otl = search.original_otl;
-      this.search.parametrs.tws = search.parametrs.tws;
-      this.search.parametrs.twf = search.parametrs.twf;
-      this.search.sid = this.hashCode(this.search.original_otl);
-
+      this.$set(this, 'search', JSON.parse(JSON.stringify({
+        ...search,
+        sid: this.hashCode(search.original_otl),
+      })));
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
-      // console.log('launch search');
-      // console.log(this.search);
-      const response = await this.$store.dispatch('getDataApi', {
+      await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
-      });
-      await this.$store.dispatch('dataResearch/fetchTimeline', response.cid);
-      await this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
-
-      // вызывая метод в хранилище
-      if (!response?.data || response.data.length === 0) {
-        // если что-то пошло не так
-        this.loading = false;
-        this.$store.commit('setErrorLogs', true);
-        this.data = [];
-        this.rows = [];
-      } else {
-        // если все нормально
-        // console.log('data ready');
-
-        const responseDB = this.$store.dispatch(
-          'putIntoDB',
-          {
-            result: response,
-            sid: this.search.sid,
-            idDash: 'reports',
-          },
-        );
-        responseDB.then(() => {
-          this.$store.dispatch('refreshElements', {
-            idDash: 'reports',
-            key: this.search.sid,
-          });
+      }).then((response) => {
+        this.$store.dispatch('dataResearch/fetchTimeline', response.cid);
+        this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
+        // вызывая метод в хранилище
+        if (!response?.data || response.data.length === 0) {
+          // если что-то пошло не так
           this.loading = false;
-          this.$store.commit('setReportSearch', this.search);
-        });
-      }
+          this.$store.commit('setErrorLogs', true);
+          this.data = [];
+          this.rows = [];
+        } else {
+          // если все нормально
+          // console.log('data ready');
+
+          const responseDB = this.$store.dispatch(
+            'putIntoDB',
+            {
+              result: response,
+              sid: this.search.sid,
+              idDash: 'reports',
+            },
+          );
+          responseDB.then(() => {
+            this.$store.dispatch('refreshElements', {
+              idDash: 'reports',
+              key: this.search.sid,
+            });
+            this.loading = false;
+            this.$store.commit('setReportSearch', this.search);
+          });
+        }
+      });
     },
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
@@ -364,7 +362,6 @@ export default {
         };
 
         request.onupgradeneeded = (requestEvent) => {
-          // console.log('create');
           db = requestEvent.target.result;
           // if there's no "books" store
           if (!db.objectStoreNames.contains('searches')) {
@@ -373,7 +370,6 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            // console.log(`successEvent: ${db}`);
           };
         };
 
@@ -391,9 +387,11 @@ export default {
           query.onsuccess = () => {
             if (query.result) {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage(query.result);
             } else {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage([]);
             }
           };
@@ -424,7 +422,6 @@ export default {
       });
     },
     changeUnited() {
-      // console.log('changeUnited');
       if (!this.unitedData.united) {
         this.unitedData.united = true;
         this.unitedData.color = this.theme.controlsActive;
@@ -471,7 +468,7 @@ export default {
       this.activeElem = elemName;
     },
     setSearch(search) {
-      this.search = { ...search };
+      this.search = JSON.parse(JSON.stringify(search));
       this.modal = false;
     },
     setRange(range) {

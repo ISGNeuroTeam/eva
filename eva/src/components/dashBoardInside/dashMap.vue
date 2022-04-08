@@ -5,12 +5,14 @@
   >
     <div
       v-if="error"
+      key="error-message"
       class="error-message"
     >
       {{ error }}
     </div>
     <div
-      v-if="!error"
+      v-show="!error"
+      key="mapContainer"
       ref="map"
       class="mapContainer"
       :style="mapStyleSize"
@@ -79,7 +81,7 @@ export default {
       clusterPosition: null,
       clusterPositionItems: null,
       clusterDelimiter: null,
-      isLegendGenerated: true,
+      isLegendGenerated: false,
       isSettings: false,
       startingPoint: [],
       mode: [],
@@ -154,11 +156,17 @@ export default {
     },
     mapStyleSize() {
       return {
-        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 45}px`,
+        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 10}px`,
       };
     },
   },
   watch: {
+    error(val) {
+      if (!val) {
+        // eslint-disable-next-line no-underscore-dangle
+        this.map._onResize();
+      }
+    },
     options: {
       handler() {
         this.reDrawMap(this.dataRestFrom);
@@ -184,40 +192,45 @@ export default {
     },
   },
   mounted() {
-    this.initMap();
-    this.initTheme();
-    this.initClusterTextCount();
-    this.initClusterPosition();
-    this.initClusterDelimiter();
-    store.subscribe((mutation) => {
-      if (mutation.type === 'updateOptions') {
-        if (this.options.initialPoint) {
-          this.map.setView(
-            [this.options.initialPoint.x, this.options.initialPoint.y],
-            mutation.payload.options.zoomLevel,
-          );
-        } else {
-          this.map.setView(
-            this.startingPoint,
-            mutation.payload.options.zoomLevel,
-          );
-        }
-        this.map.wheelPxPerZoomLevel = 200;
-        this.updateToken(
-          mutation.payload.options.zoomLevel,
-          this.map.getBounds(),
-        );
-      }
-    });
-    this.createTokens();
-    this.$store.commit('setActions', {
-      actions: this.actions,
-      idDash: this.idDash,
-      id: this.element,
-    });
-    this.loadDataForPipe(this.$store.getters.getPaperSearch);
+    if (this.$refs.map) {
+      this.init();
+    }
   },
   methods: {
+    init() {
+      this.initMap();
+      this.initTheme();
+      this.initClusterTextCount();
+      this.initClusterPosition();
+      this.initClusterDelimiter();
+      store.subscribe((mutation) => {
+        if (mutation.type === 'updateOptions') {
+          if (this.options.initialPoint) {
+            this.map.setView(
+              [this.options.initialPoint.x, this.options.initialPoint.y],
+              mutation.payload.options.zoomLevel,
+            );
+          } else {
+            this.map.setView(
+              this.startingPoint,
+              mutation.payload.options.zoomLevel,
+            );
+          }
+          this.map.wheelPxPerZoomLevel = 200;
+          this.updateToken(
+            mutation.payload.options.zoomLevel,
+            this.map.getBounds(),
+          );
+        }
+      });
+      this.createTokens();
+      this.$store.commit('setActions', {
+        actions: this.actions,
+        idDash: this.idDash,
+        id: this.element,
+      });
+      this.loadDataForPipe(this.$store.getters.getPaperSearch);
+    },
     async getDataFromRest(event) {
       // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {
@@ -233,7 +246,6 @@ export default {
         search: event,
         idDash: this.idDash,
       });
-      // console.log('response', response);
       // вызывая метод в хранилище
       if (response.length === 0) {
         // если что-то пошло не так
@@ -245,7 +257,6 @@ export default {
         });
       } else {
         // если все нормально
-
         const responseDB = this.$store.dispatch(
           'putIntoDB',
           {
@@ -269,19 +280,20 @@ export default {
     async loadDataForPipe(search) {
       this.pipelineData = await this.getDataFromRest(search);
       const allPipes = {};
-      // console.log('pipelineData', this.pipelineData);
-      this.pipelineData.forEach((x) => {
-        if (!allPipes[x.ID]) {
-          allPipes[x.ID] = [];
-        }
-        allPipes[x.ID].push(x);
-      });
+      if (Array.isArray(this.pipelineData)) {
+        this.pipelineData.forEach((x) => {
+          if (!allPipes[x.ID]) {
+            allPipes[x.ID] = [];
+          }
+          allPipes[x.ID].push(x);
+        });
+      }
 
       this.pipelineDataDictionary = allPipes;
       this.reDrawMap(this.dataRestFrom);
     },
     updateToken(value) {
-      const tokens = this.$store.state[this.idDash].tockens;
+      const tokens = this.$store.state[this.idDash]?.tockens || {};
       Object.keys(tokens).forEach((i) => {
         if (
           tokens[i].elem === this.element
@@ -467,17 +479,22 @@ export default {
         } else {
           this.library = JSON.parse(tmp);
         }
-        this.$store.commit('setLibrary', {
-          library: this.library,
-          id: this.idFrom, // id элемнета (table, graph-2)
-          idDash: this.idDashFrom,
-        });
+        if (
+          !this.options?.library
+          || (this.options?.library
+          && JSON.stringify(this.library) !== JSON.stringify(this.options.library))
+        ) {
+          this.$store.commit('setLibrary', {
+            library: this.library,
+            id: this.idFrom, // id элемнета (table, graph-2)
+            idDash: this.idDashFrom,
+          });
+        }
       } catch {
         this.error = 'Ошибка формата входных данных';
         this.map.remove();
         this.map = null;
       }
-
       if (!this.isLegendGenerated) {
         this.createLegend();
       }
@@ -485,11 +502,13 @@ export default {
 
     createLegend() {
       let generatedListHTML = '';
-      Object.keys(this.library.objects).forEach((key) => {
-        generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
-      });
-      L.Control.Legend = L.Control.extend({
-        onAdd() {
+      if (this.library?.objects && false) {
+        Object.keys(this.library.objects).forEach((key) => {
+          generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
+        });
+        const legend = L.control({ position: 'bottomright' });
+
+        legend.onAdd = function (map) {
           const img = L.DomUtil.create('div');
           img.innerHTML = `
               <div>
@@ -502,15 +521,11 @@ export default {
           img.style.maxHeight = '466px';
           img.style.background = 'black';
           return img;
-        },
-      });
+        };
 
-      L.control.legend = function (opts) {
-        return new L.Control.Legend(opts);
-      };
-
-      L.control.legend({ position: 'bottomright' }).addTo(this.map);
-      this.isLegendGenerated = true;
+        legend.onAdd(this.map);
+        this.isLegendGenerated = true;
+      }
     },
 
     generateClusterPositionItems() {

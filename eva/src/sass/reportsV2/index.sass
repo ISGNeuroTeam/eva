@@ -3,7 +3,9 @@
 .reports-v2-app-main
   //.container-report
   .report2-block
-    //margin-top: 53px
+    display: flex
+    flex-direction: column
+    height: calc(100vh - 55px)
     margin-top: 4px
     .component-block
       margin-bottom: 4px
@@ -57,7 +59,7 @@
             letter-spacing: 0px
             line-height: 15px
             text-transform: capitalize
-            color: $main_text
+            color: $main_text !important
             background: $main_bg
           .v-tab--active
             color: $primary_button

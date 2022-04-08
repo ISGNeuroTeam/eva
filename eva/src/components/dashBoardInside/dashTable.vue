@@ -34,6 +34,7 @@
             :key="`${header.value + value}menu`"
             z-index="100000"
             offset-y
+            content-class="dash-table__menu"
             :close-on-content-click="false"
           >
             <template v-slot:activator="{ on, attrs }">
@@ -62,7 +63,6 @@
                 />
               </v-col>
             </v-row>
-
             <v-row v-else-if="value === 'none'">
               <v-col cols="12">
                 <v-select
@@ -74,7 +74,6 @@
                 />
               </v-col>
             </v-row>
-
             <v-row v-else>
               <v-col cols="12">
                 <v-text-field
@@ -371,6 +370,8 @@ export default {
     dataRestFrom: {
       deep: true,
       handler(val) {
+        this.filters = {};
+        this.filtersForTypedTitles = { };
         if (val && val.length) {
           this.indexTitles(val);
         }
@@ -392,6 +393,9 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+    if (this.dataRestFrom && this.dataRestFrom.length > 0) {
+      this.indexTitles(this.dataRestFrom);
+    }
     this.setEventColor();
     if (!this.isVisibleTitles) {
       this.props.message = 'Данные не отображаются из-за настроек';

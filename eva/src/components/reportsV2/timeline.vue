@@ -9,7 +9,7 @@
           class="scale-btn"
           text
           small
-          @click="plusScale()"
+          @click="plusScale"
         >
           <v-icon
             :color="theme.$main_text"
@@ -23,7 +23,7 @@
           class="scale-btn"
           text
           small
-          @click="minusScale()"
+          @click="minusScale"
         >
           <v-icon
             :color="theme.$main_text"
@@ -99,7 +99,7 @@ import { mapGetters } from 'vuex';
 import moment from 'moment';
 
 const timelineEnum = {
-  min: 1,
+  min: 0,
   hour: 1,
   day: 2,
   month: 3,
@@ -143,7 +143,6 @@ export default {
         day: 'DD MMMM YYYY',
         month: 'MMMM YYYY',
       };
-
       return this.getTimeline[timelineEnum[this.select.value]]
         .reduce((acc, { time, value }) => ({
           ...acc,
@@ -172,21 +171,20 @@ export default {
       this.select = item;
     },
     plusScale() {
-      if (this.numberInTimeline < 10) {
-        this.numberInTimeline = 5;
-      } else {
+      if (this.numberInTimeline > 5) {
         this.numberInTimeline -= 5;
+        this.clearSVG(this.getPreparedTimeLine);
       }
     },
     minusScale() {
-      if (this.numberInTimeline > 45) {
-        this.numberInTimeline = 50;
-      } else {
+      if (this.numberInTimeline < 50) {
         this.numberInTimeline += 5;
+        this.clearSVG(this.getPreparedTimeLine);
       }
     },
     refreshScale() {
       this.numberInTimeline = 25;
+      this.clearSVG(this.getPreparedTimeLine);
     },
     clearSVG(dataset) {
       d3.select('.block-tooltip')
@@ -262,12 +260,11 @@ export default {
         .style('z-index', 10)
         .style('visibility', 'hidden')
         .text('Simple text');
-
       gs.append('rect')
         .attr('x', (d, i) => xScale(i) + rectPadding / 2)
-        .attr('y', (d) => yScale(d.value))
+        .attr('y', (d) => (d.value === 0 || yScale(d.value) < 49 ? yScale(d.value) : 48))
         .attr('width', () => xScale.step() - rectPadding)
-        .attr('height', (d) => height - marge.top - marge.bottom - yScale(d.value))
+        .attr('height', (d) => height - marge.top - marge.bottom - (d.value === 0 || yScale(d.value) < 49 ? yScale(d.value) : 48))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
           tooltip.html(`Событий (${d.value})<br>${d.time}`);
@@ -297,20 +294,20 @@ export default {
   .select
     max-width: 180px
     .v-select__selection
-      color: $main_text
+      color: $main_text !important
     .v-input__slot:before
-      border-color: $main_text
+      border-color: $main_text !important
     .v-input__append-inner
       margin-bottom: 5px
   .scale-btn
     .scale-btn-text
       text-transform: capitalize
-      color: $main_text
+      color: $main_text !important
       font-weight: normal
 .v-list
   background-color: $main_bg !important
   .v-list-item
-    background-color: $main_bg
+    background-color: $main_bg !important
 
 .container-chart
   margin: auto

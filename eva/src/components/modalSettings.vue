@@ -302,7 +302,10 @@
             >
               <v-select
                 v-model="metrics[i - 1].name"
-                :items="metricsName.map((el) => el.name)"
+                :items="metricsName.map((el) => el.name)
+                  .filter((name) =>
+                    name === metrics[i - 1].name || !printedUnitedMetrics.includes(name)
+                  )"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
                 hide-details
@@ -952,7 +955,7 @@
         :modal-text="`Вы точно хотите удалить вариант отображения ?`"
         btn-confirm-text="Удалить"
         btn-cancel-text="Отмена"
-        @result="deleteMetrics(deleteMetricId)"
+        @result="(confirm) => { confirm && deleteMetrics(deleteMetricId) }"
       />
     </div>
   </modal-persistent>
@@ -985,7 +988,7 @@ export default {
       conclusion_count: {},
       replace_count: {},
       options: {},
-      type_line: 'solid',
+      type_line: {},
       color: {},
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
@@ -1023,6 +1026,9 @@ export default {
     };
   },
   computed: {
+    printedUnitedMetrics() {
+      return this.metrics.map((item) => item.name);
+    },
     dashFromStore() {
       return this.$store.state[this.idDash];
     },
@@ -1175,6 +1181,7 @@ export default {
     },
     // отправляем настройки в хранилище
     async setOptions() {
+      // this.prepareUnitedSettingsBeforeSave();
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1232,7 +1239,7 @@ export default {
         color: this.color,
         updated: Date.now(),
       };
-      this.$store.dispatch('saveSettingsToPath', {
+      await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
         options,
@@ -1319,6 +1326,34 @@ export default {
     },
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
+    },
+    prepareUnitedSettingsBeforeSave() {
+      const metricNames = this.metrics.map((item) => item.name);
+
+      // clear colors
+      if (this.color) {
+        Object.keys(this.color).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.color[name];
+          }
+        });
+      }
+
+      // clear metricTypes
+      if (this.multilineYAxesBinding.metricTypes) {
+        Object.keys(this.multilineYAxesBinding.metricTypes).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.multilineYAxesBinding.metricTypes[name];
+          }
+        });
+      }
+      if (this.type_line && typeof this.type_line === 'object') {
+        Object.keys(this.type_line).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.type_line[name];
+          }
+        });
+      }
     },
     getSettingsByPath() {
       this.$store.commit('prepareSettingsStore', {

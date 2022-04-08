@@ -24,7 +24,7 @@
       :class="metricTemplateClass"
     >
       <div
-        v-for="(metric, idx) in dataToRender"
+        v-for="(metric, idx) in metricsForRender"
         :key="`metric-${metric.id}`"
         class="item"
         :style="{ gridArea: `item-${idx + 1}` }"
@@ -97,7 +97,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     updateSettings: {
       type: Function,
@@ -123,13 +123,12 @@ export default {
     isHeaderOpen: true,
   }),
   computed: {
-    dataToRender() {
-      const temp = [...this.metricList].sort((a, b) => a.listOrder - b.listOrder);
-      return this.update && temp.slice(0, this.metricCount);
-    },
-
     theme() {
       return this.$store.getters.getTheme;
+    },
+
+    metricsForRender() {
+      return [...this.metricList].slice(0, this.metricCount);
     },
 
     tokenizedTitle() {
@@ -229,15 +228,18 @@ export default {
           if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
             return '#FFE065';
           }
-
-          return '#5BD97A';
+          const greenrange = ranges.green[0] < ranges.green[1]
+            ? val >= ranges.green[0] && val <= ranges.green[1]
+            : val >= ranges.green[0];
+          if (greenrange) {
+            return '#5BD97A';
+          }
         }
       }
 
       if (metric.color === 'secondary') {
         return '#e0e0ec';
       }
-
       return '#5980f8';
     },
     init(settings, up) {
