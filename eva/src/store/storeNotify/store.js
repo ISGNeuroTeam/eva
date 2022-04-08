@@ -1,8 +1,12 @@
 import moment from 'moment';
 
-const messages = {
-  1: 'очень большое количество запросов',
+const getMessage = ({ code, value }) => {
+  const messages = {
+    1: `очень большое количество запросов,  запросов: ${value}`,
+  };
+  return messages[code] || `код уведомления ${code}`;
 };
+
 export default {
   namespaced: true,
   state: {
@@ -15,7 +19,7 @@ export default {
     },
     addNotifications(state, payload) {
       const time = moment().unix();
-      const ttl = 10e3;
+      const ttl = 1;
       const currentItems = state.notifications.filter((item) => item.time > (time - ttl));
       const existsNotificationsIds = currentItems.map((item) => item.code);
 
@@ -24,69 +28,17 @@ export default {
         .map((item) => ({
           ...item,
           time,
-          show: false,
-          message: messages[item.code],
+          read: false,
+          message: getMessage(item),
         }));
 
       state.notifications = [
         ...currentItems,
         ...newNotification,
       ];
-
-      return;
-
-      const notifications = payload.reduce((acc, item, index) => {
-        let idItemToReplace = -1;
-        const foundItem = state.notifications.find((test) => {
-          if (test.code === item.code) {
-            if (
-              moment.unix(time)
-                .diff(moment.unix(test.time), 'minutes', true) - 1 > 0
-              && !test.show
-            ) {
-              idItemToReplace = index;
-              return false;
-            }
-            return true;
-          }
-          return false;
-        });
-        const isItemInAcc = acc.find((accItem) => accItem.code === item.code);
-        if (!isItemInAcc) {
-          if (!foundItem && idItemToReplace === -1) {
-            acc.push(
-              {
-                code: item.code,
-                message: messages[item.code],
-                time,
-                show: true,
-              },
-            );
-            return acc;
-          }
-          if (idItemToReplace >= 0) {
-            state.notifications.splice(idItemToReplace, 1);
-            acc.push(
-              {
-                code: item.code,
-                message: messages[item.code],
-                time,
-                show: true,
-              },
-            );
-            return acc;
-          }
-        }
-        console.groupEnd();
-        return acc;
-      }, []);
-      state.notifications = [
-        ...state.notifications,
-        ...notifications,
-      ];
     },
     dismiss(state, payload) {
-      state.notifications[payload].show = false;
+      state.notifications[payload].read = true;
     },
   },
   actions: {
