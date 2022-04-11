@@ -103,7 +103,7 @@ $metric-header-height: 40px
         @include text-truncated()
 
         &.bold
-          color: $main_text
+          color: $main_text !important
           font-weight: 600
 
       .input-element
@@ -111,7 +111,7 @@ $metric-header-height: 40px
 
         &.v-text-field--outlined
           input, .v-select__selections
-            color: $main_text
+            color: $main_text !important
             caret-color: $accent_ui_color
             font-size: 15px
 
@@ -120,7 +120,7 @@ $metric-header-height: 40px
             transition: border-color .3s
 
           &.v-select .v-input__icon--append .v-icon
-            color: $main_text
+            color: $main_text !important
 
           &.v-input--is-focused
             fieldset
@@ -264,7 +264,7 @@ $metric-header-height: 40px
           justify-content: center
           background-color: $secondary_bg
           border-radius: 4px
-          color: $main_text
+          color: $main_text !important
           font-weight: 600
           cursor: pointer
           user-select: none
