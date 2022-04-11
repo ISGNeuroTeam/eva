@@ -27,8 +27,7 @@ export default {
     // Синхронизация логаута на всех вкладках браузера
     window.onstorage = () => {
       if (!document.cookie && (this.$route.fullPath !== '/')) {
-        this.$router.push('/');
-        document.title = 'EVA';
+        window.location.reload();
       }
     };
   },
