@@ -167,7 +167,7 @@ export default {
         this.map._onResize();
       }
     },
-    options: {
+    getOptions: {
       handler() {
         this.reDrawMap(this.dataRestFrom);
       },
