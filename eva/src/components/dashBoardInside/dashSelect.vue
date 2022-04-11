@@ -265,11 +265,6 @@ export default {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
-        if (Array.isArray(this.elemDeep[String(this.multiple)])) {
-          this.elemDeep[String(this.multiple)] = this.elemDeep[String(this.multiple)]
-            .filter((x) => x !== null || x !== undefined);
-        }
-
         res = this.filterSelect(res, this.elemDeep.true);
       }
 
@@ -371,6 +366,7 @@ export default {
         this.openSelect();
       }
       if (selected.elemDeep.length !== 0 || selected.elemDeep !== '') {
+        console.log('selected.elemDeep', selected.elemDeep);
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
