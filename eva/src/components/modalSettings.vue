@@ -690,6 +690,7 @@
                   <v-menu
                     top
                     transition="scale-transition"
+                    :close-on-content-click="false"
                   >
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon
@@ -715,7 +716,7 @@
                       mode="hexa"
                       show-swatches
                       swatches-max-height="200"
-                      @input="addColor"
+                      @input.capture="addColor($event)"
                     />
                   </v-menu>
                 </template>
@@ -1174,11 +1175,13 @@ export default {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
     },
-    addColor() {
-      if (this.colorsPie.colors === '') {
-        this.colorsPie.colors += `${this.colorPicker}`;
-      } else {
-        this.colorsPie.colors += ` ${this.colorPicker}`;
+    addColor(e) {
+      if (this.colorPicker) {
+        if (this.colorsPie.colors === '') {
+          this.colorsPie.colors += `${e}`;
+        } else {
+          this.colorsPie.colors += ` ${e}`;
+        }
       }
       this.colorPicker = '';
     },
