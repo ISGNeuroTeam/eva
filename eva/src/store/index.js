@@ -943,7 +943,7 @@ export default new Vuex.Store({
       Object.keys(filter.parts).forEach((key) => {
         state[filter.idDash].stashedFilterParts.push({
           ...filter.parts[key],
-          values: filter.parts[key].values ? [...filter.parts[key]] : [],
+          values: filter.parts[key].values ? [...filter.parts[key].values] : [],
         });
       });
     },
@@ -972,7 +972,7 @@ export default new Vuex.Store({
           if (part2.values && part1.values) {
             return part2.values.length - part1.values.length;
           } if (!part2.values) {
-            return -1;
+            return 0;
           }
           return 1;
         },
@@ -1387,7 +1387,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          console.error('error:', event);
         };
 
         request.onupgradeneeded = (event) => {
@@ -1442,7 +1442,7 @@ export default new Vuex.Store({
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (event) => {
-          console.log('error:', event);
+          console.error('error:', event);
         };
 
         request.onupgradeneeded = (event) => {

@@ -90,7 +90,7 @@ export default {
                   if (res?.notifications) {
                     store.commit('notify/addNotifications', res?.notifications);
                   }
-                  console.log(status);
+                  // console.log(status);
                   return res;
                 });
               }
