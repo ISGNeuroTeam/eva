@@ -140,7 +140,7 @@ export default {
   },
   data() {
     return {
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
+      mode: true,
       options: {
         visible: true,
         change: false,
