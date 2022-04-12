@@ -2,7 +2,7 @@ import moment from 'moment';
 
 const getMessage = ({ code, value }) => {
   const messages = {
-    1: `очень большое количество запросов,  запросов: ${value}`,
+    1: `В данный момент наблюдается деградация производительности в связи с большим количеством запросов: ${value}`,
   };
   return messages[code] || `код уведомления ${code}`;
 };
@@ -19,7 +19,7 @@ export default {
     },
     addNotifications(state, payload) {
       const time = moment().unix();
-      const ttl = 1;
+      const ttl = 60; // минуту
       const currentItems = state.notifications.filter((item) => item.time > (time - ttl));
       const existsNotificationsIds = currentItems.map((item) => item.code);
 

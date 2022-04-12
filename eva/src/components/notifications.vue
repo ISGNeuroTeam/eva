@@ -6,7 +6,7 @@
       v-for="(item, index) in alerts"
     >
       <v-alert
-        v-if="!item.readed"
+        v-if="!item.read"
         :key="`${index}/${item}`"
         :value="!!item"
         dismissible
