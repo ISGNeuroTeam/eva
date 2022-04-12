@@ -12,7 +12,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed piechart visual inaccuracies
-- fixed piechart choosing color for custom theme
 
 ## [1.86.1]
 
