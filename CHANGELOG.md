@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrealese]
 
+### Added
+- added color picker for custom pie chart
+
 ### Fixed
 - fixed piechart visual inaccuracies
 - fixed piechart choosing color for custom theme
