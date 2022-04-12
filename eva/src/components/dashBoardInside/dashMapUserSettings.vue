@@ -88,7 +88,7 @@
                     class="ml-2 legend-title"
                     :style="`color: ${theme.$main_text} !important;`"
                   >
-                    Легенда
+                    Легенда 123
                   </span>
                   <v-spacer />
                   <a

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed change osmserver in map settings
+- fixed default osmserver and default search in dashMapUserSettings
 
 ## [1.86.1]
 

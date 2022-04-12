@@ -3,18 +3,6 @@
     v-model="dialog"
     max-width="390"
   >
-    <!--    <template v-slot:activator="{ on, attrs }">
-      <v-btn
-        rounded
-        :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
-        v-bind="attrs"
-        v-on="on"
-      >
-        <v-icon :style="{ color: theme.$main_text }">
-          {{ mdiSettings }}
-        </v-icon>
-      </v-btn>
-    </template>-->
     <v-card
       class="dash-map-user-settings"
       :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text} !important`"
@@ -207,6 +195,10 @@ export default {
       type: String,
       required: true,
     },
+    search: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -325,12 +317,12 @@ export default {
   },
   watch: {
     modalValue(val) {
-      if (
-        val
-          && (JSON.stringify(this.options.selectedLayer)
-              !== JSON.stringify(this.dashFromStore.options.selectedLayer)
-          )) {
-        this.$set(this.options, 'selectedLayer', JSON.parse(JSON.stringify(this.dashFromStore.options.selectedLayer)));
+      if (val) {
+        if (JSON.stringify(this.options.selectedLayer)
+            !== JSON.stringify(this.dashFromStore.options.selectedLayer)) {
+          this.$set(this.options, 'selectedLayer', JSON.parse(JSON.stringify(this.dashFromStore.options.selectedLayer)));
+        }
+        this.$set(this.options, 'search', this.dashFromStore.options.search || this.search);
       }
     },
     options: {
@@ -377,11 +369,6 @@ export default {
       this.map.on('click', clickEvent);
     },
     updatePipeDataSource(e) {
-      const set = new Set(e);
-      if (this.options.mode) {
-        set.delete(this.options.mode[0]);
-      }
-      this.options.mode = Array.from(set);
       if (this.options.search) {
         this.$emit('updatePipeDataSource', this.options.search);
       }

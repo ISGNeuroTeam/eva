@@ -34,7 +34,7 @@
       </v-row>
 
       <v-row
-        v-show="options.showLegend"
+        v-if="getOptions.showLegend && library && library.objects"
         align="end"
         align-content="end"
         class="mb-5 mr-0"
@@ -88,7 +88,7 @@
                     class="ml-2 legend-title"
                     :style="`color: ${theme.$main_text} !important;`"
                   >
-                    Легенда
+                    Легенда 11333
                   </span>
                   <v-spacer />
                   <a
