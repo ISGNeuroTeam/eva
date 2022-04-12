@@ -2,7 +2,7 @@
   <div
     ref="container"
     class="dash-map"
-    :class="{ 'full-screen': isFullScreen }"
+    :class="{ 'full-screen': isFullScreen || circularResize, 'min-size': minSize }"
     :style="{ zoom: needSetField ? 1 : htmlZoom }"
   >
     <div v-if="needSetField">
@@ -17,8 +17,8 @@
     </div>
     <div
       v-else
-      class="flex flex-grow-1 justify-center align-center mt-6"
-      :class="{ row: vertical }"
+      class="flex flex-grow-1 justify-center align-center"
+      :class="{ row: vertical, 'mt-6': !minSize}"
     >
       <div class="flex-grow-0">
         <v-slider
@@ -103,12 +103,18 @@ export default {
       type: Boolean,
       default: false,
     },
+    widthFrom: {
+      type: Number,
+      required: true,
+    }, // ширина родительского компонента
+    heightFrom: {
+      type: Number,
+      required: true,
+    }, // высота родительского компонента
   },
   data() {
     return {
       vertical: true,
-      circularSize: 190,
-      circularWidth: 20,
       icons: {
         plus: mdiPlus,
         minus: mdiMinus,
@@ -125,6 +131,29 @@ export default {
     };
   },
   computed: {
+    circularSize() {
+      if (this.widthFrom > 775 && this.heightFrom > 775) {
+        return this.heightFrom - 177;
+      }
+      if (this.widthFrom > 200 && this.heightFrom > 200) {
+        if (this.widthFrom < this.heightFrom) {
+          return this.widthFrom - 147;
+        } else {
+          return this.heightFrom - 147;
+        }
+      } else {
+        return 60;
+      }
+    },
+    circularWidth() {
+      return this.circularSize / 10;
+    },
+    circularResize() {
+      return this.circularSize > 400 && this.heightFrom > 775 && this.widthFrom > 775;
+    },
+    minSize() {
+      return this.widthFrom < 300 || this.heightFrom < 300;
+    },
     htmlZoom() {
       const size = this.$attrs.heightFrom < this.$attrs.widthFrom
         ? this.$attrs.heightFrom
@@ -274,9 +303,6 @@ export default {
       if (this.$attrs['is-full-screen']) {
         this.circularWidth = 40;
         this.circularSize = 450;
-      } else {
-        this.circularWidth = 20;
-        this.circularSize = 190;
       }
     },
     addValue(val) {
@@ -342,6 +368,10 @@ export default {
 .dash-map
   color: var(--main_text) !important
   min-width: 360px
+  height: calc(100% - 50px)
+  display: flex
+  justify-content: center
+  align-items: center
 
   .v-slider__track-background
     background-color: var(--secondary_border) !important
@@ -367,4 +397,16 @@ export default {
       font-size: 62px !important
     .v-size--default
       padding: 25px 48px
+  &.min-size
+    min-width: 210px
+    .slider-vertical
+      padding-right: 10px
+      .v-slider--vertical
+        min-height: 105px
+    .v-btn:not(.v-btn--round).v-size--default
+      height: 26px
+      min-width: 47px
+      padding: 0 6px
+    .text-h4
+      font-size: 1.125rem !important
 </style>
