@@ -638,6 +638,10 @@
                 :items="Object.keys(themes)"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
                 hide-details
                 outlined
                 class="item-metric"
