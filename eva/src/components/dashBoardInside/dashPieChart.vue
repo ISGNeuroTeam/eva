@@ -549,7 +549,7 @@ export default {
         .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
         .attr('class', 'piepart')
         .attr('fill', (d) => color(d.data.key))
-        .attr('stroke', this.theme.$main_bg)
+        .attr('stroke', 'inherit')
         .style('stroke-width', '2px')
         .on('mouseover', (d, i, nodes) => {
           const node = nodes[i];
