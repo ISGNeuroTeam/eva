@@ -257,6 +257,7 @@ export default {
   mounted() {
     this.calcSize();
     this.setOptions();
+    this.setMetrics();
   },
   methods: {
     setPropDisappear(val) {
@@ -280,11 +281,7 @@ export default {
     updateSettings(localSettings) {
       this.settings = JSON.parse(JSON.stringify(localSettings));
     },
-    setOptions() {
-      if (!this.idDash) {
-        return;
-      }
-
+    setMetrics() {
       if (this.data[0]
           && (!this.dashFromStore[this.activeElem]?.metrics
               || !this.dashFromStore[this.activeElem]?.metrics.length)
@@ -297,6 +294,11 @@ export default {
             metrics: Object.keys(this.data[0]),
           },
         );
+      }
+    },
+    setOptions() {
+      if (!this.idDash) {
+        return;
       }
 
       if (!this.dashFromStore[this.activeElem].options) {
@@ -352,6 +354,7 @@ export default {
         }
       });
       this.setOptions();
+      this.setMetrics();
     },
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
