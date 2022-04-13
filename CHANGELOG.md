@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
+- Data exploration 2.0: visualization improvements
 
 ## [1.86.1]
 
