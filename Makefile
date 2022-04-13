@@ -41,6 +41,7 @@ build: ${PROJECT_NAME}/node_modules $(COMPONENTS)
 	cp README.md build/
 	cp CHANGELOG.md build/
 	cp LICENSE.md build/
+	cp -r ./nginx ./build/
 
 clean:
 	# required section"
