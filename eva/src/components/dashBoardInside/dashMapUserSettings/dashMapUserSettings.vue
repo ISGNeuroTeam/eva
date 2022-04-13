@@ -322,7 +322,11 @@ export default {
             !== JSON.stringify(this.dashFromStore.options.selectedLayer)) {
           this.$set(this.options, 'selectedLayer', JSON.parse(JSON.stringify(this.dashFromStore.options.selectedLayer)));
         }
-        this.$set(this.options, 'search', this.dashFromStore.options.search || this.search);
+        if (Object.keys(this.search)?.length > 0) {
+          this.$set(this.options, 'search', this.search);
+        } else {
+          this.$set(this.options, 'search', this.searches.find((search) => search.id === this.dashFromStore.search));
+        }
       }
     },
     options: {
