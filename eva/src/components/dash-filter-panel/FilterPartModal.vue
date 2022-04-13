@@ -110,7 +110,7 @@ export default {
     },
     filterPart: {
       type: Object,
-      required: true,
+      default: null,
     },
     editPermission: {
       type: Boolean,
@@ -118,7 +118,7 @@ export default {
     },
     filterPartIndex: {
       type: Number,
-      required: true,
+      default: null,
     },
     editMode: {
       type: Boolean,

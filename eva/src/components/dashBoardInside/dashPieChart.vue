@@ -549,7 +549,7 @@ export default {
         .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
         .attr('class', 'piepart')
         .attr('fill', (d) => color(d.data.key))
-        .attr('stroke', this.theme.$main_bg)
+        .attr('stroke', 'inherit')
         .style('stroke-width', '2px')
         .on('mouseover', (d, i, nodes) => {
           const node = nodes[i];
@@ -582,18 +582,19 @@ export default {
     },
     setToken(pieIndex) {
       const tokens = this.$store.state[this.idDashFrom].tockens;
-
-      tokens.forEach((tocken) => {
-        if (tocken.elem === this.idFrom) {
-          const value = this.dataRestFrom[pieIndex][tocken.capture];
-          this.$store.commit('setTocken', {
-            token: tocken,
-            value,
-            idDash: this.idDashFrom,
-            store: this.$store,
-          });
-        }
-      });
+      if (tokens?.length > 0) {
+        tokens.forEach((tocken) => {
+          if (tocken.elem === this.idFrom) {
+            const value = ` ${this.dataRestFrom[pieIndex][tocken.capture]} `;
+            this.$store.commit('setTocken', {
+              token: tocken,
+              value,
+              idDash: this.idDashFrom,
+              store: this.$store,
+            });
+          }
+        });
+      }
     },
     changePieChart() {
       const graphics = d3
