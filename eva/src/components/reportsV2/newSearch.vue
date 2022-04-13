@@ -56,6 +56,8 @@
         rows="1"
         row-height="15"
         @keyup.ctrl.\="addLineBreaks"
+        @keydown.enter.prevent.exact="launchSearch"
+        @keyup.ctrl.enter.prevent="newLine"
       />
       <div class="search-block-footer">
         <div
@@ -329,6 +331,14 @@ export default {
     });
   },
   methods: {
+    sendMessage() {
+      console.log('ctrl enter');
+    },
+    newLine(e) {
+      const caret = e.target.selectionStart;
+      e.target.setRangeText('\n', caret, caret, 'end');
+      this.search.original_otl = e.target.value;
+    },
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',

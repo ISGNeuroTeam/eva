@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrelise]
 
+### Feature
+- Added hotkey for query window in data research v2
+
 ### Fixed
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
