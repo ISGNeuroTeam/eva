@@ -452,12 +452,14 @@ export default {
 
       let curTocken = {};
       const data = this.dataReady;
-      Object.keys(tockens).forEach((i) => {
-        if (tockens[i].elem === this.id && tockens[i].action === 'change') {
-          curTocken = tockens[i];
-          tockensToUpdate.push({ name: tockens[i].name, capture: tockens[i].capture });
-        }
-      });
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          if (tockens[i].elem === this.id && tockens[i].action === 'change') {
+            curTocken = tockens[i];
+            tockensToUpdate.push({ name: tockens[i].name, capture: tockens[i].capture });
+          }
+        });
+      }
       let value = [];
 
       if (String(this.multiple) === 'true') {
