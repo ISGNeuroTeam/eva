@@ -366,7 +366,6 @@ export default {
         this.openSelect();
       }
       if (selected.elemDeep.length !== 0 || selected.elemDeep !== '') {
-        console.log('selected.elemDeep', selected.elemDeep);
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
