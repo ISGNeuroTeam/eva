@@ -9,17 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - added new notification system
+- added color picker for custom pie chart
 
 ### Fixed
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
 - Data exploration 2.0: visualization improvements
+- fixed piechart visual inaccuracies
 
 ## [1.86.1]
 
 ### Fixed
 - Fixed theme styles
-- fixed piechart visual inaccuracies
 
 
 ## [1.86.0]
