@@ -59,7 +59,7 @@
               : ''
           "
           @mouseover="hoverLegendLine(idx)"
-          @mouseleave="hoverLegendLine(null)"
+          @mouseleave="hoverLegendLine(-1)"
           @click="selectedPie = idx"
         >
           <div
@@ -80,6 +80,7 @@
 
 <script>
 import * as d3 from 'd3';
+import PiechartClass from '../../js/classes/PiechartClass';
 
 export default {
   props: {
@@ -122,6 +123,7 @@ export default {
       legends: [],
       positionLegends: 'row nowrap',
       timeout: '',
+      piechart: null,
       tolate: false,
     };
   },
@@ -506,18 +508,6 @@ export default {
           break;
       }
 
-      // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
-      const radius = Math.min(width, height) / 2 - MARGIN;
-
-      // добовляем svg объект в нужный div
-      const svg = d3
-        .select(this.$refs.piechartItself)
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .append('g')
-        .attr('transform', `translate(${width / 2},${height / 2})`);
-
       const data = {};
 
       const selectedDefault = [];
@@ -527,58 +517,62 @@ export default {
         selectedDefault.push(item[metrics[2]]);
       });
 
-      const color = d3
-        .scaleOrdinal() // устанавливаем цветовую схему для pie chart
-        .domain(data)
-        .range(this.dashOptions.themes[colorsPie.theme]);
-
-      const pie = d3.pie().value((d) => d.value);
-      // eslint-disable-next-line camelcase
-      const data_ready = pie(d3.entries(data));
-
+      // const hoverLegendLine = this.hoverLegendLine;
       const tooltipEl = this.$refs.chartTooltip;
+
       const tooltipOffset = { x: 30, y: 5 };
 
-      const hoverLegendLine = this.hoverLegendLine.bind(this);
+      this.piechart = new PiechartClass({
+        elem: this.$refs.piechartItself,
+        width,
+        height,
+        margin: MARGIN,
+        data,
+        colors: this.dashOptions.themes[colorsPie.theme],
+      });
 
-      svg
-        .selectAll('pies')
-        .data(data_ready)
-        .enter()
-        .append('path')
-        .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
-        .attr('class', 'piepart')
-        .attr('fill', (d) => color(d.data.key))
-        .attr('stroke', 'inherit')
-        .style('stroke-width', '2px')
-        .on('mouseover', (d, i, nodes) => {
-          const node = nodes[i];
-          if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
-          tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
-          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
-          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
-          tooltipEl.style.visibility = 'visible';
-          hoverLegendLine(i);
-        })
-        .on('mousemove', () => {
-          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
-          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
-        })
-        .on('mouseout', (_, i, nodes) => {
-          if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
-          tooltipEl.style.visibility = 'hidden';
-          hoverLegendLine(-1);
-        })
-        .on('click', (_, i, nodes) => {
-          const node = nodes[i];
-          if (this.selectedPieIndex === i) {
-            this.selectedPie = -1;
-            node.classList.remove('piepartSelect');
-          } else {
-            this.selectedPie = i;
-            node.classList.add('piepartSelect');
-          }
-        });
+      this.piechart.setEvents([
+        {
+          eventName: 'mouseover',
+          callback: (d, i, nodes) => {
+            const node = nodes[i];
+            if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
+            tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
+            tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+            tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
+            tooltipEl.style.visibility = 'visible';
+            this.hoverLegendLine(i);
+          },
+        },
+        {
+          eventName: 'mousemove',
+          callback: () => {
+            tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+            tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
+          },
+        },
+        {
+          eventName: 'mouseout',
+          callback: (_, i, nodes) => {
+            if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
+            tooltipEl.style.visibility = 'hidden';
+            this.hoverLegendLine(-1);
+          },
+        },
+        {
+          eventName: 'click',
+          callback: (_, i, nodes) => {
+            const node = nodes[i];
+            if (this.selectedPieIndex === i) {
+              this.selectedPie = -1;
+              node.classList.remove('piepartSelect');
+            } else {
+              this.selectedPie = i;
+              node.classList.add('piepartSelect');
+            }
+          },
+        },
+      ]);
     },
     setToken(pieIndex) {
       const tokens = this.$store.state[this.idDashFrom].tockens;
