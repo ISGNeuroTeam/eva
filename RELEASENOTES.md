@@ -3,7 +3,7 @@
 ### Added
 - Pop-up notifications
 - Color picker for custom pie chart settings
-- A prefix has been added to the URL
+- The prefix /eva has been added to the URL
 
 ### Fixed
 - Error with token change in the "dashSelect" component,
