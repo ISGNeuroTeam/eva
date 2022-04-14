@@ -141,7 +141,7 @@ export default {
   },
   data() {
     return {
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
+      mode: true,
       options: {
         visible: true,
         change: false,
@@ -260,6 +260,8 @@ export default {
   },
   mounted() {
     this.calcSize();
+    this.setOptions();
+    this.setMetrics();
   },
   methods: {
     setPropDisappear(val) {
@@ -283,8 +285,58 @@ export default {
     updateSettings(localSettings) {
       this.settings = JSON.parse(JSON.stringify(localSettings));
     },
+    setMetrics() {
+      if (this.data[0]
+          && (!this.dashFromStore[this.activeElem]?.metrics
+              || !this.dashFromStore[this.activeElem]?.metrics.length)
+          && this.activeElem === 'multiLine') {
+        this.$store.commit(
+          'setMetricsMulti',
+          {
+            id: this.activeElem,
+            idDash: this.idDash,
+            metrics: Object.keys(this.data[0]),
+          },
+        );
+      }
+    },
     setOptions() {
-      this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+      if (!this.idDash) {
+        return;
+      }
+
+      if (!this.dashFromStore[this.activeElem].options) {
+        this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore[this.activeElem]?.options?.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
     },
     switchOP() {
       this.$store.dispatch('openModalSettings', {
@@ -306,6 +358,7 @@ export default {
         }
       });
       this.setOptions();
+      this.setMetrics();
     },
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
