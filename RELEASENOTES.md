@@ -1,3 +1,16 @@
+# [1.87.0] Notifications, added prefix /eva
+
+### Added
+- Pop-up notifications
+- Color picker for custom pie chart settings
+- A prefix has been added to the URL
+
+### Fixed
+- Error with token change in the "dashSelect" component,
+- Drawing a list values in the "dashSelect" component
+- Data exploration 2.0: visualization improvements
+- Visual inaccuracies in the Piechart component
+
 # [1.86.1]
 
 ### Fixed
