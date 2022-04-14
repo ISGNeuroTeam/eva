@@ -335,11 +335,21 @@ export default {
     },
   },
   watch: {
+    getOptions: {
+      deep: true,
+      handler() {
+        if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+          this.options = JSON.parse(JSON.stringify(this.getOptions));
+        }
+      },
+    },
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (val.mode !== oldVal.mode) this.updatePipeDataSource();
-        this.updateOptions(val);
+        if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+          if (val.mode !== oldVal.mode) this.updatePipeDataSource();
+          this.updateOptions(val);
+        }
       },
     },
   },
@@ -360,8 +370,9 @@ export default {
         id: this.idElement,
         options: initOptions,
       });
-    } else {
-      this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
+    }
+    if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+      this.options = JSON.parse(JSON.stringify(options));
     }
   },
   methods: {
@@ -371,6 +382,11 @@ export default {
         set.delete(this.options.mode[0]);
       }
       this.options.mode = Array.from(set);
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.options,
+        prop: 'mode',
+        value: this.options.mode,
+      }]);
       if (this.options.search) {
         this.$emit('updatePipeDataSource', this.options.search);
       }
