@@ -5,17 +5,27 @@
   >
     <div
       v-if="error"
-      key="error-message"
+      :key="`error-message-${idDashFrom}`"
       class="error-message"
     >
       {{ error }}
     </div>
     <div
       v-show="!error"
-      key="mapContainer"
+      :key="`mapContainer-${idDashFrom}`"
       ref="map"
       class="mapContainer"
       :style="mapStyleSize"
+    />
+    <dash-map-user-settings-new
+      v-if="map"
+      :modal-value="modalSettingsValue"
+      :map="map"
+      :id-dash-from="idDashFrom"
+      :id-element="idFrom"
+      :search="search"
+      @update:modalValue="updateModalValue"
+      @updatePipeDataSource="loadDataForPipe"
     />
   </div>
 </template>
@@ -29,10 +39,14 @@ import Vue from 'vue';
 import * as turf from '@turf/turf';
 import * as utils from 'leaflet-geometryutil';
 import vuetify from '../../plugins/vuetify';
-import dashMapUserSettings from './dashMapUserSettings.vue';
+import DashMapUserSettingsContainer from './dashMapUserSettings/DashMapUserSettingsContainer.vue';
+import dashMapUserSettingsNew from './dashMapUserSettings/dashMapUserSettings.vue';
 import store from '../../store/index'; // подключаем файл с настройками хранилища Vuex
 
 export default {
+  components: {
+    dashMapUserSettingsNew,
+  },
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -63,9 +77,14 @@ export default {
       type: Object,
       required: true,
     },
+    search: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
+      modalSettingsValue: false,
       actions: [
         { name: 'refresh', capture: [] },
         { name: 'button', capture: [] },
@@ -113,7 +132,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-
       if (!this.dashFromStore?.options.pinned) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -121,7 +139,6 @@ export default {
           value: false,
         }]);
       }
-
       if (!this.dashFromStore.options.lastDot) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -141,6 +158,13 @@ export default {
           object: this.dashFromStore.options,
           prop: 'united',
           value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.search) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'search',
+          value: this.search || '',
         }]);
       }
 
@@ -169,7 +193,9 @@ export default {
     },
     getOptions: {
       handler() {
-        this.reDrawMap(this.dataRestFrom);
+        if (this.map) {
+          this.reDrawMap(this.dataRestFrom);
+        }
       },
       deep: true,
     },
@@ -179,16 +205,20 @@ export default {
     },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
-      if (_dataRest) {
+      if (_dataRest && this.map) {
         this.reDrawMap(_dataRest);
       }
     },
     clusterTextCount() {
-      this.clearCluster();
-      this.clustering(this.dataRestFrom);
+      if (this.map) {
+        this.clearCluster();
+        this.clustering(this.dataRestFrom);
+      }
     },
     maptheme() {
-      this.createMap();
+      if (this.map) {
+        this.createMap();
+      }
     },
   },
   mounted() {
@@ -197,39 +227,45 @@ export default {
     }
   },
   methods: {
+    updateModalValue() {
+      this.modalSettingsValue = !this.modalSettingsValue;
+    },
     init() {
       this.initMap();
       this.initTheme();
       this.initClusterTextCount();
       this.initClusterPosition();
       this.initClusterDelimiter();
-      store.subscribe((mutation) => {
-        if (mutation.type === 'updateOptions') {
-          if (this.options.initialPoint) {
-            this.map.setView(
-              [this.options.initialPoint.x, this.options.initialPoint.y],
+      if (this.map) {
+        store.subscribe((mutation) => {
+          if (mutation.type === 'updateOptions') {
+            if (this.options.initialPoint) {
+              this.map.setView(
+                [this.options.initialPoint.x, this.options.initialPoint.y],
+                mutation.payload.options.zoomLevel,
+              );
+            } else {
+              this.map.setView(
+                this.startingPoint,
+                mutation.payload.options.zoomLevel,
+              );
+            }
+            this.map.wheelPxPerZoomLevel = 200;
+            this.updateToken(
               mutation.payload.options.zoomLevel,
-            );
-          } else {
-            this.map.setView(
-              this.startingPoint,
-              mutation.payload.options.zoomLevel,
+              this.map.getBounds(),
             );
           }
-          this.map.wheelPxPerZoomLevel = 200;
-          this.updateToken(
-            mutation.payload.options.zoomLevel,
-            this.map.getBounds(),
-          );
-        }
-      });
-      this.createTokens();
-      this.$store.commit('setActions', {
-        actions: this.actions,
-        idDash: this.idDash,
-        id: this.element,
-      });
-      this.loadDataForPipe(this.$store.getters.getPaperSearch);
+        });
+
+        this.createTokens();
+        this.$store.commit('setActions', {
+          actions: this.actions,
+          idDash: this.idDash,
+          id: this.element,
+        });
+        this.loadDataForPipe(this.$store.getters.getPaperSearch);
+      }
     },
     async getDataFromRest(event) {
       // this.$set(this.loadings,event.sid,true);
@@ -279,18 +315,20 @@ export default {
     },
     async loadDataForPipe(search) {
       this.pipelineData = await this.getDataFromRest(search);
-      const allPipes = {};
-      if (Array.isArray(this.pipelineData)) {
-        this.pipelineData.forEach((x) => {
-          if (!allPipes[x.ID]) {
-            allPipes[x.ID] = [];
-          }
-          allPipes[x.ID].push(x);
-        });
-      }
+      if (this.map) {
+        const allPipes = {};
+        if (Array.isArray(this.pipelineData)) {
+          this.pipelineData.forEach((x) => {
+            if (!allPipes[x.ID]) {
+              allPipes[x.ID] = [];
+            }
+            allPipes[x.ID].push(x);
+          });
+        }
 
-      this.pipelineDataDictionary = allPipes;
-      this.reDrawMap(this.dataRestFrom);
+        this.pipelineDataDictionary = allPipes;
+        this.reDrawMap(this.dataRestFrom);
+      }
     },
     updateToken(value) {
       const tokens = this.$store.state[this.idDash]?.tockens || {};
@@ -338,33 +376,38 @@ export default {
       });
     },
     reDrawMap(dataRest) {
-      this.clearMap();
-      this.error = null;
-      // получаем osm server
-      this.getOSM();
-      // получаем библиотеку
-      // get all icons that we need on map
-      this.generateLibrary(dataRest, this.options?.primitivesLibrary);
-      this.generateClusterPositionItems();
-      this.initSettings();
-      if (!this.error) {
-        // создаем элемент карты
-        this.createMap();
-        // рисуем объекты на карте
-        this.drawObjects(dataRest);
-        if (this.options.initialPoint) {
-          this.map.setView(
-            [this.options.initialPoint.x, this.options.initialPoint.y],
-            this.options.zoomLevel,
-          );
-        } else this.map.setView(this.startingPoint, this.options.zoomLevel);
-        // this.clustering(dataRest);
+      if (this.map) {
+        this.clearMap();
+        this.error = null;
+        // получаем osm server
+        this.getOSM();
+        // получаем библиотеку
+        // get all icons that we need on map
+        this.generateLibrary(dataRest, this.options?.primitivesLibrary);
+        this.generateClusterPositionItems();
+        this.initSettings();
+        if (!this.error) {
+          // создаем элемент карты
+          this.createMap();
+          // рисуем объекты на карте
+          this.drawObjects(dataRest);
+          if (this.map) {
+            if (this.options.initialPoint) {
+              this.map.setView(
+                [this.options.initialPoint.x, this.options.initialPoint.y],
+                this.options.zoomLevel,
+              );
+            } else this.map.setView(this.startingPoint, this.options.zoomLevel);
+          }
+
+          // this.clustering(dataRest);
+        }
       }
     },
 
     initSettings() {
       if (this.isSettings) return;
-      const ComponentClass = Vue.extend(dashMapUserSettings);
+      const ComponentClass = Vue.extend(DashMapUserSettingsContainer);
       const test = new ComponentClass({
         propsData: {
           idDashFrom: this.idDashFrom,
@@ -374,7 +417,9 @@ export default {
         vuetify,
         store,
       });
-      test.$on('updatePipeDataSource', (e) => this.loadDataForPipe(e));
+      test.$on('openSettingsModal', () => {
+        this.modalSettingsValue = true;
+      });
       test.$mount();
 
       const element = this.$refs.map.getElementsByClassName(
@@ -463,9 +508,9 @@ export default {
     },
     getOSM() {
       const options = this.getOptions;
-      if (options.selectedLayer) {
+      if (options?.selectedLayer?.tile) {
         this.osmserver = options.selectedLayer;
-      } else if (options.osmserver) {
+      } else if (options?.osmserver) {
         this.osmserver = options.osmserver;
       } else {
         this.error = 'Введите osm server';
@@ -473,36 +518,38 @@ export default {
     },
     generateLibrary(dataRest, options) {
       const tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
-      try {
-        if (options) {
-          this.library = JSON.parse(options);
-        } else {
-          this.library = JSON.parse(tmp);
+      if (tmp) {
+        try {
+          if (options) {
+            this.library = JSON.parse(options);
+          } else {
+            this.library = JSON.parse(tmp);
+          }
+          if (
+            !this.options?.library
+              || (this.options?.library
+              && JSON.stringify(this.library) !== JSON.stringify(this.options.library))
+          ) {
+            this.$store.commit('setLibrary', {
+              library: this.library,
+              id: this.idFrom, // id элемнета (table, graph-2)
+              idDash: this.idDashFrom,
+            });
+          }
+        } catch {
+          this.error = 'Ошибка формата входных данных';
+          this.map.remove();
+          this.map = null;
         }
-        if (
-          !this.options?.library
-          || (this.options?.library
-          && JSON.stringify(this.library) !== JSON.stringify(this.options.library))
-        ) {
-          this.$store.commit('setLibrary', {
-            library: this.library,
-            id: this.idFrom, // id элемнета (table, graph-2)
-            idDash: this.idDashFrom,
-          });
+        if (!this.isLegendGenerated) {
+          this.createLegend();
         }
-      } catch {
-        this.error = 'Ошибка формата входных данных';
-        this.map.remove();
-        this.map = null;
-      }
-      if (!this.isLegendGenerated) {
-        this.createLegend();
       }
     },
 
     createLegend() {
       let generatedListHTML = '';
-      if (this.library?.objects && false) {
+      if (this.library?.objects) {
         Object.keys(this.library.objects).forEach((key) => {
           generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
         });
@@ -577,8 +624,10 @@ export default {
       this.deleteTitleByAttribute();
 
       this.$nextTick(() => {
-        // eslint-disable-next-line no-underscore-dangle
-        this.map._onResize();
+        if (this.map) {
+          // eslint-disable-next-line no-underscore-dangle
+          this.map._onResize();
+        }
       });
     },
 
@@ -845,7 +894,7 @@ export default {
       return html;
     },
     clearCluster() {
-      if (this.map.hasLayer(this.cluster)) {
+      if (this.map?.hasLayer(this.cluster)) {
         this.map.removeLayer(this.cluster);
       }
     },

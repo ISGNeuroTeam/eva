@@ -34,7 +34,7 @@
       </v-row>
 
       <v-row
-        v-show="options.showLegend"
+        v-if="getOptions.showLegend && library && library.objects"
         align="end"
         align-content="end"
         class="mb-5 mr-0"
@@ -88,7 +88,7 @@
                     class="ml-2 legend-title"
                     :style="`color: ${theme.$main_text} !important;`"
                   >
-                    Легенда 123
+                    Легенда 11333
                   </span>
                   <v-spacer />
                   <a
@@ -203,7 +203,7 @@ import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
 
 export default {
-  name: 'DashMapUserSettings',
+  name: 'DashMapUserSettingsContainer',
   props: {
     idElement: {
       type: String,
@@ -335,12 +335,6 @@ export default {
     },
   },
   watch: {
-    getOptions: {
-      deep: true,
-      handler() {
-        this.updateSelectedLayerValue();
-      },
-    },
     options: {
       deep: true,
       handler(val, oldVal) {
@@ -350,26 +344,27 @@ export default {
     },
   },
   mounted() {
-    this.updateSelectedLayerValue();
+    const options = JSON.parse(JSON.stringify(this.getOptions));
+    this.tileLayers[0].tile = options.osmserver;
+    // init store for reactivity
+    if (!options.showLegend || !options.initialPoint) {
+      const initOptions = {
+        showLegend: true,
+        zoomLevel: this.options.zoomLevel,
+        zoomStep: this.options.zoomStep,
+        selectedLayer: this.options.selectedLayer,
+        initialPoint: this.options.initialPoint,
+      };
+      this.$store.commit('setOptions', {
+        idDash: this.idDashFrom,
+        id: this.idElement,
+        options: initOptions,
+      });
+    } else {
+      this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
+    }
   },
   methods: {
-    // onClickChoosingCoordinates() {
-    //   const cursorCssClass = 'cursor-crosshair';
-    //   this.$emit('closeModalSettings');
-    //   // this.dialog = false;
-    //   // eslint-disable-next-line no-underscore-dangle
-    //   L.DomUtil.addClass(this.map._container, cursorCssClass);
-    //   const clickEvent = (event) => {
-    //     // this.dialog = true;
-    //     this.$emit('openModalSettings');
-    //     // eslint-disable-next-line no-underscore-dangle
-    //     L.DomUtil.removeClass(this.map._container, cursorCssClass);
-    //     this.options.initialPoint.x = event.latlng.lat;
-    //     this.options.initialPoint.y = event.latlng.lng;
-    //     this.map.off('click', clickEvent);
-    //   };
-    //   this.map.on('click', clickEvent);
-    // },
     updatePipeDataSource(e) {
       const set = new Set(e);
       if (this.options.mode) {
@@ -406,43 +401,6 @@ export default {
           <span style="color:${textColor}">кп<span>
         </div>`;
     },
-    // updateTileLayer(e) {
-    //   this.map.removeLayer(this.currentTile);
-    //   if (typeof e.tile === 'string') {
-    //     let temp = e.tile;
-    //     temp = [temp];
-    //     this.currentTile = L.tileLayer(...temp);
-    //     this.map.addLayer(this.currentTile);
-    //     this.updateOptions({ selectedLayer: temp[0] });
-    //     return;
-    //   }
-    //   this.currentTile = L.tileLayer(...e.tile);
-    //   this.map.addLayer(this.currentTile);
-    //   this.updateOptions({ selectedLayer: e.tile[0] });
-    // },
-
-    updateSelectedLayerValue() {
-      const options = JSON.parse(JSON.stringify(this.getOptions));
-      this.tileLayers[0].tile = options.osmserver;
-      // init store for reactivity
-      if (!options.showLegend || !options.initialPoint) {
-        console.log('if');
-        const initOptions = {
-          showLegend: true,
-          zoomLevel: this.options.zoomLevel,
-          zoomStep: this.options.zoomStep,
-          selectedLayer: options.selectedLayer || this.options.selectedLayer,
-          initialPoint: this.options.initialPoint,
-        };
-        this.$store.commit('setOptions', {
-          idDash: this.idDashFrom,
-          id: this.idElement,
-          options: initOptions,
-        });
-      } else {
-        this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
-      }
-    },
 
     updateOptions(newOptions) {
       this.$store.commit('updateOptions', {
@@ -460,7 +418,7 @@ export default {
 
       if (
         typeof this.options.timeFormat !== 'undefined'
-        && this.options.timeFormat == null
+          && this.options.timeFormat == null
       ) {
         this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
       }
