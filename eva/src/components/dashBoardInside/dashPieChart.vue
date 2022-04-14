@@ -79,7 +79,6 @@
 </template>
 
 <script>
-import * as d3 from 'd3';
 import PiechartClass from '../../js/classes/PiechartClass';
 
 export default {
@@ -286,39 +285,8 @@ export default {
             idDash: this.idDashFrom,
             id: this.idFrom,
           });
-
-          const graphics = d3
-            .select(this.$refs.piechartItself)
-            .selectAll('svg')
-            .nodes();
-          if (graphics.length !== 0) {
-            graphics[0].remove();
-            this.createPieChartDash();
-          } else {
-            this.createPieChartDash();
-          }
+          this.createPieChartDash();
         }
-
-        this.$nextTick(() => {
-          if (
-            this.dataRestFrom
-            && Object.keys(this.dataRestFrom).length
-            && this.dashSize
-          ) {
-            const graphics = d3
-              .select(this.$refs.piechartItself)
-              .selectAll('svg')
-              .nodes();
-
-            if (graphics.length !== 0) {
-              graphics[0].remove();
-              // если строим заново(изменились данные) - очищаем токены
-              this.createPieChartDash();
-            } else {
-              this.createPieChartDash();
-            }
-          }
-        });
       },
     },
   },
@@ -327,27 +295,10 @@ export default {
       this.setActiveLegendLine(legendLineIndex);
     },
     setActiveLegendLine(legendLineIndex) {
-      d3.select(this.$refs.pieChart)
-        .selectAll('.piepart')
-        .each((_, i, nodes) => {
-          const node = nodes[i];
-          if (i === legendLineIndex) {
-            node.classList.add('piepartSelect');
-          } else if (
-            node.classList.contains('piepartSelect')
-            && this.selectedPieIndex !== i
-          ) {
-            node.classList.remove('piepartSelect');
-          }
-        });
-      d3.select(this.$refs.legends)
-        .selectAll('.legend-line')
-        .each((_, i, nodes) => {
-          const node = nodes[i];
-          if (legendLineIndex === i) {
-            node.classList.add('legend-line_hover');
-          } else if (node.classList.contains('legend-line_hover')) node.classList.remove('legend-line_hover');
-        });
+      if (this.piechart) {
+        this.piechart.selectActivePiepart(this.selectedPieIndex, legendLineIndex);
+        this.piechart.selectActiveLegendLine(legendLineIndex, 'legend-line');
+      }
     },
     setMetrics() {
       this.$store.commit('setMetricsPie', {
@@ -400,7 +351,7 @@ export default {
             this.nodata = true; // показываем сообщение о некорректности данных
             this.legends = [];
             this.message = 'К сожалению данных слишком много для построения диаграммы'; // выводим сообщение
-            d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+            this.piechart.removePiechart(); // и еще график очищаем, чтобы не мешался
           } else {
             this.createLegend(this.dataRestFrom, metrics, showlegend, colorsPie);
             let legendSize = {};
@@ -453,7 +404,7 @@ export default {
           this.nodata = true; // показываем сообщение о некорректности данных
           this.message = 'К сожалению данные не подходят к диаграмме'; // выводим сообщение
           this.legends = [];
-          d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+          this.piechart.removePiechart(); // и еще график очищаем, чтобы не мешался
         }
       }
     },
@@ -479,7 +430,9 @@ export default {
       colorsPie,
     ) {
       // создает диаграмму
-      d3.select(this.$refs.piechartItself).selectAll('svg').remove();
+      if (this.piechart) {
+        this.piechart.removePiechart();
+      }
       const MARGIN = 40; // отступ от контейнера
       let width = sizeLine.width - MARGIN; // отступ по бокам
       let height = sizeLine.height - 35; // минус шапка
@@ -524,6 +477,7 @@ export default {
 
       this.piechart = new PiechartClass({
         elem: this.$refs.piechartItself,
+        elemForLegend: this.$refs.legends,
         width,
         height,
         margin: MARGIN,
@@ -538,7 +492,9 @@ export default {
             const node = nodes[i];
             if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
             tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
+            // eslint-disable-next-line no-restricted-globals
             tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+            // eslint-disable-next-line no-restricted-globals
             tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
             tooltipEl.style.visibility = 'visible';
             this.hoverLegendLine(i);
@@ -547,7 +503,9 @@ export default {
         {
           eventName: 'mousemove',
           callback: () => {
+            // eslint-disable-next-line no-restricted-globals
             tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+            // eslint-disable-next-line no-restricted-globals
             tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
           },
         },
@@ -591,16 +549,7 @@ export default {
       }
     },
     changePieChart() {
-      const graphics = d3
-        .select(this.$refs.piechartItself)
-        .selectAll('svg')
-        .nodes();
-      if (graphics.length !== 0) {
-        graphics[0].remove();
-        this.createPieChartDash();
-      } else {
-        this.createPieChartDash();
-      }
+      this.createPieChartDash();
     },
   },
 };

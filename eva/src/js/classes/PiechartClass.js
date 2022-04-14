@@ -3,6 +3,7 @@ import * as d3 from 'd3';
 class PiechartClass {
   constructor({
     elem,
+    elemForLegend,
     width,
     height,
     margin,
@@ -16,6 +17,8 @@ class PiechartClass {
       .attr('height', height)
       .append('g')
       .attr('transform', `translate(${width / 2},${height / 2})`);
+
+    this.legend = d3.select(elemForLegend);
 
     // устанавливаем цветовую схему для pie chart
     this.colors = d3
@@ -45,6 +48,38 @@ class PiechartClass {
 
   get getColors() {
     return this.colors;
+  }
+
+  selectActivePiepart(selectedPieIndex, legendLineIndex) {
+    this.getPiechart.selectAll('.piepart')
+      .each((_, i, nodes) => {
+        const node = nodes[i];
+        if (i === legendLineIndex) {
+          node.classList.add('piepartSelect');
+        } else if (
+          node.classList.contains('piepartSelect')
+              && selectedPieIndex !== i
+        ) {
+          node.classList.remove('piepartSelect');
+        }
+      });
+  }
+
+  selectActiveLegendLine(legendLineIndex, legendLineClass = 'legend-line') {
+    this.legend
+      .selectAll(`.${legendLineClass}`)
+      .each((_, i, nodes) => {
+        const node = nodes[i];
+        if (legendLineIndex === i) {
+          node.classList.add(`${legendLineClass}_hover`);
+        } else if (node.classList.contains(`${legendLineClass}_hover`)) {
+          node.classList.remove(`${legendLineClass}_hover`);
+        }
+      });
+  }
+
+  removePiechart() {
+    this.getPiechart.remove();
   }
 
   setEvents(events) {
