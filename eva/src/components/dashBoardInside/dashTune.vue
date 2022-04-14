@@ -34,13 +34,14 @@
           @change="onChangeSlider"
         />
       </div>
-      <div class="pt-4">
+      <div class="pt-4 d-flex flex-column align-center">
         <v-progress-circular
           :rotate="360"
           :size="circularSize"
           :width="circularWidth"
           :value="percentValue"
           :color="loading ? theme.$secondary_border : theme.$primary_button"
+          :class="value === 0 ? 'dash-map__min-value' : ''"
         >
           <div v-if="!loading">
             <span class="text-h4">{{ value }}%</span>
@@ -138,12 +139,10 @@ export default {
       if (this.widthFrom > 200 && this.heightFrom > 200) {
         if (this.widthFrom < this.heightFrom) {
           return this.widthFrom - 147;
-        } else {
-          return this.heightFrom - 147;
         }
-      } else {
-        return 60;
+        return this.heightFrom - 147;
       }
+      return 60;
     },
     circularWidth() {
       return this.circularSize / 10;
@@ -372,6 +371,14 @@ export default {
   display: flex
   justify-content: center
   align-items: center
+
+  .v-progress-circular__overlay
+    transition: all .3s ease-in-out
+    opacity: 1
+
+  &__min-value
+    .v-progress-circular__overlay
+      opacity: 0
 
   .v-slider__track-background
     background-color: var(--secondary_border) !important
