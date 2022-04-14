@@ -488,7 +488,6 @@ export default {
 .med
   height: 100%
   position: absolute
-  /* left: 0px; */
   right: 0
   z-index: 400
 
