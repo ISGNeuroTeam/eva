@@ -12,13 +12,12 @@
         :items="fieldList"
         label="Столбец данных"
         outlined
-        class="mt-6"
       />
     </div>
     <div
       v-else
       class="flex flex-grow-1 justify-center align-center"
-      :class="{ row: vertical, 'mt-6': !minSize}"
+      :class="{ row: vertical }"
     >
       <div class="flex-grow-0">
         <v-slider
@@ -367,7 +366,7 @@ export default {
 .dash-map
   color: var(--main_text) !important
   min-width: 360px
-  height: calc(100% - 50px)
+  height: calc(100% - 25px)
   display: flex
   justify-content: center
   align-items: center
