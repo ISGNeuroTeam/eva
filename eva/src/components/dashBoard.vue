@@ -68,10 +68,10 @@
             >
               [ {{ element }} ]
               <span
-                v-if="dataSourseTitle !== -1"
+                v-if="dataSourceId !== ''"
                 class="ml-1"
               >
-                {{ dataSourseTitle }}
+                {{ dataSourceTitle }}
               </span>
             </div>
             <div
@@ -100,6 +100,7 @@
         <div class="settings-dash-block">
           <div class="settings-dash">
             <v-dialog
+              ref="fullScreenModal"
               v-model="fullScreenMode"
               width="100%"
             >
@@ -170,10 +171,10 @@
                         >
                           [ {{ element }} ]
                           <span
-                            v-if="dataSourseTitle !== -1"
+                            v-if="dataSourceId !== ''"
                             class="ml-1"
                           >
-                            {{ dataSourseTitle }}
+                            {{ dataSourceTitle }}
                           </span>
                         </div>
                         <div
@@ -241,7 +242,8 @@
                   </v-card-title>
                   <v-card-text
                     :is="currentElem"
-                    v-show="showElement"
+                    v-if="showElement"
+                    ref="dashBoardInsideFull"
                     class="card-text element-itself"
                     :color-from="theme"
                     :style="{
@@ -264,12 +266,14 @@
                     :full-screen="true"
                     :table-per-page="tablePerPage"
                     :table-page="tablePage"
+                    :selected-pie-index="selectedPieIndex"
                     @hideDS="hideDS($event)"
                     @setVissible="setVissible($event)"
                     @setLoading="setLoading($event)"
                     @hideLoading="props.hideLoad = true"
                     @SetRange="setRange($event)"
                     @resetRange="resetRange($event)"
+                    @changeSelectPie="changeSelectedPie"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
                   />
@@ -426,7 +430,8 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-show="showElement"
+        v-if="showElement"
+        ref="dashBoardInside"
         class="card-text element-itself"
         :color-from="theme"
         :style="{ color: theme.$main_text, background: 'transparent' }"
@@ -446,12 +451,14 @@
         :is-full-screen="false"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
+        :selected-pie-index="selectedPieIndex"
         @hideDS="hideDS($event)"
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
         @SetRange="setRange($event)"
         @resetRange="resetRange($event)"
+        @changeSelectPie="changeSelectedPie"
         @update:table-per-page="onTableItemsPerPageChange"
         @update:table-page="onTableIItemsPageChange"
       />
@@ -501,7 +508,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     dataPageFrom: {
       type: String,
@@ -515,9 +522,9 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    dataSourseTitle: {
+    dataSourceId: {
       type: [String, Number],
-      default: -1,
+      default: '',
     },
     tooltipOpenDelay: {
       type: Number,
@@ -593,6 +600,9 @@ export default {
       },
       fullScreenWidth: 0.8 * window.innerWidth,
       fullScreenHeight: 0.8 * window.innerHeight,
+      selectedPieIndex: -1,
+      tuneValue: '',
+      tuneSliderValue: '',
     };
   },
   computed: {
@@ -638,17 +648,8 @@ export default {
     },
     dataMode() {
       this.changeOptions(this.dataModeFrom);
-      if (!this.dataModeFrom) {
-        if (
-          this.element.split('-')[0] === 'button'
-          || this.element.split('-')[0] === 'csvg'
-          || this.element.split('-')[0] === 'tile'
-        ) {
-          this.setPropDisappear(false);
-        }
-      } else {
-        this.setPropDisappear(true);
-      }
+      this.setPropDisappear(true);
+
       return this.dataModeFrom;
     },
     // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
@@ -752,12 +753,27 @@ export default {
     searchingData() {
       return this.searchData.length > 0;
     },
+    dataSourceTitle() {
+      return this.$store.state[this.idDash]?.searches?.length > 0
+        ? this.$store.state[this.idDash]?.searches
+          .find((element) => element?.id === this.dataSourceId)?.sid
+        : '';
+    },
   },
   watch: {
     fullScreenMode(to) {
+      const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
+      if (this.dataElemFrom === 'piechart') {
+        this.$nextTick(() => {
+          this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
+        });
+      }
       setTimeout(() => {
         this.disabledTooltip = to;
       }, to ? 0 : 600);
+      this.$nextTick(() => {
+        this.$refs[refNameComponent].$emit('fullScreenMode', to);
+      });
     },
     settingsIsOpened(to) {
       setTimeout(() => {
@@ -779,8 +795,19 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', this.onResize);
     });
+
+    if (this.element.includes('textarea') || this.element.includes('button')) {
+      this.$store.commit('setSwitch', {
+        idDash: this.idDash,
+        status: true,
+        id: this.element,
+      });
+    }
   },
   methods: {
+    changeSelectedPie(val) {
+      this.selectedPieIndex = val;
+    },
     onTableIItemsPageChange(page) {
       this.tablePage = page;
     },
@@ -915,7 +942,7 @@ export default {
       this.$emit('SetLevel', level);
     },
     exportDataCSV() {
-      const searchId = this.$store.state[this.idDash][this.element].should;
+      const searchId = this.$store.state[this.idDash][this.element].search;
       this.$emit('downloadData', searchId);
     },
     getData(searchID) {
@@ -923,10 +950,10 @@ export default {
       let db = null;
       const request = indexedDB.open('EVA', 1);
       request.onerror = (event) => {
-        console.log('error: ', event);
+        console.error('error: ', event);
       };
       request.onupgradeneeded = (event) => {
-        console.log('create');
+        // console.log('create');
         db = event.target.result;
         if (!db.objectStoreNames.contains('searches')) {
           // if there's no "books" store
@@ -934,7 +961,7 @@ export default {
         }
         request.onsuccess = () => {
           db = request.result;
-          console.log(`successEvent: ${db}`);
+          // console.log(`successEvent: ${db}`);
         };
       };
       return new Promise((resolve) => {
@@ -953,7 +980,7 @@ export default {
             }
           };
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            console.error('Ошибка', query.error);
           };
         };
       });
@@ -1167,7 +1194,7 @@ export default {
       this.$emit('SetRange', range);
     },
     resetRange() {
-      this.$emit('ResetRange', this.dataSourseTitle);
+      this.$emit('ResetRange', this.dataSourceId);
     },
   },
 };

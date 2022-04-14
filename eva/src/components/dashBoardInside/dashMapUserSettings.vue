@@ -29,7 +29,7 @@
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               rounded
-              :style="`background: ${theme.$secondary_bg}`"
+              :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
               v-bind="attrs"
               v-on="on"
             >
@@ -298,7 +298,7 @@
             <v-list
               :style="`color: ${theme.$main_text} !important; max-height: 382px`"
               class="overflow-y-auto"
-              :color="theme.$secondary_bg"
+              :color="theme.$main_bg"
             >
               <v-list-item
                 v-for="item in library.objects"
@@ -401,7 +401,6 @@ export default {
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
       currentTile: {},
-      searches: [],
       tileLayers: [
         {
           name: 'Заданная в настройках',
@@ -438,7 +437,7 @@ export default {
           y: 74.35169122692963,
         },
         showLegend: true,
-        mode: '',
+        mode: [],
         search: '',
       },
     };
@@ -457,17 +456,17 @@ export default {
       return this.getLibrary;
     },
     getLibrary() {
-      return this.elementFromStore?.options?.library;
+      return this.dashFromStore?.options?.library;
     },
-    elementFromStore() {
+    dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
     },
     getOptions() {
-      if (!this.idDash) {
+      if (!this.idElement) {
         return [];
       }
       if (!this.dashFromStore.options) {
-        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idDashFrom });
+        this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idElement });
       }
 
       if (!this.dashFromStore?.options.pinned) {
@@ -502,6 +501,12 @@ export default {
 
       return this.dashFromStore.options;
     },
+    searches() {
+      if (typeof this.$store.state[this.idDashFrom].searches === 'object') {
+        return Object.values(this.$store.state[this.idDashFrom].searches);
+      }
+      return this.$store.state[this.idDashFrom]?.searches || [];
+    },
   },
   watch: {
     options: {
@@ -530,10 +535,8 @@ export default {
         options: initOptions,
       });
     } else {
-      this.options = options;
+      this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
     }
-
-    this.searches = this.loadDataForPipe();
   },
   methods: {
     onClickChoosingCoordinates() {
@@ -553,12 +556,13 @@ export default {
     },
     updatePipeDataSource(e) {
       const set = new Set(e);
-      set.delete(this.options.mode[0]);
+      if (this.options.mode) {
+        set.delete(this.options.mode[0]);
+      }
       this.options.mode = Array.from(set);
-      this.$emit('updatePipeDataSource', this.options.search);
-    },
-    loadDataForPipe() {
-      return this.$store.state[this.idDashFrom].searches;
+      if (this.options.search) {
+        this.$emit('updatePipeDataSource', this.options.search);
+      }
     },
     closeLegend() {
       this.options.showLegend = false;
@@ -638,7 +642,7 @@ export default {
         );
         this.options.colorsPie = this.colorsPie;
         if (this.colorsPie.theme === 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(',');
+          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
           this.colorsPie.theme = this.colorsPie.nametheme;
         }
         this.options.themes = this.themes;
@@ -673,7 +677,7 @@ export default {
   position: absolute
   /* left: 0px; */
   right: 0
-  z-index: 1000000
+  z-index: 400
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important

@@ -44,6 +44,10 @@
       <div
         ref="legends"
         class="legend-block-pie"
+        :class="dashOptions.positionlegend === 'top'
+          || dashOptions.positionlegend === 'bottom'
+          ? 'legend-block-pie__horizontally'
+          : 'legend-block-pie__vertically'"
       >
         <div
           v-for="(item, idx) in legends"
@@ -56,7 +60,7 @@
           "
           @mouseover="hoverLegendLine(idx)"
           @mouseleave="hoverLegendLine(null)"
-          @click="selectedPieIndex = idx"
+          @click="selectedPie = idx"
         >
           <div
             class="square"
@@ -102,19 +106,18 @@ export default {
       type: Number,
       required: true,
     }, // высота родительского компонента
-    activeElemFrom: {
-      type: String,
-      required: true,
-    }, // id активного элемента
-    dataReport: {
+    selectedPieIndex: {
+      type: Number,
+      default: -1,
+    }, // индекс активного элемента
+    isFullScreen: {
       type: Boolean,
-      required: true,
-    }, // проверяет что элемент в исследовании данных
+      default: false,
+    },
   },
   data() {
     return {
       nodata: true,
-      selectedPieIndex: null,
       message: 'Нет данных для отображения',
       legends: [],
       positionLegends: 'row nowrap',
@@ -123,6 +126,9 @@ export default {
     };
   },
   computed: {
+    idDash() {
+      return this.idDashFrom;
+    },
     dashFromStore() {
       return this.$store.state[this.idDash][this.idFrom];
     },
@@ -133,7 +139,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-
       if (!this.dashFromStore?.options.pinned) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -163,7 +168,6 @@ export default {
           value: false,
         }]);
       }
-
       return this.dashFromStore.options;
     },
     // осоновные параметры, которые чатсо меняются и которы следует отслеживать
@@ -227,22 +231,41 @@ export default {
     change() {
       return true;
     },
+    selectedPie: {
+      get() {
+        return this.selectedPieIndex;
+      },
+      set(val) {
+        this.$emit('changeSelectPie', val);
+      },
+    },
   },
   watch: {
     'dashOptions.colorsPie': {
-      handler() {
-        const graphics = d3
-          .select(this.$refs.piechartItself)
-          .selectAll('svg')
-          .nodes();
-        if (graphics.length !== 0) {
-          graphics[0].remove();
-          this.createPieChartDash();
-        } else {
-          this.createPieChartDash();
+      handler(val, old) {
+        if (val && val !== old) {
+          this.changePieChart();
         }
       },
       deep: true,
+    },
+    'dashOptions.positionlegend': {
+      handler(val, old) {
+        if (val && val !== old) {
+          this.changePieChart();
+        }
+      },
+      deep: true,
+    },
+    widthFrom(val, old) {
+      if (val !== old) {
+        this.changePieChart();
+      }
+    },
+    heightFrom(val, old) {
+      if (val !== old) {
+        this.changePieChart();
+      }
     },
     selectedPieIndex(newVal) {
       if (newVal !== null) this.setToken(newVal);
@@ -299,17 +322,22 @@ export default {
   },
   methods: {
     hoverLegendLine(legendLineIndex) {
+      this.setActiveLegendLine(legendLineIndex);
+    },
+    setActiveLegendLine(legendLineIndex) {
       d3.select(this.$refs.pieChart)
         .selectAll('.piepart')
         .each((_, i, nodes) => {
           const node = nodes[i];
-          if (i === legendLineIndex) node.classList.add('piepartSelect');
-          else if (
+          if (i === legendLineIndex) {
+            node.classList.add('piepartSelect');
+          } else if (
             node.classList.contains('piepartSelect')
             && this.selectedPieIndex !== i
-          ) node.classList.remove('piepartSelect');
+          ) {
+            node.classList.remove('piepartSelect');
+          }
         });
-
       d3.select(this.$refs.legends)
         .selectAll('.legend-line')
         .each((_, i, nodes) => {
@@ -362,8 +390,7 @@ export default {
 
       if (this.dashOptions?.metricsRelation?.relations) {
         const metrics = this.dashOptions.metricsRelation.relations;
-
-        if (typeof this.dataRestFrom[0][metrics[1]] === 'number') {
+        if (typeof this.dataRestFrom[0]?.[metrics[1]] === 'number') {
           // если все-таки число
           this.nodata = false; // то убираем соощение о отсутствии данных
           if (this.dataRestFrom.length > 20) {
@@ -399,6 +426,7 @@ export default {
                       colorsPie,
                     ); // и собственно создаем график
                     clearTimeout(timeOut);
+                    this.setActiveLegendLine(this.selectedPieIndex);
                   } else {
                     timeOut = setTimeout(tick.bind(this), 100);
                   }
@@ -415,6 +443,7 @@ export default {
                 positionlegend,
                 colorsPie,
               ); // и собственно создаем график
+              this.setActiveLegendLine(this.selectedPieIndex);
             }
           }
         } else {
@@ -520,7 +549,7 @@ export default {
         .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
         .attr('class', 'piepart')
         .attr('fill', (d) => color(d.data.key))
-        .attr('stroke', this.theme.$main_bg)
+        .attr('stroke', 'inherit')
         .style('stroke-width', '2px')
         .on('mouseover', (d, i, nodes) => {
           const node = nodes[i];
@@ -538,33 +567,46 @@ export default {
         .on('mouseout', (_, i, nodes) => {
           if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
           tooltipEl.style.visibility = 'hidden';
-          hoverLegendLine(null);
+          hoverLegendLine(-1);
         })
         .on('click', (_, i, nodes) => {
           const node = nodes[i];
           if (this.selectedPieIndex === i) {
-            this.selectedPieIndex = null;
+            this.selectedPie = -1;
             node.classList.remove('piepartSelect');
           } else {
-            this.selectedPieIndex = i;
+            this.selectedPie = i;
             node.classList.add('piepartSelect');
           }
         });
     },
     setToken(pieIndex) {
       const tokens = this.$store.state[this.idDashFrom].tockens;
-
-      tokens.forEach((tocken) => {
-        if (tocken.elem === this.idFrom) {
-          const value = this.dataRestFrom[pieIndex][tocken.capture];
-          this.$store.commit('setTocken', {
-            tocken,
-            value,
-            idDash: this.idDashFrom,
-            store: this.$store,
-          });
-        }
-      });
+      if (tokens?.length > 0) {
+        tokens.forEach((tocken) => {
+          if (tocken.elem === this.idFrom) {
+            const value = ` ${this.dataRestFrom[pieIndex][tocken.capture]} `;
+            this.$store.commit('setTocken', {
+              token: tocken,
+              value,
+              idDash: this.idDashFrom,
+              store: this.$store,
+            });
+          }
+        });
+      }
+    },
+    changePieChart() {
+      const graphics = d3
+        .select(this.$refs.piechartItself)
+        .selectAll('svg')
+        .nodes();
+      if (graphics.length !== 0) {
+        graphics[0].remove();
+        this.createPieChartDash();
+      } else {
+        this.createPieChartDash();
+      }
     },
   },
 };

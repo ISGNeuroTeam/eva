@@ -29,7 +29,7 @@
       :data-elem-from="id"
       :loading="loading"
       :search-data="searchData"
-      :data-sourse-title="dataSourseTitle"
+      :data-source-id="dataSourceId"
       @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
@@ -44,7 +44,7 @@ export default {
   props: {
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     idDashFrom: {
       type: String,
@@ -74,9 +74,9 @@ export default {
       type: Array,
       default: () => ([]),
     },
-    dataSourseTitle: {
+    dataSourceId: {
       type: [String, Number],
-      default: -1,
+      default: '',
     },
   },
   data() {
@@ -250,7 +250,7 @@ export default {
   box-sizing: border-box;
   outline: none;
   border-radius: 4px;
-  transition: transform ease 0.3s;
+  transition: all 0.1s linear;
 }
 .vdr.active {
   outline-color: inherit;

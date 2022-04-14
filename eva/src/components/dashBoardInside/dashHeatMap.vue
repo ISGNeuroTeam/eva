@@ -208,16 +208,18 @@ export default {
       deep: true,
       immediate: true,
       handler(newVal) {
-        if (newVal.x) this.xField = newVal.x;
-        if (newVal.y) this.yField = newVal.y;
-        if (newVal.data) this.dataField = newVal.data;
-        if (newVal.x) this.renderData = newVal.metadata;
-        if (newVal.detailValue) this.detailValue = newVal.detailValue;
-        if (newVal.ySort) this.yFieldSort = newVal.ySort;
-        if (newVal.ySort) this.xFieldSort = newVal.xSort;
-        if (newVal.ySort) this.yFieldFormat = newVal.yFormat;
-        if (newVal.ySort) this.xFieldFormat = newVal.xFormat;
-        this.updateData += 1;
+        if (newVal) {
+          if (newVal.x) this.xField = newVal.x;
+          if (newVal.y) this.yField = newVal.y;
+          if (newVal.data) this.dataField = newVal.data;
+          if (newVal.x) this.renderData = newVal.metadata;
+          if (newVal.detailValue) this.detailValue = newVal.detailValue;
+          if (newVal.ySort) this.yFieldSort = newVal.ySort;
+          if (newVal.ySort) this.xFieldSort = newVal.xSort;
+          if (newVal.ySort) this.yFieldFormat = newVal.yFormat;
+          if (newVal.ySort) this.xFieldFormat = newVal.xFormat;
+          this.updateData += 1;
+        }
         this.render();
       },
     },
@@ -229,6 +231,19 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+
+    if (this.idDash === 'reports') {
+      if (this.dataRestFrom && this.dataRestFrom[0]) {
+        const fields = Object.keys(this.dataRestFrom[0]);
+        this.$store.commit('setOptions', {
+          id: this.idFrom,
+          idDash: this.idDashFrom,
+          options: {},
+          titles: fields,
+        });
+      }
+      this.render();
+    }
   },
 
   methods: {
@@ -239,8 +254,8 @@ export default {
         val = this.filteredData[x][y]?.value;
         row = this.filteredData[x][y]?.row;
       }
-
-      this.$store.state[this.idDash].tockens.forEach((token) => {
+      const tokens = this.$store.state[this.idDash]?.tockens || [];
+      tokens.forEach((token) => {
         if (token.elem === this.id && token.action === 'click') {
           let value;
           const { capture } = token;
@@ -253,7 +268,7 @@ export default {
             value = null;
           }
           this.$store.commit('setTocken', {
-            tocken: token,
+            token,
             idDash: this.idDash,
             value,
           });

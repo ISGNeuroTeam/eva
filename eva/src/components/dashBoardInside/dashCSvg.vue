@@ -170,19 +170,19 @@ export default {
     }, // объект тултипа
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     }, // выключена ли шапка или включена
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     isFullScreen: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -305,11 +305,55 @@ export default {
       },
     },
     dataRestFrom() {
+      this.getDataRestFrom();
+    },
+    dataModeFrom(dataMode) {
+      if (dataMode) {
+        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
+      } else {
+        this.otstupBottom = 10;
+      }
+    },
+    widthFrom() {
+      this.checkSize();
+    },
+    heightFrom() {
+      this.checkSize();
+    },
+    captures(captures) {
+      this.actions[0].capture = captures;
+      this.$store.commit('setActions', {
+        actions: this.actions,
+        idDash: this.idDash,
+        id: this.id,
+      });
+    },
+  },
+  mounted() {
+    if (this.$refs.svgBlock) {
+      this.getDataRestFrom();
+
+      this.$refs.svgBlock.addEventListener('keydown', (event) => {
+        if (event.key === 'Control') {
+          this.tooltipPress = !this.tooltipPress;
+          if (!this.tooltipPress) {
+            this.tooltipShow = false;
+            this.linkCanvasShow = false;
+          } else {
+            this.tooltipShow = true;
+            this.linkCanvasShow = true;
+          }
+        }
+      });
+    }
+  },
+  methods: {
+    getDataRestFrom() {
       if (
         this.dataRestFrom
-        && Object.keys(this.dataRestFrom).length !== 0
-        && this.dataRestFrom[0].svg_filename
-        && this.dataRestFrom[0].svg_filename !== ''
+          && Object.keys(this.dataRestFrom).length !== 0
+          && this.dataRestFrom[0].svg_filename
+          && this.dataRestFrom[0].svg_filename !== ''
       ) {
         if (this.dataReport) {
           if (this.activeElemFrom === this.id) {
@@ -337,45 +381,6 @@ export default {
         this.otstupBottom = 30;
       }
     },
-    dataModeFrom(dataMode) {
-      if (dataMode) {
-        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
-      } else {
-        this.otstupBottom = 10;
-      }
-    },
-    widthFrom() {
-      this.checkSize();
-    },
-    heightFrom() {
-      this.checkSize();
-    },
-    captures(captures) {
-      this.actions[0].capture = captures;
-      this.$store.commit('setActions', {
-        actions: this.actions,
-        idDash: this.idDash,
-        id: this.id,
-      });
-    },
-  },
-  mounted() {
-    if (this.$refs.svgBlock) {
-      this.$refs.svgBlock.addEventListener('keydown', (event) => {
-        if (event.key === 'Control') {
-          this.tooltipPress = !this.tooltipPress;
-          if (!this.tooltipPress) {
-            this.tooltipShow = false;
-            this.linkCanvasShow = false;
-          } else {
-            this.tooltipShow = true;
-            this.linkCanvasShow = true;
-          }
-        }
-      });
-    }
-  },
-  methods: {
     async getSvg(svg) {
       this.$emit('setLoading', true);
       const response = await this.$store.dispatch('setSvg', svg);
@@ -393,6 +398,7 @@ export default {
     },
     checkSize() {
       // TODO: для чего здесь эта строка?
+      // eslint-disable-next-line no-unused-expressions
       this.$refs.csvg;
       if (this.svg !== 'Нет данных для отображения' && this.svg !== '') {
         let timeOut = setTimeout(
@@ -617,14 +623,14 @@ export default {
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           if (item === 'object') {
             this.$store.commit('setTocken', {
-              tocken,
+              token: tocken,
               idDash: this.idDash,
               value: token,
               store: this.$store,
             });
           } else if (tockens[i].capture === token) {
             this.$store.commit('setTocken', {
-              tocken,
+              token: tocken,
               idDash: this.idDash,
               value: id,
               store: this.$store,
@@ -670,7 +676,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: token,
             store: this.$store,

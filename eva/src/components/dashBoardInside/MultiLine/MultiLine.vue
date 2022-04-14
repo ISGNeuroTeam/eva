@@ -66,20 +66,20 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     isFullScreen: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     /** Props from Reports page. */
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
   },
   data: () => ({
@@ -410,7 +410,7 @@ export default {
 
           [tocken.filterParam] = Object.keys(this.dataRestFrom[0]);
           this.$store.commit('setTocken', {
-            tocken, value, idDash, store,
+            token: tocken, value, idDash, store,
           });
         }
       }
@@ -735,7 +735,7 @@ export default {
         .selectAll(`.dot-${i}`)
         .transition()
         .duration(duration)
-        .attr('cx', (d) => {
+        .attr('cx', function (d) {
           const xVal = x(d[xMetric] * secondTransf);
           const yVal = isUnitedMode
             ? y(d[metricNames[i]])
@@ -779,14 +779,20 @@ export default {
         .selectAll('.vetical-line')
         .transition()
         .duration(duration)
-        .attr('x1', () => x(this.getAttribute('xVal')))
-        .attr('x2', () => x(this.getAttribute('xVal')));
+        .attr('x1', function () {
+          return x(this.getAttribute('xVal'));
+        })
+        .attr('x2', function () {
+          return x(this.getAttribute('xVal'));
+        });
 
       group
         .selectAll('.dot-vertical')
         .transition()
         .duration(duration)
-        .attr('cx', () => x(this.getAttribute('xVal')));
+        .attr('cx', function () {
+          return x(this.getAttribute('xVal'));
+        });
     },
 
     setXAxisCaptionsRotate() {
@@ -1333,6 +1339,7 @@ export default {
                 .on('mouseleave', function () {
                   if (!this.getAttribute('data-last-bar')) {
                     allDotHover.forEach((dot) => {
+                      // eslint-disable-next-line no-underscore-dangle
                       if (extraDot.indexOf(dot.__data__) === -1) {
                         dot.style.opacity = 0;
                       }
@@ -1381,12 +1388,12 @@ export default {
 
                   return h;
                 })
-                .attr('transform', () => {
+                .attr('transform', function () {
                   const translate = this.width.baseVal.value / 2;
                   return `translate(-${translate}, 0)`;
                 })
                 .attr('fill', this.legendColors[metricIndex])
-                .on('mouseenter', (d) => {
+                .on('mouseenter', function (d) {
                   const date = new Date(d[xMetric] * secondTransf);
                   let day = date.getDate();
                   let month = date.getMonth() + 1;
@@ -1413,13 +1420,16 @@ export default {
                     .filter((dot) => {
                       if (
                         dot.classList.contains('dot')
-                              && dot.__data__[xMetric]
-                              === d[xMetric] * secondTransf
-                              && dot.__data__[dot.getAttribute('metric')] !== null
+                        // eslint-disable-next-line no-underscore-dangle
+                          && dot.__data__[xMetric]
+                          === d[xMetric] * secondTransf
+                        // eslint-disable-next-line no-underscore-dangle
+                          && dot.__data__[dot.getAttribute('metric')] !== null
                       ) {
                         dot.style.opacity = 1;
                         return dot;
                       }
+                      return false;
                     });
                   lineDot
                     .attr('x1', rectX)
@@ -1427,7 +1437,7 @@ export default {
                     .attr('opacity', 0.7);
                   tooltip.style('opacity', 1).style('visibility', 'visible');
                 })
-                .on('mousemove', () => {
+                .on('mousemove', function () {
                   const { offsetX, offsetY } = d3.event;
                   const tooltipWidth = tooltipBlock.offsetWidth;
                   const tooltipHalfHeight = tooltipBlock.offsetHeight / 2;
@@ -1448,7 +1458,7 @@ export default {
 
                   tooltip.style('left', `${left}px`).style('top', `${top}px`);
                 })
-                .on('mouseleave', () => {
+                .on('mouseleave', function () {
                   if (!this.getAttribute('data-last-bar')) {
                     allDotHover.forEach((dot) => {
                       // eslint-disable-next-line no-underscore-dangle
@@ -1511,7 +1521,7 @@ export default {
                   .attr('stroke-width', this.strokeWidth)
                   .style(
                     'stroke-dasharray',
-                    getStyleLine(type_line[metricName]),
+                    getStyleLine(typeLine[metricName]),
                   )
                   .attr(
                     'd',
@@ -1681,12 +1691,14 @@ export default {
                   .filter((dot) => {
                     if (
                       dot.classList.contains('dot')
+                      // eslint-disable-next-line no-underscore-dangle
                         && dot.__data__[dot.getAttribute('metric')] !== null
                         && dot.getAttribute('cx') === x(d[xMetric] * secondTransf)
                     ) {
                       dot.style.opacity = 1;
                       return dot;
                     }
+                    return false;
                   });
 
                 this.style.opacity = 1;
@@ -1701,6 +1713,7 @@ export default {
 
                 if (!this.getAttribute('data-last-dot')) {
                   allDotHover.forEach((dot) => {
+                    // eslint-disable-next-line no-underscore-dangle
                     if (extraDot.indexOf(dot.__data__) === -1) {
                       dot.style.opacity = 0;
                     }
@@ -1774,7 +1787,7 @@ export default {
             brushObj.endX = change;
           }
 
-          if (this.brush.select('.selection').attr('width') > 5) {
+          if (this.brush?.select('.selection').attr('width') > 5) {
             this.updateData(x, yScales, [brushObj.startX, brushObj.endX]);
           }
 
@@ -1905,7 +1918,7 @@ export default {
               ),
           )
           .selectAll('.tick > text')
-          .each(() => {
+          .each(function () {
             const w = this.getBBox().width;
             if (w > maxLength) maxLength = w;
           });
@@ -2142,6 +2155,7 @@ export default {
                   && dot.getAttribute('cx') === x(d[xMetric] * secondTransf));
 
             this.style.opacity = 1;
+            // eslint-disable-next-line no-undef
             lineDot.attr('x1', cx).attr('x2', cx).attr('opacity', 0.7);
             tooltip.style('opacity', 1).style('visibility', 'visible');
           })
@@ -2177,6 +2191,7 @@ export default {
             });
 
             this.style.opacity = opacity;
+            // eslint-disable-next-line no-undef
             lineDot.attr('opacity', 0);
             tooltip.style('opacity', 0).style('visibility', 'hidden');
           });
@@ -2401,6 +2416,7 @@ export default {
                 // eslint-disable-next-line no-underscore-dangle
                     && dot.__data__[dot.getAttribute('metric')] !== null);
 
+              // eslint-disable-next-line no-undef
               lineDot.attr('x1', rectX).attr('x2', rectX).attr('opacity', 0.7);
               tooltip.style('opacity', 1).style('visibility', 'visible');
             })
@@ -2434,6 +2450,7 @@ export default {
                   }
                 });
               }
+              // eslint-disable-next-line no-undef
               lineDot.attr('opacity', 0);
               tooltip.style('opacity', 0).style('visibility', 'hidden');
             });

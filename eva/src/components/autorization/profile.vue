@@ -127,7 +127,7 @@
     </v-content>
     <footer-bottom />
     <modal-profile
-      :active-from="activeModal"
+      v-model="activeModal"
       :create="createSome"
       :key-from="keyFrom"
       :cur-item-from="curItem"
@@ -165,10 +165,7 @@ export default {
       activeDelete: false,
       createSome: false,
       colorRow: false,
-      keyFrom: {
-        type: Number,
-        required: true,
-      },
+      keyFrom: '',
       dataDelete: {},
       curItem: {},
       permission: true,
@@ -196,8 +193,9 @@ export default {
     editUser(act, item, key) {
       this.user = act === 'create' ? {} : item;
       this.createSome = act === 'create';
-
-      this.curItem = item;
+      if (item) {
+        this.curItem = item;
+      }
       this.keyFrom = key;
 
       if (act !== 'create') {
@@ -301,7 +299,7 @@ export default {
             });
             table.addEventListener('mouseout', (event) => {
               if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style = `background: transparent !important;color:${this.theme.$main_text}`;
+                event.target.parentElement.style = 'background: transparent !important;';
               }
             });
           } else {
@@ -341,10 +339,12 @@ export default {
       this.dataDelete.essence = i;
       this.activeDelete = true;
     },
-    closeModal() {
+    closeModal(isClearChanges = true) {
       this.activeDelete = false;
       this.activeModal = false;
-      this.getData(`tab-${this.keyFrom}`);
+      if (!isClearChanges) {
+        this.getData(`tab-${this.keyFrom}`);
+      }
     },
   },
 };

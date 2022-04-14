@@ -14,7 +14,7 @@
       class="modal-confirm"
       :style="{
         background: theme.$main_bg,
-        'box-shadow': `0 3px 1px -2px ${theme.$main_border},0 2px 2px 0 ${theme.$main_border},0 1px 5px 0 ${theme.$main_border}`
+        'box-shadow': calcBoxShadow
       }"
     >
       <v-card-text class="modal-confirm__wrapper">
@@ -82,6 +82,13 @@ export default {
     },
   },
   computed: {
+    calcBoxShadow() {
+      return `
+          0 3px 1px -2px ${this.theme.$main_border},
+          0 2px 2px 0 ${this.theme.$main_border},
+          0 1px 5px 0 ${this.theme.$main_border}
+        `;
+    },
     confirmModal: {
       get() {
         return this.modalValue;

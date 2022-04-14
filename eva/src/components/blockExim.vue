@@ -91,7 +91,7 @@ export default {
   methods: {
     async exportDash() {
       const response = await this.$store.dispatch('exportDash', this.idDash);
-      if (response.status != 200) {
+      if (response.status !== 200) {
         this.msgExp.text = 'Экспортировать не удалось';
         this.msgExp.color = 'controlsActive';
         this.msgExp.opacity = '1';
@@ -115,7 +115,7 @@ export default {
           idDash: this.idDash,
           file: this.file,
         });
-        if (response.status != 200) {
+        if (response.status !== 200) {
           this.msgImp.text = 'Импортировать не удалось';
           this.msgImp.color = 'controlsActive';
           this.msgImp.opacity = '1';
@@ -145,7 +145,7 @@ export default {
       };
 
       reader.onerror = function () {
-        console.log(reader.error);
+        console.error(reader.error);
       };
     },
     downloadDash(url) {

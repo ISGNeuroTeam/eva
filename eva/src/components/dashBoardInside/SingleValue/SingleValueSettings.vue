@@ -79,7 +79,7 @@
               :class="`metric-${settings.metricCount} v-${n} ${
                 n === settings.template ? 'selected' : ''
               }`"
-              @click="settings.template = n"
+              @click="setSettingTemplate(n)"
             >
               <div
                 v-for="m in settings.metricCount"
@@ -221,8 +221,11 @@
                   v-for="color in colorsList"
                   :key="color.name"
                   class="color-select"
-                  :class="{ selected: metric.color === color.name }"
-                  @click="metric.color = color.name; isChanged = true"
+                  :class="{
+                    selected: metric.color === color.name,
+                    disabled: color.name ==='range' && !metric.metadata
+                  }"
+                  @click="onChangeColor(metric, color)"
                 >
                   <div
                     v-if="color.colorGrad"
@@ -305,7 +308,9 @@ export default {
     mdiChevronUp,
     mdiChevronDown,
     /** Local settings object based on receivedSettings props. */
-    settings: {},
+    settings: {
+      template: 1,
+    },
     /** Font size select items. */
     fontSizeList: [12, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
     /** Font weight select items. */
@@ -359,12 +364,12 @@ export default {
     },
 
     isAllMetricsExpanded() {
-      const { metricOptions = [] } = this.settings;
+      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
       return metricOptions.every((m) => m.expanded === true);
     },
 
     metricCountList() {
-      const { metricOptions = [] } = this.settings;
+      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
       const metricCount = metricOptions.length;
       const countList = [];
 
@@ -387,12 +392,23 @@ export default {
     receivedSettings(newValue) {
       const newSettings = JSON.parse(JSON.stringify(newValue));
       // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
-      this.settings = {
-        ...newSettings,
-        metricOptions: newSettings.metricOptions.sort(
-          (a, b) => a.listOrder - b.listOrder,
-        ),
-      };
+      this.$set(
+        this,
+        'settings',
+        {
+          ...newSettings,
+          metricOptions: newSettings.metricOptions.sort(
+            (a, b) => a.listOrder - b.listOrder,
+          ),
+          template: this.settings.template || 1,
+        },
+      );
+      // this.settings = {
+      //   ...newSettings,
+      //   metricOptions: newSettings.metricOptions.sort(
+      //     (a, b) => a.listOrder - b.listOrder,
+      //   ),
+      // };
     },
     settings(newSet, old) {
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
@@ -401,6 +417,14 @@ export default {
     },
   },
   methods: {
+    onChangeColor(metric, color) {
+      if (color.name === 'range' && !metric.metadata) return;
+      metric.color = color.name;
+      this.isChanged = true;
+    },
+    setSettingTemplate(n) {
+      this.$set(this.settings, 'template', n);
+    },
     changeColorData(metric, color) {
       if (color.name !== 'range' || (color.name === 'range' && metric.metadata)) metric.color = color.name;
     },
@@ -408,10 +432,19 @@ export default {
     handleChangeShowTitle() {
       if (this.settings) {
         this.isChanged = true;
-        this.settings = {
-          ...JSON.parse(JSON.stringify(this.settings)),
-          showTitle: !this.settings.showTitle,
-        };
+        this.$set(
+          this,
+          'settings',
+          {
+            ...JSON.parse(JSON.stringify(this.settings)),
+            showTitle: !this.settings.showTitle,
+            template: this.settings.template || 1,
+          },
+        );
+        // this.settings = {
+        //   ...JSON.parse(JSON.stringify(this.settings)),
+        //   showTitle: !this.settings.showTitle,
+        // };
       }
     },
 
@@ -423,13 +456,23 @@ export default {
     },
 
     save() {
-      this.$emit('save', { ...this.settings });
+      this.$emit('save', { ...JSON.parse(JSON.stringify(this.settings)) });
       this.close(true);
     },
 
     handleChangeCount(count) {
-      this.settings.template = 1;
-      this.settings.metricCount = count;
+      this.$set(
+        this.settings,
+        'template',
+        1,
+      );
+      this.$set(
+        this.settings,
+        'metricCount',
+        count,
+      );
+      // this.settings.template = 1;
+      // this.settings.metricCount = count;
     },
 
     update() {
@@ -438,7 +481,15 @@ export default {
 
     close(save = false) {
       if (!save || typeof save === 'object') {
-        this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
+        this.$set(
+          this,
+          'settings',
+          {
+            ...JSON.parse(JSON.stringify(this.receivedSettings)),
+            template: this.settings.template || 1,
+          },
+        );
+        // this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
       }
       this.toggleAllMetrics(false);
       this.$emit('close');
@@ -453,10 +504,11 @@ export default {
     },
 
     toggleAllMetrics(value = true) {
-      const { metricOptions = [] } = this.settings;
+      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
       metricOptions.forEach((metric) => {
         metric.expanded = value;
       });
+      this.$set(this.settings, 'metricOptions', metricOptions);
     },
   },
 };

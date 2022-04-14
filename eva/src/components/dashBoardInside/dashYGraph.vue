@@ -444,6 +444,9 @@ export default {
       }
       return '60px';
     },
+    idDash() {
+      return this.idDashFrom;
+    },
     parentNodes() {
       if (!this.currentNode || !this.currentNode.id) return [];
       return this.dataRestFrom
@@ -816,11 +819,12 @@ export default {
     },
     createTockens(result) {
       const captures = Object.keys(result[0]);
-      this.actions.forEach((item, i) => {
-        this.$set(this.actions[i], 'capture', captures);
+      const localActions = JSON.parse(JSON.stringify(this.actions));
+      localActions.forEach((item, i) => {
+        this.$set(localActions[i], 'capture', captures);
       });
       this.$store.commit('setActions', {
-        actions: JSON.parse(JSON.stringify(this.actions)),
+        actions: JSON.parse(JSON.stringify(localActions)),
         idDash: this.idDashFrom,
         id: this.idFrom,
       });
@@ -858,12 +862,12 @@ export default {
       });
       mode.addItemClickedListener((sender, args) => {
         if (args.item instanceof yfile.INode) {
-          const tokens = this.$store.state[this.idDashFrom].tockens;
+          const tokens = this.$store.state[this.idDashFrom]?.tockens || [];
           tokens.forEach((token) => {
             if (token.elem === this.idFrom && token.action === 'click') {
               const value = args.item.tag[token.capture];
               this.$store.commit('setTocken', {
-                tocken: token,
+                token,
                 idDash: this.idDashFrom,
                 store: this.$store,
                 value,

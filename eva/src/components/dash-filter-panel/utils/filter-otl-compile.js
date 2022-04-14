@@ -4,11 +4,9 @@ export function filterCompile(filter) {
   if (filter.parts.length > 0) {
     let firstPartWithValuesIndex = 0;
 
-    for (const idxPart in filter.parts) {
-      const part = filter.parts[+idxPart];
-
-      if (part.values?.length > 0 || part.filterPartType === 'manual') {
-        if (idxPart === String(firstPartWithValuesIndex)) {
+    filter.parts.forEach((item, index) => {
+      if (item.values?.length > 0 || item.filterPartType === 'manual') {
+        if (index === firstPartWithValuesIndex) {
           filterOtlText += 'search ';
 
           // If filter inverted to open parenthesis to "NOT" directive of whole search text
@@ -18,22 +16,22 @@ export function filterCompile(filter) {
         }
 
         // If part inverted
-        if (part.invertMatches) filterOtlText += 'NOT ';
+        if (item.invertMatches) filterOtlText += 'NOT ';
 
         filterOtlText += '(';
 
-        switch (part.filterPartType) {
+        switch (item.filterPartType) {
           case 'manual':
-            switch (part.fieldType) {
+            switch (item.fieldType) {
               case 'string':
-                filterOtlText += `${part.fieldName}="${part.value.trim()}")`;
+                filterOtlText += `${item.fieldName}="${item.value.trim()}")`;
                 break;
               case 'number':
-                filterOtlText += `${part.fieldName}${part.operationManual}${part.value})`;
+                filterOtlText += `${item.fieldName}${item.operationManual}${item.value})`;
                 break;
               case 'date':
-                filterOtlText += `${part.fieldName}${part.operationManual}${
-                  Date.parse(part.value) / 1000
+                filterOtlText += `${item.fieldName}${item.operationManual}${
+                  Date.parse(item.value) / 1000
                 })`;
                 break;
               default:
@@ -41,26 +39,25 @@ export function filterCompile(filter) {
             }
             break;
           case 'token':
-            if (part.token.elem === 'multiLine') {
-              if (part.token.capture === 'start') {
-                part.operationToken = '>';
+            if (item.token.elem === 'multiLine') {
+              if (item.token.capture === 'start') {
+                item.operationToken = '>';
               } else {
-                part.operationToken = '<';
+                item.operationToken = '<';
               }
-              filterOtlText += `${part.token.filterParam}${part.operationToken}${part.token.value})`;
+              filterOtlText += `${item.token.filterParam}${item.operationToken}${item.token.value})`;
             } else {
-              for (const idxVal in part.values) {
-                const value = part.values[+idxVal];
-                if (idxVal === String(part.values.length - 1)) {
-                  if (part.values.length > 1) filterOtlText += ` ${part.operationToken} `;
-                  filterOtlText += `${part.fieldName}="${value.trim()}")`;
-                } else if (idxVal === '0') {
-                  filterOtlText += `${part.fieldName}="${value.trim()}"`;
-                  if (part.values.length === 0) filterOtlText += ')';
+              item.values.forEach((value, valIndex) => {
+                if (valIndex === item.values.length - 1) {
+                  if (item.values.length > 1) filterOtlText += ` ${item.operationToken} `;
+                  filterOtlText += `${item.fieldName}="${value.trim()}")`;
+                } else if (valIndex === 0) {
+                  filterOtlText += `${item.fieldName}="${value.trim()}"`;
+                  if (item.values.length === 0) filterOtlText += ')';
                 } else {
-                  filterOtlText += ` ${part.operationToken} ${part.fieldName}="${value.trim()}"`;
+                  filterOtlText += ` ${item.operationToken} ${item.fieldName}="${value.trim()}"`;
                 }
-              }
+              });
             }
             break;
           default:
@@ -69,7 +66,7 @@ export function filterCompile(filter) {
       } else {
         firstPartWithValuesIndex += 1;
       }
-    }
+    });
 
     // If filter inverted to close parenthesis of "NOT" directive
     if (filter.invertMatches && filterOtlText !== '') filterOtlText += ')';

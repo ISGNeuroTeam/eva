@@ -143,6 +143,7 @@
               :create="actionFrom"
               :active-from="modalValue"
               @changeData="changeDataEvent"
+              @update:is-changed="isChanged = $event"
             />
           </div>
           <div
@@ -210,6 +211,7 @@
               :color-from="theme"
               :active-from="modalValue"
               @changeData="changeDataEvent"
+              @update:is-changed="isChanged = $event"
             />
           </div>
           <div
@@ -370,16 +372,15 @@ export default {
   },
   watch: {
     active(val) {
-      this.resetModal(this.modalValue);
-      if (val) {
-        this.setData();
+      if (!val) {
+        this.isChanged = false;
       }
     },
     pickedColor(color) {
       if (this.colorInputMode === 'custom') this.setGroupColor(color);
     },
     // проверяем изменилось ли что-то в основных полях
-    'newDash.name': {
+    'newElement.name': {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
@@ -388,7 +389,7 @@ export default {
         }
       },
     },
-    'newDash.id': {
+    'newElement.id': {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = !!(val && oldVal && val !== this.dataFrom?.color);
@@ -397,28 +398,25 @@ export default {
         }
       },
     },
-    'newGroup.name': {
-      handler(val, oldVal) {
-        if (this.dataFrom) {
-          this.isChanged = val !== oldVal && val !== this.dataFrom?.name;
-        } else {
-          this.isChanged = val !== oldVal;
-        }
-      },
-    },
-    'newGroup.color': {
+    'newElement.color': {
       handler(val, oldVal) {
         if (this.dataFrom) {
           this.isChanged = !!(
             val !== '#FFA9A4'
-            && oldVal
-            && val !== this.dataFrom?.color
+              && oldVal
+              && val !== this.dataFrom?.color
           );
         } else {
           this.isChanged = !!(val !== '#FFA9A4' && oldVal);
         }
       },
     },
+  },
+  created() {
+    this.resetModal(this.modalValue);
+    if (this.active) {
+      this.setData();
+    }
   },
   mounted() {
     this.create_warning = false; // выключаем все предупреждения что были включены

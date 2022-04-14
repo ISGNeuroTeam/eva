@@ -307,7 +307,7 @@
             <div
               class="loading-bar"
               :style="{ background: theme.$accent_ui_color }"
-              :class="{ loading: search.status === 'pending' }"
+              :class="{ loading: search.status === 'pending' && search.original_otl !== null }"
             />
           </div>
           <v-tooltip
@@ -468,7 +468,7 @@
         :style="blockToolStyle"
       >
         <div
-          v-for="(tocken, i) in tockens"
+          v-for="(tocken, i) in tokens"
           :key="tocken.name"
           class="row-tocken"
           :style="{ color: theme.$main_text }"
@@ -889,6 +889,7 @@
         :edit-mode="editMode"
       />
     </div>
+    <notifications />
   </div>
 </template>
 
@@ -927,10 +928,12 @@ import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
+import Notifications from '@/components/notifications';
 
 export default {
   name: 'DashPanelBoard',
   components: {
+    Notifications,
     EvaLogo,
     DashFilterPanel,
   },
@@ -941,7 +944,7 @@ export default {
     },
     inside: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -1077,6 +1080,7 @@ export default {
       userPermissions: [],
       screenHeight: this.getScreenHeight(),
       allGroups: [],
+      tokens: [],
     };
   },
   computed: {
@@ -1137,18 +1141,6 @@ export default {
       }
       return true;
     },
-    tockens() {
-      // получения всех токенов на страницы
-      const tockens = this.$store.state[this.idDash].tockens
-        ? this.$store.state[this.idDash].tockens
-        : [];
-
-      tockens.forEach((item) => {
-        this.tockensName[item.name] = item.name;
-        this.lookTockens.push({ show: false, color: this.theme.controls });
-      });
-      return tockens;
-    },
     elements() {
       // получение всех элемнета на странице
       if (this.$store.state[this.idDash]?.elements) {
@@ -1171,23 +1163,20 @@ export default {
     },
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
-      return ({ elem, action, idDash }) => {
+      return ({ elem, action }) => {
         if (
-          this.$store.state[idDash]
-          && this.$store.state[idDash][elem]
+          this.dashFromStore
+          && this.dashFromStore[elem]
         ) {
-          let j = Object.keys(this.$store.state[idDash][elem].actions)
-            .find((key) => this.$store.state[idDash][elem].actions[key].name === action);
-          Object.keys(this.$store.state[idDash][elem].actions).forEach((item) => {
-            if (
-              this.$store.state[idDash][elem].actions[item].name === action
-            ) {
+          let j = Object.keys(this.dashFromStore[elem].actions)
+            .find((key) => this.dashFromStore[elem].actions[key].name === action);
+          Object.keys(this.dashFromStore[elem].actions).forEach((item) => {
+            if (this.dashFromStore[elem].actions[item].name === action) {
               j = item;
             }
           });
-
           if (j) {
-            return this.$store.state[idDash][elem].actions[j].capture;
+            return this.dashFromStore[elem].actions[j].capture;
           }
           return [];
         }
@@ -1208,6 +1197,9 @@ export default {
     },
     dashFromStore() {
       return this.$store.state[this.idDash];
+    },
+    tokensFromStore() {
+      return this.dashFromStore.tockens || [];
     },
     getSizeGrid() {
       if (!this.dashFromStore?.grid) {
@@ -1233,6 +1225,17 @@ export default {
       }
       return this.dashFromStore?.grid;
     },
+  },
+  watch: {
+    tokensFromStore: {
+      deep: true,
+      handler(value) {
+        this.tokens = JSON.parse(JSON.stringify(value));
+      },
+    },
+  },
+  created() {
+    this.uploadTokens();
   },
   mounted() {
     this.getCookie();
@@ -1321,7 +1324,7 @@ export default {
         this.login = this.$jwt.decode().username;
 
         const response = await fetch('/api/user/permissions').catch((error) => {
-          console.log(error);
+          console.error(error);
           return {
             status: 300,
             result: 'Post не создался, возможно из-за неточностей в запросе',
@@ -1496,11 +1499,41 @@ export default {
       }
     },
     saveTocken(index) {
+      // функция которая сохраняет токен в хранилище
+
+      if (this.tokens?.length > 0) {
+        const filterTockens = this.tokens.filter((x) => {
+          if (!Number.isNaN(index) && index !== undefined) {
+            return x.elem === this.tokens[index].elem
+                && x.action === this.tokens[index].action
+                && x.capture === this.tokens[index].capture
+                && x.name !== this.tokens[index].name;
+          }
+          return x.elem === this.newElem
+              && x.action === this.newAction
+              && x.capture === this.newCapture;
+        });
+
+        if (filterTockens.length > 0) {
+          this.errorSaveToken = true;
+          this.openwarning = true;
+          const height = this.$refs.blockTocken.clientHeight;
+
+          this.otstupBottom = height + 55;
+          this.msgWarn = 'Токен с такими опциями уже существует.';
+
+          setTimeout(() => {
+            this.openwarning = false;
+          }, 2000);
+          return;
+        }
+      }
+
       // проверяем не пустой ли токен
       if ((!this.newTockenName
           && !Number.isInteger(index))
         || (Number.isInteger(index)
-          && !this.tockensName[this.tockens[index].name].length)) {
+          && !this.tockensName[this.tokens[index].name].length)) {
         this.errorSaveToken = true;
         this.openwarning = true;
         const height = this.$refs.blockTocken.clientHeight;
@@ -1518,7 +1551,7 @@ export default {
       if ((!Number.isInteger(index)
               && globalTockens.includes(this.newTockenName.trim()))
           || (Number.isInteger(index)
-              && globalTockens.includes(this.tockensName[this.tockens[index].name].trim()))) {
+              && globalTockens.includes(this.tockensName[this.tokens[index].name].trim()))) {
         this.errorSaveToken = true;
         this.openwarning = true;
         const height = this.$refs.blockTocken.clientHeight;
@@ -1537,16 +1570,16 @@ export default {
       if (Number.isInteger(index)) {
         // редактирование
         this.tempTocken = {
-          name: this.tockensName[this.tockens[index].name],
-          elem: this.tockens[index].elem,
-          action: this.tockens[index].action,
-          capture: this.tockens[index].capture,
-          prefix: this.tockens[index].prefix,
-          sufix: this.tockens[index].sufix,
-          delimetr: this.tockens[index].delimetr,
-          defaultValue: this.tockens[index].defaultValue,
+          name: this.tockensName[this.tokens[index].name],
+          elem: this.tokens[index].elem,
+          action: this.tokens[index].action,
+          capture: this.tokens[index].capture,
+          prefix: this.tokens[index].prefix,
+          sufix: this.tokens[index].sufix,
+          delimetr: this.tokens[index].delimetr,
+          defaultValue: this.tokens[index].defaultValue,
           resetData: true, // сделать норм
-          onButton: this.tockens[index].onButton,
+          onButton: this.tokens[index].onButton,
         };
       } else {
         // создание нового
@@ -1565,7 +1598,7 @@ export default {
       }
       let j = -1;
 
-      this.tockens.forEach((item, i) => {
+      this.tokens.forEach((item, i) => {
         // затем пробегаемся по все мтокенам
         if (item.name === this.tempTocken.name) {
           // и смотрим есть ли у нас такой токен
@@ -1599,6 +1632,7 @@ export default {
         this.newTockenDop = {
           defaultValue: '*',
         };
+        this.uploadTokens();
       }
     },
     deleteTocken(name) {
@@ -1642,7 +1676,7 @@ export default {
 
       const id = this.index;
       const newName = this.tempTocken.name;
-      this.tempTocken.name = this.tockens[id].name;
+      this.tempTocken.name = this.tokens[id].name;
 
       this.$store.commit('createTockens', {
         idDash: this.idDash,
@@ -2093,7 +2127,6 @@ export default {
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
-          item.style.boxShadow = `0 5px 5px -3px ${this.theme.border},0 8px 10px 1px ${this.theme.border},0 3px 14px 2px ${this.theme.border}`;
           item.style.background = this.theme.back;
           item.style.color = this.theme.text;
           item.style.border = `1px solid ${this.theme.border}`;
@@ -2151,6 +2184,17 @@ export default {
     },
     updateScreenHeight() {
       this.screenHeight = this.getScreenHeight();
+    },
+    uploadTokens() {
+      const tokens = this.$store.state[this.idDash].tockens
+        ? this.$store.state[this.idDash].tockens
+        : [];
+
+      tokens.forEach((item) => {
+        this.tockensName[item.name] = item.name;
+        this.lookTockens.push({ show: false, color: this.theme.controls });
+      });
+      this.tokens = JSON.parse(JSON.stringify(tokens));
     },
   },
 };

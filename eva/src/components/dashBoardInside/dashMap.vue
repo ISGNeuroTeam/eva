@@ -5,12 +5,14 @@
   >
     <div
       v-if="error"
+      key="error-message"
       class="error-message"
     >
       {{ error }}
     </div>
     <div
-      v-if="!error"
+      v-show="!error"
+      key="mapContainer"
       ref="map"
       class="mapContainer"
       :style="mapStyleSize"
@@ -43,7 +45,7 @@ export default {
     }, // id дашборда
     dataRestFrom: {
       type: Array,
-      required: true,
+      default: () => ([]),
     }, // данные полученые после выполнения запроса
     colorFrom: {
       type: Object,
@@ -79,7 +81,7 @@ export default {
       clusterPosition: null,
       clusterPositionItems: null,
       clusterDelimiter: null,
-      isLegendGenerated: true,
+      isLegendGenerated: false,
       isSettings: false,
       startingPoint: [],
       mode: [],
@@ -154,11 +156,23 @@ export default {
     },
     mapStyleSize() {
       return {
-        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 45}px`,
+        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 10}px`,
       };
     },
   },
   watch: {
+    error(val) {
+      if (!val) {
+        // eslint-disable-next-line no-underscore-dangle
+        this.map._onResize();
+      }
+    },
+    options: {
+      handler() {
+        this.reDrawMap(this.dataRestFrom);
+      },
+      deep: true,
+    },
     mapStyleSize() {
       // eslint-disable-next-line no-underscore-dangle
       this.map._onResize();
@@ -177,41 +191,46 @@ export default {
       this.createMap();
     },
   },
-  async mounted() {
-    this.initMap();
-    this.initTheme();
-    this.initClusterTextCount();
-    this.initClusterPosition();
-    this.initClusterDelimiter();
-    store.subscribe((mutation) => {
-      if (mutation.type === 'updateOptions') {
-        if (this.options.initialPoint) {
-          this.map.setView(
-            [this.options.initialPoint.x, this.options.initialPoint.y],
-            mutation.payload.options.zoomLevel,
-          );
-        } else {
-          this.map.setView(
-            this.startingPoint,
-            mutation.payload.options.zoomLevel,
-          );
-        }
-        this.map.wheelPxPerZoomLevel = 200;
-        this.updateToken(
-          mutation.payload.options.zoomLevel,
-          this.map.getBounds(),
-        );
-      }
-    });
-    this.createTokens();
-    this.$store.commit('setActions', {
-      actions: this.actions,
-      idDash: this.idDash,
-      id: this.element,
-    });
-    await this.loadDataForPipe(this.$store.getters.getPaperSearch);
+  mounted() {
+    if (this.$refs.map) {
+      this.init();
+    }
   },
   methods: {
+    init() {
+      this.initMap();
+      this.initTheme();
+      this.initClusterTextCount();
+      this.initClusterPosition();
+      this.initClusterDelimiter();
+      store.subscribe((mutation) => {
+        if (mutation.type === 'updateOptions') {
+          if (this.options.initialPoint) {
+            this.map.setView(
+              [this.options.initialPoint.x, this.options.initialPoint.y],
+              mutation.payload.options.zoomLevel,
+            );
+          } else {
+            this.map.setView(
+              this.startingPoint,
+              mutation.payload.options.zoomLevel,
+            );
+          }
+          this.map.wheelPxPerZoomLevel = 200;
+          this.updateToken(
+            mutation.payload.options.zoomLevel,
+            this.map.getBounds(),
+          );
+        }
+      });
+      this.createTokens();
+      this.$store.commit('setActions', {
+        actions: this.actions,
+        idDash: this.idDash,
+        id: this.element,
+      });
+      this.loadDataForPipe(this.$store.getters.getPaperSearch);
+    },
     async getDataFromRest(event) {
       // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {
@@ -227,7 +246,6 @@ export default {
         search: event,
         idDash: this.idDash,
       });
-      console.log('response', response);
       // вызывая метод в хранилище
       if (response.length === 0) {
         // если что-то пошло не так
@@ -239,7 +257,6 @@ export default {
         });
       } else {
         // если все нормально
-
         const responseDB = this.$store.dispatch(
           'putIntoDB',
           {
@@ -263,19 +280,20 @@ export default {
     async loadDataForPipe(search) {
       this.pipelineData = await this.getDataFromRest(search);
       const allPipes = {};
-      console.log('pipelineData', this.pipelineData);
-      this.pipelineData.forEach((x) => {
-        if (!allPipes[x.ID]) {
-          allPipes[x.ID] = [];
-        }
-        allPipes[x.ID].push(x);
-      });
+      if (Array.isArray(this.pipelineData)) {
+        this.pipelineData.forEach((x) => {
+          if (!allPipes[x.ID]) {
+            allPipes[x.ID] = [];
+          }
+          allPipes[x.ID].push(x);
+        });
+      }
 
       this.pipelineDataDictionary = allPipes;
       this.reDrawMap(this.dataRestFrom);
     },
     updateToken(value) {
-      const tokens = this.$store.state[this.idDash].tockens;
+      const tokens = this.$store.state[this.idDash]?.tockens || {};
       Object.keys(tokens).forEach((i) => {
         if (
           tokens[i].elem === this.element
@@ -283,7 +301,7 @@ export default {
           && tokens[i].capture === 'zoom_level'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value,
             store: this.$store,
@@ -294,7 +312,7 @@ export default {
           && tokens[i].capture === 'top_left_point'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value: this.leftBottom[1],
             store: this.$store,
@@ -305,7 +323,7 @@ export default {
           && tokens[i].capture === 'bottom_right_point'
         ) {
           this.$store.commit('setTocken', {
-            tocken: tokens[i],
+            token: tokens[i],
             idDash: this.idDash,
             value: this.rightTop[1],
             store: this.$store,
@@ -326,6 +344,7 @@ export default {
       this.getOSM();
       // получаем библиотеку
       // get all icons that we need on map
+      this.generateLibrary(dataRest, this.options?.primitivesLibrary);
       this.generateClusterPositionItems();
       this.initSettings();
       if (!this.error) {
@@ -460,17 +479,22 @@ export default {
         } else {
           this.library = JSON.parse(tmp);
         }
-        this.$store.commit('setLibrary', {
-          library: this.library,
-          id: this.idFrom, // id элемнета (table, graph-2)
-          idDash: this.idDashFrom,
-        });
+        if (
+          !this.options?.library
+          || (this.options?.library
+          && JSON.stringify(this.library) !== JSON.stringify(this.options.library))
+        ) {
+          this.$store.commit('setLibrary', {
+            library: this.library,
+            id: this.idFrom, // id элемнета (table, graph-2)
+            idDash: this.idDashFrom,
+          });
+        }
       } catch {
         this.error = 'Ошибка формата входных данных';
         this.map.remove();
         this.map = null;
       }
-
       if (!this.isLegendGenerated) {
         this.createLegend();
       }
@@ -478,11 +502,13 @@ export default {
 
     createLegend() {
       let generatedListHTML = '';
-      Object.keys(this.library.objects).forEach((key) => {
-        generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
-      });
-      L.Control.Legend = L.Control.extend({
-        onAdd() {
+      if (this.library?.objects && false) {
+        Object.keys(this.library.objects).forEach((key) => {
+          generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
+        });
+        const legend = L.control({ position: 'bottomright' });
+
+        legend.onAdd = function (map) {
           const img = L.DomUtil.create('div');
           img.innerHTML = `
               <div>
@@ -495,35 +521,35 @@ export default {
           img.style.maxHeight = '466px';
           img.style.background = 'black';
           return img;
-        },
-      });
+        };
 
-      L.control.legend = (opts) => new L.Control.Legend(opts);
-
-      L.control.legend({ position: 'bottomright' }).addTo(this.map);
-      this.isLegendGenerated = true;
+        legend.onAdd(this.map);
+        this.isLegendGenerated = true;
+      }
     },
 
     generateClusterPositionItems() {
       this.clusterPositionItems = null;
-      Object.entries(this.library.objects).forEach((object) => {
-        if (object[1].image) {
-          const tmpObject = { ...object[1], id: Number(object[0]) };
-          this.clusterPositionItems = [tmpObject];
-        }
-      });
-
-      if (!this.clusterPosition) {
-        // пустые значения
+      if (this.library?.objects) {
         Object.entries(this.library.objects).forEach((object) => {
           if (object[1].image) {
-            if (this.clusterPosition === null) {
-              this.clusterPosition = [Number(object[0])];
-            } else {
-              this.clusterPosition.push(Number(object[0]));
-            }
+            const tmpObject = { ...object[1], id: Number(object[0]) };
+            this.clusterPositionItems = [tmpObject];
           }
         });
+
+        if (!this.clusterPosition) {
+        // пустые значения
+          Object.entries(this.library.objects).forEach((object) => {
+            if (object[1].image) {
+              if (this.clusterPosition === null) {
+                this.clusterPosition = [Number(object[0])];
+              } else {
+                this.clusterPosition.push(Number(object[0]));
+              }
+            }
+          });
+        }
       }
     },
 
@@ -558,18 +584,27 @@ export default {
 
     drawObjects(dataRest) {
       for (let i = 0; i < dataRest.length - 1; i += 1) {
-        const lib = this.library.objects[dataRest[i].type]; // choosing drawing type for each object
-        if (lib) {
-          if (dataRest[i].ID === '1') {
-            const point = dataRest[i].coordinates.split(':');
-            const coord = point[1].split(',');
-            this.startingPoint = [coord[0], coord[1]];
-          }
-          if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
-            this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
-          }
-          if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
-            this.addLine(dataRest[i], lib);
+        if (
+          !!dataRest
+          && dataRest[i]?.type
+          && this.library.objects
+          && this.library.objects[dataRest[i].type]
+        ) {
+          // choosing drawing type for each object
+          const lib = this.library.objects[dataRest[i].type];
+          if (lib) {
+            if (dataRest[i].ID === '1') {
+              const point = dataRest[i].coordinates.split(':');
+              const coord = point[1].split(',');
+
+              this.startingPoint = [coord[0], coord[1]];
+            }
+            if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
+              this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
+            }
+            if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
+              this.addLine(dataRest[i], lib);
+            }
           }
         }
       }

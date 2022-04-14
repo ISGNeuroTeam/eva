@@ -409,17 +409,23 @@ export default {
             .style('opacity', '1')
             .style('visibility', 'visible')
             .html(text)
+            // eslint-disable-next-line no-restricted-globals
             .style('top', `${event.layerY - 40}px`)
             .style('right', 'auto')
+            // eslint-disable-next-line no-restricted-globals
             .style('left', `${event.layerX + 15}px`);
+          // eslint-disable-next-line no-restricted-globals
           if (event.layerX + 100 > width) {
             tooltip
               .style('left', 'auto')
+              // eslint-disable-next-line no-restricted-globals
               .style('right', `${width - event.layerX + 100}px`);
           }
+          // eslint-disable-next-line no-restricted-globals
           if (event.layerY - 40 + toolTopBlock.offsetHeight > height) {
             tooltip.style(
               'top',
+              // eslint-disable-next-line no-restricted-globals
               `${event.layerY - 10 - toolTopBlock.offsetHeight}px`,
             );
           }
@@ -464,7 +470,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,

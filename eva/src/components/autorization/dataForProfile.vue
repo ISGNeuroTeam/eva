@@ -43,6 +43,7 @@
           :style="{ color: theme.$main_text }"
           single-line
           hide-details
+          @input="$emit('update:is-changed', true)"
         />
         <div
           v-if="!loaders[essence][subessence]"
@@ -62,6 +63,7 @@
             item-key="name"
             show-select
             :search="searchText"
+            @input="$emit('update:is-changed', true)"
           />
         </div>
         <div class="control-btn">
@@ -95,6 +97,7 @@
           :style="{ color: theme.$main_text }"
           single-line
           hide-details
+          @input="$emit('update:is-changed', true)"
         />
         <div
           v-if="!loaders[essence][`all${subessence}`]"
@@ -114,6 +117,7 @@
             item-key="name"
             show-select
             :search="searchText"
+            @input="$emit('update:is-changed', true)"
           />
         </div>
         <div class="control-btn">

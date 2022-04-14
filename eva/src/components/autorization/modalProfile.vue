@@ -1,9 +1,12 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="active"
     :width="width"
-    persistent
-    @keydown="checkEsc($event)"
+    :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="cancelModal"
   >
     <v-card
       v-if="passway"
@@ -27,6 +30,7 @@
           outlined
           hide-details
           clearable
+          @input="toggleIsChanged"
         />
         <v-text-field
           v-model="newpass"
@@ -38,6 +42,7 @@
           outlined
           hide-details
           clearable
+          @input="toggleIsChanged"
         />
       </v-card-text>
       <div
@@ -68,7 +73,7 @@
       </v-card-actions>
     </v-card>
     <v-card
-      v-if="!passway"
+      v-else
       class="profile-tab"
       :style="{ backgroundColor: theme.$main_bg }"
     >
@@ -93,6 +98,7 @@
             outlined
             hide-details
             clearable
+            @input="toggleIsChanged"
           />
           <v-text-field
             v-model="userData.pass"
@@ -106,6 +112,7 @@
             outlined
             ide-details
             clearable
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(user.tab)"
@@ -115,8 +122,9 @@
             :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :active-from="activeFrom"
-            @changeData="changeData"
+            :active-from="active"
+            @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
 
@@ -132,6 +140,7 @@
             outlined
             hide-details
             clearable
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(role.tab)"
@@ -141,8 +150,9 @@
             :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :active-from="activeFrom"
-            @changeData="changeData"
+            :active-from="active"
+            @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
 
@@ -158,6 +168,7 @@
             outlined
             hide-details
             clearable
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(permission.tab)"
@@ -167,8 +178,9 @@
             :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :active-from="activeFrom"
-            @changeData="changeData"
+            :active-from="active"
+            @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
         <div
@@ -183,6 +195,7 @@
             outlined
             hide-details
             clearable
+            @input="toggleIsChanged"
           />
           <div class="zagolovok-values">
             Изменить цвет группы
@@ -190,6 +203,7 @@
           <v-color-picker
             v-model="curItem.color"
             class="colorPicker"
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(group.tab)"
@@ -199,8 +213,9 @@
             :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :active-from="activeFrom"
-            @changeData="changeData"
+            :active-from="active"
+            @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
         <div
@@ -215,6 +230,7 @@
             outlined
             hide-details
             clearable
+            @input="toggleIsChanged"
           />
           <data-profile
             v-for="item in Object.keys(index.tab)"
@@ -224,8 +240,9 @@
             :data-from="dataRest"
             :subessence="item"
             :create="create"
-            :active-from="activeFrom"
-            @changeData="changeData"
+            :active-from="active"
+            @changeData="changeDataEvent"
+            @update:is-changed="toggleIsChanged"
           />
         </div>
       </v-card-text>
@@ -257,15 +274,20 @@
         </v-btn>
       </v-card-actions>
     </v-card>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
 export default {
+  name: 'ModalProfile',
+  model: {
+    prop: 'modalValue',
+    event: 'updateModalValue',
+  },
   props: {
-    activeFrom: {
+    modalValue: {
       type: Boolean,
-      required: true,
+      default: false,
     },
     passway: {
       type: Boolean,
@@ -280,12 +302,12 @@ export default {
       required: true,
     },
     keyFrom: {
-      type: Number,
-      required: true,
+      type: [Number, String],
+      default: '',
     },
     curItemFrom: {
       type: Object,
-      required: true,
+      default: () => ({}),
     },
   },
   data() {
@@ -337,11 +359,17 @@ export default {
       changedData: {},
       dataRest: {},
       colorFrom: {},
+      isChanged: false,
     };
   },
   computed: {
-    active() {
-      return this.activeFrom;
+    active: {
+      get() {
+        return this.modalValue;
+      },
+      set(value) {
+        this.$emit('updateModalValue', value);
+      },
     },
     width() {
       return this.passway ? '400px' : '90%';
@@ -388,7 +416,7 @@ export default {
   },
   watch: {
     active() {
-      if (this.activeFrom) {
+      if (this.active) {
         this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
         this.userData.pass = '';
         Object.keys(this.showBlock).forEach((item) => {
@@ -424,6 +452,7 @@ export default {
           this.curItem = { ...this.curItemFrom };
         }
         this.dataRest = this.getDataForEssence();
+        this.isChanged = false;
       }
     },
   },
@@ -453,13 +482,8 @@ export default {
         id: this.userFrom.id,
       });
     },
-    cancelModal() {
-      this.$emit('cancelModal');
-    },
-    checkEsc(event) {
-      if (event.code === 'Escape') {
-        this.cancelModal();
-      }
+    cancelModal(isClearChanges = true) {
+      this.$emit('cancelModal', isClearChanges);
     },
     showErrorMsg(msg, color) {
       this.msg = msg;
@@ -605,7 +629,7 @@ export default {
 
       response.then((res) => {
         if (res.status === 200) {
-          this.cancelModal();
+          this.cancelModal(false);
         } else if (res.status === 409) {
           this.showErrorMsg(
             sameMsg,
@@ -619,11 +643,16 @@ export default {
         }
       });
     },
-    changeData(event) {
+    changeDataEvent(event) {
+      this.$refs.confirmModal.focusOnModal();
       if (!this.changedData[event.essence]) {
         this.changedData[event.essence] = {};
       }
       this.changedData[event.essence][event.subessence] = event.data;
+      this.toggleIsChanged();
+    },
+    toggleIsChanged() {
+      this.isChanged = true;
     },
   },
 };

@@ -20,7 +20,7 @@
             @launchSearch="launchSearch($event)"
           />
           <timeline
-            v-show="data.length > 0"
+            v-if="getTimeline.length > 0"
             class="timeline component-block"
             :data="data"
           >
@@ -49,7 +49,7 @@
                 cols="2"
                 class="pr-0"
               >
-                <intresting
+                <interesting
                   class="intresting component-block"
                   :rows="rows"
                 />
@@ -79,6 +79,7 @@
               class="visualisation component-block"
               :data="data"
               :should-get="shouldGet"
+              :loading="loading"
             />
           </keep-alive>
         </div>
@@ -97,6 +98,7 @@
 import {
   mdiPlay, mdiSettings, mdiMerge, mdiPlus,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 import settings from '../../js/componentsSettings';
 import newSearch from './newSearch.vue';
 import timeline from './timeline.vue';
@@ -105,12 +107,12 @@ import download from './download.vue';
 import events from './events.vue';
 import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
-import intresting from './intresting.vue';
+import Interesting from './interesting.vue';
 
 export default {
   components: {
     newSearch,
-    intresting,
+    Interesting,
     events,
     timeline,
     statistic,
@@ -122,7 +124,10 @@ export default {
     return {
       tab: 0,
       search: {
-        parametrs: {},
+        parametrs: {
+          tws: 0,
+          twf: 0,
+        },
       },
       limit: 1000,
       play: mdiPlay,
@@ -159,9 +164,7 @@ export default {
   },
   asyncComputed: {
     async static_rows() {
-      console.log(this.shouldGet);
       if (this.shouldGet) {
-        console.log('this.shouldGet === true');
         this.getData();
       }
       this.$store.commit('setShould', {
@@ -173,6 +176,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters('dataResearch', ['getTimeline']),
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -207,7 +211,7 @@ export default {
   },
   mounted() {
     document.title = 'EVA | Исследование данных';
-    this.search = this.$store.getters.getReportSearch;
+    this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
@@ -243,9 +247,9 @@ export default {
         let localStatistic = '';
         this.rows = [];
         if (event.data.data.length !== 0) {
-          console.log('event.data.data.length != 0');
           this.shema = event.data.shema;
-          this.data = event.data.data;
+          // this.data = event.data.data;
+          this.$set(this, 'data', event.data.data);
 
           Object.keys(this.shema).forEach((item, i) => {
             localStatistic = this.createStatistic(item, event.data.data);
@@ -270,50 +274,48 @@ export default {
       worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
     },
     async launchSearch(search) {
-      this.search.original_otl = search.original_otl;
-      this.search.parametrs.tws = search.parametrs.tws;
-      this.search.parametrs.twf = search.parametrs.twf;
-      this.search.sid = this.hashCode(this.search.original_otl);
-
+      this.$set(this, 'search', JSON.parse(JSON.stringify({
+        ...search,
+        sid: this.hashCode(search.original_otl),
+      })));
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
-      console.log('launch search');
-      console.log(this.search);
-      const response = await this.$store.dispatch('getDataApi', {
+      await this.$store.dispatch('getDataApi', {
         search: this.search,
         idDash: 'reports',
-      });
-      // вызывая метод в хранилище
-
-      console.log(response);
-      if (!response.data || response.data.length === 0) {
-        // если что-то пошло не так
-        this.loading = false;
-        this.$store.commit('setErrorLogs', true);
-        this.data = [];
-        this.rows = [];
-      } else {
-        // если все нормально
-        console.log('data ready');
-
-        const responseDB = this.$store.dispatch(
-          'putIntoDB',
-          {
-            result: response,
-            sid: this.search.sid,
-            idDash: 'reports',
-          },
-        );
-        responseDB.then(() => {
-          this.$store.dispatch('refreshElements', {
-            idDash: 'reports',
-            key: this.search.sid,
-          });
+      }).then((response) => {
+        this.$store.dispatch('dataResearch/fetchTimeline', response.cid);
+        this.$store.dispatch('dataResearch/getInterestingFields', response.cid);
+        // вызывая метод в хранилище
+        if (!response?.data || response.data.length === 0) {
+          // если что-то пошло не так
           this.loading = false;
-          this.$store.commit('setReportSearch', this.search);
-        });
-      }
+          this.$store.commit('setErrorLogs', true);
+          this.data = [];
+          this.rows = [];
+        } else {
+          // если все нормально
+          // console.log('data ready');
+
+          const responseDB = this.$store.dispatch(
+            'putIntoDB',
+            {
+              result: response,
+              sid: this.search.sid,
+              idDash: 'reports',
+            },
+          );
+          responseDB.then(() => {
+            this.$store.dispatch('refreshElements', {
+              idDash: 'reports',
+              key: this.search.sid,
+            });
+            this.loading = false;
+            this.$store.commit('setReportSearch', this.search);
+          });
+        }
+      });
     },
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
@@ -356,11 +358,10 @@ export default {
         const request = indexedDB.open('EVA', 1);
 
         request.onerror = (requestEvent) => {
-          console.log('error: ', requestEvent);
+          console.error('error: ', requestEvent);
         };
 
         request.onupgradeneeded = (requestEvent) => {
-          console.log('create');
           db = requestEvent.target.result;
           // if there's no "books" store
           if (!db.objectStoreNames.contains('searches')) {
@@ -369,7 +370,6 @@ export default {
 
           request.onsuccess = () => {
             db = request.result;
-            console.log(`successEvent: ${db}`);
           };
         };
 
@@ -387,15 +387,17 @@ export default {
           query.onsuccess = () => {
             if (query.result) {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage(query.result);
             } else {
               // сообщение которое будет передаваться как результат выполнения функции
+              // eslint-disable-next-line no-restricted-globals
               self.postMessage([]);
             }
           };
 
           query.onerror = () => {
-            console.log('Ошибка', query.error);
+            console.error('Ошибка', query.error);
           };
         };
       };
@@ -420,7 +422,6 @@ export default {
       });
     },
     changeUnited() {
-      console.log('changeUnited');
       if (!this.unitedData.united) {
         this.unitedData.united = true;
         this.unitedData.color = this.theme.controlsActive;
@@ -467,16 +468,17 @@ export default {
       this.activeElem = elemName;
     },
     setSearch(search) {
-      this.search = { ...search };
+      this.search = JSON.parse(JSON.stringify(search));
       this.modal = false;
     },
     setRange(range) {
-      this.data = this.data.filter(
+      const data = this.data.filter(
         (item) => item.day > range[0] && item.day < range[1],
       );
+      this.$set(this, 'data', data);
     },
     ResetRange() {
-      console.log('resetRange');
+      // console.log('resetRange');
     },
   },
 };

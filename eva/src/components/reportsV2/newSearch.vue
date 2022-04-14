@@ -46,6 +46,8 @@
         ref="search"
         v-model="search.original_otl"
         class="textarea"
+        :color="theme.$main_text"
+        :style="{ color: `${theme.$main_text} !important` }"
         placeholder="Введите запрос"
         spellcheck="false"
         auto-grow
@@ -242,7 +244,7 @@ export default {
     return {
       twf: '',
       search: {
-        parameters: {
+        parametrs: {
           tws: 0,
           twf: 0,
         },
@@ -308,9 +310,11 @@ export default {
       }
     },
   },
+  created() {
+    this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
+  },
   mounted() {
     document.title = 'EVA | Исследование данных';
-    this.search = this.$store.getters.getReportSearch;
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
@@ -350,7 +354,7 @@ export default {
       this.search.original_otl = '';
     },
     async launchSearch() {
-      this.$emit('launchSearch', this.search);
+      this.$emit('launchSearch', JSON.parse(JSON.stringify(this.search)));
     },
     hashCode(otl) {
       return otl
@@ -405,8 +409,8 @@ export default {
         twf = temp;
         this.sortDates();
       }
-      this.search.parametrs.tws = tws;
-      this.search.parametrs.twf = twf;
+      this.$set(this.search.parametrs, 'tws', tws);
+      this.$set(this.search.parametrs, 'twf', twf);
       this.menuCalendar = false;
       this.menuDropdown = false;
     },
@@ -477,7 +481,7 @@ export default {
                   height: 28px
                   width: 28px
                   .v-btn__content
-                    color: $main_text
+                    color: $main_text !important
                     font-weight: 400
                     font-size: 14px
                 .accent
@@ -534,4 +538,11 @@ export default {
     width: 20px
 .v-picker__title
   display: none
+
+.theme--light.v-input input,
+.theme--light.v-input textarea,
+.theme--light.v-input textarea::placeholder
+    color: $secondary_text
+.v-input__slot fieldset
+  color: $secondary_text !important
 </style>

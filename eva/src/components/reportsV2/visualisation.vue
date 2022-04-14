@@ -2,79 +2,120 @@
   <div
     ref="vis"
     class="visualisation"
-    :style="{ background: theme.$main_bg, color: theme.$main_text }"
+    :style="{
+      background: theme.$main_bg,
+      color: theme.$main_text,
+      minHeight: activeElem ==='bush' ? '400px' : undefined }"
   >
-    <v-menu
-      v-model="menuDropdown"
-      offset-y
-      max-width="160"
-      class="select"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <div
-          v-bind="attrs"
-          v-on="on"
-        >
-          {{ aboutElem[activeElem].tooltip }}
-          <v-icon>{{ mdiChevronDown }}</v-icon>
-        </div>
-      </template>
-      <div style="min-height: 40px">
-        <v-tooltip
-          v-for="i in elements"
-          :key="aboutElem[i].key"
-          bottom
-          :color="theme.$accent_ui_color"
-          @click="changeTab(i)"
-        >
-          <template
-            v-slot:activator="{ on }"
-            class="p-5"
+    <div class="header-settings">
+      <v-menu
+        v-model="menuDropdown"
+        offset-y
+        max-width="160"
+        class="select"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <div
+            v-bind="attrs"
+            v-on="on"
           >
-            <v-icon
-              class="title-icon"
-              :color="aboutElem[i].color"
-              v-on="on"
-              @click="changeTab(i)"
+            {{ aboutElem[activeElem].tooltip }}
+            <v-icon>{{ mdiChevronDown }}</v-icon>
+          </div>
+        </template>
+        <div style="min-height: 40px">
+          <v-tooltip
+            v-for="i in elements"
+            :key="aboutElem[i].key"
+            bottom
+            :color="theme.$accent_ui_color"
+            @click="changeTab(i)"
+          >
+            <template
+              v-slot:activator="{ on }"
+              class="p-5"
             >
-              {{ aboutElem[i].icon }}
-            </v-icon>
-          </template>
-          <span>{{ aboutElem[i].tooltip }}</span>
-        </v-tooltip>
-      </div>
-    </v-menu>
+              <v-icon
+                class="title-icon"
+                :color="aboutElem[i].color"
+                v-on="on"
+                @click="changeTab(i)"
+              >
+                {{ aboutElem[i].icon }}
+              </v-icon>
+            </template>
+            <span>{{ aboutElem[i].tooltip }}</span>
+          </v-tooltip>
+        </div>
+      </v-menu>
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
+        :open-delay="tooltipOpenDelay"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon
+            class="option"
+            :color="theme.$main_border"
+            v-on="on"
+            @click="switchOP"
+          >
+            {{ mdiSettings }}
+          </v-icon>
+        </template>
+        <span>Настройки</span>
+      </v-tooltip>
+    </div>
     <v-card-title class="title-vis">
       <div
         class="divider-tab"
         :style="{ background: theme.$primary_button }"
       />
     </v-card-title>
-
-    <v-card-text
-      :is="`dash-${i}`"
+    <template
       v-for="i in elements"
-      v-show="aboutElem[i].show"
-      :key="i"
-      :id-from="i"
+    >
+      <v-card-text
+        :is="`dash-${i}`"
+        v-if="aboutElem[i].show"
+        :key="i"
+        :id-from="i"
+        :color-from="theme"
+        :active-elem-from="activeElem"
+        :options="getOptions"
+        id-dash-from="reports"
+        :width-from="size.width"
+        :height-from="size.height"
+        :time-format-from="''"
+        :size-tile-from="{
+          width: getOptions ? getOptions.widthTile : '',
+          height: getOptions ? getOptions.heightTile : ''
+        }"
+        :search-rep="true"
+        :tooltip-from="tooltipSvg"
+        :should-get="shouldGet"
+        :data-report="true"
+        :data-rest-from="data"
+        :current-settings="settings"
+        :update-settings="updateSettings"
+        :data-mode-from="dataMode"
+        :loading="loading"
+        :selected-pie-index="selectedPieIndex"
+        @changeSelectPie="changeSelectedPie"
+      />
+    </template>
+    <modal-settings
+      v-if="activeSettingModal"
       :color-from="theme"
-      :active-elem-from="activeElem"
-      id-dash-from="reports"
-      :width-from="size.width"
-      :height-from="size.height"
-      :time-format-from="''"
-      :size-tile-from="{ width: '', height: '' }"
-      :search-rep="true"
-      :tooltip-from="tooltipSvg"
-      :should-get="shouldGet"
-      :data-report="true"
-      :data-rest-from="data"
+      :id-dash-from="idDash"
     />
   </div>
 </template>
 
 <script>
-import { mdiRefresh, mdiMagnify, mdiChevronDown } from '@mdi/js';
+import {
+  mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings,
+} from '@mdi/js';
 import settings from '../../js/componentsSettings';
 
 export default {
@@ -88,19 +129,101 @@ export default {
       type: Boolean,
       required: true,
     },
+    tooltipOpenDelay: {
+      type: Number,
+      default: 500,
+    },
+    loading: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
+      mode: true,
+      options: {
+        visible: true,
+        change: false,
+        level: 1,
+        boxShadow: false,
+      },
+      differentOptions: {
+        visible: true,
+      },
+      modalSettings: false,
+      menuDropdown: false,
       aboutElem: {},
       activeElem: 'table',
       tooltipSvg: { texts: [], links: [], buttons: [] },
       mdiRefresh,
       mdiMagnify,
       mdiChevronDown,
-      size: {},
+      mdiSettings,
+      size: {
+        width: 500,
+        height: 500,
+      },
+      settings: {
+        showTitle: true,
+      },
+      disappear: true,
+      selectedPieIndex: -1,
     };
   },
   computed: {
+    dataMode() {
+      this.changeOptions(this.mode);
+      this.setPropDisappear(true);
+
+      return this.mode;
+    },
+    getOptions() {
+      return this.$store.state[this.idDash][this.activeElem].options;
+    },
+    idDash() {
+      return 'reports';
+    },
+    dashFromStore() {
+      if (this.idDash) {
+        return this.$store.state[this.idDash];
+      }
+      return null;
+    },
+    getModalSettings() {
+      if (!this.dashFromStore || !this.dashFromStore.modalSettings) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore,
+            prop: 'modalSettings',
+            value: {},
+          },
+        ]);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'element',
+            value: '',
+          },
+          {
+            object: this.dashFromStore.modalSettings,
+            prop: 'status',
+            value: false,
+          },
+        ]);
+      }
+      return this.dashFromStore.modalSettings;
+    },
+    activeSettingModal: {
+      get() {
+        return this.getModalSettings.status;
+      },
+      set(value) {
+        this.$store.dispatch('closeModalSettings', {
+          path: this.idDash,
+          status: value,
+        });
+      },
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -126,10 +249,98 @@ export default {
       return this.$store.getters.getReportElement;
     },
   },
+  watch: {
+    activeElem() {
+      this.calcSize();
+    },
+  },
   mounted() {
     this.calcSize();
+    this.setOptions();
+    this.setMetrics();
   },
   methods: {
+    setPropDisappear(val) {
+      this.disappear = val;
+    },
+    changeOptions(mode) {
+      const { level } = this.options;
+      let opacity = 1;
+      if (mode) {
+        this.differentOptions.visible = true;
+      } else if (!this.options.visible) {
+        this.differentOptions.visible = false;
+        opacity = 0;
+      } else {
+        this.differentOptions.visible = true;
+        opacity = 1;
+      }
+      this.$emit('SetOpacity', opacity);
+      this.$emit('SetLevel', level);
+    },
+    updateSettings(localSettings) {
+      this.settings = JSON.parse(JSON.stringify(localSettings));
+    },
+    setMetrics() {
+      if (this.data[0]
+          && (!this.dashFromStore[this.activeElem]?.metrics
+              || !this.dashFromStore[this.activeElem]?.metrics.length)
+          && this.activeElem === 'multiLine') {
+        this.$store.commit(
+          'setMetricsMulti',
+          {
+            id: this.activeElem,
+            idDash: this.idDash,
+            metrics: Object.keys(this.data[0]),
+          },
+        );
+      }
+    },
+    setOptions() {
+      if (!this.idDash) {
+        return;
+      }
+
+      if (!this.dashFromStore[this.activeElem].options) {
+        this.$store.commit('setDefaultOptions', { id: this.activeElem, idDash: this.idDash });
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.pinned) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'pinned',
+          value: false,
+        }]);
+      }
+
+      if (!this.dashFromStore[this.activeElem]?.options?.lastDot) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'lastDot',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.stringOX) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'stringOX',
+          value: false,
+        }]);
+      }
+      if (!this.dashFromStore[this.activeElem]?.options?.united) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore[this.activeElem].options,
+          prop: 'united',
+          value: false,
+        }]);
+      }
+    },
+    switchOP() {
+      this.$store.dispatch('openModalSettings', {
+        path: this.idDash,
+        element: this.activeElem,
+        titles: this.data[0] ? Object.keys(this.data[0]) : [],
+      });
+    },
     changeTab(elem) {
       this.unitedShow = elem === 'multiLine';
       Object.keys(this.aboutElem).forEach((item) => {
@@ -142,14 +353,23 @@ export default {
           this.$set(this.aboutElem[item], 'color', this.theme.controls);
         }
       });
+      this.setOptions();
+      this.setMetrics();
     },
     calcSize() {
       const size = this.$refs.vis.getBoundingClientRect();
       this.size.width = Math.round(size.width) - 16;
-      this.size.height = Math.round(size.height) - 66;
+      if (Math.round(size.height) - 66 < 500) {
+        this.size.height = 500;
+      } else {
+        this.size.height = Math.round(size.height) - 66;
+      }
     },
     setActiveElem(elemName) {
       this.activeElem = elemName;
+    },
+    changeSelectedPie(val) {
+      this.selectedPieIndex = val;
     },
   },
 };
@@ -157,7 +377,17 @@ export default {
 
 <style lang="scss">
 .visualisation {
-  //height: 600px;
+  flex-grow: 1;
+  position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  .theme--light.v-icon {
+    color: inherit !important;
+  }
+}
+.header-settings{
+  display: flex;
+  justify-content: space-between;
 }
 </style>

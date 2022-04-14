@@ -147,7 +147,7 @@ export default {
     },
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -251,7 +251,9 @@ export default {
         data = Object.keys(this.dataReady);
         if (Object.keys(this.dataReady).length !== 0) {
           if (!this.dataReady.error) {
-            data = Object.keys(this.dataReady[0]);
+            data = Object.keys(this.dataReady[0])
+              .filter((item) => !this.dataReady
+                .map((x) => x[item]).every((x) => x === null));
           }
         }
       }
@@ -259,18 +261,20 @@ export default {
     },
     dataRestDeep() {
       let res = [];
-      if (this.dataReady.length > 0) {
+      if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
+
         res = this.filterSelect(res, this.elemDeep.true);
       }
+
       return res;
     },
     dashFromStore() {
       return this.$store.state[this.idDash][this.id];
     },
     getSelected() {
-      if (!this.selected) {
+      if (!this.dashFromStore.selected) {
         this.$store.commit('setState', [{
           object: this.dashFromStore,
           prop: 'selected',
@@ -411,7 +415,7 @@ export default {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
-        this.elemDeep.true = [...this.topArray, ...this.bottomArray];
+        this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
       } else {
         this.chooseText = 'Выбрать все';
         this.chooseIcon = mdiCropSquare;
@@ -443,28 +447,35 @@ export default {
         id: this.id,
       });
       const { tockens } = this.$store.state[this.idDash];
-      let name = '';
-      let capture = '';
+      const tockensToUpdate = [];
+
       let curTocken = {};
       const data = this.dataReady;
-      Object.keys(tockens).forEach((i) => {
-        if (tockens[i].elem === this.id && tockens[i].action === 'change') {
-          curTocken = tockens[i];
-          name = tockens[i].name;
-          capture = tockens[i].capture;
-        }
-      });
-      let value = null;
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          if (tockens[i].elem === this.id && tockens[i].action === 'change') {
+            curTocken = tockens[i];
+            tockensToUpdate.push({ name: tockens[i].name, capture: tockens[i].capture });
+          }
+        });
+      }
+      let value = [];
+
       if (String(this.multiple) === 'true') {
-        value = [...[], ...this.elemDeep[String(this.multiple)]];
-        for (let i = 0; i < data.length; i += 1) {
-          value.forEach((deep, j) => {
-            if (data[i][this.elem] === deep) {
-              value[j] = data[i][this.elemlink];
-            }
-          });
-        }
+        this.elemDeep[String(this.multiple)].forEach((elem) => {
+          value = [
+            ...value,
+            ...data.filter((x) => elem === x[this.elem])
+              .map((x) => x[this.elemlink])
+              .reduce((a, b) => {
+                if (a.includes(b)) {
+                  return a;
+                }
+                return [...a, b];
+              }, [])];
+        });
       } else {
+        value = [...[], ...this.elemDeep[String(this.multiple)]];
         for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
             value = [data[i][this.elemlink]];
@@ -484,18 +495,21 @@ export default {
       } else if (value) {
         value = value.join(',');
       }
-      const tocken = {
-        name,
-        action: 'change',
-        capture,
-      };
-      if (name !== '') {
-        this.$store.commit('setTocken', {
-          tocken,
-          idDash: this.idDash,
-          value,
-        });
-      }
+
+      tockensToUpdate.forEach((item) => {
+        const token = {
+          name: item.name,
+          action: 'change',
+          capture: item.capture,
+        };
+        if (item.name !== '') {
+          this.$store.commit('setTocken', {
+            token,
+            idDash: this.idDash,
+            value,
+          });
+        }
+      });
     },
   },
 };

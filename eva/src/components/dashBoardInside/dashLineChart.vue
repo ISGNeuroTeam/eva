@@ -60,11 +60,11 @@ export default {
     dataLoadingFrom: null,
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -178,6 +178,9 @@ export default {
     },
     getTockens() {
       return this.$store.state[this.idDash].tockens;
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash][this.id];
     },
   },
   mounted() {
@@ -710,12 +713,16 @@ export default {
               .style('opacity', '1')
               .style('visibility', 'visible')
               .html(`<p>${d[item]}</p>`)
+              // eslint-disable-next-line no-restricted-globals
               .style('top', `${event.layerY - 30}px`)
               .style('right', 'auto')
+              // eslint-disable-next-line no-restricted-globals
               .style('left', `${event.layerX + 20}px`);
+            // eslint-disable-next-line no-restricted-globals
             if (event.layerX + 100 > width) {
               tooltip
                 .style('left', 'auto')
+                // eslint-disable-next-line no-restricted-globals
                 .style('right', `${width - event.layerX + 110}px`);
             }
           }) // при наведении мышки точка появляется
@@ -733,7 +740,7 @@ export default {
         .enter()
         .append('circle')
         .attr('cx', (d) => x(d[xMetric] * secondTransf))
-        .attr('cy', (d, i) => {
+        .attr('cy', function (d, i) {
           // поэтому сперва по умолчанию красив в цвет графика
           this.setAttribute('fill', colors[0]);
           // и делаем точки прозрачными
@@ -808,12 +815,16 @@ export default {
               `<p><span>${xMetric}</span> : ${localX}</p>
             <p><span>${metricsName[0]}</span> : ${d[metricsName[0]]}</p>`,
             )
+            // eslint-disable-next-line no-restricted-globals
             .style('top', `${event.layerY - 30}px`)
             .style('right', 'auto')
+            // eslint-disable-next-line no-restricted-globals
             .style('left', `${event.layerX + 20}px`);
+          // eslint-disable-next-line no-restricted-globals
           if (event.layerX + 100 > width) {
             tooltip
               .style('left', 'auto')
+              // eslint-disable-next-line no-restricted-globals
               .style('right', `${width - event.layerX + 110}px`);
           }
 
@@ -1182,7 +1193,7 @@ export default {
 
       const setTocken = (value) => {
         this.$store.commit('setTocken', {
-          tocken,
+          token: tocken,
           idDash: this.idDash,
           value,
           store: this.$store,

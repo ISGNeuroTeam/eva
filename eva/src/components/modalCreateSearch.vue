@@ -240,6 +240,7 @@ export default {
     return {
       currentSid: null,
       search: {
+        id: 0,
         sid: null,
         original_otl: null,
         limit: 1000,
@@ -284,7 +285,16 @@ export default {
       return this.$store.getters.getTheme;
     },
     getSearches() {
-      return this.$store.state[this.idDash]?.searches || [];
+      return this.dashFromStore?.searches || [];
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
+    },
+    searchId() {
+      if (this.dashFromStore?.searches?.length > 0) {
+        return this.dashFromStore.searches.length;
+      }
+      return 0;
     },
   },
   watch: {
@@ -331,8 +341,15 @@ export default {
         this.errorMsgShow = false;
       }
     },
+    checkAllSearchId(id = 0) {
+      if (this.getSearches.find((el) => el.id === id)) {
+        this.checkAllSearchId(id + 1);
+      } else {
+        this.$set(this.search, 'id', id);
+      }
+    },
     addSearch() {
-      if (this.search.sid && this.search.sid !== '') {
+      if (this.search.sid && this.search.sid !== '' && this.search.original_otl) {
         if (
           typeof this.search.parametrs.tws === 'string'
           && parseInt(new Date(this.search.parametrs.tws).getTime() / 1000, 10)
@@ -351,7 +368,6 @@ export default {
             10,
           );
         }
-
         // получаем все ИС
         const searches = this.getSearches;
         let j = -1;
@@ -389,6 +405,11 @@ export default {
           }
           // если нет
         } else {
+          if (searches?.length > 0) {
+            this.checkAllSearchId();
+          } else {
+            this.$set(this.search, 'id', 0);
+          }
           // отправляем в хранилище для создания
           this.$store.commit('setSearch', {
             search: this.search,

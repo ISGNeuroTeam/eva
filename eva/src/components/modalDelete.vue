@@ -113,6 +113,8 @@ export default {
             prop: 'modalDelete',
             value: {},
           },
+        ]);
+        this.$store.commit('setState', [
           {
             object: this.dashFromStore.modalDelete,
             prop: 'active',
@@ -167,7 +169,7 @@ export default {
   created() {
     this.$store.commit('setModalDelete', {
       id: this.idDash,
-      status: false,
+      active: false,
       elem: '',
       name: '',
       page: this.dataPage,

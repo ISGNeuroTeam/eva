@@ -19,7 +19,7 @@
           :style="{ color: theme.$main_text }"
         >
           <div
-            v-for="item in rows"
+            v-for="item in getInteresting"
             :key="item.id"
             class="interesting-row"
           >
@@ -35,9 +35,7 @@
                   v-on="on"
                 >
                   <span class="interesting-row-name">{{ item.text }} </span>
-                  <span class="interesting-row-number">{{
-                    item.totalCount
-                  }}</span>
+                  <span class="interesting-row-number">{{ item.totalCount }}</span>
                 </div>
               </template>
               <v-card class="action-popup">
@@ -77,14 +75,10 @@ import {
   mdiChevronRight,
   mdiChevronDown,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 
 export default {
-  props: {
-    rows: {
-      type: Array,
-      default: () => ([]),
-    },
-  },
+  name: 'Interesting',
   data() {
     return {
       mdiRefresh,
@@ -96,6 +90,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('dataResearch', ['getInteresting']),
     theme() {
       return this.$store.getters.getTheme;
     },
@@ -117,7 +112,7 @@ export default {
           inputCount: item,
         });
       });
-      console.log(dataset);
+      // console.log(dataset);
       return dataset;
     },
   },
@@ -156,7 +151,7 @@ export default {
   .interesting-row-number
     font-size: 12px
     line-height: 15px
-    color: $main_text
+    color: $main_text !important
 
 .interesting-popup
   width: 400px
@@ -172,7 +167,7 @@ export default {
   .action-popup-title
     padding: 5px 10px 5px 10px
     background-color: $main_bg
-    color: $main_text
+    color: $main_text !important
     font-weight: bold
   .v-data-table-header
     th

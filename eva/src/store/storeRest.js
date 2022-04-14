@@ -1,3 +1,5 @@
+import store from '.';
+
 export default {
   async rest(formData, searchFrom, restAuth, idDash) {
     const response = await fetch('/api/makejob', {
@@ -6,7 +8,7 @@ export default {
       body: formData,
       // mode: 'no-cors'
     }).catch((error) => {
-      console.log(error);
+      console.error(error);
       restAuth.putLog(
         `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
       );
@@ -60,7 +62,7 @@ export default {
                   return data.status;
                 })
                 .catch((error) => {
-                  console.log(error);
+                  console.error(error);
                   restAuth.putLog(
                     `Запрос выполнить не удалось.&nbsp;&nbsp;Ошибка: ${error}`,
                   );
@@ -85,7 +87,10 @@ export default {
                     }&nbsp;&nbsp;url: ${decodeURIComponent(resEvents.url)}`,
                   );
                   status = res.status;
-                  console.log(status);
+                  if (res?.notifications) {
+                    store.commit('notify/addNotifications', res?.notifications);
+                  }
+                  // console.log(status);
                   return res;
                 });
               }
@@ -174,7 +179,7 @@ export default {
                               try {
                                 allDataLocal.push(JSON.parse(dataPeace));
                               } catch (error) {
-                                console.log(error);
+                                console.error(error);
                               }
                             }
                           });
@@ -183,7 +188,6 @@ export default {
                       }));
 
                     resultProm = await Promise.all(dataProm);
-                    console.log('resultProm', resultProm);
                     let resolveData = [];
 
                     resultProm.forEach((item) => {
@@ -217,7 +221,7 @@ export default {
                       `Все данные из запроса ${searchFrom.sid} обработаны  успешно.&nbsp;&nbsp;status: ${res.status}`,
                     );
                     if (idDash === 'reports') {
-                      resolve({ data: resolveData, shema });
+                      resolve({ data: resolveData, shema, cid: result.cid });
                     } else {
                       resolve(resolveData);
                     }
@@ -377,17 +381,13 @@ export default {
   async setSvg(svg, restAuth) {
     let data = [];
 
-    const response = await fetch('/api/load/svg', {
-      // сперва нужно подать post запрос
-      method: 'POST',
-      body: svg,
-      // mode: 'no-cors'
-    }).catch((error) => {
+    const response = await fetch(`/svg/${svg}`).catch((error) => {
       restAuth.putLog(
         `Изображение отправить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
       );
       return response;
     });
+
     if (response.status === 200) {
       // если получилось
       await response

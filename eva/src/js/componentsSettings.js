@@ -144,6 +144,7 @@ export default {
       'level',
       'boxShadow',
       'stringOX',
+      'yFromZero',
       'united',
       'zoomForAll',
       'lastDot',
@@ -287,6 +288,12 @@ export default {
       description: 'Цветовая тема',
       elem: 'select',
       items: ['default', 'Anna theme'],
+    },
+    {
+      option: 'yFromZero',
+      description: 'Ось Y - от нуля',
+      elem: 'switch',
+      default: false,
     },
 
     // dashSingle
@@ -607,7 +614,21 @@ export default {
       ],
     },
   ],
-  reporstElements: ['table', 'multiLine', 'piechart', 'guntt', 'tile', 'csvg'],
+  reporstElements: [
+    'table',
+    'multiLine',
+    'piechart',
+    'guntt',
+    'tile',
+    'csvg',
+    /// ///
+    'ygraph', // работает
+    'bush', // работает
+    'map', // нужны настройки
+    'heatmap', // нужны настройки
+    'singleValue', // нужны специфичные настройки для этого компонента
+    'tune', // работает
+  ],
   reports: {
     table: {
       tooltip: 'Таблица',
@@ -659,7 +680,7 @@ export default {
     },
     tune: {
       tooltip: 'Ползунок',
-      icon: mdiNumeric,
+      icon: mdiTuneVertical,
     },
   },
 };

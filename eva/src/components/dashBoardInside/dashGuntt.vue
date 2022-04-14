@@ -27,8 +27,8 @@
       ref="tooltip"
       class="tooltipGuntt"
       :style="{
-        backgroundColor: colorFrom.backElement,
-        border: `1px solid ${colorFrom.text}`,
+        backgroundColor: colorFrom.$secondary_bg,
+        border: `1px solid ${colorFrom.$main_text}`,
       }"
     />
     <div
@@ -76,11 +76,11 @@ export default {
     }, // настройки родительского компонента
     activeElemFrom: {
       type: String,
-      required: true,
+      default: '',
     },
     dataReport: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -227,7 +227,7 @@ export default {
   },
   mounted() {
     this.dataRestFromWatch();
-    this.$emit('setVissible', this.id);
+    this.$emit('setVissible', { element: this.id, overflow: 'hidden' });
   },
   methods: {
     hiddenTooltip() {
@@ -285,7 +285,7 @@ export default {
         this.actions[0].capture = Object.keys(dataRest[0]);
 
         if (
-          this.$store.state[this.idDash][this.idFrom].actions.length
+          this.$store.state[this.idDash][this.idFrom].actions?.length
           !== this.actions.length
         ) {
           this.$store.commit('setActions', {
@@ -428,7 +428,7 @@ export default {
       }
 
       function wrap(text) {
-        text.each(() => {
+        text.each(function () {
           const localText = d3.select(this);
           let row = [];
           localText
@@ -493,7 +493,7 @@ export default {
         .append('rect')
         .attr('rx', 3)
         .attr('ry', 3)
-        .attr('x', (d) => x(Date.parse(d.start_date)))
+        .attr('x', (d, index) => x(Date.parse(d.start_date)) - (index % 2 === 0 ? 1 : 0))
         .attr('y', (d) => {
           let j = -1;
           ids.forEach((item, i) => {
@@ -501,7 +501,7 @@ export default {
               j = i;
             }
           });
-          return j * barHeight;
+          return j * barHeight - (j === 0 ? 1 : 0);
         })
         .attr('width', (d) => x(Date.parse(d.end_date)) - x(Date.parse(d.start_date)))
         .attr('height', barHeight)
@@ -521,7 +521,7 @@ export default {
       // Tooltip
 
       const tooltipBlock = this.$refs.tooltip;
-      const tooltipMargin = this.$attrs['is-full-screen'] ? 170 : 30;
+      const tooltipMargin = this.$attrs['is-full-screen'] ? 200 : 30;
 
       function transformDescription(text) {
         let rows = text.split('\\n');
@@ -531,10 +531,10 @@ export default {
       }
 
       function moveTooltip(offsetX) {
-        const localX = d3.event.offsetY - 50;
-        const y = d3.event.offsetX + offsetX;
-        tooltipBlock.style.top = `${localX}px`;
-        tooltipBlock.style.left = `${y}px`;
+        const localY = d3.event.offsetY;
+        const localX = d3.event.offsetX + offsetX;
+        tooltipBlock.style.top = `${localY}px`;
+        tooltipBlock.style.left = `${localX}px`;
       }
 
       lines
@@ -549,7 +549,6 @@ export default {
             });
           }
           moveTooltip(tooltipMargin);
-
           tooltipBlock.innerHTML = tooltip;
           tooltipBlock.style.opacity = '0.9';
           tooltipBlock.style.visibility = 'visible';
@@ -703,7 +702,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,

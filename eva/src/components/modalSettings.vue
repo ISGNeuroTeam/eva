@@ -5,7 +5,7 @@
     :is-confirm="isChanged"
     :persistent="isChanged"
     :theme="theme"
-    @cancelModal="cancelModal"
+    @cancelModal="checkOnCancel"
   >
     <div class="settings-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -302,7 +302,10 @@
             >
               <v-select
                 v-model="metrics[i - 1].name"
-                :items="metricsName.map((el) => el.name)"
+                :items="metricsName.map((el) => el.name)
+                  .filter((name) =>
+                    name === metrics[i - 1].name || !printedUnitedMetrics.includes(name)
+                  )"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
                 hide-details
@@ -635,6 +638,10 @@
                 :items="Object.keys(themes)"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
                 hide-details
                 outlined
                 class="item-metric"
@@ -644,7 +651,7 @@
                   () => {
                     colorsPie.nametheme =
                       colorsPie.theme === 'custom' ? '' : colorsPie.theme;
-                    colorsPie.colors = themes[colorsPie.theme].join(',');
+                    colorsPie.colors = themes[colorsPie.theme].join(' ');
                   }
                 "
                 @input="isChanged = true"
@@ -682,7 +689,42 @@
                 :class="{ disabled: !colorsPie.nametheme }"
                 hide-details
                 @input="isChanged = true"
-              />
+              >
+                <template #append>
+                  <v-menu
+                    top
+                    transition="scale-transition"
+                    :close-on-content-click="false"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        size="16"
+                        :style="{
+                          color: theme.$main_text,
+                          background: 'transparent',
+                          borderColor: theme.$main_border,
+                        }"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ dropper }}
+                      </v-icon>
+                    </template>
+                    <v-color-picker
+                      v-model="colorPicker"
+                      dot-size="25"
+                      hide-canvas
+                      hide-inputs
+                      hide-mode-switch
+                      hide-sliders
+                      mode="hexa"
+                      show-swatches
+                      swatches-max-height="200"
+                      @input.capture="addColor($event)"
+                    />
+                  </v-menu>
+                </template>
+              </v-text-field>
               <v-tooltip
                 v-if="!defaultThemes.includes(colorsPie.theme)"
                 bottom
@@ -949,22 +991,30 @@
       <modal-confirm
         v-model="isConfirmModal"
         :theme="theme"
-        :modal-text="`Уверенны, что хотите удалить вариант отображения ?`"
+        :modal-text="`Вы точно хотите удалить вариант отображения ?`"
         btn-confirm-text="Удалить"
         btn-cancel-text="Отмена"
-        @result="deleteMetrics(deleteMetricId)"
+        @result="(confirm) => { confirm && deleteMetrics(deleteMetricId) }"
       />
     </div>
   </modal-persistent>
 </template>
 
 <script>
-import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
+import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
 
 export default {
   name: 'ModalSettings',
+  model: {
+    prop: 'modalValue',
+    event: 'changeModalValue',
+  },
   props: {
+    modalValue: {
+      type: Boolean,
+      default: false,
+    },
     idDashFrom: {
       type: String,
       required: true,
@@ -977,11 +1027,12 @@ export default {
       conclusion_count: {},
       replace_count: {},
       options: {},
-      type_line: 'solid',
+      type_line: {},
       color: {},
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
+      dropper: mdiEyedropper,
       tooltip: {
         texts: [],
         links: [],
@@ -1012,9 +1063,13 @@ export default {
       them: {},
       isConfirmModal: false,
       deleteMetricId: '',
+      colorPicker: '',
     };
   },
   computed: {
+    printedUnitedMetrics() {
+      return this.metrics.map((item) => item.name);
+    },
     dashFromStore() {
       return this.$store.state[this.idDash];
     },
@@ -1045,11 +1100,12 @@ export default {
     },
     active: {
       get() {
-        return this.getModalSettings.status;
+        return this.dashFromStore.modalSettings.status;
       },
       set(value) {
-        this.$store.dispatch('closeModalSettings', {
-          path: this.idDash,
+        this.$store.commit('setModalSettings', {
+          idDash: this.idDash,
+          element: this.element,
           status: value,
         });
       },
@@ -1070,7 +1126,10 @@ export default {
         return [];
       }
       const [elem] = this.element.split('-');
-      return elem ? this.optionsByComponents[elem] || [] : [];
+      if (elem) {
+        return this.optionsByComponents[elem] || [];
+      }
+      return [];
     },
     changeComponent() {
       return `${this.idDash}-${this.element}`;
@@ -1109,7 +1168,7 @@ export default {
       },
     },
   },
-  mounted() {
+  created() {
     this.tooltipSettingShow = this.element.indexOf('csvg') !== -1;
     this.metricsName = this.getMetricsMulti;
     this.loadComponentsSettings();
@@ -1119,6 +1178,16 @@ export default {
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
+    },
+    addColor(e) {
+      if (this.colorPicker) {
+        if (this.colorsPie.colors === '') {
+          this.colorsPie.colors += `${e}`;
+        } else {
+          this.colorsPie.colors += ` ${e}`;
+        }
+      }
+      this.colorPicker = '';
     },
     loadComponentsSettings() {
       const localOptions = {};
@@ -1163,6 +1232,7 @@ export default {
     },
     // отправляем настройки в хранилище
     async setOptions() {
+      // this.prepareUnitedSettingsBeforeSave();
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1220,7 +1290,7 @@ export default {
         color: this.color,
         updated: Date.now(),
       };
-      this.$store.dispatch('saveSettingsToPath', {
+      await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
         options,
@@ -1230,13 +1300,12 @@ export default {
       }
       this.cancelModal();
     },
-    // если нажали на отмену создания
     cancelModal() {
-      this.$store.commit('setModalSettings', {
-        idDash: this.idDash,
-        status: false,
-        id: '',
-      });
+      this.active = false;
+      this.checkOnCancel();
+    },
+    // если нажали на отмену создания
+    checkOnCancel() {
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
         this.them = {};
@@ -1246,7 +1315,7 @@ export default {
     },
     checkEsc(event) {
       if (event.code === 'Escape') {
-        this.cancelModal();
+        this.checkOnCancel();
       }
     },
     checkOptions(option, relation) {
@@ -1309,6 +1378,34 @@ export default {
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
+    prepareUnitedSettingsBeforeSave() {
+      const metricNames = this.metrics.map((item) => item.name);
+
+      // clear colors
+      if (this.color) {
+        Object.keys(this.color).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.color[name];
+          }
+        });
+      }
+
+      // clear metricTypes
+      if (this.multilineYAxesBinding.metricTypes) {
+        Object.keys(this.multilineYAxesBinding.metricTypes).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.multilineYAxesBinding.metricTypes[name];
+          }
+        });
+      }
+      if (this.type_line && typeof this.type_line === 'object') {
+        Object.keys(this.type_line).forEach((name) => {
+          if (!metricNames.includes(name)) {
+            delete this.type_line[name];
+          }
+        });
+      }
+    },
     getSettingsByPath() {
       this.$store.commit('prepareSettingsStore', {
         path: this.idDash,
@@ -1319,7 +1416,6 @@ export default {
     changeColor() {
       if (document.querySelectorAll('.v-menu__content').length !== 0) {
         document.querySelectorAll('.v-menu__content').forEach((item) => {
-          item.style.boxShadow = `0 5px 5px -3px ${this.theme.$main_border},0 8px 10px 1px ${this.theme.$main_border},0 3px 14px 2px ${this.theme.$main_border}`;
           item.style.background = this.theme.$main_bg;
           item.style.color = this.theme.$main_text;
           item.style.border = `1px solid ${this.theme.$main_border}`;
@@ -1380,8 +1476,10 @@ export default {
                 && options.yAxesBinding.metrics
                 && options.yAxesBinding.metricTypes
               ) {
-                this.multilineYAxesBinding.metrics[metric.name] = options.yAxesBinding.metrics[metric.name];
-                this.multilineYAxesBinding.metricTypes[metric.name] = options.yAxesBinding.metricTypes[metric.name];
+                this.multilineYAxesBinding
+                  .metrics[metric.name] = options.yAxesBinding.metrics[metric.name];
+                this.multilineYAxesBinding
+                  .metricTypes[metric.name] = options.yAxesBinding.metricTypes[metric.name];
               } else {
                 this.multilineYAxesBinding.metrics[metric.name] = 'left';
                 this.multilineYAxesBinding.metricTypes[metric.name] = 'linechart';
@@ -1432,13 +1530,6 @@ export default {
                     val = oldVal;
                   }
                 }
-                // если не выбраны заголовки то выделить все имеющиеся
-                if (val.length === 0) {
-                  const allTitles = this.titles;
-                  if (allTitles.length) {
-                    val = [...allTitles];
-                  }
-                }
                 localOptions[item] = val || [];
               } else {
                 const val = options[item] !== null && typeof options[item] === 'object'
@@ -1454,10 +1545,26 @@ export default {
                 localOptions[item] = true;
               } else if (item === 'positionlegend') {
                 localOptions[item] = 'right';
+              } else if (item === 'titles') {
+                let val = options[item];
+                if (!val) {
+                  // old settings
+                  const oldVal = this.getSelectedTableTitles;
+                  if (oldVal) {
+                    val = oldVal;
+                  }
+                }
+                // если не выбраны заголовки то выделить все имеющиеся
+                if (val.length === 0) {
+                  const allTitles = this.titles;
+                  if (allTitles.length) {
+                    val = [...allTitles];
+                  }
+                }
+                localOptions[item] = val || [];
               } else {
-                const field = settings.optionFields.find(
-                  (field) => field.option === item,
-                );
+                const field = settings.optionFields
+                  .find((fieldItem) => fieldItem.option === item);
                 if (field && field.default !== undefined) {
                   localOptions[item] = field.default;
                 }
@@ -1468,6 +1575,7 @@ export default {
         if (!localOptions?.change) {
           localOptions.change = false;
         }
+
         localOptions = { ...this.loadComponentsSettings(), ...localOptions };
         this.$set(this, 'options', localOptions);
       });
@@ -1476,10 +1584,11 @@ export default {
       const nextTheme = this.defaultThemes[0];
       this.$set(this.colorsPie, 'theme', nextTheme);
       this.$set(this.colorsPie, 'nametheme', nextTheme);
-      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(','));
+      this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(' '));
       this.$set(this.options, 'colorsPie', this.colorsPie);
       this.$set(this.options, 'themes', this.themes);
       delete this.themes[theme];
+      this.isDelete = true;
     },
     deleteTheme() {
       this.options.colorsPie = this.colorsPie;

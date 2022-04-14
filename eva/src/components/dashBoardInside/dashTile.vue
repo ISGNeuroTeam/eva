@@ -1,7 +1,7 @@
 <template>
   <div class="tile-template">
     <div
-      v-show="!noMsg"
+      v-if="dataTile.length > 0 && !noMsg"
       class="dash-tile"
       :style="{ height: `${height - otstupBottom}px` }"
     >
@@ -23,7 +23,7 @@
       </div>
     </div>
     <div
-      v-show="noMsg"
+      v-else
       class="errormsg"
     >
       {{ msgText }}
@@ -51,14 +51,17 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    // sizeTileFrom: null, // размер плиток
+    sizeTileFrom: {
+      type: Object,
+      required: true,
+    }, // размер плиток
     heightFrom: {
       type: Number,
       required: true,
     }, // высота родительского элемента
     dataModeFrom: {
       type: Boolean,
-      required: true,
+      default: false,
     }, // включена ли шапка
     // activeElemFrom: null,
     // dataReport: null,
@@ -121,23 +124,18 @@ export default {
     },
   },
   watch: {
-    dataRestFrom(dataRestFrom) {
-      if (!dataRestFrom.length || dataRestFrom.length === 0) {
-        this.noMsg = true;
-        this.msgText = 'Нет данных для отображения';
-      } else if (!dataRestFrom[0].caption || !dataRestFrom[0].color) {
-        this.noMsg = true;
-        this.msgText = 'Ожидается поле caption и color';
-      } else {
-        this.noMsg = false;
-        this.msgText = '';
-        this.captures = Object.keys(dataRestFrom[0]);
-      }
+    dataRestFrom: {
+      handler(dataRestFrom) {
+        this.checkDataRestFrom(dataRestFrom);
+      },
+      deep: true,
     },
     captures(captures) {
-      this.actions[0].capture = captures;
+      const localActions = JSON.parse(JSON.stringify(this.actions));
+      localActions[0].capture = captures;
+      // this.actions[0].capture = captures;
       this.$store.commit('setActions', {
-        actions: this.actions,
+        actions: localActions,
         idDash: this.idDash,
         id: this.id,
       });
@@ -151,8 +149,22 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+    this.checkDataRestFrom();
   },
   methods: {
+    checkDataRestFrom(dataRestFrom = this.dataRestFrom) {
+      if (!dataRestFrom.length || dataRestFrom.length === 0) {
+        this.noMsg = true;
+        this.msgText = 'Нет данных для отображения';
+      } else if (!dataRestFrom[0].caption || !dataRestFrom[0].color) {
+        this.noMsg = true;
+        this.msgText = 'Ожидается поле caption и color';
+      } else {
+        this.noMsg = false;
+        this.msgText = '';
+        this.captures = Object.keys(dataRestFrom[0]);
+      }
+    },
     getEvents({ event, partelement }) {
       let result = [];
       if (!this.$store.state[this.idDash].events) {
@@ -189,7 +201,7 @@ export default {
         };
         if (tockens[i].elem === this.id && tockens[i].action === 'click') {
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: item[tockens[i].capture],
             store: this.$store,
@@ -221,7 +233,10 @@ export default {
       }
     },
     checkName(name) {
-      return name.replace('\\n', '<br>');
+      if (name) {
+        return name.replace('\\n', '<br>');
+      }
+      return '';
     },
     setSize(sizeFrom) {
       let size;

@@ -1,49 +1,55 @@
 .piechart-block
 
   .nodata
-      padding: 10px
-      opacity: 0.7
-      text-align: center
+    padding: 10px
+    opacity: 0.7
+    text-align: center
 
   .piechart-legend-block
     display: flex
     justify-content: flex-start
-    align-items: flex-start
+    align-items: center
 
     .dash-piechart
 
       .piepart
         transition: all 0.3s ease
         cursor: pointer
+      path
+        stroke: var(--main_bg)
 
       .piepartSelect
         transform: scale(1.07)
 
     .legend-block-pie
-        display: flex
+      display: flex
+      &__vertically
         flex-flow: column wrap
         justify-content: flex-start
+      &__horizontally
+        flex-wrap: wrap
 
-        .legend-line
-          display: flex
-          flex-flow: row nowrap
-          padding: 5px
-          cursor: pointer
+      .legend-line
+        display: flex
+        flex-flow: row nowrap
+        padding: 5px
+        cursor: pointer
+        align-items: center
 
-          .square
-            width: 10px
-            height: 10px
-            margin-right: 10px
+        .square
+          width: 10px
+          height: 10px
+          margin-right: 10px
 
-          .text
-            font-size: 14px
-            white-space: nowrap
+        .text
+          font-size: 14px
+          white-space: nowrap
 
-        .legend-line_hover
-            background-color: var(--secondary_bg)
-            border-radius: 3px
-        
-        .legend-line_selected
-          padding: 4px
-          border: 1px solid var(--secondary_border)
+      .legend-line_hover
+          background-color: var(--secondary_bg)
           border-radius: 3px
+
+      .legend-line_selected
+        padding: 4px
+        border: 1px solid var(--main_text)
+        border-radius: 3px

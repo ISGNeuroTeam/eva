@@ -1,3 +1,65 @@
+# [1.86.1]
+
+### Fixed
+- Fixed theme styles
+
+# [1.86.0] - Data research 2.0, multiline fixes
+
+### Added
+- Visualisations in Data research 2.0 (ygraph, bush, map, heatmap, singleValue, tune)
+- Visualization settings in Data research 2.0
+- Logout form all browser tabs
+- Added display of a message about the lack of data on the visualization "tile"
+
+### Fixed
+- Range selection on the multiline dash
+- Redrawing the dash multiline when changing the main theme
+- A metric styles bug in "united" option on the dash multiline
+- The text color on the Y-axis of the dash multiline
+- The problem of cropping the axis text in full-screen multiline mode
+- The histograms have been moved beyond the lines on the dash multiline
+- internal mechanisms of Data research 2.0
+- Graphic design of Data research 2.0
+- Old filters apply to new queries in Data research 2.0
+- The timeline change column in Data research 2.0
+- Data research 2.0: some visualizations are not displayed immediately after selection
+- White areas in SingleValue
+- Operation of modal windows for creating, confirming and working with the profile
+- Data from the previous query was saved in a new selection in Multiselect
+- Fixed removal of the display of the "Select data source" button immediately after creation
+- Incorrect list in export dashboard list
+- Reloading the bush dash when Data Source changes
+- Resizing movable visualisation
+- Tune resizing
+- Updating and undoing filter parts changes
+- Fixed the color of the number of lines per page.
+- Fixed color and layout in the dropdown menu on the "statistics" tab.
+- Fixed zoom buttons on the timeline.
+- Fixed styles in form elements
+
+
+# [1.85.0] - Token update when executing a go event, visualisations in data research, multiline
+
+### New
+- Added the ability to update tokens when executing a go event
+- Visualisations in datа research 2.0.
+- Added tab deletion confirmation
+
+### Fixed
+- The operation of the multiline component has been updated.
+- Updated styles in the GIS component.
+- Single value metadata and ranges if the boundaries coincide - incorrect processing
+- SingleValue Color setting for indicators via the Ranges button
+- Piechart color rgb and legend position
+- Calendar in data source
+- Problems with hiding columns in the table.
+- Fixed problems with creating and editing dashboards and groups.
+- Fixed a problem with renaming data sources.
+- Fixed switching by event to tabs in the heat map.
+- Fixed the theme of styles
+- Fixed synchronization of selection of pie chart fragments
+
+
 # [1.84.0] - Fixed dashboard filters, multiple tokens
 
 ### New

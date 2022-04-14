@@ -114,7 +114,7 @@ export default {
     },
     searchRep: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
@@ -579,7 +579,7 @@ export default {
             capture: tockens[i].capture,
           };
           this.$store.commit('setTocken', {
-            tocken,
+            token: tocken,
             idDash: this.idDash,
             value: name,
             store: this.$store,

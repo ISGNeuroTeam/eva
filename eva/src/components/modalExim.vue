@@ -1,9 +1,12 @@
 <template>
-  <v-dialog
+  <modal-persistent
+    ref="confirmModal"
     v-model="active"
     width="500"
-    @click:outside="closeModal"
-    @keydown.esc="closeModal"
+    :theme="theme"
+    :is-confirm="isChanged"
+    :persistent="isChanged"
+    @cancelModal="closeModal"
   >
     <div class="exin-modal-block">
       <v-card :style="{ background: theme.$main_bg }">
@@ -52,7 +55,7 @@
           <v-file-input
             :prepend-icon="fileImg"
             :color="theme.$accent_ui_color"
-            :style="{ color: theme.text, fill: theme.text }"
+            :style="{ color: theme.$main_text, fill: theme.$main_text }"
             class="file-itself"
             hide-details
             outlined
@@ -87,7 +90,7 @@
         </v-card-actions>
       </v-card>
     </div>
-  </v-dialog>
+  </modal-persistent>
 </template>
 
 <script>
@@ -114,7 +117,7 @@ export default {
     },
     curName: {
       type: String,
-      required: true,
+      default: '',
     },
     modalValue: {
       type: Boolean,
@@ -145,6 +148,7 @@ export default {
         dash: [],
       },
       selected: [],
+      isChanged: false,
     };
   },
   computed: {
@@ -163,17 +167,8 @@ export default {
     },
   },
   watch: {
-    dashboards() {
-      const list = this.dashboards.map((item) => item.name);
-      list.unshift('Выбрать все');
-      this.elements.dash = list;
-    },
-    groups() {
-      const list = this.groups.map((item) => item.name);
-      list.unshift('Выбрать все');
-      this.elements.group = list;
-    },
     selected(selected) {
+      this.isChanged = true;
       if (selected.includes('Выбрать все')) {
         let list = [];
         if (this.element === 'dash') {
@@ -184,21 +179,42 @@ export default {
         this.selected = list;
         list = [...[], ...list];
         list.unshift('Очистить все');
-        this.elements[this.element] = list;
+        this.$set(this.elements, this.element, list);
       } else if (selected.includes('Очистить все')) {
         let list = [];
-        if (this.element === 'dashs') {
+        if (this.element === 'dash') {
           list = this.dashboards.map((item) => item.name);
         } else {
           list = this.groups.map((item) => item.name);
         }
         this.selected = [];
         list.unshift('Выбрать все');
-        this.elements[this.element] = list;
+        this.$set(this.elements, this.element, list);
       }
     },
+    file() {
+      this.isChanged = true;
+    },
+  },
+  created() {
+    if (this.element === 'group') {
+      this.updateLocalGroupList();
+    }
+    if (this.element === 'dash') {
+      this.updateLocalDashboardsList();
+    }
   },
   methods: {
+    updateLocalDashboardsList() {
+      const list = this.dashboards.map((item) => item.name);
+      list.unshift('Выбрать все');
+      this.$set(this.elements, 'dash', list);
+    },
+    updateLocalGroupList() {
+      const list = this.groups.map((item) => item.name);
+      list.unshift('Выбрать все');
+      this.$set(this.elements, 'group', list);
+    },
     async exportDash() {
       const ids = [];
       if (this.element === 'dash') {
@@ -253,13 +269,18 @@ export default {
           const formData = new FormData();
           if (this.element === 'dash') {
             formData.append('group', this.curName);
-            formData.append('body', this.file);
-          } else {
-            formData.append('body', this.file);
           }
+          formData.append('body', this.file);
           await this.$store.dispatch('importDash', {
             element: this.element,
             formData,
+          }).then(() => {
+            if (this.element === 'dash') {
+              this.$emit('update:dashboards');
+            }
+            if (this.element === 'group') {
+              this.$emit('update:groups');
+            }
           });
           try {
             // тут проверяем может ли распарситься ответ от сервера
