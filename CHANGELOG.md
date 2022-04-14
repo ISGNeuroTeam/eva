@@ -5,13 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unrealese]
+## [Unrelise]
+
+### Added
+- added new notification system
+- added color picker for custom pie chart
+- added nginx configuration files for /eva endpoint
+- added eva router prefix
+
+### Fixed
+- Fixed dashSelect Tokens error
+- fixed computer dataRestDeep in dashSelect.vue
+- Data exploration 2.0: visualization improvements
+- fixed piechart visual inaccuracies
+
+## [1.86.1]
+
+### Fixed
+- Fixed theme styles
+
+
+## [1.86.0]
+
+### Added
+- added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
+- Added display of a message about the lack of data on the visualization "tile"
+- logout form all browser tabs
+
+### Fixed
+- add settings for singleValue in reportsV2
+- fixed reportsV2 heat map visualisation
+- fixed and disabled eslint errors
+- fixed White areas in SingleValue
+- fixed modal-confirm in modal-profile and modal-create
+- fixed Multiselect. Extra data from the previous request remains in the new select
+- fixed Remove display of "Select Data Source" button right after creation
+- fixed Incorrect list in export dashboard list
+- Fixed range selection on a multiline dash
+- Redrawing a dash multiline when changing the main theme
+- Fixed a metric styles bug in "united" option on the dash multiline
+- Fixed the text color on the Y-axis of multiline text.
+- fixed reportsV2: mutate vuex store state outside mutation
+- fixed the problem of cropping the axis text in full-screen multiline mode
+- histograms move beyond the lines on multilines
+- fixed reportsV2: display of columns from table settings does not work
+- fixed reportsV2: style theme
+- fixed reportsV2: old filters apply to new queries
+- fixed bush. reloading Data Source
+- fixed reportsV2: timeline change col
+- fixed reportsV2: visualization settings not working tile
+- fixed reportsV2: some visualizations are not displayed immediately after selection
+- fixed a visual bug in the single value dash
+- fixed reportsV2: map display, settings, styles
+- fixed reportsV2: Incorrect display of the graph and non-working control buttons
+- fixed resizing movable visualisation
+- fixed tune resize
+- fixed updating and undoing filter parts changes
+- Fixed the color of the number of lines per page.
+- Fixed color and layout in the dropdown menu on the "statistics" tab.
+- Fixed zoom buttons on the timeline.
+- Fixed styles on v-select\v-label\v-input
+- Fixed timeline zoom
+
+## [1.85.0]
 
 ### Added
 - added the ability to update tokens when executing a go event
-- *added nginx configuration files for /eva endpoint
+- reportsV2 timeline get data from backend
+- reportsV2 interesting get data from backend
+- added visualisations to datа research 2.0.
 
 ### Fixed
+- fix first search id
+- fix bush drawing
+- fix single value template reactivity
+- fix SR2 visualisation
+- fixed group edit and dash edit modal
 - Multiline. Moved the barplots to the background
 - fixed single value metadata and ranges if the boundaries coincide - incorrect processing
 - SingleValue Color setting for indicators via the Ranges button
@@ -32,6 +101,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed multiline label
 - fixed heatmap. Transition by event to tabs.
 - fixed renaming with data source replacement
+- fixed passed properties to token
+- fixed dashTable.vue
+- fixed save dashboards
+- fixed log icon light up on error
+- fixed Piechart. Custom themes color set reset
+- fixed gis
+- fixed multiline
+- fixed piechart chunk selection syncing
+- fixed dashSelect
+- refactoring a multiline
+- Fixed persistent modal
+- Added tab deletion confirmation
+- Added closing confirmation by "Esc\Click-outside"
+- Fixed change tracking in "modal-settings" fields
+- fixed guntt hints
+- fixed an empty data source will load indefinitely
+- fixed activate tabs in new dashboards
+- fixed dashboards\groups are not imported\exported
+- fixed piechart positionlegend
+- fixed data is not disaplayed after renaming data sources
+- fixed create dashboard visualisation
+- fixed fix color styles and ygraph tooltip
+- fixed unable to create new components
+- fixed dash tune
+- fixed default tab are not created
+- fixed multiselect refinement
+- fixed multiselect placing data on multiple lines
+- fixed add token
+- improvements handling window closing
+- fixed dropdown lists
+- fixed table columns not hiding
+- fixed handling deletion of tabs
+- fixed bugs in "modal-delete"
 
 ## [1.84.0]
 
@@ -39,7 +141,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - multiple tokens
 
 ### Fixed
-- Fixed persistent modal
 - fixed filters. name and content
 - fixed visible zoom button
 - fixed setting the title breaks the scrolling of the component
@@ -74,9 +175,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed button hints
 - fixed switching between filter types
 - fixed cell size in tile visualization
-- Added tab deletion confirmation
-- Added closing confirmation by "Esc\Click-outside"
-- Fixed change tracking in "modal-settings" fields
 - fixed missing error signal in datasource exc request
 - fixed tile visualization not showing after datasource restart
 - fixed dash single value settings no closes
@@ -1293,68 +1391,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - autorization page
 - user panel
-  - return to "main" page
-  - return to page before
-  - log
-    - put log
-    - clear log
-    - restore log
-  - edit user profile
-    - role modal page with this items - users, roles, permissions, groups and indexes. Every item can create, edit, delete if you obtain right permission.
-  - exit on autorization page (clear cookie and store)
+    - return to "main" page
+    - return to page before
+    - log
+        - put log
+        - clear log
+        - restore log
+    - edit user profile
+        - role modal page with this items - users, roles, permissions, groups and indexes. Every item can create, edit, delete if you obtain right permission.
+    - exit on autorization page (clear cookie and store)
 - dashboarding constructor
 
-  - page with all available groups and all available dashboards inside current group (create, edit, delete group/ dashboards)
+    - page with all available groups and all available dashboards inside current group (create, edit, delete group/ dashboards)
 
-    - dashboard page
+        - dashboard page
 
-      - top panel
+            - top panel
 
-        - switch display mode
+                - switch display mode
 
-        - color settings panel
+                - color settings panel
 
-        - event panel
+                - event panel
 
-        - token panel
+                - token panel
 
-        - search panel
+                - search panel
 
-        - tool panel (vaizualization itself)
+                - tool panel (vaizualization itself)
 
-        - user panel
+                - user panel
 
-        - save dashboards
+                - save dashboards
 
-      - dashboard
+            - dashboard
 
-        - top panel dashboard
+                - top panel dashboard
 
-          - icon
+                    - icon
 
-          - name
+                    - name
 
-          - id
+                    - id
 
-          - search sid
+                    - search sid
 
-          - choose search
+                    - choose search
 
-          - resize dashboard
+                    - resize dashboard
 
-          - change position dashboard
+                    - change position dashboard
 
-          - edit name dashboard
+                    - edit name dashboard
 
-          - settings dashboard
+                    - settings dashboard
 
-          - delete dashboard
+                    - delete dashboard
 
-        - vizualization block
+                - vizualization block
 
 - search and reporting
-  - statistics block
-  - search block
-    - start search
-    - setting search
-  - vizualization block
+    - statistics block
+    - search block
+        - start search
+        - setting search
+    - vizualization block
