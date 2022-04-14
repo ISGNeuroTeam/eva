@@ -24,7 +24,7 @@
         <v-slider
           v-model="sliderValue"
           :class="{ 'slider-vertical': vertical }"
-          :dark="isDarkTheme"
+          :dark="true"
           :disabled="loading || values.length === 0"
           :min="0"
           :max="values.length - 1"
@@ -372,6 +372,10 @@ export default {
   display: flex
   justify-content: center
   align-items: center
+
+  .v-slider__track-background
+    background-color: var(--secondary_border) !important
+    border-color: var(--secondary_border) !important
 
   .v-input__append-inner
     margin-top: 16px

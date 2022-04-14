@@ -889,6 +889,7 @@
         :edit-mode="editMode"
       />
     </div>
+    <notifications />
   </div>
 </template>
 
@@ -927,10 +928,12 @@ import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
+import Notifications from '@/components/notifications';
 
 export default {
   name: 'DashPanelBoard',
   components: {
+    Notifications,
     EvaLogo,
     DashFilterPanel,
   },
