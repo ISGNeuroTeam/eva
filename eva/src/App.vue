@@ -26,7 +26,7 @@ export default {
     // TODO: временный костыль
     // Синхронизация логаута на всех вкладках браузера
     window.onstorage = () => {
-      if (!document.cookie && (this.$route.fullPath !== '/')) {
+      if (!document.cookie.includes('eva_token') && (this.$route.fullPath !== '/')) {
         window.location.reload();
       }
     };

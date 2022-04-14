@@ -264,7 +264,6 @@ export default {
       if (this.dataReady.length > 0 && this.dataReady[0][this.elem]) {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
-        this.elemDeep[String(this.multiple)] = this.elemDeep[String(this.multiple)].filter((x) => x !== null || x !== undefined);
 
         res = this.filterSelect(res, this.elemDeep.true);
       }
@@ -452,12 +451,14 @@ export default {
 
       let curTocken = {};
       const data = this.dataReady;
-      Object.keys(tockens).forEach((i) => {
-        if (tockens[i].elem === this.id && tockens[i].action === 'change') {
-          curTocken = tockens[i];
-          tockensToUpdate.push({ name: tockens[i].name, capture: tockens[i].capture });
-        }
-      });
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          if (tockens[i].elem === this.id && tockens[i].action === 'change') {
+            curTocken = tockens[i];
+            tockensToUpdate.push({ name: tockens[i].name, capture: tockens[i].capture });
+          }
+        });
+      }
       let value = [];
 
       if (String(this.multiple) === 'true') {

@@ -10,6 +10,7 @@
           v-text="tokenizedTitle"
         />
       </div>
+
       <v-icon
         v-show="dataModeFrom"
         size="22"
