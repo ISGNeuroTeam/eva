@@ -3,24 +3,26 @@
     class="dash-guntt"
     :class="idDashClass()"
   >
-    <div class="legend-block">
+    <div
+      v-if="!noMsg && guntt && guntt.getPhases.length > 0"
+      class="legend-block"
+    >
       <div
-        v-for="i in legends.length"
-        v-show="!noMsg"
-        :key="i"
+        v-for="(item, index) in guntt.getPhases"
+        :key="`${item}${index}`"
         class="legends-itself"
       >
         <div
           class="circle"
-          :style="{ backgroundColor: colors[i - 1] }"
+          :style="{ backgroundColor: colors[index] }"
         />
         <div class="text">
-          {{ legends[i - 1] }}
+          {{ item }}
         </div>
       </div>
     </div>
     <div
-      v-show="!noMsg"
+      v-if="!noMsg"
       ref="gunttBlock"
       class="guntt-block"
     />
@@ -33,7 +35,7 @@
       }"
     />
     <div
-      v-show="noMsg"
+      v-if="noMsg"
       class="mt-4"
     >
       {{ msgText }}
@@ -42,28 +44,8 @@
 </template>
 
 <script>
-import * as d3 from 'd3';
 import GunttClass from '../../js/classes/GunttClass';
 
-function wrap(text) {
-  text.each(function (_, index, node) {
-    console.log(this);
-    console.log(node[index]);
-    const localText = d3.select(this);
-    let row = [];
-    localText
-      .node()
-      .querySelectorAll('text')
-      .forEach((item) => {
-        row = item.innerHTML.split(' ').filter((rowItem) => rowItem !== '');
-        if (row[1]) {
-          row[0] = `<tspan x=0 y=10>${row[0]}</tspan>`;
-          row[1] = `<tspan x=0 y=30>${row[1]}</tspan>`;
-          item.innerHTML = row.join('');
-        }
-      });
-  });
-}
 export default {
   props: {
     // переменные полученные от родителя
@@ -146,17 +128,8 @@ export default {
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
-            } else {
-              // .dash-guntt-${this.id}
-              const graphics = d3
-                .select(this.$el.querySelector('.guntt-block'))
-                .selectAll('svg')
-                .nodes(); // получаем область в которой будем рисовтаь график
-
-              if (graphics.length !== 0) {
-                // если график уже есть
-                graphics[0].remove(); // удаляем его
-              }
+            } else if (this.guntt) {
+              this.guntt.removeGuntt();
             }
           } else {
             this.prepareChart(this.dataRestFrom);
@@ -176,16 +149,8 @@ export default {
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
-            } else {
-              const graphics = d3
-                .select(this.$el.querySelector('.guntt-block'))
-                .selectAll('svg')
-                .nodes(); // получаем область в которой будем рисовтаь график
-
-              if (graphics.length !== 0) {
-                // если график уже есть
-                graphics[0].remove(); // удаляем его
-              }
+            } else if (this.guntt) {
+              this.guntt.removeGuntt();
             }
           } else {
             this.prepareChart(this.dataRestFrom);
@@ -206,16 +171,8 @@ export default {
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
-            } else {
-              const graphics = d3
-                .select(this.$el.querySelector('.guntt-block'))
-                .selectAll('svg')
-                .nodes(); // получаем область в которой будем рисовтаь график
-
-              if (graphics.length !== 0) {
-                // если график уже есть
-                graphics[0].remove(); // удаляем его
-              }
+            } else if (this.guntt) {
+              this.guntt.removeGuntt();
             }
           } else {
             this.prepareChart(this.dataRestFrom);
@@ -229,16 +186,8 @@ export default {
           if (this.dataReport) {
             if (this.activeElemFrom === this.id) {
               this.prepareChart(this.dataRestFrom);
-            } else {
-              const graphics = d3
-                .select(this.$el.querySelector('.guntt-block'))
-                .selectAll('svg')
-                .nodes(); // получаем область в которой будем рисовтаь график
-
-              if (graphics.length !== 0) {
-                // если график уже есть
-                graphics[0].remove(); // удаляем его
-              }
+            } else if (this.guntt) {
+              this.guntt.removeGuntt();
             }
           } else {
             this.prepareChart(this.dataRestFrom);
@@ -268,16 +217,8 @@ export default {
               if (this.activeElemFrom === this.id) {
                 this.noMsg = false;
                 this.prepareChart(this.dataRestFrom);
-              } else {
-                const graphics = d3
-                  .select(this.$el.querySelector('.guntt-block'))
-                  .selectAll('svg')
-                  .nodes(); // получаем область в которой будем рисовтаь график
-
-                if (graphics.length !== 0) {
-                  // если график уже есть
-                  graphics[0].remove(); // удаляем его
-                }
+              } else if (this.guntt) {
+                this.guntt.removeGuntt();
               }
             } else {
               this.noMsg = false;
@@ -324,13 +265,6 @@ export default {
         this.createChart(sizeChart, this, dataRest);
       });
     },
-    checkZero(item) {
-      if (item < 10) {
-        // если там больше 10 символов
-        item = `0${item}`;
-      }
-      return item;
-    },
     createChart(sizeChart, that, dataRest) {
       const margin = {
         top: 20,
@@ -349,54 +283,15 @@ export default {
       };
       const width = sizeChart.width - margin.left - margin.right;
       const height = sizeChart.height - margin.top - margin.bottom;
-
-      const paddingLeft = window.screen.width > 1920 ? 90 : 70;
-      const paddingRight = 80;
-      const timeAxisHeight = window.screen.width > 1920 ? 60 : 50;
-      const timeAxisPaddingLeft = window.screen.width < 1400 ? -10 : 0;
-      const timeAxisPaddingTop = window.screen.width > 1920 ? 15 : 10;
       const dateFormat = this.timeFormatFrom || '%Y-%m-%d %H:%M:%S';
 
       const data = [];
       dataRest.forEach((item) => {
         data.push({ ...{}, ...item });
       });
-      //
-      const graphics = d3
-        .select(this.$el.querySelector('.guntt-block'))
-        .selectAll('svg')
-        .nodes(); // получаем область в которой будем рисовтаь график
-
-      if (graphics.length !== 0) {
-        // если график уже есть
-        graphics[0].remove(); // удаляем его
+      if (this.guntt) {
+        this.guntt.removeGuntt();
       }
-
-      // const svg = d3
-      //   .select(this.$el.querySelector('.guntt-block'))
-      //   .append('svg')
-      //   .attr('width', width)
-      //   .attr('height', height)
-      //   .attr('class', 'guntt-svg');
-
-      data.forEach((item, i) => {
-        let newDate = new Date(item.start_date * 1000);
-        data[i].start_date = `${newDate.getFullYear()}-${this.checkZero(
-          newDate.getMonth() + 1,
-        )}-${this.checkZero(newDate.getDate())} ${this.checkZero(
-          newDate.getHours(),
-        )}:${this.checkZero(newDate.getMinutes())}:${this.checkZero(
-          newDate.getSeconds(),
-        )}`;
-        newDate = new Date(item.end_date * 1000);
-        data[i].end_date = `${newDate.getFullYear()}-${this.checkZero(
-          newDate.getMonth() + 1,
-        )}-${this.checkZero(newDate.getDate())} ${this.checkZero(
-          newDate.getHours(),
-        )}:${this.checkZero(newDate.getMinutes())}:${this.checkZero(
-          newDate.getSeconds(),
-        )}`;
-      });
 
       this.guntt = new GunttClass({
         elem: this.$refs.gunttBlock,
@@ -412,140 +307,20 @@ export default {
         tooltipElem: this.$refs.tooltip,
       });
 
-      // const svg = this.guntt.getGuntt;
-
-      // const x = d3
-      //   .scaleTime()
-      //   .domain([
-      //     d3.min(data, (d) => new Date(d.start_date)),
-      //     d3.max(data, (d) => new Date(d.end_date)),
-      //   ])
-      //   .range([paddingLeft, width - paddingRight]);
-      // рассчитываем набор фаз (состояний)
-      // const { phases, ids } = data.reduce((acc, { phase, id }) => {
-      //   if (phase && !acc.phases.includes(phase)) {
-      //     acc.phases.push(phase);
-      //   }
-      //   if (!acc.ids.includes(id)) {
-      //     acc.ids.push(id);
-      //   }
-      //   return acc;
-      // }, {
-      //   phases: [],
-      //   ids: [],
-      // });
       if (this.guntt.getPhases.length > 0) {
         this.legends = this.guntt.getPhases;
       }
 
-      // const barHeight = this.guntt.getBarHeight;
-
-      // let timeAxisDivider = 2;
-      // const fullWidth = width + margin.left + margin.right;
-      //
-      // if (fullWidth < 600) {
-      //   timeAxisDivider = 3;
-      // }
-      // if (fullWidth < 450) {
-      //   timeAxisDivider = 4;
-      // }
-      // if (fullWidth < 400) {
-      //   timeAxisDivider = 5;
-      // }
-      // if (fullWidth < 350) {
-      //   timeAxisDivider = 6;
-      // }
-
-      // добавляем ось X
-      // const xAxis = svg
-      //   .append('g')
-      //   .attr('transform', `translate(0,${height - timeAxisHeight})`)
-      //   .call(
-      //     d3
-      //       .axisBottom(x)
-      //       .tickFormat(d3.timeFormat(dateFormat))
-      //       .tickValues(
-      //         x.ticks().filter((item, i) => i % timeAxisDivider === 0),
-      //       ),
-      //   )
-      //   .call(wrap);
-      //
-      // xAxis.selectAll('line').attr('y2', `-${height}`).attr('opacity', '0.3');
-      // xAxis
-      //   .selectAll('text')
-      //   .attr('class', 'text-x')
-      //   .attr('transform', `translate(${timeAxisPaddingLeft},${timeAxisPaddingTop})`)
-      //   .style('color', this.colorFrom.text)
-      //   .style('text-anchor', 'center');
-
-      // горизонатьные значения (id)
-      // svg
-      //   .append('g')
-      //   .selectAll('rect')
-      //   .data(ids)
-      //   .enter()
-      //   .append('rect')
-      //   .attr('x', 0)
-      //   .attr('y', (d, i) => i * barHeight)
-      //   .attr('width', () => width)
-      //   .attr('height', barHeight)
-      //   .attr('stroke', 'none')
-      //   .attr('opacity', 0.2);
-
-      // сами строки данных относителньо времени
-      // const bars = svg.append('g').selectAll('rect').data(data).enter();
-      // const bars = this.guntt.getBars;
-      // const lines = bars
-      //   .append('rect')
-      //   .attr('rx', 3)
-      //   .attr('ry', 3)
-      //   .attr('x', (d, index) => {
-      //     console.log(x(Date.parse(d.start_date)), d);
-      //     return x(Date.parse(d.start_date)) - (index % 2 === 0 ? 1 : 0);
-      //   })
-      //   .attr('y', (d) => {
-      //     let j = -1;
-      //     ids.forEach((item, i) => {
-      //       if (item === d.id) {
-      //         j = i;
-      //       }
-      //     });
-      //     return j * barHeight - (j === 0 ? 1 : 0);
-      //   })
-      //   .attr('width', (d) => x(Date.parse(d.end_date)) - x(Date.parse(d.start_date)))
-      //   .attr('height', barHeight)
-      //   .attr('stroke', 'none')
-      //   .style('cursor', 'pointer')
-      //   .attr('fill', (d) => {
-      //     let j = 0;
-      //     phases.forEach((item, i) => {
-      //       if (item === d.phase) {
-      //         j = i;
-      //       }
-      //     });
-      //
-      //     return this.colors.filter(Boolean)[j];
-      //   });
-      // const lines = this.guntt.getLines;
-
       // Tooltip
-
       const tooltipBlock = this.$refs.tooltip;
       const tooltipMargin = this.$attrs['is-full-screen'] ? 200 : 30;
 
       function transformDescription(text) {
         let rows = text.split('\\n');
         rows = rows.map((item) => `<p class="row-toolrip">${item}</p>`);
-        // rows = '<div class = "tooltip-guntt">' + rows.join('') + '</div>';
         return rows.join('');
       }
 
-      // function moveTooltip(offsetX) {
-      //   const localY = d3.event.offsetY;
-      //   const localX = d3.event.offsetX + offsetX;
-      //   tooltipBlock.style.top = `${localY}px`;
-      //   tooltipBlock.style.left = `${localX}px`;
-      // }
       this.guntt.setEventsOnLines([
         {
           name: 'mouseover',
@@ -583,30 +358,6 @@ export default {
           callback: (d) => that.setClick(d),
         },
       ]);
-      // lines
-      //   .on('mouseover', (event) => {
-      //     let tooltip = '';
-      //
-      //     if (data[0].description) {
-      //       tooltip = transformDescription(event.description);
-      //     } else {
-      //       Object.keys(event).forEach((key) => {
-      //         tooltip += `<p class="row-toolrip"><span>${key}</span>: ${event[key]}</p>`;
-      //       });
-      //     }
-      //     this.guntt.moveTooltip(tooltipMargin);
-      //     tooltipBlock.innerHTML = tooltip;
-      //     tooltipBlock.style.opacity = '0.9';
-      //     tooltipBlock.style.visibility = 'visible';
-      //   })
-      //   .on('mousemove', () => {
-      //     this.guntt.moveTooltip(tooltipMargin);
-      //   })
-      //   .on('mouseout', () => {
-      //     tooltipBlock.style.opacity = '0';
-      //     tooltipBlock.style.visibility = 'hidden';
-      //   })
-      //   .on('click', (d) => that.setClick(d));
 
       this.guntt.setEventsOnTexts([
         {
@@ -634,102 +385,6 @@ export default {
           callback: (d) => that.setClick(d),
         },
       ]);
-      // const texts = this.guntt.getTexts;
-      //
-      // texts
-      //   .on('mouseover', () => {
-      //     tooltipBlock.style.opacity = '0.9';
-      //     tooltipBlock.style.visibility = 'visible';
-      //   })
-      //   .on('mousemove', () => {
-      //     this.guntt.moveTooltip(tooltipMargin);
-      //   })
-      //   .on('mouseout', () => {
-      //     tooltipBlock.style.opacity = '0';
-      //     tooltipBlock.style.visibility = 'hidden';
-      //   })
-      //   .on('click', (d) => that.setClick(d));
-
-      // подписи слева
-
-      // let currentPos = 0;
-
-      // const idsCaption = svg.append('g').selectAll('text').data(ids).enter();
-
-      // function checkCaption(name) {
-      //   if (name.length > 6) {
-      //     // если там больше 10 символов
-      //     name = `${name.substring(0, 6)}...`; // обрезаем и добовляем троеточие
-      //   }
-      //   return name;
-      // }
-      //
-      // idsCaption
-      //   .append('text')
-      //   .text((d) => checkCaption(d))
-      //   .attr('x', 10)
-      //   .attr('y', (d, i) => {
-      //     if (i === 0) {
-      //       currentPos = barHeight / 2 + 2;
-      //     } else {
-      //       currentPos += barHeight + 2;
-      //     }
-      //     return currentPos;
-      //   })
-      //   .attr('class', 'ids-caption')
-      //   .attr('font-size', 11)
-      //   .attr('text-anchor', 'start')
-      //   .style('opacity', '0.8')
-      //   .attr('fill', this.colorFrom.text || 'white');
-      //
-      // currentPos = 0;
-      //
-      // idsCaption
-      //   .append('line')
-      //   .attr('x1', 0)
-      //   .attr('x2', width - paddingRight)
-      //   .attr('y1', (d, i) => {
-      //     let curPos;
-      //     if (i !== ids.length - 1) {
-      //       curPos = currentPos + barHeight;
-      //       currentPos += barHeight;
-      //     } else {
-      //       curPos = currentPos + barHeight;
-      //       currentPos = 0;
-      //     }
-      //     return curPos;
-      //   })
-      //   .attr('y2', () => {
-      //     const curPos = currentPos + barHeight;
-      //     currentPos += barHeight;
-      //     return curPos;
-      //   })
-      //   .style('stroke', this.colorFrom.text)
-      //   .attr('opacity', '0.3');
-      //
-      // // линия отделяющяя подписи (ids) от блока данных
-      //
-      // svg
-      //   .append('g')
-      //   .append('line')
-      //   .attr('x1', paddingLeft)
-      //   .attr('x2', paddingLeft)
-      //   .attr('y1', 0)
-      //   .attr('y2', height - 50)
-      //   .style('stroke', 'black')
-      //   .attr('opacity', '0.3');
-      //
-      // // линия отделяющяя блоки данных от легенды
-      //
-      // svg
-      //   .append('g')
-      //   .append('line')
-      //   .attr('x1', width - paddingRight)
-      //   .attr('x2', width - paddingRight)
-      //   .attr('y1', 0)
-      //   .attr('y2', height - 50)
-      //   .style('stroke', 'black')
-      //   .attr('opacity', '0.3');
     },
 
     setClick(item) {

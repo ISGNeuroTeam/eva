@@ -43,6 +43,14 @@ class GunttClass {
     return name;
   }
 
+  static checkZero(item) {
+    if (item < 10) {
+      // если там больше 10 символов
+      item = `0${item}`;
+    }
+    return item;
+  }
+
   constructor({
     elem,
     width,
@@ -63,6 +71,25 @@ class GunttClass {
       .attr('width', width)
       .attr('height', height)
       .attr('class', 'guntt-svg');
+
+    data.forEach((item, i) => {
+      let newDate = new Date(item.start_date * 1000);
+      data[i].start_date = `${newDate.getFullYear()}-${GunttClass.checkZero(
+        newDate.getMonth() + 1,
+      )}-${GunttClass.checkZero(newDate.getDate())} ${GunttClass.checkZero(
+        newDate.getHours(),
+      )}:${GunttClass.checkZero(newDate.getMinutes())}:${GunttClass.checkZero(
+        newDate.getSeconds(),
+      )}`;
+      newDate = new Date(item.end_date * 1000);
+      data[i].end_date = `${newDate.getFullYear()}-${GunttClass.checkZero(
+        newDate.getMonth() + 1,
+      )}-${GunttClass.checkZero(newDate.getDate())} ${GunttClass.checkZero(
+        newDate.getHours(),
+      )}:${GunttClass.checkZero(newDate.getMinutes())}:${GunttClass.checkZero(
+        newDate.getSeconds(),
+      )}`;
+    });
 
     const x = d3
       .scaleTime()
@@ -267,28 +294,10 @@ class GunttClass {
   get getGuntt() {
     return this.guntt;
   }
-  // WIP(start)
 
   get getPhases() {
-    return this.phases;
+    return this.phases || [];
   }
-
-  get getLines() {
-    return this.lines;
-  }
-
-  get getBars() {
-    return this.bars;
-  }
-
-  get getBarHeight() {
-    return this.barHeight;
-  }
-
-  get getTexts() {
-    return this.texts;
-  }
-  // WIP(end)
 
   moveTooltip(offsetX) {
     const localY = d3.event.offsetY;
