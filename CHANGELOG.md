@@ -30,8 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed theme styles
-- fixed piechart visual inaccuracies
-
 
 ## [1.86.0]
 
