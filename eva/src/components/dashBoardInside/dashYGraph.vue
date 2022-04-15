@@ -195,6 +195,7 @@ import {
   Size,
 } from 'yfiles';
 import licenseData from './license.json';
+import GraphClass from '../../js/classes/GraphClass';
 
 yfile.License.value = licenseData; // проверка лицензии
 
@@ -434,6 +435,8 @@ export default {
       ],
       currentNode: null,
       popupNodeCurrentTab: 0,
+      graph: null,
+      graphComponent: null,
     };
   },
   computed: {
@@ -854,89 +857,64 @@ export default {
       return result;
     },
     initMode() {
-      const mode = new yfile.GraphEditorInputMode({
-        allowGroupingOperations: false,
-        allowAddLabel: false,
-        allowCreateNode: false,
-        allowCreateEdge: false,
-      });
-      mode.addItemClickedListener((sender, args) => {
-        if (args.item instanceof yfile.INode) {
-          const tokens = this.$store.state[this.idDashFrom]?.tockens || [];
-          tokens.forEach((token) => {
-            if (token.elem === this.idFrom && token.action === 'click') {
-              const value = args.item.tag[token.capture];
-              this.$store.commit('setTocken', {
-                token,
-                idDash: this.idDashFrom,
-                store: this.$store,
-                value,
-              });
-            }
-          });
-
-          const events = this.getEvents({
-            event: 'onclick',
-          });
-
-          if (events.length !== 0) {
-            events.forEach((item) => {
-              if (item.action === 'set') {
-                this.$store.commit('letEventSet', {
-                  events,
+      this.graph.initMode({
+        modeOptions: {
+          allowGroupingOperations: false,
+          allowAddLabel: false,
+          allowCreateNode: false,
+          allowCreateEdge: false,
+        },
+        callback: (sender, args) => {
+          if (args.item instanceof yfile.INode) {
+            const tokens = this.$store.state[this.idDashFrom]?.tockens || [];
+            tokens.forEach((token) => {
+              if (token.elem === this.idFrom && token.action === 'click') {
+                const value = args.item.tag[token.capture];
+                this.$store.commit('setTocken', {
+                  token,
                   idDash: this.idDashFrom,
-                });
-              } else if (item.action === 'go') {
-                this.$store.dispatch('letEventGo', {
-                  event: item,
-                  idDash: this.idDashFrom,
-                  route: this.$router,
                   store: this.$store,
+                  value,
                 });
               }
             });
-          }
-        }
-      });
 
-      mode.itemHoverInputMode.enabled = true;
-      mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE || GraphItemTypes.NODE;
-      mode.itemHoverInputMode.discardInvalidItems = false;
-      mode.itemHoverInputMode.addHoveredItemChangedListener((sender, e) => {
-        const manager = this.$graphComponent.highlightIndicatorManager;
-        // first remove previous highlights
-        manager.clearHighlights();
-
-        if (e.item) {
-          const newItem = e.item;
-
-          manager.addHighlight(newItem);
-          if (newItem instanceof INode) {
-            // and if it's a node, we highlight all adjacent edges, too
-            this.$graphComponent.graph.edgesAt(newItem).forEach((edge) => {
-              manager.addHighlight(edge);
+            const events = this.getEvents({
+              event: 'onclick',
             });
-          } else if (newItem instanceof IEdge) {
-            // if it's an edge - we highlight the adjacent nodes
-            manager.addHighlight(newItem.sourceNode);
-            manager.addHighlight(newItem.targetNode);
+
+            if (events.length !== 0) {
+              events.forEach((item) => {
+                if (item.action === 'set') {
+                  this.$store.commit('letEventSet', {
+                    events,
+                    idDash: this.idDashFrom,
+                  });
+                } else if (item.action === 'go') {
+                  this.$store.dispatch('letEventGo', {
+                    event: item,
+                    idDash: this.idDashFrom,
+                    route: this.$router,
+                    store: this.$store,
+                  });
+                }
+              });
+            }
           }
-        }
+        },
       });
-      // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
-      mode.addCanvasClickedListener(() => {
-        this.$graphComponent.currentItem = null;
-      });
-      return mode;
     },
     createGraph() {
       this.labelStyleList = {}; // варианты labelStyle
       this.edgeStyleList = {};
-      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
-      this.$graphComponent.inputMode = this.initMode();
+      this.graph = new GraphClass({
+        elem: this.$refs.graph,
+      });
+      this.$graphComponent = this.graph.getGraph;
+      this.initMode();
 
-      this.initializeDefaultStyles();
-      this.initializeTooltips();
+      this.graph.initializeDefaultStyles();
+      this.graph.initializeTooltips();
       this.initializePopups();
     },
     initializePopups() {
