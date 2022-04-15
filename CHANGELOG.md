@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrelise]
+
+### Fixed
+- fixed maps tooltip
+
 ## [1.87.0]
 
 ### Added
@@ -66,7 +71,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed zoom buttons on the timeline.
 - Fixed styles on v-select\v-label\v-input
 - Fixed timeline zoom
-- fixed maps tooltip
 
 ## [1.85.0]
 
