@@ -110,6 +110,7 @@
         color: var(--main_text);
       }
     }
+    /* @todo: hotfix v1.86.1
     & > * {
       color: var(--main_text) !important;
       caret-color: var(--main_text) !important;
@@ -132,6 +133,6 @@
     }
     &.v-label {
       color: var(--main_text) !important;
-    }
+    }*/
   }
 }
