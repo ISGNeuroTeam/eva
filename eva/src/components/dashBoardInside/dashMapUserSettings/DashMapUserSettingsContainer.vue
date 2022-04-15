@@ -7,10 +7,7 @@
       <v-row class="ma-0">
         <v-btn
           rounded
-          :style="
-            `background: ${theme.$secondary_bg};
-             color: ${theme.$main_text};
-             z-index: 400`"
+          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
           @click="toggleSelect = !toggleSelect"
         >
           Режим
@@ -37,14 +34,14 @@
       </v-row>
 
       <v-row
-        v-show="options.showLegend"
+        v-if="getOptions.showLegend && library && library.objects"
         align="end"
         align-content="end"
         class="mb-5 mr-0"
       >
         <v-spacer />
         <v-card
-          style="max-height: 466px; z-index: 400"
+          style="max-height: 466px"
           max-width="280"
           class="px-5 pb-5"
           :color="theme.$main_bg"
@@ -91,7 +88,7 @@
                     class="ml-2 legend-title"
                     :style="`color: ${theme.$main_text} !important;`"
                   >
-                    Легенда 123
+                    Легенда 11333
                   </span>
                   <v-spacer />
                   <a
@@ -200,12 +197,13 @@
 
 <script>
 import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
+// import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
 
 export default {
-  name: 'DashMapUserSettings',
+  name: 'DashMapUserSettingsContainer',
   props: {
     idElement: {
       type: String,
@@ -340,19 +338,42 @@ export default {
     getOptions: {
       deep: true,
       handler() {
-        this.updateSelectedLayerValue();
+        if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+          this.options = JSON.parse(JSON.stringify(this.getOptions));
+        }
       },
     },
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (val.mode !== oldVal.mode) this.updatePipeDataSource();
-        this.updateOptions(val);
+        if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+          if (val.mode !== oldVal.mode) this.updatePipeDataSource();
+          this.updateOptions(val);
+        }
       },
     },
   },
   mounted() {
-    this.updateSelectedLayerValue();
+    const options = JSON.parse(JSON.stringify(this.getOptions));
+    this.tileLayers[0].tile = options.osmserver;
+    // init store for reactivity
+    if (!options.showLegend || !options.initialPoint) {
+      const initOptions = {
+        showLegend: true,
+        zoomLevel: this.options.zoomLevel,
+        zoomStep: this.options.zoomStep,
+        selectedLayer: this.options.selectedLayer,
+        initialPoint: this.options.initialPoint,
+      };
+      this.$store.commit('setOptions', {
+        idDash: this.idDashFrom,
+        id: this.idElement,
+        options: initOptions,
+      });
+    }
+    if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+      this.options = JSON.parse(JSON.stringify(options));
+    }
   },
   methods: {
     updatePipeDataSource(e) {
@@ -361,6 +382,11 @@ export default {
         set.delete(this.options.mode[0]);
       }
       this.options.mode = Array.from(set);
+      this.$store.commit('setState', [{
+        object: this.dashFromStore.options,
+        prop: 'mode',
+        value: this.options.mode,
+      }]);
       if (this.options.search) {
         this.$emit('updatePipeDataSource', this.options.search);
       }
@@ -392,28 +418,6 @@ export default {
         </div>`;
     },
 
-    updateSelectedLayerValue() {
-      const options = JSON.parse(JSON.stringify(this.getOptions));
-      this.tileLayers[0].tile = options.osmserver;
-      // init store for reactivity
-      if (!options.showLegend || !options.initialPoint) {
-        const initOptions = {
-          showLegend: true,
-          zoomLevel: this.options.zoomLevel,
-          zoomStep: this.options.zoomStep,
-          selectedLayer: options.selectedLayer || this.options.selectedLayer,
-          initialPoint: this.options.initialPoint,
-        };
-        this.$store.commit('setOptions', {
-          idDash: this.idDashFrom,
-          id: this.idElement,
-          options: initOptions,
-        });
-      } else {
-        this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
-      }
-    },
-
     updateOptions(newOptions) {
       this.$store.commit('updateOptions', {
         idDash: this.idDashFrom,
@@ -430,7 +434,7 @@ export default {
 
       if (
         typeof this.options.timeFormat !== 'undefined'
-        && this.options.timeFormat == null
+          && this.options.timeFormat == null
       ) {
         this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
       }
@@ -485,7 +489,7 @@ export default {
   height: 100%
   position: absolute
   right: 0
-  //z-index: 400
+  z-index: 400
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
