@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
-- fixed default osmserver and default search in dashMapUserSett
+- fixed default osmserver and default search in dashMapUserSettings
 - fixed maps tooltip
 
 ## [1.87.0]
