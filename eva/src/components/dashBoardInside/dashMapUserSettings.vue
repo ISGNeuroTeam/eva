@@ -7,7 +7,10 @@
       <v-row class="ma-0">
         <v-btn
           rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+          :style="
+            `background: ${theme.$secondary_bg};
+             color: ${theme.$main_text};
+             z-index: 400`"
           @click="toggleSelect = !toggleSelect"
         >
           Режим
@@ -41,7 +44,7 @@
       >
         <v-spacer />
         <v-card
-          style="max-height: 466px"
+          style="max-height: 466px; z-index: 400"
           max-width="280"
           class="px-5 pb-5"
           :color="theme.$main_bg"
@@ -197,7 +200,6 @@
 
 <script>
 import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
-// import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet.tilelayer.colorfilter';
 import 'leaflet.markercluster';
@@ -353,23 +355,6 @@ export default {
     this.updateSelectedLayerValue();
   },
   methods: {
-    // onClickChoosingCoordinates() {
-    //   const cursorCssClass = 'cursor-crosshair';
-    //   this.$emit('closeModalSettings');
-    //   // this.dialog = false;
-    //   // eslint-disable-next-line no-underscore-dangle
-    //   L.DomUtil.addClass(this.map._container, cursorCssClass);
-    //   const clickEvent = (event) => {
-    //     // this.dialog = true;
-    //     this.$emit('openModalSettings');
-    //     // eslint-disable-next-line no-underscore-dangle
-    //     L.DomUtil.removeClass(this.map._container, cursorCssClass);
-    //     this.options.initialPoint.x = event.latlng.lat;
-    //     this.options.initialPoint.y = event.latlng.lng;
-    //     this.map.off('click', clickEvent);
-    //   };
-    //   this.map.on('click', clickEvent);
-    // },
     updatePipeDataSource(e) {
       const set = new Set(e);
       if (this.options.mode) {
@@ -406,27 +391,12 @@ export default {
           <span style="color:${textColor}">кп<span>
         </div>`;
     },
-    // updateTileLayer(e) {
-    //   this.map.removeLayer(this.currentTile);
-    //   if (typeof e.tile === 'string') {
-    //     let temp = e.tile;
-    //     temp = [temp];
-    //     this.currentTile = L.tileLayer(...temp);
-    //     this.map.addLayer(this.currentTile);
-    //     this.updateOptions({ selectedLayer: temp[0] });
-    //     return;
-    //   }
-    //   this.currentTile = L.tileLayer(...e.tile);
-    //   this.map.addLayer(this.currentTile);
-    //   this.updateOptions({ selectedLayer: e.tile[0] });
-    // },
 
     updateSelectedLayerValue() {
       const options = JSON.parse(JSON.stringify(this.getOptions));
       this.tileLayers[0].tile = options.osmserver;
       // init store for reactivity
       if (!options.showLegend || !options.initialPoint) {
-        console.log('if');
         const initOptions = {
           showLegend: true,
           zoomLevel: this.options.zoomLevel,
@@ -514,9 +484,8 @@ export default {
 .med
   height: 100%
   position: absolute
-  /* left: 0px; */
   right: 0
-  z-index: 400
+  //z-index: 400
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important

@@ -318,9 +318,9 @@ export default {
   watch: {
     modalValue(val) {
       if (val) {
-        if (JSON.stringify(this.options.selectedLayer)
-            !== JSON.stringify(this.dashFromStore.options.selectedLayer)) {
-          this.$set(this.options, 'selectedLayer', JSON.parse(JSON.stringify(this.dashFromStore.options.selectedLayer)));
+        if (JSON.stringify(this.options)
+            !== JSON.stringify(this.dashFromStore.options)) {
+          this.options = JSON.parse(JSON.stringify(this.dashFromStore.options));
         }
         if (Object.keys(this.search)?.length > 0) {
           this.$set(this.options, 'search', this.search);
@@ -332,8 +332,10 @@ export default {
     options: {
       deep: true,
       handler(val, oldVal) {
-        if (val.mode !== oldVal.mode) this.updatePipeDataSource();
-        this.updateOptions(val);
+        if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
+          if (val.mode !== oldVal.mode) this.updatePipeDataSource();
+          this.updateOptions(val);
+        }
       },
     },
   },
