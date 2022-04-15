@@ -83,6 +83,7 @@
         :color-from="theme"
         :active-elem-from="activeElem"
         :options="getOptions"
+        :search="search"
         id-dash-from="reports"
         :width-from="size.width"
         :height-from="size.height"
@@ -137,6 +138,10 @@ export default {
     loading: {
       type: Boolean,
       default: true,
+    },
+    search: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
