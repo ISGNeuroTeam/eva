@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - added new notification system
 - added color picker for custom pie chart
+- created piechart class
 
 ### Fixed
 - Fixed dashSelect Tokens error
