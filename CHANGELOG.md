@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed the display of histograms with negative values on a multiline dash
+- the width of the histogram is now only positive
 
 ## [1.87.0]
 

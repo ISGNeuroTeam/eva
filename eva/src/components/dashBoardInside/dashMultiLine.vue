@@ -435,12 +435,7 @@ export default {
 
           // если у метрики только одно значение
           if (maxYMetric === minYMetric) {
-            maxYMetric = maxYMetric % 1 === 0
-              ? maxYMetric += 1
-              : Math.ceil(maxYMetric);
-            minYMetric = minYMetric % 1 === 0
-              ? minYMetric -= 1
-              : Math.floor(minYMetric);
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
           } else {
             if (opt.manual) {
               if (opt.upborder) {
