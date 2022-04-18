@@ -5,7 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
 ## [Unrelise]
+
+### Feature
+- Added hotkey for query window in data research v2
+
+### Fixed
+- fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
+- fixed change osmserver in map settings
+- fixed default osmserver and default search in dashMapUserSettings
+- fixed maps tooltip
+
+## [1.87.0]
 
 ### Added
 - added new notification system
@@ -15,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - created guntt class
 
 ### Fixed
+- Fixed d3 select in timeline
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
 - Data exploration 2.0: visualization improvements
@@ -24,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed theme styles
-
 
 ## [1.86.0]
 
@@ -58,7 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: some visualizations are not displayed immediately after selection
 - fixed a visual bug in the single value dash
 - fixed reportsV2: map display, settings, styles
-- fixed reportsV2: Incorrect display of the graph and non-working control buttons
+- fixed reportsV2: Incorrect display of the graph and non-working control buttons 
 - fixed resizing movable visualisation
 - fixed tune resize
 - fixed updating and undoing filter parts changes
@@ -129,7 +141,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed default tab are not created
 - fixed multiselect refinement
 - fixed multiselect placing data on multiple lines
-- fixed add token
+- fixed add token 
 - improvements handling window closing
 - fixed dropdown lists
 - fixed table columns not hiding
@@ -1392,68 +1404,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - autorization page
 - user panel
-    - return to "main" page
-    - return to page before
-    - log
-        - put log
-        - clear log
-        - restore log
-    - edit user profile
-        - role modal page with this items - users, roles, permissions, groups and indexes. Every item can create, edit, delete if you obtain right permission.
-    - exit on autorization page (clear cookie and store)
+  - return to "main" page
+  - return to page before
+  - log
+    - put log
+    - clear log
+    - restore log
+  - edit user profile
+    - role modal page with this items - users, roles, permissions, groups and indexes. Every item can create, edit, delete if you obtain right permission.
+  - exit on autorization page (clear cookie and store)
 - dashboarding constructor
 
-    - page with all available groups and all available dashboards inside current group (create, edit, delete group/ dashboards)
+  - page with all available groups and all available dashboards inside current group (create, edit, delete group/ dashboards)
 
-        - dashboard page
+    - dashboard page
 
-            - top panel
+      - top panel
 
-                - switch display mode
+        - switch display mode
 
-                - color settings panel
+        - color settings panel
 
-                - event panel
+        - event panel
 
-                - token panel
+        - token panel
 
-                - search panel
+        - search panel
 
-                - tool panel (vaizualization itself)
+        - tool panel (vaizualization itself)
 
-                - user panel
+        - user panel
 
-                - save dashboards
+        - save dashboards
 
-            - dashboard
+      - dashboard
 
-                - top panel dashboard
+        - top panel dashboard
 
-                    - icon
+          - icon
 
-                    - name
+          - name
 
-                    - id
+          - id
 
-                    - search sid
+          - search sid
 
-                    - choose search
+          - choose search
 
-                    - resize dashboard
+          - resize dashboard
 
-                    - change position dashboard
+          - change position dashboard
 
-                    - edit name dashboard
+          - edit name dashboard
 
-                    - settings dashboard
+          - settings dashboard
 
-                    - delete dashboard
+          - delete dashboard
 
-                - vizualization block
+        - vizualization block
 
 - search and reporting
-    - statistics block
-    - search block
-        - start search
-        - setting search
-    - vizualization block
+  - statistics block
+  - search block
+    - start search
+    - setting search
+  - vizualization block
