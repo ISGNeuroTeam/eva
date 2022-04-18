@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrelise]
 
+### Added
+- created graph class
+
 ### Fixed
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
