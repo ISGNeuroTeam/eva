@@ -7,7 +7,10 @@
       <v-row class="ma-0">
         <v-btn
           rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+          :style="`
+          background: ${theme.$secondary_bg};
+           color: ${theme.$main_text};
+           pointer-events: auto`"
           @click="toggleSelect = !toggleSelect"
         >
           Режим
@@ -24,7 +27,10 @@
         <v-spacer />
         <v-btn
           rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+          :style="`
+          background: ${theme.$secondary_bg};
+           color: ${theme.$main_text};
+           pointer-events: auto`"
           @click="$emit('openSettingsModal')"
         >
           <v-icon :style="{ color: theme.$main_text }">
@@ -41,7 +47,7 @@
       >
         <v-spacer />
         <v-card
-          style="max-height: 466px"
+          style="max-height: 466px; pointer-events: auto"
           max-width="280"
           class="px-5 pb-5"
           :color="theme.$main_bg"
@@ -485,7 +491,8 @@ export default {
   height: 100%
   position: absolute
   right: 0
-  z-index: 400
+  z-index: 401
+  pointer-events: none
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
