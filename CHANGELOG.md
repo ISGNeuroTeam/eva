@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrelise]
 
 ### Added
+- Added hotkey for query window in data research v2
 - created graph class
 
 ### Fixed
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added eva router prefix
 
 ### Fixed
+- Fixed d3 select in timeline
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
 - Data exploration 2.0: visualization improvements
