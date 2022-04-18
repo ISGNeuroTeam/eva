@@ -197,10 +197,7 @@
 
 <script>
 import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
-// import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.tilelayer.colorfilter';
-import 'leaflet.markercluster';
 
 export default {
   name: 'DashMapUserSettingsContainer',
@@ -217,7 +214,6 @@ export default {
       type: Object,
       required: true,
     },
-    // library: Object
   },
   data() {
     return {

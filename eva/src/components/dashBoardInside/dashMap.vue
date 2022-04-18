@@ -39,9 +39,9 @@
 </template>
 
 <script>
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.tilelayer.colorfilter';
-import 'leaflet.markercluster';
+// import 'leaflet/dist/leaflet.css';
+// import 'leaflet.tilelayer.colorfilter';
+// import 'leaflet.markercluster';
 import DashMapUserSettingsContainer from './dashMapUserSettings/DashMapUserSettingsContainer.vue';
 import dashMapUserSettingsNew from './dashMapUserSettings/dashMapUserSettings.vue';
 import store from '../../store/index'; // подключаем файл с настройками хранилища Vuex
@@ -107,7 +107,7 @@ export default {
       // clusterDelimiter: null,
       // isLegendGenerated: false,
       isSettings: false,
-      startingPoint: [],
+      // startingPoint: [],
       mode: [],
       leftBottom: 0,
       rightTop: 0,
@@ -250,7 +250,7 @@ export default {
               );
             } else {
               this.map.setView(
-                this.startingPoint,
+                this.map.startingPoint,
                 mutation.payload.options.zoomLevel,
               );
             }
@@ -390,7 +390,7 @@ export default {
         this.generateLibrary(dataRest, this.options?.primitivesLibrary);
         this.map.generateClusterPositionItems();
         // this.initSettings();
-        if (!this.error) {
+        if (!this.error && dataRest.length > 0) {
           // создаем элемент карты
           this.map.createMap(this.maptheme);
           // рисуем объекты на карте
@@ -401,7 +401,7 @@ export default {
                 [this.options.initialPoint.x, this.options.initialPoint.y],
                 this.options.zoomLevel,
               );
-            } else this.map.setView(this.startingPoint, this.options.zoomLevel);
+            } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
           }
         }
       }
@@ -466,21 +466,23 @@ export default {
           this.map.remove();
           this.map = null;
         }
-        if (this.map && !this.map.getLegendGenerated) {
-          this.map.createLegend(this.library?.objects);
+        if (this.map && !this.map.isLegendGenerated) {
+          this.map.library = this.library;
+          this.map.createLegend(this.library);
         }
       }
     },
 
     initMap() {
-      this.map = new MapClass({
+      const map = new MapClass({
         mapRef: this.$refs.map,
         wheelPxPerZoomLevel: 1 / this.options.zoomStep || 30,
         zoomSnap: 0,
-        zoom: 10,
+        zoom: this.getOptions.zoomLevel,
         maxZoom: 25,
         center: [0, 0],
       });
+      this.map = Object.freeze(map);
       this.map.setEvents([
         {
           event: 'moveend',

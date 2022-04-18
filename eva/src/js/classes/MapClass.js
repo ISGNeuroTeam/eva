@@ -1,4 +1,6 @@
 import L from 'leaflet';
+import 'leaflet.tilelayer.colorfilter';
+import 'leaflet.markercluster';
 import * as turf from '@turf/turf';
 import * as utils from 'leaflet-geometryutil';
 
@@ -82,6 +84,8 @@ class MapClass {
     osmServer: null,
     mapTheme: 'default',
     wheelPxPerZoomLevel: 200,
+    isLegendGenerated: false,
+    startingPoint: [],
   }
 
   constructor({
@@ -92,8 +96,7 @@ class MapClass {
     maxZoom,
     center,
   }) {
-    this.wheelPxPerZoomLevel = wheelPxPerZoomLevel;
-    // создаем карту
+    this.options.wheelPxPerZoomLevel = wheelPxPerZoomLevel;
     this.map = L.map(mapRef, {
       wheelPxPerZoomLevel,
       zoomSnap,
@@ -101,24 +104,30 @@ class MapClass {
       maxZoom,
       center,
     });
-
-    this.isLegendGenerated = false;
   }
 
   get wheelPxPerZoomLevel() {
-    return this.wheelPxPerZoomLevel;
+    return this.options.wheelPxPerZoomLevel;
   }
 
   set wheelPxPerZoomLevel(val) {
-    this.wheelPxPerZoomLevel = val;
+    this.options.wheelPxPerZoomLevel = val;
   }
 
-  get getMaps() {
-    return this.map;
+  get isLegendGenerated() {
+    return this.options.isLegendGenerated;
   }
 
-  get getLegendGenerated() {
-    return this.isLegendGenerated;
+  set isLegendGenerated(val) {
+    this.options.isLegendGenerated = val;
+  }
+
+  get startingPoint() {
+    return this.options.startingPoint;
+  }
+
+  set startingPoint(val) {
+    this.options.startingPoint = val;
   }
 
   get zoom() {
@@ -187,7 +196,6 @@ class MapClass {
     let tileLayer;
     if (!this.osmServer) return;
     if (typeof this.osmServer === 'string') {
-      // TODO: что то подсказывает что maptheme не изменяется
       if (this.mapTheme === 'black') {
         tileLayer = L.tileLayer.colorFilter(this.osmServer, {
           filter: ['grayscale:100%', 'invert:100%'],
@@ -214,9 +222,9 @@ class MapClass {
 
   createLegend(library) {
     let generatedListHTML = '';
-    if (library) {
-      Object.keys(library).forEach((key) => {
-        generatedListHTML += `<li>${library[key].name}</li>`;
+    if (library?.objects) {
+      Object.keys(library.objects).forEach((key) => {
+        generatedListHTML += `<li>${library.objects[key].name}</li>`;
       });
       const legend = L.control({ position: 'bottomright' });
 
@@ -464,8 +472,8 @@ class MapClass {
     dataRest.forEach((item) => {
       if (
         item?.type
-          && this.library.objects
-          && this.library.objects[item.type]
+          && this.library?.objects
+          && this.library?.objects[item.type]
       ) {
         // choosing drawing type for each object
         const lib = this.library.objects[item.type];
@@ -477,14 +485,18 @@ class MapClass {
             this.startingPoint = [coord[0], coord[1]];
           }
           if (item.geometry_type?.toLowerCase() === 'point') {
-            this.map.addMarker(item, lib);
+            this.addMarker(item, lib);
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
-            this.map.addLine(item, lib, mode, pipelineDataDictionary[item.ID]);
+            this.addLine(item, lib, mode, pipelineDataDictionary[item.ID]);
           }
         }
       }
     });
+  }
+
+  addLayer(layer) {
+    this.map.addLayer(L.tileLayer(...layer));
   }
 
   setView(center, zoomLevel) {
@@ -513,6 +525,20 @@ class MapClass {
 
   remove() {
     this.map.remove();
+  }
+
+  removeLayer(layer) {
+    this.map.removeLayer(layer);
+  }
+
+  addClass(cursorCssClass) {
+    // eslint-disable-next-line no-underscore-dangle
+    L.DomUtil.addClass(this.map._container, cursorCssClass);
+  }
+
+  removeClass(cursorCssClass) {
+    // eslint-disable-next-line no-underscore-dangle
+    L.DomUtil.removeClass(this.map._container, cursorCssClass);
   }
 }
 
