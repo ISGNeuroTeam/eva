@@ -395,7 +395,6 @@ export default {
         colorFrom: this.colorFrom,
       });
       this.graph = Object.freeze(graph);
-      this.graphComponent = this.graph.getGraph;
       this.initMode();
 
       this.graph.initializeDefault({

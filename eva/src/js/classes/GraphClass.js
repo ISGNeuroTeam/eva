@@ -131,10 +131,6 @@ class GraphClass {
     this.options.labelStyleList = value;
   }
 
-  get getGraph() {
-    return this.graphComponent;
-  }
-
   get edgeStyleList() {
     return this.options.edgeStyleList;
   }
