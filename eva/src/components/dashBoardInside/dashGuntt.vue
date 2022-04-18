@@ -292,8 +292,7 @@ export default {
       if (this.guntt) {
         this.guntt.removeGuntt();
       }
-
-      this.guntt = new GunttClass({
+      const guntt = new GunttClass({
         elem: this.$refs.gunttBlock,
         width,
         height,
@@ -306,6 +305,7 @@ export default {
         dateFormat,
         tooltipElem: this.$refs.tooltip,
       });
+      this.guntt = Object.freeze(guntt);
 
       if (this.guntt.getPhases.length > 0) {
         this.legends = this.guntt.getPhases;

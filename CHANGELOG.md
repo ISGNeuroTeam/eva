@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added color picker for custom pie chart
 - added nginx configuration files for /eva endpoint
 - added eva router prefix
+- created guntt class
 
 ### Fixed
 - Fixed dashSelect Tokens error
