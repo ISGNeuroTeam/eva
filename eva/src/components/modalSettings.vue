@@ -638,6 +638,10 @@
                 :items="Object.keys(themes)"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
                 hide-details
                 outlined
                 class="item-metric"
@@ -685,7 +689,42 @@
                 :class="{ disabled: !colorsPie.nametheme }"
                 hide-details
                 @input="isChanged = true"
-              />
+              >
+                <template #append>
+                  <v-menu
+                    top
+                    transition="scale-transition"
+                    :close-on-content-click="false"
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                        size="16"
+                        :style="{
+                          color: theme.$main_text,
+                          background: 'transparent',
+                          borderColor: theme.$main_border,
+                        }"
+                        v-bind="attrs"
+                        v-on="on"
+                      >
+                        {{ dropper }}
+                      </v-icon>
+                    </template>
+                    <v-color-picker
+                      v-model="colorPicker"
+                      dot-size="25"
+                      hide-canvas
+                      hide-inputs
+                      hide-mode-switch
+                      hide-sliders
+                      mode="hexa"
+                      show-swatches
+                      swatches-max-height="200"
+                      @input.capture="addColor($event)"
+                    />
+                  </v-menu>
+                </template>
+              </v-text-field>
               <v-tooltip
                 v-if="!defaultThemes.includes(colorsPie.theme)"
                 bottom
@@ -962,7 +1001,7 @@
 </template>
 
 <script>
-import { mdiMinusBox, mdiPlusBox } from '@mdi/js';
+import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
 
 export default {
@@ -993,6 +1032,7 @@ export default {
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
+      dropper: mdiEyedropper,
       tooltip: {
         texts: [],
         links: [],
@@ -1023,6 +1063,8 @@ export default {
       them: {},
       isConfirmModal: false,
       deleteMetricId: '',
+      colorPicker: '',
+      isOsmServerChange: false,
     };
   },
   computed: {
@@ -1138,6 +1180,16 @@ export default {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
     },
+    addColor(e) {
+      if (this.colorPicker) {
+        if (this.colorsPie.colors === '') {
+          this.colorsPie.colors += `${e}`;
+        } else {
+          this.colorsPie.colors += ` ${e}`;
+        }
+      }
+      this.colorPicker = '';
+    },
     loadComponentsSettings() {
       const localOptions = {};
       this.optionsByComponents = settings.options;
@@ -1228,6 +1280,9 @@ export default {
           units: this.metricUnits,
         });
       }
+      if (this.element.startsWith('map')) {
+        this.changeSelectedLayer();
+      }
 
       const options = {
         ...this.options,
@@ -1248,6 +1303,25 @@ export default {
         this.deleteTheme();
       }
       this.cancelModal();
+    },
+    changeSelectedLayer() {
+      // Берем активную подложку из сторы
+      const selectedLayerFromStore = this.dashFromStore[this.element].options.selectedLayer;
+      // let newSelectedLayer = null;
+      if (!selectedLayerFromStore || selectedLayerFromStore?.name === 'Заданная в настройках') {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore[this.element].options,
+            prop: 'selectedLayer',
+            value: this.options.osmserver
+              ? {
+                name: 'Заданная в настройках',
+                tile: this.options.osmserver || [],
+              }
+              : null,
+          },
+        ]);
+      }
     },
     cancelModal() {
       this.active = false;
