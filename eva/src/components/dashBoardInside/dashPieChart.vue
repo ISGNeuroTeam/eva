@@ -475,7 +475,7 @@ export default {
 
       const tooltipOffset = { x: 30, y: 5 };
 
-      this.piechart = new PiechartClass({
+      const piechart = new PiechartClass({
         elem: this.$refs.piechartItself,
         elemForLegend: this.$refs.legends,
         width,
@@ -484,6 +484,8 @@ export default {
         data,
         colors: this.dashOptions.themes[colorsPie.theme],
       });
+
+      this.piechart = Object.freeze(piechart);
 
       this.piechart.setEvents([
         {
