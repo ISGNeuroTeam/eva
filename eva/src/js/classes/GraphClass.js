@@ -16,14 +16,31 @@ import {
   PolylineEdgeStyle,
   EdgeStyleDecorationInstaller,
   StyleDecorationZoomPolicy,
+  GraphViewerInputMode,
   BezierEdgeStyle,
   TimeSpan,
   Key,
   ModifierKeys,
-  SimpleLabel,
   Size,
+  ICommand,
+  GraphBuilder,
+  HierarchicLayoutData,
+  NodeHalo,
+  HierarchicLayout,
+  Font,
+  DefaultLabelStyle,
+  License,
 } from 'yfiles';
 import HTMLPopupSupport from './HTMLPopupSupport';
+import licenseData from '../../license/license.json';
+
+License.value = licenseData; // проверка лицензии
+const labelFont = new Font({ fontSize: 70, fontFamily: 'sefif' });
+const labelFontBOLD = new Font({
+  fontSize: 70,
+  fontFamily: 'sefif',
+  fontWeight: 'BOLD',
+});
 
 class GraphClass {
   static nodeStyle(color) {
@@ -88,14 +105,30 @@ class GraphClass {
   options = {
     labelStyleList: {}, // варианты labelStyle
     edgeStyleList: {},
+    currentNode: null,
+    startFinishColor: '#C7C7C7',
+    errorColor: '#D34C00',
+    colorFrom: '',
+    nodesSource: [],
+    edgesSource: [],
   }
 
   constructor({
     elem,
     colors,
+    colorFrom,
   }) {
     this.graphComponent = new GraphComponent(elem);
     this.colors = colors;
+    this.options.colorFrom = colorFrom;
+  }
+
+  get labelStyleList() {
+    return this.options.labelStyleList;
+  }
+
+  set labelStyleList(value) {
+    this.options.labelStyleList = value;
   }
 
   get getGraph() {
@@ -108,6 +141,54 @@ class GraphClass {
 
   set edgeStyleList(value) {
     this.options.edgeStyleList = value;
+  }
+
+  get currentNode() {
+    return this.options.currentNode;
+  }
+
+  set currentNode(value) {
+    this.options.currentNode = value;
+  }
+
+  get startFinishColor() {
+    return this.options.startFinishColor;
+  }
+
+  set startFinishColor(value) {
+    this.options.startFinishColor = value;
+  }
+
+  get errorColor() {
+    return this.options.errorColor;
+  }
+
+  set errorColor(value) {
+    this.options.errorColor = value;
+  }
+
+  get nodesSource() {
+    return this.options.nodesSource;
+  }
+
+  set nodesSource(value) {
+    this.options.nodesSource = value;
+  }
+
+  get edgesSource() {
+    return this.options.edgesSource;
+  }
+
+  set edgesSource(value) {
+    this.options.edgesSource = value;
+  }
+
+  get colorFrom() {
+    return this.options.colorFrom;
+  }
+
+  set colorFrom(value) {
+    this.options.colorFrom = value;
   }
 
   initMode({
@@ -244,7 +325,7 @@ class GraphClass {
     });
   }
 
-  initializePopups(nodePopupElem) {
+  initializePopups(nodePopupElem, edgePopupElem) {
     // Creates a label model parameter that is used to position the node pop-up
     const nodeLabelModel = new ExteriorLabelModel({ insets: 10 });
 
@@ -262,7 +343,7 @@ class GraphClass {
     // Creates the pop-up for the edge pop-up template
     const edgePopup = new HTMLPopupSupport(
       this.graphComponent,
-      nodePopupElem,
+      edgePopupElem,
       edgeLabelModel.createDefaultParameter(),
     );
 
@@ -305,6 +386,222 @@ class GraphClass {
         return true;
       },
     );
+  }
+
+  viewerInputMode() {
+    this.graphComponent.inputMode = new GraphViewerInputMode();
+  }
+
+  zoomIn() {
+    ICommand.INCREASE_ZOOM.execute(null, this.graphComponent);
+  }
+
+  zoomOut() {
+    ICommand.DECREASE_ZOOM.execute(null, this.graphComponent);
+  }
+
+  fitContent() {
+    ICommand.FIT_GRAPH_BOUNDS.execute(null, this.graphComponent);
+  }
+
+  colorEdges() {
+    const { edges } = this.graphComponent.graph;
+    edges.forEach((edge) => {
+      if (edge.tag === '-') {
+        this.graphComponent.graph.setStyle(
+          edge,
+          this.edgeStyle(this.startFinishColor),
+        );
+      } else if (edge.tag === '-1') {
+        this.graphComponent.graph.setStyle(
+          edge,
+          this.edgeStyle(this.errorColor),
+        );
+      } else {
+        this.graphComponent.graph.setStyle(
+          edge,
+          this.edgeStyle(this.colors[edge.tag % this.colors.length]),
+        );
+      }
+    });
+  }
+
+  generateNodesEdges(dataRest, callback) {
+    const allNodes = [];
+    const allEdges = [];
+
+    dataRest.forEach((dataRestItem) => {
+      if (dataRestItem.relation_id) {
+        allEdges.push({
+          fromNode: dataRestItem.id,
+          toNode: dataRestItem.relation_id,
+          label: dataRestItem.edge_description,
+          color: dataRestItem.edge_color,
+        });
+      }
+      allNodes.push(dataRestItem);
+    });
+
+    const nodesSource = Object.values(
+      allNodes.reduce((obj, item) => ({ ...obj, [item.id]: item }), {}),
+    );
+
+    callback(nodesSource);
+
+    this.nodesSource = nodesSource;
+    this.edgesSource = allEdges;
+  }
+
+  applyGraphBuilder() {
+    this.graphComponent.graph.clear();
+
+    const graphBuilder = new GraphBuilder(this.graphComponent.graph);
+
+    const nodesSource = graphBuilder.createNodesSource({
+      data: this.nodesSource, // .slice(0,10),
+      id: 'id',
+      tag: (item) => item
+      ,
+    });
+
+    // label name для nodes
+    const nodeNameCreator = nodesSource.nodeCreator.createLabelBinding(
+      (nodeDataItem) => nodeDataItem.node,
+    );
+    nodeNameCreator.defaults.layoutParameter = ExteriorLabelModel.NORTH_EAST;
+
+    // label label для nodes
+
+    /*
+    * TODO: У нода нет параметра лейбл, так что  свойство всегда ture,
+    *   а данная строка всегда возвращает undefined
+    */
+
+    const nodeLabelCreator = nodesSource.nodeCreator.createLabelBinding(
+      (nodeDataItem) => nodeDataItem.label,
+    );
+
+    nodeLabelCreator.defaults.layoutParameter = ExteriorLabelModel.EAST;
+
+    // генерация edges
+    const edgesSource = graphBuilder.createEdgesSource({
+      data: this.edgesSource, // .slice(0,10),
+      sourceId: 'fromNode',
+      targetId: 'toNode',
+      tag: (item) => item.color,
+    });
+
+    edgesSource.edgeCreator.createLabelBinding((edgeDataItem) => {
+      if (edgeDataItem.label !== '-') {
+        return edgeDataItem.label;
+      }
+      return '';
+    });
+
+    this.graphComponent.graph = graphBuilder.buildGraph();
+    // отступы для нод
+    const layoutData = new HierarchicLayoutData({
+      nodeHalos: NodeHalo.create(50, 300, 50, 300),
+    });
+    // настройки для layout
+    const layout = new HierarchicLayout({
+      integratedEdgeLabeling: true,
+      separateLayers: false,
+      considerNodeLabels: true,
+    });
+    layout.nodeToNodeDistance = 201;
+
+    // применяем layout
+    this.graphComponent.graph.applyLayout(
+      layout,
+      layoutData,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+    );
+    this.graphComponent.fitGraphBounds();
+  }
+
+  colorFont() {
+    const { nodes } = this.graphComponent.graph;
+    nodes.forEach((node) => {
+      // node.labels.elementAt(0) -- label который name
+      this.graphComponent.graph.setStyle(
+        node.labels.elementAt(0),
+        this.labelStyle(true),
+      );
+      // node.labels.elementAt(1) -- label который label
+      this.graphComponent.graph.setStyle(
+        node.labels.elementAt(1),
+        this.labelStyle(false),
+      );
+    });
+
+    const { edges } = this.graphComponent.graph;
+    edges.forEach((edge) => {
+      this.graphComponent.graph.setStyle(
+        edge.labels.elementAt(0),
+        this.labelStyle(false, this.colorFrom.backElement),
+      );
+    });
+  }
+
+  labelStyle(isBold, backgroundFill = null) {
+    const key = `${isBold ? 'b' : 'r'}_${backgroundFill || 'default'}_${
+      this.colorFrom.$main_text
+    }`;
+    // создаем только отличающиеся стили
+    if (!this.labelStyleList[key]) {
+      this.labelStyleList[key] = new DefaultLabelStyle({
+        font: isBold ? labelFontBOLD : labelFont,
+        textFill: this.colorFrom.$main_text,
+        backgroundFill,
+      });
+    }
+    return this.labelStyleList[key];
+  }
+
+  colorNodes() {
+    const { nodes } = this.graphComponent.graph;
+    nodes.forEach((node) => {
+      if (
+        typeof node.tag.node_color === 'string'
+        && (node.tag.node_color.toLowerCase() === 'start'
+          || node.tag.node_color.toLowerCase() === 'finish')
+      ) {
+        this.graphComponent.graph.setStyle(
+          node,
+          GraphClass.nodeStyle(this.startFinishColor),
+        );
+      } else if (node.tag.node_color === '-1') {
+        this.graphComponent.graph.setStyle(
+          node,
+          GraphClass.nodeStyle(this.errorColor),
+        );
+      } else {
+        this.graphComponent.graph.setStyle(
+          node,
+          GraphClass.nodeStyle(this.colors[node.tag.node_color - 1]),
+        );
+      }
+    });
+  }
+
+  initializeDefault({ nodePopupContent, edgePopupContent }) {
+    this.initializeDefaultStyles();
+    this.initializeTooltips();
+    this.initializePopups(nodePopupContent, edgePopupContent);
+  }
+
+  reDrawNodesEdges(data, callback) {
+    this.generateNodesEdges(data, callback);
+    this.applyGraphBuilder();
+    this.colorFont();
+    this.colorNodes();
+    this.colorEdges();
   }
 }
 

@@ -47,7 +47,7 @@
 <script>
 import * as yfile from 'yfiles';
 import { mdiClose, mdiCursorMove, mdiPencil } from '@mdi/js';
-import licenseData from './license.json';
+import licenseData from '../../license/license.json';
 
 yfile.License.value = licenseData; // проверка лицензии
 
