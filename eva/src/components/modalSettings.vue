@@ -139,6 +139,7 @@
                     :type="field.elemType"
                     :min="field.elemMin"
                     @input="isChanged = true"
+                    @change="(v) => options[field.option] = field.onChange ? field.onChange(v) : v"
                   />
                   <!-- elem: select -->
                   <v-select
