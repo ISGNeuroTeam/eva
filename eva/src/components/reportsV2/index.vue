@@ -80,6 +80,7 @@
               :data="data"
               :should-get="shouldGet"
               :loading="loading"
+              :search="search"
             />
           </keep-alive>
         </div>
