@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Feature
 - Added hotkey for query window in data research v2
+- Created guntt class
 
 ### Fixed
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
@@ -24,7 +25,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added color picker for custom pie chart
 - added nginx configuration files for /eva endpoint
 - added eva router prefix
-- created guntt class
 
 ### Fixed
 - Fixed d3 select in timeline
