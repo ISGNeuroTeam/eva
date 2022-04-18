@@ -192,7 +192,7 @@ export default {
         .forEach((item) => {
           item.remove();
         });
-      d3.selectAll('rect')
+      d3.selectAll('.timeline rect')
         .nodes()
         .forEach((item) => {
           item.remove();
