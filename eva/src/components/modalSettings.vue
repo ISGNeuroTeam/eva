@@ -1065,6 +1065,7 @@ export default {
       isConfirmModal: false,
       deleteMetricId: '',
       colorPicker: '',
+      isOsmServerChange: false,
     };
   },
   computed: {
@@ -1280,6 +1281,9 @@ export default {
           units: this.metricUnits,
         });
       }
+      if (this.element.startsWith('map')) {
+        this.changeSelectedLayer();
+      }
 
       const options = {
         ...this.options,
@@ -1300,6 +1304,25 @@ export default {
         this.deleteTheme();
       }
       this.cancelModal();
+    },
+    changeSelectedLayer() {
+      // Берем активную подложку из сторы
+      const selectedLayerFromStore = this.dashFromStore[this.element].options.selectedLayer;
+      // let newSelectedLayer = null;
+      if (!selectedLayerFromStore || selectedLayerFromStore?.name === 'Заданная в настройках') {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore[this.element].options,
+            prop: 'selectedLayer',
+            value: this.options.osmserver
+              ? {
+                name: 'Заданная в настройках',
+                tile: this.options.osmserver || [],
+              }
+              : null,
+          },
+        ]);
+      }
     },
     cancelModal() {
       this.active = false;
