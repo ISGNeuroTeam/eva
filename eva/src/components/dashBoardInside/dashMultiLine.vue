@@ -932,14 +932,7 @@ export default {
           return `translate(${translate}, -5)`;
         })
         .attr('font-size', '11')
-        .attr('text-anchor', (d, i) => {
-          const textToRight = (i === 0);
-          let anchor = 'start';
-          if (isLine) {
-            anchor = textToRight ? 'start' : 'end';
-          }
-          return anchor;
-        })
+        .attr('text-anchor', 'middle')
         .attr('fill', this.theme.$main_text)
         .text((d) => {
           const fieldName = (isDataAlwaysShow === 'data')
