@@ -17,7 +17,7 @@ class MapClass {
 
   static highlightFeatureFunc({
     lib,
-    option,
+    mode,
     pipelineData,
     route,
     lineTurf,
@@ -27,7 +27,7 @@ class MapClass {
       layer.bringToFront();
       layer.setStyle({
         weight: lib.width + 3,
-        color: lib.highlight_color,
+        color: lib.color,
       });
       if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
         layer.bringToFront();
@@ -41,7 +41,7 @@ class MapClass {
           return acc;
         }, Infinity) + num
       );
-      if (option?.mode[0] === 'Мониторинг') {
+      if (mode[0] === 'Мониторинг') {
         const newLine = turf.lineSlice(
           route[0],
           [e.latlng.lat, e.latlng.lng],
@@ -267,7 +267,7 @@ class MapClass {
     this.map.addLayer(cluster);
   }
 
-  addLine(element, lib, option, pipelineData) {
+  addLine(element, lib, mode, pipelineData) {
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -292,7 +292,7 @@ class MapClass {
 
     const highlightFeature = MapClass.highlightFeatureFunc({
       lib,
-      option,
+      mode,
       pipelineData,
       route,
       lineTurf,

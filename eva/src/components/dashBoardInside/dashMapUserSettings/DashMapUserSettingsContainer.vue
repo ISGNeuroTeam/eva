@@ -5,25 +5,33 @@
       style="align-items: normal"
     >
       <v-row class="ma-0">
-        <v-btn
-          rounded
-          :style="`
-          background: ${theme.$secondary_bg};
-           color: ${theme.$main_text};
-           pointer-events: auto`"
-          @click="toggleSelect = !toggleSelect"
+        <v-menu
+          v-model="toggleSelect"
+          z-index="1"
         >
-          Режим
-        </v-btn>
-        <v-select
-          :value="options.mode"
-          :menu-props="{ value: toggleSelect }"
-          :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-          :items="mode"
-          label="Режим"
-          multiple
-          @change="updatePipeDataSource($event)"
-        />
+          <template v-slot:activator="{ on:menu }">
+            <v-btn
+              rounded
+              :style="`
+              background: ${theme.$secondary_bg};
+               color: ${theme.$main_text};
+               pointer-events: auto`"
+              v-on="menu"
+              @click="toggleSelect = !toggleSelect"
+            >
+              Режим
+            </v-btn>
+            <v-select
+              :value="options.mode"
+              :menu-props="{ value:toggleSelect }"
+              :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+              :items="mode"
+              label="Режим"
+              multiple
+              @change="updatePipeDataSource($event)"
+            />
+          </template>
+        </v-menu>
         <v-spacer />
         <v-btn
           rounded
