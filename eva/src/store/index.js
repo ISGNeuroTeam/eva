@@ -1316,14 +1316,16 @@ export default new Vuex.Store({
                     if (typeof state[id][element]?.search === 'string') {
                       let searchValue = '';
                       searchValue = state[id].searches
-                        .find((searchEl) => searchEl.sid === state[id][element].search).id;
-                      commit('setState', [
-                        {
-                          object: state[id][element],
-                          prop: 'search',
-                          value: searchValue,
-                        },
-                      ]);
+                        .find((searchEl) => searchEl.sid === state[id][element].search)?.id;
+                      if (searchValue) {
+                        commit('setState', [
+                          {
+                            object: state[id][element],
+                            prop: 'search',
+                            value: searchValue,
+                          },
+                        ]);
+                      }
                     }
                   });
                 }
