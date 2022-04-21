@@ -24,6 +24,7 @@
             class="interesting-row"
           >
             <v-menu
+              min-width="356px"
               offset-x
               :close-on-content-click="false"
               content-class="interesting-popup"
@@ -42,23 +43,12 @@
                 <div class="action-popup-title">
                   {{ item.text }}
                 </div>
-                <div>
-                  <v-data-table
-                    :style="{
-                      backgroundColor: theme.$main_bg,
-                      color: theme.$main_text,
-                      'max-height': '500px',
-                    }"
-                    disable-pagination
-                    hide-default-footer
-                    :headers="[
-                      { text: 'Значение', value: 'value' },
-                      { text: 'Количество', value: 'count' },
-                      { text: 'Процент', value: '%' },
-                    ]"
-                    :items="statistic"
+                <keep-alive>
+                  <list-with-pagination
+                    :list-items="statistic"
+                    :theme="theme"
                   />
-                </div>
+                </keep-alive>
               </v-card>
             </v-menu>
           </div>
@@ -76,9 +66,11 @@ import {
   mdiChevronDown,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
+import ListWithPagination from '../listWithPagination';
 
 export default {
   name: 'Interesting',
+  components: { ListWithPagination },
   data() {
     return {
       mdiRefresh,
@@ -154,7 +146,7 @@ export default {
     color: $main_text !important
 
 .interesting-popup
-  width: 400px
+  width: 356px
 
 .v-menu__content
   border-radius: 6px !important
