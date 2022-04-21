@@ -1317,7 +1317,7 @@ export default new Vuex.Store({
                       let searchValue = '';
                       searchValue = state[id].searches
                         .find((searchEl) => searchEl.sid === state[id][element].search)?.id;
-                      if (searchValue) {
+                      if (searchValue !== undefined) {
                         commit('setState', [
                           {
                             object: state[id][element],
