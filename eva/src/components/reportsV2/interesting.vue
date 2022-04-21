@@ -40,15 +40,11 @@
                 </div>
               </template>
               <v-card class="action-popup">
-                <div class="action-popup-title">
-                  {{ item.text }}
-                </div>
-                <keep-alive>
-                  <list-with-pagination
-                    :list-items="statistic"
-                    :theme="theme"
-                  />
-                </keep-alive>
+                <list-with-pagination
+                  :list-items="statistic"
+                  :theme="theme"
+                  :title="item.text"
+                />
               </v-card>
             </v-menu>
           </div>
@@ -131,6 +127,7 @@ export default {
 <style lang="sass">
 @import './../../sass/_colors'
 .interesting
+  height: 100%
   .interesting-title
     font-size: 12px
     font-weight: 500
@@ -156,22 +153,4 @@ export default {
   padding: 0 0 0 0 !important
   border-radius: 6px
   background-color: $main_bg !important
-  .action-popup-title
-    padding: 5px 10px 5px 10px
-    background-color: $main_bg
-    color: $main_text !important
-    font-weight: bold
-  .v-data-table-header
-    th
-      color: $main_text !important
-      padding: 0 10px !important
-      height: 30px !important
-      border-bottom: none !important
-  td
-    padding: 0 10px !important
-    height: 30px !important
-    border-bottom: none !important
-  tr:hover
-    color: $main_bg
-    background-color: $accent_ui_color !important
 </style>

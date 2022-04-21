@@ -59,7 +59,7 @@
                 class="pl-0"
               >
                 <events
-                  class="events component-block"
+                  class="events component-block mb-0"
                   :data="data"
                 />
               </v-col>
