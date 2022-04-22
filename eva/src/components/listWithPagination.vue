@@ -117,15 +117,17 @@ export default {
     filteredItems() {
       const result = [];
       let group = [];
-      this.listItems.forEach((item) => {
-        group.push(item);
-        if (group.length % this.rowsPerPage === 0 && this.rowsPerPage !== 1) {
+      if (this.listItems?.length > 0) {
+        this.listItems.forEach((item) => {
+          group.push(item);
+          if (group.length % this.rowsPerPage === 0 && this.rowsPerPage !== 1) {
+            result.push(group);
+            group = [];
+          }
+        });
+        if (group.length > 0) {
           result.push(group);
-          group = [];
         }
-      });
-      if (group.length > 0) {
-        result.push(group);
       }
       return result;
     },
@@ -172,6 +174,38 @@ export default {
     line-height: 13px;
     color: var(--main_text);
   }
+  &__t-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  &__t-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: nowrap;
+    max-width: 100%;
+  }
+  &__t-col {
+    &:nth-child(1) {
+      width: 20% !important;
+      max-height: 24px;
+      overflow: hidden;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    &:nth-child(2) {
+      width: 40%;
+    }
+    &:nth-child(3) {
+      width: 40%;
+    }
+  }
   // Далее правки стилей vuetify
   &__table ::v-deep {
     margin-bottom: 8px;
@@ -197,15 +231,23 @@ export default {
       }
       &__wrapper {
         table {
+          table-layout: fixed;
           tr {
-            td {
+            & > td {
               padding: 2px 8px !important;
-              height: 15px !important;
               font-weight: 400;
               font-size: 12px;
               line-height: 15px;
               border-bottom: none !important;
               background-color: transparent !important;
+              height: 34px;
+              max-height: 34px;
+              &:nth-child(1) {
+                overflow: hidden;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+              }
             }
             &:hover,
             &:active,
