@@ -56,6 +56,7 @@
         rows="1"
         row-height="15"
         @keyup.ctrl.\="addLineBreaks"
+        @keyup.ctrl.enter.prevent="keypressCtrlEnter"
       />
       <div class="search-block-footer">
         <div
@@ -329,6 +330,11 @@ export default {
     });
   },
   methods: {
+    keypressCtrlEnter(e) {
+      if (e.ctrlKey) {
+        this.launchSearch();
+      }
+    },
     addLineBreaks() {
       this.search.original_otl = this.search.original_otl.replaceAll(
         '|',

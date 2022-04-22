@@ -1,6 +1,6 @@
 <template>
   <div class="muililine-new">
-    <div v-if="isNoData">
+    <div v-if="showMessage">
       <span>{{ errorMessage }}</span>
     </div>
     <div v-else>
@@ -26,6 +26,7 @@
       </div>
     </div>
     <div
+      v-show="!showMessage"
       ref="svgContainer"
       class="svg-container"
       @dblclick="$emit('resetRange')"
@@ -65,7 +66,6 @@ export default {
     isFullScreen: Boolean,
     /** Props from Reports page. */
     dataReport: Boolean,
-    // activeElemFrom: String,
   },
   data() {
     return {
@@ -74,7 +74,7 @@ export default {
         { name: 'select', capture: ['start', 'end'] },
       ],
       margin: {
-        top: 15, right: 10, bottom: 10, left: 30,
+        top: 18, right: 10, bottom: 18, left: 30,
       },
       marginOffset: {
         top: 0, right: 0, bottom: 0, left: 0,
@@ -86,6 +86,7 @@ export default {
       svg: null,
       idleTimeout: null,
       tempData: null,
+      warningMessage: null,
     };
   },
   computed: {
@@ -99,10 +100,10 @@ export default {
       return this.$store.getters.getTheme;
     },
     errorMessage() {
-      return this.data.error || 'Нет данных для отображения';
+      return this.warningMessage || this.data.error || 'Нет данных для отображения';
     },
-    isNoData() {
-      return !this.data.length || this.data.error;
+    showMessage() {
+      return this.warningMessage || !this.data.length || this.data.error;
     },
     dashStore() {
       const { id, idDash } = this;
@@ -289,6 +290,7 @@ export default {
         .forEach((item) => item.remove());
     },
     createChart() {
+      this.warningMessage = null;
       const {
         margin, marginOffset, marginOffsetX, width, height,
       } = this.box;
@@ -315,16 +317,32 @@ export default {
         .attr('class', 'myXaxis');
 
       // Initialize an Y axis
-      let allMaxYMetric;
+      let allMaxYMetric; let allMinYMetric;
       if (united) {
         allMaxYMetric = d3.max(this.metrics.map((metric) => d3.max(this.data, (d) => d[metric])));
+        allMinYMetric = d3.min(this.metrics.map((metric) => d3.min(this.data, (d) => d[metric])));
       }
 
       // максимум для accumulation barplot
       if (barplotstyle === 'accumulation') {
-        const maxY = this.barplotMetrics
-          .map((metric) => Math.max(...this.data.map((item) => item[metric])));
-        allMaxYMetric = maxY.reduce((max, a) => max + a, 0);
+        allMinYMetric = 0;
+        allMaxYMetric = 0;
+        this.data.forEach((item) => {
+          let up = 0; let down = 0;
+          this.barplotMetrics.forEach((metric) => {
+            const val = item[metric];
+            if (val >= 0) {
+              up += val;
+            } else {
+              down += val;
+              // Negative values are not available in accumulation histograms
+              this.warningMessage = 'Отрицательные значения недоступны на гистограммах накопления';
+              throw new Error(this.warningMessage);
+            }
+          });
+          if (up > allMaxYMetric) allMaxYMetric = up;
+          if (down < allMinYMetric) allMinYMetric = down;
+        });
       }
 
       this.y = {};
@@ -375,15 +393,41 @@ export default {
           .ticks(this.data.length > 10 ? 5 : null)
           .tickFormat(this.tickFormat);
 
-        let maxYMetric = (united && metricType === 'barplot')
-          ? allMaxYMetric
-          : d3.max(this.data, (d) => d[metric]);
+        // maxYMetric
+        let maxYMetric;
+        if (united && metricType === 'barplot') {
+          maxYMetric = allMaxYMetric;
+        } else {
+          maxYMetric = d3.max(this.data, (d) => d[metric]);
+          if (maxYMetric < 0) {
+            maxYMetric = 0;
+          } else {
+            // round
+            maxYMetric = Math.ceil(maxYMetric * 10) / 10;
+          }
+        }
 
-        maxYMetric = Math.ceil(maxYMetric * 10) / 10;
-
-        let minYMetric = (yFromZero || metricType === 'barplot')
-          ? 0
-          : d3.min(this.data, (d) => d[metric]);
+        // minYMetric
+        let minYMetric;
+        if (yFromZero) {
+          minYMetric = 0;
+        } else {
+          minYMetric = d3.min(this.data, (d) => d[metric]);
+          if (metricType === 'barplot') {
+            if (united) {
+              minYMetric = allMinYMetric < 0 ? allMinYMetric : 0;
+            } else if (minYMetric > 0) {
+              minYMetric = 0;
+            } else {
+              // round
+              if (minYMetric < 0) {
+                minYMetric -= Math.abs(minYMetric - maxYMetric) * 0.1;
+              } else {
+                minYMetric += Math.abs(minYMetric - maxYMetric) * 0.1;
+              }
+            }
+          }
+        }
 
         // гринаци оси Y
         if (!united) {
@@ -391,28 +435,29 @@ export default {
 
           // если у метрики только одно значение
           if (maxYMetric === minYMetric) {
-            maxYMetric = maxYMetric % 1 === 0
-              ? maxYMetric += 1
-              : Math.ceil(maxYMetric);
-            minYMetric = minYMetric % 1 === 0
-              ? minYMetric -= 1
-              : Math.floor(minYMetric);
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
           } else {
-            if (opt.manual && opt.upborder) {
-              maxYMetric = +opt.upborder;
-            }
-            if (opt.manual && opt.lowborder) {
-              minYMetric = +opt.lowborder;
+            if (opt.manual) {
+              if (opt.upborder) {
+                maxYMetric = +opt.upborder;
+              }
+              if (opt.lowborder) {
+                minYMetric = +opt.lowborder;
+              }
             }
             maxYMetric += Math.abs(maxYMetric) * 0.1;
-            if (metricType === 'linechart') {
-              minYMetric -= Math.abs(minYMetric) * 0.1;
-            }
           }
         }
         if (metricType === 'barplot') {
           maxYMetric += Math.abs(maxYMetric) * 0.1;
+          if (minYMetric !== 0 && minYMetric < 0) {
+            minYMetric -= Math.abs(minYMetric) * 0.1;
+          }
+          if (maxYMetric < 0 && minYMetric < 0) {
+            maxYMetric = 0;
+          }
         }
+        minYMetric -= Math.abs(minYMetric) * 0.1;
 
         this.y[metric] = d3.scaleLinear()
           .range(united ? [yHeight, 0] : [yHeight + yHeight * i, yHeight * i])
@@ -429,10 +474,21 @@ export default {
           ];
         } else {
           tickValues = [minYMetric];
-          if (minYMetric < 0) {
+          if (minYMetric < 0 && maxYMetric > 0) {
             tickValues.push(0);
           }
           tickValues.push(maxYMetric);
+        }
+
+        if (united) {
+          tickValues = tickValues.sort().reduce((a, b) => {
+            const result = [...a];
+            if (result.length > 0 && a[result.length - 1] < 0 && b > 0) {
+              result.push(0);
+            }
+            result.push(b);
+            return result;
+          }, []);
         }
 
         // y оси
@@ -643,9 +699,17 @@ export default {
                     .enter()
                     .append('rect')
                     .attr('x', (d) => xZoom(d.data[xMetric]) - currentBarWidth / 2)
-                    .attr('y', (d) => ((barplotstyle === 'overlay')
-                      ? this.y[metric](d[1] - d[0])
-                      : this.y[metric](d[1])))
+                    .attr('y', (d) => {
+                      let val = d[1];
+                      if (barplotstyle === 'overlay') {
+                        val -= d[0];
+                      }
+                      if (val < 0) {
+                        const height = this.y[metric](d[0]) - this.y[metric](d[1]);
+                        return this.y[metric](val) + height;
+                      }
+                      return this.y[metric](val);
+                    })
                     .attr('height', (d) => {
                       const height = this.y[metric](d[0]) - this.y[metric](d[1]);
                       return Math.abs(height);
@@ -687,15 +751,21 @@ export default {
                     .enter()
                     .append('rect')
                     .attr('x', (d) => xSubgroup(d.key) - currentBarWidth / 2)
-                    .attr('y', (d) => this.y[metric](d.value))
+                    .attr('y', (d) => {
+                      const yHeight = this.y[metric](d.value);
+                      if (d.value < 0) {
+                        return this.y[metric](0);
+                      }
+                      return yHeight;
+                    })
                     .attr('width', xSubgroup.bandwidth())
                     .attr('height', (d) => {
-                      const varHeight = this.box.height - this.y[metric](d.value);
-                      const height = united
-                        ? varHeight
-                        : varHeight - (this.box.height / this.metrics.length)
-                          * (this.metrics.length - (i + 1));
-                      return Math.abs(height);
+                      const valHeight = this.y[metric](d.value);
+                      const zeroHeight = this.y[metric](0);
+                      if (d.value < 0) {
+                        return valHeight - zeroHeight;
+                      }
+                      return zeroHeight - valHeight;
                     })
                     .attr('fill', (d) => this.getCurrentMetricColor(d.key))
                     .on('click', (d) => this.setClick({
@@ -715,6 +785,9 @@ export default {
               }
             } else {
               // overview
+              const allHeight = this.box.height;
+              const metricHeight = allHeight / this.metrics.length;
+              const offsetHeight = metricHeight * i;
               this.line
                 .data(data
                   // тут убираю бары с 0 высотой
@@ -723,15 +796,22 @@ export default {
                 .append('rect')
                 .attr('class', `line-${metric}`)
                 .attr('x', (d) => this.x[metric](d[this.xMetric]) - currentBarWidth / 2)
-                .attr('y', (d) => this.y[metric](d[metric]))
+                .attr('y', (d) => {
+                  const val = d[metric];
+                  const zeroHeight = this.y[metric](0);
+                  const valHeight = this.y[metric](val);
+                  return (val <= 0) ? zeroHeight : valHeight;
+                })
                 .attr('width', currentBarWidth)
                 .attr('height', (d) => {
-                  const varHeight = this.box.height - this.y[metric](d[metric]);
-                  const height = united
-                    ? varHeight
-                    : varHeight - (this.box.height / this.metrics.length)
-                      * (this.metrics.length - (i + 1));
-                  return Math.abs(height);
+                  const val = d[metric];
+                  const zeroHeight = this.y[metric](0);
+                  const valHeight = this.y[metric](val);
+                  const height = valHeight - offsetHeight;
+                  if (val <= 0) {
+                    return height + (offsetHeight - zeroHeight);
+                  }
+                  return zeroHeight - (offsetHeight + height);
                 })
                 .attr('fill', currentColor)
                 .on('click', (d) => this.setClick({
@@ -852,14 +932,7 @@ export default {
           return `translate(${translate}, -5)`;
         })
         .attr('font-size', '11')
-        .attr('text-anchor', (d, i) => {
-          const textToRight = (i === 0);
-          let anchor = 'start';
-          if (isLine) {
-            anchor = textToRight ? 'start' : 'end';
-          }
-          return anchor;
-        })
+        .attr('text-anchor', 'middle')
         .attr('fill', this.theme.$main_text)
         .text((d) => {
           const fieldName = (isDataAlwaysShow === 'data')
@@ -1015,17 +1088,17 @@ export default {
         );
         this.marginOffset.bottom = xTextMaxHeight + 5;
         this.marginOffset.top = this.$refs.legend.offsetHeight || 0;
-      });
 
-      // ось Y
-      this.marginOffset.left = d3.max(
-        this.svg.selectAll('.yAxis.left .tick text')
-          .nodes().map((node) => node.getBBox().width),
-      ) + 10;
-      this.marginOffset.right = d3.max(
-        this.svg.selectAll('.yAxis.left .tick text')
-          .nodes().map((node) => node.getBBox().width),
-      ) + 10;
+        // ось Y
+        this.marginOffset.left = d3.max(
+          this.svg.selectAll('.yAxis.left .tick text')
+            .nodes().map((node) => node.getBBox().width),
+        ) + 10;
+        this.marginOffset.right = d3.max(
+          this.svg.selectAll('.yAxis.left .tick text')
+            .nodes().map((node) => node.getBBox().width),
+        ) + 10;
+      });
     },
     getStyleLine(type) {
       if (type === 'dashed') {

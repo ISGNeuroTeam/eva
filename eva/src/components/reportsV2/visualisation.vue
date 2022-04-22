@@ -83,14 +83,15 @@
         :color-from="theme"
         :active-elem-from="activeElem"
         :options="getOptions"
+        :search="search"
         id-dash-from="reports"
         :width-from="size.width"
         :height-from="size.height"
-        :time-format-from="''"
         :size-tile-from="{
           width: getOptions ? getOptions.widthTile : '',
           height: getOptions ? getOptions.heightTile : ''
         }"
+        :time-format-from="getTimeFormatFrom"
         :search-rep="true"
         :tooltip-from="tooltipSvg"
         :should-get="shouldGet"
@@ -101,6 +102,7 @@
         :data-mode-from="dataMode"
         :loading="loading"
         :selected-pie-index="selectedPieIndex"
+
         @changeSelectPie="changeSelectedPie"
       />
     </template>
@@ -136,6 +138,10 @@ export default {
     loading: {
       type: Boolean,
       default: true,
+    },
+    search: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -247,6 +253,9 @@ export default {
       });
       this.setActiveElem('table');
       return this.$store.getters.getReportElement;
+    },
+    getTimeFormatFrom() {
+      return this.getOptions && this.getOptions.timeFormat ? this.getOptions.timeFormat : '';
     },
   },
   watch: {
