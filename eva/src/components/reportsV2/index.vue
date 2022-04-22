@@ -147,7 +147,7 @@ export default {
       curTab: null,
       size: {
         width: 0,
-        height: 0,
+        height: screen.height ?? 0,
       },
       aboutElem: {},
       rowsCount: 9,
