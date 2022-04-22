@@ -268,7 +268,7 @@ export default {
         selected: 'яндекс',
         selectedLayer: '',
         zoomLevel: 10,
-        zoomStep: 0.01,
+        // zoomStep: 0.01,
         initialPoint: {
           x: 59.242065955847735,
           y: 74.35169122692963,
@@ -365,22 +365,22 @@ export default {
   },
   mounted() {
     const options = JSON.parse(JSON.stringify(this.getOptions));
-    this.tileLayers[0].tile = options.osmserver;
-    // init store for reactivity
-    if (!options.showLegend || !options.initialPoint) {
-      const initOptions = {
-        showLegend: true,
-        zoomLevel: this.options.zoomLevel,
-        zoomStep: this.options.zoomStep,
-        selectedLayer: this.options.selectedLayer,
-        initialPoint: this.options.initialPoint,
-      };
-      this.$store.commit('setOptions', {
-        idDash: this.idDashFrom,
-        id: this.idElement,
-        options: initOptions,
-      });
-    }
+    // this.tileLayers[0].tile = options.osmserver;
+    // // init store for reactivity
+    // if (!options.showLegend || !options.initialPoint) {
+    //   const initOptions = {
+    //     showLegend: true,
+    //     zoomLevel: this.options.zoomLevel,
+    //     zoomStep: this.options.zoomStep,
+    //     selectedLayer: this.options.selectedLayer,
+    //     initialPoint: this.options.initialPoint,
+    //   };
+    //   this.$store.commit('setOptions', {
+    //     idDash: this.idDashFrom,
+    //     id: this.idElement,
+    //     options: initOptions,
+    //   });
+    // }
     if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
       this.options = JSON.parse(JSON.stringify(options));
     }

@@ -192,6 +192,10 @@ class MapClass {
     });
   }
 
+  stopEvents(event) {
+    this.map.off(event);
+  }
+
   createMap() {
     let tileLayer;
     if (!this.osmServer) return;

@@ -201,6 +201,8 @@ export default {
           if (this.options?.library) {
             this.map.library = this.library;
           }
+          this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+          this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
           this.reDrawMap(this.dataRestFrom);
         }
       },
@@ -476,7 +478,7 @@ export default {
     initMap() {
       const map = new MapClass({
         mapRef: this.$refs.map,
-        wheelPxPerZoomLevel: 1 / this.options.zoomStep || 30,
+        wheelPxPerZoomLevel: 101 - this.options.zoomStep,
         zoomSnap: 0,
         zoom: this.getOptions.zoomLevel,
         maxZoom: 25,
