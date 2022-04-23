@@ -1,87 +1,93 @@
 <template>
-  <div
-    ref="pieChart"
-    class="piechart-block"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="nodata"
-      class="nodata"
+      ref="pieChart"
+      class="piechart-block"
     >
-      {{ message }}
-    </div>
-    <div
-      ref="chartTooltip"
-      style="
+      <div
+        v-if="nodata"
+        class="nodata"
+      >
+        {{ message }}
+      </div>
+      <div
+        ref="chartTooltip"
+        style="
         position: absolute;
         visibility: hidden;
         border-radius: 3px;
         padding: 5px;
       "
-      :style="{
-        color: theme.$main_text,
-        backgroundColor: theme.$secondary_bg,
-        border: `1px solid ${theme.$secondary_border}`,
-      }"
-    >
-      Наведите курсор на график
-    </div>
+        :style="{
+          color: theme.$main_text,
+          backgroundColor: theme.$secondary_bg,
+          border: `1px solid ${theme.$secondary_border}`,
+        }"
+      >
+        Наведите курсор на график
+      </div>
 
-    <div
-      v-show="dataLoading || !dataRestFrom.length"
-      class="mt-4"
-    >
-      <p>Нет данных для отображения</p>
-    </div>
-    <div
-      v-show="!dataLoading && !!dataRestFrom.length"
-      class="piechart-legend-block"
-      :style="{ flexFlow: positionLegends }"
-    >
       <div
-        ref="piechartItself"
-        :class="`dash-piechart ${idFrom}`"
-      />
+        v-show="dataLoading || !dataRestFrom.length"
+        class="mt-4"
+      >
+        <p>Нет данных для отображения</p>
+      </div>
       <div
-        ref="legends"
-        class="legend-block-pie"
-        :class="dashOptions.positionlegend === 'top'
-          || dashOptions.positionlegend === 'bottom'
-          ? 'legend-block-pie__horizontally'
-          : 'legend-block-pie__vertically'"
+        v-show="!dataLoading && !!dataRestFrom.length"
+        class="piechart-legend-block"
+        :style="{ flexFlow: positionLegends }"
       >
         <div
-          v-for="(item, idx) in legends"
-          :key="idx"
-          class="legend-line"
-          :class="
-            selectedPieIndex === idx
-              ? 'legend-line_selected legend-line_hover'
-              : ''
-          "
-          @mouseover="hoverLegendLine(idx)"
-          @mouseleave="hoverLegendLine(-1)"
-          @click="selectedPie = idx"
+          ref="piechartItself"
+          :class="`dash-piechart ${idFrom}`"
+        />
+        <div
+          ref="legends"
+          class="legend-block-pie"
+          :class="dashOptions.positionlegend === 'top'
+            || dashOptions.positionlegend === 'bottom'
+            ? 'legend-block-pie__horizontally'
+            : 'legend-block-pie__vertically'"
         >
           <div
-            class="square"
-            :style="{ backgroundColor: item.color }"
-          />
-          <div
-            class="text"
-            :style="{ color: theme.$main_text }"
+            v-for="(item, idx) in legends"
+            :key="idx"
+            class="legend-line"
+            :class="
+              selectedPie === idx
+                ? 'legend-line_selected legend-line_hover'
+                : ''
+            "
+            @mouseover="hoverLegendLine(idx)"
+            @mouseleave="hoverLegendLine(-1)"
+            @click="selectedPie = idx"
           >
-            {{ item.label }}
+            <div
+              class="square"
+              :style="{ backgroundColor: item.color }"
+            />
+            <div
+              class="text"
+              :style="{ color: theme.$main_text }"
+            >
+              {{ item.label }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
 import PiechartClass from '../../js/classes/PiechartClass';
 
 export default {
+  name: 'PieChart',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -98,19 +104,15 @@ export default {
     }, // данные полученые после выполнения запроса
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     dataLoadingFrom: null, // сообщает что компонент в режиме получения данных
-    widthFrom: {
-      type: Number,
+    sizeFrom: {
+      type: Object,
       required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // высота родительского компонента
-    selectedPieIndex: {
-      type: Number,
-      default: -1,
-    }, // индекс активного элемента
+    },
     isFullScreen: {
+      type: Boolean,
+      default: false,
+    },
+    fullScreenMode: {
       type: Boolean,
       default: false,
     },
@@ -124,6 +126,7 @@ export default {
       timeout: '',
       piechart: null,
       tolate: false,
+      selectedPie: -1,
     };
   },
   computed: {
@@ -224,21 +227,10 @@ export default {
       return this.dataLoadingFrom;
     },
     dashSize() {
-      return {
-        width: this.widthFrom,
-        height: this.heightFrom,
-      };
+      return this.sizeFrom;
     },
     change() {
       return true;
-    },
-    selectedPie: {
-      get() {
-        return this.selectedPieIndex;
-      },
-      set(val) {
-        this.$emit('changeSelectPie', val);
-      },
     },
   },
   watch: {
@@ -258,18 +250,16 @@ export default {
       },
       deep: true,
     },
-    widthFrom(val, old) {
-      if (val !== old) {
-        this.changePieChart();
-      }
+    sizeFrom: {
+      deep: true,
+      handler(val, old) {
+        if (val !== old && this.piechart) {
+          this.piechart.changeSize(this.calculatedSize(this.legendSize()));
+        }
+      },
     },
-    heightFrom(val, old) {
-      if (val !== old) {
-        this.changePieChart();
-      }
-    },
-    selectedPieIndex(newVal) {
-      if (newVal !== null) this.setToken(newVal);
+    selectedPie(newVal) {
+      if (newVal !== -1) this.setToken(newVal);
     },
     dataRestFrom: {
       immediate: true,
@@ -289,14 +279,69 @@ export default {
         }
       },
     },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.createPieChartDash();
+      });
+    },
   },
   methods: {
+    legendSize() {
+      if (this.$refs.legends.getBoundingClientRect().width !== 0 && this.legends.length > 0) {
+        return {
+          width: Math.round(
+            this.$refs.legends.getBoundingClientRect().width,
+          ),
+          height: Math.round(
+            this.$refs.legends.getBoundingClientRect().height,
+          ),
+        };
+      }
+      return {
+        width: 0,
+        height: 0,
+      };
+    },
+    calculatedSize(legendSize) {
+      const MARGIN = 40; // отступ от контейнера
+      let width = this.sizeFrom.width - MARGIN; // отступ по бокам
+      let height = this.sizeFrom.height - 35; // минус шапка
+
+      switch (this.dashOptions.positionlegend || 'right') {
+        case 'right':
+          this.positionLegends = 'row nowrap';
+          width -= legendSize.width;
+          break;
+
+        case 'left':
+          this.positionLegends = 'row-reverse nowrap';
+          width -= legendSize.width;
+          break;
+
+        case 'top':
+          this.positionLegends = 'column-reverse nowrap';
+          height = height - legendSize.height - MARGIN;
+          break;
+
+        case 'bottom':
+          this.positionLegends = 'column nowrap';
+          height = height - legendSize.height - MARGIN;
+          break;
+        default:
+          break;
+      }
+
+      return {
+        width,
+        height,
+      };
+    },
     hoverLegendLine(legendLineIndex) {
       this.setActiveLegendLine(legendLineIndex);
     },
     setActiveLegendLine(legendLineIndex) {
       if (this.piechart) {
-        this.piechart.selectActivePiepart(this.selectedPieIndex, legendLineIndex);
+        this.piechart.selectActivePiepart(this.selectedPie, legendLineIndex);
         this.piechart.selectActiveLegendLine(legendLineIndex, 'legend-line');
       }
     },
@@ -354,49 +399,30 @@ export default {
             this.piechart.removePiechart(); // и еще график очищаем, чтобы не мешался
           } else {
             this.createLegend(this.dataRestFrom, metrics, showlegend, colorsPie);
-            let legendSize = {};
             if (this.legends.length > 0) {
-              let timeOut = setTimeout(
-                function tick() {
-                  // важно чтобы наш график построился
-                  // толкьо после того когда создался блок с легендой
-
-                  if (this.$refs.legends.getBoundingClientRect().width !== 0) {
-                    legendSize = {
-                      width: Math.round(
-                        this.$refs.legends.getBoundingClientRect().width,
-                      ),
-                      height: Math.round(
-                        this.$refs.legends.getBoundingClientRect().height,
-                      ),
-                    };
-                    this.createPieChart(
-                      this.dataRestFrom,
-                      this.dashSize,
-                      metrics,
-                      legendSize,
-                      positionlegend,
-                      colorsPie,
-                    ); // и собственно создаем график
-                    clearTimeout(timeOut);
-                    this.setActiveLegendLine(this.selectedPieIndex);
-                  } else {
-                    timeOut = setTimeout(tick.bind(this), 100);
-                  }
-                }.bind(this),
-                0,
-              );
+              this.$nextTick(() => {
+                // TODO: Поправить передачу параметров
+                this.createPieChart(
+                  this.dataRestFrom,
+                  this.dashSize,
+                  metrics,
+                  this.legendSize(),
+                  positionlegend,
+                  colorsPie,
+                ); // и собственно создаем график
+                this.setActiveLegendLine(this.selectedPie);
+              });
             } else {
-              legendSize = { width: 0, height: 0 };
+              // TODO: Поправить передачу параметров
               this.createPieChart(
                 this.dataRestFrom,
                 this.dashSize,
                 metrics,
-                legendSize,
+                { width: 0, height: 0 },
                 positionlegend,
                 colorsPie,
               ); // и собственно создаем график
-              this.setActiveLegendLine(this.selectedPieIndex);
+              this.setActiveLegendLine(this.selectedPie);
             }
           }
         } else {
@@ -433,33 +459,7 @@ export default {
       if (this.piechart) {
         this.piechart.removePiechart();
       }
-      const MARGIN = 40; // отступ от контейнера
-      let width = sizeLine.width - MARGIN; // отступ по бокам
-      let height = sizeLine.height - 35; // минус шапка
-
-      switch (positionlegend) {
-        case 'right':
-          this.positionLegends = 'row nowrap';
-          width -= legendSize.width;
-          break;
-
-        case 'left':
-          this.positionLegends = 'row-reverse nowrap';
-          width -= legendSize.width;
-          break;
-
-        case 'top':
-          this.positionLegends = 'column-reverse nowrap';
-          height = height - legendSize.height - MARGIN;
-          break;
-
-        case 'bottom':
-          this.positionLegends = 'column nowrap';
-          height = height - legendSize.height - MARGIN;
-          break;
-        default:
-          break;
-      }
+      const { width, height } = this.calculatedSize(legendSize);
 
       const data = {};
 
@@ -480,7 +480,6 @@ export default {
         elemForLegend: this.$refs.legends,
         width,
         height,
-        margin: MARGIN,
         data,
         colors: this.dashOptions.themes[colorsPie.theme],
       });
@@ -514,7 +513,7 @@ export default {
         {
           eventName: 'mouseout',
           callback: (_, i, nodes) => {
-            if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
+            if (i !== this.selectedPie) nodes[i].classList.remove('piepartSelect');
             tooltipEl.style.visibility = 'hidden';
             this.hoverLegendLine(-1);
           },
@@ -523,7 +522,7 @@ export default {
           eventName: 'click',
           callback: (_, i, nodes) => {
             const node = nodes[i];
-            if (this.selectedPieIndex === i) {
+            if (this.selectedPie === i) {
               this.selectedPie = -1;
               node.classList.remove('piepartSelect');
             } else {

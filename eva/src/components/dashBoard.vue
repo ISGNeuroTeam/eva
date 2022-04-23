@@ -240,7 +240,8 @@
                       </div>
                     </div>
                   </v-card-title>
-                  <v-card-text
+                  <portal-target :name="element" />
+                  <!--<v-card-text
                     :is="currentElem"
                     v-if="showElement"
                     ref="dashBoardInsideFull"
@@ -259,6 +260,10 @@
                     :tooltip-from="props.tooltip"
                     :current-settings="settings"
                     :update-settings="updateSettings"
+                    :size-from="{
+                      height,
+                      width
+                    }"
                     :width-from="fullScreenWidth"
                     :height-from="fullScreenHeight"
                     :options="props.options"
@@ -276,7 +281,7 @@
                     @changeSelectPie="changeSelectedPie"
                     @update:table-per-page="onTableItemsPerPageChange"
                     @update:table-page="onTableIItemsPageChange"
-                  />
+                  />-->
                 </v-card>
               </div>
             </v-dialog>
@@ -430,8 +435,8 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement"
         ref="dashBoardInside"
+        :full-screen-mode="fullScreenMode"
         class="card-text element-itself"
         :color-from="theme"
         :style="{ color: theme.$main_text, background: 'transparent' }"
@@ -442,6 +447,10 @@
         :loading="loading"
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
+        :size-from="{
+          height,
+          width
+        }"
         :tooltip-from="props.tooltip"
         :width-from="width"
         :height-from="height"
@@ -762,18 +771,18 @@ export default {
   },
   watch: {
     fullScreenMode(to) {
-      const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
-      if (this.dataElemFrom === 'piechart') {
-        this.$nextTick(() => {
-          this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
-        });
-      }
-      setTimeout(() => {
-        this.disabledTooltip = to;
-      }, to ? 0 : 600);
-      this.$nextTick(() => {
-        this.$refs[refNameComponent].$emit('fullScreenMode', to);
-      });
+      // const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
+      // if (this.dataElemFrom === 'piechart') {
+      //   this.$nextTick(() => {
+      //     // this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
+      //   });
+      // }
+      // setTimeout(() => {
+      //   this.disabledTooltip = to;
+      // }, to ? 0 : 600);
+      // this.$nextTick(() => {
+      //   // this.$refs[refNameComponent].$emit('fullScreenMode', to);
+      // });
     },
     settingsIsOpened(to) {
       setTimeout(() => {
