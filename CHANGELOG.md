@@ -5,18 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-
 ## [Unrelise]
 
 ### Feature
-- Added hotkey for query window in data research v2
+- Created guntt class
 - Created piechart class
+
+### Fixed
+- fix export link
+
+## [1.88.0]
+
+### Feature
+- Added hotkey for query window in data research v2
 
 ### Fixed
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings
 - fixed maps tooltip
+- fixed the display of histograms with negative values on a multiline dash
+- the width of the histogram is now only positive
 
 ## [1.87.0]
 
