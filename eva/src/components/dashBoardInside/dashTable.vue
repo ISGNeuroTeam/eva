@@ -6,6 +6,9 @@
     <div
       class="table-block"
       :data-change="change"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
       <div class="v-data-table--container">
         <v-data-table
@@ -24,7 +27,7 @@
           :height="height"
           fixed-header
           :items-per-page="tablePerPage"
-          :style="{ borderColor: theme.$secondary_border, color: theme.$main_text }"
+          :style="{ borderColor: theme.$secondary_border }"
           :page="tablePage"
           @update:items-per-page="onItemsPerPageChange"
           @update:page="onItemsPageChange"
@@ -148,6 +151,7 @@ import { mdiMagnify } from '@mdi/js';
 
 export default {
   name: 'DashTable',
+  inheritAttrs: false,
   props: {
     tablePerPage: {
       type: Number,
@@ -170,10 +174,6 @@ export default {
       type: String,
       required: true,
     },
-    heightFrom: {
-      type: Number,
-      required: true,
-    },
     dataReport: {
       type: Boolean,
       default: false,
@@ -193,6 +193,18 @@ export default {
     fullScreenMode: {
       type: Boolean,
       default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -303,21 +315,21 @@ export default {
       return this.$store.getters.getTheme;
     },
     height() {
-      let otstup = 100;
+      let margin = 100;
       if (window.screen.width <= 1600) {
-        otstup = 80;
+        margin = 92;
       }
       if (window.screen.width <= 1400) {
-        otstup = 70;
+        margin = 70;
       }
       if (this.props.hideFooter) {
-        otstup = 45;
+        margin = 45;
       }
       if (this.dataReport) {
-        otstup -= 30;
+        margin -= 30;
       }
       // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
-      return this.heightFrom - otstup;
+      return this.sizeFrom.height - margin;
     },
     dashFromStore() {
       return this.$store.state[this.idDash][this.id];

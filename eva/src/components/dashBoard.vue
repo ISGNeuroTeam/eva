@@ -244,7 +244,6 @@
                   <!--<v-card-text
                     :is="currentElem"
                     v-if="showElement"
-                    ref="dashBoardInsideFull"
                     class="card-text element-itself"
                     :color-from="theme"
                     :style="{
@@ -435,11 +434,14 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        ref="dashBoardInside"
+        v-if="showElement"
         :full-screen-mode="fullScreenMode"
-        class="card-text element-itself"
+        custom-class="card-text element-itself"
         :color-from="theme"
-        :style="{ color: theme.$main_text, background: 'transparent' }"
+        :custom-style="{
+          color: theme.$main_text,
+          background: 'transparent'
+        }"
         :id-from="element"
         :id-dash-from="idDash"
         :data-rest-from="searchData"
@@ -448,8 +450,8 @@
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
         :size-from="{
-          height,
-          width
+          height: fullScreenMode ? fullScreenHeight : height,
+          width: fullScreenMode ? fullScreenWidth : width,
         }"
         :tooltip-from="props.tooltip"
         :width-from="width"
@@ -457,7 +459,8 @@
         :options="props.options"
         :current-settings="settings"
         :update-settings="updateSettings"
-        :is-full-screen="false"
+        :is-full-screen="fullScreenMode"
+        :full-screen="fullScreenMode"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
         :selected-pie-index="selectedPieIndex"
@@ -607,8 +610,8 @@ export default {
         tooltip: {},
         metricsMulti: [],
       },
-      fullScreenWidth: 0.8 * window.innerWidth,
-      fullScreenHeight: 0.8 * window.innerHeight,
+      fullScreenWidth: 0.8 * window.screen.width,
+      fullScreenHeight: 0.8 * window.screen.height,
       selectedPieIndex: -1,
       tuneValue: '',
       tuneSliderValue: '',

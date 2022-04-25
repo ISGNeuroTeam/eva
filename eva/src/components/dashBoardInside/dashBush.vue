@@ -1,47 +1,58 @@
 <template>
-  <div id="bush-wrapper">
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
     <div
-      v-if="jsonError"
-      class="error-message"
-      :style="`height: ${heightPanel};`"
+      id="bush-wrapper"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
-      Ошибка формата входных данных
-    </div>
-    <div v-else>
       <div
-        v-if="dragRes"
-        class="buttons-wrapper"
+        v-if="jsonError"
+        class="error-message"
+        :style="`height: ${heightPanel};`"
       >
-        <v-icon :color="'white'">
-          {{ icon.close }}
-        </v-icon>
+        Ошибка формата входных данных
       </div>
-      <div
-        v-else
-        class="buttons-wrapper"
-      >
-        <v-icon
-          v-if="isViewMode"
-          :color="'white'"
-          @click="clickViewMode"
+      <div v-else>
+        <div
+          v-if="dragRes"
+          class="buttons-wrapper"
         >
-          {{ icon.move }}
-        </v-icon>
-        <v-icon
+          <v-icon :color="'white'">
+            {{ icon.close }}
+          </v-icon>
+        </div>
+        <div
           v-else
-          :color="'white'"
-          @click="clickEditorMode"
+          class="buttons-wrapper"
         >
-          {{ icon.pencil }}
-        </v-icon>
+          <v-icon
+            v-if="isViewMode"
+            :color="'white'"
+            @click="clickViewMode"
+          >
+            {{ icon.move }}
+          </v-icon>
+          <v-icon
+            v-else
+            :color="'white'"
+            @click="clickEditorMode"
+          >
+            {{ icon.pencil }}
+          </v-icon>
+        </div>
+        <div
+          ref="graph"
+          :key="idFrom"
+          class="bush-ygraph-container"
+          :style="{ top: `${top}` }"
+        />
       </div>
-      <div
-        ref="graph"
-        class="bush-ygraph-container"
-        :style="{ top: `${top}` }"
-      />
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -53,6 +64,7 @@ yfile.License.value = licenseData; // проверка лицензии
 
 export default {
   name: 'DashBush',
+  inheritAttrs: false,
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -71,14 +83,22 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    widthFrom: {
-      type: Number,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
       required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
+    }, // выоста\ширина родительского компонента
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -102,10 +122,10 @@ export default {
       return document.body.clientWidth <= 1600 ? '50px' : '60px';
     },
     widthPanel() {
-      return `${this.widthFrom / 10}px`;
+      return `${this.sizeFrom.width / 10}px`;
     },
     heightPanel() {
-      return `${this.heightFrom}px`;
+      return `${this.sizeFrom.height}px`;
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
@@ -137,6 +157,14 @@ export default {
       if (_dataRest.length > 0) {
         this.drawGraph(_dataRest);
       }
+    },
+    async fullScreenMode() {
+      await this.$nextTick(async () => {
+        await this.createGraph();
+        if (this.dataRestFrom.length > 0) {
+          this.drawGraph(this.dataRestFrom);
+        }
+      });
     },
   },
   async mounted() {
@@ -367,15 +395,17 @@ export default {
     },
 
     async createGraph() {
-      this.$graphComponent = await new yfile.GraphComponent(this.$refs.graph);
-      if (this.dragRes) {
-        this.$graphComponent.inputMode = null;
-      } else {
-        this.isViewMode = true;
-        this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
-      }
+      await this.$nextTick(async () => {
+        this.$graphComponent = await new yfile.GraphComponent(this.$refs.graph);
+        if (this.dragRes) {
+          this.$graphComponent.inputMode = null;
+        } else {
+          this.isViewMode = true;
+          this.$graphComponent.inputMode = new yfile.GraphViewerInputMode();
+        }
 
-      this.initializeDefaultStyles();
+        this.initializeDefaultStyles();
+      });
     },
     initializeDefaultStyles() {
       // стиль для label

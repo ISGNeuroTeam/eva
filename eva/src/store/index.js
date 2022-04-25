@@ -209,19 +209,22 @@ export default new Vuex.Store({
       }
     },
     updateManualTokens(state, { idDash }) {
-      state[idDash].tockens.forEach((token) => {
-        if (token.onButton) {
-          state[idDash].searches.forEach((search) => {
-            if (search.original_otl.includes(`$${token.name}$`)) {
-              this.commit('updateSearchStatus', {
-                idDash,
-                sid: search.sid,
-                status: 'empty',
-              });
-            }
-          });
-        }
-      });
+      if (state[idDash]?.tockens?.length > 0) {
+        state[idDash].tockens.forEach((token) => {
+          if (token.onButton) {
+            state[idDash].searches.forEach((search) => {
+              if (search.original_otl.includes(`$${token.name}$`)) {
+                this.commit('updateSearchStatus', {
+                  idDash,
+                  id: search.id,
+                  sid: search.sid,
+                  status: 'empty',
+                });
+              }
+            });
+          }
+        });
+      }
     },
     // TODO refactor
     // сохранение токена в хранилище

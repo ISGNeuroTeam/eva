@@ -1,167 +1,178 @@
 <template>
-  <div class="ygraph-wrapper">
-    <div class="button-block">
-      <v-row align="start">
-        <v-tooltip
-          bottom
-          :color="colorFrom.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon
-              :color="
-                isEditor
-                  ? colorFrom.$primary_button
-                  : colorFrom.$accent_ui_color
-              "
-              :disabled="loading"
-              v-on="on"
-              @click="changeInputMode"
-            >
-              {{ iconArrowAll }}
-            </v-icon>
-          </template>
-          <span>Перемещение по графу</span>
-        </v-tooltip>
-
-        <v-tooltip
-          bottom
-          :color="colorFrom.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon
-              :color="colorFrom.$accent_ui_color"
-              :disabled="loading"
-              v-on="on"
-              @click="zoomIn"
-            >
-              {{ mdiMagnifyPlus }}
-            </v-icon>
-          </template>
-          <span>Увеличить</span>
-        </v-tooltip>
-
-        <v-tooltip
-          bottom
-          :color="colorFrom.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon
-              :color="colorFrom.$accent_ui_color"
-              :disabled="loading"
-              v-on="on"
-              @click="zoomOut"
-            >
-              {{ mdiMagnifyMinus }}
-            </v-icon>
-          </template>
-          <span>Уменьшить</span>
-        </v-tooltip>
-
-        <v-tooltip
-          bottom
-          :color="colorFrom.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <v-icon
-              :color="colorFrom.$accent_ui_color"
-              :disabled="loading"
-              v-on="on"
-              @click="fitContent"
-            >
-              {{ mdiFitToPageOutline }}
-            </v-icon>
-          </template>
-          <span>Выровнять</span>
-        </v-tooltip>
-      </v-row>
-    </div>
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
     <div
-      ref="graph"
-      class="ygraph-component-container"
-      :style="{ top: `${top}` }"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="ygraph-wrapper"
     >
-      <div class="popupContainer">
-        <div
-          ref="nodePopupContent"
-          class="popupContent"
-          tabindex="0"
-        >
-          <div class="popupContentTitle">
-            <div data-id="node" />
-            <div
-              data-id="node_description"
-              style="font-size: 0.9rem"
-            />
-          </div>
-          <div class="popupContentTabsHeader">
-            <div
-              :class="{ active: popupNodeCurrentTab === 0 }"
-              @click="popupNodeCurrentTab = 0"
-            >
-              Parents
-            </div>
-            <div
-              :class="{ active: popupNodeCurrentTab === 1 }"
-              @click="popupNodeCurrentTab = 1"
-            >
-              Children
-            </div>
-          </div>
-          <div class="popupContentTabs">
-            <div
-              ref="popupContentTabParents"
-              :class="{ active: popupNodeCurrentTab === 0 }"
-            >
-              <div
-                v-for="item in parentNodes"
-                :key="item"
+      <div class="button-block">
+        <v-row align="start">
+          <v-tooltip
+            bottom
+            :color="colorFrom.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                :color="
+                  isEditor
+                    ? colorFrom.$primary_button
+                    : colorFrom.$accent_ui_color
+                "
+                :disabled="loading"
+                v-on="on"
+                @click="changeInputMode"
               >
-                • Node: {{ item }}
-              </div>
-              <div v-if="parentNodes.length === 0">
-                Empty
-              </div>
-            </div>
-            <div
-              ref="popupContentTabChildren"
-              :class="{ active: popupNodeCurrentTab === 1 }"
-            >
-              <div
-                v-for="item in childrenNodes"
-                :key="item"
-              >
-                • Node: {{ item }}
-              </div>
-              <div v-if="childrenNodes.length === 0">
-                Empty
-              </div>
-            </div>
-          </div>
-        </div>
+                {{ iconArrowAll }}
+              </v-icon>
+            </template>
+            <span>Перемещение по графу</span>
+          </v-tooltip>
 
-        <div
-          ref="edgePopupContent"
-          class="popupContent"
-          style="text-align: center"
-          tabindex="0"
-        >
-          <div style="display: inline-block">
-            <div
-              data-id="sourceName"
-              style="font-weight: bold; float: left"
-            />
-            <div style="float: left; margin-left: 5px; margin-right: 5px">
-              ->
+          <v-tooltip
+            bottom
+            :color="colorFrom.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                :color="colorFrom.$accent_ui_color"
+                :disabled="loading"
+                v-on="on"
+                @click="zoomIn"
+              >
+                {{ mdiMagnifyPlus }}
+              </v-icon>
+            </template>
+            <span>Увеличить</span>
+          </v-tooltip>
+
+          <v-tooltip
+            bottom
+            :color="colorFrom.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                :color="colorFrom.$accent_ui_color"
+                :disabled="loading"
+                v-on="on"
+                @click="zoomOut"
+              >
+                {{ mdiMagnifyMinus }}
+              </v-icon>
+            </template>
+            <span>Уменьшить</span>
+          </v-tooltip>
+
+          <v-tooltip
+            bottom
+            :color="colorFrom.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                :color="colorFrom.$accent_ui_color"
+                :disabled="loading"
+                v-on="on"
+                @click="fitContent"
+              >
+                {{ mdiFitToPageOutline }}
+              </v-icon>
+            </template>
+            <span>Выровнять</span>
+          </v-tooltip>
+        </v-row>
+      </div>
+      <div
+        ref="graph"
+        :key="idFrom"
+        class="ygraph-component-container"
+        :style="{ top: `${top}` }"
+      >
+        <div class="popupContainer">
+          <div
+            ref="nodePopupContent"
+            class="popupContent"
+            tabindex="0"
+          >
+            <div class="popupContentTitle">
+              <div data-id="node" />
+              <div
+                data-id="node_description"
+                style="font-size: 0.9rem"
+              />
             </div>
-            <div
-              data-id="targetName"
-              style="font-weight: bold; float: left"
-            />
+            <div class="popupContentTabsHeader">
+              <div
+                :class="{ active: popupNodeCurrentTab === 0 }"
+                @click="popupNodeCurrentTab = 0"
+              >
+                Parents
+              </div>
+              <div
+                :class="{ active: popupNodeCurrentTab === 1 }"
+                @click="popupNodeCurrentTab = 1"
+              >
+                Children
+              </div>
+            </div>
+            <div class="popupContentTabs">
+              <div
+                ref="popupContentTabParents"
+                :class="{ active: popupNodeCurrentTab === 0 }"
+              >
+                <div
+                  v-for="item in parentNodes"
+                  :key="item"
+                >
+                  • Node: {{ item }}
+                </div>
+                <div v-if="parentNodes.length === 0">
+                  Empty
+                </div>
+              </div>
+              <div
+                ref="popupContentTabChildren"
+                :class="{ active: popupNodeCurrentTab === 1 }"
+              >
+                <div
+                  v-for="item in childrenNodes"
+                  :key="item"
+                >
+                  • Node: {{ item }}
+                </div>
+                <div v-if="childrenNodes.length === 0">
+                  Empty
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            ref="edgePopupContent"
+            class="popupContent"
+            style="text-align: center"
+            tabindex="0"
+          >
+            <div style="display: inline-block">
+              <div
+                data-id="sourceName"
+                style="font-weight: bold; float: left"
+              />
+              <div style="float: left; margin-left: 5px; margin-right: 5px">
+                ->
+              </div>
+              <div
+                data-id="targetName"
+                style="font-weight: bold; float: left"
+              />
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -386,6 +397,7 @@ class HTMLPopupSupport {
 
 export default {
   name: 'DashYGraph',
+  inheritAttrs: false,
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -408,6 +420,18 @@ export default {
       type: Boolean,
       default: true,
     }, // сообщает что компонент в режиме получения данных
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -485,6 +509,21 @@ export default {
     colorFrom() {
       this.colorFont();
     },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.createGraph();
+        if (this.dataRestFrom.length) {
+          setTimeout(() => {
+            this.generateNodesEdges(this.dataRestFrom);
+            this.applyGraphBuilder();
+            this.colorFont();
+            this.colorNodes();
+            this.colorEdges();
+            this.fitContent();
+          }, 100);
+        }
+      });
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -492,6 +531,7 @@ export default {
       idDash: this.idDashFrom,
       id: this.idFrom,
     });
+
     this.createGraph();
     if (this.dataRestFrom.length) {
       setTimeout(() => {
@@ -930,14 +970,16 @@ export default {
       return mode;
     },
     createGraph() {
-      this.labelStyleList = {}; // варианты labelStyle
-      this.edgeStyleList = {};
-      this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
-      this.$graphComponent.inputMode = this.initMode();
+      this.$nextTick(() => {
+        this.labelStyleList = {}; // варианты labelStyle
+        this.edgeStyleList = {};
+        this.$graphComponent = new yfile.GraphComponent(this.$refs.graph);
+        this.$graphComponent.inputMode = this.initMode();
 
-      this.initializeDefaultStyles();
-      this.initializeTooltips();
-      this.initializePopups();
+        this.initializeDefaultStyles();
+        this.initializeTooltips();
+        this.initializePopups();
+      });
     },
     initializePopups() {
       // Creates a label model parameter that is used to position the node pop-up
