@@ -5,26 +5,40 @@
       style="align-items: normal"
     >
       <v-row class="ma-0">
-        <v-btn
-          rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
-          @click="toggleSelect = !toggleSelect"
+        <v-menu
+          v-model="toggleSelect"
+          z-index="1"
         >
-          Режим
-        </v-btn>
-        <v-select
-          :value="options.mode"
-          :menu-props="{ value: toggleSelect }"
-          :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-          :items="mode"
-          label="Режим"
-          multiple
-          @change="updatePipeDataSource($event)"
-        />
+          <template v-slot:activator="{ on:menu }">
+            <v-btn
+              rounded
+              :style="`
+              background: ${theme.$secondary_bg};
+               color: ${theme.$main_text};
+               pointer-events: auto`"
+              v-on="menu"
+              @click="toggleSelect = !toggleSelect"
+            >
+              Режим
+            </v-btn>
+            <v-select
+              :value="options.mode"
+              :menu-props="{ value:toggleSelect }"
+              :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+              :items="mode"
+              label="Режим"
+              multiple
+              @change="updatePipeDataSource($event)"
+            />
+          </template>
+        </v-menu>
         <v-spacer />
         <v-btn
           rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+          :style="`
+          background: ${theme.$secondary_bg};
+           color: ${theme.$main_text};
+           pointer-events: auto`"
           @click="$emit('openSettingsModal')"
         >
           <v-icon :style="{ color: theme.$main_text }">
@@ -41,7 +55,7 @@
       >
         <v-spacer />
         <v-card
-          style="max-height: 466px"
+          style="max-height: 466px; pointer-events: auto"
           max-width="280"
           class="px-5 pb-5"
           :color="theme.$main_bg"
@@ -197,10 +211,7 @@
 
 <script>
 import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
-// import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.tilelayer.colorfilter';
-import 'leaflet.markercluster';
 
 export default {
   name: 'DashMapUserSettingsContainer',
@@ -217,7 +228,6 @@ export default {
       type: Object,
       required: true,
     },
-    // library: Object
   },
   data() {
     return {
@@ -258,7 +268,6 @@ export default {
         selected: 'яндекс',
         selectedLayer: '',
         zoomLevel: 10,
-        zoomStep: 0.01,
         initialPoint: {
           x: 59.242065955847735,
           y: 74.35169122692963,
@@ -355,22 +364,6 @@ export default {
   },
   mounted() {
     const options = JSON.parse(JSON.stringify(this.getOptions));
-    this.tileLayers[0].tile = options.osmserver;
-    // init store for reactivity
-    if (!options.showLegend || !options.initialPoint) {
-      const initOptions = {
-        showLegend: true,
-        zoomLevel: this.options.zoomLevel,
-        zoomStep: this.options.zoomStep,
-        selectedLayer: this.options.selectedLayer,
-        initialPoint: this.options.initialPoint,
-      };
-      this.$store.commit('setOptions', {
-        idDash: this.idDashFrom,
-        id: this.idElement,
-        options: initOptions,
-      });
-    }
     if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
       this.options = JSON.parse(JSON.stringify(options));
     }
@@ -489,7 +482,8 @@ export default {
   height: 100%
   position: absolute
   right: 0
-  z-index: 400
+  z-index: 401
+  pointer-events: none
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
