@@ -506,6 +506,9 @@ export default {
       elemType: 'number',
       elemMin: 0,
       placeholder: 'Не указано',
+      onChange(val) {
+        return val !== null ? Math.abs(+val) : null;
+      },
     },
     {
       option: 'stringOX',
