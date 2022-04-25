@@ -375,7 +375,6 @@ export default {
           value: this.options.initialPoint.y,
         }]);
         this.dialog = true;
-        // this.map.off('click', clickEvent);
         this.map.stopEvents('click');
       };
       this.map.setEvents([
@@ -386,7 +385,6 @@ export default {
           },
         },
       ]);
-      // this.map.on('click', clickEvent);
     },
     updatePipeDataSource() {
       if (this.options.search) {
