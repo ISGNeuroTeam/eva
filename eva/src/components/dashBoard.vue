@@ -240,7 +240,7 @@
                       </div>
                     </div>
                   </v-card-title>
-                  <portal-target :name="element" />
+                  <portal-target :name="`${element}`" />
                   <!--<v-card-text
                     :is="currentElem"
                     v-if="showElement"
@@ -773,20 +773,6 @@ export default {
     },
   },
   watch: {
-    fullScreenMode(to) {
-      // const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
-      // if (this.dataElemFrom === 'piechart') {
-      //   this.$nextTick(() => {
-      //     // this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
-      //   });
-      // }
-      // setTimeout(() => {
-      //   this.disabledTooltip = to;
-      // }, to ? 0 : 600);
-      // this.$nextTick(() => {
-      //   // this.$refs[refNameComponent].$emit('fullScreenMode', to);
-      // });
-    },
     settingsIsOpened(to) {
       setTimeout(() => {
         this.disabledTooltip = to;

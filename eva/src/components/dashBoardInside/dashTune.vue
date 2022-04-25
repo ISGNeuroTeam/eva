@@ -1,75 +1,80 @@
 <template>
-  <div
-    ref="container"
-    class="dash-map"
-    :class="{ 'full-screen': isFullScreen || circularResize, 'min-size': minSize }"
-    :style="{ zoom: needSetField ? 1 : htmlZoom }"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
-    <div v-if="needSetField">
-      <v-select
-        v-model="dataField"
-        :dark="isDarkTheme"
-        :items="fieldList"
-        label="Столбец данных"
-        outlined
-      />
-    </div>
     <div
-      v-else
-      class="flex flex-grow-1 justify-center align-center"
-      :class="{ row: vertical }"
+      ref="container"
+      class="dash-map"
+      :class="getClasses"
+      :style="getStyles"
     >
-      <div class="flex-grow-0">
-        <v-slider
-          v-model="sliderValue"
-          :class="{ 'slider-vertical': vertical }"
-          :dark="true"
-          :disabled="loading || values.length === 0"
-          :min="0"
-          :max="values.length - 1"
-          :vertical="vertical"
-          :color="theme.$primary_button"
-          ticks="always"
-          @change="onChangeSlider"
+      <div v-if="needSetField">
+        <v-select
+          v-model="dataField"
+          :dark="isDarkTheme"
+          :items="fieldList"
+          label="Столбец данных"
+          outlined
         />
       </div>
-      <div class="pt-4 d-flex flex-column align-center">
-        <v-progress-circular
-          :rotate="360"
-          :size="circularSize"
-          :width="circularWidth"
-          :value="percentValue"
-          :color="loading ? theme.$secondary_border : theme.$primary_button"
-          :class="value === 0 ? 'dash-map__min-value' : ''"
-        >
-          <div v-if="!loading">
-            <span class="text-h4">{{ value }}%</span>
-          </div>
-        </v-progress-circular>
-        <div class="pa-4">
-          <div>
-            <v-btn
-              :dark="isDarkTheme"
-              :color="theme.$primary_button"
-              :disabled="isMinimumValue"
-              @click="addValue(-1)"
-            >
-              <v-icon>{{ icons.minus }}</v-icon>
-            </v-btn>
-            <v-btn
-              :dark="isDarkTheme"
-              :color="theme.$primary_button"
-              class="ml-2"
-              :disabled="isMaximumValue"
-              @click="addValue(1)"
-            >
-              <v-icon>{{ icons.plus }}</v-icon>
-            </v-btn>
+      <div
+        v-else
+        class="flex flex-grow-1 justify-center align-center"
+        :class="{ row: vertical }"
+      >
+        <div class="flex-grow-0">
+          <v-slider
+            v-model="sliderValue"
+            :class="{ 'slider-vertical': vertical }"
+            :dark="true"
+            :disabled="loading || values.length === 0"
+            :min="0"
+            :max="values.length - 1"
+            :vertical="vertical"
+            :color="theme.$primary_button"
+            ticks="always"
+            @change="onChangeSlider"
+          />
+        </div>
+        <div class="pt-4 d-flex flex-column align-center">
+          <v-progress-circular
+            :rotate="360"
+            :size="circularSize"
+            :width="circularWidth"
+            :value="percentValue"
+            :color="loading ? theme.$secondary_border : theme.$primary_button"
+            :class="value === 0 ? 'dash-map__min-value' : ''"
+          >
+            <div v-if="!loading">
+              <span class="text-h4">{{ value }}%</span>
+            </div>
+          </v-progress-circular>
+          <div class="pa-4">
+            <div>
+              <v-btn
+                :dark="isDarkTheme"
+                :color="theme.$primary_button"
+                :disabled="isMinimumValue"
+                @click="addValue(-1)"
+              >
+                <v-icon>{{ icons.minus }}</v-icon>
+              </v-btn>
+              <v-btn
+                :dark="isDarkTheme"
+                :color="theme.$primary_button"
+                class="ml-2"
+                :disabled="isMaximumValue"
+                @click="addValue(1)"
+              >
+                <v-icon>{{ icons.plus }}</v-icon>
+              </v-btn>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -77,6 +82,8 @@ import { mdiMinus, mdiPlus } from '@mdi/js';
 import { mapActions, mapMutations } from 'vuex';
 
 export default {
+  name: 'DashTune',
+  inheritAttrs: false,
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -103,14 +110,22 @@ export default {
       type: Boolean,
       default: false,
     },
-    widthFrom: {
-      type: Number,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
       required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // высота родительского компонента
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -132,14 +147,14 @@ export default {
   },
   computed: {
     circularSize() {
-      if (this.widthFrom > 775 && this.heightFrom > 775) {
-        return this.heightFrom - 177;
+      if (this.sizeFrom.width > 775 && this.sizeFrom.height > 775) {
+        return this.sizeFrom.height - 177;
       }
-      if (this.widthFrom > 200 && this.heightFrom > 200) {
-        if (this.widthFrom < this.heightFrom) {
-          return this.widthFrom - 147;
+      if (this.sizeFrom.width > 200 && this.sizeFrom.height > 200) {
+        if (this.sizeFrom.width < this.sizeFrom.height) {
+          return this.sizeFrom.width - 147;
         }
-        return this.heightFrom - 147;
+        return this.sizeFrom.height - 147;
       }
       return 60;
     },
@@ -147,19 +162,19 @@ export default {
       return this.circularSize / 10;
     },
     circularResize() {
-      return this.circularSize > 400 && this.heightFrom > 775 && this.widthFrom > 775;
+      return this.circularSize > 400 && this.sizeFrom.height > 775 && this.sizeFrom.width > 775;
     },
     minSize() {
-      return this.widthFrom < 300 || this.heightFrom < 300;
+      return this.sizeFrom.width < 300 || this.sizeFrom.height < 300;
     },
     htmlZoom() {
-      const size = this.$attrs.heightFrom < this.$attrs.widthFrom
-        ? this.$attrs.heightFrom
-        : this.$attrs.widthFrom;
+      const size = this.sizeFrom.height < this.sizeFrom.width
+        ? this.sizeFrom.height
+        : this.sizeFrom.width;
       return size / 370;
     },
     isFullScreen() {
-      return this.$attrs['is-full-screen'];
+      return this.fullScreenMode;
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idFrom];
@@ -220,6 +235,12 @@ export default {
     },
     changedInputData() {
       return this.$store.state[this.idDashFrom][this.idFrom]?.switch;
+    },
+    getStyles() {
+      return `${this.customStyle}${this.needSetField ? ' zoom: 1' : ` zoom: ${this.htmlZoom}`}`;
+    },
+    getClasses() {
+      return `${this.customClass} ${this.isFullScreen || this.circularResize ? 'full-screen ' : ''} ${this.minSize ? 'min-size' : ''}`;
     },
   },
   watch: {
@@ -290,19 +311,12 @@ export default {
       id: this.idFrom,
     });
     this.$nextTick(() => {
-      this.circularSizeNew();
       this.loadSelectedValue();
     });
   },
   methods: {
     ...mapActions(['actionGetElementSelected']),
     ...mapMutations(['setElementSelected']),
-    circularSizeNew() {
-      if (this.$attrs['is-full-screen']) {
-        this.circularWidth = 40;
-        this.circularSize = 450;
-      }
-    },
     addValue(val) {
       // +/- buttons
       this.sliderValue += val;
