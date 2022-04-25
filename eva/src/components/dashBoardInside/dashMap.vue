@@ -39,9 +39,6 @@
 </template>
 
 <script>
-// import 'leaflet/dist/leaflet.css';
-// import 'leaflet.tilelayer.colorfilter';
-// import 'leaflet.markercluster';
 import DashMapUserSettingsContainer from './dashMapUserSettings/DashMapUserSettingsContainer.vue';
 import dashMapUserSettingsNew from './dashMapUserSettings/dashMapUserSettings.vue';
 import store from '../../store/index'; // подключаем файл с настройками хранилища Vuex
@@ -104,10 +101,7 @@ export default {
       cluster: null,
       clusterPosition: null,
       clusterPositionItems: null,
-      // clusterDelimiter: null,
-      // isLegendGenerated: false,
       isSettings: false,
-      // startingPoint: [],
       mode: [],
       leftBottom: 0,
       rightTop: 0,
@@ -272,7 +266,6 @@ export default {
       }
     },
     async getDataFromRest(event) {
-      // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {
         search: event.sid,
         idDash: this.idDash,
@@ -389,7 +382,6 @@ export default {
         // get all icons that we need on map
         this.generateLibrary(dataRest, this.options?.primitivesLibrary);
         this.map.generateClusterPositionItems();
-        // this.initSettings();
         if (!this.error && dataRest.length > 0) {
           // создаем элемент карты
           this.map.createMap(this.maptheme);
