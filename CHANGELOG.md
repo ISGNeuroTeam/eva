@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Feature
 - Created map class
 
+### Fixed
+- fixed maps mode
+
 ## [1.88.0]
 
 ### Feature
