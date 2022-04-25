@@ -6,17 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [UNRELEASED]
+## [Unrelise]
+
 ### Feature
+- Created map class
 - additional export
 
+### Fixed
+- fixed maps mode
 
 ## [1.88.0]
 
 ### Feature
 - Added hotkey for query window in data research v2
+- Created guntt class
 
 ### Fixed
+- fix export link
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings

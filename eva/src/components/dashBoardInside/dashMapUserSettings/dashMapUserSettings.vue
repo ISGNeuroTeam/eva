@@ -76,9 +76,9 @@
         <v-slider
           v-model="options.zoomStep"
           class="align-center"
-          max="1"
-          min="0.01"
-          step="0.01"
+          max="100"
+          min="1"
+          step="1"
         >
           <template v-slot:label>
             <v-text-field
@@ -174,7 +174,6 @@
 
 <script>
 import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
-import L from 'leaflet';
 
 export default {
   name: 'DashMapUserSettings',
@@ -208,7 +207,7 @@ export default {
         selected: 'яндекс',
         selectedLayer: null,
         zoomLevel: 10,
-        zoomStep: 0.01,
+        zoomStep: 1,
         initialPoint: {
           x: 59.242065955847735,
           y: 74.35169122692963,
@@ -345,36 +344,49 @@ export default {
   methods: {
     updateTileLayer(e) {
       if (e?.tile) {
-        this.map.removeLayer(this.currentTile);
+        this.map.removeLayer({});
         if (typeof e.tile === 'string') {
           let temp = e.tile;
           temp = [temp];
-          this.currentTile = L.tileLayer(...temp);
-          this.map.addLayer(this.currentTile);
+          this.map.addLayer(temp);
           this.updateOptions({ selectedLayer: temp[0] || null });
           return;
         }
-        this.currentTile = L.tileLayer(...e.tile);
-        this.map.addLayer(this.currentTile);
+        this.map.addLayer(e.tile);
         this.updateOptions({ selectedLayer: e.tile[0] || null });
       }
     },
     onClickChoosingCoordinates() {
       const cursorCssClass = 'cursor-crosshair';
       this.dialog = false;
-      // eslint-disable-next-line no-underscore-dangle
-      L.DomUtil.addClass(this.map._container, cursorCssClass);
+      this.map.addClass(cursorCssClass);
       const clickEvent = (event) => {
-        this.dialog = true;
-        // eslint-disable-next-line no-underscore-dangle
-        L.DomUtil.removeClass(this.map._container, cursorCssClass);
+        this.map.removeClass(cursorCssClass);
         this.options.initialPoint.x = event.latlng.lat;
         this.options.initialPoint.y = event.latlng.lng;
-        this.map.off('click', clickEvent);
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options.initialPoint,
+          prop: 'x',
+          value: this.options.initialPoint.x,
+        }]);
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options.initialPoint,
+          prop: 'y',
+          value: this.options.initialPoint.y,
+        }]);
+        this.dialog = true;
+        this.map.stopEvents('click');
       };
-      this.map.on('click', clickEvent);
+      this.map.setEvents([
+        {
+          event: 'click',
+          callback: (e) => {
+            clickEvent(e);
+          },
+        },
+      ]);
     },
-    updatePipeDataSource(e) {
+    updatePipeDataSource() {
       if (this.options.search) {
         this.$emit('updatePipeDataSource', this.options.search);
       }
