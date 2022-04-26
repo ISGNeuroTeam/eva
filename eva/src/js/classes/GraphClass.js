@@ -102,6 +102,29 @@ class GraphClass {
     }
   }
 
+  static updateEdgePopupContent(edgePopup, edge) {
+    // get business data from node tags
+    const target = {
+      sourceName: edge.sourcePort.owner.tag,
+      targetName: edge.targetPort.owner.tag,
+    };
+
+    // get all divs in the pop-up
+    const divs = edgePopup.div.getElementsByTagName('div');
+    for (let i = 0; i < divs.length; i += 1) {
+      const div = divs.item(i);
+      if (div.hasAttribute('data-id')) {
+        // if div has a 'data-id' attribute, get content from the business data
+        const id = div.getAttribute('data-id');
+        const data = target[id];
+        if (data) {
+          const label = data.node || data.label;
+          div.textContent = `Node: ${label}`;
+        }
+      }
+    }
+  }
+
   options = {
     labelStyleList: {}, // варианты labelStyle
     edgeStyleList: {},
@@ -321,14 +344,14 @@ class GraphClass {
     });
   }
 
-  initializePopups(nodePopupElem, edgePopupElem) {
+  initializePopups({ nodePopupContent, edgePopupContent, callback }) {
     // Creates a label model parameter that is used to position the node pop-up
     const nodeLabelModel = new ExteriorLabelModel({ insets: 10 });
 
     // Creates the pop-up for the node pop-up template
     const nodePopup = new HTMLPopupSupport(
       this.graphComponent,
-      nodePopupElem,
+      nodePopupContent,
       nodeLabelModel.createParameter(ExteriorLabelModelPosition.NORTH),
     );
 
@@ -339,7 +362,7 @@ class GraphClass {
     // Creates the pop-up for the edge pop-up template
     const edgePopup = new HTMLPopupSupport(
       this.graphComponent,
-      edgePopupElem,
+      edgePopupContent,
       edgeLabelModel.createDefaultParameter(),
     );
 
@@ -350,7 +373,6 @@ class GraphClass {
     inputMode.focusableItems = GraphItemTypes.NODE || GraphItemTypes.EDGE;
 
     // Register a listener that shows the pop-up for the currentItem
-    // TODO: Разобраться с ивентом
     this.graphComponent.addCurrentItemChangedListener(() => {
       const item = this.graphComponent.currentItem;
       if (item instanceof INode) {
@@ -370,6 +392,7 @@ class GraphClass {
         nodePopup.currentItem = null;
         edgePopup.currentItem = null;
       }
+      callback(this.currentNode);
     });
 
     // On press of the ESCAPE key, set currentItem to <code>null</code> to hide the pop-ups
@@ -378,6 +401,7 @@ class GraphClass {
       ModifierKeys.NONE,
       (command, parameter, source) => {
         this.currentNode = null;
+        callback(this.currentNode);
         source.currentItem = null;
         return true;
       },
@@ -586,10 +610,14 @@ class GraphClass {
     });
   }
 
-  initializeDefault({ nodePopupContent, edgePopupContent }) {
+  initializeDefault({ nodePopupContent, edgePopupContent, callback }) {
     this.initializeDefaultStyles();
     this.initializeTooltips();
-    this.initializePopups(nodePopupContent, edgePopupContent);
+    this.initializePopups({
+      nodePopupContent,
+      edgePopupContent,
+      callback,
+    });
   }
 
   reDrawNodesEdges(data, callback) {

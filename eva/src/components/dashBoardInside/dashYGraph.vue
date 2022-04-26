@@ -219,6 +219,7 @@ export default {
         { name: 'mouseover', capture: [] },
       ],
       popupNodeCurrentTab: 0,
+      currentNode: null,
     };
   },
   computed: {
@@ -233,13 +234,14 @@ export default {
       return this.idDashFrom;
     },
     parentNodes() {
-      if (!this.graph?.currentNode || !this.graph?.currentNode.id) return [];
+      if (!this.currentNode || !this.currentNode.id) return [];
       return this.dataRestFrom
-        .filter((item) => `${item.relation_id}` === `${this.graph?.currentNode.id}`)
+        .filter((item) => `${item.relation_id}` === `${this.currentNode.id}`)
         .map((item) => item.node);
     },
     childrenNodes() {
-      const node = this.graph?.currentNode;
+      if (!this.currentNode || !this.currentNode.id) return [];
+      const node = this.currentNode;
       if (!node || !node.relation_id) return [];
       // eslint-disable-next-line camelcase
       const relation_ids = [];
@@ -400,6 +402,9 @@ export default {
       this.graph.initializeDefault({
         nodePopupContent: this.$refs.nodePopupContent,
         edgePopupContent: this.$refs.edgePopupContent,
+        callback: (currentNode) => {
+          this.currentNode = currentNode;
+        },
       });
     },
   },
