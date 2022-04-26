@@ -462,26 +462,9 @@ export default {
               id: search.id,
               status: 'pending',
             });
-            this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
-              .then((res) => {
-                if (res?.length === 0) {
-                  this.$store.commit('setState', [{
-                    object: this.$store.state,
-                    prop: 'logError',
-                    value: true,
-                  }]);
-                }
-                this.$store.commit('updateSearchStatus', {
-                  idDash: this.idDash,
-                  sid: search.sid,
-                  id: search.id,
-                  status: res.length ? 'downloaded' : 'nodata',
-                });
-                this.$set(this.dataObject[search.id], 'data', res);
-                this.$set(this.dataObject[search.id], 'loading', false);
-                this.$set(this.dataObjectConst[search.id], 'data', res);
-                this.$set(this.dataObjectConst[search.id], 'loading', false);
-              });
+            this.$nextTick(() => {
+              this.getData(search);
+            });
           }
         });
       },
@@ -503,6 +486,28 @@ export default {
     window.onresize = this.checkTabOverflow;
   },
   methods: {
+    getData(search) {
+      this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
+        .then((res) => {
+          if (res?.length === 0) {
+            this.$store.commit('setState', [{
+              object: this.$store.state,
+              prop: 'logError',
+              value: true,
+            }]);
+          }
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            id: search.id,
+            status: res.length ? 'downloaded' : 'nodata',
+          });
+          this.$set(this.dataObject[search.id], 'data', res);
+          this.$set(this.dataObject[search.id], 'loading', false);
+          this.$set(this.dataObjectConst[search.id], 'data', res);
+          this.$set(this.dataObjectConst[search.id], 'loading', false);
+        });
+    },
     getElementSourceId(searchId) {
       return this.searches.find((search) => search.id === searchId)?.id || '';
     },
