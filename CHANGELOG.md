@@ -7,20 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrelise]
 
-### Feature
+### Added
 - Created guntt class
 - Created piechart class
-
-### Fixed
-- fix export link
-
-## [Unrelise]
-
-### Feature
+- Created graph class 
 - Created map class
 
 ### Fixed
 - fixed maps mode
+- fix export link
 
 ## [1.88.0]
 
