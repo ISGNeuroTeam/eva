@@ -418,13 +418,6 @@ export default {
               minYMetric = allMinYMetric < 0 ? allMinYMetric : 0;
             } else if (minYMetric > 0) {
               minYMetric = 0;
-            } else {
-              // round
-              if (minYMetric < 0) {
-                minYMetric -= Math.abs(minYMetric - maxYMetric) * 0.1;
-              } else {
-                minYMetric += Math.abs(minYMetric - maxYMetric) * 0.1;
-              }
             }
           }
         }
@@ -436,28 +429,35 @@ export default {
           // если у метрики только одно значение
           if (maxYMetric === minYMetric) {
             maxYMetric += Math.abs(maxYMetric) * 0.1;
-          } else {
-            if (opt.manual) {
-              if (opt.upborder) {
-                maxYMetric = +opt.upborder;
-              }
-              if (opt.lowborder) {
-                minYMetric = +opt.lowborder;
-              }
-            }
-            maxYMetric += Math.abs(maxYMetric) * 0.1;
-          }
-        }
-        if (metricType === 'barplot') {
-          maxYMetric += Math.abs(maxYMetric) * 0.1;
-          if (minYMetric !== 0 && minYMetric < 0) {
             minYMetric -= Math.abs(minYMetric) * 0.1;
           }
-          if (maxYMetric < 0 && minYMetric < 0) {
-            maxYMetric = 0;
+
+          // вручную выставлены границы Y оси
+          if (opt.manualBorder) {
+            if (+opt.upborder > maxYMetric) {
+              maxYMetric = +opt.upborder;
+            }
+            if (+opt.lowborder < minYMetric) {
+              minYMetric = +opt.lowborder;
+            }
+          } else {
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            minYMetric -= Math.abs(minYMetric) * 0.1;
+          }
+        } else {
+          if (metricType === 'barplot') {
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            if (minYMetric !== 0 && minYMetric < 0) {
+              minYMetric -= Math.abs(minYMetric) * 0.1;
+            }
+            if (maxYMetric < 0 && minYMetric < 0) {
+              maxYMetric = 0;
+            }
+          } else {
+            // round
+            minYMetric -= Math.abs(minYMetric - maxYMetric) * 0.1;
           }
         }
-        minYMetric -= Math.abs(minYMetric) * 0.1;
 
         this.y[metric] = d3.scaleLinear()
           .range(united ? [yHeight, 0] : [yHeight + yHeight * i, yHeight * i])

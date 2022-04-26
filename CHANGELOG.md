@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed maps mode
+- Multiline. Some chart line display settings do not work
 
 ## [1.88.0]
 

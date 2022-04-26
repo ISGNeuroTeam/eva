@@ -343,7 +343,7 @@
                   background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                :disabled="metrics[i - 1].manual"
+                :disabled="!metrics[i - 1].manualBorder"
                 outlined
                 class="item-metric border"
                 hide-details
@@ -360,7 +360,7 @@
                   background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                :disabled="metrics[i - 1].manual"
+                :disabled="!metrics[i - 1].manualBorder"
                 outlined
                 class="item-metric border"
                 hide-details
@@ -465,11 +465,11 @@
                 </div>
               </div>
               <v-checkbox
-                v-model="metrics[i - 1].manual"
+                v-model="metrics[i - 1].manualBorder"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text }"
                 class="item-metric checkbox"
-                label="Автоматически/Вручную"
+                label="Установить границы"
                 hide-details
                 @change="isChanged = true"
               />
@@ -1389,7 +1389,7 @@ export default {
         type: '',
         upborder: 0,
         lowborder: 0,
-        manual: true,
+        manualBorder: false,
       });
       this.$set(this, 'metrics', arr);
     },
