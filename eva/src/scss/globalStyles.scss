@@ -110,12 +110,6 @@
         color: var(--main_text);
       }
     }
-    /* @todo: hotfix v1.86.1
-    & > * {
-      color: var(--main_text) !important;
-      caret-color: var(--main_text) !important;
-      border-color: var(--secondary_bg) !important;
-    }
     .v-tooltip__content {
       color: #FFFFFF !important;
       border: 2px solid rgb(43, 104, 177) !important;
@@ -133,6 +127,17 @@
     }
     &.v-label {
       color: var(--main_text) !important;
-    }*/
+    }
+    &.v-menu__content {
+      .v-list {
+        padding: 4px 0 !important;
+      }
+      .v-list-item {
+        min-height: 35px !important;
+        .v-list-item__content {
+          padding: 8px 0 !important;
+        }
+      }
+    }
   }
 }

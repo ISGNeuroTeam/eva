@@ -4,10 +4,12 @@
       <v-row align="start">
         <v-tooltip
           bottom
+          :light="false"
           :color="colorFrom.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon
+              :light="false"
               :color="
                 isEditor
                   ? colorFrom.$primary_button
@@ -25,10 +27,12 @@
 
         <v-tooltip
           bottom
+          :light="false"
           :color="colorFrom.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon
+              :light="false"
               :color="colorFrom.$accent_ui_color"
               :disabled="loading"
               v-on="on"
@@ -42,12 +46,14 @@
 
         <v-tooltip
           bottom
+          :light="false"
           :color="colorFrom.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon
               :color="colorFrom.$accent_ui_color"
               :disabled="loading"
+              :light="false"
               v-on="on"
               @click="zoomOut"
             >
@@ -59,10 +65,12 @@
 
         <v-tooltip
           bottom
+          :light="false"
           :color="colorFrom.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
             <v-icon
+              :light="false"
               :color="colorFrom.$accent_ui_color"
               :disabled="loading"
               v-on="on"
