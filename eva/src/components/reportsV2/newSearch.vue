@@ -98,6 +98,8 @@
         ref="searchs"
         v-model="searches"
         :options="cmOption"
+        class="search-block-codemirror"
+        :style="`height: 240px`"
       />
       <div class="search-block-footer">
         <div
@@ -116,6 +118,69 @@
           </div>
         </div>
         <div class="d-flex">
+          <div class="search-block-footer-settings">
+            <v-menu
+              offset-y
+              :close-on-content-click="false"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <div
+                  class="search-block-footer-settings__btn"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  Настройки поиска
+                  <v-icon :color="theme.$main_text">
+                    {{
+                      mdiChevronDown
+                    }}
+                  </v-icon>
+                </div>
+              </template>
+              <div class="search-block-footer-settings__search">
+                <div class="search-block-footer-settings__text">
+                  Автоперенос на новую строку
+                  <v-switch
+                    v-model="switch1"
+                    inset
+                  ></v-switch>
+                </div>
+                <v-menu
+                  :offset-x="true"
+                  :close-on-content-click="false"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <div
+                      class="search-block-footer-settings__text"
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      <div>
+                        Число отображаемых строк
+                        <v-icon :color="theme.$main_text">
+                          {{
+                            mdiChevronDown
+                          }}
+                        </v-icon>
+                      </div>
+                    </div>
+                  </template>
+                  <div class="search-block-footer-settings__search">
+                    <div
+                      v-for="item in searchSize"
+                      :key="item"
+                      class="search-block-footer-settings__text"
+                    >
+                      {{ item }} строк
+                    </div>
+                    <div class="search-block-footer-settings__text">
+                      Пользовательское значение
+                    </div>
+                  </div>
+                </v-menu>
+              </div>
+            </v-menu>
+          </div>
           <div class="date-time-picker-wrap mt-1 mr-5">
             <v-menu
               v-model="menuDropdown"
@@ -274,49 +339,14 @@ import {
 } from '@mdi/js';
 
 import { codemirror } from 'vue-codemirror';
-
 // language
 import 'codemirror/mode/python/python.js';
 
-// theme css
-import 'codemirror/theme/monokai.css';
-
-// require active-line.js
-import 'codemirror/addon/selection/active-line.js';
-
-// styleSelectedText
-import 'codemirror/addon/selection/mark-selection.js';
-import 'codemirror/addon/search/searchcursor.js';
-
-// hint
-import 'codemirror/addon/hint/show-hint.js';
-import 'codemirror/addon/hint/show-hint.css';
-import 'codemirror/addon/hint/javascript-hint.js';
-import 'codemirror/addon/selection/active-line.js';
-
-// highlightSelectionMatches
-import 'codemirror/addon/scroll/annotatescrollbar.js';
-import 'codemirror/addon/search/matchesonscrollbar.js';
-import 'codemirror/addon/search/match-highlighter.js';
-
-// keyMap
-import 'codemirror/mode/clike/clike.js';
-import 'codemirror/addon/edit/matchbrackets.js';
-import 'codemirror/addon/comment/comment.js';
-import 'codemirror/addon/dialog/dialog.js';
-import 'codemirror/addon/dialog/dialog.css';
-import 'codemirror/addon/search/search.js';
 import 'codemirror/keymap/sublime.js';
-
-// foldGutter
+// // foldGutter
 import 'codemirror/addon/fold/foldgutter.css';
-import 'codemirror/addon/fold/brace-fold.js';
-import 'codemirror/addon/fold/comment-fold.js';
-import 'codemirror/addon/fold/foldcode.js';
 import 'codemirror/addon/fold/foldgutter.js';
 import 'codemirror/addon/fold/indent-fold.js';
-import 'codemirror/addon/fold/markdown-fold.js';
-import 'codemirror/addon/fold/xml-fold.js';
 
 export default {
   components: {
@@ -380,10 +410,11 @@ export default {
         matchBrackets: true,
         showCursorWhenSelecting: true,
         theme: 'default',
-        // extraKeys: { Ctrl: 'autocomplete' },
         lineWrapping: true,
+        screenReaderLabel: 'asdlfksdhjfgjkpasdfgl',
       },
-      searches: 'fgh',
+      searches: '',
+      searchSize: [10, 15, 20, 30, 40, 50],
     };
   },
   computed: {
@@ -539,8 +570,12 @@ export default {
       this.timeRangeValue = `c ${this.dates[1]} по ${this.dates[0]}`;
     },
     backInput() {
+      // eslint-disable-next-line no-underscore-dangle
+      this.$refs.searchs._data.cminstance.doc.undo();
     },
     forwardInput() {
+      // eslint-disable-next-line no-underscore-dangle
+      this.$refs.searchs._data.cminstance.doc.redo();
     },
   },
 };
@@ -647,12 +682,45 @@ export default {
         text-transform: capitalize
         letter-spacing: 0.25px
 
+.search-block-codemirror
+  caret-color: $main_text
+  .CodeMirror
+    border-radius: 10px
+    border: 1px solid $secondary_border
+    background: $secondary_bg
+    color: $main_text
+    caret-color: $main_text
+    height: 100%
+  .CodeMirror-cursor
+    border-left: 1px solid $main_text
+  .CodeMirror-gutters
+    color: $main_text
+    background: $main_bg
 .search-block-footer
   .v-input
     padding-top: 0
     margin-top: 0
     .v-input__slot:before
       display: none
+  &-settings
+    &__search
+      padding: 6px
+    &__text
+      display: flex
+      align-items: center
+      font-size: 12px
+      cursor: pointer
+      .v-input
+        margin-left: 8px
+      .v-input--selection-controls
+        margin-top: 0
+        padding-top: 0
+      .v-input__slot
+        margin-bottom: 0
+      .v-messages
+        display: none
+      .v-input--selection-controls__input
+        margin-right: 0
 .action-btn
   .action-btn-text
     text-transform: capitalize
