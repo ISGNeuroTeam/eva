@@ -240,7 +240,9 @@
                       </div>
                     </div>
                   </v-card-title>
+
                   <portal-target :name="`${element}`" />
+
                   <!--<v-card-text
                     :is="currentElem"
                     v-if="showElement"
@@ -610,8 +612,8 @@ export default {
         tooltip: {},
         metricsMulti: [],
       },
-      fullScreenWidth: 0.8 * window.screen.width,
-      fullScreenHeight: 0.8 * window.screen.height,
+      fullScreenWidth: 0.8 * window.innerWidth,
+      fullScreenHeight: 0.8 * window.innerHeight,
       selectedPieIndex: -1,
       tuneValue: '',
       tuneSliderValue: '',

@@ -250,6 +250,14 @@ export default {
       },
       deep: true,
     },
+    'dashOptions.metricsRelation': {
+      deep: true,
+      handler(val, old) {
+        if (val && val !== old) {
+          this.changePieChart();
+        }
+      },
+    },
     sizeFrom: {
       deep: true,
       handler(val, old) {
@@ -413,16 +421,18 @@ export default {
                 this.setActiveLegendLine(this.selectedPie);
               });
             } else {
+              this.$nextTick(() => {
               // TODO: Поправить передачу параметров
-              this.createPieChart(
-                this.dataRestFrom,
-                this.dashSize,
-                metrics,
-                { width: 0, height: 0 },
-                positionlegend,
-                colorsPie,
-              ); // и собственно создаем график
-              this.setActiveLegendLine(this.selectedPie);
+                this.createPieChart(
+                  this.dataRestFrom,
+                  this.dashSize,
+                  metrics,
+                  { width: 0, height: 0 },
+                  positionlegend,
+                  colorsPie,
+                ); // и собственно создаем график
+                this.setActiveLegendLine(this.selectedPie);
+              });
             }
           }
         } else {
