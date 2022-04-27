@@ -26,6 +26,42 @@
         <v-btn
           class="action-btn"
           text
+          @click="backInput"
+        >
+          <v-icon
+            class="action-btn-icon"
+            :style="{ color: theme.$main_text }"
+          >
+            {{ mdiArrowLeftThick }}
+          </v-icon>
+          <span
+            class="action-btn-text"
+            :style="{ color: theme.$main_text }"
+          >
+            Назад
+          </span>
+        </v-btn>
+        <v-btn
+          class="action-btn"
+          text
+          @click="forwardInput"
+        >
+          <span
+            class="action-btn-text"
+            :style="{ color: theme.$main_text }"
+          >
+            Вперед
+          </span>
+          <v-icon
+            class="action-btn-icon"
+            :style="{ color: theme.$main_text }"
+          >
+            {{ mdiArrowRightThick }}
+          </v-icon>
+        </v-btn>
+        <v-btn
+          class="action-btn"
+          text
           @click="refreshInput"
         >
           <span
@@ -57,6 +93,11 @@
         row-height="15"
         @keyup.ctrl.\="addLineBreaks"
         @keyup.ctrl.enter.prevent="keypressCtrlEnter"
+      />
+      <codemirror
+        ref="searchs"
+        v-model="searches"
+        :options="cmOption"
       />
       <div class="search-block-footer">
         <div
@@ -228,9 +269,59 @@ import {
   mdiChevronDown,
   mdiCalendarMonthOutline,
   mdiCheck,
+  mdiArrowLeftThick,
+  mdiArrowRightThick,
 } from '@mdi/js';
 
+import { codemirror } from 'vue-codemirror';
+
+// language
+import 'codemirror/mode/python/python.js';
+
+// theme css
+import 'codemirror/theme/monokai.css';
+
+// require active-line.js
+import 'codemirror/addon/selection/active-line.js';
+
+// styleSelectedText
+import 'codemirror/addon/selection/mark-selection.js';
+import 'codemirror/addon/search/searchcursor.js';
+
+// hint
+import 'codemirror/addon/hint/show-hint.js';
+import 'codemirror/addon/hint/show-hint.css';
+import 'codemirror/addon/hint/javascript-hint.js';
+import 'codemirror/addon/selection/active-line.js';
+
+// highlightSelectionMatches
+import 'codemirror/addon/scroll/annotatescrollbar.js';
+import 'codemirror/addon/search/matchesonscrollbar.js';
+import 'codemirror/addon/search/match-highlighter.js';
+
+// keyMap
+import 'codemirror/mode/clike/clike.js';
+import 'codemirror/addon/edit/matchbrackets.js';
+import 'codemirror/addon/comment/comment.js';
+import 'codemirror/addon/dialog/dialog.js';
+import 'codemirror/addon/dialog/dialog.css';
+import 'codemirror/addon/search/search.js';
+import 'codemirror/keymap/sublime.js';
+
+// foldGutter
+import 'codemirror/addon/fold/foldgutter.css';
+import 'codemirror/addon/fold/brace-fold.js';
+import 'codemirror/addon/fold/comment-fold.js';
+import 'codemirror/addon/fold/foldcode.js';
+import 'codemirror/addon/fold/foldgutter.js';
+import 'codemirror/addon/fold/indent-fold.js';
+import 'codemirror/addon/fold/markdown-fold.js';
+import 'codemirror/addon/fold/xml-fold.js';
+
 export default {
+  components: {
+    codemirror,
+  },
   props: {
     data: {
       type: Array,
@@ -255,6 +346,8 @@ export default {
       mdiChevronDown,
       mdiCheck,
       mdiCalendarMonthOutline,
+      mdiArrowLeftThick,
+      mdiArrowRightThick,
       timeRangeValue: 'За все время',
       menuCalendar: false,
       menuDropdown: false,
@@ -269,6 +362,28 @@ export default {
         { text: 'Последние 7 дней', timeHours: 168 },
         { text: 'Последние 30 дней', timeHours: 720 },
       ],
+      cmOption: {
+        tabSize: 4,
+        styleActiveLine: false,
+        lineNumbers: true,
+        styleSelectedText: false,
+        line: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
+        mode: 'text/x-python',
+        // hint.js options
+        hintOptions: {
+          completeSingle: false,
+        },
+        keyMap: 'sublime',
+        matchBrackets: true,
+        showCursorWhenSelecting: true,
+        theme: 'default',
+        // extraKeys: { Ctrl: 'autocomplete' },
+        lineWrapping: true,
+      },
+      searches: 'fgh',
     };
   },
   computed: {
@@ -423,12 +538,17 @@ export default {
     sortDates() {
       this.timeRangeValue = `c ${this.dates[1]} по ${this.dates[0]}`;
     },
+    backInput() {
+    },
+    forwardInput() {
+    },
   },
 };
 </script>
 
 <style lang="sass">
 @import ./../../sass/_colors
+@import 'codemirror/lib/codemirror'
 
 .textarea
   max-height: 420px
