@@ -64,7 +64,7 @@
             "
             @mouseover="hoverLegendLine(idx)"
             @mouseleave="hoverLegendLine(-1)"
-            @click="selectedPie = idx"
+            @click.stop="selectedPie = idx"
           >
             <div
               class="square"
@@ -236,7 +236,7 @@ export default {
   watch: {
     'dashOptions.colorsPie': {
       handler(val, old) {
-        if (val && val !== old) {
+        if (val && JSON.stringify(val) !== JSON.stringify(old)) {
           this.changePieChart();
         }
       },
@@ -245,7 +245,7 @@ export default {
     'dashOptions.positionlegend': {
       handler(val, old) {
         if (val && val !== old) {
-          this.changePieChart();
+          this.piechart.changeSize(this.calculatedSize(this.legendSize()));
         }
       },
       deep: true,
@@ -261,8 +261,9 @@ export default {
     sizeFrom: {
       deep: true,
       handler(val, old) {
-        if (val !== old && this.piechart) {
+        if (JSON.stringify(val) !== JSON.stringify(old) && this.piechart) {
           this.piechart.changeSize(this.calculatedSize(this.legendSize()));
+          this.setActiveLegendLine(this.selectedPie);
         }
       },
     },
@@ -292,6 +293,9 @@ export default {
         this.createPieChartDash();
       });
     },
+  },
+  updated() {
+    console.log('update');
   },
   methods: {
     legendSize() {
@@ -535,10 +539,9 @@ export default {
             if (this.selectedPie === i) {
               this.selectedPie = -1;
               node.classList.remove('piepartSelect');
-            } else {
-              this.selectedPie = i;
-              node.classList.add('piepartSelect');
             }
+            this.selectedPie = i;
+            node.classList.add('piepartSelect');
           },
         },
       ]);
