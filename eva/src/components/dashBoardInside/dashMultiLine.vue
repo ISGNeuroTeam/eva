@@ -66,7 +66,6 @@ export default {
       required: true,
     },
     dataModeFrom: Boolean,
-    isFullScreen: Boolean,
     /** Props from Reports page. */
     dataReport: Boolean,
     fullScreenMode: {
@@ -265,13 +264,19 @@ export default {
         this.reRenderChart();
       },
     },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.reRenderChart();
+        });
+      });
+    },
   },
   mounted() {
     const { id, idDash, actions } = this;
     this.$store.commit('setActions', { id, idDash, actions });
     this.createChart();
     this.updateData(this.data);
-    this.testN = 0;
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
   },
   methods: {
@@ -279,16 +284,16 @@ export default {
       const { idDash } = this;
       let result = [];
       if (partelement) {
-        result = this.$store.state[idDash].events.filter((item) => (
+        result = this.$store.state[idDash].events?.filter((item) => (
           item.event === event
           && item.element === this.id
           && item.partelement === partelement
-        ));
+        )) || [];
       } else {
-        result = this.$store.state[idDash].events.filter(
+        result = this.$store.state[idDash].events?.filter(
           (item) => item.event === event
             && item.target === this.id,
-        );
+        ) || [];
       }
       return result;
     },
@@ -553,7 +558,7 @@ export default {
       this.renderHorizontalLines();
 
       // Add a clipPath: everything out of this area won't be drawn.
-      const clipPathID = this.isFullScreen
+      const clipPathID = this.fullScreenMode
         ? `clip-${this.id}-full`
         : `clip-${this.id}`;
 
