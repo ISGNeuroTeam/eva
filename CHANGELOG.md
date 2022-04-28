@@ -8,13 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unrelise]
 
+### Fixed
+- Multiline. Some chart line display settings do not work
+
+## [1.89.0]
+
 ### Feature
 - Created map class
 - additional export
 
 ### Fixed
+- fix export link
 - fixed maps mode
-- Multiline. Some chart line display settings do not work
+- data exploration 2.0: fixed styles and added a horizontal scroll bar
 
 ## [1.88.0]
 
@@ -23,7 +29,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created guntt class
 
 ### Fixed
-- fix export link
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings
