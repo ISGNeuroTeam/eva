@@ -6,10 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.89.0]
+
+### Feature
+- Created map class
+- additional export
+
+### Fixed
+- fix export link
+- fixed maps mode
+- data exploration 2.0: fixed styles and added a horizontal scroll bar
+
 ## [1.88.0]
 
 ### Feature
 - Added hotkey for query window in data research v2
+- Created guntt class
 
 ### Fixed
 - Fixed d3 select in timeline

@@ -134,6 +134,12 @@ export default {
       mdiMinus,
     };
   },
+  beforeDestroy() {
+    d3.select('.block-tooltip').nodes()
+      .forEach((item) => {
+        item.remove();
+      });
+  },
   computed: {
     ...mapGetters('dataResearch', ['getTimeline']),
     getPreparedTimeLine() {
