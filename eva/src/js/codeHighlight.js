@@ -1,141 +1,132 @@
-// live demo editor https://ace.c9.io/tool/mode_creator.html
-// documentation https://macromates.com/manual/en/language_grammars
+// Example https://codemirror.net/demo/simplemode.html
 
-// eslint-disable-next-line no-undef
-define((require, exports, module) => {
-  const oop = require('../lib/oop');
-  const { TextHighlightRules } = require('./text_highlight_rules');
+/**
+ * Export from
+ * CodeMirror.defineSimpleMode('otl', { ... });
+ *
+ var editor = CodeMirror(code, {
+    ...
+    theme: 'eva',
+    mode: "otl",
+    ...
+ });
+ */
+export default {
+  start: [
+    {
+      token: 'string.quoted.double',
+      regex: /"/,
+      next: 'string',
+    },
+    {
+      token: 'string.quoted.single',
+      regex: /(')/,
+      next: 'qstring',
+    },
+    {
+      token: 'constant.numeric',
+      regex: /[+-]?\d+\b/,
+    },
+    {
+      token: 'keyword.operator',
+      regex: /[-+%=<>*]|![><=]/,
+    },
+    {
+      token: 'lparen',
+      regex: /[([]/,
+    },
+    {
+      token: 'rparen',
+      regex: /[)]]/,
+    },
+    {
+      token: 'variable.token',
+      regex: /\|?\s?\$/,
+      next: 'token',
+    },
+    {
+      token: 'entity.name.function',
+      regex: /\|[\s]*\w+/,
+    },
+    {
+      token: 'support.parameter',
+      regex: /\w+\s?=/,
+    },
+    {
+      token: 'keyword',
+      regex: /\b(?:or|and|by|as)\b/,
+    },
+    {
+      token: 'support.function',
+      regex: /\b(?:count|sum|round|int|rand|max|p50|avg|dc|case|values|locate|ctime|sin|sqrt|min)\b/,
+    },
+    {
+      regex: /[{[(]/,
+      indent: true,
+    },
+    {
+      regex: /[}\])]/,
+      dedent: true,
+    },
+  ],
 
-  const AbapHighlightRules = function () {
-    const keywordMapper = this.createKeywordMapper({
-      keyword: 'as|by|or|and',
-      'support.function': 'sum|round|int|rand|min|max|p50|avg|dc|case|values|locate|ctime',
-    }, 'identifier', true);
+  qstring: [
+    {
+      regex: /'/,
+      token: 'string',
+      next: 'start',
+    },
+    {
+      regex: /[^']+/,
+      token: 'string',
+    },
+  ],
+  string: [
+    {
+      regex: /"/,
+      token: 'string',
+      next: 'start',
+    },
+    {
+      regex: /[^"]+/,
+      token: 'string',
+    },
+  ],
+  token: [
+    {
+      regex: /\$/,
+      token: 'variable.token',
+      next: 'start',
+    },
+    {
+      regex: /[^$]+/,
+      token: 'variable.token',
+    },
+  ],
 
-    this.$rules = {
+  command: [
+    {
+      token: 'variable.parameter',
+      regex: /\w+\s?/,
+      next: 'attr',
+    },
+    {
+      token: 'variable.other',
+      regex: /\s+(.*)/,
+      next: 'attr',
+    },
+  ],
 
-      start: [
-        {
-          token: 'string',
-          regex: '"',
-          next: 'string',
-        },
-        {
-          token: 'string',
-          regex: '\'',
-          next: 'qstring',
-        },
-        {
-          token: 'constant.numeric',
-          regex: '[+-]?\\d+\\b',
-        },
-        {
-          token: 'keyword.operator',
-          regex: /[-+%=<>*]|![><=]/,
-        },
-        {
-          token: 'paren.lparen',
-          regex: '[\\(]',
-        },
-        {
-          token: 'paren.rparen',
-          regex: '[\\)]',
-        },
-        {
-          token: 'markup.bold',
-          regex: /\$\w+\$/,
-        },
-        {
-          token: 'variable.parameter',
-          regex: /\w+\s?=/,
-          next: 'attr',
-        },
-        {
-          token: 'entity.name.function',
-          regex: '\\|[\\s]{0,}',
-          next: 'command',
-        },
-        {
-          token: keywordMapper,
-          regex: '[a-zA-Z_][a-zA-Z0-9_]*\\b',
-        },
-        { defaultToken: 'start' },
-      ],
-
-      qstring: [
-        {
-          token: 'constant.language.escape',
-          regex: '\'\'',
-        },
-        {
-          token: 'string',
-          regex: '\'',
-          next: 'start',
-        },
-        { defaultToken: 'string' },
-      ],
-      string: [
-        {
-          token: 'constant.language.escape',
-          regex: '""',
-        },
-        {
-          token: 'string',
-          regex: '"',
-          next: 'start',
-        },
-        { defaultToken: 'string' },
-      ],
-
-      command: [
-        {
-          token: 'markup.bold',
-          regex: /\$\w+\$/,
-          next: 'attr',
-        },
-        {
-          token: 'entity.name.function',
-          regex: '\\w+\\s?',
-          next: 'attr',
-        },
-        {
-          token: 'support.variable',
-          regex: '\\s+(.*)',
-          next: 'attr',
-        },
-        { defaultToken: 'command' },
-      ],
-
-      attr: [
-        {
-          token: 'variable.parameter',
-          regex: /\w+\s?=/,
-          next: 'attr',
-        },
-        {
-          token: 'support.variable',
-          regex: '^|',
-          next: 'start',
-        },
-        { defaultToken: 'attr' },
-      ],
-
-      list: [
-        {
-          token: 'support.variable',
-          regex: /(-?\s?\w+\s?)+/,
-          next: 'start',
-        },
-        {
-          token: 'support.variable',
-          regex: /(\w+\s?)+/,
-          next: 'start',
-        },
-        { defaultToken: 'list' },
-      ],
-    };
-  };
-  oop.inherits(AbapHighlightRules, TextHighlightRules);
-
-  exports.AbapHighlightRules = AbapHighlightRules;
-});
+  attr: [
+    {
+      token: 'support.parameter',
+      regex: /\w+\s?=/,
+      next: 'start',
+    },
+    {
+      token: 'support.parameter',
+      regex: /\n/,
+      next: 'start',
+    },
+  ],
+};
