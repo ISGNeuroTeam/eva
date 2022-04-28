@@ -1230,10 +1230,14 @@ export default {
       this.isChanged = true;
     },
     handleChangeReplaceCount(e, i) {
-      this.replace_count = {
-        ...this.replace_count,
-        [this.metrics[i].name]: Number(e),
-      };
+      if (e === null) {
+        delete this.replace_count[this.metrics[i].name];
+      } else {
+        this.replace_count = {
+          ...this.replace_count,
+          [this.metrics[i].name]: Number(e),
+        };
+      }
       this.isChanged = true;
     },
     // отправляем настройки в хранилище
