@@ -1,3 +1,16 @@
+# [1.88.0]
+
+### Feature
+- Added hotkey for query window in data research v2
+
+### Fixed
+- Data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
+- Changing the osm server in the map settings
+- Default osm server and default search in map settings
+- Maps tooltip
+- Displaying histograms with negative values on a multiline dash
+- The width of the histogram is now only positive
+
 # [1.87.0] Notifications, added prefix /eva
 
 ### Added

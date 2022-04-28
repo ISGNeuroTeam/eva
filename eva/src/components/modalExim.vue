@@ -301,7 +301,7 @@ export default {
     },
     downloadDash(url) {
       const link = this.$refs.blockExim.appendChild(document.createElement('a'));
-      link.setAttribute('href', url);
+      link.setAttribute('href', `/${url}`);
       link.click();
       link.remove();
     },
