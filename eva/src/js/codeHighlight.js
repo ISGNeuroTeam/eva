@@ -103,30 +103,4 @@ export default {
       token: 'variable.token',
     },
   ],
-
-  command: [
-    {
-      token: 'variable.parameter',
-      regex: /\w+\s?/,
-      next: 'attr',
-    },
-    {
-      token: 'variable.other',
-      regex: /\s+(.*)/,
-      next: 'attr',
-    },
-  ],
-
-  attr: [
-    {
-      token: 'support.parameter',
-      regex: /\w+\s?=/,
-      next: 'start',
-    },
-    {
-      token: 'support.parameter',
-      regex: /\n/,
-      next: 'start',
-    },
-  ],
 };
