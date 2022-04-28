@@ -1,3 +1,14 @@
+# [1.89.0]
+
+### Feature
+- Optimization of visualization classes
+- Data exploration 2.0: additional export in format xlsx
+
+### Fixed
+- Fixed the URL of the export link url in Export/Import popup window
+- Fixed map modes
+- Data exploration 2.0: fixed styles and added a horizontal scroll bar
+
 # [1.88.0]
 
 ### Feature
