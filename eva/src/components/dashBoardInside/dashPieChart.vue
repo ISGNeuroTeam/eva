@@ -481,7 +481,6 @@ export default {
         selectedDefault.push(item[metrics[2]]);
       });
 
-      // const hoverLegendLine = this.hoverLegendLine;
       const tooltipEl = this.$refs.chartTooltip;
 
       const tooltipOffset = { x: 30, y: 5 };

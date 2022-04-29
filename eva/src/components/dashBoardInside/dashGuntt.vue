@@ -75,14 +75,6 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    // widthFrom: {
-    //   type: Number,
-    //   required: true,
-    // }, // ширина родительского компонента
-    // heightFrom: {
-    //   type: Number,
-    //   required: true,
-    // }, // высота родительского компонента
     timeFormatFrom: {
       type: String,
       required: true,
@@ -231,7 +223,6 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$attrs);
     if (this.dataRestFrom?.length > 0) {
       this.dataRestFromWatch();
       this.$emit('setVissible', { element: this.id, overflow: 'hidden' });
