@@ -8,17 +8,24 @@
         :style="{
           backgroundColor: theme.$main_bg,
           color: theme.$main_text,
-          'max-height': '500px',
         }"
         disable-pagination
         hide-default-footer
-        :headers="[
-          { text: 'Значение', value: 'value' },
-          { text: 'Количество', value: 'count' },
-          { text: 'Процент', value: '%' },
-        ]"
+        :headers="tableHead"
         :items="filteredItems[currentPage - 1]"
-      />
+      >
+        <template v-slot:item="slotProps">
+          <tr>
+            <template v-for="(col) in slotProps.headers">
+              <td :key="`${col.value}${slotProps.item.value}`">
+                <div class="interesting-fields-popup__item">
+                  {{ slotProps.item[col.value] }}
+                </div>
+              </td>
+            </template>
+          </tr>
+        </template>
+      </v-data-table>
     </div>
     <div class="interesting-fields-popup__footer">
       <div class="interesting-fields-popup__pagination">
@@ -55,8 +62,8 @@
               >
                 <path
                   d="M6.00012 7.85648L9.00512 4.85148L8.29862
-              4.14398L6.00012 6.44398L3.70212
-              4.14398L2.99512 4.85098L6.00012 7.85648Z"
+                  4.14398L6.00012 6.44398L3.70212
+                  4.14398L2.99512 4.85098L6.00012 7.85648Z"
                   fill="currentColor"
                 />
               </svg>
@@ -90,8 +97,38 @@ export default {
   },
   data() {
     return {
+      test: {
+        item: {
+          value: 'т.вр.к5',
+          count: 5,
+          '%': 0.5,
+        },
+        index: 0,
+        isSelected: false,
+        isExpanded: false,
+        isMobile: false,
+        headers: [
+          {
+            text: 'Значение',
+            value: 'value',
+          },
+          {
+            text: 'Количество',
+            value: 'count',
+          },
+          {
+            text: 'Процент',
+            value: '%',
+          },
+        ],
+      },
       currentPage: 1,
       rowsPerPage: 10,
+      tableHead: [
+        { text: 'Значение', value: 'value' },
+        { text: 'Количество', value: 'count' },
+        { text: 'Процент', value: '%' },
+      ],
       rowsPerPageVariants: [
         {
           text: '5',
@@ -192,12 +229,6 @@ export default {
   &__t-col {
     &:nth-child(1) {
       width: 20% !important;
-      max-height: 24px;
-      overflow: hidden;
-      white-space: normal;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
     }
     &:nth-child(2) {
       width: 40%;
@@ -205,6 +236,14 @@ export default {
     &:nth-child(3) {
       width: 40%;
     }
+  }
+  &__item {
+    max-height: 27px;
+    overflow: hidden;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   // Далее правки стилей vuetify
   &__table ::v-deep {
@@ -242,12 +281,6 @@ export default {
               background-color: transparent !important;
               height: 34px;
               max-height: 34px;
-              &:nth-child(1) {
-                overflow: hidden;
-                display: -webkit-box;
-                -webkit-line-clamp: 2;
-                -webkit-box-orient: vertical;
-              }
             }
             &:hover,
             &:active,

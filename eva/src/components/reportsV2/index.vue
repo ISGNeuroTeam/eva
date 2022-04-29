@@ -40,31 +40,29 @@
               <download :data="data" />
             </div>
           </div>
-          <keep-alive>
-            <v-row
-              v-if="data.length > 0 && tab === 0"
-              class="mb-0"
+          <v-row
+            v-if="data.length > 0 && tab === 0"
+            class="mb-0"
+          >
+            <v-col
+              cols="2"
+              class="pr-0"
             >
-              <v-col
-                cols="2"
-                class="pr-0"
-              >
-                <interesting
-                  class="intresting component-block"
-                  :rows="rows"
-                />
-              </v-col>
-              <v-col
-                cols="10"
-                class="pl-0"
-              >
-                <events
-                  class="events component-block mb-0"
-                  :data="data"
-                />
-              </v-col>
-            </v-row>
-          </keep-alive>
+              <interesting
+                class="intresting component-block"
+                :rows="rows"
+              />
+            </v-col>
+            <v-col
+              cols="10"
+              class="pl-0"
+            >
+              <events
+                class="events component-block mb-0"
+                :data="data"
+              />
+            </v-col>
+          </v-row>
           <keep-alive>
             <statistic
               v-if="tab === 1"
