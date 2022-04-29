@@ -24,37 +24,39 @@
           Новый поиск
         </div>
         <v-btn
-          class="action-btn"
+          class="search-block-header__btn"
+          :class="historySizeUndo"
           text
           @click="backInput"
         >
           <v-icon
-            class="action-btn-icon"
-            :style="{ color: theme.$main_text }"
+            class="search-block-header__icon"
+            :class="historySizeUndo"
           >
             {{ mdiArrowLeftThick }}
           </v-icon>
           <span
-            class="action-btn-text"
-            :style="{ color: theme.$main_text }"
+            class="search-block-header__text"
+            :class="historySizeUndo"
           >
-            Назад
+            Шаг назад
           </span>
         </v-btn>
         <v-btn
-          class="action-btn"
+          class="search-block-header__btn"
+          :class="historySizeRedo"
           text
           @click="forwardInput"
         >
           <span
-            class="action-btn-text"
-            :style="{ color: theme.$main_text }"
+            class="search-block-header__text"
+            :class="historySizeRedo"
           >
-            Вперед
+            Шаг вперед
           </span>
           <v-icon
-            class="action-btn-icon"
-            :style="{ color: theme.$main_text }"
+            class="search-block-header__icon"
+            :class="historySizeRedo"
           >
             {{ mdiArrowRightThick }}
           </v-icon>
@@ -78,28 +80,31 @@
           </v-icon>
         </v-btn>
       </div>
-      <v-textarea
+      <!--      <v-textarea-->
+      <!--        ref="search"-->
+      <!--        v-model="search.original_otl"-->
+      <!--        class="textarea"-->
+      <!--        :color="theme.$main_text"-->
+      <!--        :style="{ color: `${theme.$main_text} !important` }"-->
+      <!--        placeholder="Введите запрос"-->
+      <!--        spellcheck="false"-->
+      <!--        auto-grow-->
+      <!--        filled-->
+      <!--        outlined-->
+      <!--        rows="1"-->
+      <!--        row-height="15"-->
+      <!--        @keyup.ctrl.\="addLineBreaks"-->
+      <!--        @keyup.ctrl.enter.prevent="keypressCtrlEnter"-->
+      <!--      />-->
+      <codemirror
         ref="search"
         v-model="search.original_otl"
-        class="textarea"
-        :color="theme.$main_text"
-        :style="{ color: `${theme.$main_text} !important` }"
-        placeholder="Введите запрос"
-        spellcheck="false"
-        auto-grow
-        filled
-        outlined
-        rows="1"
-        row-height="15"
-        @keyup.ctrl.\="addLineBreaks"
-        @keyup.ctrl.enter.prevent="keypressCtrlEnter"
-      />
-      <codemirror
-        ref="searchs"
-        v-model="searches"
         :options="cmOption"
         class="search-block-codemirror"
-        :style="`height: 240px`"
+        :style="`height: ${heightCodemirror}px`"
+        @keyup.ctrl.\="addLineBreaks"
+        @change="keypressCtrlEnter($event)"
+        @input="changeInput"
       />
       <div class="search-block-footer">
         <div
@@ -117,9 +122,10 @@
             <span v-if="searchTimeInterval">( {{ searchTimeInterval }} )</span>
           </div>
         </div>
-        <div class="d-flex">
+        <div class="d-flex align-center">
           <div class="search-block-footer-settings">
             <v-menu
+              v-model="settings"
               offset-y
               :close-on-content-click="false"
             >
@@ -141,13 +147,13 @@
                 <div class="search-block-footer-settings__text">
                   Автоперенос на новую строку
                   <v-switch
-                    v-model="switch1"
+                    v-model="cmOption.lineWrapping"
                     inset
-                  ></v-switch>
+                    @change="autoTransfer"
+                  />
                 </div>
                 <v-menu
                   :offset-x="true"
-                  :close-on-content-click="false"
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <div
@@ -157,7 +163,10 @@
                     >
                       <div>
                         Число отображаемых строк
-                        <v-icon :color="theme.$main_text">
+                        <v-icon
+                          :color="theme.$main_text"
+                          style="transform: rotate(-90deg)"
+                        >
                           {{
                             mdiChevronDown
                           }}
@@ -170,10 +179,17 @@
                       v-for="item in searchSize"
                       :key="item"
                       class="search-block-footer-settings__text"
+                      :class="item === heightCodemirror / 24
+                        ? 'search-block-footer-settings__text--active'
+                        : ''"
+                      @click="changeHeightCodemirror(item)"
                     >
                       {{ item }} строк
                     </div>
-                    <div class="search-block-footer-settings__text">
+                    <div
+                      class="search-block-footer-settings__text"
+                      @click="numberLineModal = true"
+                    >
                       Пользовательское значение
                     </div>
                   </div>
@@ -324,6 +340,11 @@
         </div>
       </div>
     </div>
+    <number-line-modal
+      v-model="numberLineModal"
+      @change="changeHeightCodemirror($event)"
+      @close="numberLineModal = false"
+    />
   </div>
 </template>
 
@@ -339,11 +360,9 @@ import {
 } from '@mdi/js';
 
 import { codemirror } from 'vue-codemirror';
-// language
-import 'codemirror/mode/python/python.js';
+import numberLineModal from '@/components/reportsV2/numberLineModal';
 
-import 'codemirror/keymap/sublime.js';
-// // foldGutter
+import 'codemirror/mode/python/python.js';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/fold/foldgutter.js';
 import 'codemirror/addon/fold/indent-fold.js';
@@ -351,6 +370,7 @@ import 'codemirror/addon/fold/indent-fold.js';
 export default {
   components: {
     codemirror,
+    numberLineModal,
   },
   props: {
     data: {
@@ -402,19 +422,22 @@ export default {
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
         highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
         mode: 'text/x-python',
-        // hint.js options
         hintOptions: {
           completeSingle: false,
         },
-        keyMap: 'sublime',
         matchBrackets: true,
         showCursorWhenSelecting: true,
         theme: 'default',
-        lineWrapping: true,
-        screenReaderLabel: 'asdlfksdhjfgjkpasdfgl',
+        lineWrapping: false,
       },
-      searches: '',
       searchSize: [10, 15, 20, 30, 40, 50],
+      heightCodemirror: 240,
+      numberLineModal: false,
+      settings: false,
+      historySize: {
+        redo: 0,
+        undo: 0,
+      },
     };
   },
   computed: {
@@ -423,6 +446,12 @@ export default {
     },
     dateRangeText() {
       return this.dates.join(' ~ ');
+    },
+    historySizeRedo() {
+      return this.historySize?.redo === 0 ? 'disabled' : '';
+    },
+    historySizeUndo() {
+      return this.historySize?.undo === 0 ? 'disabled' : '';
     },
     // effectiveDateRange () {
     //   return this.dates.sort().join(' - ');
@@ -470,12 +499,16 @@ export default {
       });
     }
     this.$refs.search.$el.addEventListener('keypress', (event) => {
-      if (event.ctrlKey && event.keyCode === 13) {
+      if (event.ctrlKey && event.keyCode === 10) {
         this.launchSearch();
       }
     });
   },
   methods: {
+    changeInput() {
+      // eslint-disable-next-line no-underscore-dangle
+      this.historySize = this.$refs.search._data.cminstance.doc.historySize();
+    },
     keypressCtrlEnter(e) {
       if (e.ctrlKey) {
         this.launchSearch();
@@ -571,11 +604,20 @@ export default {
     },
     backInput() {
       // eslint-disable-next-line no-underscore-dangle
-      this.$refs.searchs._data.cminstance.doc.undo();
+      this.$refs.search._data.cminstance.doc.undo();
     },
     forwardInput() {
       // eslint-disable-next-line no-underscore-dangle
-      this.$refs.searchs._data.cminstance.doc.redo();
+      this.$refs.search._data.cminstance.doc.redo();
+    },
+    autoTransfer() {
+      // eslint-disable-next-line no-underscore-dangle
+      this.$refs.search._data.cminstance.doc.cm.refresh();
+    },
+    // 24 - высота строки
+    changeHeightCodemirror(item) {
+      this.heightCodemirror = +item * 24;
+      this.settings = false;
     },
   },
 };
@@ -682,8 +724,24 @@ export default {
         text-transform: capitalize
         letter-spacing: 0.25px
 
+.search-block-header
+  &__btn
+    background: rgba(6, 154, 238, 0.12)
+    height: 24px !important
+    margin-right: 12px
+    &.disabled
+      background: $main_border
+  &__icon,
+  &__text
+    color: $primary_button !important
+    font-size: 12px !important
+    &.disabled
+      color: $secondary_border !important
+  &__icon
+    .v-icon__svg
+      height: 15px
 .search-block-codemirror
-  caret-color: $main_text
+  margin-bottom: 8px
   .CodeMirror
     border-radius: 10px
     border: 1px solid $secondary_border
@@ -696,6 +754,38 @@ export default {
   .CodeMirror-gutters
     color: $main_text
     background: $main_bg
+  .CodeMirror-vscrollbar
+    width: 7px
+    transition: all .3s
+    cursor: pointer
+    &:hover
+      width: 13px
+      &::-webkit-scrollbar-track
+        background: var(--secondary_border)
+    &::-webkit-scrollbar
+      transition: all .3s
+      width: 7px
+      &:hover
+        width: 13px
+  .CodeMirror-hscrollbar
+    height: 7px
+    transition: all .3s
+    cursor: pointer
+    &:hover
+      height: 13px
+      &::-webkit-scrollbar-track
+        background: var(--secondary_border)
+    &::-webkit-scrollbar
+      transition: all .3s
+      height: 7px
+      &:hover
+        height: 13px
+  .CodeMirror-vscrollbar,
+  .CodeMirror-hscrollbar
+    &::-webkit-scrollbar-track
+      background: rgba(0,0,0,0)
+      border-radius: 5px
+      transition: all .3s
 .search-block-footer
   .v-input
     padding-top: 0
@@ -710,6 +800,11 @@ export default {
       align-items: center
       font-size: 12px
       cursor: pointer
+      transition: all .3s ease-in-out
+      &--active
+        color: #1976d2
+      &:hover
+        color: #1976d2
       .v-input
         margin-left: 8px
       .v-input--selection-controls
@@ -721,6 +816,11 @@ export default {
         display: none
       .v-input--selection-controls__input
         margin-right: 0
+    &__btn
+      display: flex
+      align-items: center
+      margin-right: 12px
+      font-size: 14px
 .action-btn
   .action-btn-text
     text-transform: capitalize
