@@ -242,47 +242,6 @@
                   </v-card-title>
 
                   <portal-target :name="`${element}`" />
-
-                  <!--<v-card-text
-                    :is="currentElem"
-                    v-if="showElement"
-                    class="card-text element-itself"
-                    :color-from="theme"
-                    :style="{
-                      color: theme.$main_text,
-                      background: 'transparent',
-                    }"
-                    :id-from="element"
-                    :id-dash-from="idDash"
-                    :data-rest-from="searchData"
-                    :data-mode-from="dataMode"
-                    :time-format-from="props.timeFormat"
-                    :size-tile-from="props.sizeTile"
-                    :tooltip-from="props.tooltip"
-                    :current-settings="settings"
-                    :update-settings="updateSettings"
-                    :size-from="{
-                      height,
-                      width
-                    }"
-                    :width-from="fullScreenWidth"
-                    :height-from="fullScreenHeight"
-                    :options="props.options"
-                    :is-full-screen="true"
-                    :full-screen="true"
-                    :table-per-page="tablePerPage"
-                    :table-page="tablePage"
-                    :selected-pie-index="selectedPieIndex"
-                    @hideDS="hideDS($event)"
-                    @setVissible="setVissible($event)"
-                    @setLoading="setLoading($event)"
-                    @hideLoading="props.hideLoad = true"
-                    @SetRange="setRange($event)"
-                    @resetRange="resetRange($event)"
-                    @changeSelectPie="changeSelectedPie"
-                    @update:table-per-page="onTableItemsPerPageChange"
-                    @update:table-page="onTableIItemsPageChange"
-                  />-->
                 </v-card>
               </div>
             </v-dialog>
