@@ -1,6 +1,8 @@
-import store from '.';
-
 export default {
+  store: null,
+  setStore(store) {
+    this.store = store;
+  },
   async rest(formData, searchFrom, restAuth, idDash) {
     const response = await fetch('/api/makejob', {
       // сперва нужно подать post запрос
@@ -37,6 +39,8 @@ export default {
 
           const cycle = new Promise((resolve) => {
             // let i = 0;
+
+            const { store } = this;
 
             let timeOut = setTimeout(async function tick() {
               if (status === 'failed') {
@@ -87,7 +91,7 @@ export default {
                     }&nbsp;&nbsp;url: ${decodeURIComponent(resEvents.url)}`,
                   );
                   status = res.status;
-                  if (res?.notifications) {
+                  if (store && res?.notifications) {
                     store.commit('notify/addNotifications', res?.notifications);
                   }
                   // console.log(status);

@@ -10,12 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Created guntt class
 - Created piechart class
-- Created graph class 
+- Created graph class
+
+
+## [1.89.0]
+
+### Feature
 - Created map class
+- additional export
 
 ### Fixed
-- fixed maps mode
 - fix export link
+- fixed maps mode
+- data exploration 2.0: fixed styles and added a horizontal scroll bar
 
 ## [1.88.0]
 

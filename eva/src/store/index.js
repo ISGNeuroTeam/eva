@@ -1149,6 +1149,7 @@ export default new Vuex.Store({
         twf,
         cache_ttl: search.parametrs.cache_ttl,
       };
+      rest.setStore(this);
       // отправляем в файл storeRest.js
       return rest.rest(formData, searchForRest, restAuth, idDash);
     },

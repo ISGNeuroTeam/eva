@@ -44,6 +44,7 @@
             <v-row
               v-if="data.length > 0 && tab === 0"
               class="mb-0"
+              :style="{background: theme.$secondary_bg}"
             >
               <v-col
                 cols="2"
@@ -146,7 +147,7 @@ export default {
       curTab: null,
       size: {
         width: 0,
-        height: 0,
+        height: screen.height ?? 0,
       },
       aboutElem: {},
       rowsCount: 9,
