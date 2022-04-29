@@ -405,6 +405,7 @@
                     class="item-metric"
                     label="Вывод значений"
                     type="number"
+                    min="0"
                     hide-details
                     @input="(e) => handleChangeConlusionCount(e, i - 1)"
                   />
@@ -426,6 +427,8 @@
                     class="item-metric"
                     label="Значения после запятой"
                     type="number"
+                    min="0"
+                    max="100"
                     hide-details
                     @input="(e) => handleChangeReplaceCount(e, i - 1)"
                   />
@@ -1223,19 +1226,24 @@ export default {
       this.isChanged = true;
     },
     handleChangeConlusionCount(e, i) {
-      this.conclusion_count = {
-        ...this.conclusion_count,
-        [this.metrics[i].name]: Number(e),
-      };
+      if (e === null) {
+        delete this.conclusion_count[this.metrics[i].name];
+      } else {
+        this.conclusion_count = {
+          ...this.conclusion_count,
+          [this.metrics[i].name]: Math.abs(Number(e)),
+        };
+      }
       this.isChanged = true;
     },
     handleChangeReplaceCount(e, i) {
-      if (e === null) {
+      const val = Number(e);
+      if (e === null || val < 0 || val > 100) {
         delete this.replace_count[this.metrics[i].name];
       } else {
         this.replace_count = {
           ...this.replace_count,
-          [this.metrics[i].name]: Number(e),
+          [this.metrics[i].name]: val,
         };
       }
       this.isChanged = true;
