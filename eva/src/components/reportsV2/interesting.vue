@@ -26,6 +26,8 @@
             <v-menu
               min-width="356px"
               offset-x
+              offset-y
+              top
               :close-on-content-click="false"
               content-class="interesting-popup"
             >

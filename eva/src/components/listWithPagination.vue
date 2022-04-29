@@ -148,7 +148,10 @@ export default {
   computed: {
     itemsCount() {
       const start = (this.currentPage * this.rowsPerPage - this.rowsPerPage) || 1;
-      const end = start + this.filteredItems[this.currentPage - 1].length;
+      let end = start + 0;
+      if (this.filteredItems[this.currentPage - 1]?.length > 0) {
+        end = start + this.filteredItems[this.currentPage - 1].length || 0;
+      }
       return `Результаты: ${start} – ${start === 1 ? end - 1 : end} из ${this.listItems.length}`;
     },
     filteredItems() {
