@@ -240,43 +240,8 @@
                       </div>
                     </div>
                   </v-card-title>
-                  <v-card-text
-                    :is="currentElem"
-                    v-if="showElement"
-                    ref="dashBoardInsideFull"
-                    class="card-text element-itself"
-                    :color-from="theme"
-                    :style="{
-                      color: theme.$main_text,
-                      background: 'transparent',
-                    }"
-                    :id-from="element"
-                    :id-dash-from="idDash"
-                    :data-rest-from="searchData"
-                    :data-mode-from="dataMode"
-                    :time-format-from="props.timeFormat"
-                    :size-tile-from="props.sizeTile"
-                    :tooltip-from="props.tooltip"
-                    :current-settings="settings"
-                    :update-settings="updateSettings"
-                    :width-from="fullScreenWidth"
-                    :height-from="fullScreenHeight"
-                    :options="props.options"
-                    :is-full-screen="true"
-                    :full-screen="true"
-                    :table-per-page="tablePerPage"
-                    :table-page="tablePage"
-                    :selected-pie-index="selectedPieIndex"
-                    @hideDS="hideDS($event)"
-                    @setVissible="setVissible($event)"
-                    @setLoading="setLoading($event)"
-                    @hideLoading="props.hideLoad = true"
-                    @SetRange="setRange($event)"
-                    @resetRange="resetRange($event)"
-                    @changeSelectPie="changeSelectedPie"
-                    @update:table-per-page="onTableItemsPerPageChange"
-                    @update:table-page="onTableIItemsPageChange"
-                  />
+
+                  <portal-target :name="`${element}`" />
                 </v-card>
               </div>
             </v-dialog>
@@ -431,10 +396,13 @@
       <v-card-text
         :is="currentElem"
         v-if="showElement"
-        ref="dashBoardInside"
-        class="card-text element-itself"
+        :full-screen-mode="fullScreenMode"
+        custom-class="card-text element-itself"
         :color-from="theme"
-        :style="{ color: theme.$main_text, background: 'transparent' }"
+        :custom-style="{
+          color: theme.$main_text,
+          background: 'transparent'
+        }"
         :id-from="element"
         :id-dash-from="idDash"
         :data-rest-from="searchData"
@@ -442,13 +410,18 @@
         :loading="loading"
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
+        :size-from="{
+          height: fullScreenMode ? fullScreenHeight : height,
+          width: fullScreenMode ? fullScreenWidth : width,
+        }"
         :tooltip-from="props.tooltip"
         :width-from="width"
         :height-from="height"
         :options="props.options"
         :current-settings="settings"
         :update-settings="updateSettings"
-        :is-full-screen="false"
+        :is-full-screen="fullScreenMode"
+        :full-screen="fullScreenMode"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
         :selected-pie-index="selectedPieIndex"
@@ -761,20 +734,6 @@ export default {
     },
   },
   watch: {
-    fullScreenMode(to) {
-      const refNameComponent = to ? 'dashBoardInsideFull' : 'dashBoardInside';
-      if (this.dataElemFrom === 'piechart') {
-        this.$nextTick(() => {
-          this.$refs[refNameComponent].setActiveLegendLine(this.selectedPieIndex);
-        });
-      }
-      setTimeout(() => {
-        this.disabledTooltip = to;
-      }, to ? 0 : 600);
-      this.$nextTick(() => {
-        this.$refs[refNameComponent].$emit('fullScreenMode', to);
-      });
-    },
     settingsIsOpened(to) {
       setTimeout(() => {
         this.disabledTooltip = to;

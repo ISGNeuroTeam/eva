@@ -1,141 +1,149 @@
 <template>
-  <div
-    class="table-block"
-    :data-change="change"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
-    <div class="v-data-table--container">
-      <v-data-table
-        v-show="!props.nodata && isVisibleTitles"
-        ref="table"
-        v-model="props.input"
-        class="dash-table report-table"
-        :headers="props.titles"
-        :items.sync="eventedTableData"
-        :data-id="id"
-        item-key="none"
-        :hide-default-footer="props.hideFooter"
-        :footer-props="{
-          itemsPerPageOptions: [100, 500, 1000, -1],
-        }"
-        :height="height"
-        fixed-header
-        :items-per-page="tablePerPage"
-        :style="{ borderColor: theme.$secondary_border }"
-        :page="tablePage"
-        @update:items-per-page="onItemsPerPageChange"
-        @update:page="onItemsPageChange"
-      >
-        <!-- search menu -->
-        <template
-          v-for="(value, title) in typedTitles"
-          v-slot:[`header.${title}`]="{ header }"
-        >
-          <v-menu
-            :key="`${header.value + value}menu`"
-            z-index="100000"
-            offset-y
-            content-class="dash-table__menu"
-            :close-on-content-click="false"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-icon
-                v-bind="attrs"
-                large
-                class="icon"
-                :color="theme.$main_border"
-                v-on="on"
-              >
-                {{ mdiMagnify }}
-              </v-icon>
-            </template>
-            <v-row v-if="value !== 'string' && value !== 'none'">
-              <v-col cols="6">
-                <v-select
-                  :items="compare"
-                  label="Знак"
-                  @change="setFilterData(title, $event, 'compare')"
-                />
-              </v-col>
-              <v-col cols="6">
-                <v-text-field
-                  label="значение"
-                  @change="setFilterData(title, $event)"
-                />
-              </v-col>
-            </v-row>
-            <v-row v-else-if="value === 'none'">
-              <v-col cols="12">
-                <v-select
-                  label="Значение"
-                  :items="compareForBoolean"
-                  @change="
-                    onChangeForBoolean(title, $event)
-                  "
-                />
-              </v-col>
-            </v-row>
-            <v-row v-else>
-              <v-col cols="12">
-                <v-text-field
-                  label="значение"
-                  @change="
-                    setFilterData(title, '=', 'compare');
-                    setFilterData(title, $event);
-                  "
-                />
-              </v-col>
-            </v-row>
-          </v-menu>
-          <v-tooltip
-            :key="`${header.value + value}tooltip`"
-            bottom
-          >
-            <template v-slot:activator="{ on }">
-              <span v-on="on">{{ header.text }}</span>
-            </template>
-          </v-tooltip>
-        </template>
-        <template
-          v-for="(title) in props.titles"
-          v-slot:item="{ item }"
-        >
-          <tr
-            :key="title + item.rowIndex"
-            :style="item.rowColor && `background-color: ${item.rowColor}`"
-          >
-            <template v-for="({text}, colIndex) in props.titles">
-              <td
-                v-if="!excludeColumns.includes(text)"
-                :key="colIndex"
-                class="text-start"
-                :class="{
-                  'd-none': options
-                    && options.titles
-                    && !options.titles.includes(text)
-                }"
-                :style="
-                  (item.cellColor &&
-                    item.cellColor[text] &&
-                    `background-color: ${item.cellColor[text]}`) ||
-                    (item.columnColor &&
-                      item.columnColor[text] &&
-                      `background-color: ${item.columnColor[text]}`)
-                "
-              >
-                {{ item[text] }}
-              </td>
-            </template>
-          </tr>
-        </template>
-      </v-data-table>
-    </div>
     <div
-      v-show="props.nodata || !isVisibleTitles"
-      class="no-data-table"
+      class="table-block"
+      :data-change="change"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
-      {{ props.message }}
+      <div class="v-data-table--container">
+        <v-data-table
+          v-show="!props.nodata && isVisibleTitles"
+          ref="table"
+          v-model="props.input"
+          class="dash-table report-table"
+          :headers="props.titles"
+          :items.sync="eventedTableData"
+          :data-id="id"
+          item-key="none"
+          :hide-default-footer="props.hideFooter"
+          :footer-props="{
+            itemsPerPageOptions: [100, 500, 1000, -1],
+          }"
+          :height="height"
+          fixed-header
+          :items-per-page="tablePerPage"
+          :style="{ borderColor: theme.$secondary_border }"
+          :page="tablePage"
+          @update:items-per-page="onItemsPerPageChange"
+          @update:page="onItemsPageChange"
+        >
+          <!-- search menu -->
+          <template
+            v-for="(value, title) in typedTitles"
+            v-slot:[`header.${title}`]="{ header }"
+          >
+            <v-menu
+              :key="`${header.value + value}menu`"
+              z-index="100000"
+              offset-y
+              content-class="dash-table__menu"
+              :close-on-content-click="false"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-icon
+                  v-bind="attrs"
+                  large
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                >
+                  {{ mdiMagnify }}
+                </v-icon>
+              </template>
+              <v-row v-if="value !== 'string' && value !== 'none'">
+                <v-col cols="6">
+                  <v-select
+                    :items="compare"
+                    label="Знак"
+                    @change="setFilterData(title, $event, 'compare')"
+                  />
+                </v-col>
+                <v-col cols="6">
+                  <v-text-field
+                    label="значение"
+                    @change="setFilterData(title, $event)"
+                  />
+                </v-col>
+              </v-row>
+              <v-row v-else-if="value === 'none'">
+                <v-col cols="12">
+                  <v-select
+                    label="Значение"
+                    :items="compareForBoolean"
+                    @change="
+                      onChangeForBoolean(title, $event)
+                    "
+                  />
+                </v-col>
+              </v-row>
+              <v-row v-else>
+                <v-col cols="12">
+                  <v-text-field
+                    label="значение"
+                    @change="
+                      setFilterData(title, '=', 'compare');
+                      setFilterData(title, $event);
+                    "
+                  />
+                </v-col>
+              </v-row>
+            </v-menu>
+            <v-tooltip
+              :key="`${header.value + value}tooltip`"
+              bottom
+            >
+              <template v-slot:activator="{ on }">
+                <span v-on="on">{{ header.text }}</span>
+              </template>
+            </v-tooltip>
+          </template>
+          <template
+            v-for="(title) in props.titles"
+            v-slot:item="{ item }"
+          >
+            <tr
+              :key="title + item.rowIndex"
+              :style="item.rowColor && `background-color: ${item.rowColor}`"
+            >
+              <template v-for="({text}, colIndex) in props.titles">
+                <td
+                  v-if="!excludeColumns.includes(text)"
+                  :key="colIndex"
+                  class="text-start"
+                  :class="{
+                    'd-none': options
+                      && options.titles
+                      && !options.titles.includes(text)
+                  }"
+                  :style="
+                    (item.cellColor &&
+                      item.cellColor[text] &&
+                      `background-color: ${item.cellColor[text]}`) ||
+                      (item.columnColor &&
+                        item.columnColor[text] &&
+                        `background-color: ${item.columnColor[text]}`)
+                  "
+                >
+                  {{ item[text] }}
+                </td>
+              </template>
+            </tr>
+          </template>
+        </v-data-table>
+      </div>
+      <div
+        v-show="props.nodata || !isVisibleTitles"
+        class="no-data-table"
+      >
+        {{ props.message }}
+      </div>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -143,6 +151,7 @@ import { mdiMagnify } from '@mdi/js';
 
 export default {
   name: 'DashTable',
+  inheritAttrs: false,
   props: {
     tablePerPage: {
       type: Number,
@@ -165,10 +174,6 @@ export default {
       type: String,
       required: true,
     },
-    heightFrom: {
-      type: Number,
-      required: true,
-    },
     dataReport: {
       type: Boolean,
       default: false,
@@ -184,6 +189,22 @@ export default {
     options: {
       type: Object,
       default: null,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -294,21 +315,21 @@ export default {
       return this.$store.getters.getTheme;
     },
     height() {
-      let otstup = 100;
+      let margin = 100;
       if (window.screen.width <= 1600) {
-        otstup = 80;
+        margin = 92;
       }
       if (window.screen.width <= 1400) {
-        otstup = 70;
+        margin = 70;
       }
       if (this.props.hideFooter) {
-        otstup = 45;
+        margin = 45;
       }
       if (this.dataReport) {
-        otstup -= 30;
+        margin -= 30;
       }
       // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
-      return this.heightFrom - otstup;
+      return this.sizeFrom.height - margin;
     },
     dashFromStore() {
       return this.$store.state[this.idDash][this.id];
