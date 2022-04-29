@@ -294,9 +294,6 @@ export default {
       });
     },
   },
-  updated() {
-    console.log('update');
-  },
   methods: {
     legendSize() {
       if (this.$refs.legends.getBoundingClientRect().width !== 0 && this.legends.length > 0) {
