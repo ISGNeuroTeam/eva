@@ -762,6 +762,36 @@
                 Удалить
               </v-btn>
             </div>
+            <div
+              class="divider-tooltip-setting"
+              :style="{ color: theme.$main_text }"
+            >
+              <p>Тип визуализации</p>
+              <div
+                :style="{ backgroundColor: theme.$main_text }"
+                class="divider-line"
+              />
+            </div>
+            <div class="options-item-tooltip">
+              <v-select
+                v-model="pieType"
+                :items="pieTypes"
+                item-text="label"
+                item-value="value"
+                :color="theme.$primary_button"
+                :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
+                hide-details
+                outlined
+                class="item-metric"
+                label="Выберите тип"
+                @click="changeColor"
+                @input="isChanged = true"
+              />
+            </div>
           </div>
         </div>
         <v-card-text
@@ -1054,6 +1084,17 @@ export default {
         nametheme: '',
       },
       defaultThemes: ['neitral', 'indicted'],
+      pieType: '',
+      pieTypes: [
+        {
+          value: 'pie',
+          label: 'Круговая диограмма',
+        },
+        {
+          value: 'donat',
+          label: 'Кольцвая диограмма',
+        },
+      ],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1277,6 +1318,7 @@ export default {
           }
           this.$set(this.options, 'themes', this.themes);
         }
+        this.$set(this.options, 'pieType', this.pieType);
       }
       if (this.element.startsWith('multiLine')) {
         this.$store.commit('setMultilineMetricUnits', {
@@ -1559,6 +1601,8 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'pieType') {
+                this.pieType = options[item];
               } else {
                 const val = options[item] !== null && typeof options[item] === 'object'
                   ? { ...options[item] }

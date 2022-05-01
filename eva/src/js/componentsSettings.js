@@ -172,6 +172,7 @@ export default {
       'themes',
       'pinned',
       'piechartSettings',
+      'pieType',
     ],
     table: [
       'visible',
