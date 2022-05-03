@@ -1,36 +1,47 @@
 <template>
-  <div class="dash-textArea">
-    <v-textarea
-      v-model="textarea"
-      :color="color.controls"
-      outlined
-      :style="{ color: color.text }"
-      spellcheck="false"
-      hide-details
-      class="textarea-itself"
-      :height="height"
-      no-resize
-      @keypress.enter="setTockenByPress($event)"
-      @blur="setTockenBlur($event)"
-    />
-    <v-btn
-      v-if="searchBtn"
-      small
-      :color="color.controls"
-      class="accept-btn"
-      @click="acceptTextArea"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
+    <div
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="dash-textArea"
     >
-      <v-icon>
-        {{ searchIcon }}
-      </v-icon>
-    </v-btn>
-  </div>
+      <v-textarea
+        v-model="textarea"
+        :color="color.controls"
+        outlined
+        :style="{ color: color.text }"
+        spellcheck="false"
+        hide-details
+        class="textarea-itself"
+        :height="height"
+        no-resize
+        @keypress.enter="setTockenByPress($event)"
+        @blur="setTockenBlur($event)"
+      />
+      <v-btn
+        v-if="searchBtn"
+        small
+        :color="color.controls"
+        class="accept-btn"
+        @click="acceptTextArea"
+      >
+        <v-icon>
+          {{ searchIcon }}
+        </v-icon>
+      </v-btn>
+    </div>
+  </portal>
 </template>
 
 <script>
 import { mdiMagnify } from '@mdi/js';
 
 export default {
+  name: 'DashTextarea',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -45,10 +56,22 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    heightFrom: {
-      type: Number,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
       required: true,
-    }, // выоста родительского компонента
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -76,11 +99,11 @@ export default {
       if (window.screen.width > 1920) {
         rowsCount = 25;
       }
-      return Math.floor((this.heightFrom - 200) / rowsCount);
+      return Math.floor((this.sizeFrom.height - 200) / rowsCount);
     },
     height() {
-      const otstup = window.screen.width < 1600 ? 45 : 55;
-      return `${this.heightFrom - otstup}px`;
+      const margin = window.screen.width < 1600 ? 45 : 55;
+      return `${this.sizeFrom.height - margin}px`;
     },
     getOptions() {
       if (!this.idDash) {

@@ -87,6 +87,10 @@
         id-dash-from="reports"
         :width-from="size.width"
         :height-from="size.height"
+        :size-from="{
+          height: size.height,
+          width: size.width,
+        }"
         :size-tile-from="{
           width: getOptions ? getOptions.widthTile : '',
           height: getOptions ? getOptions.heightTile : ''

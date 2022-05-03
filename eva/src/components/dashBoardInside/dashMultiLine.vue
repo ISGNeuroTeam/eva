@@ -1,39 +1,49 @@
 <template>
-  <div class="muililine-new">
-    <div v-if="showMessage">
-      <span>{{ errorMessage }}</span>
-    </div>
-    <div v-else>
-      <div
-        ref="legend"
-        class="legend"
-      >
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
+    <div
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="muililine-new"
+    >
+      <div v-if="showMessage">
+        <span>{{ errorMessage }}</span>
+      </div>
+      <div v-else>
         <div
-          v-for="item in legendItems"
-          :key="item.name"
-          class="legend-item"
+          ref="legend"
+          class="legend"
         >
           <div
-            class="circle"
-            :style="{ backgroundColor: item.color }"
-          />
-          <div
-            class="text"
-            :style="{ color: theme.$main_text }"
-            v-text="item.name"
-          />
+            v-for="item in legendItems"
+            :key="item.name"
+            class="legend-item"
+          >
+            <div
+              class="circle"
+              :style="{ backgroundColor: item.color }"
+            />
+            <div
+              class="text"
+              :style="{ color: theme.$main_text }"
+              v-text="item.name"
+            />
+          </div>
         </div>
       </div>
+      <div
+        v-show="!showMessage"
+        ref="svgContainer"
+        class="svg-container"
+        @dblclick="$emit('resetRange')"
+      >
+        <div class="graph-tooltip" />
+      </div>
     </div>
-    <div
-      v-show="!showMessage"
-      ref="svgContainer"
-      class="svg-container"
-      @dblclick="$emit('resetRange')"
-    >
-      <div class="graph-tooltip" />
-    </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -41,6 +51,7 @@ import * as d3 from 'd3';
 
 export default {
   name: 'DashMultiLine',
+  inheritAttrs: false,
   props: {
     idFrom: {
       type: String,
@@ -50,22 +61,29 @@ export default {
       type: String,
       required: true,
     },
-    widthFrom: {
-      type: Number,
-      required: true,
-    },
-    heightFrom: {
-      type: Number,
-      required: true,
-    },
     dataRestFrom: {
       type: Array,
       required: true,
     },
     dataModeFrom: Boolean,
-    isFullScreen: Boolean,
     /** Props from Reports page. */
     dataReport: Boolean,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -178,9 +196,9 @@ export default {
       return this.data[this.dataRestFrom.length - 1];
     },
     box() {
-      const {
-        widthFrom, heightFrom, margin, marginOffset,
-      } = this;
+      const { sizeFrom, margin, marginOffset } = this;
+      const heightFrom = sizeFrom.height;
+      const widthFrom = sizeFrom.width;
       let minHeight = heightFrom;
       if (heightFrom < 100) {
         minHeight = 500;
@@ -246,13 +264,19 @@ export default {
         this.reRenderChart();
       },
     },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.reRenderChart();
+        });
+      });
+    },
   },
   mounted() {
     const { id, idDash, actions } = this;
     this.$store.commit('setActions', { id, idDash, actions });
     this.createChart();
     this.updateData(this.data);
-    this.testN = 0;
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
     this.$on('fullScreenMode', (isFull) => {
       if (isFull) {
@@ -272,16 +296,16 @@ export default {
       const { idDash } = this;
       let result = [];
       if (partelement) {
-        result = this.$store.state[idDash].events.filter((item) => (
+        result = this.$store.state[idDash].events?.filter((item) => (
           item.event === event
           && item.element === this.id
           && item.partelement === partelement
-        ));
+        )) || [];
       } else {
-        result = this.$store.state[idDash].events.filter(
+        result = this.$store.state[idDash].events?.filter(
           (item) => item.event === event
             && item.target === this.id,
-        );
+        ) || [];
       }
       return result;
     },
@@ -546,7 +570,7 @@ export default {
       this.renderHorizontalLines();
 
       // Add a clipPath: everything out of this area won't be drawn.
-      const clipPathID = this.isFullScreen
+      const clipPathID = this.fullScreenMode
         ? `clip-${this.id}-full`
         : `clip-${this.id}`;
 
@@ -1043,7 +1067,7 @@ export default {
           }, ''),
         );
 
-      if (left > this.widthFrom / 2) {
+      if (left > this.sizeFrom.width / 2) {
         pos.right = width - left + offset;
       } else {
         pos.left = left + offset;
@@ -1110,7 +1134,7 @@ export default {
             }),
         );
         this.marginOffset.bottom = xTextMaxHeight + 5;
-        this.marginOffset.top = this.$refs.legend.offsetHeight || 0;
+        this.marginOffset.top = this.$refs?.legend?.offsetHeight || 0;
 
         // ось Y
         this.marginOffset.left = d3.max(

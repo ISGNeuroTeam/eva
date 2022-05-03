@@ -1,78 +1,85 @@
 <template>
-  <div
-    class="single-value-container pa-3"
-    :class="{ 'header-active': dataModeFrom, 'is-header-open': !isHeaderOpen }"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
-    <div class="header">
-      <div>
-        <span
-          class="data-title"
-          v-text="tokenizedTitle"
+    <div
+      class="single-value-container pa-3"
+      :style="customStyle"
+      :class="getClass"
+      v-bind="$attrs"
+    >
+      <div class="header">
+        <div>
+          <span
+            class="data-title"
+            v-text="tokenizedTitle"
+          />
+        </div>
+
+        <v-icon
+          v-show="dataModeFrom"
+          size="22"
+          class="settings-icon"
+          @click.stop="openSettings"
+          v-text="mdiSettings"
         />
       </div>
 
-      <v-icon
-        v-show="dataModeFrom"
-        size="22"
-        class="settings-icon"
-        @click.stop="openSettings"
-        v-text="mdiSettings"
-      />
-    </div>
-
-    <div
-      class="content pt-3"
-      :class="metricTemplateClass"
-    >
       <div
-        v-for="(metric, idx) in metricsForRender"
-        :key="`metric-${metric.id}`"
-        class="item"
-        :style="{ gridArea: `item-${idx + 1}` }"
+        class="content pt-3"
+        :class="metricTemplateClass"
       >
-        <span class="metric-title">
+        <div
+          v-for="(metric, idx) in metricsForRender"
+          :key="`metric-${metric.id}`"
+          class="item"
+          :style="{ gridArea: `item-${idx + 1}` }"
+        >
+          <span class="metric-title">
+            <span
+              v-show="metric.icon !== 'no_icon'"
+              class="icon"
+              v-html="getIconSvgByID(metric.icon)"
+            />
+            <span
+              class="title-text"
+              v-text="metric.title"
+            />
+          </span>
           <span
-            v-show="metric.icon !== 'no_icon'"
-            class="icon"
-            v-html="getIconSvgByID(metric.icon)"
-          />
-          <span
-            class="title-text"
-            v-text="metric.title"
-          />
-        </span>
-        <span
-          v-if="metric.value"
-          class="metric-value"
-          :class="`color-${metric.color}`"
-          :style="`
+            v-if="metric.value"
+            class="metric-value"
+            :class="`color-${metric.color}`"
+            :style="`
             color: ${getColor(metric)};
             font-size: ${metric.fontSize || 16}px;
             font-weight: ${metric.fontWeight || 200};
             display: ${
-            metric.value
-            && metric.value.toString(10).split(',').length > 1
-              ? 'flex'
-              : 'block'};
+              metric.value
+              && metric.value.toString(10).split(',').length > 1
+                ? 'flex'
+                : 'block'};
             `"
-        >
-          <span
-            v-for="(value, inx) in metric.value.toString(10).split(',')"
-            :key="inx"
-            v-text="value + (inx !== metric.value.toString(10).split(',').length -1 ? ', ' : '') "
-          />
-        </span>
+          >
+            <span
+              v-for="(value, inx) in metric.value.toString(10).split(',')"
+              :key="inx"
+              v-text="value + (inx !== metric.value.toString(10).split(',').length -1 ? ', ' : '') "
+            />
+          </span>
+        </div>
       </div>
+      <SingleValueSettings
+        v-model="isSettingsComponentOpen"
+        :received-settings="providedSettings"
+        :update-count="updateCount"
+        :default-settings="defaultSettings"
+        @save="saveSettings"
+        @close="closeSettings"
+      />
     </div>
-    <SingleValueSettings
-      v-model="isSettingsComponentOpen"
-      :received-settings="providedSettings"
-      :update-count="updateCount"
-      :default-settings="defaultSettings"
-      @save="saveSettings"
-      @close="closeSettings"
-    />
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -107,6 +114,22 @@ export default {
     currentSettings: {
       type: Object,
       required: true,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data: () => ({
@@ -182,6 +205,13 @@ export default {
       }
 
       return this.dashFromStore.options;
+    },
+    getClass() {
+      return `${this.customClass} ${this.dataModeFrom
+        ? 'header-active '
+        : ''} ${!this.isHeaderOpen
+        ? 'is-header-open'
+        : ''}`;
     },
   },
   watch: {

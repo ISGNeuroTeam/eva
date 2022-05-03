@@ -1,117 +1,127 @@
 <template>
-  <div class="dash-select">
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
     <div
-      v-if="show"
-      ref="selectBlock"
-      class="select-with-data"
+      class="dash-select"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
       <div
-        v-if="dataModeFrom"
-        class="arrow-block"
+        v-if="show"
+        ref="selectBlock"
+        class="select-with-data"
       >
-        <v-icon
-          v-if="!open"
-          class="arrow-down arrows-select"
-          :color="theme.$primary_button"
-          @click="openSelect"
+        <div
+          v-if="dataModeFrom"
+          class="arrow-block"
         >
-          {{ down }}
-        </v-icon>
-        <v-icon
-          v-if="open"
-          class="arrow-up arrows-select"
-          :color="theme.$main_text"
-          @click="openSelect"
-        >
-          {{ up }}
-        </v-icon>
-      </div>
-      <div
-        class="source"
-        :class="{ source_show: source_show }"
-        :style="{ width: widthInput }"
-      >
-        <v-select
-          v-model="elem"
-          :items="dataRest"
-          :color="theme.$accent_ui_color"
-          :style="{ color: theme.$main_text, fill: theme.$main_text }"
-          hide-details
-          outlined
-          class="select-parent"
-          :loading="dataLoading"
-          label="Столбец данных"
-          @change="getItem('elem')"
-        />
-        <v-select
-          v-model="elemlink"
-          :items="dataRest"
-          :color="theme.$accent_ui_color"
-          :style="{ color: theme.$main_text, fill: theme.$main_text }"
-          hide-details
-          outlined
-          class="select-parent"
-          label="Связанный столбец данных"
-          :loading="dataLoading"
-          @change="getItem('elemlink')"
-        />
-      </div>
-      <div
-        ref="targetBlock"
-        class="target"
-        :style="{ width: widthInput, borderColor: theme.$main_border }"
-        :class="{ select_show: select_show }"
-      >
-        <v-autocomplete
-          v-model="elemDeep[String(multiple)]"
-          :items="dataRestDeep"
-          solo
-          flat
-          :multiple="multiple"
-          :color="theme.$accent_ui_color"
-          :style="{ color: theme.$main_text, fill: theme.$main_text }"
-          hide-details
-          class="select theme--dark"
-          label="Значение"
-          @change="setTocken"
-        >
-          <template
-            v-if="multiple"
-            v-slot:prepend-item
+          <v-icon
+            v-if="!open"
+            class="arrow-down arrows-select"
+            :color="theme.$primary_button"
+            @click="openSelect"
           >
-            <v-list-item
-              ripple
-              @click="selectItems"
+            {{ down }}
+          </v-icon>
+          <v-icon
+            v-if="open"
+            class="arrow-up arrows-select"
+            :color="theme.$main_text"
+            @click="openSelect"
+          >
+            {{ up }}
+          </v-icon>
+        </div>
+        <div
+          class="source"
+          :class="{ source_show: source_show }"
+          :style="{ width: widthInput }"
+        >
+          <v-select
+            v-model="elem"
+            :items="dataRest"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text, fill: theme.$main_text }"
+            hide-details
+            outlined
+            class="select-parent"
+            :loading="dataLoading"
+            label="Столбец данных"
+            @change="getItem('elem')"
+          />
+          <v-select
+            v-model="elemlink"
+            :items="dataRest"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text, fill: theme.$main_text }"
+            hide-details
+            outlined
+            class="select-parent"
+            label="Связанный столбец данных"
+            :loading="dataLoading"
+            @change="getItem('elemlink')"
+          />
+        </div>
+        <div
+          ref="targetBlock"
+          class="target"
+          :style="{ width: widthInput, borderColor: theme.$main_border }"
+          :class="{ select_show: select_show }"
+        >
+          <v-autocomplete
+            v-model="elemDeep[String(multiple)]"
+            :items="dataRestDeep"
+            solo
+            flat
+            :multiple="multiple"
+            :color="theme.$accent_ui_color"
+            :style="{ color: theme.$main_text, fill: theme.$main_text }"
+            hide-details
+            class="select theme--dark"
+            label="Значение"
+            @change="setTocken"
+          >
+            <template
+              v-if="multiple"
+              v-slot:prepend-item
             >
-              <v-list-item-action>
-                <v-icon
-                  :color="
-                    elemDeep[String(multiple)].length > 0
-                      ? theme.$primary_button
-                      : theme.$main_text
-                  "
-                >
-                  {{ chooseIcon }}
-                </v-icon>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>
-                  {{ chooseText }}
-                </v-list-item-title>
-              </v-list-item-content>
-            </v-list-item>
-            <v-divider class="mt-2" />
-          </template>
-        </v-autocomplete>
+              <v-list-item
+                ripple
+                @click="selectItems"
+              >
+                <v-list-item-action>
+                  <v-icon
+                    :color="
+                      elemDeep[String(multiple)].length > 0
+                        ? theme.$primary_button
+                        : theme.$main_text
+                    "
+                  >
+                    {{ chooseIcon }}
+                  </v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ chooseText }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-divider class="mt-2" />
+            </template>
+          </v-autocomplete>
+        </div>
+      </div>
+      <div
+        v-if="!show"
+        class="error-msg"
+      >
+        {{ message }}
       </div>
     </div>
-    <div
-      v-if="!show"
-      class="error-msg"
-    >
-      {{ message }}
-    </div>
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -123,6 +133,7 @@ import {
 } from '@mdi/js';
 
 export default {
+  name: 'DashSelect',
   props: {
     idFrom: {
       type: String,
@@ -141,13 +152,25 @@ export default {
       required: true,
     },
     dataLoadingFrom: null,
-    widthFrom: {
-      type: Number,
-      required: true,
-    },
     dataModeFrom: {
       type: Boolean,
       default: false,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -196,7 +219,7 @@ export default {
       return this.$store.getters.getTheme;
     },
     widthInput() {
-      return `${this.widthFrom - 70}px`;
+      return `${this.sizeFrom.width - 70}px`;
     },
     getOptions() {
       if (!this.idDash) {

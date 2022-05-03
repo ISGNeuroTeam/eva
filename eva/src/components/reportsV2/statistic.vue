@@ -11,8 +11,10 @@
       :color-from="theme"
       active-elem-from="table"
       id-dash-from="reports"
-      :width-from="size.width"
-      :height-from="height"
+      :size-from="{
+        height: height,
+        width: size.width,
+      }"
       :time-format-from="''"
       :size-tile-from="{ width: '', height: '' }"
       :search-rep="true"

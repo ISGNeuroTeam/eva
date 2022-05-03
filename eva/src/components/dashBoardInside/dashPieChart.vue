@@ -1,87 +1,93 @@
 <template>
-  <div
-    ref="pieChart"
-    class="piechart-block"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="nodata"
-      class="nodata"
+      ref="pieChart"
+      class="piechart-block"
     >
-      {{ message }}
-    </div>
-    <div
-      ref="chartTooltip"
-      style="
+      <div
+        v-if="nodata"
+        class="nodata"
+      >
+        {{ message }}
+      </div>
+      <div
+        ref="chartTooltip"
+        style="
         position: absolute;
         visibility: hidden;
         border-radius: 3px;
         padding: 5px;
       "
-      :style="{
-        color: theme.$main_text,
-        backgroundColor: theme.$secondary_bg,
-        border: `1px solid ${theme.$secondary_border}`,
-      }"
-    >
-      Наведите курсор на график
-    </div>
+        :style="{
+          color: theme.$main_text,
+          backgroundColor: theme.$secondary_bg,
+          border: `1px solid ${theme.$secondary_border}`,
+        }"
+      >
+        Наведите курсор на график
+      </div>
 
-    <div
-      v-show="dataLoading || !dataRestFrom.length"
-      class="mt-4"
-    >
-      <p>Нет данных для отображения</p>
-    </div>
-    <div
-      v-show="!dataLoading && !!dataRestFrom.length"
-      class="piechart-legend-block"
-      :style="{ flexFlow: positionLegends }"
-    >
       <div
-        ref="piechartItself"
-        :class="`dash-piechart ${idFrom}`"
-      />
+        v-show="dataLoading || !dataRestFrom.length"
+        class="mt-4"
+      >
+        <p>Нет данных для отображения</p>
+      </div>
       <div
-        ref="legends"
-        class="legend-block-pie"
-        :class="dashOptions.positionlegend === 'top'
-          || dashOptions.positionlegend === 'bottom'
-          ? 'legend-block-pie__horizontally'
-          : 'legend-block-pie__vertically'"
+        v-show="!dataLoading && !!dataRestFrom.length"
+        class="piechart-legend-block"
+        :style="{ flexFlow: positionLegends }"
       >
         <div
-          v-for="(item, idx) in legends"
-          :key="idx"
-          class="legend-line"
-          :class="
-            selectedPieIndex === idx
-              ? 'legend-line_selected legend-line_hover'
-              : ''
-          "
-          @mouseover="hoverLegendLine(idx)"
-          @mouseleave="hoverLegendLine(null)"
-          @click="selectedPie = idx"
+          ref="piechartItself"
+          :class="`dash-piechart ${idFrom}`"
+        />
+        <div
+          ref="legends"
+          class="legend-block-pie"
+          :class="dashOptions.positionlegend === 'top'
+            || dashOptions.positionlegend === 'bottom'
+            ? 'legend-block-pie__horizontally'
+            : 'legend-block-pie__vertically'"
         >
           <div
-            class="square"
-            :style="{ backgroundColor: item.color }"
-          />
-          <div
-            class="text"
-            :style="{ color: theme.$main_text }"
+            v-for="(item, idx) in legends"
+            :key="idx"
+            class="legend-line"
+            :class="
+              selectedPie === idx
+                ? 'legend-line_selected legend-line_hover'
+                : ''
+            "
+            @mouseover="hoverLegendLine(idx)"
+            @mouseleave="hoverLegendLine(-1)"
+            @click.stop="selectedPie = idx"
           >
-            {{ item.label }}
+            <div
+              class="square"
+              :style="{ backgroundColor: item.color }"
+            />
+            <div
+              class="text"
+              :style="{ color: theme.$main_text }"
+            >
+              {{ item.label }}
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
-import * as d3 from 'd3';
+import PiechartClass from '../../js/classes/PiechartClass';
 
 export default {
+  name: 'PieChart',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -98,19 +104,15 @@ export default {
     }, // данные полученые после выполнения запроса
     shouldFrom: null, // меняется в момент выбора источника данных у дашборда
     dataLoadingFrom: null, // сообщает что компонент в режиме получения данных
-    widthFrom: {
-      type: Number,
+    sizeFrom: {
+      type: Object,
       required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // высота родительского компонента
-    selectedPieIndex: {
-      type: Number,
-      default: -1,
-    }, // индекс активного элемента
+    },
     isFullScreen: {
+      type: Boolean,
+      default: false,
+    },
+    fullScreenMode: {
       type: Boolean,
       default: false,
     },
@@ -122,7 +124,9 @@ export default {
       legends: [],
       positionLegends: 'row nowrap',
       timeout: '',
+      piechart: null,
       tolate: false,
+      selectedPie: -1,
     };
   },
   computed: {
@@ -223,27 +227,16 @@ export default {
       return this.dataLoadingFrom;
     },
     dashSize() {
-      return {
-        width: this.widthFrom,
-        height: this.heightFrom,
-      };
+      return this.sizeFrom;
     },
     change() {
       return true;
-    },
-    selectedPie: {
-      get() {
-        return this.selectedPieIndex;
-      },
-      set(val) {
-        this.$emit('changeSelectPie', val);
-      },
     },
   },
   watch: {
     'dashOptions.colorsPie': {
       handler(val, old) {
-        if (val && val !== old) {
+        if (val && JSON.stringify(val) !== JSON.stringify(old)) {
           this.changePieChart();
         }
       },
@@ -252,23 +245,30 @@ export default {
     'dashOptions.positionlegend': {
       handler(val, old) {
         if (val && val !== old) {
-          this.changePieChart();
+          this.piechart.changeSize(this.calculatedSize(this.legendSize()));
         }
       },
       deep: true,
     },
-    widthFrom(val, old) {
-      if (val !== old) {
-        this.changePieChart();
-      }
+    'dashOptions.metricsRelation': {
+      deep: true,
+      handler(val, old) {
+        if (val && val !== old) {
+          this.changePieChart();
+        }
+      },
     },
-    heightFrom(val, old) {
-      if (val !== old) {
-        this.changePieChart();
-      }
+    sizeFrom: {
+      deep: true,
+      handler(val, old) {
+        if (JSON.stringify(val) !== JSON.stringify(old) && this.piechart) {
+          this.piechart.changeSize(this.calculatedSize(this.legendSize()));
+          this.setActiveLegendLine(this.selectedPie);
+        }
+      },
     },
-    selectedPieIndex(newVal) {
-      if (newVal !== null) this.setToken(newVal);
+    selectedPie(newVal) {
+      if (newVal !== -1) this.setToken(newVal);
     },
     dataRestFrom: {
       immediate: true,
@@ -284,68 +284,75 @@ export default {
             idDash: this.idDashFrom,
             id: this.idFrom,
           });
-
-          const graphics = d3
-            .select(this.$refs.piechartItself)
-            .selectAll('svg')
-            .nodes();
-          if (graphics.length !== 0) {
-            graphics[0].remove();
-            this.createPieChartDash();
-          } else {
-            this.createPieChartDash();
-          }
+          this.createPieChartDash();
         }
-
-        this.$nextTick(() => {
-          if (
-            this.dataRestFrom
-            && Object.keys(this.dataRestFrom).length
-            && this.dashSize
-          ) {
-            const graphics = d3
-              .select(this.$refs.piechartItself)
-              .selectAll('svg')
-              .nodes();
-
-            if (graphics.length !== 0) {
-              graphics[0].remove();
-              // если строим заново(изменились данные) - очищаем токены
-              this.createPieChartDash();
-            } else {
-              this.createPieChartDash();
-            }
-          }
-        });
       },
+    },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.createPieChartDash();
+      });
     },
   },
   methods: {
+    legendSize() {
+      if (this.$refs.legends.getBoundingClientRect().width !== 0 && this.legends.length > 0) {
+        return {
+          width: Math.round(
+            this.$refs.legends.getBoundingClientRect().width,
+          ),
+          height: Math.round(
+            this.$refs.legends.getBoundingClientRect().height,
+          ),
+        };
+      }
+      return {
+        width: 0,
+        height: 0,
+      };
+    },
+    calculatedSize(legendSize) {
+      const MARGIN = 40; // отступ от контейнера
+      let width = this.sizeFrom.width - MARGIN; // отступ по бокам
+      let height = this.sizeFrom.height - 35; // минус шапка
+
+      switch (this.dashOptions.positionlegend || 'right') {
+        case 'right':
+          this.positionLegends = 'row nowrap';
+          width -= legendSize.width;
+          break;
+
+        case 'left':
+          this.positionLegends = 'row-reverse nowrap';
+          width -= legendSize.width;
+          break;
+
+        case 'top':
+          this.positionLegends = 'column-reverse nowrap';
+          height = height - legendSize.height - MARGIN;
+          break;
+
+        case 'bottom':
+          this.positionLegends = 'column nowrap';
+          height = height - legendSize.height - MARGIN;
+          break;
+        default:
+          break;
+      }
+
+      return {
+        width,
+        height,
+      };
+    },
     hoverLegendLine(legendLineIndex) {
       this.setActiveLegendLine(legendLineIndex);
     },
     setActiveLegendLine(legendLineIndex) {
-      d3.select(this.$refs.pieChart)
-        .selectAll('.piepart')
-        .each((_, i, nodes) => {
-          const node = nodes[i];
-          if (i === legendLineIndex) {
-            node.classList.add('piepartSelect');
-          } else if (
-            node.classList.contains('piepartSelect')
-            && this.selectedPieIndex !== i
-          ) {
-            node.classList.remove('piepartSelect');
-          }
-        });
-      d3.select(this.$refs.legends)
-        .selectAll('.legend-line')
-        .each((_, i, nodes) => {
-          const node = nodes[i];
-          if (legendLineIndex === i) {
-            node.classList.add('legend-line_hover');
-          } else if (node.classList.contains('legend-line_hover')) node.classList.remove('legend-line_hover');
-        });
+      if (this.piechart) {
+        this.piechart.selectActivePiepart(this.selectedPie, legendLineIndex);
+        this.piechart.selectActiveLegendLine(legendLineIndex, 'legend-line');
+      }
     },
     setMetrics() {
       this.$store.commit('setMetricsPie', {
@@ -398,52 +405,35 @@ export default {
             this.nodata = true; // показываем сообщение о некорректности данных
             this.legends = [];
             this.message = 'К сожалению данных слишком много для построения диаграммы'; // выводим сообщение
-            d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+            this.piechart.removePiechart(); // и еще график очищаем, чтобы не мешался
           } else {
             this.createLegend(this.dataRestFrom, metrics, showlegend, colorsPie);
-            let legendSize = {};
             if (this.legends.length > 0) {
-              let timeOut = setTimeout(
-                function tick() {
-                  // важно чтобы наш график построился
-                  // толкьо после того когда создался блок с легендой
-
-                  if (this.$refs.legends.getBoundingClientRect().width !== 0) {
-                    legendSize = {
-                      width: Math.round(
-                        this.$refs.legends.getBoundingClientRect().width,
-                      ),
-                      height: Math.round(
-                        this.$refs.legends.getBoundingClientRect().height,
-                      ),
-                    };
-                    this.createPieChart(
-                      this.dataRestFrom,
-                      this.dashSize,
-                      metrics,
-                      legendSize,
-                      positionlegend,
-                      colorsPie,
-                    ); // и собственно создаем график
-                    clearTimeout(timeOut);
-                    this.setActiveLegendLine(this.selectedPieIndex);
-                  } else {
-                    timeOut = setTimeout(tick.bind(this), 100);
-                  }
-                }.bind(this),
-                0,
-              );
+              this.$nextTick(() => {
+                // TODO: Поправить передачу параметров
+                this.createPieChart(
+                  this.dataRestFrom,
+                  this.dashSize,
+                  metrics,
+                  this.legendSize(),
+                  positionlegend,
+                  colorsPie,
+                ); // и собственно создаем график
+                this.setActiveLegendLine(this.selectedPie);
+              });
             } else {
-              legendSize = { width: 0, height: 0 };
-              this.createPieChart(
-                this.dataRestFrom,
-                this.dashSize,
-                metrics,
-                legendSize,
-                positionlegend,
-                colorsPie,
-              ); // и собственно создаем график
-              this.setActiveLegendLine(this.selectedPieIndex);
+              this.$nextTick(() => {
+              // TODO: Поправить передачу параметров
+                this.createPieChart(
+                  this.dataRestFrom,
+                  this.dashSize,
+                  metrics,
+                  { width: 0, height: 0 },
+                  positionlegend,
+                  colorsPie,
+                ); // и собственно создаем график
+                this.setActiveLegendLine(this.selectedPie);
+              });
             }
           }
         } else {
@@ -451,7 +441,7 @@ export default {
           this.nodata = true; // показываем сообщение о некорректности данных
           this.message = 'К сожалению данные не подходят к диаграмме'; // выводим сообщение
           this.legends = [];
-          d3.select(this.$refs.piechartItself).selectAll('svg').remove(); // и еще график очищаем, чтобы не мешался
+          this.piechart.removePiechart(); // и еще график очищаем, чтобы не мешался
         }
       }
     },
@@ -477,46 +467,10 @@ export default {
       colorsPie,
     ) {
       // создает диаграмму
-      d3.select(this.$refs.piechartItself).selectAll('svg').remove();
-      const MARGIN = 40; // отступ от контейнера
-      let width = sizeLine.width - MARGIN; // отступ по бокам
-      let height = sizeLine.height - 35; // минус шапка
-
-      switch (positionlegend) {
-        case 'right':
-          this.positionLegends = 'row nowrap';
-          width -= legendSize.width;
-          break;
-
-        case 'left':
-          this.positionLegends = 'row-reverse nowrap';
-          width -= legendSize.width;
-          break;
-
-        case 'top':
-          this.positionLegends = 'column-reverse nowrap';
-          height = height - legendSize.height - MARGIN;
-          break;
-
-        case 'bottom':
-          this.positionLegends = 'column nowrap';
-          height = height - legendSize.height - MARGIN;
-          break;
-        default:
-          break;
+      if (this.piechart) {
+        this.piechart.removePiechart();
       }
-
-      // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
-      const radius = Math.min(width, height) / 2 - MARGIN;
-
-      // добовляем svg объект в нужный div
-      const svg = d3
-        .select(this.$refs.piechartItself)
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .append('g')
-        .attr('transform', `translate(${width / 2},${height / 2})`);
+      const { width, height } = this.calculatedSize(legendSize);
 
       const data = {};
 
@@ -527,58 +481,66 @@ export default {
         selectedDefault.push(item[metrics[2]]);
       });
 
-      const color = d3
-        .scaleOrdinal() // устанавливаем цветовую схему для pie chart
-        .domain(data)
-        .range(this.dashOptions.themes[colorsPie.theme]);
-
-      const pie = d3.pie().value((d) => d.value);
-      // eslint-disable-next-line camelcase
-      const data_ready = pie(d3.entries(data));
-
       const tooltipEl = this.$refs.chartTooltip;
+
       const tooltipOffset = { x: 30, y: 5 };
 
-      const hoverLegendLine = this.hoverLegendLine.bind(this);
+      const piechart = new PiechartClass({
+        elem: this.$refs.piechartItself,
+        elemForLegend: this.$refs.legends,
+        width,
+        height,
+        data,
+        colors: this.dashOptions.themes[colorsPie.theme],
+      });
 
-      svg
-        .selectAll('pies')
-        .data(data_ready)
-        .enter()
-        .append('path')
-        .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
-        .attr('class', 'piepart')
-        .attr('fill', (d) => color(d.data.key))
-        .attr('stroke', 'inherit')
-        .style('stroke-width', '2px')
-        .on('mouseover', (d, i, nodes) => {
-          const node = nodes[i];
-          if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
-          tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
-          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
-          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
-          tooltipEl.style.visibility = 'visible';
-          hoverLegendLine(i);
-        })
-        .on('mousemove', () => {
-          tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
-          tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
-        })
-        .on('mouseout', (_, i, nodes) => {
-          if (i !== this.selectedPieIndex) nodes[i].classList.remove('piepartSelect');
-          tooltipEl.style.visibility = 'hidden';
-          hoverLegendLine(-1);
-        })
-        .on('click', (_, i, nodes) => {
-          const node = nodes[i];
-          if (this.selectedPieIndex === i) {
-            this.selectedPie = -1;
-            node.classList.remove('piepartSelect');
-          } else {
+      this.piechart = Object.freeze(piechart);
+
+      this.piechart.setEvents([
+        {
+          eventName: 'mouseover',
+          callback: (d, i, nodes) => {
+            const node = nodes[i];
+            if (!node.classList.contains('piepartSelect')) nodes[i].classList.add('piepartSelect');
+            tooltipEl.textContent = `${d.data.key} - ${d.data.value}`;
+            // eslint-disable-next-line no-restricted-globals
+            tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+            // eslint-disable-next-line no-restricted-globals
+            tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
+            tooltipEl.style.visibility = 'visible';
+            this.hoverLegendLine(i);
+          },
+        },
+        {
+          eventName: 'mousemove',
+          callback: () => {
+            // eslint-disable-next-line no-restricted-globals
+            tooltipEl.style.left = `${event.offsetX + tooltipOffset.x}px`;
+            // eslint-disable-next-line no-restricted-globals
+            tooltipEl.style.top = `${event.offsetY - tooltipOffset.y}px`;
+          },
+        },
+        {
+          eventName: 'mouseout',
+          callback: (_, i, nodes) => {
+            if (i !== this.selectedPie) nodes[i].classList.remove('piepartSelect');
+            tooltipEl.style.visibility = 'hidden';
+            this.hoverLegendLine(-1);
+          },
+        },
+        {
+          eventName: 'click',
+          callback: (_, i, nodes) => {
+            const node = nodes[i];
+            if (this.selectedPie === i) {
+              this.selectedPie = -1;
+              node.classList.remove('piepartSelect');
+            }
             this.selectedPie = i;
             node.classList.add('piepartSelect');
-          }
-        });
+          },
+        },
+      ]);
     },
     setToken(pieIndex) {
       const tokens = this.$store.state[this.idDashFrom].tockens;
@@ -597,16 +559,7 @@ export default {
       }
     },
     changePieChart() {
-      const graphics = d3
-        .select(this.$refs.piechartItself)
-        .selectAll('svg')
-        .nodes();
-      if (graphics.length !== 0) {
-        graphics[0].remove();
-        this.createPieChartDash();
-      } else {
-        this.createPieChartDash();
-      }
+      this.createPieChartDash();
     },
   },
 };
