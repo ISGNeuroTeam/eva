@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created graph class
 
 
+## [Unreleased]
+
+### Fixed
+- Multiline. Some chart line display settings do not work
+
 ## [1.89.0]
 
 ### Feature

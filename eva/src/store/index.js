@@ -838,7 +838,6 @@ export default new Vuex.Store({
     },
     setMetricsMulti(state, { metrics, idDash, id }) {
       const localMetrics = metrics.map((metric) => ({ name: metric, units: '' }));
-      localMetrics.splice(0, 1);
       if (!state[idDash][id].metrics) {
         Vue.set(state[idDash][id], 'metrics', []);
       } else {
