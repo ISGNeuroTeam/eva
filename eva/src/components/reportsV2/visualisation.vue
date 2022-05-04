@@ -299,12 +299,14 @@ export default {
           && (!this.dashFromStore[this.activeElem]?.metrics
               || !this.dashFromStore[this.activeElem]?.metrics.length)
           && this.activeElem === 'multiLine') {
+        const metrics = Object.keys(this.data[0]);
+        metrics.splice(0, 1);
         this.$store.commit(
           'setMetricsMulti',
           {
             id: this.activeElem,
             idDash: this.idDash,
-            metrics: Object.keys(this.data[0]),
+            metrics,
           },
         );
       }

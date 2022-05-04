@@ -343,7 +343,7 @@
                   background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                :disabled="metrics[i - 1].manual"
+                :disabled="!metrics[i - 1].manualBorder"
                 outlined
                 class="item-metric border"
                 hide-details
@@ -360,7 +360,7 @@
                   background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                :disabled="metrics[i - 1].manual"
+                :disabled="!metrics[i - 1].manualBorder"
                 outlined
                 class="item-metric border"
                 hide-details
@@ -405,6 +405,7 @@
                     class="item-metric"
                     label="Вывод значений"
                     type="number"
+                    min="0"
                     hide-details
                     @input="(e) => handleChangeConlusionCount(e, i - 1)"
                   />
@@ -426,6 +427,8 @@
                     class="item-metric"
                     label="Значения после запятой"
                     type="number"
+                    min="0"
+                    max="100"
                     hide-details
                     @input="(e) => handleChangeReplaceCount(e, i - 1)"
                   />
@@ -465,11 +468,11 @@
                 </div>
               </div>
               <v-checkbox
-                v-model="metrics[i - 1].manual"
+                v-model="metrics[i - 1].manualBorder"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text }"
                 class="item-metric checkbox"
-                label="Автоматически/Вручную"
+                label="Установить границы"
                 hide-details
                 @change="isChanged = true"
               />
@@ -1264,17 +1267,26 @@ export default {
       this.isChanged = true;
     },
     handleChangeConlusionCount(e, i) {
-      this.conclusion_count = {
-        ...this.conclusion_count,
-        [this.metrics[i].name]: Number(e),
-      };
+      if (e === null) {
+        delete this.conclusion_count[this.metrics[i].name];
+      } else {
+        this.conclusion_count = {
+          ...this.conclusion_count,
+          [this.metrics[i].name]: Math.abs(Number(e)),
+        };
+      }
       this.isChanged = true;
     },
     handleChangeReplaceCount(e, i) {
-      this.replace_count = {
-        ...this.replace_count,
-        [this.metrics[i].name]: Number(e),
-      };
+      const val = Number(e);
+      if (e === null || val < 0 || val > 100) {
+        delete this.replace_count[this.metrics[i].name];
+      } else {
+        this.replace_count = {
+          ...this.replace_count,
+          [this.metrics[i].name]: val,
+        };
+      }
       this.isChanged = true;
     },
     // отправляем настройки в хранилище
@@ -1431,7 +1443,7 @@ export default {
         type: '',
         upborder: 0,
         lowborder: 0,
-        manual: true,
+        manualBorder: false,
       });
       this.$set(this, 'metrics', arr);
     },

@@ -252,11 +252,11 @@ export default {
     theme() {
       this.reRenderChart();
     },
-    metrics() {
+    metrics(val, old) {
       this.reRenderChart();
-      const { id, idDash, metrics } = this;
-      // @todo: проверить и исправить данный метод как будет время
-      this.$store.commit('setMetricsMulti', { id, idDash, metrics: [null, ...metrics] });
+      if (val.length && JSON.stringify(val) !== JSON.stringify(old)) {
+        this.sendMetricsToStore();
+      }
     },
     options: {
       deep: true,
@@ -278,8 +278,20 @@ export default {
     this.createChart();
     this.updateData(this.data);
     this.tooltip = d3.select(this.$refs.svgContainer).select('.graph-tooltip');
+    this.$on('fullScreenMode', (isFull) => {
+      if (isFull) {
+        this.reRenderChart();
+      }
+    });
+    if (this.metrics.length) {
+      this.sendMetricsToStore();
+    }
   },
   methods: {
+    sendMetricsToStore() {
+      const { id, idDash, metrics } = this;
+      this.$store.commit('setMetricsMulti', { id, idDash, metrics });
+    },
     eventsStore({ event, partelement }) {
       const { idDash } = this;
       let result = [];
@@ -437,13 +449,6 @@ export default {
               minYMetric = allMinYMetric < 0 ? allMinYMetric : 0;
             } else if (minYMetric > 0) {
               minYMetric = 0;
-            } else {
-              // round
-              if (minYMetric < 0) {
-                minYMetric -= Math.abs(minYMetric - maxYMetric) * 0.1;
-              } else {
-                minYMetric += Math.abs(minYMetric - maxYMetric) * 0.1;
-              }
             }
           }
         }
@@ -455,28 +460,35 @@ export default {
           // если у метрики только одно значение
           if (maxYMetric === minYMetric) {
             maxYMetric += Math.abs(maxYMetric) * 0.1;
-          } else {
-            if (opt.manual) {
-              if (opt.upborder) {
-                maxYMetric = +opt.upborder;
-              }
-              if (opt.lowborder) {
-                minYMetric = +opt.lowborder;
-              }
-            }
-            maxYMetric += Math.abs(maxYMetric) * 0.1;
-          }
-        }
-        if (metricType === 'barplot') {
-          maxYMetric += Math.abs(maxYMetric) * 0.1;
-          if (minYMetric !== 0 && minYMetric < 0) {
             minYMetric -= Math.abs(minYMetric) * 0.1;
           }
-          if (maxYMetric < 0 && minYMetric < 0) {
-            maxYMetric = 0;
+
+          // вручную выставлены границы Y оси
+          if (opt.manualBorder) {
+            if (+opt.upborder > maxYMetric) {
+              maxYMetric = +opt.upborder;
+            }
+            if (+opt.lowborder < minYMetric) {
+              minYMetric = +opt.lowborder;
+            }
+          } else {
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            minYMetric -= Math.abs(minYMetric) * 0.1;
+          }
+        } else {
+          if (metricType === 'barplot') {
+            maxYMetric += Math.abs(maxYMetric) * 0.1;
+            if (minYMetric !== 0 && minYMetric < 0) {
+              minYMetric -= Math.abs(minYMetric) * 0.1;
+            }
+            if (maxYMetric < 0 && minYMetric < 0) {
+              maxYMetric = 0;
+            }
+          } else {
+            // round
+            minYMetric -= Math.abs(minYMetric - maxYMetric) * 0.1;
           }
         }
-        minYMetric -= Math.abs(minYMetric) * 0.1;
 
         this.y[metric] = d3.scaleLinear()
           .range(united ? [yHeight, 0] : [yHeight + yHeight * i, yHeight * i])
@@ -643,7 +655,8 @@ export default {
 
       const { xMetric, xZoom } = this;
       const {
-        united, barplotstyle, isDataAlwaysShow, lastDot,
+        // eslint-disable-next-line camelcase
+        united, barplotstyle, isDataAlwaysShow, lastDot, conclusion_count = {},
       } = this.options;
 
       this.metrics
@@ -861,8 +874,15 @@ export default {
         }
 
         // рисуем текст у вершин
-        if (isDataAlwaysShow || lastDot) {
-          const textData = isDataAlwaysShow ? this.data : [this.lastDataItem];
+        const conclusionCount = conclusion_count[metric];
+        if (isDataAlwaysShow || lastDot || conclusionCount > 1) {
+          let textData = this.data;
+          if (conclusionCount > 1) {
+            textData = this.data
+              .filter((item, n) => (this.data.length - n) % conclusionCount === 1);
+          } else if (lastDot && !isDataAlwaysShow) {
+            textData = [this.lastDataItem];
+          }
           this.renderPeakTexts(metric, metricType, textData);
         }
       });
@@ -890,7 +910,9 @@ export default {
       }
     },
     updateLineDots(data, metric) {
-      const { isDataAlwaysShow, lastDot } = this.options;
+      // eslint-disable-next-line camelcase
+      const { isDataAlwaysShow, lastDot, conclusion_count = {} } = this.options;
+      const conclusionCount = conclusion_count[metric];
       const currentColor = this.getCurrentMetricColor(metric);
       this.svg
         .append('g')
@@ -899,10 +921,13 @@ export default {
         .enter()
         .append('circle')
         .attr('class', (d, i) => {
-          const textToRight = (i === this.data.length - 1);
-          const showDot = isDataAlwaysShow
-            || (lastDot && textToRight)
-            || data.length === 1;
+          const isLastDot = (i === this.data.length - 1);
+          let showDot = false;
+          if (conclusionCount > 1) {
+            showDot = (data.length - i) % conclusionCount === 1;
+          } else if (isDataAlwaysShow || (lastDot && isLastDot)) {
+            showDot = true;
+          }
           return `dot dot-${metric} ${(showDot ? 'dot-show' : '')}`;
         })
         .attr('cx', (d) => this.xZoom(d[this.xMetric]))
@@ -930,8 +955,11 @@ export default {
         : this.color(metric);
     },
     renderPeakTexts(metric, metricType, data) {
-      const { isDataAlwaysShow } = this.options;
+      // eslint-disable-next-line camelcase
+      const { isDataAlwaysShow, replace_count = {} } = this.options;
       const isLine = (metricType === 'linechart');
+      const fixedTo = replace_count[metric];
+
       this.svg
         .append('g')
         .selectAll('dot')
@@ -961,8 +989,8 @@ export default {
             return d[fieldName];
           }
           const val = d[metric];
-          return (val % 1) // is float
-            ? Number.parseFloat(val).toFixed(2)
+          return (val % 1 || fixedTo) // is float
+            ? Number.parseFloat(val).toFixed(fixedTo || 2)
             : val;
         })
         .attr('x', (d) => this.xZoom(d[this.xMetric]))
@@ -1232,6 +1260,9 @@ export default {
     },
 
     setClick(point, actionName) {
+      if (!this.tokensStore) {
+        return;
+      }
       const { id, idDash } = this;
       const tokens = this.tokensStore
         .filter(({ elem, action }) => (elem === id && action === actionName));
