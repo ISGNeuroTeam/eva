@@ -362,10 +362,12 @@ import {
 import { codemirror } from 'vue-codemirror';
 import numberLineModal from '@/components/reportsV2/numberLineModal';
 
-import 'codemirror/mode/python/python.js';
 import 'codemirror/addon/fold/foldgutter.css';
 import 'codemirror/addon/fold/foldgutter.js';
+import 'codemirror/addon/fold/foldcode.js';
 import 'codemirror/addon/fold/indent-fold.js';
+import 'codemirror/addon/merge/merge.js';
+import '../../js/codeHighlight.js';
 
 export default {
   components: {
@@ -420,14 +422,13 @@ export default {
         line: true,
         foldGutter: true,
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-        highlightSelectionMatches: { showToken: /\w/, annotateScrollbar: true },
-        mode: 'text/x-python',
+        mode: 'text/x-otl',
         hintOptions: {
           completeSingle: false,
         },
         matchBrackets: true,
         showCursorWhenSelecting: true,
-        theme: 'default',
+        theme: 'eva-dark',
         lineWrapping: false,
       },
       searchSize: [10, 15, 20, 30, 40, 50],
@@ -443,6 +444,9 @@ export default {
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    getThemeTitle() {
+      return this.$store.getters.getThemeTitle;
     },
     dateRangeText() {
       return this.dates.join(' ~ ');
@@ -485,6 +489,11 @@ export default {
         }
       }
     },
+    getThemeTitle(val) {
+      // eslint-disable-next-line no-unused-expressions
+      val === 'dark' ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
+      this.forwardInput();
+    },
   },
   created() {
     this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
@@ -503,6 +512,11 @@ export default {
         this.launchSearch();
       }
     });
+    if (this.getThemeTitle === 'dark') {
+      this.cmOption.theme = 'eva-dark';
+    } else {
+      this.cmOption.theme = 'eva';
+    }
   },
   methods: {
     changeInput() {
@@ -624,8 +638,10 @@ export default {
 </script>
 
 <style lang="sass">
-@import ./../../sass/_colors
 @import 'codemirror/lib/codemirror'
+@import ./../../sass/_colors
+@import ./../../sass/codeHighlightEva
+@import ./../../sass/codeHighlightEvaDark
 
 .textarea
   max-height: 420px
@@ -761,7 +777,7 @@ export default {
     &:hover
       width: 13px
       &::-webkit-scrollbar-track
-        background: var(--secondary_border)
+        background: $secondary_border
     &::-webkit-scrollbar
       transition: all .3s
       width: 7px
@@ -774,7 +790,7 @@ export default {
     &:hover
       height: 13px
       &::-webkit-scrollbar-track
-        background: var(--secondary_border)
+        background: $secondary_border
     &::-webkit-scrollbar
       transition: all .3s
       height: 7px
