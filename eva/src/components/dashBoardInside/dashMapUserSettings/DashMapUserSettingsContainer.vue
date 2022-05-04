@@ -19,7 +19,13 @@
               v-on="menu"
               @click="toggleSelect = !toggleSelect"
             >
+              <v-icon :style="{ color: theme.$main_text }">
+                {{ mdiClipboardText }}
+              </v-icon>
               Режим
+              <v-icon :style="{ color: theme.$main_text }">
+                {{ mdiChevronDown }}
+              </v-icon>
             </v-btn>
             <v-select
               :value="options.mode"
@@ -29,6 +35,38 @@
               label="Режим"
               multiple
               @change="updatePipeDataSource($event)"
+            />
+          </template>
+        </v-menu>
+        <v-menu
+          v-model="toggleSelectLayer"
+          z-index="1"
+        >
+          <template v-slot:activator="{ on:menu }">
+            <v-btn
+              rounded
+              :style="`
+               background: ${theme.$secondary_bg};
+               color: ${theme.$main_text};
+               pointer-events: auto`"
+              v-on="menu"
+              @click="toggleSelectLayer = !toggleSelectLayer"
+            >
+              <v-icon :style="{ color: theme.$main_text }">
+                {{ mdiLayers }}
+              </v-icon>
+              Слои
+              <v-icon :style="{ color: theme.$main_text }">
+                {{ mdiChevronDown }}
+              </v-icon>
+            </v-btn>
+            <v-select
+              :value="options.layer"
+              :menu-props="{ value:toggleSelectLayer }"
+              :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+              :items="layerList"
+              label="Слои"
+              multiple
             />
           </template>
         </v-menu>
@@ -210,7 +248,13 @@
 </template>
 
 <script>
-import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
+import {
+  mdiFormatListBulletedSquare,
+  mdiSettings,
+  mdiLayers,
+  mdiClipboardText,
+  mdiChevronDown,
+} from '@mdi/js';
 import 'leaflet/dist/leaflet.css';
 
 export default {
@@ -235,6 +279,9 @@ export default {
       mode: ['Мониторинг', 'Сравнение', 'Аналитика', 'Поиск', 'Режим 5'],
       mdiSettings,
       mdiList: mdiFormatListBulletedSquare,
+      mdiLayers,
+      mdiClipboardText,
+      mdiChevronDown,
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
       currentTile: {},
@@ -275,7 +322,10 @@ export default {
         showLegend: true,
         mode: [],
         search: '',
+        layer: [],
       },
+      layerList: ['Подложка', 'Рельеф', 'Трубы', 'Кусты', 'Скважины'],
+      toggleSelectLayer: false,
     };
   },
   computed: {
@@ -332,6 +382,13 @@ export default {
           object: this.dashFromStore.options,
           prop: 'united',
           value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.layer) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'layer',
+          value: [],
         }]);
       }
       return this.dashFromStore.options;
