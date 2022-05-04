@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created guntt class
 - Created piechart class
 - Created graph class
+- Adding a code editor to data exploration
 
 ### Fixed
 - Multiline. Some chart line display settings do not work
