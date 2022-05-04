@@ -1,41 +1,49 @@
 <template>
-  <div
-    ref="container"
-    class="dash-map"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="error"
-      :key="`error-message-${idDashFrom}`"
-      class="error-message"
+      ref="container"
+      class="dash-map"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
-      {{ error }}
-    </div>
-    <div
-      v-show="!error"
-      :key="`mapContainer-${idDashFrom}`"
-      ref="map"
-      class="mapContainer"
-      :style="mapStyleSize"
-    >
-      <dash-map-user-settings-container
+      <div
+        v-if="error"
+        :key="`error-message-${idDashFrom}`"
+        class="error-message"
+      >
+        {{ error }}
+      </div>
+      <div
+        v-show="!error"
+        :key="`mapContainer-${idDashFrom}`"
+        ref="map"
+        class="mapContainer"
+        :style="mapStyleSize"
+      >
+        <dash-map-user-settings-container
+          v-if="map"
+          :map="map"
+          :id-dash-from="idDashFrom"
+          :id-element="idFrom"
+          @openSettingsModal="modalSettingsValue = true"
+        />
+      </div>
+      <dash-map-user-settings-new
         v-if="map"
+        :modal-value="modalSettingsValue"
         :map="map"
         :id-dash-from="idDashFrom"
         :id-element="idFrom"
-        @openSettingsModal="modalSettingsValue = true"
+        :search="search"
+        @update:modalValue="updateModalValue"
+        @updatePipeDataSource="loadDataForPipe"
       />
     </div>
-    <dash-map-user-settings-new
-      v-if="map"
-      :modal-value="modalSettingsValue"
-      :map="map"
-      :id-dash-from="idDashFrom"
-      :id-element="idFrom"
-      :search="search"
-      @update:modalValue="updateModalValue"
-      @updatePipeDataSource="loadDataForPipe"
-    />
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -45,10 +53,12 @@ import store from '../../store/index'; // подключаем файл с на�
 import MapClass from '../../js/classes/MapClass';
 
 export default {
+  name: 'DashMap',
   components: {
     DashMapUserSettingsContainer,
     dashMapUserSettingsNew,
   },
+  inheritAttrs: false,
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -67,14 +77,6 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
     options: {
       type: Object,
       required: true,
@@ -82,6 +84,22 @@ export default {
     search: {
       type: Object,
       default: () => ({}),
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    }, // выоста\ширина родительского компонента
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -107,6 +125,7 @@ export default {
       rightTop: 0,
       pipelineData: [],
       pipelineDataDictionary: {},
+      position: null,
     };
   },
   computed: {
@@ -172,15 +191,19 @@ export default {
     option() {
       return this.getOptions;
     },
-
     top() {
       // для ряда управляющих иконок
       return document.body.clientWidth <= 1600 ? 50 : 60;
     },
     mapStyleSize() {
       return {
-        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 10}px`,
+        height: `${Math.trunc(this.sizeFrom.height) - this.top / 2 - 10}px`,
       };
+    },
+    getCurrentPosition() {
+      return this.position
+        ? [this.position.lat, this.position.lng]
+        : [this.options?.initialPoint?.x || 0, this.options?.initialPoint?.y || 0];
     },
   },
   watch: {
@@ -222,6 +245,11 @@ export default {
         this.map.createMap(this.maptheme);
       }
     },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.init();
+      });
+    },
   },
   mounted() {
     if (this.$refs.map) {
@@ -233,39 +261,41 @@ export default {
       this.modalSettingsValue = !this.modalSettingsValue;
     },
     init() {
-      this.initMap();
-      this.initTheme();
-      this.initCluster();
-      if (this.map) {
-        store.subscribe((mutation) => {
-          if (mutation.type === 'updateOptions') {
-            if (this.options.initialPoint) {
-              this.map.setView(
-                [this.options.initialPoint.x, this.options.initialPoint.y],
+      this.$nextTick(() => {
+        this.initMap();
+        this.initTheme();
+        this.initCluster();
+        if (this.map) {
+          store.subscribe((mutation) => {
+            if (mutation.type === 'updateOptions') {
+              if (this.options.initialPoint) {
+                this.map.setView(
+                  this.getCurrentPosition,
+                  mutation.payload.options.zoomLevel,
+                );
+              } else {
+                this.map.setView(
+                  this.map.startingPoint,
+                  mutation.payload.options.zoomLevel,
+                );
+              }
+              this.map.wheelPxPerZoomLevel = 200;
+              this.updateToken(
                 mutation.payload.options.zoomLevel,
-              );
-            } else {
-              this.map.setView(
-                this.map.startingPoint,
-                mutation.payload.options.zoomLevel,
+                this.map.bounds,
               );
             }
-            this.map.wheelPxPerZoomLevel = 200;
-            this.updateToken(
-              mutation.payload.options.zoomLevel,
-              this.map.bounds,
-            );
-          }
-        });
+          });
 
-        this.createTokens();
-        this.$store.commit('setActions', {
-          actions: this.actions,
-          idDash: this.idDash,
-          id: this.element,
-        });
-        this.loadDataForPipe(this.$store.getters.getPaperSearch);
-      }
+          this.createTokens();
+          this.$store.commit('setActions', {
+            actions: JSON.parse(JSON.stringify(this.actions)),
+            idDash: this.idDash,
+            id: this.element,
+          });
+          this.loadDataForPipe(this.$store.getters.getPaperSearch);
+        }
+      });
     },
     async getDataFromRest(event) {
       this.$store.commit('setLoading', {
@@ -375,30 +405,32 @@ export default {
       });
     },
     reDrawMap(dataRest) {
-      if (this.map) {
-        this.map.clearMap();
-        this.error = null;
-        // получаем osm server
-        this.getOSM();
-        // получаем библиотеку
-        // get all icons that we need on map
-        this.generateLibrary(dataRest, this.options?.primitivesLibrary);
-        this.map.generateClusterPositionItems();
-        if (!this.error && dataRest.length > 0) {
-          // создаем элемент карты
-          this.map.createMap(this.maptheme);
-          // рисуем объекты на карте
-          this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
-          if (this.map) {
-            if (this.options.initialPoint) {
-              this.map.setView(
-                [this.options.initialPoint.x, this.options.initialPoint.y],
-                this.options.zoomLevel,
-              );
-            } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
+      this.$nextTick(() => {
+        if (this.map) {
+          this.map.clearMap();
+          this.error = null;
+          // получаем osm server
+          this.getOSM();
+          // получаем библиотеку
+          // get all icons that we need on map
+          this.generateLibrary(dataRest, this.options?.primitivesLibrary);
+          this.map.generateClusterPositionItems();
+          if (!this.error && dataRest.length > 0) {
+            // создаем элемент карты
+            this.map.createMap(this.maptheme);
+            // рисуем объекты на карте
+            this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
+            if (this.map) {
+              if (this.options.initialPoint) {
+                this.map.setView(
+                  this.getCurrentPosition,
+                  this.options.zoomLevel,
+                );
+              } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
+            }
           }
         }
-      }
+      });
     },
     deleteTitleByAttribute() {
       const leafletControlZoomOut = this.$refs.map.querySelector(
@@ -474,13 +506,14 @@ export default {
         zoomSnap: 0,
         zoom: this.getOptions.zoomLevel,
         maxZoom: 25,
-        center: [0, 0],
+        center: this.getCurrentPosition,
       });
       this.map = Object.freeze(map);
       this.map.setEvents([
         {
           event: 'moveend',
           callback: () => {
+            this.position = this.map.center;
             [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
             this.updateToken(this.map.zoom);
           },

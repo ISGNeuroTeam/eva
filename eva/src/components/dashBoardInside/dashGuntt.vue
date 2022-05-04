@@ -1,52 +1,62 @@
 <template>
-  <div
-    class="dash-guntt"
-    :class="idDashClass()"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="!noMsg && guntt && guntt.getPhases.length > 0"
-      class="legend-block"
+      class="dash-guntt"
+      v-bind="$attrs"
+      :style="customStyle"
+      :class="idDashClass()"
     >
       <div
-        v-for="(item, index) in guntt.getPhases"
-        :key="`${item}${index}`"
-        class="legends-itself"
+        v-if="!noMsg && guntt && guntt.getPhases.length > 0"
+        class="legend-block"
       >
         <div
-          class="circle"
-          :style="{ backgroundColor: colors[index] }"
-        />
-        <div class="text">
-          {{ item }}
+          v-for="(item, index) in guntt.getPhases"
+          :key="`${item}${index}`"
+          class="legends-itself"
+        >
+          <div
+            class="circle"
+            :style="{ backgroundColor: colors[index] }"
+          />
+          <div class="text">
+            {{ item }}
+          </div>
         </div>
       </div>
+      <div
+        v-if="!noMsg"
+        ref="gunttBlock"
+        key="gunttBlock"
+        class="guntt-block"
+      />
+      <div
+        ref="tooltip"
+        class="tooltipGuntt"
+        :style="{
+          backgroundColor: colorFrom.$secondary_bg,
+          border: `1px solid ${colorFrom.$main_text}`,
+        }"
+      />
+      <div
+        v-if="noMsg"
+        class="mt-4"
+      >
+        {{ msgText }}
+      </div>
     </div>
-    <div
-      v-if="!noMsg"
-      ref="gunttBlock"
-      class="guntt-block"
-    />
-    <div
-      ref="tooltip"
-      class="tooltipGuntt"
-      :style="{
-        backgroundColor: colorFrom.$secondary_bg,
-        border: `1px solid ${colorFrom.$main_text}`,
-      }"
-    />
-    <div
-      v-if="noMsg"
-      class="mt-4"
-    >
-      {{ msgText }}
-    </div>
-  </div>
+  </portal>
 </template>
 
 <script>
 import GunttClass from '../../js/classes/GunttClass';
 
 export default {
+  name: 'DashGuntt',
+  inheritAttrs: false,
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -65,14 +75,6 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // высота родительского компонента
     timeFormatFrom: {
       type: String,
       required: true,
@@ -84,6 +86,22 @@ export default {
     dataReport: {
       type: Boolean,
       default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -164,51 +182,63 @@ export default {
         this.noMsg = true;
       }
     },
-    widthFrom() {
-      if (this.dataRestFrom.length > 0) {
-        if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
-          this.hiddenTooltip();
-          if (this.dataReport) {
-            if (this.activeElemFrom === this.id) {
+    sizeFrom: {
+      deep: true,
+      handler() {
+        if (this.dataRestFrom.length > 0) {
+          if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+            this.hiddenTooltip();
+            if (this.dataReport) {
+              if (this.activeElemFrom === this.id) {
+                this.prepareChart(this.dataRestFrom);
+              } else if (this.guntt) {
+                this.guntt.removeGuntt();
+              }
+            } else {
               this.prepareChart(this.dataRestFrom);
-            } else if (this.guntt) {
-              this.guntt.removeGuntt();
             }
-          } else {
-            this.prepareChart(this.dataRestFrom);
           }
         }
-      }
+      },
     },
-    heightFrom() {
-      if (this.dataRestFrom.length > 0) {
-        if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
-          if (this.dataReport) {
-            if (this.activeElemFrom === this.id) {
-              this.prepareChart(this.dataRestFrom);
-            } else if (this.guntt) {
-              this.guntt.removeGuntt();
+    fullScreenMode(val) {
+      this.$nextTick(() => {
+        if (val) {
+          if (this.dataRestFrom.length > 0) {
+            if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+              this.hiddenTooltip();
+              if (this.dataReport) {
+                if (this.activeElemFrom === this.id) {
+                  this.prepareChart(this.dataRestFrom);
+                } else if (this.guntt) {
+                  this.guntt.removeGuntt();
+                }
+              } else {
+                this.prepareChart(this.dataRestFrom);
+              }
             }
-          } else {
-            this.prepareChart(this.dataRestFrom);
           }
         }
-      }
+      });
     },
   },
   mounted() {
-    this.dataRestFromWatch();
-    this.$emit('setVissible', { element: this.id, overflow: 'hidden' });
+    if (this.dataRestFrom?.length > 0) {
+      this.dataRestFromWatch();
+      this.$emit('setVissible', { element: this.id, overflow: 'hidden' });
+    }
   },
   methods: {
     hiddenTooltip() {
       const tooltipBlock = this.$refs.tooltip;
-      tooltipBlock.style.opacity = '0';
-      tooltipBlock.style.visibility = 'hidden';
+      if (tooltipBlock) {
+        tooltipBlock.style.opacity = '0';
+        tooltipBlock.style.visibility = 'hidden';
+      }
     },
     dataRestFromWatch() {
       this.$nextTick(() => {
-        if (this.dataRestFrom && Object.keys(this.dataRestFrom).length !== 0) {
+        if (this.dataRestFrom?.length > 0) {
           if (
             this.dataRestFrom[0].start_date
               && this.dataRestFrom[0].end_date
@@ -235,15 +265,15 @@ export default {
       });
     },
     idDashClass() {
-      return `dash-guntt-${this.id}`;
+      return `dash-guntt-${this.id} ${this.customClass}`;
     },
     prepareChart(dataRest) {
       const prom = new Promise((resolve) => {
         // создаем promise чтобы затем отрисовать график асинхронно
 
         const sizeChart = { width: 0, height: 0 }; // получаем размеры от родителя
-        sizeChart.width = this.widthFrom;
-        sizeChart.height = this.heightFrom;
+        sizeChart.width = this.sizeFrom.width;
+        sizeChart.height = this.sizeFrom.height;
 
         this.actions[0].capture = Object.keys(dataRest[0]);
 
