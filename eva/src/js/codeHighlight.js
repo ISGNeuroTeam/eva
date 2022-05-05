@@ -99,7 +99,7 @@
       },
       {
         regex: /[^"]+/,
-        token: 'string',
+        token: 'string.big',
       },
     ],
     token: [

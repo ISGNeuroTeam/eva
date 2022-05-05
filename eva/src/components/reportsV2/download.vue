@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { mdiDownload, mdiClose } from '@mdi/js';
+import { mdiFileOutline, mdiDownload, mdiClose } from '@mdi/js';
 import { utils, writeFileXLSX } from 'xlsx';
 
 export default {
@@ -114,6 +114,7 @@ export default {
   data() {
     return {
       mdiDownload,
+      mdiFileOutline,
       mdiClose,
       dialog: false,
     };

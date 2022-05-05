@@ -128,6 +128,7 @@
               v-model="settings"
               offset-y
               :close-on-content-click="false"
+              nudge-top="9px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <div
@@ -627,6 +628,33 @@ export default {
     autoTransfer() {
       // eslint-disable-next-line no-underscore-dangle
       this.$refs.search._data.cminstance.doc.cm.refresh();
+      if (this.cmOption.lineWrapping) {
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '[',
+          '[\n  ',
+        );
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          ']',
+          '\n]',
+        );
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '"',
+          '\n "',
+        );
+      } else {
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '[\n  ',
+          '[',
+        );
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '\n]',
+          ']',
+        );
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '\n "',
+          '"',
+        );
+      }
     },
     // 24 - высота строки
     changeHeightCodemirror(item) {
