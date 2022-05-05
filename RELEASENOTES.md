@@ -1,3 +1,13 @@
+## [1.90.0]
+
+### Added
+- Add donat mod to pieChart
+- Optimization of visualization classes for gant, pie chart, graph.
+
+### Fixed
+- Multiline. Some chart line display settings do not work
+- Fixed gantt infinite reloading
+
 # [1.89.0]
 
 ### Feature
