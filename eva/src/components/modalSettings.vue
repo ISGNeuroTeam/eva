@@ -1066,7 +1066,7 @@ export default {
       replace_count: {},
       options: {},
       type_line: {},
-      color: {},
+      color: '',
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
@@ -1342,7 +1342,6 @@ export default {
       if (this.element.startsWith('map')) {
         this.changeSelectedLayer();
       }
-
       const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
@@ -1350,7 +1349,7 @@ export default {
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
-        color: this.color,
+        color: this.options.color || this.color,
         updated: Date.now(),
       };
       await this.$store.dispatch('saveSettingsToPath', {

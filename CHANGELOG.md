@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Multiline. Some chart line display settings do not work
 - Fixed guntt infinite loop
+- Fixed styles on vuetify components
 
 ## [1.89.0]
 
