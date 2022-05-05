@@ -2,6 +2,7 @@
   <div
     class="statistic"
     :style="{ background: theme.$main_bg, color: theme.$main_text }"
+    :height-from="height"
   >
     <v-card-text
       :is="`dash-table`"
@@ -10,8 +11,10 @@
       :color-from="theme"
       active-elem-from="table"
       id-dash-from="reports"
-      :width-from="size.width"
-      :height-from="size.height"
+      :size-from="{
+        height: height,
+        width: size.width,
+      }"
       :time-format-from="''"
       :size-tile-from="{ width: '', height: '' }"
       :search-rep="true"
@@ -47,6 +50,21 @@ export default {
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+
+    height() {
+      let otstup = 390;
+      if (window.screen.width <= 1600) {
+        otstup = 80;
+      }
+      if (window.screen.width <= 1400) {
+        otstup = 70;
+      }
+      if (this.data) {
+        otstup -= 30;
+      }
+      // 120 это размер блока с пагинацией таблицы + шапка с настройками самого блока
+      return this.size.height - otstup - 45;
     },
   },
   mounted() {

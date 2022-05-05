@@ -5,24 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
 
-## [Unrelise]
+### Added
+- Add donat mod to pieChart
+- Created guntt class
+- Created piechart class
+- Created graph class
+
+### Fixed
+- Multiline. Some chart line display settings do not work
+- Fixed guntt infinite loop
+
+## [1.89.0]
 
 ### Feature
 - Created map class
 - additional export
 
 ### Fixed
+- fix export link
 - fixed maps mode
+- data exploration 2.0: fixed styles and added a horizontal scroll bar
 
 ## [1.88.0]
 
 ### Feature
 - Added hotkey for query window in data research v2
-- Created guntt class
 
 ### Fixed
-- fix export link
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings

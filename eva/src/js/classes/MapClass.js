@@ -138,6 +138,10 @@ class MapClass {
     return this.map.getBounds();
   }
 
+  get center() {
+    return this.map.getCenter();
+  }
+
   get clusterDelimiter() {
     return this.options.clusterDelimiter;
   }

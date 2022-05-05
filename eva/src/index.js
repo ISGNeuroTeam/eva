@@ -4,7 +4,7 @@ import './scroll.css';
 import './scss/globalStyles.scss';
 
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
-
+import PortalVue from 'portal-vue';
 import AsyncComputed from 'vue-async-computed';
 // сопоставляем подключенный компонент с комопнентом vue
 import VueDraggableResizable from 'vue-draggable-resizable';
@@ -28,6 +28,7 @@ import screenshot from './plugins/screenshot';
 import 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.css';
 import App from './App.vue';
 
+Vue.use(PortalVue);
 // подключаем библиотеку для перемещения и изменения размеров dashboard
 Vue.use(AsyncComputed);
 // подключаем стили для этого компонента
