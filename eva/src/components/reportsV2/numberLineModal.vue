@@ -25,10 +25,20 @@
         :color="theme.$primary_button"
         :style="{ color: theme.$main_text }"
         outlined
+        :error-messages="error"
         label="Введите значение"
+        type="number"
         hide-details
         class="b-number-line__input"
+        @input="changeInput"
       />
+      <div
+        class="b-number-line__error"
+        :style="{ color: theme.$error_color }"
+        :class="{ errormsgshow: msg }"
+      >
+        {{ error }}
+      </div>
       <div class="b-number-line__row">
         <v-btn
           text
@@ -40,7 +50,7 @@
         <v-btn
           :color="theme.$primary_button"
           class="b-number-line__btn b-number-line__btn--save"
-          @click="$emit('change', number)"
+          @click="save"
         >
           Сохранить
         </v-btn>
@@ -67,6 +77,8 @@ export default {
   data() {
     return {
       number: '',
+      error: '',
+      msg: false,
       mdiPlus,
     };
   },
@@ -79,6 +91,25 @@ export default {
     close() {
       this.number = '';
       this.$emit('close');
+    },
+    save() {
+      if (this.number > 100) {
+        this.number = 100;
+      }
+      if (this.number <= 0) {
+        this.number = 10;
+      }
+      this.$emit('change', this.number);
+      this.close();
+    },
+    changeInput() {
+      if (this.number > 100 || this.number <= 0) {
+        this.error = 'Число должно быть больше 0 и не должно быть больше 100';
+        this.msg = true;
+      } else {
+        this.error = '';
+        this.msg = false;
+      }
     },
   },
 };
@@ -120,4 +151,10 @@ export default {
     color: var(--main_text)
     &--save
       color: #fff
+  &__error
+    font-size: 14px
+    opacity: 0
+    transition: all .3s ease-in-out
+    &.errormsgshow
+      opacity: 1
 </style>

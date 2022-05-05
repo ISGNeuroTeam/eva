@@ -43,11 +43,11 @@
       },
       {
         token: 'lparen',
-        regex: /[([]/,
+        regex: /[{([]/,
       },
       {
         token: 'rparen',
-        regex: /[)]]/,
+        regex: /[)\]}]/,
       },
       {
         token: 'variable.token',
