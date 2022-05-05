@@ -218,6 +218,7 @@ export default {
           if (this.options?.library) {
             this.map.library = this.library;
           }
+          this.map.options.layer = val.layer;
           this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
           this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
           this.reDrawMap(this.dataRestFrom);

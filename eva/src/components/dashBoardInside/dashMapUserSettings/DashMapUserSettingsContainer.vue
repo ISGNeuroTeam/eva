@@ -61,11 +61,12 @@
               </v-icon>
             </v-btn>
             <v-select
-              :value="options.layer"
+              v-model="options.layer"
               :menu-props="{ value:toggleSelectLayer }"
               :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
               :items="layerList"
               label="Слои"
+              item-text="name"
               multiple
             />
           </template>
@@ -324,7 +325,7 @@ export default {
         search: '',
         layer: [],
       },
-      layerList: ['Подложка', 'Рельеф', 'Трубы', 'Кусты', 'Скважины'],
+      // layerList: ['Подложка', 'Рельеф', 'Трубы', 'Куст', 'Скважины'],
       toggleSelectLayer: false,
     };
   },
@@ -343,6 +344,9 @@ export default {
     },
     getLibrary() {
       return this.dashFromStore?.options?.library;
+    },
+    layerList() {
+      return Object.values(this.library?.objects) || [];
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
@@ -388,7 +392,7 @@ export default {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
           prop: 'layer',
-          value: [],
+          value: this.layer,
         }]);
       }
       return this.dashFromStore.options;

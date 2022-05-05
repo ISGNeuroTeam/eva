@@ -86,6 +86,7 @@ class MapClass {
     wheelPxPerZoomLevel: 200,
     isLegendGenerated: false,
     startingPoint: [],
+    layer: [],
   }
 
   constructor({
@@ -190,6 +191,14 @@ class MapClass {
     this.options.mapTheme = val;
   }
 
+  get layer() {
+    return this.options.layer;
+  }
+
+  set layer(val) {
+    this.options.layer = val;
+  }
+
   setEvents(events) {
     events.forEach(({ event, callback }) => {
       this.map.on(event, callback);
@@ -276,6 +285,7 @@ class MapClass {
   }
 
   addLine(element, lib, mode, pipelineData) {
+    console.log(lib.name);
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -306,12 +316,14 @@ class MapClass {
       lineTurf,
     });
 
-    line
-      .addTo(this.map)
-      .bindTooltip(tooltip)
-      .on('mouseover', (e) => highlightFeature(e, line))
-      .on('mouseout', resetHighlight);
-    line.setTooltipContent(element.label);
+    if (this.layer.includes(lib.name)) {
+      line
+        .addTo(this.map)
+        .bindTooltip(tooltip)
+        .on('mouseover', (e) => highlightFeature(e, line))
+        .on('mouseout', resetHighlight);
+      line.setTooltipContent(element.label);
+    }
   }
 
   drawMarkerHTML({ lib, element }) {
@@ -360,6 +372,7 @@ class MapClass {
   }
 
   drawMarkerSVG({ lib, element }) {
+    console.log(lib);
     const icon = L.icon({
       iconUrl: `${window.location.origin}/svg/${lib.image}`,
       iconSize: [lib.width, lib.height],
@@ -368,19 +381,21 @@ class MapClass {
     const point = element.coordinates.split(':');
     const coord = point[1].split(',');
     this.startingPoint = [coord[0], coord[1]];
-    const marker = L.marker([coord[0], coord[1]], {
-      icon,
-      zIndexOffset: -1000,
-      riseOnHover: true,
-    })
-      .addTo(this.map)
-      .bindTooltip(element.label, {
-        permanent: false,
-        direction: 'top',
-        className: 'leaftet-hover',
-      });
-    // eslint-disable-next-line no-underscore-dangle
-    L.DomUtil.addClass(marker._icon, 'className');
+    if (this.layer.includes(lib.name)) {
+      const marker = L.marker([coord[0], coord[1]], {
+        icon,
+        zIndexOffset: -1000,
+        riseOnHover: true,
+      })
+        .addTo(this.map)
+        .bindTooltip(element.label, {
+          permanent: false,
+          direction: 'top',
+          className: 'leaftet-hover',
+        });
+      // eslint-disable-next-line no-underscore-dangle
+      L.DomUtil.addClass(marker._icon, 'className');
+    }
   }
 
   clustering(dataRest) {
