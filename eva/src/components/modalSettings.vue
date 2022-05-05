@@ -1349,7 +1349,6 @@ export default {
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
-        color: this.options.color || this.color,
         updated: Date.now(),
       };
       await this.$store.dispatch('saveSettingsToPath', {
@@ -1614,11 +1613,15 @@ export default {
                 localOptions[item] = val || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];
+              } else if (item === 'color') {
+                localOptions[item] = options[item] || '';
               } else {
-                const val = options[item] !== null && typeof options[item] === 'object'
+                localOptions[item] = options[item]
+                !== null
+                && typeof options[item]
+                === 'object'
                   ? { ...options[item] }
                   : options[item];
-                localOptions[item] = val;
               }
             } else {
               const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];

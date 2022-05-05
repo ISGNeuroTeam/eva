@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiline. Some chart line display settings do not work
 - Fixed guntt infinite loop
 - Fixed styles on vuetify components
+- Fixed default color dashButton
 
 ## [1.89.0]
 
