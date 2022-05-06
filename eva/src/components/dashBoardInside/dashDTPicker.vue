@@ -87,6 +87,7 @@
             Выбор времени и даты
           </div>
           <DTPicker
+            :id="`${idDash}-start`"
             v-model="start"
             label="Начальная дата и время"
             format="YYYY-MM-DD HH:mm"
@@ -97,6 +98,7 @@
             @validate="setTocken('dt')"
           />
           <DTPicker
+            :id="`${idDash}-end`"
             v-model="end"
             label="Конечная дата и время"
             format="YYYY-MM-DD HH:mm"
@@ -113,6 +115,7 @@
             Диапазон дат
           </div>
           <DTPicker
+            :id="`${idDash}-between`"
             v-model="range"
             range
             label="Диапазон дат"
@@ -578,13 +581,22 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-.dash-picker ::v-deep .datepicker-container {
-  .datepicker-days {
-    .datepicker-day {
-      &.first, &.between, &.last {
-        color: white !important
+.dash-picker {
+
+  ::v-deep .datetimepicker, .datepicker {
+    .time-picker-column-item {
+      &.active, &:hover {
+        color: white !important;
       }
     }
+    .datepicker-days {
+      button.datepicker-day {
+        &.first, &.between, &.last, &.selected, &:hover {
+          color: white !important;
+        }
+      }
+    }
+
   }
 }
 
