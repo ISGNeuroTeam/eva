@@ -577,12 +577,15 @@ export default {
 @import '../../sass/dashDTPicker.sass';
 </style>
 
-<style lang="sass" scoped>
-.dash-picker
-  ::v-deep .datepicker-container
-    .datepicker-days
-      .datepicker-day
-        &.first, &.between, &.last
-          color: white !important
+<style lang="scss" scoped>
+.dash-picker ::v-deep .datepicker-container {
+  .datepicker-days {
+    .datepicker-day {
+      &.first, &.between, &.last {
+        color: white !important
+      }
+    }
+  }
+}
 
 </style>
