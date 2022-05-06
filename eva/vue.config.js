@@ -21,6 +21,7 @@ module.exports = {
     },
   },
   devServer: {
+    proxy: 'http://192.168.4.198',
     overlay: {
       warnings: false,
       errors: true,
