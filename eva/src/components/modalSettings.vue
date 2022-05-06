@@ -765,6 +765,36 @@
                 Удалить
               </v-btn>
             </div>
+            <div
+              class="divider-tooltip-setting"
+              :style="{ color: theme.$main_text }"
+            >
+              <p>Тип визуализации</p>
+              <div
+                :style="{ backgroundColor: theme.$main_text }"
+                class="divider-line"
+              />
+            </div>
+            <div class="options-item-tooltip">
+              <v-select
+                v-model="pieType"
+                :items="pieTypes"
+                item-text="label"
+                item-value="value"
+                :color="theme.$primary_button"
+                :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
+                hide-details
+                outlined
+                class="item-metric"
+                label="Выберите тип"
+                @click="changeColor"
+                @input="isChanged = true"
+              />
+            </div>
           </div>
         </div>
         <v-card-text
@@ -1042,7 +1072,7 @@ export default {
       replace_count: {},
       options: {},
       type_line: {},
-      color: {},
+      color: '',
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
@@ -1063,6 +1093,17 @@ export default {
         nametheme: '',
       },
       defaultThemes: ['neitral', 'indicted'],
+      pieType: '',
+      pieTypes: [
+        {
+          value: 'pie',
+          label: 'Круговая диограмма',
+        },
+        {
+          value: 'donat',
+          label: 'Кольцвая диограмма',
+        },
+      ],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1296,6 +1337,7 @@ export default {
           }
           this.$set(this.options, 'themes', this.themes);
         }
+        this.$set(this.options, 'pieType', this.pieType);
       }
       if (this.element.startsWith('multiLine')) {
         this.$store.commit('setMultilineMetricUnits', {
@@ -1307,7 +1349,6 @@ export default {
       if (this.element.startsWith('map')) {
         this.changeSelectedLayer();
       }
-
       const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
@@ -1315,7 +1356,6 @@ export default {
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
-        color: this.color,
         updated: Date.now(),
       };
       await this.$store.dispatch('saveSettingsToPath', {
@@ -1578,11 +1618,17 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'pieType') {
+                this.pieType = options[item];
+              } else if (item === 'color') {
+                localOptions[item] = options[item] || '';
               } else {
-                const val = options[item] !== null && typeof options[item] === 'object'
+                localOptions[item] = options[item]
+                !== null
+                && typeof options[item]
+                === 'object'
                   ? { ...options[item] }
                   : options[item];
-                localOptions[item] = val;
               }
             } else {
               const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
