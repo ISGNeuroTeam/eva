@@ -143,5 +143,8 @@
     &.v-input--checkbox {
       color: var(--main_text);
     }
+    &.v-card {
+      background-color: var(--main_bg);
+    }
   }
 }

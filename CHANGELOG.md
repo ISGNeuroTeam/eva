@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed guntt infinite loop
 - Fixed styles on vuetify components
 - Fixed default color dashButton
+- Fixed errors in old reports  
+- Fixed dashSingle fullscreen mode
+- Fixed dash single background color
 
 ## [1.89.0]
 
