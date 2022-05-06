@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed errors in old reports  
 - Fixed dashSingle fullscreen mode
 - Fixed dash single background color
+- Fixed dashDTPicker active element text color
 
 ## [1.89.0]
 
