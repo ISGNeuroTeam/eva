@@ -343,7 +343,7 @@
                   background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                :disabled="metrics[i - 1].manual"
+                :disabled="!metrics[i - 1].manualBorder"
                 outlined
                 class="item-metric border"
                 hide-details
@@ -360,7 +360,7 @@
                   background: 'transparent',
                   borderColor: theme.$main_border,
                 }"
-                :disabled="metrics[i - 1].manual"
+                :disabled="!metrics[i - 1].manualBorder"
                 outlined
                 class="item-metric border"
                 hide-details
@@ -405,6 +405,7 @@
                     class="item-metric"
                     label="Вывод значений"
                     type="number"
+                    min="0"
                     hide-details
                     @input="(e) => handleChangeConlusionCount(e, i - 1)"
                   />
@@ -426,6 +427,8 @@
                     class="item-metric"
                     label="Значения после запятой"
                     type="number"
+                    min="0"
+                    max="100"
                     hide-details
                     @input="(e) => handleChangeReplaceCount(e, i - 1)"
                   />
@@ -465,11 +468,11 @@
                 </div>
               </div>
               <v-checkbox
-                v-model="metrics[i - 1].manual"
+                v-model="metrics[i - 1].manualBorder"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text }"
                 class="item-metric checkbox"
-                label="Автоматически/Вручную"
+                label="Установить границы"
                 hide-details
                 @change="isChanged = true"
               />
@@ -762,6 +765,36 @@
                 Удалить
               </v-btn>
             </div>
+            <div
+              class="divider-tooltip-setting"
+              :style="{ color: theme.$main_text }"
+            >
+              <p>Тип визуализации</p>
+              <div
+                :style="{ backgroundColor: theme.$main_text }"
+                class="divider-line"
+              />
+            </div>
+            <div class="options-item-tooltip">
+              <v-select
+                v-model="pieType"
+                :items="pieTypes"
+                item-text="label"
+                item-value="value"
+                :color="theme.$primary_button"
+                :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
+                hide-details
+                outlined
+                class="item-metric"
+                label="Выберите тип"
+                @click="changeColor"
+                @input="isChanged = true"
+              />
+            </div>
           </div>
         </div>
         <v-card-text
@@ -1033,7 +1066,7 @@ export default {
       replace_count: {},
       options: {},
       type_line: {},
-      color: {},
+      color: '',
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
@@ -1054,6 +1087,17 @@ export default {
         nametheme: '',
       },
       defaultThemes: ['neitral', 'indicted'],
+      pieType: '',
+      pieTypes: [
+        {
+          value: 'pie',
+          label: 'Круговая диограмма',
+        },
+        {
+          value: 'donat',
+          label: 'Кольцвая диограмма',
+        },
+      ],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1223,17 +1267,26 @@ export default {
       this.isChanged = true;
     },
     handleChangeConlusionCount(e, i) {
-      this.conclusion_count = {
-        ...this.conclusion_count,
-        [this.metrics[i].name]: Number(e),
-      };
+      if (e === null) {
+        delete this.conclusion_count[this.metrics[i].name];
+      } else {
+        this.conclusion_count = {
+          ...this.conclusion_count,
+          [this.metrics[i].name]: Math.abs(Number(e)),
+        };
+      }
       this.isChanged = true;
     },
     handleChangeReplaceCount(e, i) {
-      this.replace_count = {
-        ...this.replace_count,
-        [this.metrics[i].name]: Number(e),
-      };
+      const val = Number(e);
+      if (e === null || val < 0 || val > 100) {
+        delete this.replace_count[this.metrics[i].name];
+      } else {
+        this.replace_count = {
+          ...this.replace_count,
+          [this.metrics[i].name]: val,
+        };
+      }
       this.isChanged = true;
     },
     // отправляем настройки в хранилище
@@ -1277,6 +1330,7 @@ export default {
           }
           this.$set(this.options, 'themes', this.themes);
         }
+        this.$set(this.options, 'pieType', this.pieType);
       }
       if (this.element.startsWith('multiLine')) {
         this.$store.commit('setMultilineMetricUnits', {
@@ -1288,7 +1342,6 @@ export default {
       if (this.element.startsWith('map')) {
         this.changeSelectedLayer();
       }
-
       const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
@@ -1296,7 +1349,6 @@ export default {
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
-        color: this.color,
         updated: Date.now(),
       };
       await this.$store.dispatch('saveSettingsToPath', {
@@ -1389,7 +1441,7 @@ export default {
         type: '',
         upborder: 0,
         lowborder: 0,
-        manual: true,
+        manualBorder: false,
       });
       this.$set(this, 'metrics', arr);
     },
@@ -1559,11 +1611,17 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'pieType') {
+                this.pieType = options[item];
+              } else if (item === 'color') {
+                localOptions[item] = options[item] || '';
               } else {
-                const val = options[item] !== null && typeof options[item] === 'object'
+                localOptions[item] = options[item]
+                !== null
+                && typeof options[item]
+                === 'object'
                   ? { ...options[item] }
                   : options[item];
-                localOptions[item] = val;
               }
             } else {
               const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];

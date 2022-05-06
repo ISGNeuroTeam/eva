@@ -1,50 +1,56 @@
 <template>
-  <div v-if="optionsData.onButton">
-    <div
-      class="name"
-      :class="{ textDecoration: underline }"
-      :style="{
-        color: optionsData.colorText,
-        height: `${height}px`,
-        fontSize: `${fontSize}px`,
-        lineHeight: `${height - dataMode}px`,
-        background: optionsData.background,
-      }"
-      @click="updateSearches"
-    >
-      Подтвердить
-    </div>
-  </div>
-  <div
-    v-else
-    ref="buttonEl"
-    class="dash-button"
-    style="padding: 0"
-    @click="setClick"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      class="name"
-      :class="{ textDecoration: underline }"
-      :style="{
-        color: optionsData.colorText,
-        height: `${height}px`,
-        fontSize: `${fontSize}px`,
-        lineHeight: `${height - dataMode}px`,
-        background: optionsData.background,
-      }"
+      v-if="optionsData.onButton"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
-      {{ optionsData.name }}
-      <!-- <div
-        v-if="underline"
-        class="underline"
-        :style="{background:optionsData.colorText, width: `${underlineWidth}%`}"
-      /> -->
+      <div
+        class="name"
+        :class="{ textDecoration: underline }"
+        :style="{
+          color: optionsData.colorText || theme.$main_text,
+          height: `${height}px`,
+          fontSize: `${fontSize}px`,
+          lineHeight: `${height - dataMode}px`,
+          background: optionsData.background,
+        }"
+        @click="updateSearches"
+      >
+        Подтвердить
+      </div>
     </div>
-  </div>
+    <div
+      v-else
+      ref="buttonEl"
+      class="dash-button"
+      style="padding: 0"
+      @click="setClick"
+    >
+      <div
+        class="name"
+        :class="{ textDecoration: underline }"
+        :style="{
+          color: optionsData.colorText || theme.$main_text,
+          height: `${height}px`,
+          fontSize: `${fontSize}px`,
+          lineHeight: `${height - dataMode}px`,
+          background: optionsData.background,
+        }"
+      >
+        {{ optionsData.name }}
+      </div>
+    </div>
+  </portal>
 </template>
 
 <script>
 export default {
+  name: 'DashButton',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -59,17 +65,25 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
     dataModeFrom: {
       type: Boolean,
       default: false,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -95,8 +109,11 @@ export default {
     color() {
       return this.colorFrom;
     },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
     height() {
-      return this.heightFrom;
+      return this.sizeFrom.height;
     },
     dataMode() {
       if (this.dataModeFrom) {

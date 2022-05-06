@@ -87,6 +87,10 @@
         id-dash-from="reports"
         :width-from="size.width"
         :height-from="size.height"
+        :size-from="{
+          height: size.height,
+          width: size.width,
+        }"
         :size-tile-from="{
           width: getOptions ? getOptions.widthTile : '',
           height: getOptions ? getOptions.heightTile : ''
@@ -295,12 +299,14 @@ export default {
           && (!this.dashFromStore[this.activeElem]?.metrics
               || !this.dashFromStore[this.activeElem]?.metrics.length)
           && this.activeElem === 'multiLine') {
+        const metrics = Object.keys(this.data[0]);
+        metrics.splice(0, 1);
         this.$store.commit(
           'setMetricsMulti',
           {
             id: this.activeElem,
             idDash: this.idDash,
-            metrics: Object.keys(this.data[0]),
+            metrics,
           },
         );
       }
