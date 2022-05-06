@@ -976,6 +976,10 @@
             </v-icon>
           </div>
         </div>
+        <div class="otions-block">
+          {{urlList}}
+          <url-select v-model="urlList" />
+        </div>
         <v-card-actions class="actions-settings">
           <v-spacer />
           <v-btn
@@ -1011,8 +1015,10 @@
 <script>
 import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
+import urlSelect from './modalSettings/urlSelect.vue';
 
 export default {
+  components: { urlSelect },
   name: 'ModalSettings',
   model: {
     prop: 'modalValue',
@@ -1073,6 +1079,7 @@ export default {
       deleteMetricId: '',
       colorPicker: '',
       isOsmServerChange: false,
+      urlList: [],
     };
   },
   computed: {
