@@ -7,8 +7,8 @@
 ### Fixed
 - Multiline. Some chart line display settings do not work
 - Fixed gantt infinite reloading
-- Fixed theme styles
 - Fixed dash button styles
+- Fixed theme styles
 
 # [1.89.0]
 
