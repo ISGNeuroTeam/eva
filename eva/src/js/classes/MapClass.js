@@ -285,7 +285,6 @@ class MapClass {
   }
 
   addLine(element, lib, mode, pipelineData) {
-    console.log(lib.name);
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -372,7 +371,7 @@ class MapClass {
   }
 
   drawMarkerSVG({ lib, element }) {
-    console.log(lib);
+    const test = [10000, 9500, 9000, 8500, 8000, 7500, 7000, 6500, 6000, 5500, 5000, 4500];
     const icon = L.icon({
       iconUrl: `${window.location.origin}/svg/${lib.image}`,
       iconSize: [lib.width, lib.height],
@@ -384,7 +383,7 @@ class MapClass {
     if (this.layer.includes(lib.name)) {
       const marker = L.marker([coord[0], coord[1]], {
         icon,
-        zIndexOffset: -1000,
+        zIndexOffset: test[this.layer.indexOf(lib.name)],
         riseOnHover: true,
       })
         .addTo(this.map)
@@ -562,6 +561,11 @@ class MapClass {
   removeClass(cursorCssClass) {
     // eslint-disable-next-line no-underscore-dangle
     L.DomUtil.removeClass(this.map._container, cursorCssClass);
+  }
+
+  scrollWheelZoom() {
+    // eslint-disable-next-line no-underscore-dangle
+    this.map.scrollWheelZoom._enabled = false;
   }
 }
 

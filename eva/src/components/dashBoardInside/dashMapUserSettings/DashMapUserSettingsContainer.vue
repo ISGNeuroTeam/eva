@@ -4,74 +4,122 @@
       class="fill-height"
       style="align-items: normal"
     >
-      <v-row class="ma-0">
+      <v-row class="ma-0 justify-end">
         <v-menu
           v-model="toggleSelect"
           z-index="1"
         >
           <template v-slot:activator="{ on:menu }">
-            <v-btn
-              rounded
-              :style="`
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
               background: ${theme.$secondary_bg};
                color: ${theme.$main_text};
-               pointer-events: auto`"
-              v-on="menu"
-              @click="toggleSelect = !toggleSelect"
-            >
-              <v-icon :style="{ color: theme.$main_text }">
-                {{ mdiClipboardText }}
-              </v-icon>
-              Режим
-              <v-icon :style="{ color: theme.$main_text }">
-                {{ mdiChevronDown }}
-              </v-icon>
-            </v-btn>
-            <v-select
-              :value="options.mode"
-              :menu-props="{ value:toggleSelect }"
-              :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-              :items="mode"
-              label="Режим"
-              multiple
-              @change="updatePipeDataSource($event)"
-            />
+               pointer-events: auto;
+               margin-right: 30px`"
+                v-on="menu"
+                @click="toggleSelect = !toggleSelect"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiClipboardText }}
+                </v-icon>
+                Режим
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+              <v-select
+                :value="options.mode"
+                :menu-props="{
+                  value:toggleSelect,
+                  maxWidth: 200
+                }"
+                :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+                :items="mode"
+                label="Режим"
+                multiple
+                @change="updatePipeDataSource($event)"
+              />
+            </div>
           </template>
         </v-menu>
         <v-menu
           v-model="toggleSelectLayer"
-          z-index="1"
+          max-width="220"
+          max-height="198"
+          nudge-top="-25px"
         >
           <template v-slot:activator="{ on:menu }">
-            <v-btn
-              rounded
-              :style="`
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
                background: ${theme.$secondary_bg};
                color: ${theme.$main_text};
-               pointer-events: auto`"
-              v-on="menu"
-              @click="toggleSelectLayer = !toggleSelectLayer"
-            >
-              <v-icon :style="{ color: theme.$main_text }">
-                {{ mdiLayers }}
-              </v-icon>
-              Слои
-              <v-icon :style="{ color: theme.$main_text }">
-                {{ mdiChevronDown }}
-              </v-icon>
-            </v-btn>
-            <v-select
-              v-model="options.layer"
-              :menu-props="{ value:toggleSelectLayer }"
-              :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-              :items="layerList"
-              label="Слои"
-              item-text="name"
-              multiple
-            />
+               pointer-events: auto;
+               margin-right: 30px
+               `"
+                v-on="menu"
+                @click="toggleSelectLayer = !toggleSelectLayer"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiLayers }}
+                </v-icon>
+                Слои
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+              <!--              <v-select-->
+              <!--                v-model="options.layer"-->
+              <!--                :menu-props="{-->
+              <!--                  value:toggleSelectLayer,-->
+              <!--                  maxWidth: 220,-->
+              <!--                  maxHeight: 198-->
+              <!--                }"-->
+              <!--                append-outer-icon="mdiLayers"-->
+              <!--                :style="`-->
+              <!--                  visibility:hidden;-->
+              <!--                  background: ${theme.$secondary_bg};-->
+              <!--                  position: absolute;-->
+              <!--                  max-width: 220px`"-->
+              <!--                :items="layerList"-->
+              <!--                label="Слои"-->
+              <!--                item-text="name"-->
+              <!--                multiple-->
+              <!--              >-->
+              <!--                <template v-slot:append-item>-->
+              <!--                  <v-icon :style="{ color: theme.$main_text }">-->
+              <!--                    {{ mdiLayers }}-->
+              <!--                  </v-icon>-->
+              <!--                </template>-->
+              <!--              </v-select>-->
+            </div>
           </template>
+          <div
+            :style="`
+                          background: ${theme.$secondary_bg}; pointer-events: all`"
+          >
+            <v-checkbox
+              v-for="item in layerList"
+              :key="item.name"
+              v-model="options.layer"
+              :label="item.name"
+              :value="item.name"
+              draggable="true"
+            >
+              <template v-slot:append>
+                <v-icon
+                  :style="{ color: theme.$main_text }"
+                  @mousedown="onDrag($event, item)"
+                >
+                  {{ mdiLayers }}
+                </v-icon>
+              </template>
+            </v-checkbox>
+          </div>
         </v-menu>
-        <v-spacer />
         <v-btn
           rounded
           :style="`
@@ -96,7 +144,7 @@
         <v-card
           style="max-height: 466px; pointer-events: auto"
           max-width="280"
-          class="px-5 pb-5"
+          class="px-5 pb-5 test"
           :color="theme.$main_bg"
         >
           <v-subheader
@@ -430,6 +478,9 @@ export default {
     }
   },
   methods: {
+    onDrag(e, i) {
+      console.log(e, i);
+    },
     updatePipeDataSource(e) {
       const set = new Set(e);
       if (this.options.mode) {

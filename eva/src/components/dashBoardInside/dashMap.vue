@@ -519,6 +519,12 @@ export default {
             this.updateToken(this.map.zoom);
           },
         },
+        {
+          event: 'mouseout',
+          callback: () => {
+            this.map.scrollWheelZoom();
+          },
+        },
       ]);
       // TODO: Пока просили приостановить работу с ГИС.
       // this.map.on('zoomend', () => {
