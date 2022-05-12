@@ -628,33 +628,6 @@ export default {
     autoTransfer() {
       // eslint-disable-next-line no-underscore-dangle
       this.$refs.search._data.cminstance.doc.cm.refresh();
-      if (this.cmOption.lineWrapping) {
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          '[',
-          '[\n  ',
-        );
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          ']',
-          '\n]',
-        );
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          '"',
-          '\n "',
-        );
-      } else {
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          '[\n  ',
-          '[',
-        );
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          '\n]',
-          ']',
-        );
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          '\n "',
-          '"',
-        );
-      }
     },
     // 24 - высота строки
     changeHeightCodemirror(item) {
@@ -798,6 +771,9 @@ export default {
   .CodeMirror-gutters
     color: $main_text
     background: $main_bg
+  .CodeMirror-line
+    padding-left: 20px !important
+    text-indent: -18px
   .CodeMirror-vscrollbar
     width: 7px
     transition: all .3s
