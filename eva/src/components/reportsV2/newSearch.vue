@@ -127,7 +127,7 @@
             <v-menu
               v-model="settings"
               :close-on-content-click="false"
-              nudge-top="-15px"
+              nudge-top="-11px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <div
