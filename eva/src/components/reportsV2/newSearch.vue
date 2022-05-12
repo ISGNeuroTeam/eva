@@ -126,9 +126,8 @@
           <div class="search-block-footer-settings">
             <v-menu
               v-model="settings"
-              offset-y
               :close-on-content-click="false"
-              nudge-top="9px"
+              nudge-top="-15px"
             >
               <template v-slot:activator="{ on, attrs }">
                 <div
