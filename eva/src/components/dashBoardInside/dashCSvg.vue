@@ -69,7 +69,11 @@
         ref="tooltip"
         class="tooltip"
         :class="{ tooltipShow: tooltipShow }"
-        :style="{ backgroundColor: color.backElement, borderColor: color.text }"
+        :style="{
+          color: color.$main_text,
+          backgroundColor: color.$secondary_bg,
+          border: `1px solid ${color.$secondary_border}`,
+        }"
       >
         <div
           v-show="
@@ -136,7 +140,9 @@
         class="link-canvas"
         :class="{ linkCanvasShow: linkCanvasShow }"
       >
-        <canvas ref="link" />
+        <canvas
+          ref="link"
+        />
       </div>
     </div>
   </portal>
@@ -729,9 +735,10 @@ export default {
         default:
           break;
       }
-      context.strokeStyle = this.color.text;
+      console.log(this.color.$secondary_border);
+      context.strokeStyle = this.color.$secondary_border;
       context.stroke();
-      context.lineWidth = 1;
+      context.lineWidth = 2;
     },
     positionTooltip(event) {
       const id = event.target.getAttribute('id');
@@ -795,7 +802,7 @@ export default {
       let token = '';
       const id = event.target.getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
-        [token] = id.split('overlay_');
+        [, token] = id.split('overlay_');
         this.setClick(token, 'object');
       }
     },

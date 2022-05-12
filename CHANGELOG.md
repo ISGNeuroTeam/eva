@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unrelise]
+
+### Fixed
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
+
 ## [1.90.0]
 
 ### Added
@@ -18,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed guntt infinite loop
 - Fixed styles on vuetify components
 - Fixed default color dashButton
-- Fixed errors in old reports  
+- Fixed errors in old reports
 - Fixed dashSingle fullscreen mode
 - Fixed dash single background color
 
