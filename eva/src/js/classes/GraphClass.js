@@ -30,6 +30,8 @@ import {
   Font,
   DefaultLabelStyle,
   License,
+  WebGL2GraphModelManager,
+  WebGL2SelectionIndicatorManager,
 } from 'yfiles';
 import HTMLPopupSupport from './HTMLPopupSupport';
 import licenseData from '../../license/license.json';
@@ -38,16 +40,16 @@ License.value = licenseData; // проверка лицензии
 const labelFont = new Font({ fontSize: 70, fontFamily: 'sefif' });
 const labelFontBOLD = new Font({
   fontSize: 70,
-  fontFamily: 'sefif',
+  fontFamily: 'serif',
   fontWeight: 'BOLD',
 });
 
 class GraphClass {
   static nodeStyle(color) {
     return new ShapeNodeStyle({
-      fill: color,
+      fill: color || this.startFinishColor,
       shape: 'ELLIPSE',
-      stroke: color,
+      stroke: color || this.startFinishColor,
     });
   }
 
@@ -144,6 +146,7 @@ class GraphClass {
     this.graphComponent = new GraphComponent(elem);
     this.colors = colors;
     this.options.colorFrom = colorFrom;
+    this.enableWebGL2();
   }
 
   get labelStyleList() {
@@ -208,6 +211,15 @@ class GraphClass {
 
   set colorFrom(value) {
     this.options.colorFrom = value;
+  }
+
+  enableWebGL2() {
+    this.graphComponent.graphModelManager = new WebGL2GraphModelManager(
+      this.graphComponent,
+      this.graphComponent.contentGroup,
+    );
+    this.graphComponent
+      .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(this.graphComponent);
   }
 
   initMode({
@@ -421,7 +433,7 @@ class GraphClass {
   }
 
   fitContent() {
-    ICommand.FIT_GRAPH_BOUNDS.execute(null, this.graphComponent);
+    ICommand.FIT_CONTENT.execute(null, this.graphComponent);
   }
 
   colorEdges() {
@@ -480,8 +492,7 @@ class GraphClass {
     const nodesSource = graphBuilder.createNodesSource({
       data: this.nodesSource, // .slice(0,10),
       id: 'id',
-      tag: (item) => item
-      ,
+      tag: (item) => item,
     });
 
     // label name для nodes
@@ -604,7 +615,10 @@ class GraphClass {
       } else {
         this.graphComponent.graph.setStyle(
           node,
-          GraphClass.nodeStyle(this.colors[node.tag.node_color - 1]),
+          GraphClass.nodeStyle(
+            this.colors[node.tag.node_color - 1]
+            || this.startFinishColor,
+          ),
         );
       }
     });
