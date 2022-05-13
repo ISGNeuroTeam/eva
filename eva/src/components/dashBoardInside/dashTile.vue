@@ -15,19 +15,24 @@
         :style="{ height: `${height - marginBottom}px` }"
       >
         <div class="tile-block">
-          <div
-            v-for="i in dataTile.length"
-            :key="i"
-            class="tile"
-            :style="{
-              backgroundColor: dataTile[i - 1].color,
-              border: `3px inset ${borderColor(dataTile[i - 1].border)}`,
-              width: widthTile,
-              height: heightTile,
-            }"
-            @click="setClick(dataTile[i - 1])"
-          >
-            <p v-html="checkName(dataTile[i - 1].caption)" />
+          <div class="row ma-0">
+            <div
+              v-for="i in dataTile.length"
+              :key="i"
+              :class="`col-${getColumn}`"
+              class="pa-1"
+            >
+              <div
+                class="tile"
+                :style="{
+                  backgroundColor: tileStyle.bg,
+                  color: tileStyle.color,
+                }"
+                @click="setClick(dataTile[i - 1])"
+              >
+                <p v-html="checkName(dataTile[i - 1].caption)" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -90,6 +95,10 @@ export default {
       type: String,
       default: '',
     },
+    options: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -146,6 +155,29 @@ export default {
       }
       // default logic
       return this.dataRestFrom.map((item) => ({ ...item }));
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
+    getOptions() {
+      return this.dashFromStore.options;
+    },
+    getColumn() {
+      let result = 'auto';
+      if (this.getOptions?.columnCount === '1') result = '12';
+      if (this.getOptions?.columnCount === '2') result = '6';
+      if (this.getOptions?.columnCount === '3') result = '4';
+      if (this.getOptions?.columnCount === '4') result = '3';
+      if (this.getOptions?.columnCount === '6') result = '2';
+      if (this.getOptions?.columnCount === '12') result = '1';
+      return result;
+    },
+    tileStyle() {
+      // TODO: Сделать проверку на статусы при выборе цвета "диапазоны"
+      return {
+        bg: `${this.getOptions.tileStyle}3F`,
+        color: this.getOptions.tileStyle,
+      };
     },
   },
   watch: {
