@@ -446,6 +446,7 @@ export default {
             this.currentNode = currentNode;
           },
         });
+        // this.graph.enableWebGL2();
       });
     },
   },
