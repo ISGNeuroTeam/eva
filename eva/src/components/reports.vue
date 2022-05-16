@@ -177,12 +177,16 @@
                 v-for="i in elements"
                 v-show="aboutElem[i].show"
                 :key="i"
+                :current-settings="settings"
+                :update-settings="updateSettings"
+                :options="options"
                 :id-from="i"
                 :color-from="theme"
                 :active-elem-from="activeElem"
                 id-dash-from="reports"
                 :width-from="size.width"
                 :height-from="size.height"
+                :size-from="size"
                 :time-format-from="''"
                 :size-tile-from="{ width: '', height: '' }"
                 :search-rep="true"
@@ -258,6 +262,15 @@ import settings from '../js/componentsSettings';
 export default {
   data() {
     return {
+      settings: {
+        showTitle: true,
+      },
+      options: {
+        visible: true,
+        change: false,
+        level: 1,
+        boxShadow: false,
+      },
       search: {
         parametrs: {},
       },
@@ -367,6 +380,9 @@ export default {
     this.unitedData.color = this.theme.controls;
   },
   methods: {
+    updateSettings(localSettings) {
+      this.settings = JSON.parse(JSON.stringify(localSettings));
+    },
     workerOnMessage(worker) {
       return (event) => {
         let statistic = '';
