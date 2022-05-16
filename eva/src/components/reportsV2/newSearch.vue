@@ -80,22 +80,6 @@
           </v-icon>
         </v-btn>
       </div>
-      <!--      <v-textarea-->
-      <!--        ref="search"-->
-      <!--        v-model="search.original_otl"-->
-      <!--        class="textarea"-->
-      <!--        :color="theme.$main_text"-->
-      <!--        :style="{ color: `${theme.$main_text} !important` }"-->
-      <!--        placeholder="Введите запрос"-->
-      <!--        spellcheck="false"-->
-      <!--        auto-grow-->
-      <!--        filled-->
-      <!--        outlined-->
-      <!--        rows="1"-->
-      <!--        row-height="15"-->
-      <!--        @keyup.ctrl.\="addLineBreaks"-->
-      <!--        @keyup.ctrl.enter.prevent="keypressCtrlEnter"-->
-      <!--      />-->
       <codemirror
         ref="search"
         v-model="search.original_otl"
