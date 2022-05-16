@@ -381,7 +381,6 @@ class MapClass {
   }
 
   drawMarkerSVG({ lib, element }) {
-    const test = [10000, 9500, 9000, 8500, 8000, 7500, 7000, 6500, 6000, 5500, 5000, 4500];
     const icon = L.icon({
       iconUrl: `${window.location.origin}/svg/${lib.image}`,
       iconSize: [lib.width, lib.height],
@@ -393,7 +392,7 @@ class MapClass {
     // if (this.layer.includes(lib.name)) {
     const marker = L.marker([coord[0], coord[1]], {
       icon,
-      zIndexOffset: test[this.layer.indexOf(lib.name)],
+      zIndexOffset: -1000,
       riseOnHover: true,
     })
       // .addTo(this.map)
@@ -403,20 +402,20 @@ class MapClass {
         className: 'leaftet-hover',
       });
       // eslint-disable-next-line no-underscore-dangle
-      // L.DomUtil.addClass(marker._icon, 'className');
+    // L.DomUtil.addClass(marker._icon, 'className');
     // console.log(lib);
     this.test[lib.name].push(marker);
     // console.log(this.test[element.type]);
     // }
   }
 
-  testss() {
-    // const layerControl = L.control.layers().addTo(this.map);
-    for (const i in this.test) {
-      const group = L.layerGroup(this.test[i]).addTo(this.map);
-      // group.addOverlay(group, `${i}`);
-    }
-  }
+  // testss() {
+  //   // const layerControl = L.control.layers().addTo(this.map);
+  //   for (const i in this.test) {
+  //     const group = L.layerGroup(this.test[i]).addTo(this.map);
+  //     // group.addOverlay(group, `${i}`);
+  //   }
+  // }
 
   clustering(dataRest) {
     this.cluster = L.markerClusterGroup({

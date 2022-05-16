@@ -214,21 +214,21 @@ export default {
         this.map.resize();
       }
     },
-    getOptions: {
-      handler(val, old) {
-        if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
-          if (this.options?.library) {
-            this.map.library = this.library;
-            this.map.test = this.test;
-          }
-          this.map.options.layer = val.layer;
-          this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-          this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-          this.reDrawMap(this.dataRestFrom);
-        }
-      },
-      deep: true,
-    },
+    // getOptions: {
+    //   handler(val, old) {
+    //     if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
+    //       if (this.options?.library) {
+    //         this.map.library = this.library;
+    //         this.map.test = this.test;
+    //       }
+    //       this.map.options.layer = val.layer;
+    //       this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.reDrawMap(this.dataRestFrom);
+    //     }
+    //   },
+    //   deep: true,
+    // },
     mapStyleSize() {
       this.map.resize();
     },
@@ -429,10 +429,11 @@ export default {
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
             this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
-            this.map.testss();
-            Object.keys(this.map.test).forEach((item) => {
+            // this.map.testss();
+            Object.keys(this.map.test).reverse().forEach((item) => {
               if (this.map.test[item].length > 0) {
                 this.$refs.setting.layer.push(item);
+                this.$refs.setting.change(item);
               }
             });
             if (this.map) {

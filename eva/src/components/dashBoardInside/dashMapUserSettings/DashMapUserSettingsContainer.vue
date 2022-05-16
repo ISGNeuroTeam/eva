@@ -98,29 +98,34 @@
             </div>
           </template>
           <div
-            :style="`
-                          background: ${theme.$secondary_bg}; pointer-events: all`"
+            :style="`background: ${theme.$secondary_bg}; pointer-events: all`"
+            @drop="onDrop($event,)"
+            @dragenter.prevent
+            @dragover.prevent
           >
-            <v-checkbox
+            <div
               v-for="(item, i) in layerList"
-              :key="item.name"
-              v-model="layer"
-              :label="item.name"
-              :value="item.name"
+              :key="i"
               draggable="true"
-              multiple
-              @change="change(item.name, i)"
+              @dragstart="startDrag($event, item)"
             >
-              <template v-slot:append>
-                <v-icon
-                  draggable="true"
-                  :style="{ color: theme.$main_text }"
-                  @dragstart="onDrag($event, item)"
-                >
-                  {{ mdiLayers }}
-                </v-icon>
-              </template>
-            </v-checkbox>
+              <v-checkbox
+                v-model="layer"
+                :label="item.name"
+                :value="item.name"
+                multiple
+                :style="{ color: theme.$main_text }"
+                @change="change(item.name, i)"
+              >
+                <template v-slot:append>
+                  <v-icon
+                    :style="{ color: theme.$main_text }"
+                  >
+                    {{ mdiMenu }}
+                  </v-icon>
+                </template>
+              </v-checkbox>
+            </div>
           </div>
         </v-menu>
         <v-btn
@@ -306,6 +311,7 @@ import {
   mdiLayers,
   mdiClipboardText,
   mdiChevronDown,
+  mdiMenu,
 } from '@mdi/js';
 import 'leaflet/dist/leaflet.css';
 
@@ -334,6 +340,7 @@ export default {
       mdiLayers,
       mdiClipboardText,
       mdiChevronDown,
+      mdiMenu,
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
       currentTile: {},
@@ -439,13 +446,13 @@ export default {
           value: false,
         }]);
       }
-      if (!this.dashFromStore?.options.layer) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'layer',
-          value: this.layer,
-        }]);
-      }
+      // if (!this.dashFromStore?.options.layer) {
+      //   this.$store.commit('setState', [{
+      //     object: this.dashFromStore.options,
+      //     prop: 'layer',
+      //     value: this.layer,
+      //   }]);
+      // }
       return this.dashFromStore.options;
     },
     searches() {
@@ -488,8 +495,41 @@ export default {
         this.map.testRemov(this.map.test[e]);
       }
     },
-    onDrag(e, i) {
-      console.log(e, i);
+    startDrag(e, item) {
+      e.dataTransfer.dorpEffect = 'move';
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('itemDrops', item.name);
+    },
+    onDrop(e) {
+      const itemDrops = e.dataTransfer.getData('itemDrops');
+      // this.changeArray(e, this.layerList, itemDrops);
+      // this.changeArray(e, this.layer, itemDrops);
+      const element = this.layerList.find((item) => item.name === itemDrops);
+      const indexElement = this.layerList.indexOf(element);
+      const elementTo = this.layerList.find((item) => item.name === e.target.innerText);
+      const indexElementTo = this.layerList.indexOf(elementTo);
+      const element2 = this.layer.find((item) => (item.name ? item.name : item === itemDrops));
+      const indexElement2 = this.layer.indexOf(element2);
+      const elementTo2 = this.layer.find((item) => item === e.target.innerText);
+      const indexElementTo2 = this.layer.indexOf(elementTo2);
+      if (indexElementTo > -1 && indexElement > -1) {
+        this.layerList.splice(indexElement, 1);
+        this.layerList.splice(indexElementTo, 0, element);
+      }
+      if (indexElementTo2 > -1 && indexElement2 > -1) {
+        this.layer.splice(indexElement2, 1);
+        this.layer.splice(indexElementTo2, 0, element2);
+      }
+    },
+    changeArray(e, array, itemDrops) {
+      const element = array.find((item) => (item.name ? item.name : item === itemDrops));
+      const indexElement = array.indexOf(element);
+      const elementTo = array.find((item) => (item.name ? item.name : item === e.target.innerText));
+      const indexElementTo = array.indexOf(elementTo);
+      if (indexElementTo > -1 && indexElement > -1) {
+        array.splice(indexElement, 1);
+        array.splice(indexElementTo, 0, element);
+      }
     },
     updatePipeDataSource(e) {
       const set = new Set(e);
