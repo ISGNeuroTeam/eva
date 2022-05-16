@@ -30,6 +30,7 @@
           :id-dash-from="idDashFrom"
           :id-element="idFrom"
           @openSettingsModal="modalSettingsValue = true"
+          ref="setting"
         />
       </div>
       <dash-map-user-settings-new
@@ -126,6 +127,7 @@ export default {
       pipelineData: [],
       pipelineDataDictionary: {},
       position: null,
+      test: {},
     };
   },
   computed: {
@@ -217,6 +219,7 @@ export default {
         if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
           if (this.options?.library) {
             this.map.library = this.library;
+            this.map.test = this.test;
           }
           this.map.options.layer = val.layer;
           this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
@@ -415,12 +418,23 @@ export default {
           // получаем библиотеку
           // get all icons that we need on map
           this.generateLibrary(dataRest, this.options?.primitivesLibrary);
+          if (this.library?.objects) {
+            Object.values(this.library.objects).forEach((item) => {
+              this.test[item.name] = [];
+            });
+          }
           this.map.generateClusterPositionItems();
           if (!this.error && dataRest.length > 0) {
             // создаем элемент карты
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
             this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
+            this.map.testss();
+            Object.keys(this.map.test).forEach((item) => {
+              if (this.map.test[item].length > 0) {
+                this.$refs.setting.layer.push(item);
+              }
+            });
             if (this.map) {
               if (this.options.initialPoint) {
                 this.map.setView(
@@ -495,6 +509,7 @@ export default {
         }
         if (this.map && !this.map.isLegendGenerated) {
           this.map.library = this.library;
+          this.map.test = this.test;
           this.map.createLegend(this.library);
         }
       }

@@ -102,17 +102,20 @@
                           background: ${theme.$secondary_bg}; pointer-events: all`"
           >
             <v-checkbox
-              v-for="item in layerList"
+              v-for="(item, i) in layerList"
               :key="item.name"
-              v-model="options.layer"
+              v-model="layer"
               :label="item.name"
               :value="item.name"
               draggable="true"
+              multiple
+              @change="change(item.name, i)"
             >
               <template v-slot:append>
                 <v-icon
+                  draggable="true"
                   :style="{ color: theme.$main_text }"
-                  @mousedown="onDrag($event, item)"
+                  @dragstart="onDrag($event, item)"
                 >
                   {{ mdiLayers }}
                 </v-icon>
@@ -371,8 +374,8 @@ export default {
         showLegend: true,
         mode: [],
         search: '',
-        layer: [],
       },
+      layer: [],
       // layerList: ['Подложка', 'Рельеф', 'Трубы', 'Куст', 'Скважины'],
       toggleSelectLayer: false,
     };
@@ -478,6 +481,13 @@ export default {
     }
   },
   methods: {
+    change(e) {
+      if (this.layer.find((item) => item === e)) {
+        this.map.testAdd(this.map.test[e]);
+      } else {
+        this.map.testRemov(this.map.test[e]);
+      }
+    },
     onDrag(e, i) {
       console.log(e, i);
     },
