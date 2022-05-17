@@ -80,22 +80,6 @@
           </v-icon>
         </v-btn>
       </div>
-      <!--      <v-textarea-->
-      <!--        ref="search"-->
-      <!--        v-model="search.original_otl"-->
-      <!--        class="textarea"-->
-      <!--        :color="theme.$main_text"-->
-      <!--        :style="{ color: `${theme.$main_text} !important` }"-->
-      <!--        placeholder="Введите запрос"-->
-      <!--        spellcheck="false"-->
-      <!--        auto-grow-->
-      <!--        filled-->
-      <!--        outlined-->
-      <!--        rows="1"-->
-      <!--        row-height="15"-->
-      <!--        @keyup.ctrl.\="addLineBreaks"-->
-      <!--        @keyup.ctrl.enter.prevent="keypressCtrlEnter"-->
-      <!--      />-->
       <codemirror
         ref="search"
         v-model="search.original_otl"
@@ -457,9 +441,6 @@ export default {
     historySizeUndo() {
       return this.historySize?.undo === 0 ? 'disabled' : '';
     },
-    // effectiveDateRange () {
-    //   return this.dates.sort().join(' - ');
-    // }
   },
   watch: {
     loading(val) {
@@ -647,14 +628,10 @@ export default {
   max-height: 420px
   overflow: auto
 
-//.calendar
-//  .v-menu__content
-//    max-width: 150px
 .date-time-picker-wrap
   .date-time-picker-text
     font-size: 14px
 .v-menu__content
-  //width: 150px
   .dropdown-range
     padding: 6px
     max-width: 150px

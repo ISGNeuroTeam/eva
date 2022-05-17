@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add code editor to reportsV2
 
-## Fixed
+### Fixed
 - Fixed dashDTPicker active element text color
 
 ## [1.90.0]
