@@ -184,18 +184,20 @@ export default {
     },
     sizeFrom: {
       deep: true,
-      handler() {
-        if (this.dataRestFrom.length > 0) {
-          if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
-            this.hiddenTooltip();
-            if (this.dataReport) {
-              if (this.activeElemFrom === this.id) {
+      handler(val, oldVal) {
+        if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+          if (this.dataRestFrom.length > 0) {
+            if (this.dataRestFrom[0].start_date && this.dataRestFrom[0].end_date) {
+              this.hiddenTooltip();
+              if (this.dataReport) {
+                if (this.activeElemFrom === this.id) {
+                  this.prepareChart(this.dataRestFrom);
+                } else if (this.guntt) {
+                  this.guntt.removeGuntt();
+                }
+              } else {
                 this.prepareChart(this.dataRestFrom);
-              } else if (this.guntt) {
-                this.guntt.removeGuntt();
               }
-            } else {
-              this.prepareChart(this.dataRestFrom);
             }
           }
         }

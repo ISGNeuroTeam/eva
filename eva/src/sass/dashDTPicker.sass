@@ -22,7 +22,7 @@
             flex-flow: row nowrap
             justify-content: space-between
             align-itmes: center
-            border-radius: 4px 
+            border-radius: 4px
             padding: 10px
 
             p
@@ -35,7 +35,7 @@
                 width: 20px
                 height: 20px
                 fill: white
-        
+
 
         .DTPicker-elem
             position: absolute
@@ -44,7 +44,7 @@
             flex-flow: column nowrap
             justify-content: flex-start
             align-items: flex-start
-            transition: all 0.4s ease 
+            transition: all 0.4s ease
             opacity: 0
             z-index: 0
             padding: 10px
@@ -80,7 +80,7 @@
                 margin: 5px 0
                 width: 100%
                 opacity: 0.4
-                
+
             .name-of-picker
                 font-size: 14px
                 font-weight: bold
@@ -94,11 +94,11 @@
                 background: inherit
 
                 .field
-                    background: inherit 
+                    background: inherit
 
                     input
                        background: inherit  !important
-                       border-color: inherit 
+                       border-color: inherit
 
                     label
                         color: inherit
@@ -106,7 +106,7 @@
 
                     .custom-button
                         color: inherit
-                        background: inherit 
+                        background: inherit
 
                         .custom-button-content
                             color: inherit !important
@@ -134,14 +134,14 @@
                             background-color: inherit
                             border: 1px solid
 
-                        .datepicker-button 
+                        .datepicker-button
 
                             svg
                                 fill: inherit
 
                         .datepicker-day-text
                             color: inherit
-                        
+
                         .datepicker-today
                             background: transparent
                             border: 1px solid
@@ -160,7 +160,7 @@
                                     .custom-button-content
                                         color: var(--title) !important
 
-                                .datepicker-controls 
+                                .datepicker-controls
                                     border-color: inherit
 
                                     .datepicker-container-label
@@ -182,6 +182,7 @@
                             border: 1px solid
                             border-color: inherit
 
+
             .choose-period
                 display: flex
                 flex-flow: row nowrap
@@ -195,7 +196,7 @@
                     font-size: 13px
                     margin: 0
                     padding: 0
-                    margin-right: 20px 
+                    margin-right: 20px
                     opacity: 0.5
 
                 .v-input__slot
@@ -226,8 +227,8 @@
                     border-radius: 5px
 
 
-            .custom-picker 
-                
+            .custom-picker
+
                 .v-input__append-inner
                     margin-top: 8px
                     cursor: pointer
@@ -294,7 +295,7 @@
 
     .show_picker_elem
         height: 120px
-        overflow: unset 
+        overflow: unset
 
         .DTPicker-btn
             border-radius:  4px 4px 0 0
@@ -321,12 +322,12 @@
     .dash-picker
         width: 92%
 
-        .DTpicker 
+        .DTpicker
             margin: 20px 0
             height: 55px
 
-            .DTPicker-elem 
-                
+            .DTPicker-elem
+
                 .dtpicker
                     width: 100%
 
@@ -374,10 +375,10 @@
                         font-size: 16px
                         padding: 0 18px
                         height: 40px
-            
-            .DTPicker-btn 
+
+            .DTPicker-btn
                 padding: 15px
-                
+
                 p
                     font-size: 16px
 
@@ -395,11 +396,11 @@
     .dash-picker
         width: 87%
 
-        .DTpicker 
+        .DTpicker
             margin: 5px 0
 
-            .DTPicker-elem 
-                
+            .DTPicker-elem
+
                 .dtpicker
                     width: 100%
 
@@ -435,9 +436,9 @@
 
                     span
                         font-size: 12px
-            
-            .DTPicker-btn 
-                
+
+            .DTPicker-btn
+
                 p
                     font-size: 12px
 
@@ -448,21 +449,21 @@
         .current-date
             font-size: 12px
 
-    
+
 @media screen and (max-width: 1400px)
 
     .dash-picker
         width: 93%
         margin-left: 10px
 
-        .DTpicker 
+        .DTpicker
             margin: 5px 0
             height: 28px
 
             .DTPicker-elem
                 width: 93%
                 min-width: 132px
-                
+
                 .dtpicker
                     width: 100%
                     margin: 5px 0
@@ -518,7 +519,7 @@
                             .header-picker-range
                                 font-size: 14px
                                 line-height: 14px
-                                height: 14px 
+                                height: 14px
 
                         .pickers-container
 
@@ -550,16 +551,18 @@
 
                                     .datepicker-day
                                         height: 30px
+                                        &.first, &.between, &.last
+                                            color: white !important
 
                                         span
                                             font-size: 12px
                                     .selected
                                         color: #fff
-                                    
+
                             .time-picker
                                 height: 250px !important
 
-                                .time-picker-column 
+                                .time-picker-column
 
                                     .time-picker-column-item
 
@@ -567,7 +570,7 @@
                                             font-size: 12px
                                     .active
                                         color: #fff
-                        
+
                         .datepicker-buttons-container
 
                             .datepicker-button
@@ -575,16 +578,16 @@
                                 font-size: 12px
 
 
-                .custom-picker 
-                   
-                   .v-input__slot 
+                .custom-picker
+
+                   .v-input__slot
                         min-height: 30px
 
                         .v-label
-                            top: 10px 
+                            top: 10px
 
                         .v-label--active
-                            top: 18px 
+                            top: 18px
 
                 .date-time-picker
 
@@ -617,10 +620,10 @@
 
                     span
                         font-size: 10px
-            
+
             .DTPicker-btn
-                padding: 6px 
-                
+                padding: 6px
+
                 p
                     font-size: 10px
 
