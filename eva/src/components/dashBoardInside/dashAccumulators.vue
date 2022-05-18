@@ -190,6 +190,13 @@ export default {
           value: 'pie',
         }]);
       }
+      if (!this.dashFromStore.options.metrics) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'metrics',
+          value: [],
+        }]);
+      }
       return this.dashFromStore.options;
     },
     newValues() {
@@ -295,13 +302,17 @@ export default {
         value: '',
       });
     },
-    dataRestFrom(newVal, oldVal) {
-      this.setMetrics();
-      if (newVal.length > 0 && oldVal.length > 0) {
-        this.dataFieldMax = null;
-        this.dataFieldValue = null;
-        this.dataFieldLabel = null;
-      }
+    dataRestFrom: {
+      handler(newVal, oldVal) {
+        this.setMetrics();
+        if (newVal.length > 0 && oldVal.length > 0) {
+          this.dataFieldMax = null;
+          this.dataFieldValue = null;
+          this.dataFieldLabel = null;
+        }
+      },
+      deep: true,
+      immediate: true,
     },
     dataFieldMax() {
       this.setSelected();
@@ -349,7 +360,7 @@ export default {
       }]);
     },
     getFillColor(item, index) {
-      if (this.getOptions.fillColor) {
+      if (this.getOptions.fillColor.length > 0) {
         if (this.getOptions.fillColor[index].colorType === 'color') {
           return this.getOptions.fillColor[index].color || this.theme.$primary_button;
         }

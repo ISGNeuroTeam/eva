@@ -687,6 +687,7 @@
                         hide-mode-switch
                         hide-sliders
                         mode="hexa"
+                        :style="{background: 'transparent'}"
                         show-swatches
                         swatches-max-height="200"
                         @input.capture="addColor($event)"
@@ -824,6 +825,7 @@
                       hide-mode-switch
                       hide-sliders
                       mode="hexa"
+                      :style="{background: 'transparent'}"
                       show-swatches
                       swatches-max-height="200"
                       @input.capture="addColor($event)"
@@ -1731,7 +1733,7 @@ export default {
               } else if (item === 'color') {
                 localOptions[item] = options[item] || '';
               } else if (item === 'fillColor') {
-                if (this.accumulators.length === 0) {
+                if (this.accumulators?.length === 0) {
                   const defaultAccumulator = this.metrics.map(() => ({
                     colorType: 'color',
                     color: this.theme.$primary_button,

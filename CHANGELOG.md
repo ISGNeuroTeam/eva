@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Fixed
 - Fixed dashDTPicker active element text color
+- Fixed color picker background
 
 ## [1.90.0]
 
