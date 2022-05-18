@@ -124,6 +124,8 @@ Vue.component('dash-heatmap', () => import('./components/dashBoardInside/dashHea
 Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
+// компонент Accumulators
+Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
 // блок экспорта импорта
 // Vue.component('block-exim', () => import('./components/blockExim.vue'))
 // элемнет поиска пока не актуален
