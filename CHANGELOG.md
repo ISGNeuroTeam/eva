@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed dashDTPicker active element text color
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
 
 ## [1.90.0]
 
