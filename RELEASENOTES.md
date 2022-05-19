@@ -1,6 +1,19 @@
-## [1.90.0]
+# [1.91.0]
 
-### Added
+### Feature
+- Added a code editor to Reports 2.0
+- Added a new Accumulators visualization
+
+### Fixed
+- Fixed the text color of the active date picker
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
+- Fixed color picker background
+
+
+# [1.90.0]
+
+### Feature
 - Add donat mod to pieChart
 - Optimization of visualization classes for gant, pie chart, graph.
 

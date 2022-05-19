@@ -380,6 +380,9 @@ export default new Vuex.Store({
       Vue.set(state.reports.searches, search.sid, search);
       Vue.set(state.reports.table, 'search', search.sid);
     },
+    setReportUserSettings(state, value) {
+      Vue.set(state.reports.userSettings, 'heightCodemirror', value);
+    },
     setPaperSearch(state, search) {
       Vue.set(state.papers.searches, search.sid, search);
       Vue.set(state.papers, 'cursearch', search.sid);
@@ -798,6 +801,7 @@ export default new Vuex.Store({
         Vue.set(state, 'reports', {});
         Vue.set(state.reports, 'elements', settings.reporstElements);
         Vue.set(state.reports, 'searches', {});
+        Vue.set(state.reports, 'userSettings', {});
         settings.reporstElements.forEach((item) => {
           Vue.set(state.reports, item, {});
           Vue.set(state.reports[item], 'search', '');
