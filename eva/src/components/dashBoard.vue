@@ -81,6 +81,7 @@
               v-if="props.edit"
               class="dash-title"
               :style="{ color: theme.$main_text }"
+              :class="{'dash-title--pointer': props.options.urlList && props.options.urlList.length}"
               @click="nameAction(props.options.urlList)"
             >
               {{ boardTitle }}
@@ -1198,10 +1199,10 @@ export default {
           this.$store.commit('setVisualisationModalData', {idDash: this.idDash, data:action})
           break
         case 'window':
-          window.open(action.linkUrl,'name','width=auto,height=auto')
+          window.open(action.url,'name','width=auto,height=auto')
           break
         default:
-          window.open(action.linkUrl, action.type)
+          window.open(action.url, action.type)
           break
       }
     }

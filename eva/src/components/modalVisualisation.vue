@@ -6,7 +6,7 @@
       @click:outside="visualisationModal = {}"
     >
     <v-card :style="{ background: theme.$main_bg }">
-    <v-card-title>
+    <v-card-title class="card-title">
       <v-tooltip
         v-if="mode"
         bottom
@@ -24,6 +24,24 @@
           </v-icon>
         </template>
         <span>Настройки</span>
+      </v-tooltip>
+      <v-tooltip
+        v-if="mode"
+        bottom
+        :color="theme.$accent_ui_color"
+        :open-delay="tooltipOpenDelay"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon
+            class="option"
+            :color="theme.$main_border"
+            v-on="on"
+            @click="visualisationModal = {}"
+          >
+            {{ close_icon }}
+          </v-icon>
+        </template>
+        <span>закрыть</span>
       </v-tooltip>
     </v-card-title>
     <v-card-text>
@@ -44,7 +62,7 @@
 </template>
 
 <script>
-import { mdiSettings } from '@mdi/js';
+import { mdiSettings, mdiClose } from '@mdi/js';
 
 import Visualisation from './visualisation.vue';
 export default {
@@ -55,10 +73,15 @@ export default {
     getElementData: {
       type: Function,
     },
+    tooltipOpenDelay: {
+      type: Number,
+      default: 500,
+    },
     mode: Boolean
   },
   data: () => ({
     settings_icon: mdiSettings,
+    close_icon: mdiClose,
     showModal: false,
   }),
   computed: {
@@ -93,6 +116,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+  }
 </style>
