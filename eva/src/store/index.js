@@ -18,6 +18,15 @@ import notify from './storeNotify/store';
 
 Vue.use(Vuex);
 
+const defaultOptions = {
+  change: false,
+  visible: true,
+  level: 1,
+  boxShadow: false,
+  lastResult: false,
+  searchBtn: false,
+}
+
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   state: {
@@ -43,12 +52,9 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      state[idDash][id].options.change = false;
-      state[idDash][id].options.visible = true;
-      state[idDash][id].options.level = 1;
-      state[idDash][id].options.boxShadow = false;
-      state[idDash][id].options.lastResult = false;
-      state[idDash][id].options.searchBtn = false;
+      for (const option in defaultOptions) {
+        state[idDash][id].options[option] = defaultOptions[option]
+      }
     },
     // проверяет и создает объект в хранилище для настроек
     // path - это idDash либо произвольное место хранения настроек например research
@@ -466,16 +472,25 @@ export default new Vuex.Store({
     },
     // TODO: refactor
     // TODO: rename method
-    createDashboardVisualization(state, { idDash, dashboard }) {
+    createDashboardVisualization(state, { idDash, dashboard, spaceName }) {
       // создаем новый элемент
       const dash = dashboard;
       let id = Object.keys(dash)[0];
       const data = dash[id];
-      if (!state[idDash]?.elements) {
-        Vue.set(state[idDash], 'elements', []);
+      if (spaceName) {
+        id = `${id}-${spaceName}`
+      }
+      if (spaceName) {
+        if (state[idDash] && !state[idDash][`elements${spaceName}`]) {
+          Vue.set(state[idDash], `elements${spaceName}`, []);
+        }
+      } else {
+        if (!state[idDash]?.elements) {
+          Vue.set(state[idDash], 'elements', []);
+        }
       }
 
-      const stateElements = state[idDash]?.elements;
+      const stateElements = spaceName ? state[idDash][`elements${spaceName}`] : state[idDash]?.elements;
       const elements = stateElements.filter((item) => item.indexOf(id) !== -1);
       // и если есть
       if (elements.length > 0) {
@@ -489,6 +504,7 @@ export default new Vuex.Store({
             j = i;
           }
         }
+
         // если и правда мы не можем добавить элемент, потому что он уже есть
         if (j !== -1) {
           // то проверяем если он не самый первый
@@ -504,23 +520,25 @@ export default new Vuex.Store({
       }
       state[idDash][id] = data;
       state[idDash][id].tab = state[idDash].currentTab || 1;
-      state[idDash].elements.push(id);
+      stateElements.push(id);
     },
     // удаляем элемент с помощью модального окна
     deleteDashboardVisualization(state, {
-      page, idDash, id, name,
+      page, idDash, id, name, spaceName
     }) {
       let localId = -1;
       // проверяем что именно удаляем
       if (page === 'dash') {
+        // проверяем относится ли элемент к какому нибудь списку имен
+        const elements = spaceName ? `elements${spaceName}` : 'elements'
         // потом ищем его в массиве элементов дашборда
-        state[idDash].elements.forEach((item, i) => {
+        state[idDash][elements].forEach((item, i) => {
           if (item === id) {
             localId = i;
           }
         });
         // и удаляем его в массиве элемнетов
-        state[idDash].elements.splice(localId, 1);
+        state[idDash][elements].splice(localId, 1);
         // и потом сам элемнет тоже удаляем
         delete state[idDash][id];
       } else if (page === 'tocken') {
@@ -1032,6 +1050,13 @@ export default new Vuex.Store({
       );
       Vue.set(search, 'status', status);
     },
+    setVisualisationModalData(state, {idDash, data}) {
+      if(!state[idDash]?.visualisationModalData) {
+        Vue.set(state[idDash], 'visualisationModalData', {})
+      }
+
+      state[idDash].visualisationModalData = structuredClone(data)
+    }
   },
   actions: {
     ...store.actions,

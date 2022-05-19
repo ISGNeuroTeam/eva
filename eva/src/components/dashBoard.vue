@@ -53,10 +53,35 @@
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
+            <v-menu
+              :nudge-width="100"
+              :rounded="false"
+              offset-y
+              v-model="nameMenu"
+              attach
+            >
+              <v-list class="profile-dropdown--list">
+                <div
+                  v-for="(item, index) in props.options.urlList"
+                  :key="index"
+                >
+                  <v-list-item>
+                    <v-btn
+                      class="profile-dropdown--button"
+                      icon
+                      @click="urlAction(item)"
+                    >
+                      {{ item.title || item.name }}
+                    </v-btn>
+                  </v-list-item>
+                </div>
+              </v-list>
+            </v-menu>
             <div
               v-if="props.edit"
               class="dash-title"
               :style="{ color: theme.$main_text }"
+              @click="nameAction(props.options.urlList)"
             >
               {{ boardTitle }}
             </div>
@@ -459,6 +484,7 @@ import {
   mdiTrashCanOutline,
 } from '@mdi/js';
 import settings from '../js/componentsSettings';
+import visualisation from '../js/visualisationCRUD';
 
 export default {
   name: 'DashBoard',
@@ -576,6 +602,7 @@ export default {
       selectedPieIndex: -1,
       tuneValue: '',
       tuneSliderValue: '',
+      nameMenu: false
     };
   },
   computed: {
@@ -850,8 +877,8 @@ export default {
       this.props.loading = event;
     },
     // вызываем окно для удаления элемнета
-    deleteDashBoard(props) {
-      this.$store.commit('setModalDelete', {
+    async deleteDashBoard(props) {
+      await this.$store.commit('setModalDelete', {
         id: this.idDash,
         status: true,
         elem: this.element,
@@ -1155,7 +1182,44 @@ export default {
     resetRange() {
       this.$emit('ResetRange', this.dataSourceId);
     },
+    nameAction(actionList) {
+      if (!actionList) return
+      if (actionList.length === 1) {
+        this.urlAction(actionList[0])
+      } else {
+        this.nameMenu = !this.nameMenu
+      }
+
+    },
+    urlAction(action) {
+      switch(action.type) {
+        case 'modal':
+          action.open = true
+          this.$store.commit('setVisualisationModalData', {idDash: this.idDash, data:action})
+          break
+        case 'window':
+          window.open(action.linkUrl,'name','width=auto,height=auto')
+          break
+        default:
+          window.open(action.linkUrl, action.type)
+          break
+      }
+    }
   },
+  beforeDestroy() {
+    const elements = this.dashFromStore?.options?.urlList?.filter(elem => elem.type === 'modal')
+    if(elements && elements.length) {
+      elements.forEach(element => {
+        const name_elem = this.dashFromStore[element.elemName]?.name_elem
+        visualisation.delete({
+          idDash: this.idDash, 
+          id: element.elemName,
+          name: name_elem,
+          spaceName: element.type
+        })
+      })
+    }
+  }
 };
 </script>
 

@@ -1006,9 +1006,21 @@
             </v-icon>
           </div>
         </div>
-        <div class="otions-block">
-          {{urlList}}
-          <url-select v-model="urlList" />
+        <div v-if="isUrlList">
+          <v-card-text
+            class="headline"
+          >
+            <div
+              class="settings-title"
+              :style="{
+                color: theme.$main_text,
+                borderColor: theme.$main_border,
+              }"
+            >
+              Ссылки и события для панели
+            </div>
+          </v-card-text>
+          <url-select :list="elementFromStore.options.urlList" @change="changeUrlList" />
         </div>
         <v-card-actions class="actions-settings">
           <v-spacer />
@@ -1046,6 +1058,7 @@
 import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
 import urlSelect from './modalSettings/urlSelect.vue';
+import vusualisation from '@/js/visualisationCRUD'
 
 export default {
   components: { urlSelect },
@@ -1214,6 +1227,9 @@ export default {
       }
       return this.elementFromStore.metrics;
     },
+    isUrlList() {
+      return this.dashFromStore.elements.find(elem => elem === this.element)
+    },
   },
   watch: {
     options: {
@@ -1232,6 +1248,9 @@ export default {
     this.prepareOptions();
   },
   methods: {
+    changeUrlList(val) {
+      this.options.urlList = structuredClone(val)
+    } ,
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
@@ -1358,6 +1377,7 @@ export default {
         type_line: this.type_line,
         updated: Date.now(),
       };
+      this.visualisationHandler()
       await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
@@ -1367,6 +1387,36 @@ export default {
         this.deleteTheme();
       }
       this.cancelModal();
+    },
+    visualisationHandler() {
+      const oldList = this.elementFromStore.options.urlList?.filter(elem => elem.type === 'modal') || []
+      const newList = this.options.urlList?.filter(elem => elem.type === 'modal') || []
+
+      const toDelete = oldList.filter(elem => !newList.some(item => item.id === elem.id 
+                                                            && item.tool === elem.tool 
+                                                            && item.search?.search === elem.search?.search))
+      const toAdd = newList.filter(elem => !oldList.some(item => item.id === elem.id
+                                                        && item.tool === elem.tool 
+                                                        && item.search?.search === elem.search?.search))
+
+      toDelete.forEach(element => {
+        const name_elem = this.dashFromStore[element.elemName]?.name_elem
+        vusualisation.delete({
+          idDash: this.idDash, 
+          id: element.elemName,
+          name: name_elem,
+          spaceName: element.type
+        })
+      })
+
+      toAdd.forEach(element => {
+        element.elemName = vusualisation.create({
+            element: element.tool, 
+            spaceName: element.type,
+            idDash: this.idDash
+        })
+      })
+      
     },
     changeSelectedLayer() {
       // Берем активную подложку из сторы
