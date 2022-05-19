@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrelease]
 
 ### Added
+- Add code editor to reportsV2
 - add visualisation dashAccumulators.vue
 
-## Fixed
+
+### Fixed
+- Fixed dashDTPicker active element text color
 - Fixed tokens in csvg visualisation
 - Fixed csvg popup
 - Fixed dashDTPicker active element text color

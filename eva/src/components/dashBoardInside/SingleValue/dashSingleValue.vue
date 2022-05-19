@@ -243,11 +243,13 @@ export default {
       if (!metric.metadata) {
         return undefined;
       }
+      console.log(metric.metadata);
       // eslint-disable-next-line no-eval
       const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
         ranges[key] = `${ranges[key]}`.split(':').map(Number);
       });
+      console.log('test');
 
       if (metric.color === 'range') {
         if (!Number.isNaN(metric.value)) {
