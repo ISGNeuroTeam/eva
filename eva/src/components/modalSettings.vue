@@ -600,6 +600,105 @@
             </div>
           </v-card-text>
           <div
+            v-if="checkOptions('fillColor') && accumulators.length > 0"
+            ref="options"
+            class="options-block"
+          >
+            <template
+              v-for="(item, index) in metrics"
+            >
+              <div
+                :key="`${index}title`"
+                class="divider-tooltip-setting"
+                :style="{ color: theme.$main_text }"
+              >
+                <p>Показатель {{ index + 1 }}</p>
+                <div
+                  :style="{ backgroundColor: theme.$main_text }"
+                  class="divider-line"
+                />
+              </div>
+              <div
+                :key="`${index}options`"
+                class="options-item-tooltip"
+              >
+                <v-select
+                  v-model="accumulators[index].colorType"
+                  :items="accumulatorColorTypes"
+                  item-text="label"
+                  item-value="value"
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    fill: theme.$main_text,
+                  }"
+                  :menu-props="{
+                    maxHeight: '150px',
+                    overflow: 'auto',
+                  }"
+                  hide-details
+                  outlined
+                  class="item-metric"
+                  label="Выберите тип"
+                  @click="changeColor"
+                  @input="isChanged = true"
+                />
+                <v-text-field
+                  v-if="accumulators[index].colorType === 'color'"
+                  v-model="accumulators[index].color"
+                  placeholder="red #5F27FF rgb(95,39,255)"
+                  label="Набор цветов"
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    background: 'transparent',
+                    borderColor: theme.$main_border,
+                  }"
+                  outlined
+                  class="item-metric"
+                  hide-details
+                  @input="isChanged = true"
+                >
+                  <template #append>
+                    <v-menu
+                      top
+                      transition="scale-transition"
+                      :close-on-content-click="false"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                          size="16"
+                          :style="{
+                            color: theme.$main_text,
+                            background: 'transparent',
+                            borderColor: theme.$main_border,
+                          }"
+                          v-bind="attrs"
+                          v-on="on"
+                        >
+                          {{ dropper }}
+                        </v-icon>
+                      </template>
+                      <v-color-picker
+                        v-model="accumulators[index].color"
+                        dot-size="25"
+                        hide-canvas
+                        hide-inputs
+                        hide-mode-switch
+                        hide-sliders
+                        mode="hexa"
+                        :style="{background: 'transparent'}"
+                        show-swatches
+                        swatches-max-height="200"
+                        @input.capture="addColor($event)"
+                      />
+                    </v-menu>
+                  </template>
+                </v-text-field>
+              </div>
+            </template>
+          </div>
+          <div
             v-if="checkOptions('piechartSettings')"
             ref="options"
             class="options-block"
@@ -726,6 +825,7 @@
                       hide-mode-switch
                       hide-sliders
                       mode="hexa"
+                      :style="{background: 'transparent'}"
                       show-swatches
                       swatches-max-height="200"
                       @input.capture="addColor($event)"
@@ -1098,6 +1198,18 @@ export default {
           label: 'Кольцвая диограмма',
         },
       ],
+      accumulators: [],
+      accumulatorColorType: '',
+      accumulatorColorTypes: [
+        {
+          value: 'color',
+          label: 'Цвет',
+        },
+        {
+          value: 'range',
+          label: 'Диапазон',
+        },
+      ],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1230,14 +1342,16 @@ export default {
       this.deleteMetricId = val;
     },
     addColor(e) {
-      if (this.colorPicker) {
-        if (this.colorsPie.colors === '') {
-          this.colorsPie.colors += `${e}`;
-        } else {
-          this.colorsPie.colors += ` ${e}`;
+      if (this.element.indexOf('piechart') !== -1) {
+        if (this.colorPicker) {
+          if (this.colorsPie.colors === '') {
+            this.colorsPie.colors += `${e}`;
+          } else {
+            this.colorsPie.colors += ` ${e}`;
+          }
         }
+        this.colorPicker = '';
       }
-      this.colorPicker = '';
     },
     loadComponentsSettings() {
       const localOptions = {};
@@ -1331,6 +1445,9 @@ export default {
           this.$set(this.options, 'themes', this.themes);
         }
         this.$set(this.options, 'pieType', this.pieType);
+      }
+      if (this.element.indexOf('accumulators') !== -1) {
+        this.$set(this.options, 'fillColor', this.accumulators);
       }
       if (this.element.startsWith('multiLine')) {
         this.$store.commit('setMultilineMetricUnits', {
@@ -1615,6 +1732,17 @@ export default {
                 this.pieType = options[item];
               } else if (item === 'color') {
                 localOptions[item] = options[item] || '';
+              } else if (item === 'fillColor') {
+                if (this.accumulators?.length === 0) {
+                  const defaultAccumulator = this.metrics.map(() => ({
+                    colorType: 'color',
+                    color: this.theme.$primary_button,
+                  }));
+                  this.$set(this, 'accumulators', defaultAccumulator);
+                }
+                if (options[item].length > 0) {
+                  this.$set(this, 'accumulators', options[item]);
+                }
               } else {
                 localOptions[item] = options[item]
                 !== null
