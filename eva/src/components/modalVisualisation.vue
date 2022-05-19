@@ -26,7 +26,6 @@
         <span>Настройки</span>
       </v-tooltip>
       <v-tooltip
-        v-if="mode"
         bottom
         :color="theme.$accent_ui_color"
         :open-delay="tooltipOpenDelay"
@@ -119,6 +118,6 @@ export default {
 <style lang="scss" scoped>
   .card-title {
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
   }
 </style>
