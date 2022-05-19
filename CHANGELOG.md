@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - add visualisation dashAccumulators.vue
 
 ## Fixed
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
 - Fixed dashDTPicker active element text color
 - Fixed color picker background
 
