@@ -416,7 +416,6 @@ export default {
         lineWrapping: false,
       },
       searchSize: [10, 15, 20, 30, 40, 50],
-      heightCodemirror: 240,
       numberLineModal: false,
       settings: false,
       historySize: {
@@ -440,6 +439,14 @@ export default {
     },
     historySizeUndo() {
       return this.historySize?.undo === 0 ? 'disabled' : '';
+    },
+    heightCodemirror: {
+      get() {
+        return this.$store.state.reports.userSettings.heightCodemirror;
+      },
+      set(value) {
+        this.$store.commit('setReportUserSettings', value);
+      },
     },
   },
   watch: {
