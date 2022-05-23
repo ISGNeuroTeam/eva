@@ -109,9 +109,9 @@ class MapClass {
       zoom,
       maxZoom,
       center,
-      zoomAnimation: false,
+      // zoomAnimation: false,
       // fadeAnimation: false,
-      // markerZoomAnimation: false,
+      markerZoomAnimation: false,
     });
   }
 

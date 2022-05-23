@@ -551,8 +551,8 @@ export default {
         {
           event: 'moveend',
           callback: () => {
-            this.position = this.map.center;
-            [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
+            // this.position = this.map.center;
+            // [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
             // this.updateToken(this.map.zoom);
           },
         },
