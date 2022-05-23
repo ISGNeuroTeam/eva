@@ -337,6 +337,15 @@ export default {
         }
       },
     },
+    'options.zoomStep': {
+      deep: true,
+      handler(val, oldVal) {
+        if (val !== oldVal) {
+          this.map.options.wheelPxPerZoomLevel = 101 - val;
+          this.map.map.options.wheelPxPerZoomLevel = 101 - val;
+        }
+      },
+    },
   },
   mounted() {
     this.updateSelectedLayerValue();

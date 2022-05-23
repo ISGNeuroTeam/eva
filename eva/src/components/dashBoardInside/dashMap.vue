@@ -214,20 +214,19 @@ export default {
         this.map.resize();
       }
     },
-    getOptions: {
-      handler(val, old) {
-        if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
-          if (this.options?.library) {
-            this.map.library = this.library;
-          }
-          this.map.options.layer = val.layer;
-          this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-          this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-          this.reDrawMap(this.dataRestFrom);
-        }
-      },
-      deep: true,
-    },
+    // getOptions: {
+    //   handler(val, old) {
+    //     if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
+    //       if (this.options?.library) {
+    //         this.map.library = this.library;
+    //       }
+    //       this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.reDrawMap(this.dataRestFrom);
+    //     }
+    //   },
+    //   deep: true,
+    // },
     // mapStyleSize() {
     //   this.map.resize();
     // },
@@ -554,7 +553,7 @@ export default {
           callback: () => {
             this.position = this.map.center;
             [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
-            this.updateToken(this.map.zoom);
+            // this.updateToken(this.map.zoom);
           },
         },
         {

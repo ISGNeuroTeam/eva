@@ -54,6 +54,7 @@ class MapClass {
         const closestData = closest(pipelineData, sum);
 
         const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
+        // console.log(pipelineInfo);
         // div for tooltip
         const newDiv = document.createElement('div');
         newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
@@ -87,7 +88,6 @@ class MapClass {
     wheelPxPerZoomLevel: 200,
     isLegendGenerated: false,
     startingPoint: [],
-    layer: [],
   }
 
   constructor({
@@ -110,7 +110,8 @@ class MapClass {
       maxZoom,
       center,
       zoomAnimation: false,
-      markerZoomAnimation: false,
+      // fadeAnimation: false,
+      // markerZoomAnimation: false,
     });
   }
 
@@ -204,14 +205,6 @@ class MapClass {
 
   set mapTheme(val) {
     this.options.mapTheme = val;
-  }
-
-  get layer() {
-    return this.options.layer;
-  }
-
-  set layer(val) {
-    this.options.layer = val;
   }
 
   setEvents(events) {

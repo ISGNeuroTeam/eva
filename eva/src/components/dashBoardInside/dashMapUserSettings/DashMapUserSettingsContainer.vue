@@ -52,6 +52,7 @@
           max-width="220"
           max-height="198"
           nudge-top="-25px"
+          :close-on-content-click="false"
         >
           <template v-slot:activator="{ on:menu }">
             <div class="d-flex flex-column">
@@ -390,6 +391,7 @@ export default {
       },
       localLayerList: [],
       toggleSelectLayer: false,
+      pipelineParameters: ['Давление', 'Скорость потока', 'Диаметр', 'Длина'],
     };
   },
   computed: {
@@ -505,6 +507,7 @@ export default {
       } else {
         this.map.removeLayerGroup(e.type);
       }
+      this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
     },
     creationLayer() {
       if (this.layerList.length === 0) {
