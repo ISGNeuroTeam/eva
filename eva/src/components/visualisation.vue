@@ -1,8 +1,8 @@
 <template>
-<div :options="String(options)">
-  <v-card-text
-      v-if="idFrom && dashFromStore"
+  <div :options="String(options)">
+    <v-card-text
       :is="currentElem"
+      v-if="idFrom && dashFromStore"
       custom-class="card-text element-itself"
       :color-from="theme"
       :custom-style="{
@@ -31,47 +31,47 @@
       :table-page="tablePage"
       :selected-pie-index="selectedPieindex"
     />
-</div>
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'visualisation',
+  name: 'Visualisation',
   props: {
     element: {
       type: String,
-      default: ''
+      default: '',
     },
     width: {
       type: [String, Number],
-      default: 0
+      default: 0,
     },
     height: {
       type: [String, Number],
-      default: 0
+      default: 0,
     },
     isFullScreen: Boolean,
     tablePerPage: {
       type: [String, Number],
-      default: 100
+      default: 100,
     },
     tablePage: {
       type: [String, Number],
-      default: 1
+      default: 1,
     },
     selectedPieindex: {
       type: [String, Number],
-      default: -1
+      default: -1,
     },
     data: {
       type: Array,
-      default: () => ([])
+      default: () => ([]),
     },
     spaceName: {
       type: String,
-      default: ''
+      default: '',
     },
-    mode: Boolean
+    mode: Boolean,
   },
   data: () => ({
     loading: false,
@@ -89,14 +89,14 @@ export default {
         level: 1,
         boxShadow: false,
       },
-    }
+    },
   }),
   computed: {
     idFrom() {
-      return this.spaceName ? `${this.element}-${this.spaceName}` : this.element
+      return this.spaceName ? `${this.element}-${this.spaceName}` : this.element;
     },
     sData() {
-      return this.data
+      return this.data;
     },
     theme() {
       return this.$store.getters.getTheme;
@@ -113,7 +113,7 @@ export default {
       return this.$route.params.id;
     },
     dashFromStore() {
-      return this.$store.state[this.idDash][this.idFrom]
+      return this.$store.state[this.idDash][this.idFrom];
     },
 
     getOptions() {
@@ -165,7 +165,7 @@ export default {
   },
   methods: {
     updateSettings(localSettings) {
-      this.settings = JSON.parse(JSON.stringify(localSettings));
+      this.settings = structuredClone(localSettings);
     },
     setOptionsItems(options) {
       Object.keys(options).forEach((item) => {
@@ -173,7 +173,7 @@ export default {
       });
     },
   },
-}
+};
 </script>
 
 <style>

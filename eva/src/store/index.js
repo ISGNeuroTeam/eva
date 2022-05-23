@@ -25,7 +25,7 @@ const defaultOptions = {
   boxShadow: false,
   lastResult: false,
   searchBtn: false,
-}
+};
 
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
@@ -52,9 +52,13 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      for (const option in defaultOptions) {
-        state[idDash][id].options[option] = defaultOptions[option]
-      }
+      Object.keys(defaultOptions).forEach((option) => {
+        Vue.set(
+          state[idDash][id].options,
+          option,
+          defaultOptions[option],
+        );
+      });
     },
     // проверяет и создает объект в хранилище для настроек
     // path - это idDash либо произвольное место хранения настроек например research
@@ -478,16 +482,12 @@ export default new Vuex.Store({
       let id = Object.keys(dash)[0];
       const data = dash[id];
       if (spaceName) {
-        id = `${id}-${spaceName}`
-      }
-      if (spaceName) {
+        id = `${id}-${spaceName}`;
         if (state[idDash] && !state[idDash][`elements${spaceName}`]) {
           Vue.set(state[idDash], `elements${spaceName}`, []);
         }
-      } else {
-        if (!state[idDash]?.elements) {
-          Vue.set(state[idDash], 'elements', []);
-        }
+      } else if (!state[idDash]?.elements) {
+        Vue.set(state[idDash], 'elements', []);
       }
 
       const stateElements = spaceName ? state[idDash][`elements${spaceName}`] : state[idDash]?.elements;
@@ -524,13 +524,13 @@ export default new Vuex.Store({
     },
     // удаляем элемент с помощью модального окна
     deleteDashboardVisualization(state, {
-      page, idDash, id, name, spaceName
+      page, idDash, id, name, spaceName,
     }) {
       let localId = -1;
       // проверяем что именно удаляем
       if (page === 'dash') {
         // проверяем относится ли элемент к какому нибудь списку имен
-        const elements = spaceName ? `elements${spaceName}` : 'elements'
+        const elements = spaceName ? `elements${spaceName}` : 'elements';
         // потом ищем его в массиве элементов дашборда
         state[idDash][elements].forEach((item, i) => {
           if (item === id) {
@@ -1050,13 +1050,13 @@ export default new Vuex.Store({
       );
       Vue.set(search, 'status', status);
     },
-    setVisualisationModalData(state, {idDash, data}) {
-      if(!state[idDash]?.visualisationModalData) {
-        Vue.set(state[idDash], 'visualisationModalData', {})
+    setVisualisationModalData(state, { idDash, data }) {
+      if (!state[idDash]?.visualisationModalData) {
+        Vue.set(state[idDash], 'visualisationModalData', {});
       }
 
-      state[idDash].visualisationModalData = structuredClone(data)
-    }
+      state[idDash].visualisationModalData = structuredClone(data);
+    },
   },
   actions: {
     ...store.actions,

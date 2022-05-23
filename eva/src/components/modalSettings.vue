@@ -1006,7 +1006,7 @@
             </v-icon>
           </div>
         </div>
-        <div v-if="isUrlList">
+        <div v-if="istitleActions">
           <v-card-text
             class="headline"
           >
@@ -1020,7 +1020,10 @@
               Ссылки и события для панели
             </div>
           </v-card-text>
-          <url-select :list="elementFromStore.options.urlList" @change="changeUrlList" />
+          <title-ation-select
+            :list="elementFromStore.options.titleActions"
+            @change="changetitleActions"
+          />
         </div>
         <v-card-actions class="actions-settings">
           <v-spacer />
@@ -1057,12 +1060,12 @@
 <script>
 import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
-import urlSelect from './modalSettings/urlSelect.vue';
-import vusualisation from '@/js/visualisationCRUD'
+import TitleAtionSelect from './modalSettings/titleAtionSelect.vue';
+import vusualisation from '@/js/visualisationCRUD';
 
 export default {
-  components: { urlSelect },
   name: 'ModalSettings',
+  components: { TitleAtionSelect },
   model: {
     prop: 'modalValue',
     event: 'changeModalValue',
@@ -1133,7 +1136,7 @@ export default {
       deleteMetricId: '',
       colorPicker: '',
       isOsmServerChange: false,
-      urlList: [],
+      titleActions: [],
     };
   },
   computed: {
@@ -1227,8 +1230,8 @@ export default {
       }
       return this.elementFromStore.metrics;
     },
-    isUrlList() {
-      return this.dashFromStore.elements.find(elem => elem === this.element)
+    istitleActions() {
+      return this.dashFromStore.elements.find((elem) => elem === this.element);
     },
   },
   watch: {
@@ -1248,9 +1251,9 @@ export default {
     this.prepareOptions();
   },
   methods: {
-    changeUrlList(val) {
-      this.options.urlList = structuredClone(val)
-    } ,
+    changetitleActions(val) {
+      this.options.titleActions = structuredClone(val);
+    },
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
@@ -1377,7 +1380,7 @@ export default {
         type_line: this.type_line,
         updated: Date.now(),
       };
-      this.visualisationHandler()
+      this.visualisationHandler();
       await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
@@ -1389,34 +1392,39 @@ export default {
       this.cancelModal();
     },
     visualisationHandler() {
-      const oldList = this.elementFromStore.options.urlList?.filter(elem => elem.type === 'modal') || []
-      const newList = this.options.urlList?.filter(elem => elem.type === 'modal') || []
+      const oldList = this.elementFromStore.options
+        .titleActions?.filter((elem) => elem.type === 'modal') || [];
+      const newList = this.options
+        .titleActions?.filter((elem) => elem.type === 'modal') || [];
 
-      const toDelete = oldList.filter(elem => !newList.some(item => item.id === elem.id 
-                                                            && item.tool === elem.tool 
-                                                            && item.search?.search === elem.search?.search))
-      const toAdd = newList.filter(elem => !oldList.some(item => item.id === elem.id
-                                                        && item.tool === elem.tool 
-                                                        && item.search?.search === elem.search?.search))
+      const toDelete = oldList.filter(
+        (elem) => !newList.some((item) => item.id === elem.id
+          && item.tool === elem.tool
+          && item.search?.search === elem.search?.search),
+      );
+      const toAdd = newList.filter(
+        (elem) => !oldList.some((item) => item.id === elem.id
+          && item.tool === elem.tool
+          && item.search?.search === elem.search?.search),
+      );
 
-      toDelete.forEach(element => {
-        const name_elem = this.dashFromStore[element.elemName]?.name_elem
+      toDelete.forEach((element) => {
+        const name = this.dashFromStore[element.elemName]?.name_elem;
         vusualisation.delete({
-          idDash: this.idDash, 
+          idDash: this.idDash,
           id: element.elemName,
-          name: name_elem,
-          spaceName: element.type
-        })
-      })
+          name,
+          spaceName: element.type,
+        });
+      });
 
-      toAdd.forEach(element => {
+      toAdd.forEach((element) => {
         element.elemName = vusualisation.create({
-            element: element.tool, 
-            spaceName: element.type,
-            idDash: this.idDash
-        })
-      })
-      
+          element: element.tool,
+          spaceName: element.type,
+          idDash: this.idDash,
+        });
+      });
     },
     changeSelectedLayer() {
       // Берем активную подложку из сторы
