@@ -7,7 +7,7 @@
       >
         <div
           v-for="(element, index) of titleActions"
-          :key="index"
+          :key="element.id"
           class="list-elem options-item-tooltip"
         >
           <div class="list-elem__data">
@@ -124,7 +124,7 @@
               @click="editHandler(element)"
             >
               <v-icon :color="theme.$main_text">
-                {{ element.edit ? confirm_edit_icon : edit_icon }}
+                {{ element.edit ? confirmEditIcon : editIcon }}
               </v-icon>
             </v-btn>
             <v-btn
@@ -170,7 +170,7 @@
 
 <script>
 import {
-  mdiPlusBox, mdiPencil, mdiClose, mdiMenu, mdiCheckBold,
+  mdiPencil, mdiClose, mdiMenu, mdiCheckBold,
 } from '@mdi/js';
 import draggable from 'vuedraggable';
 import settings from '../../js/componentsSettings';
@@ -186,7 +186,7 @@ export default {
       default: () => [
         {
           text: 'Внешняя ссылка (новая вкладка)',
-          value: '_blanc',
+          value: '_blank',
         },
         {
           text: 'Внешняя ссылка (новое окно)',
@@ -208,9 +208,8 @@ export default {
     },
   },
   data: () => ({
-    plus_icon: mdiPlusBox,
-    edit_icon: mdiPencil,
-    confirm_edit_icon: mdiCheckBold,
+    editIcon: mdiPencil,
+    confirmEditIcon: mdiCheckBold,
     delete_icon: mdiClose,
     drag_icon: mdiMenu,
     localList: null,
@@ -232,7 +231,7 @@ export default {
     },
     searches() {
       const { searches } = this.$store.state[this.idDash];
-      return searches ? searches.map((search) => ({
+      return searches && searches.length ? searches.map((search) => ({
         text: search.sid,
         value: { sid: search.sid, search: search.id },
       })) : [];
