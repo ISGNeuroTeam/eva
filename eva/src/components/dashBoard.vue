@@ -130,8 +130,9 @@
           <div class="settings-dash">
             <v-dialog
               ref="fullScreenModal"
-              v-model="fullScreenMode"
+              v-model="bigSizeMode"
               width="100%"
+              :fullscreen="isFullScreen"
             >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip
@@ -145,17 +146,17 @@
                       class="expand"
                       :color="theme.$main_border"
                       v-on="{ ...onFullScreen, ...onTooltip }"
-                      @click="fullScreenMode = !fullScreenMode"
+                      @click="bigSizeMode = !bigSizeMode"
                     >
                       {{ props.mdiArrowExpand }}
                     </v-icon>
                   </template>
-                  <span>На весь экран</span>
+                  <span>Развернуть</span>
                 </v-tooltip>
               </template>
               <div
                 class="full-screen-dialog"
-                :style="{ height: '80vh' }"
+                :style="{ height: isFullScreen ? '100vh' : '80vh' }"
               >
                 <v-card
                   class="dash-block"
@@ -259,12 +260,37 @@
                               class="expand"
                               :color="theme.$main_border"
                               v-on="on"
-                              @click="fullScreenMode = !fullScreenMode"
+                              @click="toggleBigSize"
                             >
                               {{ props.mdiArrowCollapse }}
                             </v-icon>
                           </template>
                           <span>Свернуть</span>
+                        </v-tooltip>
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                          :open-delay="tooltipOpenDelay"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="expand"
+                              :color="theme.$main_border"
+                              v-on="on"
+                              @click="isFullScreen = !isFullScreen"
+                            >
+                              {{
+                                isFullScreen
+                                  ? props.mdiFullscreenExit
+                                  : props.mdiFullscreen
+                              }}
+                            </v-icon>
+                          </template>
+                          <span>{{
+                            isFullScreen
+                              ? 'Выход из полноэкранного режима'
+                              : 'на весь экран'
+                          }}</span>
                         </v-tooltip>
                       </div>
                     </div>
@@ -425,7 +451,7 @@
       <v-card-text
         :is="currentElem"
         v-if="showElement"
-        :full-screen-mode="fullScreenMode"
+        :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
         :custom-style="{
@@ -440,8 +466,8 @@
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
         :size-from="{
-          height: fullScreenMode ? fullScreenHeight : height,
-          width: fullScreenMode ? fullScreenWidth : width,
+          height: bigSizeMode ? fullScreenHeight : height,
+          width: bigSizeMode ? fullScreenWidth : width,
         }"
         :tooltip-from="props.tooltip"
         :width-from="width"
@@ -449,8 +475,8 @@
         :options="props.options"
         :current-settings="settings"
         :update-settings="updateSettings"
-        :is-full-screen="fullScreenMode"
-        :full-screen="fullScreenMode"
+        :is-full-screen="bigSizeMode"
+        :full-screen="bigSizeMode"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
         :selected-pie-index="selectedPieIndex"
@@ -486,6 +512,8 @@ import {
   mdiPencil,
   mdiSettings,
   mdiTrashCanOutline,
+  mdiFullscreen,
+  mdiFullscreenExit,
 } from '@mdi/js';
 import settings from '../js/componentsSettings';
 import visualisation from '../js/visualisationCRUD';
@@ -541,7 +569,8 @@ export default {
       dataFromDB: true,
       mdiDatabaseSearch,
       mdiArrowDownBold,
-      fullScreenMode: false,
+      bigSizeMode: false,
+      isFullScreen: false,
       disabledTooltip: false,
       settings: {
         showTitle: true,
@@ -563,6 +592,8 @@ export default {
         mdiChevronDown,
         mdiArrowExpand,
         mdiArrowCollapse,
+        mdiFullscreen,
+        mdiFullscreenExit,
         icons: {},
         edit: true,
         edit_icon: true,
@@ -601,8 +632,6 @@ export default {
         tooltip: {},
         metricsMulti: [],
       },
-      fullScreenWidth: 0.8 * window.innerWidth,
-      fullScreenHeight: 0.8 * window.innerHeight,
       selectedPieIndex: -1,
       tuneValue: '',
       tuneSliderValue: '',
@@ -762,6 +791,26 @@ export default {
         ? this.$store.state[this.idDash]?.searches
           .find((element) => element?.id === this.dataSourceId)?.sid
         : '';
+    },
+    fullScreenHeight() {
+      const windowHeight = window.innerHeight;
+      if (this.bigSizeMode) {
+        if (this.isFullScreen) {
+          return windowHeight;
+        }
+        return windowHeight * 0.8;
+      }
+      return this.height;
+    },
+    fullScreenWidth() {
+      const windowWidth = window.innerWidth;
+      if (this.bigSizeMode) {
+        if (this.isFullScreen) {
+          return windowWidth;
+        }
+        return windowWidth * 0.8;
+      }
+      return this.height;
     },
   },
   watch: {
@@ -1221,6 +1270,10 @@ export default {
           window.open(action.url, action.type);
           break;
       }
+    },
+    toggleBigSize() {
+      this.bigSizeMode = !this.bigSizeMode;
+      this.isFullScreen = false;
     },
   },
 };
