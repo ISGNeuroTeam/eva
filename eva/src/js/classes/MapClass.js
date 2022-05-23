@@ -81,7 +81,7 @@ class MapClass {
     clusterTextCount: 4,
     clusterPosition: null,
     library: null,
-    test: null,
+    layerGroup: null,
     osmServer: null,
     mapTheme: 'default',
     wheelPxPerZoomLevel: 200,
@@ -97,14 +97,20 @@ class MapClass {
     zoom,
     maxZoom,
     center,
+    layerGroup,
+    library,
   }) {
     this.options.wheelPxPerZoomLevel = wheelPxPerZoomLevel;
+    this.options.layerGroup = layerGroup;
+    this.options.library = library;
     this.map = L.map(mapRef, {
       wheelPxPerZoomLevel,
       zoomSnap,
       zoom,
       maxZoom,
       center,
+      zoomAnimation: false,
+      markerZoomAnimation: false,
     });
   }
 
@@ -176,12 +182,12 @@ class MapClass {
     this.options.library = val;
   }
 
-  get test() {
-    return this.options.test;
+  get layerGroup() {
+    return this.options.layerGroup;
   }
 
-  set test(val) {
-    this.options.test = val;
+  set layerGroup(val) {
+    this.options.layerGroup = val;
   }
 
   get osmServer() {
@@ -324,15 +330,13 @@ class MapClass {
       lineTurf,
     });
 
-    // if (this.layer.includes(lib.name)) {
     line
-      .addTo(this.map)
+      // .addTo(this.map)
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
       .on('mouseout', resetHighlight);
     line.setTooltipContent(element.label);
-    this.test[lib.name].push(line);
-    // }
+    this.layerGroup[element.type].addLayer(line);
   }
 
   drawMarkerHTML({ lib, element }) {
@@ -366,18 +370,19 @@ class MapClass {
     });
     const point = element.coordinates.split(':');
     const coord = point[1].split(',');
-    L.marker([coord[0], coord[1]], {
+    const marker = L.marker([coord[0], coord[1]], {
       icon,
       zIndexOffset: -1000,
       riseOnHover: true,
     })
-      .addTo(this.map)
+      // .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
         interactive: true,
       });
+    this.layerGroup[element.type].addLayer(marker);
   }
 
   drawMarkerSVG({ lib, element }) {
@@ -389,10 +394,8 @@ class MapClass {
     const point = element.coordinates.split(':');
     const coord = point[1].split(',');
     this.startingPoint = [coord[0], coord[1]];
-    // if (this.layer.includes(lib.name)) {
     const marker = L.marker([coord[0], coord[1]], {
       icon,
-      zIndexOffset: -1000,
       riseOnHover: true,
     })
       // .addTo(this.map)
@@ -403,19 +406,8 @@ class MapClass {
       });
       // eslint-disable-next-line no-underscore-dangle
     // L.DomUtil.addClass(marker._icon, 'className');
-    // console.log(lib);
-    this.test[lib.name].push(marker);
-    // console.log(this.test[element.type]);
-    // }
+    this.layerGroup[element.type].addLayer(marker);
   }
-
-  // testss() {
-  //   // const layerControl = L.control.layers().addTo(this.map);
-  //   for (const i in this.test) {
-  //     const group = L.layerGroup(this.test[i]).addTo(this.map);
-  //     // group.addOverlay(group, `${i}`);
-  //   }
-  // }
 
   clustering(dataRest) {
     this.cluster = L.markerClusterGroup({
@@ -513,7 +505,7 @@ class MapClass {
   drawObjects(dataRest, mode, pipelineDataDictionary) {
     dataRest.forEach((item) => {
       if (
-        item?.type
+        item?.type !== null
           && this.library?.objects
           && this.library?.objects[item.type]
       ) {
@@ -569,15 +561,25 @@ class MapClass {
     this.map.remove();
   }
 
-  testRemov(layer) {
-    layer.forEach((i) => {
-      this.map.removeLayer(i);
-    });
+  removeLayerGroup(i) {
+    this.layerGroup[i].remove();
   }
 
-  testAdd(layer) {
-    layer.forEach((i) => {
-      this.map.addLayer(i);
+  addLayerGroup(i) {
+    this.removeLayerGroup(i);
+    this.layerGroup[i].addTo(this.map);
+  }
+
+  addGroup(group) {
+    this.layerGroup[group] = L.layerGroup([]);
+  }
+
+  changeIndexOffset(group, zIndex) {
+    this.layerGroup[group].eachLayer((layer) => {
+      // eslint-disable-next-line no-underscore-dangle
+      if (layer._icon) {
+        layer.setZIndexOffset(zIndex);
+      }
     });
   }
 

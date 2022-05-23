@@ -26,11 +26,11 @@
       >
         <dash-map-user-settings-container
           v-if="map"
+          ref="setting"
           :map="map"
           :id-dash-from="idDashFrom"
           :id-element="idFrom"
           @openSettingsModal="modalSettingsValue = true"
-          ref="setting"
         />
       </div>
       <dash-map-user-settings-new
@@ -127,7 +127,7 @@ export default {
       pipelineData: [],
       pipelineDataDictionary: {},
       position: null,
-      test: {},
+      layerGroup: {},
     };
   },
   computed: {
@@ -214,28 +214,33 @@ export default {
         this.map.resize();
       }
     },
-    // getOptions: {
-    //   handler(val, old) {
-    //     if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
-    //       if (this.options?.library) {
-    //         this.map.library = this.library;
-    //         this.map.test = this.test;
-    //       }
-    //       this.map.options.layer = val.layer;
-    //       this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-    //       this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-    //       this.reDrawMap(this.dataRestFrom);
-    //     }
-    //   },
-    //   deep: true,
-    // },
-    mapStyleSize() {
-      this.map.resize();
+    getOptions: {
+      handler(val, old) {
+        if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
+          if (this.options?.library) {
+            this.map.library = this.library;
+          }
+          this.map.options.layer = val.layer;
+          this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+          this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+          this.reDrawMap(this.dataRestFrom);
+        }
+      },
+      deep: true,
     },
+    // mapStyleSize() {
+    //   this.map.resize();
+    // },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
       if (_dataRest && this.map) {
         this.reDrawMap(_dataRest);
+        this.$nextTick(() => {
+          if (this.library?.objects) {
+            this.$refs.setting.creationLayer();
+            this.$refs.setting.addLayer();
+          }
+        });
       }
     },
     clusterTextCount() {
@@ -253,6 +258,9 @@ export default {
       this.$nextTick(() => {
         this.init();
       });
+    },
+    sizeFrom() {
+      this.map.resize();
     },
   },
   mounted() {
@@ -297,7 +305,8 @@ export default {
             idDash: this.idDash,
             id: this.element,
           });
-          this.loadDataForPipe(this.$store.getters.getPaperSearch);
+          // this.loadDataForPipe(this.$store.state[this.idDash][this.element].options.search);
+          this.loadDataForPipe(this.options.search);
         }
       });
     },
@@ -315,6 +324,7 @@ export default {
         search: event,
         idDash: this.idDash,
       });
+      // console.log(response);
       // вызывая метод в хранилище
       if (response.length === 0) {
         // если что-то пошло не так
@@ -347,6 +357,7 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
+      // console.log(search);
       this.pipelineData = await this.getDataFromRest(search);
       if (this.map) {
         const allPipes = {};
@@ -361,6 +372,12 @@ export default {
 
         this.pipelineDataDictionary = allPipes;
         this.reDrawMap(this.dataRestFrom);
+        this.$nextTick(() => {
+          if (this.map && this.library?.objects) {
+            this.$refs.setting.creationLayer();
+            this.$refs.setting.addLayer();
+          }
+        });
       }
     },
     updateToken(value) {
@@ -417,25 +434,24 @@ export default {
           this.getOSM();
           // получаем библиотеку
           // get all icons that we need on map
+          // if (!this.fullScreenMode) {
           this.generateLibrary(dataRest, this.options?.primitivesLibrary);
           if (this.library?.objects) {
-            Object.values(this.library.objects).forEach((item) => {
-              this.test[item.name] = [];
+            Object.keys(this.library.objects).forEach((item) => {
+              if (!this.map.layerGroup[item]) {
+                this.map.addGroup(item);
+              }
             });
           }
+          // }
           this.map.generateClusterPositionItems();
           if (!this.error && dataRest.length > 0) {
             // создаем элемент карты
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
+            // if (!this.fullScreenMode) {
             this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
-            // this.map.testss();
-            Object.keys(this.map.test).reverse().forEach((item) => {
-              if (this.map.test[item].length > 0) {
-                this.$refs.setting.layer.push(item);
-                this.$refs.setting.change(item);
-              }
-            });
+            // }
             if (this.map) {
               if (this.options.initialPoint) {
                 this.map.setView(
@@ -462,7 +478,6 @@ export default {
       leafletControlZoomOut.removeAttribute('title');
       leafletControlZoomIn.removeAttribute('title');
     },
-
     initTheme() {
       const options = this.getOptions;
       this.map.mapTheme = options.maptheme ? options.maptheme : 'default';
@@ -502,6 +517,11 @@ export default {
               id: this.idFrom, // id элемнета (table, graph-2)
               idDash: this.idDashFrom,
             });
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.options,
+              prop: 'primitivesLibrary',
+              value: JSON.stringify(this.library),
+            }]);
           }
         } catch {
           this.error = 'Ошибка формата входных данных';
@@ -510,7 +530,7 @@ export default {
         }
         if (this.map && !this.map.isLegendGenerated) {
           this.map.library = this.library;
-          this.map.test = this.test;
+          this.map.layerGroup = this.layerGroup;
           this.map.createLegend(this.library);
         }
       }
@@ -524,6 +544,8 @@ export default {
         zoom: this.getOptions.zoomLevel,
         maxZoom: 25,
         center: this.getCurrentPosition,
+        layerGroup: this.layerGroup,
+        library: this.library,
       });
       this.map = Object.freeze(map);
       this.map.setEvents([

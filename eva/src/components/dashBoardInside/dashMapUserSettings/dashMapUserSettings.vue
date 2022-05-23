@@ -340,11 +340,12 @@ export default {
   },
   mounted() {
     this.updateSelectedLayerValue();
+    this.updatePipeDataSource();
   },
   methods: {
     updateTileLayer(e) {
       if (e?.tile) {
-        this.map.removeLayer({});
+        this.map.removeLayer(e.tile);
         if (typeof e.tile === 'string') {
           let temp = e.tile;
           temp = [temp];

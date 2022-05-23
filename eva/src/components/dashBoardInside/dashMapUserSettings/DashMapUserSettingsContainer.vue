@@ -14,17 +14,20 @@
               <v-btn
                 rounded
                 :style="`
-              background: ${theme.$secondary_bg};
-               color: ${theme.$main_text};
-               pointer-events: auto;
-               margin-right: 30px`"
+                   background: ${theme.$secondary_bg};
+                   color: ${theme.$main_text};
+                   pointer-events: auto;
+                   margin-right: 30px`"
+                class="med-btn"
                 v-on="menu"
                 @click="toggleSelect = !toggleSelect"
               >
                 <v-icon :style="{ color: theme.$main_text }">
                   {{ mdiClipboardText }}
                 </v-icon>
-                Режим
+                <span class="med-btn__text">
+                  Режим
+                </span>
                 <v-icon :style="{ color: theme.$main_text }">
                   {{ mdiChevronDown }}
                 </v-icon>
@@ -60,13 +63,16 @@
                pointer-events: auto;
                margin-right: 30px
                `"
+                class="med-btn"
                 v-on="menu"
                 @click="toggleSelectLayer = !toggleSelectLayer"
               >
                 <v-icon :style="{ color: theme.$main_text }">
                   {{ mdiLayers }}
                 </v-icon>
-                Слои
+                <span class="med-btn__text">
+                  Слои
+                </span>
                 <v-icon :style="{ color: theme.$main_text }">
                   {{ mdiChevronDown }}
                 </v-icon>
@@ -104,22 +110,22 @@
             @dragover.prevent
           >
             <div
-              v-for="(item, i) in layerList"
+              v-for="(item, i) in localLayerList"
               :key="i"
               draggable="true"
+              class="med-group"
               @dragstart="startDrag($event, item)"
             >
               <v-checkbox
-                v-model="layer"
+                v-model="item.isActive"
                 :label="item.name"
-                :value="item.name"
-                multiple
-                :style="{ color: theme.$main_text }"
-                @change="change(item.name, i)"
+                class="med-checkbox"
+                @change="change(item)"
               >
                 <template v-slot:append>
                   <v-icon
-                    :style="{ color: theme.$main_text }"
+                    :color="theme.$main_text"
+                    size="18"
                   >
                     {{ mdiMenu }}
                   </v-icon>
@@ -382,8 +388,7 @@ export default {
         mode: [],
         search: '',
       },
-      layer: [],
-      // layerList: ['Подложка', 'Рельеф', 'Трубы', 'Куст', 'Скважины'],
+      localLayerList: [],
       toggleSelectLayer: false,
     };
   },
@@ -403,8 +408,17 @@ export default {
     getLibrary() {
       return this.dashFromStore?.options?.library;
     },
-    layerList() {
-      return Object.values(this.library?.objects) || [];
+    layerList: {
+      get() {
+        return this.dashFromStore?.options?.layerList || [];
+      },
+      set(val) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'layerList',
+          value: val,
+        }]);
+      },
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
@@ -446,13 +460,6 @@ export default {
           value: false,
         }]);
       }
-      // if (!this.dashFromStore?.options.layer) {
-      //   this.$store.commit('setState', [{
-      //     object: this.dashFromStore.options,
-      //     prop: 'layer',
-      //     value: this.layer,
-      //   }]);
-      // }
       return this.dashFromStore.options;
     },
     searches() {
@@ -480,20 +487,45 @@ export default {
         }
       },
     },
+    layerList(val) {
+      this.localLayerList = JSON.parse(JSON.stringify(val));
+    },
   },
   mounted() {
     const options = JSON.parse(JSON.stringify(this.getOptions));
     if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
       this.options = JSON.parse(JSON.stringify(options));
     }
+    this.localLayerList = JSON.parse(JSON.stringify(this.layerList));
   },
   methods: {
     change(e) {
-      if (this.layer.find((item) => item === e)) {
-        this.map.testAdd(this.map.test[e]);
+      if (e.isActive) {
+        this.map.addLayerGroup(e.type);
       } else {
-        this.map.testRemov(this.map.test[e]);
+        this.map.removeLayerGroup(e.type);
       }
+    },
+    creationLayer() {
+      if (this.layerList.length === 0) {
+        const key = Object.keys(this.library.objects);
+        this.localLayerList = Object.values(this.library.objects);
+        this.localLayerList.forEach((item, index) => {
+          if (!item.type) {
+            item.type = +key[index];
+            item.isActive = true;
+          }
+        });
+        this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+      }
+    },
+    addLayer() {
+      this.layerList.forEach((item, index) => {
+        if (item.isActive && this.map) {
+          this.change(item);
+          this.map.changeIndexOffset(item.type, 10000 - (index * 100));
+        }
+      });
     },
     startDrag(e, item) {
       e.dataTransfer.dorpEffect = 'move';
@@ -502,34 +534,21 @@ export default {
     },
     onDrop(e) {
       const itemDrops = e.dataTransfer.getData('itemDrops');
-      // this.changeArray(e, this.layerList, itemDrops);
-      // this.changeArray(e, this.layer, itemDrops);
       const element = this.layerList.find((item) => item.name === itemDrops);
       const indexElement = this.layerList.indexOf(element);
       const elementTo = this.layerList.find((item) => item.name === e.target.innerText);
       const indexElementTo = this.layerList.indexOf(elementTo);
-      const element2 = this.layer.find((item) => (item.name ? item.name : item === itemDrops));
-      const indexElement2 = this.layer.indexOf(element2);
-      const elementTo2 = this.layer.find((item) => item === e.target.innerText);
-      const indexElementTo2 = this.layer.indexOf(elementTo2);
       if (indexElementTo > -1 && indexElement > -1) {
-        this.layerList.splice(indexElement, 1);
-        this.layerList.splice(indexElementTo, 0, element);
-      }
-      if (indexElementTo2 > -1 && indexElement2 > -1) {
-        this.layer.splice(indexElement2, 1);
-        this.layer.splice(indexElementTo2, 0, element2);
+        this.localLayerList.splice(indexElement, 1);
+        this.localLayerList.splice(indexElementTo, 0, element);
+        this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+        this.changeZIndex();
       }
     },
-    changeArray(e, array, itemDrops) {
-      const element = array.find((item) => (item.name ? item.name : item === itemDrops));
-      const indexElement = array.indexOf(element);
-      const elementTo = array.find((item) => (item.name ? item.name : item === e.target.innerText));
-      const indexElementTo = array.indexOf(elementTo);
-      if (indexElementTo > -1 && indexElement > -1) {
-        array.splice(indexElement, 1);
-        array.splice(indexElementTo, 0, element);
-      }
+    changeZIndex() {
+      this.layerList.forEach((item, i) => {
+        this.map.changeIndexOffset(item.type, 10000 - (i * 100));
+      });
     },
     updatePipeDataSource(e) {
       const set = new Set(e);
@@ -665,6 +684,30 @@ export default {
     color: var(--main_text) !important
   .v-input input
     min-height: auto !important
+
+  &-checkbox
+    margin-top: 0
+    padding: 7px 13px
+    display: flex
+    align-items: center
+    background: var(--main_bg)
+    &.v-input--is-label-active
+      background: rgba(244, 244, 250, 0.2)
+    .v-messages
+      display: none
+    .v-input__slot
+      margin-bottom: 0
+    .v-label
+      color: var(--main_text)
+    .v-input--selection-controls__input,
+    .v-input__append-outer
+      color: var(--main_text)
+  &-btn
+    .v-btn__content
+      text-transform: capitalize
+      font-size: 18px
+    &__text
+        margin: 0 8px 0 6px
 
 .map-user-settings__input
   .v-input__slot
