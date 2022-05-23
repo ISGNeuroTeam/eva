@@ -13,7 +13,7 @@
         class="name"
         :class="{ textDecoration: underline }"
         :style="{
-          color: optionsData.colorText,
+          color: optionsData.colorText || theme.$main_text,
           height: `${height}px`,
           fontSize: `${fontSize}px`,
           lineHeight: `${height - dataMode}px`,
@@ -35,7 +35,7 @@
         class="name"
         :class="{ textDecoration: underline }"
         :style="{
-          color: optionsData.colorText,
+          color: optionsData.colorText || theme.$main_text,
           height: `${height}px`,
           fontSize: `${fontSize}px`,
           lineHeight: `${height - dataMode}px`,
@@ -108,6 +108,9 @@ export default {
     },
     color() {
       return this.colorFrom;
+    },
+    theme() {
+      return this.$store.getters.getTheme;
     },
     height() {
       return this.sizeFrom.height;

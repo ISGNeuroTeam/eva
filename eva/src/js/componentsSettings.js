@@ -42,6 +42,7 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
+    { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
   ],
   size: {
     picker: {
@@ -116,6 +117,10 @@ export default {
       width: 400,
       height: 400,
     },
+    accumulators: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -136,6 +141,7 @@ export default {
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
+    accumulators: mdiTuneVertical,
   },
   options: {
     // component to options
@@ -172,6 +178,7 @@ export default {
       'themes',
       'pinned',
       'piechartSettings',
+      'pieType',
     ],
     table: [
       'visible',
@@ -232,6 +239,14 @@ export default {
     ],
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
+    accumulators: [
+      'visible',
+      'level',
+      'boxShadow',
+      'pinned',
+      'metrics',
+      'fillColor',
+    ],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -624,13 +639,12 @@ export default {
     'guntt',
     'tile',
     'csvg',
-    /// ///
-    'ygraph', // работает
-    'bush', // работает
-    'map', // нужны настройки
-    'heatmap', // нужны настройки
-    'singleValue', // нужны специфичные настройки для этого компонента
-    'tune', // работает
+    'ygraph',
+    'bush',
+    'map',
+    'heatmap',
+    'singleValue',
+    'tune',
   ],
   reports: {
     table: {
