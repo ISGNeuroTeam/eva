@@ -98,6 +98,10 @@
             :color-from="theme"
             :id-dash-from="idDash"
           />
+          <modal-visualisation
+            :mode="mode"
+            :get-element-data="getElementData"
+          />
         </v-container>
       </v-main>
     </div>
@@ -258,8 +262,11 @@
 </template>
 
 <script>
+import ModalVisualisation from './modalVisualisation.vue';
+
 export default {
   name: 'MainTitle',
+  components: { ModalVisualisation },
   data() {
     return {
       page: 'dash',

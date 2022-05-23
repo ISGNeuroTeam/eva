@@ -53,10 +53,39 @@
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
+            <v-menu
+              v-model="nameMenu"
+              :nudge-width="100"
+              :rounded="false"
+              offset-y
+              attach
+            >
+              <v-list class="profile-dropdown--list">
+                <div
+                  v-for="(item, index) in props.options.titleActions"
+                  :key="index"
+                >
+                  <v-list-item>
+                    <v-btn
+                      class="profile-dropdown--button"
+                      icon
+                      @click="urlAction(item)"
+                    >
+                      {{ item.title || item.name }}
+                    </v-btn>
+                  </v-list-item>
+                </div>
+              </v-list>
+            </v-menu>
             <div
               v-if="props.edit"
               class="dash-title"
               :style="{ color: theme.$main_text }"
+              :class="{
+                'dash-title--pointer': props.options.titleActions
+                  && props.options.titleActions.length
+              }"
+              @click="nameAction(props.options.titleActions)"
             >
               {{ boardTitle }}
             </div>
@@ -459,6 +488,7 @@ import {
   mdiTrashCanOutline,
 } from '@mdi/js';
 import settings from '../js/componentsSettings';
+import visualisation from '../js/visualisationCRUD';
 
 export default {
   name: 'DashBoard',
@@ -576,6 +606,7 @@ export default {
       selectedPieIndex: -1,
       tuneValue: '',
       tuneSliderValue: '',
+      nameMenu: false,
     };
   },
   computed: {
@@ -760,6 +791,20 @@ export default {
         idDash: this.idDash,
         status: true,
         id: this.element,
+      });
+    }
+  },
+  beforeDestroy() {
+    const elements = this.dashFromStore?.options?.titleActions?.filter((elem) => elem.type === 'modal');
+    if (elements?.length > 0) {
+      elements.forEach((element) => {
+        const nameElem = this.dashFromStore[element.elemName]?.name_elem;
+        visualisation.delete({
+          idDash: this.idDash,
+          id: element.elemName,
+          name: nameElem,
+          spaceName: element.type,
+        });
       });
     }
   },
@@ -1154,6 +1199,28 @@ export default {
     },
     resetRange() {
       this.$emit('ResetRange', this.dataSourceId);
+    },
+    nameAction(actionList) {
+      if (!actionList) return;
+      if (actionList.length === 1) {
+        this.urlAction(actionList[0]);
+      } else {
+        this.nameMenu = !this.nameMenu;
+      }
+    },
+    urlAction(action) {
+      switch (action.type) {
+        case 'modal':
+          action.open = true;
+          this.$store.commit('setVisualisationModalData', { idDash: this.idDash, data: action });
+          break;
+        case 'window':
+          window.open(action.url, 'name', 'width=auto,height=auto');
+          break;
+        default:
+          window.open(action.url, action.type);
+          break;
+      }
     },
   },
 };
