@@ -686,7 +686,7 @@ export default {
     min-height: auto !important
 
   &-checkbox
-    margin-top: 0
+    margin-top: 0 !important
     padding: 7px 13px
     display: flex
     align-items: center
