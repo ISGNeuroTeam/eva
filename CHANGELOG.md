@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add code editor to reportsV2
 - add visualisation dashAccumulators.vue
+- Add title actions in settings for visualisations
 
 
 ### Fixed
