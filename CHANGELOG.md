@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed csvg popup
 - Fixed dashDTPicker active element text color
 - Fixed color picker background
+- Removed old reports page 
 
 ## [1.90.0]
 
