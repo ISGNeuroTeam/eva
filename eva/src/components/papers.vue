@@ -432,7 +432,7 @@ export default {
   },
   mounted() {
     document.title = 'EVA | Конструирование отчетов';
-    this.search = this.$store.getters.getPaperSearch;
+    this.search = this.$store.getters.getPaperSearch; // хз
     if (this.search.original_otl !== '') {
       this.launchSearch();
     }
@@ -459,7 +459,7 @@ export default {
       } else {
         const formData = new FormData();
         formData.append('file', this.uploadFile);
-        const result = await this.$store.dispatch('loadPaper', formData);
+        const result = await this.$store.dispatch('loadPaper', formData); //!
         if (result.status === 'success') {
           this.message('Файл успшено загружен');
           this.setPaperBack();
@@ -603,7 +603,7 @@ export default {
       } else {
         // если все нормально
         this.loading = false;
-        this.$store.commit('setPaperSearch', this.search);
+        this.$store.commit('setPaperSearch', this.search); //!
         // this.data = response;
         this.dispSid = response.sid;
         this.steps['2'].complete = true;
