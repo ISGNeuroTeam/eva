@@ -27,23 +27,6 @@
           <v-card
             class="product-block-itself"
             :style="{ backgroundColor: theme.$main_bg }"
-            @click="openReport"
-          >
-            <v-card-text
-              class="product-text"
-              :style="{ color: theme.$title }"
-            >
-              Исследование <br>
-              данных
-              <p
-                class="delimetr"
-                :style="{ backgroundColor: theme.$title }"
-              />
-            </v-card-text>
-          </v-card>
-          <v-card
-            class="product-block-itself"
-            :style="{ backgroundColor: theme.$main_bg }"
             @click="openDataResearch"
           >
             <v-card-text
@@ -115,10 +98,6 @@ export default {
   methods: {
     openDash() {
       this.$router.push('/dashboards');
-    },
-    openReport() {
-      this.$store.commit('createReportSearch');
-      this.$router.push('/reports');
     },
     openDataResearch() {
       this.$router.push('/data-research');

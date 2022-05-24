@@ -29,14 +29,6 @@ const routes = [
     },
   },
   {
-    name: 'Репорты',
-    path: '/reports', // если главная страница
-    component: () => import('../components/reports.vue'),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
     name: 'Исследование данных',
     path: '/data-research', // если главная страница
     component: () => import('../components/reportsV2/index.vue'),
