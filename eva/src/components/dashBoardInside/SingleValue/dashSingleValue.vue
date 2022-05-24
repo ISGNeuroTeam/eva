@@ -31,10 +31,10 @@
         :class="metricTemplateClass"
       >
         <div
-          v-for="(metric, idx) in metricsForRender"
+          v-for="(metric) in metricsForRender"
           :key="`metric-${metric.id}`"
           class="item"
-          :style="{ gridArea: `item-${idx + 1}` }"
+          :style="{ gridArea: `item-${metric.listOrder}` }"
         >
           <span class="metric-title">
             <span
@@ -243,13 +243,11 @@ export default {
       if (!metric.metadata) {
         return undefined;
       }
-      console.log(metric.metadata);
       // eslint-disable-next-line no-eval
       const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
       Object.keys(ranges).forEach((key) => {
         ranges[key] = `${ranges[key]}`.split(':').map(Number);
       });
-      console.log('test');
 
       if (metric.color === 'range') {
         if (!Number.isNaN(metric.value)) {
