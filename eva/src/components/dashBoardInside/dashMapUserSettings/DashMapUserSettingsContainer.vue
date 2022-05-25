@@ -391,7 +391,6 @@ export default {
       },
       localLayerList: [],
       toggleSelectLayer: false,
-      pipelineParameters: ['Давление', 'Скорость потока', 'Диаметр', 'Длина'],
     };
   },
   computed: {

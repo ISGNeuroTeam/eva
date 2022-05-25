@@ -54,7 +54,6 @@ class MapClass {
         const closestData = closest(pipelineData, sum);
 
         const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
-        // console.log(pipelineInfo);
         // div for tooltip
         const newDiv = document.createElement('div');
         newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
@@ -109,8 +108,6 @@ class MapClass {
       zoom,
       maxZoom,
       center,
-      // zoomAnimation: false,
-      // fadeAnimation: false,
       markerZoomAnimation: false,
     });
   }
@@ -324,7 +321,6 @@ class MapClass {
     });
 
     line
-      // .addTo(this.map)
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
       .on('mouseout', resetHighlight);
@@ -368,7 +364,6 @@ class MapClass {
       zIndexOffset: -1000,
       riseOnHover: true,
     })
-      // .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
@@ -391,14 +386,12 @@ class MapClass {
       icon,
       riseOnHover: true,
     })
-      // .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
       });
       // eslint-disable-next-line no-underscore-dangle
-    // L.DomUtil.addClass(marker._icon, 'className');
     this.layerGroup[element.type].addLayer(marker);
   }
 

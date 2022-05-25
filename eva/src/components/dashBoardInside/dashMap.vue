@@ -214,6 +214,7 @@ export default {
         this.map.resize();
       }
     },
+    // TODO: Временный коммент
     // getOptions: {
     //   handler(val, old) {
     //     if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
@@ -227,9 +228,9 @@ export default {
     //   },
     //   deep: true,
     // },
-    // mapStyleSize() {
-    //   this.map.resize();
-    // },
+    mapStyleSize() {
+      this.map.resize();
+    },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
       if (_dataRest && this.map) {
@@ -258,8 +259,10 @@ export default {
         this.init();
       });
     },
-    sizeFrom() {
-      this.map.resize();
+    sizeFrom(val, oldVal) {
+      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.map.resize();
+      }
     },
   },
   mounted() {
@@ -304,8 +307,7 @@ export default {
             idDash: this.idDash,
             id: this.element,
           });
-          // this.loadDataForPipe(this.$store.state[this.idDash][this.element].options.search);
-          this.loadDataForPipe(this.options.search);
+          this.loadDataForPipe(this.$store.getters.getPaperSearch);
         }
       });
     },
@@ -323,7 +325,6 @@ export default {
         search: event,
         idDash: this.idDash,
       });
-      // console.log(response);
       // вызывая метод в хранилище
       if (response.length === 0) {
         // если что-то пошло не так
@@ -356,7 +357,6 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
-      // console.log(search);
       this.pipelineData = await this.getDataFromRest(search);
       if (this.map) {
         const allPipes = {};
@@ -433,7 +433,6 @@ export default {
           this.getOSM();
           // получаем библиотеку
           // get all icons that we need on map
-          // if (!this.fullScreenMode) {
           this.generateLibrary(dataRest, this.options?.primitivesLibrary);
           if (this.library?.objects) {
             Object.keys(this.library.objects).forEach((item) => {
@@ -442,15 +441,12 @@ export default {
               }
             });
           }
-          // }
           this.map.generateClusterPositionItems();
           if (!this.error && dataRest.length > 0) {
             // создаем элемент карты
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
-            // if (!this.fullScreenMode) {
             this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
-            // }
             if (this.map) {
               if (this.options.initialPoint) {
                 this.map.setView(
@@ -551,8 +547,9 @@ export default {
         {
           event: 'moveend',
           callback: () => {
-            // this.position = this.map.center;
-            // [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
+            this.position = this.map.center;
+            [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
+            // TODO: Временный коммент
             // this.updateToken(this.map.zoom);
           },
         },
