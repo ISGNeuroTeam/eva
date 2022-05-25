@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrelease]
 
 ### Added
+- Add fullscreen mode to visualosations
 - Add title actions in settings for visualisations
 
 ## [1.91.0]

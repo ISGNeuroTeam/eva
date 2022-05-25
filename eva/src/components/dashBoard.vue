@@ -133,6 +133,7 @@
               v-model="bigSizeMode"
               width="100%"
               :fullscreen="isFullScreen"
+              style="z-index: 999"
             >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip
@@ -156,7 +157,9 @@
               </template>
               <div
                 class="full-screen-dialog"
-                :style="{ height: isFullScreen ? '100vh' : '80vh' }"
+                :style="{
+                  height: isFullScreen ? '100vh' : '80vh'
+                }"
               >
                 <v-card
                   class="dash-block"
@@ -636,6 +639,8 @@ export default {
       tuneValue: '',
       tuneSliderValue: '',
       nameMenu: false,
+      windowHeight: window.innerHeight,
+      windowWidth: window.innerWidth,
     };
   },
   computed: {
@@ -793,22 +798,20 @@ export default {
         : '';
     },
     fullScreenHeight() {
-      const windowHeight = window.innerHeight;
       if (this.bigSizeMode) {
         if (this.isFullScreen) {
-          return windowHeight;
+          return this.windowHeight;
         }
-        return windowHeight * 0.8;
+        return this.windowHeight * 0.8;
       }
       return this.height;
     },
     fullScreenWidth() {
-      const windowWidth = window.innerWidth;
       if (this.bigSizeMode) {
         if (this.isFullScreen) {
-          return windowWidth;
+          return this.windowWidth;
         }
-        return windowWidth * 0.8;
+        return this.windowWidth * 0.8;
       }
       return this.height;
     },
@@ -888,8 +891,8 @@ export default {
       this.$set(this.props.tooltip, item, value);
     },
     onResize() {
-      this.fullScreenWidth = window.innerWidth * 0.8;
-      this.fullScreenHeight = window.innerHeight * 0.8;
+      this.windowWidth = window.innerWidth;
+      this.windowHeight = window.innerHeight;
     },
     updateSettings(localSettings) {
       this.settings = JSON.parse(JSON.stringify(localSettings));
