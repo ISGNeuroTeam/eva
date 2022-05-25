@@ -361,7 +361,7 @@ export default {
     },
     getFillColor(item, index) {
       if (this.getOptions.fillColor.length > 0) {
-        if (this.getOptions.fillColor[index].colorType === 'color') {
+        if (this.getOptions.fillColor[index]?.colorType === 'color') {
           return this.getOptions.fillColor[index].color || this.theme.$primary_button;
         }
         // eslint-disable-next-line no-eval
