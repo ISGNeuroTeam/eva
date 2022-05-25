@@ -58,23 +58,6 @@
               />
             </v-card-text>
           </v-card>
-          <v-card
-            class="product-block-itself"
-            :style="{ backgroundColor: theme.$main_bg }"
-            @click="openPaper"
-          >
-            <v-card-text
-              class="product-text"
-              :style="{ color: theme.$title }"
-            >
-              Конструирование <br>
-              отчетов
-              <p
-                class="delimetr"
-                :style="{ backgroundColor: theme.$title }"
-              />
-            </v-card-text>
-          </v-card>
         </div>
       </v-container>
     </v-main>
@@ -101,10 +84,6 @@ export default {
     },
     openDataResearch() {
       this.$router.push('/data-research');
-    },
-    openPaper() {
-      this.$store.commit('createPaperSearch');
-      this.$router.push('/papers');
     },
     openQuis() {
       window.location.href = '/quiz/list'; // используем window.location.href потому что /quiz/list внешняя ссылка а не часть приложения

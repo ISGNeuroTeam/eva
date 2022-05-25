@@ -37,14 +37,6 @@ const routes = [
     },
   },
   {
-    name: 'Документы',
-    path: '/papers', // если главная страница
-    component: () => import('../components/papers.vue'),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
     name: 'Дашборды',
     path: '/dashboards', // если главная страница
     component: () => import('../components/mainPageDash.vue'),
