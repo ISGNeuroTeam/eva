@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add title actions in settings for visualisations
 
+### Fixed
+- Removed old reports page 
+- Removed papers page
+
 ## [1.91.0]
 
 ### Added
@@ -22,7 +26,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed csvg popup
 - Fixed dashDTPicker active element text color
 - Fixed color picker background
-- Removed old reports page 
 
 ## [1.90.0]
 
