@@ -25,14 +25,21 @@
           v-text="mdiSettings"
         />
       </div>
-
       <div
+        v-if="error"
+        :key="`error-message-${idDashFrom}`"
+        class="error-message"
+      >
+        {{ error }}
+      </div>
+      <div
+        v-else
         class="content pt-3"
         :class="metricTemplateClass"
       >
         <div
           v-for="(metric) in metricsForRender"
-          :key="`metric-${metric.id}`"
+          :key="`metric-${metric.listOrder}`"
           class="item"
           :style="{ gridArea: `item-${metric.listOrder}` }"
         >
@@ -136,7 +143,6 @@ export default {
     mdiSettings,
     metricTitleIcons,
     titleToken: '',
-    options: {},
     metricList: [],
     metricCount: 0,
     template: 1,
@@ -145,6 +151,7 @@ export default {
     isSettingsComponentOpen: false,
     update: 1,
     isHeaderOpen: true,
+    error: '',
   }),
   computed: {
     theme() {
@@ -152,11 +159,11 @@ export default {
     },
 
     metricsForRender() {
-      return [...this.metricList].slice(0, this.metricCount);
+      return this.metricList.slice(0, this.metricCount);
     },
 
     tokenizedTitle() {
-      const title = this.options?.settings?.title || '';
+      const title = this.getOptions?.settings?.title || '';
       return title.replaceAll('<title>', this.titleToken);
     },
 
@@ -215,22 +222,26 @@ export default {
     },
   },
   watch: {
-    dataRestFrom() {
-      const options = JSON.parse(
-        JSON.stringify(this.getOptions),
-      );
-      this.setVisual(
-        this.currentSettings.metricOptions?.length
-          ? this.currentSettings.metricOptions
-          : options.settings?.metricOptions,
-      );
+    dataRestFrom: {
+      handler(val) {
+        if (val.length > 0) {
+          const options = structuredClone(this.getOptions);
+          this.setVisual(
+            this.currentSettings.metricOptions?.length > 0
+              ? this.currentSettings.metricOptions
+              : options.settings?.metricOptions,
+          );
+        }
+      },
+      deep: true,
     },
     currentSettings() {
       const currentSettings = {
         metricOptions: [],
         ...this.currentSettings,
       };
-      this.providedSettings = currentSettings;
+      // this.providedSettings = currentSettings;
+      this.$set(this, 'providedSettings', currentSettings);
       this.init(currentSettings);
     },
   },
@@ -274,9 +285,7 @@ export default {
       return '#5980f8';
     },
     init(settings, up) {
-      const options = JSON.parse(
-        JSON.stringify(this.getOptions),
-      );
+      const options = structuredClone(this.getOptions);
       if (!options.settings && !settings) {
         options.settings = {
           title: '',
@@ -288,16 +297,19 @@ export default {
       if (this.updateSettings && up) {
         this.updateSettings(settings || options.settings);
       }
-      this.providedSettings = settings || options.settings;
+      this.$set(this, 'providedSettings', settings || options.settings);
       const { template, metricCount } = settings || options.settings;
 
-      this.options = {
-        ...options,
-        settings: settings || options.settings,
-      };
+      this.$store.commit('setState', [{
+        object: this.getOptions,
+        prop: 'settings',
+        value: settings || options.settings,
+      }]);
+
       this.template = template;
       this.isHeaderOpen = !!settings?.showTitle;
-      this.metricCount = this.metricCount || metricCount;
+      // this.metricCount = this.metricCount || metricCount;
+      this.$set(this, 'metricCount', this.metricCount || metricCount);
       this.updateVisual(settings || options.settings);
     },
     updateCount(count) {
@@ -320,24 +332,33 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
-      this.dataRestFrom.forEach((data, index) => {
+      structuredClone(this.dataRestFrom).forEach((data) => {
         const {
-          metric, value, metadata,
+          metric, value, metadata, _order: sortOrder,
         } = data;
-        const id = index + 1;
+
+        if (sortOrder === undefined) {
+          this.error = 'В запросе отссутствует обязательное поле "_order"';
+          return;
+        }
+        this.error = '';
+        const id = sortOrder;
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
-          let range = metadata;
+          let range;
 
           if (!metadata || typeof metadata !== 'string') {
             range = null;
+          } else {
+            range = metadata;
           }
           const startId = `${metric}_${id}`;
           const metricCurrent = metricOptionsCurrent?.find(
             (m) => m.startId === startId,
           );
           const defaultMetricOption = {
+            ...metricCurrent,
             id: metricCurrent?.id || id,
             startId: metricCurrent?.startId || startId,
             metadata,
@@ -348,17 +369,20 @@ export default {
             fontWeight: metricCurrent?.fontWeight || 400,
             listOrder:
               metricCurrent?.listOrder === undefined
-                ? index
+                ? sortOrder
                 : metricCurrent?.listOrder,
-            ...metricCurrent,
           };
-          metricList.push({ value, ...defaultMetricOption });
-          metricOptions.push({
-            id,
-            range,
-            expanded: false,
+          metricList[(metricCurrent?.listOrder ?? sortOrder) - 1] = {
+            value,
             ...defaultMetricOption,
-          });
+          };
+
+          metricOptions[(metricCurrent?.listOrder ?? sortOrder) - 1] = {
+            ...defaultMetricOption,
+            id,
+            expanded: false,
+            range,
+          };
         }
       });
 
@@ -368,32 +392,31 @@ export default {
       ) {
         this.titleToken = '';
       }
-      this.metricList = metricList;
-      this.options.settings.metricOptions = metricOptions;
+      this.$set(this, 'metricList', metricList);
+      this.$store.commit('setState', [{
+        object: this.getOptions.settings,
+        prop: 'metricOptions',
+        value: metricOptions,
+      }]);
     },
     updateVisual(settings) {
-      this.metricList = settings.metricOptions?.map((item, idx) => ({
+      this.$set(this, 'metricList', settings.metricOptions?.map((item, idx) => ({
         ...item,
         listOrder: idx,
         title: item.name || item.title,
         fontWeight: 400,
         value: item.startId?.value,
-      }));
+      })));
 
       this.setVisual(settings.metricOptions);
     },
     updateOptions() {
-      this.$store.commit('setOptions', {
-        id: this.idFrom,
-        idDash: this.idDashFrom,
-        options: { ...this.options },
-      });
     },
 
     openSettings() {
       /** Updating the settings provided to the SingleValueSettings. */
-      this.providedSettings = { ...this.options.settings };
-      this.defaultSettings = { ...this.options.settings };
+      this.providedSettings = { ...this.getOptions.settings };
+      this.defaultSettings = { ...this.getOptions.settings };
       this.isSettingsComponentOpen = true;
     },
 
@@ -407,7 +430,11 @@ export default {
       this.template = template;
       this.metricCount = metricCount;
       /** Applying settings from the SingleValueSettings. */
-      this.options.settings = newSettings;
+      this.$store.commit('setState', [{
+        object: this.getOptions,
+        prop: 'settings',
+        value: newSettings,
+      }]);
 
       /** Updated local metricList array. */
       const newMetricList = metricOptions
@@ -433,14 +460,9 @@ export default {
           return acc;
         }, []);
 
-      this.metricList = [...newMetricList];
-      this.providedSettings = { ...newSettings };
+      this.$set(this, 'metricList', { ...newMetricList });
 
-      this.$store.commit('setOptions', {
-        id: this.idFrom,
-        idDash: this.idDashFrom,
-        options: { ...this.options, settings: newSettings },
-      });
+      this.$set(this, 'providedSettings', { ...newSettings });
 
       if (this.updateSettings) this.updateSettings(newSettings);
       this.update += 1;
