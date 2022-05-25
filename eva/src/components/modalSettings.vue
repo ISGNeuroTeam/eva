@@ -1106,7 +1106,10 @@
             </v-icon>
           </div>
         </div>
-        <div v-if="istitleActions">
+        <div
+          v-if="
+            istitleActions && dataPageFrom !== 'reports'"
+        >
           <v-card-text
             class="headline"
           >
@@ -1178,6 +1181,10 @@ export default {
     idDashFrom: {
       type: String,
       required: true,
+    },
+    dataPageFrom: {
+      type: String,
+      default: '',
     },
   },
   data() {
