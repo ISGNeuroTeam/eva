@@ -119,27 +119,60 @@
             </div>
           </div>
           <div class="list-elem__actions">
-            <v-btn
-              icon
-              @click="editHandler(element)"
+            <v-tooltip
+              bottom
+              :open-delay="tooltipOpenDelay"
             >
-              <v-icon :color="theme.$main_text">
-                {{ element.edit ? confirmEditIcon : editIcon }}
-              </v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              :color="theme.$error_color"
-              @click="removeFromList(element)"
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  :color="theme.$main_text"
+                  @click="editHandler(element)"
+                  v-on="on"
+                >
+                  <v-icon>
+                    {{ element.edit ? confirmEditIcon : editIcon }}
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>{{ element.edit ? 'Подтвердить' : 'Редактировать' }}</span>
+            </v-tooltip>
+            <v-tooltip
+              bottom
+              :open-delay="tooltipOpenDelay"
             >
-              <v-icon>{{ delete_icon }}</v-icon>
-            </v-btn>
-            <v-icon
-              class="action-drag"
-              :color="theme.$main_text"
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  :color="theme.$error_color"
+                  @click="removeFromList(element)"
+                  v-on="on"
+                >
+                  <v-icon>{{ delete_icon }}</v-icon>
+                </v-btn>
+              </template>
+              <span>Удалить</span>
+            </v-tooltip>
+            <v-tooltip
+              bottom
+              :open-delay="tooltipOpenDelay"
             >
-              {{ drag_icon }}
-            </v-icon>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  :color="theme.$main_text"
+                  v-on="on"
+                >
+                  <v-icon
+                    class="action-drag"
+                    :color="theme.$main_text"
+                  >
+                    {{ drag_icon }}
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>Перетащить</span>
+            </v-tooltip>
           </div>
         </div>
       </draggable>
@@ -193,7 +226,7 @@ export default {
           value: 'window',
         },
         {
-          text: 'Внешняя ссылка (в тойже вкладке)',
+          text: 'Внешняя ссылка (в той же вкладке)',
           value: '_self',
         },
         {
@@ -205,6 +238,10 @@ export default {
     list: {
       type: Array,
       default: () => [],
+    },
+    tooltipOpenDelay: {
+      type: Number,
+      default: 500,
     },
   },
   data: () => ({
@@ -247,7 +284,8 @@ export default {
   },
   watch: {
     titleActions: {
-      handler(newVal) {
+      handler(newVal, oldVal) {
+        console.log('lollal', newVal, oldVal);
         this.$emit('change', newVal);
       },
       deep: true,

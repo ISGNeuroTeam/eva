@@ -1364,7 +1364,7 @@ export default {
   },
   methods: {
     changetitleActions(val) {
-      this.options.titleActions = structuredClone(val);
+      this.options.titleActions = structuredClone(val.filter((elem) => !elem.edit));
     },
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
