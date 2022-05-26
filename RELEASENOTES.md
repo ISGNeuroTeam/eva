@@ -17,10 +17,10 @@
 - Fixed an error in the modal visualization console
 - Fixed an error when pressing Esc in modal visualisation
 
-#### ¹ The "Single Value" component now requires an additional field
+#### ¹⁾ The "Single Value" component now requires an additional field
 
 In the returned data, there should be a "_order" field in each data row.
-System fields that are not output data (for example, "_title") should have no order field.
+System fields that are not output data (for example, "_title") should have empty order field.
 The "_order" field must be a positive number and the values for different rows must not be repeated.
 The values of "_order" should go in order without omissions:
 - 1,4,3,2 - it is possible
