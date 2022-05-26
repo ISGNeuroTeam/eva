@@ -223,13 +223,15 @@ export default {
   },
   watch: {
     dataRestFrom: {
-      handler(val) {
+      handler(val, oldVal) {
         if (val.length > 0) {
+          const isNew = val.length !== oldVal.langth;
           const options = structuredClone(this.getOptions);
           this.setVisual(
             this.currentSettings.metricOptions?.length > 0
               ? this.currentSettings.metricOptions
               : options.settings?.metricOptions,
+            isNew,
           );
         }
       },
@@ -329,23 +331,22 @@ export default {
 
       this.setVisual();
     },
-    setVisual(metricOptionsCurrent) {
+    setVisual(metricOptionsCurrent, isNew) {
       const metricList = [];
       const metricOptions = [];
       structuredClone(this.dataRestFrom).forEach((data) => {
         const {
           metric, value, metadata, _order: sortOrder,
         } = data;
-
-        if (sortOrder === undefined) {
-          this.error = 'В запросе отссутствует обязательное поле "_order"';
-          return;
-        }
-        this.error = '';
         const id = sortOrder;
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
+          if (sortOrder === undefined) {
+            this.error = 'В запросе отсутствует обязательное поле "_order"';
+            return;
+          }
+          this.error = '';
           let range;
 
           if (!metadata || typeof metadata !== 'string') {
@@ -354,7 +355,7 @@ export default {
             range = metadata;
           }
           const startId = `${metric}_${id}`;
-          const metricCurrent = metricOptionsCurrent?.find(
+          const metricCurrent = !isNew && metricOptionsCurrent?.find(
             (m) => m.startId === startId,
           );
           const defaultMetricOption = {
