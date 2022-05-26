@@ -114,6 +114,7 @@
       v-if="activeSettingModal"
       :color-from="theme"
       :id-dash-from="idDash"
+      :data-page-from="dataPageFrom"
     />
   </div>
 </template>
@@ -146,6 +147,10 @@ export default {
     search: {
       type: Object,
       default: () => ({}),
+    },
+    dataPageFrom: {
+      type: String,
+      default: '',
     },
   },
   data() {

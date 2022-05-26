@@ -380,23 +380,6 @@
             <span>Экспортировать ИД</span>
           </v-tooltip>
           <v-tooltip
-            z-index="99"
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                class="search-clock"
-                :color="theme.$primary_button"
-                v-on="on"
-                @click="(modalPaperSid = search.sid), (modalPaper = true)"
-              >
-                {{ paper }}
-              </v-icon>
-            </template>
-            <span>Создать отчет</span>
-          </v-tooltip>
-          <v-tooltip
             bottom
             z-index="99"
             :color="theme.$accent_ui_color"
@@ -871,11 +854,6 @@
         :id-dash-from="idDashFrom"
         @changeMode="setEditMode"
       />
-      <modal-paper
-        v-model="modalPaper"
-        :sid="modalPaperSid"
-        :id-dash="idDash"
-      />
     </div>
 
     <div
@@ -907,7 +885,6 @@ import {
   mdiDatabase,
   mdiDoor,
   mdiEye,
-  mdiFileDocumentOutline,
   mdiFilter,
   mdiHelpCircleOutline,
   mdiHomeVariantOutline,
@@ -979,7 +956,6 @@ export default {
       play: mdiPlay,
       clock: mdiClockOutline,
       download: mdiArrowDownBold,
-      paper: mdiFileDocumentOutline,
       mdiAnimationPlay,
       help_elem: true,
       help_coral: 'fill:teal',
@@ -1075,8 +1051,6 @@ export default {
       createSearchBtn: '',
       errorSaveToken: false,
       disabledDS: {},
-      modalPaperSid: '',
-      modalPaper: false,
       userPermissions: [],
       screenHeight: this.getScreenHeight(),
       allGroups: [],
@@ -1313,7 +1287,6 @@ export default {
     },
     cancelModal() {
       this.activeModal = false;
-      this.modalPaper = false;
     },
     openSchedule(id) {
       this.scheduleSid = id;
