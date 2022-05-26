@@ -9,6 +9,11 @@
       :class="getClasses"
       :style="getStyles"
     >
+      <arrow-block
+        v-if="dataModeFrom"
+        :state="needSetField"
+        @toggle="isOpen = !isOpen"
+      />
       <div v-if="needSetField">
         <v-select
           v-model="dataFieldLabel"
@@ -68,9 +73,11 @@
 <script>
 import { mdiMinus, mdiPlus } from '@mdi/js';
 import { mapActions, mapMutations } from 'vuex';
+import ArrowBlock from '../arrowBlock.vue';
 
 export default {
   name: 'DashAccumulator',
+  components: { ArrowBlock },
   inheritAttrs: false,
   props: {
     // переменные полученные от родителя
@@ -132,6 +139,7 @@ export default {
       dataFieldMax: null, // поле с данными
       dataFieldValue: null, // поле с данными
       dataFieldLabel: null, // поле с данными
+      isOpen: true,
     };
   },
   computed: {
@@ -257,10 +265,11 @@ export default {
       return this.dashFromStore;
     },
     needSetField() {
-      return (!this.dataFieldLabel
+      return ((!this.dataFieldLabel
           || !this.dataFieldValue
           || !this.dataFieldMax)
-          && !this.loading;
+          && !this.loading)
+          || this.isOpen;
     },
     theme() {
       return this.colorFrom;
@@ -305,7 +314,7 @@ export default {
     dataRestFrom: {
       handler(newVal, oldVal) {
         this.setMetrics();
-        if (newVal.length > 0 && oldVal.length > 0) {
+        if (newVal.length > 0 && oldVal?.length > 0) {
           this.dataFieldMax = null;
           this.dataFieldValue = null;
           this.dataFieldLabel = null;
@@ -393,6 +402,7 @@ export default {
             max: this.dataFieldMax,
           },
         });
+        this.isOpen = false;
       }
     },
     setToken() {
@@ -433,7 +443,6 @@ export default {
   height: calc(100% - 25px);
   display: flex;
   justify-content: center;
-  align-items: center;
   &.full-screen {
     min-width: 690px
   }
