@@ -1806,7 +1806,14 @@ export default {
                   this.$set(this, 'accumulators', defaultAccumulator);
                 }
                 if (options[item].length > 0) {
-                  this.$set(this, 'accumulators', options[item]);
+                  if (this.accumulators.length > options[item].length) {
+                    const accumOptions = options[item];
+                    const extraElements = this.accumulators.slice(accumOptions.length);
+                    const optionsWithExtra = accumOptions.concat(extraElements);
+                    this.$set(this, 'accumulators', optionsWithExtra);
+                  } else {
+                    this.$set(this, 'accumulators', options[item]);
+                  }
                 }
               } else {
                 localOptions[item] = options[item]
