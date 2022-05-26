@@ -1372,7 +1372,7 @@ export default {
   },
   methods: {
     changetitleActions(val) {
-      this.options.titleActions = structuredClone(val);
+      this.titleActions = structuredClone(val);
     },
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
@@ -1496,6 +1496,9 @@ export default {
       if (this.element.startsWith('map')) {
         this.changeSelectedLayer();
       }
+      if (this.titleActions) {
+        this.$set(this.options, 'titleActions', this.titleActions);
+      }
       const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
@@ -1519,8 +1522,8 @@ export default {
     visualisationHandler() {
       const oldList = this.elementFromStore.options
         .titleActions?.filter((elem) => elem.type === 'modal') || [];
-      const newList = this.options
-        .titleActions?.filter((elem) => elem.type === 'modal') || [];
+      const newList = this.titleActions
+        ?.filter((elem) => elem.type === 'modal') || [];
 
       const toDelete = oldList.filter(
         (elem) => !newList.some((item) => item.id === elem.id
