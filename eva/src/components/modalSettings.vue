@@ -1108,7 +1108,8 @@
         </div>
         <div
           v-if="
-            istitleActions && dataPageFrom !== 'reports'"
+            istitleActions && dataPageFrom !== 'reports'
+          "
         >
           <v-card-text
             class="headline"
