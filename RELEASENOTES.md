@@ -8,11 +8,11 @@
 
 ### Fixed
 - Fixed colors in the "accumulator" component
-- Fixed the order of metrics in the "single value" component
-- Fixed an error in the "single value" component when changing the data source. ¹
+- Fixed the order of metrics in the "single value" component ¹
+- Fixed an error in the "single value" component when changing the data source
 - Fixed the title of the actions
-- The old reports page has been deleted.
-- The papers page has been deleted.
+- The old reports page has been deleted
+- The papers page has been deleted
 - Removed the title actions from the reports visualisations
 - Fixed an error in the modal visualization console
 - Fixed an error when pressing Esc in modal visualisation
