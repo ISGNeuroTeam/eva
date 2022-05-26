@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrelease]
 
 ### Added
+- Add fullscreen mode to visualosations
 - Add options mode tune and accumulators visualisations
 - Add title actions in settings for visualisations
 - Adding layers to the map
