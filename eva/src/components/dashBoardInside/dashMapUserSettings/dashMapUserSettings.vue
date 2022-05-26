@@ -337,14 +337,24 @@ export default {
         }
       },
     },
+    'options.zoomStep': {
+      deep: true,
+      handler(val, oldVal) {
+        if (val !== oldVal) {
+          this.map.options.wheelPxPerZoomLevel = 101 - val;
+          this.map.map.options.wheelPxPerZoomLevel = 101 - val;
+        }
+      },
+    },
   },
   mounted() {
     this.updateSelectedLayerValue();
+    this.updatePipeDataSource();
   },
   methods: {
     updateTileLayer(e) {
       if (e?.tile) {
-        this.map.removeLayer({});
+        this.map.removeLayer(e.tile);
         if (typeof e.tile === 'string') {
           let temp = e.tile;
           temp = [temp];

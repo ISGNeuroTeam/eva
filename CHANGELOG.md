@@ -5,12 +5,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.92.0]
+
+### Added
+- Add fullscreen mode to visualosations
+- Add options mode tune and accumulators visualisations
+- Add title actions in settings for visualisations
+- Adding layers to the map
+
+### Fixed
+- Fix accumulator colors
+- Fixed metrics order in dashSingleValue.vue
+- Fixed error in dashSingleValue.vue on data source changed
+- Fixed title actions
+- Removed old reports page 
+- Removed papers page
+- Remove title actions from reports visualisations
+- Fixed modal visualisation console error
+- Fixed modal visualisation esc error
+
 ## [1.91.0]
 
 ### Added
 - Add code editor to reportsV2
 - add visualisation dashAccumulators.vue
-
 
 ### Fixed
 - Fixed dashDTPicker active element text color
