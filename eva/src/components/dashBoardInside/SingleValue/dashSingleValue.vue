@@ -210,6 +210,18 @@ export default {
           value: false,
         }]);
       }
+      if (!this.dashFromStore?.options.settings) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'settings',
+          value: {
+            metricCount: 1,
+            showTitle: false,
+            template: 1,
+            title: '',
+          },
+        }]);
+      }
 
       return this.dashFromStore.options;
     },
@@ -302,11 +314,13 @@ export default {
       this.$set(this, 'providedSettings', settings || options.settings);
       const { template, metricCount } = settings || options.settings;
 
-      this.$store.commit('setState', [{
-        object: this.getOptions,
-        prop: 'settings',
-        value: settings || options.settings,
-      }]);
+      if (settings?.metricOptions.length > 0) {
+        this.$store.commit('setState', [{
+          object: this.getOptions,
+          prop: 'settings',
+          value: settings || options.settings,
+        }]);
+      }
 
       this.template = template;
       this.isHeaderOpen = !!settings?.showTitle;
@@ -331,7 +345,7 @@ export default {
 
       this.setVisual();
     },
-    setVisual(metricOptionsCurrent, isNew) {
+    setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
       structuredClone(this.dataRestFrom).forEach((data) => {
@@ -342,7 +356,7 @@ export default {
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
-          if (!Number.isInteger(sortOrder) || this.error) {
+          if (!sortOrder || this.error) {
             this.error = 'В запросе отсутствует обязательное поле "_order"';
             metricList.length = 0;
             metricOptions.length = 0;
@@ -357,15 +371,15 @@ export default {
             range = metadata;
           }
           const startId = `${metric}_${id}`;
-          const metricCurrent = !isNew && metricOptionsCurrent?.find(
+          const metricCurrent = metricOptionsCurrent?.find(
             (m) => m.startId === startId,
           );
           const defaultMetricOption = {
+            title: metric || data.phase,
             ...metricCurrent,
             id: metricCurrent?.id || id,
             startId: metricCurrent?.startId || startId,
             metadata,
-            title: metric || data.phase,
             color: metricCurrent?.color || 'main',
             icon: metricCurrent?.icon || 'no_icon',
             fontSize: metricCurrent?.fontSize || 54,
@@ -395,21 +409,23 @@ export default {
       ) {
         this.titleToken = '';
       }
-      this.$set(this, 'metricList', metricList);
-      this.$store.commit('setState', [{
-        object: this.getOptions.settings,
-        prop: 'metricOptions',
-        value: metricOptions,
-      }]);
+      if (metricOptions.length > 0 && metricList.length > 0) {
+        this.$set(this, 'metricList', metricList);
+        this.$store.commit('setState', [{
+          object: this.getOptions.settings,
+          prop: 'metricOptions',
+          value: metricOptions,
+        }]);
+      }
     },
     updateVisual(settings) {
-      this.$set(this, 'metricList', settings.metricOptions?.map((item, idx) => ({
-        ...item,
-        listOrder: idx,
-        title: item.name || item.title,
-        fontWeight: 400,
-        value: item.startId?.value,
-      })));
+      // this.$set(this, 'metricList', settings.metricOptions?.map((item, idx) => ({
+      //   ...item,
+      //   listOrder: idx,
+      //   title: item.name || item.title,
+      //   fontWeight: 400,
+      //   value: item.startId?.value,
+      // })));
 
       this.setVisual(settings.metricOptions);
     },
