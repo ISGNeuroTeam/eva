@@ -1,6 +1,6 @@
 <template>
   <v-dialog
-    v-if="visualisationModal"
+    v-if="visualisationModal.open"
     :value="visualisationModal.open"
     width="100%"
     @click:outside="visualisationModal = {}"

@@ -1106,7 +1106,11 @@
             </v-icon>
           </div>
         </div>
-        <div v-if="istitleActions">
+        <div
+          v-if="
+            istitleActions && dataPageFrom !== 'reports'
+          "
+        >
           <v-card-text
             class="headline"
           >
@@ -1178,6 +1182,10 @@ export default {
     idDashFrom: {
       type: String,
       required: true,
+    },
+    dataPageFrom: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -1364,7 +1372,7 @@ export default {
   },
   methods: {
     changetitleActions(val) {
-      this.options.titleActions = structuredClone(val);
+      this.titleActions = structuredClone(val);
     },
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
@@ -1488,6 +1496,9 @@ export default {
       if (this.element.startsWith('map')) {
         this.changeSelectedLayer();
       }
+      if (this.titleActions) {
+        this.$set(this.options, 'titleActions', this.titleActions);
+      }
       const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
@@ -1511,8 +1522,8 @@ export default {
     visualisationHandler() {
       const oldList = this.elementFromStore.options
         .titleActions?.filter((elem) => elem.type === 'modal') || [];
-      const newList = this.options
-        .titleActions?.filter((elem) => elem.type === 'modal') || [];
+      const newList = this.titleActions
+        ?.filter((elem) => elem.type === 'modal') || [];
 
       const toDelete = oldList.filter(
         (elem) => !newList.some((item) => item.id === elem.id
@@ -1806,7 +1817,14 @@ export default {
                   this.$set(this, 'accumulators', defaultAccumulator);
                 }
                 if (options[item].length > 0) {
-                  this.$set(this, 'accumulators', options[item]);
+                  if (this.accumulators.length > options[item].length) {
+                    const accumOptions = options[item];
+                    const extraElements = this.accumulators.slice(accumOptions.length);
+                    const optionsWithExtra = accumOptions.concat(extraElements);
+                    this.$set(this, 'accumulators', optionsWithExtra);
+                  } else {
+                    this.$set(this, 'accumulators', options[item]);
+                  }
                 }
               } else {
                 localOptions[item] = options[item]

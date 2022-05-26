@@ -81,6 +81,7 @@ class MapClass {
     clusterTextCount: 4,
     clusterPosition: null,
     library: null,
+    layerGroup: null,
     osmServer: null,
     mapTheme: 'default',
     wheelPxPerZoomLevel: 200,
@@ -95,14 +96,19 @@ class MapClass {
     zoom,
     maxZoom,
     center,
+    layerGroup,
+    library,
   }) {
     this.options.wheelPxPerZoomLevel = wheelPxPerZoomLevel;
+    this.options.layerGroup = layerGroup;
+    this.options.library = library;
     this.map = L.map(mapRef, {
       wheelPxPerZoomLevel,
       zoomSnap,
       zoom,
       maxZoom,
       center,
+      markerZoomAnimation: false,
     });
   }
 
@@ -172,6 +178,14 @@ class MapClass {
 
   set library(val) {
     this.options.library = val;
+  }
+
+  get layerGroup() {
+    return this.options.layerGroup;
+  }
+
+  set layerGroup(val) {
+    this.options.layerGroup = val;
   }
 
   get osmServer() {
@@ -307,11 +321,11 @@ class MapClass {
     });
 
     line
-      .addTo(this.map)
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
       .on('mouseout', resetHighlight);
     line.setTooltipContent(element.label);
+    this.layerGroup[element.type].addLayer(line);
   }
 
   drawMarkerHTML({ lib, element }) {
@@ -345,18 +359,18 @@ class MapClass {
     });
     const point = element.coordinates.split(':');
     const coord = point[1].split(',');
-    L.marker([coord[0], coord[1]], {
+    const marker = L.marker([coord[0], coord[1]], {
       icon,
       zIndexOffset: -1000,
       riseOnHover: true,
     })
-      .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
         interactive: true,
       });
+    this.layerGroup[element.type].addLayer(marker);
   }
 
   drawMarkerSVG({ lib, element }) {
@@ -370,17 +384,15 @@ class MapClass {
     this.startingPoint = [coord[0], coord[1]];
     const marker = L.marker([coord[0], coord[1]], {
       icon,
-      zIndexOffset: -1000,
       riseOnHover: true,
     })
-      .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
       });
-    // eslint-disable-next-line no-underscore-dangle
-    L.DomUtil.addClass(marker._icon, 'className');
+      // eslint-disable-next-line no-underscore-dangle
+    this.layerGroup[element.type].addLayer(marker);
   }
 
   clustering(dataRest) {
@@ -479,7 +491,7 @@ class MapClass {
   drawObjects(dataRest, mode, pipelineDataDictionary) {
     dataRest.forEach((item) => {
       if (
-        item?.type
+        item?.type !== null
           && this.library?.objects
           && this.library?.objects[item.type]
       ) {
@@ -535,6 +547,28 @@ class MapClass {
     this.map.remove();
   }
 
+  removeLayerGroup(i) {
+    this.layerGroup[i].remove();
+  }
+
+  addLayerGroup(i) {
+    this.removeLayerGroup(i);
+    this.layerGroup[i].addTo(this.map);
+  }
+
+  addGroup(group) {
+    this.layerGroup[group] = L.layerGroup([]);
+  }
+
+  changeIndexOffset(group, zIndex) {
+    this.layerGroup[group].eachLayer((layer) => {
+      // eslint-disable-next-line no-underscore-dangle
+      if (layer._icon) {
+        layer.setZIndexOffset(zIndex);
+      }
+    });
+  }
+
   removeLayer(layer) {
     this.map.removeLayer(layer);
   }
@@ -547,6 +581,11 @@ class MapClass {
   removeClass(cursorCssClass) {
     // eslint-disable-next-line no-underscore-dangle
     L.DomUtil.removeClass(this.map._container, cursorCssClass);
+  }
+
+  scrollWheelZoom() {
+    // eslint-disable-next-line no-underscore-dangle
+    this.map.scrollWheelZoom._enabled = false;
   }
 }
 

@@ -845,9 +845,25 @@ export default {
         id: this.element,
       });
     }
+
+    const elements = this.dashFromStore
+      ?.options?.titleActions?.filter((elem) => elem.type === 'modal');
+
+    if (elements?.length > 0) {
+      elements.forEach((element) => {
+        if (!this.$store.state[this.idDash]?.[element.elemName]) {
+          visualisation.create({
+            element: element.tool,
+            spaceName: element.type,
+            idDash: this.idDash,
+          });
+        }
+      });
+    }
   },
   beforeDestroy() {
-    const elements = this.dashFromStore?.options?.titleActions?.filter((elem) => elem.type === 'modal');
+    const elements = this.dashFromStore
+      ?.options?.titleActions?.filter((elem) => elem.type === 'modal');
     if (elements?.length > 0) {
       elements.forEach((element) => {
         const nameElem = this.dashFromStore[element.elemName]?.name_elem;
@@ -1267,7 +1283,7 @@ export default {
           this.$store.commit('setVisualisationModalData', { idDash: this.idDash, data: action });
           break;
         case 'window':
-          window.open(action.url, 'name', 'width=auto,height=auto');
+          window.open(action.url, '', 'width=auto,height=auto');
           break;
         default:
           window.open(action.url, action.type);
