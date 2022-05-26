@@ -1,9 +1,10 @@
 <template>
   <v-dialog
-    v-if="visualisationModal.open"
+    v-if="visualisationModal && visualisationModal.open"
     :value="visualisationModal.open"
     width="100%"
     @click:outside="visualisationModal = {}"
+    @keydown.esc="visualisationModal = {}"
   >
     <v-card :style="{ background: theme.$main_bg }">
       <v-card-title class="card-title">
