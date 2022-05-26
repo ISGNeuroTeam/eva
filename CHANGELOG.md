@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add title actions in settings for visualisations
 
 ### Fixed
-- Remove title atcions from reports visualisations
+- Fixed title actions
 
 ## [1.91.0]
 

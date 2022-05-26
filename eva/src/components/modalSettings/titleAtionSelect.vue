@@ -20,7 +20,6 @@
               class="data-modal"
             >
               <v-text-field
-                v-if="element.edit"
                 v-model="element.title"
                 clearable
                 placeholder="Введите название"
@@ -35,7 +34,6 @@
                 hide-details
               />
               <v-select
-                v-if="element.edit"
                 v-model="element.tool"
                 label="Визуализации"
                 :items="tools"
@@ -47,7 +45,6 @@
                 hide-details
               />
               <v-select
-                v-if="element.edit"
                 v-model="element.search"
                 label="Источники данных"
                 :items="searches"
@@ -58,27 +55,12 @@
                 dense
                 hide-details
               />
-              <span v-else>
-                <span
-                  v-if="element.title"
-                  :style="{color: theme.$main_text}"
-                >Название: {{ element.title }} </span>
-                <span
-                  v-if="element.tool"
-                  :style="{color: theme.$main_text}"
-                >Тип: {{ getNameFromSettings(element.tool) }} </span>
-                <span
-                  v-if="element.search"
-                  :style="{color: theme.$main_text}"
-                >Источник данных: {{ getSid(element.search) }}</span>
-              </span>
             </div>
             <div
               v-else
               class="data-link"
             >
               <v-text-field
-                v-if="element.edit"
                 v-model="element.title"
                 clearable
                 placeholder="Введите название ссылки"
@@ -93,7 +75,6 @@
                 hide-details
               />
               <v-text-field
-                v-if="element.edit"
                 v-model="element.url"
                 clearable
                 placeholder="Введите текст ссылки"
@@ -107,36 +88,9 @@
                 class="item-link"
                 hide-details
               />
-              <a
-                v-else
-                :href="element.url"
-                :target="element.type"
-                rel="noopener noreferrer"
-                @click="openInNewWindow(element, $event)"
-              >
-                {{ element.title }}
-              </a>
             </div>
           </div>
           <div class="list-elem__actions">
-            <v-tooltip
-              bottom
-              :open-delay="tooltipOpenDelay"
-            >
-              <template v-slot:activator="{ on }">
-                <v-btn
-                  icon
-                  :color="theme.$main_text"
-                  @click="editHandler(element)"
-                  v-on="on"
-                >
-                  <v-icon>
-                    {{ element.edit ? confirmEditIcon : editIcon }}
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>{{ element.edit ? 'Подтвердить' : 'Редактировать' }}</span>
-            </v-tooltip>
             <v-tooltip
               bottom
               :open-delay="tooltipOpenDelay"
@@ -203,7 +157,7 @@
 
 <script>
 import {
-  mdiPencil, mdiClose, mdiMenu, mdiCheckBold,
+  mdiClose, mdiMenu,
 } from '@mdi/js';
 import draggable from 'vuedraggable';
 import settings from '../../js/componentsSettings';
@@ -245,8 +199,6 @@ export default {
     },
   },
   data: () => ({
-    editIcon: mdiPencil,
-    confirmEditIcon: mdiCheckBold,
     delete_icon: mdiClose,
     drag_icon: mdiMenu,
     localList: null,
@@ -284,8 +236,7 @@ export default {
   },
   watch: {
     titleActions: {
-      handler(newVal, oldVal) {
-        console.log('lollal', newVal, oldVal);
+      handler(newVal) {
         this.$emit('change', newVal);
       },
       deep: true,
@@ -296,12 +247,6 @@ export default {
     this.id = this.list.length ? Math.max.apply(0, this.list.map((elem) => elem.id)) : 0;
   },
   methods: {
-    getNameFromSettings(name) {
-      return settings.tools.find((elem) => elem.type === name)?.name;
-    },
-    getSid(search) {
-      return search?.sid;
-    },
     addToList(val) {
       if (!val) return;
       const item = this.items.find((elem) => elem.value === val);
@@ -311,7 +256,6 @@ export default {
         id: this.id,
         name: item.text,
         type: item.value,
-        edit: true,
       });
       this.titleActions = structuredClone(list);
     },
@@ -319,15 +263,6 @@ export default {
       const list = structuredClone(this.titleActions);
       list.splice(list.findIndex((elem) => elem.id === element.id), 1);
       this.titleActions = structuredClone(list);
-    },
-    openInNewWindow(data, e) {
-      if (data.type === 'window') {
-        e.preventDefault();
-        window.open(data.url, 'name', 'width=auto,height=auto');
-      }
-    },
-    editHandler(element) {
-      element.edit = !element.edit;
     },
   },
 };
