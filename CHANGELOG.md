@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unrelease]
 
 ### Added
+- Add options mode tune and accumulators visualisations
 - Add title actions in settings for visualisations
+- Adding layers to the map
 
 ### Fixed
+- Fix accumulator colors
 - Fixed metrics order in dashSingleValue.vue
 - Fixed error in dashSingleValue.vue on data source changed
 - Fixed title actions

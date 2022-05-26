@@ -4,35 +4,112 @@
       class="fill-height"
       style="align-items: normal"
     >
-      <v-row class="ma-0">
+      <v-row class="ma-0 justify-end">
         <v-menu
           v-model="toggleSelect"
           z-index="1"
         >
           <template v-slot:activator="{ on:menu }">
-            <v-btn
-              rounded
-              :style="`
-              background: ${theme.$secondary_bg};
-               color: ${theme.$main_text};
-               pointer-events: auto`"
-              v-on="menu"
-              @click="toggleSelect = !toggleSelect"
-            >
-              Режим
-            </v-btn>
-            <v-select
-              :value="options.mode"
-              :menu-props="{ value:toggleSelect }"
-              :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-              :items="mode"
-              label="Режим"
-              multiple
-              @change="updatePipeDataSource($event)"
-            />
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
+                   background: ${theme.$secondary_bg};
+                   color: ${theme.$main_text};
+                   pointer-events: auto;
+                   margin-right: 30px`"
+                class="med-btn"
+                v-on="menu"
+                @click="toggleSelect = !toggleSelect"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiClipboardText }}
+                </v-icon>
+                <span class="med-btn__text">
+                  Режим
+                </span>
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+              <v-select
+                :value="options.mode"
+                :menu-props="{
+                  value:toggleSelect,
+                  maxWidth: 200
+                }"
+                :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+                :items="mode"
+                label="Режим"
+                multiple
+                @change="updatePipeDataSource($event)"
+              />
+            </div>
           </template>
         </v-menu>
-        <v-spacer />
+        <v-menu
+          v-model="toggleSelectLayer"
+          max-width="220"
+          max-height="198"
+          nudge-top="-25px"
+          :close-on-content-click="false"
+        >
+          <template v-slot:activator="{ on:menu }">
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
+               background: ${theme.$secondary_bg};
+               color: ${theme.$main_text};
+               pointer-events: auto;
+               margin-right: 30px
+               `"
+                class="med-btn"
+                v-on="menu"
+                @click="toggleSelectLayer = !toggleSelectLayer"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiLayers }}
+                </v-icon>
+                <span class="med-btn__text">
+                  Слои
+                </span>
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+            </div>
+          </template>
+          <draggable
+            v-model="localLayerList"
+            handle=".burger"
+            :style="`background: ${theme.$secondary_bg}; pointer-events: all`"
+            @change="onDrop"
+          >
+            <div
+              v-for="(item, i) in localLayerList"
+              :key="i"
+              class="med-group"
+            >
+              <v-checkbox
+                v-model="item.isActive"
+                :label="item.name"
+                class="med-checkbox"
+                @change="change(item)"
+              >
+                <template v-slot:append>
+                  <v-icon
+                    :color="theme.$main_text"
+                    size="18"
+                    class="burger"
+                    style="cursor: move"
+                    v-text="mdiMenu"
+                  />
+                </template>
+              </v-checkbox>
+            </div>
+          </draggable>
+        </v-menu>
         <v-btn
           rounded
           :style="`
@@ -57,7 +134,7 @@
         <v-card
           style="max-height: 466px; pointer-events: auto"
           max-width="280"
-          class="px-5 pb-5"
+          class="px-5 pb-5 test"
           :color="theme.$main_bg"
         >
           <v-subheader
@@ -210,11 +287,22 @@
 </template>
 
 <script>
-import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
+import draggable from 'vuedraggable';
+import {
+  mdiFormatListBulletedSquare,
+  mdiSettings,
+  mdiLayers,
+  mdiClipboardText,
+  mdiChevronDown,
+  mdiMenu,
+} from '@mdi/js';
 import 'leaflet/dist/leaflet.css';
 
 export default {
   name: 'DashMapUserSettingsContainer',
+  components: {
+    draggable,
+  },
   props: {
     idElement: {
       type: String,
@@ -235,6 +323,10 @@ export default {
       mode: ['Мониторинг', 'Сравнение', 'Аналитика', 'Поиск', 'Режим 5'],
       mdiSettings,
       mdiList: mdiFormatListBulletedSquare,
+      mdiLayers,
+      mdiClipboardText,
+      mdiChevronDown,
+      mdiMenu,
       dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
       currentTile: {},
@@ -276,6 +368,8 @@ export default {
         mode: [],
         search: '',
       },
+      localLayerList: [],
+      toggleSelectLayer: false,
     };
   },
   computed: {
@@ -293,6 +387,18 @@ export default {
     },
     getLibrary() {
       return this.dashFromStore?.options?.library;
+    },
+    layerList: {
+      get() {
+        return this.dashFromStore?.options?.layerList || [];
+      },
+      set(val) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'layerList',
+          value: val,
+        }]);
+      },
     },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
@@ -361,14 +467,56 @@ export default {
         }
       },
     },
+    layerList(val) {
+      this.localLayerList = JSON.parse(JSON.stringify(val));
+    },
   },
   mounted() {
     const options = JSON.parse(JSON.stringify(this.getOptions));
     if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
       this.options = JSON.parse(JSON.stringify(options));
     }
+    this.localLayerList = JSON.parse(JSON.stringify(this.layerList));
   },
   methods: {
+    change(e) {
+      if (e.isActive) {
+        this.map.addLayerGroup(e.type);
+      } else {
+        this.map.removeLayerGroup(e.type);
+      }
+      this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+    },
+    creationLayer() {
+      if (this.layerList.length === 0) {
+        const key = Object.keys(this.library.objects);
+        this.localLayerList = Object.values(this.library.objects);
+        this.localLayerList.forEach((item, index) => {
+          if (!item.type) {
+            item.type = +key[index];
+            item.isActive = true;
+          }
+        });
+        this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+      }
+    },
+    addLayer() {
+      this.layerList.forEach((item, index) => {
+        if (item.isActive && this.map) {
+          this.change(item);
+          this.map.changeIndexOffset(item.type, 10000 - (index * 100));
+        }
+      });
+    },
+    onDrop() {
+      this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+      this.changeZIndex();
+    },
+    changeZIndex() {
+      this.layerList.forEach((item, i) => {
+        this.map.changeIndexOffset(item.type, 10000 - (i * 100));
+      });
+    },
     updatePipeDataSource(e) {
       const set = new Set(e);
       if (this.options.mode) {
@@ -503,6 +651,30 @@ export default {
     color: var(--main_text) !important
   .v-input input
     min-height: auto !important
+
+  &-checkbox
+    margin-top: 0 !important
+    padding: 7px 13px
+    display: flex
+    align-items: center
+    background: var(--main_bg)
+    &.v-input--is-label-active
+      background: rgba(244, 244, 250, 0.2)
+    .v-messages
+      display: none
+    .v-input__slot
+      margin-bottom: 0
+    .v-label
+      color: var(--main_text)
+    .v-input--selection-controls__input,
+    .v-input__append-outer
+      color: var(--main_text)
+  &-btn
+    .v-btn__content
+      text-transform: capitalize
+      font-size: 18px
+    &__text
+      margin: 0 8px 0 6px
 
 .map-user-settings__input
   .v-input__slot

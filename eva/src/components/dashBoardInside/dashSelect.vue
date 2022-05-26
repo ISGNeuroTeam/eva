@@ -14,27 +14,11 @@
         ref="selectBlock"
         class="select-with-data"
       >
-        <div
+        <arrow-block
           v-if="dataModeFrom"
-          class="arrow-block"
-        >
-          <v-icon
-            v-if="!open"
-            class="arrow-down arrows-select"
-            :color="theme.$primary_button"
-            @click="openSelect"
-          >
-            {{ down }}
-          </v-icon>
-          <v-icon
-            v-if="open"
-            class="arrow-up arrows-select"
-            :color="theme.$main_text"
-            @click="openSelect"
-          >
-            {{ up }}
-          </v-icon>
-        </div>
+          :state="open"
+          @toggle="openSelect"
+        />
         <div
           class="source"
           :class="{ source_show: source_show }"
@@ -126,14 +110,14 @@
 
 <script>
 import {
-  mdiArrowDownBoldBoxOutline,
-  mdiArrowUpBoldBoxOutline,
   mdiCropSquare,
   mdiSquare,
 } from '@mdi/js';
+import ArrowBlock from '../arrowBlock.vue';
 
 export default {
   name: 'DashSelect',
+  components: { ArrowBlock },
   props: {
     idFrom: {
       type: String,
@@ -186,8 +170,6 @@ export default {
       topArray: [],
       bottomArray: [],
       open: true,
-      down: mdiArrowDownBoldBoxOutline,
-      up: mdiArrowUpBoldBoxOutline,
       source_show: true,
       select_show: false,
       dataFromRest: {},
