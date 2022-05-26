@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Removed old reports page 
 - Removed papers page
+- Remove title actions from reports visualisations
 
 ## [1.91.0]
 
