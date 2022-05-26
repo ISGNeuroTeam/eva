@@ -1,3 +1,31 @@
+# [1.92.0]
+
+### Feature
+- Added full-screen mode for visualization
+- Added options mode tune and accumulators visualisations
+- Added title actions in settings for visualizations
+- Added layers to the map
+
+### Fixed
+- Fixed colors in the "accumulator" component
+- Fixed the order of metrics in the "single value" component
+- Fixed an error in the "single value" component when changing the data source. ¹
+- Fixed the title of the actions
+- The old reports page has been deleted.
+- The papers page has been deleted.
+- Removed the title actions from the reports visualisations
+- Fixed an error in the modal visualization console
+- Fixed an error when pressing Esc in modal visualisation
+
+#### ¹ The "Single Value" component now requires an additional field
+
+In the returned data, there should be a "_order" field in each data row.
+System fields that are not output data (for example, "_title") should have no order field.
+The "_order" field must be a positive number and the values for different rows must not be repeated.
+The values of "_order" should go in order without omissions:
+- 1,4,3,2 - it is possible
+- 1,4,2,5 - not allowed (3 is missing here)
+
 # [1.91.0]
 
 ### Feature
