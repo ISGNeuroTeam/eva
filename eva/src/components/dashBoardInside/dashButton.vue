@@ -366,25 +366,6 @@ export default {
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
     },
-    async getPaper(file, data) {
-      this.$emit('setLoading', true);
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('data', JSON.stringify(data));
-      const result = await this.$store.dispatch('getPaper', formData);
-      try {
-        if (result.status === 'success') {
-          this.$emit('setLoading', false);
-          this.downloadFile(result.file);
-        } else {
-          return false;
-        }
-      } catch (error) {
-
-        // this.message(`Ошибка: ${error}`);
-      }
-      return false;
-    },
     getSearch(search, sid) {
       let csvContent = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,'; // задаем кодировку csv файла
       const keys = Object.keys(search[0]); // получаем ключи для заголовков столбцов
@@ -416,9 +397,7 @@ export default {
       worker.onmessage = function (event) {
         if (event.data.length !== 0) {
           // this.data = event.data;
-          if (type === 'report') {
-            this.getPaper(file, event.data);
-          } else {
+          if (type !== 'report') {
             this.getSearch(event.data, sid);
           }
         } else {

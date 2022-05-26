@@ -393,10 +393,6 @@ export default new Vuex.Store({
     setReportUserSettings(state, value) {
       Vue.set(state.reports.userSettings, 'heightCodemirror', value);
     },
-    setPaperSearch(state, search) {
-      Vue.set(state.papers.searches, search.sid, search);
-      Vue.set(state.papers, 'cursearch', search.sid);
-    },
     setPickerDate(state, { idDash, id, date }) {
       // отдельно можно проверить если ИС прикреплен то переключить и обновить
       state[idDash][id].date = date;
@@ -825,13 +821,6 @@ export default new Vuex.Store({
           Vue.set(state.reports[item], 'search', '');
           Vue.set(state.reports[item], 'should', false);
         });
-      }
-    },
-    createPaperSearch(state) {
-      if (!state.papers) {
-        Vue.set(state, 'papers', {});
-        Vue.set(state.papers, 'searches', {});
-        Vue.set(state.papers, 'cursearch', 0);
       }
     },
     deleteDashFromMain(state, { id, name }) {
@@ -1383,15 +1372,6 @@ export default new Vuex.Store({
     getGroups() {
       return rest.getGroups(restAuth);
     },
-    loadPaper(paper) {
-      return rest.loadPaper(paper, restAuth);
-    },
-    getAllPaper() {
-      return rest.getAllPaper(restAuth);
-    },
-    getPaper(fileData) {
-      return rest.getPaper(restAuth, fileData);
-    },
     checkDataSearch(context, sid) {
       return new Promise((resolve) => {
         function setTransaction(dB) {
@@ -1930,24 +1910,19 @@ export default new Vuex.Store({
         limit: 1000,
       };
     },
-    getPaperSearch: (state) => {
-      const key = state.papers?.cursearch || 0;
-      if (key !== 0) {
-        return state.papers.searches[key];
-      }
-      return {
-        sid: '',
-        original_otl: '',
-        parametrs: {
-          tws: 0,
-          twf: 0,
-          timeout: 100,
-          preview: false,
-          field_extraction: false,
-          cache_ttl: 100,
-        },
-      };
-    },
+
+    getPaperSearch: () => ({ // TODO: разобраться нужно ли
+      sid: '',
+      original_otl: '',
+      parametrs: {
+        tws: 0,
+        twf: 0,
+        timeout: 100,
+        preview: false,
+        field_extraction: false,
+        cache_ttl: 100,
+      },
+    }),
     getReportElement: (state) => state.reports?.elements || [],
     getThemeTitle(state) {
       return state.theme.name;
