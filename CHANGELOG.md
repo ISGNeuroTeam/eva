@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding layers to the map
 
 ### Fixed
+- Fix accumulator colors
 - Fixed title actions
 - Removed old reports page 
 - Removed papers page
