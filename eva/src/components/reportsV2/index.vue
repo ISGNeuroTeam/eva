@@ -82,6 +82,7 @@
               :should-get="shouldGet"
               :loading="loading"
               :search="search"
+              :data-page-from="page"
             />
           </keep-alive>
         </div>
@@ -125,6 +126,7 @@ export default {
   data() {
     return {
       tab: 0,
+      page: 'reports',
       search: {
         parametrs: {
           tws: 0,

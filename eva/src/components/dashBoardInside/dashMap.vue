@@ -307,7 +307,7 @@ export default {
             idDash: this.idDash,
             id: this.element,
           });
-          this.loadDataForPipe(this.$store.getters.getPaperSearch);
+          this.loadDataForPipe(this.$store.getters.getPaperSearch); // TODO: убрать getPaperSearch
         }
       });
     },
