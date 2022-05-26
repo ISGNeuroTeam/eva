@@ -76,8 +76,6 @@ Vue.component('modal-settings', () => import('./components/modalSettings.vue'));
 Vue.component('theme-settings', () => import('./components/themeSettings.vue'));
 // настройки дашборда
 Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
-// настройки дашборда
-Vue.component('modal-paper', () => import('./components/modalPaper.vue'));
 // настройки темы
 Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
 // элемент таблицы
