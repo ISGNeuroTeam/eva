@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed metrics order in dashSingleValue.vue
 - Fixed error in dashSingleValue.vue on data source changed
+- Fixed title actions
+- Removed old reports page 
+- Removed papers page
+- Remove title actions from reports visualisations
 
 ## [1.91.0]
 
