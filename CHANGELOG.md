@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add title actions in settings for visualisations
+- Adding layers to the map
 
 ### Fixed
 - Fixed title actions
