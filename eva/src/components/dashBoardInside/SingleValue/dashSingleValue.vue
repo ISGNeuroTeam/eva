@@ -342,8 +342,10 @@ export default {
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
-          if (sortOrder === undefined) {
+          if (!Number.isInteger(sortOrder) || this.error) {
             this.error = 'В запросе отсутствует обязательное поле "_order"';
+            metricList.length = 0;
+            metricOptions.length = 0;
             return;
           }
           this.error = '';
