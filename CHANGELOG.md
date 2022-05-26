@@ -20,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed old reports page 
 - Removed papers page
 - Remove title actions from reports visualisations
+- Fixed modal visualisation console error
+- Fixed modal visualisation esc error
 
 ## [1.91.0]
 
