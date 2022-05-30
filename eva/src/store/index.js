@@ -1937,5 +1937,14 @@ export default new Vuex.Store({
     dataResearch,
     notify,
   },
-  plugins: [createPersistedState()],
+  plugins: [createPersistedState({
+    filter: (elem) => {
+      if (elem.type === 'setModalSettings') {
+        delete elem.payload.status;
+      }
+
+      console.log(elem);
+      return elem;
+    },
+  })],
 });
