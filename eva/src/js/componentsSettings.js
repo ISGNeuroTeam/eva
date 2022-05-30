@@ -42,6 +42,7 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
+    { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
   ],
   size: {
     picker: {
@@ -116,6 +117,10 @@ export default {
       width: 400,
       height: 400,
     },
+    constructorSchemes: {
+      width: 930,
+      height: 850,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -136,6 +141,7 @@ export default {
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
+    constructorSchemes: mdiTuneVertical,
   },
   options: {
     // component to options
@@ -232,6 +238,7 @@ export default {
     ],
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
+    constructorSchemes: ['visible', 'level', 'pinned'],
   },
   optionFields: [
     // описание типов полей и их характеристик

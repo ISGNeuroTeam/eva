@@ -122,6 +122,8 @@ Vue.component('dash-map', () => import('./components/dashBoardInside/dashMap.vue
 Vue.component('dash-heatmap', () => import('./components/dashBoardInside/dashHeatMap.vue'));
 // компонент ползунок
 Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.vue'));
+// конструктор схем
+Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorSchemes.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // блок экспорта импорта

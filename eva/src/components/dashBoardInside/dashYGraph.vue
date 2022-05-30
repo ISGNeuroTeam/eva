@@ -9,6 +9,12 @@
       v-bind="$attrs"
       class="ygraph-wrapper"
     >
+      <button @click="testSave">
+        SAVE TEST
+      </button>
+      <button @click="testOpen">
+        OPEN TEST
+      </button>
       <div class="button-block">
         <v-row align="start">
           <v-tooltip
@@ -327,6 +333,12 @@ export default {
     }
   },
   methods: {
+    testSave() {
+      this.graph.testSave();
+    },
+    testOpen() {
+      this.graph.testOpen();
+    },
     zoomIn() {
       this.graph.zoomIn();
     },

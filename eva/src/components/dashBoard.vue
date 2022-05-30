@@ -382,7 +382,7 @@
         </div>
       </div>
       <v-card-text
-        v-show="!showElement"
+        v-show="!showElement && false"
         class="card-text"
       >
         <button
@@ -395,7 +395,6 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement"
         :full-screen-mode="fullScreenMode"
         custom-class="card-text element-itself"
         :color-from="theme"
