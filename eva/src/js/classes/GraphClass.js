@@ -30,6 +30,8 @@ import {
   Font,
   DefaultLabelStyle,
   License,
+  GraphMLSupport,
+  StorageLocation,
   WebGL2GraphModelManager,
   WebGL2SelectionIndicatorManager,
 } from 'yfiles';
@@ -147,6 +149,8 @@ class GraphClass {
     this.colors = colors;
     this.options.colorFrom = colorFrom;
     this.enableWebGL2();
+    const support = new GraphMLSupport(this.graphComponent);
+    support.storageLocation = StorageLocation.FILE_SYSTEM;
   }
 
   get labelStyleList() {
@@ -214,10 +218,7 @@ class GraphClass {
   }
 
   enableWebGL2() {
-    this.graphComponent.graphModelManager = new WebGL2GraphModelManager(
-      this.graphComponent,
-      this.graphComponent.contentGroup,
-    );
+    this.graphComponent.graphModelManager = new WebGL2GraphModelManager();
     this.graphComponent
       .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(this.graphComponent);
   }
@@ -257,6 +258,14 @@ class GraphClass {
       this.graphComponent.currentItem = null;
     });
     this.graphComponent.inputMode = mode;
+  }
+
+  testSave() {
+    ICommand.SAVE.execute(null, this.graphComponent);
+  }
+
+  testOpen() {
+    ICommand.OPEN.execute(null, this.graphComponent);
   }
 
   edgeStyle(color) {
@@ -440,17 +449,17 @@ class GraphClass {
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
       if (edge.tag === '-') {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           edge,
           this.edgeStyle(this.startFinishColor),
         );
       } else if (edge.tag === '-1') {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           edge,
           this.edgeStyle(this.errorColor),
         );
       } else {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           edge,
           this.edgeStyle(this.colors[edge.tag % this.colors.length]),
         );
@@ -461,11 +470,11 @@ class GraphClass {
   generateNodesEdges(dataRest, callback) {
     const allNodes = [];
     const allEdges = [];
-
+    // Генерация и привязка nodes к edges
     dataRest.forEach((dataRestItem) => {
       if (dataRestItem.relation_id) {
         allEdges.push({
-          fromNode: dataRestItem.id,
+          fromNode: `${dataRestItem.id}`,
           toNode: dataRestItem.relation_id,
           label: dataRestItem.edge_description,
           color: dataRestItem.edge_color,
@@ -560,12 +569,12 @@ class GraphClass {
     const { nodes } = this.graphComponent.graph;
     nodes.forEach((node) => {
       // node.labels.elementAt(0) -- label который name
-      this.graphComponent.graph.setStyle(
+      this.graphComponent.graphModelManager.graph.setStyle(
         node.labels.elementAt(0),
         this.labelStyle(true),
       );
       // node.labels.elementAt(1) -- label который label
-      this.graphComponent.graph.setStyle(
+      this.graphComponent.graphModelManager.graph.setStyle(
         node.labels.elementAt(1),
         this.labelStyle(false),
       );
@@ -573,7 +582,7 @@ class GraphClass {
 
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
-      this.graphComponent.graph.setStyle(
+      this.graphComponent.graphModelManager.graph.setStyle(
         edge.labels.elementAt(0),
         this.labelStyle(false, this.colorFrom.backElement),
       );
@@ -603,17 +612,17 @@ class GraphClass {
         && (node.tag.node_color.toLowerCase() === 'start'
           || node.tag.node_color.toLowerCase() === 'finish')
       ) {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           node,
           GraphClass.nodeStyle(this.startFinishColor),
         );
       } else if (node.tag.node_color === '-1') {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           node,
           GraphClass.nodeStyle(this.errorColor),
         );
       } else {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           node,
           GraphClass.nodeStyle(
             this.colors[node.tag.node_color - 1]
