@@ -100,16 +100,16 @@ export default {
       expanded: [],
       headers: [
         {
-          text: 'Инфо',
+          text: 'Info',
           align: 'left',
           sortable: false,
           value: 'info',
           width: '80px',
         },
         {
-          text: 'Время', sortable: false, value: 'time', width: '120px',
+          text: 'Time', sortable: false, value: 'time', width: '120px',
         },
-        { text: 'Данные', sortable: false, value: 'inputCount' },
+        { text: 'Data', sortable: false, value: 'inputCount' },
       ],
     };
   },

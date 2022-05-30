@@ -19,7 +19,7 @@
             {{ mdiCompare }}
           </v-icon>
           <v-card-title class="modal-title">
-            Настройки темы
+            Theme Settings
           </v-card-title>
           <svg
             v-if="mode === 'manual'"
@@ -52,7 +52,7 @@
           v-if="mode === 'select'"
           :style="{ color: theme.$main_text, fontSize: '15px' }"
         >
-          Выберите тему
+          Choose a theme
           <v-select
             v-model="select"
             :color="theme.$accent_ui_color"
@@ -77,7 +77,7 @@
               >
                 {{ mdiPencil }}
               </v-icon>
-              Редактировать
+              Edit
             </div>
             <div
               :style="{ color: theme.$error_color }"
@@ -90,15 +90,16 @@
               >
                 {{ mdiTrashCanOutline }}
               </v-icon>
-              Удалить
+              Delete
             </div>
             <modal-delete />
             <modal-confirm
               v-model="isConfirmModal"
               :theme="theme"
-              :modal-text="`Вы точно хотите удалить тему - <strong>${select}</strong>?`"
-              btn-confirm-text="Удалить"
-              btn-cancel-text="Отмена"
+              :modal-text="
+                `Are you sure you want to delete the topic - <strong>${select}</strong>?`"
+              btn-confirm-text="Confirm"
+              btn-cancel-text="Cancel"
               @result="deleteTheme"
             />
           </div>
@@ -118,14 +119,14 @@
             >
               {{ mdiPlusCircleOutline }}
             </v-icon>
-            Создать свою тему
+            Create your color theme
           </div>
         </v-card-text>
         <v-card-text
           v-if="mode === 'create' || mode === 'edit'"
           :style="{ color: theme.$main_text, fontSize: '15px' }"
         >
-          Название темы
+          Color Theme Name
           <v-text-field
             v-model="newTitle"
             :style="{ color: theme.$secondary_bg }"
@@ -137,7 +138,7 @@
           />
           <div class="helper-title">
             <p @click="mode = 'manual'">
-              Руководство по настройке темы
+              Theme Setup Guide
             </p>
           </div>
           <v-row>
@@ -189,7 +190,7 @@
             </v-col>
           </v-row>
           <div class="image-preview-title">
-            Фоновое изображение (необязательно)
+            Background image (optional)
           </div>
           <div class="upload-wrapper">
             <div v-if="imagePreview">
@@ -227,12 +228,12 @@
                     :fill="theme.$secondary_text"
                   />
                 </svg>
-                <div>Загрузить изображение</div>
+                <div>Upload image</div>
               </div>
             </div>
           </div>
           <div v-if="imagePreview">
-            Прозрачность изображения
+            Image transparency
             <v-row>
               <v-col cols="9">
                 <v-slider
@@ -260,41 +261,41 @@
           :style="{ color: theme.$main_text, fontSize: '12px' }"
         >
           <div class="manual-block">
-            <h2>Руководство по настройке темы</h2>
+            <h2>Theme Setup Guide</h2>
             <p>
-              По возможности старайтесь не использовать светлые оттенки
-              красного, желтого и зеленого цветов, так как они используются для
-              технических сообщений.
+              If possible, try not to use light shades of red, yellow,
+              and green colors because they are used for technical messages.
             </p>
             <p>
-              Основной фон является главным цветом для фона в приложении.
-              Дополнительный фон используется для выделения отдельных частей
-              окон или для фона визуальных компонентов.
+              The main background is the main color for the background in the application.
+              An additional background is used to highlight individual parts of
+              windows or for the background of visual components.
             </p>
             <p>
-              Основной цвет линий используется для компонентов форм или для
-              главных линий в схемах и графиках. Дополнительный цвет нужен для
-              неважных линий или дополнительных линий в схемах и графиках.
+              The main color of the lines is used for the components
+              of the shapes or for main lines in diagrams and charts.
+              The complementary color is needed for unimportant lines
+              or additional lines in diagrams and charts.
             </p>
             <p>
-              Цвета текста также делятся на гавный и дополнительный. Для
-              основного текста используется основной цвет, для примечаний или
-              пояснений - дополнительный.
+              Text colors are also divided into primary and secondary colors.
+              The primary color is used for the main text,
+              and the secondary color is used for notes or explanations.
             </p>
             <p>
-              Цвет заголовка используется в шапке приложения или в шапках
-              отдельных компонентов или окон.
+              The header color is used in the application header
+              or in the headers of or the headers of individual components or windows.
             </p>
             <p>
-              Акцентный цвет используется для дополнительных органов управления,
-              иконок компонентов приложения и выделения активных элементов
-              интерфейса.
+              The accent color is used for additional controls,
+              icons of the application components and highlighting
+              of active elements interface.
             </p>
             <p>
-              Цвета взаимодействия используются для различных кнопок и органов
-              управления в настройках. Дополнительный цвет должен отличаться от
-              основного на несколько тонов, он используется для эффекта
-              наведения.
+              Interaction colors are used for the different buttons
+              and controls in the settings. The complementary color
+              must differ from the the main color by several tones,
+              it is used for the pointing effect.
             </p>
           </div>
         </v-card-text>
@@ -305,14 +306,14 @@
               :style="{ color: theme.$main_text }"
               @click="toSelectMode"
             >
-              Отмена
+              Cancel
             </v-btn>
             <v-btn
               :color="theme.$primary_button"
               :style="{ color: '#FFF', marginLeft: '10px' }"
               @click="saveNewTheme"
             >
-              Сохранить
+              Save
             </v-btn>
           </div>
           <div v-if="mode === 'manual'">
@@ -321,7 +322,7 @@
               :style="{ color: '#FFF' }"
               @click="mode = 'create'"
             >
-              Понятно
+              Understood
             </v-btn>
           </div>
         </v-card-actions>
@@ -368,104 +369,104 @@ export default {
       opacity: 1,
       fields: [
         {
-          title: 'Основной фон',
+          title: 'Main background',
           propName: '$main_bg',
           value: '#8F8F9C',
         },
         {
-          title: 'Дополнительный фон',
+          title: 'Additional background',
           propName: '$secondary_bg',
           value: '#8F8F9C',
         },
         {
-          title: 'Основные линии',
+          title: 'The main lines',
           propName: '$main_border',
           value: '#8F8F9C',
         },
         {
-          title: 'Дополнительные линии',
+          title: 'Additional lines',
           propName: '$secondary_border',
           value: '#8F8F9C',
         },
         {
-          title: 'Основной текст',
+          title: 'Main text',
           propName: '$main_text',
           value: '#8F8F9C',
         },
         {
-          title: 'Дополнительный текст',
+          title: 'Additional text',
           propName: '$secondary_text',
           value: '#8F8F9C',
         },
         {
-          title: 'Заголовки',
+          title: 'Headlines',
           propName: '$title',
           value: '#8F8F9C',
         },
         {
-          title: 'Иконки и акценты',
+          title: 'Icons and accents',
           propName: '$accent_ui_color',
           value: '#8F8F9C',
         },
         {
-          title: 'Взаимодейтсвия',
+          title: 'Interactions',
           propName: '$primary_button',
           value: '#8F8F9C',
         },
         {
-          title: 'Взаимодейтсвия (доп.)',
+          title: 'Interactions (optional)',
           propName: '$primary_button_hover',
           value: '#8F8F9C',
         },
       ],
       defaultFieldsValue: [
         {
-          title: 'Основной фон',
+          title: 'Main background',
           propName: '$main_bg',
           value: '#8F8F9C',
         },
         {
-          title: 'Дополнительный фон',
+          title: 'Additional background',
           propName: '$secondary_bg',
           value: '#8F8F9C',
         },
         {
-          title: 'Основные линии',
+          title: 'The main lines',
           propName: '$main_border',
           value: '#8F8F9C',
         },
         {
-          title: 'Дополнительные линии',
+          title: 'Additional lines',
           propName: '$secondary_border',
           value: '#8F8F9C',
         },
         {
-          title: 'Основной текст',
+          title: 'Main text',
           propName: '$main_text',
           value: '#8F8F9C',
         },
         {
-          title: 'Дополнительный текст',
+          title: 'Additional text',
           propName: '$secondary_text',
           value: '#8F8F9C',
         },
         {
-          title: 'Заголовки',
+          title: 'Headlines',
           propName: '$title',
           value: '#8F8F9C',
         },
         {
-          title: 'Иконки и акценты',
+          title: 'Icons and accents',
           propName: '$accent_ui_color',
           value: '#8F8F9C',
         },
         {
-          title: 'Взаимодейтсвия',
+          title: 'Interactions',
           propName: '$primary_button',
           value: '#8F8F9C',
         },
         {
-          title: 'Взаимодейтсвия (доп.)',
+          title: 'Interactions (optional)',
           propName: '$primary_button_hover',
           value: '#8F8F9C',
         },
@@ -636,8 +637,8 @@ export default {
         const response = await fetch('/api/themes');
         const themeTitles = await response.json();
         const newThemeTitles = themeTitles.map((them) => ({ title: them.name, ...them }));
-        this.themeTitles = [{ title: 'Тёмная', name: 'dark' },
-          { title: 'Светлая', name: 'light' }].concat(
+        this.themeTitles = [{ title: 'Dark', name: 'dark' },
+          { title: 'Light', name: 'light' }].concat(
           newThemeTitles,
         );
       } catch (e) {

@@ -52,9 +52,9 @@
                     disable-pagination
                     hide-default-footer
                     :headers="[
-                      { text: 'Значение', value: 'value' },
-                      { text: 'Количество', value: 'count' },
-                      { text: 'Процент', value: '%' },
+                      { text: 'The value', value: 'value' },
+                      { text: 'Quantity', value: 'count' },
+                      { text: 'Percentage', value: '%' },
                     ]"
                     :items="statistic"
                   />

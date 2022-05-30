@@ -63,7 +63,7 @@
             {{ mdiSettings }}
           </v-icon>
         </template>
-        <span>Настройки</span>
+        <span>Settings</span>
       </v-tooltip>
     </div>
     <v-card-title class="title-vis">

@@ -14,7 +14,7 @@
             class="settings-title"
             :style="{ color: theme.$title, borderColor: theme.$main_border }"
           >
-            Настройки
+            Settings
             <p>{{ element }}</p>
           </div>
         </v-card-text>
@@ -28,7 +28,7 @@
               class="switch"
               :color="theme.$primary_button"
               :style="{ color: theme.$main_text }"
-              label="Открыть в новой вкладке"
+              label="Open in new tab"
               @change="isChanged = true"
             />
           </div>
@@ -40,7 +40,7 @@
                 borderBottom: `1px solid ${theme.$main_border}`,
               }"
             >
-              Название
+              Option name
             </div>
             <div
               class="discribe-option main item"
@@ -49,7 +49,7 @@
                 borderBottom: `1px solid ${theme.$main_border}`,
               }"
             >
-              Описание
+              Option description
             </div>
             <div
               class="status-option main item"
@@ -58,7 +58,7 @@
                 borderBottom: `1px solid ${theme.$main_border}`,
               }"
             >
-              Статус
+              Option status
             </div>
           </div>
           <template v-for="field in fieldsForRender">
@@ -252,7 +252,7 @@
                   borderColor: theme.$main_border,
                 }"
               >
-                Единицы измерения для линии {{ metric.name }}
+                Unit of measures for the line {{ metric.name }}
               </div>
               <div class="status-option item">
                 <v-text-field
@@ -284,7 +284,7 @@
                 borderColor: theme.$main_border,
               }"
             >
-              Настройки режима United
+              United mode settings
             </div>
           </v-card-text>
           <div
@@ -316,7 +316,7 @@
                 hide-details
                 outlined
                 class="item-metric"
-                label="Имя метрики"
+                label="Metric name"
                 @click="changeColor"
                 @change="isChanged = true"
               />
@@ -328,7 +328,7 @@
                 hide-details
                 outlined
                 class="item-metric"
-                label="Тип графика"
+                label="Type of graph"
                 @click="changeColor"
                 @change="isChanged = true"
               />
@@ -336,7 +336,7 @@
                 v-model="metrics[i - 1].lowborder"
                 clearable
                 placeholder="0"
-                label="Нижняя граница (ось Y)"
+                label="Lower boundary (Y-axis)"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -353,7 +353,7 @@
                 v-model="metrics[i - 1].upborder"
                 clearable
                 placeholder="0"
-                label="Верхняя граница (ось Y)"
+                label="Upper boundary (Y-axis)"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -375,7 +375,7 @@
                     borderColor: theme.$main_border,
                   }"
                 >
-                  Цвет
+                  Color
                 </div>
                 <div class="status-option item">
                   <label>
@@ -403,7 +403,7 @@
                     style="min-width: 100px"
                     outlined
                     class="item-metric"
-                    label="Вывод значений"
+                    label="Output of values"
                     type="number"
                     min="0"
                     hide-details
@@ -425,7 +425,7 @@
                     style="min-width: 100px"
                     outlined
                     class="item-metric"
-                    label="Значения после запятой"
+                    label="Values after the decimal point"
                     type="number"
                     min="0"
                     max="100"
@@ -439,7 +439,7 @@
                   <v-select
                     :value="type_line[metrics[i - 1].name]"
                     :disabled="metrics[i - 1].type === 'Bar chart'"
-                    label="Тип линии"
+                    label="Line type"
                     class="item-metric"
                     :items="[
                       {
@@ -472,7 +472,7 @@
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text }"
                 class="item-metric checkbox"
-                label="Установить границы"
+                label="Set the boundaries"
                 hide-details
                 @change="isChanged = true"
               />
@@ -513,7 +513,7 @@
                 borderColor: theme.$main_border,
               }"
             >
-              Позиция легенды
+              Position of a legend
             </div>
             <div class="status-option item">
               <v-select
@@ -524,7 +524,7 @@
                 hide-details
                 outlined
                 class="subnumber"
-                label="Позиция легенды"
+                label="Position of a legend"
                 @click="changeColor"
                 @change="isChanged = true"
               />
@@ -544,7 +544,7 @@
                     borderColor: theme.$main_border,
                   }"
                 >
-                  Библиотека примитивов отображения
+                  Display primitives library
                 </div>
               </v-card-text>
               <v-btn
@@ -562,7 +562,7 @@
                 name="input-7-1"
                 filled
                 rows="6"
-                label="JSON c примитивами"
+                label="JSON with primitives"
                 :auto-grow="primitivesLibraryAutoGrow"
                 class="textarea-event"
                 spellcheck="false"
@@ -596,7 +596,7 @@
                 borderColor: theme.$main_border,
               }"
             >
-              Настройки круговой диаграммы
+              Pie Chart Settings
             </div>
           </v-card-text>
           <div
@@ -612,7 +612,7 @@
                 class="divider-tooltip-setting"
                 :style="{ color: theme.$main_text }"
               >
-                <p>Показатель {{ index + 1 }}</p>
+                <p>Index {{ index + 1 }}</p>
                 <div
                   :style="{ backgroundColor: theme.$main_text }"
                   class="divider-line"
@@ -639,7 +639,7 @@
                   hide-details
                   outlined
                   class="item-metric"
-                  label="Выберите тип"
+                  label="Choose type"
                   @click="changeColor"
                   @input="isChanged = true"
                 />
@@ -647,7 +647,7 @@
                   v-if="accumulators[index].colorType === 'color'"
                   v-model="accumulators[index].color"
                   placeholder="red #5F27FF rgb(95,39,255)"
-                  label="Набор цветов"
+                  label="A set of colors"
                   :color="theme.$primary_button"
                   :style="{
                     color: theme.$main_text,
@@ -707,7 +707,7 @@
               class="divider-tooltip-setting"
               :style="{ color: theme.$main_text }"
             >
-              <p>Соотношение метрик</p>
+              <p>Ratio of metrics</p>
               <div
                 :style="{ backgroundColor: theme.$main_text }"
                 class="divider-line"
@@ -733,7 +733,7 @@
               class="divider-tooltip-setting"
               :style="{ color: theme.$main_text }"
             >
-              <p>Цветовая схема</p>
+              <p>Color scheme</p>
               <div
                 :style="{ backgroundColor: theme.$main_text }"
                 class="divider-line"
@@ -752,7 +752,7 @@
                 hide-details
                 outlined
                 class="item-metric"
-                label="Выберите схему"
+                label="Choose a scheme"
                 @click="changeColor"
                 @change="
                   () => {
@@ -767,7 +767,7 @@
                 v-show="!defaultThemes.includes(colorsPie.theme)"
                 v-model="colorsPie.nametheme"
                 placeholder="green"
-                label="Имя схемы"
+                label="Scheme name"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -784,7 +784,7 @@
                 v-model="colorsPie.colors"
                 :disabled="!colorsPie.nametheme"
                 placeholder="red #5F27FF rgb(95,39,255)"
-                label="Набор цветов"
+                label="Set of colors"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -851,7 +851,7 @@
                     ?
                   </v-icon>
                 </template>
-                <span>Эталон: red #5F27FF rgb(95,39,255)</span>
+                <span>Reference: red #5F27FF rgb(95,39,255)</span>
               </v-tooltip>
               <v-btn
                 v-if="
@@ -862,14 +862,14 @@
                 :color="theme.$primary_button"
                 @click="onClickDeleteTheme(colorsPie.theme)"
               >
-                Удалить
+                Delete
               </v-btn>
             </div>
             <div
               class="divider-tooltip-setting"
               :style="{ color: theme.$main_text }"
             >
-              <p>Тип визуализации</p>
+              <p>Type of visualization</p>
               <div
                 :style="{ backgroundColor: theme.$main_text }"
                 class="divider-line"
@@ -890,7 +890,7 @@
                 hide-details
                 outlined
                 class="item-metric"
-                label="Выберите тип"
+                label="Choose type"
                 @click="changeColor"
                 @input="isChanged = true"
               />
@@ -908,7 +908,7 @@
               borderColor: theme.$main_border,
             }"
           >
-            Настройки tooltip
+            Tooltip settings
           </div>
         </v-card-text>
         <div
@@ -920,7 +920,7 @@
             class="divider-tooltip-setting"
             :style="{ color: theme.$main_text }"
           >
-            <p>Текст</p>
+            <p>Text</p>
             <div
               :style="{ backgroundColor: theme.$main_text }"
               class="divider-line"
@@ -942,7 +942,7 @@
             <v-text-field
               v-model="tooltip.texts[i - 1]"
               clearable
-              placeholder="Введите текст tooltip"
+              placeholder="Enter the tooltip text"
               :color="theme.$primary_button"
               :style="{
                 color: theme.$main_text,
@@ -973,7 +973,7 @@
             class="divider-tooltip-setting"
             :style="{ color: theme.$main_text }"
           >
-            <p>Ссылка</p>
+            <p>Link</p>
             <div
               :style="{ backgroundColor: theme.$main_text }"
               class="divider-line"
@@ -995,7 +995,7 @@
             <v-text-field
               v-model="tooltip.links[i - 1].name"
               clearable
-              placeholder="Введите название ссылки"
+              placeholder="Enter the link name"
               :color="theme.$primary_button"
               :style="{
                 color: theme.$main_text,
@@ -1010,7 +1010,7 @@
             <v-text-field
               v-model="tooltip.links[i - 1].url"
               clearable
-              placeholder="Введите текст ссылки"
+              placeholder="Enter the link text"
               :color="theme.$primary_button"
               :style="{
                 color: theme.$main_text,
@@ -1041,7 +1041,7 @@
             class="divider-tooltip-setting"
             :style="{ color: theme.$main_text }"
           >
-            <p>Кнопка</p>
+            <p>Button</p>
             <div
               :style="{ backgroundColor: theme.$main_text }"
               class="divider-line"
@@ -1063,7 +1063,7 @@
             <v-text-field
               v-model="tooltip.buttons[i - 1].name"
               clearable
-              placeholder="Введите название кнопки"
+              placeholder="Enter the button name"
               :color="theme.$primary_button"
               :style="{
                 color: theme.$main_text,
@@ -1078,7 +1078,7 @@
             <v-text-field
               v-model="tooltip.buttons[i - 1].id"
               clearable
-              placeholder="Введите id кнопки"
+              placeholder="Enter the button id"
               :color="theme.$primary_button"
               :style="{
                 color: theme.$main_text,
@@ -1121,7 +1121,7 @@
                 borderColor: theme.$main_border,
               }"
             >
-              Ссылки и события для панели
+              Links and events for the panel
             </div>
           </v-card-text>
           <title-ation-select
@@ -1137,7 +1137,7 @@
             class="create-btn"
             @click="setOptions"
           >
-            Подтвердить
+            Confirm
           </v-btn>
           <v-btn
             small
@@ -1145,16 +1145,16 @@
             class="create-btn"
             @click="cancelModal"
           >
-            Отмена
+            Cancel
           </v-btn>
         </v-card-actions>
       </v-card>
       <modal-confirm
         v-model="isConfirmModal"
         :theme="theme"
-        :modal-text="`Вы точно хотите удалить вариант отображения ?`"
-        btn-confirm-text="Удалить"
-        btn-cancel-text="Отмена"
+        :modal-text="`You definitely want to remove the display option ?`"
+        btn-confirm-text="Confirm"
+        btn-cancel-text="Cancel"
         @result="(confirm) => { confirm && deleteMetrics(deleteMetricId) }"
       />
     </div>
@@ -1209,7 +1209,7 @@ export default {
       metricsRelation: {
         metrics: [],
         relations: [],
-        namesMetric: ['Категория', 'Процентное соотношение'],
+        namesMetric: ['The category', 'Percentage ratio'],
       },
       colorsPie: {
         theme: 'neitral',
@@ -1221,11 +1221,11 @@ export default {
       pieTypes: [
         {
           value: 'pie',
-          label: 'Круговая диограмма',
+          label: 'Circle diagram',
         },
         {
           value: 'donat',
-          label: 'Кольцвая диограмма',
+          label: 'Ring Diagram',
         },
       ],
       accumulators: [],
@@ -1233,11 +1233,11 @@ export default {
       accumulatorColorTypes: [
         {
           value: 'color',
-          label: 'Цвет',
+          label: 'Color',
         },
         {
           value: 'range',
-          label: 'Диапазон',
+          label: 'Range',
         },
       ],
       themesArr: [],
@@ -1311,8 +1311,8 @@ export default {
     },
     primitivesLibraryAutoGrowLinkText() {
       return this.primitivesLibraryAutoGrow
-        ? 'Свернуть поле'
-        : 'Расширить поле';
+        ? 'Collapse the field'
+        : 'Expand the field';
     },
     optionsItems() {
       if (!this.element) {
@@ -1558,14 +1558,14 @@ export default {
       // Берем активную подложку из сторы
       const selectedLayerFromStore = this.dashFromStore[this.element].options.selectedLayer;
       // let newSelectedLayer = null;
-      if (!selectedLayerFromStore || selectedLayerFromStore?.name === 'Заданная в настройках') {
+      if (!selectedLayerFromStore || selectedLayerFromStore?.name === 'Set in the settings') {
         this.$store.commit('setState', [
           {
             object: this.dashFromStore[this.element].options,
             prop: 'selectedLayer',
             value: this.options.osmserver
               ? {
-                name: 'Заданная в настройках',
+                name: 'Set in the settings',
                 tile: this.options.osmserver || [],
               }
               : null,
@@ -1783,8 +1783,8 @@ export default {
                   ...options[item].relations,
                 ]);
                 this.$set(this.metricsRelation, 'namesMetric', [
-                  'Категория',
-                  'Процентное соотношение',
+                  'The category',
+                  'Percentage ratio',
                 ]);
               } else if (item === 'colorsPie') {
                 this.colorsPie = {};

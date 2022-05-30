@@ -23,7 +23,7 @@
             class="download-btn-text"
             :style="{ color: theme.$main_text }"
           >
-            Отчет
+            The report
           </span>
         </v-btn>
       </template>
@@ -39,7 +39,7 @@
             >
               {{ mdiFileOutline }}
             </v-icon>
-            Отчет
+            The report
           </div>
           <div>
             <v-btn
@@ -56,7 +56,7 @@
           class="card-text"
           :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
         >
-          В результате поиска найдено событий -
+          The search results found events -
           <span class="card-text-value">{{ length }}</span>
         </v-card-text>
       </v-card>

@@ -31,9 +31,9 @@
               v-model="tab"
               class="tabs"
             >
-              <v-tab>События ({{ data.length }})</v-tab>
-              <v-tab>Статистика</v-tab>
-              <v-tab>Визуализация</v-tab>
+              <v-tab>The events ({{ data.length }})</v-tab>
+              <v-tab>Statistic</v-tab>
+              <v-tab>Visualization</v-tab>
             </v-tabs>
             <div class="d-flex">
               <report :length="data.length" />
@@ -214,7 +214,7 @@ export default {
     this.$store.commit('createReportSearch');
   },
   mounted() {
-    document.title = 'EVA | Исследование данных';
+    document.title = 'EVA | Data research';
     this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
@@ -282,7 +282,7 @@ export default {
         ...search,
         sid: this.hashCode(search.original_otl),
       })));
-      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
+      await this.$store.dispatch('auth/putLog', `Request launched  ${this.search.sid}`);
 
       this.loading = true;
       await this.$store.dispatch('getDataApi', {
@@ -401,7 +401,7 @@ export default {
           };
 
           query.onerror = () => {
-            console.error('Ошибка', query.error);
+            console.error('Error', query.error);
           };
         };
       };

@@ -21,7 +21,7 @@
           class="search-block-title"
           :style="{ color: theme.$title }"
         >
-          Новый поиск
+          The new search
         </div>
         <v-btn
           class="search-block-header__btn"
@@ -39,7 +39,7 @@
             class="search-block-header__text"
             :class="historySizeUndo"
           >
-            Шаг назад
+            Step backward
           </span>
         </v-btn>
         <v-btn
@@ -52,7 +52,7 @@
             class="search-block-header__text"
             :class="historySizeRedo"
           >
-            Шаг вперед
+            Step forward
           </span>
           <v-icon
             class="search-block-header__icon"
@@ -70,7 +70,7 @@
             class="action-btn-text"
             :style="{ color: theme.$main_text }"
           >
-            Сбросить
+            Reset
           </span>
           <v-icon
             class="action-btn-icon"
@@ -102,7 +102,7 @@
             <v-icon :color="theme.$ok_color">
               {{ mdiCheck }}
             </v-icon>
-            <span>{{ data.length }} результатов </span>
+            <span>Number of results - {{ data.length }}</span>
             <span v-if="searchTimeInterval">( {{ searchTimeInterval }} )</span>
           </div>
         </div>
@@ -119,7 +119,7 @@
                   v-bind="attrs"
                   v-on="on"
                 >
-                  Настройки поиска
+                  Search settings
                   <v-icon :color="theme.$main_text">
                     {{
                       mdiChevronDown
@@ -129,7 +129,7 @@
               </template>
               <div class="search-block-footer-settings__search">
                 <div class="search-block-footer-settings__text">
-                  Автоперенос на новую строку
+                  Auto transfer to a new line
                   <v-switch
                     v-model="cmOption.lineWrapping"
                     inset
@@ -146,7 +146,7 @@
                       v-on="on"
                     >
                       <div>
-                        Число отображаемых строк
+                        Number of displayed lines
                         <v-icon
                           :color="theme.$main_text"
                           style="transform: rotate(-90deg)"
@@ -168,13 +168,13 @@
                         : ''"
                       @click="changeHeightCodemirror(item)"
                     >
-                      {{ item }} строк
+                      {{ item }} lines
                     </div>
                     <div
                       class="search-block-footer-settings__text"
                       @click="numberLineModal = true"
                     >
-                      Пользовательское значение
+                      User value
                     </div>
                   </div>
                 </v-menu>
@@ -205,23 +205,23 @@
               <div class="dropdown-range">
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">
-                    Общие
+                    General
                   </div>
                   <div
                     class="dropdown-range-item"
                     @click="
                       changeTimeRange({
-                        text: 'За все время',
+                        text: 'In all the time',
                         timeHours: 'all',
                       })
                     "
                   >
-                    За все время
+                    In all the time
                   </div>
                 </div>
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">
-                    Недавние
+                    The recent
                   </div>
                   <div
                     v-for="item in timeRanges"
@@ -234,7 +234,7 @@
                 </div>
                 <div class="dropdown-range-block">
                   <div class="dropdown-range-title">
-                    Гибкий поиск
+                    Flexible search
                   </div>
                   <v-menu
                     v-model="menuCalendar"
@@ -250,7 +250,7 @@
                         v-bind="attrs"
                         v-on="on"
                       >
-                        <div>Выбрать дату</div>
+                        <div>Choose a date</div>
                         <div>
                           <v-icon>{{ mdiCalendarMonthOutline }}</v-icon>
                         </div>
@@ -264,10 +264,10 @@
                       />
                       <div class="d-flex justify-space-around date-range-wrap">
                         <div class="date-range-string">
-                          c {{ dates[0] }}
+                          from {{ dates[0] }}
                         </div>
                         <div class="date-range-string">
-                          по {{ dates[1] }}
+                          to {{ dates[1] }}
                         </div>
                       </div>
                       <div class="time-picker d-flex justify-space-around p-3">
@@ -286,7 +286,7 @@
                           small
                           @click="menuCalendar = false"
                         >
-                          Отменить
+                          Cancel
                         </v-btn>
                         <v-btn
                           depressed
@@ -298,7 +298,7 @@
                             setTimeFromPicker(dates, timeStart, timeFinish)
                           "
                         >
-                          Выбрать
+                          Select
                         </v-btn>
                       </div>
                     </div>
@@ -316,7 +316,7 @@
             :loading="loading"
             @click="launchSearch"
           >
-            <span class="action-btn-text">Поиск</span>
+            <span class="action-btn-text">Search</span>
             <v-icon class="action-btn-icon">
               {{ mdiMagnify }}
             </v-icon>
@@ -384,7 +384,7 @@ export default {
       mdiCalendarMonthOutline,
       mdiArrowLeftThick,
       mdiArrowRightThick,
-      timeRangeValue: 'За все время',
+      timeRangeValue: 'In all the time',
       menuCalendar: false,
       menuDropdown: false,
       dates: [],
@@ -392,11 +392,11 @@ export default {
       timeFinish: '00:00',
       searchTimeInterval: '',
       timeRanges: [
-        { text: 'Последние 60 минут', timeHours: 1 },
-        { text: 'Последние 4 часа', timeHours: 4 },
-        { text: 'Последние 24 часа', timeHours: 24 },
-        { text: 'Последние 7 дней', timeHours: 168 },
-        { text: 'Последние 30 дней', timeHours: 720 },
+        { text: 'Last 60 minutes', timeHours: 1 },
+        { text: 'Last 4 hours', timeHours: 4 },
+        { text: 'Last 24 hours', timeHours: 24 },
+        { text: 'Last 7 days', timeHours: 168 },
+        { text: 'Last 30 days', timeHours: 720 },
       ],
       cmOption: {
         tabSize: 4,
@@ -464,13 +464,13 @@ export default {
           this.search.parametrs.twf === 0
           && this.search.parametrs.twf === 0
         ) {
-          this.searchTimeInterval = 'за все время';
+          this.searchTimeInterval = 'in all the time';
         } else {
-          this.searchTimeInterval = `c ${
+          this.searchTimeInterval = `from ${
             new Intl.DateTimeFormat('ru', options).format(
               this.search.parametrs.tws * 1000,
             )
-          } по ${
+          } to ${
             new Intl.DateTimeFormat('ru', options).format(
               this.search.parametrs.twf * 1000,
             )}`;
@@ -487,7 +487,7 @@ export default {
     this.$set(this, 'search', JSON.parse(JSON.stringify(this.$store.getters.getReportSearch)));
   },
   mounted() {
-    document.title = 'EVA | Исследование данных';
+    document.title = 'EVA | Data research';
     if (this.search.original_otl !== '') {
       this.$store.commit('setShould', {
         idDash: 'reports',
@@ -585,7 +585,7 @@ export default {
         twfArr[3],
         twfArr[4],
       ).getTime() / 1000;
-      this.timeRangeValue = `c ${dates[0]} по ${dates[1]}`;
+      this.timeRangeValue = `from ${dates[0]} to ${dates[1]}`;
       this.setTwsTwf(tws, twf);
     },
     setTwsTwf(tws, twf) {
@@ -602,7 +602,7 @@ export default {
       this.menuDropdown = false;
     },
     sortDates() {
-      this.timeRangeValue = `c ${this.dates[1]} по ${this.dates[0]}`;
+      this.timeRangeValue = `from ${this.dates[1]} to ${this.dates[0]}`;
     },
     backInput() {
       // eslint-disable-next-line no-underscore-dangle

@@ -41,7 +41,7 @@ class MapClass {
           return acc;
         }, Infinity) + num
       );
-      if (mode[0] === 'Мониторинг') {
+      if (mode[0] === 'Monitoring') {
         const newLine = turf.lineSlice(
           route[0],
           [e.latlng.lat, e.latlng.lng],
@@ -254,7 +254,7 @@ class MapClass {
         const img = L.DomUtil.create('div');
         img.innerHTML = `
               <div>
-                <p>Легенда</p>
+                <p>The legend</p>
                 <ul class="fa-ul">
                 ${generatedListHTML}
                 </ul>

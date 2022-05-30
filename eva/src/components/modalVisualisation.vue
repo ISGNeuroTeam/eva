@@ -24,7 +24,7 @@
               {{ settingsIcon }}
             </v-icon>
           </template>
-          <span>Настройки</span>
+          <span>Settings</span>
         </v-tooltip>
         <v-tooltip
           bottom
@@ -41,7 +41,7 @@
               {{ closeIcon }}
             </v-icon>
           </template>
-          <span>закрыть</span>
+          <span>Close</span>
         </v-tooltip>
       </v-card-title>
       <v-card-text>

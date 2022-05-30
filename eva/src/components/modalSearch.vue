@@ -55,7 +55,7 @@
           class="delete-btn"
           @click="startDS"
         >
-          Подтвердить
+          Confirm
         </v-btn>
         <v-btn
           small
@@ -63,7 +63,7 @@
           class="delete-btn"
           @click="cancelModal"
         >
-          Отмена
+          Cancel
         </v-btn>
       </v-card-actions>
     </v-card>

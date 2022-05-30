@@ -22,7 +22,7 @@
               <v-text-field
                 v-model="element.title"
                 clearable
-                placeholder="Введите название"
+                placeholder="Enter a name"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -35,7 +35,7 @@
               />
               <v-select
                 v-model="element.tool"
-                label="Визуализации"
+                label="Visualizations"
                 :items="tools"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
@@ -46,7 +46,7 @@
               />
               <v-select
                 v-model="element.search"
-                label="Источники данных"
+                label="Data sources"
                 :items="searches"
                 :color="theme.$primary_button"
                 :style="{ color: theme.$main_text, fill: theme.$main_text }"
@@ -63,7 +63,7 @@
               <v-text-field
                 v-model="element.title"
                 clearable
-                placeholder="Введите название ссылки"
+                placeholder="Enter the link name"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -77,7 +77,7 @@
               <v-text-field
                 v-model="element.url"
                 clearable
-                placeholder="Введите текст ссылки"
+                placeholder="Enter the link text"
                 :color="theme.$primary_button"
                 :style="{
                   color: theme.$main_text,
@@ -105,7 +105,7 @@
                   <v-icon>{{ delete_icon }}</v-icon>
                 </v-btn>
               </template>
-              <span>Удалить</span>
+              <span>Delete</span>
             </v-tooltip>
             <v-tooltip
               bottom
@@ -125,7 +125,7 @@
                   </v-icon>
                 </v-btn>
               </template>
-              <span>Перетащить</span>
+              <span>Drag and drop</span>
             </v-tooltip>
           </div>
         </div>
@@ -136,7 +136,7 @@
         v-model="val"
         :color="theme.$primary_button"
         :style="{ color: theme.$main_text, fill: theme.$main_text }"
-        placeholder="Выберите тип события"
+        placeholder="Select the type of event"
         class="subnumber"
         outlined
         dense
@@ -149,7 +149,7 @@
         class="add-btn"
         @click="addToList(val)"
       >
-        Добавить
+        Add
       </v-btn>
     </div>
   </div>
@@ -172,19 +172,19 @@ export default {
       type: Array,
       default: () => [
         {
-          text: 'Внешняя ссылка (новая вкладка)',
+          text: 'External link (new tab)',
           value: '_blank',
         },
         {
-          text: 'Внешняя ссылка (новое окно)',
+          text: 'External link (new window)',
           value: 'window',
         },
         {
-          text: 'Внешняя ссылка (в той же вкладке)',
+          text: 'External link (in the same tab)',
           value: '_self',
         },
         {
-          text: 'Всплывающее окно с визуализацией',
+          text: 'Popup window with visualization',
           value: 'modal',
         },
       ],

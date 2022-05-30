@@ -23,7 +23,7 @@
             class="download-btn-text"
             :style="{ color: theme.$main_text }"
           >
-            Скачать
+            Download
           </span>
         </v-btn>
       </template>
@@ -39,7 +39,7 @@
             >
               {{ mdiFileOutline }}
             </v-icon>
-            Отчет
+            The report
           </div>
           <div>
             <v-btn
@@ -72,7 +72,7 @@
                 class="download-btn-text"
                 :style="{ color: theme.$main_text }"
               >
-                Скачать xlsx
+                Download XLSX
               </span>
             </v-btn>
             <v-btn
@@ -90,7 +90,7 @@
                 class="download-btn-text"
                 :style="{ color: theme.$main_text }"
               >
-                Скачать CSV
+                Download CSV
               </span>
             </v-btn>
           </template>

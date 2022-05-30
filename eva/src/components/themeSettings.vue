@@ -19,14 +19,14 @@
         class="theme-choise-btn"
         @click="setTheme('light')"
       >
-        Светлая тема
+        Light theme
       </v-btn>
       <v-btn
         :color="theme.$primary_button"
         class="theme-choise-btn"
         @click="setTheme('dark')"
       >
-        Тёмная тема
+        Dark theme
       </v-btn>
     </div>
   </v-navigation-drawer>

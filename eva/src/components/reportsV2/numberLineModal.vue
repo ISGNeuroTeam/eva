@@ -7,7 +7,7 @@
     <div class="b-number-line">
       <div class="d-flex justify-space-between">
         <div class="b-number-line__title">
-          Количество отображаемых строк
+          Number of displayed lines
         </div>
         <v-icon
           class="b-number-line__icon"
@@ -18,7 +18,7 @@
         </v-icon>
       </div>
       <div class="b-number-line__subtitle">
-        Выберите количество отображаемых строк в окне запроса до появления внутреннего скролла
+        Select the number of lines to display in the query window before the internal scroll appears
       </div>
       <v-text-field
         v-model="number"
@@ -26,7 +26,7 @@
         :style="{ color: theme.$main_text }"
         outlined
         :error-messages="error"
-        label="Введите значение"
+        label="Enter the value"
         type="number"
         hide-details
         class="b-number-line__input"
@@ -45,14 +45,14 @@
           class="b-number-line__btn"
           @click="close"
         >
-          Отменить
+          Cancel
         </v-btn>
         <v-btn
           :color="theme.$primary_button"
           class="b-number-line__btn b-number-line__btn--save"
           @click="save"
         >
-          Сохранить
+          Save
         </v-btn>
       </div>
     </div>
@@ -104,7 +104,7 @@ export default {
     },
     changeInput() {
       if (this.number > 100 || this.number <= 0) {
-        this.error = 'Число должно быть больше 0 и не должно быть больше 100';
+        this.error = 'The number must be greater than 0 and must not be greater than 100';
         this.msg = true;
       } else {
         this.error = '';

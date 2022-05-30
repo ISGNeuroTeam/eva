@@ -17,7 +17,7 @@
           >
             {{ mdiPlus }}
           </v-icon>
-          <span class="scale-btn-text">Увеличить</span>
+          <span class="scale-btn-text">Increase</span>
         </v-btn>
         <v-btn
           class="scale-btn"
@@ -31,7 +31,7 @@
           >
             {{ mdiMinus }}
           </v-icon>
-          <span class="scale-btn-text">Уменьшить</span>
+          <span class="scale-btn-text">Decrease</span>
         </v-btn>
         <v-btn
           class="scale-btn"
@@ -45,7 +45,7 @@
           >
             {{ mdiRefresh }}
           </v-icon>
-          <span class="scale-btn-text">Исходный вид</span>
+          <span class="scale-btn-text">Initial view</span>
         </v-btn>
       </div>
       <v-menu
@@ -120,12 +120,12 @@ export default {
       },
       numberInTimeline: 25,
       menuDropdown: false,
-      select: { text: 'Колонка (1 день)', value: 'day' },
+      select: { text: 'Column (1 day)', value: 'day' },
       periodItemsSelect: [
-        { text: 'Колонка (1 мин.)', value: 'min' },
-        { text: 'Колонка (1 час)', value: 'hour' },
-        { text: 'Колонка (1 день)', value: 'day' },
-        { text: 'Колонка (1 месяц)', value: 'month' },
+        { text: 'Column (1 min.)', value: 'min' },
+        { text: 'Column (1 hour)', value: 'hour' },
+        { text: 'Column (1 day)', value: 'day' },
+        { text: 'Column (1 month)', value: 'month' },
       ],
       mdiRefresh,
       mdiMagnify,
@@ -206,7 +206,7 @@ export default {
       if (this.$refs.chart) {
         this.renderSVG(dataset);
       } else {
-        console.error('элемент для отрисовки таймлайна не найдет');
+        console.error('element to draw the time line will not find');
       }
     },
     renderSVG(dataset) {
@@ -273,7 +273,7 @@ export default {
         .attr('height', (d) => height - marge.top - marge.bottom - (d.value === 0 || yScale(d.value) < 49 ? yScale(d.value) : 48))
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
-          tooltip.html(`Событий (${d.value})<br>${d.time}`);
+          tooltip.html(`Events  (${d.value})<br>${d.time}`);
           tooltip.style('display', 'block');
           return tooltip.style('visibility', 'visible');
         })
