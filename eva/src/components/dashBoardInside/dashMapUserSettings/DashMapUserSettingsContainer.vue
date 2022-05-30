@@ -6,6 +6,59 @@
     >
       <v-row class="ma-0 justify-end">
         <v-menu
+          v-if="options.mode[0] === 'Мониторинг'"
+          v-model="toggleSelectPipeline"
+          max-width="220"
+          max-height="198"
+          nudge-top="-25px"
+          :close-on-content-click="false"
+        >
+          <template v-slot:activator="{ on:menu }">
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
+                 background: ${theme.$secondary_bg};
+                 color: ${theme.$main_text};
+                 pointer-events: auto;
+                 margin-right: 30px
+                 `"
+                class="med-btn"
+                v-on="menu"
+                @click="toggleSelectPipeline = !toggleSelectPipeline"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiLayers }}
+                </v-icon>
+                <span class="med-btn__text">
+                  Параметры трубопровода
+                </span>
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+            </div>
+          </template>
+          <div
+            :style="`background: ${theme.$secondary_bg}; pointer-events: all`"
+          >
+            <div
+              v-for="(item, i) in pipeline"
+              :key="i"
+              class="med-group"
+            >
+              <v-checkbox
+                v-model="pipelineParameters"
+                :value="item"
+                :label="item.name"
+                class="med-checkbox"
+                multiple
+                @change="changePipeline($event)"
+              />
+            </div>
+          </div>
+        </v-menu>
+        <v-menu
           v-model="toggleSelect"
           z-index="1"
         >
@@ -313,7 +366,6 @@
 
 <script>
 import {
-  mdiFormatListBulletedSquare,
   mdiSettings,
   mdiLayers,
   mdiClipboardText,
@@ -343,40 +395,11 @@ export default {
       toggleSelect: false,
       mode: ['Мониторинг', 'Сравнение', 'Аналитика', 'Поиск', 'Режим 5'],
       mdiSettings,
-      mdiList: mdiFormatListBulletedSquare,
       mdiLayers,
       mdiClipboardText,
       mdiChevronDown,
       mdiMenu,
-      dialog: false,
       base_svg_url: `${window.location.origin}/svg/`,
-      currentTile: {},
-      tileLayers: [
-        {
-          name: 'Заданная в настройках',
-          tile: [],
-        },
-        {
-          name: 'Google спутник',
-          tile: [
-            'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-            {
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-              attribution: '<a http="google.ru" target="_blank">Google</a>',
-            },
-          ],
-        },
-        {
-          name: 'Google карты',
-          tile: [
-            'http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
-            {
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-              attribution: '<a http="google.ru" target="_blank">Google</a>',
-            },
-          ],
-        },
-      ],
       options: {
         selected: 'яндекс',
         selectedLayer: '',
@@ -391,6 +414,25 @@ export default {
       },
       localLayerList: [],
       toggleSelectLayer: false,
+      toggleSelectPipeline: false,
+      pipeline: [
+        {
+          type: 'P',
+          name: 'Давление',
+        },
+        {
+          type: 'S',
+          name: 'Скорость потока',
+        },
+        {
+          type: 'D',
+          name: 'Диаметр',
+        },
+        {
+          type: 'L',
+          name: 'Длина',
+        },
+      ],
     };
   },
   computed: {
@@ -421,6 +463,18 @@ export default {
         }]);
       },
     },
+    pipelineParameters: {
+      get() {
+        return this.dashFromStore?.options?.pipelineParameters || [];
+      },
+      set(val) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pipelineParameters',
+          value: val,
+        }]);
+      },
+    },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
     },
@@ -431,34 +485,11 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idElement });
       }
-
-      if (!this.dashFromStore?.options.pinned) {
+      if (!this.dashFromStore?.options.pipelineParameters) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
+          prop: 'pipelineParameters',
+          value: this.pipeline,
         }]);
       }
       return this.dashFromStore.options;
@@ -498,6 +529,11 @@ export default {
       this.options = JSON.parse(JSON.stringify(options));
     }
     this.localLayerList = JSON.parse(JSON.stringify(this.layerList));
+    if (!this.getOptions.pipelineParameters && this.options.mode[0] === 'Мониторинг') {
+      this.map.options.mode = this.options.mode;
+      this.options.pipelineParameters = this.pipelineParameters;
+      this.map.options.pipelineParameters = this.pipelineParameters;
+    }
   },
   methods: {
     change(e) {
@@ -563,7 +599,8 @@ export default {
         prop: 'mode',
         value: this.options.mode,
       }]);
-      if (this.options.search) {
+      this.map.options.mode = this.options.mode;
+      if (this.options.search && this.options.mode[0] === 'Мониторинг') {
         this.$emit('updatePipeDataSource', this.options.search);
       }
     },
@@ -602,51 +639,8 @@ export default {
       });
     },
 
-    setOptions() {
-      // отправляем настройки в хранилище
-      if (!this.options.level) {
-        this.options.level = 1;
-      }
-
-      if (
-        typeof this.options.timeFormat !== 'undefined'
-          && this.options.timeFormat == null
-      ) {
-        this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
-      }
-      if (typeof this.options.size !== 'undefined') {
-        if (this.options.size == null) {
-          this.options.size = '100px';
-        } else if (String(this.options.size).indexOf('px') === -1) {
-          this.options.size = `${this.options.size}px`;
-        }
-      }
-      // let options = {...{},...this.options};
-      if (this.element.indexOf('csvg') !== -1) {
-        this.options.tooltip = this.tooltip;
-      }
-      if (this.element.indexOf('piechart') !== -1) {
-        this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation),
-        );
-        this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme === 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
-          this.colorsPie.theme = this.colorsPie.nametheme;
-        }
-        this.options.themes = this.themes;
-      }
-      if (this.element.indexOf('multiLine') !== -1) {
-        const updateMetrics = this.metrics.map((item) => JSON.parse(JSON.stringify(item)));
-        this.$set(this.options, 'metrics', updateMetrics);
-      }
-      this.$store.commit('setOptions', {
-        idDash: this.idDash,
-        id: this.element,
-        options: this.options,
-        titles: this.tableTitles,
-      });
-      this.cancelModal();
+    changePipeline(parameters) {
+      this.map.options.pipelineParameters = parameters;
     },
   },
 };

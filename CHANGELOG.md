@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Adding layers to the map
+- Add pipeline parameters
 
 ## [1.91.0]
 
