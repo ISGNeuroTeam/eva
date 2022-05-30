@@ -464,8 +464,6 @@ export default {
       };
     },
 
-    // @todo: develop
-
     openSettings() {
       this.isSettingsComponentOpen = true;
     },

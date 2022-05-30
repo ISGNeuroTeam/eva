@@ -106,14 +106,27 @@
                               label="Выберите цвет" persistent-placeholder
                               dense outlined hide-details
                           />-->
-                          <div @dblclick="colorPickerInputChange">
+                          <div
+                             @dblclick="colorPickerInputChange"
+                             style="position: relative;">
+                            <v-tooltip right>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    size="14px"
+                                    style="position:absolute;z-index: 2;right: -15px;"
+                                >{{mdiHelpCircleOutline }}</v-icon>
+                              </template>
+                              <span>Двойным кликом переключается режим выбора цвета</span>
+                            </v-tooltip>
                             <v-color-picker
                                 v-model="metric.color"
                                 dot-size="10"
                                 :hide-canvas="!colorPickerInputMode"
                                 mode="hexa"
                                 :hide-inputs="!colorPickerInputMode"
-                                width="250"
+                                width="200"
                                 canvas-height="100"
                             ></v-color-picker>
                           </div>
@@ -312,7 +325,7 @@
                 <div class="col">
                   <div
                     class="v-label"
-                    style="font-size: 12px;margin-top: -8px;">
+                    style="font-size: 12px;margin-top: -10px;margin-bottom: 2px;">
                     Градус наклона подписей
                   </div>
                   <v-btn-toggle
@@ -347,6 +360,30 @@
                       min="1"
                       max="99"
                       class="mt-0 mr-1"
+                      hide-details dense
+                  ></v-slider>
+                </div>
+              </div>
+              <div class="row mt-0">
+                <div class="col-8 py-0">
+                  <v-checkbox
+                      v-model="xAxis.ticksEnabled"
+                      :label="`Частота подписей оси X: ${xAxis.ticks}`"
+                      persistent-placeholder
+                      dense outlined hide-details
+                      color="blue"
+                      class="mt-3"
+                  />
+                </div>
+                <div class="col-4">
+                  <v-slider
+                      v-model="xAxis.ticks"
+                      :disabled="!xAxis.ticksEnabled"
+                      color="blue"
+                      min="1"
+                      max="100"
+                      class="mt-0 mr-1"
+                      hide-details
                   ></v-slider>
                 </div>
               </div>
@@ -391,9 +428,8 @@ import {
   mdiChevronDown,
   mdiChartBellCurve,
   mdiChartBar,
+  mdiHelpCircleOutline,
 } from '@mdi/js';
-import { length } from '@turf/turf';
-// eslint-disable-next-line camelcase
 
 export default {
   name: 'dashChartSettings',
@@ -471,6 +507,7 @@ export default {
     mdiChevronDown,
     mdiChartBellCurve,
     mdiChartBar,
+    mdiHelpCircleOutline,
     /** Local settings object based on receivedSettings props. */
     settings: {},
     isChanged: false,
@@ -487,6 +524,8 @@ export default {
       textRotate: -45, // 45, -45, 90, -90
       textTranslate: [-10, 0],
       textAnchor: 'end', // start, end
+      ticksEnabled: false,
+      ticks: 10,
     },
     colorPickerInputMode: false,
     openXAxisPanel: null,

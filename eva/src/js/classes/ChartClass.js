@@ -105,10 +105,11 @@ export default class ChartClass {
 
   createXAxis() {
     const { height } = this.box;
+    const { type, nice, ticksEnabled, ticks } = this.options.xAxis;
     const { options, maxYLeftAxisWidth } = this;
     const barWidth = this.bandX?.bandwidth() || 30;
     const scaleFuncName = ChartClass
-      .capitalizeFirstLetter(options.xAxis.type, 'scale?');
+      .capitalizeFirstLetter(type, 'scale?');
 
     this.xMinMax = [
       d3.min(this.data.map((item) => item[this.xMetric])),
@@ -120,8 +121,8 @@ export default class ChartClass {
       .domain(this.xMinMax)
       .range([0, this.chartWidth]);
 
-    if (xFun.nice && options.xAxis.nice !== undefined) {
-      xFun.nice(options.xAxis.nice);
+    if (xFun.nice && nice !== undefined) {
+      xFun.nice(nice);
     } else {
       const rangeOffset = (barWidth / 2) * 1.5;
       xFun.range([rangeOffset, this.chartWidth - rangeOffset]);
@@ -142,8 +143,7 @@ export default class ChartClass {
       .call(
         d3.axisBottom(this.x)
           .tickFormat(this.xTickFormat.bind(this))
-          // @todo: ticks 5 ?
-          .ticks(5),
+          .ticks(ticksEnabled ? ticks : null),
       );
 
     // rotate x axis text
@@ -245,7 +245,6 @@ export default class ChartClass {
       this.y[metric.name] = d3.scaleLinear()
         .domain([minYBarMetric, maxYBarMetric])
         .range([groupHeight, 0])
-        // @todo: nice
         .nice(metric.nice);
       yGroupItem
         .call(
@@ -275,7 +274,7 @@ export default class ChartClass {
       this.y[metric.name] = d3.scaleLinear()
         .domain([minYMetric, maxYMetric])
         .range([groupHeight, 0])
-        .nice(metric.nice); // @todo: nice
+        .nice(metric.nice);
 
       const offset = (axisSide === 'Right')
         ? xOffset[axisSide]
@@ -449,7 +448,7 @@ export default class ChartClass {
           this.options.xAxis.textAnchor = 'start';
           break;
         case -90:
-          this.options.xAxis.textTranslate = [14, 8];
+          this.options.xAxis.textTranslate = [-12, 10];
           this.options.xAxis.textAnchor = 'end';
           break;
         case -45:
@@ -463,7 +462,7 @@ export default class ChartClass {
     const metrics = ChartClass.metricsToMetricsByGroup(metricsByGroup);
     this.metrics = metrics.map((item, n) => ({
       ...item,
-      n, // @todo: for del?
+      n,
       type: item.type || 'line',
       color: (item.color || color(item.name)),
     }));
@@ -856,6 +855,7 @@ export default class ChartClass {
     const metricByKeys = this.metricByKeys();
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
 
+    // for debug
     /*chartGroup.append('g')
       .attr('transform', `translate(0,${groupHeight})`)
       .call(d3.axisBottom(this.bandX).ticks(groups.length))
@@ -867,10 +867,7 @@ export default class ChartClass {
     const stackedData = d3.stack()
       .keys(groupBarplotMetrics.map((d) => d.name))(this.data);
 
-    // @todo; for offset charts
     const barWidth = this.bandX.bandwidth();
-    // @todo; metricName = 0 is bad
-    const metricName = groupBarplotMetrics[0].name;
 
     chartGroup.append('g')
       .selectAll('g')
@@ -888,17 +885,21 @@ export default class ChartClass {
       .append('rect')
       .attr('x', (d) => this.bandX(d.data[this.xMetric]))
       .attr('y', (d) => {
+        const { metric } = d;
         let val = d[1];
         if (barplotType === 'overlay') {
           val -= d[0];
         }
         if (val < 0) {
-          const barHeight = this.y[metricName](d[0]) - this.y[metricName](d[1]);
-          return this.y[metricName](val) + barHeight;
+          const barHeight = this.y[metric.name](d[0]) - this.y[metric.name](d[1]);
+          return this.y[metric.name](val) + barHeight;
         }
-        return this.y[metricName](val);
+        return this.y[metric.name](val);
       })
-      .attr('height', (d) => Math.abs(this.y[metricName](d[0]) - this.y[metricName](d[1])))
+      .attr('height', (d) => {
+        const { metric } = d;
+        return Math.abs(this.y[metric.name](d[0]) - this.y[metric.name](d[1]));
+      })
       .attr('width', barWidth)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d[1] - d[0]]))
       .on('mouseenter', () => this.showTooltip.bind(this))
@@ -907,10 +908,11 @@ export default class ChartClass {
         this.hideLineDot();
       })
       .on('mousemove', (d) => {
+        const { metric } = d;
         const lineXPos = this.bandX(d.data[this.xMetric]) + barWidth / 2;
-        let lineYPos = this.y[metricName](d[1]);
+        let lineYPos = this.y[metric.name](d[1]);
         if (barplotType === 'overlay') {
-          lineYPos = this.y[metricName](d[1] - d[0]);
+          lineYPos = this.y[metric.name](d[1] - d[0]);
         }
         this.setLineDotPosition(lineXPos, lineYPos, num);
 
