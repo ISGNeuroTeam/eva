@@ -97,6 +97,11 @@
             v-if="activeSettingModal"
             :color-from="theme"
             :id-dash-from="idDash"
+            :data-page-from="page"
+          />
+          <modal-visualisation
+            :mode="mode"
+            :get-element-data="getElementData"
           />
         </v-container>
       </v-main>
@@ -258,8 +263,11 @@
 </template>
 
 <script>
+import ModalVisualisation from './modalVisualisation.vue';
+
 export default {
   name: 'MainTitle',
+  components: { ModalVisualisation },
   data() {
     return {
       page: 'dash',

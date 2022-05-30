@@ -131,44 +131,18 @@
                   {{ mdiChevronDown }}
                 </v-icon>
               </v-btn>
-              <!--              <v-select-->
-              <!--                v-model="options.layer"-->
-              <!--                :menu-props="{-->
-              <!--                  value:toggleSelectLayer,-->
-              <!--                  maxWidth: 220,-->
-              <!--                  maxHeight: 198-->
-              <!--                }"-->
-              <!--                append-outer-icon="mdiLayers"-->
-              <!--                :style="`-->
-              <!--                  visibility:hidden;-->
-              <!--                  background: ${theme.$secondary_bg};-->
-              <!--                  position: absolute;-->
-              <!--                  max-width: 220px`"-->
-              <!--                :items="layerList"-->
-              <!--                label="Слои"-->
-              <!--                item-text="name"-->
-              <!--                multiple-->
-              <!--              >-->
-              <!--                <template v-slot:append-item>-->
-              <!--                  <v-icon :style="{ color: theme.$main_text }">-->
-              <!--                    {{ mdiLayers }}-->
-              <!--                  </v-icon>-->
-              <!--                </template>-->
-              <!--              </v-select>-->
             </div>
           </template>
-          <div
+          <draggable
+            v-model="localLayerList"
+            handle=".burger"
             :style="`background: ${theme.$secondary_bg}; pointer-events: all`"
-            @drop="onDrop($event,)"
-            @dragenter.prevent
-            @dragover.prevent
+            @change="onDrop"
           >
             <div
               v-for="(item, i) in localLayerList"
               :key="i"
-              draggable="true"
               class="med-group"
-              @dragstart="startDrag($event, item)"
             >
               <v-checkbox
                 v-model="item.isActive"
@@ -180,13 +154,14 @@
                   <v-icon
                     :color="theme.$main_text"
                     size="18"
-                  >
-                    {{ mdiMenu }}
-                  </v-icon>
+                    class="burger"
+                    style="cursor: move"
+                    v-text="mdiMenu"
+                  />
                 </template>
               </v-checkbox>
             </div>
-          </div>
+          </draggable>
         </v-menu>
         <v-btn
           rounded
@@ -365,6 +340,7 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable';
 import {
   mdiSettings,
   mdiLayers,
@@ -376,6 +352,9 @@ import 'leaflet/dist/leaflet.css';
 
 export default {
   name: 'DashMapUserSettingsContainer',
+  components: {
+    draggable,
+  },
   props: {
     idElement: {
       type: String,
@@ -565,23 +544,9 @@ export default {
         }
       });
     },
-    startDrag(e, item) {
-      e.dataTransfer.dorpEffect = 'move';
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('itemDrops', item.name);
-    },
-    onDrop(e) {
-      const itemDrops = e.dataTransfer.getData('itemDrops');
-      const element = this.layerList.find((item) => item.name === itemDrops);
-      const indexElement = this.layerList.indexOf(element);
-      const elementTo = this.layerList.find((item) => item.name === e.target.innerText);
-      const indexElementTo = this.layerList.indexOf(elementTo);
-      if (indexElementTo > -1 && indexElement > -1) {
-        this.localLayerList.splice(indexElement, 1);
-        this.localLayerList.splice(indexElementTo, 0, element);
-        this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
-        this.changeZIndex();
-      }
+    onDrop() {
+      this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+      this.changeZIndex();
     },
     changeZIndex() {
       this.layerList.forEach((item, i) => {
@@ -703,7 +668,7 @@ export default {
       text-transform: capitalize
       font-size: 18px
     &__text
-        margin: 0 8px 0 6px
+      margin: 0 8px 0 6px
 
 .map-user-settings__input
   .v-input__slot
