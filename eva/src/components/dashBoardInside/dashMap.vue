@@ -286,6 +286,7 @@ export default {
         idDash: this.idDash,
         should: true,
         error: false,
+        name: this.element,
       });
 
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${event.sid}`);
@@ -302,6 +303,7 @@ export default {
           idDash: this.idDash,
           should: false,
           error: true,
+          name: this.element,
         });
       } else {
         // если все нормально
@@ -319,6 +321,7 @@ export default {
             idDash: this.idDash,
             should: false,
             error: false,
+            name: this.element,
           });
         });
       }
@@ -534,6 +537,12 @@ export default {
           event: 'mouseout',
           callback: () => {
             this.map.scrollWheelZoom();
+          },
+        },
+        {
+          event: 'click',
+          callback: (e) => {
+            console.log(e);
           },
         },
       ]);
