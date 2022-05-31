@@ -2,8 +2,8 @@
 
 import Vue from 'vue';
 import Vuex from 'vuex';
-// это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import createPersistedState from 'vuex-persistedstate';
+// это подключаем чтобы после перезагрузки страницы он сохранял состояние
 
 import store from './store'; // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import auth from './storeAuth/store';
@@ -1937,14 +1937,6 @@ export default new Vuex.Store({
     dataResearch,
     notify,
   },
-  plugins: [createPersistedState({
-    filter: (elem) => {
-      if (elem.type === 'setModalSettings') {
-        delete elem.payload.status;
-      }
 
-      console.log(elem);
-      return elem;
-    },
-  })],
+  plugins: [createPersistedState()],
 });

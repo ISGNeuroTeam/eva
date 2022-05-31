@@ -479,6 +479,26 @@ export default {
     },
   },
   async mounted() {
+    if (this.dashFromStore) {
+      const isSettingsOpen = this.dashFromStore
+        .modalSettings.status;
+      const isModalVisualisationOpen = this.dashFromStore
+        .visualisationModalData?.open;
+      if (isSettingsOpen) {
+        this.$store.commit('setModalSettings', {
+          idDash: this.idDash,
+          element: '',
+          status: false,
+        });
+      }
+      if (isModalVisualisationOpen) {
+        this.$store.commit('setVisualisationModalData', {
+          idDash: this.idDash,
+          data: {},
+        });
+      }
+    }
+
     await this.checkAlreadyDash();
     this.loadingDash = false;
     document.title = `EVA | ${this.dashFromStore.name}`;
