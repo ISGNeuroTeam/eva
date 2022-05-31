@@ -222,9 +222,6 @@ export default class ChartClass {
             up += val;
           } else {
             down += val;
-            // @todo: (develop) Negative values are not available in accumulation histograms
-            //this.warningMessage = 'Отрицательные значения недоступны на гистограммах накопления';
-            //throw new Error(this.warningMessage);
           }
         });
         if (up > maxYBarMetric) maxYBarMetric = up;
@@ -336,7 +333,12 @@ export default class ChartClass {
       if (barplotType === 'divided') {
         this.addDividedBarplots(num, groups, subgroups, groupHeight);
       } else {
-        this.addBarplots(num, groups, groupBarplotMetrics, groupHeight);
+        try {
+          this.addBarplots(num, groups, groupBarplotMetrics, groupHeight);
+        } catch (err) {
+          console.warn(err);
+          this.renderGroupError(num, err.message);
+        }
       }
       groupBarplotMetrics.forEach((metric) => {
         this.addZeroLine(chartGroup, metric);
@@ -887,6 +889,10 @@ export default class ChartClass {
       .attr('y', (d) => {
         const { metric } = d;
         let val = d[1];
+        if (barplotType === 'accumulation' && (val - d[0]) < 0) {
+          // @todo: (develop) Negative values are not available in accumulation histograms
+          throw new Error(`${metric.name}: Отрицательные значения недоступны на гистограммах накопления`);
+        }
         if (barplotType === 'overlay') {
           val -= d[0];
         }
@@ -1012,7 +1018,7 @@ export default class ChartClass {
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
             .attr('x', this.x.baseVal.value + 1)
-            .attr('y', this.y.baseVal.value + (d.value < 0 ? (this.height.baseVal.value - 2) : -2))
+            .attr('y', this.y.baseVal.value + (d.value < 0 ? (this.height.baseVal.value + 10) : -2))
             .attr('font-size', '11')
             .attr('pointer-events', 'none')
             .attr('text-anchor', 'start') // middle
@@ -1051,6 +1057,18 @@ export default class ChartClass {
       prev[cur.name] = cur;
       return prev;
     }, {});
+  }
+
+  renderGroupError(num, message) {
+    const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
+    chartGroup
+      .append('text')
+      .attr('fill', 'red')
+      .attr('font-size', '12px')
+      .attr('text-anchor', 'start')
+      .attr('x', 5)
+      .attr('y', 5)
+      .text(message);
   }
 
   /// static
