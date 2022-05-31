@@ -151,9 +151,11 @@ export default class ChartClass {
           .ticks(ticksEnabled ? ticks : null),
       );
 
+    const rotate = options.xAxis.textRotate ? ` rotate(${options.xAxis.textRotate})` : '';
+
     // rotate x axis text
     this.xAxis.selectAll('text')
-      .attr('transform', `translate(${options.xAxis.textTranslate}) rotate(${options.xAxis.textRotate})`) //
+      .attr('transform', `translate(${options.xAxis.textTranslate}) ${rotate}`) //
       .style('text-anchor', options.xAxis.textAnchor);
 
     // recalculate x axis height
@@ -259,15 +261,27 @@ export default class ChartClass {
     xOffset[axisPosition] += yGroupItem.node().getBBox().width;
 
     /// create Y axes
-    metrics.filter((metric) => metric.type === 'line').forEach((metric) => {
+    const linearMetrics = metrics.filter((metric) => metric.type === 'line');
+    linearMetrics.forEach((metric) => {
       const axisSide = metric.yAxisSide === 'right' ? 'Right' : 'Left';
 
-      const min = d3.min(this.data, (d) => d[metric.name]);
+      const extendMetrics = linearMetrics.filter(({ yAxisLink }) => yAxisLink === metric.name);
+
+      let min = d3.min(this.data, (d) => d[metric.name]);
+      let max = d3.max(this.data, (d) => d[metric.name]);
+      let addClassName = '';
+      extendMetrics.forEach((item) => {
+        const minExt = d3.min(this.data, (d) => d[item.name]);
+        const maxExt = d3.max(this.data, (d) => d[item.name]);
+        if (minExt < min) min = minExt;
+        if (maxExt > max) max = maxExt;
+        addClassName += ` axis-y-${item.n}`;
+      });
+
       const minYMetric = ChartClass.canBeNumber(metric.lowerBound) && +metric.lowerBound < min
         ? +metric.lowerBound
         : min;
 
-      const max = d3.max(this.data, (d) => d[metric.name]);
       const maxYMetric = ChartClass.canBeNumber(metric.upperBound) && metric.upperBound > max
         ? +metric.upperBound
         : max;
@@ -278,12 +292,16 @@ export default class ChartClass {
         .range([groupHeight, 0])
         .nice(metric.nice);
 
+      if (metric.yAxisLink) {
+        return;
+      }
+
       const offset = (axisSide === 'Right')
         ? xOffset[axisSide]
         : -xOffset[axisSide];
       const yGroup = yGroups[axisSide]
         .append('g')
-        .attr('class', `y${axisSide}Axis axis-y axis-y-${metric.n}`)
+        .attr('class', `y${axisSide}Axis axis-y axis-y-${metric.n} ${addClassName}`)
         .attr('transform', `translate(${offset},0)`)
         .call(
           d3[`axis${axisSide}`](this.y[metric.name])
@@ -705,14 +723,14 @@ export default class ChartClass {
       })
       .style('opacity', (d, i, elems) => +elems[i].classList.contains('dot-show'))
       .attr('cx', (d) => this.x(d[this.xMetric]))
-      .attr('cy', (d) => this.y[metric.name](d[metric.name]))
+      .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
       .attr('r', metric.dotSize)
       .attr('fill', metric.color)
       .on('click', (d) => this.clickChart([d[this.xMetric], d[metric.name]]))
       .on('mouseover', (d, i, elems) => {
         d3.select(elems[i]).style('opacity', 1);
         const lineXPos = this.x(d[this.xMetric]);
-        const lineYPos = this.y[metric.name](d[metric.name]);
+        const lineYPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
         this.setLineDotPosition(lineXPos, lineYPos, groupNum);
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * groupNum) + groupsTopOffset;
@@ -769,7 +787,7 @@ export default class ChartClass {
         return xPos;
       })
       .attr('y', (d) => {
-        let yPos = this.y[metric.name](d[metric.name]);
+        let yPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
         if (metric.type === 'barplot' && d[metric.name] < 0) {
           yPos += 15;
         }
@@ -778,9 +796,10 @@ export default class ChartClass {
   }
 
   addZeroLine(chartGroup, metric) {
-    const zeroHeight = this.y[metric.name](0);
-    const minHeight = this.y[metric.name](this.yMinMax[metric.name][0]);
-    const maxHeight = this.y[metric.name](this.yMinMax[metric.name][1]);
+    const yName = metric.yAxisLink || metric.name;
+    const zeroHeight = this.y[yName](0);
+    const minHeight = this.y[yName](this.yMinMax[metric.name][0]);
+    const maxHeight = this.y[yName](this.yMinMax[metric.name][1]);
     const strokeWidth = 0.5;
     if (zeroHeight < minHeight && zeroHeight > maxHeight) {
       chartGroup
@@ -828,7 +847,7 @@ export default class ChartClass {
           .style('stroke-dasharray', metric.strokeDasharray)
           .attr('d', d3.line()
             .x((d) => this.x(d[this.xMetric]))
-            .y((d) => this.y[metric.name](d[metric.name])));
+            .y((d) => this.y[metric.yAxisLink || metric.name](d[metric.name])));
 
         // add dots
         this.renderPeakDots(chartGroup, metric, height, num, line);
@@ -894,6 +913,7 @@ export default class ChartClass {
       .attr('x', (d) => this.bandX(d.data[this.xMetric]))
       .attr('y', (d) => {
         const { metric } = d;
+        const yName = metric.yAxisLink || metric.name;
         let val = d[1];
         if (barplotType === 'accumulation' && (val - d[0]) < 0) {
           // Negative values are not available in accumulation histograms
@@ -903,14 +923,15 @@ export default class ChartClass {
           val -= d[0];
         }
         if (val < 0) {
-          const barHeight = this.y[metric.name](d[0]) - this.y[metric.name](d[1]);
-          return this.y[metric.name](val) + barHeight;
+          const barHeight = this.y[yName](d[0]) - this.y[yName](d[1]);
+          return this.y[yName](val) + barHeight;
         }
-        return this.y[metric.name](val);
+        return this.y[yName](val);
       })
       .attr('height', (d) => {
         const { metric } = d;
-        return Math.abs(this.y[metric.name](d[0]) - this.y[metric.name](d[1]));
+        const yName = metric.yAxisLink || metric.name;
+        return Math.abs(this.y[yName](d[0]) - this.y[yName](d[1]));
       })
       .attr('width', barWidth)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d[1] - d[0]]))

@@ -60,6 +60,11 @@
                         <v-icon>
                           {{ open ? mdiChevronUp : mdiChevronDown }}
                         </v-icon>
+
+                        <span
+                          v-if="metric.yAxisLink"
+                          class="grey--text ml-2"
+                        >📎 {{ metric.yAxisLink }}</span>
                       </div>
                     </template>
                     <template v-slot:actions>
@@ -114,11 +119,6 @@
 
                       <div class="row my-1">
                         <div class="col">
-                          <!--                          <v-text-field
-                              v-model="metric.color"
-                              label="Выберите цвет" persistent-placeholder
-                              dense outlined hide-details
-                          />-->
                           <div
                             style="position: relative;"
                             @dblclick="colorPickerInputChange"
@@ -280,7 +280,7 @@
 
                       <div class="row my-1">
                         <div class="col">
-                          <v-autocomplete
+<!--                          <v-autocomplete
                             v-model="metric.yAxisSide"
                             :items="yAxisSideList"
                             :disabled="metric.type !== 'line'"
@@ -289,6 +289,28 @@
                             dense
                             outlined
                             hide-details
+                          />-->
+                          <v-autocomplete
+                            v-model="metric.yAxisLink"
+                            :items="metricLineList
+                              .filter(m => m.group === groupNumber
+                                && m.type === 'line'
+                                && !m.yAxisLink
+                                && m.name !== metric.name
+                                && metricLineList
+                                  .findIndex(m => m.yAxisLink === metric.name) === -1)
+                              .map(m => ({
+                                value: m.name,
+                                text: `📎 ${m.name}`,
+                              }))"
+                            :disabled="metric.type !== 'line'"
+                            label="Ось Y"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            no-data-text="Нет подходящих осей"
+                            clearable
                           />
                         </div>
                         <div class="col">
@@ -610,6 +632,7 @@ export default {
         return this.modalValue;
       },
       set(val) {
+        this.panelMetric = [];
         this.$emit('updateModalValue', val);
       },
     },
@@ -632,6 +655,19 @@ export default {
         xAxis: { ...this.xAxis },
       };
     },
+
+    metricLineList() {
+      const metrics = [];
+      this.metricsByGroup.forEach((group, nG) => {
+        group.forEach((metric) => {
+          metrics.push({
+            ...metric,
+            group: nG,
+          });
+        });
+      });
+      return metrics;
+    },
   },
   watch: {
     isOpen(val) {
@@ -653,7 +689,7 @@ export default {
   },
   methods: {
     save() {
-      console.log('[save] this.currentSettings', this.currentSettings);
+      this.panelMetric = [];
       this.$emit('save', { ...this.currentSettings });
       this.close(true);
     },
@@ -663,6 +699,7 @@ export default {
     },
 
     close() {
+      this.panelMetric = [];
       this.makeMetricsOrderList();
       this.$emit('close');
     },

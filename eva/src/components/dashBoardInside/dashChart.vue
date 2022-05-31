@@ -10,6 +10,7 @@
       class="muililine-new"
     >
       <v-icon
+        v-show="dataModeFrom"
         size="22"
         class="settings-icon"
         @click.stop="openSettings"
@@ -178,7 +179,7 @@ export default {
           ? 'linear' // linear, time, - log, point, band
           : 'time',
         timeFormat,
-        textRotate: xAxisCaptionRotate,
+        textRotate: +xAxisCaptionRotate || -45,
         barplotType: barplotstyle || 'divided',
       };
     },
@@ -390,7 +391,7 @@ export default {
       const {
         metricTypes = {},
         optionsColor = {},
-        metricsAxis = {},
+        // metricsAxis = {},
         yAxesBinding,
         color: optionColor = {},
         // eslint-disable-next-line camelcase
@@ -425,7 +426,8 @@ export default {
         color,
         name,
         type: isBarplot ? 'barplot' : 'line',
-        yAxisSide: (this.options.united && metricsAxis[name]) === 'right' ? 'right' : 'left',
+        // yAxisSide: (this.options.united && metricsAxis[name]) === 'right' ? 'right' : 'left',
+        yAxisSide: 'left',
         // eslint-disable-next-line no-nested-ternary
         lastDot: conclusion_count[name] || (isDataAlwaysShow ? 1 : (lastDot ? 0 : '')),
         // eslint-disable-next-line no-restricted-globals
