@@ -7,18 +7,14 @@
     scrollable
     :is-confirm="isChanged"
     :persistent="isChanged"
-    @cancelModal="close"
     :dark="isDarkTheme"
+    @cancelModal="close"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
         <span class="main-title">Настройка визуализации</span>
       </v-card-title>
       <v-card-text class="content groups-multiline-settings">
-<!--        <pre style="font-size: 9px;line-height: 1.1;">
-          {{ receivedSettings }}
-        </pre>-->
-
         <!-- Groups -->
         <div
           v-for="(_, groupNumber) in metricsByGroup"
@@ -32,7 +28,10 @@
             <v-divider :color="theme.$main_bg" />
 
             <!-- Metrics -->
-            <v-expansion-panels flat v-model="panelMetric[groupNumber]">
+            <v-expansion-panels
+              v-model="panelMetric[groupNumber]"
+              flat
+            >
               <draggable
                 v-model="metricsByGroup[groupNumber]"
                 class="v-item-group v-expansion-panels v-expansion-panels--flat"
@@ -42,14 +41,17 @@
                 @change="(changes) => changeMetricsOrder(groupNumber, changes)"
               >
                 <v-expansion-panel
-                    v-for="metric in metricsByGroup[groupNumber]"
-                    :key="metric.n"
-                    class="ma-0"
+                  v-for="metric in metricsByGroup[groupNumber]"
+                  :key="metric.n"
+                  class="ma-0"
                 >
                   <v-expansion-panel-header class="draggable-item panel-header">
                     <template v-slot:default="{ open }">
                       <div class="title-metric">
-                        <v-icon :color="metric.color" class="mr-1">
+                        <v-icon
+                          :color="metric.color"
+                          class="mr-1"
+                        >
                           {{ metric.type === 'barplot' ? mdiChartBar : mdiChartBellCurve }}
                         </v-icon>
                         {{ metric.title }}
@@ -62,11 +64,11 @@
                     </template>
                     <template v-slot:actions>
                       <v-icon
-                          class="draggable-burger"
-                          :color="theme.$main_border"
-                          style="cursor: move; transform: none;"
-                          v-text="mdiMenu"
-                          @click.stop
+                        class="draggable-burger"
+                        :color="theme.$main_border"
+                        style="cursor: move; transform: none;"
+                        @click.stop
+                        v-text="mdiMenu"
                       />
                     </template>
                   </v-expansion-panel-header>
@@ -74,143 +76,171 @@
                     <!-- forms -->
                     <div class="my-2">
                       <v-text-field
-                          v-model="metric.title"
-                          label="Название" persistent-placeholder
-                          placeholder="Введите название показателя"
-                          dense outlined hide-details
+                        v-model="metric.title"
+                        label="Название"
+                        persistent-placeholder
+                        placeholder="Введите название показателя"
+                        dense
+                        outlined
+                        hide-details
                       />
 
                       <div class="row my-1">
                         <div class="col">
                           <v-autocomplete
-                              v-model="metric.type" required
-                              :items="metricTypes"
-                              value="value"
-                              label="Тип графика" persistent-placeholder
-                              dense outlined hide-details
-                          ></v-autocomplete>
+                            v-model="metric.type"
+                            required
+                            :items="metricTypes"
+                            value="value"
+                            label="Тип графика"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                          />
                         </div>
                         <div class="col">
                           <v-text-field
-                              v-model="metric.unit" clearable
-                              label="Единица измерения" persistent-placeholder
-                              dense outlined hide-details
-                          ></v-text-field>
+                            v-model="metric.unit"
+                            clearable
+                            label="Единица измерения"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                          />
                         </div>
                       </div>
 
                       <div class="row my-1">
                         <div class="col">
-<!--                          <v-text-field
+                          <!--                          <v-text-field
                               v-model="metric.color"
                               label="Выберите цвет" persistent-placeholder
                               dense outlined hide-details
                           />-->
                           <div
-                             @dblclick="colorPickerInputChange"
-                             style="position: relative;">
+                            style="position: relative;"
+                            @dblclick="colorPickerInputChange"
+                          >
                             <v-tooltip right>
                               <template v-slot:activator="{ on, attrs }">
                                 <v-icon
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    size="14px"
-                                    style="position:absolute;z-index: 2;right: -15px;"
-                                >{{mdiHelpCircleOutline }}</v-icon>
+                                  v-bind="attrs"
+                                  size="14px"
+                                  style="position:absolute;z-index: 2;right: -15px;"
+                                  v-on="on"
+                                >
+                                  {{ mdiHelpCircleOutline }}
+                                </v-icon>
                               </template>
                               <span>Двойным кликом переключается режим выбора цвета</span>
                             </v-tooltip>
                             <v-color-picker
-                                v-model="metric.color"
-                                dot-size="10"
-                                :hide-canvas="!colorPickerInputMode"
-                                mode="hexa"
-                                :hide-inputs="!colorPickerInputMode"
-                                width="200"
-                                canvas-height="100"
-                            ></v-color-picker>
+                              v-model="metric.color"
+                              dot-size="10"
+                              :hide-canvas="!colorPickerInputMode"
+                              mode="hexa"
+                              :hide-inputs="!colorPickerInputMode"
+                              width="200"
+                              canvas-height="100"
+                            />
                           </div>
                         </div>
                         <div class="col">
                           <v-autocomplete
-                              v-model="metric.strokeWidth"
-                              :disabled="metric.type !== 'line'"
-                              :items="strokeWidthList"
-                              label="Толщина" persistent-placeholder
-                              dense outlined hide-details
-                          ></v-autocomplete>
+                            v-model="metric.strokeWidth"
+                            :disabled="metric.type !== 'line'"
+                            :items="strokeWidthList"
+                            label="Толщина"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                          />
                         </div>
                         <div class="col">
                           <v-autocomplete
-                              v-model="metric.strokeDasharray"
-                              :disabled="metric.type !== 'line'"
-                              :items="strokeDasharrayList"
-                              label="Тип линий" persistent-placeholder
-                              dense outlined hide-details />
+                            v-model="metric.strokeDasharray"
+                            :disabled="metric.type !== 'line'"
+                            :items="strokeDasharrayList"
+                            label="Тип линий"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                          />
                         </div>
                       </div>
 
                       <v-checkbox
-                          v-model="metric.hideLegend"
-                          label="Скрыть легенду" persistent-placeholder
-                          dense outlined hide-details
-                          color="blue"
+                        v-model="metric.hideLegend"
+                        label="Скрыть легенду"
+                        persistent-placeholder
+                        dense
+                        outlined
+                        hide-details
+                        color="blue"
                       />
-<!--                      <v-checkbox
-                          v-model="metric.hidePeakText"
-                          label="Скрыть подписи осей" persistent-placeholder
-                          dense outlined hide-details
-                          color="blue"
-                      />-->
                       <div class="row mt-0 mb-1">
                         <div class="col col-auto py-0">
                           <v-checkbox
-                              v-model="metric.showPeakDots"
-                              :disabled="metric.type !== 'line'"
-                              label="Отображать точки с данными" persistent-placeholder
-                              dense outlined hide-details
-                              color="blue"
+                            v-model="metric.showPeakDots"
+                            :disabled="metric.type !== 'line'"
+                            label="Отображать точки с данными"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            color="blue"
                           />
                         </div>
                         <div class="col py-0">
                           <v-slider
-                              v-model="metric.dotSize"
-                              color="blue"
-                              label="Размер"
-                              :disabled="!metric.showPeakDots || metric.type !== 'line'"
-                              min="2"
-                              max="18"
-                              thumb-label="always"
-                              class="ml-2"
-                              style="height: 20px;"
-                          ></v-slider>
+                            v-model="metric.dotSize"
+                            color="blue"
+                            label="Размер"
+                            :disabled="!metric.showPeakDots || metric.type !== 'line'"
+                            min="2"
+                            max="18"
+                            thumb-label="always"
+                            class="ml-2"
+                            style="height: 20px;"
+                          />
                         </div>
                         <div class="col col-12 py-0">
                           <div class="d-flex">
                             <v-checkbox
-                                class="d-inline-block"
-                                v-model="metric.showText"
-                                :disabled="!metric.showPeakDots && metric.type === 'line'"
-                                label="Отображение данных к точкам" persistent-placeholder
-                                dense outlined hide-details
-                                color="blue"
+                              v-model="metric.showText"
+                              class="d-inline-block"
+                              :disabled="!metric.showPeakDots && metric.type === 'line'"
+                              label="Отображение данных к точкам"
+                              persistent-placeholder
+                              dense
+                              outlined
+                              hide-details
+                              color="blue"
                             />
                             <v-btn-toggle
-                                v-model="metric.peakTextData"
-                                color="blue accent-6"
-                                class="d-inline checkbox-toggle-data"
-                                dense
+                              v-model="metric.peakTextData"
+                              color="blue accent-6"
+                              class="d-inline checkbox-toggle-data"
+                              dense
                             >
                               <v-btn
-                                :disabled="(!metric.showText || !metric.showPeakDots && metric.type === 'line') "
+                                :disabled="(!metric.showText
+                                  || !metric.showPeakDots && metric.type === 'line')"
                                 value="data"
-                                class="ma-0">
+                                class="ma-0"
+                              >
                                 Данные
                               </v-btn>
                               <v-btn
-                                :disabled="(!metric.showText || !metric.showPeakDots && metric.type === 'line') "
+                                :disabled="(!metric.showText
+                                  || !metric.showPeakDots && metric.type === 'line')"
                                 value="caption"
-                                class="ma-0">
+                                class="ma-0"
+                              >
                                 Подписи
                               </v-btn>
                             </v-btn-toggle>
@@ -221,22 +251,29 @@
                       <div class="row my-1">
                         <div class="col">
                           <v-autocomplete
-                              v-model="metric.zerosAfterDot"
-                              :disabled="(!metric.showPeakDots && metric.type === 'line') || !metric.showText"
-                              :items="zerosAfterDotList"
-                              label="Округление значений" persistent-placeholder
-                              dense outlined hide-details
+                            v-model="metric.zerosAfterDot"
+                            :disabled="(!metric.showPeakDots && metric.type === 'line')
+                              || !metric.showText"
+                            :items="zerosAfterDotList"
+                            label="Округление значений"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
                           />
                         </div>
                         <div class="col">
                           <v-text-field
-                              v-model="metric.lastDot"
-                              :disabled="!metric.showPeakDots"
-                              label="Вывод значений" persistent-placeholder
-                              placeholder="0 - last, 1 - every, 2, 3, 4, ..."
-                              type="number"
-                              min="0"
-                              dense outlined hide-details
+                            v-model="metric.lastDot"
+                            :disabled="!metric.showPeakDots"
+                            label="Вывод значений"
+                            persistent-placeholder
+                            placeholder="0 - last, 1 - every, 2, 3, 4, ..."
+                            type="number"
+                            min="0"
+                            dense
+                            outlined
+                            hide-details
                           />
                         </div>
                       </div>
@@ -244,47 +281,59 @@
                       <div class="row my-1">
                         <div class="col">
                           <v-autocomplete
-                              v-model="metric.yAxisSide"
-                              :items="yAxisSideList"
-                              :disabled="metric.type !== 'line'"
-                              label="Ось Y" persistent-placeholder
-                              dense outlined hide-details
+                            v-model="metric.yAxisSide"
+                            :items="yAxisSideList"
+                            :disabled="metric.type !== 'line'"
+                            label="Ось Y"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
                           />
                         </div>
                         <div class="col">
                           <v-text-field
                             v-model="metric.lowerBound"
                             :disabled="metric.type === 'barplot'"
-                            type="number" clearable
+                            type="number"
+                            clearable
                             :max="metric.upperBound"
-                            label="Нижняя граница" persistent-placeholder
-                            dense outlined hide-details
+                            label="Нижняя граница"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
                           />
                         </div>
                         <div class="col">
                           <v-text-field
-                              v-model="metric.upperBound"
-                              :disabled="metric.type === 'barplot'"
-                              type="number" clearable
-                              :min="metric.lowerBound"
-                              label="Верхняя граница" persistent-placeholder
-                              dense outlined hide-details
+                            v-model="metric.upperBound"
+                            :disabled="metric.type === 'barplot'"
+                            type="number"
+                            clearable
+                            :min="metric.lowerBound"
+                            label="Верхняя граница"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
                           />
                         </div>
                       </div>
-
                     </div>
                     <!-- /forms -->
                   </v-expansion-panel-content>
                 </v-expansion-panel>
               </draggable>
             </v-expansion-panels>
-
           </div>
         </div>
 
         <!-- X axis settings -->
-        <v-expansion-panels flat v-model="openXAxisPanel">
+        <v-expansion-panels
+          v-model="openXAxisPanel"
+          flat
+        >
           <v-expansion-panel class="ma-0">
             <v-expansion-panel-header class="draggable-item panel-header">
               <div class="text-uppercase v-card__subtitle pa-0 text-secondary">
@@ -297,101 +346,125 @@
               <div class="row">
                 <div class="col-6">
                   <v-select
-                      v-model="xAxis.type"
-                      label="Тип оси Х" persistent-placeholder
-                      dense outlined hide-details
-                      :items="xAxisTypes"
-                      value="value"
+                    v-model="xAxis.type"
+                    label="Тип оси Х"
+                    persistent-placeholder
+                    dense
+                    outlined
+                    hide-details
+                    :items="xAxisTypes"
+                    value="value"
                   />
                 </div>
                 <div class="col-6">
                   <v-select
-                      v-model="xAxis.barplotType"
-                      label="Стиль столбцов" persistent-placeholder
-                      dense outlined hide-details
-                      :items="xAxisBarplotType"
-                      value="value"
+                    v-model="xAxis.barplotType"
+                    label="Стиль столбцов"
+                    persistent-placeholder
+                    dense
+                    outlined
+                    hide-details
+                    :items="xAxisBarplotType"
+                    value="value"
                   />
                 </div>
                 <div class="col">
                   <v-text-field
-                      v-model="xAxis.timeFormat"
-                      :disabled="xAxis.type !== 'time'"
-                      label="Формат веремени" persistent-placeholder
-                      placeholder="Пример %Y-%m-%d %H:%M:%S"
-                      dense outlined hide-details
+                    v-model="xAxis.timeFormat"
+                    :disabled="xAxis.type !== 'time'"
+                    label="Формат веремени"
+                    persistent-placeholder
+                    placeholder="Пример %Y-%m-%d %H:%M:%S"
+                    dense
+                    outlined
+                    hide-details
                   />
                 </div>
                 <div class="col">
                   <div
                     class="v-label"
-                    style="font-size: 12px;margin-top: -10px;margin-bottom: 2px;">
+                    style="font-size: 12px;margin-top: -10px;margin-bottom: 2px;"
+                  >
                     Градус наклона подписей
                   </div>
                   <v-btn-toggle
-                      v-model="xAxis.textRotate"
-                      color="blue"
-                      dense
+                    v-model="xAxis.textRotate"
+                    color="blue"
+                    dense
                   >
-                    <v-btn :value="0" >0°</v-btn>
-                    <v-btn :value="45">45°</v-btn>
-                    <v-btn :value="-45">-45°</v-btn>
-                    <v-btn :value="90">90°</v-btn>
-                    <v-btn :value="-90">-90°</v-btn>
+                    <v-btn :value="0">
+                      0°
+                    </v-btn>
+                    <v-btn :value="45">
+                      45°
+                    </v-btn>
+                    <v-btn :value="-45">
+                      -45°
+                    </v-btn>
+                    <v-btn :value="90">
+                      90°
+                    </v-btn>
+                    <v-btn :value="-90">
+                      -90°
+                    </v-btn>
                   </v-btn-toggle>
                 </div>
               </div>
               <div class="row mt-4">
                 <div class="col-8 py-0">
                   <v-checkbox
-                      v-model="xAxis.barplotBarWidthEnabled"
-                      :label="`Ширина столбцов барплот-графика: ${xAxis.barplotBarWidth}%`"
-                      persistent-placeholder
-                      dense outlined hide-details
-                      color="blue"
-                      class="mt-3"
+                    v-model="xAxis.barplotBarWidthEnabled"
+                    :label="`Ширина столбцов барплот-графика: ${xAxis.barplotBarWidth}%`"
+                    persistent-placeholder
+                    dense
+                    outlined
+                    hide-details
+                    color="blue"
+                    class="mt-3"
                   />
                 </div>
                 <div class="col-4">
                   <v-slider
-                      v-model="xAxis.barplotBarWidth"
-                      :disabled="!xAxis.barplotBarWidthEnabled"
-                      color="blue"
-                      min="1"
-                      max="99"
-                      class="mt-0 mr-1"
-                      hide-details dense
-                  ></v-slider>
+                    v-model="xAxis.barplotBarWidth"
+                    :disabled="!xAxis.barplotBarWidthEnabled"
+                    color="blue"
+                    min="1"
+                    max="99"
+                    class="mt-0 mr-1"
+                    hide-details
+                    dense
+                  />
                 </div>
               </div>
               <div class="row mt-0">
                 <div class="col-8 py-0">
                   <v-checkbox
-                      v-model="xAxis.ticksEnabled"
-                      :label="`Частота подписей оси X: ${xAxis.ticks}`"
-                      persistent-placeholder
-                      dense outlined hide-details
-                      color="blue"
-                      class="mt-3"
+                    v-model="xAxis.ticksEnabled"
+                    :label="`Частота подписей оси X: ${xAxis.ticks}`"
+                    persistent-placeholder
+                    dense
+                    outlined
+                    hide-details
+                    color="blue"
+                    class="mt-3"
                   />
                 </div>
                 <div class="col-4">
                   <v-slider
-                      v-model="xAxis.ticks"
-                      :disabled="!xAxis.ticksEnabled"
-                      color="blue"
-                      min="1"
-                      max="100"
-                      class="mt-0 mr-1"
-                      hide-details
-                  ></v-slider>
+                    v-model="xAxis.ticks"
+                    :disabled="!xAxis.ticksEnabled"
+                    color="blue"
+                    min="1"
+                    max="100"
+                    class="mt-0 mr-1"
+                    hide-details
+                  />
                 </div>
               </div>
               <!-- /forms -->
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-
       </v-card-text>
 
       <v-card-actions class="footer pr-3 d-flex justify-end px-6">
@@ -399,18 +472,18 @@
           text
           depressed
           class="btn-cancel"
-          @click="close"
           dark
           :color="theme.$primary_button"
+          @click="close"
         >
           Отмена
         </v-btn>
         <v-btn
           depressed
           class="btn-save"
-          @click="save"
           dark
           :color="theme.$primary_button"
+          @click="save"
         >
           Сохранить
         </v-btn>
@@ -432,7 +505,7 @@ import {
 } from '@mdi/js';
 
 export default {
-  name: 'dashChartSettings',
+  name: 'DashChartSettings',
   components: {
     draggable,
   },
@@ -560,9 +633,6 @@ export default {
       };
     },
   },
-  mounted() {
-    this.makeMetricsOrderList();
-  },
   watch: {
     isOpen(val) {
       if (!val) {
@@ -578,6 +648,9 @@ export default {
       this.makeMetricsOrderList();
     },
   },
+  mounted() {
+    this.makeMetricsOrderList();
+  },
   methods: {
     save() {
       console.log('[save] this.currentSettings', this.currentSettings);
@@ -589,7 +662,7 @@ export default {
       // this.$emit("save", { ...this.settings });
     },
 
-    close(save = false) {
+    close() {
       this.makeMetricsOrderList();
       this.$emit('close');
     },
@@ -656,8 +729,7 @@ export default {
   > div
     padding: 0 !important
 .checkbox-toggle-data
-  margin: 8px
-  margin-left: 20px
+  margin: 8px 8px 8px 20px
   > button
     height: 20px !important
     font-size: 10px

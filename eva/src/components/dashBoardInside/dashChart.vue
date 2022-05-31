@@ -18,10 +18,11 @@
       <div
         ref="legend"
         class="legend"
-        @mouseleave="chart.highlightMetric(null)">
+        @mouseleave="chart.highlightMetric(null)"
+      >
         <template v-for="(group, nGroup) in metricsByGroup">
           <div
-            v-for="(metric, nMetric) in group.filter(metric => !metric.hideLegend)"
+            v-for="(metric, nMetric) in group.filter(({hideLegend}) => !hideLegend)"
             :key="metric.name"
             @mouseenter="chart.highlightMetric(metric)"
             @click="openSettingsForMetric(metric, nGroup, nMetric)"
@@ -29,7 +30,7 @@
             <div
               class="circle"
               :style="`background-color: ${metric.color}`"
-            ></div>
+            />
             {{ metric.title || metric.name }}
           </div>
         </template>
@@ -41,8 +42,7 @@
         ref="svgContainer"
         class="svg-container"
         @dblclick="$emit('resetRange')"
-      >
-      </div>
+      />
     </div>
     <DashChartSettings
       ref="chartSettings"
@@ -173,7 +173,6 @@ export default {
         xAxisCaptionRotate,
         barplotstyle,
       } = this.options;
-      // @todo: user deprecated property: stringOX
       return {
         type: (this.options.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
           ? 'linear' // linear, time, - log, point, band
@@ -203,7 +202,7 @@ export default {
       }
 
       // add new metrics config
-      const newMetrics = this.metrics.filter(i => existsMetrics.indexOf(i) < 0);
+      const newMetrics = this.metrics.filter((i) => existsMetrics.indexOf(i) < 0);
       if (newMetrics.length) {
         metricsByGroup.push([]);
         newMetrics.forEach((metricName, nN) => {
@@ -232,7 +231,7 @@ export default {
       const { width, height } = sizeFrom;
       return {
         width: Math.round(width - 42),
-        height: Math.round(height - 55) - 60, // @todo: legend height
+        height: Math.round(height - 55) - 60,
       };
     },
 
@@ -262,22 +261,6 @@ export default {
     data() {
       this.updateData();
     },
-    /*
-    metrics(val, old) {
-      this.reRenderChart();
-      if (val.length && JSON.stringify(val) !== JSON.stringify(old)) {
-        this.sendMetricsToStore();
-      }
-    },
-    theme() {
-      this.reRenderChart();
-    },
-    options: {
-      deep: true,
-      handler() {
-        this.reRenderChart();
-      },
-    },*/
     fullScreenMode() {
       this.$nextTick(() => {
         this.$nextTick(() => {
@@ -295,20 +278,16 @@ export default {
   },
   methods: {
     createChart() {
-      console.log('- createChart')
       const { width, height } = this.box;
       this.chart = new ChartClass(this.$refs.svgContainer, width, height, {
         xAxis: {
           type: 'time', // linear, time, - log, point, band
-          //barplotType: 'divided', // overlay, divided, accumulation
           timeFormat: '%d.%m.%y %H:%M',
           nice: 100, // count
-          // textRotate: 90,
-          // textTranslate: [12, 8],
         },
       });
       this.chart.onZoom((range) => {
-         this.$emit('SetRange', {
+        this.$emit('SetRange', {
           range,
           xMetric: this.xMetric,
         });
@@ -407,59 +386,64 @@ export default {
       return '0';
     },
 
-    getOldMetricConfig (name) {
+    getOldMetricConfig(name) {
       const {
-        // eslint-disable-next-line camelcase
-        conclusion_count = {},
         metricTypes = {},
         optionsColor = {},
-        // eslint-disable-next-line camelcase
-        replace_count = {},
         metricsAxis = {},
         yAxesBinding,
         color: optionColor = {},
+        // eslint-disable-next-line camelcase
+        conclusion_count = {},
+        // eslint-disable-next-line camelcase
+        replace_count = {},
+        isDataAlwaysShow = false,
+        lastDot = false,
       } = this.options;
 
-      const metricOptions = this.options.metrics?.find((item) => item.name === name) || {
-        type: 'line',
-      };
-      const metricTypesOptions = metricTypes[name] || metricOptions.type;
+      const metricOptions = this.options.metrics?.find((item) => item.name === name) || {};
+      const metricTypesOptions = metricTypes[name] || metricOptions.type || 'line';
 
       const isBarplot = (yAxesBinding && yAxesBinding.metricTypes[name])
-          ? (yAxesBinding.metricTypes[name] === 'barplot' || metricTypes[name] === 'barplot')
-          : ['Bar chart', 'barplot'].includes(metricTypesOptions);
+        ? (yAxesBinding.metricTypes[name] === 'barplot' || metricTypes[name] === 'barplot')
+        : ['Bar chart', 'barplot'].includes(metricTypesOptions);
 
       const color = (!isBarplot && !this.options.united)
-          ? (optionsColor[name] || optionColor[name] || this.color(name))
-          : this.color(name);
+        ? (optionsColor[name] || optionColor[name] || this.color(name))
+        : this.color(name);
 
-      const zerosAfterDot = parseInt(replace_count[name]) ?? null;
+      const zerosAfterDot = parseInt(replace_count[name], 10) ?? null;
       const enabledBounding = metricOptions.manualBorder === true;
       const upperBound = parseFloat(metricOptions.upborder);
       const lowerBound = parseFloat(metricOptions.lowborder);
-      const typeLine = !isBarplot && !this.options.united && this.options.type_line
-          ? this.options.type_line[name]
-          : null;
-      const unit = this.metricUnits.find(d => d.name === name);
+      const typeLine = (!isBarplot && !this.options.united && this.options.type_line)
+        ? this.options.type_line[name]
+        : null;
+      const unit = this.metricUnits.find((d) => d.name === name);
 
-      // @todo: need optimization
       return {
         color,
         name,
         type: isBarplot ? 'barplot' : 'line',
         yAxisSide: (this.options.united && metricsAxis[name]) === 'right' ? 'right' : 'left',
-        lastDot: conclusion_count[name] || (this.options.isDataAlwaysShow ? 1 : (this.options.lastDot ? 0 : '')),
+        // eslint-disable-next-line no-nested-ternary
+        lastDot: conclusion_count[name] || (isDataAlwaysShow ? 1 : (lastDot ? 0 : '')),
+        // eslint-disable-next-line no-restricted-globals
         zerosAfterDot: isNaN(zerosAfterDot) ? 2 : zerosAfterDot,
-        peakTextData: this.options.isDataAlwaysShow || false,
-        showPeakDots: conclusion_count[name] > 0 || !!this.options.isDataAlwaysShow || this.options.lastDot,
-        showText: !!this.options.isDataAlwaysShow || conclusion_count[name] > 0 || this.options.lastDot,
+        peakTextData: isDataAlwaysShow || false,
+        showPeakDots: conclusion_count[name] > 0
+          || isDataAlwaysShow
+          || lastDot,
+        showText: isDataAlwaysShow
+          || conclusion_count[name] > 0
+          || lastDot,
+        // eslint-disable-next-line no-restricted-globals
         upperBound: (!enabledBounding || isNaN(upperBound)) ? null : upperBound,
+        // eslint-disable-next-line no-restricted-globals
         lowerBound: (!enabledBounding || isNaN(lowerBound)) ? null : lowerBound,
         dotSize: 4,
         strokeDasharray: this.getStyleLine(typeLine),
         unit: unit?.units,
-
-        // @todo: need adaption
         strokeWidth: 1,
       };
     },
@@ -477,7 +461,12 @@ export default {
       this.$store.commit('setOptions', {
         id: this.idFrom,
         idDash: this.idDashFrom,
-        options: { ...this.options, metricsByGroup, xAxis, version: 3 },
+        options: {
+          ...this.options,
+          metricsByGroup,
+          xAxis,
+          version: 3,
+        },
       });
       this.chart.update(this.metricsByGroup, this.xAxisSettings, this.data, this.xMetric);
     },

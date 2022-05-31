@@ -105,7 +105,12 @@ export default class ChartClass {
 
   createXAxis() {
     const { height } = this.box;
-    const { type, nice, ticksEnabled, ticks } = this.options.xAxis;
+    const {
+      type,
+      nice,
+      ticksEnabled,
+      ticks,
+    } = this.options.xAxis;
     const { options, maxYLeftAxisWidth } = this;
     const barWidth = this.bandX?.bandwidth() || 30;
     const scaleFuncName = ChartClass
@@ -246,7 +251,7 @@ export default class ChartClass {
       yGroupItem
         .call(
           d3[`axis${axisPosition}`](this.y[metric.name])
-            .ticks(metric.ticks || Math.ceil(groupHeight / 30)), // @todo: fix 30 ?
+            .ticks(metric.ticks || Math.ceil(groupHeight / 30)),
         );
       className += ` axis-y-${metric.n}`;
     });
@@ -283,11 +288,11 @@ export default class ChartClass {
         .call(
           d3[`axis${axisSide}`](this.y[metric.name])
             .tickFormat((str) => (metric.unit ? `${str} ${metric.unit}` : str))
-            .ticks(metric.ticks || Math.ceil(groupHeight / 30)), // @todo: fix 30 ?
+            .ticks(metric.ticks || Math.ceil(groupHeight / 30)),
         );
 
       yGroup.selectAll('text').attr('fill', metric.color);
-      xOffset[axisSide] += yGroup.node().getBBox().width + 8; // @todo: fix 8 ?
+      xOffset[axisSide] += yGroup.node().getBBox().width + 8;
     });
 
     // recalculate y axis width
@@ -400,7 +405,7 @@ export default class ChartClass {
   }
 
   /**
-   * @param metricsByGroup: [
+   * @param metricsByGroup = [
    * [ // groups
    *    [ // metrics
    *      {
@@ -421,11 +426,18 @@ export default class ChartClass {
    *    ]
    * ],
    * ...]
+   * @param xAxisSettings = {
+   *   type: 'time', // linear, time
+   *   timeFormat: null, // %Y-%m-%d %H:%M:%S
+   *   textRotate: -45, // 45, -45, 90, -90
+   *   barplotType: 'divided', // overlay, divided, accumulation
+   *   barplotBarWidthEnabled: false,
+   *   barplotBarWidth: 80, // percent
+   * }
    * @param data
    * @param xMetric
    */
   update(metricsByGroup, xAxisSettings, data, xMetric = '_time') {
-    console.log('update', xMetric, metricsByGroup, xAxisSettings);
     this.resetTmpData();
     const color = d3.scaleOrdinal().range(d3.schemeSet2);
     this.xMetric = xMetric;
@@ -476,7 +488,6 @@ export default class ChartClass {
     this.createGroups();
   }
 
-  // @todo: delete it ?
   resetTmpData() {
     this.xAxisHeight = 30;
     this.maxYRightAxisWidth = 30;
@@ -508,7 +519,6 @@ export default class ChartClass {
     if (this.maxYRightAxisWidth < width) {
       this.maxYRightAxisWidth = width;
       this.updateYRightSizes();
-      //this.createXAxis();
     }
   }
 
@@ -521,7 +531,6 @@ export default class ChartClass {
     if (this.maxYLeftAxisWidth < width) {
       this.maxYLeftAxisWidth = width;
       this.updateYLeftSizes();
-      //this.createXAxis();
     }
   }
 
@@ -530,7 +539,6 @@ export default class ChartClass {
       .attr('transform', `translate(${this.maxYLeftAxisWidth},0)`);
   }
 
-  // @todo: to fix?
   moveInNewContainer(container) {
     this.svgContainer = container;
     this.svg = d3.select(container)
@@ -683,15 +691,13 @@ export default class ChartClass {
         let className = 'dot';
         if (nodes.length === 1) {
           className += ' dot-show';
-        } else {
-          if (metric.showPeakDots) {
-            if (+metric.lastDot === 0 && nodes.length === i + 1) {
-              className += ' last-dot dot-show';
-            }
-            if (+metric.lastDot > 0) {
-              if ((nodes.length - 1 - i) % metric.lastDot === 0) {
-                className += ' dot-show';
-              }
+        } else if (metric.showPeakDots) {
+          if (+metric.lastDot === 0 && nodes.length === i + 1) {
+            className += ' last-dot dot-show';
+          }
+          if (+metric.lastDot > 0) {
+            if ((nodes.length - 1 - i) % metric.lastDot === 0) {
+              className += ' dot-show';
             }
           }
         }
@@ -724,7 +730,7 @@ export default class ChartClass {
     const data = line.filter((d, i) => {
       if (+metric.lastDot === 0 && line.length === i + 1) {
         return true;
-      } else if (+metric.lastDot > 0) {
+      } if (+metric.lastDot > 0) {
         if (((line.length - 1 - i) % +metric.lastDot) === 0) {
           return true;
         }
@@ -858,13 +864,13 @@ export default class ChartClass {
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
 
     // for debug
-    /*chartGroup.append('g')
+    /* chartGroup.append('g')
       .attr('transform', `translate(0,${groupHeight})`)
       .call(d3.axisBottom(this.bandX).ticks(groups.length))
       .selectAll('text')
       .attr('transform', 'translate(-2,12) rotate(45)').attr('fill', 'yellow')
       .style('text-anchor', 'start');
-    chartGroup.selectAll('line ').attr('stroke', 'yellow')*/
+    chartGroup.selectAll('line ').attr('stroke', 'yellow') */
 
     const stackedData = d3.stack()
       .keys(groupBarplotMetrics.map((d) => d.name))(this.data);
@@ -890,7 +896,7 @@ export default class ChartClass {
         const { metric } = d;
         let val = d[1];
         if (barplotType === 'accumulation' && (val - d[0]) < 0) {
-          // @todo: (develop) Negative values are not available in accumulation histograms
+          // Negative values are not available in accumulation histograms
           throw new Error(`${metric.name}: Отрицательные значения недоступны на гистограммах накопления`);
         }
         if (barplotType === 'overlay') {
@@ -926,7 +932,7 @@ export default class ChartClass {
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, {}, tooltipLeftPos, tooltipTopPos);
       })
-      .each(function (d, i) {
+      .each(function (d) {
         if (d[1] !== null && d.metric.showText) {
           d3.select(this.parentNode)
             .append('text')
@@ -946,13 +952,13 @@ export default class ChartClass {
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
     const { groupsTopOffset } = this.options;
 
-    /*chartGroup.append('g')
+    /* chartGroup.append('g')
       .attr('transform', `translate(0,${groupHeight})`)
       .call(d3.axisBottom(this.bandX).ticks(groups.length))
       .selectAll('text')
       .attr('transform', 'translate(8,2) rotate(45)').attr('fill', 'red')
       .style('text-anchor', 'start');
-    chartGroup.selectAll('line ').attr('stroke', 'red')*/
+    chartGroup.selectAll('line ').attr('stroke', 'red') */
 
     const xSubgroup = d3.scaleBand()
       .domain(subgroups)
@@ -1004,7 +1010,7 @@ export default class ChartClass {
         this.hideLineDot();
       })
       .on('mousemove', (d) => {
-        const lineXPos = this.bandX(d.data[this.xMetric]) + barWidth/2;
+        const lineXPos = this.bandX(d.data[this.xMetric]) + barWidth / 2;
         const lineYPos = this.y[d.metric.name](d.value);
         this.setLineDotPosition(lineXPos, lineYPos, num);
 
@@ -1012,7 +1018,7 @@ export default class ChartClass {
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, {}, tooltipLeftPos, tooltipTopPos);
       })
-      .each(function (d, i) {
+      .each(function (d) {
         if (d.value !== null && d.metric.showText) {
           d3.select(this.parentNode)
             .append('text')
@@ -1048,6 +1054,7 @@ export default class ChartClass {
           .attr('fill', 'var(--main_text)')
           .attr('x', rect.x.baseVal.value)
           .attr('y', rect.y.baseVal.value + 14)
+          // eslint-disable-next-line no-underscore-dangle
           .text((_) => ChartClass.valueToText(metricByKeys[_.key], rect.__data__.data));
       });
   }
@@ -1093,14 +1100,14 @@ export default class ChartClass {
     if (!sources.length) return target;
     const source = sources.shift();
     if (ChartClass.isObject(target) && ChartClass.isObject(source)) {
-      for (const key in source) {
+      Object.keys(source).forEach((key) => {
         if (ChartClass.isObject(source[key])) {
           if (!target[key]) Object.assign(target, { [key]: {} });
           ChartClass.mergeDeep(target[key], source[key]);
         } else {
           Object.assign(target, { [key]: source[key] });
         }
-      }
+      });
     }
     return ChartClass.mergeDeep(target, ...sources);
   }
