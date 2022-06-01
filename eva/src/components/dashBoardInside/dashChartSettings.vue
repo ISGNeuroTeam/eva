@@ -704,7 +704,9 @@ export default {
       this.$emit('close');
     },
 
-    changeMetricsOrder() {
+    changeMetricsOrder(nG, { removed }) {
+      // remove yAxisLink on other metric outside group
+      removed.element.yAxisLink = null;
       this.metricsByGroup = [...this.metricsByGroupNoEmpty];
       if (this.metricsByGroup[this.metricsByGroup.length - 1].length !== 0) {
         this.metricsByGroup.push([]);
