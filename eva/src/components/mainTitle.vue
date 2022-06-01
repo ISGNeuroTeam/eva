@@ -572,6 +572,9 @@ export default {
     },
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
+      if (this.$store.state[this.idDash][elem.elem].loading) {
+        return this.$store.state[this.idDash][elem.elem].loading;
+      }
       return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
