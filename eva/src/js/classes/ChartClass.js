@@ -958,12 +958,14 @@ export default class ChartClass {
           d3.select(this.parentNode)
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
-            .attr('x', this.x.baseVal.value + 1)
+            .attr('x', this.x.baseVal.value + barWidth / 2)
             .attr('y', this.y.baseVal.value + (d[1] < 0 ? (this.height.baseVal.value - 2) : 11))
             .attr('font-size', '11')
             .attr('pointer-events', 'none')
-            .attr('text-anchor', 'start') // middle
+            .attr('text-anchor', 'middle')
             .attr('fill', 'var(--main_text)')
+            .attr('stroke', 'var(--main_text)')
+            .attr('stroke-width', 0)
             .text(`${ChartClass.valueToText(d.metric, d.data)} ${d.metric.unit || ''}`);
         }
       });
@@ -1044,12 +1046,26 @@ export default class ChartClass {
           d3.select(this.parentNode)
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
-            .attr('x', this.x.baseVal.value + 1)
-            .attr('y', this.y.baseVal.value + (d.value < 0 ? (this.height.baseVal.value + 10) : -2))
-            .attr('font-size', '11')
+            .attr('x', this.x.baseVal.value + xSubgroup.bandwidth() / 2)
+            .attr('y', () => {
+              const y = this.y.baseVal.value;
+              const height = this.height.baseVal.value;
+              let posY = y;
+              if (d.value < 0) {
+                posY += height + 10;
+              } else {
+                posY -= 2;
+              }
+              if (posY + 2 > groupHeight) {
+                posY -= 12;
+                this.darkText = true;
+              }
+              return posY;
+            })
+            .attr('font-size', '10')
             .attr('pointer-events', 'none')
-            .attr('text-anchor', 'start') // middle
-            .attr('fill', 'var(--main_text)')
+            .attr('text-anchor', 'middle')
+            .attr('fill', this.darkText ? 'var(--main_bg)' : 'var(--main_text)')
             .text(`${ChartClass.valueToText(d.metric, d.data)} ${d.metric.unit || ''}`);
         }
       });
