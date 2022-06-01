@@ -539,12 +539,6 @@ export default {
             this.map.scrollWheelZoom();
           },
         },
-        {
-          event: 'click',
-          callback: (e) => {
-            console.log(e);
-          },
-        },
       ]);
       // TODO: Пока просили приостановить работу с ГИС.
       // this.map.on('zoomend', () => {
