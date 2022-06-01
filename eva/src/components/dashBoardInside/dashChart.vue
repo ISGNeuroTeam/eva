@@ -482,7 +482,7 @@ export default {
 .settings-icon
   float: right
   margin: 8px 2px
-  color: $secondary-text
+  color: $secondary-text !important
 
 .svg-container
   position: relative

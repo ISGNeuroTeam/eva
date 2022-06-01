@@ -731,6 +731,10 @@ export default {
 
 <style lang="sass" scoped>
 @import ../../sass/_colors
+.dialog-content::v-deep,
+.v-expansion-panel,
+.v-color-picker
+  background-color: $main_bg !important
 .title-metric
   font-size: 16px
   font-weight: bold
