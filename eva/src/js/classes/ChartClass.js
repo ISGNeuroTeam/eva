@@ -948,10 +948,9 @@ export default class ChartClass {
           lineYPos = this.y[metric.name](d[1] - d[0]);
         }
         this.setLineDotPosition(lineXPos, lineYPos, num);
-
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
-        this.updateTooltip(d.data, {}, tooltipLeftPos, tooltipTopPos);
+        this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
       })
       .each(function (d) {
         if (d[1] !== null && d.metric.showText) {
@@ -1033,13 +1032,14 @@ export default class ChartClass {
         this.hideLineDot();
       })
       .on('mousemove', (d) => {
+        const { metric } = d;
         const lineXPos = this.bandX(d.data[this.xMetric]) + barWidth / 2;
-        const lineYPos = this.y[d.metric.name](d.value);
+        const lineYPos = this.y[metric.name](d.value);
         this.setLineDotPosition(lineXPos, lineYPos, num);
 
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
-        this.updateTooltip(d.data, {}, tooltipLeftPos, tooltipTopPos);
+        this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
       })
       .each(function (d) {
         if (d.value !== null && d.metric.showText) {

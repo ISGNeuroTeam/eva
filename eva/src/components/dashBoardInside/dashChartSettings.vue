@@ -704,10 +704,24 @@ export default {
       this.$emit('close');
     },
 
-    changeMetricsOrder(nG, { removed }) {
+    changeMetricsOrder(nG, { added, removed }) {
       // remove yAxisLink on other metric outside group
-      removed.element.yAxisLink = null;
+      if (removed && removed.element?.yAxisLink) {
+        removed.element.yAxisLink = null;
+      }
       this.metricsByGroup = [...this.metricsByGroupNoEmpty];
+      if (added && added.element) {
+        Object.keys(this.metricsByGroup).forEach((nGroup) => {
+          Object.keys(this.metricsByGroup[nGroup]).forEach((nMetric) => {
+            const metric = this.metricsByGroup[nGroup][nMetric];
+            if (added.element.name === metric.yAxisLink) {
+              metric.yAxisLink = null;
+            }
+          });
+        });
+      }
+
+      // add empty group
       if (this.metricsByGroup[this.metricsByGroup.length - 1].length !== 0) {
         this.metricsByGroup.push([]);
       }
