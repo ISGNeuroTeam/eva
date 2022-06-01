@@ -151,7 +151,6 @@ export default {
       'boxShadow',
       'metrics',
       'lastResult',
-      'thememultiline',
       'pinned',
     ],
     piechart: [
@@ -276,14 +275,6 @@ export default {
       description:
         'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
-    },
-
-    // MultiLine
-    {
-      option: 'thememultiline',
-      description: 'Цветовая тема',
-      elem: 'select',
-      items: ['default', 'Anna theme'],
     },
 
     // dashSingle

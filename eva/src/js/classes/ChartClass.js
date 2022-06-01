@@ -811,7 +811,7 @@ export default class ChartClass {
         .attr('y2', zeroHeight + strokeWidth)
         .attr('stroke-width', strokeWidth)
         .style('stroke-dasharray', '3,3')
-        .attr('stroke', '#8888')
+        .attr('stroke', '#999')
         .style('pointer-events', 'none');
     }
   }
