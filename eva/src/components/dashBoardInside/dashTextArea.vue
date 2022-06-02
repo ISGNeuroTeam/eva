@@ -21,6 +21,7 @@
         no-resize
         @keypress.enter="setTockenByPress($event)"
         @blur="setTockenBlur($event)"
+        @change="onInputText"
       />
       <v-btn
         v-if="searchBtn"
@@ -185,6 +186,24 @@ export default {
         textarea: this.textarea,
       });
       this.setTocken();
+    },
+    onInputText(val) {
+      const { options } = this.dashFromStore;
+      const validationNumberRangeMin = parseFloat(options.validationNumberRangeMin)
+      const validationNumberRangeMax = parseFloat(options.validationNumberRangeMax)
+      if (options?.validationType === 'numberRange') {
+        let numberValue = parseFloat(val);
+        if (Number.isNaN(numberValue)) {
+          numberValue = '';
+        }
+        if (!Number.isNaN(validationNumberRangeMin) || numberValue < validationNumberRangeMin) {
+          numberValue = validationNumberRangeMin;
+        }
+        if (!Number.isNaN(validationNumberRangeMax) && numberValue > validationNumberRangeMax) {
+          numberValue = validationNumberRangeMax;
+        }
+        this.textarea = `${numberValue}`;
+      }
     },
     acceptTextArea() {
       this.$store.commit('setTextArea', {
