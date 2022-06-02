@@ -152,34 +152,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
       if (!this.dashFromStore?.options.search) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -189,9 +161,6 @@ export default {
       }
 
       return this.dashFromStore.options;
-    },
-    option() {
-      return this.getOptions;
     },
     top() {
       // для ряда управляющих иконок
@@ -307,7 +276,7 @@ export default {
             idDash: this.idDash,
             id: this.element,
           });
-          this.loadDataForPipe(this.$store.getters.getPaperSearch); // TODO: убрать getPaperSearch
+          this.loadDataForPipe(this.getOptions.search);
         }
       });
     },
@@ -317,6 +286,7 @@ export default {
         idDash: this.idDash,
         should: true,
         error: false,
+        name: this.element,
       });
 
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${event.sid}`);
@@ -333,6 +303,7 @@ export default {
           idDash: this.idDash,
           should: false,
           error: true,
+          name: this.element,
         });
       } else {
         // если все нормально
@@ -350,6 +321,7 @@ export default {
             idDash: this.idDash,
             should: false,
             error: false,
+            name: this.element,
           });
         });
       }
@@ -357,8 +329,8 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
-      this.pipelineData = await this.getDataFromRest(search);
-      if (this.map) {
+      if (this.getOptions.mode[0] === 'Мониторинг' && this.map) {
+        this.pipelineData = await this.getDataFromRest(search);
         const allPipes = {};
         if (Array.isArray(this.pipelineData)) {
           this.pipelineData.forEach((x) => {
@@ -370,6 +342,9 @@ export default {
         }
 
         this.pipelineDataDictionary = allPipes;
+      }
+
+      if (this.map) {
         this.reDrawMap(this.dataRestFrom);
         this.$nextTick(() => {
           if (this.map && this.library?.objects) {
@@ -446,7 +421,10 @@ export default {
             // создаем элемент карты
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
-            this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
+            this.map.drawObjects(
+              dataRest,
+              this.pipelineDataDictionary,
+            );
             if (this.map) {
               if (this.options.initialPoint) {
                 this.map.setView(
@@ -541,6 +519,8 @@ export default {
         center: this.getCurrentPosition,
         layerGroup: this.layerGroup,
         library: this.library,
+        mode: this.getOptions.mode,
+        pipelineParameters: this.getOptions.pipelineParameters,
       });
       this.map = Object.freeze(map);
       this.map.setEvents([
