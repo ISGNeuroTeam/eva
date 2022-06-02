@@ -116,9 +116,15 @@ export default class ChartClass {
     const scaleFuncName = ChartClass
       .capitalizeFirstLetter(type, 'scale?');
 
+    const xMin = d3.min(this.data.map((item) => item[this.xMetric]));
+    const xMax = d3.max(this.data.map((item) => item[this.xMetric]));
+    let offset = 0;
+    if (this.hasBarplot) {
+      offset = ((xMax - xMin) / this.data.length) / 1.8;
+    }
     this.xMinMax = [
-      d3.min(this.data.map((item) => item[this.xMetric])),
-      d3.max(this.data.map((item) => item[this.xMetric])),
+      xMin - offset,
+      xMax + offset,
     ];
 
     // eslint-disable-next-line no-multi-assign
@@ -130,7 +136,9 @@ export default class ChartClass {
       xFun.nice(nice);
     } else {
       const rangeOffset = (barWidth / 2) * 1.5;
-      xFun.range([rangeOffset, this.chartWidth - rangeOffset]);
+      if (rangeOffset) {
+        xFun.range([rangeOffset, this.chartWidth - rangeOffset]);
+      }
     }
 
     if (this.xAxis && this.xAxis.size()) {
@@ -345,11 +353,10 @@ export default class ChartClass {
     const subgroups = groupBarplotMetrics.map((d) => d.name);
     const groups = d3.map(this.data, (d) => d[this.xMetric]).keys();
 
-    // add band X
-    const rangeOffset = 0;
+    // add band X for barplot width
     this.bandX = d3.scaleBand()
-      .domain((+groups[0] > +groups[groups.length - 1]) ? groups.reverse() : groups)
-      .range([rangeOffset, this.chartWidth - rangeOffset])
+      .domain(groups)
+      .range([0, this.chartWidth])
       .padding([barplotBarWidthEnabled ? (1 - barplotBarWidth / 100) : 0.2]);
 
     if (groupBarplotMetrics.length) {
@@ -492,6 +499,7 @@ export default class ChartClass {
     }
 
     const metrics = ChartClass.metricsToMetricsByGroup(metricsByGroup);
+    this.hasBarplot = metrics.findIndex((m) => m.type === 'barplot') !== -1;
     this.metrics = metrics.map((item, n) => ({
       ...item,
       n,
@@ -777,11 +785,8 @@ export default class ChartClass {
       .attr('class', `metric metric-${metric.n}`)
       .text((d) => ChartClass.valueToText(metric, d))
       .attr('x', (d) => {
-        const isBarplot = metric.type === 'barplot';
-        let xPos = isBarplot
-          ? this.bandX(d[this.xMetric])
-          : this.x(d[this.xMetric]);
-        if (isBarplot && this.options.xAxis.barplotType === 'divided') {
+        let xPos = this.x(d[this.xMetric]);
+        if (metric.type === 'barplot' && this.options.xAxis.barplotType === 'divided') {
           xPos += metric.n * this.barplotWidth * 1.1;
         }
         return xPos;
@@ -881,20 +886,9 @@ export default class ChartClass {
     const { barplotType } = this.options.xAxis;
     const metricByKeys = this.metricByKeys();
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
-
-    // for debug
-    /* chartGroup.append('g')
-      .attr('transform', `translate(0,${groupHeight})`)
-      .call(d3.axisBottom(this.bandX).ticks(groups.length))
-      .selectAll('text')
-      .attr('transform', 'translate(-2,12) rotate(45)').attr('fill', 'yellow')
-      .style('text-anchor', 'start');
-    chartGroup.selectAll('line ').attr('stroke', 'yellow') */
-
+    const barWidth = this.bandX.bandwidth();
     const stackedData = d3.stack()
       .keys(groupBarplotMetrics.map((d) => d.name))(this.data);
-
-    const barWidth = this.bandX.bandwidth();
 
     chartGroup.append('g')
       .selectAll('g')
@@ -910,7 +904,7 @@ export default class ChartClass {
         .map((d) => ({ ...d, metric: groupBarplotMetrics[nG] })))
       .enter()
       .append('rect')
-      .attr('x', (d) => this.bandX(d.data[this.xMetric]))
+      .attr('x', (d) => this.x(d.data[this.xMetric]) - barWidth / 2)
       .attr('y', (d) => {
         const { metric } = d;
         const yName = metric.yAxisLink || metric.name;
@@ -942,7 +936,7 @@ export default class ChartClass {
       })
       .on('mousemove', (d) => {
         const { metric } = d;
-        const lineXPos = this.bandX(d.data[this.xMetric]) + barWidth / 2;
+        const lineXPos = this.x(d.data[this.xMetric]);
         let lineYPos = this.y[metric.name](d[1]);
         if (barplotType === 'overlay') {
           lineYPos = this.y[metric.name](d[1] - d[0]);
@@ -973,29 +967,21 @@ export default class ChartClass {
   addDividedBarplots(num, groups, subgroups, groupHeight) {
     const chartGroup = this.svgGroups.select(`g.group-${num}-chart`);
     const { groupsTopOffset } = this.options;
-
-    /* chartGroup.append('g')
-      .attr('transform', `translate(0,${groupHeight})`)
-      .call(d3.axisBottom(this.bandX).ticks(groups.length))
-      .selectAll('text')
-      .attr('transform', 'translate(8,2) rotate(45)').attr('fill', 'red')
-      .style('text-anchor', 'start');
-    chartGroup.selectAll('line ').attr('stroke', 'red') */
+    const barWidth = this.bandX.bandwidth();
 
     const xSubgroup = d3.scaleBand()
       .domain(subgroups)
-      .range([0, this.bandX.bandwidth()])
+      .range([0, barWidth])
       .padding([0.05]);
 
     const metricByKeys = this.metricByKeys();
-    const barWidth = this.bandX.bandwidth();
 
     chartGroup.append('g')
       .selectAll('g')
       .data(this.data)
       .enter()
       .append('g')
-      .attr('transform', (d) => `translate(${this.bandX(d[this.xMetric])},0)`)
+      .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
       .data((d) => subgroups.map((key) => ({
         key,
@@ -1033,7 +1019,7 @@ export default class ChartClass {
       })
       .on('mousemove', (d) => {
         const { metric } = d;
-        const lineXPos = this.bandX(d.data[this.xMetric]) + barWidth / 2;
+        const lineXPos = this.x(d.data[this.xMetric]);
         const lineYPos = this.y[metric.name](d.value);
         this.setLineDotPosition(lineXPos, lineYPos, num);
 

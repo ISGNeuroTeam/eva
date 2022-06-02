@@ -9,6 +9,7 @@
     :persistent="isChanged"
     :dark="isDarkTheme"
     @cancelModal="close"
+    @keydown.esc="close"
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
@@ -118,7 +119,7 @@
                       </div>
 
                       <div class="row my-1">
-                        <div class="col">
+                        <div class="col col-5">
                           <div
                             style="position: relative;"
                             @dblclick="colorPickerInputChange"
@@ -147,10 +148,12 @@
                             />
                           </div>
                         </div>
-                        <div class="col">
+                        <div
+                          v-if="metric.type === 'line'"
+                          class="col"
+                        >
                           <v-autocomplete
                             v-model="metric.strokeWidth"
-                            :disabled="metric.type !== 'line'"
                             :items="strokeWidthList"
                             label="Толщина"
                             persistent-placeholder
@@ -159,7 +162,10 @@
                             hide-details
                           />
                         </div>
-                        <div class="col">
+                        <div
+                          v-if="metric.type === 'line'"
+                          class="col"
+                        >
                           <v-autocomplete
                             v-model="metric.strokeDasharray"
                             :disabled="metric.type !== 'line'"
@@ -183,7 +189,10 @@
                         color="blue"
                       />
                       <div class="row mt-0 mb-1">
-                        <div class="col col-auto py-0">
+                        <div
+                          class="col col-auto py-0"
+                          v-if="metric.type === 'line'"
+                        >
                           <v-checkbox
                             v-model="metric.showPeakDots"
                             :disabled="metric.type !== 'line'"
@@ -195,14 +204,17 @@
                             color="blue"
                           />
                         </div>
-                        <div class="col py-0">
+                        <div
+                          v-if="metric.type === 'line'"
+                          class="col py-0"
+                        >
                           <v-slider
                             v-model="metric.dotSize"
                             color="blue"
                             label="Размер"
                             :disabled="!metric.showPeakDots || metric.type !== 'line'"
                             min="2"
-                            max="18"
+                            max="10"
                             thumb-label="always"
                             class="ml-2"
                             style="height: 20px;"
@@ -214,7 +226,7 @@
                               v-model="metric.showText"
                               class="d-inline-block"
                               :disabled="!metric.showPeakDots && metric.type === 'line'"
-                              label="Отображение данных к точкам"
+                              :label="`Отображение данных ${metric.type==='line'?'к точкам':''}`"
                               persistent-placeholder
                               dense
                               outlined
@@ -263,14 +275,17 @@
                           />
                         </div>
                         <div class="col">
-                          <v-text-field
+                          <v-autocomplete
                             v-model="metric.lastDot"
                             :disabled="!metric.showPeakDots"
+                            :items="[
+                              { value: '', text: 'Последнее' },
+                              { value: '1', text: 'Каждое' },
+                              { value: '2', text: 'Нечетное' },
+                              { value: '3', text: 'Каждое 3' },
+                            ]"
                             label="Вывод значений"
                             persistent-placeholder
-                            placeholder="0 - last, 1 - every, 2, 3, 4, ..."
-                            type="number"
-                            min="0"
                             dense
                             outlined
                             hide-details
@@ -278,7 +293,10 @@
                         </div>
                       </div>
 
-                      <div class="row my-1">
+                      <div
+                        v-if="metric.type === 'line'"
+                        class="row my-1"
+                      >
                         <div class="col">
 <!--                          <v-autocomplete
                             v-model="metric.yAxisSide"
@@ -451,7 +469,7 @@
                     :disabled="!xAxis.barplotBarWidthEnabled"
                     color="blue"
                     min="1"
-                    max="99"
+                    max="100"
                     class="mt-0 mr-1"
                     hide-details
                     dense
