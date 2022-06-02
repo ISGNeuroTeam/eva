@@ -124,6 +124,8 @@ Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.v
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
 Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
+// компонент Menu
+Vue.component('dash-menu', () => import('./components/dashBoardInside/dashMenu.vue'));
 // блок экспорта импорта
 // Vue.component('block-exim', () => import('./components/blockExim.vue'))
 // элемнет поиска пока не актуален

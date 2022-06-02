@@ -210,10 +210,16 @@ export default {
       return this.$store.getters.getTheme;
     },
     tools() {
-      return settings.tools.map((tool) => ({
-        text: tool.name,
-        value: tool.type,
-      }));
+      return settings.tools
+        .filter(
+          (elem) => !settings.excludes.fromTitleActions.some(
+            (item) => item === elem.type,
+          ),
+        )
+        .map((tool) => ({
+          text: tool.name,
+          value: tool.type,
+        }));
     },
     idDash() {
       return this.$route.params.id;
