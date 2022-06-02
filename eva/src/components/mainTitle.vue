@@ -467,7 +467,7 @@ export default {
   async mounted() {
     if (this.dashFromStore) {
       const isSettingsOpen = this.dashFromStore
-        .modalSettings.status;
+        .modalSettings?.status;
       const isModalVisualisationOpen = this.dashFromStore
         .visualisationModalData?.open;
       if (isSettingsOpen) {
