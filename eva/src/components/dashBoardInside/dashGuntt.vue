@@ -345,7 +345,9 @@ export default {
 
       // Tooltip
       const tooltipBlock = this.$refs.tooltip;
-      const tooltipMargin = this.$attrs['is-full-screen'] ? 200 : 30;
+      const tooltipMargin = 30;
+      let windowWidth;
+      let tooltipWidth;
 
       function transformDescription(text) {
         let rows = text.split('\\n');
@@ -366,16 +368,19 @@ export default {
                 tooltip += `<p class="row-toolrip"><span>${key}</span>: ${event[key]}</p>`;
               });
             }
-            this.guntt.moveTooltip(tooltipMargin);
+
             tooltipBlock.innerHTML = tooltip;
             tooltipBlock.style.opacity = '0.9';
             tooltipBlock.style.visibility = 'visible';
+            tooltipWidth = tooltipBlock.clientWidth;
+            windowWidth = window.innerWidth;
+            this.guntt.moveTooltip(tooltipMargin, windowWidth, tooltipWidth);
           },
         },
         {
           name: 'mousemove',
           callback: () => {
-            this.guntt.moveTooltip(tooltipMargin);
+            this.guntt.moveTooltip(tooltipMargin, windowWidth, tooltipWidth);
           },
         },
         {

@@ -131,7 +131,7 @@
             <v-dialog
               ref="fullScreenModal"
               v-model="bigSizeMode"
-              width="100%"
+              :width="isFullScreen ? '100vw' : '80vw'"
               :fullscreen="isFullScreen"
               style="z-index: 999"
             >
