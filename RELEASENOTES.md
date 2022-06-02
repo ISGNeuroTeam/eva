@@ -1,3 +1,14 @@
+# [1.93.0]
+
+### Feature
+- Added the data source setting for its autorun immediately after loading the dashboard
+- Add pipeline parameters to the map component
+
+### Fixed
+- Fixed data source export
+- Fixed modal windows behavior
+- Fixed an error when selecting numeric data in the select component
+
 # [1.92.0]
 
 ### Feature
