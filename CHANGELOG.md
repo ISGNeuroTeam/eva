@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Add pipeline parameters to map
+- Adding transition on click to map
 
 ## [1.92.0]
 
