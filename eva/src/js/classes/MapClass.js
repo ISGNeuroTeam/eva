@@ -15,58 +15,6 @@ class MapClass {
     };
   }
 
-  static highlightFeatureFunc({
-    lib,
-    mode,
-    pipelineData,
-    route,
-    lineTurf,
-  }) {
-    return (e, line) => {
-      const layer = e.target;
-      layer.bringToFront();
-      layer.setStyle({
-        weight: lib.width + 3,
-        color: lib.color,
-      });
-      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        layer.bringToFront();
-      }
-      if (!pipelineData) return;
-      const closest = (arr, num) => (
-        arr.reduce((acc, val) => {
-          if (Math.abs(val.pos - num) < Math.abs(acc)) {
-            return val.pos - num;
-          }
-          return acc;
-        }, Infinity) + num
-      );
-      if (mode[0] === 'Мониторинг') {
-        const newLine = turf.lineSlice(
-          route[0],
-          [e.latlng.lat, e.latlng.lng],
-          lineTurf,
-        );
-        const newLinePoly = L.polyline(newLine.geometry.coordinates);
-        const distances = utils.accumulatedLengths(newLinePoly);
-        const sum = distances[distances.length - 1];
-
-        const closestData = closest(pipelineData, sum);
-
-        const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
-        // div for tooltip
-        const newDiv = document.createElement('div');
-        newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
-          <p>${pipelineInfo.label}</p>
-          <p>P ${pipelineInfo.P}</p>
-          <p>S ${pipelineInfo.S}</p>
-          <p>L ${pipelineInfo.L}</p>
-          </div>`;
-        line.setTooltipContent(newDiv);
-      }
-    };
-  }
-
   static getElementDrawType(lib) {
     if (lib.view_type === 'html') {
       return 'HTML';
@@ -87,6 +35,8 @@ class MapClass {
     wheelPxPerZoomLevel: 200,
     isLegendGenerated: false,
     startingPoint: [],
+    mode: [],
+    pipelineParameters: [],
   }
 
   constructor({
@@ -98,10 +48,14 @@ class MapClass {
     center,
     layerGroup,
     library,
+    mode,
+    pipelineParameters,
   }) {
     this.options.wheelPxPerZoomLevel = wheelPxPerZoomLevel;
     this.options.layerGroup = layerGroup;
     this.options.library = library;
+    this.options.mode = mode;
+    this.options.pipelineParameters = pipelineParameters;
     this.map = L.map(mapRef, {
       wheelPxPerZoomLevel,
       zoomSnap,
@@ -204,6 +158,22 @@ class MapClass {
     this.options.mapTheme = val;
   }
 
+  get mode() {
+    return this.options.mode;
+  }
+
+  set mode(val) {
+    this.options.mode = val;
+  }
+
+  get pipelineParameters() {
+    return this.options.pipelineParameters;
+  }
+
+  set pipelineParameters(val) {
+    this.options.pipelineParameters = val;
+  }
+
   setEvents(events) {
     events.forEach(({ event, callback }) => {
       this.map.on(event, callback);
@@ -289,7 +259,7 @@ class MapClass {
     this.map.addLayer(cluster);
   }
 
-  addLine(element, lib, mode, pipelineData) {
+  addLine(element, lib, pipelineData) {
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -312,12 +282,12 @@ class MapClass {
     const route = line.getLatLngs().map((el) => [el.lat, el.lng]);
     const lineTurf = turf.lineString(route);
 
-    const highlightFeature = MapClass.highlightFeatureFunc({
+    const highlightFeature = this.highlightFeatureFunc({
       lib,
-      mode,
       pipelineData,
       route,
       lineTurf,
+      element,
     });
 
     line
@@ -488,7 +458,7 @@ class MapClass {
     }
   }
 
-  drawObjects(dataRest, mode, pipelineDataDictionary) {
+  drawObjects(dataRest, pipelineDataDictionary) {
     dataRest.forEach((item) => {
       if (
         item?.type !== null
@@ -508,11 +478,68 @@ class MapClass {
             this.addMarker(item, lib);
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
-            this.addLine(item, lib, mode, pipelineDataDictionary[item.ID]);
+            this.addLine(item, lib, pipelineDataDictionary[item.ID]);
           }
         }
       }
     });
+  }
+
+  highlightFeatureFunc({
+    lib,
+    pipelineData,
+    route,
+    lineTurf,
+    element,
+  }) {
+    return (e, line) => {
+      const layer = e.target;
+      layer.bringToFront();
+      layer.setStyle({
+        weight: lib.width + 3,
+        color: lib.color,
+      });
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+      }
+      if (!pipelineData) return;
+      const closest = (arr, num) => (
+        arr.reduce((acc, val) => {
+          if (Math.abs(val.pos - num) < Math.abs(acc)) {
+            return val.pos - num;
+          }
+          return acc;
+        }, Infinity) + num
+      );
+      if (this.mode[0] === 'Мониторинг') {
+        const newLine = turf.lineSlice(
+          route[0],
+          [e.latlng.lat, e.latlng.lng],
+          lineTurf,
+        );
+        const newLinePoly = L.polyline(newLine.geometry.coordinates);
+        const distances = utils.accumulatedLengths(newLinePoly);
+        const sum = distances[distances.length - 1];
+
+        const closestData = closest(pipelineData, sum);
+
+        const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
+        // div for tooltip
+        const newDiv = document.createElement('div');
+        let html = '<div style="text-align: left; background-color: #191919; color: white">';
+        html += `<p>${pipelineInfo.label}</p>`;
+        if (this.pipelineParameters.length > 0) {
+          this.pipelineParameters.forEach((item) => {
+            html += `<p>${item.type} ${pipelineInfo[item.type]}</p>`;
+          });
+        }
+        html += '</div>';
+        newDiv.innerHTML = html;
+        line.setTooltipContent(newDiv);
+      } else {
+        line.setTooltipContent(element.label);
+      }
+    };
   }
 
   addLayer(layer) {
