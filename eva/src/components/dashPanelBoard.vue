@@ -372,7 +372,7 @@
                 :color="theme.$primary_button"
                 :disabled="search.status !== 'downloaded'"
                 v-on="on"
-                @click="exportSearch(search.sid)"
+                @click="exportSearch(search.id)"
               >
                 {{ download }}
               </v-icon>

@@ -458,7 +458,7 @@ export default new Vuex.Store({
       }
     },
     setLoading(state, {
-      idDash, search, should, error,
+      idDash, search, should, error, name,
     }) {
       state[idDash].elements.forEach((item) => {
         if (state[idDash][item].search === search) {
@@ -466,6 +466,11 @@ export default new Vuex.Store({
             state[idDash][item].loading = '';
           }
 
+          state[idDash][item].loading = should;
+        } else if (search
+            && state[idDash][item].name_elem.toLowerCase() === name.toLowerCase()) {
+          state[idDash][item].loading = should;
+        } else {
           state[idDash][item].loading = should;
         }
       });
