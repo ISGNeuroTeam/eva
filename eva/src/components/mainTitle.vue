@@ -449,32 +449,18 @@ export default {
       handler(searches) {
         if (this.firstLoad) {
           searches.forEach((search) => {
-            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            const loading = search.parametrs?.isStartImmediately
+              || search.parametrs.isStartImmediately === undefined;
+            this.$set(this.dataObject, search.id, { data: [], loading });
             this.$set(this.dataObjectConst, search.id, {
               data: [],
-              loading: true,
+              loading,
             });
           });
+
           this.firstLoad = false;
         }
-        searches.forEach((search) => {
-          if (search.status === 'empty') {
-            this.$set(this.dataObject, search.id, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.id, {
-              data: [],
-              loading: true,
-            });
-            this.$store.commit('updateSearchStatus', {
-              idDash: this.idDash,
-              sid: search.sid,
-              id: search.id,
-              status: 'pending',
-            });
-            this.$nextTick(() => {
-              this.getData(search);
-            });
-          }
-        });
+        this.startSearches(searches);
       },
     },
   },
@@ -514,6 +500,26 @@ export default {
     window.onresize = this.checkTabOverflow;
   },
   methods: {
+    startSearches(searches) {
+      searches.forEach((search) => {
+        if (search.status === 'empty') {
+          this.$set(this.dataObject, search.id, { data: [], loading: true });
+          this.$set(this.dataObjectConst, search.id, {
+            data: [],
+            loading: true,
+          });
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            id: search.id,
+            status: 'pending',
+          });
+          this.$nextTick(() => {
+            this.getData(search);
+          });
+        }
+      });
+    },
     getData(search) {
       this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
         .then((res) => {

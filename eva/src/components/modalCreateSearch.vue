@@ -179,6 +179,17 @@
             />
           </div>
         </div>
+        <v-checkbox
+          v-model="search.parametrs.isStartImmediately"
+          hide-details
+          :color="theme.$primary_button"
+        >
+          <template v-slot:label>
+            <span :style="`color: ${theme.$secondary_text} !important`">
+              Запускать ИД при загрузке дашборда
+            </span>
+          </template>
+        </v-checkbox>
       </div>
       <v-card-actions class="searchBtn">
         <div
@@ -252,6 +263,7 @@ export default {
           preview: false,
           field_extraction: false,
           cache_ttl: 60,
+          isStartImmediately: true,
         },
       },
       createText: 'Создать',
@@ -322,6 +334,9 @@ export default {
   methods: {
     setData() {
       this.search = JSON.parse(JSON.stringify(this.dataSearch));
+      if (this.search.parametrs.isStartImmediately === undefined) {
+        this.$set(this.search.parametrs, 'isStartImmediately', true);
+      }
       if (this.createBtnFrom === 'edit') {
         this.createBtn = 'Редактировать';
       } else {
@@ -453,5 +468,8 @@ export default {
 </script>
 
 <style lang="scss">
+.card-search .v-input__control .v-icon {
+  color: var(--main_text) !important
+}
 @import '../sass/modalCreateSearch.sass';
 </style>

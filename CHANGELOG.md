@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added data source setting for its autorun immediately after loading the dashboard
 - Add pipeline parameters to map
 
 ### Fixed

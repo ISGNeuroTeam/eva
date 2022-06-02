@@ -119,7 +119,7 @@ export default new Vuex.Store({
     },
     setSearch(state, { idDash, reload, search }) {
       const checkId = search.sid;
-      search.status = 'empty';
+      search.status = search.isStartImmediately ? 'empty' : 'stop';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {
           if (checkId === item.sid || search.currentSid === item.sid) {
@@ -1357,13 +1357,26 @@ export default new Vuex.Store({
                 }
               }
               state[id].searches.forEach((search) => {
-                commit('setState', [
-                  {
-                    object: search,
-                    prop: 'status',
-                    value: 'empty',
-                  },
-                ]);
+                if (
+                  search.parametrs?.isStartImmediately
+                  || search.parametrs.isStartImmediately === undefined
+                ) {
+                  commit('setState', [
+                    {
+                      object: search,
+                      prop: 'status',
+                      value: 'empty',
+                    },
+                  ]);
+                } else {
+                  commit('setState', [
+                    {
+                      object: search,
+                      prop: 'status',
+                      value: 'stop',
+                    },
+                  ]);
+                }
               });
             }
             resolve({ status: 'finish' });
