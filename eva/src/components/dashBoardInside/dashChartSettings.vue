@@ -215,8 +215,9 @@
                             :disabled="!metric.showPeakDots || metric.type !== 'line'"
                             min="2"
                             max="10"
+                            thumb-size="25px"
                             thumb-label="always"
-                            class="ml-2"
+                            class="ml-2 mr-1"
                             style="height: 20px;"
                           />
                         </div>
