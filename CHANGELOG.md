@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed data source export
 - Fixed modal windows behavior
+- Fixed select number
 
 ## [1.92.0]
 
