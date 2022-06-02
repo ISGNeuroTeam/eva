@@ -119,7 +119,6 @@ export default new Vuex.Store({
     },
     setSearch(state, { idDash, reload, search }) {
       const checkId = search.sid;
-      console.log('search', search);
       search.status = search.isStartImmediately ? 'empty' : 'stop';
       if (reload) {
         state[idDash].searches.forEach((item, i) => {

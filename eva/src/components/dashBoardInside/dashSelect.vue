@@ -480,9 +480,7 @@ export default {
               }, [])];
         });
       } else {
-        console.log(this.elemDeep[String(this.multiple)]);
-        // value = [...[], ...this.elemDeep[String(this.multiple)]];
-        console.log(value);
+        value = [...[], ...String(this.elemDeep[String(this.multiple)])];
         for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
             value = [data[i][this.elemlink]];
@@ -490,7 +488,7 @@ export default {
           }
         }
       }
-      console.log(value);
+
       if (curTocken.prefix && curTocken.prefix !== '') {
         value = value.map((item) => `${curTocken.prefix}${item}`);
       }

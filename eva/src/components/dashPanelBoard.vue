@@ -1629,7 +1629,6 @@ export default {
       });
     },
     runAllSearches() {
-      console.log('runAllSearches');
       this.searches.forEach((search) => {
         this.$store.commit('updateSearchStatus', {
           idDash: this.idDash,

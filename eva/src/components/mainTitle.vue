@@ -418,7 +418,6 @@ export default {
           value: [],
         }]);
       }
-      console.log('serches', this.dashFromStore.searches);
       return this.dashFromStore.searches;
     },
     tokens() {
