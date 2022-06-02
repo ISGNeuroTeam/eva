@@ -439,12 +439,11 @@ export default class ChartClass {
    *        color: 'red',
    *        ticks: 10',
    *        type: 'line', // 'barplot'
-   *        lastDot: 0, // 0 - last, 1 - every, 2, 3, ...
+   *        lastDot: 0, // 0 - last, 1 - every, 'odd', 'even', 3, ...
    *        zerosAfterDot: 2, // 1, 2, 3, ...
    *        strokeDasharray: '0', // '5,5', '1,3', '1, 3, 6, 3'
    *        strokeWidth: 1,
    *        dotSize: 4,
-   *        ...
    *        showPeakDots: false,
    *      },
    *      ...
@@ -718,13 +717,8 @@ export default class ChartClass {
         if (nodes.length === 1) {
           className += ' dot-show';
         } else if (metric.showPeakDots) {
-          if (+metric.lastDot === 0 && nodes.length === i + 1) {
-            className += ' last-dot dot-show';
-          }
-          if (+metric.lastDot > 0) {
-            if ((nodes.length - 1 - i) % metric.lastDot === 0) {
-              className += ' dot-show';
-            }
+          if (ChartClass.lastDotParamForPoint(metric.lastDot, i, nodes)) {
+            className += ' dot-show';
           }
         }
         return className;
@@ -756,10 +750,9 @@ export default class ChartClass {
     const data = line.filter((d, i) => {
       if (+metric.lastDot === 0 && line.length === i + 1) {
         return true;
-      } if (+metric.lastDot > 0) {
-        if (((line.length - 1 - i) % +metric.lastDot) === 0) {
-          return true;
-        }
+      }
+      if (ChartClass.lastDotParamForPoint(metric.lastDot, i, line)) {
+        return true;
       }
       return false;
     });
@@ -1141,8 +1134,8 @@ export default class ChartClass {
       ? captionKey
       : metric.name;
     const val = data[fieldName];
-    return (val % 1 || metric.zerosAfterDot) // is float
-      ? Number.parseFloat(val).toFixed(metric.zerosAfterDot || 2)
+    return (val % 1 || metric.zerosAfterDot || metric.zerosAfterDot === 0)
+      ? Number.parseFloat(val).toFixed(metric.zerosAfterDot ?? 2)
       : val;
   }
 
@@ -1160,5 +1153,31 @@ export default class ChartClass {
   static canBeNumber(val) {
     // eslint-disable-next-line no-restricted-globals
     return !isNaN(parseInt(val, 10));
+  }
+
+  static lastDotParamForPoint(lastDot, i, nodes) {
+    if (+lastDot === 0 && nodes.length === i + 1) {
+      return true;
+    }
+    switch (lastDot) {
+      case 'odd':
+        if ((nodes.length - 1 - i) % 2 === 0) {
+          return true;
+        }
+        break;
+      case 'even':
+        if ((nodes.length - 1 - i) % 2 === 1) {
+          return true;
+        }
+        break;
+      default:
+        if (+lastDot > 0) {
+          if ((nodes.length - 1 - i) % lastDot === 0) {
+            return true;
+          }
+        }
+        break;
+    }
+    return false;
   }
 }

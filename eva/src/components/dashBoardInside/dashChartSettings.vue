@@ -282,7 +282,8 @@
                             :items="[
                               { value: '', text: 'Последнее' },
                               { value: '1', text: 'Каждое' },
-                              { value: '2', text: 'Нечетное' },
+                              { value: 'even', text: 'Четное' },
+                              { value: 'odd', text: 'Нечетное' },
                               { value: '3', text: 'Каждое 3' },
                             ]"
                             label="Вывод значений"
