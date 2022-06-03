@@ -22,6 +22,7 @@
         @keypress.enter="setTockenByPress($event)"
         @blur="setTockenBlur($event)"
         @change="onInputText"
+        @keyup="onKeyUpText"
       />
       <v-btn
         v-if="searchBtn"
@@ -187,20 +188,32 @@ export default {
       });
       this.setTocken();
     },
+    onKeyUpText() {
+      const { options } = this.dashFromStore;
+      if (options?.validationType === 'numberRange') {
+        const num = this.textarea.match(/^-?(\d+)?(\.)?(\d+)?/);
+        this.textarea = num ? num[0] : '';
+      }
+    },
     onInputText(val) {
       const { options } = this.dashFromStore;
-      const validationNumberRangeMin = parseFloat(options.validationNumberRangeMin)
-      const validationNumberRangeMax = parseFloat(options.validationNumberRangeMax)
       if (options?.validationType === 'numberRange') {
+        const {
+          validationNumberRangeMin,
+          validationNumberRangeMax,
+        } = options;
+        const min = parseFloat(validationNumberRangeMin);
+        const max = parseFloat(validationNumberRangeMax);
         let numberValue = parseFloat(val);
         if (Number.isNaN(numberValue)) {
           numberValue = '';
-        }
-        if (!Number.isNaN(validationNumberRangeMin) || numberValue < validationNumberRangeMin) {
-          numberValue = validationNumberRangeMin;
-        }
-        if (!Number.isNaN(validationNumberRangeMax) && numberValue > validationNumberRangeMax) {
-          numberValue = validationNumberRangeMax;
+        } else {
+          if (numberValue < min) {
+            numberValue = min;
+          }
+          if (numberValue > max) {
+            numberValue = max;
+          }
         }
         this.textarea = `${numberValue}`;
       }
