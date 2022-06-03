@@ -449,36 +449,42 @@ export default {
       handler(searches) {
         if (this.firstLoad) {
           searches.forEach((search) => {
-            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            const loading = search.parametrs?.isStartImmediately
+              || search.parametrs.isStartImmediately === undefined;
+            this.$set(this.dataObject, search.id, { data: [], loading });
             this.$set(this.dataObjectConst, search.id, {
               data: [],
-              loading: true,
+              loading,
             });
           });
+
           this.firstLoad = false;
         }
-        searches.forEach((search) => {
-          if (search.status === 'empty') {
-            this.$set(this.dataObject, search.id, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.id, {
-              data: [],
-              loading: true,
-            });
-            this.$store.commit('updateSearchStatus', {
-              idDash: this.idDash,
-              sid: search.sid,
-              id: search.id,
-              status: 'pending',
-            });
-            this.$nextTick(() => {
-              this.getData(search);
-            });
-          }
-        });
+        this.startSearches(searches);
       },
     },
   },
   async mounted() {
+    if (this.dashFromStore) {
+      const isSettingsOpen = this.dashFromStore
+        .modalSettings?.status;
+      const isModalVisualisationOpen = this.dashFromStore
+        .visualisationModalData?.open;
+      if (isSettingsOpen) {
+        this.$store.commit('setModalSettings', {
+          idDash: this.idDash,
+          element: '',
+          status: false,
+        });
+      }
+      if (isModalVisualisationOpen) {
+        this.$store.commit('setVisualisationModalData', {
+          idDash: this.idDash,
+          data: {},
+        });
+      }
+    }
+
     await this.checkAlreadyDash();
     this.loadingDash = false;
     document.title = `EVA | ${this.dashFromStore.name}`;
@@ -494,6 +500,26 @@ export default {
     window.onresize = this.checkTabOverflow;
   },
   methods: {
+    startSearches(searches) {
+      searches.forEach((search) => {
+        if (search.status === 'empty') {
+          this.$set(this.dataObject, search.id, { data: [], loading: true });
+          this.$set(this.dataObjectConst, search.id, {
+            data: [],
+            loading: true,
+          });
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            id: search.id,
+            status: 'pending',
+          });
+          this.$nextTick(() => {
+            this.getData(search);
+          });
+        }
+      });
+    },
     getData(search) {
       this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
         .then((res) => {
@@ -572,6 +598,9 @@ export default {
     },
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
+      if (this.$store.state[this.idDash][elem.elem].loading) {
+        return this.$store.state[this.idDash][elem.elem].loading;
+      }
       return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
