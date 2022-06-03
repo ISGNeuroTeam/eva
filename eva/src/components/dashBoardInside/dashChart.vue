@@ -36,7 +36,7 @@
           </div>
         </template>
       </div>
-      <div v-if="data.length === 0">
+      <div v-if="dataRestFrom.length === 0">
         <span>Нет данных для отображения</span>
       </div>
       <div
@@ -223,10 +223,6 @@ export default {
       return xMetric;
     },
 
-    data() {
-      return this.dataRestFrom;
-    },
-
     box() {
       const { sizeFrom } = this;
       const { width, height } = sizeFrom;
@@ -259,7 +255,7 @@ export default {
         this.updateBox();
       }
     },
-    data() {
+    dataRestFrom() {
       this.updateData();
     },
     fullScreenMode() {
@@ -363,7 +359,7 @@ export default {
     },
 
     updateData() {
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.data, this.xMetric);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
     },
     updateBox() {
       const { height } = this.box;
@@ -470,7 +466,7 @@ export default {
           version: 3,
         },
       });
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.data, this.xMetric);
+      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
     },
   },
 };
