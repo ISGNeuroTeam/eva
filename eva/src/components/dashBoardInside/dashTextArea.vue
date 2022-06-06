@@ -173,6 +173,7 @@ export default {
       handler(val) {
         if (val) {
           this.onInputText(this.textarea);
+          this.setTocken();
         }
       },
     },
