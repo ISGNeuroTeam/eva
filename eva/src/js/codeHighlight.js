@@ -12,14 +12,13 @@
  });
  */
 
+// eslint-disable-next-line func-names
 (function (mod) {
   if (typeof exports === 'object' && typeof module === 'object') // CommonJS
   // eslint-disable-next-line brace-style,global-require
   { mod(require('codemirror/lib/codemirror'), require('codemirror/addon/mode/simple')); }
-  else if (typeof define === 'function' && define.amd) {
-    define(['codemirror/lib/codemirror', 'codemirror/addon/mode/simple'], mod);
-    // eslint-disable-next-line no-undef
-  } else { mod(CodeMirror); }
+  // eslint-disable-next-line no-undef
+  else { mod(CodeMirror); }
 }((CodeMirror) => {
   CodeMirror.defineSimpleMode('otl', {
     start: [

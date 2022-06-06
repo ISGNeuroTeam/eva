@@ -480,7 +480,7 @@ export default {
               }, [])];
         });
       } else {
-        value = [...[], ...this.elemDeep[String(this.multiple)]];
+        value = [...[], ...String(this.elemDeep[String(this.multiple)])];
         for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
             value = [data[i][this.elemlink]];
