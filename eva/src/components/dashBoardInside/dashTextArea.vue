@@ -16,7 +16,7 @@
         :style="{
           color: color.text,
           fontWeight: getOptions.fontWeight,
-          fontSize: `${getOptions.fontSize}px`,
+          fontSize: `${getOptions.textFontSize}px`,
         }"
         spellcheck="false"
         hide-details
@@ -146,18 +146,18 @@ export default {
           value: false,
         }]);
       }
-      if (!this.dashFromStore?.options.fontSize) {
+      if (!this.dashFromStore?.options.textFontSize) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
-          prop: 'fontSize',
-          value: '14',
+          prop: 'textFontSize',
+          value: 14,
         }]);
       }
       if (!this.dashFromStore?.options.fontWeight) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
           prop: 'fontWeight',
-          value: '400',
+          value: 400,
         }]);
       }
 

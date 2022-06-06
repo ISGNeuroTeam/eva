@@ -200,7 +200,7 @@ export default {
       'pinned',
       'onButton',
     ],
-    textarea: ['visible', 'level', 'searchBtn', 'pinned', 'fontSize', 'fontWeight'],
+    textarea: ['visible', 'level', 'searchBtn', 'pinned', 'textFontSize', 'fontWeight'],
     guntt: ['visible', 'level', 'timeFormat', 'pinned'],
     tile: ['visible', 'level', 'widthTile', 'heightTile', 'pinned'],
     csvg: ['visible', 'level', 'tooltip', 'pinned'],
@@ -269,9 +269,16 @@ export default {
       elem: 'switch',
     },
     {
+      option: 'textFontSize',
+      description: 'Выбрать размер шрифта',
+      elem: 'select',
+      items: [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
+    },
+    {
       option: 'fontWeight',
       description: 'Установить насыщенности текста',
-      elem: 'text-field',
+      elem: 'select',
+      items: [100, 200, 400, 500, 800],
     },
 
     // dashMap
