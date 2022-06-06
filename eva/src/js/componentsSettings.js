@@ -176,7 +176,15 @@ export default {
       'titles',
       'pinned',
     ],
-    select: ['visible', 'level', 'boxShadow', 'multiple', 'pinned'],
+    select: [
+      'visible',
+      'level',
+      'boxShadow',
+      'multiple',
+      'pinned',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+    ],
     picker: ['visible', 'level', 'pinned'],
     graph: ['visible', 'level', 'boxShadow', 'pinned'],
     single: [
@@ -200,7 +208,14 @@ export default {
       'pinned',
       'onButton',
     ],
-    textarea: ['visible', 'level', 'searchBtn', 'pinned'],
+    textarea: [
+      'visible',
+      'level',
+      'searchBtn',
+      'pinned',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+    ],
     guntt: ['visible', 'level', 'timeFormat', 'pinned'],
     tile: ['visible', 'level', 'widthTile', 'heightTile', 'pinned'],
     csvg: ['visible', 'level', 'tooltip', 'pinned'],
@@ -223,7 +238,13 @@ export default {
       'detailValue',
     ],
     singleValue: ['visible', 'level', 'pinned'],
-    tune: ['visible', 'level', 'pinned'],
+    tune: [
+      'visible',
+      'level',
+      'pinned',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+    ],
     accumulators: [
       'visible',
       'level',
@@ -267,6 +288,34 @@ export default {
       option: 'searchBtn',
       description: 'Показывать кнопку поиска',
       elem: 'switch',
+    },
+    {
+      option: 'defaultFromSourceData',
+      description: 'Дефолтное значение из источника данных',
+      elem: 'select',
+      default: null,
+      items() {
+        const sourceDataList = this.$store.state[this.idDash].searches
+          .map(({ id, sid }) => ({
+            value: id,
+            text: sid,
+          }));
+        return [
+          {
+            value: null,
+            text: '-- Не использовать --',
+          },
+          ...sourceDataList,
+        ];
+      },
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataField',
+      description: 'Поле для дефолтного значения из ИД',
+      elem: 'text-field',
+      default: 'value',
+      placeholder: 'Default: value',
     },
 
     // dashMap

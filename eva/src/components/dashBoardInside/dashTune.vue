@@ -133,6 +133,10 @@ export default {
       type: String,
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -312,6 +316,12 @@ export default {
     percentValue() {
       this.detectSliderValue(this.values);
     },
+    'dashFromStore.options.defaultFromSourceData': {
+      deep: true,
+      handler() {
+        this.onChangeSlider();
+      },
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -336,6 +346,12 @@ export default {
     },
     changeValue() {
       this.$nextTick(() => {
+        if (this.value === undefined || this.value === 0) {
+          const defaultValue = this.getDefaultValue();
+          if (defaultValue !== null) {
+            this.value = defaultValue;
+          }
+        }
         this.setToken();
         this.storeValue();
       });
@@ -380,6 +396,24 @@ export default {
       if (this.value === '' && values?.length > 0) {
         this.value = values[this.sliderValue];
       }
+    },
+    getDefaultValue() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataField = null,
+      } = this.dashFromStore.options;
+      const fieldName = defaultSourceDataField || 'value';
+      if (defaultFromSourceData) {
+        const { data = undefined } = this.dataSources[defaultFromSourceData];
+        if (data && data.length) {
+          const [firstRow] = data;
+          const rowKeys = Object.keys(firstRow);
+          if (rowKeys.includes(fieldName)) {
+            return firstRow[fieldName];
+          }
+        }
+      }
+      return null;
     },
   },
 };

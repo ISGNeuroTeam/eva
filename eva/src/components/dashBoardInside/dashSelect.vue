@@ -156,6 +156,10 @@ export default {
       type: String,
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -307,6 +311,12 @@ export default {
     },
   },
   watch: {
+    'dashFromStore.options.defaultFromSourceData': {
+      deep: true,
+      handler() {
+        this.setTocken();
+      },
+    },
     selectedElemDeep(val) {
       if (val.elemDeep === '') {
         this.$store.commit('setState', [{
@@ -416,6 +426,24 @@ export default {
       this.open = !this.open;
       this.select_show = !this.select_show;
     },
+    getDefaultValue() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataField = null,
+      } = this.dashFromStore.options;
+      const fieldName = defaultSourceDataField || 'value';
+      if (defaultFromSourceData) {
+        const { data = undefined } = this.dataSources[defaultFromSourceData];
+        if (data && data.length) {
+          const [firstRow] = data;
+          const rowKeys = Object.keys(firstRow);
+          if (rowKeys.includes(fieldName)) {
+            return firstRow[fieldName];
+          }
+        }
+      }
+      return null;
+    },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
@@ -445,6 +473,17 @@ export default {
       return data;
     },
     setTocken() {
+      const defaultValue = this.getDefaultValue();
+      if (defaultValue !== null) {
+        if (this.multiple) {
+          if (this.elemDeep[String(this.multiple)].length === 0) {
+            this.elemDeep[String(this.multiple)] = [defaultValue];
+          }
+        } else if (!this.elemDeep[String(this.multiple)]) {
+          this.elemDeep[String(this.multiple)] = defaultValue;
+        }
+      }
+
       this.$store.commit('setSelected', {
         element: 'elemDeep',
         value: this.elemDeep[String(this.multiple)],

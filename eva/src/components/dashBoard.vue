@@ -465,6 +465,7 @@
         :id-dash-from="idDash"
         :data-rest-from="searchData"
         :data-mode-from="dataMode"
+        :data-sources="dataSources"
         :loading="loading"
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
@@ -563,6 +564,10 @@ export default {
     tooltipOpenDelay: {
       type: Number,
       default: 500,
+    },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
