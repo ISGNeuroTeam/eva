@@ -225,11 +225,13 @@ export default {
     },
     fullScreenMode() {
       this.$nextTick(() => {
+        this.map.remove();
+        this.map = null;
         this.init();
       });
     },
     sizeFrom(val, oldVal) {
-      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+      if (this.map && JSON.stringify(val) !== JSON.stringify(oldVal)) {
         this.map.resize();
       }
     },
@@ -347,10 +349,12 @@ export default {
       if (this.map) {
         this.reDrawMap(this.dataRestFrom);
         this.$nextTick(() => {
-          if (this.map && this.library?.objects) {
-            this.$refs.setting.creationLayer();
-            this.$refs.setting.addLayer();
-          }
+          this.$nextTick(() => {
+            if (this.map && this.library?.objects) {
+              this.$refs.setting.creationLayer();
+              this.$refs.setting.addLayer();
+            }
+          });
         });
       }
     },

@@ -574,6 +574,7 @@ class MapClass {
   }
 
   remove() {
+    this.map.off();
     this.map.remove();
   }
 
