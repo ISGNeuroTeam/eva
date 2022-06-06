@@ -216,20 +216,20 @@ export default {
       iconsList: [
         {
           src: '/icons/icon-test-1.svg',
-          width: 459,
-          height: 274,
+          width: 91,
+          height: 54,
           label: 'Image Node',
         },
         {
           src: '/icons/icon-test-1.svg',
-          width: 459,
-          height: 274,
+          width: 91,
+          height: 54,
           label: 'Image Node',
         },
         {
           src: '/icons/icon-test-1.svg',
-          width: 459,
-          height: 274,
+          width: 91,
+          height: 54,
           label: 'Image Node',
         },
       ],
@@ -238,11 +238,131 @@ export default {
           id: '',
         },
       ],
+      allItems: [],
+      mockData: [
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_NGS1_PNI',
+          metric_long_name: 'НГС-1 Давление',
+          value: '6.793125152587891',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_NGS1_LNI',
+          metric_long_name: 'НГС-1 Уровень',
+          value: '0.8172000050544739',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_NGS2_PNI',
+          metric_long_name: 'НГС-2 Давление',
+          value: '',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_NGS2_LNI',
+          metric_long_name: 'НГС-2 Уровень',
+          value: '',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'TAYL-D1_NGS3_PNI',
+          metric_long_name: 'НГС-3 Давление',
+          value: '6.817500114440918',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'TAYL-D1_NGS3_TNI',
+          metric_long_name: 'НГС-3 Температура',
+          value: '37.959373474121094',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'TAYL-D1_NGS3_LNI',
+          metric_long_name: 'НГС-3 Уровень',
+          value: '0.8356599807739258',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove1_In_PNI',
+          metric_long_name: 'П-1 Давление на входе',
+          value: '5.357499599456787',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove1_Out_PNI',
+          metric_long_name: 'П-1 Давление на выходе',
+          value: '4.078125',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove1_In_TNI',
+          metric_long_name: 'П-1 Температура на входе',
+          value: '45.390625',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove1_Out_TNI',
+          metric_long_name: 'П-1 Температура на выходе',
+          value: '58.412498474121094',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove2_In_PNI',
+          metric_long_name: 'П-2 Давление на входе',
+          value: '5.059375286102295',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove2_Out_PNI',
+          metric_long_name: 'П-2 Давление на выходе',
+          value: '4.093124866485596',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove2_In_TNI',
+          metric_long_name: 'П-2 Температура на входе',
+          value: '43.56249237060547',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove2_Out_TNI',
+          metric_long_name: 'П-2 Температура на выходе',
+          value: '54.36000061035156',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove3_In_PNI',
+          metric_long_name: 'П-3 Давление на входе',
+          value: '4.653749942779541',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove3_Out_PNI',
+          metric_long_name: 'П-3 Давление на выходе',
+          value: '4.324999809265137',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove4_In_PNI',
+          metric_long_name: 'П-4 Давление на входе',
+          value: '4.473750114440918',
+        },
+        {
+          object_name: 'Тайлаковское м/р ДНС-1',
+          metric_name: 'S1D1_Stove4_Out_PNI',
+          metric_long_name: 'П-4 Давление на выходе',
+          value: '4.23562479019165',
+        },
+      ],
     };
   },
   computed: {
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
+    },
+    savedGraphElementsFromStore() {
+      return this.dashFromStore.savedGraphElements || [];
     },
     innerSize() {
       return {
@@ -309,17 +429,36 @@ export default {
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
     },
+    saveGraphItem(items) {
+      // this.allItems.push(item);
+      this.$store.commit('setState', [{
+        object: this.dashFromStore,
+        prop: 'savedGraphElements',
+        value: JSON.parse(JSON.stringify(items)),
+      }]);
+    },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
         dndPanelContainerElem: this.$refs.dndPanelContainer,
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
         iconsList: this.iconsList,
+        savedElements: this.savedGraphElementsFromStore,
         edgeCustomStyles: this.edgeCustomStyles,
         nodeCustomStyles: this.nodeCustomStyles,
         labelCustomStyles: this.labelCustomStyles,
+        saveGraphItemCallback: this.saveGraphItem,
       });
       // this.constructorSchemes = constructorSchemes;
+      if (this.constructorSchemes) {
+        // this.constructorSchemes.parseDataJson();
+      }
+    },
+    onClickGraphElement(sender, evt) {
+      console.log(sender, evt);
+    },
+    async onCreatedElement(sender, evt) {
+      console.log(sender, evt);
     },
   },
 };
@@ -374,6 +513,31 @@ export default {
   }
   &__graph-component {
     height: inherit;
+  }
+}
+</style>
+
+<style lang="scss">
+.b-data-node {
+  &__text {
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 13px;
+  }
+  &__wrapper {
+    &--type-2 {
+      display: flex;
+      height: 100%;
+      text-align: center;
+      font-weight: 700;
+      font-size: 11px;
+      line-height: 13px;
+      color: #FFFFFF;
+      box-sizing: border-box;
+      justify-content: center;
+      align-items: center;
+      padding: 7.5px 12px;
+    }
   }
 }
 </style>
