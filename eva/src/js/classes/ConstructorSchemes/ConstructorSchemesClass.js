@@ -33,9 +33,10 @@ import {
   INode,
   WebGL2GraphModelManager,
   WebGL2SelectionIndicatorManager,
-  Color,
+  Color, YString, Mapper, IMapper, IPortOwner, FreeNodePortLocationModel,
 } from 'yfiles';
 
+import { throttle } from '../../utils/throttle';
 import licenseData from '../../../license/license.json';
 import { DragAndDropPanelItem, DragAndDropPanel } from './DnDPanelClass';
 import HtmlLabelStyle from './HtmlLabelStyles';
@@ -44,12 +45,579 @@ import VuejsNodeStyle from './VueNodeStyle';
 License.value = licenseData; // Проверка лицензии
 
 class ConstructorSchemesClass {
+  createdElements = {
+    nodes: [],
+    edges: [],
+  }
+
+  get getSavedNodes() {
+    return this.createdElements.nodes;
+  }
+
+  set setSavedNodes(newValue) {
+    this.createdElements.nodes = newValue;
+  }
+
+  get getSavedEdges() {
+    return this.createdElements.edges;
+  }
+
+  set setSavedEdges(newValue) {
+    this.createdElements.edges = newValue;
+  }
+
+  dndDataPanelItems = [
+    // TemplateType: template-0
+    // Frame-1376
+    {
+      template: `<g class="b-data-node">
+          <!--Area-->
+          <defs>
+           <!--Border-radius-bg-->
+           <clipPath id="border-radius">
+             <rect 
+               x="0" 
+               y="0" 
+               :width="layout.width" 
+               :height="(16 * tag.items.length) - 1" 
+               fill="transparent" 
+               rx="3" 
+               ry="3" 
+             />
+           </clipPath>
+           <!--Separator-line-->
+           <rect 
+             id="separator-line" 
+             :width="layout.width" 
+             height="1" 
+             fill="#E0E0EC" 
+           />
+          </defs>
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width / 2"
+           :height="16 * tag.items.length"
+           fill="#FFFFFF"
+           clip-path="url(#border-radius)"
+          />
+          <!--Bg-right-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width / 2"
+           :height="16 * tag.items.length"
+           fill="#000000"
+           clip-path="url(#border-radius)"
+           :transform="'translate(' + layout.width + ',' + ((16 * tag.items.length) - 1) + '), rotate(180)'"
+          />
+          <template v-if="tag && tag.items && tag.items.length > 0">
+           <g
+            v-for="(item, index) in tag.items"
+            :key="'row-' + item.id"
+            class="b-data-node__items"
+           >
+             <text
+              dx="0.5em"
+              class="b-data-node__text b-data-node__text--left"
+              fill="#3C3B45"
+              :dy="index > 0 ? 1 + (1.45 * index) + 'em' : '1em'"
+             >
+               {{ item.textLeft }}
+             </text>
+             <text
+               text-anchor="end"
+               :dy="index > 0 ? 1 + (1.45 * index) + 'em' : '1em'"
+               :dx="(layout.width / 2) - 1"
+               class="b-data-node__text b-data-node__text--right"
+               :transform="'translate(' + (layout.width - 8) / 2 + ')'"
+               fill="white"
+             >
+               {{ item.textRight }}
+             </text>
+             <use href="#separator-line" x="0" :y="15.5 * (index + 1)" v-if="index < (tag.items.length - 1)"/>
+           </g>
+          </template>
+        </g>`,
+      width: 150,
+      rowHeight: 15,
+      dataRest: {
+        // Идентификатор для связки данных с элементом,
+        // в дальнейшем должен приходить с сервера
+        id: '0',
+        templateType: 'template-0',
+        items: [
+          {
+            id: 111111,
+            textLeft: 'F,m3/час',
+            textRight: '1279.1',
+          },
+          {
+            id: 222222,
+            textLeft: 'F,m3[сут]',
+            textRight: '12055',
+          },
+          {
+            id: 333333,
+            textLeft: 'Р,кГс/см3',
+            textRight: '7.39',
+          },
+          {
+            id: 444444,
+            textLeft: 'Т,Со',
+            textRight: '23.56',
+          },
+        ],
+      },
+    },
+    // TemplateType: template-1
+    // Frame-1367
+    {
+      template: `<g class="b-data-node">
+       <!--Area-->
+       <defs>
+         <clipPath :id="'border-radius-' + tag.id">
+           <rect 
+             x="0" 
+             y="0" 
+             :width="layout.width" 
+             :height="(16 * tag.items.length) - 2" 
+             fill="transparent" 
+             rx="3" 
+             ry="3" 
+           />
+         </clipPath>
+         <rect 
+           :id="'separator-line-' + tag.id" 
+           :width="layout.width" 
+           height="1" 
+           fill="#E0E0EC" 
+         />
+       </defs>
+       <!--Bg-left-->
+       <rect
+         x="0"
+         y="0"
+         :width="layout.width / 3"
+         :height="(16 * tag.items.length) - 2"
+         fill="#FFFFFF"
+         :clip-path="'url(#border-radius-' + tag.id + ')'"
+       />
+       <!--Bg-right-->
+       <rect
+         x="0"
+         y="0"
+         :width="((layout.width / 3) * 2)"
+         :height="(16 * tag.items.length) - 2"
+         fill="#000000"
+         :clip-path="'url(#border-radius-' + tag.id + ')'"
+         :transform="'translate(' + layout.width + ',' + ((16 * tag.items.length) - 2) + '), rotate(180)'"
+       />
+       <template v-if="tag && tag.items && tag.items.length > 0">
+         <g
+          v-for="(item, index) in tag.items"
+          :key="'row-' + item.id"
+          class="b-data-node__items"
+         >
+           <text
+            :dx="layout.width / 6"
+            text-anchor="middle"
+            class="b-data-node__text b-data-node__text--left"
+            fill="#3C3B45"
+            :dy="index > 0 ? 1 + (1.45 * index) + 'em' : '1em'"
+           >
+             {{ item.textLeft }}
+           </text>
+           <text
+             text-anchor="middle"
+             :dy="index > 0 ? 1 + (1.45 * index) + 'em' : '1em'"
+             :dx="layout.width / 5"
+             class="b-data-node__text b-data-node__text--right"
+             :transform="'translate(' + (layout.width - 8) / 2 + ')'"
+             fill="white"
+           >
+             {{ item.textRight }}
+           </text>
+           <use 
+             :href="'#separator-line-' + tag.id"
+             x="0" 
+             :y="15.5 * (index + 1)" 
+             v-if="index < (tag.items.length - 1)"
+           />
+         </g>
+       </template>
+     </g>`,
+      width: 150,
+      rowHeight: 15,
+      dataRest: {
+        id: '1',
+        templateType: 'template-1',
+        items: [
+          {
+            id: 111111,
+            textLeft: 'Р',
+            textRight: '4.33',
+          },
+          {
+            id: 222222,
+            textLeft: 'Т',
+            textRight: '53.43',
+          },
+        ],
+      },
+    },
+    // TemplateType: template-2
+    // Frame-1366
+    {
+      template: `<g class="b-data-node">
+      <!--Area-->
+      <defs>
+        <clipPath id="border-radius">
+          <rect 
+            x="0" 
+            y="0" 
+            :width="layout.width" 
+            :height="30" 
+            fill="transparent" 
+            rx="3" 
+            ry="3" 
+          />
+        </clipPath>
+        <rect 
+          id="separator-line" 
+          :width="layout.width" 
+          height="1" 
+          fill="#E0E0EC" 
+        />
+      </defs>
+      <!--Bg-top-->
+      <rect
+        x="0"
+        y="0"
+        :width="layout.width"
+        :height="layout.height / 2"
+        fill="#000000"
+        clip-path="url(#border-radius)"
+      />
+      <!--Bg-bottom-->
+      <rect
+        x="0"
+        y="0"
+        :width="layout.width"
+        :height="layout.height / 2"
+        fill="#FFFFFF"
+        clip-path="url(#border-radius)"
+        :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
+      />
+      <text
+       :dx="layout.width / 2"
+       text-anchor="middle"
+       class="b-data-node__text"
+       fill="#FFFFFF"
+       dy="1em"
+      >
+        {{ tag.textFirst }}
+      </text>
+      <text
+       :dx="layout.width / 2"
+       text-anchor="middle"
+       class="b-data-node__text"
+       fill="#3C3B45"
+       dy="2.45em"
+      >
+        {{ tag.textSecond }}
+      </text>
+    </g>`,
+      width: 150,
+      rowHeight: 30,
+      dataRest: {
+        id: '2',
+        templateType: 'template-2',
+        textFirst: '17',
+        textSecond: 'F,m3/час',
+      },
+    },
+    // TemplateType: template-3
+    // Frame-1375
+    {
+      template: `<g class="b-data-node">
+        <!--Area-->
+        <defs>
+          <clipPath id="border-radius">
+            <rect 
+              x="0" 
+              y="0" 
+              :width="layout.width" 
+              height="30" 
+              fill="transparent" 
+              rx="3" 
+              ry="3" 
+            />
+          </clipPath>
+          <rect 
+            id="separator-line" 
+            :width="layout.width" 
+            height="1" 
+            fill="#E0E0EC" 
+          />
+        </defs>
+        <!--Bg-top-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height / 2"
+          fill="#000000"
+          clip-path="url(#border-radius)"
+        />
+        <!--Bg-bottom-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height / 2"
+          fill="#FFFFFF"
+          clip-path="url(#border-radius)"
+          :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
+        />
+        <text
+            :dx="layout.width / 2"
+            text-anchor="middle"
+            class="b-data-node__text"
+            fill="#FFFFFF"
+            dy="1em"
+        >
+          {{ tag.textFirst }}
+        </text>
+        <text
+            :dx="layout.width / 2"
+            text-anchor="middle"
+            class="b-data-node__text"
+            fill="#3C3B45"
+            dy="2.45em"
+        >
+          {{ tag.textSecond }}
+        </text>
+      </g>`,
+      width: 150,
+      rowHeight: 30,
+      dataRest: {
+        id: '3',
+        templateType: 'template-3',
+        textFirst: '17',
+        textSecond: 'F,m3/час',
+      },
+    },
+    // TemplateType: template-4
+    // Frame-1374
+    {
+      template: `<g class="b-data-node">
+       <!--Area-->
+       <defs>
+         <clipPath id="border-radius">
+           <rect 
+             x="0" 
+             y="0" 
+             :width="layout.width" 
+             :height="(16 * tag.items.length) - 2" 
+             fill="transparent" 
+             rx="3" 
+             ry="3" 
+           />
+         </clipPath>
+         <rect 
+           id="separator-line" 
+           :width="layout.width" 
+           height="1" 
+           fill="#E0E0EC" 
+         />
+       </defs>
+       <!--Bg-left-->
+       <rect
+         x="0"
+         y="0"
+         :width="layout.width / 3"
+         :height="(16 * tag.items.length) - 2"
+         fill="#FFFFFF"
+         clip-path="url(#border-radius)"
+       />
+       <!--Bg-right-->
+       <rect
+         x="0"
+         y="0"
+         :width="((layout.width / 3) * 2)"
+         :height="(16 * tag.items.length) - 2"
+         fill="#000000"
+         clip-path="url(#border-radius)"
+         :transform="'translate(' + layout.width + ',' + ((16 * tag.items.length) - 2) + '), rotate(180)'"
+       />
+       <template v-if="tag && tag.items && tag.items.length > 0">
+         <g
+          v-for="(item, index) in tag.items"
+          :key="'row-' + item.id"
+          class="b-data-node__items"
+         >
+           <text
+            :dx="layout.width / 6"
+            text-anchor="middle"
+            class="b-data-node__text b-data-node__text--left"
+            fill="#3C3B45"
+            :dy="index > 0 ? 1 + (1.45 * index) + 'em' : '1em'"
+           >
+             {{ item.textLeft }}
+           </text>
+           <text
+             text-anchor="middle"
+             :dy="index > 0 ? 1 + (1.45 * index) + 'em' : '1em'"
+             :dx="layout.width / 5"
+             class="b-data-node__text b-data-node__text--right"
+             :transform="'translate(' + (layout.width - 8) / 2 + ')'"
+             fill="white"
+           >
+             {{ item.textRight }}
+           </text>
+           <use href="#separator-line" x="0" :y="15.5 * (index + 1)" v-if="index < (tag.items.length - 1)"/>
+         </g>
+       </template>
+     </g>`,
+      width: 150,
+      rowHeight: 15,
+      dataRest: {
+        id: '4',
+        templateType: '4',
+        items: [
+          {
+            textLeft: 'Р',
+            textRight: '4.33',
+          },
+        ],
+      },
+    },
+    // TemplateType: template-5
+    // Frame-1364, Frame-1368
+    {
+      template: `<g class="b-data-node">
+       <!--Area-->
+       <defs>
+         <clipPath id="border-radius">
+           <rect x="0" y="0" :width="layout.width" :height="layout.height" fill="transparent" rx="3" ry="3" />
+         </clipPath>
+         <rect id="separator-line" :width="layout.width" height="1" fill="#E0E0EC" />
+       </defs>
+       <!--Bg-left-->
+       <rect
+         x="0"
+         y="0"
+         :width="layout.width"
+         :height="layout.height"
+         :fill="tag.maxValueColor"
+         clip-path="url(#border-radius)"
+       />
+       <!--Bg-right-->
+       <rect
+         x="0"
+         y="0"
+         :width="layout.width"
+         :height="((layout.height / 100) * (tag.currentValue * 100 / tag.maxValue))"
+         :fill="tag.currentValueColor"
+         clip-path="url(#border-radius)"
+         :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
+       />
+       <text
+         class="b-data-node__text"
+         :dx="layout.width / 2"
+         :dy="layout.height / 2"
+         alignment-baseline="middle"
+         text-anchor="middle"
+         :fill="tag.textColor"
+       >
+           {{ tag.currentValue }}
+       </text>
+     </g>`,
+      width: 150,
+      height: 30,
+      dataRest: {
+        id: '5',
+        templateType: 'template-5',
+        currentValue: 1.5,
+        currentValueColor: '#FFFFFF',
+        maxValue: 3,
+        maxValueColor: '#000000',
+        textColor: 'red',
+      },
+    },
+    // TemplateType: template-6
+    // Frame-1369
+    {
+      template: `<g class="b-data-node">
+      <!--Area-->
+      <defs>
+        <clipPath id="border-radius">
+          <rect x="0" y="0" :width="layout.width" :height="layout.height" fill="transparent" rx="3" ry="3" />
+        </clipPath>
+        <rect id="separator-line" :width="layout.width" height="1" fill="#E0E0EC" />
+      </defs>
+      <!--Bg-left-->
+      <rect
+        x="0"
+        y="0"
+        :width="layout.width"
+        :height="(layout.height / 100) * ((tag.firstValue * 100) / (tag.firstValue + tag.secondValue))"
+        :fill="tag.firstValueColor"
+        clip-path="url(#border-radius)"
+      />
+      <!--Bg-right-->
+      <rect
+        x="0"
+        y="0"
+        :width="layout.width"
+        :height="(layout.height / 100) * ((tag.secondValue * 100) / (tag.firstValue + tag.secondValue))"
+        :fill="tag.secondValueColor"
+        clip-path="url(#border-radius)"
+        :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
+      />
+      <text
+        class="b-data-node__text"
+        :dx="layout.width / 2"
+        :dy="(layout.height / 6) * 2"
+        alignment-baseline="middle"
+        text-anchor="middle"
+        :fill="tag.textColor"
+      >
+          {{ tag.firstValue }}
+      </text>
+      <text
+        class="b-data-node__text"
+        :dx="layout.width / 2"
+        :dy="(layout.height / 6) * 4"
+        alignment-baseline="middle"
+        text-anchor="middle"
+        :fill="tag.textColor"
+      >
+          {{ tag.secondValue }}
+      </text>
+    </g>`,
+      width: 150,
+      height: 70,
+      dataRest: {
+        id: '6',
+        templateType: 'template-6',
+        firstValue: 5,
+        firstValueColor: '#3366FF',
+        secondValue: 5,
+        secondValueColor: '#FF5147',
+        textColor: '#FFFFFF',
+      },
+    },
+  ]
+
   options = {
     defaultNodeStyle: {
       fill: '#FFFFFF',
       strokeColor: '#F4F4F4',
       strokeSize: '1.5px',
-      size: [140, 140], // Width, height
+      size: [150, 150], // Width, height
     },
     defaultEdgeStyle: {
       strokeColor: '#FFFFFF',
@@ -64,6 +632,20 @@ class ConstructorSchemesClass {
     },
   }
 
+  allDataNodes = []
+
+  get allDataNodes() {
+    return this.allDataNodes;
+  }
+
+  set allDataNode(value) {
+    this.allDataNode = value;
+  }
+
+  get dndDataPanelItems() {
+    return this.dndDataPanelItems;
+  }
+
   get defaultNodeStyle() {
     return this.options.defaultNodeStyle;
   }
@@ -72,7 +654,7 @@ class ConstructorSchemesClass {
     fill = Color.TRANSPARENT,
     strokeColor = Color.TRANSPARENT,
     strokeSize = '1.5px',
-    size = [140, 140],
+    size = [150, 150],
   }) {
     this.options.defaultNodeStyle = {
       fill,
@@ -124,10 +706,14 @@ class ConstructorSchemesClass {
     edgeCustomStyles,
     nodeCustomStyles,
     labelCustomStyles,
+    savedElements,
+    saveGraphItemCallback,
   }) {
     // this.applyStylesElements();
     this.dragAndDropPanel = null;
+    this.mapper = null;
     this.iconsList = iconsList;
+    this.savedElements = JSON.parse(JSON.stringify(savedElements));
     // initialize the GraphComponent
     this.graphComponent = new GraphComponent(elem);
     // this.enableWebGL2();
@@ -139,6 +725,7 @@ class ConstructorSchemesClass {
       edgeCustomStyles,
       labelCustomStyles,
     });
+    // this.parseDataJson();
     // this.setDefaultStyles();
     // Populates the graph and overrides some styles and label models
     // this.populateGraph();
@@ -146,8 +733,11 @@ class ConstructorSchemesClass {
     this.updateViewport();
     this.dndPanelContainerElem = dndPanelContainerElem;
     this.dndPanelElem = dndPanelElem;
-    this.configureInputModes();
+    this.configureInputModes(saveGraphItemCallback);
     this.initializeDnDPanel();
+    if (this.savedElements?.length > 0) {
+      this.createLoadedElements();
+    }
   }
 
   applyStylesElements({
@@ -181,17 +771,112 @@ class ConstructorSchemesClass {
     }
   }
 
-  configureInputModes() {
+  createLoadedElements() {
+    this.savedElements.forEach((element) => {
+      if (element.type.indexOf('node') !== -1) {
+        this.createLoadedNodes(element);
+      }
+      if (element.type.indexOf('edge') !== -1) {
+        this.createLoadedEdge(element);
+      }
+    });
+  }
+
+  createLoadedNodes(data) {
+    let createElement = null;
+    if (data.type === 'data-node') {
+      createElement = this.graphComponent.graph.createNode({
+        layout: new Rect(
+          data.layout.x,
+          data.layout.y,
+          data.layout.width,
+          data.layout.height,
+        ),
+        style: new VuejsNodeStyle(
+          this.dndDataPanelItems[data.tag.templateType.replace('template-', '')].template,
+        ),
+        tag: data.tag,
+      });
+    }
+    if (data.type === 'image-node') {
+      createElement = this.graphComponent.graph.createNode({
+        layout: new Rect(
+          data.layout.x,
+          data.layout.y,
+          data.layout.width,
+          data.layout.height,
+        ),
+        style: new ImageNodeStyle(data.image),
+        tag: data.tag,
+      });
+    }
+    if (data.type === 'default-node') {
+      createElement = this.graphComponent.graph.createNode({
+        layout: new Rect(
+          data.layout.x,
+          data.layout.y,
+          data.layout.width,
+          data.layout.height,
+        ),
+        style: new ShapeNodeStyle({
+          shape: 'round-rectangle',
+          fill: `${ConstructorSchemesClass.colorToString(data.stroke.color)}`,
+          stroke: `${data.stroke.thickness}px ${ConstructorSchemesClass.colorToString(data.stroke.color)}`,
+        }),
+        tag: data.tag,
+      });
+    }
+    // Добавление дополнительных портов
+    this.createAdditionalPorts(createElement);
+  }
+
+  createLoadedEdge(data) {
+    const sourceNode = this.findNodeById(data.sourceNode);
+    const targetNode = this.findNodeById(data.targetNode);
+    const strokeColor = ConstructorSchemesClass.colorToString(data.style.fill);
+    const createdEdge = this.graphComponent.graph.createEdge({
+      sourcePort: this.findPortByType(data.sourcePort, sourceNode),
+      targetPort: this.findPortByType(data.targetPort, targetNode),
+      style: new PolylineEdgeStyle({
+        smoothingLength: data.style.smoothingLength,
+        stroke: `${data.style.thickness}px solid ${strokeColor}`,
+        // targetArrow: `${data.style.targetArrowColor} ${data.style.targetArrowType}`,
+        // sourceArrow: `${data.style.targetArrowColor} ${data.style.targetArrowType}`,
+      }),
+    });
+    createdEdge.tag = {
+      edgeId: `${sourceNode.tag.nodeId}-${targetNode.tag.nodeId}`,
+    };
+    this.graphComponent.graph.addBends(
+      createdEdge,
+      data.bends.map((item) => new Point(item.x, item.y)),
+    );
+  }
+
+  findNodeById(nodeId) {
+    return this.graphComponent.graph.nodes.find((item) => item.tag.nodeId === nodeId);
+  }
+
+  findPortByType(type, node) {
+    return node.ports.toArray().find((item) => item.tag.portType === type);
+  }
+
+  configureInputModes(saveGraphItemCallback) {
     // configure the snapping context
     const mode = new GraphEditorInputMode({
+      allowCreateNode: false,
       allowGroupingOperations: true,
+      deletableItems: INode | IEdge | ILabel,
+      ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
-        nodeToNodeDistance: 30,
-        nodeToEdgeDistance: -50,
+        nodeToNodeDistance: 10,
+        nodeToEdgeDistance: -100,
         snapOrthogonalMovement: false,
         snapDistance: 10,
+        cropSnapLines: false,
         snapSegmentsToSnapLines: true,
         snapBendsToSnapLines: true,
+        snapLineExtension: 100,
         gridSnapType: GridSnapTypes.ALL,
       }),
     });
@@ -205,18 +890,24 @@ class ConstructorSchemesClass {
       // by default the mode available in GraphEditorInputMode is disabled, so first enable it
       enabled: true,
       itemCreator: async (context, graph, dropData, dropTarget, dropLocation) => {
-        console.group();
-        console.log('context', context);
-        console.log('graph', graph);
-        console.log('dropData', dropData);
-        console.log('dropTarget', dropTarget);
-        console.log('dropLocation', dropLocation);
-        console.groupEnd();
-        const createdNode = graph.createNodeAt({
-          location: dropLocation,
-          style: dropData.style,
-          labels: dropData.labels,
-        });
+        let createdNode = null;
+        if (dropData?.tag?.templateType) {
+          createdNode = graph.createNodeAt({
+            location: dropLocation,
+            style: new VuejsNodeStyle(this.dndDataPanelItems[dropData.tag.id].template),
+            labels: dropData.labels,
+            tag: { ...dropData.tag, nodeId: dropData.hashCode() },
+          });
+        } else {
+          createdNode = graph.createNodeAt({
+            location: dropLocation,
+            style: dropData.style,
+            labels: dropData.labels,
+            tag: {
+              nodeId: dropData.hashCode(),
+            },
+          });
+        }
         // Позиция и размеры нового элемента
         graph.setNodeLayout(createdNode, new Rect(
           dropLocation.x - (dropData.layout.width / 2),
@@ -226,22 +917,7 @@ class ConstructorSchemesClass {
         ));
         return createdNode;
       },
-      // nodes that have a DemoGroupStyle assigned have to be created as group nodes
-      // isGroupNodePredicate: (draggedNode) => draggedNode.style instanceof DemoGroupStyle,
     });
-
-    // Обновляем состояние графа(обязательно при работе с WebGl2)
-    // mode.nodeDropInputMode.addItemCreatedListener(async (sender, evt) => {
-    //   const node = await evt.item;
-    //   this.graphComponent.graphModelManager.update(node);
-    //   this.defaultNodeStyle = {
-    //     fill: '#FFFFFF',
-    //     strokeColor: '#FFFFFF',
-    //     strokeSize: '1.5px',
-    //     size: [140, 140],
-    //   };
-    //   this.setDefaultStyles();
-    // });
 
     mode.labelDropInputMode = new LabelDropInputMode({
       showPreview: true,
@@ -265,22 +941,229 @@ class ConstructorSchemesClass {
 
     mode.deletableItems = GraphItemTypes.NODE | GraphItemTypes.EDGE;
 
-    // this.graphComponent.graph.decorator.nodeDecorator.portCandidateProviderDecorator.setFactory(
-    //   ConstructorSchemesClass.getPortCandidateProvider,
-    // );
+    mode.addLabelAddedListener((sender, evt) => {
+      // Сохранять label в объект с сохраненным node
+      console.log('addLabelAddedListener', sender, evt);
+    });
 
-    // configure the edge drop input mode
-    // ConstructorSchemesClass.configureEdgeDropInputMode(mode);
+    mode.addNodeCreatedListener(async (sender, evt) => {
+      const createdItem = await evt.item;
+      // Добавление элемента в список для сохранения
+      this.savedElements.push(ConstructorSchemesClass.extractDataToSave(createdItem));
+      // Добавление дополнительных портов
+      this.createAdditionalPorts(createdItem);
+      // Обновление списка сохраненных элементов
+      saveGraphItemCallback(this.savedElements);
+    });
+
+    mode.addItemClickedListener((sender, evt) => {
+      console.log('addItemClickedListener', sender, evt.item);
+    });
+
+    // Узел создан
+    mode.createEdgeInputMode.addEdgeCreatedListener(async (sender, evt) => {
+      const createdEdge = await evt.item;
+      createdEdge.tag = {
+        edgeId: `${createdEdge.sourceNode.tag.nodeId}-${createdEdge.targetNode.tag.nodeId}`,
+      };
+      this.savedElements.push(ConstructorSchemesClass.extractEdgeDataToSave(createdEdge));
+      // Обновление списка сохраненных элементов
+      saveGraphItemCallback(this.savedElements);
+    });
+
+    mode.addDeletedItemListener(async (sender, evt) => {
+      const deletedItem = await evt.item;
+      this.deleteSavedElement(deletedItem, saveGraphItemCallback);
+    });
+
+    this.graphComponent.graph.addNodeLayoutChangedListener(throttle((source, node) => {
+      this.changeSavedNodes(node?.tag?.nodeId || node.hashCode(), node);
+      // Обновление списка сохраненных элементов
+      saveGraphItemCallback(this.savedElements);
+    }, 200));
+
+    this.graphComponent.graph.addBendLocationChangedListener(throttle((sender, evt) => {
+      this.changeSavedEdges(evt.owner.tag.edgeId, evt.owner, {
+        location: {
+          x: evt.location.x,
+          y: evt.location.y,
+        },
+        index: evt.index,
+      });
+      // Обновление списка сохраненных элементов
+      saveGraphItemCallback(this.savedElements);
+    }, 200));
 
     this.graphComponent.inputMode = mode;
   }
 
-  // static getPortCandidateProvider(forNode) {
-  //   // noinspection JSCheckFunctionSignatures
-  //   return IPortCandidateProvider.fromCandidates([
-  //     new DefaultPortCandidate(forNode, FreeNodePortLocationModel.NODE_TOP_ANCHORED.model),
-  //   ]);
-  // }
+  deleteSavedElement(element, callback) {
+    // Удаление узла
+    if (element instanceof INode) {
+      // Удаление элемента из сохраненных(Node)
+      this.savedElements = this.savedElements
+        .filter((item) => item.tag.nodeId !== element?.tag?.nodeId);
+    }
+    // Удаление ребра
+    if (element instanceof IEdge) {
+      // Удаление элемента из сохраненных(Edge)
+      this.savedElements = this.savedElements
+        .filter((item) => item?.edgeId !== element.tag?.edgeId);
+    }
+
+    // Обновление списка сохраненных элементов
+    callback(this.savedElements);
+  }
+
+  static extractEdgeDataToSave(createdEdge, newBendsData) {
+    const fillColor = createdEdge.style.stroke.fill.color;
+    const bends = createdEdge.bends.toArray().map((item) => ({
+      x: item.location.x,
+      y: item.location.y,
+    }));
+    if (newBendsData) {
+      bends[newBendsData.index] = newBendsData.location;
+    }
+    return {
+      type: 'edge',
+      edgeId: `${createdEdge.sourceNode.tag.nodeId}-${createdEdge.targetNode.tag.nodeId}`,
+      sourceNode: createdEdge.sourceNode.tag.nodeId,
+      targetNode: createdEdge.targetNode.tag.nodeId,
+      sourcePort: createdEdge.sourcePort.tag.portType,
+      targetPort: createdEdge.targetPort.tag.portType,
+      style: {
+        smoothingLength: createdEdge.style.smoothingLength,
+        // targetArrow: '',
+        // sourceArrow: '',
+        thickness: createdEdge.style.stroke.thickness,
+        fill: {
+          r: fillColor.r,
+          g: fillColor.g,
+          b: fillColor.b,
+          a: fillColor.a,
+        },
+      },
+      bends,
+    };
+  }
+
+  // Подготовка данных для сохранения
+  static extractDataToSave(node) {
+    if (node?.tag?.templateType) {
+      return {
+        type: 'data-node',
+        layout: {
+          height: node.layout.height,
+          width: node.layout.width,
+          x: node.layout.x,
+          y: node.layout.y,
+        },
+        tag: {
+          ...node.tag,
+          nodeId: node.tag?.nodeId || node.hashCode(),
+        },
+      };
+    }
+    if (node.style?.image) {
+      return {
+        type: 'image-node',
+        image: node.style?.image,
+        layout: {
+          height: node.layout.height,
+          width: node.layout.width,
+          x: node.layout.x,
+          y: node.layout.y,
+        },
+        tag: {
+          nodeId: node.tag?.nodeId || node.hashCode(),
+        },
+      };
+    }
+    const strokeThickness = node.style.stroke.thickness;
+    const strokeColor = node.style.stroke.fill.color;
+    const fill = node.style.fill.color;
+    return {
+      type: 'default-node',
+      fill: {
+        r: fill.r,
+        g: fill.g,
+        b: fill.b,
+        a: fill.a,
+      },
+      stroke: {
+        thickness: strokeThickness,
+        color: {
+          r: strokeColor.r,
+          g: strokeColor.g,
+          b: strokeColor.b,
+          a: strokeColor.a,
+        },
+      },
+      layout: {
+        height: node.layout.height,
+        width: node.layout.width,
+        x: node.layout.x,
+        y: node.layout.y,
+      },
+      tag: {
+        nodeId: node.tag?.nodeId || node.hashCode(),
+      },
+    };
+  }
+
+  // Изменение ранее сохраненных узлов
+  changeSavedNodes(hashCode, newData) {
+    this.savedElements = this.savedElements.map((item) => {
+      if (item?.tag?.nodeId === hashCode) {
+        return ConstructorSchemesClass.extractDataToSave(newData);
+      }
+      return item;
+    });
+  }
+
+  // Изменение ранее сохраненных ребер
+  changeSavedEdges(edgeId, newEdgeData, newBendsData) {
+    this.savedElements = this.savedElements.map((item) => {
+      if (item?.edgeId === edgeId) {
+        return ConstructorSchemesClass.extractEdgeDataToSave(newEdgeData, newBendsData);
+      }
+      return item;
+    });
+  }
+
+  createAdditionalPorts(createdItem) {
+    this.graphComponent.graph.addRelativePort(
+      createdItem,
+      new Point((createdItem.layout.width / 6) * 2, 0),
+    ).tag = {
+      portType: 'right',
+    };
+    this.graphComponent.graph.addRelativePort(
+      createdItem,
+      new Point(-(createdItem.layout.width / 6) * 2, 0),
+    ).tag = {
+      portType: 'left',
+    };
+    this.graphComponent.graph.addRelativePort(
+      createdItem,
+      new Point(0, (createdItem.layout.height / 6) * 2),
+    ).tag = {
+      portType: 'top',
+    };
+    this.graphComponent.graph.addRelativePort(
+      createdItem,
+      new Point(0, -(createdItem.layout.height / 6) * 2),
+    ).tag = {
+      portType: 'bottom',
+    };
+    // Center
+    this.graphComponent.graph.addRelativePort(
+      createdItem,
+      new Point(0, 0),
+    ).tag = {
+      portType: 'center',
+    };
+  }
 
   static async webGl2CreateNode({
     graph,
@@ -299,19 +1182,10 @@ class ConstructorSchemesClass {
   }
 
   static colorToString(color) {
-    console.log(`rgb(${color.r}, ${color.g}, ${color.b})`);
+    if (color?.a) {
+      return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    }
     return `rgb(${color.r}, ${color.g}, ${color.b})`;
-  }
-
-  prepareNode({
-    dropLocation,
-    dropData,
-  }) {
-    this.graphComponent.graph.nodeDefaults.size = new Size(
-      dropData.layout.width,
-      dropData.layout.height,
-    );
-    return this.graphComponent.graph.createNodeAt(dropLocation);
   }
 
   static async webGl2CreateIcon({
@@ -319,7 +1193,6 @@ class ConstructorSchemesClass {
     graph,
     createdNode,
   }) {
-    // const ctx = ConstructorSchemesClass.createCanvasContext(dropData.layout.size);
     await graph.setStyle(
       createdNode,
       new ImageNodeStyle(dropData.style.image),
@@ -361,53 +1234,12 @@ class ConstructorSchemesClass {
     // Sets this style as the default for all nodes that don't have another
     // style assigned explicitly
     graph.nodeDefaults.ports.autoCleanUp = false;
-    // graph.nodeDefaults.style = new ShapeNodeStyle({
-    //   shape: 'round-rectangle',
-    //   fill: this.defaultNodeStyle.fill,
-    //   stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
-    // });
-    // graph.nodeDefaults.style = new ShapeNodeStyle({
-    //   shape: 'round-rectangle',
-    //   fill: this.defaultNodeStyle.fill,
-    //   stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
-    // });
+    graph.nodeDefaults.style = new ShapeNodeStyle({
+      shape: 'round-rectangle',
+      fill: this.defaultNodeStyle.fill,
+      stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
+    });
     // Sets the default size for nodes explicitly to 40x40
-    graph.nodeDefaults.style = new VuejsNodeStyle(`<g>
-<rect fill="#C0C0C0" :width="layout.width" :height="layout.height" x="2" y="2"></rect>
-<rect :fill="localUrl('bottomGradient')" stroke="#C0C0C0" :width="layout.width" :height="layout.height"></rect>
-<rect v-if="tag.status === 'present'" :width="layout.width" height="2" fill="#55B757"></rect>
-<rect v-else-if="tag.status === 'busy'" :width="layout.width" height="2" fill="#E7527C"></rect>
-<rect v-else-if="tag.status === 'travel'" :width="layout.width" height="2" fill="#9945E9"></rect>
-<rect v-else-if="tag.status === 'unavailable'" :width="layout.width" height="2" fill="#8D8F91"></rect>
-<rect fill="transparent" :stroke="selected ? '#FF6C00' : 'transparent'" stroke-width="3" :width="layout.width-3" :height="layout.height-3" x="1.5" y="1.5"></rect>
-<template v-if="zoom >= 0.7">
-  <image :xlink:href="'./resources/' + tag.icon + '.svg'" x="15" y="10" width="63.75" height="63.75"></image>
-  <image :xlink:href="'./resources/' + tag.status + '_icon.svg'" x="25" y="80" height="15" width="60"></image>
-  <g style="font-family: Roboto,sans-serif; fill: #444" width="185">
-    <text transform="translate(90 25)" style="font-size: 16px; fill: #336699">{{tag.name}}</text>
-    <text transform="translate(90 45)" style="text-transform: uppercase">{{tag.position}}</text>
-    <text transform="translate(90 72)">{{tag.email}}</text>
-    <text transform="translate(90 88)">{{tag.phone}}</text>
-    <text transform="translate(170 88)">{{tag.fax}}</text>
-  </g>
-</template>
-<template v-else>
-  <image :xlink:href="'./resources/' + tag.icon + '.svg'" x="15" y="20" width="56.25" height="56.25"></image>
-  <g style="font-size: 15px; font-family: Roboto,sans-serif; fill: #444" width="185">
-    <text transform="translate(85 40)" style="font-size: 26px; fill: #336699">{{tag.name}}</text>
-    <svg-text :content="tag.position.toUpperCase()" x="85" y="50" :width="layout.width - 100" :height="50" :wrapping="4" font-family="sans-serif" :font-size="14" :font-style="0" :font-weight="0" :text-decoration="0" fill="black" :opacity="1" :visible="true" :clipped="true" align="start" transform=""></svg-text>
-  </g>
-</template>
-<defs>
-  <linearGradient :id="localId('bottomGradient')" x1="0%" y1="100%" x2="0%" y2="0%">
-    <stop offset="0%" v-if="tag.status === 'present'" style="stop-color:#76b041;stop-opacity:1"/>
-    <stop offset="0%" v-else-if="tag.status === 'busy'" style="stop-color:#ab2346;stop-opacity:1"/>
-    <stop offset="0%" v-else-if="tag.status === 'travel'" style="stop-color:#a367dc;stop-opacity:1"/>
-    <stop offset="0%" v-else-if="tag.status === 'unavailable'" style="stop-color:#c1c1c1;stop-opacity:1"/>
-    <stop offset="5%" style="stop-color:white;stop-opacity:1" />
-  </linearGradient>
-</defs>
-</g>`);
     graph.nodeDefaults.size = new Size(
       this.defaultNodeStyle.size[0],
       this.defaultNodeStyle.size[1],
@@ -504,7 +1336,7 @@ class ConstructorSchemesClass {
 
     this.dragAndDropPanel.maxItemWidth = 160;
     this.dragAndDropPanel.populatePanel(
-      ConstructorSchemesClass.createDnDPanelItems({
+      this.createDnDPanelItems({
         iconsList: this.iconsList,
         defaultEdgeStyle: this.defaultEdgeStyle,
         defaultNodeStyle: this.defaultNodeStyle,
@@ -513,18 +1345,18 @@ class ConstructorSchemesClass {
     );
   }
 
-  parseDataJson(jsonData) {
-    this.graphComponent.selection.selectedNodes.forEach((node) => {
-      try {
-        node.tag = JSON.parse(jsonData);
-        // ConstructorSchemesClass.removeClass(errorArea, 'open-error');
-      } catch (err) {
-        console.log('ERROR', err);
-        // addClass(errorArea, 'open-error');
-        // errorArea.setAttribute('title', err.toString());
+  addingDataToNode({
+    jsonData, targetNode,
+  }) {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node === targetNode) {
+        try {
+          node.tag = jsonData;
+        } catch (err) {
+          console.log('ERROR', err);
+        }
       }
     });
-    this.graphComponent.invalidate();
   }
 
   static generateIconNodes(iconsList) {
@@ -569,7 +1401,7 @@ class ConstructorSchemesClass {
   }
 
   // TODO: Вынести создание элементов панели в отдельные методы для передачи входных данных снаружи
-  static createDnDPanelItems({
+  createDnDPanelItems({
     iconsList,
     defaultNodeStyle,
     defaultEdgeStyle,
@@ -599,7 +1431,20 @@ class ConstructorSchemesClass {
     // groupNode.labels = new ListEnumerable([groupLabel]);
     // itemContainer.push(new DragAndDropPanelItem(groupNode, 'Group Node'));
     // Узел создаваемый кликом по графу
-
+    this.dndDataPanelItems.forEach((item, index) => {
+      const dataNode = new SimpleNode();
+      dataNode.tag = item.dataRest;
+      dataNode.style = new VuejsNodeStyle(item.template);
+      dataNode.layout = new Rect(
+        0,
+        0,
+        item?.width,
+        item?.height
+          ? item.height
+          : item.rowHeight * (item?.dataRest?.items?.length || 1),
+      );
+      itemContainer.push(new DragAndDropPanelItem(dataNode, `Data node - ${index}`));
+    });
     // Стандартный узел
     itemContainer.push(ConstructorSchemesClass.createDnDPanelDefaultNode(defaultNodeStyle));
 
@@ -683,56 +1528,6 @@ class ConstructorSchemesClass {
     const r = new RegExp(`\\b${className}\\b`, '');
     return r.test(classes);
   }
-
-  static async createUrlIcon(ctx, url, imageSize, iconSize) {
-    return new Promise((resolve, reject) => {
-      // create an Image from the url
-      const image = new Image(imageSize.width, imageSize.height);
-      image.onload = () => {
-        // render the image into the canvas
-        ctx.clearRect(0, 0, iconSize.width, iconSize.height);
-        ctx.drawImage(
-          image,
-          0,
-          0,
-          imageSize.width,
-          imageSize.height,
-          0,
-          0,
-          iconSize.width,
-          iconSize.height,
-        );
-        const imageData = ctx.getImageData(0, 0, iconSize.width, iconSize.height);
-        resolve(imageData);
-      };
-      image.onerror = () => {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject('Loading the image failed.');
-      };
-      image.src = url;
-    });
-  }
-
-  static createCanvasContext(iconSize) {
-    // canvas used to pre-render the icons
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('width', `${iconSize.width}`);
-    canvas.setAttribute('height', `${iconSize.height}`);
-    return canvas.getContext('2d');
-  }
-
-  // Дополнительные порты
-  // static getPortCandidateProvider(forNode) {
-  //   const model = new CustomNodePortLocationModel(10);
-  //   // noinspection JSCheckFunctionSignatures
-  //   return IPortCandidateProvider.fromCandidates([
-  //     new DefaultPortCandidate(forNode, model.createCustomParameter(PortLocation.CENTER)),
-  //     new DefaultPortCandidate(forNode, model.createCustomParameter(PortLocation.NORTH)),
-  //     new DefaultPortCandidate(forNode, model.createCustomParameter(PortLocation.EAST)),
-  //     new DefaultPortCandidate(forNode, model.createCustomParameter(PortLocation.SOUTH)),
-  //     new DefaultPortCandidate(forNode, model.createCustomParameter(PortLocation.WEST)),
-  //   ]);
-  // }
 }
 
 export default ConstructorSchemesClass;
