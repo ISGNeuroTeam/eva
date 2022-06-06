@@ -541,7 +541,7 @@ export default {
       this.search.original_otl = '';
     },
     async launchSearch() {
-      this.$emit('launchSearch', JSON.parse(JSON.stringify(this.search)));
+      this.$emit('launchSearch', structuredClone(this.search));
     },
     hashCode(otl) {
       return otl
