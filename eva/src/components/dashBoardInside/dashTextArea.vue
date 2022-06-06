@@ -168,6 +168,14 @@ export default {
     textAreaValue(val) {
       this.textarea = val;
     },
+    'dashFromStore.options.validationType': {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.onInputText(this.textarea);
+        }
+      },
+    },
   },
   mounted() {
     this.$emit('hideDS', this.id);
