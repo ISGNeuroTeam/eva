@@ -348,6 +348,7 @@ export default {
     setVisual(metricOptionsCurrent) {
       const metricList = [];
       const metricOptions = [];
+      this.error = '';
       structuredClone(this.dataRestFrom).forEach((data) => {
         const {
           metric, value, metadata, _order: sortOrder,
@@ -362,7 +363,6 @@ export default {
             metricOptions.length = 0;
             return;
           }
-          this.error = '';
           let range;
 
           if (!metadata || typeof metadata !== 'string') {
