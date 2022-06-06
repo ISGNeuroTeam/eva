@@ -200,7 +200,7 @@ export default {
       'pinned',
       'onButton',
     ],
-    textarea: ['visible', 'level', 'searchBtn', 'pinned'],
+    textarea: ['visible', 'level', 'searchBtn', 'pinned', 'fontSize', 'fontWeight'],
     guntt: ['visible', 'level', 'timeFormat', 'pinned'],
     tile: ['visible', 'level', 'widthTile', 'heightTile', 'pinned'],
     csvg: ['visible', 'level', 'tooltip', 'pinned'],
@@ -267,6 +267,11 @@ export default {
       option: 'searchBtn',
       description: 'Показывать кнопку поиска',
       elem: 'switch',
+    },
+    {
+      option: 'fontWeight',
+      description: 'Установить насыщенности текста',
+      elem: 'text-field',
     },
 
     // dashMap

@@ -13,7 +13,11 @@
         v-model="textarea"
         :color="color.controls"
         outlined
-        :style="{ color: color.text }"
+        :style="{
+          color: color.text,
+          fontWeight: getOptions.fontWeight,
+          fontSize: `${getOptions.fontSize}px`,
+        }"
         spellcheck="false"
         hide-details
         class="textarea-itself"
@@ -140,6 +144,20 @@ export default {
           object: this.dashFromStore.options,
           prop: 'united',
           value: false,
+        }]);
+      }
+      if (!this.dashFromStore?.options.fontSize) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'fontSize',
+          value: '14',
+        }]);
+      }
+      if (!this.dashFromStore?.options.fontWeight) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'fontWeight',
+          value: '400',
         }]);
       }
 
