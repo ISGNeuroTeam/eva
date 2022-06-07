@@ -9,6 +9,7 @@
     <button @click="toggleDnDPanel">
       Open
     </button>
+    <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
       class="dash-constructor-schemes__dnd-panel-container"
@@ -152,6 +153,24 @@
         class="dash-constructor-schemes__dnd-panel"
       />
     </div>
+    <div
+      class="dash-constructor-schemes__data-panel-container"
+      :class="{
+        'dash-constructor-schemes__data-panel-container--active': dataPanel,
+      }"
+    >
+      <div class="row">
+        <div class="col-12">
+          <button @click="closeDataPanel">
+            Close
+          </button>
+        </div>
+      </div>
+      <div
+        ref="dataPanelItems"
+        class="dash-constructor-schemes__data-panel-items"
+      />
+    </div>
     <!--The GraphComponent-->
     <div
       ref="graphComponent"
@@ -194,6 +213,7 @@ export default {
   data() {
     return {
       dndPanel: false,
+      dataPanel: false,
       edgeColorPopup: false,
       nodeBgColorPopup: false,
       nodeBorderColorPopup: false,
@@ -355,6 +375,8 @@ export default {
           value: '4.23562479019165',
         },
       ],
+      selectedNode: '',
+      selectedDataType: '',
     };
   },
   computed: {
@@ -411,25 +433,10 @@ export default {
     closeEdgeColorPicker() {
       this.edgeColorPopup = false;
     },
-    closeNodeBgColorPicker() {
-      this.nodeBgColorPopup = false;
-    },
-    closeNodeBorderColorPicker() {
-      this.nodeBorderColorPopup = false;
-    },
-    changeDefaultColors() {
-      this.constructorSchemes.defaultNodeStyle = {
-        fill: '#ee0000',
-        strokeColor: '#000000',
-        strokeSize: '3.5px',
-        size: [50, 50],
-      };
-      this.constructorSchemes.setDefaultStyles();
-    },
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
     },
-    saveGraphItem(items) {
+    saveGraphItems(items) {
       // this.allItems.push(item);
       this.$store.commit('setState', [{
         object: this.dashFromStore,
@@ -447,18 +454,23 @@ export default {
         edgeCustomStyles: this.edgeCustomStyles,
         nodeCustomStyles: this.nodeCustomStyles,
         labelCustomStyles: this.labelCustomStyles,
-        saveGraphItemCallback: this.saveGraphItem,
+        saveGraphItemCallback: this.saveGraphItems,
+        openDataPanelCallback: this.openDataPanel,
       });
       // this.constructorSchemes = constructorSchemes;
       if (this.constructorSchemes) {
         // this.constructorSchemes.parseDataJson();
       }
     },
-    onClickGraphElement(sender, evt) {
-      console.log(sender, evt);
+    closeDataPanel() {
+      this.dataPanel = false;
+      this.selectedNode = '';
+      this.selectedDataType = '';
     },
-    async onCreatedElement(sender, evt) {
-      console.log(sender, evt);
+    openDataPanel({ dataType, nodeId }) {
+      this.dataPanel = true;
+      this.selectedNode = nodeId;
+      this.selectedDataType = dataType;
     },
   },
 };
@@ -486,26 +498,38 @@ export default {
       left: -170px;
     }
   }
-  &__dnd-panel-container {
+  &__dnd-panel-container, &__data-panel-container {
     color: var(--main_text);
     z-index: 1;
     position: absolute;
-    left: 0;
     top: 5px;
     bottom: 15px;
     background-color: var(--main_bg);
     width: 250px;
     padding: 10px;
-    border-right: 2px solid var(--secondary_bg);
     border-top: 2px solid var(--secondary_bg);
     border-bottom: 2px solid var(--secondary_bg);
-    border-radius: 0 4px 4px 0;
     transition: all .2s ease;
-    transform: translateX(-100%);
     pointer-events: none;
     max-height: inherit;
     overflow-y: auto;
     overflow-x: hidden;
+  }
+  &__dnd-panel-container {
+    left: 0;
+    border-right: 2px solid var(--secondary_bg);
+    border-radius: 0 4px 4px 0;
+    transform: translateX(-100%);
+    &--active {
+      transform: translateX(0);
+      pointer-events: all;
+    }
+  }
+  &__data-panel-container {
+    right: 0;
+    transform: translateX(100%);
+    border-left: 2px solid var(--secondary_bg);
+    border-radius: 4px 0 0 4px;
     &--active {
       transform: translateX(0);
       pointer-events: all;
@@ -514,6 +538,7 @@ export default {
   &__graph-component {
     height: inherit;
   }
+
 }
 </style>
 

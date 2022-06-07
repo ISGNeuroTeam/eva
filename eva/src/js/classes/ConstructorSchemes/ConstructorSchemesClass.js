@@ -708,6 +708,7 @@ class ConstructorSchemesClass {
     labelCustomStyles,
     savedElements,
     saveGraphItemCallback,
+    openDataPanelCallback,
   }) {
     // this.applyStylesElements();
     this.dragAndDropPanel = null;
@@ -733,7 +734,7 @@ class ConstructorSchemesClass {
     this.updateViewport();
     this.dndPanelContainerElem = dndPanelContainerElem;
     this.dndPanelElem = dndPanelElem;
-    this.configureInputModes(saveGraphItemCallback);
+    this.configureInputModes(saveGraphItemCallback, openDataPanelCallback);
     this.initializeDnDPanel();
     if (this.savedElements?.length > 0) {
       this.createLoadedElements();
@@ -835,8 +836,8 @@ class ConstructorSchemesClass {
     const targetNode = this.findNodeById(data.targetNode);
     const strokeColor = ConstructorSchemesClass.colorToString(data.style.fill);
     const createdEdge = this.graphComponent.graph.createEdge({
-      sourcePort: this.findPortByType(data.sourcePort, sourceNode),
-      targetPort: this.findPortByType(data.targetPort, targetNode),
+      sourcePort: ConstructorSchemesClass.findPortByType(data.sourcePort, sourceNode),
+      targetPort: ConstructorSchemesClass.findPortByType(data.targetPort, targetNode),
       style: new PolylineEdgeStyle({
         smoothingLength: data.style.smoothingLength,
         stroke: `${data.style.thickness}px solid ${strokeColor}`,
@@ -857,11 +858,11 @@ class ConstructorSchemesClass {
     return this.graphComponent.graph.nodes.find((item) => item.tag.nodeId === nodeId);
   }
 
-  findPortByType(type, node) {
+  static findPortByType(type, node) {
     return node.ports.toArray().find((item) => item.tag.portType === type);
   }
 
-  configureInputModes(saveGraphItemCallback) {
+  configureInputModes(saveGraphItemCallback, openDataPanelCallback) {
     // configure the snapping context
     const mode = new GraphEditorInputMode({
       allowCreateNode: false,
@@ -958,6 +959,12 @@ class ConstructorSchemesClass {
 
     mode.addItemClickedListener((sender, evt) => {
       console.log('addItemClickedListener', sender, evt.item);
+      if (evt.item instanceof INode) {
+        openDataPanelCallback({
+          dataType: evt.item.tag.id,
+          nodeId: evt.item.tag.nodeId,
+        });
+      }
     });
 
     // Узел создан
@@ -1000,9 +1007,10 @@ class ConstructorSchemesClass {
   deleteSavedElement(element, callback) {
     // Удаление узла
     if (element instanceof INode) {
-      // Удаление элемента из сохраненных(Node)
+      // Удаление элемента из сохраненных(Node и связанных с ними Edge)
       this.savedElements = this.savedElements
-        .filter((item) => item.tag.nodeId !== element?.tag?.nodeId);
+        .filter((item) => (item.tag?.nodeId !== element?.tag?.nodeId)
+          && (String(item?.edgeId).indexOf(String(element?.tag?.nodeId)) === -1));
     }
     // Удаление ребра
     if (element instanceof IEdge) {
