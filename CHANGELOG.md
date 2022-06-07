@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding layers to the map
 
 ### Fixed
+- Fixed SingleValue "missing _order" error if order exist in edited data source
 - Fixed username in DS request
 - Fix accumulator colors
 - Fixed metrics order in dashSingleValue.vue
