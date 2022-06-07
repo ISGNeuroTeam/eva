@@ -1055,11 +1055,13 @@ export default {
       if (!this.element) {
         return [];
       }
+      const { commonOptions } = settings;
       const [elem] = this.element.split('-');
       if (elem) {
-        return this.optionsByComponents[elem] || [];
+        const componentsOptions = this.optionsByComponents[elem] || [];
+        return [...commonOptions, ...componentsOptions];
       }
-      return [];
+      return commonOptions;
     },
     changeComponent() {
       return `${this.idDash}-${this.element}`;
@@ -1572,7 +1574,18 @@ export default {
                   : options[item];
               }
             } else {
-              const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+              const propsToFalse = [
+                'panelNameHide',
+                'panelIconUpdate',
+                'panelBackHide',
+                'panelIconDownload',
+                'panelIconFullscreen',
+                'multiple',
+                'underline',
+                'onButton',
+                'pinned',
+              ];
+              console.log(item)
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;
               } else if (item === 'showlegend') {
