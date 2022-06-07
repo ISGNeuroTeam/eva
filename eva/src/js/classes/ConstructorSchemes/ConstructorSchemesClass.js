@@ -31,9 +31,7 @@ import {
   FreeNodeLabelModel,
   SimpleEdge,
   INode,
-  WebGL2GraphModelManager,
-  WebGL2SelectionIndicatorManager,
-  Color, YString, Mapper, IMapper, IPortOwner, FreeNodePortLocationModel,
+  Color,
 } from 'yfiles';
 
 import { throttle } from '../../utils/throttle';
@@ -45,27 +43,6 @@ import VuejsNodeStyle from './VueNodeStyle';
 License.value = licenseData; // Проверка лицензии
 
 class ConstructorSchemesClass {
-  createdElements = {
-    nodes: [],
-    edges: [],
-  }
-
-  get getSavedNodes() {
-    return this.createdElements.nodes;
-  }
-
-  set setSavedNodes(newValue) {
-    this.createdElements.nodes = newValue;
-  }
-
-  get getSavedEdges() {
-    return this.createdElements.edges;
-  }
-
-  set setSavedEdges(newValue) {
-    this.createdElements.edges = newValue;
-  }
-
   dndDataPanelItems = [
     // TemplateType: template-0
     // Frame-1376
@@ -74,7 +51,7 @@ class ConstructorSchemesClass {
           <!--Area-->
           <defs>
            <!--Border-radius-bg-->
-           <clipPath id="border-radius">
+           <clipPath :id="'border-radius-' + tag.nodeId">
              <rect 
                x="0" 
                y="0" 
@@ -87,7 +64,7 @@ class ConstructorSchemesClass {
            </clipPath>
            <!--Separator-line-->
            <rect 
-             id="separator-line" 
+             :id="'separator-line-' + tag.nodeId"
              :width="layout.width" 
              height="1" 
              fill="#E0E0EC" 
@@ -100,7 +77,7 @@ class ConstructorSchemesClass {
            :width="layout.width / 2"
            :height="16 * tag.items.length"
            fill="#FFFFFF"
-           clip-path="url(#border-radius)"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
           />
           <!--Bg-right-->
           <rect
@@ -109,13 +86,13 @@ class ConstructorSchemesClass {
            :width="layout.width / 2"
            :height="16 * tag.items.length"
            fill="#000000"
-           clip-path="url(#border-radius)"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
            :transform="'translate(' + layout.width + ',' + ((16 * tag.items.length) - 1) + '), rotate(180)'"
           />
           <template v-if="tag && tag.items && tag.items.length > 0">
            <g
             v-for="(item, index) in tag.items"
-            :key="'row-' + item.id"
+            :key="'row-' + tag.nodeId + '-' + index"
             class="b-data-node__items"
            >
              <text
@@ -136,37 +113,43 @@ class ConstructorSchemesClass {
              >
                {{ item.textRight }}
              </text>
-             <use href="#separator-line" x="0" :y="15.5 * (index + 1)" v-if="index < (tag.items.length - 1)"/>
+             <use
+              v-if="index < (tag.items.length - 1)"
+              :href="'#separator-line-' + tag.nodeId"
+              x="0" 
+              :y="15.5 * (index + 1)"
+             />
            </g>
           </template>
         </g>`,
       width: 150,
       rowHeight: 15,
       dataRest: {
+        nodeId: 'template-0',
         // Идентификатор для связки данных с элементом,
         // в дальнейшем должен приходить с сервера
-        id: '0',
+        dataType: '0',
         templateType: 'template-0',
         items: [
           {
-            id: 111111,
-            textLeft: 'F,m3/час',
-            textRight: '1279.1',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
           {
-            id: 222222,
-            textLeft: 'F,m3[сут]',
-            textRight: '12055',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
           {
-            id: 333333,
-            textLeft: 'Р,кГс/см3',
-            textRight: '7.39',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
           {
-            id: 444444,
-            textLeft: 'Т,Со',
-            textRight: '23.56',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
         ],
       },
@@ -177,7 +160,7 @@ class ConstructorSchemesClass {
       template: `<g class="b-data-node">
        <!--Area-->
        <defs>
-         <clipPath :id="'border-radius-' + tag.id">
+         <clipPath :id="'border-radius-' + tag.nodeId">
            <rect 
              x="0" 
              y="0" 
@@ -189,7 +172,7 @@ class ConstructorSchemesClass {
            />
          </clipPath>
          <rect 
-           :id="'separator-line-' + tag.id" 
+           :id="'separator-line-' + tag.nodeId" 
            :width="layout.width" 
            height="1" 
            fill="#E0E0EC" 
@@ -202,7 +185,7 @@ class ConstructorSchemesClass {
          :width="layout.width / 3"
          :height="(16 * tag.items.length) - 2"
          fill="#FFFFFF"
-         :clip-path="'url(#border-radius-' + tag.id + ')'"
+         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
        />
        <!--Bg-right-->
        <rect
@@ -211,13 +194,13 @@ class ConstructorSchemesClass {
          :width="((layout.width / 3) * 2)"
          :height="(16 * tag.items.length) - 2"
          fill="#000000"
-         :clip-path="'url(#border-radius-' + tag.id + ')'"
+         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
          :transform="'translate(' + layout.width + ',' + ((16 * tag.items.length) - 2) + '), rotate(180)'"
        />
        <template v-if="tag && tag.items && tag.items.length > 0">
          <g
           v-for="(item, index) in tag.items"
-          :key="'row-' + item.id"
+          :key="'row-' + tag.nodeId + '-' + index"
           class="b-data-node__items"
          >
            <text
@@ -240,7 +223,7 @@ class ConstructorSchemesClass {
              {{ item.textRight }}
            </text>
            <use 
-             :href="'#separator-line-' + tag.id"
+             :href="'#separator-line-' + tag.nodeId"
              x="0" 
              :y="15.5 * (index + 1)" 
              v-if="index < (tag.items.length - 1)"
@@ -251,18 +234,19 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 15,
       dataRest: {
-        id: '1',
+        dataType: '1',
+        nodeId: 'template-1',
         templateType: 'template-1',
         items: [
           {
-            id: 111111,
-            textLeft: 'Р',
-            textRight: '4.33',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
           {
-            id: 222222,
-            textLeft: 'Т',
-            textRight: '53.43',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
         ],
       },
@@ -273,7 +257,7 @@ class ConstructorSchemesClass {
       template: `<g class="b-data-node">
       <!--Area-->
       <defs>
-        <clipPath id="border-radius">
+        <clipPath :id="'border-radius-' + tag.nodeId">
           <rect 
             x="0" 
             y="0" 
@@ -284,12 +268,6 @@ class ConstructorSchemesClass {
             ry="3" 
           />
         </clipPath>
-        <rect 
-          id="separator-line" 
-          :width="layout.width" 
-          height="1" 
-          fill="#E0E0EC" 
-        />
       </defs>
       <!--Bg-top-->
       <rect
@@ -298,7 +276,7 @@ class ConstructorSchemesClass {
         :width="layout.width"
         :height="layout.height / 2"
         fill="#000000"
-        clip-path="url(#border-radius)"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
       />
       <!--Bg-bottom-->
       <rect
@@ -307,7 +285,7 @@ class ConstructorSchemesClass {
         :width="layout.width"
         :height="layout.height / 2"
         fill="#FFFFFF"
-        clip-path="url(#border-radius)"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
         :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
       />
       <text
@@ -332,10 +310,12 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 30,
       dataRest: {
-        id: '2',
+        dataType: '2',
+        nodeId: 'template-2',
         templateType: 'template-2',
-        textFirst: '17',
-        textSecond: 'F,m3/час',
+        id: '',
+        textFirst: 'Value',
+        textSecond: 'Label',
       },
     },
     // TemplateType: template-3
@@ -344,7 +324,7 @@ class ConstructorSchemesClass {
       template: `<g class="b-data-node">
         <!--Area-->
         <defs>
-          <clipPath id="border-radius">
+          <clipPath :id="'border-radius-' + tag.nodeId">
             <rect 
               x="0" 
               y="0" 
@@ -355,12 +335,6 @@ class ConstructorSchemesClass {
               ry="3" 
             />
           </clipPath>
-          <rect 
-            id="separator-line" 
-            :width="layout.width" 
-            height="1" 
-            fill="#E0E0EC" 
-          />
         </defs>
         <!--Bg-top-->
         <rect
@@ -369,7 +343,7 @@ class ConstructorSchemesClass {
           :width="layout.width"
           :height="layout.height / 2"
           fill="#000000"
-          clip-path="url(#border-radius)"
+          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
         />
         <!--Bg-bottom-->
         <rect
@@ -378,7 +352,7 @@ class ConstructorSchemesClass {
           :width="layout.width"
           :height="layout.height / 2"
           fill="#FFFFFF"
-          clip-path="url(#border-radius)"
+          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
           :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
         />
         <text
@@ -403,10 +377,12 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 30,
       dataRest: {
-        id: '3',
+        dataType: '3',
+        nodeId: 'template-3',
         templateType: 'template-3',
-        textFirst: '17',
-        textSecond: 'F,m3/час',
+        id: '',
+        textFirst: 'Value',
+        textSecond: 'Label',
       },
     },
     // TemplateType: template-4
@@ -415,7 +391,7 @@ class ConstructorSchemesClass {
       template: `<g class="b-data-node">
        <!--Area-->
        <defs>
-         <clipPath id="border-radius">
+         <clipPath :id="'border-radius-' + tag.nodeId">
            <rect 
              x="0" 
              y="0" 
@@ -427,7 +403,7 @@ class ConstructorSchemesClass {
            />
          </clipPath>
          <rect 
-           id="separator-line" 
+           :id="'separator-line-' + tag.nodeId" 
            :width="layout.width" 
            height="1" 
            fill="#E0E0EC" 
@@ -440,7 +416,7 @@ class ConstructorSchemesClass {
          :width="layout.width / 3"
          :height="(16 * tag.items.length) - 2"
          fill="#FFFFFF"
-         clip-path="url(#border-radius)"
+         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
        />
        <!--Bg-right-->
        <rect
@@ -449,13 +425,13 @@ class ConstructorSchemesClass {
          :width="((layout.width / 3) * 2)"
          :height="(16 * tag.items.length) - 2"
          fill="#000000"
-         clip-path="url(#border-radius)"
+         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
          :transform="'translate(' + layout.width + ',' + ((16 * tag.items.length) - 2) + '), rotate(180)'"
        />
        <template v-if="tag && tag.items && tag.items.length > 0">
          <g
           v-for="(item, index) in tag.items"
-          :key="'row-' + item.id"
+          :key="'row-' + tag.nodeId + '-' + index"
           class="b-data-node__items"
          >
            <text
@@ -477,19 +453,26 @@ class ConstructorSchemesClass {
            >
              {{ item.textRight }}
            </text>
-           <use href="#separator-line" x="0" :y="15.5 * (index + 1)" v-if="index < (tag.items.length - 1)"/>
+           <use
+            v-if="index < (tag.items.length - 1)"
+            :href="'#separator-line-' + tag.nodeId" 
+            x="0" 
+            :y="15.5 * (index + 1)" 
+           />
          </g>
        </template>
      </g>`,
       width: 150,
       rowHeight: 15,
       dataRest: {
-        id: '4',
+        dataType: '4',
+        nodeId: 'template-4',
         templateType: '4',
         items: [
           {
-            textLeft: 'Р',
-            textRight: '4.33',
+            id: '',
+            textLeft: 'Label',
+            textRight: 'Value',
           },
         ],
       },
@@ -500,10 +483,17 @@ class ConstructorSchemesClass {
       template: `<g class="b-data-node">
        <!--Area-->
        <defs>
-         <clipPath id="border-radius">
-           <rect x="0" y="0" :width="layout.width" :height="layout.height" fill="transparent" rx="3" ry="3" />
+         <clipPath :id="'border-radius-' + tag.nodeId">
+           <rect 
+             x="0" 
+             y="0" 
+             :width="layout.width" 
+             :height="layout.height" 
+             fill="transparent" 
+             rx="3" 
+             ry="3" 
+           />
          </clipPath>
-         <rect id="separator-line" :width="layout.width" height="1" fill="#E0E0EC" />
        </defs>
        <!--Bg-left-->
        <rect
@@ -512,7 +502,7 @@ class ConstructorSchemesClass {
          :width="layout.width"
          :height="layout.height"
          :fill="tag.maxValueColor"
-         clip-path="url(#border-radius)"
+         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
        />
        <!--Bg-right-->
        <rect
@@ -521,7 +511,7 @@ class ConstructorSchemesClass {
          :width="layout.width"
          :height="((layout.height / 100) * (tag.currentValue * 100 / tag.maxValue))"
          :fill="tag.currentValueColor"
-         clip-path="url(#border-radius)"
+         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
          :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
        />
        <text
@@ -538,7 +528,9 @@ class ConstructorSchemesClass {
       width: 150,
       height: 30,
       dataRest: {
-        id: '5',
+        dataType: '5',
+        nodeId: 'template-5',
+        id: '',
         templateType: 'template-5',
         currentValue: 1.5,
         currentValueColor: '#FFFFFF',
@@ -553,10 +545,17 @@ class ConstructorSchemesClass {
       template: `<g class="b-data-node">
       <!--Area-->
       <defs>
-        <clipPath id="border-radius">
-          <rect x="0" y="0" :width="layout.width" :height="layout.height" fill="transparent" rx="3" ry="3" />
+        <clipPath :id="'border-radius-' + tag.nodeId">
+          <rect 
+            x="0" 
+            y="0" 
+            :width="layout.width" 
+            :height="layout.height" 
+            fill="transparent" 
+            rx="3" 
+            ry="3" 
+          />
         </clipPath>
-        <rect id="separator-line" :width="layout.width" height="1" fill="#E0E0EC" />
       </defs>
       <!--Bg-left-->
       <rect
@@ -565,7 +564,7 @@ class ConstructorSchemesClass {
         :width="layout.width"
         :height="(layout.height / 100) * ((tag.firstValue * 100) / (tag.firstValue + tag.secondValue))"
         :fill="tag.firstValueColor"
-        clip-path="url(#border-radius)"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
       />
       <!--Bg-right-->
       <rect
@@ -574,7 +573,7 @@ class ConstructorSchemesClass {
         :width="layout.width"
         :height="(layout.height / 100) * ((tag.secondValue * 100) / (tag.firstValue + tag.secondValue))"
         :fill="tag.secondValueColor"
-        clip-path="url(#border-radius)"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
         :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
       />
       <text
@@ -601,7 +600,9 @@ class ConstructorSchemesClass {
       width: 150,
       height: 70,
       dataRest: {
-        id: '6',
+        dataType: '6',
+        nodeId: 'template-6',
+        id: '',
         templateType: 'template-6',
         firstValue: 5,
         firstValueColor: '#3366FF',
@@ -702,6 +703,7 @@ class ConstructorSchemesClass {
     dndPanelContainerElem,
     dndPanelElem,
     elem,
+    dataRest,
     iconsList,
     edgeCustomStyles,
     nodeCustomStyles,
@@ -709,12 +711,17 @@ class ConstructorSchemesClass {
     savedElements,
     saveGraphItemCallback,
     openDataPanelCallback,
+    closeDataPanelCallback,
   }) {
     // this.applyStylesElements();
     this.dragAndDropPanel = null;
     this.mapper = null;
+    this.dataRest = dataRest;
     this.iconsList = iconsList;
-    this.savedElements = JSON.parse(JSON.stringify(savedElements));
+    this.savedElements = structuredClone(savedElements);
+    // Вторая реализация сохранения данных
+    this.savedElements2 = {};
+    this.targetDataNode = {};
     // initialize the GraphComponent
     this.graphComponent = new GraphComponent(elem);
     // this.enableWebGL2();
@@ -734,11 +741,15 @@ class ConstructorSchemesClass {
     this.updateViewport();
     this.dndPanelContainerElem = dndPanelContainerElem;
     this.dndPanelElem = dndPanelElem;
-    this.configureInputModes(saveGraphItemCallback, openDataPanelCallback);
+    this.configureInputModes(saveGraphItemCallback, openDataPanelCallback, closeDataPanelCallback);
     this.initializeDnDPanel();
-    if (this.savedElements?.length > 0) {
+    if (this.savedElements) {
       this.createLoadedElements();
     }
+  }
+
+  updateDataRest(updatedDataRest) {
+    this.dataRest = updatedDataRest;
   }
 
   applyStylesElements({
@@ -773,19 +784,39 @@ class ConstructorSchemesClass {
   }
 
   createLoadedElements() {
-    this.savedElements.forEach((element) => {
-      if (element.type.indexOf('node') !== -1) {
+    Object.keys(this.savedElements).forEach((key) => {
+      const element = this.savedElements[key];
+      if (String(element.elementType).indexOf('node') !== -1) {
         this.createLoadedNodes(element);
       }
-      if (element.type.indexOf('edge') !== -1) {
+      if (String(element.elementType).indexOf('edge') !== -1) {
         this.createLoadedEdge(element);
       }
     });
   }
 
+  updateDataNode(nodeId, newData) {
+    if (this.targetDataNode) {
+      this.targetDataNode.tag = structuredClone(newData);
+      this.graphComponent.updateVisual();
+    }
+  }
+
+  // Old
+  // createLoadedElements() {
+  //   this.savedElements.forEach((element) => {
+  //     if (String(element?.type || '').indexOf('node') !== -1) {
+  //       this.createLoadedNodes(element);
+  //     }
+  //     if (String(element?.type || '').indexOf('edge') !== -1) {
+  //       this.createLoadedEdge(element);
+  //     }
+  //   });
+  // }
+
   createLoadedNodes(data) {
     let createElement = null;
-    if (data.type === 'data-node') {
+    if (data.elementType === 'data-node') {
       createElement = this.graphComponent.graph.createNode({
         layout: new Rect(
           data.layout.x,
@@ -799,7 +830,7 @@ class ConstructorSchemesClass {
         tag: data.tag,
       });
     }
-    if (data.type === 'image-node') {
+    if (data.elementType === 'image-node') {
       createElement = this.graphComponent.graph.createNode({
         layout: new Rect(
           data.layout.x,
@@ -811,7 +842,7 @@ class ConstructorSchemesClass {
         tag: data.tag,
       });
     }
-    if (data.type === 'default-node') {
+    if (data.elementType === 'default-node') {
       createElement = this.graphComponent.graph.createNode({
         layout: new Rect(
           data.layout.x,
@@ -862,7 +893,7 @@ class ConstructorSchemesClass {
     return node.ports.toArray().find((item) => item.tag.portType === type);
   }
 
-  configureInputModes(saveGraphItemCallback, openDataPanelCallback) {
+  configureInputModes(saveGraphItemCallback, openDataPanelCallback, closeDataPanelCallback) {
     // configure the snapping context
     const mode = new GraphEditorInputMode({
       allowCreateNode: false,
@@ -895,7 +926,7 @@ class ConstructorSchemesClass {
         if (dropData?.tag?.templateType) {
           createdNode = graph.createNodeAt({
             location: dropLocation,
-            style: new VuejsNodeStyle(this.dndDataPanelItems[dropData.tag.id].template),
+            style: new VuejsNodeStyle(this.dndDataPanelItems[dropData.tag.templateType.replace('template-', '')].template),
             labels: dropData.labels,
             tag: { ...dropData.tag, nodeId: dropData.hashCode() },
           });
@@ -949,8 +980,14 @@ class ConstructorSchemesClass {
 
     mode.addNodeCreatedListener(async (sender, evt) => {
       const createdItem = await evt.item;
+      if (typeof createdItem.tag?.nodeId === 'string') {
+        createdItem.tag.nodeId = createdItem.hashCode();
+      }
+      // Альтернативный вариант сохранения
+      this.savedElements[createdItem.tag.nodeId] = ConstructorSchemesClass
+        .extractDataToSave(createdItem);
       // Добавление элемента в список для сохранения
-      this.savedElements.push(ConstructorSchemesClass.extractDataToSave(createdItem));
+      // this.savedElements.push(dataFromNode);
       // Добавление дополнительных портов
       this.createAdditionalPorts(createdItem);
       // Обновление списка сохраненных элементов
@@ -958,12 +995,14 @@ class ConstructorSchemesClass {
     });
 
     mode.addItemClickedListener((sender, evt) => {
-      console.log('addItemClickedListener', sender, evt.item);
-      if (evt.item instanceof INode) {
+      if (evt.item instanceof INode && evt.item.tag?.templateType) {
+        this.targetDataNode = evt.item;
         openDataPanelCallback({
-          dataType: evt.item.tag.id,
+          dataType: evt.item.tag.dataType,
           nodeId: evt.item.tag.nodeId,
         });
+      } else {
+        closeDataPanelCallback();
       }
     });
 
@@ -973,7 +1012,9 @@ class ConstructorSchemesClass {
       createdEdge.tag = {
         edgeId: `${createdEdge.sourceNode.tag.nodeId}-${createdEdge.targetNode.tag.nodeId}`,
       };
-      this.savedElements.push(ConstructorSchemesClass.extractEdgeDataToSave(createdEdge));
+      this.savedElements[createdEdge.tag.edgeId] = ConstructorSchemesClass
+        .extractEdgeDataToSave(createdEdge);
+      // this.savedElements.push(ConstructorSchemesClass.extractEdgeDataToSave(createdEdge));
       // Обновление списка сохраненных элементов
       saveGraphItemCallback(this.savedElements);
     });
@@ -1005,22 +1046,22 @@ class ConstructorSchemesClass {
   }
 
   deleteSavedElement(element, callback) {
-    // Удаление узла
-    if (element instanceof INode) {
-      // Удаление элемента из сохраненных(Node и связанных с ними Edge)
-      this.savedElements = this.savedElements
-        .filter((item) => (item.tag?.nodeId !== element?.tag?.nodeId)
-          && (String(item?.edgeId).indexOf(String(element?.tag?.nodeId)) === -1));
+    if (this.savedElements) {
+      // Удаление узла
+      if (element instanceof INode) {
+        delete this.savedElements[element.tag.nodeId];
+        const edgesIds = Object.keys(this.savedElements)
+          .filter((key) => String(key).indexOf(element.tag.nodeId) !== -1);
+        edgesIds.forEach((edge) => {
+          delete this.savedElements[edge];
+        });
+      }
+      // Удаление ребра
+      if (element instanceof IEdge) {
+        delete this.savedElements[element.tag.edgeId];
+      }
+      callback(this.savedElements);
     }
-    // Удаление ребра
-    if (element instanceof IEdge) {
-      // Удаление элемента из сохраненных(Edge)
-      this.savedElements = this.savedElements
-        .filter((item) => item?.edgeId !== element.tag?.edgeId);
-    }
-
-    // Обновление списка сохраненных элементов
-    callback(this.savedElements);
   }
 
   static extractEdgeDataToSave(createdEdge, newBendsData) {
@@ -1033,7 +1074,7 @@ class ConstructorSchemesClass {
       bends[newBendsData.index] = newBendsData.location;
     }
     return {
-      type: 'edge',
+      elementType: 'edge',
       edgeId: `${createdEdge.sourceNode.tag.nodeId}-${createdEdge.targetNode.tag.nodeId}`,
       sourceNode: createdEdge.sourceNode.tag.nodeId,
       targetNode: createdEdge.targetNode.tag.nodeId,
@@ -1059,7 +1100,7 @@ class ConstructorSchemesClass {
   static extractDataToSave(node) {
     if (node?.tag?.templateType) {
       return {
-        type: 'data-node',
+        elementType: 'data-node',
         layout: {
           height: node.layout.height,
           width: node.layout.width,
@@ -1068,13 +1109,12 @@ class ConstructorSchemesClass {
         },
         tag: {
           ...node.tag,
-          nodeId: node.tag?.nodeId || node.hashCode(),
         },
       };
     }
     if (node.style?.image) {
       return {
-        type: 'image-node',
+        elementType: 'image-node',
         image: node.style?.image,
         layout: {
           height: node.layout.height,
@@ -1083,7 +1123,7 @@ class ConstructorSchemesClass {
           y: node.layout.y,
         },
         tag: {
-          nodeId: node.tag?.nodeId || node.hashCode(),
+          ...node.tag,
         },
       };
     }
@@ -1091,7 +1131,7 @@ class ConstructorSchemesClass {
     const strokeColor = node.style.stroke.fill.color;
     const fill = node.style.fill.color;
     return {
-      type: 'default-node',
+      elementType: 'default-node',
       fill: {
         r: fill.r,
         g: fill.g,
@@ -1114,29 +1154,38 @@ class ConstructorSchemesClass {
         y: node.layout.y,
       },
       tag: {
-        nodeId: node.tag?.nodeId || node.hashCode(),
+        ...node.tag,
       },
     };
   }
 
   // Изменение ранее сохраненных узлов
   changeSavedNodes(hashCode, newData) {
-    this.savedElements = this.savedElements.map((item) => {
-      if (item?.tag?.nodeId === hashCode) {
-        return ConstructorSchemesClass.extractDataToSave(newData);
-      }
-      return item;
-    });
+    if (this.savedElements) {
+      this.savedElements[hashCode] = ConstructorSchemesClass
+        .extractDataToSave(newData);
+    }
+    // this.savedElements = this.savedElements.map((item) => {
+    //   if (item?.tag?.nodeId === hashCode) {
+    //     return ConstructorSchemesClass.extractDataToSave(newData);
+    //   }
+    //   return item;
+    // });
   }
 
   // Изменение ранее сохраненных ребер
   changeSavedEdges(edgeId, newEdgeData, newBendsData) {
-    this.savedElements = this.savedElements.map((item) => {
-      if (item?.edgeId === edgeId) {
-        return ConstructorSchemesClass.extractEdgeDataToSave(newEdgeData, newBendsData);
-      }
-      return item;
-    });
+    if (this.savedElements) {
+      this.savedElements[edgeId] = ConstructorSchemesClass
+        .extractEdgeDataToSave(newEdgeData, newBendsData);
+    }
+
+    // this.savedElements = this.savedElements.map((item) => {
+    //   if (item?.edgeId === edgeId) {
+    //     return ConstructorSchemesClass.extractEdgeDataToSave(newEdgeData, newBendsData);
+    //   }
+    //   return item;
+    // });
   }
 
   createAdditionalPorts(createdItem) {
@@ -1212,11 +1261,11 @@ class ConstructorSchemesClass {
     return createdNode;
   }
 
-  enableWebGL2() {
-    this.graphComponent.graphModelManager = new WebGL2GraphModelManager();
-    this.graphComponent
-      .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(this.graphComponent);
-  }
+  // enableWebGL2() {
+  //   this.graphComponent.graphModelManager = new WebGL2GraphModelManager();
+  //   this.graphComponent
+  //     .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(this.graphComponent);
+  // }
 
   setDefaultLabelParameters() {
     const { graph } = this.graphComponent;
