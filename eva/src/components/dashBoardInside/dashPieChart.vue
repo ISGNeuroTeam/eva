@@ -165,11 +165,18 @@ export default {
           value: false,
         }]);
       }
-      if (!this.dashFromStore?.options.united) {
+      if (!this.dashFromStore.options.united) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
           prop: 'united',
           value: false,
+        }]);
+      }
+      if (!this.dashFromStore.options.pieType) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pieType',
+          value: 'pie',
         }]);
       }
       return this.dashFromStore.options;
@@ -232,6 +239,9 @@ export default {
     change() {
       return true;
     },
+    isDonat() {
+      return this.dashOptions.pieType === 'donat';
+    },
   },
   watch: {
     'dashOptions.colorsPie': {
@@ -245,7 +255,7 @@ export default {
     'dashOptions.positionlegend': {
       handler(val, old) {
         if (val && val !== old) {
-          this.piechart.changeSize(this.calculatedSize(this.legendSize()));
+          this.piechart.size = this.calculatedSize(this.legendSize());
         }
       },
       deep: true,
@@ -258,11 +268,17 @@ export default {
         }
       },
     },
+    isDonat(val) {
+      if (val !== this.piechart?.isDonat) {
+        this.piechart.isDonat = val;
+        this.setActiveLegendLine(this.selectedPie);
+      }
+    },
     sizeFrom: {
       deep: true,
       handler(val, old) {
         if (JSON.stringify(val) !== JSON.stringify(old) && this.piechart) {
-          this.piechart.changeSize(this.calculatedSize(this.legendSize()));
+          this.piechart.size = this.calculatedSize(this.legendSize());
           this.setActiveLegendLine(this.selectedPie);
         }
       },
@@ -492,6 +508,7 @@ export default {
         height,
         data,
         colors: this.dashOptions.themes[colorsPie.theme],
+        isDonat: this.isDonat,
       });
 
       this.piechart = Object.freeze(piechart);

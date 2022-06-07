@@ -1,8 +1,13 @@
 import * as d3 from 'd3';
 
-class PiechartClass {
+export default class PiechartClass {
   options = {
     margin: 40,
+    isDonat: false,
+    width: 0,
+    height: 0,
+    elem: '',
+    elemForLegend: '',
   }
 
   constructor({
@@ -12,38 +17,100 @@ class PiechartClass {
     height,
     data,
     colors,
+    isDonat = false,
   }) {
+    this.options.isDonat = isDonat;
+    this.options.width = width;
+    this.options.height = height;
+    this.options.elem = elem;
+    this.options.elemForLegend = elemForLegend;
+
+    this.createPieChart(elemForLegend, data, colors);
+  }
+
+  createPieChart(elemForLegend, data, colors) {
+    this.createPieChartSvg();
+
+    this.createPieChartGroup();
+
+    this.createLegend();
+
+    this.createColors(data, colors);
+
+    this.createDataRedy(data);
+    // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
+
+    this.createPies();
+  }
+
+  createPieChartSvg() {
+    const { width, height } = this.size;
     this.piechart = d3
-      .select(elem)
+      .select(this.elem)
       .append('svg')
       .attr('width', width)
       .attr('height', height);
+  }
 
+  createPieChartGroup() {
+    const { width, height } = this.size;
     this.piechartG = this.piechart.append('g')
       .attr('transform', `translate(${width / 2},${height / 2})`);
+  }
 
-    this.legend = d3.select(elemForLegend);
+  createLegend() {
+    this.legend = d3.select(this.elemForLegend);
+  }
 
-    // устанавливаем цветовую схему для pie chart
+  createColors(data, colors) {
     this.colors = d3
       .scaleOrdinal()
       .domain(data)
       .range(colors);
+  }
 
+  createDataRedy(data) {
     const pie = d3.pie().value((d) => d.value);
     this.dataReady = pie(d3.entries(data));
-    // радиус диаграммы это половина длины или ширины, смотря что меньше и еще отступ отнимаем
-    const radius = Math.min(width, height) / 2 - this.margin;
+  }
 
+  createPies() {
     this.piechartG.selectAll('pies')
       .data(this.dataReady)
       .enter()
       .append('path')
-      .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
+      .attr('d', d3.arc().innerRadius(this.innerRadius).outerRadius(this.radius))
       .attr('class', 'piepart')
       .attr('fill', (d) => this.colors(d.data.key))
       .attr('stroke', 'inherit')
       .style('stroke-width', '2px');
+  }
+
+  get size() {
+    return {
+      width: this.options.width,
+      height: this.options.height,
+    };
+  }
+
+  set size(value) {
+    this.options.width = value.width ?? this.options.width;
+    this.options.height = value.height ?? this.options.height;
+
+    this.changeSize();
+  }
+
+  get radius() {
+    const { width, height } = this.size;
+    return Math.min(width, height) / 2 - this.margin;
+  }
+
+  get getPiechart() {
+    return this.piechart;
+  }
+
+  get getColors() {
+    return this.colors;
   }
 
   get margin() {
@@ -54,12 +121,25 @@ class PiechartClass {
     this.options.margin = value;
   }
 
-  get getPiechart() {
-    return this.piechart;
+  get elem() {
+    return this.options.elem;
   }
 
-  get getColors() {
-    return this.colors;
+  get elemForLegend() {
+    return this.options.elemForLegend;
+  }
+
+  get isDonat() {
+    return this.options.isDonat;
+  }
+
+  set isDonat(val) {
+    this.options.isDonat = val;
+    this.changeSize();
+  }
+
+  get innerRadius() {
+    return this.isDonat ? this.radius / 1.5 : 0;
   }
 
   selectActivePiepart(selectedPieIndex, legendLineIndex) {
@@ -94,8 +174,8 @@ class PiechartClass {
     this.getPiechart.remove();
   }
 
-  changeSize({ width, height }) {
-    const radius = Math.min(width, height) / 2 - this.margin;
+  changeSize() {
+    const { width, height } = this.size;
     this.piechart
       .attr('width', width)
       .attr('height', height);
@@ -104,7 +184,7 @@ class PiechartClass {
 
     this.piechartG
       .selectAll('path')
-      .attr('d', d3.arc().innerRadius(0).outerRadius(radius))
+      .attr('d', d3.arc().innerRadius(this.innerRadius).outerRadius(this.radius))
       .attr('class', 'piepart')
       .attr('fill', (d) => this.colors(d.data.key))
       .attr('stroke', 'inherit')
@@ -122,5 +202,3 @@ class PiechartClass {
     });
   }
 }
-
-export default PiechartClass;

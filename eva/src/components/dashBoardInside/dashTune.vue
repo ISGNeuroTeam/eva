@@ -9,6 +9,11 @@
       :class="getClasses"
       :style="getStyles"
     >
+      <arrow-block
+        v-if="dataModeFrom"
+        :state="needSetField"
+        @toggle="isOpen = !isOpen"
+      />
       <div v-if="needSetField">
         <v-select
           v-model="dataField"
@@ -80,9 +85,11 @@
 <script>
 import { mdiMinus, mdiPlus } from '@mdi/js';
 import { mapActions, mapMutations } from 'vuex';
+import ArrowBlock from '../arrowBlock.vue';
 
 export default {
   name: 'DashTune',
+  components: { ArrowBlock },
   inheritAttrs: false,
   props: {
     // переменные полученные от родителя
@@ -143,6 +150,7 @@ export default {
       sliderValue: 0,
       dataField: null, // поле с данными
       value: '',
+      isOpen: true,
     };
   },
   computed: {
@@ -189,7 +197,7 @@ export default {
       return this.dashFromStore;
     },
     needSetField() {
-      return !this.dataField && !this.loading;
+      return (!this.dataField && !this.loading) || this.isOpen;
     },
     theme() {
       return this.colorFrom;
@@ -297,6 +305,7 @@ export default {
             value,
           });
           this.changeValue();
+          this.isOpen = false;
         }
       });
     },
@@ -383,7 +392,6 @@ export default {
   height: calc(100% - 25px)
   display: flex
   justify-content: center
-  align-items: center
 
   .v-progress-circular__overlay
     transition: all .3s ease-in-out

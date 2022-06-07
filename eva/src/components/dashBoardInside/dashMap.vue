@@ -26,6 +26,7 @@
       >
         <dash-map-user-settings-container
           v-if="map"
+          ref="setting"
           :map="map"
           :id-dash-from="idDashFrom"
           :id-element="idFrom"
@@ -126,6 +127,7 @@ export default {
       pipelineData: [],
       pipelineDataDictionary: {},
       position: null,
+      layerGroup: {},
     };
   },
   computed: {
@@ -150,34 +152,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
       if (!this.dashFromStore?.options.search) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -187,9 +161,6 @@ export default {
       }
 
       return this.dashFromStore.options;
-    },
-    option() {
-      return this.getOptions;
     },
     top() {
       // для ряда управляющих иконок
@@ -212,26 +183,44 @@ export default {
         this.map.resize();
       }
     },
-    getOptions: {
+    // TODO: Временный коммент
+    // getOptions: {
+    //   handler(val, old) {
+    //     if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
+    //       if (this.options?.library) {
+    //         this.map.library = this.library;
+    //       }
+    //       this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.reDrawMap(this.dataRestFrom);
+    //     }
+    //   },
+    //   deep: true,
+    // },
+    'getOptions.selectedLayer': {
       handler(val, old) {
-        if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
-          if (this.options?.library) {
-            this.map.library = this.library;
-          }
-          this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-          this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
-          this.reDrawMap(this.dataRestFrom);
+        if (JSON.stringify(val) !== JSON.stringify(old) && !old) {
+          this.map.remove();
+          this.init();
         }
       },
       deep: true,
     },
     mapStyleSize() {
-      this.map.resize();
+      if (this.map) {
+        this.map.resize();
+      }
     },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
       if (_dataRest && this.map) {
         this.reDrawMap(_dataRest);
+        this.$nextTick(() => {
+          if (this.library?.objects) {
+            this.$refs.setting.creationLayer();
+            this.$refs.setting.addLayer();
+          }
+        });
       }
     },
     clusterTextCount() {
@@ -249,6 +238,11 @@ export default {
       this.$nextTick(() => {
         this.init();
       });
+    },
+    sizeFrom(val, oldVal) {
+      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.map.resize();
+      }
     },
   },
   mounted() {
@@ -293,7 +287,7 @@ export default {
             idDash: this.idDash,
             id: this.element,
           });
-          this.loadDataForPipe(this.$store.getters.getPaperSearch);
+          this.loadDataForPipe(this.getOptions.search);
         }
       });
     },
@@ -303,6 +297,7 @@ export default {
         idDash: this.idDash,
         should: true,
         error: false,
+        name: this.element,
       });
 
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${event.sid}`);
@@ -319,6 +314,7 @@ export default {
           idDash: this.idDash,
           should: false,
           error: true,
+          name: this.element,
         });
       } else {
         // если все нормально
@@ -336,6 +332,7 @@ export default {
             idDash: this.idDash,
             should: false,
             error: false,
+            name: this.element,
           });
         });
       }
@@ -343,8 +340,8 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
-      this.pipelineData = await this.getDataFromRest(search);
-      if (this.map) {
+      if (this.getOptions.mode && this.getOptions.mode[0] === 'Мониторинг' && this.map) {
+        this.pipelineData = await this.getDataFromRest(search);
         const allPipes = {};
         if (Array.isArray(this.pipelineData)) {
           this.pipelineData.forEach((x) => {
@@ -356,7 +353,16 @@ export default {
         }
 
         this.pipelineDataDictionary = allPipes;
+      }
+
+      if (this.map) {
         this.reDrawMap(this.dataRestFrom);
+        this.$nextTick(() => {
+          if (this.map && this.library?.objects) {
+            this.$refs.setting.creationLayer();
+            this.$refs.setting.addLayer();
+          }
+        });
       }
     },
     updateToken(value) {
@@ -414,12 +420,22 @@ export default {
           // получаем библиотеку
           // get all icons that we need on map
           this.generateLibrary(dataRest, this.options?.primitivesLibrary);
+          if (this.library?.objects) {
+            Object.keys(this.library.objects).forEach((item) => {
+              if (!this.map.layerGroup[item]) {
+                this.map.addGroup(item);
+              }
+            });
+          }
           this.map.generateClusterPositionItems();
           if (!this.error && dataRest.length > 0) {
             // создаем элемент карты
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
-            this.map.drawObjects(dataRest, this.getOptions.mode, this.pipelineDataDictionary);
+            this.map.drawObjects(
+              dataRest,
+              this.pipelineDataDictionary,
+            );
             if (this.map) {
               if (this.options.initialPoint) {
                 this.map.setView(
@@ -446,7 +462,6 @@ export default {
       leafletControlZoomOut.removeAttribute('title');
       leafletControlZoomIn.removeAttribute('title');
     },
-
     initTheme() {
       const options = this.getOptions;
       this.map.mapTheme = options.maptheme ? options.maptheme : 'default';
@@ -486,6 +501,11 @@ export default {
               id: this.idFrom, // id элемнета (table, graph-2)
               idDash: this.idDashFrom,
             });
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.options,
+              prop: 'primitivesLibrary',
+              value: JSON.stringify(this.library),
+            }]);
           }
         } catch {
           this.error = 'Ошибка формата входных данных';
@@ -494,6 +514,7 @@ export default {
         }
         if (this.map && !this.map.isLegendGenerated) {
           this.map.library = this.library;
+          this.map.layerGroup = this.layerGroup;
           this.map.createLegend(this.library);
         }
       }
@@ -507,6 +528,10 @@ export default {
         zoom: this.getOptions.zoomLevel,
         maxZoom: 25,
         center: this.getCurrentPosition,
+        layerGroup: this.layerGroup,
+        library: this.library,
+        mode: this.getOptions.mode,
+        pipelineParameters: this.getOptions.pipelineParameters,
       });
       this.map = Object.freeze(map);
       this.map.setEvents([
@@ -515,7 +540,14 @@ export default {
           callback: () => {
             this.position = this.map.center;
             [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
-            this.updateToken(this.map.zoom);
+            // TODO: Временный коммент
+            // this.updateToken(this.map.zoom);
+          },
+        },
+        {
+          event: 'mouseout',
+          callback: () => {
+            this.map.scrollWheelZoom();
           },
         },
       ]);

@@ -15,58 +15,6 @@ class MapClass {
     };
   }
 
-  static highlightFeatureFunc({
-    lib,
-    mode,
-    pipelineData,
-    route,
-    lineTurf,
-  }) {
-    return (e, line) => {
-      const layer = e.target;
-      layer.bringToFront();
-      layer.setStyle({
-        weight: lib.width + 3,
-        color: lib.color,
-      });
-      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        layer.bringToFront();
-      }
-      if (!pipelineData) return;
-      const closest = (arr, num) => (
-        arr.reduce((acc, val) => {
-          if (Math.abs(val.pos - num) < Math.abs(acc)) {
-            return val.pos - num;
-          }
-          return acc;
-        }, Infinity) + num
-      );
-      if (mode[0] === 'Мониторинг') {
-        const newLine = turf.lineSlice(
-          route[0],
-          [e.latlng.lat, e.latlng.lng],
-          lineTurf,
-        );
-        const newLinePoly = L.polyline(newLine.geometry.coordinates);
-        const distances = utils.accumulatedLengths(newLinePoly);
-        const sum = distances[distances.length - 1];
-
-        const closestData = closest(pipelineData, sum);
-
-        const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
-        // div for tooltip
-        const newDiv = document.createElement('div');
-        newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
-          <p>${pipelineInfo.label}</p>
-          <p>P ${pipelineInfo.P}</p>
-          <p>S ${pipelineInfo.S}</p>
-          <p>L ${pipelineInfo.L}</p>
-          </div>`;
-        line.setTooltipContent(newDiv);
-      }
-    };
-  }
-
   static getElementDrawType(lib) {
     if (lib.view_type === 'html') {
       return 'HTML';
@@ -81,11 +29,14 @@ class MapClass {
     clusterTextCount: 4,
     clusterPosition: null,
     library: null,
+    layerGroup: null,
     osmServer: null,
     mapTheme: 'default',
     wheelPxPerZoomLevel: 200,
     isLegendGenerated: false,
     startingPoint: [],
+    mode: [],
+    pipelineParameters: [],
   }
 
   constructor({
@@ -95,14 +46,23 @@ class MapClass {
     zoom,
     maxZoom,
     center,
+    layerGroup,
+    library,
+    mode,
+    pipelineParameters,
   }) {
     this.options.wheelPxPerZoomLevel = wheelPxPerZoomLevel;
+    this.options.layerGroup = layerGroup;
+    this.options.library = library;
+    this.options.mode = mode;
+    this.options.pipelineParameters = pipelineParameters;
     this.map = L.map(mapRef, {
       wheelPxPerZoomLevel,
       zoomSnap,
       zoom,
       maxZoom,
       center,
+      markerZoomAnimation: false,
     });
   }
 
@@ -174,6 +134,14 @@ class MapClass {
     this.options.library = val;
   }
 
+  get layerGroup() {
+    return this.options.layerGroup;
+  }
+
+  set layerGroup(val) {
+    this.options.layerGroup = val;
+  }
+
   get osmServer() {
     return this.options.osmServer;
   }
@@ -188,6 +156,22 @@ class MapClass {
 
   set mapTheme(val) {
     this.options.mapTheme = val;
+  }
+
+  get mode() {
+    return this.options.mode;
+  }
+
+  set mode(val) {
+    this.options.mode = val;
+  }
+
+  get pipelineParameters() {
+    return this.options.pipelineParameters;
+  }
+
+  set pipelineParameters(val) {
+    this.options.pipelineParameters = val;
   }
 
   setEvents(events) {
@@ -275,7 +259,7 @@ class MapClass {
     this.map.addLayer(cluster);
   }
 
-  addLine(element, lib, mode, pipelineData) {
+  addLine(element, lib, pipelineData) {
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -298,20 +282,20 @@ class MapClass {
     const route = line.getLatLngs().map((el) => [el.lat, el.lng]);
     const lineTurf = turf.lineString(route);
 
-    const highlightFeature = MapClass.highlightFeatureFunc({
+    const highlightFeature = this.highlightFeatureFunc({
       lib,
-      mode,
       pipelineData,
       route,
       lineTurf,
+      element,
     });
 
     line
-      .addTo(this.map)
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
       .on('mouseout', resetHighlight);
     line.setTooltipContent(element.label);
+    this.layerGroup[element.type].addLayer(line);
   }
 
   drawMarkerHTML({ lib, element }) {
@@ -345,18 +329,18 @@ class MapClass {
     });
     const point = element.coordinates.split(':');
     const coord = point[1].split(',');
-    L.marker([coord[0], coord[1]], {
+    const marker = L.marker([coord[0], coord[1]], {
       icon,
       zIndexOffset: -1000,
       riseOnHover: true,
     })
-      .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
         interactive: true,
       });
+    this.layerGroup[element.type].addLayer(marker);
   }
 
   drawMarkerSVG({ lib, element }) {
@@ -370,17 +354,15 @@ class MapClass {
     this.startingPoint = [coord[0], coord[1]];
     const marker = L.marker([coord[0], coord[1]], {
       icon,
-      zIndexOffset: -1000,
       riseOnHover: true,
     })
-      .addTo(this.map)
       .bindTooltip(element.label, {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
       });
-    // eslint-disable-next-line no-underscore-dangle
-    L.DomUtil.addClass(marker._icon, 'className');
+      // eslint-disable-next-line no-underscore-dangle
+    this.layerGroup[element.type].addLayer(marker);
   }
 
   clustering(dataRest) {
@@ -476,10 +458,10 @@ class MapClass {
     }
   }
 
-  drawObjects(dataRest, mode, pipelineDataDictionary) {
+  drawObjects(dataRest, pipelineDataDictionary) {
     dataRest.forEach((item) => {
       if (
-        item?.type
+        item?.type !== null
           && this.library?.objects
           && this.library?.objects[item.type]
       ) {
@@ -496,11 +478,68 @@ class MapClass {
             this.addMarker(item, lib);
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
-            this.addLine(item, lib, mode, pipelineDataDictionary[item.ID]);
+            this.addLine(item, lib, pipelineDataDictionary[item.ID]);
           }
         }
       }
     });
+  }
+
+  highlightFeatureFunc({
+    lib,
+    pipelineData,
+    route,
+    lineTurf,
+    element,
+  }) {
+    return (e, line) => {
+      const layer = e.target;
+      layer.bringToFront();
+      layer.setStyle({
+        weight: lib.width + 3,
+        color: lib.color,
+      });
+      if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();
+      }
+      if (!pipelineData) return;
+      const closest = (arr, num) => (
+        arr.reduce((acc, val) => {
+          if (Math.abs(val.pos - num) < Math.abs(acc)) {
+            return val.pos - num;
+          }
+          return acc;
+        }, Infinity) + num
+      );
+      if (this.mode[0] === 'Мониторинг') {
+        const newLine = turf.lineSlice(
+          route[0],
+          [e.latlng.lat, e.latlng.lng],
+          lineTurf,
+        );
+        const newLinePoly = L.polyline(newLine.geometry.coordinates);
+        const distances = utils.accumulatedLengths(newLinePoly);
+        const sum = distances[distances.length - 1];
+
+        const closestData = closest(pipelineData, sum);
+
+        const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
+        // div for tooltip
+        const newDiv = document.createElement('div');
+        let html = '<div style="text-align: left; background-color: #191919; color: white">';
+        html += `<p>${pipelineInfo.label}</p>`;
+        if (this.pipelineParameters.length > 0) {
+          this.pipelineParameters.forEach((item) => {
+            html += `<p>${item.type} ${pipelineInfo[item.type]}</p>`;
+          });
+        }
+        html += '</div>';
+        newDiv.innerHTML = html;
+        line.setTooltipContent(newDiv);
+      } else {
+        line.setTooltipContent(element.label);
+      }
+    };
   }
 
   addLayer(layer) {
@@ -535,6 +574,28 @@ class MapClass {
     this.map.remove();
   }
 
+  removeLayerGroup(i) {
+    this.layerGroup[i].remove();
+  }
+
+  addLayerGroup(i) {
+    this.removeLayerGroup(i);
+    this.layerGroup[i].addTo(this.map);
+  }
+
+  addGroup(group) {
+    this.layerGroup[group] = L.layerGroup([]);
+  }
+
+  changeIndexOffset(group, zIndex) {
+    this.layerGroup[group].eachLayer((layer) => {
+      // eslint-disable-next-line no-underscore-dangle
+      if (layer._icon) {
+        layer.setZIndexOffset(zIndex);
+      }
+    });
+  }
+
   removeLayer(layer) {
     this.map.removeLayer(layer);
   }
@@ -547,6 +608,11 @@ class MapClass {
   removeClass(cursorCssClass) {
     // eslint-disable-next-line no-underscore-dangle
     L.DomUtil.removeClass(this.map._container, cursorCssClass);
+  }
+
+  scrollWheelZoom() {
+    // eslint-disable-next-line no-underscore-dangle
+    this.map.scrollWheelZoom._enabled = false;
   }
 }
 

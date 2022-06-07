@@ -173,7 +173,6 @@
 </template>
 
 <script>
-import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
 
 export default {
   name: 'DashMapUserSettings',
@@ -201,8 +200,6 @@ export default {
   },
   data() {
     return {
-      mdiSettings,
-      mdiList: mdiFormatListBulletedSquare,
       options: {
         selected: 'яндекс',
         selectedLayer: null,
@@ -269,36 +266,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idElement });
       }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
       return this.dashFromStore.options;
     },
     dashFromStore() {
@@ -321,11 +288,6 @@ export default {
             !== JSON.stringify(this.dashFromStore.options)) {
           this.options = JSON.parse(JSON.stringify(this.dashFromStore.options));
         }
-        if (Object.keys(this.search)?.length > 0) {
-          this.$set(this.options, 'search', this.search);
-        } else {
-          this.$set(this.options, 'search', this.searches.find((search) => search.id === this.dashFromStore.search));
-        }
       }
     },
     options: {
@@ -337,6 +299,15 @@ export default {
         }
       },
     },
+    'options.zoomStep': {
+      deep: true,
+      handler(val, oldVal) {
+        if (val !== oldVal) {
+          this.map.options.wheelPxPerZoomLevel = 101 - val;
+          this.map.map.options.wheelPxPerZoomLevel = 101 - val;
+        }
+      },
+    },
   },
   mounted() {
     this.updateSelectedLayerValue();
@@ -344,7 +315,7 @@ export default {
   methods: {
     updateTileLayer(e) {
       if (e?.tile) {
-        this.map.removeLayer({});
+        this.map.removeLayer(e.tile);
         if (typeof e.tile === 'string') {
           let temp = e.tile;
           temp = [temp];
@@ -426,11 +397,6 @@ export default {
 <style lang="sass">
 .theme--light.v-select .v-select__selections
   color: var(--main_text) !important
-
-.legend-title
-  font-size: 18px
-  font-weight: 600
-  line-height: 22px
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
