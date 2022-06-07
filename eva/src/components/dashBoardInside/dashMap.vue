@@ -422,7 +422,7 @@ export default {
           // получаем osm server
           this.getOSM();
           // получаем библиотеку
-          // get all icons that we need on map
+          // get all icons that we need on maps
           this.generateLibrary(dataRest, this.options?.primitivesLibrary);
           if (this.library?.objects) {
             Object.keys(this.library.objects).forEach((item) => {
