@@ -318,7 +318,7 @@ export default {
       },
     },
     selectedElemDeep(val) {
-      if (val.elemDeep === '') {
+      if (val === null || val.elemDeep === '') {
         this.$store.commit('setState', [{
           object: this.elemDeep,
           prop: String(this.multiple),
@@ -519,7 +519,9 @@ export default {
               }, [])];
         });
       } else {
-        value = [...[], ...String(this.elemDeep[String(this.multiple)])];
+        if (this.elemDeep[String(this.multiple)] !== null) {
+          value = [...[], ...String(this.elemDeep[String(this.multiple)])];
+        }
         for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
             value = [data[i][this.elemlink]];

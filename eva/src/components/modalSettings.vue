@@ -1342,7 +1342,7 @@ export default {
               });
               return show;
             }
-            return !!this.options[item];
+            return this.options[item] === 0 || !!this.options[item];
           });
           if (res.length !== relation.length) {
             return false;
