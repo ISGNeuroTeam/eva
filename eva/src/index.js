@@ -94,7 +94,7 @@ Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashL
 //   'dash-multiLine',
 //   () => import('./components/dashBoardInside/MultiLine/MultiLine.vue')
 // );
-Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashMultiLine.vue'));
+Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashChart.vue'));
 // элемент графика
 Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
 // элемент выбора даты и времени

@@ -167,8 +167,8 @@ export default {
         left: this.$store.state[this.idDash][this.id].left,
       };
 
-      this.left = pos.left * this.verticalCell;
-      this.top = pos.top * this.horizontalCell;
+      this.left = Math.round(pos.left * this.verticalCell);
+      this.top = Math.round(pos.top * this.horizontalCell);
 
       const size = {
         width: this.$store.state[this.idDash][this.id].width,

@@ -197,8 +197,19 @@ export default {
     //   },
     //   deep: true,
     // },
+    'getOptions.selectedLayer': {
+      handler(val, old) {
+        if (JSON.stringify(val) !== JSON.stringify(old) && !old) {
+          this.map.remove();
+          this.init();
+        }
+      },
+      deep: true,
+    },
     mapStyleSize() {
-      this.map.resize();
+      if (this.map) {
+        this.map.resize();
+      }
     },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
@@ -329,7 +340,7 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
-      if (this.getOptions.mode[0] === 'Мониторинг' && this.map) {
+      if (this.getOptions.mode && this.getOptions.mode[0] === 'Мониторинг' && this.map) {
         this.pipelineData = await this.getDataFromRest(search);
         const allPipes = {};
         if (Array.isArray(this.pipelineData)) {

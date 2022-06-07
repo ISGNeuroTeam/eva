@@ -1357,13 +1357,26 @@ export default new Vuex.Store({
                 }
               }
               state[id].searches.forEach((search) => {
-                commit('setState', [
-                  {
-                    object: search,
-                    prop: 'status',
-                    value: 'empty',
-                  },
-                ]);
+                if (
+                  search.parametrs?.isStartImmediately
+                  || search.parametrs.isStartImmediately === undefined
+                ) {
+                  commit('setState', [
+                    {
+                      object: search,
+                      prop: 'status',
+                      value: 'empty',
+                    },
+                  ]);
+                } else {
+                  commit('setState', [
+                    {
+                      object: search,
+                      prop: 'status',
+                      value: 'stop',
+                    },
+                  ]);
+                }
               });
             }
             resolve({ status: 'finish' });

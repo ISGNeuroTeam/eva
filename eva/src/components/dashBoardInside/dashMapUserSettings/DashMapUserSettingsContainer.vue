@@ -6,7 +6,7 @@
     >
       <v-row class="ma-0 justify-end">
         <v-menu
-          v-if="options.mode[0] === 'Мониторинг'"
+          v-if="options.mode && options.mode[0] === 'Мониторинг'"
           v-model="toggleSelectPipeline"
           max-width="220"
           max-height="198"
