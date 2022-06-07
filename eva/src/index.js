@@ -76,8 +76,6 @@ Vue.component('modal-settings', () => import('./components/modalSettings.vue'));
 Vue.component('theme-settings', () => import('./components/themeSettings.vue'));
 // настройки дашборда
 Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
-// настройки дашборда
-Vue.component('modal-paper', () => import('./components/modalPaper.vue'));
 // настройки темы
 Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
 // элемент таблицы
@@ -93,7 +91,7 @@ Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashL
 //   'dash-multiLine',
 //   () => import('./components/dashBoardInside/MultiLine/MultiLine.vue')
 // );
-Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashMultiLine.vue'));
+Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashChart.vue'));
 // элемент графика
 Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
 // элемент выбора даты и времени
@@ -126,6 +124,8 @@ Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.v
 Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorSchemes.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
+// компонент Accumulators
+Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
 // блок экспорта импорта
 // Vue.component('block-exim', () => import('./components/blockExim.vue'))
 // элемнет поиска пока не актуален

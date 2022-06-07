@@ -8,7 +8,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Created guntt class
+- Multiline: updated the settings design, added chart groups
+- added legend highlight on the multiline component
+- added ability to bind the Y axis in the multiline component
+
+
+## [1.93.0]
+
+### Added
+- Added data source setting for its autorun immediately after loading the dashboard
+- Add pipeline parameters to map
+
+### Fixed
+- Fixed data source export
+- Fixed modal windows behavior
+- Fixed select number
+
+## [1.92.0]
+
+### Added
+- Add fullscreen mode to visualosations
+- Add options mode tune and accumulators visualisations
+- Add title actions in settings for visualisations
+- Adding layers to the map
+
+### Fixed
+- Fix accumulator colors
+- Fixed metrics order in dashSingleValue.vue
+- Fixed error in dashSingleValue.vue on data source changed
+- Fixed title actions
+- Removed old reports page 
+- Removed papers page
+- Remove title actions from reports visualisations
+- Fixed modal visualisation console error
+- Fixed modal visualisation esc error
+
+## [1.91.0]
+
+### Added
+- Add code editor to reportsV2
+- add visualisation dashAccumulators.vue
+
+### Fixed
+- Fixed dashDTPicker active element text color
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
+- Fixed dashDTPicker active element text color
+- Fixed color picker background
+
+## [1.90.0]
+
+### Added
+- Add donat mod to pieChart
+- Created gantt class
 - Created piechart class
 - Created graph class
 - Upgrade yFiles to 24.0.5
@@ -16,6 +68,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Multiline. Some chart line display settings do not work
 - Fixed guntt infinite loop
+- Fixed styles on vuetify components
+- Fixed default color dashButton
+- Fixed errors in old reports  
+- Fixed dashSingle fullscreen mode
+- Fixed dash single background color
 
 ## [1.89.0]
 

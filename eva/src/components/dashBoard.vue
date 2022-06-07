@@ -53,10 +53,39 @@
             {{ props.icons[elemIcon] }}
           </v-icon>
           <div class="dash-capture">
+            <v-menu
+              v-model="nameMenu"
+              :nudge-width="100"
+              :rounded="false"
+              offset-y
+              attach
+            >
+              <v-list class="profile-dropdown--list">
+                <div
+                  v-for="(item, index) in props.options.titleActions"
+                  :key="index"
+                >
+                  <v-list-item>
+                    <v-btn
+                      class="profile-dropdown--button"
+                      icon
+                      @click="urlAction(item)"
+                    >
+                      {{ item.title || item.name }}
+                    </v-btn>
+                  </v-list-item>
+                </div>
+              </v-list>
+            </v-menu>
             <div
               v-if="props.edit"
               class="dash-title"
               :style="{ color: theme.$main_text }"
+              :class="{
+                'dash-title--pointer': props.options.titleActions
+                  && props.options.titleActions.length
+              }"
+              @click="nameAction(props.options.titleActions)"
             >
               {{ boardTitle }}
             </div>
@@ -101,8 +130,10 @@
           <div class="settings-dash">
             <v-dialog
               ref="fullScreenModal"
-              v-model="fullScreenMode"
+              v-model="bigSizeMode"
               width="100%"
+              :fullscreen="isFullScreen"
+              style="z-index: 999"
             >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip
@@ -116,17 +147,19 @@
                       class="expand"
                       :color="theme.$main_border"
                       v-on="{ ...onFullScreen, ...onTooltip }"
-                      @click="fullScreenMode = !fullScreenMode"
+                      @click="bigSizeMode = !bigSizeMode"
                     >
                       {{ props.mdiArrowExpand }}
                     </v-icon>
                   </template>
-                  <span>На весь экран</span>
+                  <span>Развернуть</span>
                 </v-tooltip>
               </template>
               <div
                 class="full-screen-dialog"
-                :style="{ height: '80vh' }"
+                :style="{
+                  height: isFullScreen ? '100vh' : '80vh'
+                }"
               >
                 <v-card
                   class="dash-block"
@@ -230,12 +263,37 @@
                               class="expand"
                               :color="theme.$main_border"
                               v-on="on"
-                              @click="fullScreenMode = !fullScreenMode"
+                              @click="toggleBigSize"
                             >
                               {{ props.mdiArrowCollapse }}
                             </v-icon>
                           </template>
                           <span>Свернуть</span>
+                        </v-tooltip>
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                          :open-delay="tooltipOpenDelay"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="expand"
+                              :color="theme.$main_border"
+                              v-on="on"
+                              @click="isFullScreen = !isFullScreen"
+                            >
+                              {{
+                                isFullScreen
+                                  ? props.mdiFullscreenExit
+                                  : props.mdiFullscreen
+                              }}
+                            </v-icon>
+                          </template>
+                          <span>{{
+                            isFullScreen
+                              ? 'Выход из полноэкранного режима'
+                              : 'на весь экран'
+                          }}</span>
                         </v-tooltip>
                       </div>
                     </div>
@@ -382,7 +440,7 @@
         </div>
       </div>
       <v-card-text
-        v-show="!showElement && false"
+        v-show="!showElement"
         class="card-text"
       >
         <button
@@ -395,7 +453,8 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        :full-screen-mode="fullScreenMode"
+        v-if="showElement"
+        :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
         :custom-style="{
@@ -410,8 +469,8 @@
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
         :size-from="{
-          height: fullScreenMode ? fullScreenHeight : height,
-          width: fullScreenMode ? fullScreenWidth : width,
+          height: bigSizeMode ? fullScreenHeight : height,
+          width: bigSizeMode ? fullScreenWidth : width,
         }"
         :tooltip-from="props.tooltip"
         :width-from="width"
@@ -419,8 +478,8 @@
         :options="props.options"
         :current-settings="settings"
         :update-settings="updateSettings"
-        :is-full-screen="fullScreenMode"
-        :full-screen="fullScreenMode"
+        :is-full-screen="bigSizeMode"
+        :full-screen="bigSizeMode"
         :table-per-page="tablePerPage"
         :table-page="tablePage"
         :selected-pie-index="selectedPieIndex"
@@ -456,8 +515,11 @@ import {
   mdiPencil,
   mdiSettings,
   mdiTrashCanOutline,
+  mdiFullscreen,
+  mdiFullscreenExit,
 } from '@mdi/js';
 import settings from '../js/componentsSettings';
+import visualisation from '../js/visualisationCRUD';
 
 export default {
   name: 'DashBoard',
@@ -510,7 +572,8 @@ export default {
       dataFromDB: true,
       mdiDatabaseSearch,
       mdiArrowDownBold,
-      fullScreenMode: false,
+      bigSizeMode: false,
+      isFullScreen: false,
       disabledTooltip: false,
       settings: {
         showTitle: true,
@@ -532,6 +595,8 @@ export default {
         mdiChevronDown,
         mdiArrowExpand,
         mdiArrowCollapse,
+        mdiFullscreen,
+        mdiFullscreenExit,
         icons: {},
         edit: true,
         edit_icon: true,
@@ -570,11 +635,12 @@ export default {
         tooltip: {},
         metricsMulti: [],
       },
-      fullScreenWidth: 0.8 * window.innerWidth,
-      fullScreenHeight: 0.8 * window.innerHeight,
       selectedPieIndex: -1,
       tuneValue: '',
       tuneSliderValue: '',
+      nameMenu: false,
+      windowHeight: window.innerHeight,
+      windowWidth: window.innerWidth,
     };
   },
   computed: {
@@ -663,28 +729,6 @@ export default {
         }]);
       }
 
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
       return this.dashFromStore.options;
     },
     lastResult() {
@@ -731,6 +775,24 @@ export default {
           .find((element) => element?.id === this.dataSourceId)?.sid
         : '';
     },
+    fullScreenHeight() {
+      if (this.bigSizeMode) {
+        if (this.isFullScreen) {
+          return this.windowHeight;
+        }
+        return this.windowHeight * 0.8;
+      }
+      return this.height;
+    },
+    fullScreenWidth() {
+      if (this.bigSizeMode) {
+        if (this.isFullScreen) {
+          return this.windowWidth;
+        }
+        return this.windowWidth * 0.8;
+      }
+      return this.height;
+    },
   },
   watch: {
     settingsIsOpened(to) {
@@ -759,6 +821,36 @@ export default {
         idDash: this.idDash,
         status: true,
         id: this.element,
+      });
+    }
+
+    const elements = this.dashFromStore
+      ?.options?.titleActions?.filter((elem) => elem.type === 'modal');
+
+    if (elements?.length > 0) {
+      elements.forEach((element) => {
+        if (!this.$store.state[this.idDash]?.[element.elemName]) {
+          visualisation.create({
+            element: element.tool,
+            spaceName: element.type,
+            idDash: this.idDash,
+          });
+        }
+      });
+    }
+  },
+  beforeDestroy() {
+    const elements = this.dashFromStore
+      ?.options?.titleActions?.filter((elem) => elem.type === 'modal');
+    if (elements?.length > 0) {
+      elements.forEach((element) => {
+        const nameElem = this.dashFromStore[element.elemName]?.name_elem;
+        visualisation.delete({
+          idDash: this.idDash,
+          id: element.elemName,
+          name: nameElem,
+          spaceName: element.type,
+        });
       });
     }
   },
@@ -793,8 +885,8 @@ export default {
       this.$set(this.props.tooltip, item, value);
     },
     onResize() {
-      this.fullScreenWidth = window.innerWidth * 0.8;
-      this.fullScreenHeight = window.innerHeight * 0.8;
+      this.windowWidth = window.innerWidth;
+      this.windowHeight = window.innerHeight;
     },
     updateSettings(localSettings) {
       this.settings = JSON.parse(JSON.stringify(localSettings));
@@ -1153,6 +1245,32 @@ export default {
     },
     resetRange() {
       this.$emit('ResetRange', this.dataSourceId);
+    },
+    nameAction(actionList) {
+      if (!actionList) return;
+      if (actionList.length === 1) {
+        this.urlAction(actionList[0]);
+      } else {
+        this.nameMenu = !this.nameMenu;
+      }
+    },
+    urlAction(action) {
+      switch (action.type) {
+        case 'modal':
+          action.open = true;
+          this.$store.commit('setVisualisationModalData', { idDash: this.idDash, data: action });
+          break;
+        case 'window':
+          window.open(action.url, '', 'width=auto,height=auto');
+          break;
+        default:
+          window.open(action.url, action.type);
+          break;
+      }
+    },
+    toggleBigSize() {
+      this.bigSizeMode = !this.bigSizeMode;
+      this.isFullScreen = false;
     },
   },
 };

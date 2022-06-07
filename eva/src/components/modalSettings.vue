@@ -230,269 +230,6 @@
             </template>
           </template>
 
-          <template v-if="!options.united">
-            <div
-              v-for="metric in metricsName"
-              :key="metric.name"
-              class="option-item"
-            >
-              <div
-                class="name-option item"
-                :style="{
-                  color: theme.$main_text,
-                  borderColor: theme.$main_border,
-                }"
-              >
-                {{ metric.name }} units
-              </div>
-              <div
-                class="discribe-option item"
-                :style="{
-                  color: theme.$main_text,
-                  borderColor: theme.$main_border,
-                }"
-              >
-                Единицы измерения для линии {{ metric.name }}
-              </div>
-              <div class="status-option item">
-                <v-text-field
-                  v-model="metricUnits[metric.name]"
-                  clearable
-                  :color="theme.$primary_button"
-                  :style="{
-                    color: theme.$main_text,
-                    background: 'transparent',
-                    borderColor: theme.$main_border,
-                  }"
-                  outlined
-                  class="subnumber"
-                  hide-details
-                  @input="isChanged = true"
-                />
-              </div>
-            </div>
-          </template>
-
-          <v-card-text
-            v-if="!options.united && checkOptions('united')"
-            class="headline"
-          >
-            <div
-              class="settings-title"
-              :style="{
-                color: theme.$main_text,
-                borderColor: theme.$main_border,
-              }"
-            >
-              Настройки режима United
-            </div>
-          </v-card-text>
-          <div
-            v-if="!options.united && checkOptions('united')"
-            class="options-block united-block"
-          >
-            <v-icon
-              v-if="metrics.length === 0"
-              class="icon-plus"
-              :color="theme.$primary_button"
-              @click="addMetrics"
-            >
-              {{ plus_icon }}
-            </v-icon>
-            <div
-              v-for="i in metrics.length"
-              :key="i"
-              class="options-item-tooltip"
-              style="flex-wrap: wrap; margin-bottom: 40px"
-            >
-              <v-select
-                v-model="metrics[i - 1].name"
-                :items="metricsName.map((el) => el.name)
-                  .filter((name) =>
-                    name === metrics[i - 1].name || !printedUnitedMetrics.includes(name)
-                  )"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                hide-details
-                outlined
-                class="item-metric"
-                label="Имя метрики"
-                @click="changeColor"
-                @change="isChanged = true"
-              />
-              <v-select
-                v-model="metrics[i - 1].type"
-                :items="['Line chart', 'Bar chart']"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                hide-details
-                outlined
-                class="item-metric"
-                label="Тип графика"
-                @click="changeColor"
-                @change="isChanged = true"
-              />
-              <v-text-field
-                v-model="metrics[i - 1].lowborder"
-                clearable
-                placeholder="0"
-                label="Нижняя граница (ось Y)"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                :disabled="!metrics[i - 1].manualBorder"
-                outlined
-                class="item-metric border"
-                hide-details
-                @input="isChanged = true"
-              />
-              <v-text-field
-                v-model="metrics[i - 1].upborder"
-                clearable
-                placeholder="0"
-                label="Верхняя граница (ось Y)"
-                :color="theme.$primary_button"
-                :style="{
-                  color: theme.$main_text,
-                  background: 'transparent',
-                  borderColor: theme.$main_border,
-                }"
-                :disabled="!metrics[i - 1].manualBorder"
-                outlined
-                class="item-metric border"
-                hide-details
-                @input="isChanged = true"
-              />
-              <br>
-              <div class="item-metric">
-                <div
-                  class="discribe-option item"
-                  :style="{
-                    color: theme.$main_text,
-                    borderColor: theme.$main_border,
-                  }"
-                >
-                  Цвет
-                </div>
-                <div class="status-option item">
-                  <label>
-                    <input
-                      :value="color[metrics[i - 1].name]"
-                      style="width: 100px; cursor: pointer"
-                      type="color"
-                      name="multiline-color"
-                      @change="(e) => handleChangeColor(e, i - 1)"
-                    >
-                  </label>
-                </div>
-              </div>
-              <div>
-                <div class="status-option item">
-                  <v-text-field
-                    :value="conclusion_count[metrics[i - 1].name]"
-                    clearable
-                    :color="theme.$primary_button"
-                    :style="{
-                      color: theme.$main_text,
-                      background: 'transparent',
-                      borderColor: theme.$main_border,
-                    }"
-                    style="min-width: 100px"
-                    outlined
-                    class="item-metric"
-                    label="Вывод значений"
-                    type="number"
-                    min="0"
-                    hide-details
-                    @input="(e) => handleChangeConlusionCount(e, i - 1)"
-                  />
-                </div>
-              </div>
-              <div>
-                <div class="status-option item">
-                  <v-text-field
-                    :value="replace_count[metrics[i - 1].name]"
-                    clearable
-                    :color="theme.$primary_button"
-                    :style="{
-                      color: theme.$main_text,
-                      background: 'transparent',
-                      borderColor: theme.$main_border,
-                    }"
-                    style="min-width: 100px"
-                    outlined
-                    class="item-metric"
-                    label="Значения после запятой"
-                    type="number"
-                    min="0"
-                    max="100"
-                    hide-details
-                    @input="(e) => handleChangeReplaceCount(e, i - 1)"
-                  />
-                </div>
-              </div>
-              <div>
-                <div class="status-option item">
-                  <v-select
-                    :value="type_line[metrics[i - 1].name]"
-                    :disabled="metrics[i - 1].type === 'Bar chart'"
-                    label="Тип линии"
-                    class="item-metric"
-                    :items="[
-                      {
-                        text: '━━━━━━',
-                        value: 'solid',
-                      },
-                      {
-                        text: '-------------------',
-                        value: 'dashed',
-                      },
-                      {
-                        text: '.........................',
-                        value: 'dotted',
-                      },
-                      {
-                        text: '﹎﹎﹎﹎﹎﹎',
-                        value: 'double',
-                      },
-                    ]"
-                    :color="theme.$primary_button"
-                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
-                    hide-details
-                    outlined
-                    @change="(e) => handleChangeTypeLine(e, i - 1)"
-                  />
-                </div>
-              </div>
-              <v-checkbox
-                v-model="metrics[i - 1].manualBorder"
-                :color="theme.$primary_button"
-                :style="{ color: theme.$main_text }"
-                class="item-metric checkbox"
-                label="Установить границы"
-                hide-details
-                @change="isChanged = true"
-              />
-              <v-icon
-                class="icon-inside"
-                :color="theme.$primary_button"
-                @click="addMetrics"
-              >
-                {{ plus_icon }}
-              </v-icon>
-              <v-icon
-                class="icon-inside"
-                :color="theme.$primary_button"
-                @click="confirmDeleteMetric(i - 1)"
-              >
-                {{ minus_icon }}
-              </v-icon>
-            </div>
-          </div>
-
           <div
             v-if="checkOptions('positionlegend')"
             class="option-item"
@@ -599,6 +336,105 @@
               Настройки круговой диаграммы
             </div>
           </v-card-text>
+          <div
+            v-if="checkOptions('fillColor') && accumulators.length > 0"
+            ref="options"
+            class="options-block"
+          >
+            <template
+              v-for="(item, index) in metrics"
+            >
+              <div
+                :key="`${index}title`"
+                class="divider-tooltip-setting"
+                :style="{ color: theme.$main_text }"
+              >
+                <p>Показатель {{ index + 1 }}</p>
+                <div
+                  :style="{ backgroundColor: theme.$main_text }"
+                  class="divider-line"
+                />
+              </div>
+              <div
+                :key="`${index}options`"
+                class="options-item-tooltip"
+              >
+                <v-select
+                  v-model="accumulators[index].colorType"
+                  :items="accumulatorColorTypes"
+                  item-text="label"
+                  item-value="value"
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    fill: theme.$main_text,
+                  }"
+                  :menu-props="{
+                    maxHeight: '150px',
+                    overflow: 'auto',
+                  }"
+                  hide-details
+                  outlined
+                  class="item-metric"
+                  label="Выберите тип"
+                  @click="changeColor"
+                  @input="isChanged = true"
+                />
+                <v-text-field
+                  v-if="accumulators[index].colorType === 'color'"
+                  v-model="accumulators[index].color"
+                  placeholder="red #5F27FF rgb(95,39,255)"
+                  label="Набор цветов"
+                  :color="theme.$primary_button"
+                  :style="{
+                    color: theme.$main_text,
+                    background: 'transparent',
+                    borderColor: theme.$main_border,
+                  }"
+                  outlined
+                  class="item-metric"
+                  hide-details
+                  @input="isChanged = true"
+                >
+                  <template #append>
+                    <v-menu
+                      top
+                      transition="scale-transition"
+                      :close-on-content-click="false"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                          size="16"
+                          :style="{
+                            color: theme.$main_text,
+                            background: 'transparent',
+                            borderColor: theme.$main_border,
+                          }"
+                          v-bind="attrs"
+                          v-on="on"
+                        >
+                          {{ dropper }}
+                        </v-icon>
+                      </template>
+                      <v-color-picker
+                        v-model="accumulators[index].color"
+                        dot-size="25"
+                        hide-canvas
+                        hide-inputs
+                        hide-mode-switch
+                        hide-sliders
+                        mode="hexa"
+                        :style="{background: 'transparent'}"
+                        show-swatches
+                        swatches-max-height="200"
+                        @input.capture="addColor($event)"
+                      />
+                    </v-menu>
+                  </template>
+                </v-text-field>
+              </div>
+            </template>
+          </div>
           <div
             v-if="checkOptions('piechartSettings')"
             ref="options"
@@ -726,6 +562,7 @@
                       hide-mode-switch
                       hide-sliders
                       mode="hexa"
+                      :style="{background: 'transparent'}"
                       show-swatches
                       swatches-max-height="200"
                       @input.capture="addColor($event)"
@@ -764,6 +601,36 @@
               >
                 Удалить
               </v-btn>
+            </div>
+            <div
+              class="divider-tooltip-setting"
+              :style="{ color: theme.$main_text }"
+            >
+              <p>Тип визуализации</p>
+              <div
+                :style="{ backgroundColor: theme.$main_text }"
+                class="divider-line"
+              />
+            </div>
+            <div class="options-item-tooltip">
+              <v-select
+                v-model="pieType"
+                :items="pieTypes"
+                item-text="label"
+                item-value="value"
+                :color="theme.$primary_button"
+                :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                :menu-props="{
+                  maxHeight: '150px',
+                  overflow: 'auto',
+                }"
+                hide-details
+                outlined
+                class="item-metric"
+                label="Выберите тип"
+                @click="changeColor"
+                @input="isChanged = true"
+              />
             </div>
           </div>
         </div>
@@ -976,6 +843,29 @@
             </v-icon>
           </div>
         </div>
+        <div
+          v-if="
+            istitleActions && dataPageFrom !== 'reports'
+          "
+        >
+          <v-card-text
+            class="headline"
+          >
+            <div
+              class="settings-title"
+              :style="{
+                color: theme.$main_text,
+                borderColor: theme.$main_border,
+              }"
+            >
+              Ссылки и события для панели
+            </div>
+          </v-card-text>
+          <title-ation-select
+            :list="elementFromStore.options.titleActions"
+            @change="changetitleActions"
+          />
+        </div>
         <v-card-actions class="actions-settings">
           <v-spacer />
           <v-btn
@@ -1011,9 +901,12 @@
 <script>
 import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
 import settings from '../js/componentsSettings';
+import TitleAtionSelect from './modalSettings/titleAtionSelect.vue';
+import vusualisation from '@/js/visualisationCRUD';
 
 export default {
   name: 'ModalSettings',
+  components: { TitleAtionSelect },
   model: {
     prop: 'modalValue',
     event: 'changeModalValue',
@@ -1027,6 +920,10 @@ export default {
       type: String,
       required: true,
     },
+    dataPageFrom: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -1036,7 +933,7 @@ export default {
       replace_count: {},
       options: {},
       type_line: {},
-      color: {},
+      color: '',
       tooltipSettingShow: false,
       plus_icon: mdiPlusBox,
       minus_icon: mdiMinusBox,
@@ -1057,6 +954,29 @@ export default {
         nametheme: '',
       },
       defaultThemes: ['neitral', 'indicted'],
+      pieType: '',
+      pieTypes: [
+        {
+          value: 'pie',
+          label: 'Круговая диограмма',
+        },
+        {
+          value: 'donat',
+          label: 'Кольцвая диограмма',
+        },
+      ],
+      accumulators: [],
+      accumulatorColorType: '',
+      accumulatorColorTypes: [
+        {
+          value: 'color',
+          label: 'Цвет',
+        },
+        {
+          value: 'range',
+          label: 'Диапазон',
+        },
+      ],
       themesArr: [],
       themes: {},
       metrics: [],
@@ -1073,6 +993,7 @@ export default {
       deleteMetricId: '',
       colorPicker: '',
       isOsmServerChange: false,
+      titleActions: [],
     };
   },
   computed: {
@@ -1166,6 +1087,9 @@ export default {
       }
       return this.elementFromStore.metrics;
     },
+    istitleActions() {
+      return this.dashFromStore.elements.find((elem) => elem === this.element);
+    },
   },
   watch: {
     options: {
@@ -1184,19 +1108,24 @@ export default {
     this.prepareOptions();
   },
   methods: {
+    changetitleActions(val) {
+      this.titleActions = structuredClone(val);
+    },
     confirmDeleteMetric(val) {
       this.isConfirmModal = true;
       this.deleteMetricId = val;
     },
     addColor(e) {
-      if (this.colorPicker) {
-        if (this.colorsPie.colors === '') {
-          this.colorsPie.colors += `${e}`;
-        } else {
-          this.colorsPie.colors += ` ${e}`;
+      if (this.element.indexOf('piechart') !== -1) {
+        if (this.colorPicker) {
+          if (this.colorsPie.colors === '') {
+            this.colorsPie.colors += `${e}`;
+          } else {
+            this.colorsPie.colors += ` ${e}`;
+          }
         }
+        this.colorPicker = '';
       }
-      this.colorPicker = '';
     },
     loadComponentsSettings() {
       const localOptions = {};
@@ -1289,6 +1218,10 @@ export default {
           }
           this.$set(this.options, 'themes', this.themes);
         }
+        this.$set(this.options, 'pieType', this.pieType);
+      }
+      if (this.element.indexOf('accumulators') !== -1) {
+        this.$set(this.options, 'fillColor', this.accumulators);
       }
       if (this.element.startsWith('multiLine')) {
         this.$store.commit('setMultilineMetricUnits', {
@@ -1300,7 +1233,9 @@ export default {
       if (this.element.startsWith('map')) {
         this.changeSelectedLayer();
       }
-
+      if (this.titleActions) {
+        this.$set(this.options, 'titleActions', this.titleActions);
+      }
       const options = {
         ...this.options,
         conclusion_count: this.conclusion_count,
@@ -1308,9 +1243,9 @@ export default {
         replace_count: this.replace_count,
         openNewScreen: this.openNewScreen,
         type_line: this.type_line,
-        color: this.color,
         updated: Date.now(),
       };
+      this.visualisationHandler();
       await this.$store.dispatch('saveSettingsToPath', {
         path: this.idDash,
         element: this.element,
@@ -1320,6 +1255,41 @@ export default {
         this.deleteTheme();
       }
       this.cancelModal();
+    },
+    visualisationHandler() {
+      const oldList = this.elementFromStore.options
+        .titleActions?.filter((elem) => elem.type === 'modal') || [];
+      const newList = this.titleActions
+        ?.filter((elem) => elem.type === 'modal') || [];
+
+      const toDelete = oldList.filter(
+        (elem) => !newList.some((item) => item.id === elem.id
+          && item.tool === elem.tool
+          && item.search?.search === elem.search?.search),
+      );
+      const toAdd = newList.filter(
+        (elem) => !oldList.some((item) => item.id === elem.id
+          && item.tool === elem.tool
+          && item.search?.search === elem.search?.search),
+      );
+
+      toDelete.forEach((element) => {
+        const name = this.dashFromStore[element.elemName]?.name_elem;
+        vusualisation.delete({
+          idDash: this.idDash,
+          id: element.elemName,
+          name,
+          spaceName: element.type,
+        });
+      });
+
+      toAdd.forEach((element) => {
+        element.elemName = vusualisation.create({
+          element: element.tool,
+          spaceName: element.type,
+          idDash: this.idDash,
+        });
+      });
     },
     changeSelectedLayer() {
       // Берем активную подложку из сторы
@@ -1571,11 +1541,35 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'pieType') {
+                this.pieType = options[item];
+              } else if (item === 'color') {
+                localOptions[item] = options[item] || '';
+              } else if (item === 'fillColor') {
+                if (this.accumulators?.length === 0) {
+                  const defaultAccumulator = this.metrics.map(() => ({
+                    colorType: 'color',
+                    color: this.theme.$primary_button,
+                  }));
+                  this.$set(this, 'accumulators', defaultAccumulator);
+                }
+                if (options[item].length > 0) {
+                  if (this.accumulators.length > options[item].length) {
+                    const accumOptions = options[item];
+                    const extraElements = this.accumulators.slice(accumOptions.length);
+                    const optionsWithExtra = accumOptions.concat(extraElements);
+                    this.$set(this, 'accumulators', optionsWithExtra);
+                  } else {
+                    this.$set(this, 'accumulators', options[item]);
+                  }
+                }
               } else {
-                const val = options[item] !== null && typeof options[item] === 'object'
+                localOptions[item] = options[item]
+                !== null
+                && typeof options[item]
+                === 'object'
                   ? { ...options[item] }
                   : options[item];
-                localOptions[item] = val;
               }
             } else {
               const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];

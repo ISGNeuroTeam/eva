@@ -43,6 +43,7 @@ export default {
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
     { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
+    { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
   ],
   size: {
     picker: {
@@ -117,6 +118,10 @@ export default {
       width: 400,
       height: 400,
     },
+    accumulators: {
+      width: 400,
+      height: 400,
+    },
     constructorSchemes: {
       width: 930,
       height: 850,
@@ -142,6 +147,7 @@ export default {
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
     constructorSchemes: mdiTuneVertical,
+    accumulators: mdiTuneVertical,
   },
   options: {
     // component to options
@@ -149,24 +155,9 @@ export default {
       'visible',
       'level',
       'boxShadow',
-      'stringOX',
-      'yFromZero',
-      'united',
-      'zoomForAll',
-      'lastDot',
       'metrics',
-      'timeFormat',
       'lastResult',
-      'strokeWidth',
-      'thememultiline',
       'pinned',
-      'isDataAlwaysShow',
-      'xAxisCaptionRotate',
-      'barplotBarWidth',
-      'barplotstyle',
-      'metricTypes',
-      'axesCount',
-      'metricsAxis',
     ],
     piechart: [
       'visible',
@@ -178,6 +169,7 @@ export default {
       'themes',
       'pinned',
       'piechartSettings',
+      'pieType',
     ],
     table: [
       'visible',
@@ -238,6 +230,14 @@ export default {
     ],
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
+    accumulators: [
+      'visible',
+      'level',
+      'boxShadow',
+      'pinned',
+      'metrics',
+      'fillColor',
+    ],
     constructorSchemes: ['visible', 'level', 'pinned'],
   },
   optionFields: [
@@ -282,25 +282,6 @@ export default {
       description:
         'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
-    },
-
-    // MultiLine
-    {
-      option: 'strokeWidth',
-      description: 'Толщина линий',
-      elem: 'text-field',
-    },
-    {
-      option: 'thememultiline',
-      description: 'Цветовая тема',
-      elem: 'select',
-      items: ['default', 'Anna theme'],
-    },
-    {
-      option: 'yFromZero',
-      description: 'Ось Y - от нуля',
-      elem: 'switch',
-      default: false,
     },
 
     // dashSingle
@@ -478,73 +459,6 @@ export default {
       elem: 'switch',
     },
 
-    // MultiLine
-    {
-      option: 'lastDot',
-      description: 'Показывать последнее значение',
-      elem: 'switch',
-    },
-    {
-      option: 'isDataAlwaysShow',
-      description: 'Постоянное отображение данных на графике',
-      elem: 'radio-group',
-      items: [
-        { value: false, label: 'Нет' },
-        { value: 'data', label: 'data' },
-        { value: 'caption', label: 'caption' },
-      ],
-    },
-    {
-      option: 'xAxisCaptionRotate',
-      description: 'Градус наклона подписей на оси X',
-      elem: 'radio-group',
-      items: [
-        { value: 0, label: '0' },
-        { value: 45, label: '45' },
-        { value: -45, label: '-45' },
-        { value: 90, label: '90' },
-        { value: -90, label: '-90' },
-      ],
-    },
-    {
-      option: 'barplotBarWidth',
-      description: 'Ширина столбцов барплот-графика',
-      elem: 'text-field',
-      elemType: 'number',
-      elemMin: 0,
-      placeholder: 'Не указано',
-      onChange(val) {
-        return val !== null ? Math.abs(+val) : null;
-      },
-    },
-    {
-      option: 'stringOX',
-      description: 'Ось X - строки',
-      elem: 'switch',
-    },
-    {
-      option: 'united',
-      description: 'Отображать ли все метрики на одной плоскости координат',
-      elem: 'switch',
-    },
-    {
-      option: 'zoomForAll',
-      description: 'Режим масштабирования с одного графика на все',
-      elem: 'switch',
-      default: false,
-    },
-    {
-      option: 'barplotstyle',
-      relation: 'united',
-      description: 'Стиль столбцов',
-      elem: 'select',
-      items: [
-        { text: 'разделенный', value: 'divided' },
-        { text: 'наложенный', value: 'overlay' },
-        { text: 'с накоплением', value: 'accumulation' },
-      ],
-    },
-
     // dashSelect
     {
       option: 'multiple',
@@ -559,70 +473,14 @@ export default {
       elem: 'switch',
     },
 
-    // MultiLine, dashBoard
+    // dashBoard
     {
       option: 'timeFormat',
       description: 'Выбрать формат даты и времени',
       elem: 'text-field',
       placeholder: '%Y-%m-%d %H:%M:%S',
     },
-    {
-      relation: 'united',
-      option: 'axesCount',
-      default: 1,
-      description: 'Привязка осей',
-      elem: 'radio-group',
-      items: [
-        { value: 1, label: 'Одна ось' },
-        { value: 2, label: 'Две оси' },
-      ],
-    },
 
-    {
-      relation: 'united',
-      group: 'Выбор типа графика', // вывод заголовка для следующих полей
-      option: 'metricTypes',
-    },
-    {
-      relation: 'united',
-      each() {
-        // each реализовано только для select и radio-group
-        return this.titles && this.titles.splice
-          ? [...this.titles].splice(1)
-          : [];
-      },
-      label: 'metricTypes',
-      option: 'metricTypes',
-      description: 'Тип графика',
-      elem: 'select',
-      items: [
-        { value: 'linechart', text: 'Линейный' },
-        { value: 'barplot', text: 'Столбчатый' },
-      ],
-    },
-
-    {
-      relation: ['united', { axesCount: 2 }],
-      group: 'Привязка осей',
-      option: 'metricsAxis',
-    },
-    {
-      relation: ['united', { axesCount: 2 }],
-      each() {
-        // each реализовано только для select и radio-group, разбивает настройку для полей записи
-        return this.titles && this.titles.splice
-          ? [...this.titles].splice(1)
-          : [];
-      },
-      label: 'metricsAxis',
-      option: 'metricsAxis',
-      description: 'Привязка оси',
-      elem: 'radio-group',
-      items: [
-        { value: 'left', label: 'Слева' },
-        { value: 'right', label: 'Справа' },
-      ],
-    },
   ],
   reporstElements: [
     'table',
@@ -631,13 +489,12 @@ export default {
     'guntt',
     'tile',
     'csvg',
-    /// ///
-    'ygraph', // работает
-    'bush', // работает
-    'map', // нужны настройки
-    'heatmap', // нужны настройки
-    'singleValue', // нужны специфичные настройки для этого компонента
-    'tune', // работает
+    'ygraph',
+    'bush',
+    'map',
+    'heatmap',
+    'singleValue',
+    'tune',
   ],
   reports: {
     table: {

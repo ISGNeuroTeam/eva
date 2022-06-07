@@ -104,7 +104,6 @@
           v-if="settings.metricOptions && settings.metricOptions.length > 0"
           v-model="settings.metricOptions"
           handle=".burger"
-          @end="update()"
         >
           <div
             v-for="(metric, i) in settings.metricOptions"
@@ -340,6 +339,7 @@ export default {
       2: 2, 3: 6, 4: 7, 5: 4, 6: 2,
     },
     isChanged: false,
+    metricCountList: [1, 2, 3, 4, 5, 6],
   }),
   computed: {
     isOpen: {
@@ -364,23 +364,8 @@ export default {
     },
 
     isAllMetricsExpanded() {
-      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
+      const { metricOptions = [] } = structuredClone(this.settings);
       return metricOptions.every((m) => m.expanded === true);
-    },
-
-    metricCountList() {
-      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
-      const metricCount = metricOptions.length;
-      const countList = [];
-
-      if (metricCount > 0) {
-        const max = metricCount <= 6 ? metricCount : 6;
-        for (let i = 0; i < max; i += 1) {
-          countList.push(i + 1);
-        }
-      }
-
-      return [1, 2, 3, 4, 5, 6];
     },
   },
   watch: {
@@ -390,7 +375,7 @@ export default {
       }
     },
     receivedSettings(newValue) {
-      const newSettings = JSON.parse(JSON.stringify(newValue));
+      const newSettings = structuredClone(newValue);
       // TODO: метрики приходят без id это вызывает кучу ошибок в консоли!!!!
       this.$set(
         this,
@@ -400,15 +385,9 @@ export default {
           metricOptions: newSettings.metricOptions.sort(
             (a, b) => a.listOrder - b.listOrder,
           ),
-          template: this.settings.template || 1,
+          template: newSettings.template || 1,
         },
       );
-      // this.settings = {
-      //   ...newSettings,
-      //   metricOptions: newSettings.metricOptions.sort(
-      //     (a, b) => a.listOrder - b.listOrder,
-      //   ),
-      // };
     },
     settings(newSet, old) {
       if (this.updateCount && old.metricCount !== newSet.metricCount) {
@@ -436,15 +415,11 @@ export default {
           this,
           'settings',
           {
-            ...JSON.parse(JSON.stringify(this.settings)),
+            ...structuredClone(this.settings),
             showTitle: !this.settings.showTitle,
             template: this.settings.template || 1,
           },
         );
-        // this.settings = {
-        //   ...JSON.parse(JSON.stringify(this.settings)),
-        //   showTitle: !this.settings.showTitle,
-        // };
       }
     },
 
@@ -456,7 +431,7 @@ export default {
     },
 
     save() {
-      this.$emit('save', { ...JSON.parse(JSON.stringify(this.settings)) });
+      this.$emit('save', { ...structuredClone(this.settings) });
       this.close(true);
     },
 
@@ -475,21 +450,16 @@ export default {
       // this.settings.metricCount = count;
     },
 
-    update() {
-      // this.$emit("save", { ...this.settings });
-    },
-
     close(save = false) {
       if (!save || typeof save === 'object') {
         this.$set(
           this,
           'settings',
           {
-            ...JSON.parse(JSON.stringify(this.receivedSettings)),
+            ...structuredClone(this.receivedSettings),
             template: this.settings.template || 1,
           },
         );
-        // this.settings = JSON.parse(JSON.stringify(this.receivedSettings));
       }
       this.toggleAllMetrics(false);
       this.$emit('close');
@@ -504,7 +474,7 @@ export default {
     },
 
     toggleAllMetrics(value = true) {
-      const { metricOptions = [] } = JSON.parse(JSON.stringify(this.settings));
+      const { metricOptions = [] } = structuredClone(this.settings);
       metricOptions.forEach((metric) => {
         metric.expanded = value;
       });

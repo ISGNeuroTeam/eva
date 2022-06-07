@@ -18,6 +18,15 @@ import notify from './storeNotify/store';
 
 Vue.use(Vuex);
 
+const defaultOptions = {
+  change: false,
+  visible: true,
+  level: 1,
+  boxShadow: false,
+  lastResult: false,
+  searchBtn: false,
+};
+
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   state: {
@@ -43,12 +52,13 @@ export default new Vuex.Store({
         'options',
         {},
       );
-      state[idDash][id].options.change = false;
-      state[idDash][id].options.visible = true;
-      state[idDash][id].options.level = 1;
-      state[idDash][id].options.boxShadow = false;
-      state[idDash][id].options.lastResult = false;
-      state[idDash][id].options.searchBtn = false;
+      Object.keys(defaultOptions).forEach((option) => {
+        Vue.set(
+          state[idDash][id].options,
+          option,
+          defaultOptions[option],
+        );
+      });
     },
     // проверяет и создает объект в хранилище для настроек
     // path - это idDash либо произвольное место хранения настроек например research
@@ -380,9 +390,8 @@ export default new Vuex.Store({
       Vue.set(state.reports.searches, search.sid, search);
       Vue.set(state.reports.table, 'search', search.sid);
     },
-    setPaperSearch(state, search) {
-      Vue.set(state.papers.searches, search.sid, search);
-      Vue.set(state.papers, 'cursearch', search.sid);
+    setReportUserSettings(state, value) {
+      Vue.set(state.reports.userSettings, 'heightCodemirror', value);
     },
     setPickerDate(state, { idDash, id, date }) {
       // отдельно можно проверить если ИС прикреплен то переключить и обновить
@@ -448,7 +457,7 @@ export default new Vuex.Store({
       }
     },
     setLoading(state, {
-      idDash, search, should, error,
+      idDash, search, should, error, name,
     }) {
       state[idDash].elements.forEach((item) => {
         if (state[idDash][item].search === search) {
@@ -456,6 +465,11 @@ export default new Vuex.Store({
             state[idDash][item].loading = '';
           }
 
+          state[idDash][item].loading = should;
+        } else if (search
+            && state[idDash][item].name_elem.toLowerCase() === name.toLowerCase()) {
+          state[idDash][item].loading = should;
+        } else {
           state[idDash][item].loading = should;
         }
       });
@@ -466,16 +480,21 @@ export default new Vuex.Store({
     },
     // TODO: refactor
     // TODO: rename method
-    createDashboardVisualization(state, { idDash, dashboard }) {
+    createDashboardVisualization(state, { idDash, dashboard, spaceName }) {
       // создаем новый элемент
       const dash = dashboard;
       let id = Object.keys(dash)[0];
       const data = dash[id];
-      if (!state[idDash]?.elements) {
+      if (spaceName) {
+        id = `${id}-${spaceName}`;
+        if (state[idDash] && !state[idDash][`elements${spaceName}`]) {
+          Vue.set(state[idDash], `elements${spaceName}`, []);
+        }
+      } else if (!state[idDash]?.elements) {
         Vue.set(state[idDash], 'elements', []);
       }
 
-      const stateElements = state[idDash]?.elements;
+      const stateElements = spaceName ? state[idDash][`elements${spaceName}`] : state[idDash]?.elements;
       const elements = stateElements.filter((item) => item.indexOf(id) !== -1);
       // и если есть
       if (elements.length > 0) {
@@ -489,6 +508,7 @@ export default new Vuex.Store({
             j = i;
           }
         }
+
         // если и правда мы не можем добавить элемент, потому что он уже есть
         if (j !== -1) {
           // то проверяем если он не самый первый
@@ -504,23 +524,25 @@ export default new Vuex.Store({
       }
       state[idDash][id] = data;
       state[idDash][id].tab = state[idDash].currentTab || 1;
-      state[idDash].elements.push(id);
+      stateElements.push(id);
     },
     // удаляем элемент с помощью модального окна
     deleteDashboardVisualization(state, {
-      page, idDash, id, name,
+      page, idDash, id, name, spaceName,
     }) {
       let localId = -1;
       // проверяем что именно удаляем
       if (page === 'dash') {
+        // проверяем относится ли элемент к какому нибудь списку имен
+        const elements = spaceName ? `elements${spaceName}` : 'elements';
         // потом ищем его в массиве элементов дашборда
-        state[idDash].elements.forEach((item, i) => {
+        state[idDash][elements].forEach((item, i) => {
           if (item === id) {
             localId = i;
           }
         });
         // и удаляем его в массиве элемнетов
-        state[idDash].elements.splice(localId, 1);
+        state[idDash][elements].splice(localId, 1);
         // и потом сам элемнет тоже удаляем
         delete state[idDash][id];
       } else if (page === 'tocken') {
@@ -798,18 +820,12 @@ export default new Vuex.Store({
         Vue.set(state, 'reports', {});
         Vue.set(state.reports, 'elements', settings.reporstElements);
         Vue.set(state.reports, 'searches', {});
+        Vue.set(state.reports, 'userSettings', {});
         settings.reporstElements.forEach((item) => {
           Vue.set(state.reports, item, {});
           Vue.set(state.reports[item], 'search', '');
           Vue.set(state.reports[item], 'should', false);
         });
-      }
-    },
-    createPaperSearch(state) {
-      if (!state.papers) {
-        Vue.set(state, 'papers', {});
-        Vue.set(state.papers, 'searches', {});
-        Vue.set(state.papers, 'cursearch', 0);
       }
     },
     deleteDashFromMain(state, { id, name }) {
@@ -1031,6 +1047,13 @@ export default new Vuex.Store({
         (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
       Vue.set(search, 'status', status);
+    },
+    setVisualisationModalData(state, { idDash, data }) {
+      if (!state[idDash]?.visualisationModalData) {
+        Vue.set(state[idDash], 'visualisationModalData', {});
+      }
+
+      state[idDash].visualisationModalData = structuredClone(data);
     },
   },
   actions: {
@@ -1334,13 +1357,26 @@ export default new Vuex.Store({
                 }
               }
               state[id].searches.forEach((search) => {
-                commit('setState', [
-                  {
-                    object: search,
-                    prop: 'status',
-                    value: 'empty',
-                  },
-                ]);
+                if (
+                  search.parametrs?.isStartImmediately
+                  || search.parametrs.isStartImmediately === undefined
+                ) {
+                  commit('setState', [
+                    {
+                      object: search,
+                      prop: 'status',
+                      value: 'empty',
+                    },
+                  ]);
+                } else {
+                  commit('setState', [
+                    {
+                      object: search,
+                      prop: 'status',
+                      value: 'stop',
+                    },
+                  ]);
+                }
               });
             }
             resolve({ status: 'finish' });
@@ -1353,15 +1389,6 @@ export default new Vuex.Store({
     },
     getGroups() {
       return rest.getGroups(restAuth);
-    },
-    loadPaper(paper) {
-      return rest.loadPaper(paper, restAuth);
-    },
-    getAllPaper() {
-      return rest.getAllPaper(restAuth);
-    },
-    getPaper(fileData) {
-      return rest.getPaper(restAuth, fileData);
     },
     checkDataSearch(context, sid) {
       return new Promise((resolve) => {
@@ -1901,24 +1928,19 @@ export default new Vuex.Store({
         limit: 1000,
       };
     },
-    getPaperSearch: (state) => {
-      const key = state.papers?.cursearch || 0;
-      if (key !== 0) {
-        return state.papers.searches[key];
-      }
-      return {
-        sid: '',
-        original_otl: '',
-        parametrs: {
-          tws: 0,
-          twf: 0,
-          timeout: 100,
-          preview: false,
-          field_extraction: false,
-          cache_ttl: 100,
-        },
-      };
-    },
+
+    getPaperSearch: () => ({ // TODO: разобраться нужно ли
+      sid: '',
+      original_otl: '',
+      parametrs: {
+        tws: 0,
+        twf: 0,
+        timeout: 100,
+        preview: false,
+        field_extraction: false,
+        cache_ttl: 100,
+      },
+    }),
     getReportElement: (state) => state.reports?.elements || [],
     getThemeTitle(state) {
       return state.theme.name;

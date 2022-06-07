@@ -1,3 +1,67 @@
+# [1.93.0]
+
+### Feature
+- Added the data source setting for its autorun immediately after loading the dashboard
+- Add pipeline parameters to the map component
+
+### Fixed
+- Fixed data source export
+- Fixed modal windows behavior
+- Fixed an error when selecting numeric data in the select component
+
+# [1.92.0]
+
+### Feature
+- Added full-screen mode for visualization
+- Added options mode tune and accumulators visualisations
+- Added title actions in settings for visualizations
+- Added layers to the map
+
+### Fixed
+- Fixed colors in the "accumulator" component
+- Fixed the order of metrics in the "single value" component ¹
+- Fixed an error in the "single value" component when changing the data source
+- Fixed the title of the actions
+- The old reports page has been deleted
+- The papers page has been deleted
+- Removed the title actions from the reports visualisations
+- Fixed an error in the modal visualization console
+- Fixed an error when pressing Esc in modal visualisation
+
+#### ¹⁾ The "Single Value" component now requires an additional field
+
+In the returned data, there should be a "_order" field in each data row.
+System fields that are not output data (for example, "_title") should have empty order field.
+The "_order" field must be a positive number and the values for different rows must not be repeated.
+The values of "_order" should go in order without omissions:
+- 1,4,3,2 - it is possible
+- 1,4,2,5 - not allowed (3 is missing here)
+
+# [1.91.0]
+
+### Feature
+- Added a code editor to Reports 2.0
+- Added a new Accumulators visualization
+
+### Fixed
+- Fixed the text color of the active date picker
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
+- Fixed color picker background
+
+
+# [1.90.0]
+
+### Feature
+- Add donat mod to pieChart
+- Optimization of visualization classes for gant, pie chart, graph.
+
+### Fixed
+- Multiline. Some chart line display settings do not work
+- Fixed gantt infinite reloading
+- Fixed dash button styles
+- Fixed theme styles
+
 # [1.89.0]
 
 ### Feature
