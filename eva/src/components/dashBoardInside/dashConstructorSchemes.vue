@@ -154,9 +154,9 @@
       />
     </div>
     <div
-      class="dash-constructor-schemes__data-panel-container"
+      class="dash-constructor-schemes__data-panel"
       :class="{
-        'dash-constructor-schemes__data-panel-container--active': dataPanel,
+        'dash-constructor-schemes__data-panel--active': dataPanel,
       }"
     >
       <div class="row">
@@ -167,9 +167,35 @@
         </div>
       </div>
       <div
+        v-if="dataSelectedNode"
         ref="dataPanelItems"
-        class="dash-constructor-schemes__data-panel-items"
-      />
+        class="dash-constructor-schemes__data-panel-wrapper"
+      >
+        <div
+          v-if="dataSelectedNode.dataType === '0'"
+          class="dash-constructor-schemes__data-panel-item"
+        >
+          <v-select
+            v-for="(item, index) in dataSelectedNode.items"
+            :key="`${dataSelectedNode.nodeId}-${index}`"
+            v-model="item.id"
+            :items="mockData"
+            item-value="metric_name"
+            item-text="metric_long_name"
+            label="Данные для строки"
+            :menu-props="{
+              'z-index': 100,
+            }"
+            @change="changeDataSelectedNode"
+          />
+          <v-btn
+            small
+            :color="theme.$primary_button"
+          >
+            Добавить строку
+          </v-btn>
+        </div>
+      </div>
     </div>
     <!--The GraphComponent-->
     <div
@@ -377,6 +403,7 @@ export default {
       ],
       selectedNode: '',
       selectedDataType: '',
+      dataSelectedNode: null,
     };
   },
   computed: {
@@ -384,13 +411,16 @@ export default {
       return this.$store.state[this.idDashFrom];
     },
     savedGraphElementsFromStore() {
-      return this.dashFromStore.savedGraphElements || [];
+      return this.dashFromStore.savedGraphElements || {};
     },
     innerSize() {
       return {
         height: this.sizeFrom.height - 25,
         width: this.sizeFrom.width,
       };
+    },
+    theme() {
+      return this.$store.getters.getTheme;
     },
   },
   watch: {
@@ -441,7 +471,7 @@ export default {
       this.$store.commit('setState', [{
         object: this.dashFromStore,
         prop: 'savedGraphElements',
-        value: JSON.parse(JSON.stringify(items)),
+        value: structuredClone(items),
       }]);
     },
     createGraph() {
@@ -449,6 +479,7 @@ export default {
         dndPanelContainerElem: this.$refs.dndPanelContainer,
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
+        dataRest: this.mockData,
         iconsList: this.iconsList,
         savedElements: this.savedGraphElementsFromStore,
         edgeCustomStyles: this.edgeCustomStyles,
@@ -456,21 +487,55 @@ export default {
         labelCustomStyles: this.labelCustomStyles,
         saveGraphItemCallback: this.saveGraphItems,
         openDataPanelCallback: this.openDataPanel,
+        closeDataPanelCallback: this.closeDataPanel,
       });
-      // this.constructorSchemes = constructorSchemes;
+    },
+
+    changeDataSelectedNode() {
+      if (this.dataSelectedNode.dataType === '0') {
+        this.dataSelectedNode.items.forEach((item, index) => {
+          this.dataSelectedNode.items[index].textLeft = this.findDataItemByMetricName(item.id)
+            ?.metric_long_name;
+          this.dataSelectedNode.items[index].textRight = this.findDataItemByMetricName(item.id)
+            ?.value || '-';
+        });
+      }
+      this.updateDataNode(this.dataSelectedNode.nodeId, this.dataSelectedNode);
+      // Update saved element
+      this.$store.commit('setState', [{
+        object: this.savedGraphElementsFromStore[this.dataSelectedNode.nodeId],
+        prop: 'tag',
+        value: structuredClone(this.dataSelectedNode),
+      }]);
+    },
+
+    findDataItemByMetricName(metricName, data = this.mockData) {
+      return data.find((item) => item?.metric_name === metricName);
+    },
+
+    updateDataNode(nodeId, newData) {
       if (this.constructorSchemes) {
-        // this.constructorSchemes.parseDataJson();
+        this.constructorSchemes.updateDataNode(nodeId, newData);
+      }
+    },
+
+    updateGraphDataRest(updatedDataRest) {
+      if (this.constructorSchemes) {
+        this.constructorSchemes.updateDataRest(updatedDataRest);
       }
     },
     closeDataPanel() {
       this.dataPanel = false;
       this.selectedNode = '';
       this.selectedDataType = '';
+      this.dataSelectedNode = null;
     },
     openDataPanel({ dataType, nodeId }) {
+      this.closeDataPanel();
       this.dataPanel = true;
       this.selectedNode = nodeId;
       this.selectedDataType = dataType;
+      this.dataSelectedNode = structuredClone(this.savedGraphElementsFromStore[nodeId]?.tag);
     },
   },
 };
@@ -498,7 +563,7 @@ export default {
       left: -170px;
     }
   }
-  &__dnd-panel-container, &__data-panel-container {
+  &__dnd-panel-container, &__data-panel {
     color: var(--main_text);
     z-index: 1;
     position: absolute;
@@ -525,8 +590,9 @@ export default {
       pointer-events: all;
     }
   }
-  &__data-panel-container {
+  &__data-panel {
     right: 0;
+    width: 300px;
     transform: translateX(100%);
     border-left: 2px solid var(--secondary_bg);
     border-radius: 4px 0 0 4px;
