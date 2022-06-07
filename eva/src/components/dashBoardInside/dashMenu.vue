@@ -4,7 +4,7 @@
     :disabled="!fullScreenMode"
   >
     <div
-      class="dash-select"
+      class="dash-menu"
       :style="customStyle"
       :class="customClass"
       v-bind="$attrs"
@@ -20,6 +20,12 @@
               icon
               @click="urlAction(item)"
             >
+              <v-icon
+                v-if="!!item.icon"
+                small
+              >
+                {{ item.icon }}
+              </v-icon>
               {{ item.title || item.name }}
             </v-btn>
           </v-list-item>

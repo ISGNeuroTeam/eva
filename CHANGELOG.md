@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Add Menu visualisation
+- Add icons to title actions
 - Add pipeline parameters to map
 
 ## [1.92.0]

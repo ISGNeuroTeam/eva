@@ -3,6 +3,9 @@ import './fonts.css';
 import './scroll.css';
 import './scss/globalStyles.scss';
 
+// Подключаем кастомный мконочный шрифт
+import './fonts/eva-iconfont/style.css';
+
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 import PortalVue from 'portal-vue';
 import AsyncComputed from 'vue-async-computed';
