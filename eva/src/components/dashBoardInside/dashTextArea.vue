@@ -148,20 +148,6 @@ export default {
           value: false,
         }]);
       }
-      if (!this.dashFromStore?.options.textFontSize) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'textFontSize',
-          value: 14,
-        }]);
-      }
-      if (!this.dashFromStore?.options.fontWeight) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'fontWeight',
-          value: 400,
-        }]);
-      }
 
       return this.dashFromStore.options;
     },
