@@ -43,6 +43,7 @@ export default {
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
     { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
+    { name: 'Меню', img: mdiTuneVertical, type: 'menu' },
   ],
   size: {
     picker: {
@@ -121,6 +122,10 @@ export default {
       width: 400,
       height: 400,
     },
+    menu: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -142,6 +147,7 @@ export default {
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
     accumulators: mdiTuneVertical,
+    menu: mdiTuneVertical,
   },
   options: {
     // component to options
@@ -236,6 +242,14 @@ export default {
     singleValue: ['visible', 'level', 'pinned'],
     tune: ['visible', 'level', 'pinned'],
     accumulators: [
+      'visible',
+      'level',
+      'boxShadow',
+      'pinned',
+      'metrics',
+      'fillColor',
+    ],
+    menu: [
       'visible',
       'level',
       'boxShadow',
@@ -596,5 +610,13 @@ export default {
       tooltip: 'Ползунок',
       icon: mdiTuneVertical,
     },
+  },
+  excludes: {
+    fromTitleActions: [
+      'menu',
+    ],
+    fromDataSearches: [
+      'menu',
+    ],
   },
 };
