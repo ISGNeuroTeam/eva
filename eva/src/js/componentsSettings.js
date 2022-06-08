@@ -16,6 +16,7 @@ import {
   mdiChartScatterPlot,
   mdiGrid,
   mdiTuneVertical,
+  mdiImageFilterTiltShift,
 } from '@mdi/js';
 
 export default {
@@ -43,6 +44,7 @@ export default {
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
     { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
+    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'scale' },
   ],
   size: {
     picker: {
@@ -121,6 +123,10 @@ export default {
       width: 400,
       height: 400,
     },
+    scale: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -142,6 +148,7 @@ export default {
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
     accumulators: mdiTuneVertical,
+    scale: mdiImageFilterTiltShift,
   },
   options: {
     // component to options
@@ -232,6 +239,7 @@ export default {
       'metrics',
       'fillColor',
     ],
+    scale: ['visible', 'level', 'pinned'],
   },
   optionFields: [
     // описание типов полей и их характеристик

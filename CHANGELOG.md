@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiline: updated the settings design, added chart groups
 - added legend highlight on the multiline component
 - added ability to bind the Y axis in the multiline component
-
+- added circular scale
 
 ## [1.93.0]
 
