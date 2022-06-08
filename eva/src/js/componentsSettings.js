@@ -209,6 +209,8 @@ export default {
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
+      'textFontSize',
+      'fontWeight',
     ],
     guntt: ['visible', 'level', 'timeFormat', 'pinned'],
     tile: ['visible', 'level', 'widthTile', 'heightTile', 'pinned'],
@@ -276,6 +278,18 @@ export default {
       option: 'searchBtn',
       description: 'Показывать кнопку поиска',
       elem: 'switch',
+    },
+    {
+      option: 'textFontSize',
+      description: 'Выбрать размер шрифта',
+      elem: 'select',
+      items: [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
+    },
+    {
+      option: 'fontWeight',
+      description: 'Установить насыщенности текста',
+      elem: 'select',
+      items: [100, 200, 400, 500, 800],
     },
     {
       group: 'Валидация',

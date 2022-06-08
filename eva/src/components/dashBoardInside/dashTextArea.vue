@@ -13,7 +13,11 @@
         v-model="textarea"
         :color="color.controls"
         outlined
-        :style="{ color: color.text }"
+        :style="{
+          color: color.text,
+          fontWeight: getOptions.fontWeight,
+          fontSize: `${getOptions.textFontSize}px`,
+        }"
         spellcheck="false"
         hide-details
         class="textarea-itself"
