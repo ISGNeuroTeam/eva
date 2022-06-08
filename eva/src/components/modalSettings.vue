@@ -1181,7 +1181,6 @@ export default {
     },
     // отправляем настройки в хранилище
     async setOptions() {
-      // this.prepareUnitedSettingsBeforeSave();
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1390,34 +1389,6 @@ export default {
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
     },
-    prepareUnitedSettingsBeforeSave() {
-      const metricNames = this.metrics.map((item) => item.name);
-
-      // clear colors
-      if (this.color) {
-        Object.keys(this.color).forEach((name) => {
-          if (!metricNames.includes(name)) {
-            delete this.color[name];
-          }
-        });
-      }
-
-      // clear metricTypes
-      if (this.multilineYAxesBinding.metricTypes) {
-        Object.keys(this.multilineYAxesBinding.metricTypes).forEach((name) => {
-          if (!metricNames.includes(name)) {
-            delete this.multilineYAxesBinding.metricTypes[name];
-          }
-        });
-      }
-      if (this.type_line && typeof this.type_line === 'object') {
-        Object.keys(this.type_line).forEach((name) => {
-          if (!metricNames.includes(name)) {
-            delete this.type_line[name];
-          }
-        });
-      }
-    },
     getSettingsByPath() {
       this.$store.commit('prepareSettingsStore', {
         path: this.idDash,
@@ -1585,7 +1556,6 @@ export default {
                 'onButton',
                 'pinned',
               ];
-              console.log(item)
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;
               } else if (item === 'showlegend') {

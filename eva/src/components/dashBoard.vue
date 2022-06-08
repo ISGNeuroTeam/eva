@@ -26,7 +26,10 @@
           v-if="getOptions.panelNameHide"
           class="name-dash"
         ></div>
-        <div class="name-dash" v-else>
+        <div
+          v-else
+          class="name-dash"
+        >
           <v-icon
             v-if="dataFromDB"
             class="icon"
@@ -119,7 +122,6 @@
         </div>
         <div class="settings-dash-block">
           <div class="settings-dash">
-
             <v-tooltip
               v-if="isMultiline"
               bottom
