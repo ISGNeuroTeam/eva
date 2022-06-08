@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - adding settings for the textarea
 
 ### Fixed
+- Fixed dashboard save edit state
+- Fixed dashboard save grag/resize state
 - Fixed SingleValue "missing _order" error if order exist in edited data source
 - Fixed username in DS request
 
