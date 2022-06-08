@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added ability to bind the Y axis in the multiline component
 - Added input data validation in the textarea component 
 - adding settings for the textarea
+- Added transition on click to map
 
 ### Fixed
 - Fixed SingleValue "missing _order" error if order exist in edited data source
