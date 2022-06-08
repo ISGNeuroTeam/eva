@@ -372,13 +372,21 @@ export default {
             tooltipBlock.style.opacity = '0.9';
             tooltipBlock.style.visibility = 'visible';
             tooltipWidth = tooltipBlock.clientWidth;
-            this.guntt.moveTooltip(tooltipMargin, this.sizeFrom.width, tooltipWidth);
+            this.guntt.moveTooltip({
+              offsetX: tooltipMargin,
+              dashboardWidth: this.sizeFrom.width,
+              tooltipWidth,
+            });
           },
         },
         {
           name: 'mousemove',
           callback: () => {
-            this.guntt.moveTooltip(tooltipMargin, this.sizeFrom.width, tooltipWidth);
+            this.guntt.moveTooltip({
+              offsetX: tooltipMargin,
+              dashboardWidth: this.sizeFrom.width,
+              tooltipWidth,
+            });
           },
         },
         {

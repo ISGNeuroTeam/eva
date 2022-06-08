@@ -299,7 +299,7 @@ class GunttClass {
     return this.phases || [];
   }
 
-  moveTooltip(offsetX, dashboardWidth, tooltipWidth) {
+  moveTooltip({ offsetX, dashboardWidth, tooltipWidth }) {
     const localY = d3.event.offsetY;
     const localX = dashboardWidth - offsetX <= d3.event.offsetX + tooltipWidth
       ? d3.event.offsetX - tooltipWidth
