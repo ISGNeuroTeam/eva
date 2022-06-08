@@ -1064,9 +1064,7 @@ export default new Vuex.Store({
       const hash = Math.floor(Math.random() * 1000);
 
       // получаем нужный ИС на основе полученных при вызове настроек
-      // let search = getters.getSearch(searchOut);
-      const { search } = searchFrom;
-      const { idDash } = searchFrom;
+      const { search, idDash } = searchFrom;
       let otl = search.original_otl;
       let { tws } = search.parametrs;
       let { twf } = search.parametrs;
