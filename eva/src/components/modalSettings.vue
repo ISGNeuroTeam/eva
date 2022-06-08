@@ -1458,7 +1458,7 @@ export default {
 
           if (this.element.startsWith('multiLine')) {
             if (options.yAxesBinding) {
-              //     // поддержка старой структуры сохраненных настроек
+              // поддержка старой структуры сохраненных настроек
               if (!options.metricTypes) {
                 if (options.yAxesBinding.metrics) {
                   options.metricsAxis = options.yAxesBinding.metrics;
