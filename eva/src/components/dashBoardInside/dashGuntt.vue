@@ -346,7 +346,6 @@ export default {
       // Tooltip
       const tooltipBlock = this.$refs.tooltip;
       const tooltipMargin = 30;
-      let windowWidth;
       let tooltipWidth;
 
       function transformDescription(text) {
@@ -373,14 +372,13 @@ export default {
             tooltipBlock.style.opacity = '0.9';
             tooltipBlock.style.visibility = 'visible';
             tooltipWidth = tooltipBlock.clientWidth;
-            windowWidth = window.innerWidth;
-            this.guntt.moveTooltip(tooltipMargin, windowWidth, tooltipWidth);
+            this.guntt.moveTooltip(tooltipMargin, this.sizeFrom.width, tooltipWidth);
           },
         },
         {
           name: 'mousemove',
           callback: () => {
-            this.guntt.moveTooltip(tooltipMargin, windowWidth, tooltipWidth);
+            this.guntt.moveTooltip(tooltipMargin, this.sizeFrom.width, tooltipWidth);
           },
         },
         {
