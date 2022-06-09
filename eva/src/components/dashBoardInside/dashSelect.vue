@@ -315,7 +315,7 @@ export default {
         defaultFromSourceData = null,
         defaultSourceDataUpdates = false,
       } = this.dashFromStore.options;
-      if (defaultSourceDataUpdates) {
+      if (defaultFromSourceData && defaultSourceDataUpdates) {
         const {
           loading,
         } = this.dataSources[defaultFromSourceData];
