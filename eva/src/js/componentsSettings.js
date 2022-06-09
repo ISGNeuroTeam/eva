@@ -184,6 +184,7 @@ export default {
       'pinned',
       'defaultFromSourceData',
       'defaultSourceDataField',
+      'defaultSourceDataUpdates',
     ],
     picker: ['visible', 'level', 'pinned'],
     graph: ['visible', 'level', 'boxShadow', 'pinned'],
@@ -215,6 +216,7 @@ export default {
       'pinned',
       'defaultFromSourceData',
       'defaultSourceDataField',
+      'defaultSourceDataUpdates',
     ],
     guntt: ['visible', 'level', 'timeFormat', 'pinned'],
     tile: ['visible', 'level', 'widthTile', 'heightTile', 'pinned'],
@@ -244,6 +246,7 @@ export default {
       'pinned',
       'defaultFromSourceData',
       'defaultSourceDataField',
+      'defaultSourceDataUpdates',
     ],
     accumulators: [
       'visible',
@@ -316,6 +319,13 @@ export default {
       elem: 'text-field',
       default: 'value',
       placeholder: 'Default: value',
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataUpdates',
+      description: 'Обновлять значение компонента при изменениях в ИД для дефолтного значения',
+      elem: 'switch',
+      default: false,
     },
 
     // dashMap

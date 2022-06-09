@@ -309,6 +309,20 @@ export default {
     dataLoading() {
       return this.dataLoadingFrom;
     },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
+    },
   },
   watch: {
     'dashFromStore.options.defaultFromSourceData': {
@@ -357,6 +371,22 @@ export default {
             value: data,
           }]);
         });
+      }
+    },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          if (this.multiple) {
+            if (this.elemDeep[String(this.multiple)].length === 0) {
+              this.elemDeep[String(this.multiple)] = [defaultValue];
+            }
+          } else {
+            this.elemDeep[String(this.multiple)] = defaultValue;
+          }
+        }
+        this.setTocken();
       }
     },
   },

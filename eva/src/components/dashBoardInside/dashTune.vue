@@ -254,6 +254,20 @@ export default {
     getClasses() {
       return `${this.customClass} ${this.isFullScreen || this.circularResize ? 'full-screen ' : ''} ${this.minSize ? 'min-size' : ''}`;
     },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
+    },
   },
   watch: {
     storedElement(element) {
@@ -321,6 +335,17 @@ export default {
       handler() {
         this.onChangeSlider();
       },
+    },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.value = defaultValue;
+        }
+        this.setToken();
+        this.storeValue();
+      }
     },
   },
   mounted() {

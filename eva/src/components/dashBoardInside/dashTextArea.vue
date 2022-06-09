@@ -143,6 +143,20 @@ export default {
       }
       return this.dashFromStore.textarea;
     },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
+    },
   },
   watch: {
     textAreaValue(val) {
@@ -153,6 +167,16 @@ export default {
       handler() {
         this.setTockenBlur();
       },
+    },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.textarea = `${defaultValue}`;
+        }
+        this.setTockenBlur();
+      }
     },
   },
   mounted() {
