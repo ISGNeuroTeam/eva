@@ -2,7 +2,10 @@
   <div
     class="dash-layout"
     :options="String(options)"
-    :class="{ show_board: props.differentOptions.visible }"
+    :class="{
+      show_board: props.differentOptions.visible,
+      'no-bg': getOptions.panelBackHide,
+    }"
     :style="{ boxShadow: ` 0 0 5px 5px ${props.optionsBoxShadow}` }"
   >
     <v-card
@@ -19,7 +22,14 @@
           : props.disappear"
         class="card-title open_title"
       >
-        <div class="name-dash">
+        <div
+          v-if="getOptions.panelNameHide"
+          class="name-dash"
+        ></div>
+        <div
+          v-else
+          class="name-dash"
+        >
           <v-icon
             v-if="dataFromDB"
             class="icon"
@@ -27,24 +37,6 @@
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-            style="z-index: 100"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                v-show="searchingData"
-                class="icon"
-                :color="theme.$main_border"
-                @click="exportDataCSV"
-                v-on="on"
-              >
-                {{ mdiArrowDownBold }}
-              </v-icon>
-            </template>
-            <span>Скачать результаты</span>
-          </v-tooltip>
           <v-icon
             v-show="dataMode"
             class="icon chart"
@@ -54,13 +46,14 @@
           </v-icon>
           <div class="dash-capture">
             <v-menu
+              v-if="props.options.titleActions && props.options.titleActions.length > 1"
               v-model="nameMenu"
               :nudge-width="100"
               :rounded="false"
               offset-y
               attach
             >
-              <v-list class="profile-dropdown--list">
+              <v-list class="menu-dropdown profile-dropdown--list">
                 <div
                   v-for="(item, index) in props.options.titleActions"
                   :key="index"
@@ -88,6 +81,7 @@
               class="dash-title"
               :style="{ color: theme.$main_text }"
               :class="{
+                'dash-title--view': !dataMode,
                 'dash-title--pointer': props.options.titleActions
                   && props.options.titleActions.length
                   && !excludedFromTitleAcrions
@@ -135,7 +129,64 @@
         </div>
         <div class="settings-dash-block">
           <div class="settings-dash">
+            <v-tooltip
+              v-if="isMultiline"
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  @click="resetRange()"
+                >
+                  {{ props.mdiMagnifyMinusOutline }}
+                </v-icon>
+              </template>
+              <span>Сбросить зум</span>
+            </v-tooltip>
+            <v-tooltip
+              v-if="getOptions.panelIconUpdate"
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-show="searchingData"
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  @click="startSearch(dataSource)"
+                >
+                  {{ mdiCached }}
+                </v-icon>
+              </template>
+              <span>Запустить ИД</span>
+            </v-tooltip>
+            <v-tooltip
+              v-if="getOptions.panelIconDownload"
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-show="searchingData"
+                  class="icon"
+                  :color="theme.$main_border"
+                  @click="exportDataCSV"
+                  v-on="on"
+                >
+                  {{ mdiArrowDownBold }}
+                </v-icon>
+              </template>
+              <span>Скачать результаты</span>
+            </v-tooltip>
             <v-dialog
+              v-if="getOptions.panelIconFullscreen"
               ref="fullScreenModal"
               v-model="bigSizeMode"
               :width="isFullScreen ? '100vw' : '80vw'"
@@ -177,7 +228,7 @@
                   }"
                 >
                   <v-card-title
-                    v-show="props.disappear"
+                    v-show="props.disappear && !getOptions.panelNameHide"
                     class="card-title open_title"
                   >
                     <div class="name-dash">
@@ -250,7 +301,7 @@
                         >
                           <template v-slot:activator="{ on }">
                             <v-icon
-                              class="datasource"
+                              class="icon"
                               :color="theme.$main_border"
                               v-on="on"
                               @click="resetRange()"
@@ -310,24 +361,6 @@
                 </v-card>
               </div>
             </v-dialog>
-            <v-tooltip
-              v-if="isMultiline"
-              bottom
-              :color="theme.$accent_ui_color"
-              :open-delay="tooltipOpenDelay"
-            >
-              <template v-slot:activator="{ on }">
-                <v-icon
-                  class="datasource"
-                  :color="theme.$main_border"
-                  v-on="on"
-                  @click="resetRange()"
-                >
-                  {{ props.mdiMagnifyMinusOutline }}
-                </v-icon>
-              </template>
-              <span>Сбросить зум</span>
-            </v-tooltip>
           </div>
           <div
             v-show="dataMode"
@@ -342,7 +375,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="datasource"
+                  class="icon"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="switchDS(props)"
@@ -353,14 +386,14 @@
               <span>Источник данных</span>
             </v-tooltip>
             <v-tooltip
-              v-if="props.edit_icon"
+              v-if="props.edit_icon && !getOptions.panelNameHide"
               bottom
               :color="theme.$accent_ui_color"
               :open-delay="tooltipOpenDelay"
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="pencil"
+                  class="icon"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="
@@ -383,7 +416,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="check"
+                  class="icon"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="editName(props)"
@@ -418,7 +451,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="delete"
+                  class="icon mx-2"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="deleteDashBoard(props)"
@@ -436,7 +469,7 @@
         class="loading-block"
       >
         <div
-          v-show="props.disappear"
+          v-show="props.disappear && !getOptions.panelNameHide"
           :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
           class="loading-divider"
           :class="{ loading: loading, noBorder: !dataMode }"
@@ -511,6 +544,7 @@ import {
   mdiArrowAll,
   mdiArrowCollapse,
   mdiArrowDownBold,
+  mdiCached,
   mdiArrowExpand,
   mdiArrowExpandAll,
   mdiCheckBold,
@@ -578,9 +612,10 @@ export default {
     return {
       tablePerPage: 100,
       tablePage: 1,
-      dataFromDB: true,
+      dataFromDB: false,
       mdiDatabaseSearch,
       mdiArrowDownBold,
+      mdiCached,
       bigSizeMode: false,
       isFullScreen: false,
       disabledTooltip: false,
@@ -781,10 +816,11 @@ export default {
       return this.searchData.length > 0;
     },
     dataSourceTitle() {
-      return this.$store.state[this.idDash]?.searches?.length > 0
-        ? this.$store.state[this.idDash]?.searches
-          .find((element) => element?.id === this.dataSourceId)?.sid
-        : '';
+      return this.dataSource?.sid || '';
+    },
+    dataSource() {
+      return this.$store.state[this.idDash]?.searches
+        .find((element) => element?.id === this.dataSourceId);
     },
     fullScreenHeight() {
       if (this.bigSizeMode) {
@@ -872,6 +908,13 @@ export default {
     }
   },
   methods: {
+    async startSearch(search) {
+      this.$store.commit('updateSearchStatus', {
+        idDash: this.idDash,
+        sid: search.sid,
+        status: 'empty',
+      });
+    },
     changeSelectedPie(val) {
       this.selectedPieIndex = val;
     },
@@ -1298,6 +1341,11 @@ export default {
 </style>
 <style lang="sass">
 .settings-dash
-    .v-icon:focus::after
-        opacity: 0
+  .v-icon:focus::after
+    opacity: 0
+.menu-dropdown
+  padding-top: 0
+  .profile-dropdown--button
+    margin-top: 0
+    padding-right: 8px
 </style>

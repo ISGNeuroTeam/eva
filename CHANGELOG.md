@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- added general settings for panels.
+- added the ability to hide the name of the panel.
+- added the ability to update the source data by the panel icon.
+- added the ability to hide the background color on panels.
+- added the ability to add a download icon to the panel.
+- added a setting for hiding/displaying a full-screen icon on panels.
+
 ## [1.94.0]
 
 ### Added
