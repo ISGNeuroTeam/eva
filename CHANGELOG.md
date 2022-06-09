@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added removal of restrictions
+
+## [1.94.0]
+
+### Added
 - Add Menu visualisation
 - Add icons to title actions
 - Multiline: updated the settings design, added chart groups

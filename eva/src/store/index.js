@@ -1924,7 +1924,6 @@ export default new Vuex.Store({
           field_extraction: false,
           cache_ttl: 100,
         },
-        limit: 1000,
       };
     },
 
