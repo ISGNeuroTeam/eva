@@ -228,7 +228,7 @@ export default {
       const { width, height } = sizeFrom;
       return {
         width: Math.round(width - 42),
-        height: Math.round(height - 55) - 60,
+        height: Math.round(height - 55) - 30,
       };
     },
 
