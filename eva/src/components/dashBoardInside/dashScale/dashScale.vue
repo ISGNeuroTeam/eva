@@ -77,6 +77,10 @@
           </span>
         </div>
       </div>
+      <div
+        ref="pie"
+        class="circle-scale"
+      />
       <scale-settings
         v-model="isSettingsComponentOpen"
         :received-settings="providedSettings"
@@ -93,6 +97,7 @@
 import { mdiSettings } from '@mdi/js';
 import scaleSettings from './dashScaleSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
+import ScaleClass from '../../../js/classes/ScaleClass';
 
 export default {
   name: 'Scale',
@@ -152,6 +157,7 @@ export default {
     update: 1,
     isHeaderOpen: true,
     error: '',
+    scale: null,
   }),
   computed: {
     theme() {
@@ -179,36 +185,6 @@ export default {
       }
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDashFrom });
-      }
-
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
       }
       if (!this.dashFromStore?.options.settings) {
         this.$store.commit('setState', [{
@@ -257,6 +233,17 @@ export default {
       // this.providedSettings = currentSettings;
       this.$set(this, 'providedSettings', currentSettings);
       this.init(currentSettings);
+    },
+    sizeFrom: {
+      deep: true,
+      handler(val, old) {
+        if (JSON.stringify(val) !== JSON.stringify(old) && this.scale) {
+          this.scale.size = {
+            width: val.width - 30,
+            height: val.height - 60,
+          };
+        }
+      },
     },
   },
   mounted() {
@@ -327,6 +314,29 @@ export default {
       // this.metricCount = this.metricCount || metricCount;
       this.$set(this, 'metricCount', this.metricCount || metricCount);
       this.updateVisual(settings || options.settings);
+      if (this.scale) {
+        this.scale.removePiechart();
+      }
+      const piechart = new ScaleClass({
+        elem: this.$refs.pie,
+        width: this.sizeFrom.width - 30,
+        height: this.sizeFrom.height - 60,
+        data: {
+          1: 8,
+          2: 8,
+          3: 8,
+          4: 8,
+          5: 8,
+          6: 8,
+          7: 8,
+          8: 8,
+          9: 8,
+          10: 8,
+          11: 8,
+          12: 8,
+        },
+      });
+      this.scale = Object.freeze(piechart);
     },
     updateCount(count) {
       const options = { ...this.getOptions };
@@ -501,4 +511,10 @@ export default {
 
 <style lang="sass" scoped>
 @import 'sass/dashScale'
+.circle-scale
+  position: absolute
+  top: 55%
+  left: 50%
+  z-index: 1
+  transform: translate(-50%, -50%)
 </style>
