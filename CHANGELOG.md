@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added transition on click to map
 
 ### Fixed
+- Updated drawing of points on multi-line lines
 - Fixed SingleValue title tockens
 - Fixed piechart legend in big size mode
 - Fixed SingleValue "missing _order" error if order exist in edited data source

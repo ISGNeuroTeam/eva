@@ -717,9 +717,7 @@ export default class ChartClass {
         if (nodes.length === 1) {
           className += ' dot-show';
         } else if (metric.showPeakDots) {
-          if (ChartClass.lastDotParamForPoint(metric.lastDot, i, nodes)) {
-            className += ' dot-show';
-          }
+          className += ' dot-show';
         }
         return className;
       })
