@@ -1,3 +1,22 @@
+# [1.94.0]
+
+### Added
+- Added the menu component
+- Added icons to header actions
+- Updated the settings design and added chart groups in the multiline component
+- added legend highlight on the multiline component
+- added ability to bind the Y axis in the multiline component
+- Added input data validation in the textarea component
+- Added font settings in the textarea component
+- Added transition on click to map
+
+### Fixed
+- Fixed the use of tokens in the name of the single value component
+- Fixed piechart legend in big size mode
+- Fixed "missing _order" error if order exist in edited data source in the single value component
+- Fixed sending the username during data exploration
+- Fixed big size visualisation mode
+
 # [1.93.0]
 
 ### Feature

@@ -71,6 +71,12 @@
                       icon
                       @click="urlAction(item)"
                     >
+                      <v-icon
+                        v-if="!!item.icon"
+                        small
+                      >
+                        {{ item.icon }}
+                      </v-icon>
                       {{ item.title || item.name }}
                     </v-btn>
                   </v-list-item>
@@ -84,6 +90,7 @@
               :class="{
                 'dash-title--pointer': props.options.titleActions
                   && props.options.titleActions.length
+                  && !excludedFromTitleAcrions
               }"
               @click="nameAction(props.options.titleActions)"
             >
@@ -131,7 +138,7 @@
             <v-dialog
               ref="fullScreenModal"
               v-model="bigSizeMode"
-              width="100%"
+              :width="isFullScreen ? '100vw' : '80vw'"
               :fullscreen="isFullScreen"
               style="z-index: 999"
             >
@@ -328,6 +335,7 @@
             :class="{ settings_move: props.open_gear }"
           >
             <v-tooltip
+              v-if="!excludedFromDataSearches"
               bottom
               :color="theme.$accent_ui_color"
               :open-delay="tooltipOpenDelay"
@@ -440,6 +448,7 @@
         </div>
       </div>
       <v-card-text
+        v-if="!excludedFromDataSearches"
         v-show="!showElement"
         class="card-text"
       >
@@ -453,7 +462,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement"
+        v-if="showElement || excludedFromDataSearches"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
@@ -690,12 +699,14 @@ export default {
 
       return this.dataModeFrom;
     },
+    elementType() {
+      return this.element.split('-')[0];
+    },
     // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
     currentElem() {
       let nameElement = '';
       if (this.element) {
-        const element = this.element.split('-')[0];
-        nameElement = `dash-${element}`;
+        nameElement = `dash-${this.elementType}`;
       }
       return nameElement;
     },
@@ -725,28 +736,6 @@ export default {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
           prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
           value: false,
         }]);
       }
@@ -814,6 +803,12 @@ export default {
         return this.windowWidth * 0.8;
       }
       return this.height;
+    },
+    excludedFromTitleAcrions() {
+      return settings.excludes.fromTitleActions.some((item) => item === this.elementType);
+    },
+    excludedFromDataSearches() {
+      return settings.excludes.fromDataSearches.some((item) => item === this.elementType);
     },
   },
   watch: {
@@ -1269,7 +1264,7 @@ export default {
       this.$emit('ResetRange', this.dataSourceId);
     },
     nameAction(actionList) {
-      if (!actionList) return;
+      if (!actionList || this.excludedFromTitleAcrions) return;
       if (actionList.length === 1) {
         this.urlAction(actionList[0]);
       } else {

@@ -149,7 +149,7 @@ export default {
       curTab: null,
       size: {
         width: 0,
-        height: screen.height ?? 0,
+        height: window.screen.height ?? 0,
       },
       aboutElem: {},
       rowsCount: 9,
@@ -164,6 +164,7 @@ export default {
         buttons: [],
       },
       activeElem: 'table',
+      username: '',
     };
   },
   asyncComputed: {
@@ -278,10 +279,14 @@ export default {
       worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
     },
     async launchSearch(search) {
-      this.$set(this, 'search', JSON.parse(JSON.stringify({
+      this.$set(this, 'search', structuredClone({
         ...search,
+        parametrs: {
+          ...search.parametrs,
+          username: this.username,
+        },
         sid: this.hashCode(search.original_otl),
-      })));
+      }));
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
@@ -343,7 +348,7 @@ export default {
       );
     },
     setUsername(event) {
-      this.search.parametrs.username = event;
+      this.username = event;
     },
     hashCode(otl) {
       return otl
