@@ -162,8 +162,17 @@ export default {
       return this.metricList.slice(0, this.metricCount);
     },
 
+    tockens() {
+      return this.$store.state[this.idDashFrom]?.tockens || [];
+    },
+
     tokenizedTitle() {
-      const title = this.getOptions?.settings?.title || '';
+      let title = this.getOptions?.settings?.title || '';
+
+      this.tockens.forEach((token) => {
+        title = title.replaceAll(`$${token.name}$`, token.value);
+      });
+
       return title.replaceAll('<title>', this.titleToken);
     },
 
