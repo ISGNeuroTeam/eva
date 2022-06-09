@@ -43,6 +43,7 @@ export default {
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
     { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
+    { name: 'Меню', img: mdiTuneVertical, type: 'menu' },
   ],
   size: {
     picker: {
@@ -121,6 +122,10 @@ export default {
       width: 400,
       height: 400,
     },
+    menu: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -142,6 +147,7 @@ export default {
     singleValue: mdiNumeric,
     tune: mdiTuneVertical,
     accumulators: mdiTuneVertical,
+    menu: mdiTuneVertical,
   },
   commonOptions: [
     'panelSettings',
@@ -197,7 +203,15 @@ export default {
       'underline',
       'onButton',
     ],
-    textarea: ['searchBtn'],
+    textarea: [
+      'searchBtn',
+      'validationGroup',
+      'validationType',
+      'validationNumberRangeMin',
+      'validationNumberRangeMax',
+      'textFontSize',
+      'fontWeight',
+    ],
     guntt: ['timeFormat'],
     tile: ['widthTile', 'heightTile'],
     csvg: ['tooltip'],
@@ -219,6 +233,11 @@ export default {
     singleValue: [],
     tune: [],
     accumulators: [
+      'boxShadow',
+      'metrics',
+      'fillColor',
+    ],
+    menu: [
       'boxShadow',
       'metrics',
       'fillColor',
@@ -302,6 +321,49 @@ export default {
       option: 'searchBtn',
       description: 'Показывать кнопку поиска',
       elem: 'switch',
+    },
+    {
+      option: 'textFontSize',
+      description: 'Выбрать размер шрифта',
+      elem: 'select',
+      items: [12, 14, 16, 18, 24, 28, 32, 36, 42, 48, 54, 62, 68, 72],
+    },
+    {
+      option: 'fontWeight',
+      description: 'Установить насыщенности текста',
+      elem: 'select',
+      items: [100, 200, 400, 500, 800],
+    },
+    {
+      group: 'Валидация',
+      option: 'validationGroup',
+    },
+    {
+      optionGroup: 'validationGroup',
+      option: 'validationType',
+      description: 'Валидация данных',
+      elem: 'select',
+      items: [
+        { value: null, text: 'Нет вализации' },
+        { value: 'numberRange', text: 'Диапазон чисел' },
+      ],
+      default: null,
+    },
+    {
+      optionGroup: 'validationGroup',
+      option: 'validationNumberRangeMin',
+      relation: ['validationType', { validationType: 'numberRange' }],
+      description: 'Минимальное значение',
+      elem: 'text-field',
+      elemType: 'number',
+    },
+    {
+      optionGroup: 'validationGroup',
+      option: 'validationNumberRangeMax',
+      relation: ['validationType', { validationType: 'numberRange' }],
+      description: 'Максимальное значение',
+      elem: 'text-field',
+      elemType: 'number',
     },
 
     // dashMap
@@ -577,5 +639,13 @@ export default {
       tooltip: 'Ползунок',
       icon: mdiTuneVertical,
     },
+  },
+  excludes: {
+    fromTitleActions: [
+      'menu',
+    ],
+    fromDataSearches: [
+      'menu',
+    ],
   },
 };

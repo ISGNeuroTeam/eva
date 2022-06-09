@@ -13,7 +13,11 @@
         v-model="textarea"
         :color="color.controls"
         outlined
-        :style="{ color: color.text }"
+        :style="{
+          color: color.text,
+          fontWeight: getOptions.fontWeight,
+          fontSize: `${getOptions.textFontSize}px`,
+        }"
         spellcheck="false"
         hide-details
         class="textarea-itself"
@@ -21,6 +25,8 @@
         no-resize
         @keypress.enter="setTockenByPress($event)"
         @blur="setTockenBlur($event)"
+        @change="onInputText"
+        @keyup="onKeyUpText"
       />
       <v-btn
         v-if="searchBtn"
@@ -166,6 +172,15 @@ export default {
     textAreaValue(val) {
       this.textarea = val;
     },
+    'dashFromStore.options.validationType': {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.onInputText(this.textarea);
+          this.setTocken();
+        }
+      },
+    },
   },
   mounted() {
     this.$emit('hideDS', this.id);
@@ -185,6 +200,36 @@ export default {
         textarea: this.textarea,
       });
       this.setTocken();
+    },
+    onKeyUpText() {
+      const { options } = this.dashFromStore;
+      if (options?.validationType === 'numberRange') {
+        const num = this.textarea.match(/^-?(\d+)?(\.)?(\d+)?/);
+        this.textarea = num ? num[0] : '';
+      }
+    },
+    onInputText(val) {
+      const { options } = this.dashFromStore;
+      if (options?.validationType === 'numberRange') {
+        const {
+          validationNumberRangeMin,
+          validationNumberRangeMax,
+        } = options;
+        const min = parseFloat(validationNumberRangeMin);
+        const max = parseFloat(validationNumberRangeMax);
+        let numberValue = parseFloat(val);
+        if (Number.isNaN(numberValue)) {
+          numberValue = '';
+        } else {
+          if (numberValue < min) {
+            numberValue = min;
+          }
+          if (numberValue > max) {
+            numberValue = max;
+          }
+        }
+        this.textarea = `${numberValue}`;
+      }
     },
     acceptTextArea() {
       this.$store.commit('setTextArea', {

@@ -8,9 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Multiline: updated the settings design, added chart groups
-- added legend highlight on the multiline component
-- added ability to bind the Y axis in the multiline component
 - added general settings for panels.
 - added the ability to hide the name of the panel.
 - added the ability to update the source data by the panel icon.
@@ -18,6 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to add a download icon to the panel.
 - added a setting for hiding/displaying a full-screen icon on panels.
 
+## [1.94.0]
+
+### Added
+- Add Menu visualisation
+- Add icons to title actions
+- Multiline: updated the settings design, added chart groups
+- added legend highlight on the multiline component
+- added ability to bind the Y axis in the multiline component
+- Added input data validation in the textarea component 
+- adding settings for the textarea
+- Added transition on click to map
+
+### Fixed
+- Fixed SingleValue title tockens
+- Fixed piechart legend in big size mode
+- Fixed SingleValue "missing _order" error if order exist in edited data source
+- Fixed username in DS request
+- Fixed big size visualisation mode
 
 ## [1.93.0]
 
