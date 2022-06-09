@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.94.0]
 
 ### Added
 - Add Menu visualisation
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed piechart legend in big size mode
 - Fixed SingleValue "missing _order" error if order exist in edited data source
 - Fixed username in DS request
+- Fixed big size visualisation mode
 
 ## [1.93.0]
 
@@ -44,7 +45,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding layers to the map
 
 ### Fixed
-- Fixed big size visualisation mode
 - Fix accumulator colors
 - Fixed metrics order in dashSingleValue.vue
 - Fixed error in dashSingleValue.vue on data source changed
