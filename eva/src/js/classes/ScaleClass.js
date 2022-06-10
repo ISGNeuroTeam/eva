@@ -57,6 +57,8 @@ export default class ScaleClass {
 
     this.createPieChartGroup();
 
+    this.createColors(data, colors);
+
     this.createDataRedy(data);
 
     this.createPies();
@@ -89,7 +91,7 @@ export default class ScaleClass {
       .append('path')
       .attr('d', d3.arc().innerRadius(this.innerRadius).outerRadius(this.radius))
       .attr('class', 'piepart')
-      .attr('fill', '#C4C4C4')
+      .attr('fill', (d) => this.colors(d.data.key - 1))
       .attr('stroke', 'var(--main_bg)')
       .style('stroke-width', '10px');
   }
@@ -106,12 +108,19 @@ export default class ScaleClass {
       .selectAll('path')
       .attr('d', d3.arc().innerRadius(this.innerRadius).outerRadius(this.radius))
       .attr('class', 'piepart')
-      .attr('fill', '#C4C4C4')
+      .attr('fill', (d) => this.colors(d.data.key - 1))
       .attr('stroke', 'var(--main_bg)')
       .style('stroke-width', '10px');
   }
 
   removePiechart() {
     this.getPiechart.remove();
+  }
+
+  createColors(data, colors) {
+    this.colors = d3
+      .scaleOrdinal()
+      .domain(data)
+      .range(colors);
   }
 }

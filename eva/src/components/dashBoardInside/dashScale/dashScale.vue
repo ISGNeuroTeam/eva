@@ -2,6 +2,7 @@
   <portal
     :to="idFrom"
     :disabled="!fullScreenMode"
+    style="height: calc(100% - 28px)"
   >
     <div
       class="single-value-container pa-3"
@@ -95,6 +96,7 @@
 
 <script>
 import { mdiSettings } from '@mdi/js';
+import moment from 'moment';
 import scaleSettings from './dashScaleSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
 import ScaleClass from '../../../js/classes/ScaleClass';
@@ -158,6 +160,7 @@ export default {
     isHeaderOpen: true,
     error: '',
     scale: null,
+    colors: [],
   }),
   computed: {
     theme() {
@@ -195,6 +198,8 @@ export default {
             showTitle: false,
             template: 1,
             title: '',
+            selectSections: 1,
+            countSections: [1],
           },
         }]);
       }
@@ -230,8 +235,8 @@ export default {
         metricOptions: [],
         ...this.currentSettings,
       };
-      // this.providedSettings = currentSettings;
       this.$set(this, 'providedSettings', currentSettings);
+      this.checkTime();
       this.init(currentSettings);
     },
     sizeFrom: {
@@ -249,8 +254,28 @@ export default {
   mounted() {
     /** Getting saved component options from the store. */
     this.init(null, true);
+    this.checkTime();
   },
   methods: {
+    checkTime() {
+      if (
+        this.currentSettings.countSections
+          && this.currentSettings.countSections.length > 0
+      ) {
+        const elem = this.currentSettings.countSections.length;
+        const time = moment().format('HH');
+        const color = 24 / elem;
+        const amountColor = Math.floor(time / color);
+        this.colors = [];
+        this.currentSettings.countSections.forEach((item, i) => {
+          if (i + 1 <= amountColor) {
+            this.colors.push('#069AEE');
+          } else {
+            this.colors.push('#E5E5F2');
+          }
+        });
+      }
+    },
     getColor(metric) {
       if (!metric.metadata) {
         return undefined;
@@ -293,6 +318,8 @@ export default {
           template: 1,
           metricCount: this.metricCount || 1,
           metricOptions: [],
+          selectSections: 1,
+          countSections: [1],
         };
       }
       if (this.updateSettings && up) {
@@ -311,7 +338,6 @@ export default {
 
       this.template = template;
       this.isHeaderOpen = !!settings?.showTitle;
-      // this.metricCount = this.metricCount || metricCount;
       this.$set(this, 'metricCount', this.metricCount || metricCount);
       this.updateVisual(settings || options.settings);
       if (this.scale) {
@@ -321,20 +347,8 @@ export default {
         elem: this.$refs.pie,
         width: this.sizeFrom.width - 30,
         height: this.sizeFrom.height - 60,
-        data: {
-          1: 8,
-          2: 8,
-          3: 8,
-          4: 8,
-          5: 8,
-          6: 8,
-          7: 8,
-          8: 8,
-          9: 8,
-          10: 8,
-          11: 8,
-          12: 8,
-        },
+        data: { ...this.currentSettings.countSections },
+        colors: this.colors,
       });
       this.scale = Object.freeze(piechart);
     },
@@ -429,14 +443,6 @@ export default {
       }
     },
     updateVisual(settings) {
-      // this.$set(this, 'metricList', settings.metricOptions?.map((item, idx) => ({
-      //   ...item,
-      //   listOrder: idx,
-      //   title: item.name || item.title,
-      //   fontWeight: 400,
-      //   value: item.startId?.value,
-      // })));
-
       this.setVisual(settings.metricOptions);
     },
     updateOptions() {

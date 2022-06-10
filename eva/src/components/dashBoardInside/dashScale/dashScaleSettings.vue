@@ -92,6 +92,21 @@
           </div>
         </div>
 
+        <div class="content-section offset">
+          <span class="section-title">Количество секций шкалы</span>
+          <v-select
+            :items="sections"
+            :append-icon="mdiChevronDown"
+            dense
+            outlined
+            :value="settings.selectSections"
+            hide-details
+            menu-props="offsetY"
+            class="input-element"
+            @change="changeSections"
+          />
+        </div>
+
         <div class="content-section style-settings-header">
           <span class="section-title">Настройка стилей</span>
           <span
@@ -340,6 +355,7 @@ export default {
     },
     isChanged: false,
     metricCountList: [1, 2, 3, 4],
+    sections: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   }),
   computed: {
     isOpen: {
@@ -366,6 +382,18 @@ export default {
     isAllMetricsExpanded() {
       const { metricOptions = [] } = structuredClone(this.settings);
       return metricOptions.every((m) => m.expanded === true);
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
+    getOptions() {
+      if (!this.idFrom) {
+        return [];
+      }
+      if (!this.dashFromStore.options) {
+        this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDashFrom });
+      }
+      return this.dashFromStore.options;
     },
   },
   watch: {
@@ -420,6 +448,19 @@ export default {
             template: this.settings.template || 1,
           },
         );
+      }
+    },
+
+    changeSections(e) {
+      this.$set(
+        this.settings,
+        'selectSections',
+        e,
+      );
+
+      this.settings.countSections = [];
+      for (let i = 0; i < this.settings.selectSections; i += 1) {
+        this.settings.countSections.push(1);
       }
     },
 
