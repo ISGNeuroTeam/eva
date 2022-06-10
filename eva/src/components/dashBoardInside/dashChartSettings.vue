@@ -414,7 +414,7 @@
                   <v-text-field
                     v-model="xAxis.timeFormat"
                     :disabled="xAxis.type !== 'time'"
-                    label="Формат веремени"
+                    label="Формат времени"
                     persistent-placeholder
                     placeholder="Пример %Y-%m-%d %H:%M:%S"
                     dense
