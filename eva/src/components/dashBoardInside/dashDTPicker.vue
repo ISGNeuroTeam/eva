@@ -16,8 +16,17 @@
           border: `1px solid ${theme.$main_border}`
         }"
       >
-        <span class="cur-date">
+        <span
+          v-if="curDate"
+          class="cur-date"
+        >
           {{ curDate }}
+        </span>
+        <span
+          v-else
+          class="cur-date--placeholder"
+        >
+          01.01.2001
         </span>
         <div
           v-click-outside="onClose"
@@ -585,6 +594,10 @@ export default {
       }
     }
 
+  }
+
+  .cur-date--placeholder {
+    opacity: .4;
   }
 }
 
