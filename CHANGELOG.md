@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- added general settings for panels.
+- added the ability to hide the name of the panel.
+- added the ability to update the source data by the panel icon.
+- added the ability to hide the background color on panels.
+- added the ability to add a download icon to the panel.
+- added a setting for hiding/displaying a full-screen icon on panels.
+
 ### Fixed
+- Fixed dashboard save edit state
+- Fixed dashboard save drag/resize state
 - Fixed text color in codeMirror if selected custom color theme
 
 ## [1.94.0]
