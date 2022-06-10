@@ -481,11 +481,6 @@ export default {
         }
       }
     },
-    // getThemeTitle(val) {
-    //   // eslint-disable-next-line no-unused-expressions
-    //   val === 'dark' ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
-    //   this.forwardInput();
-    // },
     isDarkTheme(val) {
       // eslint-disable-next-line no-unused-expressions
       val ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
