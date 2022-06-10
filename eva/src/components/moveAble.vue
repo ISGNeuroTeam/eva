@@ -14,7 +14,7 @@
     :style="{
       zIndex: movableProps.zIndex,
       outlineColor: theme.$accent_ui_color,
-      backgroundColor: theme.$accent_ui_color,
+      backgroundColor: panelBackHide ? null : theme.$accent_ui_color,
     }"
     @resizestop="sendSize"
     @dragstop="sendMove"
@@ -88,6 +88,7 @@ export default {
       height: 0,
       reload: 0,
       maxZIndex: 1,
+      panelBackHide: false,
       movableProps: {
         vue_drag: false,
         zIndex: 1,
@@ -127,6 +128,17 @@ export default {
     },
   },
   watch: {
+    dashFromStore: {
+      deep: true,
+      handler(val) {
+        if (val[this.dataElem]) {
+          const { panelBackHide } = val[this.dataElem].options;
+          if (typeof panelBackHide === 'boolean' && this.panelBackHide !== panelBackHide) {
+            this.panelBackHide = panelBackHide;
+          }
+        }
+      },
+    },
     'movableProps.zIndex': {
       handler(val, oldVal) {
         if (oldVal > val) {

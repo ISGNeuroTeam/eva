@@ -305,8 +305,10 @@ export default {
       },
     },
     fullScreenMode() {
+      let legendSize = {};
+      if (this.legends.length > 0) { legendSize = this.legendSize(); }
       this.$nextTick(() => {
-        this.createPieChartDash();
+        this.createPieChartDash(legendSize);
       });
     },
   },
@@ -382,7 +384,7 @@ export default {
         id: this.idFrom,
       });
     },
-    createPieChartDash() {
+    createPieChartDash(legendSize) {
       if (this.dataRestFrom.error) {
         // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
@@ -431,7 +433,7 @@ export default {
                   this.dataRestFrom,
                   this.dashSize,
                   metrics,
-                  this.legendSize(),
+                  legendSize || this.legendSize(),
                   positionlegend,
                   colorsPie,
                 ); // и собственно создаем график
