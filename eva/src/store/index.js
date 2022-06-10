@@ -1056,6 +1056,13 @@ export default new Vuex.Store({
 
       state[idDash].visualisationModalData = structuredClone(data);
     },
+    setEditMode(state, { idDash, newModeState }) {
+      if (!state[idDash]?.editMode) {
+        Vue.set(state[idDash], 'editMode', newModeState);
+      } else {
+        state[idDash].editMode = newModeState;
+      }
+    },
   },
   actions: {
     ...store.actions,

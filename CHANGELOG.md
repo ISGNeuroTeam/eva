@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to add a download icon to the panel.
 - added a setting for hiding/displaying a full-screen icon on panels.
 
+### Fixed
+- Fixed dashboard save edit state
+- Fixed dashboard save drag/resize state
+
 ## [1.94.0]
 
 ### Added
