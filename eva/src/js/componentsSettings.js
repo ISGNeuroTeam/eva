@@ -249,6 +249,9 @@ export default {
     {
       group: 'Основные настройки',
       option: 'panelSettings',
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -256,6 +259,9 @@ export default {
       description: 'скрыть название панели',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -263,6 +269,9 @@ export default {
       description: 'возможность вручную обновить данные',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -270,6 +279,9 @@ export default {
       description: 'скрыть фон панели',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -277,6 +289,9 @@ export default {
       description: 'возможность скачать результаты',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -284,6 +299,9 @@ export default {
       description: 'возможность раскрывать на весь экран',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       group: 'Дополнительные настройки',

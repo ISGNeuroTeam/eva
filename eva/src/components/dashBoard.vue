@@ -228,7 +228,7 @@
                   }"
                 >
                   <v-card-title
-                    v-show="props.disappear && !getOptions.panelNameHide"
+                    v-show="props.disappear"
                     class="card-title open_title"
                   >
                     <div class="name-dash">
