@@ -7,6 +7,9 @@
       :inside="true"
       @setUsername="setUsername($event)"
     />
+    <div style="position: relative">
+      <notifications style="z-index: 1" />
+    </div>
     <v-content>
       <div class="main-container container-report">
         <div
@@ -111,6 +114,7 @@ import events from './events.vue';
 import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
 import Interesting from './interesting.vue';
+import Notifications from '@/components/notifications';
 
 export default {
   components: {
@@ -122,6 +126,7 @@ export default {
     visualisation,
     download,
     report,
+    Notifications,
   },
   data() {
     return {
