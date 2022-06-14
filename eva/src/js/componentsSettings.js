@@ -41,9 +41,9 @@ export default {
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
-    { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
-    { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
-    { name: 'Меню', img: mdiTuneVertical, type: 'menu' },
+    { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
+    { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
+    { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
   ],
   size: {
     picker: {
@@ -145,9 +145,9 @@ export default {
     map: mdiMapMarker,
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
-    tune: mdiTuneVertical,
-    accumulators: mdiTuneVertical,
-    menu: mdiTuneVertical,
+    tune: 'eva-basic_slider_01',
+    accumulators: 'eva-chart_bar_chart_horizontal',
+    menu: 'eva-edit_list_checklist',
   },
   commonOptions: [
     'panelSettings',
