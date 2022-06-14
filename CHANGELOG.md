@@ -8,7 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- added general settings for panels.
+- added the ability to hide the name of the panel.
+- added the ability to update the source data by the panel icon.
+- added the ability to hide the background color on panels.
+- added the ability to add a download icon to the panel.
+- added a setting for hiding/displaying a full-screen icon on panels.
 - Added removal of restrictions
+
+### Fixed
+- Fixed dashboard save edit state
+- Fixed dashboard save drag/resize state
+- Fixed text color in codeMirror if selected custom color theme
 
 ## [1.94.0]
 
@@ -27,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed piechart legend in big size mode
 - Fixed SingleValue "missing _order" error if order exist in edited data source
 - Fixed username in DS request
+- Fixed big size visualisation mode
 
 ## [1.93.0]
 
@@ -48,7 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Adding layers to the map
 
 ### Fixed
-- Fixed big size visualisation mode
 - Fix accumulator colors
 - Fixed metrics order in dashSingleValue.vue
 - Fixed error in dashSingleValue.vue on data source changed
