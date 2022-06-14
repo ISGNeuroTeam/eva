@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed dashboard save edit state
 - Fixed dashboard save drag/resize state
 - Fixed text color in codeMirror if selected custom color theme
+- Fixed resizing UI dashes without background
 
 ## [1.94.0]
 
