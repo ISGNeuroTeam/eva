@@ -352,6 +352,7 @@ import 'codemirror/addon/fold/foldcode.js';
 import 'codemirror/addon/fold/indent-fold.js';
 import 'codemirror/addon/merge/merge.js';
 import '../../js/codeHighlight.js';
+import { isDarkColor } from '@/js/colorutility/isDarkColor';
 
 export default {
   components: {
@@ -448,6 +449,9 @@ export default {
         this.$store.commit('setReportUserSettings', value);
       },
     },
+    isDarkTheme() {
+      return isDarkColor(this.theme.$secondary_bg);
+    },
   },
   watch: {
     loading(val) {
@@ -477,9 +481,14 @@ export default {
         }
       }
     },
-    getThemeTitle(val) {
+    // getThemeTitle(val) {
+    //   // eslint-disable-next-line no-unused-expressions
+    //   val === 'dark' ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
+    //   this.forwardInput();
+    // },
+    isDarkTheme(val) {
       // eslint-disable-next-line no-unused-expressions
-      val === 'dark' ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
+      val ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
       this.forwardInput();
     },
   },
@@ -500,7 +509,7 @@ export default {
         this.launchSearch();
       }
     });
-    if (this.getThemeTitle === 'dark') {
+    if (this.isDarkTheme) {
       this.cmOption.theme = 'eva-dark';
     } else {
       this.cmOption.theme = 'eva';
