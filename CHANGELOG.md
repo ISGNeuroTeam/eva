@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added new picker button to dash picker
 - added general settings for panels.
 - added the ability to hide the name of the panel.
 - added the ability to update the source data by the panel icon.
