@@ -118,7 +118,7 @@ export default {
     },
     dragRes() {
       const dragRes = this.getDragRes;
-      return dragRes === 'true';
+      return dragRes;
     },
     headerTop() {
       if (document.body.clientWidth <= 1400) {
