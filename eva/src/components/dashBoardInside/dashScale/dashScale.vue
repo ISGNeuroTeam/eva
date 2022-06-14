@@ -37,6 +37,7 @@
         v-else
         class="content pt-3"
         :class="metricTemplateClass"
+        :style="`max-width: ${maxSize}px; max-height: ${maxSize}px`"
       >
         <div
           v-for="(metric) in metricsForRender"
@@ -161,6 +162,7 @@ export default {
     error: '',
     scale: null,
     colors: [],
+    maxSize: 200,
   }),
   computed: {
     theme() {
@@ -247,8 +249,14 @@ export default {
             width: val.width - 30,
             height: val.height - 60,
           };
+          this.maxSize = this.scale.radius * 1.5;
         }
       },
+    },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.init();
+      });
     },
   },
   mounted() {
@@ -277,36 +285,35 @@ export default {
       }
     },
     getColor(metric) {
-      if (!metric.metadata) {
-        return undefined;
-      }
-      // eslint-disable-next-line no-eval
-      const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
-      Object.keys(ranges).forEach((key) => {
-        ranges[key] = `${ranges[key]}`.split(':').map(Number);
-      });
+      if (metric.metadata) {
+        // eslint-disable-next-line no-eval
+        const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
+        Object.keys(ranges).forEach((key) => {
+          ranges[key] = `${ranges[key]}`.split(':').map(Number);
+        });
 
-      if (metric.color === 'range') {
-        if (!Number.isNaN(metric.value)) {
-          const val = Number(metric.value);
-          if (val >= ranges.red[0] && val <= ranges.red[1]) {
-            return '#FF5147';
-          }
+        if (metric.color === 'range') {
+          if (!Number.isNaN(metric.value)) {
+            const val = Number(metric.value);
+            if (val >= ranges.red[0] && val <= ranges.red[1]) {
+              return '#FF5147';
+            }
 
-          if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
-            return '#FFE065';
-          }
-          const greenrange = ranges.green[0] < ranges.green[1]
-            ? val >= ranges.green[0] && val <= ranges.green[1]
-            : val >= ranges.green[0];
-          if (greenrange) {
-            return '#5BD97A';
+            if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
+              return '#FFE065';
+            }
+            const greenrange = ranges.green[0] < ranges.green[1]
+              ? val >= ranges.green[0] && val <= ranges.green[1]
+              : val >= ranges.green[0];
+            if (greenrange) {
+              return '#5BD97A';
+            }
           }
         }
-      }
 
-      if (metric.color === 'secondary') {
-        return '#e0e0ec';
+        if (metric.color === 'secondary') {
+          return '#e0e0ec';
+        }
       }
       return '#5980f8';
     },
@@ -351,6 +358,9 @@ export default {
         colors: this.colors,
       });
       this.scale = Object.freeze(piechart);
+      if (this.scale) {
+        this.maxSize = this.scale.radius * 1.5;
+      }
     },
     updateCount(count) {
       const options = { ...this.getOptions };
@@ -519,7 +529,7 @@ export default {
 @import 'sass/dashScale'
 .circle-scale
   position: absolute
-  top: 55%
+  top: 52%
   left: 50%
   z-index: 1
   transform: translate(-50%, -50%)

@@ -357,7 +357,10 @@
                     </div>
                   </v-card-title>
 
-                  <portal-target :name="`${element}`" />
+                  <portal-target
+                    style="height: calc(100% - 35px)"
+                    :name="`${element}`"
+                  />
                 </v-card>
               </div>
             </v-dialog>
