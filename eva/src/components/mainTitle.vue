@@ -7,7 +7,6 @@
       v-if="prepared"
       :horizontal-cell="horizontalCell"
       :id-dash-from="idDash"
-      @changeMode="changeMode"
       @openProfile="
         (event) => {
           openProfile = event;
@@ -272,7 +271,6 @@ export default {
   data() {
     return {
       page: 'dash',
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       showSetting: false,
       rotate: '',
       openProfile: false,
@@ -303,6 +301,9 @@ export default {
     };
   },
   computed: {
+    mode() {
+      return !!this.dashFromStore?.editMode;
+    },
     modalText() {
       return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId + 1}</strong> ?`;
     },
@@ -676,9 +677,6 @@ export default {
     },
     hash(elem) {
       return `${elem}#${this.idDash}`;
-    },
-    changeMode() {
-      this.mode = !this.mode;
     },
     openSettings() {
       this.showSetting = !this.showSetting;

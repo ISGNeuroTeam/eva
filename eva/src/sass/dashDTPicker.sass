@@ -9,13 +9,8 @@
     color: var(--main_text)
 
     .DTpicker
-        margin: 20px 0
         cursor: pointer
         transition: all 0.4s ease
-        height: 40px
-        overflow: hidden
-        width: 100%
-        margin-bottom: 10px
 
         .DTPicker-btn
             display: flex
@@ -294,7 +289,6 @@
 
 
     .show_picker_elem
-        height: 120px
         overflow: unset
 
         .DTPicker-btn
@@ -306,6 +300,9 @@
             z-index: 4
 
     .current-date
+            display: flex
+            justify-content: space-between
+            align-items: center
             border-radius: 4px
             padding: 10px
             font-size: 14px

@@ -2,7 +2,10 @@
   <div
     class="dash-layout"
     :options="String(options)"
-    :class="{ show_board: props.differentOptions.visible }"
+    :class="{
+      show_board: props.differentOptions.visible,
+      'no-bg': getOptions.panelBackHide,
+    }"
     :style="{ boxShadow: ` 0 0 5px 5px ${props.optionsBoxShadow}` }"
   >
     <v-card
@@ -19,7 +22,14 @@
           : props.disappear"
         class="card-title open_title"
       >
-        <div class="name-dash">
+        <div
+          v-if="getOptions.panelNameHide"
+          class="name-dash"
+        ></div>
+        <div
+          v-else
+          class="name-dash"
+        >
           <v-icon
             v-if="dataFromDB"
             class="icon"
@@ -27,24 +37,6 @@
           >
             {{ mdiDatabaseSearch }}
           </v-icon>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-            style="z-index: 100"
-          >
-            <template v-slot:activator="{ on }">
-              <v-icon
-                v-show="searchingData"
-                class="icon"
-                :color="theme.$main_border"
-                @click="exportDataCSV"
-                v-on="on"
-              >
-                {{ mdiArrowDownBold }}
-              </v-icon>
-            </template>
-            <span>Скачать результаты</span>
-          </v-tooltip>
           <v-icon
             v-show="dataMode"
             class="icon chart"
@@ -54,13 +46,14 @@
           </v-icon>
           <div class="dash-capture">
             <v-menu
+              v-if="props.options.titleActions && props.options.titleActions.length > 1"
               v-model="nameMenu"
               :nudge-width="100"
               :rounded="false"
               offset-y
               attach
             >
-              <v-list class="profile-dropdown--list">
+              <v-list class="menu-dropdown profile-dropdown--list">
                 <div
                   v-for="(item, index) in props.options.titleActions"
                   :key="index"
@@ -71,6 +64,12 @@
                       icon
                       @click="urlAction(item)"
                     >
+                      <v-icon
+                        v-if="!!item.icon"
+                        small
+                      >
+                        {{ item.icon }}
+                      </v-icon>
                       {{ item.title || item.name }}
                     </v-btn>
                   </v-list-item>
@@ -82,8 +81,10 @@
               class="dash-title"
               :style="{ color: theme.$main_text }"
               :class="{
+                'dash-title--view': !dataMode,
                 'dash-title--pointer': props.options.titleActions
                   && props.options.titleActions.length
+                  && !excludedFromTitleAcrions
               }"
               @click="nameAction(props.options.titleActions)"
             >
@@ -128,10 +129,67 @@
         </div>
         <div class="settings-dash-block">
           <div class="settings-dash">
+            <v-tooltip
+              v-if="isMultiline"
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  @click="resetRange()"
+                >
+                  {{ props.mdiMagnifyMinusOutline }}
+                </v-icon>
+              </template>
+              <span>Сбросить зум</span>
+            </v-tooltip>
+            <v-tooltip
+              v-if="getOptions.panelIconUpdate"
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-show="searchingData"
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  @click="startSearch(dataSource)"
+                >
+                  {{ mdiCached }}
+                </v-icon>
+              </template>
+              <span>Запустить ИД</span>
+            </v-tooltip>
+            <v-tooltip
+              v-if="getOptions.panelIconDownload"
+              bottom
+              :color="theme.$accent_ui_color"
+              style="z-index: 100"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  v-show="searchingData"
+                  class="icon"
+                  :color="theme.$main_border"
+                  @click="exportDataCSV"
+                  v-on="on"
+                >
+                  {{ mdiArrowDownBold }}
+                </v-icon>
+              </template>
+              <span>Скачать результаты</span>
+            </v-tooltip>
             <v-dialog
+              v-if="getOptions.panelIconFullscreen"
               ref="fullScreenModal"
               v-model="bigSizeMode"
-              width="100%"
+              :width="isFullScreen ? '100vw' : '80vw'"
               :fullscreen="isFullScreen"
               style="z-index: 999"
             >
@@ -243,7 +301,7 @@
                         >
                           <template v-slot:activator="{ on }">
                             <v-icon
-                              class="datasource"
+                              class="icon"
                               :color="theme.$main_border"
                               v-on="on"
                               @click="resetRange()"
@@ -303,24 +361,6 @@
                 </v-card>
               </div>
             </v-dialog>
-            <v-tooltip
-              v-if="isMultiline"
-              bottom
-              :color="theme.$accent_ui_color"
-              :open-delay="tooltipOpenDelay"
-            >
-              <template v-slot:activator="{ on }">
-                <v-icon
-                  class="datasource"
-                  :color="theme.$main_border"
-                  v-on="on"
-                  @click="resetRange()"
-                >
-                  {{ props.mdiMagnifyMinusOutline }}
-                </v-icon>
-              </template>
-              <span>Сбросить зум</span>
-            </v-tooltip>
           </div>
           <div
             v-show="dataMode"
@@ -328,13 +368,14 @@
             :class="{ settings_move: props.open_gear }"
           >
             <v-tooltip
+              v-if="!excludedFromDataSearches"
               bottom
               :color="theme.$accent_ui_color"
               :open-delay="tooltipOpenDelay"
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="datasource"
+                  class="icon"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="switchDS(props)"
@@ -345,14 +386,14 @@
               <span>Источник данных</span>
             </v-tooltip>
             <v-tooltip
-              v-if="props.edit_icon"
+              v-if="props.edit_icon && !getOptions.panelNameHide"
               bottom
               :color="theme.$accent_ui_color"
               :open-delay="tooltipOpenDelay"
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="pencil"
+                  class="icon"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="
@@ -375,7 +416,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="check"
+                  class="icon"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="editName(props)"
@@ -410,7 +451,7 @@
             >
               <template v-slot:activator="{ on }">
                 <v-icon
-                  class="delete"
+                  class="icon mx-2"
                   :color="theme.$main_border"
                   v-on="on"
                   @click="deleteDashBoard(props)"
@@ -440,6 +481,7 @@
         </div>
       </div>
       <v-card-text
+        v-if="!excludedFromDataSearches"
         v-show="!showElement"
         class="card-text"
       >
@@ -453,7 +495,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement"
+        v-if="showElement || excludedFromDataSearches"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
@@ -503,6 +545,7 @@ import {
   mdiArrowAll,
   mdiArrowCollapse,
   mdiArrowDownBold,
+  mdiCached,
   mdiArrowExpand,
   mdiArrowExpandAll,
   mdiCheckBold,
@@ -574,9 +617,10 @@ export default {
     return {
       tablePerPage: 100,
       tablePage: 1,
-      dataFromDB: true,
+      dataFromDB: false,
       mdiDatabaseSearch,
       mdiArrowDownBold,
+      mdiCached,
       bigSizeMode: false,
       isFullScreen: false,
       disabledTooltip: false,
@@ -695,12 +739,14 @@ export default {
 
       return this.dataModeFrom;
     },
+    elementType() {
+      return this.element.split('-')[0];
+    },
     // создаем некий тег элемнета который хотим добавтиь чтобы он был вида типа dash-table
     currentElem() {
       let nameElement = '';
       if (this.element) {
-        const element = this.element.split('-')[0];
-        nameElement = `dash-${element}`;
+        nameElement = `dash-${this.elementType}`;
       }
       return nameElement;
     },
@@ -775,10 +821,11 @@ export default {
       return this.searchData.length > 0;
     },
     dataSourceTitle() {
-      return this.$store.state[this.idDash]?.searches?.length > 0
-        ? this.$store.state[this.idDash]?.searches
-          .find((element) => element?.id === this.dataSourceId)?.sid
-        : '';
+      return this.dataSource?.sid || '';
+    },
+    dataSource() {
+      return this.$store.state[this.idDash]?.searches
+        .find((element) => element?.id === this.dataSourceId);
     },
     fullScreenHeight() {
       if (this.bigSizeMode) {
@@ -797,6 +844,12 @@ export default {
         return this.windowWidth * 0.8;
       }
       return this.height;
+    },
+    excludedFromTitleAcrions() {
+      return settings.excludes.fromTitleActions.some((item) => item === this.elementType);
+    },
+    excludedFromDataSearches() {
+      return settings.excludes.fromDataSearches.some((item) => item === this.elementType);
     },
   },
   watch: {
@@ -860,6 +913,13 @@ export default {
     }
   },
   methods: {
+    async startSearch(search) {
+      this.$store.commit('updateSearchStatus', {
+        idDash: this.idDash,
+        sid: search.sid,
+        status: 'empty',
+      });
+    },
     changeSelectedPie(val) {
       this.selectedPieIndex = val;
     },
@@ -1252,7 +1312,7 @@ export default {
       this.$emit('ResetRange', this.dataSourceId);
     },
     nameAction(actionList) {
-      if (!actionList) return;
+      if (!actionList || this.excludedFromTitleAcrions) return;
       if (actionList.length === 1) {
         this.urlAction(actionList[0]);
       } else {
@@ -1286,6 +1346,11 @@ export default {
 </style>
 <style lang="sass">
 .settings-dash
-    .v-icon:focus::after
-        opacity: 0
+  .v-icon:focus::after
+    opacity: 0
+.menu-dropdown
+  padding-top: 0
+  .profile-dropdown--button
+    margin-top: 0
+    padding-right: 8px
 </style>
