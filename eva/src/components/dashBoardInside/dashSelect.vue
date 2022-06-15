@@ -375,17 +375,18 @@ export default {
     },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
+      const {
+        dataReady,
+        selectedElemLink,
+        selectedElem,
+        multiple,
+      } = this;
       if (val === false && val !== oldVal) {
         const defaultValue = this.getDefaultValue();
-        const valueData = this.dataReady
-          ?.find((item) => item[this.selectedElemLink] === defaultValue);
+        const valueData = dataReady?.find((item) => item[selectedElemLink] === defaultValue);
         if (defaultValue !== null) {
-          if (this.multiple) {
-            if (this.elemDeep[String(this.multiple)].length === 0) {
-              this.elemDeep[String(this.multiple)] = [defaultValue];
-            }
-          } else if (valueData) {
-            this.elemDeep[String(this.multiple)] = valueData[this.selectedElem];
+          if (!multiple && valueData) {
+            this.elemDeep[String(multiple)] = valueData[selectedElem];
           }
         }
         this.setTocken();
