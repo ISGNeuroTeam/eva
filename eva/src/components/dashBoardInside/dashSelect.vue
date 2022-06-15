@@ -377,13 +377,15 @@ export default {
     changedDataDefaultLoading(val, oldVal) {
       if (val === false && val !== oldVal) {
         const defaultValue = this.getDefaultValue();
+        const valueData = this.dataReady
+          ?.find((item) => item[this.selectedElemLink] === defaultValue);
         if (defaultValue !== null) {
           if (this.multiple) {
             if (this.elemDeep[String(this.multiple)].length === 0) {
               this.elemDeep[String(this.multiple)] = [defaultValue];
             }
-          } else {
-            this.elemDeep[String(this.multiple)] = defaultValue;
+          } else if (valueData) {
+            this.elemDeep[String(this.multiple)] = valueData[this.selectedElem];
           }
         }
         this.setTocken();
@@ -410,7 +412,7 @@ export default {
       ) {
         this.openSelect();
       }
-      if (selected.elemDeep.length !== 0 || selected.elemDeep !== '') {
+      if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
@@ -462,7 +464,7 @@ export default {
         defaultSourceDataField = null,
       } = this.dashFromStore.options;
       const fieldName = defaultSourceDataField || 'value';
-      if (defaultFromSourceData) {
+      if (defaultFromSourceData !== null) {
         const { data = undefined } = this.dataSources[defaultFromSourceData];
         if (data && data.length) {
           const [firstRow] = data;
@@ -504,13 +506,17 @@ export default {
     },
     setTocken() {
       const defaultValue = this.getDefaultValue();
+      const valueData = this.dataReady
+        ?.find((item) => item[this.selectedElemLink] === defaultValue);
       if (defaultValue !== null) {
         if (this.multiple) {
           if (this.elemDeep[String(this.multiple)].length === 0) {
             this.elemDeep[String(this.multiple)] = [defaultValue];
           }
         } else if (!this.elemDeep[String(this.multiple)]) {
-          this.elemDeep[String(this.multiple)] = defaultValue;
+          if (valueData) {
+            this.elemDeep[String(this.multiple)] = valueData[this.selectedElem];
+          }
         }
       }
 
@@ -549,8 +555,10 @@ export default {
               }, [])];
         });
       } else {
-        if (this.elemDeep[String(this.multiple)] !== null) {
+        if (Array.isArray(this.elemDeep[String(this.multiple)])) {
           value = [...[], ...String(this.elemDeep[String(this.multiple)])];
+        } else {
+          value = [String(this.elemDeep[String(this.multiple)])];
         }
         for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
