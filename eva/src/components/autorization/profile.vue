@@ -99,12 +99,12 @@
                         <span>Редактировать</span>
                       </v-tooltip>
                       <v-tooltip
+                        v-if="adminRool"
                         bottom
                         :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
-                            v-if="adminRool"
                             v-model="item.actions"
                             class="editUser icon-aut"
                             :color="theme.$primary_button"
@@ -139,6 +139,7 @@
       :active-delete="activeDelete"
       :data-from="dataDelete"
       @cancelModal="closeModal"
+      @deleted="removeFromList"
     />
   </v-app>
 </template>
@@ -345,6 +346,9 @@ export default {
       if (!isClearChanges) {
         this.getData(`tab-${this.keyFrom}`);
       }
+    },
+    removeFromList(id) {
+      this.originData = this.originData.filter((item) => item.id !== id);
     },
   },
 };
