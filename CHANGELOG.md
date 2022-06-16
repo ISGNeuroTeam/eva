@@ -26,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed resizing UI dashes without background
 - When selecting an area on the multiline, a tooltip is displayed on the barplots
 
+### Fixed
+-Fixed spaces around text in tokens from table
+
 ## [1.94.0]
 
 ### Added
