@@ -108,7 +108,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker"
-              @validate="setTocken('dt')"
+              @input="setTocken('dt')"
             />
             <DTPicker
               :id="`${idDash}-end`"
@@ -119,7 +119,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker"
-              @validate="setTocken('dt')"
+              @input="setTocken('dt')"
             />
             <div
               class="name-of-picker"
@@ -137,7 +137,7 @@
               :button-color="theme.$primary_button"
               :custom-shortcuts="DTPickerCustomShortcuts"
               class="dtpicker range-picker"
-              @validate="setTocken('range')"
+              @input="setTocken('range')"
             />
             <div
               class="name-of-picker"
@@ -151,13 +151,12 @@
               counter="500"
               :style="{ color: theme.$main_text }"
               clearable
-              :append-icon="check"
               :color="theme[start_custom.color]"
               hide-details
               outlined
               class="dtpicker custom-picker"
               @blur="start_custom.color = 'controlsActive'"
-              @click:append="customDate('begin')"
+              @input="setTocken('custom')"
             />
             <v-text-field
               v-model="end_custom.value"
@@ -165,13 +164,12 @@
               counter="500"
               :style="{ color: theme.$main_text }"
               clearable
-              :append-icon="check"
               :color="theme[end_custom.color]"
               hide-details
               outlined
               class="dtpicker custom-picker"
               @blur="end_custom.color = 'controlsActive'"
-              @click:append="customDate('end')"
+              @input="setTocken('custom')"
             />
             <div class="set-btn-block">
               <v-btn
@@ -409,14 +407,6 @@ export default {
         this.onClose();
       }
     },
-    customDate(elem) {
-      if (elem === 'begin') {
-        this.start_custom.color = 'controls';
-      } else {
-        this.end_custom.color = 'controls';
-      }
-      this.setTocken('custom');
-    },
     showCurrent() {
       this.$set(this.date, 'start', this.start);
       this.$set(this.date, 'end', this.end);
@@ -468,14 +458,16 @@ export default {
           break;
 
         case 'range':
-          this.startForStore = parseInt(
-            new Date(this.range.start).getTime() / 1000,
-            10,
-          );
-          this.endForStore = parseInt(
-            new Date(this.range.end).getTime() / 1000,
-            10,
-          );
+          if (this.range) {
+            this.startForStore = parseInt(
+              new Date(this.range.start).getTime() / 1000,
+              10,
+            );
+            this.endForStore = parseInt(
+              new Date(this.range.end).getTime() / 1000,
+              10,
+            );
+          }
           this.start = null;
           this.end = null;
           this.start_custom.value = null;

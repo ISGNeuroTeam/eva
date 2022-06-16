@@ -718,6 +718,7 @@ export default {
     ],
     fromDataSearches: [
       'menu',
+      'picker',
     ],
   },
 };
