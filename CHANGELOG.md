@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added removal of restrictions
 
 ### Fixed
+- Fixed datepicker visualisation
 - Changed icons for menu, tune and accumulators visualisations 
 - Fixed dashboard save edit state
 - Fixed dashboard save drag/resize state
