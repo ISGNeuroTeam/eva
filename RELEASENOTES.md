@@ -25,8 +25,8 @@
 - Fixed fullscreen multiline
 
 #### ¹⁾ Removed the limits on 1000 rows in the Data Research 2.0
-- Minimum required OT-Rest version: v1.11.0-0056
-- It is necessary to set the same limit on the number of events in OT-Rest and in Apache Spark dispatcher
+- Minimum required ot-simple-rest version: v1.12.0
+- It is necessary to set the same limit on the number of events in ot-simple-rest and in Apache Spark dispatcher
 
 # [1.94.0]
 
