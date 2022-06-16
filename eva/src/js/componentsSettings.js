@@ -366,11 +366,17 @@ export default {
       items: [100, 200, 400, 500, 800],
     },
     {
+      relation() {
+        return !!this.$store.state[this.idDash].searches;
+      },
       option: 'defaultFromSourceData',
       description: 'Дефолтное значение из источника данных',
       elem: 'select',
       default: null,
       items() {
+        if (this.$store.state[this.idDash]?.searches) {
+          return [];
+        }
         const sourceDataList = this.$store.state[this.idDash].searches
           .map(({ id, sid }) => ({
             value: id,
