@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When selecting an area on the multiline, a tooltip is displayed on the barplots
 - Fixed spaces around text in tokens from table
 - Fixed loading bar
+- Fixed the save dashboard dialog has no frame
 
 ## [1.94.0]
 
