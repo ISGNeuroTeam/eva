@@ -30,6 +30,7 @@
       :loading="loading"
       :search-data="searchData"
       :data-source-id="dataSourceId"
+      :data-sources="dataSources"
       @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
@@ -77,6 +78,10 @@ export default {
     dataSourceId: {
       type: [String, Number],
       default: '',
+    },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
