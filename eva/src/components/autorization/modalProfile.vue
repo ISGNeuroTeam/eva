@@ -357,7 +357,7 @@ export default {
       },
       curItem: {},
       changedData: {},
-      dataRest: {},
+      // dataRest: {},
       colorFrom: {},
       isChanged: false,
     };
@@ -413,6 +413,9 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    dataRest() {
+      return this.$store.getters['auth/essence'];
+    },
   },
   watch: {
     active() {
@@ -451,7 +454,7 @@ export default {
           this.$set(this.userData, 'username', this.curItemFrom.name);
           this.curItem = { ...this.curItemFrom };
         }
-        this.dataRest = this.getDataForEssence();
+        this.getDataForEssence();
         this.isChanged = false;
       }
     },
@@ -477,10 +480,14 @@ export default {
 
         return allData;
       }
-      return this.$store.dispatch('auth/getEssence', {
+      let result;
+      await this.$store.dispatch('auth/getEssence', {
         essence: this.userFrom.tab,
         id: this.userFrom.id,
+      }).then((res) => {
+        result = res;
       });
+      return result;
     },
     cancelModal(isClearChanges = true) {
       this.$emit('cancelModal', isClearChanges);

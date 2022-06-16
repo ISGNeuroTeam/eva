@@ -2,8 +2,15 @@ import rest from './storeRest';
 
 export default {
   namespaced: true,
-  state: {},
-  mutations: {},
+  state: {
+    essence: [],
+  },
+  mutations: {
+    setEssence(state, data) {
+      console.log(data);
+      state.essence = structuredClone(data);
+    },
+  },
   actions: {
     deleteLog: () => rest.deleteLog(),
     getLog: (context, side) => rest.getLog(side),
@@ -45,7 +52,11 @@ export default {
       return rest.deleteEssence(localData);
     },
     setEssence: (context, data) => rest.setEssence(data),
-    getEssence: (context, { essence, id }) => rest.getEssence(essence, id),
+    async getEssence({ commit }, { essence, id }) {
+      const localEssence = await rest.getEssence(essence, id);
+      commit('setEssence', localEssence);
+      return localEssence;
+    },
     getEssenceList: async (context, { role, create }) => {
       let data;
       if (!create) {
@@ -74,5 +85,7 @@ export default {
       return data;
     },
   },
-  getters: {},
+  getters: {
+    essence: (state) => state.essence,
+  },
 };

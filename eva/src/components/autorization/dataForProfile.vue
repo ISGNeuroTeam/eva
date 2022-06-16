@@ -59,7 +59,7 @@
             hide-default-header
             :no-data-text="alldata[essence][subessence].nodata"
             :headers="alldata[essence][subessence].titles"
-            :items="alldata[essence][subessence].data"
+            :items="userListAdded"
             item-key="name"
             show-select
             :search="searchText"
@@ -104,7 +104,7 @@
           class="table-profile-block"
         >
           <v-data-table
-            v-model="alldata[essence][`all${subessence}`].selected"
+            v-model="selectedtToAdd"
             :style="{
               background: theme.$main_bg,
               color: theme.$main_text,
@@ -364,6 +364,31 @@ export default {
     };
   },
   computed: {
+    data() {
+      return this.translateToObj(this.dataFrom?.data?.[this.subessence]);
+    },
+    selectedtToAdd: {
+      get() {
+        const subessence = this.alldata[this.essence][this.subessence];
+        const allSubessence = this.alldata[this.essence][`all${this.subessence}`];
+        console.log(subessence.data, allSubessence.selected);
+        return allSubessence.selected?.length ? allSubessence.selected : subessence.data;
+      },
+      set(newVal) {
+        this.alldata[this.essence][`all${this.subessence}`].selected = structuredClone(newVal);
+      },
+    },
+    userListAdded: {
+      get() {
+        if (!this.dataFrom) return {};
+        return this.alldata[this.essence][this.subessence].data?.length
+          ? this.alldata[this.essence][this.subessence].data
+          : this.data;
+      },
+      set(newVal) {
+        this.alldata[this.essence][this.subessence].data = structuredClone(newVal);
+      },
+    },
     active() {
       if (this.activeFrom) {
         this.$nextTick(() => {
@@ -395,8 +420,6 @@ export default {
     async getData() {
       const { essence } = this;
       const { subessence } = this;
-      const data = await this.dataFrom;
-
       if (this.create) {
         if (essence === 'dash') {
           this.alldata[essence][subessence] = {
@@ -423,15 +446,15 @@ export default {
           selected: [],
           nodata: this.noneText[subessence],
           titles: [{ text: 'Название', value: 'name' }],
-          data: this.translateToObj(data.data[subessence]),
+          data: this.userListAdded,
         };
       }
-
+      console.log('deadula data', this.data);
       this.alldata[essence][`all${subessence}`] = {
         selected: [],
         nodata: this.noneText[subessence],
         titles: [{ text: 'Название', value: 'name' }],
-        data: this.translateToObj(data[subessence]),
+        data: this.data[subessence],
       };
 
       this.loaders[essence][subessence] = false;
