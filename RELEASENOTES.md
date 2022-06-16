@@ -8,7 +8,7 @@
 - Added the ability to hide the background color on panels
 - Added the ability to add a download icon to the panel
 - Added a setting for hiding/displaying a full-screen icon on panels
-- Removed the limits on 1000 rows in the Data Research 2.0
+- Removed the limits on 1000 rows in the Data Research 2.0 ¹
 - Added the ability to configure the source data for the default component value
 
 ### Fixed
@@ -23,6 +23,10 @@
 - Fixed the save dashboard dialog has no frame
 - Updated drawing of points on multi-line lines
 - Fixed fullscreen multiline
+
+#### ¹⁾ Removed the limits on 1000 rows in the Data Research 2.0
+- Minimum required OT-Rest version: v1.11.0-0056
+- It is necessary to set the same limit on the number of events in OT-Rest and in Apache Spark dispatcher
 
 # [1.94.0]
 
