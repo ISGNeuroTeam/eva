@@ -80,6 +80,7 @@
         </div>
       </div>
       <div
+        v-if="!error"
         ref="pie"
         class="circle-scale"
       />
@@ -384,7 +385,7 @@ export default {
       const metricOptions = [];
       structuredClone(this.dataRestFrom).forEach((data) => {
         const {
-          metric, value, metadata, order: sortOrder,
+          metric, value, metadata, _order: sortOrder,
         } = data;
         const id = sortOrder;
         if (metric === '_title') {
