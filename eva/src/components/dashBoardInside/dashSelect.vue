@@ -327,8 +327,10 @@ export default {
   watch: {
     'dashFromStore.options.defaultFromSourceData': {
       deep: true,
-      handler() {
-        this.setTocken();
+      handler(val, oldVal) {
+        if (val !== oldVal) {
+          this.setTocken();
+        }
       },
     },
     selectedElemDeep(val) {

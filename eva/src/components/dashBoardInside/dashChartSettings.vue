@@ -281,11 +281,14 @@
                             dense
                             outlined
                             hide-details
+                            clearable
                             @keyup.prevent="(e) => {
                               e.target.value = e.target.value.replaceAll(/\D/g, '')
                             }"
                             @input="() => {
-                              metric.lastDot = metric.lastDot.replaceAll(/\D/g, '');
+                              if (metric.lastDot !== null) {
+                                metric.lastDot = metric.lastDot.replaceAll(/\D/g, '');
+                              }
                             }"
                           />
                           <v-autocomplete
@@ -294,7 +297,6 @@
                             :disabled="!metric.showText"
                             :items="defaultLastDotItems"
                             label="Вывод значений"
-                            placeholder="Введите число"
                             persistent-placeholder
                             clearable
                             dense
