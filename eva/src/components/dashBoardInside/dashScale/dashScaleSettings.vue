@@ -16,7 +16,7 @@
           class="icon-main"
           v-text="mdiSettings"
         />
-        <span class="main-title">Настройки Single Value</span>
+        <span class="main-title">Настройки Scale</span>
         <v-icon
           right
           class="icon-close"
