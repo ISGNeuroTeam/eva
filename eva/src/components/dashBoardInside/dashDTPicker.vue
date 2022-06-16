@@ -458,14 +458,16 @@ export default {
           break;
 
         case 'range':
-          this.startForStore = parseInt(
-            new Date(this.range.start).getTime() / 1000,
-            10,
-          );
-          this.endForStore = parseInt(
-            new Date(this.range.end).getTime() / 1000,
-            10,
-          );
+          if (this.range) {
+            this.startForStore = parseInt(
+              new Date(this.range.start).getTime() / 1000,
+              10,
+            );
+            this.endForStore = parseInt(
+              new Date(this.range.end).getTime() / 1000,
+              10,
+            );
+          }
           this.start = null;
           this.end = null;
           this.start_custom.value = null;
