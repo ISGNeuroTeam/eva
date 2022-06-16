@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to add a download icon to the panel.
 - added a setting for hiding/displaying a full-screen icon on panels.
 - Added removal of restrictions
+- added the ability to configure the source data for the default component value
 
 ### Fixed
 - Changed icons for menu, tune and accumulators visualisations 
@@ -23,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed dashboard save drag/resize state
 - Fixed text color in codeMirror if selected custom color theme
 - Fixed resizing UI dashes without background
+- When selecting an area on the multiline, a tooltip is displayed on the barplots
+- Fixed spaces around text in tokens from table
 - Fixed loading bar
 
 ## [1.94.0]
