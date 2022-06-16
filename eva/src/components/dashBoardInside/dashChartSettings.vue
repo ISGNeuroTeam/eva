@@ -273,29 +273,34 @@
                         </div>
                         <div class="col">
                           <v-text-field
-                            v-if="metric.lastDot > 3"
+                            v-if="metric.lastDot >= 3"
                             v-model="metric.lastDot"
-                            clearable
                             label="Вывод значений"
                             placeholder="Введите число"
                             persistent-placeholder
                             dense
                             outlined
                             hide-details
-                            @change="(val) => metric.lastDot = Number.parseInt(val)"
+                            @keyup.prevent="(e) => {
+                              e.target.value = e.target.value.replaceAll(/\D/g, '')
+                            }"
+                            @input="() => {
+                              metric.lastDot = metric.lastDot.replaceAll(/\D/g, '');
+                            }"
                           />
                           <v-autocomplete
-                              v-else
+                            v-else
                             v-model="metric.lastDot"
                             :disabled="!metric.showText"
-                            :items="lastDotItems"
+                            :items="defaultLastDotItems"
                             label="Вывод значений"
                             placeholder="Введите число"
                             persistent-placeholder
+                            clearable
                             dense
                             outlined
                             hide-details
-                            :search-input.sync="lastDotSearch"
+                            :search-input.sync="metric.lastDotSearch"
                           />
                         </div>
                       </div>
@@ -656,6 +661,7 @@ export default {
       { value: 'even', text: 'Четное' },
       { value: 'odd', text: 'Нечетное' },
       { value: '3', text: 'Каждое 3' },
+      { value: '10', text: 'Указать число' },
     ],
   }),
   computed: {
@@ -667,18 +673,6 @@ export default {
         this.panelMetric = [];
         this.$emit('updateModalValue', val);
       },
-    },
-
-    lastDotItems() {
-      const items = [...this.defaultLastDotItems];
-      if (this.lastDotSearch){
-        const matchesNum = this.lastDotSearch.match(/\d+/);
-        if (matchesNum) {
-          const num = matchesNum[0];
-          items.push({ value: num, text: `Каждое ${num}` });
-        }
-      }
-      return items;
     },
 
     theme() {
