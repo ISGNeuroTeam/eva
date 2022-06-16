@@ -78,6 +78,10 @@ export default {
       type: String,
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -127,28 +131,6 @@ export default {
         }]);
       }
 
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
-
       return this.dashFromStore.options;
     },
     searchBtn() {
@@ -167,6 +149,20 @@ export default {
       }
       return this.dashFromStore.textarea;
     },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultFromSourceData && defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
+    },
   },
   watch: {
     textAreaValue(val) {
@@ -181,6 +177,22 @@ export default {
         }
       },
     },
+    'dashFromStore.options.defaultFromSourceData': {
+      deep: true,
+      handler() {
+        this.setTockenBlur();
+      },
+    },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.textarea = `${defaultValue}`;
+        }
+        this.setTockenBlur();
+      }
+    },
   },
   mounted() {
     this.$emit('hideDS', this.id);
@@ -192,8 +204,16 @@ export default {
     });
   },
   methods: {
-    setTockenBlur(event) {
-      event.preventDefault();
+    setTockenBlur(event = null) {
+      if (event) {
+        event.preventDefault();
+      }
+      if (this.textarea === '') {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.textarea = `${defaultValue}`;
+        }
+      }
       this.$store.commit('setTextArea', {
         idDash: this.idDash,
         id: this.id,
@@ -230,6 +250,24 @@ export default {
         }
         this.textarea = `${numberValue}`;
       }
+    },
+    getDefaultValue() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataField = null,
+      } = this.dashFromStore.options;
+      const fieldName = defaultSourceDataField || 'value';
+      if (defaultFromSourceData) {
+        const { data = undefined } = this.dataSources[defaultFromSourceData];
+        if (data && data.length) {
+          const [firstRow] = data;
+          const rowKeys = Object.keys(firstRow);
+          if (rowKeys.includes(fieldName)) {
+            return firstRow[fieldName];
+          }
+        }
+      }
+      return null;
     },
     acceptTextArea() {
       this.$store.commit('setTextArea', {

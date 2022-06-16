@@ -1092,6 +1092,9 @@ export default {
     istitleActions() {
       return this.dashFromStore.elements.find((elem) => elem === this.element);
     },
+    isDashBoard() {
+      return this.$route.meta?.isDashboard;
+    },
   },
   watch: {
     options: {
@@ -1343,11 +1346,13 @@ export default {
               });
               return show;
             }
-            return !!this.options[item];
+            return this.options[item] === 0 || !!this.options[item];
           });
           if (res.length !== relation.length) {
             return false;
           }
+        } else if (typeof relation === 'function') {
+          return relation.bind(this)();
         } else if (!this.options[relation]) {
           return false;
         }

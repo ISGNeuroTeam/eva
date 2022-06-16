@@ -159,5 +159,11 @@
         background: transparent !important;
       }
     }
+    .loading-divider {
+      border-color: transparent !important;
+    }
+  }
+  .active.draggable .handle {
+    background: rgb(0, 148, 218);
   }
 }

@@ -10,184 +10,191 @@
       class="dash-picker"
     >
       <div
-        v-click-outside="onClose"
-        class="DTpicker"
-        :class="{ show_picker_elem: show_picker_elem }"
-      >
-        <div
-          class="DTPicker-btn"
-          :style="{ background: theme.$accent_ui_color }"
-          @click="openHidden"
-        >
-          <p>Выберите время и дату</p>
-          <v-icon
-            :style="{ color: theme.$main_text }"
-            class="picker-arrow"
-          >
-            {{ arrow.elem }}
-          </v-icon>
-        </div>
-        <div
-          class="DTPicker-elem"
-          :style="{
-            boxShadow: `0 5px 5px -3px ${theme.$main_border},
-          0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
-            background: theme.$main_bg,
-            color: theme.$main_text,
-            border: `1px solid ${theme.$main_border}`
-          }"
-        >
-          <div
-            class="name-of-picker"
-            :style="{ color: theme.$title }"
-          >
-            Выбор времени
-          </div>
-          <div class="choose-period">
-            <p :style="{ color: theme.$main_text }">
-              Последние
-            </p>
-            <v-text-field
-              v-model="lastEvery"
-              class="textarea-item"
-              outlined
-              :color="theme.$accent_ui_color"
-              :style="{ color: theme.$main_text }"
-              hide-details
-              @input="setLast($event)"
-            />
-          </div>
-          <div class="choose-time">
-            <v-chip
-              :color="theme[color.hour]"
-              class="time"
-              @click="setTime('hour')"
-            >
-              Часов
-            </v-chip>
-            <v-chip
-              :color="theme[color.minute]"
-              class="time"
-              @click="setTime('minute')"
-            >
-              Минут
-            </v-chip>
-            <v-chip
-              :color="theme[color.second]"
-              class="time"
-              @click="setTime('second')"
-            >
-              Секунд
-            </v-chip>
-          </div>
-          <div
-            class="name-of-picker"
-            :style="{ color: theme.$title }"
-          >
-            Выбор времени и даты
-          </div>
-          <DTPicker
-            :id="`${idDash}-start`"
-            v-model="start"
-            label="Начальная дата и время"
-            format="YYYY-MM-DD HH:mm"
-            button-now-translation="Сейчас"
-            :color="theme.$accent_ui_color"
-            :button-color="theme.$primary_button"
-            class="dtpicker"
-            @validate="setTocken('dt')"
-          />
-          <DTPicker
-            :id="`${idDash}-end`"
-            v-model="end"
-            label="Конечная дата и время"
-            format="YYYY-MM-DD HH:mm"
-            button-now-translation="Сейчас"
-            :color="theme.$accent_ui_color"
-            :button-color="theme.$primary_button"
-            class="dtpicker"
-            @validate="setTocken('dt')"
-          />
-          <div
-            class="name-of-picker"
-            :style="{ color: theme.$title }"
-          >
-            Диапазон дат
-          </div>
-          <DTPicker
-            :id="`${idDash}-between`"
-            v-model="range"
-            range
-            label="Диапазон дат"
-            format="YYYY-MM-DD"
-            :color="theme.$accent_ui_color"
-            :button-color="theme.$primary_button"
-            :custom-shortcuts="DTPickerCustomShortcuts"
-            class="dtpicker range-picker"
-            @validate="setTocken('range')"
-          />
-          <div
-            class="name-of-picker"
-            :style="{ color: theme.$title }"
-          >
-            Ввод даты и времени вручную
-          </div>
-          <v-text-field
-            v-model="start_custom.value"
-            label="Начальная дата"
-            counter="500"
-            :style="{ color: theme.$main_text }"
-            clearable
-            :append-icon="check"
-            :color="theme[start_custom.color]"
-            hide-details
-            outlined
-            class="dtpicker custom-picker"
-            @blur="start_custom.color = 'controlsActive'"
-            @click:append="customDate('begin')"
-          />
-          <v-text-field
-            v-model="end_custom.value"
-            label="Конечная дата"
-            counter="500"
-            :style="{ color: theme.$main_text }"
-            clearable
-            :append-icon="check"
-            :color="theme[end_custom.color]"
-            hide-details
-            outlined
-            class="dtpicker custom-picker"
-            @blur="end_custom.color = 'controlsActive'"
-            @click:append="customDate('end')"
-          />
-          <div class="set-btn-block">
-            <v-btn
-              small
-              :color="theme.$primary_button"
-              class="set-btn"
-              @click="setDate"
-            >
-              Установить
-            </v-btn>
-          </div>
-        </div>
-      </div>
-      <div
-        class="current-date"
+        class="current-date show_curent"
         :style="{
           color: theme.$main_text,
           border: `1px solid ${theme.$main_border}`
         }"
-        :class="{ show_curent: show_curent }"
       >
-        {{ curDate }}
+        <span
+          v-if="curDate"
+          class="cur-date"
+        >
+          {{ curDate }}
+        </span>
+        <span
+          v-else
+          class="cur-date--placeholder"
+        >
+          01.01.2001
+        </span>
+        <div
+          v-click-outside="onClose"
+          class="DTpicker"
+          :class="{ show_picker_elem: show_picker_elem }"
+        >
+          <v-btn
+            icon
+            :color="theme.$main_text"
+            @click="openHidden"
+          >
+            <v-icon>{{ calendar }}</v-icon>
+          </v-btn>
+          <div
+            class="DTPicker-elem"
+            :style="{
+              boxShadow: `0 5px 5px -3px ${theme.$main_border},
+          0 8px 10px 1px ${theme.$main_border},0 3px 14px 2px ${theme.$main_border}`,
+              background: theme.$main_bg,
+              color: theme.$main_text,
+              border: `1px solid ${theme.$main_border}`
+            }"
+          >
+            <div
+              class="name-of-picker"
+              :style="{ color: theme.$title }"
+            >
+              Выбор времени
+            </div>
+            <div class="choose-period">
+              <p :style="{ color: theme.$main_text }">
+                Последние
+              </p>
+              <v-text-field
+                v-model="lastEvery"
+                class="textarea-item"
+                outlined
+                :color="theme.$accent_ui_color"
+                :style="{ color: theme.$main_text }"
+                hide-details
+                @input="setLast($event)"
+              />
+            </div>
+            <div class="choose-time">
+              <v-chip
+                :color="theme[color.hour]"
+                class="time"
+                @click="setTime('hour')"
+              >
+                Часов
+              </v-chip>
+              <v-chip
+                :color="theme[color.minute]"
+                class="time"
+                @click="setTime('minute')"
+              >
+                Минут
+              </v-chip>
+              <v-chip
+                :color="theme[color.second]"
+                class="time"
+                @click="setTime('second')"
+              >
+                Секунд
+              </v-chip>
+            </div>
+            <div
+              class="name-of-picker"
+              :style="{ color: theme.$title }"
+            >
+              Выбор времени и даты
+            </div>
+            <DTPicker
+              :id="`${idDash}-start`"
+              v-model="start"
+              label="Начальная дата и время"
+              format="YYYY-MM-DD HH:mm"
+              button-now-translation="Сейчас"
+              :color="theme.$accent_ui_color"
+              :button-color="theme.$primary_button"
+              class="dtpicker"
+              @validate="setTocken('dt')"
+            />
+            <DTPicker
+              :id="`${idDash}-end`"
+              v-model="end"
+              label="Конечная дата и время"
+              format="YYYY-MM-DD HH:mm"
+              button-now-translation="Сейчас"
+              :color="theme.$accent_ui_color"
+              :button-color="theme.$primary_button"
+              class="dtpicker"
+              @validate="setTocken('dt')"
+            />
+            <div
+              class="name-of-picker"
+              :style="{ color: theme.$title }"
+            >
+              Диапазон дат
+            </div>
+            <DTPicker
+              :id="`${idDash}-between`"
+              v-model="range"
+              range
+              label="Диапазон дат"
+              format="YYYY-MM-DD"
+              :color="theme.$accent_ui_color"
+              :button-color="theme.$primary_button"
+              :custom-shortcuts="DTPickerCustomShortcuts"
+              class="dtpicker range-picker"
+              @validate="setTocken('range')"
+            />
+            <div
+              class="name-of-picker"
+              :style="{ color: theme.$title }"
+            >
+              Ввод даты и времени вручную
+            </div>
+            <v-text-field
+              v-model="start_custom.value"
+              label="Начальная дата"
+              counter="500"
+              :style="{ color: theme.$main_text }"
+              clearable
+              :append-icon="check"
+              :color="theme[start_custom.color]"
+              hide-details
+              outlined
+              class="dtpicker custom-picker"
+              @blur="start_custom.color = 'controlsActive'"
+              @click:append="customDate('begin')"
+            />
+            <v-text-field
+              v-model="end_custom.value"
+              label="Конечная дата"
+              counter="500"
+              :style="{ color: theme.$main_text }"
+              clearable
+              :append-icon="check"
+              :color="theme[end_custom.color]"
+              hide-details
+              outlined
+              class="dtpicker custom-picker"
+              @blur="end_custom.color = 'controlsActive'"
+              @click:append="customDate('end')"
+            />
+            <div class="set-btn-block">
+              <v-btn
+                small
+                :color="theme.$primary_button"
+                class="set-btn"
+                @click="setDate"
+              >
+                Установить
+              </v-btn>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </portal>
 </template>
 
 <script>
-import { mdiChevronDown, mdiChevronUp, mdiCheckBold } from '@mdi/js';
+import {
+  mdiCalendarMonthOutline,
+  mdiCheckBold,
+} from '@mdi/js';
 
 export default {
   name: 'DashDatePicker',
@@ -255,13 +262,8 @@ export default {
         value: null,
         color: 'controlsActive',
       },
-      up: mdiChevronUp,
-      down: mdiChevronDown,
       check: mdiCheckBold,
-      arrow: {
-        direct: 'down',
-        elem: mdiChevronDown,
-      },
+      calendar: mdiCalendarMonthOutline,
       show_picker_elem: false,
       show_curent: false,
       date: {},
@@ -339,10 +341,6 @@ export default {
         this.$emit('setVissible', { element: this.id, overflow: 'scroll' });
 
         this.changeDate = !this.changeDate;
-        this.arrow.direct = 'down';
-        this.arrow.elem = this.down;
-        this.showCurrent();
-        this.curDate = this.calcCurrentDate();
       }
     },
     calcCurrentDate() {
@@ -403,12 +401,9 @@ export default {
       return current;
     },
     openHidden() {
-      this.show_picker_elem = !this.show_picker_elem;
-      if (this.arrow.direct === 'down') {
+      if (!this.show_picker_elem) {
         this.$emit('setVissible', { element: this.id, overflow: 'visible' });
-
-        this.arrow.direct = 'up';
-        this.arrow.elem = this.up;
+        this.show_picker_elem = !this.show_picker_elem;
         this.show_curent = false;
       } else {
         this.onClose();
@@ -570,6 +565,8 @@ export default {
           }
         }
       });
+      this.showCurrent();
+      this.curDate = this.calcCurrentDate();
       this.openHidden();
     },
   },
@@ -597,6 +594,10 @@ export default {
       }
     }
 
+  }
+
+  .cur-date--placeholder {
+    opacity: .4;
   }
 }
 
