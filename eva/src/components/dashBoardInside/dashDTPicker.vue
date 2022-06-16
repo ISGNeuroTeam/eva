@@ -151,13 +151,12 @@
               counter="500"
               :style="{ color: theme.$main_text }"
               clearable
-              :append-icon="check"
               :color="theme[start_custom.color]"
               hide-details
               outlined
               class="dtpicker custom-picker"
               @blur="start_custom.color = 'controlsActive'"
-              @click:append="customDate('begin')"
+              @input="setTocken('custom')"
             />
             <v-text-field
               v-model="end_custom.value"
@@ -165,13 +164,12 @@
               counter="500"
               :style="{ color: theme.$main_text }"
               clearable
-              :append-icon="check"
               :color="theme[end_custom.color]"
               hide-details
               outlined
               class="dtpicker custom-picker"
               @blur="end_custom.color = 'controlsActive'"
-              @click:append="customDate('end')"
+              @input="setTocken('custom')"
             />
             <div class="set-btn-block">
               <v-btn
@@ -408,14 +406,6 @@ export default {
       } else {
         this.onClose();
       }
-    },
-    customDate(elem) {
-      if (elem === 'begin') {
-        this.start_custom.color = 'controls';
-      } else {
-        this.end_custom.color = 'controls';
-      }
-      this.setTocken('custom');
     },
     showCurrent() {
       this.$set(this.date, 'start', this.start);
