@@ -108,7 +108,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker"
-              @validate="setTocken('dt')"
+              @input="setTocken('dt')"
             />
             <DTPicker
               :id="`${idDash}-end`"
@@ -119,7 +119,7 @@
               :color="theme.$accent_ui_color"
               :button-color="theme.$primary_button"
               class="dtpicker"
-              @validate="setTocken('dt')"
+              @input="setTocken('dt')"
             />
             <div
               class="name-of-picker"
@@ -137,7 +137,7 @@
               :button-color="theme.$primary_button"
               :custom-shortcuts="DTPickerCustomShortcuts"
               class="dtpicker range-picker"
-              @validate="setTocken('range')"
+              @input="setTocken('range')"
             />
             <div
               class="name-of-picker"
@@ -442,6 +442,7 @@ export default {
       this.setTocken('time');
     },
     setTocken(elem) {
+      console.log('settocken', elem);
       let period = 0;
       switch (elem) {
         case 'dt':
