@@ -121,9 +121,8 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-  .card-title {
-    display: flex;
-    justify-content: end;
-  }
+<style lang="sass" scoped>
+  .card-title
+    display: flex
+    justify-content: flex-end
 </style>

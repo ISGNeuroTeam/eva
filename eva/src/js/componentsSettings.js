@@ -41,9 +41,9 @@ export default {
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
-    { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
-    { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
-    { name: 'Меню', img: mdiTuneVertical, type: 'menu' },
+    { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
+    { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
+    { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
   ],
   size: {
     picker: {
@@ -145,90 +145,90 @@ export default {
     map: mdiMapMarker,
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
-    tune: mdiTuneVertical,
-    accumulators: mdiTuneVertical,
-    menu: mdiTuneVertical,
+    tune: 'eva-basic_slider_01',
+    accumulators: 'eva-chart_bar_chart_horizontal',
+    menu: 'eva-edit_list_checklist',
   },
+  commonOptions: [
+    'panelSettings',
+    'panelNameHide',
+    'panelIconUpdate',
+    'panelBackHide',
+    'panelIconDownload',
+    'panelIconFullscreen',
+    'visible',
+    'level',
+    'pinned',
+    'otherSettings',
+  ],
   options: {
     // component to options
     multiLine: [
-      'visible',
-      'level',
       'boxShadow',
       'metrics',
       'lastResult',
-      'pinned',
     ],
     piechart: [
-      'visible',
-      'level',
       'metricsRelation',
       'showlegend',
       'positionlegend',
       'colorsPie',
       'themes',
-      'pinned',
       'piechartSettings',
       'pieType',
     ],
     table: [
-      'visible',
-      'level',
       'boxShadow',
       'rowcolor',
       'columncolor',
       'cellcolor',
       'lastResult',
       'titles',
-      'pinned',
     ],
-    select: ['visible', 'level', 'boxShadow', 'multiple', 'pinned'],
-    picker: ['visible', 'level', 'pinned'],
-    graph: ['visible', 'level', 'boxShadow', 'pinned'],
+    select: [
+      'boxShadow',
+      'multiple',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
+    ],
+    picker: [],
+    graph: ['boxShadow'],
     single: [
-      'visible',
-      'level',
       'subnumber',
       'color',
       'boxShadow',
       'fontSize',
       'lastResult',
-      'pinned',
     ],
     button: [
-      'visible',
-      'level',
       'color',
       'backgroundcolor',
       'name',
       'fontSize',
       'underline',
-      'pinned',
       'onButton',
     ],
     textarea: [
-      'visible',
-      'level',
       'searchBtn',
-      'pinned',
+      'textFontSize',
+      'fontWeight',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
       'validationGroup',
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
-      'textFontSize',
-      'fontWeight',
     ],
-    guntt: ['visible', 'level', 'timeFormat', 'pinned'],
-    tile: ['visible', 'level', 'widthTile', 'heightTile', 'pinned'],
-    csvg: ['visible', 'level', 'tooltip', 'pinned'],
-    ygraph: ['visible', 'level', 'pinned'],
-    bush: ['visible', 'level', 'pinned'],
-    map: ['visible', 'level', 'osmserver', 'primitivesLibrary', 'pinned'],
+    guntt: ['timeFormat'],
+    tile: ['widthTile', 'heightTile'],
+    csvg: ['tooltip'],
+    ygraph: [],
+    bush: [],
+    map: ['osmserver', 'primitivesLibrary'],
     heatmap: [
-      'visible',
-      'level',
       'dataFormat',
-      'pinned',
       'x',
       'xFormat',
       'xSort',
@@ -239,27 +239,87 @@ export default {
       'metadata',
       'detailValue',
     ],
-    singleValue: ['visible', 'level', 'pinned'],
-    tune: ['visible', 'level', 'pinned'],
+    singleValue: [],
+    tune: [
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
+    ],
     accumulators: [
-      'visible',
-      'level',
       'boxShadow',
-      'pinned',
       'metrics',
       'fillColor',
     ],
     menu: [
-      'visible',
-      'level',
       'boxShadow',
-      'pinned',
       'metrics',
       'fillColor',
     ],
   },
   optionFields: [
     // описание типов полей и их характеристик
+    // common
+    {
+      group: 'Основные настройки',
+      option: 'panelSettings',
+      relation() {
+        return this.isDashBoard;
+      },
+    },
+    {
+      optionGroup: 'panelSettings',
+      option: 'panelNameHide',
+      description: 'скрыть название панели',
+      elem: 'switch',
+      default: false,
+      relation() {
+        return this.isDashBoard;
+      },
+    },
+    {
+      optionGroup: 'panelSettings',
+      option: 'panelIconUpdate',
+      description: 'возможность вручную обновить данные',
+      elem: 'switch',
+      default: false,
+      relation() {
+        return this.isDashBoard;
+      },
+    },
+    {
+      optionGroup: 'panelSettings',
+      option: 'panelBackHide',
+      description: 'скрыть фон панели',
+      elem: 'switch',
+      default: false,
+      relation() {
+        return this.isDashBoard;
+      },
+    },
+    {
+      optionGroup: 'panelSettings',
+      option: 'panelIconDownload',
+      description: 'возможность скачать результаты',
+      elem: 'switch',
+      default: false,
+      relation() {
+        return this.isDashBoard;
+      },
+    },
+    {
+      optionGroup: 'panelSettings',
+      option: 'panelIconFullscreen',
+      description: 'возможность раскрывать на весь экран',
+      elem: 'switch',
+      default: false,
+      relation() {
+        return this.isDashBoard;
+      },
+    },
+    {
+      group: 'Дополнительные настройки',
+      option: 'otherSettings',
+    },
     // dashBoard
     {
       option: 'visible',
@@ -304,6 +364,47 @@ export default {
       description: 'Установить насыщенности текста',
       elem: 'select',
       items: [100, 200, 400, 500, 800],
+    },
+    {
+      relation() {
+        return !!this.$store.state[this.idDash].searches;
+      },
+      option: 'defaultFromSourceData',
+      description: 'Дефолтное значение из источника данных',
+      elem: 'select',
+      default: null,
+      items() {
+        if (this.$store.state[this.idDash]?.searches) {
+          return [];
+        }
+        const sourceDataList = this.$store.state[this.idDash].searches
+          .map(({ id, sid }) => ({
+            value: id,
+            text: sid,
+          }));
+        return [
+          {
+            value: null,
+            text: '-- Не использовать --',
+          },
+          ...sourceDataList,
+        ];
+      },
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataField',
+      description: 'Поле для дефолтного значения из ИД',
+      elem: 'text-field',
+      default: 'value',
+      placeholder: 'Default: value',
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataUpdates',
+      description: 'Обновлять значение компонента при изменениях в ИД для дефолтного значения',
+      elem: 'switch',
+      default: false,
     },
     {
       group: 'Валидация',
@@ -617,6 +718,7 @@ export default {
     ],
     fromDataSearches: [
       'menu',
+      'picker',
     ],
   },
 };

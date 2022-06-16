@@ -745,7 +745,10 @@
       <div
         class="block-save"
         :class="{ opensave: opensave }"
-        :style="{ background: theme.$main_bg }"
+        :style="{
+          background: theme.$main_bg,
+          border: `1px solid ${theme.$main_text}`
+        }"
       >
         <div
           v-show="!errorSave"
@@ -852,7 +855,6 @@
         :gear-from="gearShow"
         :permissions-from="userPermissions"
         :id-dash-from="idDashFrom"
-        @changeMode="setEditMode"
       />
     </div>
 
@@ -939,7 +941,6 @@ export default {
       tocken_elem: false,
       profile_elem: false,
       save_elem: false,
-      editMode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       code_elem: false,
       check: mdiCheckBold,
       look: mdiEye,
@@ -1058,6 +1059,9 @@ export default {
     };
   },
   computed: {
+    editMode() {
+      return this.dashFromStore?.editMode;
+    },
     getColorError() {
       if (!this.$store.state.logError) {
         this.$store.commit('setState', [{

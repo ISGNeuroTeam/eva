@@ -921,12 +921,11 @@ export default class ChartClass {
       })
       .attr('width', barWidth)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d[1] - d[0]]))
-      .on('mouseenter', () => this.showTooltip.bind(this))
       .on('mouseleave', () => {
         this.hideTooltip();
         this.hideLineDot();
       })
-      .on('mousemove', (d) => {
+      .on('mouseenter', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);
         let lineYPos = this.y[metric.name](d[1]);
@@ -1007,12 +1006,7 @@ export default class ChartClass {
       })
       .attr('fill', (d) => d.color)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d.value]))
-      .on('mouseenter', () => this.showTooltip.bind(this))
-      .on('mouseleave', () => {
-        this.hideTooltip();
-        this.hideLineDot();
-      })
-      .on('mousemove', (d) => {
+      .on('mouseenter', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);
         const lineYPos = this.y[metric.name](d.value);
@@ -1021,6 +1015,11 @@ export default class ChartClass {
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
+        this.showTooltip();
+      })
+      .on('mouseleave', () => {
+        this.hideTooltip();
+        this.hideLineDot();
       })
       .each(function (d) {
         // eslint-disable-next-line no-underscore-dangle
