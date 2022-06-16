@@ -185,7 +185,13 @@ export default {
       'lastResult',
       'titles',
     ],
-    select: ['boxShadow', 'multiple'],
+    select: [
+      'boxShadow',
+      'multiple',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
+    ],
     picker: [],
     graph: ['boxShadow'],
     single: [
@@ -205,12 +211,15 @@ export default {
     ],
     textarea: [
       'searchBtn',
+      'textFontSize',
+      'fontWeight',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
       'validationGroup',
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
-      'textFontSize',
-      'fontWeight',
     ],
     guntt: ['timeFormat'],
     tile: ['widthTile', 'heightTile'],
@@ -231,7 +240,11 @@ export default {
       'detailValue',
     ],
     singleValue: [],
-    tune: [],
+    tune: [
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
+    ],
     accumulators: [
       'boxShadow',
       'metrics',
@@ -351,6 +364,41 @@ export default {
       description: 'Установить насыщенности текста',
       elem: 'select',
       items: [100, 200, 400, 500, 800],
+    },
+    {
+      option: 'defaultFromSourceData',
+      description: 'Дефолтное значение из источника данных',
+      elem: 'select',
+      default: null,
+      items() {
+        const sourceDataList = this.$store.state[this.idDash].searches
+          .map(({ id, sid }) => ({
+            value: id,
+            text: sid,
+          }));
+        return [
+          {
+            value: null,
+            text: '-- Не использовать --',
+          },
+          ...sourceDataList,
+        ];
+      },
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataField',
+      description: 'Поле для дефолтного значения из ИД',
+      elem: 'text-field',
+      default: 'value',
+      placeholder: 'Default: value',
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataUpdates',
+      description: 'Обновлять значение компонента при изменениях в ИД для дефолтного значения',
+      elem: 'switch',
+      default: false,
     },
     {
       group: 'Валидация',
