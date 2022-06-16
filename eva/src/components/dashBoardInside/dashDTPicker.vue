@@ -442,7 +442,6 @@ export default {
       this.setTocken('time');
     },
     setTocken(elem) {
-      console.log('settocken', elem);
       let period = 0;
       switch (elem) {
         case 'dt':
