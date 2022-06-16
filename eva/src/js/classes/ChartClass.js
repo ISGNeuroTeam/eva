@@ -717,9 +717,7 @@ export default class ChartClass {
         if (nodes.length === 1) {
           className += ' dot-show';
         } else if (metric.showPeakDots) {
-          if (ChartClass.lastDotParamForPoint(metric.lastDot, i, nodes)) {
-            className += ' dot-show';
-          }
+          className += ' dot-show';
         }
         return className;
       })
@@ -851,7 +849,7 @@ export default class ChartClass {
         this.renderPeakDots(chartGroup, metric, height, num, line);
 
         // add text
-        if (metric.showPeakDots && metric.showText) {
+        if (metric.showText) {
           this.renderPeakTexts(chartGroup, metric, line);
         }
       });
@@ -882,6 +880,7 @@ export default class ChartClass {
     const barWidth = this.bandX.bandwidth();
     const stackedData = d3.stack()
       .keys(groupBarplotMetrics.map((d) => d.name))(this.data);
+    const { length } = this.data;
 
     chartGroup.append('g')
       .selectAll('g')
@@ -938,8 +937,9 @@ export default class ChartClass {
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
       })
-      .each(function (d) {
-        if (d[1] !== null && d.metric.showText) {
+      .each(function (d, i) {
+        const showText = ChartClass.lastDotParamForPoint(d.metric.lastDot, i, { length });
+        if (d[1] !== null && d.metric.showText && showText) {
           d3.select(this.parentNode)
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
@@ -967,6 +967,7 @@ export default class ChartClass {
       .padding([0.05]);
 
     const metricByKeys = this.metricByKeys();
+    const { length } = this.data;
 
     chartGroup.append('g')
       .selectAll('g')
@@ -975,13 +976,14 @@ export default class ChartClass {
       .append('g')
       .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
-      .data((d) => subgroups.map((key) => ({
+      .data((d, i) => subgroups.map((key) => ({
         key,
         value: d[key],
         color: metricByKeys[key].color,
         n: metricByKeys[key].n,
         metric: metricByKeys[key],
         data: d,
+        _pn: i,
       })))
       .enter()
       .append('rect')
@@ -1020,7 +1022,9 @@ export default class ChartClass {
         this.hideLineDot();
       })
       .each(function (d) {
-        if (d.value !== null && d.metric.showText) {
+        // eslint-disable-next-line no-underscore-dangle
+        const showText = ChartClass.lastDotParamForPoint(d.metric.lastDot, d._pn, { length });
+        if (d.value !== null && d.metric.showText && showText) {
           d3.select(this.parentNode)
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)

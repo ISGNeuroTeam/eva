@@ -30,6 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed spaces around text in tokens from table
 - Fixed loading bar
 - Fixed the save dashboard dialog has no frame
+- Updated drawing of points on multi-line lines
+- Fixed fullscreen multiline
 
 ## [1.94.0]
 
