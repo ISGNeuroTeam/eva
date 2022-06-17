@@ -464,13 +464,10 @@ export default new Vuex.Store({
           if (!state[idDash][item].loading) {
             state[idDash][item].loading = '';
           }
-
           state[idDash][item].loading = should;
         } else if (search
-            && name
-            && state[idDash][item].name_elem.toLowerCase() === name.toLowerCase()) {
-          state[idDash][item].loading = should;
-        } else {
+          && name
+          && state[idDash][item].name_elem.toLowerCase() === name.toLowerCase()) {
           state[idDash][item].loading = should;
         }
       });
@@ -1055,6 +1052,13 @@ export default new Vuex.Store({
       }
 
       state[idDash].visualisationModalData = structuredClone(data);
+    },
+    setEditMode(state, { idDash, newModeState }) {
+      if (!state[idDash]?.editMode) {
+        Vue.set(state[idDash], 'editMode', newModeState);
+      } else {
+        state[idDash].editMode = newModeState;
+      }
     },
   },
   actions: {
@@ -1924,7 +1928,6 @@ export default new Vuex.Store({
           field_extraction: false,
           cache_ttl: 100,
         },
-        limit: 1000,
       };
     },
 

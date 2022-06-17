@@ -61,6 +61,7 @@
         <v-menu
           v-model="toggleSelect"
           z-index="1"
+          content-class="med-menu"
         >
           <template v-slot:activator="{ on:menu }">
             <div class="d-flex flex-column">
@@ -626,6 +627,8 @@ export default {
   right: 0
   z-index: 401
   pointer-events: none
+  &-menu
+    border: none !important
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important

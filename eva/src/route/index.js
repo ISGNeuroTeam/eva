@@ -51,6 +51,7 @@ const routes = [
     props: true,
     meta: {
       requiresAuth: true,
+      isDashboard: true,
     },
   },
   {
@@ -60,6 +61,7 @@ const routes = [
     props: true,
     meta: {
       requiresAuth: true,
+      isDashboard: true,
     },
   },
   {
