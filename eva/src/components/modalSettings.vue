@@ -1207,11 +1207,19 @@ export default {
         if (this.colorsPie.nametheme) {
           this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            this.$set(
-              this.themes,
-              this.colorsPie.nametheme,
-              this.colorsPie.colors.split(' '),
-            );
+            // this.$set(
+            //   this.themes,
+            //   this.colorsPie.nametheme,
+            //   this.colorsPie.colors.split(' '),
+            // );
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
+            this.$store.commit('setState', [
+              {
+                object: this.dashFromStore[this.element].options,
+                prop: 'themes',
+                value: this.themes,
+              },
+            ]);
             if (
               this.colorsPie.theme !== 'custom'
               && this.colorsPie.theme !== this.colorsPie.nametheme
@@ -1323,7 +1331,14 @@ export default {
       if (this.isDelete) {
         this.themes = { ...this.themes, ...this.them };
         this.them = {};
-        this.options.themes = this.themes;
+        this.$set(this.options, 'themes', this.themes);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore[this.element].options,
+            prop: 'themes',
+            value: this.themes,
+          },
+        ]);
         this.isDelete = false;
       }
     },
@@ -1609,12 +1624,20 @@ export default {
       this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(' '));
       this.$set(this.options, 'colorsPie', this.colorsPie);
       this.$set(this.options, 'themes', this.themes);
+      this.them = { [theme]: this.themes[theme] };
       delete this.themes[theme];
       this.isDelete = true;
     },
     deleteTheme() {
       this.options.colorsPie = this.colorsPie;
       this.options.themes = this.themes;
+      this.$store.commit('setState', [
+        {
+          object: this.dashFromStore[this.element].options,
+          prop: 'themes',
+          value: this.themes,
+        },
+      ]);
       this.isDelete = false;
       this.them = {};
     },

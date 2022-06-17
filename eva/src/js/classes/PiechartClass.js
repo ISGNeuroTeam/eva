@@ -157,6 +157,21 @@ export default class PiechartClass {
       });
   }
 
+  activetetPiepart(selectedPieIndex, legendLineIndex) {
+    this.getPiechart.selectAll('.piepart')
+      .each((_, i, nodes) => {
+        const node = nodes[i];
+        if (i === legendLineIndex) {
+          node.classList.add('piepartSelect');
+        } else if (
+          node.classList.contains('piepartSelect')
+          && legendLineIndex !== i
+        ) {
+          node.classList.remove('piepartSelect');
+        }
+      });
+  }
+
   selectActiveLegendLine(legendLineIndex, legendLineClass = 'legend-line') {
     this.legend
       .selectAll(`.${legendLineClass}`)
