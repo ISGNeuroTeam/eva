@@ -1,6 +1,7 @@
 import {
   Color,
-  DefaultLabelStyle, DefaultPortCandidate,
+  DefaultLabelStyle,
+  DefaultPortCandidate,
   DragDropEffects,
   DragDropItem,
   DragSource,
@@ -14,7 +15,8 @@ import {
   GraphMLIOHandler,
   GraphMLSupport,
   GraphSnapContext,
-  GridSnapTypes, HandlePositions,
+  GridSnapTypes,
+  HandlePositions,
   ICommand,
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
@@ -22,18 +24,19 @@ import {
   ImageNodeStyle,
   INode,
   InteriorLabelModel,
-  IPort, IReshapeHandler,
+  IPort,
+  IReshapeHandler,
   KeyEventRecognizers,
   LabelDropInputMode,
   License,
   ListEnumerable,
   MouseEventRecognizers,
-  NodeDropInputMode, NodeReshapeHandleProvider,
+  NodeDropInputMode,
+  NodeReshapeHandleProvider,
   NodeStylePortStyleAdapter,
   Point,
   PolylineEdgeStyle,
   PortDropInputMode,
-  PortRelocationHandleProvider,
   Rect,
   ShapeNodeStyle,
   SimpleEdge,
@@ -41,7 +44,6 @@ import {
   SimpleNode,
   Size,
   StorageLocation,
-  Visualization,
   VoidNodeStyle,
 } from 'yfiles';
 
@@ -55,6 +57,8 @@ import VuejsNodeStyleMarkupExtension from './VuejsNodeStyleMarkupExtension.js';
 import EdgeDropInputMode from './EdgeDropInputModeClass';
 
 License.value = licenseData; // Проверка лицензии
+
+const regexpSize = /<svg width="(?<width>.*?)" height="(?<height>.*?)"/;
 
 class ConstructorSchemesClass {
   dndDataPanelItems = [
@@ -818,29 +822,57 @@ class ConstructorSchemesClass {
     return `rgb(${color.r}, ${color.g}, ${color.b})`;
   }
 
-  static async webGl2CreateIcon({
-    dropData,
-    graph,
-    createdNode,
-  }) {
-    await graph.setStyle(
-      createdNode,
-      new ImageNodeStyle(dropData.style.image),
-    );
-    graph.addRelativePort(createdNode, new Point(30, -80));
-    graph.addRelativePort(createdNode, new Point(30, 80));
-    graph.addRelativePort(createdNode, new Point(0, 0));
-
-    return createdNode;
+  static generateIconNodes(iconsList) {
+    return Promise.all(iconsList.map((icon) => new Promise((resolve) => {
+      const imageStyleNode = new SimpleNode();
+      ConstructorSchemesClass.getSvgLayoutSize(icon.src).then((layoutSize) => {
+        imageStyleNode.layout = new Rect(0, 0, +layoutSize.width, +layoutSize.height);
+        imageStyleNode.style = new ImageNodeStyle(icon.src);
+        imageStyleNode.tag = {
+          isAspectRatio: true,
+        };
+        resolve(new DragAndDropPanelItem(imageStyleNode, 'image-node'));
+      });
+    })));
   }
 
-  static generateIconNodes(iconsList) {
-    return iconsList.map((icon) => {
-      const imageStyleNode = new SimpleNode();
-      imageStyleNode.layout = new Rect(0, 0, icon.width, icon.height);
-      imageStyleNode.style = new ImageNodeStyle(icon.src);
-      return new DragAndDropPanelItem(imageStyleNode, 'image-node');
-    });
+  static async getSvgLayoutSize(iconUrl) {
+    return fetch(iconUrl)
+      .then((response) => response.body)
+      .then((rb) => {
+        const reader = rb.getReader();
+
+        return new ReadableStream({
+          start(controller) {
+            // The following function handles each data chunk
+            function push() {
+              // "done" is a Boolean and value a "Uint8Array"
+              reader.read()
+                .then(({ done, value }) => {
+                  // If there is no more data to read
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+                  // Get the data and send it to the browser via the controller
+                  controller.enqueue(value);
+                  push();
+                });
+            }
+
+            push();
+          },
+        });
+      })
+      .then((stream) => new Response(
+        stream,
+        {
+          headers: {
+            'Content-Type': 'text/html',
+          },
+        },
+      ).text())
+      .then((svgText) => svgText.match(regexpSize).groups);
   }
 
   static createDnDPanelDefaultNode(defaultNodeStyle) {
@@ -924,6 +956,7 @@ class ConstructorSchemesClass {
   }) {
     this.dragAndDropPanel = null;
     this.mapper = null;
+    this.elem = elem;
     this.dataRest = dataRest;
     this.iconsList = iconsList;
     // Сохранение через GraphML
@@ -969,6 +1002,8 @@ class ConstructorSchemesClass {
     // Отключаем изменение размеров у ненвидимых узлов
     nodeDecorator.reshapeHandleProviderDecorator
       .hideImplementation((node) => node.tag === 'invisible');
+
+    this.registerReshapeHandleProvider();
   }
 
   registerReshapeHandleProvider() {
@@ -976,7 +1011,7 @@ class ConstructorSchemesClass {
 
     // return customized reshape handle provider for the orange, blue and green node
     nodeDecorator.reshapeHandleProviderDecorator.setFactory(
-      (node) => node?.tag?.isAspectedRatio,
+      (node) => node?.tag?.isAspectRatio,
       (node) => {
         // Create a default reshape handle provider for nodes
         const reshapeHandler = node.lookup(IReshapeHandler.$class);
@@ -1192,6 +1227,13 @@ class ConstructorSchemesClass {
       // Добавление дополнительных портов
       this.createAdditionalPorts(createdItem);
 
+      const images = this.elem.querySelectorAll('image');
+      if (images?.length > 0) {
+        images.forEach((image) => {
+          image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        });
+      }
+
       // Сохранение в store
       this.save(updateStoreCallback);
     });
@@ -1265,6 +1307,24 @@ class ConstructorSchemesClass {
             labels: dropData.labels,
             tag: { ...dropData.tag, nodeId: dropData.hashCode() },
           });
+        } else if (dropData?.tag?.isAspectRatio) {
+          // const imageSize = [dropData.layout.width, dropData.layout.height];
+          // const canvasContext = ConstructorSchemesClass.createCanvasContext(...imageSize);
+          // const createdImage = await ConstructorSchemesClass.createUrlIcon(
+          //   canvasContext,
+          //   dropData.style.image,
+          //   new Size(...imageSize),
+          //   new Size(...imageSize),
+          // );
+          createdNode = graph.createNodeAt({
+            location: dropLocation,
+            style: dropData.style,
+            labels: dropData.labels,
+            tag: {
+              ...dropData.tag,
+              nodeId: dropData.hashCode(),
+            },
+          });
         } else {
           createdNode = graph.createNodeAt({
             location: dropLocation,
@@ -1285,6 +1345,44 @@ class ConstructorSchemesClass {
         return createdNode;
       },
     });
+  }
+
+  static createUrlIcon(ctx, url, imageSize, iconSize) {
+    return new Promise((resolve, reject) => {
+      // create an Image from the url
+      const image = new Image(imageSize.width, imageSize.height);
+      image.onload = () => {
+        // render the image into the canvas
+        ctx.clearRect(0, 0, iconSize.width, iconSize.height);
+        ctx.drawImage(
+          image,
+          0,
+          0,
+          imageSize.width,
+          imageSize.height,
+          0,
+          0,
+          iconSize.width,
+          iconSize.height,
+        );
+        const imageData = ctx.getImageData(0, 0, iconSize.width, iconSize.height);
+        resolve(imageData);
+      };
+      image.onerror = () => {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject('Loading the image failed.');
+      };
+      image.src = url;
+      image.preserveAspectRatio = 'xMidYMid meet';
+    });
+  }
+
+  static createCanvasContext(iconSize) {
+    // canvas used to pre-render the icons
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('width', `${iconSize.width}`);
+    canvas.setAttribute('height', `${iconSize.height}`);
+    return canvas.getContext('2d');
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -1616,14 +1714,14 @@ class ConstructorSchemesClass {
     };
 
     this.dragAndDropPanel.maxItemWidth = 160;
-    this.dragAndDropPanel.populatePanel(
-      this.createDnDPanelItems({
-        iconsList: this.iconsList,
-        defaultEdgeStyle: this.defaultEdgeStyle,
-        defaultNodeStyle: this.defaultNodeStyle,
-        defaultLabelStyle: this.defaultLabelStyle,
-      }),
-    );
+    this.createDnDPanelItems({
+      iconsList: this.iconsList,
+      defaultEdgeStyle: this.defaultEdgeStyle,
+      defaultNodeStyle: this.defaultNodeStyle,
+      defaultLabelStyle: this.defaultLabelStyle,
+    }).then((response) => {
+      this.dragAndDropPanel.populatePanel(response);
+    });
   }
 
   static createReactiveNode(data, type) {
@@ -1641,69 +1739,75 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(dataNode, type);
   }
 
-  createDnDPanelItems({
+  async createDnDPanelItems({
     iconsList,
     defaultNodeStyle,
     defaultEdgeStyle,
     defaultLabelStyle,
   }) {
-    const itemContainer = [];
+    const itemContainer = await new Promise((resolve) => {
+      const items = [];
+      // Стандартный узел
+      items.push(ConstructorSchemesClass.createDnDPanelDefaultNode(defaultNodeStyle));
 
-    // Стандартный узел
-    itemContainer.push(ConstructorSchemesClass.createDnDPanelDefaultNode(defaultNodeStyle));
+      // Ребра
+      const edge1 = new SimpleEdge({
+        style: new PolylineEdgeStyle({
+          smoothingLength: defaultEdgeStyle.smoothingLength,
+          // [color]
+          // [scale - xx-small|x-small|small|medium|large|x-large|xx-large]
+          // type- normal|none|default|simple|short|diamond|cross|circle|ball|triangle
+          targetArrow: 'none',
+          sourceArrow: 'none',
+          stroke: `${defaultEdgeStyle.strokeSize} solid ${defaultEdgeStyle.strokeColor}`, // '[thickness] [type] color'
+        }),
+      });
+      items.push(new DragAndDropPanelItem(edge1, 'default-node'));
 
-    // Ребра
-    const edge1 = new SimpleEdge({
-      style: new PolylineEdgeStyle({
-        smoothingLength: defaultEdgeStyle.smoothingLength,
-        // [color]
-        // [scale - xx-small|x-small|small|medium|large|x-large|xx-large]
-        // type- normal|none|default|simple|short|diamond|cross|circle|ball|triangle
-        targetArrow: 'none',
-        sourceArrow: 'none',
-        stroke: `${defaultEdgeStyle.strokeSize} solid ${defaultEdgeStyle.strokeColor}`, // '[thickness] [type] color'
-      }),
+      // Узел с данными
+      this.dndDataPanelItems.forEach((item) => {
+        items.push(ConstructorSchemesClass.createReactiveNode(item, 'data-node'));
+      });
+
+      // Узел с текстом
+      this.dndLabelPanelItems.forEach((item) => {
+        items.push(ConstructorSchemesClass.createReactiveNode(item, 'text-node'));
+      });
+
+      // Подписи к узлам\ребрам
+      const labelNode = new SimpleNode();
+      labelNode.layout = new Rect(0, 0, defaultNodeStyle.size[0], 16);
+      labelNode.style = new VoidNodeStyle();
+
+      const labelStyle = new DefaultLabelStyle({
+        backgroundStroke: 'transparent',
+        backgroundFill: 'transparent',
+        insets: [3, 5, 3, 5],
+        textFill: defaultLabelStyle.textFill,
+        font: defaultLabelStyle.font,
+      });
+
+      const label = new SimpleLabel(
+        labelNode,
+        'label',
+        FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
+      );
+      label.style = labelStyle;
+      label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
+      labelNode.tag = label;
+      labelNode.labels = new ListEnumerable([label]);
+      items.push(new DragAndDropPanelItem(labelNode, 'label-node'));
+
+      // Узел с изображением\иконкой
+      if (iconsList?.length > 0) {
+        ConstructorSchemesClass.generateIconNodes(iconsList).then((result) => {
+          items.push(...result);
+          resolve(items);
+        });
+      } else {
+        resolve(items);
+      }
     });
-    itemContainer.push(new DragAndDropPanelItem(edge1, 'default-node'));
-
-    // Узел с данными
-    this.dndDataPanelItems.forEach((item) => {
-      itemContainer.push(ConstructorSchemesClass.createReactiveNode(item, 'data-node'));
-    });
-
-    // Узел с текстом
-    this.dndLabelPanelItems.forEach((item) => {
-      itemContainer.push(ConstructorSchemesClass.createReactiveNode(item, 'text-node'));
-    });
-
-    // Узел с изображением\иконкой
-    if (iconsList?.length > 0) {
-      itemContainer.push(...ConstructorSchemesClass.generateIconNodes(iconsList));
-    }
-
-    // Подписи к узлам\ребрам
-    const labelNode = new SimpleNode();
-    labelNode.layout = new Rect(0, 0, defaultNodeStyle.size[0], 16);
-    labelNode.style = new VoidNodeStyle();
-
-    const labelStyle = new DefaultLabelStyle({
-      backgroundStroke: 'transparent',
-      backgroundFill: 'transparent',
-      insets: [3, 5, 3, 5],
-      textFill: defaultLabelStyle.textFill,
-      font: defaultLabelStyle.font,
-    });
-
-    const label = new SimpleLabel(
-      labelNode,
-      'label',
-      FreeNodeLabelModel.INSTANCE.createDefaultParameter(),
-    );
-    label.style = labelStyle;
-    label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
-    labelNode.tag = label;
-    labelNode.labels = new ListEnumerable([label]);
-    itemContainer.push(new DragAndDropPanelItem(labelNode, 'label-node'));
 
     return itemContainer;
   }
@@ -1770,7 +1874,6 @@ class ConstructorSchemesClass {
       });
     }
     if (this.graphComponent.selection.selectedEdges.toArray()?.length > 0) {
-      console.log('edges');
       this.graphComponent.graphModelManager
         .toFront(this.graphComponent.selection.selectedEdges);
       this.graphComponent.selection.selectedEdges.toArray().forEach((edge) => {
@@ -1789,7 +1892,6 @@ class ConstructorSchemesClass {
       });
     }
     if (this.graphComponent.selection.selectedEdges.toArray()?.length > 0) {
-      console.log('edges');
       this.graphComponent.graphModelManager
         .toBack(this.graphComponent.selection.selectedEdges);
       this.graphComponent.selection.selectedEdges.toArray().forEach((edge) => {
