@@ -1,0 +1,11 @@
+import RotatablePortLocationModelDecorator from './RotatablePortLocationModelDecorator';
+import RotatablePortLocationModelDecoratorParameterExtension from './RotatablePortLocationModelDecoratorParameterExtension';
+import RotatablePortLocationModelDecoratorExtension from './RotatablePortLocationModelDecoratorExtension';
+import RotatablePortLocationModelDecoratorParameter from './RotatablePortLocationModelDecoratorParameter';
+
+export {
+  RotatablePortLocationModelDecorator,
+  RotatablePortLocationModelDecoratorParameterExtension,
+  RotatablePortLocationModelDecoratorExtension,
+  RotatablePortLocationModelDecoratorParameter,
+};
