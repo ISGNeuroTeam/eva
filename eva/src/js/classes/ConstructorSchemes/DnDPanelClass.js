@@ -62,7 +62,7 @@ export class DragAndDropPanel {
   constructor(div) {
     this.div = div;
 
-    this.div.innerHTML = '';
+    this.clearDnDPanel();
 
     this.graphComponent = new GraphComponent();
 
@@ -77,6 +77,12 @@ export class DragAndDropPanel {
     // A callback that is called then the user presses the mouse button on an item.
     // It should start the actual drag and drop operation.
     this.beginDragCallback = null;
+  }
+
+  clearDnDPanel() {
+    this.div.querySelectorAll('.dndPanelItem__group').forEach((group) => {
+      group.querySelector('.dndPanelItem__group-items').innerHTML = '';
+    });
   }
 
   /**
@@ -94,12 +100,7 @@ export class DragAndDropPanel {
     const items = itemFactory || [];
 
     // Convert the nodes into plain visualizations
-    // const graphComponent = new GraphComponent();
     this.graphComponent.graph.clear();
-    // Enable webGl2
-    // graphComponent.graphModelManager = new WebGL2GraphModelManager();
-    // graphComponent
-    //   .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(graphComponent);
 
     items.forEach((item) => {
       const modelItem = item instanceof INode || item instanceof IEdge ? item : item.element;
@@ -107,7 +108,10 @@ export class DragAndDropPanel {
         ? this.createNodeVisual(modelItem, this.graphComponent)
         : this.createEdgeVisual(modelItem, this.graphComponent);
       this.addPointerDownListener(modelItem, visual, this.beginDragCallback);
-      this.div.appendChild(visual);
+      this.div
+        .querySelector(`.dndPanelItem__group--${item.tooltip}`)
+        .querySelector('.dndPanelItem__group-items')
+        .appendChild(visual);
     });
   }
 
@@ -227,7 +231,7 @@ export class DragAndDropPanel {
     visual.removeAttribute('clip-path');
 
     const div = document.createElement('div');
-    div.setAttribute('class', 'demo-dndPanelItem');
+    div.setAttribute('class', 'dndPanelItem');
     div.appendChild(visual);
     div.style.setProperty('width', visual.getAttribute('width'));
     div.style.setProperty('height', visual.getAttribute('height'));

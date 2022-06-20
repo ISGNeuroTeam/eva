@@ -6,8 +6,21 @@
       'height': `${innerSize.height}px`,
     }"
   >
-    <button @click="toggleDnDPanel">
-      Open
+    <button
+      @click="toggleDnDPanel"
+    >
+      <v-icon
+        class="control-button edit-icon theme--dark"
+        :style="{ color: theme.$secondary_text }"
+      >
+        {{ gear }}
+      </v-icon>
+    </button>
+    <button @click="orderToFront">
+      orderToFront
+    </button>
+    <button @click="orderToBack">
+      orderToBack
     </button>
     <!--Drag-and-drop panel-->
     <div
@@ -134,7 +147,7 @@
                   />
                 </v-menu>
               </div>
-              <!--Размер линии-->
+              <!--Размер рамки блока-->
               <div class="col-8">
                 Размер рамки узла:
               </div>
@@ -151,7 +164,38 @@
       <div
         ref="dndPanel"
         class="dash-constructor-schemes__dnd-panel"
-      />
+      >
+        <div class="dndPanelItem__group dndPanelItem__group--default-node">
+          <div class="dndPanelItem__group-title">
+            Default node
+          </div>
+          <div class="dndPanelItem__group-items" />
+        </div>
+        <div class="dndPanelItem__group dndPanelItem__group--data-node">
+          <div class="dndPanelItem__group-title">
+            Data node
+          </div>
+          <div class="dndPanelItem__group-items" />
+        </div>
+        <div class="dndPanelItem__group dndPanelItem__group--text-node">
+          <div class="dndPanelItem__group-title">
+            Text node
+          </div>
+          <div class="dndPanelItem__group-items" />
+        </div>
+        <div class="dndPanelItem__group dndPanelItem__group--image-node">
+          <div class="dndPanelItem__group-title">
+            Image node
+          </div>
+          <div class="dndPanelItem__group-items" />
+        </div>
+        <div class="dndPanelItem__group dndPanelItem__group--label-node">
+          <div class="dndPanelItem__group-title">
+            Label node
+          </div>
+          <div class="dndPanelItem__group-items" />
+        </div>
+      </div>
     </div>
     <div
       class="dash-constructor-schemes__data-panel"
@@ -206,6 +250,7 @@
 </template>
 
 <script>
+import { mdiSettings } from '@mdi/js';
 import ConstructorSchemesClass from '../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 
 export default {
@@ -238,6 +283,7 @@ export default {
   },
   data() {
     return {
+      gear: mdiSettings,
       dndPanel: false,
       dataPanel: false,
       edgeColorPopup: false,
@@ -262,22 +308,149 @@ export default {
       iconsList: [
         {
           src: '/icons/icon-test-1.svg',
-          width: 91,
-          height: 54,
-          label: 'Image Node',
+          width: 459,
+          height: 274,
+          label: 'ГС (Газосепаратор)',
         },
         {
-          src: '/icons/icon-test-1.svg',
-          width: 91,
-          height: 54,
-          label: 'Image Node',
+          src: '/icons/icon-test-2.svg',
+          width: 380,
+          height: 331,
+          label: 'ДЕ (Дренажная емкость)',
         },
         {
-          src: '/icons/icon-test-1.svg',
-          width: 91,
-          height: 54,
-          label: 'Image Node',
+          src: '/icons/icon-test-3.svg',
+          width: 378,
+          height: 466,
+          label: 'Дизельная электростанция',
         },
+        {
+          src: '/icons/icon-test-4.svg',
+          width: 395,
+          height: 492,
+          label: 'Клапан регулятор',
+        },
+        {
+          src: '/icons/icon-test-5.svg',
+          width: 424,
+          height: 473,
+          label: 'НВО (Насосная внешней откачки)',
+        },
+        {
+          src: '/icons/icon-test-6.svg',
+          width: 523,
+          height: 296,
+          label: 'НГС (Нефтегазосепаратор)',
+        },
+        {
+          src: '/icons/icon-test-7.svg',
+          width: 560,
+          height: 211,
+          label: 'ОВ (Отстойник водяной)',
+        },
+        {
+          src: '/icons/icon-test-8.svg',
+          width: 556,
+          height: 224,
+          label: 'П (Печь OFF)',
+        },
+        {
+          src: '/icons/icon-test-9.svg',
+          width: 600,
+          height: 238,
+          label: 'П (Печь ON)',
+        },
+        {
+          src: '/icons/icon-test-10.svg',
+          width: 310,
+          height: 431,
+          label: 'РВС (Резервуар вертикальный стальной)',
+        },
+        {
+          src: '/icons/icon-test-11.svg',
+          width: 138,
+          height: 372,
+          label: 'Соединение №1',
+        },
+        {
+          src: '/icons/icon-test-12.svg',
+          width: 117,
+          height: 530,
+          label: 'Соединение №2(1)',
+        },
+        {
+          src: '/icons/icon-test-13.svg',
+          width: 116,
+          height: 530,
+          label: 'Соединение №2(2)',
+        },
+        {
+          src: '/icons/icon-test-14.svg',
+          width: 490,
+          height: 463,
+          label: 'Соединение №3(1)',
+        },
+        {
+          src: '/icons/icon-test-15.svg',
+          width: 464,
+          height: 488,
+          label: 'Соединение №3(2)',
+        },
+        {
+          src: '/icons/icon-test-15.svg',
+          width: 490,
+          height: 461,
+          label: 'Соединение №3(3)',
+        },
+        {
+          src: '/icons/icon-test-16.svg',
+          width: 459,
+          height: 488,
+          label: 'Соединение №3(4)',
+        },
+        {
+          src: '/icons/icon-test-17.svg',
+          width: 313,
+          height: 524,
+          label: 'ФВД и ФНД (Факел высокого давления) и (Факел низкого давления)',
+        },
+        {
+          src: '/icons/icon-test-18.svg',
+          width: 352,
+          height: 471,
+          label: 'Электроприводная задвижка',
+        },
+        // Слишком много весят иконки
+        // {
+        //   src: '/icons/icon-test-19.svg',
+        //   width: 633,
+        //   height: 475,
+        //   label: 'Баки 1',
+        // },
+        // {
+        //   src: '/icons/icon-test-20.svg',
+        //   width: 633,
+        //   height: 475,
+        //   label: 'Вентель зеленый 2',
+        // },
+        // {
+        //   src: '/icons/icon-test-21.svg',
+        //   width: 633,
+        //   height: 475,
+        //   label: 'Манометр 1',
+        // },
+        // {
+        //   src: '/icons/icon-test-22.svg',
+        //   width: 633,
+        //   height: 475,
+        //   label: 'Вентель красный 2',
+        // },
+        // {
+        //   src: '/icons/icon-test-23.svg',
+        //   width: 633,
+        //   height: 475,
+        //   label: 'Насос 1 1',
+        // },
       ],
       testData: [
         {
@@ -410,8 +583,8 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
     },
-    savedGraphElementsFromStore() {
-      return this.dashFromStore.savedGraphElements || {};
+    savedGraph() {
+      return this.dashFromStore.savedGraph || '';
     },
     innerSize() {
       return {
@@ -455,74 +628,60 @@ export default {
         }
       },
     },
+    mockData: {
+      deep: true,
+      handler(value) {
+        if (this.constructorSchemes) {
+          this.constructorSchemes.updateDataInNode(value);
+        }
+      },
+    },
   },
   mounted() {
     this.createGraph();
+    setTimeout(() => {
+      this.testUpdate();
+    }, 2000);
   },
   methods: {
+    testUpdate() {
+      this.mockData[0].value = '333';
+    },
     closeEdgeColorPicker() {
       this.edgeColorPopup = false;
     },
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
     },
-    saveGraphItems(items) {
-      // this.allItems.push(item);
-      this.$store.commit('setState', [{
-        object: this.dashFromStore,
-        prop: 'savedGraphElements',
-        value: structuredClone(items),
-      }]);
-    },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
-        dndPanelContainerElem: this.$refs.dndPanelContainer,
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
         dataRest: this.mockData,
         iconsList: this.iconsList,
-        savedElements: this.savedGraphElementsFromStore,
         edgeCustomStyles: this.edgeCustomStyles,
         nodeCustomStyles: this.nodeCustomStyles,
         labelCustomStyles: this.labelCustomStyles,
-        saveGraphItemCallback: this.saveGraphItems,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
+        savedGraph: this.savedGraph,
+        updateStoreCallback: this.updateSavedGraph,
       });
     },
 
     changeDataSelectedNode() {
-      if (this.dataSelectedNode.dataType === '0') {
-        this.dataSelectedNode.items.forEach((item, index) => {
-          this.dataSelectedNode.items[index].textLeft = this.findDataItemByMetricName(item.id)
-            ?.metric_long_name;
-          this.dataSelectedNode.items[index].textRight = this.findDataItemByMetricName(item.id)
-            ?.value || '-';
-        });
-      }
-      this.updateDataNode(this.dataSelectedNode.nodeId, this.dataSelectedNode);
-      // Update saved element
+      this.constructorSchemes.updateSelectedNode(
+        this.dataSelectedNode,
+        this.updateSavedGraph,
+      );
+    },
+
+    updateSavedGraph(data) {
       this.$store.commit('setState', [{
-        object: this.savedGraphElementsFromStore[this.dataSelectedNode.nodeId],
-        prop: 'tag',
-        value: structuredClone(this.dataSelectedNode),
+        object: this.dashFromStore,
+        prop: 'savedGraph',
+        value: data,
       }]);
-    },
-
-    findDataItemByMetricName(metricName, data = this.mockData) {
-      return data.find((item) => item?.metric_name === metricName);
-    },
-
-    updateDataNode(nodeId, newData) {
-      if (this.constructorSchemes) {
-        this.constructorSchemes.updateDataNode(nodeId, newData);
-      }
-    },
-
-    updateGraphDataRest(updatedDataRest) {
-      if (this.constructorSchemes) {
-        this.constructorSchemes.updateDataRest(updatedDataRest);
-      }
     },
     closeDataPanel() {
       this.dataPanel = false;
@@ -530,12 +689,24 @@ export default {
       this.selectedDataType = '';
       this.dataSelectedNode = null;
     },
-    openDataPanel({ dataType, nodeId }) {
+    openDataPanel(targetElement) {
       this.closeDataPanel();
       this.dataPanel = true;
-      this.selectedNode = nodeId;
-      this.selectedDataType = dataType;
-      this.dataSelectedNode = structuredClone(this.savedGraphElementsFromStore[nodeId]?.tag);
+      this.selectedNode = structuredClone(targetElement.nodeId);
+      this.selectedDataType = structuredClone(targetElement.dataType);
+      this.dataSelectedNode = structuredClone(targetElement);
+    },
+    orderRaise() {
+      this.constructorSchemes.orderRaise();
+    },
+    orderLower() {
+      this.constructorSchemes.orderLower();
+    },
+    orderToFront() {
+      this.constructorSchemes.orderToFront();
+    },
+    orderToBack() {
+      this.constructorSchemes.orderToBack();
     },
   },
 };
@@ -613,7 +784,7 @@ export default {
   &__text {
     font-weight: 700;
     font-size: 11px;
-    line-height: 13px;
+    line-height: 1;
   }
   &__wrapper {
     &--type-2 {
