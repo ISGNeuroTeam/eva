@@ -35,7 +35,7 @@
       </div>
       <div
         v-else
-        class="content pt-3"
+        class="content"
         :class="metricTemplateClass"
         :style="`max-width: ${maxSize}px; max-height: ${maxSize}px`"
       >
@@ -289,24 +289,36 @@ export default {
       if (metric.metadata) {
         // eslint-disable-next-line no-eval
         const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
-        Object.keys(ranges).forEach((key) => {
-          ranges[key] = `${ranges[key]}`.split(':').map(Number);
-        });
-
         if (metric.color === 'range') {
-          if (!Number.isNaN(metric.value)) {
+          if (!Number.isNaN(+metric.value)) {
+            const numbersRanges = Object.keys(ranges)
+              .reduce((acc, key) => ({
+                ...acc,
+                [key]: `${ranges[key]}`.split(':').map(Number),
+              }), {});
             const val = Number(metric.value);
-            if (val >= ranges.red[0] && val <= ranges.red[1]) {
+            if (val >= numbersRanges.red[0] && val <= numbersRanges.red[1]) {
               return '#FF5147';
             }
 
-            if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
+            if (val >= numbersRanges.yellow[0] && val <= numbersRanges.yellow[1]) {
               return '#FFE065';
             }
-            const greenrange = ranges.green[0] < ranges.green[1]
-              ? val >= ranges.green[0] && val <= ranges.green[1]
-              : val >= ranges.green[0];
+            const greenrange = numbersRanges.green[0] < numbersRanges.green[1]
+              ? val >= numbersRanges.green[0] && val <= numbersRanges.green[1]
+              : val >= numbersRanges.green[0];
             if (greenrange) {
+              return '#5BD97A';
+            }
+          } else {
+            if (metric.value === ranges.red) {
+              return '#FF5147';
+            }
+
+            if (metric.value === ranges.yellow) {
+              return '#FFE065';
+            }
+            if (metric.value === ranges.green) {
               return '#5BD97A';
             }
           }
@@ -530,7 +542,7 @@ export default {
 @import 'sass/dashScale'
 .circle-scale
   position: absolute
-  top: 52%
+  top: 50%
   left: 50%
   z-index: 1
   transform: translate(-50%, -50%)

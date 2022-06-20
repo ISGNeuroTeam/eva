@@ -29,16 +29,6 @@
 
       <v-card-text class="content pa-0">
         <div class="content-section">
-          <span class="section-title">Название</span>
-          <v-text-field
-            v-model="settings.title"
-            dense
-            outlined
-            hide-details
-            class="input-element"
-            @input="isChanged = true"
-          />
-          <br>
           <label class="checkbox-google">
             <input
               type="checkbox"

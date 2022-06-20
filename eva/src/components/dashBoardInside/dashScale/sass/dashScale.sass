@@ -32,7 +32,9 @@ $dash-loading-height: 3px
   display: flex
   flex-direction: column
   overflow: auto
-  @include container-height(35px)
+  height: 100%
+  position: relative
+  //@include container-height(35px)
 
   &::-webkit-scrollbar
     width: 6px
@@ -43,18 +45,18 @@ $dash-loading-height: 3px
   &::-webkit-scrollbar-thumb
     background-color: $main_border
 
-  &.header-active
-    @include container-height(35px)
-
-  &.is-header-open
-    @include container-height(0px)
-
-  @media screen and (max-width: 1600px)
-    &.header-active
-      @include container-height(25px)
-
-    &.is-header-open
-      @include container-height(0px)
+  //&.header-active
+  //  @include container-height(35px)
+  //
+  //&.is-header-open
+  //  @include container-height(0px)
+  //
+  //@media screen and (max-width: 1600px)
+  //  &.header-active
+  //    @include container-height(25px)
+  //
+  //  &.is-header-open
+  //    @include container-height(0px)
 
   .header
     display: flex
@@ -80,11 +82,11 @@ $dash-loading-height: 3px
     display: grid
     gap: 10px
     width: 100%
-    margin: 0 auto
+    margin: auto
     flex: 1
-    position: relative
-    top: 45%
-    transform: translateY(-50%)
+    //position: relative
+    //top: 45%
+    //transform: translateY(-50%)
     @include templates-for-all-metric-variants()
 
     .item
