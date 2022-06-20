@@ -108,6 +108,12 @@ export class DragAndDropPanel {
         ? this.createNodeVisual(modelItem, this.graphComponent)
         : this.createEdgeVisual(modelItem, this.graphComponent);
       this.addPointerDownListener(modelItem, visual, this.beginDragCallback);
+      const images = visual.querySelectorAll('image');
+      if (images?.length > 0) {
+        images.forEach((image) => {
+          image.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+        });
+      }
       this.div
         .querySelector(`.dndPanelItem__group--${item.tooltip}`)
         .querySelector('.dndPanelItem__group-items')
@@ -219,7 +225,7 @@ export class DragAndDropPanel {
   exportAndWrap(graphComponent, tooltip) {
     const exporter = new SvgExport({
       worldBounds: this.graphComponent.contentRect,
-      margins: 5,
+      margins: 2,
     });
 
     exporter.scale = exporter.calculateScaleForWidth(
