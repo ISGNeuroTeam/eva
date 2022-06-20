@@ -363,6 +363,7 @@ export default class ChartClass {
       if (barplotType === 'divided') {
         this.addDividedBarplots(num, groups, subgroups, groupHeight);
       } else {
+        groupBarplotMetrics.reverse();
         try {
           this.addBarplots(num, groups, groupBarplotMetrics, groupHeight);
         } catch (err) {
