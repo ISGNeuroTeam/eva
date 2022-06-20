@@ -15,6 +15,10 @@
               class="data-name"
               :style="{color: theme.$main_text}"
             >{{ index+1 }}. {{ element.name }}:</span>
+            <icon-select
+              v-model="element.icon"
+              class="mr-5"
+            />
             <div
               v-if="element.type === 'modal'"
               class="data-modal"
@@ -161,11 +165,13 @@ import {
 } from '@mdi/js';
 import draggable from 'vuedraggable';
 import settings from '../../js/componentsSettings';
+import IconSelect from '../iconSelect.vue';
 
 export default {
   name: 'TitleAtionSelect',
   components: {
     draggable,
+    IconSelect,
   },
   props: {
     items: {
@@ -210,10 +216,16 @@ export default {
       return this.$store.getters.getTheme;
     },
     tools() {
-      return settings.tools.map((tool) => ({
-        text: tool.name,
-        value: tool.type,
-      }));
+      return settings.tools
+        .filter(
+          (elem) => !settings.excludes.fromTitleActions.some(
+            (item) => item === elem.type,
+          ),
+        )
+        .map((tool) => ({
+          text: tool.name,
+          value: tool.type,
+        }));
     },
     idDash() {
       return this.$route.params.id;
@@ -305,7 +317,7 @@ export default {
 
         &__actions {
           display: flex;
-          justify-content: end;
+          justify-content: flex-end;
           flex-shrink: 0;
         }
       }

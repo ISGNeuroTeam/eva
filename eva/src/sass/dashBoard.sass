@@ -59,7 +59,6 @@ $transition: all 0.4s ease
 //                     font-weight: bold
 
 .dash-layout, .full-screen-dialog
-    width: 100%
     height: 100%
     // opacity: 0
     //visibility: hidden
@@ -147,6 +146,14 @@ $transition: all 0.4s ease
                         &--pointer
                             cursor: pointer
 
+                        &--view
+                            font-size: 12px
+                            letter-spacing: 1.25px
+                            white-space: nowrap
+                            text-overflow: ellipsis
+                            text-transform: uppercase
+                            font-weight: normal
+
                     .dash-edit-title
                         padding: 0
                         margin: 0
@@ -190,10 +197,11 @@ $transition: all 0.4s ease
                     transition: all 0.4s ease
                     // transform: translateX(200px)
 
-                    .pencil
+                    .icon
                         cursor: pointer
                         width: 20px
                         height: 20px
+                        margin-right: 10px
 
                     .check
                         cursor: pointer
@@ -222,7 +230,6 @@ $transition: all 0.4s ease
                         margin-left: 10px
 
                     .option
-                        margin-left: 10px
                         width: 20px
                         height: 20px
 
@@ -421,6 +428,12 @@ $transition: all 0.4s ease
 
                     .settings-dash
 
+                        .icon
+                            cursor: pointer
+                            width: 25px
+                            height: 25px
+                            margin-right: 15px
+
                         .pencil
                             cursor: pointer
                             width: 25px
@@ -453,7 +466,11 @@ $transition: all 0.4s ease
                             margin-left: 15px
 
                         .option
-                            margin-left: 15px
+                            width: 25px
+                            height: 25px
+
+                        .expand
+                            margin-right: 15px
                             width: 25px
                             height: 25px
 
@@ -504,6 +521,12 @@ $transition: all 0.4s ease
 
                     .settings-dash
 
+                        .icon
+                            cursor: pointer
+                            width: 15px
+                            height: 15px
+                            margin-right: 5px
+
                         .pencil
                             cursor: pointer
                             width: 15px
@@ -536,7 +559,11 @@ $transition: all 0.4s ease
                             margin-left: 5px
 
                         .option
-                            margin-left: 5px
+                            width: 15px
+                            height: 15px
+
+                        .expand
+                            margin-right: 5px
                             width: 15px
                             height: 15px
 

@@ -3,6 +3,9 @@ import './fonts.css';
 import './scroll.css';
 import './scss/globalStyles.scss';
 
+// Подключаем кастомный мконочный шрифт
+import './fonts/eva-iconfont/style.css';
+
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 import PortalVue from 'portal-vue';
 import AsyncComputed from 'vue-async-computed';
@@ -126,6 +129,8 @@ Vue.component('dash-constructorSchemes', () => import('./components/dashBoardIns
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
 Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
+// компонент Menu
+Vue.component('dash-menu', () => import('./components/dashBoardInside/dashMenu.vue'));
 // блок экспорта импорта
 // Vue.component('block-exim', () => import('./components/blockExim.vue'))
 // элемнет поиска пока не актуален

@@ -343,7 +343,7 @@ class MapClass {
     this.layerGroup[element.type].addLayer(marker);
   }
 
-  drawMarkerSVG({ lib, element }) {
+  drawMarkerSVG({ lib, element, callback }) {
     const icon = L.icon({
       iconUrl: `${window.location.origin}/svg/${lib.image}`,
       iconSize: [lib.width, lib.height],
@@ -360,6 +360,9 @@ class MapClass {
         permanent: false,
         direction: 'top',
         className: 'leaftet-hover',
+      })
+      .on('click', () => {
+        callback(element.ID);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
@@ -449,16 +452,16 @@ class MapClass {
     }
   }
 
-  addMarker(element, lib) {
+  addMarker({ element, lib, callback }) {
     const type = MapClass.getElementDrawType(lib);
     if (type === 'SVG') {
-      this.drawMarkerSVG({ lib, element });
+      this.drawMarkerSVG({ lib, element, callback });
     } else {
       this.drawMarkerHTML({ lib, element });
     }
   }
 
-  drawObjects(dataRest, pipelineDataDictionary) {
+  drawObjects({ dataRest, pipelineDataDictionary, callback }) {
     dataRest.forEach((item) => {
       if (
         item?.type !== null
@@ -475,7 +478,7 @@ class MapClass {
             this.startingPoint = [coord[0], coord[1]];
           }
           if (item.geometry_type?.toLowerCase() === 'point') {
-            this.addMarker(item, lib);
+            this.addMarker({ element: item, lib, callback });
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
             this.addLine(item, lib, pipelineDataDictionary[item.ID]);
@@ -571,6 +574,7 @@ class MapClass {
   }
 
   remove() {
+    this.map.off();
     this.map.remove();
   }
 
