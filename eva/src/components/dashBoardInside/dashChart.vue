@@ -228,7 +228,7 @@ export default {
       const { width, height } = sizeFrom;
       return {
         width: Math.round(width - 42),
-        height: Math.round(height - 55) - 60,
+        height: Math.round(height - 55) - 30,
       };
     },
 
@@ -362,8 +362,8 @@ export default {
       this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
     },
     updateBox() {
-      const { height } = this.box;
-      this.chart.updateBox(this.$refs.svgContainer.offsetWidth, height);
+      const { width, height } = this.box;
+      this.chart.updateBox(width, height);
     },
     openSettingsForMetric(metric, nGroup, nMetric) {
       const panelMetric = [];

@@ -236,11 +236,13 @@ export default {
     },
     fullScreenMode() {
       this.$nextTick(() => {
+        this.map.remove();
+        this.map = null;
         this.init();
       });
     },
     sizeFrom(val, oldVal) {
-      if (JSON.stringify(val) !== JSON.stringify(oldVal)) {
+      if (this.map && JSON.stringify(val) !== JSON.stringify(oldVal)) {
         this.map.resize();
       }
     },
@@ -358,10 +360,12 @@ export default {
       if (this.map) {
         this.reDrawMap(this.dataRestFrom);
         this.$nextTick(() => {
-          if (this.map && this.library?.objects) {
-            this.$refs.setting.creationLayer();
-            this.$refs.setting.addLayer();
-          }
+          this.$nextTick(() => {
+            if (this.map && this.library?.objects) {
+              this.$refs.setting.creationLayer();
+              this.$refs.setting.addLayer();
+            }
+          });
         });
       }
     },
@@ -418,7 +422,7 @@ export default {
           // получаем osm server
           this.getOSM();
           // получаем библиотеку
-          // get all icons that we need on map
+          // get all icons that we need on maps
           this.generateLibrary(dataRest, this.options?.primitivesLibrary);
           if (this.library?.objects) {
             Object.keys(this.library.objects).forEach((item) => {
@@ -432,10 +436,13 @@ export default {
             // создаем элемент карты
             this.map.createMap(this.maptheme);
             // рисуем объекты на карте
-            this.map.drawObjects(
+            this.map.drawObjects({
               dataRest,
-              this.pipelineDataDictionary,
-            );
+              pipelineDataDictionary: this.pipelineDataDictionary,
+              callback: (id) => {
+                this.setClick(id);
+              },
+            });
             if (this.map) {
               if (this.options.initialPoint) {
                 this.map.setView(
@@ -567,6 +574,51 @@ export default {
           this.map.resize();
         }
       });
+    },
+
+    setClick(tokenValue) {
+      const events = this.getEvents({
+        event: 'onclick',
+        partelement: 'empty',
+      });
+      if (events.length !== 0) {
+        events.forEach((item) => {
+          if (item.action === 'go') {
+            item.value[0] = tokenValue;
+            this.$store.dispatch('letEventGo', {
+              event: item,
+              id: this.element,
+              idDash: this.idDash,
+              route: this.$router,
+              store: this.$store,
+            });
+          }
+        });
+      }
+    },
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+            && item.element === this.element
+            && item.partelement === partelement
+        ));
+      } else {
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+                && item.target === this.element,
+        );
+      }
+      return result;
     },
   },
 };

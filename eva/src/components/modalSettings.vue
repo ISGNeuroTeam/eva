@@ -1055,11 +1055,13 @@ export default {
       if (!this.element) {
         return [];
       }
+      const { commonOptions } = settings;
       const [elem] = this.element.split('-');
       if (elem) {
-        return this.optionsByComponents[elem] || [];
+        const componentsOptions = this.optionsByComponents[elem] || [];
+        return [...commonOptions, ...componentsOptions];
       }
-      return [];
+      return commonOptions;
     },
     changeComponent() {
       return `${this.idDash}-${this.element}`;
@@ -1089,6 +1091,9 @@ export default {
     },
     istitleActions() {
       return this.dashFromStore.elements.find((elem) => elem === this.element);
+    },
+    isDashBoard() {
+      return this.$route.meta?.isDashboard;
     },
   },
   watch: {
@@ -1179,7 +1184,6 @@ export default {
     },
     // отправляем настройки в хранилище
     async setOptions() {
-      // this.prepareUnitedSettingsBeforeSave();
       if (!this.options.level) {
         this.$set(this.options, 'level', 1);
       }
@@ -1342,11 +1346,13 @@ export default {
               });
               return show;
             }
-            return !!this.options[item];
+            return this.options[item] === 0 || !!this.options[item];
           });
           if (res.length !== relation.length) {
             return false;
           }
+        } else if (typeof relation === 'function') {
+          return relation.bind(this)();
         } else if (!this.options[relation]) {
           return false;
         }
@@ -1387,34 +1393,6 @@ export default {
     },
     deleteMetrics(i) {
       this.metrics.splice(i, 1);
-    },
-    prepareUnitedSettingsBeforeSave() {
-      const metricNames = this.metrics.map((item) => item.name);
-
-      // clear colors
-      if (this.color) {
-        Object.keys(this.color).forEach((name) => {
-          if (!metricNames.includes(name)) {
-            delete this.color[name];
-          }
-        });
-      }
-
-      // clear metricTypes
-      if (this.multilineYAxesBinding.metricTypes) {
-        Object.keys(this.multilineYAxesBinding.metricTypes).forEach((name) => {
-          if (!metricNames.includes(name)) {
-            delete this.multilineYAxesBinding.metricTypes[name];
-          }
-        });
-      }
-      if (this.type_line && typeof this.type_line === 'object') {
-        Object.keys(this.type_line).forEach((name) => {
-          if (!metricNames.includes(name)) {
-            delete this.type_line[name];
-          }
-        });
-      }
     },
     getSettingsByPath() {
       this.$store.commit('prepareSettingsStore', {
@@ -1458,7 +1436,7 @@ export default {
 
           if (this.element.startsWith('multiLine')) {
             if (options.yAxesBinding) {
-              //     // поддержка старой структуры сохраненных настроек
+              // поддержка старой структуры сохраненных настроек
               if (!options.metricTypes) {
                 if (options.yAxesBinding.metrics) {
                   options.metricsAxis = options.yAxesBinding.metrics;
@@ -1572,7 +1550,17 @@ export default {
                   : options[item];
               }
             } else {
-              const propsToFalse = ['multiple', 'underline', 'onButton', 'pinned'];
+              const propsToFalse = [
+                'panelNameHide',
+                'panelIconUpdate',
+                'panelBackHide',
+                'panelIconDownload',
+                'panelIconFullscreen',
+                'multiple',
+                'underline',
+                'onButton',
+                'pinned',
+              ];
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;
               } else if (item === 'showlegend') {

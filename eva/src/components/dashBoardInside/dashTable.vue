@@ -129,7 +129,7 @@
                         `background-color: ${item.columnColor[text]}`)
                   "
                 >
-                  {{ item[text] }}
+                  <span>{{ item[text] }}</span>
                 </td>
               </template>
             </tr>
