@@ -385,6 +385,7 @@ export default class ChartClass {
     // add lines charts
     groupMetrics
       .filter((metric) => metric.type === 'line')
+      .reverse()
       .forEach((metric) => {
         this.addZeroLine(chartGroup, metric);
         this.addPath(chartGroup, metric, height, num);
