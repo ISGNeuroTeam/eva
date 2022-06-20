@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- Fixed zooming of a multiline in the Data Research 2.0
 - The order of rendering lines on the multiline has also been changed
 
 ## [1.95.0]
