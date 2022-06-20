@@ -42,9 +42,9 @@ export default {
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
-    { name: 'Ползунок', img: mdiTuneVertical, type: 'tune' },
-    { name: 'Накопитель', img: mdiTuneVertical, type: 'accumulators' },
-    { name: 'Меню', img: mdiTuneVertical, type: 'menu' },
+    { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
+    { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
+    { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'scale' },
   ],
   size: {
@@ -151,9 +151,9 @@ export default {
     map: mdiMapMarker,
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
-    tune: mdiTuneVertical,
-    accumulators: mdiTuneVertical,
-    menu: mdiTuneVertical,
+    tune: 'eva-basic_slider_01',
+    accumulators: 'eva-chart_bar_chart_horizontal',
+    menu: 'eva-edit_list_checklist',
     scale: mdiImageFilterTiltShift,
   },
   commonOptions: [
@@ -192,7 +192,13 @@ export default {
       'lastResult',
       'titles',
     ],
-    select: ['boxShadow', 'multiple'],
+    select: [
+      'boxShadow',
+      'multiple',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
+    ],
     picker: [],
     graph: ['boxShadow'],
     single: [
@@ -212,12 +218,15 @@ export default {
     ],
     textarea: [
       'searchBtn',
+      'textFontSize',
+      'fontWeight',
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
       'validationGroup',
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
-      'textFontSize',
-      'fontWeight',
     ],
     guntt: ['timeFormat'],
     tile: ['widthTile', 'heightTile'],
@@ -238,7 +247,11 @@ export default {
       'detailValue',
     ],
     singleValue: [],
-    tune: [],
+    tune: [
+      'defaultFromSourceData',
+      'defaultSourceDataField',
+      'defaultSourceDataUpdates',
+    ],
     accumulators: [
       'boxShadow',
       'metrics',
@@ -249,7 +262,7 @@ export default {
       'metrics',
       'fillColor',
     ],
-    scale: ['visible', 'level', 'pinned'],
+    scale: [],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -257,6 +270,9 @@ export default {
     {
       group: 'Основные настройки',
       option: 'panelSettings',
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -264,6 +280,9 @@ export default {
       description: 'скрыть название панели',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -271,6 +290,9 @@ export default {
       description: 'возможность вручную обновить данные',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -278,6 +300,9 @@ export default {
       description: 'скрыть фон панели',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -285,6 +310,9 @@ export default {
       description: 'возможность скачать результаты',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       optionGroup: 'panelSettings',
@@ -292,6 +320,9 @@ export default {
       description: 'возможность раскрывать на весь экран',
       elem: 'switch',
       default: false,
+      relation() {
+        return this.isDashBoard;
+      },
     },
     {
       group: 'Дополнительные настройки',
@@ -341,6 +372,47 @@ export default {
       description: 'Установить насыщенности текста',
       elem: 'select',
       items: [100, 200, 400, 500, 800],
+    },
+    {
+      relation() {
+        return !!this.$store.state[this.idDash].searches;
+      },
+      option: 'defaultFromSourceData',
+      description: 'Дефолтное значение из источника данных',
+      elem: 'select',
+      default: null,
+      items() {
+        if (this.$store.state[this.idDash]?.searches) {
+          return [];
+        }
+        const sourceDataList = this.$store.state[this.idDash].searches
+          .map(({ id, sid }) => ({
+            value: id,
+            text: sid,
+          }));
+        return [
+          {
+            value: null,
+            text: '-- Не использовать --',
+          },
+          ...sourceDataList,
+        ];
+      },
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataField',
+      description: 'Поле для дефолтного значения из ИД',
+      elem: 'text-field',
+      default: 'value',
+      placeholder: 'Default: value',
+    },
+    {
+      relation: ['defaultFromSourceData'],
+      option: 'defaultSourceDataUpdates',
+      description: 'Обновлять значение компонента при изменениях в ИД для дефолтного значения',
+      elem: 'switch',
+      default: false,
     },
     {
       group: 'Валидация',
@@ -654,6 +726,7 @@ export default {
     ],
     fromDataSearches: [
       'menu',
+      'picker',
     ],
   },
 };

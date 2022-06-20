@@ -78,6 +78,7 @@
             :vertical-cell="verticalCell"
             :search-data="getElementData(elem)"
             :data-source-id="elem.search"
+            :data-sources="dataObject"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"

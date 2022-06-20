@@ -228,7 +228,7 @@
                   }"
                 >
                   <v-card-title
-                    v-show="props.disappear && !getOptions.panelNameHide"
+                    v-show="props.disappear"
                     class="card-title open_title"
                   >
                     <div class="name-dash">
@@ -472,7 +472,7 @@
         class="loading-block"
       >
         <div
-          v-show="props.disappear && !getOptions.panelNameHide"
+          v-show="props.disappear"
           :style="{ borderColor: theme.$main_border, opacity: '0.2' }"
           class="loading-divider"
           :class="{ loading: loading, noBorder: !dataMode }"
@@ -510,6 +510,7 @@
         :id-dash-from="idDash"
         :data-rest-from="searchData"
         :data-mode-from="dataMode"
+        :data-sources="dataSources"
         :loading="loading"
         :time-format-from="props.timeFormat"
         :size-tile-from="props.sizeTile"
@@ -609,6 +610,10 @@ export default {
     tooltipOpenDelay: {
       type: Number,
       default: 500,
+    },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
     },
   },
   data() {
