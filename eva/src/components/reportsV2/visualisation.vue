@@ -65,7 +65,7 @@
             {{ mdiMagnifyMinusOutline }}
           </v-icon>
         </template>
-        <span>aboutElem.multiLine.show</span>
+        <span>Убрать зум</span>
       </v-tooltip>
       <v-tooltip
         bottom
