@@ -484,6 +484,8 @@ export default {
         essence,
         subessence,
       });
+      this.selectedToAdd = userListAdded;
+      this.toRemove = [];
     },
     addSelected() {
       const { essence } = this;

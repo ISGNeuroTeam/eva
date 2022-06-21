@@ -295,8 +295,10 @@ export default {
             clearTimeout(timeOut);
             table = document.querySelector(`[data-id="${i}"]`);
             table.addEventListener('mouseover', (event) => {
-              if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
+              const elem = event.target.tagName.toLowerCase();
+              const icon = event.target.parentElement.closest('td');
+              if (elem === 'td' || icon) {
+                event.target.parentElement.closest('tr').style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
               }
             });
             table.addEventListener('mouseout', (event) => {
