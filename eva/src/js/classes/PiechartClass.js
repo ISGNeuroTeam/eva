@@ -161,7 +161,7 @@ export default class PiechartClass {
     this.getPiechart.selectAll('.piepart')
       .each((_, i, nodes) => {
         const node = nodes[i];
-        if (i === legendLineIndex && selectedPieIndex === -1) {
+        if (i === legendLineIndex && selectedPieIndex !== -1) {
           node.classList.add('piepartSelect');
         } else if (
           node.classList.contains('piepartSelect')

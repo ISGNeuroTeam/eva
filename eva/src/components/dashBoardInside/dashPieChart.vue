@@ -480,12 +480,12 @@ export default {
       }
     },
     activateLegend(idx) {
-      this.piechart.activetetPiepart(this.selectedPie, idx);
       if (this.selectedPie === idx) {
         this.selectedPie = -1;
       } else {
         this.selectedPie = idx;
       }
+      this.piechart.activetetPiepart(this.selectedPie, idx);
     },
 
     createPieChart(
