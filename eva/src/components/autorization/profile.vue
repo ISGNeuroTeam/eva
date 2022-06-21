@@ -127,6 +127,7 @@
     </v-content>
     <footer-bottom />
     <modal-profile
+      v-if="activeModal"
       v-model="activeModal"
       :create="createSome"
       :key-from="keyFrom"

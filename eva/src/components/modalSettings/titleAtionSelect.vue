@@ -317,7 +317,7 @@ export default {
 
         &__actions {
           display: flex;
-          justify-content: end;
+          justify-content: flex-end;
           flex-shrink: 0;
         }
       }

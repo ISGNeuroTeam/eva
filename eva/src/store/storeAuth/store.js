@@ -7,7 +7,6 @@ export default {
   },
   mutations: {
     setEssence(state, data) {
-      console.log(data);
       state.essence = structuredClone(data);
     },
   },

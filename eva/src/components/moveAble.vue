@@ -30,6 +30,7 @@
       :loading="loading"
       :search-data="searchData"
       :data-source-id="dataSourceId"
+      :data-sources="dataSources"
       @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
@@ -78,6 +79,10 @@ export default {
       type: [String, Number],
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -113,12 +118,9 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDash];
     },
-    getDragRes() {
-      return this.dashFromStore.dragRes;
-    },
     dragRes() {
-      const dragRes = this.getDragRes;
-      return dragRes;
+      const { dragRes } = this.dashFromStore;
+      return dragRes && dragRes !== 'false';
     },
     headerTop() {
       if (document.body.clientWidth <= 1400) {

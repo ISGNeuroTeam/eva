@@ -104,7 +104,7 @@
           class="table-profile-block"
         >
           <v-data-table
-            v-model="selectedtToAdd"
+            v-model="selectedToAdd"
             :style="{
               background: theme.$main_bg,
               color: theme.$main_text,
@@ -113,7 +113,7 @@
             hide-default-header
             :no-data-text="alldata[essence][subessence].nodata"
             :headers="alldata[essence][`all${subessence}`].titles"
-            :items="alldata[essence][`all${subessence}`].data"
+            :items="fullData"
             item-key="name"
             show-select
             :search="searchText"
@@ -125,7 +125,7 @@
             small
             :color="theme.$primary_button"
             class="control-btn-itself"
-            @click="addSelected(subessence)"
+            @click="addSelected()"
           >
             {{ alldata[essence][`${subessence}DeleteName`].del2 }}
           </v-btn>
@@ -361,32 +361,31 @@ export default {
         indexs: 'Индексы не выбраны',
         dashs: 'Дашборды не выбраны',
       },
+      added: null,
+      selected: null,
     };
   },
   computed: {
+    fullData() {
+      return this.translateToObj(this.dataFrom[this.subessence]);
+    },
     data() {
       return this.translateToObj(this.dataFrom?.data?.[this.subessence]);
     },
-    selectedtToAdd: {
+    selectedToAdd: {
       get() {
-        const subessence = this.alldata[this.essence][this.subessence];
-        const allSubessence = this.alldata[this.essence][`all${this.subessence}`];
-        console.log(subessence.data, allSubessence.selected);
-        return allSubessence.selected?.length ? allSubessence.selected : subessence.data;
+        return this.selected ? this.selected : this.userListAdded;
       },
       set(newVal) {
-        this.alldata[this.essence][`all${this.subessence}`].selected = structuredClone(newVal);
+        this.selected = structuredClone(newVal);
       },
     },
     userListAdded: {
       get() {
-        if (!this.dataFrom) return {};
-        return this.alldata[this.essence][this.subessence].data?.length
-          ? this.alldata[this.essence][this.subessence].data
-          : this.data;
+        return this.added ? this.added : this.data;
       },
       set(newVal) {
-        this.alldata[this.essence][this.subessence].data = structuredClone(newVal);
+        this.added = structuredClone(newVal);
       },
     },
     active() {
@@ -449,7 +448,6 @@ export default {
           data: this.userListAdded,
         };
       }
-      console.log('deadula data', this.data);
       this.alldata[essence][`all${subessence}`] = {
         selected: [],
         nodata: this.noneText[subessence],
@@ -486,20 +484,21 @@ export default {
         subessence,
       });
     },
-    addSelected(subj) {
+    addSelected() {
       const { essence } = this;
       const { subessence } = this;
-      const added = this.alldata[essence][`all${subj}`].selected.map((item) => item.name);
-      const already = this.alldata[essence][subj].data.map((item) => item.name);
-      this.alldata[essence][`all${subj}`].data.forEach((item) => {
-        if (added.includes(item.name) && !already.includes(item.name)) {
-          this.alldata[essence][subj].data.push(item);
-        }
-      });
-      this.alldata[essence][`all${subj}`].selected = [];
-      this.alldata[essence].tab[subj] = 'tab-1';
+      console.log('this.userListAdded', this.userListAdded);
+      const toAdd = !this.userListAdded.length
+        ? this.selectedToAdd
+        : this.selectedToAdd.filter(
+          (selected) => !this.userListAdded.some((item) => item.name === selected.name),
+        );
+      console.log('toAdd', toAdd);
+      this.userListAdded.push(...toAdd);
+      console.log('this.userListAdded', this.userListAdded);
+      this.alldata[essence].tab[subessence] = 'tab-1';
       this.$emit('changeData', {
-        data: this.translateToArray(this.alldata[essence][subj].data),
+        data: this.translateToArray(this.userListAdded),
         essence,
         subessence,
       });

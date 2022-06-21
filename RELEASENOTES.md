@@ -1,3 +1,33 @@
+# [1.95.0]
+
+### Added
+- Added new picker button to dash picker
+- Added general settings for panels
+- Added the ability to hide the name of the panel
+- Added the ability to update the source data by the panel icon
+- Added the ability to hide the background color on panels
+- Added the ability to add a download icon to the panel
+- Added a setting for hiding/displaying a full-screen icon on panels
+- Removed the limits on 1000 rows in the Data Research 2.0 ¹
+- Added the ability to configure the source data for the default component value
+
+### Fixed
+- Fixed the datepicker visualisation
+- Changed icons for menu, tune and accumulators visualisations
+- Fixed dashboard save edit/drag/resize state
+- Fixed text color in code editor in the Data Research 2.0 if selected custom color theme 
+- Fixed resizing UI dashes without background
+- When selecting an area on the multiline, a tooltip is displayed on the barplots
+- Fixed spaces around text in tokens from table
+- Fixed loading bar
+- Fixed the save dashboard dialog has no frame
+- Updated drawing of points on multi-line lines
+- Fixed fullscreen multiline
+
+#### ¹⁾ Removed the limits on 1000 rows in the Data Research 2.0
+- Minimum required ot-simple-rest version: v1.12.0
+- It is necessary to set the same limit on the number of events in ot-simple-rest and in Apache Spark dispatcher
+
 # [1.94.0]
 
 ### Added
