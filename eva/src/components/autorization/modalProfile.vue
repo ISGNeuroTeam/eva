@@ -415,7 +415,6 @@ export default {
     dataRest: {
       get() {
         const essence = this.$store.getters['auth/essence'];
-        console.log('userFrom', this.userFrom);
         return this.changedData ? this.changedData : essence;
       },
       set(newVal) {
@@ -480,10 +479,12 @@ export default {
         });
 
         const result = await Promise.all(promise);
+
         result.forEach((item, i) => {
           allData[keys[i]] = item;
         });
-
+        allData.data = {};
+        this.$store.commit('auth/setEssence', allData);
         return allData;
       }
       let result;
@@ -496,6 +497,7 @@ export default {
       return result;
     },
     cancelModal(isClearChanges = true) {
+      this.$store.commit('auth/dropEssence');
       this.$emit('cancelModal', isClearChanges);
     },
     showErrorMsg(msg, color) {
@@ -510,7 +512,6 @@ export default {
       let method = 'POST';
       const formData = {}; // формируем объект для передачи RESTу
       let sameMsg = '';
-      console.log(this.keyFrom);
       switch (this.keyFrom) {
         case 1:
           formData.id = this.userFrom.id;
@@ -518,7 +519,6 @@ export default {
           this.msg = 'Пароль не может быть пустым';
           if (act === true) {
             method = 'POST';
-            console.log(this.userData);
             if (!this.userData.pass || this.userData.pass.length === 0) {
               this.showErrorMsg(
                 'Логин или пароль не могут быть пустыми',
@@ -619,17 +619,20 @@ export default {
         default:
           break;
       }
-      console.log('this.dataRest', this.dataRest, formData);
       if (Object.keys(this.dataRest.data).length !== 0) {
         const essence = this.dataRest.data;
         Object.keys(essence).forEach((item) => {
-          if (Array.isArray(essence[item]) && essence[item].length !== 0) {
-            essence[item].forEach((itemEs) => {
-              if (!formData[item]) {
-                formData[item] = [];
-              }
-              formData[item].push(itemEs);
-            });
+          if (Array.isArray(essence[item])) {
+            if (essence[item].length !== 0) {
+              essence[item].forEach((itemEs) => {
+                if (!formData[item]) {
+                  formData[item] = [];
+                }
+                formData[item].push(itemEs);
+              });
+            } else {
+              formData[item] = [];
+            }
           }
         });
       }

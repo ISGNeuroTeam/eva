@@ -50,7 +50,7 @@
           class="table-profile-block"
         >
           <v-data-table
-            v-model="alldata[essence][subessence].selected"
+            v-model="toRemove"
             :style="{
               background: theme.$main_bg,
               color: theme.$main_text,
@@ -71,7 +71,7 @@
             small
             :color="theme.$primary_button"
             class="control-btn-itself"
-            @click="deleteSelected(subessence)"
+            @click="deleteSelected()"
           >
             {{ alldata[essence][`${subessence}DeleteName`].del1 }}
           </v-btn>
@@ -362,7 +362,8 @@ export default {
         dashs: 'Дашборды не выбраны',
       },
       added: null,
-      selected: null,
+      toAdd: null,
+      toRemove: [],
     };
   },
   computed: {
@@ -374,10 +375,10 @@ export default {
     },
     selectedToAdd: {
       get() {
-        return this.selected ? this.selected : this.userListAdded;
+        return this.toAdd ? this.toAdd : this.userListAdded;
       },
       set(newVal) {
-        this.selected = structuredClone(newVal);
+        this.toAdd = structuredClone(newVal);
       },
     },
     userListAdded: {
@@ -470,16 +471,16 @@ export default {
       }
       return [];
     },
-    deleteSelected(subj) {
+    deleteSelected() {
       const { essence } = this;
       const { subessence } = this;
-      const deleted = this.alldata[essence][subj].selected.map((item) => item.name);
-
-      this.alldata[essence][subj].data = this.alldata[essence][subj].data
-        .filter((item) => !deleted.includes(item.name));
-      this.alldata[essence][subj].selected = [];
+      const userListAdded = this.userListAdded.filter(
+        (item) => !this.toRemove.some(
+          (toRemoveItem) => toRemoveItem.name === item.name,
+        ),
+      );
       this.$emit('changeData', {
-        data: this.translateToArray(this.alldata[essence][subj].data),
+        data: this.translateToArray(userListAdded),
         essence,
         subessence,
       });
@@ -487,15 +488,12 @@ export default {
     addSelected() {
       const { essence } = this;
       const { subessence } = this;
-      console.log('this.userListAdded', this.userListAdded);
       const toAdd = !this.userListAdded.length
         ? this.selectedToAdd
         : this.selectedToAdd.filter(
           (selected) => !this.userListAdded.some((item) => item.name === selected.name),
         );
-      console.log('toAdd', toAdd);
       this.userListAdded.push(...toAdd);
-      console.log('this.userListAdded', this.userListAdded);
       this.alldata[essence].tab[subessence] = 'tab-1';
       this.$emit('changeData', {
         data: this.translateToArray(this.userListAdded),

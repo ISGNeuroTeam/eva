@@ -9,6 +9,9 @@ export default {
     setEssence(state, data) {
       state.essence = structuredClone(data);
     },
+    dropEssence(state) {
+      state.essence = structuredClone({});
+    },
   },
   actions: {
     deleteLog: () => rest.deleteLog(),
