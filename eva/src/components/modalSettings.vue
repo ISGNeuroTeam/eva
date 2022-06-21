@@ -1207,11 +1207,6 @@ export default {
         if (this.colorsPie.nametheme) {
           this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            // this.$set(
-            //   this.themes,
-            //   this.colorsPie.nametheme,
-            //   this.colorsPie.colors.split(' '),
-            // );
             this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
             this.$store.commit('setState', [
               {

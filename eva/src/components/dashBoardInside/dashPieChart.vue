@@ -32,13 +32,6 @@
       >
         Наведите курсор на график
       </div>
-
-      <!--      <div-->
-      <!--        v-show="dataLoading || !dataRestFrom.length"-->
-      <!--        class="mt-4"-->
-      <!--      >-->
-      <!--        <p>Нет данных для отображения</p>-->
-      <!--      </div>-->
       <div
         v-show="!dataLoading && !!dataRestFrom.length"
         class="piechart-legend-block"
