@@ -1229,6 +1229,7 @@ export default {
             this.$set(this.colorsPie, 'theme', this.colorsPie.nametheme);
           }
           this.$set(this.options, 'themes', this.themes);
+          this.them = JSON.parse(JSON.stringify(this.themes));
         }
         this.$set(this.options, 'pieType', this.pieType);
       }
@@ -1329,8 +1330,7 @@ export default {
     // если нажали на отмену создания
     checkOnCancel() {
       if (this.isDelete) {
-        this.themes = { ...this.themes, ...this.them };
-        this.them = {};
+        this.themes = JSON.parse(JSON.stringify(this.them));
         this.$set(this.options, 'themes', this.themes);
         this.$store.commit('setState', [
           {
@@ -1524,6 +1524,7 @@ export default {
               } else if (item === 'themes') {
                 this.themesArr = Object.keys(options[item]);
                 this.themes = options[item];
+                this.them = JSON.parse(JSON.stringify(this.themes));
               } else if (item === 'titles') {
                 let val = options[item];
                 if (!val) {
@@ -1624,7 +1625,6 @@ export default {
       this.$set(this.colorsPie, 'colors', this.themes[nextTheme].join(' '));
       this.$set(this.options, 'colorsPie', this.colorsPie);
       this.$set(this.options, 'themes', this.themes);
-      this.them = { [theme]: this.themes[theme] };
       delete this.themes[theme];
       this.isDelete = true;
     },
@@ -1639,7 +1639,6 @@ export default {
         },
       ]);
       this.isDelete = false;
-      this.them = {};
     },
   },
 };
