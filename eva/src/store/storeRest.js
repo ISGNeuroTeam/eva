@@ -170,33 +170,34 @@ export default {
 
                     const dataProm = resultProm
                       .map((prom, i) => new Promise((resultPromResolve) => {
-                        const allDataLocal = [];
 
                         prom.text().then((dataitself) => {
                           if (shema === i) {
                             shema = dataitself;
                           }
+                          // eslint-disable-next-line no-shadow
+                          const result = [];
                           // все это потому что там не совсем json,
                           // а строка состоящая из строка в json
                           dataitself.split('\n').forEach((dataPeace) => {
                             if (dataPeace !== '') {
                               try {
-                                allDataLocal.push(JSON.parse(dataPeace));
+                                result.push(JSON.parse(dataPeace));
                               } catch (error) {
                                 console.error(error);
                               }
                             }
                           });
-                          resultPromResolve(allDataLocal);
+                          resultPromResolve(result);
                         });
                       }));
 
                     resultProm = await Promise.all(dataProm);
-                    let resolveData = [];
+                    const resolveData = [];
 
                     resultProm.forEach((item) => {
                       if (item.length !== 0) {
-                        resolveData = [...item];
+                        resolveData.push(...item);
                       }
                     });
 
