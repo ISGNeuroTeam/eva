@@ -70,7 +70,10 @@
                     :items-per-page="15"
                     class="aut-table"
                     :data-id="`${i}`"
-                    :sort-by="['roles']"
+                    :sort-by="sortBy"
+                    :sort-desc="isDesc"
+                    @update:sort-by="sortBy = $event"
+                    @update:sort-desc="isDesc = $event"
                   >
                     <template v-slot:item.color="{ item }">
                       <div
@@ -171,9 +174,15 @@ export default {
       dataDelete: {},
       curItem: {},
       permission: true,
+      sortBy: ['roles'],
+      isDesc: false,
     };
   },
   computed: {
+    userId() {
+      if (!this.$jwt.hasToken()) return null;
+      return this.$jwt.decode().user_id;
+    },
     adminRool() {
       return this.adminRoot;
     },
@@ -351,7 +360,14 @@ export default {
       }
     },
     removeFromList(id) {
-      this.originData = this.originData.filter((item) => item.id !== id);
+      if (id === this.userId) {
+        document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
+        document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
+        this.$store.commit('clearState');
+        this.$router.push('/');
+      } else {
+        this.originData = this.originData.filter((item) => item.id !== id);
+      }
     },
   },
 };

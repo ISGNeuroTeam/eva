@@ -250,7 +250,7 @@
       <div
         class="msg-profile"
         :class="{ openMsg: openMsg }"
-        :style="{ color: colorMsg }"
+        :style="{ color: theme.$error_color }"
       >
         {{ msg }}
       </div>
@@ -457,7 +457,7 @@ export default {
       if (this.create) {
         this.$set(this.userData, 'username', '');
         this.$set(this.userData, 'pass', '');
-        this.$set(this.curItem, 'color', '');
+        this.$set(this.curItem, 'color', '#FF0000');
         this.$set(this.curItem, 'name', '');
       } else {
         this.$set(this.userData, 'username', this.curItemFrom.name);
