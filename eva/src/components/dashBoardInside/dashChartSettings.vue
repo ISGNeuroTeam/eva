@@ -273,7 +273,7 @@
                         </div>
                         <div class="col">
                           <v-text-field
-                            v-if="metric.lastDot >= 1"
+                            v-if="metric.lastDot >= 1 || metric.lastDot === ''"
                             v-model="metric.lastDot"
                             label="Вывод значений"
                             placeholder="Введите число"
@@ -662,7 +662,7 @@ export default {
     openXAxisPanel: null,
     lastDotSearch: '',
     defaultLastDotItems: [
-      { value: '', text: 'Последнее' },
+      { value: '0', text: 'Последнее' },
       { value: '1', text: 'Каждое' },
       { value: 'even', text: 'Четное' },
       { value: 'odd', text: 'Нечетное' },
