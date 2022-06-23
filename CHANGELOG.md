@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to configure the source data for the default component value
 
 ### Fixed
+- Fixed ygraph tooltip position
 - Changed icons for menu, tune and accumulators visualisations 
 - Fixed dashboard save edit state
 - Fixed dashboard save drag/resize state
