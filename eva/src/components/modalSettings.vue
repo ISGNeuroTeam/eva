@@ -1092,6 +1092,9 @@ export default {
     istitleActions() {
       return this.dashFromStore.elements.find((elem) => elem === this.element);
     },
+    isDashBoard() {
+      return this.$route.meta?.isDashboard;
+    },
   },
   watch: {
     options: {
@@ -1204,11 +1207,14 @@ export default {
         if (this.colorsPie.nametheme) {
           this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
-            this.$set(
-              this.themes,
-              this.colorsPie.nametheme,
-              this.colorsPie.colors.split(' '),
-            );
+            this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
+            this.$store.commit('setState', [
+              {
+                object: this.dashFromStore[this.element].options,
+                prop: 'themes',
+                value: this.themes,
+              },
+            ]);
             if (
               this.colorsPie.theme !== 'custom'
               && this.colorsPie.theme !== this.colorsPie.nametheme
@@ -1218,6 +1224,7 @@ export default {
             this.$set(this.colorsPie, 'theme', this.colorsPie.nametheme);
           }
           this.$set(this.options, 'themes', this.themes);
+          this.them = JSON.parse(JSON.stringify(this.themes));
         }
         this.$set(this.options, 'pieType', this.pieType);
       }
@@ -1318,9 +1325,15 @@ export default {
     // если нажали на отмену создания
     checkOnCancel() {
       if (this.isDelete) {
-        this.themes = { ...this.themes, ...this.them };
-        this.them = {};
-        this.options.themes = this.themes;
+        this.themes = JSON.parse(JSON.stringify(this.them));
+        this.$set(this.options, 'themes', this.themes);
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore[this.element].options,
+            prop: 'themes',
+            value: this.themes,
+          },
+        ]);
         this.isDelete = false;
       }
     },
@@ -1343,11 +1356,13 @@ export default {
               });
               return show;
             }
-            return !!this.options[item];
+            return this.options[item] === 0 || !!this.options[item];
           });
           if (res.length !== relation.length) {
             return false;
           }
+        } else if (typeof relation === 'function') {
+          return relation.bind(this)();
         } else if (!this.options[relation]) {
           return false;
         }
@@ -1504,6 +1519,7 @@ export default {
               } else if (item === 'themes') {
                 this.themesArr = Object.keys(options[item]);
                 this.themes = options[item];
+                this.them = JSON.parse(JSON.stringify(this.themes));
               } else if (item === 'titles') {
                 let val = options[item];
                 if (!val) {
@@ -1610,8 +1626,14 @@ export default {
     deleteTheme() {
       this.options.colorsPie = this.colorsPie;
       this.options.themes = this.themes;
+      this.$store.commit('setState', [
+        {
+          object: this.dashFromStore[this.element].options,
+          prop: 'themes',
+          value: this.themes,
+        },
+      ]);
       this.isDelete = false;
-      this.them = {};
     },
   },
 };

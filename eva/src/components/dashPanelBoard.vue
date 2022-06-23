@@ -745,7 +745,10 @@
       <div
         class="block-save"
         :class="{ opensave: opensave }"
-        :style="{ background: theme.$main_bg }"
+        :style="{
+          background: theme.$main_bg,
+          border: `1px solid ${theme.$main_text}`
+        }"
       >
         <div
           v-show="!errorSave"

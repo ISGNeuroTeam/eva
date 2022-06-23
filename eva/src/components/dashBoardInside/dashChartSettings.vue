@@ -226,8 +226,7 @@
                             <v-checkbox
                               v-model="metric.showText"
                               class="d-inline-block"
-                              :disabled="!metric.showPeakDots && metric.type === 'line'"
-                              :label="`Отображение данных ${metric.type==='line'?'к точкам':''}`"
+                              label="Отображать подписи"
                               persistent-placeholder
                               dense
                               outlined
@@ -241,16 +240,14 @@
                               dense
                             >
                               <v-btn
-                                :disabled="(!metric.showText
-                                  || !metric.showPeakDots && metric.type === 'line')"
+                                :disabled="(!metric.showText)"
                                 value="data"
                                 class="ma-0"
                               >
                                 Данные
                               </v-btn>
                               <v-btn
-                                :disabled="(!metric.showText
-                                  || !metric.showPeakDots && metric.type === 'line')"
+                                :disabled="(!metric.showText)"
                                 value="caption"
                                 class="ma-0"
                               >
@@ -265,8 +262,7 @@
                         <div class="col">
                           <v-autocomplete
                             v-model="metric.zerosAfterDot"
-                            :disabled="(!metric.showPeakDots && metric.type === 'line')
-                              || !metric.showText"
+                            :disabled="!metric.showText"
                             :items="zerosAfterDotList"
                             label="Округление значений"
                             persistent-placeholder
@@ -276,21 +272,41 @@
                           />
                         </div>
                         <div class="col">
-                          <v-autocomplete
+                          <v-text-field
+                            v-if="metric.lastDot >= 1"
                             v-model="metric.lastDot"
-                            :disabled="!metric.showPeakDots"
-                            :items="[
-                              { value: '', text: 'Последнее' },
-                              { value: '1', text: 'Каждое' },
-                              { value: 'even', text: 'Четное' },
-                              { value: 'odd', text: 'Нечетное' },
-                              { value: '3', text: 'Каждое 3' },
-                            ]"
+                            label="Вывод значений"
+                            placeholder="Введите число"
+                            persistent-placeholder
+                            dense
+                            outlined
+                            hide-details
+                            clearable
+                            @keyup.prevent="(e) => {
+                              e.target.value = e.target.value.replaceAll(/\D/g, '')
+                            }"
+                            @input="() => {
+                              if (metric.lastDot !== null) {
+                                metric.lastDot = metric.lastDot.replaceAll(/\D/g, '');
+                              }
+                            }"
+                          />
+                          <v-autocomplete
+                            v-else
+                            v-model="metric.lastDot"
+                            :disabled="!metric.showText"
+                            :items="metric.lastDotSearch
+                              ? [
+                                ...defaultLastDotItems,
+                                `${metric.lastDotSearch.replaceAll(/\D/g, '')}`
+                              ]
+                              : defaultLastDotItems"
                             label="Вывод значений"
                             persistent-placeholder
                             dense
                             outlined
                             hide-details
+                            :search-input.sync="metric.lastDotSearch"
                           />
                         </div>
                       </div>
@@ -644,7 +660,15 @@ export default {
     },
     colorPickerInputMode: false,
     openXAxisPanel: null,
-
+    lastDotSearch: '',
+    defaultLastDotItems: [
+      { value: '', text: 'Последнее' },
+      { value: '1', text: 'Каждое' },
+      { value: 'even', text: 'Четное' },
+      { value: 'odd', text: 'Нечетное' },
+      { value: '3', text: 'Каждое 3' },
+      { value: '10', text: 'Указать число' },
+    ],
   }),
   computed: {
     isOpen: {
@@ -822,4 +846,7 @@ export default {
   padding: 0
 .groups-multiline-settings .v-color-picker__controls
   padding: 6px 0
+.theme--light.v-list-item .v-list-item__mask
+  color: rgb(255 255 255)
+  background: #7575756b
 </style>

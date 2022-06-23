@@ -363,6 +363,7 @@ export default class ChartClass {
       if (barplotType === 'divided') {
         this.addDividedBarplots(num, groups, subgroups, groupHeight);
       } else {
+        groupBarplotMetrics.reverse();
         try {
           this.addBarplots(num, groups, groupBarplotMetrics, groupHeight);
         } catch (err) {
@@ -385,6 +386,7 @@ export default class ChartClass {
     // add lines charts
     groupMetrics
       .filter((metric) => metric.type === 'line')
+      .reverse()
       .forEach((metric) => {
         this.addZeroLine(chartGroup, metric);
         this.addPath(chartGroup, metric, height, num);
@@ -717,9 +719,7 @@ export default class ChartClass {
         if (nodes.length === 1) {
           className += ' dot-show';
         } else if (metric.showPeakDots) {
-          if (ChartClass.lastDotParamForPoint(metric.lastDot, i, nodes)) {
-            className += ' dot-show';
-          }
+          className += ' dot-show';
         }
         return className;
       })
@@ -851,7 +851,7 @@ export default class ChartClass {
         this.renderPeakDots(chartGroup, metric, height, num, line);
 
         // add text
-        if (metric.showPeakDots && metric.showText) {
+        if (metric.showText) {
           this.renderPeakTexts(chartGroup, metric, line);
         }
       });
@@ -882,6 +882,7 @@ export default class ChartClass {
     const barWidth = this.bandX.bandwidth();
     const stackedData = d3.stack()
       .keys(groupBarplotMetrics.map((d) => d.name))(this.data);
+    const { length } = this.data;
 
     chartGroup.append('g')
       .selectAll('g')
@@ -922,12 +923,11 @@ export default class ChartClass {
       })
       .attr('width', barWidth)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d[1] - d[0]]))
-      .on('mouseenter', () => this.showTooltip.bind(this))
       .on('mouseleave', () => {
         this.hideTooltip();
         this.hideLineDot();
       })
-      .on('mousemove', (d) => {
+      .on('mouseenter', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);
         let lineYPos = this.y[metric.name](d[1]);
@@ -939,8 +939,9 @@ export default class ChartClass {
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
       })
-      .each(function (d) {
-        if (d[1] !== null && d.metric.showText) {
+      .each(function (d, i) {
+        const showText = ChartClass.lastDotParamForPoint(d.metric.lastDot, i, { length });
+        if (d[1] !== null && d.metric.showText && showText) {
           d3.select(this.parentNode)
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
@@ -968,6 +969,7 @@ export default class ChartClass {
       .padding([0.05]);
 
     const metricByKeys = this.metricByKeys();
+    const { length } = this.data;
 
     chartGroup.append('g')
       .selectAll('g')
@@ -976,13 +978,14 @@ export default class ChartClass {
       .append('g')
       .attr('transform', (d) => `translate(${this.x(d[this.xMetric]) - barWidth / 2},0)`)
       .selectAll('rect')
-      .data((d) => subgroups.map((key) => ({
+      .data((d, i) => subgroups.map((key) => ({
         key,
         value: d[key],
         color: metricByKeys[key].color,
         n: metricByKeys[key].n,
         metric: metricByKeys[key],
         data: d,
+        _pn: i,
       })))
       .enter()
       .append('rect')
@@ -1005,12 +1008,7 @@ export default class ChartClass {
       })
       .attr('fill', (d) => d.color)
       .on('click', (d) => this.clickChart([d.data[this.xMetric], d.value]))
-      .on('mouseenter', () => this.showTooltip.bind(this))
-      .on('mouseleave', () => {
-        this.hideTooltip();
-        this.hideLineDot();
-      })
-      .on('mousemove', (d) => {
+      .on('mouseenter', (d) => {
         const { metric } = d;
         const lineXPos = this.x(d.data[this.xMetric]);
         const lineYPos = this.y[metric.name](d.value);
@@ -1019,9 +1017,16 @@ export default class ChartClass {
         const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
         const tooltipTopPos = lineYPos + (groupHeight * num) + groupsTopOffset;
         this.updateTooltip(d.data, metric, tooltipLeftPos, tooltipTopPos);
+        this.showTooltip();
+      })
+      .on('mouseleave', () => {
+        this.hideTooltip();
+        this.hideLineDot();
       })
       .each(function (d) {
-        if (d.value !== null && d.metric.showText) {
+        // eslint-disable-next-line no-underscore-dangle
+        const showText = ChartClass.lastDotParamForPoint(d.metric.lastDot, d._pn, { length });
+        if (d.value !== null && d.metric.showText && showText) {
           d3.select(this.parentNode)
             .append('text')
             .attr('class', `metric metric-${d.metric.n}`)
