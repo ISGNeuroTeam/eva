@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added otl commands info tooltips
 
 ### Fixed
+
+## [1.96.0]
+
+### Fixed
 - Fixed delete user in profile
 - Fixed datepicker visualisation
 - Fixed zooming of a multiline in the Data Research 2.0
