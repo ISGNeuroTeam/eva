@@ -175,20 +175,19 @@ export default {
                           if (shema === i) {
                             shema = dataitself;
                           }
-                          // eslint-disable-next-line no-shadow
-                          const result = [];
+                          const resultData = [];
                           // все это потому что там не совсем json,
                           // а строка состоящая из строка в json
                           dataitself.split('\n').forEach((dataPeace) => {
                             if (dataPeace !== '') {
                               try {
-                                result.push(JSON.parse(dataPeace));
+                                resultData.push(JSON.parse(dataPeace));
                               } catch (error) {
                                 console.error(error);
                               }
                             }
                           });
-                          resultPromResolve(result);
+                          resultPromResolve(resultData);
                         });
                       }));
 
