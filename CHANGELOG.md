@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed delete user in profile
+- Fixed zooming of a multiline in the Data Research 2.0
+- The order of rendering lines on the multiline has also been changed
+- Fixed selection the default source data in dash settings
+- Fixed piechart visualisation
+- Problem with data increment on request
 
 ## [1.95.0]
 
