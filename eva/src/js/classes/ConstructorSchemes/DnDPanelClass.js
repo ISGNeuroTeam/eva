@@ -79,6 +79,10 @@ export class DragAndDropPanel {
     this.beginDragCallback = null;
   }
 
+  get getMaxItemWidth() {
+    return this.maxItemWidth;
+  }
+
   clearDnDPanel() {
     this.div.querySelectorAll('.dndPanelItem__group').forEach((group) => {
       group.querySelector('.dndPanelItem__group-items').innerHTML = '';

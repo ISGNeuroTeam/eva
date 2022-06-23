@@ -171,6 +171,12 @@
           </div>
           <div class="dndPanelItem__group-items" />
         </div>
+        <div class="dndPanelItem__group dndPanelItem__group--edge-node">
+          <div class="dndPanelItem__group-title">
+            Edges
+          </div>
+          <div class="dndPanelItem__group-items" />
+        </div>
         <div class="dndPanelItem__group dndPanelItem__group--data-node">
           <div class="dndPanelItem__group-title">
             Data node
