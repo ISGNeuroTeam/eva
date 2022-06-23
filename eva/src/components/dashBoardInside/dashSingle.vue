@@ -36,6 +36,9 @@
       <div
         v-show="noMsg"
         class="errormsg"
+        :style="{
+          color: theme.$main_text,
+        }"
       >
         {{ msgText }}
       </div>
@@ -167,6 +170,9 @@ export default {
         color = options.color;
       }
       return color;
+    },
+    theme() {
+      return this.$store.getters.getTheme;
     },
   },
   watch: {
