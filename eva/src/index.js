@@ -153,6 +153,8 @@ Vue.component('modal-delete-profile', () => import('./components/autorization/mo
 Vue.component('modal-log', () => import('./components/autorization/modalLog.vue'));
 //  компонент для получения данных для пользователя
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
+//  компонент для загрузки svg
+Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {

@@ -1909,6 +1909,10 @@ export default new Vuex.Store({
         });
       }
     },
+
+    setLoadingSvg(context, param) {
+      return rest.setLoadingSvg(param, restAuth);
+    },
   },
   getters: {
     // ...store.getters,

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added loading svg
 
 ### Fixed
 - Fixed zooming of a multiline in the Data Research 2.0

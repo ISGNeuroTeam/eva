@@ -62,6 +62,23 @@
                 :style="{ color: theme.$secondary_text }"
                 :class="{ hide_control: !editMode }"
                 v-on="on"
+                @click="loadSvg = !loadSvg"
+              >
+                {{ mdiCloudUpload }}
+              </v-icon>
+            </template>
+            <span>Загрузка SVG</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="control-button theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                :class="{ hide_control: !editMode }"
+                v-on="on"
                 @click="openEventCode"
               >
                 {{ code_icon }}
@@ -856,6 +873,10 @@
         :permissions-from="userPermissions"
         :id-dash-from="idDashFrom"
       />
+      <modal-loading-svg
+        v-model="loadSvg"
+        @updateModalValue="loadSvg = false"
+      />
     </div>
 
     <div
@@ -902,6 +923,7 @@ import {
   mdiTrashCanOutline,
   mdiUndoVariant,
   mdiVariable,
+  mdiCloudUpload,
 } from '@mdi/js';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
@@ -1056,6 +1078,8 @@ export default {
       screenHeight: this.getScreenHeight(),
       allGroups: [],
       tokens: [],
+      loadSvg: false,
+      mdiCloudUpload,
     };
   },
   computed: {
