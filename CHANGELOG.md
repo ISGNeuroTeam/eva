@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- Fixed delete user in profile
+- Fixed datepicker visualisation
 - Fixed zooming of a multiline in the Data Research 2.0
 - The order of rendering lines on the multiline has also been changed
 - Fixed selection the default source data in dash settings
@@ -30,7 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to configure the source data for the default component value
 
 ### Fixed
-- Fixed datepicker visualisation
 - Changed icons for menu, tune and accumulators visualisations 
 - Fixed dashboard save edit state
 - Fixed dashboard save drag/resize state
