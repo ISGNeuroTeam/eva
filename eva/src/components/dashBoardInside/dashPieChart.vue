@@ -10,6 +10,9 @@
       <div
         v-if="nodata"
         class="nodata"
+        :style="{
+          color: theme.$main_text,
+        }"
       >
         {{ message }}
       </div>
@@ -28,13 +31,6 @@
         }"
       >
         Наведите курсор на график
-      </div>
-
-      <div
-        v-show="dataLoading || !dataRestFrom.length"
-        class="mt-4"
-      >
-        <p>Нет данных для отображения</p>
       </div>
       <div
         v-show="!dataLoading && !!dataRestFrom.length"
@@ -64,7 +60,7 @@
             "
             @mouseover="hoverLegendLine(idx)"
             @mouseleave="hoverLegendLine(-1)"
-            @click.stop="selectedPie = idx"
+            @click="activateLegend(idx)"
           >
             <div
               class="square"
@@ -476,6 +472,15 @@ export default {
         });
       }
     },
+    activateLegend(idx) {
+      if (this.selectedPie === idx) {
+        this.selectedPie = -1;
+      } else {
+        this.selectedPie = idx;
+      }
+      this.piechart.activetetPiepart(this.selectedPie, idx);
+    },
+
     createPieChart(
       dataFrom,
       sizeLine,
@@ -551,12 +556,18 @@ export default {
           eventName: 'click',
           callback: (_, i, nodes) => {
             const node = nodes[i];
+            nodes.forEach((item) => {
+              if (item !== node) {
+                item.classList.remove('piepartSelect');
+              }
+            });
             if (this.selectedPie === i) {
               this.selectedPie = -1;
               node.classList.remove('piepartSelect');
+            } else {
+              this.selectedPie = i;
+              node.classList.add('piepartSelect');
             }
-            this.selectedPie = i;
-            node.classList.add('piepartSelect');
           },
         },
       ]);

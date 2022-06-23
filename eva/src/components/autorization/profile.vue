@@ -67,10 +67,14 @@
                     }"
                     :headers="titles"
                     :items.sync="originData"
-                    :items-per-page="15"
+                    :items-per-page="perPage[i] || 15"
                     class="aut-table"
                     :data-id="`${i}`"
-                    :sort-by="['roles']"
+                    :sort-by="sortBy[i] || ['roles']"
+                    :sort-desc="isDesc[i]"
+                    @update:sort-by="sortBy[i] = $event"
+                    @update:sort-desc="isDesc[i] = $event"
+                    @update:items-per-page="perPage[i] = $event"
                   >
                     <template v-slot:item.color="{ item }">
                       <div
@@ -99,12 +103,12 @@
                         <span>Редактировать</span>
                       </v-tooltip>
                       <v-tooltip
+                        v-if="adminRool"
                         bottom
                         :color="theme.$accent_ui_color"
                       >
                         <template v-slot:activator="{ on }">
                           <v-icon
-                            v-if="adminRool"
                             v-model="item.actions"
                             class="editUser icon-aut"
                             :color="theme.$primary_button"
@@ -127,6 +131,7 @@
     </v-content>
     <footer-bottom />
     <modal-profile
+      v-if="activeModal"
       v-model="activeModal"
       :create="createSome"
       :key-from="keyFrom"
@@ -139,6 +144,7 @@
       :active-delete="activeDelete"
       :data-from="dataDelete"
       @cancelModal="closeModal"
+      @deleted="removeFromList"
     />
   </v-app>
 </template>
@@ -169,9 +175,16 @@ export default {
       dataDelete: {},
       curItem: {},
       permission: true,
+      sortBy: {},
+      isDesc: {},
+      perPage: {},
     };
   },
   computed: {
+    userId() {
+      if (!this.$jwt.hasToken()) return null;
+      return this.$jwt.decode().user_id;
+    },
     adminRool() {
       return this.adminRoot;
     },
@@ -293,8 +306,10 @@ export default {
             clearTimeout(timeOut);
             table = document.querySelector(`[data-id="${i}"]`);
             table.addEventListener('mouseover', (event) => {
-              if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
+              const elem = event.target.tagName.toLowerCase();
+              const icon = event.target.parentElement.closest('td');
+              if (elem === 'td' || icon) {
+                event.target.parentElement.closest('tr').style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
               }
             });
             table.addEventListener('mouseout', (event) => {
@@ -344,6 +359,16 @@ export default {
       this.activeModal = false;
       if (!isClearChanges) {
         this.getData(`tab-${this.keyFrom}`);
+      }
+    },
+    removeFromList(id) {
+      if (id === this.userId) {
+        document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
+        document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
+        this.$store.commit('clearState');
+        this.$router.push('/');
+      } else {
+        this.originData = this.originData.filter((item) => item.id !== id);
       }
     },
   },

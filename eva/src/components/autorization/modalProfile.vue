@@ -250,7 +250,7 @@
       <div
         class="msg-profile"
         :class="{ openMsg: openMsg }"
-        :style="{ color: colorMsg }"
+        :style="{ color: theme.$error_color }"
       >
         {{ msg }}
       </div>
@@ -356,8 +356,7 @@ export default {
         indexes: false,
       },
       curItem: {},
-      changedData: {},
-      dataRest: {},
+      changedData: null,
       colorFrom: {},
       isChanged: false,
     };
@@ -413,51 +412,60 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    dataRest: {
+      get() {
+        const essence = this.$store.getters['auth/essence'];
+        return this.changedData ? this.changedData : essence;
+      },
+      set(newVal) {
+        this.changedData = structuredClone(newVal);
+      },
+
+    },
   },
   watch: {
-    active() {
-      if (this.active) {
-        this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
-        this.userData.pass = '';
-        Object.keys(this.showBlock).forEach((item) => {
-          this.showBlock[item] = false;
-        });
-
-        switch (this.keyFrom) {
-          case 1:
-            this.showBlock.users = true;
-            break;
-          case 2:
-            this.showBlock.roles = true;
-            break;
-          case 3:
-            this.showBlock.permissions = true;
-            break;
-          case 4:
-            this.showBlock.groups = true;
-            break;
-          case 5:
-            this.showBlock.indexes = true;
-            break;
-          default:
-            break;
-        }
-        if (this.create) {
-          this.$set(this.userData, 'username', '');
-          this.$set(this.userData, 'pass', '');
-          this.$set(this.curItem, 'color', '');
-          this.$set(this.curItem, 'name', '');
-        } else {
-          this.$set(this.userData, 'username', this.curItemFrom.name);
-          this.curItem = { ...this.curItemFrom };
-        }
-        this.dataRest = this.getDataForEssence();
-        this.isChanged = false;
-      }
-    },
   },
   mounted() {
     this.colorFrom = this.theme;
+
+    if (this.active) {
+      this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
+      this.userData.pass = '';
+      Object.keys(this.showBlock).forEach((item) => {
+        this.showBlock[item] = false;
+      });
+
+      switch (this.keyFrom) {
+        case 1:
+          this.showBlock.users = true;
+          break;
+        case 2:
+          this.showBlock.roles = true;
+          break;
+        case 3:
+          this.showBlock.permissions = true;
+          break;
+        case 4:
+          this.showBlock.groups = true;
+          break;
+        case 5:
+          this.showBlock.indexes = true;
+          break;
+        default:
+          break;
+      }
+      if (this.create) {
+        this.$set(this.userData, 'username', '');
+        this.$set(this.userData, 'pass', '');
+        this.$set(this.curItem, 'color', '#FF0000');
+        this.$set(this.curItem, 'name', '');
+      } else {
+        this.$set(this.userData, 'username', this.curItemFrom.name);
+        this.curItem = { ...this.curItemFrom };
+      }
+      this.getDataForEssence();
+      this.isChanged = false;
+    }
   },
   methods: {
     async getDataForEssence() {
@@ -471,18 +479,25 @@ export default {
         });
 
         const result = await Promise.all(promise);
+
         result.forEach((item, i) => {
           allData[keys[i]] = item;
         });
-
+        allData.data = {};
+        this.$store.commit('auth/setEssence', allData);
         return allData;
       }
-      return this.$store.dispatch('auth/getEssence', {
+      let result;
+      await this.$store.dispatch('auth/getEssence', {
         essence: this.userFrom.tab,
         id: this.userFrom.id,
+      }).then((res) => {
+        result = res;
       });
+      return result;
     },
     cancelModal(isClearChanges = true) {
+      this.$store.commit('auth/dropEssence');
       this.$emit('cancelModal', isClearChanges);
     },
     showErrorMsg(msg, color) {
@@ -504,7 +519,7 @@ export default {
           this.msg = 'Пароль не может быть пустым';
           if (act === true) {
             method = 'POST';
-            if (this.userData.pass.length === 0 || !this.userData.pass) {
+            if (!this.userData.pass || this.userData.pass.length === 0) {
               this.showErrorMsg(
                 'Логин или пароль не могут быть пустыми',
                 this.colorFrom.controlsActive,
@@ -555,7 +570,7 @@ export default {
             }
             formData.old_password = this.oldpass;
             formData.new_password = this.newpass;
-          } else if (this.userData.pass.length !== 0 && this.userData.pass) {
+          } else if (this.userData.pass && this.userData.pass.length !== 0) {
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
@@ -604,29 +619,28 @@ export default {
         default:
           break;
       }
-
-      if (Object.keys(this.changedData).length !== 0) {
-        const essence = this.changedData[this.essence[this.keyFrom - 1]];
+      if (Object.keys(this.dataRest.data).length !== 0) {
+        const essence = this.dataRest.data;
         Object.keys(essence).forEach((item) => {
-          if (essence[item].length !== 0) {
-            essence[item].forEach((itemEs) => {
-              if (!formData[item]) {
-                formData[item] = [];
-              }
-              formData[item].push(itemEs);
-            });
-          } else {
-            formData[item] = [];
+          if (Array.isArray(essence[item])) {
+            if (essence[item].length !== 0) {
+              essence[item].forEach((itemEs) => {
+                if (!formData[item]) {
+                  formData[item] = [];
+                }
+                formData[item].push(itemEs);
+              });
+            } else {
+              formData[item] = [];
+            }
           }
         });
       }
-
       const response = this.$store.dispatch('auth/setEssence', {
         formData: JSON.stringify(formData),
         essence: this.essence[this.keyFrom - 1],
         method,
       });
-
       response.then((res) => {
         if (res.status === 200) {
           this.cancelModal(false);
@@ -645,10 +659,9 @@ export default {
     },
     changeDataEvent(event) {
       this.$refs.confirmModal.focusOnModal();
-      if (!this.changedData[event.essence]) {
-        this.changedData[event.essence] = {};
-      }
-      this.changedData[event.essence][event.subessence] = event.data;
+      const dataRest = structuredClone(this.dataRest);
+      dataRest.data[event.subessence] = structuredClone(event.data);
+      this.dataRest = dataRest;
       this.toggleIsChanged();
     },
     toggleIsChanged() {

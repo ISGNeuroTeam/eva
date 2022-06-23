@@ -50,7 +50,7 @@
           class="table-profile-block"
         >
           <v-data-table
-            v-model="alldata[essence][subessence].selected"
+            v-model="toRemove"
             :style="{
               background: theme.$main_bg,
               color: theme.$main_text,
@@ -59,7 +59,7 @@
             hide-default-header
             :no-data-text="alldata[essence][subessence].nodata"
             :headers="alldata[essence][subessence].titles"
-            :items="alldata[essence][subessence].data"
+            :items="userListAdded"
             item-key="name"
             show-select
             :search="searchText"
@@ -71,7 +71,7 @@
             small
             :color="theme.$primary_button"
             class="control-btn-itself"
-            @click="deleteSelected(subessence)"
+            @click="deleteSelected()"
           >
             {{ alldata[essence][`${subessence}DeleteName`].del1 }}
           </v-btn>
@@ -104,7 +104,7 @@
           class="table-profile-block"
         >
           <v-data-table
-            v-model="alldata[essence][`all${subessence}`].selected"
+            v-model="selectedToAdd"
             :style="{
               background: theme.$main_bg,
               color: theme.$main_text,
@@ -113,7 +113,7 @@
             hide-default-header
             :no-data-text="alldata[essence][subessence].nodata"
             :headers="alldata[essence][`all${subessence}`].titles"
-            :items="alldata[essence][`all${subessence}`].data"
+            :items="fullData"
             item-key="name"
             show-select
             :search="searchText"
@@ -125,7 +125,7 @@
             small
             :color="theme.$primary_button"
             class="control-btn-itself"
-            @click="addSelected(subessence)"
+            @click="addSelected()"
           >
             {{ alldata[essence][`${subessence}DeleteName`].del2 }}
           </v-btn>
@@ -361,9 +361,34 @@ export default {
         indexs: 'Индексы не выбраны',
         dashs: 'Дашборды не выбраны',
       },
+      added: null,
+      toAdd: null,
+      toRemove: [],
     };
   },
   computed: {
+    fullData() {
+      return this.translateToObj(this.dataFrom[this.subessence]);
+    },
+    data() {
+      return this.translateToObj(this.dataFrom?.data?.[this.subessence]);
+    },
+    selectedToAdd: {
+      get() {
+        return this.toAdd ? this.toAdd : this.userListAdded;
+      },
+      set(newVal) {
+        this.toAdd = structuredClone(newVal);
+      },
+    },
+    userListAdded: {
+      get() {
+        return this.added ? this.added : this.data;
+      },
+      set(newVal) {
+        this.added = structuredClone(newVal);
+      },
+    },
     active() {
       if (this.activeFrom) {
         this.$nextTick(() => {
@@ -395,8 +420,6 @@ export default {
     async getData() {
       const { essence } = this;
       const { subessence } = this;
-      const data = await this.dataFrom;
-
       if (this.create) {
         if (essence === 'dash') {
           this.alldata[essence][subessence] = {
@@ -423,15 +446,14 @@ export default {
           selected: [],
           nodata: this.noneText[subessence],
           titles: [{ text: 'Название', value: 'name' }],
-          data: this.translateToObj(data.data[subessence]),
+          data: this.userListAdded,
         };
       }
-
       this.alldata[essence][`all${subessence}`] = {
         selected: [],
         nodata: this.noneText[subessence],
         titles: [{ text: 'Название', value: 'name' }],
-        data: this.translateToObj(data[subessence]),
+        data: this.data[subessence],
       };
 
       this.loaders[essence][subessence] = false;
@@ -449,37 +471,38 @@ export default {
       }
       return [];
     },
-    deleteSelected(subj) {
+    deleteSelected() {
       const { essence } = this;
       const { subessence } = this;
-      const deleted = this.alldata[essence][subj].selected.map((item) => item.name);
-
-      this.alldata[essence][subj].data = this.alldata[essence][subj].data
-        .filter((item) => !deleted.includes(item.name));
-      this.alldata[essence][subj].selected = [];
+      const userListAdded = this.userListAdded.filter(
+        (item) => !this.toRemove.some(
+          (toRemoveItem) => toRemoveItem.name === item.name,
+        ),
+      );
       this.$emit('changeData', {
-        data: this.translateToArray(this.alldata[essence][subj].data),
+        data: this.translateToArray(userListAdded),
         essence,
         subessence,
       });
+      this.selectedToAdd = userListAdded;
+      this.toRemove = [];
     },
-    addSelected(subj) {
+    addSelected() {
       const { essence } = this;
       const { subessence } = this;
-      const added = this.alldata[essence][`all${subj}`].selected.map((item) => item.name);
-      const already = this.alldata[essence][subj].data.map((item) => item.name);
-      this.alldata[essence][`all${subj}`].data.forEach((item) => {
-        if (added.includes(item.name) && !already.includes(item.name)) {
-          this.alldata[essence][subj].data.push(item);
-        }
-      });
-      this.alldata[essence][`all${subj}`].selected = [];
-      this.alldata[essence].tab[subj] = 'tab-1';
+      const toAdd = !this.userListAdded.length
+        ? this.selectedToAdd
+        : this.selectedToAdd.filter(
+          (selected) => !this.userListAdded.some((item) => item.name === selected.name),
+        );
+      this.userListAdded.push(...toAdd);
+      this.alldata[essence].tab[subessence] = 'tab-1';
       this.$emit('changeData', {
-        data: this.translateToArray(this.alldata[essence][subj].data),
+        data: this.translateToArray(this.userListAdded),
         essence,
         subessence,
       });
+      this.selectedToAdd = structuredClone(this.userListAdded);
     },
     translateToArray(array) {
       return array.map((item) => item.name);

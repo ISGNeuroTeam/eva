@@ -374,14 +374,14 @@ export default {
       elem: 'select',
       default: null,
       items() {
-        if (this.$store.state[this.idDash]?.searches) {
+        const dashState = this.$store.state[this.idDash];
+        if (!dashState?.searches || !dashState.searches.map) {
           return [];
         }
-        const sourceDataList = this.$store.state[this.idDash].searches
-          .map(({ id, sid }) => ({
-            value: id,
-            text: sid,
-          }));
+        const sourceDataList = dashState.searches.map(({ id, sid }) => ({
+          value: id,
+          text: sid,
+        }));
         return [
           {
             value: null,
