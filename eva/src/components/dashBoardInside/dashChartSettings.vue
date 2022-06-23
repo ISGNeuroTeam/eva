@@ -273,8 +273,9 @@
                         </div>
                         <div class="col">
                           <v-text-field
-                            v-if="metric.lastDot >= 1 || metric.lastDot === ''"
+                            v-if="metric.lastDot >= 1"
                             v-model="metric.lastDot"
+                            :disabled="!metric.showText"
                             label="Вывод значений"
                             placeholder="Введите число"
                             persistent-placeholder
@@ -298,7 +299,7 @@
                             :items="metric.lastDotSearch
                               ? [
                                 ...defaultLastDotItems,
-                                `${metric.lastDotSearch.replaceAll(/\D/g, '')}`
+                                metric.lastDotSearch.replaceAll(/\D/g, '').toString() || null
                               ]
                               : defaultLastDotItems"
                             label="Вывод значений"

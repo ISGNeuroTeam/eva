@@ -748,7 +748,7 @@ export default class ChartClass {
 
   renderPeakTexts(chartGroup, metric, line) {
     const data = line.filter((d, i) => {
-      if (+metric.lastDot === 0 && line.length === i + 1) {
+      if (metric.lastDot === '0' && line.length === i + 1) {
         return true;
       }
       if (ChartClass.lastDotParamForPoint(metric.lastDot, i, line)) {
@@ -1161,6 +1161,9 @@ export default class ChartClass {
   }
 
   static lastDotParamForPoint(lastDot, i, { length }) {
+    if (lastDot === '' || lastDot === null) {
+      return false;
+    }
     if (+lastDot === 0 && length === i + 1) {
       return true;
     }
