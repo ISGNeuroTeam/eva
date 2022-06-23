@@ -502,6 +502,7 @@ export default {
         essence,
         subessence,
       });
+      this.selectedToAdd = structuredClone(this.userListAdded);
     },
     translateToArray(array) {
       return array.map((item) => item.name);

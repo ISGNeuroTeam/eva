@@ -67,13 +67,14 @@
                     }"
                     :headers="titles"
                     :items.sync="originData"
-                    :items-per-page="15"
+                    :items-per-page="perPage[i] || 15"
                     class="aut-table"
                     :data-id="`${i}`"
-                    :sort-by="sortBy"
-                    :sort-desc="isDesc"
-                    @update:sort-by="sortBy = $event"
-                    @update:sort-desc="isDesc = $event"
+                    :sort-by="sortBy[i] || ['roles']"
+                    :sort-desc="isDesc[i]"
+                    @update:sort-by="sortBy[i] = $event"
+                    @update:sort-desc="isDesc[i] = $event"
+                    @update:items-per-page="perPage[i] = $event"
                   >
                     <template v-slot:item.color="{ item }">
                       <div
@@ -174,8 +175,9 @@ export default {
       dataDelete: {},
       curItem: {},
       permission: true,
-      sortBy: ['roles'],
-      isDesc: false,
+      sortBy: {},
+      isDesc: {},
+      perPage: {},
     };
   },
   computed: {
