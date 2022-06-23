@@ -17,10 +17,12 @@
           :style="{ color: theme.$main_text }"
           accept="image/svg"
           label="Выбирите Svg"
+          @focus="focus()"
         />
       </div>
       <div
         v-if="message"
+        :style="`color: ${color}`"
         class="b-loading-svg__message"
       >
         {{ message }}
@@ -64,6 +66,7 @@ export default {
     return {
       file: null,
       message: '',
+      color: '',
     };
   },
   computed: {
@@ -85,13 +88,21 @@ export default {
       const res = JSON.parse(response);
       if (res.status === 'ok') {
         this.message = `Загрузка файла ${this.file.name} прошла успешно`;
+        this.color = 'green';
         setTimeout(() => {
           this.file = null;
           this.$emit('updateModalValue', false);
+          this.color = '';
+          this.message = '';
         }, 1000);
       } else {
+        this.color = 'red';
         this.message = `Загрузить файл ${this.file.name} не удалось.`;
       }
+    },
+    focus() {
+      this.color = '';
+      this.message = '';
     },
   },
 };
