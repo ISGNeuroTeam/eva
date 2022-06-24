@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- Dash Table: when saving the settings, the checkboxes for the columns are removed
 
 ## [1.96.0]
 

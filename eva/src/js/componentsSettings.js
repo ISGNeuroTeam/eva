@@ -498,7 +498,10 @@ export default {
       elem: 'checkbox-list',
       items() {
         // this is modalSettings context
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.titles || [];
+        const curTitles = storeElement?.availableTableTitles || [];
+        return new Set([...savedTitles, ...curTitles]);
       },
       default: [],
     },
