@@ -7,6 +7,7 @@
     }"
   >
     <button
+      class="pa-2"
       @click="toggleDnDPanel"
     >
       <v-icon
@@ -16,11 +17,29 @@
         {{ gear }}
       </v-icon>
     </button>
-    <button @click="orderToFront">
-      orderToFront
+    <button
+      v-if="dataSelectedNode"
+      class="pa-2"
+      @click="orderToFront"
+    >
+      <v-icon
+        class="control-button edit-icon theme--dark"
+        :style="{ color: theme.$secondary_text }"
+      >
+        {{ arrowUp }}
+      </v-icon>
     </button>
-    <button @click="orderToBack">
-      orderToBack
+    <button
+      v-if="dataSelectedNode"
+      class="pa-2"
+      @click="orderToBack"
+    >
+      <v-icon
+        class="control-button edit-icon theme--dark"
+        :style="{ color: theme.$secondary_text }"
+      >
+        {{ arrowDown }}
+      </v-icon>
     </button>
     <!--Drag-and-drop panel-->
     <div
@@ -30,177 +49,225 @@
         'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
       }"
     >
-      <div class="row">
-        <div class="col-12">
-          <button @click="toggleDnDPanel">
-            Close
+      <div class="row justify-end">
+        <div class="col-auto">
+          <button
+            @click="toggleDnDPanel"
+          >
+            <v-icon
+              class="control-button edit-icon theme--dark"
+              :style="{ color: theme.$secondary_text }"
+            >
+              {{ closeIcon }}
+            </v-icon>
           </button>
-        </div>
-        <div class="col-12">
-          <div class="dash-constructor-schemes__options">
-            <div class="row">
-              <!--Цвет линии-->
-              <div class="col-8">
-                Цвет линии:
-              </div>
-              <div class="col-4">
-                <v-menu
-                  top
-                  offset-x
-                  :close-on-content-click="false"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      :style="{
-                        'background-color': edgeCustomStyles.strokeColor,
-                      }"
-                      dark
-                      v-bind="attrs"
-                      v-on="on"
-                    />
-                  </template>
-
-                  <v-color-picker
-                    v-model="edgeCustomStyles.strokeColor"
-                    dot-size="12"
-                    mode="rgba"
-                    @input="closeEdgeColorPicker"
-                  />
-                </v-menu>
-              </div>
-              <!--Размер линии-->
-              <div class="col-8">
-                Размер линии:
-              </div>
-              <div class="col-4">
-                <v-text-field
-                  v-model="edgeCustomStyles.strokeSize"
-                  dense
-                />
-              </div>
-              <!--Скругление линии-->
-              <div class="col-8">
-                Скругление линии:
-              </div>
-              <div class="col-4">
-                <v-text-field
-                  v-model.number="edgeCustomStyles.smoothingLength"
-                  dense
-                  placeholder="Скругление"
-                />
-              </div>
-              <!--Цвет блока-->
-              <div class="col-8">
-                Цвет блока:
-              </div>
-              <div class="col-4">
-                <v-menu
-                  top
-                  offset-x
-                  :close-on-content-click="false"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      :style="{
-                        'background-color': nodeCustomStyles.fill,
-                      }"
-                      dark
-                      v-bind="attrs"
-                      v-on="on"
-                    />
-                  </template>
-
-                  <v-color-picker
-                    v-model="nodeCustomStyles.fill"
-                    dot-size="12"
-                    mode="rgba"
-                    @input="closeEdgeColorPicker"
-                  />
-                </v-menu>
-              </div>
-              <!--Цвет рамки блока-->
-              <div class="col-8">
-                Цвет рамки блока:
-              </div>
-              <div class="col-4">
-                <v-menu
-                  top
-                  offset-x
-                  :close-on-content-click="false"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-btn
-                      :style="{
-                        'background-color': nodeCustomStyles.strokeColor,
-                      }"
-                      dark
-                      v-bind="attrs"
-                      v-on="on"
-                    />
-                  </template>
-
-                  <v-color-picker
-                    v-model="nodeCustomStyles.strokeColor"
-                    dot-size="12"
-                    mode="rgba"
-                    @input="closeEdgeColorPicker"
-                  />
-                </v-menu>
-              </div>
-              <!--Размер рамки блока-->
-              <div class="col-8">
-                Размер рамки узла:
-              </div>
-              <div class="col-4">
-                <v-text-field
-                  v-model="nodeCustomStyles.strokeSize"
-                  dense
-                />
-              </div>
-            </div>
-          </div>
         </div>
       </div>
       <div
         ref="dndPanel"
         class="dash-constructor-schemes__dnd-panel"
       >
-        <div class="dndPanelItem__group dndPanelItem__group--default-node">
-          <div class="dndPanelItem__group-title">
-            Default node
-          </div>
-          <div class="dndPanelItem__group-items" />
-        </div>
-        <div class="dndPanelItem__group dndPanelItem__group--edge-node">
-          <div class="dndPanelItem__group-title">
-            Edges
-          </div>
-          <div class="dndPanelItem__group-items" />
-        </div>
-        <div class="dndPanelItem__group dndPanelItem__group--data-node">
-          <div class="dndPanelItem__group-title">
-            Data node
-          </div>
-          <div class="dndPanelItem__group-items" />
-        </div>
-        <div class="dndPanelItem__group dndPanelItem__group--text-node">
-          <div class="dndPanelItem__group-title">
-            Text node
-          </div>
-          <div class="dndPanelItem__group-items" />
-        </div>
-        <div class="dndPanelItem__group dndPanelItem__group--image-node">
-          <div class="dndPanelItem__group-title">
-            Image node
-          </div>
-          <div class="dndPanelItem__group-items" />
-        </div>
-        <div class="dndPanelItem__group dndPanelItem__group--label-node">
-          <div class="dndPanelItem__group-title">
-            Label node
-          </div>
-          <div class="dndPanelItem__group-items" />
-        </div>
+        <v-expansion-panels
+          accordion
+        >
+          <v-expansion-panel>
+            <v-expansion-panel-header
+              class="dndPanelItem__group-title"
+            >
+              Стандартные элементы
+            </v-expansion-panel-header>
+            <v-expansion-panel-content eager>
+              <div class="dndPanelItem__group dndPanelItem__group--default-element">
+                <v-expansion-panels>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header>
+                      Настройки:
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      <div
+                        class="dash-constructor-schemes__options"
+                      >
+                        <div class="row">
+                          <div class="col-12">
+                            Настройки линии
+                          </div>
+                          <!--Цвет линии-->
+                          <div class="col-8">
+                            Цвет:
+                          </div>
+                          <div class="col-4">
+                            <v-menu
+                              top
+                              offset-x
+                              :close-on-content-click="false"
+                            >
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                  :style="{
+                                    'background-color': edgeCustomStyles.strokeColor,
+                                  }"
+                                  dark
+                                  v-bind="attrs"
+                                  v-on="on"
+                                />
+                              </template>
+
+                              <v-color-picker
+                                v-model="edgeCustomStyles.strokeColor"
+                                dot-size="12"
+                                mode="rgba"
+                                @input="closeEdgeColorPicker"
+                              />
+                            </v-menu>
+                          </div>
+                          <!--Размер линии-->
+                          <div class="col-8">
+                            Размер:
+                          </div>
+                          <div class="col-4">
+                            <v-text-field
+                              v-model="edgeCustomStyles.strokeSize"
+                              dense
+                            />
+                          </div>
+                          <!--Скругление линии-->
+                          <div class="col-8">
+                            Скругление:
+                          </div>
+                          <div class="col-4">
+                            <v-text-field
+                              v-model.number="edgeCustomStyles.smoothingLength"
+                              dense
+                              placeholder="Скругление"
+                            />
+                          </div>
+                          <div class="col-12">
+                            Настройки блока
+                          </div>
+                          <!--Цвет блока-->
+                          <div class="col-8">
+                            Цвет фона:
+                          </div>
+                          <div class="col-4">
+                            <v-menu
+                              top
+                              offset-x
+                              :close-on-content-click="false"
+                            >
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                  :style="{
+                                    'background-color': nodeCustomStyles.fill,
+                                  }"
+                                  dark
+                                  v-bind="attrs"
+                                  v-on="on"
+                                />
+                              </template>
+
+                              <v-color-picker
+                                v-model="nodeCustomStyles.fill"
+                                dot-size="12"
+                                mode="rgba"
+                                @input="closeEdgeColorPicker"
+                              />
+                            </v-menu>
+                          </div>
+                          <!--Цвет рамки блока-->
+                          <div class="col-8">
+                            Цвет рамки:
+                          </div>
+                          <div class="col-4">
+                            <v-menu
+                              top
+                              offset-x
+                              :close-on-content-click="false"
+                            >
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                  :style="{
+                                    'background-color': nodeCustomStyles.strokeColor,
+                                  }"
+                                  dark
+                                  v-bind="attrs"
+                                  v-on="on"
+                                />
+                              </template>
+
+                              <v-color-picker
+                                v-model="nodeCustomStyles.strokeColor"
+                                dot-size="12"
+                                mode="rgba"
+                                @input="closeEdgeColorPicker"
+                              />
+                            </v-menu>
+                          </div>
+                          <!--Размер рамки блока-->
+                          <div class="col-8">
+                            Размер рамки:
+                          </div>
+                          <div class="col-4">
+                            <v-text-field
+                              v-model="nodeCustomStyles.strokeSize"
+                              dense
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+                <div class="dndPanelItem__group-items" />
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header
+              class="dndPanelItem__group-title"
+            >
+              Блоки с данными
+            </v-expansion-panel-header>
+            <v-expansion-panel-content eager>
+              <div class="dndPanelItem__group dndPanelItem__group--data-node">
+                <div class="dndPanelItem__group-items" />
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header
+              class="dndPanelItem__group-title"
+            >
+              Текстовые блоки
+            </v-expansion-panel-header>
+            <v-expansion-panel-content eager>
+              <div class="dndPanelItem__group dndPanelItem__group--text-node">
+                <div class="dndPanelItem__group-items" />
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header
+              class="dndPanelItem__group-title"
+            >
+              Изображения\иконки
+            </v-expansion-panel-header>
+            <v-expansion-panel-content eager>
+              <div class="dndPanelItem__group dndPanelItem__group--image-node">
+                <div class="dndPanelItem__group-items" />
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+          <v-expansion-panel>
+            <v-expansion-panel-header class="dndPanelItem__group-title">
+              Подписи к блокам
+            </v-expansion-panel-header>
+            <v-expansion-panel-content eager>
+              <div class="dndPanelItem__group dndPanelItem__group--label-node">
+                <div class="dndPanelItem__group-items" />
+              </div>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </div>
     </div>
     <div
@@ -212,7 +279,12 @@
       <div class="row">
         <div class="col-12">
           <button @click="closeDataPanel">
-            Close
+            <v-icon
+              class="control-button edit-icon theme--dark"
+              :style="{ color: theme.$secondary_text }"
+            >
+              {{ closeIcon }}
+            </v-icon>
           </button>
         </div>
       </div>
@@ -256,7 +328,9 @@
 </template>
 
 <script>
-import { mdiSettings } from '@mdi/js';
+import {
+  mdiSettings, mdiClose, mdiArrowUp, mdiArrowDown,
+} from '@mdi/js';
 import ConstructorSchemesClass from '../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 
 export default {
@@ -290,6 +364,9 @@ export default {
   data() {
     return {
       gear: mdiSettings,
+      closeIcon: mdiClose,
+      arrowUp: mdiArrowUp,
+      arrowDown: mdiArrowDown,
       dndPanel: false,
       dataPanel: false,
       edgeColorPopup: false,
@@ -606,31 +683,31 @@ export default {
     // TODO: Написать метод для перерисовки отдельного элемента на DnD панели
     edgeCustomStyles: {
       deep: true,
-      handler(value) {
+      handler(/* value */) {
         if (this.constructorSchemes) {
-          this.constructorSchemes.applyStylesElements({
-            edgeCustomStyles: value,
-          });
+          // this.constructorSchemes.applyStylesElements({
+          //   edgeCustomStyles: value,
+          // });
         }
       },
     },
     nodeCustomStyles: {
       deep: true,
-      handler(value) {
+      handler(/* value */) {
         if (this.constructorSchemes) {
-          this.constructorSchemes.applyStylesElements({
-            nodeCustomStyles: value,
-          });
+          // this.constructorSchemes.applyStylesElements({
+          //   nodeCustomStyles: value,
+          // });
         }
       },
     },
     labelCustomStyles: {
       deep: true,
-      handler(value) {
+      handler(/* value */) {
         if (this.constructorSchemes) {
-          this.constructorSchemes.applyStylesElements({
-            labelCustomStyles: value,
-          });
+          // this.constructorSchemes.applyStylesElements({
+          //   labelCustomStyles: value,
+          // });
         }
       },
     },
@@ -701,12 +778,6 @@ export default {
       this.selectedNode = structuredClone(targetElement.nodeId);
       this.selectedDataType = structuredClone(targetElement.dataType);
       this.dataSelectedNode = structuredClone(targetElement);
-    },
-    orderRaise() {
-      this.constructorSchemes.orderRaise();
-    },
-    orderLower() {
-      this.constructorSchemes.orderLower();
     },
     orderToFront() {
       this.constructorSchemes.orderToFront();
@@ -780,6 +851,31 @@ export default {
   }
   &__graph-component {
     height: inherit;
+  }
+  &__dnd-panel ::v-deep {
+    .v-expansion-panel {
+      background-color: var(--main_bg);
+      color: var(--main_text);
+      &::before {
+        box-shadow: none;
+      }
+    }
+    .v-expansion-panel-content__wrap {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .v-expansion-panel-header {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .v-expansion-panels {
+      .v-expansion-panel-header__icon  {
+        .v-icon {
+          color: var(--main_text);
+        }
+      }
+    }
+
   }
 
 }

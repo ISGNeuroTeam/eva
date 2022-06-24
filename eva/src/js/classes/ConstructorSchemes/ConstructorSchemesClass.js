@@ -16,7 +16,7 @@ import {
   GraphMLSupport,
   GraphSnapContext,
   GridSnapTypes,
-  HandlePositions,
+  HandlePositions, HierarchicNestingPolicy,
   ICommand,
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
@@ -832,7 +832,7 @@ class ConstructorSchemesClass {
       imageStyleNode.tag = {
         isAspectRatio: true,
       };
-      return new DragAndDropPanelItem(imageStyleNode, 'image-node');
+      return new DragAndDropPanelItem(imageStyleNode, 'Элементы с картинкой', 'image-node');
     }));
   }
 
@@ -904,7 +904,7 @@ class ConstructorSchemesClass {
       fill: defaultNodeStyle.fill,
       stroke: `${defaultNodeStyle.strokeSize} ${defaultNodeStyle.strokeColor}`,
     });
-    return new DragAndDropPanelItem(defaultNode, 'default-node');
+    return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
   static createDnDPanelDataNode(defaultNodeStyle) {
@@ -1013,6 +1013,7 @@ class ConstructorSchemesClass {
       .hideImplementation((node) => node.tag === 'invisible');
 
     this.registerReshapeHandleProvider();
+    this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
   }
 
   registerReshapeHandleProvider() {
@@ -1569,30 +1570,32 @@ class ConstructorSchemesClass {
   }
 
   createAdditionalPorts(createdItem) {
-    this.graphComponent.graph.addRelativePort(
-      createdItem,
-      new Point((createdItem.layout.width / 6) * 2, 0),
-    ).tag = {
-      portType: 'right',
-    };
-    this.graphComponent.graph.addRelativePort(
-      createdItem,
-      new Point(-(createdItem.layout.width / 6) * 2, 0),
-    ).tag = {
-      portType: 'left',
-    };
-    this.graphComponent.graph.addRelativePort(
-      createdItem,
-      new Point(0, (createdItem.layout.height / 6) * 2),
-    ).tag = {
-      portType: 'top',
-    };
-    this.graphComponent.graph.addRelativePort(
-      createdItem,
-      new Point(0, -(createdItem.layout.height / 6) * 2),
-    ).tag = {
-      portType: 'bottom',
-    };
+    if (!createdItem.style.image) {
+      this.graphComponent.graph.addRelativePort(
+        createdItem,
+        new Point((createdItem.layout.width / 6) * 2, 0),
+      ).tag = {
+        portType: 'right',
+      };
+      this.graphComponent.graph.addRelativePort(
+        createdItem,
+        new Point(-(createdItem.layout.width / 6) * 2, 0),
+      ).tag = {
+        portType: 'left',
+      };
+      this.graphComponent.graph.addRelativePort(
+        createdItem,
+        new Point(0, (createdItem.layout.height / 6) * 2),
+      ).tag = {
+        portType: 'top',
+      };
+      this.graphComponent.graph.addRelativePort(
+        createdItem,
+        new Point(0, -(createdItem.layout.height / 6) * 2),
+      ).tag = {
+        portType: 'bottom',
+      };
+    }
     // Center
     this.graphComponent.graph.addRelativePort(
       createdItem,
@@ -1732,7 +1735,7 @@ class ConstructorSchemesClass {
     });
   }
 
-  static createReactiveNode(data, type) {
+  static createReactiveNode(data, tooltip, type) {
     const dataNode = new SimpleNode();
     dataNode.tag = data.dataRest;
     dataNode.style = new VuejsNodeStyle(data.template);
@@ -1744,7 +1747,7 @@ class ConstructorSchemesClass {
         ? data.height
         : data.rowHeight * (data?.dataRest?.items?.length || 1),
     );
-    return new DragAndDropPanelItem(dataNode, type);
+    return new DragAndDropPanelItem(dataNode, tooltip, type);
   }
 
   async createDnDPanelItems({
@@ -1767,16 +1770,16 @@ class ConstructorSchemesClass {
           stroke: `${defaultEdgeStyle.strokeSize} solid ${defaultEdgeStyle.strokeColor}`,
         }),
       });
-      items.push(new DragAndDropPanelItem(edge1, 'edge-node'));
+      items.push(new DragAndDropPanelItem(edge1, 'Стандартные элементы', 'default-element'));
 
       // Узел с данными
       this.dndDataPanelItems.forEach((item) => {
-        items.push(ConstructorSchemesClass.createReactiveNode(item, 'data-node'));
+        items.push(ConstructorSchemesClass.createReactiveNode(item, 'Элменты с данными', 'data-node'));
       });
 
       // Узел с текстом
       this.dndLabelPanelItems.forEach((item) => {
-        items.push(ConstructorSchemesClass.createReactiveNode(item, 'text-node'));
+        items.push(ConstructorSchemesClass.createReactiveNode(item, 'Элементы с текстом', 'text-node'));
       });
 
       // Подписи к узлам\ребрам
@@ -1801,7 +1804,7 @@ class ConstructorSchemesClass {
       label.preferredSize = labelStyle.renderer.getPreferredSize(label, labelStyle);
       labelNode.tag = label;
       labelNode.labels = new ListEnumerable([label]);
-      items.push(new DragAndDropPanelItem(labelNode, 'label-node'));
+      items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {

@@ -83,10 +83,15 @@ export class DragAndDropPanel {
     return this.maxItemWidth;
   }
 
+  get getGraphComponent() {
+    return this.graphComponent;
+  }
+
   clearDnDPanel() {
-    this.div.querySelectorAll('.dndPanelItem__group').forEach((group) => {
-      group.querySelector('.dndPanelItem__group-items').innerHTML = '';
-    });
+    this.div.querySelectorAll('.dndPanelItem__group')
+      .forEach((group) => {
+        group.querySelector('.dndPanelItem__group-items').innerHTML = '';
+      });
   }
 
   /**
@@ -119,7 +124,7 @@ export class DragAndDropPanel {
         });
       }
       this.div
-        .querySelector(`.dndPanelItem__group--${item.tooltip}`)
+        .querySelector(`.dndPanelItem__group--${item.elementType}`)
         .querySelector('.dndPanelItem__group-items')
         .appendChild(visual);
     });
@@ -130,10 +135,9 @@ export class DragAndDropPanel {
    * This method is used by populatePanel to create the visualization
    * for each node provided by the factory.
    * @param {!Item.<INode>} original
-   * @param {!GraphComponent} graphComponent
    * @returns {!HTMLDivElement}
    */
-  createNodeVisual(original, graphComponent) {
+  createNodeVisual(original) {
     const { graph } = this.graphComponent;
     graph.clear();
 
@@ -162,17 +166,16 @@ export class DragAndDropPanel {
 
     return this.exportAndWrap(
       this.graphComponent,
-      original instanceof INode ? undefined : original.tooltip,
+      original instanceof INode ? undefined : original.elementType,
     );
   }
 
   /**
    * Creates an element that contains the visualization of the given edge.
    * @param {!Item.<IEdge>} original
-   * @param {!GraphComponent} graphComponent
    * @returns {!HTMLDivElement}
    */
-  createEdgeVisual(original, graphComponent) {
+  createEdgeVisual(original) {
     const { graph } = this.graphComponent;
     graph.clear();
 
@@ -191,15 +194,12 @@ export class DragAndDropPanel {
 
     return this.exportAndWrap(
       this.graphComponent,
-      original instanceof IEdge ? undefined : original.tooltip,
+      original instanceof IEdge ? undefined : original.elementType,
     );
   }
 
-  /**
-   * @param {!GraphComponent} graphComponent
-   */
   // eslint-disable-next-line class-methods-use-this
-  updateViewport(graphComponent) {
+  updateViewport() {
     const { graph } = this.graphComponent;
     let viewport = Rect.EMPTY;
     graph.nodes.forEach((node) => {
@@ -223,10 +223,10 @@ export class DragAndDropPanel {
   /**
    * Exports and wraps the original visualization in an HTML element.
    * @param {!GraphComponent} graphComponent
-   * @param {!string} [tooltip]
+   * @param {!string} [elementType]
    * @returns {!HTMLDivElement}
    */
-  exportAndWrap(graphComponent, tooltip) {
+  exportAndWrap(graphComponent, elementType) {
     const exporter = new SvgExport({
       worldBounds: this.graphComponent.contentRect,
       margins: 2,
@@ -251,8 +251,8 @@ export class DragAndDropPanel {
     } catch (e) {
       /* IE9 doesn't support grab cursor */
     }
-    if (tooltip) {
-      div.title = tooltip;
+    if (elementType) {
+      div.title = elementType;
     }
     return div;
   }
@@ -348,9 +348,11 @@ export class DragAndDropPanelItem {
   /**
    * @param {!T} element
    * @param {!string} tooltip
+   * @param {!string} elementType
    */
-  constructor(element, tooltip) {
+  constructor(element, tooltip, elementType) {
     this.tooltip = tooltip;
+    this.elementType = elementType;
     this.element = element;
   }
 }
