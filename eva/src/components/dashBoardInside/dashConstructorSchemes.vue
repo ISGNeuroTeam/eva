@@ -84,9 +84,7 @@
                       Настройки:
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <div
-                        class="dash-constructor-schemes__options"
-                      >
+                      <div class="dash-constructor-schemes__options">
                         <div class="row">
                           <div class="col-12">
                             Настройки линии
@@ -211,6 +209,14 @@
                               v-model="nodeCustomStyles.strokeSize"
                               dense
                             />
+                          </div>
+                          <div class="col-12">
+                            <v-btn
+                              class="dash-constructor-schemes__apply-options"
+                              @click="applyOptions"
+                            >
+                              Применить настройки
+                            </v-btn>
                           </div>
                         </div>
                       </div>
@@ -729,6 +735,13 @@ export default {
   methods: {
     testUpdate() {
       this.mockData[0].value = '333';
+    },
+    applyOptions() {
+      this.constructorSchemes.applyStylesElements({
+        edgeCustomStyles: this.edgeCustomStyles,
+        nodeCustomStyles: this.nodeCustomStyles,
+        labelCustomStyles: this.labelCustomStyles,
+      });
     },
     closeEdgeColorPicker() {
       this.edgeColorPopup = false;
