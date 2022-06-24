@@ -323,6 +323,9 @@
             Добавить строку
           </v-btn>
         </div>
+        <div v-if="dataSelectedNode.dataType === 'default-node'">
+          Default node
+        </div>
       </div>
     </div>
     <!--The GraphComponent-->
@@ -789,8 +792,12 @@ export default {
       this.closeDataPanel();
       this.dataPanel = true;
       this.selectedNode = structuredClone(targetElement.nodeId);
-      this.selectedDataType = structuredClone(targetElement.dataType);
       this.dataSelectedNode = structuredClone(targetElement);
+      if (targetElement.dataType) {
+        this.selectedDataType = structuredClone(targetElement.dataType);
+      } else {
+        this.selectedDataType = 'default-node';
+      }
     },
     orderToFront() {
       this.constructorSchemes.orderToFront();
