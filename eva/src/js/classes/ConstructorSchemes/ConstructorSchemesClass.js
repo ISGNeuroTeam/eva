@@ -904,6 +904,9 @@ class ConstructorSchemesClass {
       fill: defaultNodeStyle.fill,
       stroke: `${defaultNodeStyle.strokeSize} ${defaultNodeStyle.strokeColor}`,
     });
+    defaultNode.tag = {
+      dataType: 'default-node',
+    };
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
@@ -1251,11 +1254,22 @@ class ConstructorSchemesClass {
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
       // Проверяем на наличие данных в узле
-      if (evt.item instanceof INode && evt.item.tag?.templateType) {
+      if (evt.item instanceof INode) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
         // Открываем панель для редактирования данных элемента
-        openDataPanelCallback(evt.item.tag);
+        if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
+          openDataPanelCallback(evt.item.tag);
+        } else {
+          openDataPanelCallback({
+            nodeId: evt.item.tag.nodeId,
+            bgColor: '',
+            borderColor: '',
+            borderSize: '',
+            borderType: '',
+            type: '',
+          });
+        }
       } else {
         // Закрываем панель для редактирования данных элемента
         closeDataPanelCallback();
