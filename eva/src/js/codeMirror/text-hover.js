@@ -18,7 +18,8 @@
     document.body.appendChild(tt);
 
     function position() {
-      const target = e.target.classList.contains('CodeMirror-line') ? e.target : e.target.parentNode.parentNode;
+      const { target } = e;
+      console.log(target);
       const targetRect = target.getBoundingClientRect();
       tt.style.top = `${targetRect.bottom}px`;
       tt.style.left = `${targetRect.left}px`;
@@ -105,7 +106,7 @@
 
   function onMouseOver(cm, e) {
     const node = e.target;
-    if (node) {
+    if (node && !node.classList.contains('CodeMirror-line')) {
       if (/\bCodeMirror-lint-mark-/.test(node.className)) return;
       const state = cm.state.textHover;
       const data = getTokenAndPosAt(cm, e);
