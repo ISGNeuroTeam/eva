@@ -748,7 +748,7 @@ export default class ChartClass {
 
   renderPeakTexts(chartGroup, metric, line) {
     const data = line.filter((d, i) => {
-      if (+metric.lastDot === 0 && line.length === i + 1) {
+      if (metric.lastDot === '0' && line.length === i + 1) {
         return true;
       }
       if (ChartClass.lastDotParamForPoint(metric.lastDot, i, line)) {
@@ -1160,24 +1160,27 @@ export default class ChartClass {
     return !isNaN(parseInt(val, 10));
   }
 
-  static lastDotParamForPoint(lastDot, i, nodes) {
-    if (+lastDot === 0 && nodes.length === i + 1) {
+  static lastDotParamForPoint(lastDot, i, { length }) {
+    if (lastDot === '' || lastDot === null) {
+      return false;
+    }
+    if (+lastDot === 0 && length === i + 1) {
       return true;
     }
     switch (lastDot) {
       case 'odd':
-        if ((nodes.length - 1 - i) % 2 === 0) {
+        if (i % 2 === 0) {
           return true;
         }
         break;
       case 'even':
-        if ((nodes.length - 1 - i) % 2 === 1) {
+        if (i % 2 === 1) {
           return true;
         }
         break;
       default:
         if (+lastDot > 0) {
-          if ((nodes.length - 1 - i) % lastDot === 0) {
+          if ((i + 1) % lastDot === 0) {
             return true;
           }
         }
