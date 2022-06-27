@@ -1,39 +1,23 @@
 <template>
-  <div
-    class="dash-main"
-    :style="{ background: theme.$main_bg, height }"
-  >
+  <div class="dash-main" :style="{ background: theme.$main_bg, height }">
     <div class="main-title">
       <div class="logo-block">
         <EvaLogo />
       </div>
-      <div
-        class="title-name"
-        :style="{ color: theme.$title }"
-      >
+      <div class="title-name" :style="{ color: theme.$title }">
         {{ titlePage }}
       </div>
-      <v-tooltip
-        bottom
-        :color="theme.$accent_ui_color"
-      >
+      <v-tooltip bottom :color="theme.$accent_ui_color">
         <template v-slot:activator="{ on }">
           <router-link to="main">
-            <v-icon
-              class="home"
-              :color="theme.$secondary_text"
-              v-on="on"
-            >
+            <v-icon class="home" :color="theme.$secondary_text" v-on="on">
               {{ home }}
             </v-icon>
           </router-link>
         </template>
         <span>На главную</span>
       </v-tooltip>
-      <v-tooltip
-        bottom
-        :color="theme.$accent_ui_color"
-      >
+      <v-tooltip bottom :color="theme.$accent_ui_color">
         <template v-slot:activator="{ on }">
           <v-icon
             class="undo"
@@ -48,21 +32,13 @@
       </v-tooltip>
     </div>
     <div class="control-block">
-      <div
-        v-if="inside"
-        class="user-control-panel"
-      >
-        <v-tooltip
-          bottom
-          :color="theme.$accent_ui_color"
-        >
+      <div v-if="inside" class="user-control-panel">
+        <v-tooltip bottom :color="theme.$accent_ui_color">
           <template v-slot:activator="{ on }">
             <v-icon
               class="control-button theme--dark"
               :color="
-                getColorError
-                  ? theme.$primary_button
-                  : theme.$secondary_text
+                getColorError ? theme.$primary_button : theme.$secondary_text
               "
               v-on="on"
               @click="openLogs"
@@ -74,21 +50,11 @@
         </v-tooltip>
       </div>
 
-      <v-menu
-        :nudge-width="100"
-        :rounded="false"
-        offset-y
-      >
+      <v-menu :nudge-width="100" :rounded="false" offset-y>
         <template v-slot:activator="{ on: onMenu }">
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
+          <v-tooltip bottom :color="theme.$accent_ui_color">
             <template v-slot:activator="{ on: onTooltip }">
-              <div
-                class="dropdown-profile"
-                v-on="{ ...onMenu, ...onTooltip }"
-              >
+              <div class="dropdown-profile" v-on="{ ...onMenu, ...onTooltip }">
                 <v-icon
                   :style="{ color: theme.$secondary_text }"
                   class="profile theme--dark"
@@ -108,26 +74,18 @@
         </template>
         <v-list class="profile-dropdown--list">
           <v-list-item>
-            <v-list-item-title
-              class="profile-dropdown--title"
-            >
+            <v-list-item-title class="profile-dropdown--title">
               Профиль
             </v-list-item-title>
           </v-list-item>
-          <div
-            v-for="item in profileDropdownButtons"
-            :key="item.id"
-          >
+          <div v-for="item in profileDropdownButtons" :key="item.id">
             <v-list-item v-if="!item.hide">
               <v-btn
                 class="profile-dropdown--button"
                 icon
                 @click="item.onClick"
               >
-                <v-icon
-                  class="edit icon-aut"
-                  :color="theme.$secondary_text"
-                >
+                <v-icon class="edit icon-aut" :color="theme.$secondary_text">
                   {{ item.icon }}
                 </v-icon>
                 {{ item.label }}
@@ -138,13 +96,8 @@
       </v-menu>
     </div>
 
-    <modal-log
-      v-model="modalActive"
-    />
-    <modal-themes
-      v-model="paleteShow"
-      :admin="isAdmin"
-    />
+    <modal-log v-model="modalActive" />
+    <modal-themes v-model="paleteShow" :admin="isAdmin" />
   </div>
 </template>
 
@@ -175,7 +128,6 @@ export default {
   },
   data() {
     return {
-      login: '',
       user: {},
       titlePage: this.$router.history.current.name,
       door: mdiDoor,
@@ -217,11 +169,13 @@ export default {
   computed: {
     getColorError() {
       if (!this.$store.state.logError) {
-        this.$store.commit('setState', [{
-          object: this.$store.state,
-          prop: 'logError',
-          value: false,
-        }]);
+        this.$store.commit('setState', [
+          {
+            object: this.$store.state,
+            prop: 'logError',
+            value: false,
+          },
+        ]);
       }
       return this.$store.state.logError;
     },
@@ -232,7 +186,12 @@ export default {
       return this.$store.getters.getTheme;
     },
     isAdmin() {
-      return !!(this.userPermissions && this.userPermissions.includes('admin_all'));
+      return !!(
+        this.userPermissions && this.userPermissions.includes('admin_all')
+      );
+    },
+    login() {
+      return this.$store.getters['auth/userName'];
     },
   },
   mounted() {
@@ -247,7 +206,6 @@ export default {
     },
     async getCookie() {
       if (this.$jwt.hasToken()) {
-        this.login = this.$jwt.decode().username;
         // let id = this.$jwt.decode().user_id;
         let permissions = [];
 
@@ -275,10 +233,7 @@ export default {
       }
     },
     exit() {
-      document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
-      document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
-      this.$store.commit('clearState');
-      this.$router.push('/');
+      this.$store.dispatch('auth/logout');
     },
     edit() {
       this.$router.push('/profile');

@@ -13,13 +13,8 @@
       class="passcard"
       :style="{ backgroundColor: theme.$main_bg }"
     >
-      <v-card-text
-        class="card-text-profile"
-        :style="{ color: theme.$title }"
-      >
-        <div class="headline">
-          Изменить пароль
-        </div>
+      <v-card-text class="card-text-profile" :style="{ color: theme.$title }">
+        <div class="headline">Изменить пароль</div>
         <v-text-field
           v-model="oldpass"
           label="Старый пароль"
@@ -77,18 +72,12 @@
       class="profile-tab"
       :style="{ backgroundColor: theme.$main_bg }"
     >
-      <v-card-text
-        class="card-text-profile"
-        :style="{ color: theme.$title }"
-      >
+      <v-card-text class="card-text-profile" :style="{ color: theme.$title }">
         <div class="headline">
           {{ titleModal }}
         </div>
 
-        <div
-          v-if="showBlock.users"
-          class="profile-block"
-        >
+        <div v-if="showBlock.users" class="profile-block">
           <v-text-field
             v-model="userData.username"
             label="Логин пользователя"
@@ -110,7 +99,6 @@
             placeholder="********"
             type="password"
             outlined
-            ide-details
             clearable
             @input="toggleIsChanged"
           />
@@ -128,10 +116,7 @@
           />
         </div>
 
-        <div
-          v-if="showBlock.roles"
-          class="profile-block"
-        >
+        <div v-if="showBlock.roles" class="profile-block">
           <v-text-field
             v-model="curItem.name"
             label="Название роли"
@@ -156,10 +141,7 @@
           />
         </div>
 
-        <div
-          v-if="showBlock.permissions"
-          class="profile-block"
-        >
+        <div v-if="showBlock.permissions" class="profile-block">
           <v-text-field
             v-model="curItem.name"
             label="Название привилегии"
@@ -183,10 +165,7 @@
             @update:is-changed="toggleIsChanged"
           />
         </div>
-        <div
-          v-if="showBlock.groups"
-          class="profile-block"
-        >
+        <div v-if="showBlock.groups" class="profile-block">
           <v-text-field
             v-model="curItem.name"
             label="Название группы"
@@ -197,9 +176,7 @@
             clearable
             @input="toggleIsChanged"
           />
-          <div class="zagolovok-values">
-            Изменить цвет группы
-          </div>
+          <div class="zagolovok-values">Изменить цвет группы</div>
           <v-color-picker
             v-model="curItem.color"
             class="colorPicker"
@@ -218,10 +195,7 @@
             @update:is-changed="toggleIsChanged"
           />
         </div>
-        <div
-          v-if="showBlock.indexes"
-          class="profile-block"
-        >
+        <div v-if="showBlock.indexes" class="profile-block">
           <v-text-field
             v-model="curItem.name"
             label="Название индекса"
@@ -308,6 +282,10 @@ export default {
     curItemFrom: {
       type: Object,
       default: () => ({}),
+    },
+    curUserId: {
+      type: Number,
+      required: true,
     },
   },
   data() {
@@ -420,16 +398,15 @@ export default {
       set(newVal) {
         this.changedData = structuredClone(newVal);
       },
-
     },
   },
-  watch: {
-  },
+  watch: {},
   mounted() {
     this.colorFrom = this.theme;
 
     if (this.active) {
-      this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
+      this.userData.username =
+        Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
       this.userData.pass = '';
       Object.keys(this.showBlock).forEach((item) => {
         this.showBlock[item] = false;
@@ -475,7 +452,10 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.dispatch('auth/getEssenceList', { role: item, create: true });
+          return this.$store.dispatch('auth/getEssenceList', {
+            role: item,
+            create: true,
+          });
         });
 
         const result = await Promise.all(promise);
@@ -488,12 +468,14 @@ export default {
         return allData;
       }
       let result;
-      await this.$store.dispatch('auth/getEssence', {
-        essence: this.userFrom.tab,
-        id: this.userFrom.id,
-      }).then((res) => {
-        result = res;
-      });
+      await this.$store
+        .dispatch('auth/getEssence', {
+          essence: this.userFrom.tab,
+          id: this.userFrom.id,
+        })
+        .then((res) => {
+          result = res;
+        });
       return result;
     },
     cancelModal(isClearChanges = true) {
@@ -522,49 +504,52 @@ export default {
             if (!this.userData.pass || this.userData.pass.length === 0) {
               this.showErrorMsg(
                 'Логин или пароль не могут быть пустыми',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
               );
               return;
             }
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
               );
               return;
             }
             formData.password = this.userData.pass;
           } else if (act === 'pass') {
             if (
-              this.oldpass == null
-              || this.oldpass.length === 0
-              || !this.oldpass
+              this.oldpass == null ||
+              this.oldpass.length === 0 ||
+              !this.oldpass
             ) {
               this.showErrorMsg(
                 'Введите старый пароль',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
               );
               return;
-            } if (
-              this.newpass == null
-              || this.newpass.length === 0
-              || !this.newpass
+            }
+            if (
+              this.newpass == null ||
+              this.newpass.length === 0 ||
+              !this.newpass
             ) {
               this.showErrorMsg(
                 'Введите новый пароль',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
               );
               return;
-            } if (this.newpass.length < 7) {
+            }
+            if (this.newpass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
               );
               return;
-            } if (this.newpass === this.oldpass) {
+            }
+            if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
               );
               return;
             }
@@ -574,7 +559,14 @@ export default {
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
+                this.colorFrom.controlsActive
+              );
+              return;
+            }
+            if (this.userData.pass.length > 20) {
+              this.showErrorMsg(
+                'Пароль должен быть меньше 20 символов',
+                this.colorFrom.controlsActive
               );
               return;
             }
@@ -643,17 +635,14 @@ export default {
       });
       response.then((res) => {
         if (res.status === 200) {
+          if (this.userFrom.id === this.curUserId) {
+            this.$store.commit('auth/setUserName', this.userData.username);
+          }
           this.cancelModal(false);
         } else if (res.status === 409) {
-          this.showErrorMsg(
-            sameMsg,
-            '#FF6D70',
-          );
+          this.showErrorMsg(sameMsg, '#FF6D70');
         } else if (res.status === 403) {
-          this.showErrorMsg(
-            '',
-            '#FF6D70',
-          );
+          this.showErrorMsg('', '#FF6D70');
         }
       });
     },

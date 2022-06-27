@@ -9,12 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add password max length
+
 ### Fixed
+
+- Change username on edit
 - Multiline. Signature of the nth point
 
 ## [1.96.0]
 
 ### Fixed
+
 - Fixed delete user in profile
 - Fixed datepicker visualisation
 - Fixed zooming of a multiline in the Data Research 2.0
@@ -26,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.95.0]
 
 ### Added
+
 - Added new picker button to dash picker
 - added general settings for panels.
 - added the ability to hide the name of the panel.
@@ -37,8 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to configure the source data for the default component value
 
 ### Fixed
+
 - Fixed ygraph tooltip position
-- Changed icons for menu, tune and accumulators visualisations 
+- Changed icons for menu, tune and accumulators visualisations
 - Fixed dashboard save edit state
 - Fixed dashboard save drag/resize state
 - Fixed text color in codeMirror if selected custom color theme
@@ -54,29 +61,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.94.0]
 
 ### Added
+
 - Add Menu visualisation
 - Add icons to title actions
 - Multiline: updated the settings design, added chart groups
 - added legend highlight on the multiline component
 - added ability to bind the Y axis in the multiline component
-- Added input data validation in the textarea component 
+- Added input data validation in the textarea component
 - adding settings for the textarea
 - Added transition on click to map
 
 ### Fixed
+
 - Fixed SingleValue title tockens
 - Fixed piechart legend in big size mode
-- Fixed SingleValue "missing _order" error if order exist in edited data source
+- Fixed SingleValue "missing \_order" error if order exist in edited data source
 - Fixed username in DS request
 - Fixed big size visualisation mode
 
 ## [1.93.0]
 
 ### Added
+
 - Added data source setting for its autorun immediately after loading the dashboard
 - Add pipeline parameters to map
 
 ### Fixed
+
 - Fixed data source export
 - Fixed modal windows behavior
 - Fixed select number
@@ -84,17 +95,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.92.0]
 
 ### Added
+
 - Add fullscreen mode to visualosations
 - Add options mode tune and accumulators visualisations
 - Add title actions in settings for visualisations
 - Adding layers to the map
 
 ### Fixed
+
 - Fix accumulator colors
 - Fixed metrics order in dashSingleValue.vue
 - Fixed error in dashSingleValue.vue on data source changed
 - Fixed title actions
-- Removed old reports page 
+- Removed old reports page
 - Removed papers page
 - Remove title actions from reports visualisations
 - Fixed modal visualisation console error
@@ -103,10 +116,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.91.0]
 
 ### Added
+
 - Add code editor to reportsV2
 - add visualisation dashAccumulators.vue
 
 ### Fixed
+
 - Fixed dashDTPicker active element text color
 - Fixed tokens in csvg visualisation
 - Fixed csvg popup
@@ -116,27 +131,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.90.0]
 
 ### Added
+
 - Add donat mod to pieChart
 - Created gantt class
 - Created piechart class
 - Created graph class
 
 ### Fixed
+
 - Multiline. Some chart line display settings do not work
 - Fixed guntt infinite loop
 - Fixed styles on vuetify components
 - Fixed default color dashButton
-- Fixed errors in old reports  
+- Fixed errors in old reports
 - Fixed dashSingle fullscreen mode
 - Fixed dash single background color
 
 ## [1.89.0]
 
 ### Feature
+
 - Created map class
 - additional export
 
 ### Fixed
+
 - fix export link
 - fixed maps mode
 - data exploration 2.0: fixed styles and added a horizontal scroll bar
@@ -144,9 +163,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.88.0]
 
 ### Feature
+
 - Added hotkey for query window in data research v2
 
 ### Fixed
+
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings
@@ -157,12 +178,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.87.0]
 
 ### Added
+
 - added new notification system
 - added color picker for custom pie chart
 - added nginx configuration files for /eva endpoint
 - added eva router prefix
 
 ### Fixed
+
 - Fixed d3 select in timeline
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
@@ -172,16 +195,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.86.1]
 
 ### Fixed
+
 - Fixed theme styles
 
 ## [1.86.0]
 
 ### Added
+
 - added visualisations in DS2 (ygraph, bush, map, heatmap, singleValue, tune)
 - Added display of a message about the lack of data on the visualization "tile"
 - logout form all browser tabs
 
 ### Fixed
+
 - add settings for singleValue in reportsV2
 - fixed reportsV2 heat map visualisation
 - fixed and disabled eslint errors
@@ -206,7 +232,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportsV2: some visualizations are not displayed immediately after selection
 - fixed a visual bug in the single value dash
 - fixed reportsV2: map display, settings, styles
-- fixed reportsV2: Incorrect display of the graph and non-working control buttons 
+- fixed reportsV2: Incorrect display of the graph and non-working control buttons
 - fixed resizing movable visualisation
 - fixed tune resize
 - fixed updating and undoing filter parts changes
@@ -219,12 +245,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.85.0]
 
 ### Added
+
 - added the ability to update tokens when executing a go event
 - reportsV2 timeline get data from backend
 - reportsV2 interesting get data from backend
 - added visualisations to datа research 2.0.
 
 ### Fixed
+
 - fix first search id
 - fix bush drawing
 - fix single value template reactivity
@@ -277,7 +305,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed default tab are not created
 - fixed multiselect refinement
 - fixed multiselect placing data on multiple lines
-- fixed add token 
+- fixed add token
 - improvements handling window closing
 - fixed dropdown lists
 - fixed table columns not hiding
@@ -287,9 +315,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.84.0]
 
 ### Added
+
 - multiple tokens
 
 ### Fixed
+
 - fixed filters. name and content
 - fixed visible zoom button
 - fixed setting the title breaks the scrolling of the component
@@ -301,11 +331,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.83.1]
 
 ### Fixed
+
 - release name
 
 ## [1.83.0]
 
 ### Added
+
 - added ability zoom all multiline graphs
 - added the ability to zoom out by double-clicking on a multiline
 - Added a frame for the event window
@@ -355,10 +387,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.81.0]
 
 ### Added
+
 - refactoring modal settings
 - datа research 2.0.
 
 ## Fixed
+
 - Fixed display of dashboard edit button
 
 ## [1.80.0]
