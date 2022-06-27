@@ -110,6 +110,7 @@
             placeholder="********"
             type="password"
             outlined
+            hide-details
             clearable
             @input="toggleIsChanged"
           />
