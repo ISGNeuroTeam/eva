@@ -138,6 +138,7 @@
       :cur-item-from="curItem"
       :passway="permission"
       :user-from="user"
+      :cur-user-id="userId"
       @cancelModal="closeModal"
     />
     <modal-delete-profile
@@ -295,7 +296,10 @@ export default {
       }
     },
     async setData(role) {
-      const result = await this.$store.dispatch('auth/getEssenceList', { role, create: false });
+      const result = await this.$store.dispatch('auth/getEssenceList', {
+        role,
+        create: false,
+      });
       return result;
     },
     setColorHover(i) {
@@ -309,7 +313,9 @@ export default {
               const elem = event.target.tagName.toLowerCase();
               const icon = event.target.parentElement.closest('td');
               if (elem === 'td' || icon) {
-                event.target.parentElement.closest('tr').style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
+                event.target.parentElement.closest(
+                  'tr',
+                ).style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
               }
             });
             table.addEventListener('mouseout', (event) => {
@@ -363,10 +369,7 @@ export default {
     },
     removeFromList(id) {
       if (id === this.userId) {
-        document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
-        document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
-        this.$store.commit('clearState');
-        this.$router.push('/');
+        this.$store.dispatch('auth/logout');
       } else {
         this.originData = this.originData.filter((item) => item.id !== id);
       }
