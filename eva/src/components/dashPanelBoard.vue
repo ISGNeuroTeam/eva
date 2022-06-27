@@ -1,14 +1,23 @@
 <template>
   <div class="app-header">
-    <div class="dash-main" :style="{ background: theme.$main_bg }">
+    <div
+      class="dash-main"
+      :style="{ background: theme.$main_bg }"
+    >
       <div class="main-title">
         <div class="logo-block">
           <EvaLogo />
         </div>
-        <div class="title-name" :style="{ color: theme.$title }">
+        <div
+          class="title-name"
+          :style="{ color: theme.$title }"
+        >
           {{ name }}
         </div>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="home"
@@ -21,7 +30,10 @@
           </template>
           <span>На главную</span>
         </v-tooltip>
-        <v-tooltip bottom :color="theme.$accent_ui_color">
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
           <template v-slot:activator="{ on }">
             <v-icon
               class="undo"
@@ -36,8 +48,14 @@
         </v-tooltip>
       </div>
       <div class="control-block">
-        <div class="edit-container" :class="{ hide_control: !editMode }">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+        <div
+          class="edit-container"
+          :class="{ hide_control: !editMode }"
+        >
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -51,7 +69,10 @@
             </template>
             <span>События</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -65,7 +86,10 @@
             </template>
             <span>Токены</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -79,7 +103,10 @@
             </template>
             <span>Источники данных</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -95,7 +122,10 @@
           </v-tooltip>
         </div>
         <div class="user-control-panel">
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -142,7 +172,10 @@
             </template>
             <span>Сохранить</span>
           </v-tooltip>
-          <v-tooltip bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
@@ -158,9 +191,16 @@
             <span>Открыть окно логов</span>
           </v-tooltip>
         </div>
-        <v-menu :nudge-width="100" :rounded="false" offset-y>
+        <v-menu
+          :nudge-width="100"
+          :rounded="false"
+          offset-y
+        >
           <template v-slot:activator="{ on: onMenu }">
-            <v-tooltip bottom :color="theme.$accent_ui_color">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+            >
               <template v-slot:activator="{ on: onTooltip }">
                 <div
                   class="dropdown-profile"
@@ -189,7 +229,10 @@
                 Профиль
               </v-list-item-title>
             </v-list-item>
-            <div v-for="item in profileDropdownButtons" :key="item.id">
+            <div
+              v-for="item in profileDropdownButtons"
+              :key="item.id"
+            >
               <v-list-item v-if="!item.hide">
                 <v-btn
                   class="profile-dropdown--button"
@@ -197,7 +240,10 @@
                   v-on="on"
                   @click="item.onClick"
                 >
-                  <v-icon class="edit icon-aut" :color="theme.$secondary_text">
+                  <v-icon
+                    class="edit icon-aut"
+                    :color="theme.$secondary_text"
+                  >
                     {{ item.icon }}
                   </v-icon>
                   {{ item.label }}
@@ -214,10 +260,16 @@
         :style="blockToolStyle"
       >
         <div class="iconsNavigations">
-          <v-icon :color="theme.$primary_button" @click="runAllSearches">
+          <v-icon
+            :color="theme.$primary_button"
+            @click="runAllSearches"
+          >
             {{ mdiAnimationPlay }}
           </v-icon>
-          <v-icon :color="theme.$primary_button" @click="openModal">
+          <v-icon
+            :color="theme.$primary_button"
+            @click="openModal"
+          >
             {{ plus_icon }}
           </v-icon>
         </div>
@@ -257,7 +309,11 @@
               }"
             />
           </div>
-          <v-tooltip z-index="99" bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-play"
@@ -270,7 +326,11 @@
             </template>
             <span>Запустить ИД</span>
           </v-tooltip>
-          <v-tooltip z-index="99" bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-pencil"
@@ -283,7 +343,11 @@
             </template>
             <span>Редактировать ИД</span>
           </v-tooltip>
-          <v-tooltip z-index="99" bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -296,7 +360,11 @@
             </template>
             <span>Планировщик</span>
           </v-tooltip>
-          <v-tooltip z-index="99" bottom :color="theme.$accent_ui_color">
+          <v-tooltip
+            z-index="99"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-clock"
@@ -310,7 +378,11 @@
             </template>
             <span>Экспортировать ИД</span>
           </v-tooltip>
-          <v-tooltip bottom z-index="99" :color="theme.$accent_ui_color">
+          <v-tooltip
+            bottom
+            z-index="99"
+            :color="theme.$accent_ui_color"
+          >
             <template v-slot:activator="{ on }">
               <v-icon
                 class="search-trash"
@@ -352,7 +424,10 @@
               border: `2px solid ${theme.$accent_ui_color}`,
             }"
           >
-            <v-icon class="tool-img-itself" :style="{ color: '#FFF' }">
+            <v-icon
+              class="tool-img-itself"
+              :style="{ color: '#FFF' }"
+            >
               {{ `${tool.img}` }}
             </v-icon>
           </div>
@@ -674,8 +749,14 @@
           border: `1px solid ${theme.$main_text}`,
         }"
       >
-        <div v-show="!errorSave" class="save-obertka">
-          <div class="question-save" :style="{ color: theme.$main_text }">
+        <div
+          v-show="!errorSave"
+          class="save-obertka"
+        >
+          <div
+            class="question-save"
+            :style="{ color: theme.$main_text }"
+          >
             Сохранить дашборд
             <span class="save-name">
               {{ name }}
@@ -704,8 +785,14 @@
             </v-btn>
           </div>
         </div>
-        <div v-show="errorSave" class="save-obertka message-save">
-          <div class="question-save" :style="{ color: theme.$error_color }">
+        <div
+          v-show="errorSave"
+          class="save-obertka message-save"
+        >
+          <div
+            class="question-save"
+            :style="{ color: theme.$error_color }"
+          >
             {{ msgErrorSave }}
           </div>
         </div>
@@ -721,7 +808,10 @@
         <div class="warning-text">
           {{ msgWarn }}
         </div>
-        <div v-show="!errorSaveToken" class="btn-warning">
+        <div
+          v-show="!errorSaveToken"
+          class="btn-warning"
+        >
           <v-btn
             small
             :color="theme.$primary_button"
@@ -747,7 +837,10 @@
         :data-search-from="newSearch"
         @cancelModal="cancelModal"
       />
-      <modal-themes v-model="paleteShow" :admin="isAdmin" />
+      <modal-themes
+        v-model="paleteShow"
+        :admin="isAdmin"
+      />
       <modal-schedule
         v-model="activeSchedule"
         :id-dash-from="idDash"
@@ -762,7 +855,10 @@
       />
     </div>
 
-    <div class="block-filter" :class="{ openfilter }">
+    <div
+      class="block-filter"
+      :class="{ openfilter }"
+    >
       <dash-filter-panel
         :permissions-from="userPermissions"
         :id-dash-from="idDashFrom"
@@ -1007,8 +1103,8 @@ export default {
     },
     editPermission() {
       return (
-        this.userPermissions.includes('admin_all') ||
-        this.userPermissions.includes('editdash')
+        this.userPermissions.includes('admin_all')
+        || this.userPermissions.includes('editdash')
       );
     },
     getEventFull() {
@@ -1028,10 +1124,9 @@ export default {
       // получение всех элемнета на странице
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
-          (elem) =>
-            this.$store.state[this.idDash][elem].tab ===
-              this.$store.state[this.idDash].currentTab ||
-            this.$store.state[this.idDash][elem].options.pinned
+          (elem) => this.$store.state[this.idDash][elem].tab
+              === this.$store.state[this.idDash].currentTab
+            || this.$store.state[this.idDash][elem].options.pinned,
         );
       }
       return [];
@@ -1041,7 +1136,7 @@ export default {
       return (element) => {
         if (this.$store.state[this.idDash][element]) {
           return this.$store.state[this.idDash][element].actions.map(
-            (item) => item.name
+            (item) => item.name,
           );
         }
         return [];
@@ -1052,7 +1147,7 @@ export default {
       return ({ elem, action }) => {
         if (this.dashFromStore && this.dashFromStore[elem]) {
           let j = Object.keys(this.dashFromStore[elem].actions).find(
-            (key) => this.dashFromStore[elem].actions[key].name === action
+            (key) => this.dashFromStore[elem].actions[key].name === action,
           );
           Object.keys(this.dashFromStore[elem].actions).forEach((item) => {
             if (this.dashFromStore[elem].actions[item].name === action) {
@@ -1076,8 +1171,7 @@ export default {
     },
     isEditDash() {
       return !!this.allGroups.find(
-        (group) =>
-          group.dashs.includes(this.name) && group.users.includes(this.login)
+        (group) => group.dashs.includes(this.name) && group.users.includes(this.login),
       );
     },
     dashFromStore() {
@@ -1386,16 +1480,16 @@ export default {
         const filterTockens = this.tokens.filter((x) => {
           if (!Number.isNaN(index) && index !== undefined) {
             return (
-              x.elem === this.tokens[index].elem &&
-              x.action === this.tokens[index].action &&
-              x.capture === this.tokens[index].capture &&
-              x.name !== this.tokens[index].name
+              x.elem === this.tokens[index].elem
+              && x.action === this.tokens[index].action
+              && x.capture === this.tokens[index].capture
+              && x.name !== this.tokens[index].name
             );
           }
           return (
-            x.elem === this.newElem &&
-            x.action === this.newAction &&
-            x.capture === this.newCapture
+            x.elem === this.newElem
+            && x.action === this.newAction
+            && x.capture === this.newCapture
           );
         });
 
@@ -1416,9 +1510,9 @@ export default {
 
       // проверяем не пустой ли токен
       if (
-        (!this.newTockenName && !Number.isInteger(index)) ||
-        (Number.isInteger(index) &&
-          !this.tockensName[this.tokens[index].name].length)
+        (!this.newTockenName && !Number.isInteger(index))
+        || (Number.isInteger(index)
+          && !this.tockensName[this.tokens[index].name].length)
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -1435,11 +1529,11 @@ export default {
 
       // проверяем на запретние названия
       if (
-        (!Number.isInteger(index) &&
-          globalTockens.includes(this.newTockenName.trim())) ||
-        (Number.isInteger(index) &&
-          globalTockens.includes(
-            this.tockensName[this.tokens[index].name].trim()
+        (!Number.isInteger(index)
+          && globalTockens.includes(this.newTockenName.trim()))
+        || (Number.isInteger(index)
+          && globalTockens.includes(
+            this.tockensName[this.tokens[index].name].trim(),
           ))
       ) {
         this.errorSaveToken = true;
@@ -1447,8 +1541,7 @@ export default {
         const height = this.$refs.blockTocken.clientHeight;
 
         this.otstupBottom = height + 55;
-        this.msgWarn =
-          'Невозможно использовать это имя для токена. Попробуйте еще раз.';
+        this.msgWarn = 'Невозможно использовать это имя для токена. Попробуйте еще раз.';
 
         setTimeout(() => {
           this.openwarning = false;
@@ -1606,8 +1699,8 @@ export default {
     },
     openEditSearch(event, sid) {
       if (
-        event.target.classList.contains('search-id') ||
-        event.target.classList.contains('search-query')
+        event.target.classList.contains('search-id')
+        || event.target.classList.contains('search-query')
       ) {
         this.openEdit(sid);
       }
@@ -1690,7 +1783,7 @@ export default {
         this.$set(
           this.newDashBoard[type],
           'name_elem',
-          type[0].toUpperCase() + type.substring(1)
+          type[0].toUpperCase() + type.substring(1),
         );
 
         const step = { ...this.getSizeGrid };
@@ -1702,7 +1795,7 @@ export default {
           settings.size[type].height,
           settings.size[type].width,
           step,
-          'size'
+          'size',
         );
 
         this.$set(this.newDashBoard[type], 'width', size.vert);
@@ -1813,7 +1906,7 @@ export default {
               this.$set(
                 this.event,
                 'event',
-                reg.exec(item)[0].replace('(', '')
+                reg.exec(item)[0].replace('(', ''),
               );
               // reg = new RegExp(/\(.+\)/, 'g');
               reg = /\(.+\)/g;
@@ -1833,14 +1926,14 @@ export default {
                   this.$set(
                     this.event,
                     'row',
-                    element.splice(2, element.length - 1).join(',')
+                    element.splice(2, element.length - 1).join(','),
                   );
                 } else {
                   this.$set(this.event, 'compare', element[0]);
                   this.$set(
                     this.event,
                     'sense',
-                    element.splice(1, element.length - 1).join(',')
+                    element.splice(1, element.length - 1).join(','),
                   );
                 }
               } else if (this.event.event === 'OnTokenCompare') {
@@ -1849,7 +1942,7 @@ export default {
                 this.$set(
                   this.event,
                   'tokenval',
-                  element.splice(2, element.length - 1).join(',')
+                  element.splice(2, element.length - 1).join(','),
                 );
               } else if (this.event.event === 'onValueCompare') {
                 if (element.length === 2) {
@@ -1861,12 +1954,12 @@ export default {
                       this.$set(
                         this.event,
                         'treshold',
-                        element.slice(0, index + 1).join(',')
+                        element.slice(0, index + 1).join(','),
                       );
                       this.$set(
                         this.event,
                         'color',
-                        element.slice(index + 1, element.length).join(',')
+                        element.slice(index + 1, element.length).join(','),
                       );
                     }
                   });
@@ -1963,9 +2056,7 @@ export default {
                 this.$set(this.event, 'sid', doing[0]);
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
-                  const files = doing.map((file) =>
-                    file.replace('[', '').replace(']', '')
-                  );
+                  const files = doing.map((file) => file.replace('[', '').replace(']', ''));
                   this.$set(this.event, 'file', files);
                 } else {
                   this.$set(this.event, 'file', [doing[1]]);
@@ -2034,7 +2125,7 @@ export default {
             'auth/putLog',
             `Сохранен дашборд  ${this.toHichName(res.data.name)} c id ${
               res.data.id
-            }`
+            }`,
           );
           this.updateDash({ data: res.data, dash });
         } else {
@@ -2056,7 +2147,7 @@ export default {
         'auth/putLog',
         `Обновлен дашборд ${this.toHichName(dash.data.name)} с id ${
           this.idDash
-        }`
+        }`,
       );
     },
     toHichName(name) {

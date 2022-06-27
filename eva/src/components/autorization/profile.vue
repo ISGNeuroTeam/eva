@@ -1,13 +1,27 @@
 <template>
-  <v-app class="aut-app-profile" :style="{ background: theme.$secondary_bg }">
-    <header-top inside @permissions="setPermissions" />
+  <v-app
+    class="aut-app-profile"
+    :style="{ background: theme.$secondary_bg }"
+  >
+    <header-top
+      inside
+      @permissions="setPermissions"
+    />
     <v-content>
       <v-container class="main-container">
         <v-card class="card-aut-table">
           <v-card-text :style="{ background: theme.$main_bg }">
-            <v-tabs v-model="tab" :color="theme.$main_text" @change="getData">
+            <v-tabs
+              v-model="tab"
+              :color="theme.$main_text"
+              @change="getData"
+            >
               <v-tabs-slider />
-              <v-tab v-for="i in tabs.length" :key="i" :href="`#tab-${i}`">
+              <v-tab
+                v-for="i in tabs.length"
+                :key="i"
+                :href="`#tab-${i}`"
+              >
                 {{ tabs[i - 1] }}
               </v-tab>
               <v-tab-item
@@ -16,7 +30,10 @@
                 class="item"
                 :value="`tab-${i}`"
               >
-                <div v-if="dataLoading" class="loading-tab">
+                <div
+                  v-if="dataLoading"
+                  class="loading-tab"
+                >
                   <v-skeleton-loader
                     type="table-tbody"
                     tile
@@ -67,7 +84,10 @@
                     </template>
 
                     <template v-slot:item.actions="{ item }">
-                      <v-tooltip bottom :color="theme.$accent_ui_color">
+                      <v-tooltip
+                        bottom
+                        :color="theme.$accent_ui_color"
+                      >
                         <template v-slot:activator="{ on }">
                           <v-icon
                             v-if="i === 1 || showPencilRoot"
@@ -224,7 +244,7 @@ export default {
           Object.keys(item).forEach((itemopt) => {
             if (Array.isArray(item[itemopt])) {
               this.originData[i][itemopt] = this.checkName(
-                item[itemopt].join(', ')
+                item[itemopt].join(', '),
               );
             }
           });
@@ -294,21 +314,20 @@ export default {
               const icon = event.target.parentElement.closest('td');
               if (elem === 'td' || icon) {
                 event.target.parentElement.closest(
-                  'tr'
+                  'tr',
                 ).style = `background: ${this.theme.$accent_ui_color} !important;color:white`;
               }
             });
             table.addEventListener('mouseout', (event) => {
               if (event.target.tagName.toLowerCase() === 'td') {
-                event.target.parentElement.style =
-                  'background: transparent !important;';
+                event.target.parentElement.style = 'background: transparent !important;';
               }
             });
           } else {
             timeOut = setTimeout(tick.bind(this), 100);
           }
         }.bind(this),
-        0
+        0,
       );
     },
     checkName(name) {

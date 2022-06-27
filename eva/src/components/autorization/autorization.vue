@@ -17,7 +17,10 @@
             >
               Авторизация
             </v-card-title>
-            <v-card-text class="text-aut" :style="{ color: theme.$main_text }">
+            <v-card-text
+              class="text-aut"
+              :style="{ color: theme.$main_text }"
+            >
               <v-text-field
                 v-model="user.username"
                 label="Логин"
@@ -54,7 +57,10 @@
                 Подтвердить
               </v-btn>
             </v-card-actions>
-            <div class="example" v-html="msgg" />
+            <div
+              class="example"
+              v-html="msgg"
+            />
           </v-card>
         </div>
       </v-container>
@@ -89,10 +95,10 @@ export default {
   methods: {
     async sendAut() {
       if (
-        this.user.username &&
-        this.user.username.length !== 0 &&
-        this.user.password &&
-        this.user.password.length !== 0
+        this.user.username
+        && this.user.username.length !== 0
+        && this.user.password
+        && this.user.password.length !== 0
       ) {
         const response = await fetch('/api/auth/login', {
           // сперва нужно подать post запрос
@@ -114,7 +120,7 @@ export default {
             // переводим полученные данные из json в нормальный объект
             this.$store.dispatch(
               'auth/putLog',
-              `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`
+              `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`,
             );
             this.$store.commit('clearState');
             this.$store.commit('auth/setUserName', this.$jwt.decode().username);
@@ -124,7 +130,7 @@ export default {
         } else {
           await this.$store.dispatch(
             'auth/putLog',
-            `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`
+            `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
           );
           this.msgText = 'Логин или пароль введены неверно';
           this.msg = true;

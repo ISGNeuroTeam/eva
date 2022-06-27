@@ -13,8 +13,13 @@
       class="passcard"
       :style="{ backgroundColor: theme.$main_bg }"
     >
-      <v-card-text class="card-text-profile" :style="{ color: theme.$title }">
-        <div class="headline">Изменить пароль</div>
+      <v-card-text
+        class="card-text-profile"
+        :style="{ color: theme.$title }"
+      >
+        <div class="headline">
+          Изменить пароль
+        </div>
         <v-text-field
           v-model="oldpass"
           label="Старый пароль"
@@ -72,12 +77,18 @@
       class="profile-tab"
       :style="{ backgroundColor: theme.$main_bg }"
     >
-      <v-card-text class="card-text-profile" :style="{ color: theme.$title }">
+      <v-card-text
+        class="card-text-profile"
+        :style="{ color: theme.$title }"
+      >
         <div class="headline">
           {{ titleModal }}
         </div>
 
-        <div v-if="showBlock.users" class="profile-block">
+        <div
+          v-if="showBlock.users"
+          class="profile-block"
+        >
           <v-text-field
             v-model="userData.username"
             label="Логин пользователя"
@@ -116,7 +127,10 @@
           />
         </div>
 
-        <div v-if="showBlock.roles" class="profile-block">
+        <div
+          v-if="showBlock.roles"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название роли"
@@ -141,7 +155,10 @@
           />
         </div>
 
-        <div v-if="showBlock.permissions" class="profile-block">
+        <div
+          v-if="showBlock.permissions"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название привилегии"
@@ -165,7 +182,10 @@
             @update:is-changed="toggleIsChanged"
           />
         </div>
-        <div v-if="showBlock.groups" class="profile-block">
+        <div
+          v-if="showBlock.groups"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название группы"
@@ -176,7 +196,9 @@
             clearable
             @input="toggleIsChanged"
           />
-          <div class="zagolovok-values">Изменить цвет группы</div>
+          <div class="zagolovok-values">
+            Изменить цвет группы
+          </div>
           <v-color-picker
             v-model="curItem.color"
             class="colorPicker"
@@ -195,7 +217,10 @@
             @update:is-changed="toggleIsChanged"
           />
         </div>
-        <div v-if="showBlock.indexes" class="profile-block">
+        <div
+          v-if="showBlock.indexes"
+          class="profile-block"
+        >
           <v-text-field
             v-model="curItem.name"
             label="Название индекса"
@@ -405,8 +430,7 @@ export default {
     this.colorFrom = this.theme;
 
     if (this.active) {
-      this.userData.username =
-        Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
+      this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
       this.userData.pass = '';
       Object.keys(this.showBlock).forEach((item) => {
         this.showBlock[item] = false;
@@ -504,52 +528,52 @@ export default {
             if (!this.userData.pass || this.userData.pass.length === 0) {
               this.showErrorMsg(
                 'Логин или пароль не могут быть пустыми',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
             formData.password = this.userData.pass;
           } else if (act === 'pass') {
             if (
-              this.oldpass == null ||
-              this.oldpass.length === 0 ||
-              !this.oldpass
+              this.oldpass == null
+              || this.oldpass.length === 0
+              || !this.oldpass
             ) {
               this.showErrorMsg(
                 'Введите старый пароль',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
             if (
-              this.newpass == null ||
-              this.newpass.length === 0 ||
-              !this.newpass
+              this.newpass == null
+              || this.newpass.length === 0
+              || !this.newpass
             ) {
               this.showErrorMsg(
                 'Введите новый пароль',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
             if (this.newpass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
             if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
@@ -559,14 +583,14 @@ export default {
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
             if (this.userData.pass.length > 20) {
               this.showErrorMsg(
                 'Пароль должен быть меньше 20 символов',
-                this.colorFrom.controlsActive
+                this.colorFrom.controlsActive,
               );
               return;
             }
