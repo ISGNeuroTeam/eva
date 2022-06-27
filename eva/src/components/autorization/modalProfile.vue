@@ -426,7 +426,6 @@ export default {
       },
     },
   },
-  watch: {},
   mounted() {
     this.colorFrom = this.theme;
 
