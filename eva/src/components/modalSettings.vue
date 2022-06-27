@@ -1111,6 +1111,7 @@ export default {
     this.metricsName = this.getMetricsMulti;
     this.loadComponentsSettings();
     this.prepareOptions();
+    this.updateTableTitles();
   },
   methods: {
     changetitleActions(val) {
@@ -1634,6 +1635,24 @@ export default {
         },
       ]);
       this.isDelete = false;
+    },
+    updateTableTitles() {
+      if (!this.element.startsWith('table')) {
+        return;
+      }
+      const savedTitles = this.dashFromStore[this.element].options.titles || [];
+      const { availableTableTitles = [] } = this.elementFromStore;
+      if (savedTitles.length === 0 && availableTableTitles.length) {
+        this.$store.commit('setState', [
+          {
+            object: this.dashFromStore[this.element].options,
+            prop: 'titles',
+            value: [
+              ...availableTableTitles,
+            ],
+          },
+        ]);
+      }
     },
   },
 };
