@@ -203,6 +203,9 @@ export default new Vuex.Store({
     setSwitch(state, { idDash, id, status }) {
       state[idDash][id].switch = status;
       if (id.includes('table')) {
+        if (state[idDash][id].options) {
+          state[idDash][id].options.titles = [];
+        }
         delete state[idDash][id].selectedTableTitles;
         delete state[idDash][id].availableTableTitles;
       }
