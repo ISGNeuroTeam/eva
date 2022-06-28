@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Multiline. Signature of the nth point
+- Fixing versions of third-party components
 
 ## [1.96.0]
 
