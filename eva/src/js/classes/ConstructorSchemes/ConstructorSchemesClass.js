@@ -518,7 +518,7 @@ class ConstructorSchemesClass {
         :dy="(layout.height / 6) * 2"
         alignment-baseline="middle"
         text-anchor="middle"
-        :fill="tag.textColor"
+        :fill="tag.firstTextColor"
       >
           {{ tag.firstValue }}
       </text>
@@ -528,7 +528,7 @@ class ConstructorSchemesClass {
         :dy="(layout.height / 6) * 4"
         alignment-baseline="middle"
         text-anchor="middle"
-        :fill="tag.textColor"
+        :fill="tag.secondTextColor"
       >
           {{ tag.secondValue }}
       </text>
@@ -538,13 +538,15 @@ class ConstructorSchemesClass {
       dataRest: {
         dataType: '5',
         nodeId: 'template-5',
-        id: '',
+        idFirst: '',
         templateType: 'template-5',
         firstValue: 5,
         firstValueColor: '#3366FF',
+        firstTextColor: '#FFFFFF',
         secondValue: 5,
         secondValueColor: '#FF5147',
-        textColor: '#FFFFFF',
+        secondTextColor: '#FFFFFF',
+        idSecond: '',
       },
     },
   ]
@@ -577,8 +579,8 @@ class ConstructorSchemesClass {
           :stroke="tag.bordered && tag.borderColor || 'transparent'" 
           :stroke-width="tag.bordered && tag.borderSize || '0'" 
           :stroke-dasharray="tag.bordered && tag.borderDashed ? '4' : '0'" 
-          rx="4" 
-          ry="4" 
+          rx="3" 
+          ry="3" 
         />
         <foreignObject :height="layout.height" :width="layout.width">
           <div
@@ -613,7 +615,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 30,
       dataRest: {
-        dataType: '0',
+        dataType: 'label-0',
         nodeId: 'label-template-0',
         id: '',
         textTemplateType: 'template-0',
@@ -1256,7 +1258,7 @@ class ConstructorSchemesClass {
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
           openDataPanelCallback(evt.item.tag);
-        } else {
+        }  else {
           openDataPanelCallback({
             nodeId: evt.item.tag.nodeId,
             dataType: 'default-node',
@@ -1830,7 +1832,7 @@ class ConstructorSchemesClass {
   }
 
   getDataItemById(dataId) {
-    return this.dataRest.find((dataItem) => dataItem.metric_name === dataId);
+    return this.dataRest.find((dataItem) => dataItem.TagName === dataId);
   }
 
   getShapeById(shapeId) {
@@ -1841,16 +1843,20 @@ class ConstructorSchemesClass {
     return '';
   }
 
+  // TODO: Рефакторин
   updateDataInNode(updatedData) {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
-        if (node.tag.dataType === '0') {
+        if (
+          node.tag.dataType === '0'
+          || node.tag.dataType === '1'
+        ) {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
-            const targetData = updatedData.find((item) => item.metric_name === nodeDataItem.id);
+            const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textLeft: targetData.metric_long_name,
+                textLeft: targetData.Description,
                 textRight: targetData.value,
               };
             }
@@ -1860,6 +1866,43 @@ class ConstructorSchemesClass {
             ...node.tag,
             items: updatedItems,
           };
+        } else if (
+          node.tag.dataType === '2'
+          || node.tag.dataType === '3'
+        ) {
+          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+          const updateTag = {
+            ...node.tag,
+            textFirst: targetData?.value || '-',
+            textSecond: targetData.Description || '-',
+          };
+          node.tag = {
+            ...node.tag,
+            ...updateTag,
+          };
+        } else if (node.tag.dataType === '4') {
+          const targetData = updatedData.find((item) => item.TagName === node.tag.id);
+          const updateTag = {
+            ...node.tag,
+            currentValue: +targetData.value,
+            maxValue: +targetData.value + 100,
+          };
+          node.tag = {
+            ...node.tag,
+            ...updateTag,
+          };
+        } else if (node.tag.dataType === '5') {
+          const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
+          const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
+          const updateTag = {
+            ...node.tag,
+            firstValue: +targetDataFirst.value,
+            secondValue: +targetDataSecond.value,
+          };
+          node.tag = {
+            ...node.tag,
+            ...updateTag,
+          };
         }
       });
       resolve();
@@ -1868,16 +1911,58 @@ class ConstructorSchemesClass {
     });
   }
 
+  // TODO: Рефакторин
   updateSelectedNode(updatedData, updateStoreCallback) {
-    if (this.targetDataNode.tag.dataType === '0') {
+    if (
+      this.targetDataNode.tag.dataType === '0'
+      || this.targetDataNode.tag.dataType === '1'
+    ) {
       const items = updatedData.items.map((item) => ({
         ...item,
-        textLeft: this.getDataItemById(item.id)?.metric_long_name || '-',
+        textLeft: this.getDataItemById(item.id)?.Description || '-',
         textRight: this.getDataItemById(item.id)?.value || '-',
       }));
       this.targetDataNode.tag = {
         ...this.targetDataNode.tag,
         items,
+      };
+    } else if (
+      this.targetDataNode.tag.dataType === '2'
+      || this.targetDataNode.tag.dataType === '3'
+    ) {
+      const items = {
+        ...updatedData,
+        textFirst: this.getDataItemById(updatedData.id)?.value || '-',
+        textSecond: this.getDataItemById(updatedData.id)?.Description || '-',
+      };
+      this.targetDataNode.tag = {
+        ...this.targetDataNode.tag,
+        ...items,
+      };
+    } else if (this.targetDataNode.tag.dataType === '4') {
+      const items = {
+        ...updatedData,
+        currentValue: Number(this.getDataItemById(updatedData.id)?.value),
+        maxValue: Number(this.getDataItemById(updatedData.id)?.value) + 100,
+      };
+      this.targetDataNode.tag = {
+        ...this.targetDataNode.tag,
+        ...items,
+      };
+    } else if (this.targetDataNode.tag.dataType === '5') {
+      const items = {
+        ...updatedData,
+        firstValue: Number(this.getDataItemById(updatedData.idFirst)?.value),
+        secondValue: Number(this.getDataItemById(updatedData.idSecond)?.value),
+      };
+      this.targetDataNode.tag = {
+        ...this.targetDataNode.tag,
+        ...items,
+      };
+    } else if (this.targetDataNode.tag.dataType === 'label-0') {
+      this.targetDataNode.tag = {
+        ...this.targetDataNode.tag,
+        ...updatedData,
       };
     }
     // Обновляем состояние графа

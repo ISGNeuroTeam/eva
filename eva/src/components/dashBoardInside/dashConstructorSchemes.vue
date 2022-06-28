@@ -313,27 +313,478 @@
         class="dash-constructor-schemes__data-panel-wrapper"
       >
         <div
-          v-if="dataSelectedNode.dataType === '0'"
+          v-if="
+            dataSelectedNode.dataType === '0'
+              || dataSelectedNode.dataType === '1'
+          "
+          class="dash-constructor-schemes__data-panel-item"
+        >
+          <div
+            v-for="(item, index) in dataSelectedNode.items"
+            :key="`${dataSelectedNode.nodeId}-${index}`"
+            class="row align-center"
+          >
+            <v-select
+              v-model="item.id"
+              :items="mockData"
+              item-value="TagName"
+              item-text="Description"
+              label="Данные для строки"
+              :menu-props="{
+                'z-index': 100,
+              }"
+              class="col-10"
+              @change="changeDataSelectedNode"
+            />
+            <v-icon
+              class="control-button edit-icon theme--dark col-2"
+              :style="{ color: theme.$secondary_text }"
+              @click="deleteLine(index)"
+            >
+              {{ closeIcon }}
+            </v-icon>
+          </div>
+
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            @click="addLine()"
+          >
+            Добавить строку
+          </v-btn>
+        </div>
+        <div
+          v-if="
+            dataSelectedNode.dataType === '2'
+              || dataSelectedNode.dataType === '3'
+          "
           class="dash-constructor-schemes__data-panel-item"
         >
           <v-select
-            v-for="(item, index) in dataSelectedNode.items"
-            :key="`${dataSelectedNode.nodeId}-${index}`"
-            v-model="item.id"
+            v-model="dataSelectedNode.id"
             :items="mockData"
-            item-value="metric_name"
-            item-text="metric_long_name"
+            item-value="TagName"
+            item-text="Description"
             label="Данные для строки"
             :menu-props="{
               'z-index': 100,
             }"
             @change="changeDataSelectedNode"
           />
+        </div>
+        <div
+          v-if=" dataSelectedNode.dataType === '4' "
+          class="dash-constructor-schemes__data-panel-item"
+        >
+          <v-select
+            v-model="dataSelectedNode.id"
+            :items="mockData"
+            item-value="TagName"
+            item-text="Description"
+            label="Данные для строки"
+            :menu-props="{
+              'z-index': 100,
+            }"
+          />
+          <div class="row">
+            <div class="col-8">
+              Цвет текущего
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.currentValueColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.currentValueColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+            <div class="col-8">
+              Цвет максимального
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.maxValueColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.maxValueColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+            <div class="col-8">
+              Цвет текста
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.textColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.textColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
           <v-btn
             small
             :color="theme.$primary_button"
+            @click="changeDataSelectedNode"
           >
-            Добавить строку
+            Применить
+          </v-btn>
+        </div>
+        <div
+          v-if="dataSelectedNode.dataType === '5'"
+          class="dash-constructor-schemes__data-panel-item"
+        >
+          <v-select
+            v-model="dataSelectedNode.idFirst"
+            :items="mockData"
+            item-value="TagName"
+            item-text="Description"
+            label="Первое значение"
+            :menu-props="{
+              'z-index': 100,
+            }"
+          />
+          <div class="row">
+            <div class="col-8">
+              Цвет первого значения
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.firstValueColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.firstValueColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              Цвет текста первого значения
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.firstTextColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.firstTextColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <v-select
+            v-model="dataSelectedNode.idSecond"
+            :items="mockData"
+            item-value="TagName"
+            item-text="Description"
+            label="Второе значение"
+            :menu-props="{
+              'z-index': 100,
+            }"
+          />
+          <div class="row">
+            <div class="col-8">
+              Цвет второго значения
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.secondValueColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.secondValueColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              Цвет текста второго значения
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.secondTextColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.secondTextColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            @click="changeDataSelectedNode"
+          >
+            Применить
+          </v-btn>
+        </div>
+        <div
+          v-if="dataSelectedNode.dataType === 'label-0'"
+          class="dash-constructor-schemes__data-panel-item"
+        >
+          <v-text-field
+            v-model="dataSelectedNode.text"
+            label="Текст"
+            :color="theme.$main_text"
+            style="margin-bottom: 10px"
+            outlined
+            hide-details
+          />
+          <div class="row align-center">
+            <div class="col-8">
+              Цвет текста
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.textColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.textColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+            <div class="col-8">
+              Цвет заливки
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.bgColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.bgColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+            <div class="col-8">
+              Вертикальное расположение
+            </div>
+            <div class="col-4">
+              <v-switch
+                v-model="dataSelectedNode.isVertical"
+              />
+            </div>
+            <div class="col-8">
+              Отображение бордера
+            </div>
+            <div class="col-4">
+              <v-switch
+                v-model="dataSelectedNode.bordered"
+              />
+            </div>
+          </div>
+          <div
+            v-if="dataSelectedNode.bordered"
+            class="row align-center"
+          >
+            <div class="col-8">
+              Цвет бордера
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.borderColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.borderColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+            <div class="col-8">
+              Пунктирный бордер
+            </div>
+            <div class="col-4">
+              <v-switch
+                v-model="dataSelectedNode.borderDashed"
+              />
+            </div>
+            <div class="col-12">
+              <v-text-field
+                v-model="dataSelectedNode.borderSize"
+                label="Размер бордера"
+                :color="theme.$main_text"
+                outlined
+                hide-details
+                style="margin-bottom: 10px"
+              />
+            </div>
+          </div>
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            @click="changeDataSelectedNode"
+          >
+            Применить
           </v-btn>
         </div>
         <div v-if="dataSelectedNode.dataType === 'default-node'">
@@ -487,7 +938,7 @@ export default {
       },
       nodeCustomStyles: {
         fill: '#ee0000',
-        strokeColor: '#ee0000',
+        strokeColor: '#EE0000FF',
         strokeSize: '1.5px',
       },
       labelCustomStyles: {
@@ -650,117 +1101,117 @@ export default {
       allItems: [],
       mockData: [
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_NGS1_PNI',
-          metric_long_name: 'НГС-1 Давление',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_NGS1_PNI',
+          Description: 'НГС-1 Давление',
           value: '6.793125152587891',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_NGS1_LNI',
-          metric_long_name: 'НГС-1 Уровень',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_NGS1_LNI',
+          Description: 'НГС-1 Уровень',
           value: '0.8172000050544739',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_NGS2_PNI',
-          metric_long_name: 'НГС-2 Давление',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_NGS2_PNI',
+          Description: 'НГС-2 Давление',
           value: '',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_NGS2_LNI',
-          metric_long_name: 'НГС-2 Уровень',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_NGS2_LNI',
+          Description: 'НГС-2 Уровень',
           value: '',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'TAYL-D1_NGS3_PNI',
-          metric_long_name: 'НГС-3 Давление',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'TAYL-D1_NGS3_PNI',
+          Description: 'НГС-3 Давление',
           value: '6.817500114440918',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'TAYL-D1_NGS3_TNI',
-          metric_long_name: 'НГС-3 Температура',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'TAYL-D1_NGS3_TNI',
+          Description: 'НГС-3 Температура',
           value: '37.959373474121094',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'TAYL-D1_NGS3_LNI',
-          metric_long_name: 'НГС-3 Уровень',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'TAYL-D1_NGS3_LNI',
+          Description: 'НГС-3 Уровень',
           value: '0.8356599807739258',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove1_In_PNI',
-          metric_long_name: 'П-1 Давление на входе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove1_In_PNI',
+          Description: 'П-1 Давление на входе',
           value: '5.357499599456787',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove1_Out_PNI',
-          metric_long_name: 'П-1 Давление на выходе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove1_Out_PNI',
+          Description: 'П-1 Давление на выходе',
           value: '4.078125',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove1_In_TNI',
-          metric_long_name: 'П-1 Температура на входе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove1_In_TNI',
+          Description: 'П-1 Температура на входе',
           value: '45.390625',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove1_Out_TNI',
-          metric_long_name: 'П-1 Температура на выходе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove1_Out_TNI',
+          Description: 'П-1 Температура на выходе',
           value: '58.412498474121094',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove2_In_PNI',
-          metric_long_name: 'П-2 Давление на входе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove2_In_PNI',
+          Description: 'П-2 Давление на входе',
           value: '5.059375286102295',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove2_Out_PNI',
-          metric_long_name: 'П-2 Давление на выходе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove2_Out_PNI',
+          Description: 'П-2 Давление на выходе',
           value: '4.093124866485596',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove2_In_TNI',
-          metric_long_name: 'П-2 Температура на входе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove2_In_TNI',
+          Description: 'П-2 Температура на входе',
           value: '43.56249237060547',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove2_Out_TNI',
-          metric_long_name: 'П-2 Температура на выходе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove2_Out_TNI',
+          Description: 'П-2 Температура на выходе',
           value: '54.36000061035156',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove3_In_PNI',
-          metric_long_name: 'П-3 Давление на входе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove3_In_PNI',
+          Description: 'П-3 Давление на входе',
           value: '4.653749942779541',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove3_Out_PNI',
-          metric_long_name: 'П-3 Давление на выходе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove3_Out_PNI',
+          Description: 'П-3 Давление на выходе',
           value: '4.324999809265137',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove4_In_PNI',
-          metric_long_name: 'П-4 Давление на входе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove4_In_PNI',
+          Description: 'П-4 Давление на входе',
           value: '4.473750114440918',
         },
         {
-          object_name: 'Тайлаковское м/р ДНС-1',
-          metric_name: 'S1D1_Stove4_Out_PNI',
-          metric_long_name: 'П-4 Давление на выходе',
+          NameObject: 'Тайлаковское м/р ДНС-1',
+          TagName: 'S1D1_Stove4_Out_PNI',
+          Description: 'П-4 Давление на выходе',
           value: '4.23562479019165',
         },
       ],
@@ -778,7 +1229,7 @@ export default {
     },
     innerSize() {
       return {
-        height: this.sizeFrom.height - 25,
+        height: this.sizeFrom.height - 32,
         width: this.sizeFrom.width,
       };
     },
@@ -913,6 +1364,18 @@ export default {
     orderToBack() {
       this.constructorSchemes.orderToBack();
     },
+    addLine() {
+      this.dataSelectedNode.items.push({
+        id: '',
+        textLeft: 'Label',
+        textRight: 'Value',
+      });
+      this.changeDataSelectedNode();
+    },
+    deleteLine(index) {
+      this.dataSelectedNode.items.splice(index, 1);
+      this.changeDataSelectedNode();
+    },
   },
 };
 </script>
@@ -976,9 +1439,13 @@ export default {
       transform: translateX(0);
       pointer-events: all;
     }
+    &-wrapper {
+      padding-top: 10px;
+    }
   }
   &__graph-component {
-    height: inherit;
+    //height: inherit;
+    height: calc(100% - 42px);
   }
   &__dnd-panel ::v-deep {
     .v-expansion-panel {
@@ -1005,7 +1472,6 @@ export default {
     }
 
   }
-
 }
 </style>
 
