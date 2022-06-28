@@ -1,31 +1,3 @@
-/** **************************************************************************
- ** @license
- ** This demo file is part of yFiles for HTML 2.4.
- ** Copyright (c) 2000-2022 by yWorks GmbH, Vor dem Kreuzberg 28,
- ** 72070 Tuebingen, Germany. All rights reserved.
- **
- ** yFiles demo files exhibit yFiles for HTML functionalities. Any redistribution
- ** of demo files in source code or binary form, with or without
- ** modification, is not permitted.
- **
- ** Owners of a valid software license for a yFiles for HTML version that this
- ** demo is shipped with are allowed to use the demo source code as basis
- ** for their own yFiles for HTML powered applications. Use of such programs is
- ** governed by the rights and conditions as set out in the yFiles for HTML
- ** license agreement.
- **
- ** THIS SOFTWARE IS PROVIDED ''AS IS'' AND ANY EXPRESS OR IMPLIED
- ** WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- ** MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN
- ** NO EVENT SHALL yWorks BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- ** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- ** TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- ** PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- ** LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- ** NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **
- ************************************************************************** */
 // eslint-disable-next-line max-classes-per-file
 import yfiles, {
   GraphComponent,
@@ -46,14 +18,6 @@ import yfiles, {
   VoidNodeStyle, WebGL2GraphModelManager, WebGL2SelectionIndicatorManager,
 } from 'yfiles';
 
-/**
- * @typedef {(T|object)} Item
- */
-
-/**
- * A palette of sample nodes.
- * Users can drag and drop the nodes from this palette to a graph control.
- */
 export class DragAndDropPanel {
   /**
    * Create a new style panel in the given element.
@@ -114,8 +78,8 @@ export class DragAndDropPanel {
     items.forEach((item) => {
       const modelItem = item instanceof INode || item instanceof IEdge ? item : item.element;
       const visual = modelItem instanceof INode
-        ? this.createNodeVisual(modelItem, this.graphComponent)
-        : this.createEdgeVisual(modelItem, this.graphComponent);
+        ? this.createNodeVisual(modelItem)
+        : this.createEdgeVisual(modelItem);
       this.addPointerDownListener(modelItem, visual, this.beginDragCallback);
       const images = visual.querySelectorAll('image');
       if (images?.length > 0) {
@@ -163,7 +127,6 @@ export class DragAndDropPanel {
       graph.addPort(node, port.locationParameter, port.style, port.tag);
     });
     this.updateViewport(this.graphComponent);
-
     return this.exportAndWrap(
       this.graphComponent,
       original instanceof INode ? undefined : original.elementType,
@@ -345,11 +308,6 @@ export class DragAndDropPanel {
 }
 
 export class DragAndDropPanelItem {
-  /**
-   * @param {!T} element
-   * @param {!string} tooltip
-   * @param {!string} elementType
-   */
   constructor(element, tooltip, elementType) {
     this.tooltip = tooltip;
     this.elementType = elementType;

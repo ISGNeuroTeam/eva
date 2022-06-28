@@ -45,6 +45,7 @@ import {
   Size,
   StorageLocation,
   VoidNodeStyle,
+  ShapeNodeShape,
 } from 'yfiles';
 
 import { throttle } from '../../utils/throttle';
@@ -631,78 +632,87 @@ class ConstructorSchemesClass {
 
   shapeNodeStyleList = [
     {
-      label: 'Параллелограмм',
-      value: 'DIAMOND',
+      label: 'Четырехугольник',
+      value: 'RECTANGLE',
+      numberValue: 0,
+    },
+    {
+      label: 'Четырехугольник(rounded)',
+      value: 'ROUND_RECTANGLE',
+      numberValue: 1,
     },
     {
       label: 'Эллиптическая форма',
       value: 'ELLIPSE',
-    },
-    {
-      label: 'Стрелка вправо',
-      value: 'FAT_ARROW',
-    },
-    {
-      label: 'Стрелка влево',
-      value: 'FAT_ARROW2',
-    },
-    {
-      label: 'Шестигранник',
-      value: 'HEXAGON',
-    },
-    {
-      label: 'Восьмигранник',
-      value: 'OCTAGON',
-    },
-    {
-      label: 'Прямоугольник',
-      value: 'RECTANGLE',
-    },
-    {
-      label: 'Прямоугольник(rounded)',
-      value: 'ROUND_RECTANGLE',
-    },
-    {
-      label: 'Пятиконечная звезда',
-      value: 'STAR5',
-    },
-    {
-      label: 'Шестиконечная звезда',
-      value: 'STAR6',
-    },
-    {
-      label: 'Восьмиконечная звезда',
-      value: 'STAR8',
-    },
-    {
-      label: 'Трапеция вниз',
-      value: 'TRAPEZ',
-    },
-    {
-      label: 'Трапеция вверх',
-      value: 'TRAPEZ2',
+      numberValue: 2,
     },
     {
       label: 'Треугольник вверх',
       value: 'TRIANGLE',
+      numberValue: 3,
     },
     {
       label: 'Треугольник вниз',
       value: 'TRIANGLE2',
+      numberValue: 4,
+    },
+    {
+      label: 'Трапеция вниз',
+      value: 'TRAPEZ',
+      numberValue: 7,
+    },
+    {
+      label: 'Трапеция вверх',
+      value: 'TRAPEZ2',
+      numberValue: 8,
+    },
+    {
+      label: 'Пятиконечная звезда',
+      value: 'STAR5',
+      numberValue: 9,
+    },
+    {
+      label: 'Шестиконечная звезда',
+      value: 'STAR6',
+      numberValue: 10,
+    },
+    {
+      label: 'Восьмиконечная звезда',
+      value: 'STAR8',
+      numberValue: 11,
+    },
+    {
+      label: 'Параллелограмм',
+      value: 'DIAMOND',
+      numberValue: 14,
+    },
+    {
+      label: 'Восьмигранник',
+      value: 'OCTAGON',
+      numberValue: 15,
+    },
+    {
+      label: 'Шестигранник',
+      value: 'HEXAGON',
+      numberValue: 16,
     },
   ]
+
+  get getShapeNodeStyleList() {
+    return this.shapeNodeStyleList;
+  }
 
   get dndDataPanelItems() {
     return this.dndDataPanelItems;
   }
 
   options = {
-
+    defaultNodeSize: [150, 150],
     defaultNodeStyle: {
+      shape: 'ROUND_RECTANGLE',
       fill: '#FFFFFF',
       strokeColor: '#F4F4F4',
       strokeSize: '1.5px',
-      size: [150, 150], // Width, height
     },
     defaultEdgeStyle: {
       strokeColor: '#FFFFFF',
@@ -721,6 +731,14 @@ class ConstructorSchemesClass {
   localVariables = {
     isEdgeCreating: false,
     creatingEdge: null,
+  }
+
+  get defaultNodeSize() {
+    return this.options.defaultNodeSize;
+  }
+
+  set defaultNodeSize(value) {
+    this.options.defaultNodeSize = value;
   }
 
   get creatingEdge() {
@@ -752,16 +770,16 @@ class ConstructorSchemesClass {
   }
 
   set defaultNodeStyle({
+    shape = 'ROUND_RECTANGLE',
     fill = Color.TRANSPARENT,
     strokeColor = Color.TRANSPARENT,
     strokeSize = '1.5px',
-    size = [150, 150],
   }) {
     this.options.defaultNodeStyle = {
       fill,
       strokeColor,
       strokeSize,
-      size,
+      shape,
     };
   }
 
@@ -826,12 +844,17 @@ class ConstructorSchemesClass {
     return Promise.all(iconsList.map(async (icon) => {
       const imageStyleNode = new SimpleNode();
       const layout = await ConstructorSchemesClass.getSvgLayoutSize(icon.src);
-      const nodeSize = this.generateImageSize(layout);
-      imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-      imageStyleNode.style = new ImageNodeStyle(icon.src);
-      imageStyleNode.tag = {
-        isAspectRatio: true,
-      };
+      try {
+        const nodeSize = this.generateImageSize(layout);
+        imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
+        imageStyleNode.style = new ImageNodeStyle(icon.src);
+        imageStyleNode.tag = {
+          dataType: 'image-node',
+          isAspectRatio: true,
+        };
+      } catch {
+        throw new Error();
+      }
       return new DragAndDropPanelItem(imageStyleNode, 'Элементы с картинкой', 'image-node');
     }));
   }
@@ -891,39 +914,23 @@ class ConstructorSchemesClass {
       .then((svgText) => svgText.match(regexpSize).groups);
   }
 
-  static createDnDPanelDefaultNode(defaultNodeStyle) {
+  createDnDPanelDefaultNode() {
     const defaultNode = new SimpleNode();
     defaultNode.layout = new Rect(
       0,
       0,
-      defaultNodeStyle.size[0],
-      defaultNodeStyle.size[1],
+      this.defaultNodeSize[0],
+      this.defaultNodeSize[1],
     );
     defaultNode.style = new ShapeNodeStyle({
-      shape: 'round-rectangle',
-      fill: defaultNodeStyle.fill,
-      stroke: `${defaultNodeStyle.strokeSize} ${defaultNodeStyle.strokeColor}`,
+      shape: this.defaultNodeStyle.shape,
+      fill: this.defaultNodeStyle.fill,
+      stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
     });
     defaultNode.tag = {
       dataType: 'default-node',
     };
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
-  }
-
-  static createDnDPanelDataNode(defaultNodeStyle) {
-    const dataNode1 = new SimpleNode();
-    dataNode1.layout = new Rect(0, 0, defaultNodeStyle.size[0], defaultNodeStyle.size[0]);
-    dataNode1.style = new ShapeNodeStyle({
-      shape: 'round-rectangle',
-      fill: 'transparent',
-      stroke: 'transparent',
-    });
-    const dataNode1Label = new SimpleLabel(
-      dataNode1,
-      '<span style="font-size: 100px;">Test label</span>',
-    );
-    dataNode1.labels = new ListEnumerable([dataNode1Label]);
-    return new DragAndDropPanelItem(dataNode1, 'Data node 1');
   }
 
   static removeClass(e, className) {
@@ -1124,24 +1131,13 @@ class ConstructorSchemesClass {
     labelCustomStyles,
   }) {
     if (nodeCustomStyles) {
-      this.defaultNodeStyle = {
-        strokeColor: nodeCustomStyles.strokeColor,
-        fill: nodeCustomStyles.fill,
-        strokeSize: nodeCustomStyles.strokeSize,
-      };
+      this.defaultNodeStyle = nodeCustomStyles;
     }
     if (edgeCustomStyles) {
-      this.defaultEdgeStyle = {
-        strokeSize: edgeCustomStyles.strokeSize,
-        strokeColor: edgeCustomStyles.strokeColor,
-        smoothingLength: edgeCustomStyles.smoothingLength,
-      };
+      this.defaultEdgeStyle = edgeCustomStyles;
     }
     if (labelCustomStyles) {
-      this.defaultLabelStyle = {
-        textFill: labelCustomStyles.textFill,
-        font: labelCustomStyles.font,
-      };
+      this.defaultLabelStyle = labelCustomStyles;
     }
     this.setDefaultStyles();
     if (this.dndPanelElem) {
@@ -1263,11 +1259,11 @@ class ConstructorSchemesClass {
         } else {
           openDataPanelCallback({
             nodeId: evt.item.tag.nodeId,
-            bgColor: '',
-            borderColor: '',
-            borderSize: '',
-            borderType: '',
-            type: '',
+            dataType: 'default-node',
+            fill: ConstructorSchemesClass.colorToString(evt.item.style.fill.color),
+            strokeColor: ConstructorSchemesClass.colorToString(evt.item.style.stroke.fill.color),
+            strokeSize: `${evt.item.style.stroke.thickness}px`,
+            shape: this.getShapeById(evt.item.style.shape),
           });
         }
       } else {
@@ -1650,8 +1646,8 @@ class ConstructorSchemesClass {
     });
     // Sets the default size for nodes explicitly to 40x40
     graph.nodeDefaults.size = new Size(
-      this.defaultNodeStyle.size[0],
-      this.defaultNodeStyle.size[1],
+      this.defaultNodeSize[0],
+      this.defaultNodeSize[1],
     );
 
     // Creates a PolylineEdgeStyle which will be used as default for all edges
@@ -1773,7 +1769,8 @@ class ConstructorSchemesClass {
     return new Promise((resolve) => {
       const items = [];
       // Стандартный узел
-      items.push(ConstructorSchemesClass.createDnDPanelDefaultNode(defaultNodeStyle));
+      const defaultItem = this.createDnDPanelDefaultNode();
+      items.push(defaultItem);
 
       // Ребра
       const edge1 = new SimpleEdge({
@@ -1798,7 +1795,7 @@ class ConstructorSchemesClass {
 
       // Подписи к узлам\ребрам
       const labelNode = new SimpleNode();
-      labelNode.layout = new Rect(0, 0, defaultNodeStyle.size[0], 16);
+      labelNode.layout = new Rect(0, 0, this.defaultNodeSize[0], 16);
       labelNode.style = new VoidNodeStyle();
 
       const labelStyle = new DefaultLabelStyle({
@@ -1834,6 +1831,14 @@ class ConstructorSchemesClass {
 
   getDataItemById(dataId) {
     return this.dataRest.find((dataItem) => dataItem.metric_name === dataId);
+  }
+
+  getShapeById(shapeId) {
+    const targetShape = this.shapeNodeStyleList.find((item) => item.numberValue === shapeId);
+    if (targetShape) {
+      return targetShape.value;
+    }
+    return '';
   }
 
   updateDataInNode(updatedData) {
@@ -1882,7 +1887,7 @@ class ConstructorSchemesClass {
   }
 
   // Order commands
-
+  // TODO: Завязать на выделение элементов
   orderToFront() {
     if (this.graphComponent.selection.selectedNodes.toArray()?.length > 0) {
       this.graphComponent.graphModelManager
