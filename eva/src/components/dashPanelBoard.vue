@@ -57,15 +57,14 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <v-icon
+              <div
                 class="control-button theme--dark"
-                :style="{ color: theme.$secondary_text }"
+                :style="{ display: 'inline-flex' }"
                 :class="{ hide_control: !editMode }"
                 v-on="on"
                 @click="loadSvg = !loadSvg"
-              >
-                {{ mdiCloudUpload }}
-              </v-icon>
+                v-html="svgIcon.svg"
+              />
             </template>
             <span>Загрузка SVG</span>
           </v-tooltip>
@@ -923,13 +922,13 @@ import {
   mdiTrashCanOutline,
   mdiUndoVariant,
   mdiVariable,
-  mdiCloudUpload,
 } from '@mdi/js';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
 import Notifications from '@/components/notifications';
+import { svgIcon } from '@/js/svg';
 
 export default {
   name: 'DashPanelBoard',
@@ -1079,7 +1078,7 @@ export default {
       allGroups: [],
       tokens: [],
       loadSvg: false,
-      mdiCloudUpload,
+      svgIcon,
     };
   },
   computed: {

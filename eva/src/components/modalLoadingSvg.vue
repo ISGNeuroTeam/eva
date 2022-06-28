@@ -15,7 +15,11 @@
           v-model="file"
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
-          accept="image/svg"
+          :rules="[
+            value => !value || value.size < 2000000 || 'Размер должен быть меньше 2 МБ!',
+            value => !value || value.type === 'image/svg+xml' || 'Не допустимый формат!',
+          ]"
+          accept="image/svg+xml"
           label="Выбирите Svg"
           @focus="focus()"
         />
@@ -32,6 +36,7 @@
           small
           :color="theme.$primary_button"
           class="b-loading-svg__button"
+          :disabled="!file || file.type !== 'image/svg+xml'"
           @click="loadingSvg"
         >
           Отправить
