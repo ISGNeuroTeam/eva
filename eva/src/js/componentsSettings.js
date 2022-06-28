@@ -16,6 +16,7 @@ import {
   mdiChartScatterPlot,
   mdiGrid,
   mdiTuneVertical,
+  mdiImageFilterTiltShift,
 } from '@mdi/js';
 
 export default {
@@ -44,6 +45,7 @@ export default {
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
+    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
   ],
   size: {
     picker: {
@@ -126,6 +128,10 @@ export default {
       width: 400,
       height: 400,
     },
+    dial: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -148,6 +154,7 @@ export default {
     tune: 'eva-basic_slider_01',
     accumulators: 'eva-chart_bar_chart_horizontal',
     menu: 'eva-edit_list_checklist',
+    dial: mdiImageFilterTiltShift,
   },
   commonOptions: [
     'panelSettings',
@@ -255,6 +262,7 @@ export default {
       'metrics',
       'fillColor',
     ],
+    dial: [],
   },
   optionFields: [
     // описание типов полей и их характеристик

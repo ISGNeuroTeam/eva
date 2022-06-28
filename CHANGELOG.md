@@ -8,11 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-
 - Add password max length
+- Added visualization  circular dial
 
 ### Fixed
-
 - Change username on edit
 - Multiline. Signature of the nth point
 - Dash Table: when saving the settings, the checkboxes for the columns are removed
