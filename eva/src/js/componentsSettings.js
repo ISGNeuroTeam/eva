@@ -382,14 +382,14 @@ export default {
       elem: 'select',
       default: null,
       items() {
-        if (this.$store.state[this.idDash]?.searches) {
+        const dashState = this.$store.state[this.idDash];
+        if (!dashState?.searches || !dashState.searches.map) {
           return [];
         }
-        const sourceDataList = this.$store.state[this.idDash].searches
-          .map(({ id, sid }) => ({
-            value: id,
-            text: sid,
-          }));
+        const sourceDataList = dashState.searches.map(({ id, sid }) => ({
+          value: id,
+          text: sid,
+        }));
         return [
           {
             value: null,
@@ -506,7 +506,10 @@ export default {
       elem: 'checkbox-list',
       items() {
         // this is modalSettings context
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.titles || [];
+        const curTitles = storeElement?.availableTableTitles || [];
+        return new Set([...savedTitles, ...curTitles]);
       },
       default: [],
     },

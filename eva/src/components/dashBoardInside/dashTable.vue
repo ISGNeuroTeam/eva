@@ -118,6 +118,7 @@
                   :class="{
                     'd-none': options
                       && options.titles
+                      && options.titles.length
                       && !options.titles.includes(text)
                   }"
                   :style="
@@ -584,18 +585,18 @@ export default {
       });
     },
     createTitles(result) {
-      if (this.options?.titles) {
+      if (this.options?.titles && this.dataRestFrom.length) {
         const allTitles = Object.keys(this.dataRestFrom[0]);
         this.props.titles = allTitles.map((x) => ({
           text: x,
           value: x,
           sortable: true,
           align:
-              this.options.titles.includes(x)
+              this.options.titles.length === 0 || this.options.titles.includes(x)
                 ? undefined
                 : ' d-none',
         }));
-      } else if (result && result.length) {
+      } else if (result) {
         this.props.titles = Object.keys(result[0]).reduce((titles, item) => {
           if (!this.excludeColumns.includes(item)) {
             return [
