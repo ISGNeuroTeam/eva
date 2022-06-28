@@ -45,7 +45,7 @@ export default {
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
-    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'scale' },
+    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
   ],
   size: {
     picker: {
@@ -128,7 +128,7 @@ export default {
       width: 400,
       height: 400,
     },
-    scale: {
+    dial: {
       width: 400,
       height: 400,
     },
@@ -154,7 +154,7 @@ export default {
     tune: 'eva-basic_slider_01',
     accumulators: 'eva-chart_bar_chart_horizontal',
     menu: 'eva-edit_list_checklist',
-    scale: mdiImageFilterTiltShift,
+    dial: mdiImageFilterTiltShift,
   },
   commonOptions: [
     'panelSettings',
@@ -262,7 +262,7 @@ export default {
       'metrics',
       'fillColor',
     ],
-    scale: [],
+    dial: [],
   },
   optionFields: [
     // описание типов полей и их характеристик

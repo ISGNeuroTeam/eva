@@ -82,9 +82,9 @@
       <div
         v-if="!error"
         ref="pie"
-        class="circle-scale"
+        class="circle-dial"
       />
-      <scale-settings
+      <dial-settings
         v-model="isSettingsComponentOpen"
         :received-settings="providedSettings"
         :update-count="updateCount"
@@ -99,13 +99,13 @@
 <script>
 import { mdiSettings } from '@mdi/js';
 import moment from 'moment';
-import scaleSettings from './dashScaleSettings.vue';
+import dialSettings from './dashDialSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
-import ScaleClass from '../../../js/classes/ScaleClass';
+import DialClass from '../../../js/classes/DialClass';
 
 export default {
-  name: 'Scale',
-  components: { scaleSettings },
+  name: 'Dial',
+  components: { dialSettings },
   props: {
     idFrom: {
       type: String,
@@ -161,7 +161,7 @@ export default {
     update: 1,
     isHeaderOpen: true,
     error: '',
-    scale: null,
+    dial: null,
     colors: [],
     maxSize: 200,
   }),
@@ -245,12 +245,12 @@ export default {
     sizeFrom: {
       deep: true,
       handler(val, old) {
-        if (JSON.stringify(val) !== JSON.stringify(old) && this.scale) {
-          this.scale.size = {
+        if (JSON.stringify(val) !== JSON.stringify(old) && this.dial) {
+          this.dial.size = {
             width: val.width - 30,
             height: val.height - 60,
           };
-          this.maxSize = this.scale.radius * 1.5;
+          this.maxSize = this.dial.radius * 1.5;
         }
       },
     },
@@ -360,19 +360,19 @@ export default {
       this.isHeaderOpen = !!settings?.showTitle;
       this.$set(this, 'metricCount', this.metricCount || metricCount);
       this.updateVisual(settings || options.settings);
-      if (this.scale) {
-        this.scale.removePiechart();
+      if (this.dial) {
+        this.dial.removePiechart();
       }
-      const piechart = new ScaleClass({
+      const piechart = new DialClass({
         elem: this.$refs.pie,
         width: this.sizeFrom.width - 30,
         height: this.sizeFrom.height - 60,
         data: { ...this.currentSettings.countSections },
         colors: this.colors,
       });
-      this.scale = Object.freeze(piechart);
-      if (this.scale) {
-        this.maxSize = this.scale.radius * 1.5;
+      this.dial = Object.freeze(piechart);
+      if (this.dial) {
+        this.maxSize = this.dial.radius * 1.5;
       }
     },
     updateCount(count) {
@@ -539,8 +539,8 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import 'sass/dashScale'
-.circle-scale
+@import 'sass/dashDial'
+.circle-dial
   position: absolute
   top: 50%
   left: 50%

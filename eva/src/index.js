@@ -102,7 +102,7 @@ Vue.component('dash-picker', () => import('./components/dashBoardInside/dashDTPi
 // элемент вывода числа
 Vue.component('dash-single', () => import('./components/dashBoardInside/dashSingle.vue'));
 // элумент круговой шкалы
-Vue.component('dash-scale', () => import('./components/dashBoardInside/dashScale/dashScale.vue'));
+Vue.component('dash-dial', () => import('./components/dashBoardInside/dashScale/dashDial.vue'));
 // элемент кнопки
 Vue.component('dash-button', () => import('./components/dashBoardInside/dashButton.vue'));
 // элемент текстового поля

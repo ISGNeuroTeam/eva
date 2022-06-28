@@ -1,6 +1,6 @@
 import * as d3 from 'd3';
 
-export default class ScaleClass {
+export default class DialClass {
   options = {
     width: 0,
     height: 0,
@@ -18,7 +18,7 @@ export default class ScaleClass {
     this.options.height = height;
     this.options.elem = elem;
 
-    this.createScale(data, colors);
+    this.createDial(data, colors);
   }
 
   get size() {
@@ -52,7 +52,7 @@ export default class ScaleClass {
     return this.radius / 1.15;
   }
 
-  createScale(data, colors) {
+  createDial(data, colors) {
     this.createPieChartSvg();
 
     this.createPieChartGroup();

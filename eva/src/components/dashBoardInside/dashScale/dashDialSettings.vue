@@ -16,7 +16,7 @@
           class="icon-main"
           v-text="mdiSettings"
         />
-        <span class="main-title">Настройки Scale</span>
+        <span class="main-title">Настройки Dial</span>
         <v-icon
           right
           class="icon-close"
@@ -477,8 +477,6 @@ export default {
         'metricCount',
         count,
       );
-      // this.settings.template = 1;
-      // this.settings.metricCount = count;
     },
 
     close(save = false) {
@@ -516,5 +514,5 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import 'sass/scaleSettings'
+@import 'sass/dialSettings'
 </style>
