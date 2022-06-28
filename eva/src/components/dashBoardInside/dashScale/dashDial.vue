@@ -287,8 +287,7 @@ export default {
     },
     getColor(metric) {
       if (metric.metadata) {
-        // eslint-disable-next-line no-eval
-        const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
+        const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
         if (metric.color === 'range') {
           if (!Number.isNaN(+metric.value)) {
             const numbersRanges = Object.keys(ranges)
