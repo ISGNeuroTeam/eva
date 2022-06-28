@@ -142,6 +142,19 @@
                           <div class="col-12">
                             Настройки блока
                           </div>
+                          <!--Фигура-->
+                          <div class="col-12">
+                            <v-select
+                              v-model="shapeNodeStyle"
+                              :items="shapeNodeStyleList"
+                              item-value="value"
+                              item-text="label"
+                              label="Фигура"
+                              :menu-props="{
+                                'z-index': 100,
+                              }"
+                            />
+                          </div>
                           <!--Цвет блока-->
                           <div class="col-8">
                             Цвет фона:
@@ -324,7 +337,90 @@
           </v-btn>
         </div>
         <div v-if="dataSelectedNode.dataType === 'default-node'">
-          Default node
+          <div class="row">
+            <div class="col-8">
+              Цвет блока:
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.fill,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.fill"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              Цвет рамки блока:
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.strokeColor,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.strokeColor"
+                  dot-size="12"
+                  mode="rgba"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-8">
+              Размер рамки:
+            </div>
+            <div class="col-4">
+              <v-text-field
+                v-model="dataSelectedNode.strokeSize"
+                dense
+              />
+            </div>
+          </div>
+          <v-select
+            v-model="dataSelectedNode.shape"
+            :items="shapeNodeStyleList"
+            item-value="value"
+            item-text="label"
+            label="Фигура"
+            :menu-props="{
+              'z-index': 100,
+            }"
+          />
+          <v-btn>
+            Сохранить настройки
+          </v-btn>
         </div>
       </div>
     </div>
@@ -381,6 +477,8 @@ export default {
       edgeColorPopup: false,
       nodeBgColorPopup: false,
       nodeBorderColorPopup: false,
+      shapeNodeStyle: '',
+      shapeNodeStyleList: [],
       edgeCustomStyles: {
         strokeSize: '10.5px',
         smoothingLength: 0,
@@ -740,6 +838,12 @@ export default {
       this.mockData[0].value = '333';
     },
     applyOptions() {
+      if (this.shapeNodeStyle) {
+        this.nodeCustomStyles = {
+          ...this.nodeCustomStyles,
+          shape: this.shapeNodeStyle,
+        };
+      }
       this.constructorSchemes.applyStylesElements({
         edgeCustomStyles: this.edgeCustomStyles,
         nodeCustomStyles: this.nodeCustomStyles,
@@ -766,6 +870,10 @@ export default {
         savedGraph: this.savedGraph,
         updateStoreCallback: this.updateSavedGraph,
       });
+      if (this.constructorSchemes) {
+        this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
+        this.shapeNodeStyle = this.constructorSchemes.defaultNodeStyle.shape;
+      }
     },
 
     changeDataSelectedNode() {
