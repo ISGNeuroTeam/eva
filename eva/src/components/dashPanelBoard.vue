@@ -1217,9 +1217,9 @@ export default {
     this.uploadTokens();
   },
   mounted() {
-    document.addEventListener('load', () => {
+    document.onload = () => {
       this.getCookie();
-    });
+    };
     this.getGroups();
     this.tools = settings.tools;
 

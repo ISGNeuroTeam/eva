@@ -236,9 +236,9 @@ export default {
     },
   },
   mounted() {
-    document.addEventListener('load', () => {
+    document.onload = () => {
       this.getCookie();
-    });
+    };
   },
   methods: {
     async getTheme() {
