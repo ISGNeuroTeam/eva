@@ -51,6 +51,14 @@
         </v-btn>
       </div>
     </div>
+    <modal-confirm
+      v-model="modalValue"
+      :theme="theme"
+      :modal-text="`Есть несохраненные данные, сохранить?`"
+      btn-confirm-text="Да"
+      btn-cancel-text="Нет"
+      @result="confirm($event)"
+    />
   </v-dialog>
 </template>
 
@@ -72,6 +80,7 @@ export default {
       file: null,
       message: '',
       color: '',
+      modalValue: false,
     };
   },
   computed: {
@@ -81,7 +90,11 @@ export default {
   },
   methods: {
     cancelModal() {
-      this.$emit('updateModalValue', false);
+      if (this.file) {
+        this.modalValue = true;
+      } else {
+        this.$emit('updateModalValue', false);
+      }
     },
     async loadingSvg() {
       const formData = new FormData();
@@ -108,6 +121,14 @@ export default {
     focus() {
       this.color = '';
       this.message = '';
+    },
+    confirm(val) {
+      if (val) {
+        this.loadingSvg();
+      } else {
+        this.file = null;
+        this.$emit('updateModalValue', false);
+      }
     },
   },
 };
