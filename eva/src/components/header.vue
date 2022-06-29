@@ -236,7 +236,7 @@ export default {
     },
   },
   mounted() {
-    window.addEventListener('load', () => {
+    document.addEventListener('load', () => {
       this.getCookie();
     });
   },
