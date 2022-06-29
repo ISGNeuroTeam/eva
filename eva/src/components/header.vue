@@ -277,6 +277,7 @@ export default {
     },
     exit() {
       this.$store.dispatch('auth/logout');
+      document.title = 'EVA';
     },
     edit() {
       this.$router.push('/profile');
