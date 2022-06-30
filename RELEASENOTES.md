@@ -3,7 +3,6 @@
 ### Added
 - Password length is limited
 - Added visualization circular dial
-- Added the ability to download svg
 
 ### Fixed
 - When changing username, the old value remained on the panel
