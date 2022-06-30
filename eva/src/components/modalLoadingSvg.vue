@@ -16,7 +16,7 @@
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           :rules="[
-            value => !value || value.size < 10000000 || 'Размер должен быть меньше 2 МБ!',
+            value => !value || value.size < 10000000 || 'Размер должен быть меньше 10 МБ!',
             value => !value || value.type === 'image/svg+xml' || 'Не допустимый формат!',
           ]"
           accept="image/svg+xml"
