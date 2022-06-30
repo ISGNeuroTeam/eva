@@ -180,9 +180,7 @@
               <v-icon
                 class="control-button theme--dark"
                 :color="
-                  getColorError
-                    ? theme.$primary_button
-                    : theme.$secondary_text
+                  getColorError ? theme.$primary_button : theme.$secondary_text
                 "
                 v-on="on"
                 @click="openLogs"
@@ -227,9 +225,7 @@
           </template>
           <v-list class="profile-dropdown--list">
             <v-list-item>
-              <v-list-item-title
-                class="profile-dropdown--title"
-              >
+              <v-list-item-title class="profile-dropdown--title">
                 Профиль
               </v-list-item-title>
             </v-list-item>
@@ -307,7 +303,10 @@
             <div
               class="loading-bar"
               :style="{ background: theme.$accent_ui_color }"
-              :class="{ loading: search.status === 'pending' && search.original_otl !== null }"
+              :class="{
+                loading:
+                  search.status === 'pending' && search.original_otl !== null,
+              }"
             />
           </div>
           <v-tooltip
@@ -747,7 +746,7 @@
         :class="{ opensave: opensave }"
         :style="{
           background: theme.$main_bg,
-          border: `1px solid ${theme.$main_text}`
+          border: `1px solid ${theme.$main_text}`,
         }"
       >
         <div
@@ -848,9 +847,7 @@
         :color-from="theme"
         :data-sid-from="scheduleSid"
       />
-      <modal-log
-        v-model="modalActive"
-      />
+      <modal-log v-model="modalActive" />
       <dash-settings
         :gear-from="gearShow"
         :permissions-from="userPermissions"
@@ -1064,11 +1061,13 @@ export default {
     },
     getColorError() {
       if (!this.$store.state.logError) {
-        this.$store.commit('setState', [{
-          object: this.$store.state,
-          prop: 'logError',
-          value: false,
-        }]);
+        this.$store.commit('setState', [
+          {
+            object: this.$store.state,
+            prop: 'logError',
+            value: false,
+          },
+        ]);
       }
       return this.$store.state.logError;
     },
@@ -1103,8 +1102,10 @@ export default {
       return this.$store.getters.getTheme;
     },
     editPermission() {
-      return this.userPermissions.includes('admin_all')
-        || this.userPermissions.includes('editdash');
+      return (
+        this.userPermissions.includes('admin_all')
+        || this.userPermissions.includes('editdash')
+      );
     },
     getEventFull() {
       if (this.dashFromStore.eventFull) {
@@ -1123,8 +1124,8 @@ export default {
       // получение всех элемнета на странице
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
-          (elem) => this.$store.state[this.idDash][elem]
-            .tab === this.$store.state[this.idDash].currentTab
+          (elem) => this.$store.state[this.idDash][elem].tab
+              === this.$store.state[this.idDash].currentTab
             || this.$store.state[this.idDash][elem].options.pinned,
         );
       }
@@ -1134,7 +1135,9 @@ export default {
       // получение всех событий элемента на странице
       return (element) => {
         if (this.$store.state[this.idDash][element]) {
-          return this.$store.state[this.idDash][element].actions.map((item) => item.name);
+          return this.$store.state[this.idDash][element].actions.map(
+            (item) => item.name,
+          );
         }
         return [];
       };
@@ -1142,12 +1145,10 @@ export default {
     capture() {
       // получение всех подсобытий элемента на странице (события второго уровня )
       return ({ elem, action }) => {
-        if (
-          this.dashFromStore
-          && this.dashFromStore[elem]
-        ) {
-          let j = Object.keys(this.dashFromStore[elem].actions)
-            .find((key) => this.dashFromStore[elem].actions[key].name === action);
+        if (this.dashFromStore && this.dashFromStore[elem]) {
+          let j = Object.keys(this.dashFromStore[elem].actions).find(
+            (key) => this.dashFromStore[elem].actions[key].name === action,
+          );
           Object.keys(this.dashFromStore[elem].actions).forEach((item) => {
             if (this.dashFromStore[elem].actions[item].name === action) {
               j = item;
@@ -1264,10 +1265,8 @@ export default {
       });
     },
     exit() {
-      document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
-      document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
-      this.$store.commit('clearState');
-      this.$router.push('/');
+      this.$store.dispatch('auth/logout');
+      document.title = 'EVA';
     },
     openThemeModal() {
       this.paleteShow = !this.paleteShow;
@@ -1481,14 +1480,18 @@ export default {
       if (this.tokens?.length > 0) {
         const filterTockens = this.tokens.filter((x) => {
           if (!Number.isNaN(index) && index !== undefined) {
-            return x.elem === this.tokens[index].elem
-                && x.action === this.tokens[index].action
-                && x.capture === this.tokens[index].capture
-                && x.name !== this.tokens[index].name;
+            return (
+              x.elem === this.tokens[index].elem
+              && x.action === this.tokens[index].action
+              && x.capture === this.tokens[index].capture
+              && x.name !== this.tokens[index].name
+            );
           }
-          return x.elem === this.newElem
-              && x.action === this.newAction
-              && x.capture === this.newCapture;
+          return (
+            x.elem === this.newElem
+            && x.action === this.newAction
+            && x.capture === this.newCapture
+          );
         });
 
         if (filterTockens.length > 0) {
@@ -1507,10 +1510,11 @@ export default {
       }
 
       // проверяем не пустой ли токен
-      if ((!this.newTockenName
-          && !Number.isInteger(index))
+      if (
+        (!this.newTockenName && !Number.isInteger(index))
         || (Number.isInteger(index)
-          && !this.tockensName[this.tokens[index].name].length)) {
+          && !this.tockensName[this.tokens[index].name].length)
+      ) {
         this.errorSaveToken = true;
         this.openwarning = true;
         const height = this.$refs.blockTocken.clientHeight;
@@ -1525,10 +1529,14 @@ export default {
       }
 
       // проверяем на запретние названия
-      if ((!Number.isInteger(index)
-              && globalTockens.includes(this.newTockenName.trim()))
-          || (Number.isInteger(index)
-              && globalTockens.includes(this.tockensName[this.tokens[index].name].trim()))) {
+      if (
+        (!Number.isInteger(index)
+          && globalTockens.includes(this.newTockenName.trim()))
+        || (Number.isInteger(index)
+          && globalTockens.includes(
+            this.tockensName[this.tokens[index].name].trim(),
+          ))
+      ) {
         this.errorSaveToken = true;
         this.openwarning = true;
         const height = this.$refs.blockTocken.clientHeight;
@@ -1887,8 +1895,7 @@ export default {
         let bodyArray;
         let element;
         let doing;
-        let
-          originItem;
+        let originItem;
 
         if (events.length !== 0) {
           events.forEach((item) => {
@@ -2014,8 +2021,7 @@ export default {
                 this.$set(this.event, 'target', doing[0]);
 
                 let prop;
-                let
-                  value;
+                let value;
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
@@ -2047,16 +2053,11 @@ export default {
                 // changeReport
 
                 [, doing] = originItem.split(doing[0]);
-                doing = doing.replace(/\(/g, '')
-                  .replace(/\)/g, '')
-                  .split(',');
+                doing = doing.replace(/\(/g, '').replace(/\)/g, '').split(',');
                 this.$set(this.event, 'sid', doing[0]);
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
-                  const files = doing.map(
-                    (file) => file.replace('[', '')
-                      .replace(']', ''),
-                  );
+                  const files = doing.map((file) => file.replace('[', '').replace(']', ''));
                   this.$set(this.event, 'file', files);
                 } else {
                   this.$set(this.event, 'file', [doing[1]]);
@@ -2189,6 +2190,6 @@ export default {
 }
 
 .v-tooltip__content {
-  width: fit-content
+  width: fit-content;
 }
 </style>

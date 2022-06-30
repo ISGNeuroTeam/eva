@@ -1,0 +1,278 @@
+// -------------------- import templates mixins --------------------
+
+@import './metricTemplates'
+
+// -------------------- colors --------------------
+
+$title: var(--title)
+$main_bg: var(--main_bg)
+$main_text: var(--main_text)
+$main_border: var(--main_border)
+$secondary_text: var(--secondary_text)
+$secondary_bg: var(--secondary_bg)
+$secondary_border: var(--secondary_border)
+$primary_button: var(--primary_button)
+$error_color: var(--error_color)
+$accent_ui_color: var(--accent_ui_color)
+
+// -------------------- vars --------------------
+
+$header-height: 60px
+$icon-width: 30px
+$metric-header-height: 40px
+
+// -------------------- mixins --------------------
+
+@mixin text-truncated()
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+// -------------------- styles --------------------
+
+
+.gradient-style
+  -webkit-background-clip: text !important
+  -webkit-text-fill-color: transparent
+
+.dialog-content::v-deep
+  background-color: $main_bg !important
+
+  .header
+    min-height: $header-height
+    flex-wrap: nowrap
+
+    .main-title
+      flex-grow: 1
+      color: $title
+      font-size: 18px
+      font-weight: 600
+      @include text-truncated()
+
+    .icon-main
+      color: $title
+
+    .icon-close
+      color: $secondary_text
+
+  .footer
+    min-height: $header-height
+    flex-wrap: nowrap
+    justify-content: flex-end
+
+    .btn-save, .btn-cancel
+      height: 32px
+      padding: 0 12px
+      border-radius: 6px
+      font-size: 15px
+      font-weight: 600
+      text-transform: none
+
+    .btn-save
+      color: #fff
+      background-color: $primary_button
+
+    .btn-cancel
+      color: $secondary_text
+
+  .content
+    color: $main_text !important
+    background-color: $secondary_bg
+
+    &::-webkit-scrollbar
+      width: 6px
+
+    &::-webkit-scrollbar-track
+      background-color: transparent
+
+    &::-webkit-scrollbar-thumb
+      background-color: $main_border
+
+    .content-section
+      display: flex
+      flex-direction: column
+      padding: 12px 24px
+      background-color: $main_bg
+
+      &.offset
+        margin-top: 10px
+
+      .section-title
+        color: $secondary_text
+        font-size: 16px
+        @include text-truncated()
+
+        &.bold
+          color: $main_text !important
+          font-weight: 600
+
+      .input-element
+        margin-top: 4px
+
+        &.v-text-field--outlined
+          input, .v-select__selections
+            color: $main_text !important
+            caret-color: $accent_ui_color
+            font-size: 15px
+
+          fieldset
+            border: 1px solid $main_border
+            transition: border-color .3s
+
+          &.v-select .v-input__icon--append .v-icon
+            color: $main_text !important
+
+          &.v-input--is-focused
+            fieldset
+              border-color: $accent_ui_color
+
+            &.v-select .v-input__icon--append .v-icon
+              color: $accent_ui_color !important
+
+      .templates-container
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr))
+        gap: 10px
+        margin-top: 4px
+
+        .data-template
+          min-height: 70px
+          display: grid
+          gap: 5px
+          padding: 10px
+          background-color: $secondary_border
+          border-radius: 4px
+          cursor: pointer
+          @include templates-for-all-metric-variants()
+
+          .item
+            display: flex
+            align-items: center
+            justify-content: center
+            background-color: $main_border
+            border-radius: 2px
+            color: $secondary_text
+            font-size: 13px
+            font-weight: 600
+            user-select: none
+
+          &.selected
+            box-shadow: 0 0 0 1px $primary_button inset
+
+            .item
+              color: #fff
+              background-color: $primary_button
+
+      &.style-settings-header
+        flex-direction: row
+        align-items: center
+        justify-content: space-between
+        background-color: transparent
+
+        .section-title
+          font-size: 13px
+          text-transform: uppercase
+
+        .show-all-title
+          font-size: 13px
+          font-weight: 600
+          color: $secondary_text
+          cursor: pointer
+          user-select: none
+          text-decoration: underline
+          @include text-truncated()
+
+    .metric-section
+      background-color: $main_bg
+      height: $metric-header-height
+      overflow: hidden
+
+      & + .metric-section
+        margin-top: 10px
+
+      &.expanded
+        height: auto
+
+      .metric-header
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 0 24px
+        height: $metric-header-height
+
+        .title-wrapper
+          flex: 1 0
+          display: flex
+          align-items: center
+          cursor: pointer
+          @include text-truncated()
+
+          .metric-title
+            color: $accent_ui_color
+            font-size: 15px
+            font-weight: 600
+            @include text-truncated()
+
+      .icons-container
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax($icon-width, 30px))
+        gap: 10px
+        max-height: 100px
+        margin-top: 4px
+        padding: 10px
+        background-color: $secondary_bg
+        border: 1px solid $main_border
+        border-radius: 4px
+        overflow-y: auto
+
+        &::-webkit-scrollbar
+          width: 4px
+
+        &::-webkit-scrollbar-track
+          background-color: transparent
+
+        &::-webkit-scrollbar-thumb
+          background-color: $main_border
+
+        .icon
+          display: flex
+          align-items: center
+          justify-content: center
+          cursor: pointer
+          fill: $main_border
+          height: $icon-width
+          transition: .3s
+
+          &:hover, &.selected
+            fill: $primary_button
+
+      .font-selects-box
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax(45%, 1fr))
+        gap: 10px 20px
+
+      .color-selects-box
+        margin-top: 4px
+        display: grid
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr))
+        gap: 10px
+
+        .color-select
+          height: 40px
+          display: flex
+          align-items: center
+          justify-content: center
+          background-color: $secondary_bg
+          border-radius: 4px
+          color: $main_text !important
+          font-weight: 600
+          cursor: pointer
+          user-select: none
+          @include text-truncated()
+
+          &.disabled
+            opacity: 0.5
+            cursor: auto
+          &.selected
+            color: $accent_ui_color
+            border: 1px solid $accent_ui_color
