@@ -1489,8 +1489,8 @@ export default {
   }
   &__dnd-panel ::v-deep {
     .v-expansion-panel {
-      background-color: var(--main_bg);
-      color: var(--main_text);
+      background-color: var(--main_bg) !important;
+      color: var(--main_text) !important;
       &::before {
         box-shadow: none;
       }
@@ -1506,7 +1506,7 @@ export default {
     .v-expansion-panels {
       .v-expansion-panel-header__icon  {
         .v-icon {
-          color: var(--main_text);
+          color: var(--main_text) !important;
         }
       }
     }
