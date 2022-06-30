@@ -16,7 +16,7 @@
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           :rules="[
-            value => !value || value.size < 2000000 || 'Размер должен быть меньше 2 МБ!',
+            value => !value || value.size < 10000000 || 'Размер должен быть меньше 2 МБ!',
             value => !value || value.type === 'image/svg+xml' || 'Не допустимый формат!',
           ]"
           accept="image/svg+xml"
@@ -148,7 +148,7 @@ export default {
   &__input::v-deep {
     .v-icon,
     .v-file-input__text {
-      color: var(--main_text);
+      color: var(--main_text) !important;
     }
   }
   &__message {
