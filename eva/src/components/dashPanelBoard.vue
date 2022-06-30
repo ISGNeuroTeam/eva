@@ -57,22 +57,6 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
-              <div
-                class="control-button theme--dark"
-                :style="{ display: 'inline-flex' }"
-                :class="{ hide_control: !editMode }"
-                v-on="on"
-                @click="loadSvg = !loadSvg"
-                v-html="svgIcon.svg"
-              />
-            </template>
-            <span>Загрузка SVG</span>
-          </v-tooltip>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
@@ -869,10 +853,6 @@
         :permissions-from="userPermissions"
         :id-dash-from="idDashFrom"
       />
-      <modal-loading-svg
-        v-model="loadSvg"
-        @updateModalValue="loadSvg = false"
-      />
     </div>
 
     <div
@@ -925,7 +905,6 @@ import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
 import Notifications from '@/components/notifications';
-import { svgIcon } from '@/js/svg';
 
 export default {
   name: 'DashPanelBoard',
@@ -1074,8 +1053,6 @@ export default {
       screenHeight: this.getScreenHeight(),
       allGroups: [],
       tokens: [],
-      loadSvg: false,
-      svgIcon,
     };
   },
   computed: {
