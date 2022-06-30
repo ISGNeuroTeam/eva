@@ -12,10 +12,8 @@ import yfiles, {
   Rect,
   SimpleNode,
   SvgExport,
-  Size,
-  WebGL2IconNodeStyle,
-  WebGL2Stroke,
-  VoidNodeStyle, WebGL2GraphModelManager, WebGL2SelectionIndicatorManager,
+  YVector,
+  VoidNodeStyle,
 } from 'yfiles';
 
 export class DragAndDropPanel {
@@ -113,6 +111,9 @@ export class DragAndDropPanel {
       originalNode.style,
       originalNode.tag,
     );
+    if (originalNode.tag.isTriangle) {
+      // graph.setStyle(node, );
+    }
     originalNode.labels.forEach((label) => {
       graph.addLabel(
         node,
@@ -128,7 +129,7 @@ export class DragAndDropPanel {
     });
     this.updateViewport(this.graphComponent);
     return this.exportAndWrap(
-      this.graphComponent,
+      original?.tag || null,
       original instanceof INode ? undefined : original.elementType,
     );
   }
@@ -183,13 +184,7 @@ export class DragAndDropPanel {
     this.graphComponent.zoomTo(viewport);
   }
 
-  /**
-   * Exports and wraps the original visualization in an HTML element.
-   * @param {!GraphComponent} graphComponent
-   * @param {!string} [elementType]
-   * @returns {!HTMLDivElement}
-   */
-  exportAndWrap(graphComponent, elementType) {
+  exportAndWrap(nodeTag, elementType) {
     const exporter = new SvgExport({
       worldBounds: this.graphComponent.contentRect,
       margins: 2,

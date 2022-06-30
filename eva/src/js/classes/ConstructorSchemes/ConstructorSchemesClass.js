@@ -16,7 +16,8 @@ import {
   GraphMLSupport,
   GraphSnapContext,
   GridSnapTypes,
-  HandlePositions, HierarchicNestingPolicy,
+  HandlePositions,
+  HierarchicNestingPolicy,
   ICommand,
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
@@ -30,6 +31,7 @@ import {
   LabelDropInputMode,
   License,
   ListEnumerable,
+  MatrixOrder,
   MouseEventRecognizers,
   NodeDropInputMode,
   NodeReshapeHandleProvider,
@@ -45,7 +47,9 @@ import {
   Size,
   StorageLocation,
   VoidNodeStyle,
-  ShapeNodeShape,
+  SimplePort,
+  FreeNodePortLocationModel,
+  GraphViewerInputMode,
 } from 'yfiles';
 
 import { throttle } from '../../utils/throttle';
@@ -632,71 +636,85 @@ class ConstructorSchemesClass {
     },
   ]
 
+  dndShapeNode = {
+    template: `
+      <g>
+        <template v-if="tag.shape === 0">
+          <!--round-rectangle-->
+          <rect 
+            x="0" 
+            y="0" 
+            :width="layout.width" 
+            :height="layout.height" 
+            rx="10" 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+          />
+        </template>
+        <template v-else-if="tag.shape === 1">
+          <!--rectangle-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+            :points="'0,0 ' + layout.width + ',0 ' + layout.width + ',' + layout.height + ' 0,' + layout.height"
+          />
+        </template>
+        <template v-else-if="tag.shape === 2">
+          <!--ellipse-->
+          <ellipse 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+            :ry="layout.height / 2" 
+            :cy="layout.height / 2" 
+            :rx="layout.width / 2" 
+            :cx="layout.width / 2"
+          />
+        </template>
+        <template v-else-if="tag.shape === 3">
+          <!--triangle-left-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+           :points="layout.width + ',' + layout.height + ' ' + '0,' + layout.height / 2 + ' ' + layout.width + ',0'"
+          />
+        </template>
+        <template v-else-if="tag.shape === 4">
+          <!--triangle-right-->
+          <polygon 
+            :fill="tag.fill.rgbaString || 'transparent'" 
+            :stroke="tag.strokeColor.rgbaString || 'transparent'" 
+            :stroke-width="tag.thickness || '0'"
+           :points="0 + ',' + layout.height + ' ' + layout.width + ',' + layout.height / 2 + ' ' + '0,0'"
+          />
+        </template>
+      </g> 
+    `,
+  };
+
   shapeNodeStyleList = [
     {
-      label: 'Четырехугольник',
-      value: 'RECTANGLE',
-      numberValue: 0,
+      label: 'Rectangle(rounded)',
+      id: 0,
     },
     {
-      label: 'Четырехугольник(rounded)',
-      value: 'ROUND_RECTANGLE',
-      numberValue: 1,
+      label: 'Rectangle',
+      id: 1,
     },
     {
-      label: 'Эллиптическая форма',
-      value: 'ELLIPSE',
-      numberValue: 2,
+      label: 'Ellipse',
+      id: 2,
     },
     {
-      label: 'Треугольник вверх',
-      value: 'TRIANGLE',
-      numberValue: 3,
+      label: 'Triangle(left)',
+      id: 3,
     },
     {
-      label: 'Треугольник вниз',
-      value: 'TRIANGLE2',
-      numberValue: 4,
-    },
-    {
-      label: 'Трапеция вниз',
-      value: 'TRAPEZ',
-      numberValue: 7,
-    },
-    {
-      label: 'Трапеция вверх',
-      value: 'TRAPEZ2',
-      numberValue: 8,
-    },
-    {
-      label: 'Пятиконечная звезда',
-      value: 'STAR5',
-      numberValue: 9,
-    },
-    {
-      label: 'Шестиконечная звезда',
-      value: 'STAR6',
-      numberValue: 10,
-    },
-    {
-      label: 'Восьмиконечная звезда',
-      value: 'STAR8',
-      numberValue: 11,
-    },
-    {
-      label: 'Параллелограмм',
-      value: 'DIAMOND',
-      numberValue: 14,
-    },
-    {
-      label: 'Восьмигранник',
-      value: 'OCTAGON',
-      numberValue: 15,
-    },
-    {
-      label: 'Шестигранник',
-      value: 'HEXAGON',
-      numberValue: 16,
+      label: 'Triangle(right)',
+      id: 4,
     },
   ]
 
@@ -711,7 +729,7 @@ class ConstructorSchemesClass {
   options = {
     defaultNodeSize: [150, 150],
     defaultNodeStyle: {
-      shape: 'ROUND_RECTANGLE',
+      shape: 0,
       fill: '#FFFFFF',
       strokeColor: '#F4F4F4',
       strokeSize: '1.5px',
@@ -728,11 +746,20 @@ class ConstructorSchemesClass {
       textFill: '#000000', // Color
     },
     selectedShapeNodeStyle: '',
+    isEdit: false,
   }
 
   localVariables = {
     isEdgeCreating: false,
     creatingEdge: null,
+  }
+
+  get isEdit() {
+    return this.options.isEdit;
+  }
+
+  set isEdit(val) {
+    this.options.isEdit = val;
   }
 
   get defaultNodeSize() {
@@ -772,7 +799,7 @@ class ConstructorSchemesClass {
   }
 
   set defaultNodeStyle({
-    shape = 'ROUND_RECTANGLE',
+    shape = 0,
     fill = Color.TRANSPARENT,
     strokeColor = Color.TRANSPARENT,
     strokeSize = '1.5px',
@@ -840,6 +867,23 @@ class ConstructorSchemesClass {
       return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
     }
     return `rgb(${color.r}, ${color.g}, ${color.b})`;
+  }
+
+  static colorToRgbaObject(color) {
+    const rgbaColor = Color.from(color);
+    return {
+      r: rgbaColor.r,
+      g: rgbaColor.g,
+      b: rgbaColor.b,
+      a: rgbaColor.a,
+    };
+  }
+
+  static generateColor(color) {
+    return {
+      rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
+      rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
+    };
   }
 
   generateIconNodes(iconsList) {
@@ -924,13 +968,13 @@ class ConstructorSchemesClass {
       this.defaultNodeSize[0],
       this.defaultNodeSize[1],
     );
-    defaultNode.style = new ShapeNodeStyle({
-      shape: this.defaultNodeStyle.shape,
-      fill: this.defaultNodeStyle.fill,
-      stroke: `${this.defaultNodeStyle.strokeSize} ${this.defaultNodeStyle.strokeColor}`,
-    });
+    defaultNode.style = new VuejsNodeStyle(this.dndShapeNode.template);
     defaultNode.tag = {
       dataType: 'default-node',
+      fill: ConstructorSchemesClass.generateColor(this.defaultNodeStyle.fill),
+      strokeColor: ConstructorSchemesClass.generateColor(this.defaultNodeStyle.strokeColor),
+      thickness: this.defaultNodeStyle.strokeSize,
+      shape: this.defaultNodeStyle.shape,
     };
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
@@ -981,14 +1025,19 @@ class ConstructorSchemesClass {
     updateStoreCallback,
     openDataPanelCallback,
     closeDataPanelCallback,
+    isEdit,
   }) {
     this.dragAndDropPanel = null;
     this.mapper = null;
     this.elem = elem;
+    this.isEdit = isEdit;
     this.dataRest = dataRest;
     this.iconsList = iconsList;
     // Сохранение через GraphML
     this.savedGraph = savedGraph;
+    this.updateStoreCallback = updateStoreCallback;
+    this.openDataPanelCallback = openDataPanelCallback;
+    this.closeDataPanelCallback = closeDataPanelCallback;
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
@@ -999,8 +1048,13 @@ class ConstructorSchemesClass {
       edgeCustomStyles,
       labelCustomStyles,
     });
-    this.configureInputModes(updateStoreCallback, openDataPanelCallback, closeDataPanelCallback);
-
+    if (this.isEdit) {
+      this.configureInputModes(
+        this.updateStoreCallback,
+        this.openDataPanelCallback,
+        this.closeDataPanelCallback,
+      );
+    }
     // Сохранение через GraphML
     this.initializeIO();
     if (this.savedGraph) {
@@ -1097,6 +1151,12 @@ class ConstructorSchemesClass {
   }
 
   // Сохранение
+  save(updateStoreCallback) {
+    this.saveGraphToLocalStorage().then(() => {
+      this.updateGraphFromLocalStorage(updateStoreCallback);
+    });
+  }
+
   async saveGraphToLocalStorage() {
     return new Promise((resolve) => {
       ICommand.SAVE.execute(null, this.graphComponent);
@@ -1112,19 +1172,13 @@ class ConstructorSchemesClass {
     });
   }
 
-  // Выгразука из LocalStorage в Store через callback фукцию
+  // Выгразука из LocalStorage в Store через callback
   updateGraphFromLocalStorage(updateStoreCallback) {
     this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
     window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
     if (updateStoreCallback && this.savedGraph) {
       updateStoreCallback(this.savedGraph);
     }
-  }
-
-  save(updateStoreCallback) {
-    this.saveGraphToLocalStorage().then(() => {
-      this.updateGraphFromLocalStorage(updateStoreCallback);
-    });
   }
 
   applyStylesElements({
@@ -1147,17 +1201,6 @@ class ConstructorSchemesClass {
     }
   }
 
-  updateDataNode(nodeId, newData) {
-    if (this.targetDataNode) {
-      this.targetDataNode.tag = structuredClone(newData);
-      this.graphComponent.updateVisual();
-      return this.saveGraphToLocalStorage();
-    }
-    return new Promise((resolve) => {
-      resolve();
-    });
-  }
-
   getDataNodeTemplate(templateType) {
     return this.dndDataPanelItems[templateType.replace('template-', '')].template;
   }
@@ -1166,9 +1209,24 @@ class ConstructorSchemesClass {
     return this.dndLabelPanelItems[templateType.replace('template-', '')].template;
   }
 
+  toggleInputMode() {
+    if (!this.isEdit) {
+      this.isEdit = true;
+      this.configureInputModes(
+        this.updateStoreCallback,
+        this.openDataPanelCallback,
+        this.closeDataPanelCallback,
+      );
+    } else {
+      this.isEdit = false;
+      this.graphComponent.inputMode = new GraphViewerInputMode();
+      this.closeDataPanelCallback();
+    }
+    return this.isEdit;
+  }
+
   // Настройка взаимодействия с графом
   configureInputModes(updateStoreCallback, openDataPanelCallback, closeDataPanelCallback) {
-    // configure the snapping context
     const mode = new GraphEditorInputMode({
       allowCreateNode: false,
       allowAddLabel: false,
@@ -1189,16 +1247,12 @@ class ConstructorSchemesClass {
       }),
     });
 
-    // Settings dropInputMode
+    // Настройка dropInputMode
     // Node
     mode.nodeDropInputMode = this.settingsNodeDropInputMode();
 
     // Label
     mode.labelDropInputMode = this.settingsLabelDropInputMode();
-
-    mode.addLabelAddedListener(() => {
-      this.save(updateStoreCallback);
-    });
 
     // Port
     mode.portDropInputMode = this.settingsPortDropInputMode();
@@ -1206,19 +1260,24 @@ class ConstructorSchemesClass {
     // Edge-to-edge
     mode.createEdgeInputMode.allowEdgeToEdgeConnections = true;
 
-    // create bends only when shift is pressed
     mode.createBendInputMode.pressedRecognizer = EventRecognizers.createAndRecognizer(
       MouseEventRecognizers.LEFT_DOWN,
       KeyEventRecognizers.SHIFT_IS_DOWN,
     );
 
-    // Init edge-to-edge settings
     this.additionalEdgeToEdgeSettings();
 
+    // Edge
     this.configureEdgeDropInputMode(mode);
 
     // Event listeners
     this.additionalEdgeToInvisibleNodeSettings(mode, updateStoreCallback);
+
+    // Событие добавления подписи
+    mode.addLabelAddedListener(() => {
+      this.save(updateStoreCallback);
+    });
+
     // Событие добавления ребра
     mode.createEdgeInputMode.addEdgeCreatedListener(() => {
       // Сохранение в store
@@ -1229,7 +1288,7 @@ class ConstructorSchemesClass {
     mode.addNodeCreatedListener(async (sender, evt) => {
       const createdItem = await evt.item;
 
-      // Проверяем на значение по-умолчанию
+      // Проверяем nodeId на значение по-умолчанию
       if (typeof createdItem.tag?.nodeId === 'string') {
         // Заменяем на id элемента
         createdItem.tag.nodeId = createdItem.hashCode();
@@ -1258,14 +1317,9 @@ class ConstructorSchemesClass {
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
           openDataPanelCallback(evt.item.tag);
-        }  else {
+        } else {
           openDataPanelCallback({
-            nodeId: evt.item.tag.nodeId,
-            dataType: 'default-node',
-            fill: ConstructorSchemesClass.colorToString(evt.item.style.fill.color),
-            strokeColor: ConstructorSchemesClass.colorToString(evt.item.style.stroke.fill.color),
-            strokeSize: `${evt.item.style.stroke.thickness}px`,
-            shape: this.getShapeById(evt.item.style.shape),
+            ...evt.item.tag,
           });
         }
       } else {
@@ -1303,13 +1357,22 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
+  static getColorForColorPicker(color) {
+    return {
+      rgba: {
+        r: color.r,
+        g: color.g,
+        b: color.b,
+        a: color.a,
+      },
+      rgbaString: ConstructorSchemesClass.colorToString(color),
+    };
+  }
+
   settingsNodeDropInputMode() {
     return new NodeDropInputMode({
-      // enables the display of the dragged element during the drag
       showPreview: true,
-      // initially disables snapping fo the dragged element to existing elements
       snappingEnabled: false,
-      // by default the mode available in GraphEditorInputMode is disabled, so first enable it
       enabled: true,
       itemCreator: async (
         context,
@@ -1349,20 +1412,21 @@ class ConstructorSchemesClass {
           // Обычный узел
           createdNode = graph.createNodeAt({
             location: dropLocation,
-            style: dropData.style,
+            style: new VuejsNodeStyle(this.dndShapeNode.template),
             labels: dropData.labels,
             tag: {
+              ...dropData.tag,
               nodeId: dropData.hashCode(),
             },
           });
         }
-        // Позиция и размеры нового узла
-        graph.setNodeLayout(createdNode, new Rect(
+        const nodePosition = new Rect(
           dropLocation.x - (dropData.layout.width / 2),
           dropLocation.y - (dropData.layout.height / 2),
           dropData.layout.width,
           dropData.layout.height,
-        ));
+        );
+        graph.setNodeLayout(createdNode, nodePosition);
         return createdNode;
       },
     });
@@ -1582,7 +1646,11 @@ class ConstructorSchemesClass {
   }
 
   createAdditionalPorts(createdItem) {
-    if (!createdItem.style.image) {
+    if (
+      !createdItem.style.image
+        && createdItem.tag.dataType
+        !== 'default-node'
+    ) {
       this.graphComponent.graph.addRelativePort(
         createdItem,
         new Point((createdItem.layout.width / 6) * 2, 0),
@@ -1764,7 +1832,6 @@ class ConstructorSchemesClass {
 
   async createDnDPanelItems({
     iconsList,
-    defaultNodeStyle,
     defaultEdgeStyle,
     defaultLabelStyle,
   }) {
@@ -1818,6 +1885,21 @@ class ConstructorSchemesClass {
       labelNode.tag = label;
       labelNode.labels = new ListEnumerable([label]);
       items.push(new DragAndDropPanelItem(labelNode, 'Подписи к блокам', 'label-node'));
+
+      const portNode = new SimpleNode();
+      portNode.layout = new Rect(0, 0, 5, 5);
+      portNode.style = new VoidNodeStyle();
+      const port = new SimplePort(portNode, FreeNodePortLocationModel.NODE_CENTER_ANCHORED);
+      port.style = new NodeStylePortStyleAdapter(
+        new ShapeNodeStyle({
+          fill: 'transparent',
+          stroke: 'cornflowerblue',
+          shape: 'ellipse',
+        }),
+      );
+      portNode.tag = port;
+      portNode.ports = new ListEnumerable([port]);
+      items.push(new DragAndDropPanelItem(portNode, 'Порт', 'port-node'));
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
@@ -1960,6 +2042,11 @@ class ConstructorSchemesClass {
         ...items,
       };
     } else if (this.targetDataNode.tag.dataType === 'label-0') {
+      this.targetDataNode.tag = {
+        ...this.targetDataNode.tag,
+        ...updatedData,
+      };
+    } else if (this.targetDataNode.tag.dataType === 'default-node') {
       this.targetDataNode.tag = {
         ...this.targetDataNode.tag,
         ...updatedData,

@@ -145,9 +145,6 @@ import yfiles, {
 
 const compat = yfiles.module('compat')
 
-/**
- * @yjs:keep=Node
- */
 export function configureIOHandler(ioh) {
   // enable serialization of the compat modules - without a namespace mapping, serialization will fail
   ioh.addXamlNamespaceMapping('http://www.yworks.com/xml/yfiles-common/2.0', compat.graphml.common)
@@ -219,6 +216,7 @@ export function configureIOHandler(ioh) {
   })
 }
 
+// TODO: Удалить лишнее, если такое имеется
 yfiles.lang.module('compat.graphml.common', function (exports) {
   exports.NodeViewStateExtension = new ClassDefinition(function () {
     return {
