@@ -1,3 +1,16 @@
+# [1.97.0]
+
+### Added
+- Password length is limited
+- Added visualization circular dial
+- Added the ability to download svg
+
+### Fixed
+- When changing username, the old value remained on the panel
+- Fixed the logic of displaying the signature of the nth item on the multiline
+- Dash Table: when saving the settings, the checkboxes for the columns were removed
+- fixed logout on reboot
+
 # [1.96.0]
 
 ### Fixed

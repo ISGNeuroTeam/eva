@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Fixed
+
+## [1.97.0]
+
+### Added
 - Add password max length
 - Added visualization  circular dial
 - Added loading svg
