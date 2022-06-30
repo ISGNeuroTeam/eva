@@ -1,0 +1,112 @@
+// -------------------- import templates mixins --------------------
+
+@import './metricTemplates'
+
+// -------------------- colors --------------------
+
+$main_text: var(--main_text)
+$main_border: var(--main_border)
+$secondary-text: var(--secondary_text)
+$accent_ui_color: var(--accent_ui_color)
+$blue: var(--blue)
+
+
+// -------------------- vars --------------------
+
+$dash-loading-height: 3px
+
+// -------------------- mixins --------------------
+
+@mixin text-truncated()
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+
+@mixin container-height($dash-header-height)
+  height: calc(100% - (#{$dash-header-height} + #{$dash-loading-height}))
+
+// -------------------- styles --------------------
+
+
+.single-value-container::v-deep
+  display: flex
+  flex-direction: column
+  overflow: auto
+  height: 100%
+  position: relative
+
+  &::-webkit-scrollbar
+    width: 6px
+
+  &::-webkit-scrollbar-track
+    background-color: transparent
+
+  &::-webkit-scrollbar-thumb
+    background-color: $main_border
+
+  .header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    z-index: 2
+    position: absolute
+    right: 12px
+
+    .data-title
+      color: $secondary-text
+      font-size: 12px
+      font-weight: 400
+      line-height: 15px
+      letter-spacing: 1.25px
+      text-transform: uppercase
+      @include text-truncated()
+
+    .settings-icon
+      margin-left: 8px
+      color: $secondary-text
+
+  .content
+    z-index: 2
+    display: grid
+    gap: 10px
+    width: 100%
+    margin: auto
+    flex: 1
+    @include templates-for-all-metric-variants()
+
+    .item
+      display: flex
+      align-items: center
+      justify-content: center
+      flex-direction: column
+      @include text-truncated()
+
+      .metric-title
+        display: flex
+        align-items: center
+        @include text-truncated()
+
+        .icon
+          display: flex
+          align-items: center
+          justify-content: center
+          fill: $secondary-text
+          padding-right: 4px
+
+        .title-text
+          color: $secondary-text
+          font-size: 12px
+          font-weight: 400
+          line-height: 15px
+          @include text-truncated()
+
+      .metric-value
+        text-align: left
+        flex-wrap: wrap
+        @include text-truncated()
+
+        &.color-main
+          color: $blue
+
+        &.color-secondary
+          color: $secondary-text

@@ -76,9 +76,7 @@
             <v-icon
               class="control-button theme--dark"
               :color="
-                getColorError
-                  ? theme.$primary_button
-                  : theme.$secondary_text
+                getColorError ? theme.$primary_button : theme.$secondary_text
               "
               v-on="on"
               @click="openLogs"
@@ -124,9 +122,7 @@
         </template>
         <v-list class="profile-dropdown--list">
           <v-list-item>
-            <v-list-item-title
-              class="profile-dropdown--title"
-            >
+            <v-list-item-title class="profile-dropdown--title">
               Профиль
             </v-list-item-title>
           </v-list-item>
@@ -154,9 +150,7 @@
       </v-menu>
     </div>
 
-    <modal-log
-      v-model="modalActive"
-    />
+    <modal-log v-model="modalActive" />
     <modal-themes
       v-model="paleteShow"
       :admin="isAdmin"
@@ -196,7 +190,6 @@ export default {
   },
   data() {
     return {
-      login: '',
       user: {},
       titlePage: this.$router.history.current.name,
       door: mdiDoor,
@@ -240,11 +233,13 @@ export default {
   computed: {
     getColorError() {
       if (!this.$store.state.logError) {
-        this.$store.commit('setState', [{
-          object: this.$store.state,
-          prop: 'logError',
-          value: false,
-        }]);
+        this.$store.commit('setState', [
+          {
+            object: this.$store.state,
+            prop: 'logError',
+            value: false,
+          },
+        ]);
       }
       return this.$store.state.logError;
     },
@@ -255,7 +250,12 @@ export default {
       return this.$store.getters.getTheme;
     },
     isAdmin() {
-      return !!(this.userPermissions && this.userPermissions.includes('admin_all'));
+      return !!(
+        this.userPermissions && this.userPermissions.includes('admin_all')
+      );
+    },
+    login() {
+      return this.$store.getters['auth/userName'];
     },
   },
   mounted() {
@@ -270,7 +270,6 @@ export default {
     },
     async getCookie() {
       if (this.$jwt.hasToken()) {
-        this.login = this.$jwt.decode().username;
         // let id = this.$jwt.decode().user_id;
         let permissions = [];
 
@@ -298,10 +297,8 @@ export default {
       }
     },
     exit() {
-      document.cookie = 'eva-dashPage=\'\'; max-age=0 ; path=/';
-      document.cookie = 'eva_token=\'\'; max-age=0 ; path=/';
-      this.$store.commit('clearState');
-      this.$router.push('/');
+      this.$store.dispatch('auth/logout');
+      document.title = 'EVA';
     },
     edit() {
       this.$router.push('/profile');

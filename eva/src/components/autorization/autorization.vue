@@ -123,6 +123,7 @@ export default {
               `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`,
             );
             this.$store.commit('clearState');
+            this.$store.commit('auth/setUserName', this.$jwt.decode().username);
             this.$router.push('/main');
             return res;
           });

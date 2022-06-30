@@ -79,6 +79,7 @@ export default {
 
       response.then((res) => {
         if (res.status === 200) {
+          this.$emit('deleted', this.dataFrom.id);
           this.cancelModal();
         }
       });
