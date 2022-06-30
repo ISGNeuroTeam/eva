@@ -593,42 +593,4 @@ export default {
     }
     return data;
   },
-  async setLoadingSvg(param, restAuth) {
-    let data = [];
-
-    const response = await fetch('/api/load/svg', {
-      // сперва нужно подать post запрос
-      method: 'POST',
-      body: param.formData,
-    }).catch((error) => {
-      restAuth.putLog(
-        `Загрузить файл ${param.file.name} не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-      );
-      return response;
-    });
-    if (response.status === 200) {
-      // если получилось
-      await response
-        .text()
-        .then((res) => {
-          // переводим полученные данные из json в нормальный объект
-          data = res;
-          restAuth.putLog(
-            `Загрузка файла ${param.file.name} прошла успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
-          );
-        })
-        .catch((error) => {
-          restAuth.putLog(
-            `Загрузить файл ${param.file.name} не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-          );
-        });
-    } else {
-      restAuth.putLog(
-        `Загрузить файл ${param.file.name} не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
-      );
-      return response;
-    }
-
-    return data;
-  },
 };
