@@ -326,6 +326,8 @@ export default {
         if (metric.color === 'secondary') {
           return '#e0e0ec';
         }
+      } else if (!metric.metadata && metric.color === 'secondary'){
+        return '#e0e0ec';
       }
       return '#5980f8';
     },

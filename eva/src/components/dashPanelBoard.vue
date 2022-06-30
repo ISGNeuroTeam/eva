@@ -1266,6 +1266,7 @@ export default {
     },
     exit() {
       this.$store.dispatch('auth/logout');
+      document.title = 'EVA';
     },
     openThemeModal() {
       this.paleteShow = !this.paleteShow;
