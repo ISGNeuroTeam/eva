@@ -1,3 +1,26 @@
+# [1.97.0]
+
+### Added
+- Password length is limited
+- Added visualization circular dial
+
+### Fixed
+- When changing username, the old value remained on the panel
+- Fixed the logic of displaying the signature of the nth item on the multiline
+- Dash Table: when saving the settings, the checkboxes for the columns were removed
+- fixed logout on reboot
+
+# [1.96.0]
+
+### Fixed
+- Fixed user deletion in profile
+- Fixed datepicker visualisation
+- Fixed zooming of a multiline in the Data Research 2.0
+- The order of rendering lines on the multiline has also been changed
+- Fixed selection the default source data in dash settings
+- Fixed piechart visualisation
+- Problem with data increment on request
+
 # [1.95.0]
 
 ### Added

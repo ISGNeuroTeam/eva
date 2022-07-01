@@ -534,5 +534,9 @@ export default {
       }
     }
   }
+
+}
+.yfiles-tooltip {
+  position: fixed !important;
 }
 </style>
