@@ -16,6 +16,7 @@ import {
   mdiChartScatterPlot,
   mdiGrid,
   mdiTuneVertical,
+  mdiImageFilterTiltShift,
 } from '@mdi/js';
 
 export default {
@@ -45,6 +46,7 @@ export default {
     { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
+    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
   ],
   size: {
     picker: {
@@ -127,6 +129,10 @@ export default {
       width: 400,
       height: 400,
     },
+    dial: {
+      width: 400,
+      height: 400,
+    },
     constructorSchemes: {
       width: 930,
       height: 850,
@@ -154,6 +160,7 @@ export default {
     constructorSchemes: mdiTuneVertical,
     accumulators: 'eva-chart_bar_chart_horizontal',
     menu: 'eva-edit_list_checklist',
+    dial: mdiImageFilterTiltShift,
   },
   commonOptions: [
     'panelSettings',
@@ -261,6 +268,7 @@ export default {
       'metrics',
       'fillColor',
     ],
+    dial: [],
     constructorSchemes: ['visible', 'level', 'pinned'],
   },
   optionFields: [
@@ -381,14 +389,14 @@ export default {
       elem: 'select',
       default: null,
       items() {
-        if (this.$store.state[this.idDash]?.searches) {
+        const dashState = this.$store.state[this.idDash];
+        if (!dashState?.searches || !dashState.searches.map) {
           return [];
         }
-        const sourceDataList = this.$store.state[this.idDash].searches
-          .map(({ id, sid }) => ({
-            value: id,
-            text: sid,
-          }));
+        const sourceDataList = dashState.searches.map(({ id, sid }) => ({
+          value: id,
+          text: sid,
+        }));
         return [
           {
             value: null,
@@ -505,7 +513,10 @@ export default {
       elem: 'checkbox-list',
       items() {
         // this is modalSettings context
-        return this.$store.state[this.idDash][this.element]?.availableTableTitles;
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.titles || [];
+        const curTitles = storeElement?.availableTableTitles || [];
+        return new Set([...savedTitles, ...curTitles]);
       },
       default: [],
     },

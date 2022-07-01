@@ -13,6 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.97.0]
+
+### Added
+- Add password max length
+- Added visualization  circular dial
+
+### Fixed
+- Change username on edit
+- Multiline. Signature of the nth point
+- Dash Table: when saving the settings, the checkboxes for the columns are removed
+- fixed logout on reboot
+
+## [1.96.0]
+
+### Fixed
+- Fixed delete user in profile
+- Fixed datepicker visualisation
+- Fixed zooming of a multiline in the Data Research 2.0
+- The order of rendering lines on the multiline has also been changed
+- Fixed selection the default source data in dash settings
+- Fixed piechart visualisation
+- Problem with data increment on request
+
 ## [1.95.0]
 
 ### Added
@@ -27,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added the ability to configure the source data for the default component value
 
 ### Fixed
-- Fixed datepicker visualisation
+- Fixed ygraph tooltip position
 - Changed icons for menu, tune and accumulators visualisations 
 - Fixed dashboard save edit state
 - Fixed dashboard save drag/resize state

@@ -39,25 +39,17 @@ export default new Vuex.Store({
   mutations: {
     ...store.mutations,
     /* метод для добавления реактивных свойств
-   * payload - массив объектов {object, prop, value}
-   * */
+     * payload - массив объектов {object, prop, value}
+     * */
     setState(state, payload) {
       payload.forEach(({ object, prop, value }) => {
         Vue.set(object, prop, value);
       });
     },
     setDefaultOptions(state, { idDash, id }) {
-      Vue.set(
-        state[idDash][id],
-        'options',
-        {},
-      );
+      Vue.set(state[idDash][id], 'options', {});
       Object.keys(defaultOptions).forEach((option) => {
-        Vue.set(
-          state[idDash][id].options,
-          option,
-          defaultOptions[option],
-        );
+        Vue.set(state[idDash][id].options, option, defaultOptions[option]);
       });
     },
     // проверяет и создает объект в хранилище для настроек
@@ -137,8 +129,9 @@ export default new Vuex.Store({
       if (search) {
         // то ищем его среди всех ИС фильтруя массив и отбрасывая его из массива
         // и обновляем массив ИС
-        state[search.idDash].searches = state[search.idDash].searches
-          .filter((item) => item.sid !== search.sid);
+        state[search.idDash].searches = state[search.idDash].searches.filter(
+          (item) => item.sid !== search.sid,
+        );
       }
     },
     // открывает или закрывает модальное окно с ИС
@@ -203,6 +196,9 @@ export default new Vuex.Store({
     setSwitch(state, { idDash, id, status }) {
       state[idDash][id].switch = status;
       if (id.includes('table')) {
+        if (state[idDash][id].options) {
+          state[idDash][id].options.titles = [];
+        }
         delete state[idDash][id].selectedTableTitles;
         delete state[idDash][id].availableTableTitles;
       }
@@ -213,7 +209,9 @@ export default new Vuex.Store({
     },
     changeTokenName(state, { tocken, idDash, value }) {
       //  проверяем есть ли такой токен уже
-      const token = state[idDash].tockens.find((item) => item.name === tocken.name);
+      const token = state[idDash].tockens.find(
+        (item) => item.name === tocken.name,
+      );
       if (token) {
         token.name = value;
       }
@@ -239,10 +237,11 @@ export default new Vuex.Store({
     // TODO refactor
     // сохранение токена в хранилище
     setTocken(state, { token, idDash, value }) {
-      const id = Object.keys(state[idDash].tockens)
-        .find((item) => state[idDash].tockens[item].name === token.name
+      const id = Object.keys(state[idDash].tockens).find(
+        (item) => state[idDash].tockens[item].name === token.name
           && state[idDash].tockens[item].action === token.action
-          && state[idDash].tockens[item].capture === token.capture);
+          && state[idDash].tockens[item].capture === token.capture,
+      );
       // если токен нашелся
       if (id) {
         // если value задано, то присваиваем его токену
@@ -260,10 +259,7 @@ export default new Vuex.Store({
             // если в нашем событии есть упоминание нашего токена
             if (item.token === state[idDash].tockens[id].name) {
               // то добовляем событие в заготовленный массив
-              return [
-                ...acc,
-                i,
-              ];
+              return [...acc, i];
             }
             return acc;
           }, []);
@@ -282,7 +278,10 @@ export default new Vuex.Store({
                   // в случаях когда нужно сравнить значения токена по равенству,
                   // это может быть строка, а значит нужно обрезать пробелы,
                   // чтобы сравнение было корректным
-                  localValue = state[idDash].tockens[id].value.replace(/\s/g, '');
+                  localValue = state[idDash].tockens[id].value.replace(
+                    /\s/g,
+                    '',
+                  );
                   // сравниваем значения в событии и значение токена
                   if (localValue === state[idDash].events[item].tokenval) {
                     // вызываем метод обновляйщий элемент
@@ -338,8 +337,10 @@ export default new Vuex.Store({
                   data = state[idDash].events[item].tokenval
                     .replace(/\[|\]/g, '')
                     .split(',');
-                  if (state[idDash].tockens[id].value >= data[0]
-                    && state[idDash].tockens[id].value <= data[1]) {
+                  if (
+                    state[idDash].tockens[id].value >= data[0]
+                    && state[idDash].tockens[id].value <= data[1]
+                  ) {
                     // если число нашлось
                     this.commit('letEventSet', {
                       events: [state[idDash].events[item]],
@@ -465,9 +466,11 @@ export default new Vuex.Store({
             state[idDash][item].loading = '';
           }
           state[idDash][item].loading = should;
-        } else if (search
+        } else if (
+          search
           && name
-          && state[idDash][item].name_elem.toLowerCase() === name.toLowerCase()) {
+          && state[idDash][item].name_elem.toLowerCase() === name.toLowerCase()
+        ) {
           state[idDash][item].loading = should;
         }
       });
@@ -492,7 +495,9 @@ export default new Vuex.Store({
         Vue.set(state[idDash], 'elements', []);
       }
 
-      const stateElements = spaceName ? state[idDash][`elements${spaceName}`] : state[idDash]?.elements;
+      const stateElements = spaceName
+        ? state[idDash][`elements${spaceName}`]
+        : state[idDash]?.elements;
       const elements = stateElements.filter((item) => item.indexOf(id) !== -1);
       // и если есть
       if (elements.length > 0) {
@@ -575,13 +580,21 @@ export default new Vuex.Store({
         || modalsetting.page === 'search'
       ) {
         // если удаляем элемент то его характеристики заносим в объект моадльного окна
-        Vue.set(state[modalsetting.id].modalDelete, 'active', modalsetting.status);
+        Vue.set(
+          state[modalsetting.id].modalDelete,
+          'active',
+          modalsetting.status,
+        );
         Vue.set(state[modalsetting.id].modalDelete, 'id', modalsetting.elem);
         Vue.set(state[modalsetting.id].modalDelete, 'name', modalsetting.name);
         if (!modalsetting.status) {
           Vue.set(state[modalsetting.id].modalDelete, 'page', '');
         } else {
-          Vue.set(state[modalsetting.id].modalDelete, 'page', modalsetting.page);
+          Vue.set(
+            state[modalsetting.id].modalDelete,
+            'page',
+            modalsetting.page,
+          );
         }
       }
     },
@@ -627,7 +640,9 @@ export default new Vuex.Store({
       let foundItem = null;
       //  проверяем есть ли такой токен уже
       if (state[idDash]?.tockens) {
-        foundItem = state[idDash].tockens.find((item) => item.name === tocken.name);
+        foundItem = state[idDash].tockens.find(
+          (item) => item.name === tocken.name,
+        );
       } else {
         Vue.set(state[idDash], 'tockens', []);
       }
@@ -710,11 +725,7 @@ export default new Vuex.Store({
         } else {
           // для любой другой настройки
           // просто обновляем ее значение на новое
-          Vue.set(
-            state[idDash][id].options,
-            item,
-            options[item],
-          );
+          Vue.set(state[idDash][id].options, item, options[item]);
         }
       });
       if (titles) {
@@ -765,23 +776,14 @@ export default new Vuex.Store({
       state[idDash].modalSettings.status = status;
       state[idDash].modalSettings.element = element;
       if (titles) {
-        Vue.set(
-          state[idDash][element],
-          'availableTableTitles',
-          titles,
-        );
+        Vue.set(state[idDash][element], 'availableTableTitles', titles);
       }
       if (
         element
-        && (element.includes('table')
-          || element.includes('heatmap'))
+        && (element.includes('table') || element.includes('heatmap'))
       ) {
         if (!state[idDash][element].selectedTableTitles) {
-          Vue.set(
-            state[idDash][element],
-            'selectedTableTitles',
-            titles,
-          );
+          Vue.set(state[idDash][element], 'selectedTableTitles', titles);
         }
       }
     },
@@ -836,13 +838,7 @@ export default new Vuex.Store({
     // TODO: избавится от этого метода, он вычищает не только root,
     //  но и все отсальные модули
     clearState(state) {
-      const exclude = [
-        'auth',
-        'dataResearch',
-        'form',
-        'theme',
-        'notify',
-      ];
+      const exclude = ['auth', 'dataResearch', 'form', 'theme', 'notify'];
       Object.keys(state).forEach((key) => {
         if (!exclude.includes(key)) {
           delete state[key];
@@ -851,7 +847,10 @@ export default new Vuex.Store({
       window.localStorage.clear();
     },
     setMetricsMulti(state, { metrics, idDash, id }) {
-      const localMetrics = metrics.map((metric) => ({ name: metric, units: '' }));
+      const localMetrics = metrics.map((metric) => ({
+        name: metric,
+        units: '',
+      }));
       if (!state[idDash][id].metrics) {
         Vue.set(state[idDash][id], 'metrics', []);
       } else {
@@ -876,13 +875,21 @@ export default new Vuex.Store({
       const localMetrics = [...[], ...metrics];
       if (!state[idDash][id].options.metricsRelation) {
         Vue.set(state[idDash][id].options, 'metricsRelation', {});
-        Vue.set(state[idDash][id].options.metricsRelation, 'relations', localMetrics);
+        Vue.set(
+          state[idDash][id].options.metricsRelation,
+          'relations',
+          localMetrics,
+        );
         Vue.set(state[idDash][id].options.metricsRelation, 'namesMetric', [
           'Категория',
           'Процентное соотношение',
         ]);
       }
-      Vue.set(state[idDash][id].options.metricsRelation, 'metrics', localMetrics);
+      Vue.set(
+        state[idDash][id].options.metricsRelation,
+        'metrics',
+        localMetrics,
+      );
     },
     setThemePie(state, dash) {
       const localThemes = { ...{}, ...dash.themes };
@@ -944,7 +951,9 @@ export default new Vuex.Store({
       state[idDash].tabs = mode;
     },
     editTabName(state, { idDash, tabID, newName }) {
-      const tab = state[idDash].tabList.find((tabElement) => tabElement.id === tabID);
+      const tab = state[idDash].tabList.find(
+        (tabElement) => tabElement.id === tabID,
+      );
       if (tab) {
         tab.name = newName;
       }
@@ -983,24 +992,21 @@ export default new Vuex.Store({
     },
     sortFilterParts(state, { idDash }) {
       // idDash as property to case when sort not for focusedFilter (backward compatibility)
-      state[idDash].focusedFilter.parts.sort(
-        (part1, part2) => {
-          if (part2.values && part1.values) {
-            return part2.values.length - part1.values.length;
-          } if (!part2.values) {
-            return 0;
-          }
-          return 1;
-        },
-      );
+      state[idDash].focusedFilter.parts.sort((part1, part2) => {
+        if (part2.values && part1.values) {
+          return part2.values.length - part1.values.length;
+        }
+        if (!part2.values) {
+          return 0;
+        }
+        return 1;
+      });
     },
     declineFilterChanges(state, idDash) {
       state[idDash].focusedFilter.parts = state[idDash].stashedFilterParts;
     },
     refreshFilter(state, { idDash, id }) {
-      const foundFilter = state[idDash].filters.find(
-        (val) => id === val.id,
-      );
+      const foundFilter = state[idDash].filters.find((val) => id === val.id);
       foundFilter.parts.forEach((part) => {
         part.values = [];
       });
@@ -1097,10 +1103,7 @@ export default new Vuex.Store({
             if (state[idDash].tockens[item].value) {
               otl = otl.replace(reg, state[idDash].tockens[item].value);
             } else {
-              otl = otl.replace(
-                reg,
-                state[idDash].tockens[item].defaultValue,
-              );
+              otl = otl.replace(reg, state[idDash].tockens[item].defaultValue);
             }
           }
 
@@ -1344,8 +1347,9 @@ export default new Vuex.Store({
                   state[id].elements.forEach((element) => {
                     if (typeof state[id][element]?.search === 'string') {
                       let searchValue = '';
-                      searchValue = state[id].searches
-                        .find((searchEl) => searchEl.sid === state[id][element].search)?.id;
+                      searchValue = state[id].searches.find(
+                        (searchEl) => searchEl.sid === state[id][element].search,
+                      )?.id;
                       if (searchValue !== undefined) {
                         commit('setState', [
                           {
@@ -1545,10 +1549,10 @@ export default new Vuex.Store({
     deleteFromDb(context, { ids, idDash }) {
       let db = null;
       const nameDash = idDash;
-      const searchName = ids.reduce((acc, id) => [
-        ...acc,
-        `${nameDash}-${id}`,
-      ], []);
+      const searchName = ids.reduce(
+        (acc, id) => [...acc, `${nameDash}-${id}`],
+        [],
+      );
 
       const request = indexedDB.open('EVA', 1);
 
@@ -1572,22 +1576,26 @@ export default new Vuex.Store({
 
     refreshElements({ state, commit }, { idDash, key }) {
       if (idDash === 'reports') {
-        commit('setState', [{
-          object: state[idDash].table,
-          prop: 'should',
-          value: true,
-        }]);
+        commit('setState', [
+          {
+            object: state[idDash].table,
+            prop: 'should',
+            value: true,
+          },
+        ]);
       } else {
         // пробегаемся по всем элементам
         state[idDash].elements.forEach((item) => {
           // то смотрим если наш элемент завязан на search который поменялся
           if (state[idDash][item].search === key) {
             // то его нужно пересчитать
-            commit('setState', [{
-              object: state[idDash][item],
-              prop: 'should',
-              value: true,
-            }]);
+            commit('setState', [
+              {
+                object: state[idDash][item],
+                prop: 'should',
+                value: true,
+              },
+            ]);
           }
         });
       }
@@ -1602,10 +1610,7 @@ export default new Vuex.Store({
     },
 
     // сохранение настроек
-    saveSettingsToPath(
-      { state, commit },
-      { path, element, options },
-    ) {
+    saveSettingsToPath({ state, commit }, { path, element, options }) {
       commit('prepareSettingsStore', { path, element });
       commit('setOptions', { idDash: path, id: element, options });
       // return dispatch('getOptions', { idDash: path, id: element });
@@ -1636,17 +1641,21 @@ export default new Vuex.Store({
         result.then((stateFrom) => {
           if (stateFrom) {
             if (!state[id]) {
-              commit('setState', [{
-                object: state,
-                prop: id,
-                value: {},
-              }]);
-              if (stateFrom.body) {
-                commit('setState', [{
+              commit('setState', [
+                {
                   object: state,
                   prop: id,
-                  value: JSON.parse(stateFrom.body),
-                }]);
+                  value: {},
+                },
+              ]);
+              if (stateFrom.body) {
+                commit('setState', [
+                  {
+                    object: state,
+                    prop: id,
+                    value: JSON.parse(stateFrom.body),
+                  },
+                ]);
               }
               commit('setState', [
                 {
@@ -1704,20 +1713,24 @@ export default new Vuex.Store({
             if (state[id].elements) {
               state[id].elements.forEach((elem) => {
                 if (!state[id][elem].tab) {
-                  commit('setState', [{
-                    object: state[id][elem],
-                    prop: 'tab',
-                    value: 1,
-                  }]);
+                  commit('setState', [
+                    {
+                      object: state[id][elem],
+                      prop: 'tab',
+                      value: 1,
+                    },
+                  ]);
                 }
               });
             }
             if (state[id].searches) {
-              state[id].searches.forEach((search) => commit('setState', [{
-                object: search,
-                prop: 'status',
-                value: 'empty',
-              }]));
+              state[id].searches.forEach((search) => commit('setState', [
+                {
+                  object: search,
+                  prop: 'status',
+                  value: 'empty',
+                },
+              ]));
             }
             resolve({ status: 'finish' });
             // }
@@ -1728,9 +1741,7 @@ export default new Vuex.Store({
       });
     },
     // TODO refactor checkalreadydash
-    letEventGo: async ({
-      state, commit, dispatch,
-    }, event) => {
+    letEventGo: async ({ state, commit, dispatch }, event) => {
       // load dash
 
       // при переходе на другой дашборд нам нужно обновить определенный токен
@@ -1759,7 +1770,8 @@ export default new Vuex.Store({
           itemValue = itemValue.replace(/\$/g, '');
           return {
             ...acc,
-            [k]: tockens.find((tockenDeep) => tockenDeep.name === itemValue).value,
+            [k]: tockens.find((tockenDeep) => tockenDeep.name === itemValue)
+              .value,
           };
         }
         return {
@@ -1775,18 +1787,22 @@ export default new Vuex.Store({
         );
         if (response) {
           id = response.id;
-          commit('setState', [{
-            object: state,
-            prop: response.id,
-            value: {},
-          }]);
+          commit('setState', [
+            {
+              object: state,
+              prop: response.id,
+              value: {},
+            },
+          ]);
 
           if (response.body !== '') {
-            commit('setState', [{
-              object: state,
-              prop: id,
-              value: JSON.parse(response.body),
-            }]);
+            commit('setState', [
+              {
+                object: state,
+                prop: id,
+                value: JSON.parse(response.body),
+              },
+            ]);
           }
           commit('setState', [
             {
@@ -1816,17 +1832,21 @@ export default new Vuex.Store({
         tockensTarget.forEach((itemTock, i) => {
           if (itemProp === itemTock.name) {
             if (itemTock.elem.indexOf('select') !== -1) {
-              commit('setState', [{
-                object: state[id][itemTock.elem].selected,
-                prop: 'elemDeep',
-                value: values[j],
-              }]);
+              commit('setState', [
+                {
+                  object: state[id][itemTock.elem].selected,
+                  prop: 'elemDeep',
+                  value: values[j],
+                },
+              ]);
             }
-            commit('setState', [{
-              object: state[id].tockens[i],
-              prop: 'value',
-              value: values[j],
-            }]);
+            commit('setState', [
+              {
+                object: state[id].tockens[i],
+                prop: 'value',
+                value: values[j],
+              },
+            ]);
             changed.push(itemProp);
           }
         });
@@ -1835,8 +1855,9 @@ export default new Vuex.Store({
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
-      const lastEl = state[id]?.tabList
-        .find((el) => el.id.toString() === event.event.tab);
+      const lastEl = state[id]?.tabList.find(
+        (el) => el.id.toString() === event.event.tab,
+      );
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}`);
@@ -1931,7 +1952,8 @@ export default new Vuex.Store({
       };
     },
 
-    getPaperSearch: () => ({ // TODO: разобраться нужно ли
+    getPaperSearch: () => ({
+      // TODO: разобраться нужно ли
       sid: '',
       original_otl: '',
       parametrs: {

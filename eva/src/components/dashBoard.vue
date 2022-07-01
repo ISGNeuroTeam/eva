@@ -357,7 +357,10 @@
                     </div>
                   </v-card-title>
 
-                  <portal-target :name="`${element}`" />
+                  <portal-target
+                    style="height: calc(100% - 35px)"
+                    :name="`${element}`"
+                  />
                 </v-card>
               </div>
             </v-dialog>
@@ -481,7 +484,7 @@
         </div>
       </div>
       <v-card-text
-        v-if="!excludedFromDataSearches && false"
+        v-if="!excludedFromDataSearches && currentElem !== 'constructorSchemes'"
         v-show="!showElement"
         class="card-text"
       >
@@ -495,6 +498,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
+        v-if="showElement || excludedFromDataSearches || currentElem === 'constructorSchemes'"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
