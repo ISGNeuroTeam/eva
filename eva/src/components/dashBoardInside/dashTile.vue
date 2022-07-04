@@ -25,13 +25,15 @@
               <div
                 class="tile"
                 :style="{
-                  backgroundColor: `${dataTile[i - 1].color}3F`,
+                  backgroundColor: tileStyleIsNotRange
+                    ? `${getOptions.tileStyle}3F`
+                    : `${dataTile[i - 1].color}3F`,
                 }"
                 @click="setClick(dataTile[i - 1])"
               >
                 <p
                   :style="{
-                    color: dataTile[i - 1].color,
+                    color: tileStyleIsNotRange ? getOptions.tileStyle : dataTile[i - 1].color,
                   }"
                   v-html="checkName(dataTile[i - 1].caption)"
                 />
@@ -177,14 +179,7 @@ export default {
       return result;
     },
     tileStyleIsNotRange() {
-      return this.options.tileStyle;
-    },
-    tileStyle() {
-      // TODO: Сделать проверку на статусы при выборе цвета "диапазоны"
-      return {
-        bg: `${this.getOptions.tileStyle}3F`,
-        color: this.getOptions.tileStyle,
-      };
+      return typeof this.getOptions.tileStyle === 'string';
     },
   },
   watch: {
@@ -278,16 +273,21 @@ export default {
         partelement: 'empty',
       });
 
-      if (events.length !== 0) {
+      console.log(events);
+
+      if (events?.length > 0) {
         events.forEach((event) => {
+          console.log(event);
           if (event.action === 'set') {
             this.$store.commit('letEventSet', {
               events,
               idDash: this.idDash,
             });
           } else if (event.action === 'go') {
+            event.value[0] = item.caption;
             this.$store.dispatch('letEventGo', {
               event,
+              id: this.id,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
