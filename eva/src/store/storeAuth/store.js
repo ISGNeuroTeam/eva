@@ -1,9 +1,23 @@
 import rest from './storeRest';
+import router from '../../route';
 
 export default {
   namespaced: true,
-  state: {},
-  mutations: {},
+  state: {
+    userName: '',
+    essence: [],
+  },
+  mutations: {
+    setUserName(state, userName) {
+      state.userName = userName;
+    },
+    setEssence(state, data) {
+      state.essence = structuredClone(data);
+    },
+    dropEssence(state) {
+      state.essence = structuredClone({});
+    },
+  },
   actions: {
     deleteLog: () => rest.deleteLog(),
     getLog: (context, side) => rest.getLog(side),
@@ -45,7 +59,11 @@ export default {
       return rest.deleteEssence(localData);
     },
     setEssence: (context, data) => rest.setEssence(data),
-    getEssence: (context, { essence, id }) => rest.getEssence(essence, id),
+    async getEssence({ commit }, { essence, id }) {
+      const localEssence = await rest.getEssence(essence, id);
+      commit('setEssence', localEssence);
+      return localEssence;
+    },
     getEssenceList: async (context, { role, create }) => {
       let data;
       if (!create) {
@@ -73,6 +91,16 @@ export default {
       }
       return data;
     },
+    logout({ commit }) {
+      document.cookie = "eva-dashPage=''; max-age=0 ; path=/";
+      document.cookie = "eva_token=''; max-age=0 ; path=/";
+      commit({ type: 'clearState' }, { root: true });
+      commit('setUserName', '');
+      router.push('/');
+    },
   },
-  getters: {},
+  getters: {
+    essence: (state) => state.essence,
+    userName: (state) => state.userName,
+  },
 };

@@ -14,7 +14,7 @@
     :style="{
       zIndex: movableProps.zIndex,
       outlineColor: theme.$accent_ui_color,
-      backgroundColor: theme.$accent_ui_color,
+      backgroundColor: panelBackHide ? null : theme.$accent_ui_color,
     }"
     @resizestop="sendSize"
     @dragstop="sendMove"
@@ -30,6 +30,7 @@
       :loading="loading"
       :search-data="searchData"
       :data-source-id="dataSourceId"
+      :data-sources="dataSources"
       @SetLevel="movableProps.zIndex = Number.parseInt($event)"
       @SetOpacity="changeOpacity($event)"
       @downloadData="$emit('downloadData', $event)"
@@ -78,6 +79,10 @@ export default {
       type: [String, Number],
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -88,6 +93,7 @@ export default {
       height: 0,
       reload: 0,
       maxZIndex: 1,
+      panelBackHide: false,
       movableProps: {
         vue_drag: false,
         zIndex: 1,
@@ -112,12 +118,9 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDash];
     },
-    getDragRes() {
-      return this.dashFromStore.dragRes;
-    },
     dragRes() {
-      const dragRes = this.getDragRes;
-      return dragRes === 'true';
+      const { dragRes } = this.dashFromStore;
+      return dragRes && dragRes !== 'false';
     },
     headerTop() {
       if (document.body.clientWidth <= 1400) {
@@ -127,6 +130,17 @@ export default {
     },
   },
   watch: {
+    dashFromStore: {
+      deep: true,
+      handler(val) {
+        if (val[this.dataElem]) {
+          const { panelBackHide } = val[this.dataElem].options;
+          if (typeof panelBackHide === 'boolean' && this.panelBackHide !== panelBackHide) {
+            this.panelBackHide = panelBackHide;
+          }
+        }
+      },
+    },
     'movableProps.zIndex': {
       handler(val, oldVal) {
         if (oldVal > val) {
@@ -167,8 +181,8 @@ export default {
         left: this.$store.state[this.idDash][this.id].left,
       };
 
-      this.left = pos.left * this.verticalCell;
-      this.top = pos.top * this.horizontalCell;
+      this.left = Math.round(pos.left * this.verticalCell);
+      this.top = Math.round(pos.top * this.horizontalCell);
 
       const size = {
         width: this.$store.state[this.idDash][this.id].width,

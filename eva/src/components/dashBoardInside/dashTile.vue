@@ -25,12 +25,16 @@
               <div
                 class="tile"
                 :style="{
-                  backgroundColor: tileStyle.bg,
-                  color: tileStyle.color,
+                  backgroundColor: `${dataTile[i - 1].color}3F`,
                 }"
                 @click="setClick(dataTile[i - 1])"
               >
-                <p v-html="checkName(dataTile[i - 1].caption)" />
+                <p
+                  :style="{
+                    color: dataTile[i - 1].color,
+                  }"
+                  v-html="checkName(dataTile[i - 1].caption)"
+                />
               </div>
             </div>
           </div>
@@ -171,6 +175,9 @@ export default {
       if (this.getOptions?.columnCount === '6') result = '2';
       if (this.getOptions?.columnCount === '12') result = '1';
       return result;
+    },
+    tileStyleIsNotRange() {
+      return this.options.tileStyle;
     },
     tileStyle() {
       // TODO: Сделать проверку на статусы при выборе цвета "диапазоны"

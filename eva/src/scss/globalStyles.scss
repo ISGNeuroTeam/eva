@@ -147,4 +147,23 @@
       background-color: var(--main_bg);
     }
   }
+  .dash-layout.no-bg {
+    .dash-block {
+      border-color: transparent !important;
+    }
+    > div {
+      background: transparent !important;
+      .v-data-table--container,
+      .dash-single .number-block,
+      .dash-single .number-block .number {
+        background: transparent !important;
+      }
+    }
+    .loading-divider {
+      border-color: transparent !important;
+    }
+  }
+  .active.draggable .handle {
+    background: rgb(0, 148, 218);
+  }
 }

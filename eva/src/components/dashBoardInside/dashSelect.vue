@@ -14,27 +14,11 @@
         ref="selectBlock"
         class="select-with-data"
       >
-        <div
+        <arrow-block
           v-if="dataModeFrom"
-          class="arrow-block"
-        >
-          <v-icon
-            v-if="!open"
-            class="arrow-down arrows-select"
-            :color="theme.$primary_button"
-            @click="openSelect"
-          >
-            {{ down }}
-          </v-icon>
-          <v-icon
-            v-if="open"
-            class="arrow-up arrows-select"
-            :color="theme.$main_text"
-            @click="openSelect"
-          >
-            {{ up }}
-          </v-icon>
-        </div>
+          :state="open"
+          @toggle="openSelect"
+        />
         <div
           class="source"
           :class="{ source_show: source_show }"
@@ -126,14 +110,14 @@
 
 <script>
 import {
-  mdiArrowDownBoldBoxOutline,
-  mdiArrowUpBoldBoxOutline,
   mdiCropSquare,
   mdiSquare,
 } from '@mdi/js';
+import ArrowBlock from '../arrowBlock.vue';
 
 export default {
   name: 'DashSelect',
+  components: { ArrowBlock },
   props: {
     idFrom: {
       type: String,
@@ -172,6 +156,10 @@ export default {
       type: String,
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -186,8 +174,6 @@ export default {
       topArray: [],
       bottomArray: [],
       open: true,
-      down: mdiArrowDownBoldBoxOutline,
-      up: mdiArrowUpBoldBoxOutline,
       source_show: true,
       select_show: false,
       dataFromRest: {},
@@ -323,10 +309,32 @@ export default {
     dataLoading() {
       return this.dataLoadingFrom;
     },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultFromSourceData && defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
+    },
   },
   watch: {
+    'dashFromStore.options.defaultFromSourceData': {
+      deep: true,
+      handler(val, oldVal) {
+        if (val !== oldVal) {
+          this.setTocken();
+        }
+      },
+    },
     selectedElemDeep(val) {
-      if (val.elemDeep === '') {
+      if (val === null || val.elemDeep === '') {
         this.$store.commit('setState', [{
           object: this.elemDeep,
           prop: String(this.multiple),
@@ -367,6 +375,25 @@ export default {
         });
       }
     },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      const {
+        dataReady,
+        selectedElemLink,
+        selectedElem,
+        multiple,
+      } = this;
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        const valueData = dataReady?.find((item) => item[selectedElemLink] === defaultValue);
+        if (defaultValue !== null) {
+          if (!multiple && valueData) {
+            this.elemDeep[String(multiple)] = valueData[selectedElem];
+          }
+        }
+        this.setTocken();
+      }
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -388,7 +415,7 @@ export default {
       ) {
         this.openSelect();
       }
-      if (selected.elemDeep.length !== 0 || selected.elemDeep !== '') {
+      if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
         this.chooseIcon = mdiSquare;
@@ -434,6 +461,24 @@ export default {
       this.open = !this.open;
       this.select_show = !this.select_show;
     },
+    getDefaultValue() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataField = null,
+      } = this.dashFromStore.options;
+      const fieldName = defaultSourceDataField || 'value';
+      if (defaultFromSourceData !== null) {
+        const { data = undefined } = this.dataSources[defaultFromSourceData];
+        if (data && data.length) {
+          const [firstRow] = data;
+          const rowKeys = Object.keys(firstRow);
+          if (rowKeys.includes(fieldName)) {
+            return firstRow[fieldName];
+          }
+        }
+      }
+      return null;
+    },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
@@ -463,6 +508,21 @@ export default {
       return data;
     },
     setTocken() {
+      const defaultValue = this.getDefaultValue();
+      const valueData = this.dataReady
+        ?.find((item) => item[this.selectedElemLink] === defaultValue);
+      if (defaultValue !== null) {
+        if (this.multiple) {
+          if (this.elemDeep[String(this.multiple)].length === 0) {
+            this.elemDeep[String(this.multiple)] = [defaultValue];
+          }
+        } else if (!this.elemDeep[String(this.multiple)]) {
+          if (valueData) {
+            this.elemDeep[String(this.multiple)] = valueData[this.selectedElem];
+          }
+        }
+      }
+
       this.$store.commit('setSelected', {
         element: 'elemDeep',
         value: this.elemDeep[String(this.multiple)],
@@ -498,7 +558,11 @@ export default {
               }, [])];
         });
       } else {
-        value = [...[], ...this.elemDeep[String(this.multiple)]];
+        if (Array.isArray(this.elemDeep[String(this.multiple)])) {
+          value = [...[], ...String(this.elemDeep[String(this.multiple)])];
+        } else {
+          value = [String(this.elemDeep[String(this.multiple)])];
+        }
         for (let i = 0; i < data.length; i += 1) {
           if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
             value = [data[i][this.elemlink]];

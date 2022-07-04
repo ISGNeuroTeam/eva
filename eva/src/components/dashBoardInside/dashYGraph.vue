@@ -428,6 +428,13 @@ export default {
           }
         },
       });
+      this.graph.initializeDefault({
+        nodePopupContent: this.$refs.nodePopupContent,
+        edgePopupContent: this.$refs.edgePopupContent,
+        callback: (currentNode) => {
+          this.currentNode = currentNode;
+        },
+      });
     },
     createGraph() {
       this.$nextTick(() => {
@@ -438,14 +445,6 @@ export default {
         });
         this.graph = Object.freeze(graph);
         this.initMode();
-
-        this.graph.initializeDefault({
-          nodePopupContent: this.$refs.nodePopupContent,
-          edgePopupContent: this.$refs.edgePopupContent,
-          callback: (currentNode) => {
-            this.currentNode = currentNode;
-          },
-        });
       });
     },
   },
@@ -521,5 +520,9 @@ export default {
       }
     }
   }
+
+}
+.yfiles-tooltip {
+  position: fixed !important;
 }
 </style>

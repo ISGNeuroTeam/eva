@@ -9,6 +9,11 @@
       :class="getClasses"
       :style="getStyles"
     >
+      <arrow-block
+        v-if="dataModeFrom"
+        :state="needSetField"
+        @toggle="isOpen = !isOpen"
+      />
       <div v-if="needSetField">
         <v-select
           v-model="dataField"
@@ -80,9 +85,11 @@
 <script>
 import { mdiMinus, mdiPlus } from '@mdi/js';
 import { mapActions, mapMutations } from 'vuex';
+import ArrowBlock from '../arrowBlock.vue';
 
 export default {
   name: 'DashTune',
+  components: { ArrowBlock },
   inheritAttrs: false,
   props: {
     // переменные полученные от родителя
@@ -126,6 +133,10 @@ export default {
       type: String,
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -143,6 +154,7 @@ export default {
       sliderValue: 0,
       dataField: null, // поле с данными
       value: '',
+      isOpen: true,
     };
   },
   computed: {
@@ -189,7 +201,7 @@ export default {
       return this.dashFromStore;
     },
     needSetField() {
-      return !this.dataField && !this.loading;
+      return (!this.dataField && !this.loading) || this.isOpen;
     },
     theme() {
       return this.colorFrom;
@@ -241,6 +253,20 @@ export default {
     },
     getClasses() {
       return `${this.customClass} ${this.isFullScreen || this.circularResize ? 'full-screen ' : ''} ${this.minSize ? 'min-size' : ''}`;
+    },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultFromSourceData && defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
     },
   },
   watch: {
@@ -297,11 +323,29 @@ export default {
             value,
           });
           this.changeValue();
+          this.isOpen = false;
         }
       });
     },
     percentValue() {
       this.detectSliderValue(this.values);
+    },
+    'dashFromStore.options.defaultFromSourceData': {
+      deep: true,
+      handler() {
+        this.onChangeSlider();
+      },
+    },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.value = defaultValue;
+        }
+        this.setToken();
+        this.storeValue();
+      }
     },
   },
   mounted() {
@@ -327,6 +371,12 @@ export default {
     },
     changeValue() {
       this.$nextTick(() => {
+        if (this.value === undefined || this.value === 0) {
+          const defaultValue = this.getDefaultValue();
+          if (defaultValue !== null) {
+            this.value = defaultValue;
+          }
+        }
         this.setToken();
         this.storeValue();
       });
@@ -372,6 +422,24 @@ export default {
         this.value = values[this.sliderValue];
       }
     },
+    getDefaultValue() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataField = null,
+      } = this.dashFromStore.options;
+      const fieldName = defaultSourceDataField || 'value';
+      if (defaultFromSourceData) {
+        const { data = undefined } = this.dataSources[defaultFromSourceData];
+        if (data && data.length) {
+          const [firstRow] = data;
+          const rowKeys = Object.keys(firstRow);
+          if (rowKeys.includes(fieldName)) {
+            return firstRow[fieldName];
+          }
+        }
+      }
+      return null;
+    },
   },
 };
 </script>
@@ -383,7 +451,6 @@ export default {
   height: calc(100% - 25px)
   display: flex
   justify-content: center
-  align-items: center
 
   .v-progress-circular__overlay
     transition: all .3s ease-in-out

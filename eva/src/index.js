@@ -3,6 +3,9 @@ import './fonts.css';
 import './scroll.css';
 import './scss/globalStyles.scss';
 
+// Подключаем кастомный мконочный шрифт
+import './fonts/eva-iconfont/style.css';
+
 // import regeneratorRuntime from "regenerator-runtime";  // НЕ УДАЛЯТЬ
 import PortalVue from 'portal-vue';
 import AsyncComputed from 'vue-async-computed';
@@ -76,8 +79,6 @@ Vue.component('modal-settings', () => import('./components/modalSettings.vue'));
 Vue.component('theme-settings', () => import('./components/themeSettings.vue'));
 // настройки дашборда
 Vue.component('dash-settings', () => import('./components/dashSettings.vue'));
-// настройки дашборда
-Vue.component('modal-paper', () => import('./components/modalPaper.vue'));
 // настройки темы
 Vue.component('modal-themes', () => import('./components/modalThemes.vue'));
 // элемент таблицы
@@ -93,13 +94,15 @@ Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashL
 //   'dash-multiLine',
 //   () => import('./components/dashBoardInside/MultiLine/MultiLine.vue')
 // );
-Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashMultiLine.vue'));
+Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashChart.vue'));
 // элемент графика
 Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
 // элемент выбора даты и времени
 Vue.component('dash-picker', () => import('./components/dashBoardInside/dashDTPicker.vue'));
 // элемент вывода числа
 Vue.component('dash-single', () => import('./components/dashBoardInside/dashSingle.vue'));
+// элумент круговой шкалы
+Vue.component('dash-dial', () => import('./components/dashBoardInside/dashScale/dashDial.vue'));
 // элемент кнопки
 Vue.component('dash-button', () => import('./components/dashBoardInside/dashButton.vue'));
 // элемент текстового поля
@@ -124,6 +127,10 @@ Vue.component('dash-heatmap', () => import('./components/dashBoardInside/dashHea
 Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
+// компонент Accumulators
+Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
+// компонент Menu
+Vue.component('dash-menu', () => import('./components/dashBoardInside/dashMenu.vue'));
 // блок экспорта импорта
 // Vue.component('block-exim', () => import('./components/blockExim.vue'))
 // элемнет поиска пока не актуален

@@ -10,6 +10,9 @@
       <div
         v-if="nodata"
         class="nodata"
+        :style="{
+          color: theme.$main_text,
+        }"
       >
         {{ message }}
       </div>
@@ -28,13 +31,6 @@
         }"
       >
         Наведите курсор на график
-      </div>
-
-      <div
-        v-show="dataLoading || !dataRestFrom.length"
-        class="mt-4"
-      >
-        <p>Нет данных для отображения</p>
       </div>
       <div
         v-show="!dataLoading && !!dataRestFrom.length"
@@ -64,7 +60,7 @@
             "
             @mouseover="hoverLegendLine(idx)"
             @mouseleave="hoverLegendLine(-1)"
-            @click.stop="selectedPie = idx"
+            @click="activateLegend(idx)"
           >
             <div
               class="square"
@@ -305,8 +301,10 @@ export default {
       },
     },
     fullScreenMode() {
+      let legendSize = {};
+      if (this.legends.length > 0) { legendSize = this.legendSize(); }
       this.$nextTick(() => {
-        this.createPieChartDash();
+        this.createPieChartDash(legendSize);
       });
     },
   },
@@ -382,7 +380,7 @@ export default {
         id: this.idFrom,
       });
     },
-    createPieChartDash() {
+    createPieChartDash(legendSize) {
       if (this.dataRestFrom.error) {
         // смотрим если с ошибкой
         this.message = this.dataRestFrom.error; // то выводим сообщение о ошибке
@@ -431,7 +429,7 @@ export default {
                   this.dataRestFrom,
                   this.dashSize,
                   metrics,
-                  this.legendSize(),
+                  legendSize || this.legendSize(),
                   positionlegend,
                   colorsPie,
                 ); // и собственно создаем график
@@ -474,6 +472,15 @@ export default {
         });
       }
     },
+    activateLegend(idx) {
+      if (this.selectedPie === idx) {
+        this.selectedPie = -1;
+      } else {
+        this.selectedPie = idx;
+      }
+      this.piechart.activetetPiepart(this.selectedPie, idx);
+    },
+
     createPieChart(
       dataFrom,
       sizeLine,
@@ -549,12 +556,18 @@ export default {
           eventName: 'click',
           callback: (_, i, nodes) => {
             const node = nodes[i];
+            nodes.forEach((item) => {
+              if (item !== node) {
+                item.classList.remove('piepartSelect');
+              }
+            });
             if (this.selectedPie === i) {
               this.selectedPie = -1;
               node.classList.remove('piepartSelect');
+            } else {
+              this.selectedPie = i;
+              node.classList.add('piepartSelect');
             }
-            this.selectedPie = i;
-            node.classList.add('piepartSelect');
           },
         },
       ]);
