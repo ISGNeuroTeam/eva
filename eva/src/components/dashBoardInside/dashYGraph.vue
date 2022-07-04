@@ -338,6 +338,7 @@ export default {
     },
     changeInputMode() {
       // меняем режим графика
+      console.log(this.graph);
       if (this.isEditor) {
         this.initMode();
       } else {
@@ -428,6 +429,13 @@ export default {
           }
         },
       });
+      this.graph.initializeDefault({
+        nodePopupContent: this.$refs.nodePopupContent,
+        edgePopupContent: this.$refs.edgePopupContent,
+        callback: (currentNode) => {
+          this.currentNode = currentNode;
+        },
+      });
     },
     createGraph() {
       this.$nextTick(() => {
@@ -438,14 +446,6 @@ export default {
         });
         this.graph = Object.freeze(graph);
         this.initMode();
-
-        this.graph.initializeDefault({
-          nodePopupContent: this.$refs.nodePopupContent,
-          edgePopupContent: this.$refs.edgePopupContent,
-          callback: (currentNode) => {
-            this.currentNode = currentNode;
-          },
-        });
       });
     },
   },
