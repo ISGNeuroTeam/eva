@@ -338,7 +338,6 @@ export default {
     },
     changeInputMode() {
       // меняем режим графика
-      console.log(this.graph);
       if (this.isEditor) {
         this.initMode();
       } else {
