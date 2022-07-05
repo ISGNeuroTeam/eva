@@ -507,6 +507,7 @@ export default {
       this.$emit('cancelModal', isClearChanges);
     },
     showErrorMsg(msg, color) {
+      if (this.openMsg) return;
       this.msg = msg;
       this.openMsg = true;
       this.colorMsg = color;
@@ -540,7 +541,6 @@ export default {
           formData.id = this.userFrom.id;
           method = 'PUT';
           forbiddenError = 'Старый пароль введен неверно';
-          this.msg = 'Пароль не может быть пустым';
           if (act === true) {
             method = 'POST';
             if (!this.userData.pass || this.userData.pass.length === 0) {
