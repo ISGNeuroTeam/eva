@@ -33,6 +33,7 @@
             outlined
             class="select-parent"
             :loading="dataLoading"
+            :attach="true"
             label="Столбец данных"
             @change="getItem('elem')"
           />
@@ -45,6 +46,7 @@
             outlined
             class="select-parent"
             label="Связанный столбец данных"
+            :attach="true"
             :loading="dataLoading"
             @change="getItem('elemlink')"
           />
@@ -65,6 +67,7 @@
             :style="{ color: theme.$main_text, fill: theme.$main_text }"
             hide-details
             class="select theme--dark"
+            :attach="true"
             label="Значение"
             @change="setTocken"
           >
