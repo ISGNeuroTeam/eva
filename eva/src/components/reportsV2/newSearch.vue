@@ -419,7 +419,9 @@ export default {
         showCursorWhenSelecting: true,
         theme: 'eva-dark',
         lineWrapping: false,
-        textHover: true,
+        textHover: {
+          delay: 400,
+        },
       },
       searchSize: [10, 15, 20, 30, 40, 50],
       numberLineModal: false,
@@ -854,7 +856,6 @@ export default {
 </style>
 
 <style lang="scss">
-
 .CodeMirror-hover-tooltip {
   background-color: infobackground;
   border: 1px solid black;
@@ -867,12 +868,12 @@ export default {
   position: fixed;
   z-index: 100;
   max-width: 600px;
-  opacity: 0;
-  transition: opacity .4s;
-  -moz-transition: opacity .4s;
-  -webkit-transition: opacity .4s;
-  -o-transition: opacity .4s;
-  -ms-transition: opacity .4s;
+  opacity: 0.1;
+  transition: opacity .2s;
+  -moz-transition: opacity .2s;
+  -webkit-transition: opacity .2s;
+  -o-transition: opacity .2s;
+  -ms-transition: opacity .2s;
 
   ul {
     padding-left: 20px;

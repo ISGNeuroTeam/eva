@@ -19,7 +19,6 @@
 
     function position() {
       const { target } = e;
-      console.log(target);
       const targetRect = target.getBoundingClientRect();
       tt.style.top = `${targetRect.bottom}px`;
       tt.style.left = `${targetRect.left}px`;
@@ -46,36 +45,36 @@
     }, 600);
   }
 
-  function showTooltipFor(e, content, node, state, cm) {
-    let tooltip = showTooltip(e, content);
+  function CodeMirrorOnce(obj, type, func) {
+    function cbFunc(event) {
+      func(event);
+      CodeMirror.off(obj, type, cbFunc);
+    }
+    CodeMirror.on(obj, type, cbFunc);
+  }
 
+  function showTooltipFor(e, content, node, state, cm) {
+    const tooltip = showTooltip(e, content);
+    let hideTimeOut = null;
     function hide() {
-      CodeMirror.off(node, 'mouseout', hide);
-      CodeMirror.off(node, 'click', hide);
+      cm.removeKeyMap(state.keyMap);
       node.className = node.className.replace(HOVER_CLASS, '');
       if (tooltip) {
         hideTooltip(tooltip);
-        tooltip = null;
       }
-      cm.removeKeyMap(state.keyMap);
     }
-
-    const poll = setInterval(() => {
-      if (tooltip) {
-        for (let n = node; ; n = n.parentNode) {
-          if (n === document.body) { return; }
-          if (!n) {
-            hide();
-            break;
-          }
-        }
+    function hideFromNode(event) {
+      hideTimeOut = setTimeout(() => {
+        hide(event);
+      }, 100);
+    }
+    CodeMirrorOnce(tooltip, 'mouseenter', () => {
+      if (hideTimeOut) {
+        clearTimeout(hideTimeOut);
       }
-      // eslint-disable-next-line consistent-return
-      if (!tooltip) { return clearInterval(poll); }
-    }, 400);
-
-    CodeMirror.on(node, 'mouseout', hide);
-    CodeMirror.on(node, 'click', hide);
+    });
+    CodeMirrorOnce(node, 'mouseleave', hideFromNode);
+    CodeMirrorOnce(tooltip, 'mouseleave', hide);
     state.keyMap = { Esc: hide };
     cm.addKeyMap(state.keyMap);
   }
@@ -163,7 +162,6 @@
         "Required option 'getTextHover' missing (text-hover addon)",
       );
     }
-    options.delay = 100;
     return options;
   }
 

@@ -2,7 +2,6 @@ import docs from '@/js/codeMirror/docs';
 
 // eslint-disable-next-line func-names
 (function () {
-  console.log('registerHelper');
   const { CodeMirror } = window;
   CodeMirror.registerHelper('textHover', 'otl', (cm, data, node) => {
     let html = '';
