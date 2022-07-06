@@ -110,7 +110,7 @@
             placeholder="********"
             type="password"
             outlined
-            ide-details
+            hide-details
             clearable
             @input="toggleIsChanged"
           />
@@ -309,6 +309,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    curUserId: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -420,10 +424,7 @@ export default {
       set(newVal) {
         this.changedData = structuredClone(newVal);
       },
-
     },
-  },
-  watch: {
   },
   mounted() {
     this.colorFrom = this.theme;
@@ -475,7 +476,10 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.dispatch('auth/getEssenceList', { role: item, create: true });
+          return this.$store.dispatch('auth/getEssenceList', {
+            role: item,
+            create: true,
+          });
         });
 
         const result = await Promise.all(promise);
@@ -488,12 +492,14 @@ export default {
         return allData;
       }
       let result;
-      await this.$store.dispatch('auth/getEssence', {
-        essence: this.userFrom.tab,
-        id: this.userFrom.id,
-      }).then((res) => {
-        result = res;
-      });
+      await this.$store
+        .dispatch('auth/getEssence', {
+          essence: this.userFrom.tab,
+          id: this.userFrom.id,
+        })
+        .then((res) => {
+          result = res;
+        });
       return result;
     },
     cancelModal(isClearChanges = true) {
@@ -545,7 +551,8 @@ export default {
                 this.colorFrom.controlsActive,
               );
               return;
-            } if (
+            }
+            if (
               this.newpass == null
               || this.newpass.length === 0
               || !this.newpass
@@ -555,13 +562,15 @@ export default {
                 this.colorFrom.controlsActive,
               );
               return;
-            } if (this.newpass.length < 7) {
+            }
+            if (this.newpass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
                 this.colorFrom.controlsActive,
               );
               return;
-            } if (this.newpass === this.oldpass) {
+            }
+            if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
                 this.colorFrom.controlsActive,
@@ -574,6 +583,13 @@ export default {
             if (this.userData.pass.length < 7) {
               this.showErrorMsg(
                 'Пароль должен быть больше 7 символов',
+                this.colorFrom.controlsActive,
+              );
+              return;
+            }
+            if (this.userData.pass.length > 20) {
+              this.showErrorMsg(
+                'Пароль должен быть меньше 20 символов',
                 this.colorFrom.controlsActive,
               );
               return;
@@ -643,17 +659,14 @@ export default {
       });
       response.then((res) => {
         if (res.status === 200) {
+          if (this.userFrom.id === this.curUserId) {
+            this.$store.commit('auth/setUserName', this.userData.username);
+          }
           this.cancelModal(false);
         } else if (res.status === 409) {
-          this.showErrorMsg(
-            sameMsg,
-            '#FF6D70',
-          );
+          this.showErrorMsg(sameMsg, '#FF6D70');
         } else if (res.status === 403) {
-          this.showErrorMsg(
-            '',
-            '#FF6D70',
-          );
+          this.showErrorMsg('', '#FF6D70');
         }
       });
     },
