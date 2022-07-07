@@ -25,7 +25,7 @@
         <div
           v-if="getOptions.panelNameHide"
           class="name-dash"
-        ></div>
+        />
         <div
           v-else
           class="name-dash"
@@ -484,7 +484,7 @@
         </div>
       </div>
       <v-card-text
-        v-if="!excludedFromDataSearches"
+        v-if="!excludedFromDataSearches && currentElem !== 'constructorSchemes'"
         v-show="!showElement"
         class="card-text"
       >
@@ -498,7 +498,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement || excludedFromDataSearches"
+        v-if="showElement || excludedFromDataSearches || currentElem === 'constructorSchemes'"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
