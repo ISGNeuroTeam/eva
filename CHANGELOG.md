@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added columnCount, tileStyle options on dashTile
+- Added event handling on dashTile
 
 ### Fixed
 - Fixed error messages fo password un profile
