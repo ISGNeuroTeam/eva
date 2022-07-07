@@ -5,6 +5,7 @@
 - Added event handling in the "Tile" component
 - Updated the "yFiles" library to version 24.0.5
 - Added the "schema constructor" component
+- Added the ability to upload SVG to the server ¹
 
 ### Fixed
 - Fixed error messages fo password un profile
@@ -12,6 +13,9 @@
 - Fixed visualization height in data exploration 2.0
 - After selecting the date, you cannot enter other data
 - Frozen versions of third-party components
+
+#### ¹⁾ Added the ability to upload SVG to the server
+- Minimum required ot-simple-rest version: v1.13.0
 
 # [1.97.0]
 
