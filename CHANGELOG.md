@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed error messages fo password un profile
 - Fix yGraph moving issue
 - fixed reportV2 height visualization
+- fix filter datapicker
 
 ## [1.97.0]
 
