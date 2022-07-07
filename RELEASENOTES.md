@@ -1,3 +1,18 @@
+# [1.98.0]
+
+### Added
+- Added transitions to other dashboards when clicking on a tile in the "Tile" component
+- Added event handling in the "Tile" component
+- Updated the "yFiles" library to version 24.0.5
+- Added the "schema constructor" component
+
+### Fixed
+- Fixed error messages fo password un profile
+- Fixed the tooltip display after switching the move mode in the "yGraph" component
+- Fixed visualization height in data exploration 2.0
+- After selecting the date, you cannot enter other data
+- Frozen versions of third-party components
+
 # [1.97.0]
 
 ### Added
