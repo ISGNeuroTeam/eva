@@ -15,19 +15,30 @@
         :style="{ height: `${height - marginBottom}px` }"
       >
         <div class="tile-block">
-          <div
-            v-for="i in dataTile.length"
-            :key="i"
-            class="tile"
-            :style="{
-              backgroundColor: dataTile[i - 1].color,
-              border: `3px inset ${borderColor(dataTile[i - 1].border)}`,
-              width: widthTile,
-              height: heightTile,
-            }"
-            @click="setClick(dataTile[i - 1])"
-          >
-            <p v-html="checkName(dataTile[i - 1].caption)" />
+          <div class="row ma-0">
+            <div
+              v-for="i in dataTile.length"
+              :key="i"
+              :class="`col-${getColumn}`"
+              class="pa-1"
+            >
+              <div
+                class="tile"
+                :style="{
+                  backgroundColor: tileStyleIsNotRange
+                    ? `${getOptions.tileStyle}3F`
+                    : `${dataTile[i - 1].color}3F`,
+                }"
+                @click="setClick(dataTile[i - 1])"
+              >
+                <p
+                  :style="{
+                    color: tileStyleIsNotRange ? getOptions.tileStyle : dataTile[i - 1].color,
+                  }"
+                  v-html="checkName(dataTile[i - 1].caption)"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -90,6 +101,10 @@ export default {
       type: String,
       default: '',
     },
+    options: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -102,6 +117,7 @@ export default {
       captures: {},
       noMsg: false,
       msgText: '',
+      maxColumnCount: 12,
     };
   },
   computed: {
@@ -146,6 +162,21 @@ export default {
       }
       // default logic
       return this.dataRestFrom.map((item) => ({ ...item }));
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDashFrom][this.idFrom];
+    },
+    getOptions() {
+      return this.dashFromStore.options;
+    },
+    getColumn() {
+      if (this.getOptions?.columnCount) {
+        return this.maxColumnCount / Number(this.getOptions.columnCount);
+      }
+      return 'auto';
+    },
+    tileStyleIsNotRange() {
+      return typeof this.getOptions.tileStyle === 'string';
     },
   },
   watch: {
@@ -239,7 +270,7 @@ export default {
         partelement: 'empty',
       });
 
-      if (events.length !== 0) {
+      if (events?.length > 0) {
         events.forEach((event) => {
           if (event.action === 'set') {
             this.$store.commit('letEventSet', {
@@ -247,8 +278,10 @@ export default {
               idDash: this.idDash,
             });
           } else if (event.action === 'go') {
+            event.value[0] = item.caption;
             this.$store.dispatch('letEventGo', {
               event,
+              id: this.id,
               idDash: this.idDash,
               route: this.$router,
               store: this.$store,
