@@ -4,27 +4,172 @@
       class="fill-height"
       style="align-items: normal"
     >
-      <v-row class="ma-0">
-        <v-btn
-          rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
-          @click="toggleSelect = !toggleSelect"
+      <v-row class="ma-0 justify-end">
+        <v-menu
+          v-if="options.mode && options.mode[0] === 'Мониторинг'"
+          v-model="toggleSelectPipeline"
+          max-width="220"
+          max-height="198"
+          nudge-top="-25px"
+          :close-on-content-click="false"
         >
-          Режим
-        </v-btn>
-        <v-select
-          :value="options.mode"
-          :menu-props="{ value: toggleSelect }"
-          :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
-          :items="mode"
-          label="Режим"
-          multiple
-          @change="updatePipeDataSource($event)"
-        />
-        <v-spacer />
+          <template v-slot:activator="{ on:menu }">
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
+                 background: ${theme.$secondary_bg};
+                 color: ${theme.$main_text};
+                 pointer-events: auto;
+                 margin-right: 30px
+                 `"
+                class="med-btn"
+                v-on="menu"
+                @click="toggleSelectPipeline = !toggleSelectPipeline"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiLayers }}
+                </v-icon>
+                <span class="med-btn__text">
+                  Параметры трубопровода
+                </span>
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+            </div>
+          </template>
+          <div
+            :style="`background: ${theme.$secondary_bg}; pointer-events: all`"
+          >
+            <div
+              v-for="(item, i) in pipeline"
+              :key="i"
+              class="med-group"
+            >
+              <v-checkbox
+                v-model="pipelineParameters"
+                :value="item"
+                :label="item.name"
+                class="med-checkbox"
+                multiple
+                @change="changePipeline($event)"
+              />
+            </div>
+          </div>
+        </v-menu>
+        <v-menu
+          v-model="toggleSelect"
+          z-index="1"
+          content-class="med-menu"
+        >
+          <template v-slot:activator="{ on:menu }">
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
+                   background: ${theme.$secondary_bg};
+                   color: ${theme.$main_text};
+                   pointer-events: auto;
+                   margin-right: 30px`"
+                class="med-btn"
+                v-on="menu"
+                @click="toggleSelect = !toggleSelect"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiClipboardText }}
+                </v-icon>
+                <span class="med-btn__text">
+                  Режим
+                </span>
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+              <v-select
+                :value="options.mode"
+                :menu-props="{
+                  value:toggleSelect,
+                  maxWidth: 200
+                }"
+                :style="`visibility:hidden;background: ${theme.$secondary_bg}; position: absolute`"
+                :items="mode"
+                label="Режим"
+                multiple
+                @change="updatePipeDataSource($event)"
+              />
+            </div>
+          </template>
+        </v-menu>
+        <v-menu
+          v-model="toggleSelectLayer"
+          max-width="220"
+          max-height="198"
+          nudge-top="-25px"
+          :close-on-content-click="false"
+        >
+          <template v-slot:activator="{ on:menu }">
+            <div class="d-flex flex-column">
+              <v-btn
+                rounded
+                :style="`
+               background: ${theme.$secondary_bg};
+               color: ${theme.$main_text};
+               pointer-events: auto;
+               margin-right: 30px
+               `"
+                class="med-btn"
+                v-on="menu"
+                @click="toggleSelectLayer = !toggleSelectLayer"
+              >
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiLayers }}
+                </v-icon>
+                <span class="med-btn__text">
+                  Слои
+                </span>
+                <v-icon :style="{ color: theme.$main_text }">
+                  {{ mdiChevronDown }}
+                </v-icon>
+              </v-btn>
+            </div>
+          </template>
+          <draggable
+            v-model="localLayerList"
+            handle=".burger"
+            :style="`background: ${theme.$secondary_bg}; pointer-events: all`"
+            @change="onDrop"
+          >
+            <div
+              v-for="(item, i) in localLayerList"
+              :key="i"
+              class="med-group"
+            >
+              <v-checkbox
+                v-model="item.isActive"
+                :label="item.name"
+                class="med-checkbox"
+                @change="change(item)"
+              >
+                <template v-slot:append>
+                  <v-icon
+                    :color="theme.$main_text"
+                    size="18"
+                    class="burger"
+                    style="cursor: move"
+                    v-text="mdiMenu"
+                  />
+                </template>
+              </v-checkbox>
+            </div>
+          </draggable>
+        </v-menu>
         <v-btn
           rounded
-          :style="`background: ${theme.$secondary_bg}; color: ${theme.$main_text}`"
+          :style="`
+          background: ${theme.$secondary_bg};
+           color: ${theme.$main_text};
+           pointer-events: auto`"
           @click="$emit('openSettingsModal')"
         >
           <v-icon :style="{ color: theme.$main_text }">
@@ -41,9 +186,9 @@
       >
         <v-spacer />
         <v-card
-          style="max-height: 466px"
+          style="max-height: 466px; pointer-events: auto"
           max-width="280"
-          class="px-5 pb-5"
+          class="px-5 pb-5 test"
           :color="theme.$main_bg"
         >
           <v-subheader
@@ -196,14 +341,21 @@
 </template>
 
 <script>
-import { mdiFormatListBulletedSquare, mdiSettings } from '@mdi/js';
-// import L from 'leaflet';
+import draggable from 'vuedraggable';
+import {
+  mdiSettings,
+  mdiLayers,
+  mdiClipboardText,
+  mdiChevronDown,
+  mdiMenu,
+} from '@mdi/js';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet.tilelayer.colorfilter';
-import 'leaflet.markercluster';
 
 export default {
   name: 'DashMapUserSettingsContainer',
+  components: {
+    draggable,
+  },
   props: {
     idElement: {
       type: String,
@@ -217,48 +369,21 @@ export default {
       type: Object,
       required: true,
     },
-    // library: Object
   },
   data() {
     return {
       toggleSelect: false,
       mode: ['Мониторинг', 'Сравнение', 'Аналитика', 'Поиск', 'Режим 5'],
       mdiSettings,
-      mdiList: mdiFormatListBulletedSquare,
-      dialog: false,
+      mdiLayers,
+      mdiClipboardText,
+      mdiChevronDown,
+      mdiMenu,
       base_svg_url: `${window.location.origin}/svg/`,
-      currentTile: {},
-      tileLayers: [
-        {
-          name: 'Заданная в настройках',
-          tile: [],
-        },
-        {
-          name: 'Google спутник',
-          tile: [
-            'http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',
-            {
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-              attribution: '<a http="google.ru" target="_blank">Google</a>',
-            },
-          ],
-        },
-        {
-          name: 'Google карты',
-          tile: [
-            'http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}',
-            {
-              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-              attribution: '<a http="google.ru" target="_blank">Google</a>',
-            },
-          ],
-        },
-      ],
       options: {
         selected: 'яндекс',
         selectedLayer: '',
         zoomLevel: 10,
-        zoomStep: 0.01,
         initialPoint: {
           x: 59.242065955847735,
           y: 74.35169122692963,
@@ -267,6 +392,27 @@ export default {
         mode: [],
         search: '',
       },
+      localLayerList: [],
+      toggleSelectLayer: false,
+      toggleSelectPipeline: false,
+      pipeline: [
+        {
+          type: 'P',
+          name: 'Давление',
+        },
+        {
+          type: 'S',
+          name: 'Скорость потока',
+        },
+        {
+          type: 'D',
+          name: 'Диаметр',
+        },
+        {
+          type: 'L',
+          name: 'Длина',
+        },
+      ],
     };
   },
   computed: {
@@ -285,6 +431,30 @@ export default {
     getLibrary() {
       return this.dashFromStore?.options?.library;
     },
+    layerList: {
+      get() {
+        return this.dashFromStore?.options?.layerList || [];
+      },
+      set(val) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'layerList',
+          value: val,
+        }]);
+      },
+    },
+    pipelineParameters: {
+      get() {
+        return this.dashFromStore?.options?.pipelineParameters || [];
+      },
+      set(val) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'pipelineParameters',
+          value: val,
+        }]);
+      },
+    },
     dashFromStore() {
       return this.$store.state[this.idDashFrom][this.idElement];
     },
@@ -295,34 +465,11 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idElement, idDash: this.idElement });
       }
-
-      if (!this.dashFromStore?.options.pinned) {
+      if (!this.dashFromStore?.options.pipelineParameters) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
+          prop: 'pipelineParameters',
+          value: this.pipeline,
         }]);
       }
       return this.dashFromStore.options;
@@ -352,30 +499,61 @@ export default {
         }
       },
     },
+    layerList(val) {
+      this.localLayerList = JSON.parse(JSON.stringify(val));
+    },
   },
   mounted() {
     const options = JSON.parse(JSON.stringify(this.getOptions));
-    this.tileLayers[0].tile = options.osmserver;
-    // init store for reactivity
-    if (!options.showLegend || !options.initialPoint) {
-      const initOptions = {
-        showLegend: true,
-        zoomLevel: this.options.zoomLevel,
-        zoomStep: this.options.zoomStep,
-        selectedLayer: this.options.selectedLayer,
-        initialPoint: this.options.initialPoint,
-      };
-      this.$store.commit('setOptions', {
-        idDash: this.idDashFrom,
-        id: this.idElement,
-        options: initOptions,
-      });
-    }
     if (JSON.stringify(this.options) !== JSON.stringify(this.getOptions)) {
       this.options = JSON.parse(JSON.stringify(options));
     }
+    this.localLayerList = JSON.parse(JSON.stringify(this.layerList));
+    if (!this.getOptions.pipelineParameters && this.options.mode[0] === 'Мониторинг') {
+      this.map.options.mode = this.options.mode;
+      this.options.pipelineParameters = this.pipelineParameters;
+      this.map.options.pipelineParameters = this.pipelineParameters;
+    }
   },
   methods: {
+    change(e) {
+      if (e.isActive) {
+        this.map.addLayerGroup(e.type);
+      } else {
+        this.map.removeLayerGroup(e.type);
+      }
+      this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+    },
+    creationLayer() {
+      if (this.layerList.length === 0) {
+        const key = Object.keys(this.library.objects);
+        this.localLayerList = Object.values(this.library.objects);
+        this.localLayerList.forEach((item, index) => {
+          if (!item.type) {
+            item.type = +key[index];
+            item.isActive = true;
+          }
+        });
+        this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+      }
+    },
+    addLayer() {
+      this.layerList.forEach((item, index) => {
+        if (item.isActive && this.map) {
+          this.change(item);
+          this.map.changeIndexOffset(item.type, 10000 - (index * 100));
+        }
+      });
+    },
+    onDrop() {
+      this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
+      this.changeZIndex();
+    },
+    changeZIndex() {
+      this.layerList.forEach((item, i) => {
+        this.map.changeIndexOffset(item.type, 10000 - (i * 100));
+      });
+    },
     updatePipeDataSource(e) {
       const set = new Set(e);
       if (this.options.mode) {
@@ -387,7 +565,8 @@ export default {
         prop: 'mode',
         value: this.options.mode,
       }]);
-      if (this.options.search) {
+      this.map.options.mode = this.options.mode;
+      if (this.options.search && this.options.mode[0] === 'Мониторинг') {
         this.$emit('updatePipeDataSource', this.options.search);
       }
     },
@@ -426,51 +605,8 @@ export default {
       });
     },
 
-    setOptions() {
-      // отправляем настройки в хранилище
-      if (!this.options.level) {
-        this.options.level = 1;
-      }
-
-      if (
-        typeof this.options.timeFormat !== 'undefined'
-          && this.options.timeFormat == null
-      ) {
-        this.options.timeFormat = '%Y-%m-%d %H:%M:%S';
-      }
-      if (typeof this.options.size !== 'undefined') {
-        if (this.options.size == null) {
-          this.options.size = '100px';
-        } else if (String(this.options.size).indexOf('px') === -1) {
-          this.options.size = `${this.options.size}px`;
-        }
-      }
-      // let options = {...{},...this.options};
-      if (this.element.indexOf('csvg') !== -1) {
-        this.options.tooltip = this.tooltip;
-      }
-      if (this.element.indexOf('piechart') !== -1) {
-        this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation),
-        );
-        this.options.colorsPie = this.colorsPie;
-        if (this.colorsPie.theme === 'custom') {
-          this.themes[this.colorsPie.nametheme] = this.colorsPie.colors.split(' ');
-          this.colorsPie.theme = this.colorsPie.nametheme;
-        }
-        this.options.themes = this.themes;
-      }
-      if (this.element.indexOf('multiLine') !== -1) {
-        const updateMetrics = this.metrics.map((item) => JSON.parse(JSON.stringify(item)));
-        this.$set(this.options, 'metrics', updateMetrics);
-      }
-      this.$store.commit('setOptions', {
-        idDash: this.idDash,
-        id: this.element,
-        options: this.options,
-        titles: this.tableTitles,
-      });
-      this.cancelModal();
+    changePipeline(parameters) {
+      this.map.options.pipelineParameters = parameters;
     },
   },
 };
@@ -489,7 +625,10 @@ export default {
   height: 100%
   position: absolute
   right: 0
-  z-index: 400
+  z-index: 401
+  pointer-events: none
+  &-menu
+    border: none !important
 
 .theme--light.v-input input, .theme--light.v-input textarea
   color: var(--main_text) !important
@@ -509,6 +648,30 @@ export default {
     color: var(--main_text) !important
   .v-input input
     min-height: auto !important
+
+  &-checkbox
+    margin-top: 0 !important
+    padding: 7px 13px
+    display: flex
+    align-items: center
+    background: var(--main_bg)
+    &.v-input--is-label-active
+      background: rgba(244, 244, 250, 0.2)
+    .v-messages
+      display: none
+    .v-input__slot
+      margin-bottom: 0
+    .v-label
+      color: var(--main_text)
+    .v-input--selection-controls__input,
+    .v-input__append-outer
+      color: var(--main_text)
+  &-btn
+    .v-btn__content
+      text-transform: capitalize
+      font-size: 18px
+    &__text
+      margin: 0 8px 0 6px
 
 .map-user-settings__input
   .v-input__slot

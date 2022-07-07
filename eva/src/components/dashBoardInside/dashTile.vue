@@ -1,38 +1,49 @@
 <template>
-  <div class="tile-template">
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
     <div
-      v-if="dataTile.length > 0 && !noMsg"
-      class="dash-tile"
-      :style="{ height: `${height - otstupBottom}px` }"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="tile-template"
     >
-      <div class="tile-block">
-        <div
-          v-for="i in dataTile.length"
-          :key="i"
-          class="tile"
-          :style="{
-            backgroundColor: dataTile[i - 1].color,
-            border: `3px inset ${borderColor(dataTile[i - 1].border)}`,
-            width: widthTile,
-            height: heightTile,
-          }"
-          @click="setClick(dataTile[i - 1])"
-        >
-          <p v-html="checkName(dataTile[i - 1].caption)" />
+      <div
+        v-if="dataTile.length > 0 && !noMsg"
+        class="dash-tile"
+        :style="{ height: `${height - marginBottom}px` }"
+      >
+        <div class="tile-block">
+          <div
+            v-for="i in dataTile.length"
+            :key="i"
+            class="tile"
+            :style="{
+              backgroundColor: dataTile[i - 1].color,
+              border: `3px inset ${borderColor(dataTile[i - 1].border)}`,
+              width: widthTile,
+              height: heightTile,
+            }"
+            @click="setClick(dataTile[i - 1])"
+          >
+            <p v-html="checkName(dataTile[i - 1].caption)" />
+          </div>
         </div>
       </div>
+      <div
+        v-else
+        class="errormsg"
+      >
+        {{ msgText }}
+      </div>
     </div>
-    <div
-      v-else
-      class="errormsg"
-    >
-      {{ msgText }}
-    </div>
-  </div>
+  </portal>
 </template>
 
 <script>
 export default {
+  name: 'DashTile',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -63,8 +74,22 @@ export default {
       type: Boolean,
       default: false,
     }, // включена ли шапка
-    // activeElemFrom: null,
-    // dataReport: null,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -87,23 +112,23 @@ export default {
     idDash() {
       return this.idDashFrom;
     },
-    otstupBottom() {
-      let otstup;
+    marginBottom() {
+      let margin;
       if (this.dataModeFrom) {
-        otstup = 50;
+        margin = 50;
         if (window.screen.width <= 1600) {
-          otstup = 35;
+          margin = 35;
         }
       } else {
-        otstup = 10;
+        margin = 10;
       }
-      return otstup;
+      return margin;
     },
     color() {
       return this.colorFrom;
     },
     height() {
-      return this.heightFrom;
+      return this.sizeFrom.height;
     },
     widthTile() {
       return this.setSize('width');

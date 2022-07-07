@@ -156,7 +156,6 @@ export default {
     return {
       gearShow: false,
       settings: {},
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       sizeGrid: {
         vert: '32',
         hor: '18',
@@ -165,7 +164,6 @@ export default {
         true: 'да',
         false: 'нет',
       },
-      dragresable: true,
       showTabs: false,
     };
   },
@@ -173,8 +171,29 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    dragresable: {
+      get() {
+        return this.dashFromStore.dragRes;
+      },
+      set(newVal) {
+        this.$store.commit('setDragResize', {
+          id: this.idDashFrom,
+          item: newVal,
+        });
+      },
+    },
+    mode: {
+      get() {
+        return this.dashFromStore.editMode;
+      },
+      set(newModeState) {
+        this.$store.commit('setEditMode', {
+          idDash: this.idDashFrom,
+          newModeState,
+        });
+      },
+    },
     permissions() {
-      this.setDragresable();
       return true;
     },
     getGridShow() {
@@ -225,29 +244,10 @@ export default {
       }
       return this.dashFromStore?.grid;
     },
-    getDragResize() {
-      if (!this.dashFromStore.dragRes) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore,
-          prop: 'dragRes',
-          value: 'true',
-        }]);
-      }
-      return this.dashFromStore.dragRes;
-    },
   },
   watch: {
     gearFrom(gear) {
       this.gearShow = !!gear;
-    },
-    mode() {
-      this.$emit('changeMode');
-    },
-    dragresable() {
-      this.$store.commit('setDragResize', {
-        id: this.idDashFrom,
-        item: String(this.dragresable),
-      });
     },
     showTabs() {
       this.$store.commit('setTabMode', {
@@ -257,25 +257,18 @@ export default {
     },
   },
   mounted() {
+    if (this.dashFromStore.editMode === undefined) {
+      this.mode = process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true';
+    }
+    if (this.dashFromStore.dragRes === undefined) {
+      this.dragresable = true;
+    }
     const grid = this.getSizeGrid;
     this.sizeGrid.vert = grid.vert;
     this.sizeGrid.hor = grid.hor;
-    if (
-      !this.permissionsFrom.includes('admin_all')
-      && !this.permissionsFrom.includes('editdash')
-    ) {
-      this.dragresable = false;
-    } else {
-      const dragRes = this.getDragResize;
-      this.dragresable = dragRes === 'true';
-    }
     this.showTabs = this.$store.state[this.idDashFrom]?.tabs || false;
   },
   methods: {
-    setDragresable() {
-      this.dragresable = !(!this.permissionsFrom.includes('admin_all')
-        && !this.permissionsFrom.includes('editdash'));
-    },
     sendSizeGrid() {
       this.$store.commit('setSizeGrid', {
         id: this.idDashFrom,

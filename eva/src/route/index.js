@@ -29,25 +29,9 @@ const routes = [
     },
   },
   {
-    name: 'Репорты',
-    path: '/reports', // если главная страница
-    component: () => import('../components/reports.vue'),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
     name: 'Исследование данных',
     path: '/data-research', // если главная страница
     component: () => import('../components/reportsV2/index.vue'),
-    meta: {
-      requiresAuth: true,
-    },
-  },
-  {
-    name: 'Документы',
-    path: '/papers', // если главная страница
-    component: () => import('../components/papers.vue'),
     meta: {
       requiresAuth: true,
     },
@@ -67,6 +51,7 @@ const routes = [
     props: true,
     meta: {
       requiresAuth: true,
+      isDashboard: true,
     },
   },
   {
@@ -76,6 +61,7 @@ const routes = [
     props: true,
     meta: {
       requiresAuth: true,
+      isDashboard: true,
     },
   },
   {

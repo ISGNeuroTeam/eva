@@ -146,6 +146,8 @@ export default {
 
 <style lang="sass">
 @import './../../sass/_colors'
+#app .theme--light.v-data-table .v-data-table__wrapper table tbody tr:hover
+  background:  $accent_ui_color !important
 .events
   .collapse-row
     border-bottom: 1px solid $main-border !important
@@ -169,4 +171,5 @@ export default {
   tr:hover
     color: $main_bg !important
     background-color: $accent_ui_color !important
+
 </style>

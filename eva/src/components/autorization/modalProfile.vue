@@ -110,7 +110,7 @@
             placeholder="********"
             type="password"
             outlined
-            ide-details
+            hide-details
             clearable
             @input="toggleIsChanged"
           />
@@ -250,7 +250,7 @@
       <div
         class="msg-profile"
         :class="{ openMsg: openMsg }"
-        :style="{ color: colorMsg }"
+        :style="{ color: theme.$error_color }"
       >
         {{ msg }}
       </div>
@@ -309,6 +309,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    curUserId: {
+      type: Number,
+      required: true,
+    },
   },
   data() {
     return {
@@ -356,8 +360,7 @@ export default {
         indexes: false,
       },
       curItem: {},
-      changedData: {},
-      dataRest: {},
+      changedData: null,
       colorFrom: {},
       isChanged: false,
     };
@@ -413,51 +416,57 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
-  },
-  watch: {
-    active() {
-      if (this.active) {
-        this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
-        this.userData.pass = '';
-        Object.keys(this.showBlock).forEach((item) => {
-          this.showBlock[item] = false;
-        });
-
-        switch (this.keyFrom) {
-          case 1:
-            this.showBlock.users = true;
-            break;
-          case 2:
-            this.showBlock.roles = true;
-            break;
-          case 3:
-            this.showBlock.permissions = true;
-            break;
-          case 4:
-            this.showBlock.groups = true;
-            break;
-          case 5:
-            this.showBlock.indexes = true;
-            break;
-          default:
-            break;
-        }
-        if (this.create) {
-          this.$set(this.userData, 'username', '');
-          this.$set(this.userData, 'pass', '');
-          this.$set(this.curItem, 'color', '');
-          this.$set(this.curItem, 'name', '');
-        } else {
-          this.$set(this.userData, 'username', this.curItemFrom.name);
-          this.curItem = { ...this.curItemFrom };
-        }
-        this.dataRest = this.getDataForEssence();
-        this.isChanged = false;
-      }
+    dataRest: {
+      get() {
+        const essence = this.$store.getters['auth/essence'];
+        return this.changedData ? this.changedData : essence;
+      },
+      set(newVal) {
+        this.changedData = structuredClone(newVal);
+      },
     },
   },
   mounted() {
     this.colorFrom = this.theme;
+
+    if (this.active) {
+      this.userData.username = Object.keys(this.userFrom).length !== 0 ? this.userFrom.username : '';
+      this.userData.pass = '';
+      Object.keys(this.showBlock).forEach((item) => {
+        this.showBlock[item] = false;
+      });
+
+      switch (this.keyFrom) {
+        case 1:
+          this.showBlock.users = true;
+          break;
+        case 2:
+          this.showBlock.roles = true;
+          break;
+        case 3:
+          this.showBlock.permissions = true;
+          break;
+        case 4:
+          this.showBlock.groups = true;
+          break;
+        case 5:
+          this.showBlock.indexes = true;
+          break;
+        default:
+          break;
+      }
+      if (this.create) {
+        this.$set(this.userData, 'username', '');
+        this.$set(this.userData, 'pass', '');
+        this.$set(this.curItem, 'color', '#FF0000');
+        this.$set(this.curItem, 'name', '');
+      } else {
+        this.$set(this.userData, 'username', this.curItemFrom.name);
+        this.curItem = { ...this.curItemFrom };
+      }
+      this.getDataForEssence();
+      this.isChanged = false;
+    }
   },
   methods: {
     async getDataForEssence() {
@@ -467,25 +476,38 @@ export default {
         const keys = [];
         const promise = Object.keys(this.$data[role].tab).map((item) => {
           keys.push(item);
-          return this.$store.dispatch('auth/getEssenceList', { role: item, create: true });
+          return this.$store.dispatch('auth/getEssenceList', {
+            role: item,
+            create: true,
+          });
         });
 
         const result = await Promise.all(promise);
+
         result.forEach((item, i) => {
           allData[keys[i]] = item;
         });
-
+        allData.data = {};
+        this.$store.commit('auth/setEssence', allData);
         return allData;
       }
-      return this.$store.dispatch('auth/getEssence', {
-        essence: this.userFrom.tab,
-        id: this.userFrom.id,
-      });
+      let result;
+      await this.$store
+        .dispatch('auth/getEssence', {
+          essence: this.userFrom.tab,
+          id: this.userFrom.id,
+        })
+        .then((res) => {
+          result = res;
+        });
+      return result;
     },
     cancelModal(isClearChanges = true) {
+      this.$store.commit('auth/dropEssence');
       this.$emit('cancelModal', isClearChanges);
     },
     showErrorMsg(msg, color) {
+      if (this.openMsg) return;
       this.msg = msg;
       this.openMsg = true;
       this.colorMsg = color;
@@ -493,31 +515,42 @@ export default {
         this.openMsg = false;
       }, 2000);
     },
+    checkPassLength(pass) {
+      if (pass.length < 7) {
+        this.showErrorMsg(
+          'Пароль должен быть больше 7 символов',
+          this.colorFrom.controlsActive,
+        );
+        return false;
+      } if (pass.length > 20) {
+        this.showErrorMsg(
+          'Пароль должен быть меньше 20 символов',
+          this.colorFrom.controlsActive,
+        );
+        return false;
+      }
+      return true;
+    },
     changeBtn(act) {
       let method = 'POST';
       const formData = {}; // формируем объект для передачи RESTу
       let sameMsg = '';
+      let forbiddenError = '';
       switch (this.keyFrom) {
         case 1:
           formData.id = this.userFrom.id;
           method = 'PUT';
-          this.msg = 'Пароль не может быть пустым';
+          forbiddenError = 'Старый пароль введен неверно';
           if (act === true) {
             method = 'POST';
-            if (this.userData.pass.length === 0 || !this.userData.pass) {
+            if (!this.userData.pass || this.userData.pass.length === 0) {
               this.showErrorMsg(
                 'Логин или пароль не могут быть пустыми',
                 this.colorFrom.controlsActive,
               );
               return;
             }
-            if (this.userData.pass.length < 7) {
-              this.showErrorMsg(
-                'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            }
+            if (!this.checkPassLength(this.userData.pass)) return;
             formData.password = this.userData.pass;
           } else if (act === 'pass') {
             if (
@@ -530,7 +563,8 @@ export default {
                 this.colorFrom.controlsActive,
               );
               return;
-            } if (
+            }
+            if (
               this.newpass == null
               || this.newpass.length === 0
               || !this.newpass
@@ -540,13 +574,9 @@ export default {
                 this.colorFrom.controlsActive,
               );
               return;
-            } if (this.newpass.length < 7) {
-              this.showErrorMsg(
-                'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            } if (this.newpass === this.oldpass) {
+            }
+            if (!this.checkPassLength(this.newpass)) return;
+            if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
                 this.colorFrom.controlsActive,
@@ -555,14 +585,8 @@ export default {
             }
             formData.old_password = this.oldpass;
             formData.new_password = this.newpass;
-          } else if (this.userData.pass.length !== 0 && this.userData.pass) {
-            if (this.userData.pass.length < 7) {
-              this.showErrorMsg(
-                'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            }
+          } else if (this.userData.pass && this.userData.pass.length !== 0) {
+            if (!this.checkPassLength(this.userData.pass)) return;
             formData.password = this.userData.pass;
           }
           formData.name = this.userData.username;
@@ -604,51 +628,46 @@ export default {
         default:
           break;
       }
-
-      if (Object.keys(this.changedData).length !== 0) {
-        const essence = this.changedData[this.essence[this.keyFrom - 1]];
+      if (Object.keys(this.dataRest.data).length !== 0) {
+        const essence = this.dataRest.data;
         Object.keys(essence).forEach((item) => {
-          if (essence[item].length !== 0) {
-            essence[item].forEach((itemEs) => {
-              if (!formData[item]) {
-                formData[item] = [];
-              }
-              formData[item].push(itemEs);
-            });
-          } else {
-            formData[item] = [];
+          if (Array.isArray(essence[item])) {
+            if (essence[item].length !== 0) {
+              essence[item].forEach((itemEs) => {
+                if (!formData[item]) {
+                  formData[item] = [];
+                }
+                formData[item].push(itemEs);
+              });
+            } else {
+              formData[item] = [];
+            }
           }
         });
       }
-
       const response = this.$store.dispatch('auth/setEssence', {
         formData: JSON.stringify(formData),
         essence: this.essence[this.keyFrom - 1],
         method,
       });
-
       response.then((res) => {
         if (res.status === 200) {
+          if (this.userFrom.id === this.curUserId) {
+            this.$store.commit('auth/setUserName', this.userData.username);
+          }
           this.cancelModal(false);
         } else if (res.status === 409) {
-          this.showErrorMsg(
-            sameMsg,
-            '#FF6D70',
-          );
+          this.showErrorMsg(sameMsg, '#FF6D70');
         } else if (res.status === 403) {
-          this.showErrorMsg(
-            '',
-            '#FF6D70',
-          );
+          this.showErrorMsg(forbiddenError, '#FF6D70');
         }
       });
     },
     changeDataEvent(event) {
       this.$refs.confirmModal.focusOnModal();
-      if (!this.changedData[event.essence]) {
-        this.changedData[event.essence] = {};
-      }
-      this.changedData[event.essence][event.subessence] = event.data;
+      const dataRest = structuredClone(this.dataRest);
+      dataRest.data[event.subessence] = structuredClone(event.data);
+      this.dataRest = dataRest;
       this.toggleIsChanged();
     },
     toggleIsChanged() {

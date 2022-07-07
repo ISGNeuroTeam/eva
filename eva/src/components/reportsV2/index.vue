@@ -7,6 +7,9 @@
       :inside="true"
       @setUsername="setUsername($event)"
     />
+    <div style="position: relative">
+      <notifications style="z-index: 1" />
+    </div>
     <v-content>
       <div class="main-container container-report">
         <div
@@ -40,29 +43,32 @@
               <download :data="data" />
             </div>
           </div>
-          <v-row
-            v-if="data.length > 0 && tab === 0"
-            class="mb-0"
-          >
-            <v-col
-              cols="2"
-              class="pr-0"
+          <keep-alive>
+            <v-row
+              v-if="data.length > 0 && tab === 0"
+              class="mb-0"
+              :style="{background: theme.$secondary_bg}"
             >
-              <interesting
-                class="intresting component-block"
-                :rows="rows"
-              />
-            </v-col>
-            <v-col
-              cols="10"
-              class="pl-0"
-            >
-              <events
-                class="events component-block mb-0"
-                :data="data"
-              />
-            </v-col>
-          </v-row>
+              <v-col
+                cols="2"
+                class="pr-0"
+              >
+                <interesting
+                  class="intresting component-block"
+                  :rows="rows"
+                />
+              </v-col>
+              <v-col
+                cols="10"
+                class="pl-0"
+              >
+                <events
+                  class="events component-block"
+                  :data="data"
+                />
+              </v-col>
+            </v-row>
+          </keep-alive>
           <keep-alive>
             <statistic
               v-if="tab === 1"
@@ -79,6 +85,7 @@
               :should-get="shouldGet"
               :loading="loading"
               :search="search"
+              :data-page-from="page"
             />
           </keep-alive>
         </div>
@@ -107,6 +114,7 @@ import events from './events.vue';
 import statistic from './statistic.vue';
 import visualisation from './visualisation.vue';
 import Interesting from './interesting.vue';
+import Notifications from '@/components/notifications';
 
 export default {
   components: {
@@ -118,10 +126,12 @@ export default {
     visualisation,
     download,
     report,
+    Notifications,
   },
   data() {
     return {
       tab: 0,
+      page: 'reports',
       search: {
         parametrs: {
           tws: 0,
@@ -144,7 +154,7 @@ export default {
       curTab: null,
       size: {
         width: 0,
-        height: 0,
+        height: window.screen.height ?? 0,
       },
       aboutElem: {},
       rowsCount: 9,
@@ -159,6 +169,7 @@ export default {
         buttons: [],
       },
       activeElem: 'table',
+      username: '',
     };
   },
   asyncComputed: {
@@ -273,10 +284,14 @@ export default {
       worker.postMessage(`reports-${this.search.sid}`); // запускаем воркер на выполнение
     },
     async launchSearch(search) {
-      this.$set(this, 'search', JSON.parse(JSON.stringify({
+      this.$set(this, 'search', structuredClone({
         ...search,
+        parametrs: {
+          ...search.parametrs,
+          username: this.username,
+        },
         sid: this.hashCode(search.original_otl),
-      })));
+      }));
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${this.search.sid}`);
 
       this.loading = true;
@@ -338,7 +353,7 @@ export default {
       );
     },
     setUsername(event) {
-      this.search.parametrs.username = event;
+      this.username = event;
     },
     hashCode(otl) {
       return otl

@@ -1,26 +1,108 @@
 <template>
-  <v-btn
-    small
-    text
-    @click="exportDataCSV()"
-  >
-    <v-icon
-      :style="{ color: theme.$main_text }"
-      class="download-icon"
+  <div class="text-center">
+    <v-dialog
+      v-model="dialog"
+      width="500"
     >
-      {{ mdiDownload }}
-    </v-icon>
-    <span
-      class="download-btn-text"
-      :style="{ color: theme.$main_text }"
-    >
-      Скачать
-    </span>
-  </v-btn>
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          small
+          text
+          v-bind="attrs"
+          v-on="on"
+        >
+          <v-icon
+            :style="{ color: theme.$main_text }"
+            class="download-icon"
+          >
+            {{
+              mdiDownload
+            }}
+          </v-icon>
+          <span
+            class="download-btn-text"
+            :style="{ color: theme.$main_text }"
+          >
+            Скачать
+          </span>
+        </v-btn>
+      </template>
+      <v-card class="report-card">
+        <v-card-title
+          class="card-title"
+          :style="{ background: theme.$main_bg, color: theme.$main_text }"
+        >
+          <div>
+            <v-icon
+              :style="{ color: theme.$main_text }"
+              class="download-icon"
+            >
+              {{ mdiFileOutline }}
+            </v-icon>
+            Отчет
+          </div>
+          <div>
+            <v-btn
+              icon
+              :color="theme.$main_text"
+              @click="dialog = false"
+            >
+              <v-icon>{{ mdiClose }}</v-icon>
+            </v-btn>
+          </div>
+        </v-card-title>
+
+        <v-card-text
+          class="card-text"
+          :style="{ background: theme.$secondary_bg, color: theme.$main_text }"
+        >
+          <template>
+            <v-btn
+              small
+              text
+              @click="exportDataxlsx()"
+            >
+              <v-icon
+                :style="{ color: theme.$main_text }"
+                class="download-icon"
+              >
+                {{ mdiDownload }}
+              </v-icon>
+              <span
+                class="download-btn-text"
+                :style="{ color: theme.$main_text }"
+              >
+                Скачать xlsx
+              </span>
+            </v-btn>
+            <v-btn
+              small
+              text
+              @click="exportDataCSV()"
+            >
+              <v-icon
+                :style="{ color: theme.$main_text }"
+                class="download-icon"
+              >
+                {{ mdiDownload }}
+              </v-icon>
+              <span
+                class="download-btn-text"
+                :style="{ color: theme.$main_text }"
+              >
+                Скачать CSV
+              </span>
+            </v-btn>
+          </template>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
-import { mdiDownload } from '@mdi/js';
+import { mdiFileOutline, mdiDownload, mdiClose } from '@mdi/js';
+import { utils, writeFileXLSX } from 'xlsx';
 
 export default {
   props: {
@@ -32,6 +114,9 @@ export default {
   data() {
     return {
       mdiDownload,
+      mdiFileOutline,
+      mdiClose,
+      dialog: false,
     };
   },
   computed: {
@@ -55,6 +140,12 @@ export default {
       link.setAttribute('download', 'report.csv'); // указываем имя файла
       link.click(); // жмем на скачку
       link.remove(); // удаляем ссылку
+    },
+    exportDataxlsx() {
+      const workSheet = utils.json_to_sheet(this.data);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, workSheet, 'data');
+      writeFileXLSX(wb, 'report.xlsx');
     },
   },
 };

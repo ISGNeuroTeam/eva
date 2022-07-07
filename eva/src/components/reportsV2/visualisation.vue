@@ -48,6 +48,25 @@
           </v-tooltip>
         </div>
       </v-menu>
+      <v-spacer />
+      <v-tooltip
+        v-if="aboutElem.multiLine.show && displayingRange"
+        bottom
+        :color="theme.$accent_ui_color"
+        :open-delay="tooltipOpenDelay"
+      >
+        <template v-slot:activator="{ on }">
+          <v-icon
+            class="option mr-2"
+            :color="theme.$main_border"
+            v-on="on"
+            @click="onResetRange"
+          >
+            {{ mdiMagnifyMinusOutline }}
+          </v-icon>
+        </template>
+        <span>Убрать зум</span>
+      </v-tooltip>
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
@@ -87,6 +106,10 @@
         id-dash-from="reports"
         :width-from="size.width"
         :height-from="size.height"
+        :size-from="{
+          height: size.height,
+          width: size.width,
+        }"
         :size-tile-from="{
           width: getOptions ? getOptions.widthTile : '',
           height: getOptions ? getOptions.heightTile : ''
@@ -96,7 +119,7 @@
         :tooltip-from="tooltipSvg"
         :should-get="shouldGet"
         :data-report="true"
-        :data-rest-from="data"
+        :data-rest-from="preparedData"
         :current-settings="settings"
         :update-settings="updateSettings"
         :data-mode-from="dataMode"
@@ -104,19 +127,22 @@
         :selected-pie-index="selectedPieIndex"
 
         @changeSelectPie="changeSelectedPie"
+        @SetRange="onSetRange"
+        @resetRange="onResetRange"
       />
     </template>
     <modal-settings
       v-if="activeSettingModal"
       :color-from="theme"
       :id-dash-from="idDash"
+      :data-page-from="dataPageFrom"
     />
   </div>
 </template>
 
 <script>
 import {
-  mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings,
+  mdiRefresh, mdiMagnify, mdiChevronDown, mdiSettings, mdiMagnifyMinusOutline,
 } from '@mdi/js';
 import settings from '../../js/componentsSettings';
 
@@ -143,6 +169,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    dataPageFrom: {
+      type: String,
+      default: '',
+    },
   },
   data() {
     return {
@@ -165,6 +195,7 @@ export default {
       mdiMagnify,
       mdiChevronDown,
       mdiSettings,
+      mdiMagnifyMinusOutline,
       size: {
         width: 500,
         height: 500,
@@ -174,9 +205,20 @@ export default {
       },
       disappear: true,
       selectedPieIndex: -1,
+      displayingRange: null,
     };
   },
   computed: {
+    preparedData() {
+      if (this.aboutElem.multiLine.show && this.displayingRange) {
+        const { range, xMetric } = this.displayingRange;
+        return this.data.filter((item) => {
+          const x = item[xMetric];
+          return x >= range[0] && x <= range[1];
+        });
+      }
+      return this.data;
+    },
     dataMode() {
       this.changeOptions(this.mode);
       this.setPropDisappear(true);
@@ -295,12 +337,14 @@ export default {
           && (!this.dashFromStore[this.activeElem]?.metrics
               || !this.dashFromStore[this.activeElem]?.metrics.length)
           && this.activeElem === 'multiLine') {
+        const metrics = Object.keys(this.data[0]);
+        metrics.splice(0, 1);
         this.$store.commit(
           'setMetricsMulti',
           {
             id: this.activeElem,
             idDash: this.idDash,
-            metrics: Object.keys(this.data[0]),
+            metrics,
           },
         );
       }
@@ -379,6 +423,12 @@ export default {
     },
     changeSelectedPie(val) {
       this.selectedPieIndex = val;
+    },
+    onSetRange(val) {
+      this.displayingRange = val;
+    },
+    onResetRange() {
+      this.displayingRange = null;
     },
   },
 };

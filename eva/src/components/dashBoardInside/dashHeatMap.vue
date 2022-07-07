@@ -1,93 +1,103 @@
 <template>
-  <div class="heatmap-container px-0">
-    <v-simple-table
-      dense
-      fixed-header
-      class="heatmap-table"
-      height="100%"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
+    <div
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="heatmap-container px-0"
     >
-      <template v-slot:default>
-        <thead>
-          <tr>
-            <th class="table-th" />
-            <th
-              v-for="(y, index) in filteredY"
-              :key="index"
-              class="text-center table-th"
-              @click="onClickTd(null, y)"
-              v-text="y"
-            />
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="x in filteredX"
-            :key="x"
-          >
-            <td
-              class="text-left"
-              @click="onClickTd(x)"
-            >
-              <v-menu
-                open-on-hover
-                top
-                offset-y
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <span
-                    v-bind="attrs"
-                    v-on="on"
-                  >
-                    {{ x }}
-                  </span>
-                </template>
-
-                <v-list>
-                  <v-list-item
-                    v-for="(item, index) in ['Детали']"
-                    :key="index"
-                  >
-                    <v-list-item-title
-                      style="color: black"
-                    >
-                      <a @click="setClick(x)">{{ item }}</a>
-                    </v-list-item-title>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </td>
-
-            <td
-              v-for="y in filteredY"
-              :key="y"
-              class="pa-0"
-              @click="onClickTd(x, y)"
-            >
-              <div
-                v-if="filteredData[x][y] && filteredData[x][y].metadata"
-                class="td-inner"
-                :style="{
-                  backgroundColor: filteredData[x][y].metadata.background_color,
-                }"
-              >
-                <DashHeatMapLinear
-                  :title="filteredData[x][y].value"
-                  :value="filteredData[x][y].metadata.progress_bar_value"
-                  :color="filteredData[x][y].metadata.progress_bar_color"
-                  :comment="filteredData[x][y].metadata.description"
-                />
-              </div>
-              <div
-                v-else-if="filteredData[x][y]"
-                class="td-inner"
-                v-text="filteredData[x][y].value"
+      <v-simple-table
+        dense
+        fixed-header
+        class="heatmap-table"
+        height="100%"
+      >
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="table-th" />
+              <th
+                v-for="(y, index) in filteredY"
+                :key="index"
+                class="text-center table-th"
+                @click="onClickTd(null, y)"
+                v-text="y"
               />
-            </td>
-          </tr>
-        </tbody>
-      </template>
-    </v-simple-table>
-  </div>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="x in filteredX"
+              :key="x"
+            >
+              <td
+                class="text-left"
+                @click="onClickTd(x)"
+              >
+                <v-menu
+                  open-on-hover
+                  top
+                  offset-y
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                      v-bind="attrs"
+                      v-on="on"
+                    >
+                      {{ x }}
+                    </span>
+                  </template>
+
+                  <v-list>
+                    <v-list-item
+                      v-for="(item, index) in ['Детали']"
+                      :key="index"
+                    >
+                      <v-list-item-title
+                        style="color: black"
+                      >
+                        <a @click="setClick(x)">{{ item }}</a>
+                      </v-list-item-title>
+                    </v-list-item>
+                  </v-list>
+                </v-menu>
+              </td>
+
+              <td
+                v-for="y in filteredY"
+                :key="y"
+                class="pa-0"
+                @click="onClickTd(x, y)"
+              >
+                <div
+                  v-if="filteredData[x][y] && filteredData[x][y].metadata"
+                  class="td-inner"
+                  :style="{
+                    backgroundColor: filteredData[x][y].metadata.background_color,
+                  }"
+                >
+                  <DashHeatMapLinear
+                    :title="filteredData[x][y].value"
+                    :value="filteredData[x][y].metadata.progress_bar_value"
+                    :color="filteredData[x][y].metadata.progress_bar_color"
+                    :comment="filteredData[x][y].metadata.description"
+                  />
+                </div>
+                <div
+                  v-else-if="filteredData[x][y]"
+                  class="td-inner"
+                  v-text="filteredData[x][y].value"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </div>
+  </portal>
 </template>
 
 <script>
@@ -112,6 +122,18 @@ export default {
     idDashFrom: {
       type: String,
       required: true,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data: () => ({

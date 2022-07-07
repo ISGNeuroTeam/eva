@@ -1,45 +1,54 @@
 <template>
-  <div
-    ref="single"
-    class="dash-single"
-    @click="setClick"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
-    <v-card
-      v-show="!noMsg"
-      class="number-block"
-      outlined
-      :loading="dataLoading"
-      :look-size="changeSize"
+    <div
+      ref="single"
+      class="dash-single"
+      @click="setClick"
     >
-      <div
-        class="number"
-        :style="{ fontSize: `${fontSize}px` }"
+      <v-card
+        v-show="!noMsg"
+        class="number-block"
+        outlined
+        :loading="dataLoading"
+        :look-size="changeSize"
       >
         <div
-          class="number-itself"
-          :style="{ color: 'var(--accent_ui_color)' }"
+          class="number"
+          :style="{ fontSize: `${fontSize}px` }"
         >
-          {{ number }}
+          <div
+            class="number-itself"
+            :style="{ color: 'var(--accent_ui_color)' }"
+          >
+            {{ number }}
+          </div>
+          <div
+            class="number-sub"
+            :style="{ color: 'var(--primary_button)' }"
+          >
+            {{ subnumber }}
+          </div>
         </div>
-        <div
-          class="number-sub"
-          :style="{ color: 'var(--primary_button)' }"
-        >
-          {{ subnumber }}
-        </div>
+      </v-card>
+      <div
+        v-show="noMsg"
+        class="errormsg"
+        :style="{
+          color: theme.$main_text,
+        }"
+      >
+        {{ msgText }}
       </div>
-    </v-card>
-    <div
-      v-show="noMsg"
-      class="errormsg"
-    >
-      {{ msgText }}
     </div>
-  </div>
+  </portal>
 </template>
 
 <script>
 export default {
+  name: 'DashSingle',
   props: {
     idFrom: {
       type: String,
@@ -54,9 +63,9 @@ export default {
       required: true,
     },
     dataLoadingFrom: null,
-    widthFrom: {
-      type: Number,
-      required: true,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
     },
     colorFrom: {
       type: Object,
@@ -162,10 +171,23 @@ export default {
       }
       return color;
     },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
   },
   watch: {
     dataRestFrom(dataRestFrom) {
       this.setNoMsg(dataRestFrom);
+    },
+    fullScreenMode() {
+      this.setNoMsg(this.dataRestFrom);
+      //  В первый раз раскомментить чтобы создать события для элемнета,
+      //  а затем лучше закоментить чтобы каждый раз не обращаться к store
+      this.$store.commit('setActions', {
+        actions: this.actions,
+        idDash: this.idDash,
+        id: this.id,
+      });
     },
   },
   mounted() {

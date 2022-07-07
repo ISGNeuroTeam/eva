@@ -1,143 +1,158 @@
 <template>
-  <div
-    ref="svgBlock"
-    class="dash-csvg"
-    tabindex="0"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-show="noMsg === 1"
-      ref="csvg"
-      class="csvg-block"
-      :style="{ width: svgStyleWidth, height: svgStyleHeight }"
-      @mouseover="positionTooltip"
-      @click="clickSvg"
-      @mouseout="mouseoutSvg"
-      v-html="svg"
-    />
-    <div
-      v-show="noMsg === 0"
-      class="file-input"
-    >
-      <v-file-input
-        :prepend-icon="image"
-        :style="{ color: color.text, fill: color.text }"
-        :color="color.controls"
-        class="file-itself"
-        hide-details
-        outlined
-        label="Загрузить изображение"
-        @change="file = $event"
-      />
-      <button
-        class="file-btn"
-        :style="{ color: 'white', background: color.controls }"
-        @click="setSvg"
-      >
-        {{ sendMsg }}
-      </button>
-      <div
-        class="answer-block"
-        :class="{ answerShow: answerShow }"
-        :style="{ color: answerColor }"
-      >
-        {{ answer }}
-      </div>
-    </div>
-    <div
-      v-show="noMsg === 2"
-      class="errormsg"
-    >
-      {{ msgText }}
-    </div>
-    <v-icon
-      v-if="dataModeFrom"
-      v-show="noMsg !== 2"
-      class="icon file"
-      :color="colorMsg"
-      @click="noMsg === 0 ? (noMsg = 1) : (noMsg = 0)"
-    >
-      {{ upload }}
-    </v-icon>
-    <div
-      ref="tooltip"
-      class="tooltip"
-      :class="{ tooltipShow: tooltipShow }"
-      :style="{ backgroundColor: color.backElement, borderColor: color.text }"
+      ref="svgBlock"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="dash-csvg"
+      tabindex="0"
     >
       <div
-        v-show="
-          tooltipFrom.texts &&
-            tooltipFrom.texts.length === 0 &&
-            tooltipFrom.links.length === 0 &&
-            tooltipFrom.buttons.length === 0
-        "
-        class="id-tooltip"
-      >
-        {{ idTooltip }}
-      </div>
-      <div
-        v-if="tooltipFrom.texts"
-        class="text-block-tooltip"
-      >
-        <p
-          v-for="i in tooltipFrom.texts.length"
-          :key="i + 'texts'"
-        >
-          {{ checkTokenInTooltip(tooltipFrom.texts[i - 1]) }}
-        </p>
-      </div>
-      <div
-        v-show="tooltipFrom.links && tooltipFrom.links.length !== 0"
-        class="white-space"
+        v-show="noMsg === 1"
+        ref="csvg"
+        class="csvg-block"
+        :style="{ width: svgStyleWidth, height: svgStyleHeight }"
+        @mouseover="positionTooltip"
+        @click="clickSvg"
+        @mouseout="mouseoutSvg"
+        v-html="svg"
       />
       <div
-        v-if="tooltipFrom.links"
-        class="link-block-tooltip"
+        v-show="noMsg === 0"
+        class="file-input"
       >
-        <a
-          v-for="i in tooltipFrom.links.length"
-          :key="i + 'links'"
-          :href="checkTokenInTooltip(tooltipFrom.links[i - 1].url)"
-          target="_blank"
-        >
-          {{ tooltipFrom.links[i - 1].name }}
-          <span />
-        </a>
-      </div>
-      <div
-        v-show="tooltipFrom.buttons && tooltipFrom.buttons.length !== 0"
-        class="white-space"
-      />
-      <div
-        v-if="tooltipFrom.buttons"
-        class="button-block-tooltip"
-        :data-options="String(options)"
-      >
+        <v-file-input
+          :prepend-icon="image"
+          :style="{ color: color.text, fill: color.text }"
+          :color="color.controls"
+          class="file-itself"
+          hide-details
+          outlined
+          label="Загрузить изображение"
+          @change="file = $event"
+        />
         <button
-          v-for="i in tooltipFrom.buttons.length"
-          :key="i + 'buttons'"
-          :data-id="tooltipFrom.buttons[i - 1].id"
-          class="tooltip-button"
+          class="file-btn"
           :style="{ color: 'white', background: color.controls }"
-          @click="setClick(tooltipFrom.buttons[i - 1].id, 'btn')"
+          @click="setSvg"
         >
-          {{ tooltipFrom.buttons[i - 1].name }}
+          {{ sendMsg }}
         </button>
+        <div
+          class="answer-block"
+          :class="{ answerShow: answerShow }"
+          :style="{ color: answerColor }"
+        >
+          {{ answer }}
+        </div>
+      </div>
+      <div
+        v-show="noMsg === 2"
+        class="errormsg"
+      >
+        {{ msgText }}
+      </div>
+      <v-icon
+        v-if="dataModeFrom"
+        v-show="noMsg !== 2"
+        class="icon file"
+        :color="colorMsg"
+        @click="noMsg === 0 ? (noMsg = 1) : (noMsg = 0)"
+      >
+        {{ upload }}
+      </v-icon>
+      <div
+        ref="tooltip"
+        class="tooltip"
+        :class="{ tooltipShow: tooltipShow }"
+        :style="{
+          color: color.$main_text,
+          backgroundColor: color.$secondary_bg,
+          border: `1px solid ${color.$secondary_border}`,
+        }"
+      >
+        <div
+          v-show="
+            tooltipFrom.texts &&
+              tooltipFrom.texts.length === 0 &&
+              tooltipFrom.links.length === 0 &&
+              tooltipFrom.buttons.length === 0
+          "
+          class="id-tooltip"
+        >
+          {{ idTooltip }}
+        </div>
+        <div
+          v-if="tooltipFrom.texts"
+          class="text-block-tooltip"
+        >
+          <p
+            v-for="i in tooltipFrom.texts.length"
+            :key="i + 'texts'"
+          >
+            {{ checkTokenInTooltip(tooltipFrom.texts[i - 1]) }}
+          </p>
+        </div>
+        <div
+          v-show="tooltipFrom.links && tooltipFrom.links.length !== 0"
+          class="white-space"
+        />
+        <div
+          v-if="tooltipFrom.links"
+          class="link-block-tooltip"
+        >
+          <a
+            v-for="i in tooltipFrom.links.length"
+            :key="i + 'links'"
+            :href="checkTokenInTooltip(tooltipFrom.links[i - 1].url)"
+            target="_blank"
+          >
+            {{ tooltipFrom.links[i - 1].name }}
+            <span />
+          </a>
+        </div>
+        <div
+          v-show="tooltipFrom.buttons && tooltipFrom.buttons.length !== 0"
+          class="white-space"
+        />
+        <div
+          v-if="tooltipFrom.buttons"
+          class="button-block-tooltip"
+          :data-options="String(options)"
+        >
+          <button
+            v-for="i in tooltipFrom.buttons.length"
+            :key="i + 'buttons'"
+            :data-id="tooltipFrom.buttons[i - 1].id"
+            class="tooltip-button"
+            :style="{ color: 'white', background: color.controls }"
+            @click="setClick(tooltipFrom.buttons[i - 1].id, 'btn')"
+          >
+            {{ tooltipFrom.buttons[i - 1].name }}
+          </button>
+        </div>
+      </div>
+      <div
+        class="link-canvas"
+        :class="{ linkCanvasShow: linkCanvasShow }"
+      >
+        <canvas
+          ref="link"
+        />
       </div>
     </div>
-    <div
-      class="link-canvas"
-      :class="{ linkCanvasShow: linkCanvasShow }"
-    >
-      <canvas ref="link" />
-    </div>
-  </div>
+  </portal>
 </template>
 
 <script>
 import { mdiFileImageOutline, mdiUpload } from '@mdi/js';
 
 export default {
+  name: 'DashCSvg',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -156,14 +171,6 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
     tooltipFrom: {
       type: Object,
       required: true,
@@ -183,6 +190,22 @@ export default {
     isFullScreen: {
       type: Boolean,
       default: false,
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -209,7 +232,7 @@ export default {
       answer: 'Изображение успешно загружено',
       answerShow: false,
       answerColor: '',
-      otstupBottom: 45,
+      marginBottom: 45,
       tooltipShow: false,
       linkCanvasShow: false,
       tooltipPress: false,
@@ -229,10 +252,10 @@ export default {
       return this.idDashFrom;
     },
     svgStyleWidth() {
-      return `${this.widthFrom - 40}px`;
+      return `${this.sizeFrom.width - 40}px`;
     },
     svgStyleHeight() {
-      return `${this.heightFrom - this.otstupBottom}px`;
+      return `${this.sizeFrom.height - this.marginBottom}px`;
     },
     color() {
       return this.colorFrom;
@@ -309,16 +332,16 @@ export default {
     },
     dataModeFrom(dataMode) {
       if (dataMode) {
-        this.otstupBottom = window.screen.width <= 1600 ? 30 : 45;
+        this.marginBottom = window.screen.width <= 1600 ? 30 : 45;
       } else {
-        this.otstupBottom = 10;
+        this.marginBottom = 10;
       }
     },
-    widthFrom() {
-      this.checkSize();
-    },
-    heightFrom() {
-      this.checkSize();
+    sizeFrom: {
+      deep: true,
+      handler() {
+        this.checkSize();
+      },
     },
     captures(captures) {
       this.actions[0].capture = captures;
@@ -378,7 +401,7 @@ export default {
         }
       }
       if (window.screen.width <= 1600) {
-        this.otstupBottom = 30;
+        this.marginBottom = 30;
       }
     },
     async getSvg(svg) {
@@ -406,10 +429,10 @@ export default {
             if (this.$refs.csvg.querySelector('svg') != null) {
               clearTimeout(timeOut);
               const svgElem = this.$refs.csvg.querySelector('svg');
-              svgElem.setAttribute('width', this.widthFrom - 40);
+              svgElem.setAttribute('width', this.sizeFrom.width - 40);
               svgElem.setAttribute(
                 'height',
-                this.heightFrom - this.otstupBottom,
+                this.sizeFrom.height - this.marginBottom,
               );
             } else {
               timeOut = setTimeout(tick.bind(this), 1000);
@@ -712,9 +735,10 @@ export default {
         default:
           break;
       }
-      context.strokeStyle = this.color.text;
+      console.log(this.color.$secondary_border);
+      context.strokeStyle = this.color.$secondary_border;
       context.stroke();
-      context.lineWidth = 1;
+      context.lineWidth = 2;
     },
     positionTooltip(event) {
       const id = event.target.getAttribute('id');
@@ -778,7 +802,7 @@ export default {
       let token = '';
       const id = event.target.getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
-        [token] = id.split('overlay_');
+        [, token] = id.split('overlay_');
         this.setClick(token, 'object');
       }
     },

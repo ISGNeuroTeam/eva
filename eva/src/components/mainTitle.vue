@@ -7,7 +7,6 @@
       v-if="prepared"
       :horizontal-cell="horizontalCell"
       :id-dash-from="idDash"
-      @changeMode="changeMode"
       @openProfile="
         (event) => {
           openProfile = event;
@@ -79,6 +78,7 @@
             :vertical-cell="verticalCell"
             :search-data="getElementData(elem)"
             :data-source-id="elem.search"
+            :data-sources="dataObject"
             :loading="checkLoading(elem)"
             @downloadData="exportDataCSV"
             @SetRange="setRange($event, elem)"
@@ -97,6 +97,11 @@
             v-if="activeSettingModal"
             :color-from="theme"
             :id-dash-from="idDash"
+            :data-page-from="page"
+          />
+          <modal-visualisation
+            :mode="mode"
+            :get-element-data="getElementData"
           />
         </v-container>
       </v-main>
@@ -258,12 +263,14 @@
 </template>
 
 <script>
+import ModalVisualisation from './modalVisualisation.vue';
+
 export default {
   name: 'MainTitle',
+  components: { ModalVisualisation },
   data() {
     return {
       page: 'dash',
-      mode: process.env.VUE_APP_DASHBOARD_EDITING_MODE === 'true',
       showSetting: false,
       rotate: '',
       openProfile: false,
@@ -294,6 +301,9 @@ export default {
     };
   },
   computed: {
+    mode() {
+      return !!this.dashFromStore?.editMode;
+    },
     modalText() {
       return `Вы точно хотите удалить вкладку - <strong>${this.deleteTabName ? this.deleteTabName : this.deleteTabId + 1}</strong> ?`;
     },
@@ -441,53 +451,42 @@ export default {
       handler(searches) {
         if (this.firstLoad) {
           searches.forEach((search) => {
-            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            const loading = search.parametrs?.isStartImmediately
+              || search.parametrs.isStartImmediately === undefined;
+            this.$set(this.dataObject, search.id, { data: [], loading });
             this.$set(this.dataObjectConst, search.id, {
               data: [],
-              loading: true,
+              loading,
             });
           });
+
           this.firstLoad = false;
         }
-        searches.forEach((search) => {
-          if (search.status === 'empty') {
-            this.$set(this.dataObject, search.id, { data: [], loading: true });
-            this.$set(this.dataObjectConst, search.id, {
-              data: [],
-              loading: true,
-            });
-            this.$store.commit('updateSearchStatus', {
-              idDash: this.idDash,
-              sid: search.sid,
-              id: search.id,
-              status: 'pending',
-            });
-            this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
-              .then((res) => {
-                if (res?.length === 0) {
-                  this.$store.commit('setState', [{
-                    object: this.$store.state,
-                    prop: 'logError',
-                    value: true,
-                  }]);
-                }
-                this.$store.commit('updateSearchStatus', {
-                  idDash: this.idDash,
-                  sid: search.sid,
-                  id: search.id,
-                  status: res.length ? 'downloaded' : 'nodata',
-                });
-                this.$set(this.dataObject[search.id], 'data', res);
-                this.$set(this.dataObject[search.id], 'loading', false);
-                this.$set(this.dataObjectConst[search.id], 'data', res);
-                this.$set(this.dataObjectConst[search.id], 'loading', false);
-              });
-          }
-        });
+        this.startSearches(searches);
       },
     },
   },
   async mounted() {
+    if (this.dashFromStore) {
+      const isSettingsOpen = this.dashFromStore
+        .modalSettings?.status;
+      const isModalVisualisationOpen = this.dashFromStore
+        .visualisationModalData?.open;
+      if (isSettingsOpen) {
+        this.$store.commit('setModalSettings', {
+          idDash: this.idDash,
+          element: '',
+          status: false,
+        });
+      }
+      if (isModalVisualisationOpen) {
+        this.$store.commit('setVisualisationModalData', {
+          idDash: this.idDash,
+          data: {},
+        });
+      }
+    }
+
     await this.checkAlreadyDash();
     this.loadingDash = false;
     document.title = `EVA | ${this.dashFromStore.name}`;
@@ -503,6 +502,48 @@ export default {
     window.onresize = this.checkTabOverflow;
   },
   methods: {
+    startSearches(searches) {
+      searches.forEach((search) => {
+        if (search.status === 'empty') {
+          this.$set(this.dataObject, search.id, { data: [], loading: true });
+          this.$set(this.dataObjectConst, search.id, {
+            data: [],
+            loading: true,
+          });
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            id: search.id,
+            status: 'pending',
+          });
+          this.$nextTick(() => {
+            this.getData(search);
+          });
+        }
+      });
+    },
+    getData(search) {
+      this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
+        .then((res) => {
+          if (res?.length === 0) {
+            this.$store.commit('setState', [{
+              object: this.$store.state,
+              prop: 'logError',
+              value: true,
+            }]);
+          }
+          this.$store.commit('updateSearchStatus', {
+            idDash: this.idDash,
+            sid: search.sid,
+            id: search.id,
+            status: res.length ? 'downloaded' : 'nodata',
+          });
+          this.$set(this.dataObject[search.id], 'data', res);
+          this.$set(this.dataObject[search.id], 'loading', false);
+          this.$set(this.dataObjectConst[search.id], 'data', res);
+          this.$set(this.dataObjectConst[search.id], 'loading', false);
+        });
+    },
     getElementSourceId(searchId) {
       return this.searches.find((search) => search.id === searchId)?.id || '';
     },
@@ -559,6 +600,9 @@ export default {
     },
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
+      if (this.$store.state[this.idDash][elem.elem].loading) {
+        return this.$store.state[this.idDash][elem.elem].loading;
+      }
       return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
@@ -633,9 +677,6 @@ export default {
     },
     hash(elem) {
       return `${elem}#${this.idDash}`;
-    },
-    changeMode() {
-      this.mode = !this.mode;
     },
     openSettings() {
       this.showSetting = !this.showSetting;

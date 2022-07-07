@@ -1,52 +1,65 @@
 <template>
-  <div
-    ref="container"
-    class="dash-map"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      v-if="error"
-      :key="`error-message-${idDashFrom}`"
-      class="error-message"
+      ref="container"
+      class="dash-map"
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
     >
-      {{ error }}
+      <div
+        v-if="error"
+        :key="`error-message-${idDashFrom}`"
+        class="error-message"
+      >
+        {{ error }}
+      </div>
+      <div
+        v-show="!error"
+        :key="`mapContainer-${idDashFrom}`"
+        ref="map"
+        class="mapContainer"
+        :style="mapStyleSize"
+      >
+        <dash-map-user-settings-container
+          v-if="map"
+          ref="setting"
+          :map="map"
+          :id-dash-from="idDashFrom"
+          :id-element="idFrom"
+          @openSettingsModal="modalSettingsValue = true"
+        />
+      </div>
+      <dash-map-user-settings-new
+        v-if="map"
+        :modal-value="modalSettingsValue"
+        :map="map"
+        :id-dash-from="idDashFrom"
+        :id-element="idFrom"
+        :search="search"
+        @update:modalValue="updateModalValue"
+        @updatePipeDataSource="loadDataForPipe"
+      />
     </div>
-    <div
-      v-show="!error"
-      :key="`mapContainer-${idDashFrom}`"
-      ref="map"
-      class="mapContainer"
-      :style="mapStyleSize"
-    />
-    <dash-map-user-settings-new
-      v-if="map"
-      :modal-value="modalSettingsValue"
-      :map="map"
-      :id-dash-from="idDashFrom"
-      :id-element="idFrom"
-      :search="search"
-      @update:modalValue="updateModalValue"
-      @updatePipeDataSource="loadDataForPipe"
-    />
-  </div>
+  </portal>
 </template>
 
 <script>
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet.tilelayer.colorfilter';
-import 'leaflet.markercluster';
-import Vue from 'vue';
-import * as turf from '@turf/turf';
-import * as utils from 'leaflet-geometryutil';
-import vuetify from '../../plugins/vuetify';
 import DashMapUserSettingsContainer from './dashMapUserSettings/DashMapUserSettingsContainer.vue';
 import dashMapUserSettingsNew from './dashMapUserSettings/dashMapUserSettings.vue';
 import store from '../../store/index'; // подключаем файл с настройками хранилища Vuex
+import MapClass from '../../js/classes/MapClass';
 
 export default {
+  name: 'DashMap',
   components: {
+    DashMapUserSettingsContainer,
     dashMapUserSettingsNew,
   },
+  inheritAttrs: false,
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -65,14 +78,6 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    widthFrom: {
-      type: Number,
-      required: true,
-    }, // ширина родительского компонента
-    heightFrom: {
-      type: Number,
-      required: true,
-    }, // выоста родительского компонента
     options: {
       type: Object,
       required: true,
@@ -80,6 +85,22 @@ export default {
     search: {
       type: Object,
       default: () => ({}),
+    },
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
+      required: true,
+    }, // выоста\ширина родительского компонента
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -99,15 +120,14 @@ export default {
       cluster: null,
       clusterPosition: null,
       clusterPositionItems: null,
-      clusterDelimiter: null,
-      isLegendGenerated: false,
       isSettings: false,
-      startingPoint: [],
       mode: [],
       leftBottom: 0,
       rightTop: 0,
       pipelineData: [],
       pipelineDataDictionary: {},
+      position: null,
+      layerGroup: {},
     };
   },
   computed: {
@@ -132,34 +152,6 @@ export default {
       if (!this.dashFromStore.options) {
         this.$store.commit('setDefaultOptions', { id: this.idFrom, idDash: this.idDash });
       }
-      if (!this.dashFromStore?.options.pinned) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'pinned',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
-          value: false,
-        }]);
-      }
       if (!this.dashFromStore?.options.search) {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
@@ -170,54 +162,88 @@ export default {
 
       return this.dashFromStore.options;
     },
-    option() {
-      return this.getOptions;
-    },
-
     top() {
       // для ряда управляющих иконок
       return document.body.clientWidth <= 1600 ? 50 : 60;
     },
     mapStyleSize() {
       return {
-        height: `${Math.trunc(this.heightFrom) - this.top / 2 - 10}px`,
+        height: `${Math.trunc(this.sizeFrom.height) - this.top / 2 - 10}px`,
       };
+    },
+    getCurrentPosition() {
+      return this.position
+        ? [this.position.lat, this.position.lng]
+        : [this.options?.initialPoint?.x || 0, this.options?.initialPoint?.y || 0];
     },
   },
   watch: {
     error(val) {
       if (!val) {
-        // eslint-disable-next-line no-underscore-dangle
-        this.map._onResize();
+        this.map.resize();
       }
     },
-    getOptions: {
-      handler() {
-        if (this.map) {
-          this.reDrawMap(this.dataRestFrom);
+    // TODO: Временный коммент
+    // getOptions: {
+    //   handler(val, old) {
+    //     if (this.map && JSON.stringify(val) !== JSON.stringify(old)) {
+    //       if (this.options?.library) {
+    //         this.map.library = this.library;
+    //       }
+    //       this.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.map.map.options.wheelPxPerZoomLevel = 101 - val.zoomStep;
+    //       this.reDrawMap(this.dataRestFrom);
+    //     }
+    //   },
+    //   deep: true,
+    // },
+    'getOptions.selectedLayer': {
+      handler(val, old) {
+        if (JSON.stringify(val) !== JSON.stringify(old) && !old) {
+          this.map.remove();
+          this.init();
         }
       },
       deep: true,
     },
     mapStyleSize() {
-      // eslint-disable-next-line no-underscore-dangle
-      this.map._onResize();
+      if (this.map) {
+        this.map.resize();
+      }
     },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
       if (_dataRest && this.map) {
         this.reDrawMap(_dataRest);
+        this.$nextTick(() => {
+          if (this.library?.objects) {
+            this.$refs.setting.creationLayer();
+            this.$refs.setting.addLayer();
+          }
+        });
       }
     },
     clusterTextCount() {
       if (this.map) {
-        this.clearCluster();
-        this.clustering(this.dataRestFrom);
+        this.map.clearCluster(this.cluster);
+        this.map.clustering(this.dataRestFrom);
       }
     },
     maptheme() {
       if (this.map) {
-        this.createMap();
+        this.map.createMap(this.maptheme);
+      }
+    },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.map.remove();
+        this.map = null;
+        this.init();
+      });
+    },
+    sizeFrom(val, oldVal) {
+      if (this.map && JSON.stringify(val) !== JSON.stringify(oldVal)) {
+        this.map.resize();
       }
     },
   },
@@ -231,49 +257,49 @@ export default {
       this.modalSettingsValue = !this.modalSettingsValue;
     },
     init() {
-      this.initMap();
-      this.initTheme();
-      this.initClusterTextCount();
-      this.initClusterPosition();
-      this.initClusterDelimiter();
-      if (this.map) {
-        store.subscribe((mutation) => {
-          if (mutation.type === 'updateOptions') {
-            if (this.options.initialPoint) {
-              this.map.setView(
-                [this.options.initialPoint.x, this.options.initialPoint.y],
+      this.$nextTick(() => {
+        this.initMap();
+        this.initTheme();
+        this.initCluster();
+        if (this.map) {
+          store.subscribe((mutation) => {
+            if (mutation.type === 'updateOptions') {
+              if (this.options.initialPoint) {
+                this.map.setView(
+                  this.getCurrentPosition,
+                  mutation.payload.options.zoomLevel,
+                );
+              } else {
+                this.map.setView(
+                  this.map.startingPoint,
+                  mutation.payload.options.zoomLevel,
+                );
+              }
+              this.map.wheelPxPerZoomLevel = 200;
+              this.updateToken(
                 mutation.payload.options.zoomLevel,
-              );
-            } else {
-              this.map.setView(
-                this.startingPoint,
-                mutation.payload.options.zoomLevel,
+                this.map.bounds,
               );
             }
-            this.map.wheelPxPerZoomLevel = 200;
-            this.updateToken(
-              mutation.payload.options.zoomLevel,
-              this.map.getBounds(),
-            );
-          }
-        });
+          });
 
-        this.createTokens();
-        this.$store.commit('setActions', {
-          actions: this.actions,
-          idDash: this.idDash,
-          id: this.element,
-        });
-        this.loadDataForPipe(this.$store.getters.getPaperSearch);
-      }
+          this.createTokens();
+          this.$store.commit('setActions', {
+            actions: JSON.parse(JSON.stringify(this.actions)),
+            idDash: this.idDash,
+            id: this.element,
+          });
+          this.loadDataForPipe(this.getOptions.search);
+        }
+      });
     },
     async getDataFromRest(event) {
-      // this.$set(this.loadings,event.sid,true);
       this.$store.commit('setLoading', {
         search: event.sid,
         idDash: this.idDash,
         should: true,
         error: false,
+        name: this.element,
       });
 
       await this.$store.dispatch('auth/putLog', `Запущен запрос  ${event.sid}`);
@@ -290,6 +316,7 @@ export default {
           idDash: this.idDash,
           should: false,
           error: true,
+          name: this.element,
         });
       } else {
         // если все нормально
@@ -307,6 +334,7 @@ export default {
             idDash: this.idDash,
             should: false,
             error: false,
+            name: this.element,
           });
         });
       }
@@ -314,8 +342,8 @@ export default {
       return response;
     },
     async loadDataForPipe(search) {
-      this.pipelineData = await this.getDataFromRest(search);
-      if (this.map) {
+      if (this.getOptions.mode && this.getOptions.mode[0] === 'Мониторинг' && this.map) {
+        this.pipelineData = await this.getDataFromRest(search);
         const allPipes = {};
         if (Array.isArray(this.pipelineData)) {
           this.pipelineData.forEach((x) => {
@@ -327,7 +355,18 @@ export default {
         }
 
         this.pipelineDataDictionary = allPipes;
+      }
+
+      if (this.map) {
         this.reDrawMap(this.dataRestFrom);
+        this.$nextTick(() => {
+          this.$nextTick(() => {
+            if (this.map && this.library?.objects) {
+              this.$refs.setting.creationLayer();
+              this.$refs.setting.addLayer();
+            }
+          });
+        });
       }
     },
     updateToken(value) {
@@ -376,58 +415,45 @@ export default {
       });
     },
     reDrawMap(dataRest) {
-      if (this.map) {
-        this.clearMap();
-        this.error = null;
-        // получаем osm server
-        this.getOSM();
-        // получаем библиотеку
-        // get all icons that we need on map
-        this.generateLibrary(dataRest, this.options?.primitivesLibrary);
-        this.generateClusterPositionItems();
-        this.initSettings();
-        if (!this.error) {
-          // создаем элемент карты
-          this.createMap();
-          // рисуем объекты на карте
-          this.drawObjects(dataRest);
-          if (this.map) {
-            if (this.options.initialPoint) {
-              this.map.setView(
-                [this.options.initialPoint.x, this.options.initialPoint.y],
-                this.options.zoomLevel,
-              );
-            } else this.map.setView(this.startingPoint, this.options.zoomLevel);
+      this.$nextTick(() => {
+        if (this.map) {
+          this.map.clearMap();
+          this.error = null;
+          // получаем osm server
+          this.getOSM();
+          // получаем библиотеку
+          // get all icons that we need on maps
+          this.generateLibrary(dataRest, this.options?.primitivesLibrary);
+          if (this.library?.objects) {
+            Object.keys(this.library.objects).forEach((item) => {
+              if (!this.map.layerGroup[item]) {
+                this.map.addGroup(item);
+              }
+            });
           }
-
-          // this.clustering(dataRest);
+          this.map.generateClusterPositionItems();
+          if (!this.error && dataRest.length > 0) {
+            // создаем элемент карты
+            this.map.createMap(this.maptheme);
+            // рисуем объекты на карте
+            this.map.drawObjects({
+              dataRest,
+              pipelineDataDictionary: this.pipelineDataDictionary,
+              callback: (id) => {
+                this.setClick(id);
+              },
+            });
+            if (this.map) {
+              if (this.options.initialPoint) {
+                this.map.setView(
+                  this.getCurrentPosition,
+                  this.options.zoomLevel,
+                );
+              } else this.map.setView(this.map.startingPoint, this.options.zoomLevel);
+            }
+          }
         }
-      }
-    },
-
-    initSettings() {
-      if (this.isSettings) return;
-      const ComponentClass = Vue.extend(DashMapUserSettingsContainer);
-      const test = new ComponentClass({
-        propsData: {
-          idDashFrom: this.idDashFrom,
-          idElement: this.idFrom,
-          map: this.map,
-        },
-        vuetify,
-        store,
       });
-      test.$on('openSettingsModal', () => {
-        this.modalSettingsValue = true;
-      });
-      test.$mount();
-
-      const element = this.$refs.map.getElementsByClassName(
-        'leaflet-control-container',
-      );
-      const container = element[0];
-      container.appendChild(test.$el);
-      this.isSettings = true;
     },
     deleteTitleByAttribute() {
       const leafletControlZoomOut = this.$refs.map.querySelector(
@@ -443,75 +469,22 @@ export default {
       leafletControlZoomOut.removeAttribute('title');
       leafletControlZoomIn.removeAttribute('title');
     },
-
     initTheme() {
       const options = this.getOptions;
-      if (options.maptheme) {
-        this.maptheme = options.maptheme;
-      } else {
-        this.maptheme = 'default';
-      }
+      this.map.mapTheme = options.maptheme ? options.maptheme : 'default';
     },
-    changeMapTheme(val) {
+    initCluster() {
       const options = this.getOptions;
-      options.maptheme = val;
-    },
-    initClusterTextCount() {
-      const options = this.getOptions;
-      if (options.clusterTextCount) {
-        this.clusterTextCount = options.clusterTextCount;
-      } else {
-        this.clusterTextCount = 4;
-      }
-    },
-    initClusterDelimiter() {
-      const options = this.getOptions;
-      if (options.clusterDelimiter) {
-        this.clusterDelimiter = options.clusterDelimiter;
-      } else {
-        this.clusterDelimiter = ';';
-      }
-    },
-    initClusterPosition() {
-      const options = this.getOptions;
-      if (options.clusterPosition) {
-        this.clusterPosition = options.clusterPosition;
-      } else {
-        this.clusterPosition = null;
-      }
-    },
-    changeClusterTextCount(val) {
-      const options = this.getOptions;
-      options.clusterTextCount = val;
-    },
-    blurClusterPosition() {
-      const options = this.getOptions;
-      if (this.clusterPosition.length > 0) {
-        options.clusterPosition = this.clusterPosition;
-      } else {
-        options.clusterPosition = null;
-      }
-
-      this.clearCluster();
-      this.clustering(this.dataRestFrom);
-    },
-    blurClusterDelimiter() {
-      const options = this.getOptions;
-      options.clusterDelimiter = this.clusterDelimiter;
-      this.clearCluster();
-      this.clustering(this.dataRestFrom);
-    },
-    clearMap() {
-      this.map.eachLayer((layer) => {
-        this.map.removeLayer(layer);
-      });
+      this.map.clusterTextCount = options.clusterTextCount ? options.clusterTextCount : 4;
+      this.map.clusterDelimiter = options.clusterDelimiter ? options.clusterDelimiter : ';';
+      this.map.clusterPosition = options.clusterPosition ? options.clusterPosition : null;
     },
     getOSM() {
       const options = this.getOptions;
       if (options?.selectedLayer?.tile) {
-        this.osmserver = options.selectedLayer;
+        this.map.osmServer = options.selectedLayer;
       } else if (options?.osmserver) {
-        this.osmserver = options.osmserver;
+        this.map.osmServer = options.osmserver;
       } else {
         this.error = 'Введите osm server';
       }
@@ -535,83 +508,56 @@ export default {
               id: this.idFrom, // id элемнета (table, graph-2)
               idDash: this.idDashFrom,
             });
+            this.$store.commit('setState', [{
+              object: this.dashFromStore.options,
+              prop: 'primitivesLibrary',
+              value: JSON.stringify(this.library),
+            }]);
           }
         } catch {
           this.error = 'Ошибка формата входных данных';
           this.map.remove();
           this.map = null;
         }
-        if (!this.isLegendGenerated) {
-          this.createLegend();
-        }
-      }
-    },
-
-    createLegend() {
-      let generatedListHTML = '';
-      if (this.library?.objects) {
-        Object.keys(this.library.objects).forEach((key) => {
-          generatedListHTML += `<li>${this.library.objects[key].name}</li>`;
-        });
-        const legend = L.control({ position: 'bottomright' });
-
-        legend.onAdd = function (map) {
-          const img = L.DomUtil.create('div');
-          img.innerHTML = `
-              <div>
-                <p>Легенда</p>
-                <ul class="fa-ul">
-                ${generatedListHTML}
-                </ul>
-              </div>`;
-          img.style.width = '280px';
-          img.style.maxHeight = '466px';
-          img.style.background = 'black';
-          return img;
-        };
-
-        legend.onAdd(this.map);
-        this.isLegendGenerated = true;
-      }
-    },
-
-    generateClusterPositionItems() {
-      this.clusterPositionItems = null;
-      if (this.library?.objects) {
-        Object.entries(this.library.objects).forEach((object) => {
-          if (object[1].image) {
-            const tmpObject = { ...object[1], id: Number(object[0]) };
-            this.clusterPositionItems = [tmpObject];
-          }
-        });
-
-        if (!this.clusterPosition) {
-        // пустые значения
-          Object.entries(this.library.objects).forEach((object) => {
-            if (object[1].image) {
-              if (this.clusterPosition === null) {
-                this.clusterPosition = [Number(object[0])];
-              } else {
-                this.clusterPosition.push(Number(object[0]));
-              }
-            }
-          });
+        if (this.map && !this.map.isLegendGenerated) {
+          this.map.library = this.library;
+          this.map.layerGroup = this.layerGroup;
+          this.map.createLegend(this.library);
         }
       }
     },
 
     initMap() {
-      this.map = L.map(this.$refs.map, {
-        wheelPxPerZoomLevel: 1 / this.options.zoomStep || 30,
+      const map = new MapClass({
+        mapRef: this.$refs.map,
+        wheelPxPerZoomLevel: 101 - this.options.zoomStep,
         zoomSnap: 0,
-        zoom: 10,
+        zoom: this.getOptions.zoomLevel,
         maxZoom: 25,
-        center: [0, 0],
+        center: this.getCurrentPosition,
+        layerGroup: this.layerGroup,
+        library: this.library,
+        mode: this.getOptions.mode,
+        pipelineParameters: this.getOptions.pipelineParameters,
       });
-      this.map.on('moveend', () => {
-        [this.leftBottom, this.rightTop] = Object.entries(this.map.getBounds());
-        this.updateToken(this.map.getZoom());
-      });
+      this.map = Object.freeze(map);
+      this.map.setEvents([
+        {
+          event: 'moveend',
+          callback: () => {
+            this.position = this.map.center;
+            [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
+            // TODO: Временный коммент
+            // this.updateToken(this.map.zoom);
+          },
+        },
+        {
+          event: 'mouseout',
+          callback: () => {
+            this.map.scrollWheelZoom();
+          },
+        },
+      ]);
       // TODO: Пока просили приостановить работу с ГИС.
       // this.map.on('zoomend', () => {
       //   const layers = document.getElementsByClassName('leaflet-marker-icon');
@@ -625,323 +571,54 @@ export default {
 
       this.$nextTick(() => {
         if (this.map) {
-          // eslint-disable-next-line no-underscore-dangle
-          this.map._onResize();
+          this.map.resize();
         }
       });
     },
 
-    drawObjects(dataRest) {
-      for (let i = 0; i < dataRest.length - 1; i += 1) {
-        if (
-          !!dataRest
-          && dataRest[i]?.type
-          && this.library.objects
-          && this.library.objects[dataRest[i].type]
-        ) {
-          // choosing drawing type for each object
-          const lib = this.library.objects[dataRest[i].type];
-          if (lib) {
-            if (dataRest[i].ID === '1') {
-              const point = dataRest[i].coordinates.split(':');
-              const coord = point[1].split(',');
-
-              this.startingPoint = [coord[0], coord[1]];
-            }
-            if (dataRest[i].geometry_type?.toLowerCase() === 'point') {
-              this.addMarker(dataRest[i], dataRest[i].ID === '1', lib);
-            }
-            if (dataRest[i].geometry_type?.toLowerCase() === 'line') {
-              this.addLine(dataRest[i], lib);
-            }
-          }
-        }
-      }
-    },
-
-    addMarker(element, isCenter, lib) {
-      const type = this.getElementDrawType(lib);
-      if (type === 'SVG') {
-        this.drawMarkerSVG(lib, element, isCenter);
-      } else {
-        this.drawMarkerHTML({ lib, element, isCenter });
-      }
-    },
-
-    getElementDrawType(lib) {
-      if (lib.view_type === 'html') {
-        return 'HTML';
-      }
-      return 'SVG';
-    },
-
-    drawMarkerSVG(lib, element) {
-      const icon = L.icon({
-        iconUrl: `${window.location.origin}/svg/${lib.image}`,
-        iconSize: [lib.width, lib.height],
+    setClick(tokenValue) {
+      const events = this.getEvents({
+        event: 'onclick',
+        partelement: 'empty',
       });
-
-      const point = element.coordinates.split(':');
-      const coord = point[1].split(',');
-      this.startingPoint = [coord[0], coord[1]];
-      const marker = L.marker([coord[0], coord[1]], {
-        icon,
-        zIndexOffset: -1000,
-        riseOnHover: true,
-      })
-        .addTo(this.map)
-        .bindTooltip(element.label, {
-          permanent: false,
-          direction: 'top',
-          className: 'leaftet-hover',
-        });
-      // eslint-disable-next-line no-underscore-dangle
-      L.DomUtil.addClass(marker._icon, 'className');
-    },
-
-    drawMarkerHTML({ lib, element }) {
-      const {
-        text_color: textColor = '#FFFFFF',
-        background_color: color = '65, 62, 218',
-        opacity = 0.6,
-        border_radius: borderRadius = '2px',
-        border = 'none',
-        width,
-        height,
-      } = lib;
-      const icon = L.divIcon({
-        className: 'location-pin',
-        riseOnHover: true,
-        html: `<div class="leaflet-div-icon"
-          style="
-            background-color: ${color};
-            opacity: ${opacity};
-            mix-blend-mode: normal;
-            border: ${border};
-            border-radius: ${borderRadius}px;
-            padding: 2px 6px;
-            display: inline-block;
-            font-size: 14px;
-            font-weight: 600;
-        ">
-          <span style="color:${textColor}">${element.label}<span>
-        </div>`,
-        iconSize: [width, height],
-      });
-      const point = element.coordinates.split(':');
-      const coord = point[1].split(',');
-      L.marker([coord[0], coord[1]], {
-        icon,
-        zIndexOffset: -1000,
-        riseOnHover: true,
-      })
-        .addTo(this.map)
-        .bindTooltip(element.label, {
-          permanent: false,
-          direction: 'top',
-          className: 'leaftet-hover',
-          interactive: true,
-        });
-    },
-
-    addLine(element, lib) {
-      const { option } = this;
-
-      const pipelineData = this.pipelineDataDictionary[element.ID];
-
-      const latlngs = [];
-      element.coordinates.split(';').forEach((point) => {
-        const p = point.split(':');
-        latlngs[p[0] - 1] = p[1].split(',');
-      });
-      const line = L.polyline(latlngs, {
-        color: lib.color,
-        weight: lib.width,
-        opacity: lib.opacity,
-      });
-      const tooltip = L.tooltip({
-        permanent: false,
-        direction: 'top',
-        className: 'leaftet-hover',
-        sticky: true,
-      });
-
-      function resetHighlight(e) {
-        const layer = e.target;
-        layer.setStyle({
-          color: lib.color,
-          weight: lib.width,
-        });
-      }
-
-      const route = line.getLatLngs().map((el) => [el.lat, el.lng]);
-      const lineTurf = turf.lineString(route);
-
-      function highlightFeature(e) {
-        const layer = e.target;
-        layer.bringToFront();
-        layer.setStyle({
-          weight: lib.width + 3,
-          color: lib.highlight_color,
-        });
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-          layer.bringToFront();
-        }
-        if (!pipelineData) return;
-        const closest = (arr, num) => (
-          arr.reduce((acc, val) => {
-            if (Math.abs(val.pos - num) < Math.abs(acc)) {
-              return val.pos - num;
-            }
-            return acc;
-          }, Infinity) + num
-        );
-        if (option?.mode[0] === 'Мониторинг') {
-          const newLine = turf.lineSlice(
-            route[0],
-            [e.latlng.lat, e.latlng.lng],
-            lineTurf,
-          );
-          const newLinePoly = L.polyline(newLine.geometry.coordinates);
-          const distances = utils.accumulatedLengths(newLinePoly);
-          const sum = distances[distances.length - 1];
-
-          const closestData = closest(pipelineData, sum);
-
-          const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
-          // div for tooltip
-          const newDiv = document.createElement('div');
-          newDiv.innerHTML = `<div style="text-align: left; background-color: #191919; color: white">
-          <p>${pipelineInfo.label}</p>
-          <p>P ${pipelineInfo.P}</p>
-          <p>S ${pipelineInfo.S}</p>
-          <p>L ${pipelineInfo.L}</p>
-          </div>`;
-          line.setTooltipContent(newDiv);
-        }
-      }
-
-      line
-        .addTo(this.map)
-        .bindTooltip(tooltip)
-        .on('mouseover', (e) => highlightFeature(e, line))
-        .on('mouseout', resetHighlight);
-      line.setTooltipContent(element.label);
-    },
-
-    clustering(dataRest) {
-      this.cluster = L.markerClusterGroup({
-        showCoverageOnHover: false,
-        iconCreateFunction: (cluster) => {
-          const markers = cluster.getAllChildMarkers();
-          // eslint-disable-next-line no-underscore-dangle
-          if (cluster._zoom > 10) {
-            const html = `<div class='leaflet-tooltip'>${
-              this.generateHtml(markers)
-            }</div>`;
-            return L.divIcon({
-              iconSize: [0, 0],
-              html,
+      if (events.length !== 0) {
+        events.forEach((item) => {
+          if (item.action === 'go') {
+            item.value[0] = tokenValue;
+            this.$store.dispatch('letEventGo', {
+              event: item,
+              id: this.element,
+              idDash: this.idDash,
+              route: this.$router,
+              store: this.$store,
             });
           }
-          return L.divIcon({
-            iconSize: [0, 0],
-          });
-        },
-      });
-      const sortDataRest = this.sortForTooltip(dataRest);
-      for (let i = 0; i < sortDataRest.length - 1; i += 1) {
-        this.addTooltip(this.cluster, sortDataRest[i]);
-      }
-    },
-    sortForTooltip(dataRest) {
-      const sortDataRest = [];
-      this.clusterPosition?.forEach((position) => {
-        dataRest.forEach((dr) => {
-          if (position === dr.type) {
-            sortDataRest.push(dr);
-          }
         });
-      });
-      return sortDataRest;
-    },
-    generateHtml(markers) {
-      // eslint-disable-next-line no-underscore-dangle
-      let html = "<div class ='leaftet-flex'>";
-      // eslint-disable-next-line no-underscore-dangle
-      let count = 0;
-      let i;
-      for (
-        i = 0;
-        i < markers.length - 1 && count < this.clusterTextCount;
-        i += 1
-      ) {
-        // eslint-disable-next-line no-underscore-dangle
-        html = `${html}<div>${markers[i].getTooltip()._content}</div>`;
-        html += `<div> ${this.clusterDelimiter} </div>`;
-        count += 1;
-      }
-      // удаление лишенего дилителя
-      html = html.substr(
-        0,
-        html.length - `<div> ${this.clusterDelimiter} </div>`.length,
-      );
-      // закрываем leaftet-flex
-      html += '</div>';
-      if (i !== markers.length - 1) {
-        html += "<div class ='leaftet-flex'>...</div>";
-      }
-      return html;
-    },
-    clearCluster() {
-      if (this.map?.hasLayer(this.cluster)) {
-        this.map.removeLayer(this.cluster);
       }
     },
-    addTooltip(cluster, element) {
-      const lib = this.library.objects[element.type];
-      const icon = L.divIcon({
-        iconSize: [0, 0],
-      });
-      const point = element.coordinates.split(':');
-      const coord = point[1].split(',');
-      const marker = L.marker([coord[0], coord[1]], {
-        icon,
-      }).bindTooltip(element.label, {
-        permanent: true,
-        direction: 'bottom',
-        offset: [0, lib.height / 2],
-      });
-
-      cluster.addLayer(marker);
-      this.map.addLayer(cluster);
-    },
-    createMap() {
-      let tileLayer;
-      if (!this.osmserver) return;
-      if (typeof this.osmserver === 'string') {
-        if (this.maptheme === 'black') {
-          tileLayer = L.tileLayer.colorFilter(this.osmserver, {
-            filter: ['grayscale:100%', 'invert:100%'],
-          });
-        } else {
-          tileLayer = L.tileLayer.colorFilter(this.osmserver);
-        }
+    getEvents({ event, partelement }) {
+      let result = [];
+      if (!this.$store.state[this.idDash].events) {
+        this.$store.commit('setState', [{
+          object: this.$store.state[this.idDash],
+          prop: 'events',
+          value: [],
+        }]);
+        return [];
+      }
+      if (partelement) {
+        result = this.$store.state[this.idDash].events.filter((item) => (
+          item.event === event
+            && item.element === this.element
+            && item.partelement === partelement
+        ));
       } else {
-        if (!this.osmserver.tile) return;
-
-        let temp = this.osmserver.tile;
-        if (typeof this.osmserver.tile === 'string') {
-          temp = [this.osmserver.tile];
-        }
-        if (this.maptheme === 'black') {
-          temp[1].filter = ['grayscale:100%', 'invert:100%'];
-          tileLayer = L.tileLayer.colorFilter(...temp);
-        } else {
-          tileLayer = L.tileLayer(...temp);
-        }
+        result = this.$store.state[this.idDash].events.filter(
+          (item) => item.event === event
+                && item.target === this.element,
+        );
       }
-      tileLayer.addTo(this.map);
+      return result;
     },
   },
 };

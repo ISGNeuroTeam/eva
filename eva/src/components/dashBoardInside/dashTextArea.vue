@@ -1,36 +1,53 @@
 <template>
-  <div class="dash-textArea">
-    <v-textarea
-      v-model="textarea"
-      :color="color.controls"
-      outlined
-      :style="{ color: color.text }"
-      spellcheck="false"
-      hide-details
-      class="textarea-itself"
-      :height="height"
-      no-resize
-      @keypress.enter="setTockenByPress($event)"
-      @blur="setTockenBlur($event)"
-    />
-    <v-btn
-      v-if="searchBtn"
-      small
-      :color="color.controls"
-      class="accept-btn"
-      @click="acceptTextArea"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
+  >
+    <div
+      :style="customStyle"
+      :class="customClass"
+      v-bind="$attrs"
+      class="dash-textArea"
     >
-      <v-icon>
-        {{ searchIcon }}
-      </v-icon>
-    </v-btn>
-  </div>
+      <v-textarea
+        v-model="textarea"
+        :color="color.controls"
+        outlined
+        :style="{
+          color: color.text,
+          fontWeight: getOptions.fontWeight,
+          fontSize: `${getOptions.textFontSize}px`,
+        }"
+        spellcheck="false"
+        hide-details
+        class="textarea-itself"
+        :height="height"
+        no-resize
+        @keypress.enter="setTockenByPress($event)"
+        @blur="setTockenBlur($event)"
+        @change="onInputText"
+        @keyup="onKeyUpText"
+      />
+      <v-btn
+        v-if="searchBtn"
+        small
+        :color="color.controls"
+        class="accept-btn"
+        @click="acceptTextArea"
+      >
+        <v-icon>
+          {{ searchIcon }}
+        </v-icon>
+      </v-btn>
+    </div>
+  </portal>
 </template>
 
 <script>
 import { mdiMagnify } from '@mdi/js';
 
 export default {
+  name: 'DashTextarea',
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -45,10 +62,26 @@ export default {
       type: Object,
       required: true,
     }, // цветовые переменные
-    heightFrom: {
-      type: Number,
+    fullScreenMode: {
+      type: Boolean,
+      default: false,
+    },
+    sizeFrom: {
+      type: Object,
       required: true,
-    }, // выоста родительского компонента
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
+    },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -76,11 +109,11 @@ export default {
       if (window.screen.width > 1920) {
         rowsCount = 25;
       }
-      return Math.floor((this.heightFrom - 200) / rowsCount);
+      return Math.floor((this.sizeFrom.height - 200) / rowsCount);
     },
     height() {
-      const otstup = window.screen.width < 1600 ? 45 : 55;
-      return `${this.heightFrom - otstup}px`;
+      const margin = window.screen.width < 1600 ? 45 : 55;
+      return `${this.sizeFrom.height - margin}px`;
     },
     getOptions() {
       if (!this.idDash) {
@@ -94,28 +127,6 @@ export default {
         this.$store.commit('setState', [{
           object: this.dashFromStore.options,
           prop: 'pinned',
-          value: false,
-        }]);
-      }
-
-      if (!this.dashFromStore.options.lastDot) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'lastDot',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore.options.stringOX) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'stringOX',
-          value: false,
-        }]);
-      }
-      if (!this.dashFromStore?.options.united) {
-        this.$store.commit('setState', [{
-          object: this.dashFromStore.options,
-          prop: 'united',
           value: false,
         }]);
       }
@@ -138,10 +149,49 @@ export default {
       }
       return this.dashFromStore.textarea;
     },
+    // Стктус загрузки ИД для дефолтного значения
+    changedDataDefaultLoading() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataUpdates = false,
+      } = this.dashFromStore.options;
+      if (defaultFromSourceData && defaultSourceDataUpdates) {
+        const {
+          loading,
+        } = this.dataSources[defaultFromSourceData];
+        return loading;
+      }
+      return true;
+    },
   },
   watch: {
     textAreaValue(val) {
       this.textarea = val;
+    },
+    'dashFromStore.options.validationType': {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.onInputText(this.textarea);
+          this.setTocken();
+        }
+      },
+    },
+    'dashFromStore.options.defaultFromSourceData': {
+      deep: true,
+      handler() {
+        this.setTockenBlur();
+      },
+    },
+    // Загрузился ИД для дефотла
+    changedDataDefaultLoading(val, oldVal) {
+      if (val === false && val !== oldVal) {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.textarea = `${defaultValue}`;
+        }
+        this.setTockenBlur();
+      }
     },
   },
   mounted() {
@@ -154,14 +204,70 @@ export default {
     });
   },
   methods: {
-    setTockenBlur(event) {
-      event.preventDefault();
+    setTockenBlur(event = null) {
+      if (event) {
+        event.preventDefault();
+      }
+      if (this.textarea === '') {
+        const defaultValue = this.getDefaultValue();
+        if (defaultValue !== null) {
+          this.textarea = `${defaultValue}`;
+        }
+      }
       this.$store.commit('setTextArea', {
         idDash: this.idDash,
         id: this.id,
         textarea: this.textarea,
       });
       this.setTocken();
+    },
+    onKeyUpText() {
+      const { options } = this.dashFromStore;
+      if (options?.validationType === 'numberRange') {
+        const num = this.textarea.match(/^-?(\d+)?(\.)?(\d+)?/);
+        this.textarea = num ? num[0] : '';
+      }
+    },
+    onInputText(val) {
+      const { options } = this.dashFromStore;
+      if (options?.validationType === 'numberRange') {
+        const {
+          validationNumberRangeMin,
+          validationNumberRangeMax,
+        } = options;
+        const min = parseFloat(validationNumberRangeMin);
+        const max = parseFloat(validationNumberRangeMax);
+        let numberValue = parseFloat(val);
+        if (Number.isNaN(numberValue)) {
+          numberValue = '';
+        } else {
+          if (numberValue < min) {
+            numberValue = min;
+          }
+          if (numberValue > max) {
+            numberValue = max;
+          }
+        }
+        this.textarea = `${numberValue}`;
+      }
+    },
+    getDefaultValue() {
+      const {
+        defaultFromSourceData = null,
+        defaultSourceDataField = null,
+      } = this.dashFromStore.options;
+      const fieldName = defaultSourceDataField || 'value';
+      if (defaultFromSourceData) {
+        const { data = undefined } = this.dataSources[defaultFromSourceData];
+        if (data && data.length) {
+          const [firstRow] = data;
+          const rowKeys = Object.keys(firstRow);
+          if (rowKeys.includes(fieldName)) {
+            return firstRow[fieldName];
+          }
+        }
+      }
+      return null;
     },
     acceptTextArea() {
       this.$store.commit('setTextArea', {

@@ -1,3 +1,163 @@
+# [1.97.0]
+
+### Added
+- Password length is limited
+- Added visualization circular dial
+
+### Fixed
+- When changing username, the old value remained on the panel
+- Fixed the logic of displaying the signature of the nth item on the multiline
+- Dash Table: when saving the settings, the checkboxes for the columns were removed
+- fixed logout on reboot
+
+# [1.96.0]
+
+### Fixed
+- Fixed user deletion in profile
+- Fixed datepicker visualisation
+- Fixed zooming of a multiline in the Data Research 2.0
+- The order of rendering lines on the multiline has also been changed
+- Fixed selection the default source data in dash settings
+- Fixed piechart visualisation
+- Problem with data increment on request
+
+# [1.95.0]
+
+### Added
+- Added new picker button to dash picker
+- Added general settings for panels
+- Added the ability to hide the name of the panel
+- Added the ability to update the source data by the panel icon
+- Added the ability to hide the background color on panels
+- Added the ability to add a download icon to the panel
+- Added a setting for hiding/displaying a full-screen icon on panels
+- Removed the limits on 1000 rows in the Data Research 2.0 ¹
+- Added the ability to configure the source data for the default component value
+
+### Fixed
+- Fixed the datepicker visualisation
+- Changed icons for menu, tune and accumulators visualisations
+- Fixed dashboard save edit/drag/resize state
+- Fixed text color in code editor in the Data Research 2.0 if selected custom color theme 
+- Fixed resizing UI dashes without background
+- When selecting an area on the multiline, a tooltip is displayed on the barplots
+- Fixed spaces around text in tokens from table
+- Fixed loading bar
+- Fixed the save dashboard dialog has no frame
+- Updated drawing of points on multi-line lines
+- Fixed fullscreen multiline
+
+#### ¹⁾ Removed the limits on 1000 rows in the Data Research 2.0
+- Minimum required ot-simple-rest version: v1.12.0
+- It is necessary to set the same limit on the number of events in ot-simple-rest and in Apache Spark dispatcher
+
+# [1.94.0]
+
+### Added
+- Added the menu component
+- Added icons to header actions
+- Updated the settings design and added chart groups in the multiline component
+- added legend highlight on the multiline component
+- added ability to bind the Y axis in the multiline component
+- Added input data validation in the textarea component
+- Added font settings in the textarea component
+- Added transition on click to map
+
+### Fixed
+- Fixed the use of tokens in the name of the single value component
+- Fixed piechart legend in big size mode
+- Fixed "missing _order" error if order exist in edited data source in the single value component
+- Fixed sending the username during data exploration
+- Fixed big size visualisation mode
+
+# [1.93.0]
+
+### Feature
+- Added the data source setting for its autorun immediately after loading the dashboard
+- Add pipeline parameters to the map component
+
+### Fixed
+- Fixed data source export
+- Fixed modal windows behavior
+- Fixed an error when selecting numeric data in the select component
+
+# [1.92.0]
+
+### Feature
+- Added full-screen mode for visualization
+- Added options mode tune and accumulators visualisations
+- Added title actions in settings for visualizations
+- Added layers to the map
+
+### Fixed
+- Fixed colors in the "accumulator" component
+- Fixed the order of metrics in the "single value" component ¹
+- Fixed an error in the "single value" component when changing the data source
+- Fixed the title of the actions
+- The old reports page has been deleted
+- The papers page has been deleted
+- Removed the title actions from the reports visualisations
+- Fixed an error in the modal visualization console
+- Fixed an error when pressing Esc in modal visualisation
+
+#### ¹⁾ The "Single Value" component now requires an additional field
+
+In the returned data, there should be a "_order" field in each data row.
+System fields that are not output data (for example, "_title") should have empty order field.
+The "_order" field must be a positive number and the values for different rows must not be repeated.
+The values of "_order" should go in order without omissions:
+- 1,4,3,2 - it is possible
+- 1,4,2,5 - not allowed (3 is missing here)
+
+# [1.91.0]
+
+### Feature
+- Added a code editor to Reports 2.0
+- Added a new Accumulators visualization
+
+### Fixed
+- Fixed the text color of the active date picker
+- Fixed tokens in csvg visualisation
+- Fixed csvg popup
+- Fixed color picker background
+
+
+# [1.90.0]
+
+### Feature
+- Add donat mod to pieChart
+- Optimization of visualization classes for gant, pie chart, graph.
+
+### Fixed
+- Multiline. Some chart line display settings do not work
+- Fixed gantt infinite reloading
+- Fixed dash button styles
+- Fixed theme styles
+
+# [1.89.0]
+
+### Feature
+- Optimization of visualization classes
+- Data exploration 2.0: additional export in format xlsx
+
+### Fixed
+- Fixed the URL of the export link url in Export/Import popup window
+- Fixed map modes
+- Data exploration 2.0: fixed styles and added a horizontal scroll bar
+
+# [1.88.0]
+
+### Feature
+- Added hotkey for query window in data research v2
+
+### Fixed
+- Data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
+- Changing the osm server in the map settings
+- Default osm server and default search in map settings
+- Maps tooltip
+- Displaying histograms with negative values on a multiline dash
+- The width of the histogram is now only positive
+
 # [1.87.0] Notifications, added prefix /eva
 
 ### Added

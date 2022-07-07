@@ -1,6 +1,8 @@
-import store from '.';
-
 export default {
+  store: null,
+  setStore(store) {
+    this.store = store;
+  },
   async rest(formData, searchFrom, restAuth, idDash) {
     const response = await fetch('/api/makejob', {
       // сперва нужно подать post запрос
@@ -37,6 +39,8 @@ export default {
 
           const cycle = new Promise((resolve) => {
             // let i = 0;
+
+            const { store } = this;
 
             let timeOut = setTimeout(async function tick() {
               if (status === 'failed') {
@@ -87,7 +91,7 @@ export default {
                     }&nbsp;&nbsp;url: ${decodeURIComponent(resEvents.url)}`,
                   );
                   status = res.status;
-                  if (res?.notifications) {
+                  if (store && res?.notifications) {
                     store.commit('notify/addNotifications', res?.notifications);
                   }
                   // console.log(status);
@@ -166,33 +170,33 @@ export default {
 
                     const dataProm = resultProm
                       .map((prom, i) => new Promise((resultPromResolve) => {
-                        const allDataLocal = [];
 
                         prom.text().then((dataitself) => {
                           if (shema === i) {
                             shema = dataitself;
                           }
+                          const resultData = [];
                           // все это потому что там не совсем json,
                           // а строка состоящая из строка в json
                           dataitself.split('\n').forEach((dataPeace) => {
                             if (dataPeace !== '') {
                               try {
-                                allDataLocal.push(JSON.parse(dataPeace));
+                                resultData.push(JSON.parse(dataPeace));
                               } catch (error) {
                                 console.error(error);
                               }
                             }
                           });
-                          resultPromResolve(allDataLocal);
+                          resultPromResolve(resultData);
                         });
                       }));
 
                     resultProm = await Promise.all(dataProm);
-                    let resolveData = [];
+                    const resolveData = [];
 
                     resultProm.forEach((item) => {
                       if (item.length !== 0) {
-                        resolveData = [...item];
+                        resolveData.push(...item);
                       }
                     });
 
@@ -233,11 +237,7 @@ export default {
                   }
                 });
               });
-              if (idDash === 'papers') {
-                resolveMain({ data: allData, sid: cycleResult.cid });
-              } else {
-                resolveMain(allData);
-              }
+              resolveMain(allData);
             }
           });
         });
@@ -553,164 +553,6 @@ export default {
     } else {
       restAuth.putLog(
         `Настройки пользователя обновить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
-      );
-      return response;
-    }
-
-    return data;
-  },
-  async loadPaper(paper, restAuth) {
-    let data = [];
-
-    const response = await fetch('/api/eva/reports/load', {
-      // сперва нужно подать post запрос
-      method: 'POST',
-      body: paper,
-      // mode: 'no-cors'
-    }).catch((error) => {
-      restAuth.putLog(
-        `Загрузить отчет не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-      );
-      return response;
-    });
-
-    if (response.status === 200) {
-      // если получилось
-
-      await response
-        .json()
-        .then((res) => {
-          // переводим полученные данные из json в нормальный объект
-          data = res;
-          if (data.status === 'success') {
-            restAuth.putLog(
-              `Отчет загружен успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
-            );
-          } else {
-            restAuth.putLog(
-              `Загрузить отчет не удалось.&nbsp;&nbsp;status: ${data.status}&nbsp;&nbsp;error: ${data.description}`,
-            );
-          }
-        })
-        .catch((error) => {
-          restAuth.putLog(
-            `Загрузить отчет не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-          );
-        });
-    } else {
-      restAuth.putLog(
-        `Загрузить отчет не удалось..&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
-      );
-      return response;
-    }
-
-    return data;
-  },
-  async getAllPaper(restAuth) {
-    let data = [];
-    const response = await fetch('/api/eva/reports/getAll').catch((error) => {
-      restAuth.putLog(
-        `Список отчетов получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-      );
-      return response;
-    });
-    if (response.status === 200) {
-      // если получилось
-      await response
-        .text()
-        .then((res) => {
-          // переводим полученные данные из json в нормальный объект
-          data = res;
-          restAuth.putLog(
-            `Список отчетов успешно получен.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
-          );
-        })
-        .catch((error) => {
-          restAuth.putLog(
-            `Список отчетов получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-          );
-        });
-    } else {
-      restAuth.putLog(
-        `Список отчетов получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
-      );
-      return response;
-    }
-
-    return data;
-  },
-  async getPaper(restAuth, fileData) {
-    let result = [];
-
-    const response = await fetch('/api/eva/reports/get', {
-      method: 'POST',
-      body: fileData,
-      // mode: 'no-cors'
-    }).catch((error) => {
-      restAuth.putLog(
-        `Отчет получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-      );
-      return response;
-    });
-    if (response.status === 200) {
-      // если получилось
-      await response
-        .text()
-        .then((res) => {
-          // переводим полученные данные из json в нормальный объект
-          result = JSON.parse(res);
-          if (result.status === 'success') {
-            restAuth.putLog(
-              `Отчет успешно получен.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
-            );
-          } else {
-            restAuth.putLog(
-              `Отчет получить не удалось.&nbsp;&nbsp;status: ${result.status}&nbsp;&nbsp;error: ${result.description}`,
-            );
-          }
-        })
-        .catch((error) => {
-          restAuth.putLog(
-            `Отчет получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-          );
-        });
-    } else {
-      restAuth.putLog(
-        `Отчет получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
-      );
-      return response;
-    }
-
-    return result;
-  },
-  async getPaperVis(restAuth, url) {
-    let data = [];
-
-    const response = await fetch(`${url}`).catch((error) => {
-      restAuth.putLog(
-        `Отчет для визуализации получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-      );
-      return response;
-    });
-    if (response.status === 200) {
-      // если получилось
-      await response
-        .text()
-        .then((res) => {
-          // переводим полученные данные из json в нормальный объект
-          data = res;
-          restAuth.putLog(
-            `Отчет для визуализации успешно получен.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
-          );
-        })
-        .catch((error) => {
-          restAuth.putLog(
-            `Отчет для визуализации получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
-          );
-        });
-    } else {
-      restAuth.putLog(
-        `Отчет для визуализации получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
       );
       return response;
     }
