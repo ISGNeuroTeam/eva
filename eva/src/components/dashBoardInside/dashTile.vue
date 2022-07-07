@@ -169,14 +169,10 @@ export default {
       return this.dashFromStore.options;
     },
     getColumn() {
-      let result = 'auto';
-      if (this.getOptions?.columnCount === '1') result = '12';
-      if (this.getOptions?.columnCount === '2') result = '6';
-      if (this.getOptions?.columnCount === '3') result = '4';
-      if (this.getOptions?.columnCount === '4') result = '3';
-      if (this.getOptions?.columnCount === '6') result = '2';
-      if (this.getOptions?.columnCount === '12') result = '1';
-      return result;
+      if (this.getOptions?.columnCount) {
+        return 12 / Number(this.getOptions.columnCount);
+      }
+      return 'auto';
     },
     tileStyleIsNotRange() {
       return typeof this.getOptions.tileStyle === 'string';
@@ -273,11 +269,8 @@ export default {
         partelement: 'empty',
       });
 
-      console.log(events);
-
       if (events?.length > 0) {
         events.forEach((event) => {
-          console.log(event);
           if (event.action === 'set') {
             this.$store.commit('letEventSet', {
               events,
