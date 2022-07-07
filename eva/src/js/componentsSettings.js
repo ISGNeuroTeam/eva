@@ -43,6 +43,7 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
+    { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
@@ -132,6 +133,10 @@ export default {
       width: 400,
       height: 400,
     },
+    constructorSchemes: {
+      width: 930,
+      height: 850,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -152,6 +157,7 @@ export default {
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
     tune: 'eva-basic_slider_01',
+    constructorSchemes: mdiTuneVertical,
     accumulators: 'eva-chart_bar_chart_horizontal',
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
@@ -270,6 +276,7 @@ export default {
       'fillColor',
     ],
     dial: [],
+    constructorSchemes: ['visible', 'level', 'pinned'],
   },
   optionFields: [
     // описание типов полей и их характеристик

@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added columnCount, tileStyle options on dashTile
 - Added event handling on dashTile
 
+- Added Constructor-schemes component
+
 ### Fixed
 - Fixed error messages fo password un profile
 - Fix yGraph moving issue
@@ -138,6 +140,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created gantt class
 - Created piechart class
 - Created graph class
+- Upgrade yFiles to 24.0.5
 
 ### Fixed
 - Multiline. Some chart line display settings do not work
