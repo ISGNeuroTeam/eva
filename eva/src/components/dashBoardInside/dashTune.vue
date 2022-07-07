@@ -86,10 +86,14 @@
 import { mdiMinus, mdiPlus } from '@mdi/js';
 import { mapActions, mapMutations } from 'vuex';
 import ArrowBlock from '../arrowBlock.vue';
+import defaultSourceData from '../../mixins/defaultSourceData';
 
 export default {
   name: 'DashTune',
   components: { ArrowBlock },
+  mixins: [
+    defaultSourceData,
+  ],
   inheritAttrs: false,
   props: {
     // переменные полученные от родителя
@@ -249,7 +253,10 @@ export default {
       return this.$store.state[this.idDashFrom][this.idFrom]?.switch;
     },
     getStyles() {
-      return `${this.customStyle}${this.needSetField ? ' zoom: 1' : ` zoom: ${this.htmlZoom}`}`;
+      const styles = Object.entries(this.customStyle)
+        .map((arg) => arg.join(':'))
+        .join(';');
+      return `${styles}${this.needSetField ? ' zoom: 1' : ` zoom: ${this.htmlZoom}`}`;
     },
     getClasses() {
       return `${this.customClass} ${this.isFullScreen || this.circularResize ? 'full-screen ' : ''} ${this.minSize ? 'min-size' : ''}`;
@@ -339,10 +346,7 @@ export default {
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
       if (val === false && val !== oldVal) {
-        const defaultValue = this.getDefaultValue();
-        if (defaultValue !== null) {
-          this.value = defaultValue;
-        }
+        this.setDefaultValueIfExists();
         this.setToken();
         this.storeValue();
       }
@@ -369,13 +373,18 @@ export default {
     onChangeSlider() {
       this.changeValue();
     },
+    setDefaultValueIfExists() {
+      const defaultValue = this.getDefaultValue();
+      if (defaultValue !== null && this.values.includes(defaultValue)) {
+        this.value = defaultValue;
+        return true;
+      }
+      return false;
+    },
     changeValue() {
       this.$nextTick(() => {
         if (this.value === undefined || this.value === 0) {
-          const defaultValue = this.getDefaultValue();
-          if (defaultValue !== null) {
-            this.value = defaultValue;
-          }
+          this.setDefaultValueIfExists();
         }
         this.setToken();
         this.storeValue();
@@ -421,24 +430,6 @@ export default {
       if (this.value === '' && values?.length > 0) {
         this.value = values[this.sliderValue];
       }
-    },
-    getDefaultValue() {
-      const {
-        defaultFromSourceData = null,
-        defaultSourceDataField = null,
-      } = this.dashFromStore.options;
-      const fieldName = defaultSourceDataField || 'value';
-      if (defaultFromSourceData) {
-        const { data = undefined } = this.dataSources[defaultFromSourceData];
-        if (data && data.length) {
-          const [firstRow] = data;
-          const rowKeys = Object.keys(firstRow);
-          if (rowKeys.includes(fieldName)) {
-            return firstRow[fieldName];
-          }
-        }
-      }
-      return null;
     },
   },
 };

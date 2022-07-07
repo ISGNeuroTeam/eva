@@ -114,10 +114,14 @@ import {
   mdiSquare,
 } from '@mdi/js';
 import ArrowBlock from '../arrowBlock.vue';
+import defaultSourceData from '../../mixins/defaultSourceData';
 
 export default {
   name: 'DashSelect',
   components: { ArrowBlock },
+  mixins: [
+    defaultSourceData,
+  ],
   props: {
     idFrom: {
       type: String,
@@ -460,24 +464,6 @@ export default {
       this.source_show = !this.source_show;
       this.open = !this.open;
       this.select_show = !this.select_show;
-    },
-    getDefaultValue() {
-      const {
-        defaultFromSourceData = null,
-        defaultSourceDataField = null,
-      } = this.dashFromStore.options;
-      const fieldName = defaultSourceDataField || 'value';
-      if (defaultFromSourceData !== null) {
-        const { data = undefined } = this.dataSources[defaultFromSourceData];
-        if (data && data.length) {
-          const [firstRow] = data;
-          const rowKeys = Object.keys(firstRow);
-          if (rowKeys.includes(fieldName)) {
-            return firstRow[fieldName];
-          }
-        }
-      }
-      return null;
     },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {

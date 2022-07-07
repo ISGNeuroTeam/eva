@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
 
 ## [1.97.0]
 
