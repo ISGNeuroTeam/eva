@@ -117,6 +117,7 @@ export default {
       captures: {},
       noMsg: false,
       msgText: '',
+      maxColumnCount: 12,
     };
   },
   computed: {
@@ -170,7 +171,8 @@ export default {
     },
     getColumn() {
       if (this.getOptions?.columnCount) {
-        return 12 / Number(this.getOptions.columnCount);
+        //
+        return this.maxColumnCount / Number(this.getOptions.columnCount);
       }
       return 'auto';
     },
