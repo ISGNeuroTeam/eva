@@ -9,12 +9,6 @@
       v-bind="$attrs"
       class="ygraph-wrapper"
     >
-      <button @click="testSave">
-        SAVE TEST
-      </button>
-      <button @click="testOpen">
-        OPEN TEST
-      </button>
       <div class="button-block">
         <v-row align="start">
           <v-tooltip
@@ -333,12 +327,6 @@ export default {
     }
   },
   methods: {
-    testSave() {
-      this.graph.testSave();
-    },
-    testOpen() {
-      this.graph.testOpen();
-    },
     zoomIn() {
       this.graph.zoomIn();
     },
@@ -440,6 +428,13 @@ export default {
           }
         },
       });
+      this.graph.initializeDefault({
+        nodePopupContent: this.$refs.nodePopupContent,
+        edgePopupContent: this.$refs.edgePopupContent,
+        callback: (currentNode) => {
+          this.currentNode = currentNode;
+        },
+      });
     },
     createGraph() {
       this.$nextTick(() => {
@@ -450,15 +445,6 @@ export default {
         });
         this.graph = Object.freeze(graph);
         this.initMode();
-
-        this.graph.initializeDefault({
-          nodePopupContent: this.$refs.nodePopupContent,
-          edgePopupContent: this.$refs.edgePopupContent,
-          callback: (currentNode) => {
-            this.currentNode = currentNode;
-          },
-        });
-        // this.graph.enableWebGL2();
       });
     },
   },
