@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix yGraph moving issue
 - fixed reportV2 height visualization
 - fix filter datapicker
+- Fixing versions of third-party components
 
 ## [1.97.0]
 
@@ -162,7 +163,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Feature
 - Added hotkey for query window in data research v2
-- Added pagination on interesting fields
 
 ### Fixed
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
