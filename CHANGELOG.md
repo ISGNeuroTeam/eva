@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Fixed
+
+## [1.98.0]
+
+### Added
 - Added columnCount, tileStyle options on dashTile
 - Added event handling on dashTile
-
+- Upgrade yFiles to 24.0.5
 - Added Constructor-schemes component
 
 ### Fixed
@@ -140,7 +146,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created gantt class
 - Created piechart class
 - Created graph class
-- Upgrade yFiles to 24.0.5
 
 ### Fixed
 - Multiline. Some chart line display settings do not work
