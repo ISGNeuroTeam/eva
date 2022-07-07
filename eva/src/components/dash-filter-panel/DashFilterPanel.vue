@@ -312,6 +312,7 @@
       v-model="filterPartModalShow"
       :theme="theme"
       width="400"
+      content-class="dash-filter-panel__modal"
       :is-confirm="isChanged"
       :persistent="isChanged"
       @cancelModal="closeFilterPartModal"
@@ -751,4 +752,8 @@ $filter-container-height: 60px
         justify-content: flex-end
         border-left: 1px solid $secondary_border
         padding-left: 20px
+</style>
+<style lang="sass">
+.dash-filter-panel__modal
+  overflow: visible !important
 </style>

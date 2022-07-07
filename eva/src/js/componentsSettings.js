@@ -229,7 +229,14 @@ export default {
       'validationNumberRangeMax',
     ],
     guntt: ['timeFormat'],
-    tile: ['widthTile', 'heightTile'],
+    tile: [
+      'visible',
+      'level',
+      'pinned',
+      'tileSettings',
+      'columnCount',
+      'tileStyle',
+    ],
     csvg: ['tooltip'],
     ygraph: [],
     bush: [],
@@ -595,6 +602,26 @@ export default {
       items() {
         return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
+    },
+
+    {
+      option: 'columnCount',
+      description: 'Количество столбцов',
+      elem: 'select',
+      items: [
+        { value: '1', text: '1' },
+        { value: '2', text: '2' },
+        { value: '3', text: '3' },
+        { value: '4', text: '4' },
+        { value: '6', text: '6' },
+        { value: '12', text: '12' },
+      ],
+      default: '1',
+    },
+    {
+      option: 'tileStyle',
+      description: 'Стиль плиток',
+      elem: 'custom-select',
     },
 
     // dashBoard
