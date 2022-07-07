@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- Fixed error messages fo password un profile
+- Fix yGraph moving issue
 - Fixing versions of third-party components
 
 ## [1.97.0]
