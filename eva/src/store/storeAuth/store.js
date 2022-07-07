@@ -1,11 +1,16 @@
 import rest from './storeRest';
+import router from '../../route';
 
 export default {
   namespaced: true,
   state: {
+    userName: '',
     essence: [],
   },
   mutations: {
+    setUserName(state, userName) {
+      state.userName = userName;
+    },
     setEssence(state, data) {
       state.essence = structuredClone(data);
     },
@@ -86,8 +91,16 @@ export default {
       }
       return data;
     },
+    logout({ commit }) {
+      document.cookie = "eva-dashPage=''; max-age=0 ; path=/";
+      document.cookie = "eva_token=''; max-age=0 ; path=/";
+      commit({ type: 'clearState' }, { root: true });
+      commit('setUserName', '');
+      router.push('/');
+    },
   },
   getters: {
     essence: (state) => state.essence,
+    userName: (state) => state.userName,
   },
 };

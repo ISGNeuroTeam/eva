@@ -10,8 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
-- Multiline. Signature of the nth point
 - Fixing versions of third-party components
+
+## [1.97.0]
+
+### Added
+- Add password max length
+- Added visualization  circular dial
+
+### Fixed
+- Change username on edit
+- Multiline. Signature of the nth point
+- Dash Table: when saving the settings, the checkboxes for the columns are removed
+- fixed logout on reboot
 
 ## [1.96.0]
 
