@@ -171,7 +171,6 @@ export default {
     },
     getColumn() {
       if (this.getOptions?.columnCount) {
-        //
         return this.maxColumnCount / Number(this.getOptions.columnCount);
       }
       return 'auto';
