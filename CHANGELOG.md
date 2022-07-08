@@ -8,10 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added columnCount, tileStyle options on dashTile
+- Added event handling on dashTile
+- Added Constructor-schemes component
+- Added loading svg
 
 ### Fixed
 - Fixed error messages fo password un profile
 - Fix yGraph moving issue
+- fixed reportV2 height visualization
+- fix filter datapicker
+- Fixing versions of third-party components
+- Fixed the styles of the user menu
+- Fixed text color on dashTile
+- When clicking on the text in the table cell, the token was not updated
 - Fixed position select
 
 ## [1.97.0]
@@ -134,6 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created gantt class
 - Created piechart class
 - Created graph class
+- Upgrade yFiles to 24.0.5
 
 ### Fixed
 - Multiline. Some chart line display settings do not work

@@ -59,6 +59,22 @@
           <template v-slot:activator="{ on }">
             <v-icon
               class="control-button theme--dark"
+              :style="{ color: theme.$secondary_text }"
+              v-on="on"
+              @click="loadSvg = !loadSvg"
+            >
+              {{ mdiCloudUpload }}
+            </v-icon>
+          </template>
+          <span>Загрузка SVG</span>
+        </v-tooltip>
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              class="control-button theme--dark"
               :color="
                 getColorError ? theme.$primary_button : theme.$secondary_text
               "
@@ -139,6 +155,10 @@
       v-model="paleteShow"
       :admin="isAdmin"
     />
+    <modal-loading-svg
+      v-model="loadSvg"
+      @updateModalValue="loadSvg = false"
+    />
   </div>
 </template>
 
@@ -154,6 +174,7 @@ import {
   mdiUndoVariant,
   mdiHomeVariantOutline,
   mdiScriptTextOutline,
+  mdiCloudUpload,
 } from '@mdi/js';
 import EvaLogo from '../images/eva-logo.svg';
 
@@ -205,6 +226,8 @@ export default {
         },
       ],
       userPermissions: null,
+      loadSvg: false,
+      mdiCloudUpload,
     };
   },
   computed: {

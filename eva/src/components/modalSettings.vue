@@ -172,6 +172,19 @@
                     :attach="true"
                     @change="isChanged = true"
                   />
+                  <!--elem: custom-select-->
+                  <v-select
+                    v-else-if="field.elem === 'custom-select'"
+                    v-model="options[field.option]"
+                    :items="tileStyleOptions"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    class="subnumber"
+                    @change="isChanged = true"
+                  />
                   <!-- elem: checkbox-list -->
                   <div
                     v-else-if="field.elem === 'checkbox-list'"
@@ -1102,6 +1115,22 @@ export default {
     isDashBoard() {
       return this.$route.meta?.isDashboard;
     },
+    tileStyleOptions() {
+      return [
+        {
+          value: this.theme.$main_text,
+          text: 'Основной',
+        },
+        {
+          value: this.theme.$secondary_text,
+          text: 'Дополнительный',
+        },
+        {
+          value: ['green', 'yellow', 'red'],
+          text: 'Диапазоны',
+        },
+      ];
+    },
   },
   watch: {
     options: {
@@ -1495,6 +1524,7 @@ export default {
 
           this.optionsItems.forEach((item) => {
             if (Object.keys(options).includes(item)) {
+              // Настройка указана - получаем значение
               if (item === 'tooltip') {
                 this.tooltip = {};
                 this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([...[], ...options[item].texts])));
@@ -1603,6 +1633,8 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'tileStyle') {
+                localOptions[item] = this.theme.$main_text;
               } else {
                 const field = settings.optionFields
                   .find((fieldItem) => fieldItem.option === item);
@@ -1616,7 +1648,6 @@ export default {
         if (!localOptions?.change) {
           localOptions.change = false;
         }
-
         localOptions = { ...this.loadComponentsSettings(), ...localOptions };
         this.$set(this, 'options', localOptions);
       });

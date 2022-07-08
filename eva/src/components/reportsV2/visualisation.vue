@@ -441,6 +441,7 @@ export default {
   width: 100%;
   display: flex;
   flex-direction: column;
+  height: 100vh;
   .theme--light.v-icon {
     color: inherit !important;
   }
