@@ -20,8 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportV2 height visualization
 - fix filter datapicker
 - Fixing versions of third-party components
-- fixed, style profile menu
+- Fixed the styles of the user menu
 - Fixed text color on dashTile
+- When clicking on the text in the table cell, the token was not updated
 
 ## [1.97.0]
 
