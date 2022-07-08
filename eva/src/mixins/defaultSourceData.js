@@ -1,3 +1,5 @@
+import { mdiViewDashboard } from '@mdi/js';
+
 const defaultSourceData = {
   methods: {
     getDefaultValue() {
@@ -6,7 +8,6 @@ const defaultSourceData = {
         defaultSourceDataField = null,
       } = this.dashFromStore.options;
       const fieldName = defaultSourceDataField || 'value';
-      console.log(this.idFrom, { defaultFromSourceData })
       if (defaultFromSourceData !== null) {
         const { data = undefined } = this.dataSources[defaultFromSourceData];
         if (data && data.length) {
@@ -15,6 +16,11 @@ const defaultSourceData = {
           if (rowKeys.includes(fieldName)) {
             return firstRow[fieldName];
           }
+          this.$store.commit('notify/addNotification', {
+            id: `defSourceWarn-${this.idFrom}`,
+            icon: mdiViewDashboard,
+            message: `Поле "${fieldName}" для дефолтного значения из ИД не найдено для компонента ${this.idFrom}`,
+          });
         }
       }
       return null;

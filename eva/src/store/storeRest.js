@@ -179,7 +179,7 @@ export default {
                           // все это потому что там не совсем json,
                           // а строка состоящая из строка в json
                           dataitself.split('\n').forEach((dataPeace) => {
-                            if (dataPeace !== '') {
+                            if (dataPeace[0] === '{') {
                               try {
                                 resultData.push(JSON.parse(dataPeace));
                               } catch (error) {
