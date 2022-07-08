@@ -12,6 +12,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
 
+## [1.98.0]
+
+### Added
+- Added columnCount, tileStyle options on dashTile
+- Added event handling on dashTile
+- Upgrade yFiles to 24.0.5
+- Added Constructor-schemes component
+- Added loading svg
+
+### Fixed
+- Fixed error messages fo password un profile
+- Fix yGraph moving issue
+- fixed reportV2 height visualization
+- fix filter datapicker
+- Fixing versions of third-party components
+- Fixed the styles of the user menu
+- Fixed text color on dashTile
+- When clicking on the text in the table cell, the token was not updated
+
 ## [1.97.0]
 
 ### Added

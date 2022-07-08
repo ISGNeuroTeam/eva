@@ -43,6 +43,7 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
+    { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
@@ -132,6 +133,10 @@ export default {
       width: 400,
       height: 400,
     },
+    constructorSchemes: {
+      width: 930,
+      height: 850,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -152,6 +157,7 @@ export default {
     heatmap: mdiGrid,
     singleValue: mdiNumeric,
     tune: 'eva-basic_slider_01',
+    constructorSchemes: mdiTuneVertical,
     accumulators: 'eva-chart_bar_chart_horizontal',
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
@@ -229,7 +235,14 @@ export default {
       'validationNumberRangeMax',
     ],
     guntt: ['timeFormat'],
-    tile: ['widthTile', 'heightTile'],
+    tile: [
+      'visible',
+      'level',
+      'pinned',
+      'tileSettings',
+      'columnCount',
+      'tileStyle',
+    ],
     csvg: ['tooltip'],
     ygraph: [],
     bush: [],
@@ -263,6 +276,7 @@ export default {
       'fillColor',
     ],
     dial: [],
+    constructorSchemes: ['visible', 'level', 'pinned'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -595,6 +609,26 @@ export default {
       items() {
         return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
+    },
+
+    {
+      option: 'columnCount',
+      description: 'Количество столбцов',
+      elem: 'select',
+      items: [
+        { value: '1', text: '1' },
+        { value: '2', text: '2' },
+        { value: '3', text: '3' },
+        { value: '4', text: '4' },
+        { value: '6', text: '6' },
+        { value: '12', text: '12' },
+      ],
+      default: '1',
+    },
+    {
+      option: 'tileStyle',
+      description: 'Стиль плиток',
+      elem: 'custom-select',
     },
 
     // dashBoard
