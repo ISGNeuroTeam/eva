@@ -31,6 +31,7 @@
           </timeline>
           <div class="tab-block component-block d-flex justify-content-between">
             <v-tabs
+              ref="tabs"
               v-model="tab"
               class="tabs"
             >
@@ -216,6 +217,16 @@ export default {
       return this.$store.getters.getReportElement;
     },
   },
+  watch: {
+    'data.length': {
+      handler() {
+        setTimeout(() => {
+          this.fixLine();
+        }, 0);
+      },
+      deep: true,
+    },
+  },
   beforeCreate() {
     this.$store.commit('createReportSearch');
   },
@@ -241,6 +252,7 @@ export default {
       this.rowsCount = 6;
     }
     this.unitedData.color = this.theme.controls;
+    this.fixLine();
   },
   methods: {
     getData() {
@@ -308,6 +320,7 @@ export default {
           this.$store.commit('setErrorLogs', true);
           this.data = [];
           this.rows = [];
+          this.fixLine();
         } else {
           // если все нормально
           // console.log('data ready');
@@ -327,7 +340,25 @@ export default {
             });
             this.loading = false;
             this.$store.commit('setReportSearch', this.search);
+            this.fixLine();
           });
+        }
+      });
+    },
+    fixLine() {
+      const slider = document.querySelector('.v-tabs-slider-wrapper');
+      this.$refs.tabs.$children[0].$children.forEach((item, index) => {
+        if (item?.isActive) {
+          if (index === 1) {
+            slider.style.width = `${item.$el.clientWidth}px`;
+          } else if (index === 2) {
+            const element = this.$refs.tabs.$children[0].$children[1];
+            slider.style.left = `${element.$el.clientWidth + 24}px`;
+          } else if (index === 3) {
+            const element = this.$refs.tabs.$children[0].$children[1];
+            const elementTwo = this.$refs.tabs.$children[0].$children[2];
+            slider.style.left = `${element.$el.clientWidth + elementTwo.$el.clientWidth + 40}px`;
+          }
         }
       });
     },
