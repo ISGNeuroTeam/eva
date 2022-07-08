@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fixed reportV2 height visualization
 - fix filter datapicker
 - Fixing versions of third-party components
+- fixed, style profile menu
 
 ## [1.97.0]
 
