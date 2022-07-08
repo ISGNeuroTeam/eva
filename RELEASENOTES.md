@@ -13,6 +13,9 @@
 - Fixed visualization height in data exploration 2.0
 - After selecting the date, you cannot enter other data
 - Frozen versions of third-party components
+- Fixed the styles of the user menu
+- Fixed text color on the Tile component
+- When clicking on the text in the table cell, the token was not updated
 
 #### ¹⁾ Added the ability to upload SVG to the server
 - Minimum required ot-simple-rest version: v1.13.0
