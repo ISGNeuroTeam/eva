@@ -507,6 +507,7 @@ export default {
       this.$emit('cancelModal', isClearChanges);
     },
     showErrorMsg(msg, color) {
+      if (this.openMsg) return;
       this.msg = msg;
       this.openMsg = true;
       this.colorMsg = color;
@@ -514,15 +515,32 @@ export default {
         this.openMsg = false;
       }, 2000);
     },
+    checkPassLength(pass) {
+      if (pass.length < 7) {
+        this.showErrorMsg(
+          'Пароль должен быть больше 7 символов',
+          this.colorFrom.controlsActive,
+        );
+        return false;
+      } if (pass.length > 20) {
+        this.showErrorMsg(
+          'Пароль должен быть меньше 20 символов',
+          this.colorFrom.controlsActive,
+        );
+        return false;
+      }
+      return true;
+    },
     changeBtn(act) {
       let method = 'POST';
       const formData = {}; // формируем объект для передачи RESTу
       let sameMsg = '';
+      let forbiddenError = '';
       switch (this.keyFrom) {
         case 1:
           formData.id = this.userFrom.id;
           method = 'PUT';
-          this.msg = 'Пароль не может быть пустым';
+          forbiddenError = 'Старый пароль введен неверно';
           if (act === true) {
             method = 'POST';
             if (!this.userData.pass || this.userData.pass.length === 0) {
@@ -532,13 +550,7 @@ export default {
               );
               return;
             }
-            if (this.userData.pass.length < 7) {
-              this.showErrorMsg(
-                'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            }
+            if (!this.checkPassLength(this.userData.pass)) return;
             formData.password = this.userData.pass;
           } else if (act === 'pass') {
             if (
@@ -563,13 +575,7 @@ export default {
               );
               return;
             }
-            if (this.newpass.length < 7) {
-              this.showErrorMsg(
-                'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            }
+            if (!this.checkPassLength(this.newpass)) return;
             if (this.newpass === this.oldpass) {
               this.showErrorMsg(
                 'Пароли не должны совпадать',
@@ -580,20 +586,7 @@ export default {
             formData.old_password = this.oldpass;
             formData.new_password = this.newpass;
           } else if (this.userData.pass && this.userData.pass.length !== 0) {
-            if (this.userData.pass.length < 7) {
-              this.showErrorMsg(
-                'Пароль должен быть больше 7 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            }
-            if (this.userData.pass.length > 20) {
-              this.showErrorMsg(
-                'Пароль должен быть меньше 20 символов',
-                this.colorFrom.controlsActive,
-              );
-              return;
-            }
+            if (!this.checkPassLength(this.userData.pass)) return;
             formData.password = this.userData.pass;
           }
           formData.name = this.userData.username;
@@ -666,7 +659,7 @@ export default {
         } else if (res.status === 409) {
           this.showErrorMsg(sameMsg, '#FF6D70');
         } else if (res.status === 403) {
-          this.showErrorMsg('', '#FF6D70');
+          this.showErrorMsg(forbiddenError, '#FF6D70');
         }
       });
     },

@@ -49,32 +49,30 @@
         dense
         @input="$emit('isChanged', true)"
       >
-        <v-btn
-          slot="append"
-          icon
-          :color="theme.$primary_button"
-          @click="showDatePicker = !showDatePicker"
-        >
-          <v-icon :style="{ color: `${theme.$primary_button} !important` }">
-            {{ calendarIcon }}
-          </v-icon>
-        </v-btn>
+        <template v-slot:append>
+          <DTPicker
+            v-model="temp.value"
+            :no-value-to-custom-elem="true"
+            format="YYYY-MM-DD HH:mm"
+            class="dtpicker"
+            :style="{
+              fill: theme.$main_text,
+              background: theme.$main_bg,
+              color: theme.$main_text,
+            }"
+            :color="theme.$accent_ui_color"
+            :button-color="theme.$primary_button"
+            @input="$emit('isChanged', true)"
+          >
+            <v-icon
+              class="manual-type-filter-modal__icon"
+              :style="`color: ${theme.$primary_button} !important`"
+            >
+              {{ calendarIcon }}
+            </v-icon>
+          </DTPicker>
+        </template>
       </v-text-field>
-      <v-dialog
-        v-model="showDatePicker"
-        max-width="400"
-        @input="$emit('isChanged', true)"
-      >
-        <DTPicker
-          v-model="temp.value"
-          inline
-          format="YYYY-MM-DD HH:mm"
-          class="dtpicker"
-          :color="theme.$accent_ui_color"
-          :button-color="theme.$primary_button"
-          @input="$emit('isChanged', true)"
-        />
-      </v-dialog>
     </div>
     <div
       v-else
@@ -163,7 +161,6 @@ export default {
           '<': 'Раньше',
         },
       },
-      showDatePicker: false,
       calendarIcon: mdiCalendarMonth,
     };
   },
@@ -195,12 +192,6 @@ export default {
     getOperationManualTitle(operation) {
       return this.operationManualTitleMap[this.temp.fieldType][operation];
     },
-    openDatePicker() {
-      this.showDatePicker = true;
-    },
-    closeDatePicker() {
-      this.showDatePicker = false;
-    },
     changeSelected() {
       this.temp.operationManual = this.operationMap[this.temp.fieldType][this.currentOperationTab];
     },
@@ -212,6 +203,8 @@ export default {
 
 .manual-type-filter-modal
   color: var(--main_text) !important
+  &__icon
+    cursor: pointer
 
   .v-text-field__slot input
     color: var(--main_text)
@@ -228,4 +221,46 @@ export default {
 
   .v-input input
     min-height: auto !important
+  .datetimepicker
+    background: inherit
+
+    .datepicker
+      background: inherit
+      border: 1px solid
+
+      .pickers-container
+        background: inherit
+
+        .datepicker-controls
+
+          .custom-button
+            background: inherit
+
+        .month-container
+
+          .datepicker-day
+
+            .datepicker-day-text
+              color: inherit
+
+            .datepicker-today
+              background: inherit
+              border: 1px solid
+
+        .time-picker
+
+          .time-picker-column-item
+            color: inherit
+
+      .datepicker-buttons-container
+        background: inherit
+
+        .datepicker-button
+          background: inherit
+
+          svg
+            fill: inherit
+
+          .datepicker-button-effect
+            background: transparent
 </style>
