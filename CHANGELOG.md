@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added a notification if the field specified for the default data source isn't found
+- Updated the design of notifications
 
 ### Fixed
 - The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
