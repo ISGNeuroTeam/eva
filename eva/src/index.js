@@ -125,6 +125,8 @@ Vue.component('dash-map', () => import('./components/dashBoardInside/dashMap.vue
 Vue.component('dash-heatmap', () => import('./components/dashBoardInside/dashHeatMap.vue'));
 // компонент ползунок
 Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.vue'));
+// конструктор схем
+Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorSchemes.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
@@ -155,6 +157,8 @@ Vue.component('modal-delete-profile', () => import('./components/autorization/mo
 Vue.component('modal-log', () => import('./components/autorization/modalLog.vue'));
 //  компонент для получения данных для пользователя
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
+//  компонент для загрузки svg
+Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
