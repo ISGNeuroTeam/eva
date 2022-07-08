@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - fix filter datapicker
 - Fixing versions of third-party components
 - fixed, style profile menu
+- Fixed text color on dashTile
 
 ## [1.97.0]
 

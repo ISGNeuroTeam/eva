@@ -27,13 +27,13 @@
                 :style="{
                   backgroundColor: tileStyleIsNotRange
                     ? `${getOptions.tileStyle}3F`
-                    : `${dataTile[i - 1].color}3F`,
+                    : `${dataTile[i - 1].color}`,
                 }"
                 @click="setClick(dataTile[i - 1])"
               >
                 <p
                   :style="{
-                    color: tileStyleIsNotRange ? getOptions.tileStyle : dataTile[i - 1].color,
+                    color: tileStyleIsNotRange ? getOptions.tileStyle : '#FFFFFF',
                   }"
                   v-html="checkName(dataTile[i - 1].caption)"
                 />
