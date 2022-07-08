@@ -37,6 +37,7 @@ import {
 } from 'yfiles';
 import HTMLPopupSupport from './HTMLPopupSupport';
 import licenseData from '../../license/license.json';
+import { throttle } from '../utils/throttle';
 
 License.value = licenseData; // проверка лицензии
 const labelFont = new Font({ fontSize: 70, fontFamily: 'sefif' });
@@ -144,10 +145,16 @@ class GraphClass {
     elem,
     colors,
     colorFrom,
+    nodePopupContent,
+    edgePopupContent,
+    popupCallback,
   }) {
     this.graphComponent = new GraphComponent(elem);
     this.colors = colors;
     this.options.colorFrom = colorFrom;
+    this.nodePopupContent = nodePopupContent;
+    this.edgePopupContent = edgePopupContent;
+    this.popupCallback = popupCallback;
     this.enableWebGL2();
     const support = new GraphMLSupport(this.graphComponent);
     support.storageLocation = StorageLocation.FILE_SYSTEM;
@@ -365,7 +372,12 @@ class GraphClass {
     });
   }
 
-  initializePopups({ nodePopupContent, edgePopupContent, callback }) {
+  initializePopups({
+    inputMode,
+    nodePopupContent,
+    edgePopupContent,
+    callback,
+  }) {
     // Creates a label model parameter that is used to position the node pop-up
     const nodeLabelModel = new ExteriorLabelModel({ insets: 10 });
 
@@ -388,14 +400,12 @@ class GraphClass {
     );
 
     // The following works with both GraphEditorInputMode and GraphViewerInputMode
-    const { inputMode } = this.graphComponent;
+    // const { inputMode } = this.graphComponent;
 
     // The pop-up is shown for the currentItem thus nodes and edges should be focusable
     inputMode.focusableItems = GraphItemTypes.NODE || GraphItemTypes.EDGE;
-
-    // Register a listener that shows the pop-up for the currentItem
-    this.graphComponent.addCurrentItemChangedListener(() => {
-      const item = this.graphComponent.currentItem;
+    inputMode.itemHoverInputMode.addHoveredItemChangedListener((sender, evt) => {
+      const { item } = evt;
       if (item instanceof INode) {
         this.currentNode = item.tag;
         // update data in node pop-up
@@ -427,10 +437,16 @@ class GraphClass {
         return true;
       },
     );
+    return inputMode;
   }
 
   viewerInputMode() {
-    this.graphComponent.inputMode = new GraphViewerInputMode();
+    this.graphComponent.inputMode = this.initializePopups({
+      nodePopupContent: this.nodePopupContent,
+      edgePopupContent: this.edgePopupContent,
+      callback: this.popupCallback,
+      inputMode: new GraphViewerInputMode(),
+    });
   }
 
   zoomIn() {
@@ -633,13 +649,14 @@ class GraphClass {
     });
   }
 
-  initializeDefault({ nodePopupContent, edgePopupContent, callback }) {
+  initializeDefault() {
     this.initializeDefaultStyles();
     this.initializeTooltips();
     this.initializePopups({
-      nodePopupContent,
-      edgePopupContent,
-      callback,
+      nodePopupContent: this.nodePopupContent,
+      edgePopupContent: this.edgePopupContent,
+      callback: this.popupCallback,
+      inputMode: this.graphComponent.inputMode,
     });
   }
 

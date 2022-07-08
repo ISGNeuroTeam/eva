@@ -428,13 +428,7 @@ export default {
           }
         },
       });
-      this.graph.initializeDefault({
-        nodePopupContent: this.$refs.nodePopupContent,
-        edgePopupContent: this.$refs.edgePopupContent,
-        callback: (currentNode) => {
-          this.currentNode = currentNode;
-        },
-      });
+      this.graph.initializeDefault();
     },
     createGraph() {
       this.$nextTick(() => {
@@ -442,6 +436,11 @@ export default {
           elem: this.$refs.graph,
           colors: this.colors,
           colorFrom: this.colorFrom,
+          nodePopupContent: this.$refs.nodePopupContent,
+          edgePopupContent: this.$refs.edgePopupContent,
+          popupCallback: (currentNode) => {
+            this.currentNode = currentNode;
+          },
         });
         this.graph = Object.freeze(graph);
         this.initMode();

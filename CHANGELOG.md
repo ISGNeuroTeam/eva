@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed the styles of the user menu
 - Fixed text color on dashTile
 - When clicking on the text in the table cell, the token was not updated
+- Fixed handling popup on graph
 
 ## [1.97.0]
 
