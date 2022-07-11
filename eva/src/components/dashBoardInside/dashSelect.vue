@@ -381,6 +381,7 @@ export default {
     },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
+      console.log(this.id, val, oldVal)
       const {
         dataReady,
         selectedElemLink,
@@ -390,10 +391,10 @@ export default {
       if (val === false && val !== oldVal) {
         const defaultValue = this.getDefaultValue();
         const valueData = dataReady?.find((item) => item[selectedElemLink] === defaultValue);
-        if (defaultValue !== null) {
-          if (!multiple && valueData) {
-            this.elemDeep[String(multiple)] = valueData[selectedElem];
-          }
+        if (defaultValue != null && valueData) {
+          this.elemDeep[String(multiple)] = multiple
+            ? [valueData[selectedElem]]
+            : valueData[selectedElem];
         }
         this.setTocken();
       }
