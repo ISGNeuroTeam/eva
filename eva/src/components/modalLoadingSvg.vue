@@ -20,7 +20,7 @@
             value => !value || value.type === 'image/svg+xml' || 'Не допустимый формат!',
           ]"
           accept="image/svg+xml"
-          label="Выбирите Svg"
+          label="Выберите Svg"
           @focus="focus()"
         />
       </div>
