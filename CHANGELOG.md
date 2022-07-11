@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- fixed lists of users, groups, indexes empty in group editing modal
 
 ## [1.98.0]
 
