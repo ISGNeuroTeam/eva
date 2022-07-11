@@ -472,7 +472,7 @@ export default {
         this.colorInputMode = 'preset';
       }
     },
-    setData() {
+    async setData() {
       this.pickedColor = this.theme.$main_bg;
       if (this.modalValue) {
         if (this.groupFlagFrom) {
@@ -495,7 +495,7 @@ export default {
           }
           this.nameBtn.create = 'Редактировать';
         }
-        this.dataRest = this.getDataForEssence();
+        this.dataRest = await this.getDataForEssence();
       }
     },
     setGroupColor(color) {
