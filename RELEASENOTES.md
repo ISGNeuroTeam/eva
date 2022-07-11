@@ -1,3 +1,30 @@
+# [1.98.1]
+
+### Fixed
+- Fixed empty lists of users, groups, indexes in group editing mode
+
+# [1.98.0]
+
+### Added
+- Added transitions to other dashboards when clicking on a tile in the "Tile" component
+- Added event handling in the "Tile" component
+- Updated the "yFiles" library to version 24.0.5
+- Added the "schema constructor" component
+- Added the ability to upload SVG to the server ¹
+
+### Fixed
+- Fixed error messages fo password un profile
+- Fixed the tooltip display after switching the move mode in the "yGraph" component
+- Fixed visualization height in data exploration 2.0
+- After selecting the date, you cannot enter other data
+- Frozen versions of third-party components
+- Fixed the styles of the user menu
+- Fixed text color on the Tile component
+- When clicking on the text in the table cell, the token was not updated
+
+#### ¹⁾ Added the ability to upload SVG to the server
+- Minimum required ot-simple-rest version: v1.13.0
+
 # [1.97.0]
 
 ### Added

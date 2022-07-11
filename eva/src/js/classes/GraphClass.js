@@ -39,10 +39,13 @@ import HTMLPopupSupport from './HTMLPopupSupport';
 import licenseData from '../../license/license.json';
 
 License.value = licenseData; // проверка лицензии
-const labelFont = new Font({ fontSize: 70, fontFamily: 'sefif' });
+const labelFont = new Font({
+  fontSize: 70,
+  fontFamily: 'ProximaNova',
+});
 const labelFontBOLD = new Font({
   fontSize: 70,
-  fontFamily: 'serif',
+  fontFamily: 'ProximaNova',
   fontWeight: 'BOLD',
 });
 
@@ -275,11 +278,11 @@ class GraphClass {
     const key = `edgeStyle_${color}`;
     if (!this.edgeStyleList[key]) {
       this.edgeStyleList[key] = new PolylineEdgeStyle({
-        stroke: `6px ${color}`,
+        stroke: `4px ${color}`,
         targetArrow: new Arrow({
           fill: color,
           scale: 5,
-          type: 'SHORT',
+          type: 'TRIANGLE',
         }),
       });
     }
