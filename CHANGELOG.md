@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Updated
+- Changed the "Not found" page
+
 ## [1.98.1]
 
 ### Fixed
