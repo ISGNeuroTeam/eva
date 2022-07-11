@@ -40,7 +40,7 @@ import licenseData from '../../license/license.json';
 
 License.value = licenseData; // проверка лицензии
 const labelFont = new Font({
-  fontSize: 70,
+  fontSize: 50,
   fontFamily: 'ProximaNova',
 });
 const labelFontBOLD = new Font({
@@ -509,7 +509,12 @@ class GraphClass {
 
     // label name для nodes
     const nodeNameCreator = nodesSource.nodeCreator.createLabelBinding(
-      (nodeDataItem) => nodeDataItem.node,
+      (nodeDataItem) => {
+        if (nodeDataItem.node.length > 10 && nodeDataItem.node.split(' ').length - 1 >= 1) {
+          return nodeDataItem.node.replace(' ', '\n');
+        }
+        return nodeDataItem.node;
+      },
     );
     nodeNameCreator.defaults.layoutParameter = ExteriorLabelModel.NORTH_EAST;
 
@@ -552,7 +557,8 @@ class GraphClass {
       separateLayers: false,
       considerNodeLabels: true,
     });
-    layout.nodeToNodeDistance = 201;
+    layout.nodeToNodeDistance = 301;
+    layout.minimumLayerDistance = 201;
 
     // применяем layout
     this.graphComponent.graph.applyLayout(
