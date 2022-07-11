@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
+- If you select the Option to select multiple values, the default value is added to the drop-down list
 
 ## [1.98.0]
 
