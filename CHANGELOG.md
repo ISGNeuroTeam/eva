@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Fixed
+- The name of the token in the list of tokens disappears when navigating through the tabs
 
 ## [1.98.1]
 
