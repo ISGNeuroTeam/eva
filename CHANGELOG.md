@@ -11,6 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added otl commands info tooltips
 
 ### Fixed
+- Fixed position select
+- fixed typo in svg loading field placeholder
+
+## [1.98.1]
+
+### Fixed
+- fixed lists of users, groups, indexes empty in group editing modal
+
+## [1.98.0]
+
+### Added
+- Added columnCount, tileStyle options on dashTile
+- Added event handling on dashTile
+- Upgrade yFiles to 24.0.5
+- Added Constructor-schemes component
+- Added loading svg
+
+### Fixed
+- Fixed error messages fo password un profile
+- Fix yGraph moving issue
+- fixed reportV2 height visualization
+- fix filter datapicker
+- Fixing versions of third-party components
+- Fixed the styles of the user menu
+- Fixed text color on dashTile
+- When clicking on the text in the table cell, the token was not updated
 
 ## [1.97.0]
 
@@ -159,6 +185,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added hotkey for query window in data research v2
 
 ### Fixed
+- Fixed d3 select in timeline
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings
@@ -175,7 +202,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added eva router prefix
 
 ### Fixed
-- Fixed d3 select in timeline
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
 - Data exploration 2.0: visualization improvements

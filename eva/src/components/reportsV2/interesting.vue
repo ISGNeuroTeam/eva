@@ -24,7 +24,10 @@
             class="interesting-row"
           >
             <v-menu
+              min-width="356px"
               offset-x
+              offset-y
+              top
               :close-on-content-click="false"
               content-class="interesting-popup"
             >
@@ -39,26 +42,11 @@
                 </div>
               </template>
               <v-card class="action-popup">
-                <div class="action-popup-title">
-                  {{ item.text }}
-                </div>
-                <div>
-                  <v-data-table
-                    :style="{
-                      backgroundColor: theme.$main_bg,
-                      color: theme.$main_text,
-                      'max-height': '500px',
-                    }"
-                    disable-pagination
-                    hide-default-footer
-                    :headers="[
-                      { text: 'Значение', value: 'value' },
-                      { text: 'Количество', value: 'count' },
-                      { text: 'Процент', value: '%' },
-                    ]"
-                    :items="statistic"
-                  />
-                </div>
+                <list-with-pagination
+                  :list-items="statistic"
+                  :theme="theme"
+                  :title="item.text"
+                />
               </v-card>
             </v-menu>
           </div>
@@ -76,9 +64,11 @@ import {
   mdiChevronDown,
 } from '@mdi/js';
 import { mapGetters } from 'vuex';
+import ListWithPagination from '../listWithPagination';
 
 export default {
   name: 'Interesting',
+  components: { ListWithPagination },
   data() {
     return {
       mdiRefresh,
@@ -139,6 +129,7 @@ export default {
 <style lang="sass">
 @import './../../sass/_colors'
 .interesting
+  height: 100%
   .interesting-title
     font-size: 12px
     font-weight: 500
@@ -154,7 +145,7 @@ export default {
     color: $main_text !important
 
 .interesting-popup
-  width: 400px
+  width: 356px
 
 .v-menu__content
   border-radius: 6px !important
@@ -164,22 +155,4 @@ export default {
   padding: 0 0 0 0 !important
   border-radius: 6px
   background-color: $main_bg !important
-  .action-popup-title
-    padding: 5px 10px 5px 10px
-    background-color: $main_bg
-    color: $main_text !important
-    font-weight: bold
-  .v-data-table-header
-    th
-      color: $main_text !important
-      padding: 0 10px !important
-      height: 30px !important
-      border-bottom: none !important
-  td
-    padding: 0 10px !important
-    height: 30px !important
-    border-bottom: none !important
-  tr:hover
-    color: $main_bg
-    background-color: $accent_ui_color !important
 </style>

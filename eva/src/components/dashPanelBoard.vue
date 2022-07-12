@@ -57,6 +57,22 @@
             :color="theme.$accent_ui_color"
           >
             <template v-slot:activator="{ on }">
+              <div
+                class="control-button theme--dark"
+                :style="{ display: 'inline-flex' }"
+                :class="{ hide_control: !editMode }"
+                v-on="on"
+                @click="loadSvg = !loadSvg"
+                v-html="svgIcon.svg"
+              />
+            </template>
+            <span>Загрузка SVG</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
               <v-icon
                 class="control-button theme--dark"
                 :style="{ color: theme.$secondary_text }"
@@ -471,6 +487,7 @@
               v-model="tocken.elem"
               :items="elements"
               :color="theme.$accent_ui_color"
+              :attach="true"
               label="Элемент"
               hide-details
               outlined
@@ -481,6 +498,7 @@
               v-model="tocken.action"
               :items="actions(tocken.elem)"
               :color="theme.$accent_ui_color"
+              :attach="true"
               label="Действие"
               hide-details
               outlined
@@ -491,6 +509,7 @@
               v-model="tocken.capture"
               :items="capture({ action: tocken.action, elem: tocken.elem })"
               :color="theme.$accent_ui_color"
+              :attach="true"
               label="Свойство"
               hide-details
               outlined
@@ -615,6 +634,7 @@
             v-model="newElem"
             :items="elements"
             :color="theme.$main_text"
+            :attach="true"
             hide-details
             outlined
             class="tocken-elem theme--dark"
@@ -625,6 +645,7 @@
             v-model="newAction"
             :items="actions(newElem)"
             :color="theme.$main_text"
+            :attach="true"
             hide-details
             outlined
             class="tocken-action theme--dark"
@@ -635,6 +656,7 @@
             v-model="newCapture"
             :items="capture({ action: newAction, elem: newElem })"
             :color="theme.$main_text"
+            :attach="true"
             hide-details
             outlined
             class="tocken-capture theme--dark"
@@ -853,6 +875,10 @@
         :permissions-from="userPermissions"
         :id-dash-from="idDashFrom"
       />
+      <modal-loading-svg
+        v-model="loadSvg"
+        @updateModalValue="loadSvg = false"
+      />
     </div>
 
     <div
@@ -905,6 +931,7 @@ import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
 import { globalTockens } from '../constants/globalTockens';
 import Notifications from '@/components/notifications';
+import { svgIcon } from '@/js/svg';
 
 export default {
   name: 'DashPanelBoard',
@@ -1053,6 +1080,8 @@ export default {
       screenHeight: this.getScreenHeight(),
       allGroups: [],
       tokens: [],
+      loadSvg: false,
+      svgIcon,
     };
   },
   computed: {
