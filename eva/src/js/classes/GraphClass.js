@@ -30,24 +30,31 @@ import {
   Font,
   DefaultLabelStyle,
   License,
+  GraphMLSupport,
+  StorageLocation,
+  WebGL2GraphModelManager,
+  WebGL2SelectionIndicatorManager,
 } from 'yfiles';
 import HTMLPopupSupport from './HTMLPopupSupport';
 import licenseData from '../../license/license.json';
 
 License.value = licenseData; // проверка лицензии
-const labelFont = new Font({ fontSize: 70, fontFamily: 'sefif' });
+const labelFont = new Font({
+  fontSize: 70,
+  fontFamily: 'ProximaNova',
+});
 const labelFontBOLD = new Font({
   fontSize: 70,
-  fontFamily: 'sefif',
+  fontFamily: 'ProximaNova',
   fontWeight: 'BOLD',
 });
 
 class GraphClass {
   static nodeStyle(color) {
     return new ShapeNodeStyle({
-      fill: color,
+      fill: color || this.startFinishColor,
       shape: 'ELLIPSE',
-      stroke: color,
+      stroke: color || this.startFinishColor,
     });
   }
 
@@ -144,6 +151,9 @@ class GraphClass {
     this.graphComponent = new GraphComponent(elem);
     this.colors = colors;
     this.options.colorFrom = colorFrom;
+    this.enableWebGL2();
+    const support = new GraphMLSupport(this.graphComponent);
+    support.storageLocation = StorageLocation.FILE_SYSTEM;
   }
 
   get labelStyleList() {
@@ -210,6 +220,12 @@ class GraphClass {
     this.options.colorFrom = value;
   }
 
+  enableWebGL2() {
+    this.graphComponent.graphModelManager = new WebGL2GraphModelManager();
+    this.graphComponent
+      .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(this.graphComponent);
+  }
+
   initMode({
     modeOptions,
     callback,
@@ -247,6 +263,14 @@ class GraphClass {
     this.graphComponent.inputMode = mode;
   }
 
+  testSave() {
+    ICommand.SAVE.execute(null, this.graphComponent);
+  }
+
+  testOpen() {
+    ICommand.OPEN.execute(null, this.graphComponent);
+  }
+
   edgeStyle(color) {
     if (color === undefined) {
       [color] = this.colors;
@@ -254,11 +278,11 @@ class GraphClass {
     const key = `edgeStyle_${color}`;
     if (!this.edgeStyleList[key]) {
       this.edgeStyleList[key] = new PolylineEdgeStyle({
-        stroke: `6px ${color}`,
+        stroke: `4px ${color}`,
         targetArrow: new Arrow({
           fill: color,
           scale: 5,
-          type: 'SHORT',
+          type: 'TRIANGLE',
         }),
       });
     }
@@ -421,24 +445,24 @@ class GraphClass {
   }
 
   fitContent() {
-    ICommand.FIT_GRAPH_BOUNDS.execute(null, this.graphComponent);
+    ICommand.FIT_CONTENT.execute(null, this.graphComponent);
   }
 
   colorEdges() {
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
       if (edge.tag === '-') {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           edge,
           this.edgeStyle(this.startFinishColor),
         );
       } else if (edge.tag === '-1') {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           edge,
           this.edgeStyle(this.errorColor),
         );
       } else {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           edge,
           this.edgeStyle(this.colors[edge.tag % this.colors.length]),
         );
@@ -449,11 +473,11 @@ class GraphClass {
   generateNodesEdges(dataRest, callback) {
     const allNodes = [];
     const allEdges = [];
-
+    // Генерация и привязка nodes к edges
     dataRest.forEach((dataRestItem) => {
       if (dataRestItem.relation_id) {
         allEdges.push({
-          fromNode: dataRestItem.id,
+          fromNode: `${dataRestItem.id}`,
           toNode: dataRestItem.relation_id,
           label: dataRestItem.edge_description,
           color: dataRestItem.edge_color,
@@ -480,8 +504,7 @@ class GraphClass {
     const nodesSource = graphBuilder.createNodesSource({
       data: this.nodesSource, // .slice(0,10),
       id: 'id',
-      tag: (item) => item
-      ,
+      tag: (item) => item,
     });
 
     // label name для nodes
@@ -549,12 +572,12 @@ class GraphClass {
     const { nodes } = this.graphComponent.graph;
     nodes.forEach((node) => {
       // node.labels.elementAt(0) -- label который name
-      this.graphComponent.graph.setStyle(
+      this.graphComponent.graphModelManager.graph.setStyle(
         node.labels.elementAt(0),
         this.labelStyle(true),
       );
       // node.labels.elementAt(1) -- label который label
-      this.graphComponent.graph.setStyle(
+      this.graphComponent.graphModelManager.graph.setStyle(
         node.labels.elementAt(1),
         this.labelStyle(false),
       );
@@ -562,7 +585,7 @@ class GraphClass {
 
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
-      this.graphComponent.graph.setStyle(
+      this.graphComponent.graphModelManager.graph.setStyle(
         edge.labels.elementAt(0),
         this.labelStyle(false, this.colorFrom.backElement),
       );
@@ -592,19 +615,22 @@ class GraphClass {
         && (node.tag.node_color.toLowerCase() === 'start'
           || node.tag.node_color.toLowerCase() === 'finish')
       ) {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           node,
           GraphClass.nodeStyle(this.startFinishColor),
         );
       } else if (node.tag.node_color === '-1') {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           node,
           GraphClass.nodeStyle(this.errorColor),
         );
       } else {
-        this.graphComponent.graph.setStyle(
+        this.graphComponent.graphModelManager.graph.setStyle(
           node,
-          GraphClass.nodeStyle(this.colors[node.tag.node_color - 1]),
+          GraphClass.nodeStyle(
+            this.colors[node.tag.node_color - 1]
+            || this.startFinishColor,
+          ),
         );
       }
     });

@@ -2,8 +2,8 @@
   <vue-draggable-resizable
     ref="dragres"
     :key="reload"
-    :w="width"
-    :h="height"
+    :w="width === 0 ? movableProps.grid[0] : width"
+    :h="height === 0 ? movableProps.grid[1] : height"
     :x="left"
     :y="top"
     :draggable="dragRes"
