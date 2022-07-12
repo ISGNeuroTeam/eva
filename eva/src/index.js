@@ -133,8 +133,6 @@ Vue.component('dash-singleValue', () => import('./components/dashBoardInside/Sin
 Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
 // компонент Menu
 Vue.component('dash-menu', () => import('./components/dashBoardInside/dashMenu.vue'));
-// блок экспорта импорта
-// Vue.component('block-exim', () => import('./components/blockExim.vue'))
 // элемнет поиска пока не актуален
 // Vue.component('dash-search', () => import('./components/dashBoardInside/dashSearch.vue'))
 // фильтр для таблицы пока не актуален
