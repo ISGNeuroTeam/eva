@@ -732,6 +732,13 @@ export default new Vuex.Store({
         Vue.set(state[idDash][id], 'selectedTableTitles', titles);
       }
     },
+    setLastMetrics(state, {
+      idDash, id, metrics,
+    }) {
+      if (metrics && metrics.length) {
+        Vue.set(state[idDash][id], 'lastMetrics', metrics);
+      }
+    },
     updateOptions(state, { idDash, idElement, options }) {
       // state[idDash][idElement].options = options;
       Vue.set(state[idDash][idElement], 'options', options);
