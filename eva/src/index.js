@@ -159,6 +159,9 @@ Vue.component('modal-log', () => import('./components/autorization/modalLog.vue'
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
 //  компонент для загрузки svg
 Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
+// Точечный график
+Vue.component('dash-scatterPlot', () => import('./components/dashBoardInside/dashScatterPlot.vue'));
+
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
