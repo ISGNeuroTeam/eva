@@ -125,10 +125,6 @@
     const state = cm.state.textHover; const
       { delay } = state.options;
     clearTimeout(state.timeout);
-    // if (e.srcElement) {
-    //   // hack for IE, because e.srcElement failed when it is used in the tiemout function
-    //   e = { srcElement: e.srcElement, clientX: e.clientX, clientY: e.clientY };
-    // }
     state.timeout = setTimeout(() => {
       onMouseOver(cm, e);
     }, delay);
