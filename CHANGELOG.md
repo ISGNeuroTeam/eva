@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed lists of users, groups, indexes empty in group editing modal
 - fixed typo in svg loading field placeholder
+- fixed bug with color if change metric position
 
 ## [1.98.0]
 
