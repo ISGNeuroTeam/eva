@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed position select
 - fixed typo in svg loading field placeholder
 
+### Changed
+- Changed the "Not found" page
+
 ## [1.98.1]
 
 ### Fixed
