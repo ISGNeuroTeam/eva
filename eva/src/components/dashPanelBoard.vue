@@ -629,7 +629,7 @@
           />
           <v-select
             v-model="newElem"
-            :items="elements"
+            :items="elementsOnPage"
             :color="theme.$main_text"
             hide-details
             outlined
@@ -1143,7 +1143,7 @@ export default {
       }
       return true;
     },
-    elements() {
+    elementsOnPage() {
       // получение всех элемнета на странице
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
@@ -1153,6 +1153,10 @@ export default {
         );
       }
       return [];
+    },
+    elements() {
+      // получение всех элемнета на странице
+      return this.$store.state[this.idDash]?.elements || [];
     },
     actions() {
       // получение всех событий элемента на странице
