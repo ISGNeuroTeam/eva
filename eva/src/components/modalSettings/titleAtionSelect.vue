@@ -141,6 +141,7 @@
         :color="theme.$primary_button"
         :style="{ color: theme.$main_text, fill: theme.$main_text }"
         placeholder="Выберите тип события"
+        :attach="true"
         class="subnumber"
         outlined
         dense

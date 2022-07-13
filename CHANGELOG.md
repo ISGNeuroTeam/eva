@@ -8,15 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added otl commands info tooltips
 
 ### Fixed
+- Fixed position select
+- fixed typo in svg loading field placeholder
 - The name of the token in the list of tokens disappears when navigating through the tabs
+
+### Changed
+- Changed the "Not found" page
 
 ## [1.98.1]
 
 ### Fixed
 - fixed lists of users, groups, indexes empty in group editing modal
-- fixed typo in svg loading field placeholder
 
 ## [1.98.0]
 
@@ -184,6 +189,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added hotkey for query window in data research v2
 
 ### Fixed
+- Fixed d3 select in timeline
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings
@@ -200,7 +206,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added eva router prefix
 
 ### Fixed
-- Fixed d3 select in timeline
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
 - Data exploration 2.0: visualization improvements

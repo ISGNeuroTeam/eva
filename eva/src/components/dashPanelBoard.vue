@@ -487,6 +487,7 @@
               v-model="tocken.elem"
               :items="elements"
               :color="theme.$accent_ui_color"
+              :attach="true"
               label="Элемент"
               hide-details
               outlined
@@ -497,6 +498,7 @@
               v-model="tocken.action"
               :items="actions(tocken.elem)"
               :color="theme.$accent_ui_color"
+              :attach="true"
               label="Действие"
               hide-details
               outlined
@@ -507,6 +509,7 @@
               v-model="tocken.capture"
               :items="capture({ action: tocken.action, elem: tocken.elem })"
               :color="theme.$accent_ui_color"
+              :attach="true"
               label="Свойство"
               hide-details
               outlined
@@ -631,6 +634,7 @@
             v-model="newElem"
             :items="elementsOnPage"
             :color="theme.$main_text"
+            :attach="true"
             hide-details
             outlined
             class="tocken-elem theme--dark"
@@ -641,6 +645,7 @@
             v-model="newAction"
             :items="actions(newElem)"
             :color="theme.$main_text"
+            :attach="true"
             hide-details
             outlined
             class="tocken-action theme--dark"
@@ -651,6 +656,7 @@
             v-model="newCapture"
             :items="capture({ action: newAction, elem: newElem })"
             :color="theme.$main_text"
+            :attach="true"
             hide-details
             outlined
             class="tocken-capture theme--dark"
