@@ -1,3 +1,8 @@
+# [1.98.1]
+
+### Fixed
+- Fixed empty lists of users, groups, indexes in group editing mode
+
 # [1.98.0]
 
 ### Added
