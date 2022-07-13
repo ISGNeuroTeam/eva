@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added otl commands info tooltips
+- Added tooltips describing OTL commands in data exploration
 
 ### Fixed
 - Fixed position select

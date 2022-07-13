@@ -21,7 +21,11 @@
       const { target } = e;
       const targetRect = target.getBoundingClientRect();
       tt.style.top = `${targetRect.bottom}px`;
-      tt.style.left = `${targetRect.left}px`;
+      if (targetRect.left > document.body.scrollWidth / 2) {
+        tt.style.right = `${document.body.scrollWidth - targetRect.left - targetRect.width}px`;
+      } else {
+        tt.style.left = `${targetRect.left}px`;
+      }
     }
 
     // CodeMirror.on(document, 'mousemove', position);
@@ -74,6 +78,7 @@
       }
     });
     CodeMirrorOnce(node, 'mouseleave', hideFromNode);
+    CodeMirrorOnce(document.body, 'keyup', hideFromNode);
     CodeMirrorOnce(tooltip, 'mouseleave', hide);
     state.keyMap = { Esc: hide };
     cm.addKeyMap(state.keyMap);
