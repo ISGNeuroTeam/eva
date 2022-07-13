@@ -10,7 +10,7 @@
     <div style="position: relative">
       <notifications style="z-index: 1" />
     </div>
-    <v-main>
+    <v-content>
       <div class="main-container container-report">
         <div
           ref="report"
@@ -91,7 +91,7 @@
           </keep-alive>
         </div>
       </div>
-    </v-main>
+    </v-content>
     <footer-bottom />
     <modal-report
       v-model="modal"

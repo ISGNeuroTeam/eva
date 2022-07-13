@@ -1,5 +1,5 @@
 // Example https://codemirror.net/demo/simplemode.html
-/* eslint-disable */
+
 /**
  * Export from
  * CodeMirror.defineSimpleMode('otl', { ... });
@@ -20,9 +20,6 @@
   // eslint-disable-next-line no-undef
   else { mod(CodeMirror); }
 }((CodeMirror) => {
-
-  window.CodeMirror = CodeMirror;
-
   CodeMirror.defineSimpleMode('otl', {
     start: [
       {
@@ -58,7 +55,7 @@
       },
       {
         token: 'entity.name.function',
-        regex: /\|\s\w+/,
+        regex: /\|[\s]*\w+/,
       },
       {
         token: 'support.parameter',
