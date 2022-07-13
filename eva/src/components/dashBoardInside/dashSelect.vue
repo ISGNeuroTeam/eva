@@ -353,27 +353,7 @@ export default {
       }
     },
     dataReady(dataReady) {
-      let data = [];
-      if (dataReady.length > 0) {
-        data = Object.keys(dataReady);
-        this.show = true;
-        if (Object.keys(dataReady).length !== 0) {
-          if (dataReady.error) {
-            this.message = dataReady.error;
-            this.show = false;
-          } else {
-            data = Object.keys(dataReady[0]);
-          }
-        }
-        this.dataFromRest = data;
-        this.actions.forEach((action) => {
-          this.$store.commit('setState', [{
-            object: action,
-            prop: 'capture',
-            value: data,
-          }]);
-        });
-      }
+      this.updateActions(dataReady);
     },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
@@ -401,6 +381,9 @@ export default {
       idDash: this.idDash,
       id: this.id,
     });
+    if (this.dataReady.length > 0) {
+      this.updateActions(this.dataReady);
+    }
     const selected = this.getSelected;
     if (selected) {
       if (selected.elem) {
@@ -426,6 +409,29 @@ export default {
     }
   },
   methods: {
+    updateActions(dataReady) {
+      let data = [];
+      if (dataReady.length > 0) {
+        data = Object.keys(dataReady);
+        this.show = true;
+        if (Object.keys(dataReady).length !== 0) {
+          if (dataReady.error) {
+            this.message = dataReady.error;
+            this.show = false;
+          } else {
+            data = Object.keys(dataReady[0]);
+          }
+        }
+        this.dataFromRest = data;
+        this.actions.forEach((action) => {
+          this.$store.commit('setState', [{
+            object: action,
+            prop: 'capture',
+            value: data,
+          }]);
+        });
+      }
+    },
     getItem(element) {
       switch (element) {
         case 'elem':
