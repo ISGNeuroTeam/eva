@@ -45,6 +45,7 @@
           <v-select
             :items="metricCountList"
             :append-icon="mdiChevronDown"
+            :attach="true"
             dense
             outlined
             :value="settings.metricCount"
@@ -87,6 +88,7 @@
           <v-select
             :items="sections"
             :append-icon="mdiChevronDown"
+            :attach="true"
             dense
             outlined
             :value="settings.selectSections"
@@ -181,6 +183,7 @@
                   v-model="metric.fontSize"
                   :items="fontSizeList"
                   :append-icon="mdiChevronDown"
+                  :attach="true"
                   dense
                   outlined
                   hide-details
@@ -195,6 +198,7 @@
                   v-model="metric.fontWeight"
                   :items="fontWeightList"
                   :append-icon="mdiChevronDown"
+                  :attach="true"
                   dense
                   outlined
                   hide-details
