@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed position select
 - fixed typo in svg loading field placeholder
+- Fixed. Unable to select property for dropdown list token
 
 ### Changed
 - Changed the "Not found" page
