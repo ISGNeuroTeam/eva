@@ -510,8 +510,14 @@ class GraphClass {
     // label name для nodes
     const nodeNameCreator = nodesSource.nodeCreator.createLabelBinding(
       (nodeDataItem) => {
-        if (nodeDataItem.node.length > 10 && nodeDataItem.node.split(' ').length - 1 >= 1) {
-          return nodeDataItem.node.replace(' ', '\n');
+        if (nodeDataItem.node.length > 10) {
+          const itemLength = nodeDataItem.node.split(' ').length - 1;
+          if (itemLength >= 1 && itemLength < 3) {
+            return nodeDataItem.node.replace(' ', '\n');
+          }
+          const item = nodeDataItem.node.split(' ');
+          item.splice(3, 0, '\n');
+          return item.join(' ');
         }
         return nodeDataItem.node;
       },
