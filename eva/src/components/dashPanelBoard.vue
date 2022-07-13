@@ -1144,7 +1144,6 @@ export default {
       return true;
     },
     elementsOnPage() {
-      // получение всех элемнета на странице
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
           (elem) => this.$store.state[this.idDash][elem].tab
