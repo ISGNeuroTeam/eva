@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed incorrect textarea update
+
+## [1.98.1]
+
 ### Added
 - Added otl commands info tooltips
 - Added a notification if the field specified for the default data source isn't found
