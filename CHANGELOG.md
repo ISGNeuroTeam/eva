@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Fixed dashed border in a corner of text block in schemes constructor 
 
 ## [1.99.0]
 
