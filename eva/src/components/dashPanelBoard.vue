@@ -632,7 +632,7 @@
           />
           <v-select
             v-model="newElem"
-            :items="elements"
+            :items="elementsOnPage"
             :color="theme.$main_text"
             :attach="true"
             hide-details
@@ -1149,8 +1149,7 @@ export default {
       }
       return true;
     },
-    elements() {
-      // получение всех элемнета на странице
+    elementsOnPage() {
       if (this.$store.state[this.idDash]?.elements) {
         return this.$store.state[this.idDash].elements.filter(
           (elem) => this.$store.state[this.idDash][elem].tab
@@ -1159,6 +1158,10 @@ export default {
         );
       }
       return [];
+    },
+    elements() {
+      // получение всех элемнета на странице
+      return this.$store.state[this.idDash]?.elements || [];
     },
     actions() {
       // получение всех событий элемента на странице
