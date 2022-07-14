@@ -315,7 +315,7 @@ class GraphClass {
     this.graphComponent.graph.nodeDefaults.style = GraphClass.nodeStyle('#0AB3FF');
     this.graphComponent.graph.nodeDefaults.size = new Size(120, 120);
 
-    this.graphComponent.graph.edgeDefaults.style = new VoidEdgeStyle();
+    this.graphComponent.graph.edgeDefaults.style = this.edgeStyle('#0AB3FF');
     this.graphComponent.graph.edgeDefaults.labels.style.minimumSize = new Size(70 * 3, 0);
 
     const orangeRed = Color.ORANGE_RED;
@@ -392,9 +392,6 @@ class GraphClass {
       edgePopupContent,
       edgeLabelModel.createDefaultParameter(),
     );
-
-    // The following works with both GraphEditorInputMode and GraphViewerInputMode
-    // const { inputMode } = this.graphComponent;
 
     inputMode.addItemClickedListener((sender, evt) => {
       setTimeout(() => {

@@ -93,14 +93,14 @@
         <div
           class="popupContainer"
           :class="{
-            'popupContainer--is-active': isPopup,
+            'popupContainer--is-active': isPopupShow,
           }"
         >
           <div
             ref="nodePopupContent"
             class="popupContent"
             :class="{
-              'popupContent--is-active': isPopup,
+              'popupContent--is-active': isPopupShow,
             }"
             tabindex="0"
           >
@@ -175,7 +175,7 @@
             class="popupContent"
             style="text-align: center"
             :class="{
-              'popupContent--is-active': isPopup,
+              'popupContent--is-active': isPopupShow,
             }"
             tabindex="0"
           >
@@ -262,7 +262,7 @@ export default {
       mdiMagnifyMinus,
       mdiClose,
       isEditor: false,
-      isPopup: false,
+      isPopupShow: false,
       colors: [
         '#aefaff',
         '#0ab3ff',
@@ -340,7 +340,7 @@ export default {
       });
     },
     currentNode(val) {
-      this.isPopup = !!val;
+      this.isPopupShow = !!val;
     },
   },
   mounted() {
