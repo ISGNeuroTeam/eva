@@ -600,8 +600,8 @@ export default {
     },
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
-      if (this.$store.state[this.idDash][elem.elem].loading) {
-        return this.$store.state[this.idDash][elem.elem].loading;
+      if (elem.elem === 'map' && !this.dataObject[elem.search]?.loading) {
+        return this.dataObject[this.dashFromStore[elem.elem].options.search.id]?.loading;
       }
       return this.dataObject[elem.search]?.loading;
     },
