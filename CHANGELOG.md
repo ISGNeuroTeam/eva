@@ -9,7 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
 ### Fixed
+
+## [1.99.0]
+
+### Added
+- Added otl commands info tooltips
+- Added a notification if the field specified for the default data source isn't found
+- Updated the design of notifications
+- Added tooltips describing OTL commands in data exploration
+
+### Fixed
+- Fixed position select
+- fixed typo in svg loading field placeholder
+- fixed bug with color if change metric position
+- The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
+- If you select the Option to select multiple values, the default value is added to the drop-down list
+- The name of the token in the list of tokens disappears when navigating through the tabs
+- Fixed. Unable to select property for dropdown list token
+
+### Changed
+- Changed the "Not found" page
 
 ## [1.98.1]
 
