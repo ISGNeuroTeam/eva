@@ -18,25 +18,36 @@ export default {
     setNotify(state, payload) {
       state.notifications = payload;
     },
-    addNotifications(state, payload) {
+    removeOldNotifications(state) {
       const time = moment().unix();
       const ttl = 60; // минуту
-      const currentItems = state.notifications.filter((item) => item.time > (time - ttl));
-      const existsNotificationsIds = currentItems.map((item) => item.code);
-
-      const newNotification = payload
-        .filter((item) => !existsNotificationsIds.includes(item.code))
-        .map((item) => ({
-          ...item,
-          time,
-          read: false,
+      state.notifications = state.notifications
+        .filter((item) => item.time > (time - ttl));
+    },
+    addNotifications(state, items) {
+      this.commit('notify/removeOldNotifications');
+      items.forEach((item) => {
+        const id = `notif-code-${item.code || 'last'}`;
+        this.commit('notify/addNotification', {
+          id,
           message: getMessage(item),
-        }));
-
-      state.notifications = [
-        ...currentItems,
-        ...newNotification,
-      ];
+          ...item,
+        });
+      });
+    },
+    addNotification(state, payload) {
+      const time = moment().unix();
+      const newItem = {
+        ...payload,
+        time,
+        read: false,
+      };
+      const savedItem = state.notifications.find((item) => item.id === payload.id);
+      if (savedItem) {
+        Object.assign(savedItem, newItem);
+      } else {
+        state.notifications.push(newItem);
+      }
     },
     dismiss(state, payload) {
       state.notifications[payload].read = true;

@@ -114,10 +114,14 @@ import {
   mdiSquare,
 } from '@mdi/js';
 import ArrowBlock from '../arrowBlock.vue';
+import defaultSourceData from '../../mixins/defaultSourceData';
 
 export default {
   name: 'DashSelect',
   components: { ArrowBlock },
+  mixins: [
+    defaultSourceData,
+  ],
   props: {
     idFrom: {
       type: String,
@@ -136,6 +140,10 @@ export default {
       required: true,
     },
     dataLoadingFrom: null,
+    loading: {
+      type: Boolean,
+      default: false,
+    },
     dataModeFrom: {
       type: Boolean,
       default: false,
@@ -311,6 +319,9 @@ export default {
     },
     // Стктус загрузки ИД для дефолтного значения
     changedDataDefaultLoading() {
+      if (this.dataLoadingFrom) {
+        return false;
+      }
       const {
         defaultFromSourceData = null,
         defaultSourceDataUpdates = false,
@@ -378,18 +389,14 @@ export default {
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
       const {
-        dataReady,
-        selectedElemLink,
-        selectedElem,
         multiple,
       } = this;
       if (val === false && val !== oldVal) {
         const defaultValue = this.getDefaultValue();
-        const valueData = dataReady?.find((item) => item[selectedElemLink] === defaultValue);
-        if (defaultValue !== null) {
-          if (!multiple && valueData) {
-            this.elemDeep[String(multiple)] = valueData[selectedElem];
-          }
+        if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
+          this.elemDeep[String(multiple)] = multiple
+            ? [defaultValue]
+            : defaultValue;
         }
         this.setTocken();
       }
@@ -461,24 +468,6 @@ export default {
       this.open = !this.open;
       this.select_show = !this.select_show;
     },
-    getDefaultValue() {
-      const {
-        defaultFromSourceData = null,
-        defaultSourceDataField = null,
-      } = this.dashFromStore.options;
-      const fieldName = defaultSourceDataField || 'value';
-      if (defaultFromSourceData !== null) {
-        const { data = undefined } = this.dataSources[defaultFromSourceData];
-        if (data && data.length) {
-          const [firstRow] = data;
-          const rowKeys = Object.keys(firstRow);
-          if (rowKeys.includes(fieldName)) {
-            return firstRow[fieldName];
-          }
-        }
-      }
-      return null;
-    },
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
@@ -508,20 +497,20 @@ export default {
       return data;
     },
     setTocken() {
+      if (this.loading !== false) {
+        return;
+      }
       const defaultValue = this.getDefaultValue();
-      const valueData = this.dataReady
-        ?.find((item) => item[this.selectedElemLink] === defaultValue);
-      if (defaultValue !== null) {
+      if (defaultValue != null && this.dataRestDeep.includes(defaultValue)) {
         if (this.multiple) {
           if (this.elemDeep[String(this.multiple)].length === 0) {
             this.elemDeep[String(this.multiple)] = [defaultValue];
           }
         } else if (!this.elemDeep[String(this.multiple)]) {
-          if (valueData) {
-            this.elemDeep[String(this.multiple)] = valueData[this.selectedElem];
-          }
+          this.elemDeep[String(this.multiple)] = defaultValue;
         }
       }
+      const elemDeepValue = this.elemDeep[String(this.multiple)];
 
       this.$store.commit('setSelected', {
         element: 'elemDeep',
@@ -545,26 +534,22 @@ export default {
       let value = [];
 
       if (String(this.multiple) === 'true') {
-        this.elemDeep[String(this.multiple)].forEach((elem) => {
-          value = [
-            ...value,
-            ...data.filter((x) => elem === x[this.elem])
-              .map((x) => x[this.elemlink])
-              .reduce((a, b) => {
-                if (a.includes(b)) {
-                  return a;
-                }
-                return [...a, b];
-              }, [])];
+        elemDeepValue.forEach((elem) => {
+          const addValues = data.filter((x) => elem === x[this.elem])
+            .map((x) => x[this.elemlink])
+            .reduce((a, b) => (a.includes(b) ? a : [...a, b]), []);
+          value.push(...addValues);
         });
       } else {
-        if (Array.isArray(this.elemDeep[String(this.multiple)])) {
-          value = [...[], ...String(this.elemDeep[String(this.multiple)])];
-        } else {
-          value = [String(this.elemDeep[String(this.multiple)])];
+        if (elemDeepValue !== null) {
+          if (Array.isArray(elemDeepValue)) {
+            value = [...[], ...String(elemDeepValue)];
+          } else {
+            value = [String(elemDeepValue)];
+          }
         }
         for (let i = 0; i < data.length; i += 1) {
-          if (data[i][this.elem] === this.elemDeep[String(this.multiple)]) {
+          if (data[i][this.elem] === elemDeepValue) {
             value = [data[i][this.elemlink]];
             break;
           }
