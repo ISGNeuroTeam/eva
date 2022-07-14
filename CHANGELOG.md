@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.99.0]
+
+### Added
 - Added otl commands info tooltips
 - Added a notification if the field specified for the default data source isn't found
 - Updated the design of notifications
