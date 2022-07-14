@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you select the Option to select multiple values, the default value is added to the drop-down list
 - The name of the token in the list of tokens disappears when navigating through the tabs
 - Fixed. Unable to select property for dropdown list token
+- Multiselect. The problem with the empty display of the component
 
 ### Changed
 - Changed the "Not found" page
