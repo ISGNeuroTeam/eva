@@ -1,6 +1,6 @@
 <template>
   <v-app class="application-aut">
-    <v-content>
+    <v-main>
       <v-container
         class="main-container container-app"
         :style="{ backgroundColor: theme.$secondary_bg }"
@@ -64,7 +64,7 @@
           </v-card>
         </div>
       </v-container>
-    </v-content>
+    </v-main>
     <footer-bottom />
   </v-app>
 </template>

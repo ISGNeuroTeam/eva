@@ -45,9 +45,13 @@
 
 <script>
 import { mdiMagnify } from '@mdi/js';
+import defaultSourceData from '../../mixins/defaultSourceData';
 
 export default {
   name: 'DashTextarea',
+  mixins: [
+    defaultSourceData,
+  ],
   props: {
     // переменные полученные от родителя
     idFrom: {
@@ -155,7 +159,7 @@ export default {
         defaultFromSourceData = null,
         defaultSourceDataUpdates = false,
       } = this.dashFromStore.options;
-      if (defaultFromSourceData && defaultSourceDataUpdates) {
+      if (defaultFromSourceData !== null && defaultSourceDataUpdates) {
         const {
           loading,
         } = this.dataSources[defaultFromSourceData];
@@ -250,24 +254,6 @@ export default {
         }
         this.textarea = `${numberValue}`;
       }
-    },
-    getDefaultValue() {
-      const {
-        defaultFromSourceData = null,
-        defaultSourceDataField = null,
-      } = this.dashFromStore.options;
-      const fieldName = defaultSourceDataField || 'value';
-      if (defaultFromSourceData) {
-        const { data = undefined } = this.dataSources[defaultFromSourceData];
-        if (data && data.length) {
-          const [firstRow] = data;
-          const rowKeys = Object.keys(firstRow);
-          if (rowKeys.includes(fieldName)) {
-            return firstRow[fieldName];
-          }
-        }
-      }
-      return null;
     },
     acceptTextArea() {
       this.$store.commit('setTextArea', {
