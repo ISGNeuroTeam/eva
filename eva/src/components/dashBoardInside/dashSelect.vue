@@ -384,7 +384,6 @@ export default {
             value: data,
           }]);
         });
-        //this.setTocken();
       }
     },
     // Загрузился ИД для дефотла
