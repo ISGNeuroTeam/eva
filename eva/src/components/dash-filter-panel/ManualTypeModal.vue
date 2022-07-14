@@ -33,6 +33,7 @@
 
     <div
       v-if="temp.fieldType === 'date'"
+      key="date"
       style="position: relative; padding-bottom: 10px"
       class="filter-date-type-form"
     >
@@ -75,7 +76,28 @@
       </v-text-field>
     </div>
     <div
+      v-else-if="temp.fieldType === 'time'"
+      key="time"
+      style="position: relative; padding-bottom: 10px"
+      class="filter-date-type-form"
+    >
+      Время
+      <v-text-field
+        v-model="temp.value"
+        :background-color="theme.$main_bg"
+        :color="theme.$accent_ui_color"
+        :style="{ color: theme.$main_text }"
+        class="textarea-item"
+        placeholder="0"
+        hide-details
+        outlined
+        dense
+        @input="$emit('isChanged', true)"
+      />
+    </div>
+    <div
       v-else
+      key="string"
       style="padding-bottom: 10px"
     >
       Значение
@@ -88,6 +110,44 @@
         @input="$emit('isChanged', true)"
       />
     </div>
+    <v-slide-group
+      v-if="temp.fieldType === 'time'"
+      v-model="currentTimeUnit"
+      mandatory
+      style="margin-bottom: 10px;"
+      @change="$emit('isChanged', true)"
+    >
+      <div
+        style="width: 100%"
+        class="d-flex justify-space-around"
+      >
+        <v-slide-item
+          v-for="(item, index) in timeUnits"
+          :key="index"
+          v-slot="{ active, toggle }"
+          style="text-transform: none; font-size: 12px; box-shadow: none"
+        >
+          <v-btn
+            style="font-size: 12px; width: 100px"
+            :style="
+              active
+                ? {
+                  'background-color': theme.$primary_button,
+                  color: theme.$main_bg,
+                  'border-radius': '3px',
+                }
+                : {
+                  'background-color': theme.$main_bg,
+                  color: theme.$main_text,
+                }
+            "
+            @click="toggle"
+          >
+            {{ timeUnitsTitles[item] }}
+          </v-btn>
+        </v-slide-item>
+      </div>
+    </v-slide-group>
     <v-slide-group
       v-model="currentOperationTab"
       mandatory
@@ -119,7 +179,7 @@
             "
             @click="toggle"
           >
-            {{ getOperationManualTitle(item) }}
+            {{ getOperationManualForType[item] }}
           </v-btn>
         </v-slide-item>
       </div>
@@ -143,12 +203,22 @@ export default {
         { value: 'string', title: 'Строка' },
         { value: 'number', title: 'Число' },
         { value: 'date', title: 'Дата' },
+        { value: 'time', title: 'Время' },
       ],
       currentOperationTab: 0,
+      currentTimeUnit: 0,
+      timeUnits: ['s', 'm', 'h', 'd'],
+      timeUnitsTitles: {
+        s: 'Секунды',
+        m: 'Минуты',
+        h: 'Часы',
+        d: 'Сутки',
+      },
       operationMap: {
         string: [],
         date: ['<', '>'],
         number: ['>', '<', '='],
+        time: ['>', '<', '='],
       },
       operationManualTitleMap: {
         number: {
@@ -160,6 +230,11 @@ export default {
           '>': 'Позже',
           '<': 'Раньше',
         },
+        time: {
+          '>': 'Больше',
+          '<': 'Меньше',
+          '=': 'Равно',
+        },
       },
       calendarIcon: mdiCalendarMonth,
     };
@@ -167,6 +242,9 @@ export default {
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    getOperationManualForType() {
+      return this.operationManualTitleMap[this.temp.fieldType];
     },
   },
   watch: {
@@ -185,13 +263,20 @@ export default {
           ].indexOf(val.operationManual);
           this.currentOperationTab = manualOperationMapIndex !== -1 ? manualOperationMapIndex : 0;
         }
+        if (val.fieldType === 'time') {
+          this.currentTimeUnit = val?.timeUnits ? val.timeUnits : 0;
+        }
       },
+    },
+    currentTimeUnit(val) {
+      if (this.temp.fieldType === 'time') {
+        this.$set(this.temp, 'timeUnits', val);
+      } else {
+        delete this.temp.currentTimeUnit;
+      }
     },
   },
   methods: {
-    getOperationManualTitle(operation) {
-      return this.operationManualTitleMap[this.temp.fieldType][operation];
-    },
     changeSelected() {
       this.temp.operationManual = this.operationMap[this.temp.fieldType][this.currentOperationTab];
     },
