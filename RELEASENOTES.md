@@ -1,3 +1,22 @@
+# [1.99.0]
+
+### Added
+- Tooltips with a describing OTL commands in data exploration
+- Notification if the field specified for the default data source isn't found
+
+### Changed
+- Appearance of the "Not found" page
+- Notifications have become more compact
+
+### Fixed
+- Position of the open list of the "select" component
+- Typo in the svg upload field placeholder
+- Bug with color if change metric position in the Single Value component
+- The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
+- If you select the Option to select multiple values, the default value is added to the drop-down list
+- The name of the token in the list of tokens disappears when navigating through the tabs
+- When creating a token, it is not possible to select properties in the drop-down list if the component was just added
+
 # [1.98.1]
 
 ### Fixed
