@@ -1481,6 +1481,12 @@ class ConstructorSchemesClass {
       isValidLabelOwnerPredicate: (labelOwner) => labelOwner instanceof INode
         || labelOwner instanceof IEdge
         || labelOwner instanceof IPort,
+      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => graph.addLabel({
+        owner: dropTarget,
+        location: dropLocation,
+        text: dropData.text,
+        style: dropData.style.clone(),
+      }),
     });
   }
 
