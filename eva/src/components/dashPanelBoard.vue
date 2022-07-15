@@ -2049,11 +2049,15 @@ export default {
                 }
               } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
                 /// go
-                doing = doing[1].slice(0, doing[1].length - 1).split(',');
+
+                // TODO: оставленно специально, если возникнет баг в смежном функционале
+                // doing = doing[1].slice(0, doing[1].length - 1).split(',');
+                doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
                 this.$set(this.event, 'target', doing[0]);
 
                 let prop;
                 let value;
+
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
                   doing = doing.join(',');
