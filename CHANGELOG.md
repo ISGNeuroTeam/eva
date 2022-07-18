@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Fixed graph readability
+- Fixed graph alignment
 
 ## [1.99.0]
 
