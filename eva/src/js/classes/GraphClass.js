@@ -48,7 +48,7 @@ import { throttle } from '../utils/throttle';
 
 License.value = licenseData; // проверка лицензии
 const labelFont = new Font({
-  fontSize: 70,
+  fontSize: 50,
   fontFamily: 'ProximaNova',
 });
 const labelFontBOLD = new Font({
@@ -544,7 +544,18 @@ class GraphClass {
 
       // label name для nodes
       const nodeNameCreator = nodesSource.nodeCreator.createLabelBinding(
-        (nodeDataItem) => nodeDataItem.node,
+        (nodeDataItem) => {
+          if (nodeDataItem.node.length > 10) {
+            const itemLength = nodeDataItem.node.split(' ').length - 1;
+            if (itemLength >= 1 && itemLength < 3) {
+              return nodeDataItem.node.replace(' ', '\n');
+            }
+            const item = nodeDataItem.node.split(' ');
+            item.splice(3, 0, '\n');
+            return item.join(' ');
+          }
+          return nodeDataItem.node;
+        },
       );
       nodeNameCreator.defaults.layoutParameter = ExteriorLabelModel.NORTH_EAST;
 
@@ -589,7 +600,8 @@ class GraphClass {
           portAssignment: HierarchicLayoutPortAssignmentMode.DEFAULT,
         }),
       });
-      layout.nodeToNodeDistance = 201;
+      layout.nodeToNodeDistance = 301;
+      layout.minimumLayerDistance = 201;
 
       // применяем layout
       this.graphComponent.graph.applyLayout({
