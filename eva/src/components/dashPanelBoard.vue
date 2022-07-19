@@ -2057,19 +2057,24 @@ export default {
 
                 let prop;
                 let value;
+                let tab;
 
                 if (doing[1].indexOf('[') !== -1) {
                   doing.splice(0, 1);
+
+                  tab = doing[2] ?? 1;
+
                   doing = doing.join(',');
                   doing = doing.match(/[^[]+(?=\])/g);
-                  prop = doing[0].split(',');
-                  value = doing[1].split(',');
+                  value = doing[0].split(',');
+                  prop = doing[1].split(',');
                 } else {
                   prop = [doing[1]];
-                  value = [doing[2]];
+                  value = [`$${doing[1]}$`];
+                  tab = doing[2] ?? 1;
                 }
                 this.$set(this.event, 'prop', prop);
-                this.$set(this.event, 'tab', doing[2]);
+                this.$set(this.event, 'tab', tab);
                 this.$set(this.event, 'value', value);
               } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
                 // open
