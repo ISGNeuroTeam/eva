@@ -156,6 +156,7 @@
                     hide-details
                     outlined
                     class="subnumber"
+                    :attach="true"
                     @change="isChanged = true"
                   />
                   <v-select
@@ -168,6 +169,7 @@
                     hide-details
                     outlined
                     class="subnumber"
+                    :attach="true"
                     @change="isChanged = true"
                   />
                   <!--elem: custom-select-->
@@ -275,6 +277,7 @@
                 outlined
                 class="subnumber"
                 label="Позиция легенды"
+                :attach="true"
                 @click="changeColor"
                 @change="isChanged = true"
               />
@@ -390,6 +393,7 @@
                   outlined
                   class="item-metric"
                   label="Выберите тип"
+                  :attach="true"
                   @click="changeColor"
                   @input="isChanged = true"
                 />
@@ -475,6 +479,7 @@
                 hide-details
                 outlined
                 class="item-metric"
+                :attach="true"
                 @click="changeColor"
                 @input="isChanged = true"
               />
@@ -503,6 +508,7 @@
                 outlined
                 class="item-metric"
                 label="Выберите схему"
+                :attach="true"
                 @click="changeColor"
                 @change="
                   () => {
@@ -641,6 +647,7 @@
                 outlined
                 class="item-metric"
                 label="Выберите тип"
+                :attach="true"
                 @click="changeColor"
                 @input="isChanged = true"
               />
