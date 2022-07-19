@@ -484,7 +484,7 @@
         </div>
       </div>
       <v-card-text
-        v-if="!excludedFromDataSearches && currentElem !== 'constructorSchemes'"
+        v-if="!excludedFromDataSearches && currentElem !== 'dash-constructorSchemes'"
         v-show="!showElement"
         class="card-text"
       >
@@ -498,7 +498,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement || excludedFromDataSearches || currentElem === 'constructorSchemes'"
+        v-if="showElement || excludedFromDataSearches || currentElem === 'dash-constructorSchemes'"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
