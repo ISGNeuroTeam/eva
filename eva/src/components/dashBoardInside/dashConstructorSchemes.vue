@@ -6,46 +6,61 @@
       'height': `${innerSize.height}px`,
     }"
   >
-    <template v-if="isEdit">
-      <button
-        class="pa-2"
-        @click="toggleDnDPanel"
+    <div class="d-flex align-center ml-5">
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
       >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <v-switch
+              v-model="isEdit"
+              inset
+              label=""
+              @change="toggleInputMode"
+            />
+          </div>
+        </template>
+        <span>Toggle edit</span>
+      </v-tooltip>
+      <template v-if="isEdit">
+        <button
+          class="pa-2"
+          @click="toggleDnDPanel"
         >
-          {{ gear }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderToFront"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ gear }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderToFront"
         >
-          {{ arrowUp }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderToBack"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowUp }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderToBack"
         >
-          {{ arrowDown }}
-        </v-icon>
-      </button>
-    </template>
-    <button @click="toggleInputMode">
-      Toggle edit ({{ isEdit }})
-    </button>
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowDown }}
+          </v-icon>
+        </button>
+      </template>
+    </div>
     <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
@@ -1380,7 +1395,9 @@ export default {
     },
     openDataPanel(targetElement) {
       this.closeDataPanel();
-      this.dataPanel = true;
+      if (targetElement.dataType !== 'image-node') {
+        this.dataPanel = true;
+      }
       this.selectedNode = structuredClone(targetElement.nodeId);
       this.dataSelectedNode = structuredClone(targetElement);
       if (targetElement.dataType) {
@@ -1519,7 +1536,7 @@ export default {
 .b-data-node {
   &__text {
     font-weight: 700;
-    font-size: 11px;
+    //font-size: 11px;
     line-height: 1;
   }
   &__wrapper {
@@ -1537,5 +1554,8 @@ export default {
       padding: 7.5px 12px;
     }
   }
+}
+.yfiles-snap-line {
+  stroke: #ff0000 !important;
 }
 </style>

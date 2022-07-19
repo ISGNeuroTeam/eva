@@ -122,6 +122,7 @@ class ConstructorSchemesClass {
             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
             alignment-baseline="middle"
             :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textLeft }}
            </text>
@@ -134,6 +135,7 @@ class ConstructorSchemesClass {
              :transform="'translate(' + (layout.width - 8) / 2 + ')'"
              fill="white"
              :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textRight }}
            </text>
@@ -233,6 +235,7 @@ class ConstructorSchemesClass {
             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
             alignment-baseline="middle"
             :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textLeft }}
            </text>
@@ -245,6 +248,7 @@ class ConstructorSchemesClass {
              :transform="'translate(' + (layout.width - 8) / 2 + ')'"
              fill="white"
              :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textRight }}
            </text>
@@ -322,6 +326,7 @@ class ConstructorSchemesClass {
        fill="#FFFFFF"
        :dy="((layout.height / 2) - (layout.height / 4))"
        alignment-baseline="middle"
+       :font-size="((layout.height / 2) * 0.8) + 'px'"
       >
         {{ tag.textFirst }}
       </text>
@@ -332,6 +337,7 @@ class ConstructorSchemesClass {
        fill="#3C3B45"
        :dy="(layout.height - (layout.height / 4))"
        alignment-baseline="middle"
+       :font-size="((layout.height / 2) * 0.8) + 'px'"
       >
         {{ tag.textSecond }}
       </text>
@@ -392,6 +398,7 @@ class ConstructorSchemesClass {
           fill="#FFFFFF"
           :dy="((layout.height / 2) - (layout.height / 4))"
           alignment-baseline="middle"
+          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textFirst }}
         </text>
@@ -402,6 +409,7 @@ class ConstructorSchemesClass {
           fill="#3C3B45"
           :dy="(layout.height - (layout.height / 4))"
           alignment-baseline="middle"
+          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textSecond }}
         </text>
@@ -461,6 +469,7 @@ class ConstructorSchemesClass {
          alignment-baseline="middle"
          text-anchor="middle"
          :fill="tag.textColor"
+         :font-size="((layout.height / 2) * 0.8) + 'px'"
        >
            {{ tag.currentValue }}
        </text>
@@ -523,6 +532,7 @@ class ConstructorSchemesClass {
         alignment-baseline="middle"
         text-anchor="middle"
         :fill="tag.firstTextColor"
+        :font-size="((layout.height / 3) * 0.8) + 'px'"
       >
           {{ tag.firstValue }}
       </text>
@@ -533,6 +543,7 @@ class ConstructorSchemesClass {
         alignment-baseline="middle"
         text-anchor="middle"
         :fill="tag.secondTextColor"
+        :font-size="((layout.height / 3) * 0.8) + 'px'"
       >
           {{ tag.secondValue }}
       </text>
@@ -1497,6 +1508,23 @@ class ConstructorSchemesClass {
       useBestMatchingParameter: true,
       // allow only for nodes to be the new port owner
       isValidPortOwnerPredicate: (portOwner) => portOwner instanceof INode,
+      itemCreator: (
+        context,
+        graph,
+        dropData,
+        dropTarget,
+        dropLocation,
+      ) => graph.addPortAt({
+        owner: dropTarget,
+        location: dropLocation,
+        style: new NodeStylePortStyleAdapter(
+          new ShapeNodeStyle({
+            fill: 'transparent',
+            stroke: 'transparent',
+            shape: 'ellipse',
+          }),
+        ),
+      }),
     });
   }
 
