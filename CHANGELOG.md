@@ -12,8 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- fixed label can be moved outside node in schemes constructor
+- Fixed dashed border in a corner of text block in schemes constructor 
 - Fixed graph readability
 - Fixed graph alignment
+- Fixed handling popup on graph
 
 ## [1.99.0]
 
