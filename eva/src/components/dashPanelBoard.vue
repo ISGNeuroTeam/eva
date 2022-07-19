@@ -2054,23 +2054,28 @@ export default {
                 // doing = doing[1].slice(0, doing[1].length - 1).split(',');
                 doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
                 this.$set(this.event, 'target', doing[0]);
-
                 let prop;
                 let value;
                 let tab;
 
-                if (doing[1].indexOf('[') !== -1) {
-                  doing.splice(0, 1);
-
-                  tab = doing[2] ?? 1;
-
-                  doing = doing.join(',');
-                  doing = doing.match(/[^[]+(?=\])/g);
-                  value = doing[0].split(',');
-                  prop = doing[1].split(',');
-                } else {
+                if (doing[3] && doing[3].indexOf('[') !== -1) {
                   prop = [doing[1]];
                   value = [`$${doing[1]}$`];
+                  tab = doing[2] ?? 1;
+                  doing.splice(0, 3);
+                  doing = doing.join(',');
+                  doing = doing.match(/[^[]+(?=\])/g);
+
+                  if (doing.length === 1) {
+                    value = [...value, ...doing[0].split(',').map((token) => `$${token}$`)];
+                    prop = [...prop, ...doing[0].split(',')];
+                  } else {
+                    value = [...value, ...doing[0].split(',')];
+                    prop = [...prop, ...doing[1].split(',')];
+                  }
+                } else {
+                  prop = [doing[1]];
+                  value = [doing[1]];
                   tab = doing[2] ?? 1;
                 }
                 this.$set(this.event, 'prop', prop);
