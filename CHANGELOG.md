@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed graph alignment
 - Fixed handling popup on graph
 - Fixed. In the header of the component infinite loading
+- fixed: graph vertex labels overlap each other
 
 ## [1.99.0]
 
