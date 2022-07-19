@@ -256,7 +256,7 @@ export default {
       const styles = Object.entries(this.customStyle)
         .map((arg) => arg.join(':'))
         .join(';');
-      return `${styles}${this.needSetField ? ' zoom: 1' : ` zoom: ${this.htmlZoom}`}`;
+      return `${styles}`;
     },
     getClasses() {
       return `${this.customClass} ${this.isFullScreen || this.circularResize ? 'full-screen ' : ''} ${this.minSize ? 'min-size' : ''}`;
@@ -267,7 +267,7 @@ export default {
         defaultFromSourceData = null,
         defaultSourceDataUpdates = false,
       } = this.dashFromStore.options;
-      if (defaultFromSourceData && defaultSourceDataUpdates) {
+      if (defaultFromSourceData !== null && defaultSourceDataUpdates) {
         const {
           loading,
         } = this.dataSources[defaultFromSourceData];

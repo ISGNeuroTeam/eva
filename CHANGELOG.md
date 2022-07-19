@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Fixed incorrect textarea update
+- Fixed graph readability
+- Fixed graph alignment
+- Fixed handling popup on graph
+
+## [1.98.1]
+
+### Added
+
+### Changed
+- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
+
+### Fixed
+- fixed label can be moved outside node in schemes constructor
+- Fixed dashed border in a corner of text block in schemes constructor
+
+## [1.99.0]
+
 ### Added
 - Added otl commands info tooltips
 - Added a notification if the field specified for the default data source isn't found
