@@ -9,8 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
+
 ### Fixed
+- fixed label can be moved outside node in schemes constructor
+- Fixed dashed border in a corner of text block in schemes constructor
+- Fixed incorrect textarea update
+- Fixed graph readability
+- Fixed graph alignment
+- Fixed handling popup on graph
+- Fixed. In the header of the component infinite loading
 - fixed: graph vertex labels overlap each other
+
+## [1.99.0]
+
+### Added
+- Added otl commands info tooltips
+- Added a notification if the field specified for the default data source isn't found
+- Updated the design of notifications
+- Added tooltips describing OTL commands in data exploration
+
+### Fixed
+- Fixed position select
+- fixed typo in svg loading field placeholder
+- fixed bug with color if change metric position
+- The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
+- If you select the Option to select multiple values, the default value is added to the drop-down list
+- The name of the token in the list of tokens disappears when navigating through the tabs
+- Fixed. Unable to select property for dropdown list token
+
+### Changed
+- Changed the "Not found" page
 
 ## [1.98.1]
 
@@ -183,6 +213,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added hotkey for query window in data research v2
 
 ### Fixed
+- Fixed d3 select in timeline
 - fixed data exploration 2.0 gantt: the date format setting for the Gantt chart does not apply
 - fixed change osmserver in map settings
 - fixed default osmserver and default search in dashMapUserSettings
@@ -199,7 +230,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - added eva router prefix
 
 ### Fixed
-- Fixed d3 select in timeline
 - Fixed dashSelect Tokens error
 - fixed computer dataRestDeep in dashSelect.vue
 - Data exploration 2.0: visualization improvements

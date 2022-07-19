@@ -1,33 +1,36 @@
 <template>
-  <div class="notfound">
-    <h1>К сожалению, страница не найдена</h1>
-    <div class="img-block">
-      <img
-        :src="require('../images/notfound.gif')"
-        alt="notfound"
-      >
-    </div>
-  </div>
+  <v-app>
+    <v-main class="full-page align-center">
+      <div class="text-center">
+        <h2 class="display-1">
+          Страница не найдена
+        </h2>
+        <div class="mt-4">
+          <v-btn
+            to="/"
+            outlined
+            :dark="isDarkTheme"
+          >
+            На главную
+          </v-btn>
+        </div>
+      </div>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
 export default {
-  data() {
-    return {};
+  computed: {
+    isDarkTheme() {
+      return this.$store.getters.getThemeTitle.indexOf('light') === -1;
+    },
   },
 };
 </script>
 
-<style>
-h1 {
-  font-size: 40px;
-  text-align: center;
-  margin: 100px auto;
-}
-.img-block {
-  width: 100%;
-  height: auto;
-  margin: 0 auto;
-  text-align: center;
-}
+<style scoped lang="sass">
+.full-page
+  background: var(--secondary_bg)
+  color: var(--main_text)
 </style>
