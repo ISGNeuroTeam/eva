@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Constructor schemes: Edge editing
+- Constructor schemes: Step change element z-order
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
@@ -21,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed handling popup on graph
 - Fixed. In the header of the component infinite loading
 - fixed: graph vertex labels overlap each other
+- Constructor schemes: Disabled focusing on elements
 
 ## [1.99.0]
 
