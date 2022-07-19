@@ -10,9 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
+- Changed "onclick" on heatmap event syntax
 
 ### Fixed
-- Fixed event "go" dont send tknBegin and tknEnd
+- fixed label can be moved outside node in schemes constructor
+- Fixed dashed border in a corner of text block in schemes constructor
+- Fixed incorrect textarea update
+- Fixed graph readability
+- Fixed graph alignment
+- Fixed handling popup on graph
+- Fixed. In the header of the component infinite loading
+- fixed: graph vertex labels overlap each other
 
 ## [1.99.0]
 
