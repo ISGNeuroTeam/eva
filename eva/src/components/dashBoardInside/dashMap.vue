@@ -102,6 +102,10 @@ export default {
       type: String,
       default: '',
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -246,6 +250,12 @@ export default {
         this.map.resize();
       }
     },
+    dataSources: {
+      handler() {
+        this.loadDataForPipe(this.getOptions.search);
+      },
+      deep: true,
+    },
   },
   mounted() {
     if (this.$refs.map) {
@@ -293,57 +303,9 @@ export default {
         }
       });
     },
-    async getDataFromRest(event) {
-      this.$store.commit('setLoading', {
-        search: event.sid,
-        idDash: this.idDash,
-        should: true,
-        error: false,
-        name: this.element,
-      });
-
-      await this.$store.dispatch('auth/putLog', `Запущен запрос  ${event.sid}`);
-      // собственно проводим все операции с данными
-      const response = await this.$store.dispatch('getDataApi', {
-        search: event,
-        idDash: this.idDash,
-      });
-      // вызывая метод в хранилище
-      if (response.length === 0) {
-        // если что-то пошло не так
-        this.$store.commit('setLoading', {
-          search: event.sid,
-          idDash: this.idDash,
-          should: false,
-          error: true,
-          name: this.element,
-        });
-      } else {
-        // если все нормально
-        const responseDB = this.$store.dispatch(
-          'putIntoDB',
-          {
-            result: response,
-            sid: event.sid,
-            idDash: this.idDash,
-          },
-        );
-        responseDB.then(() => {
-          this.$store.commit('setLoading', {
-            search: event.sid,
-            idDash: this.idDash,
-            should: false,
-            error: false,
-            name: this.element,
-          });
-        });
-      }
-
-      return response;
-    },
     async loadDataForPipe(search) {
       if (this.getOptions.mode && this.getOptions.mode[0] === 'Мониторинг' && this.map) {
-        this.pipelineData = await this.getDataFromRest(search);
+        this.pipelineData = this.dataSources[search.id].data;
         const allPipes = {};
         if (Array.isArray(this.pipelineData)) {
           this.pipelineData.forEach((x) => {
