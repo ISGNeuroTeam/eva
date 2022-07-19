@@ -7,14 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- Fixed incorrect textarea update
-- Fixed graph readability
-- Fixed graph alignment
-- Fixed handling popup on graph
-
-## [1.98.1]
-
 ### Added
 
 ### Changed
@@ -23,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed label can be moved outside node in schemes constructor
 - Fixed dashed border in a corner of text block in schemes constructor
+- Fixed incorrect textarea update
+- Fixed graph readability
+- Fixed graph alignment
+- Fixed handling popup on graph
+- Fixed. In the header of the component infinite loading
 
 ## [1.99.0]
 
@@ -40,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If you select the Option to select multiple values, the default value is added to the drop-down list
 - The name of the token in the list of tokens disappears when navigating through the tabs
 - Fixed. Unable to select property for dropdown list token
-- Fixed. In the header of the component infinite loading
 
 ### Changed
 - Changed the "Not found" page
