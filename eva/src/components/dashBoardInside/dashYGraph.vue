@@ -90,10 +90,18 @@
         class="ygraph-component-container"
         :style="{ top: `${top}` }"
       >
-        <div class="popupContainer">
+        <div
+          class="popupContainer"
+          :class="{
+            'popupContainer--is-active': isPopupShow,
+          }"
+        >
           <div
             ref="nodePopupContent"
             class="popupContent"
+            :class="{
+              'popupContent--is-active': isPopupShow,
+            }"
             tabindex="0"
           >
             <div class="popupContentTitle">
@@ -102,15 +110,28 @@
                 data-id="node_description"
                 style="font-size: 0.9rem"
               />
+
+              <div class="popupContent__close-btn">
+                <v-icon
+                  :color="colorFrom.$accent_ui_color"
+                  :disabled="loading"
+                  size="20px"
+                  @click="closePopup"
+                >
+                  {{ mdiClose }}
+                </v-icon>
+              </div>
             </div>
             <div class="popupContentTabsHeader">
               <div
+                class="d-flex align-center justify-center"
                 :class="{ active: popupNodeCurrentTab === 0 }"
                 @click="popupNodeCurrentTab = 0"
               >
                 Parents
               </div>
               <div
+                class="d-flex align-center justify-center"
                 :class="{ active: popupNodeCurrentTab === 1 }"
                 @click="popupNodeCurrentTab = 1"
               >
@@ -153,6 +174,9 @@
             ref="edgePopupContent"
             class="popupContent"
             style="text-align: center"
+            :class="{
+              'popupContent--is-active': isPopupShow,
+            }"
             tabindex="0"
           >
             <div style="display: inline-block">
@@ -163,8 +187,14 @@
               <div style="float: left; margin-left: 5px; margin-right: 5px">
                 ->
               </div>
+              <br>
               <div
                 data-id="targetName"
+                style="font-weight: bold; float: left"
+              />
+              <br>
+              <div
+                data-id="metricValue"
                 style="font-weight: bold; float: left"
               />
             </div>
@@ -182,6 +212,7 @@ import {
   mdiMagnifyPlus,
   mdiFitToPageOutline,
   mdiMagnifyMinus,
+  mdiClose,
 } from '@mdi/js';
 import GraphClass from '../../js/classes/GraphClass';
 
@@ -229,7 +260,9 @@ export default {
       mdiMagnifyPlus,
       mdiFitToPageOutline,
       mdiMagnifyMinus,
+      mdiClose,
       isEditor: false,
+      isPopupShow: false,
       colors: [
         '#aefaff',
         '#0ab3ff',
@@ -276,7 +309,6 @@ export default {
             relation_ids.push(`${item.relation_id}`);
           }
         });
-
       return this.dataRestFrom
         .filter((item) => relation_ids.includes(`${item.id}`))
         .map((item) => item.node)
@@ -306,6 +338,9 @@ export default {
           }, 100);
         }
       });
+    },
+    currentNode(val) {
+      this.isPopupShow = !!val;
     },
   },
   mounted() {
@@ -428,13 +463,7 @@ export default {
           }
         },
       });
-      this.graph.initializeDefault({
-        nodePopupContent: this.$refs.nodePopupContent,
-        edgePopupContent: this.$refs.edgePopupContent,
-        callback: (currentNode) => {
-          this.currentNode = currentNode;
-        },
-      });
+      this.graph.initializeDefault();
     },
     createGraph() {
       this.$nextTick(() => {
@@ -442,10 +471,18 @@ export default {
           elem: this.$refs.graph,
           colors: this.colors,
           colorFrom: this.colorFrom,
+          nodePopupContent: this.$refs.nodePopupContent,
+          edgePopupContent: this.$refs.edgePopupContent,
+          popupCallback: (currentNode) => {
+            this.currentNode = currentNode;
+          },
         });
         this.graph = Object.freeze(graph);
         this.initMode();
       });
+    },
+    closePopup() {
+      this.graph.closeNodePopup();
     },
   },
 };
@@ -474,21 +511,35 @@ export default {
   position: absolute;
   display: none;
   border: 2px solid lightgray;
-  border-radius: 5px;
-  padding: 5px;
+  border-radius: 3px;
+  padding: 2px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  line-height: 1;
   color: black;
   opacity: 0; /* will be faded in */
   transition: opacity 0.2s ease-in;
   text-align: left;
+  max-width: 250px;
+  &--is-active {
+    display: block;
+    opacity: 1;
+  }
   &.popupContentClone {
     transition: opacity 0.2s ease-out;
+  }
+  &__close-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
   }
 
   &Title {
     font-size: 1.2rem;
     text-align: center;
+    position: relative;
+    padding-right: 25px;
   }
 
   &Tabs {
