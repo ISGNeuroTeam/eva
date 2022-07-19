@@ -567,8 +567,7 @@ class ConstructorSchemesClass {
               :width="layout.width" 
               :height="layout.height" 
               fill="transparent" 
-              rx="3" 
-              ry="3" 
+              :rx="tag.bordered && tag.borderSize / 2 || 3"
             />
           </clipPath>
         </defs>
@@ -583,8 +582,7 @@ class ConstructorSchemesClass {
           :stroke="tag.bordered && tag.borderColor || 'transparent'" 
           :stroke-width="tag.bordered && tag.borderSize || '0'" 
           :stroke-dasharray="tag.bordered && tag.borderDashed ? '4' : '0'" 
-          rx="3" 
-          ry="3" 
+          :rx="tag.bordered && tag.borderSize / 2 || 3" 
         />
         <foreignObject :height="layout.height" :width="layout.width">
           <div
