@@ -110,6 +110,9 @@
         @input="$emit('isChanged', true)"
       />
     </div>
+    <div>
+      Единицы изменения
+    </div>
     <v-slide-group
       v-if="temp.fieldType === 'time'"
       v-model="currentTimeUnit"
@@ -128,18 +131,15 @@
           style="text-transform: none; font-size: 12px; box-shadow: none"
         >
           <v-btn
-            style="font-size: 12px; width: 100px"
+            style="
+              font-size: 12px;
+              flex: auto 1 1;
+            "
             :style="
-              active
-                ? {
-                  'background-color': theme.$primary_button,
-                  color: theme.$main_bg,
-                  'border-radius': '3px',
-                }
-                : {
-                  'background-color': theme.$main_bg,
-                  color: theme.$main_text,
-                }
+              `background-color: ${active ? theme.$primary_button : theme.$main_bg};
+              color: ${active ? theme.$main_bg : theme.$main_text};
+              border-radius: ${active ? '3px' : null};
+              margin-right: ${timeUnits.length - 1 > index ? '20px' : null};`
             "
             @click="toggle"
           >
@@ -148,6 +148,9 @@
         </v-slide-item>
       </div>
     </v-slide-group>
+    <div>
+      Тип сравнения
+    </div>
     <v-slide-group
       v-model="currentOperationTab"
       mandatory
@@ -164,18 +167,12 @@
           style="text-transform: none; font-size: 12px; box-shadow: none"
         >
           <v-btn
-            style="font-size: 12px; width: 100px"
+            style="font-size: 12px; width: 100px; flex: auto 1 1;"
             :style="
-              active
-                ? {
-                  'background-color': theme.$primary_button,
-                  color: theme.$main_bg,
-                  'border-radius': '3px',
-                }
-                : {
-                  'background-color': theme.$main_bg,
-                  color: theme.$main_text,
-                }
+              `background-color: ${active ? theme.$primary_button : theme.$main_bg};
+              color: ${active ? theme.$main_bg : theme.$main_text};
+              border-radius: ${active ? '3px' : null};
+              margin-right: ${operationMap[temp.fieldType].length - 1 > index ? '20px' : null};`
             "
             @click="toggle"
           >
