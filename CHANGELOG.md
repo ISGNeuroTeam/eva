@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - fixed label can be moved outside node in schemes constructor
+- Fixed visual bug if SingleValue set value equal 0 if exist value less then 0
+- Fixed bug if change DS then slider thumb is in the wrong position
 - Fixed dashed border in a corner of text block in schemes constructor
 - Fixed incorrect textarea update
 - Fixed graph readability
