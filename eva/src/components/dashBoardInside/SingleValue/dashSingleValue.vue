@@ -39,7 +39,7 @@
       >
         <div
           v-for="(metric) in metricsForRender"
-          :key="`metric-${metric.listOrder}`"
+          :key="`metric-${metric.startId}`"
           class="item"
           :style="{ gridArea: `item-${metric.listOrder}` }"
         >
@@ -277,8 +277,7 @@ export default {
       if (!metric.metadata) {
         return undefined;
       }
-      // eslint-disable-next-line no-eval
-      const ranges = eval(`({obj:[${metric.metadata}]})`).obj[0];
+      const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
       Object.keys(ranges).forEach((key) => {
         ranges[key] = `${ranges[key]}`.split(':').map(Number);
       });
