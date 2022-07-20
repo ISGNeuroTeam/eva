@@ -20,6 +20,9 @@ export function filterCompile(filter) {
 
         filterOtlText += '(';
 
+        const timeUnits = ['s', 'm', 'h', 'd'];
+        let value;
+
         switch (item.filterPartType) {
           case 'manual':
             switch (item.fieldType) {
@@ -33,6 +36,22 @@ export function filterCompile(filter) {
                 filterOtlText += `${item.fieldName}${item.operationManual}${
                   Date.parse(item.value) / 1000
                 })`;
+                break;
+              case 'time':
+                console.log(item.timeUnits);
+                console.log(timeUnits);
+                console.log(timeUnits[item.timeUnits]);
+                if (timeUnits[item.timeUnits] === 'd') {
+                  value = item.value * 3600 * 24;
+                } else if (timeUnits[item.timeUnits] === 'h') {
+                  value = item.value * 3600;
+                } else if (timeUnits[item.timeUnits] === 'm') {
+                  value = item.value * 60;
+                } else {
+                  value = item.value;
+                }
+
+                filterOtlText += `${item.fieldName}${item.operationManual}${value})`;
                 break;
               default:
                 break;
