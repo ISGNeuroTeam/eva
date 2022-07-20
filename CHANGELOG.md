@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Ability to paint the area between the line and 0 on a multiline chart
+- Ability to change the metric for the x axis on a multiline chart 
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
