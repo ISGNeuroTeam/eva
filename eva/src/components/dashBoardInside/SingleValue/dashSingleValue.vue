@@ -18,7 +18,7 @@
         </div>
 
         <v-icon
-          v-show="dataModeFrom"
+          v-show="dataModeFrom && !error"
           size="22"
           class="settings-icon"
           @click.stop="openSettings"
@@ -78,7 +78,6 @@
         </div>
       </div>
       <SingleValueSettings
-        v-if="isSettingsComponentOpen"
         v-model="isSettingsComponentOpen"
         :received-settings="providedSettings"
         :update-count="updateCount"
