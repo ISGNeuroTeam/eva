@@ -898,6 +898,59 @@
             Применить
           </v-btn>
         </div>
+        <div
+          v-if="dataSelectedNode.dataType === 'label'"
+          class="dash-constructor-schemes__data-panel-item"
+        >
+          <v-text-field
+            v-model="dataSelectedNode.fontSize"
+            label="Размер текста"
+            :color="theme.$main_text"
+            style="margin-bottom: 10px"
+            outlined
+            type="Number"
+            hide-details
+          />
+          <div class="row align-center">
+            <div class="col-8">
+              Цвет текста
+            </div>
+            <div class="col-4">
+              <v-menu
+                top
+                offset-x
+                :close-on-content-click="false"
+                z-index="100"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    :style="{
+                      'background-color': dataSelectedNode.color.rgbaString,
+                    }"
+                    dark
+                    v-bind="attrs"
+                    v-on="on"
+                  />
+                </template>
+
+                <v-color-picker
+                  v-model="dataSelectedNode.color.rgbaObject"
+                  dot-size="12"
+                  mode="rgba"
+                  @update:color="updateSelectedNodeColor($event, 'color')"
+                  @input="closeEdgeColorPicker"
+                />
+              </v-menu>
+            </div>
+          </div>
+          <v-btn
+            small
+            :color="theme.$primary_button"
+            @click="changeDataSelectedNode"
+          >
+            Применить
+          </v-btn>
+        </div>
       </div>
     </div>
     <!--The GraphComponent-->
