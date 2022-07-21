@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
+- Changed "onclick" on heatmap event syntax
 
 ### Fixed
 - fixed label can be moved outside node in schemes constructor
