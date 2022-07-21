@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added time filter in filters
+- Constructor schemes: Edge editing
+- Constructor schemes: Step change element z-order
 - Added error message about out-of-order elements in field "_order"
 
 ### Changed
@@ -27,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed handling popup on graph
 - Fixed. In the header of the component infinite loading
 - fixed: graph vertex labels overlap each other
+- Constructor schemes: Disabled focusing on elements
 
 ## [1.99.0]
 
