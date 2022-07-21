@@ -259,7 +259,9 @@ export default {
       'metadata',
       'detailValue',
     ],
-    singleValue: [],
+    singleValue: [
+      'numberPerDigit',
+    ],
     tune: [
       'defaultFromSourceData',
       'defaultSourceDataField',
@@ -342,6 +344,7 @@ export default {
       group: 'Дополнительные настройки',
       option: 'otherSettings',
     },
+
     // dashBoard
     {
       option: 'visible',
@@ -686,6 +689,13 @@ export default {
       description: 'Выбрать формат даты и времени',
       elem: 'text-field',
       placeholder: '%Y-%m-%d %H:%M:%S',
+    },
+
+    // dashSingleValue
+    {
+      option: 'numberPerDigit',
+      description: 'Разделять число на разряды',
+      elem: 'switch',
     },
 
   ],
