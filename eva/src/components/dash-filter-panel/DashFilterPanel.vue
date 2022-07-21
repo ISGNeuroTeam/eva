@@ -311,7 +311,7 @@
       ref="confirmModal"
       v-model="filterPartModalShow"
       :theme="theme"
-      width="400"
+      width="500"
       content-class="dash-filter-panel__modal"
       :is-confirm="isChanged"
       :persistent="isChanged"
