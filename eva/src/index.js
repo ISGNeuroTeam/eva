@@ -126,7 +126,8 @@ Vue.component('dash-heatmap', () => import('./components/dashBoardInside/dashHea
 // компонент ползунок
 Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.vue'));
 // конструктор схем
-Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorSchemes.vue'));
+Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemes.vue'));
+Vue.component('dash-constructor-schemes-settings', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemesSettings.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators

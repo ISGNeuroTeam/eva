@@ -218,12 +218,14 @@ export default {
           this.textarea = `${defaultValue}`;
         }
       }
-      this.$store.commit('setTextArea', {
-        idDash: this.idDash,
-        id: this.id,
-        textarea: this.textarea,
-      });
-      this.setTocken();
+      if (this.dashFromStore.textarea !== this.textarea) {
+        this.$store.commit('setTextArea', {
+          idDash: this.idDash,
+          id: this.id,
+          textarea: this.textarea,
+        });
+        this.setTocken();
+      }
     },
     onKeyUpText() {
       const { options } = this.dashFromStore;
@@ -256,24 +258,28 @@ export default {
       }
     },
     acceptTextArea() {
-      this.$store.commit('setTextArea', {
-        idDash: this.idDash,
-        id: this.id,
-        textarea: this.textarea,
-      });
-      this.setTocken();
+      if (this.dashFromStore.textarea !== this.textarea) {
+        this.$store.commit('setTextArea', {
+          idDash: this.idDash,
+          id: this.id,
+          textarea: this.textarea,
+        });
+        this.setTocken();
+      }
     },
     setTockenByPress(event) {
       event.preventDefault();
-      this.setTocken();
+      this.acceptTextArea();
     },
     setTocken() {
       const { tockens } = this.$store.state[this.idDash];
       if (tockens) {
         let name = '';
+        let currentTokenValue = '';
         tockens.forEach((token) => {
           if (token.elem === this.id && token.action === 'accept') {
             name = token.name;
+            currentTokenValue = token?.value || '';
           }
         });
 
