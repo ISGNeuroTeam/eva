@@ -170,6 +170,8 @@ export default {
         }]);
         return [];
       }
+      this.setError('');
+
       return elementsToShow;
     },
 
