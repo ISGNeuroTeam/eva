@@ -1312,7 +1312,6 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      deletableItems: GraphItemTypes.NODE | GraphItemTypes.EDGE | GraphItemTypes.LABEL,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1521,12 +1520,24 @@ class ConstructorSchemesClass {
       isValidLabelOwnerPredicate: (labelOwner) => labelOwner instanceof INode
         || labelOwner instanceof IEdge
         || labelOwner instanceof IPort,
-      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => graph.addLabel({
-        owner: dropTarget,
-        location: dropLocation,
-        text: dropData.text,
-        style: dropData.style.clone(),
-      }),
+      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => {
+        if (dropTarget instanceof IPort) {
+          this.graphComponent.graphModelManager.graph.addLabel({
+            owner: dropTarget.owner,
+            style: dropData.style.clone(),
+            text: dropData.text,
+            tag: dropData.tag,
+          });
+        } else {
+          graph.addLabel({
+            owner: dropTarget,
+            location: dropLocation,
+            text: dropData.text,
+            style: dropData.style.clone(),
+          });
+        }
+        return graph;
+      },
     });
   }
 

@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor schemes: Edge editing
 - Constructor schemes: Step change element z-order
 - Added error message about out-of-order elements in field "_order"
+- Added ability to remove ports
+- Added inability to add a label to the "port" component
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
