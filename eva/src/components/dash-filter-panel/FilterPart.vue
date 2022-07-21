@@ -90,7 +90,9 @@
         </div>
         <div
           class="part-subtitle"
-          v-text="`(${filterPart.fieldType}) ${operationManualTitle}`"
+          v-text="`(${filterPart.fieldType})
+            ${ filterPart.fieldType ==='time' && timeUnitsTitles[filterPart.timeUnits] },
+            ${operationManualTitle}`"
         />
       </template>
     </div>
@@ -177,6 +179,12 @@ export default {
       refreshIcon: mdiRefresh,
       editIcon: mdiPencil,
       dropDownIcon: mdiChevronDown,
+      timeUnitsTitles: [
+        'Секунды',
+        'Минуты',
+        'Часы',
+        'Сутки',
+      ],
       operationManualTitleMap: {
         number: {
           '>': 'Больше',
@@ -186,6 +194,11 @@ export default {
         date: {
           '>': 'Позже',
           '<': 'Раньше',
+        },
+        time: {
+          '>': 'Больше',
+          '<': 'Меньше',
+          '=': 'Равно',
         },
       },
     };

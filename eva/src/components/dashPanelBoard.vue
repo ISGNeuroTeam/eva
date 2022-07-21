@@ -2049,23 +2049,37 @@ export default {
                 }
               } else if (doing[0].toLowerCase() === 'go'.toLowerCase()) {
                 /// go
-                doing = doing[1].slice(0, doing[1].length - 1).split(',');
-                this.$set(this.event, 'target', doing[0]);
 
+                // TODO: оставленно специально, если возникнет баг в смежном функционале
+                // doing = doing[1].slice(0, doing[1].length - 1).split(',');
+                doing = doing[1].match(/([\w-_]+)|(\[([^\]]+)])/g);
+                this.$set(this.event, 'target', doing[0]);
                 let prop;
                 let value;
-                if (doing[1].indexOf('[') !== -1) {
-                  doing.splice(0, 1);
+                let tab;
+
+                if (doing[3] && doing[3].indexOf('[') !== -1) {
+                  prop = [doing[1]];
+                  value = [`$${doing[1]}$`];
+                  tab = doing[2] ?? 1;
+                  doing.splice(0, 3);
                   doing = doing.join(',');
                   doing = doing.match(/[^[]+(?=\])/g);
-                  prop = doing[0].split(',');
-                  value = doing[1].split(',');
+
+                  if (doing.length === 1) {
+                    value = [...value, ...doing[0].split(',').map((token) => `$${token}$`)];
+                    prop = [...prop, ...doing[0].split(',')];
+                  } else {
+                    value = [...value, ...doing[0].split(',')];
+                    prop = [...prop, ...doing[1].split(',')];
+                  }
                 } else {
                   prop = [doing[1]];
-                  value = [doing[2]];
+                  value = [doing[1]];
+                  tab = doing[2] ?? 1;
                 }
                 this.$set(this.event, 'prop', prop);
-                this.$set(this.event, 'tab', doing[2]);
+                this.$set(this.event, 'tab', tab);
                 this.$set(this.event, 'value', value);
               } else if (doing[0].toLowerCase() === 'open'.toLowerCase()) {
                 // open

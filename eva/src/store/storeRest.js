@@ -51,13 +51,15 @@ export default {
               // отправляем get запрос с параметрами ИД
 
               responseGet = await fetch(
-                `/api/checkjob?original_otl=${encodeURIComponent(
-                  searchFrom.otl,
-                )}&tws=${searchFrom.tws}&twf=${searchFrom.twf}&cache_ttl=${
-                  searchFrom.cache_ttl
-                }`,
+                '/api/checkjob',
                 {
-                  method: 'GET',
+                  method: 'POST',
+                  body: JSON.stringify({
+                    original_otl: searchFrom.otl,
+                    tws: searchFrom.tws,
+                    twf: searchFrom.twf,
+                    cache_ttl: searchFrom.cache_ttl,
+                  }),
                   //  mode: 'no-cors'
                 },
               )
@@ -170,7 +172,6 @@ export default {
 
                     const dataProm = resultProm
                       .map((prom, i) => new Promise((resultPromResolve) => {
-
                         prom.text().then((dataitself) => {
                           if (shema === i) {
                             shema = dataitself;
