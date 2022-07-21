@@ -9,12 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added time filter in filters
+- Added error message about out-of-order elements in field "_order"
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
 - Changed "onclick" on heatmap event syntax
 
 ### Fixed
+- Fixed if out-of-order elements in field "_order" in DS for singleValue, then after fix but visualisation not work
 - fixed label can be moved outside node in schemes constructor
 - Fixed dashed border in a corner of text block in schemes constructor
 - Fixed incorrect textarea update
