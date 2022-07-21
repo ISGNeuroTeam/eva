@@ -1309,12 +1309,18 @@ class ConstructorSchemesClass {
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
       // Проверяем на наличие данных в узле
-      if (evt.item instanceof INode) {
+      if (evt.item instanceof INode || evt.item instanceof ILabel) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
           openDataPanelCallback(evt.item.tag);
+        } else if (evt.item instanceof ILabel) {
+          openDataPanelCallback({
+            dataType: 'label',
+            fontSize: evt.item.style.textSize,
+            color: ConstructorSchemesClass.generateColor(evt.item.style.textFill.color),
+          });
         } else {
           openDataPanelCallback({
             ...evt.item.tag,
@@ -1999,62 +2005,75 @@ class ConstructorSchemesClass {
 
   // TODO: Рефакторин
   updateSelectedNode(updatedData, updateStoreCallback) {
-    if (
-      this.targetDataNode.tag.dataType === '0'
-      || this.targetDataNode.tag.dataType === '1'
-    ) {
-      const items = updatedData.items.map((item) => ({
-        ...item,
-        textLeft: this.getDataItemById(item.id)?.Description || '-',
-        textRight: this.getDataItemById(item.id)?.value || '-',
-      }));
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        items,
-      };
-    } else if (
-      this.targetDataNode.tag.dataType === '2'
-      || this.targetDataNode.tag.dataType === '3'
-    ) {
-      const items = {
-        ...updatedData,
-        textFirst: this.getDataItemById(updatedData.id)?.value || '-',
-        textSecond: this.getDataItemById(updatedData.id)?.Description || '-',
-      };
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...items,
-      };
-    } else if (this.targetDataNode.tag.dataType === '4') {
-      const items = {
-        ...updatedData,
-        currentValue: Number(this.getDataItemById(updatedData.id)?.value),
-        maxValue: Number(this.getDataItemById(updatedData.id)?.value) + 100,
-      };
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...items,
-      };
-    } else if (this.targetDataNode.tag.dataType === '5') {
-      const items = {
-        ...updatedData,
-        firstValue: Number(this.getDataItemById(updatedData.idFirst)?.value),
-        secondValue: Number(this.getDataItemById(updatedData.idSecond)?.value),
-      };
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...items,
-      };
-    } else if (this.targetDataNode.tag.dataType === 'label-0') {
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...updatedData,
-      };
-    } else if (this.targetDataNode.tag.dataType === 'default-node') {
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...updatedData,
-      };
+    if (!updatedData.dataType) {
+      if (
+        this.targetDataNode.tag.dataType === '0'
+        || this.targetDataNode.tag.dataType === '1'
+      ) {
+        const items = updatedData.items.map((item) => ({
+          ...item,
+          textLeft: this.getDataItemById(item.id)?.Description || '-',
+          textRight: this.getDataItemById(item.id)?.value || '-',
+        }));
+        this.targetDataNode.tag = {
+          ...this.targetDataNode.tag,
+          items,
+        };
+      } else if (
+        this.targetDataNode.tag.dataType === '2'
+        || this.targetDataNode.tag.dataType === '3'
+      ) {
+        const items = {
+          ...updatedData,
+          textFirst: this.getDataItemById(updatedData.id)?.value || '-',
+          textSecond: this.getDataItemById(updatedData.id)?.Description || '-',
+        };
+        this.targetDataNode.tag = {
+          ...this.targetDataNode.tag,
+          ...items,
+        };
+      } else if (this.targetDataNode.tag.dataType === '4') {
+        const items = {
+          ...updatedData,
+          currentValue: Number(this.getDataItemById(updatedData.id)?.value),
+          maxValue: Number(this.getDataItemById(updatedData.id)?.value) + 100,
+        };
+        this.targetDataNode.tag = {
+          ...this.targetDataNode.tag,
+          ...items,
+        };
+      } else if (this.targetDataNode.tag.dataType === '5') {
+        const items = {
+          ...updatedData,
+          firstValue: Number(this.getDataItemById(updatedData.idFirst)?.value),
+          secondValue: Number(this.getDataItemById(updatedData.idSecond)?.value),
+        };
+        this.targetDataNode.tag = {
+          ...this.targetDataNode.tag,
+          ...items,
+        };
+      } else if (this.targetDataNode.tag.dataType === 'label-0') {
+        this.targetDataNode.tag = {
+          ...this.targetDataNode.tag,
+          ...updatedData,
+        };
+      } else if (this.targetDataNode.tag.dataType === 'default-node') {
+        this.targetDataNode.tag = {
+          ...this.targetDataNode.tag,
+          ...updatedData,
+        };
+      }
+    } else if (updatedData.dataType === 'label') {
+      this.graphComponent.graphModelManager.graph.setStyle(
+        this.targetDataNode,
+        new DefaultLabelStyle({
+          backgroundStroke: 'transparent',
+          backgroundFill: 'transparent',
+          insets: [3, 5, 3, 5],
+          textFill: updatedData.color.rgbaString,
+          textSize: +updatedData.fontSize,
+        }),
+      );
     }
     // Обновляем состояние графа
     this.graphComponent.updateVisual();

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added time filter in filters
+- Constructor-schemes. Added settings for label
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
