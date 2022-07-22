@@ -1,3 +1,50 @@
+# [1.100.0]
+
+### Added
+- The ability to set the time format of numbers in the filter
+- Constructor schemes: ability to edit edges
+- Constructor schemes: The order of the elements display
+- Added an error message about out-of-order elements in the "_order" field
+
+### Changed
+- Changed the method of requesting the status of the job from GET to POST ¹
+
+### Fixed
+- No additional tokens are passed in the Header component
+- Settings do not open of SingleValue component
+- Bug when the label can be moved outside node in schemes constructor
+- The component is displayed incorrectly when editing the data source 
+- Bug when changing the data source when the tune slider thumb is in the wrong position
+- Fixed dashed border in a corner of text block in schemes constructor
+- Fixed incorrect token updating of the textarea component
+- Fixed readability and alignment of the Graph component
+- The ability to select an edge when hovering the cursor in the Graph component
+- In the header of the component infinite loading
+- Bug when the labels of the graph vertices overlap each other
+- Constructor schemes: Disabled focusing on elements
+
+#### ¹⁾ Changed the method of requesting the status of the job from GET to POST
+- Minimum required OT simple REST version: 1.13.0
+
+# [1.99.0]
+
+### Added
+- Tooltips with a describing OTL commands in data exploration
+- Notification if the field specified for the default data source isn't found
+
+### Changed
+- Appearance of the "Not found" page
+- Notifications have become more compact
+
+### Fixed
+- Position of the open list of the "select" component
+- Typo in the svg upload field placeholder
+- Bug with color if change metric position in the Single Value component
+- The problem with going beyond the boundaries of the "Tune" component after restarting the Data Source
+- If you select the Option to select multiple values, the default value is added to the drop-down list
+- The name of the token in the list of tokens disappears when navigating through the tabs
+- When creating a token, it is not possible to select properties in the drop-down list if the component was just added
+
 # [1.98.1]
 
 ### Fixed
