@@ -1,3 +1,8 @@
+# [1.100.1]
+
+### Fixed
+- Missing token name after renaming
+
 # [1.100.0]
 
 ### Added
