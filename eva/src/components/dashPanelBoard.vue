@@ -1695,6 +1695,10 @@ export default {
       const newName = this.tempTocken.name;
       this.tempTocken.name = this.tokens[id].name;
 
+      // заменяем сторое значение имени на новое
+      delete this.tockensName[this.tempTocken.name];
+      this.$set(this.tockensName, newName, newName);
+
       this.$store.commit('createTockens', {
         idDash: this.idDash,
         tocken: this.tempTocken,
