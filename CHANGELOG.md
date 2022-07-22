@@ -12,10 +12,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to change the metric for the x axis on a multiline chart 
 
 ### Changed
-- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
 
 ### Fixed
+
+## [1.100.0]
+
+### Added
+- Added time filter in filters
+- Constructor schemes: Edge editing
+- Constructor schemes: Step change element z-order
+- Added error message about out-of-order elements in field "_order"
+
+### Changed
+- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
+- Changed "onclick" on heatmap event syntax
+
+### Fixed
+- Fixed if out-of-order elements in field "_order" in DS for singleValue, then after fix but visualisation not work
 - fixed label can be moved outside node in schemes constructor
+- Fixed visual bug if SingleValue set value equal 0 if exist value less then 0
+- Fixed bug if change DS then slider thumb is in the wrong position
 - Fixed dashed border in a corner of text block in schemes constructor
 - Fixed incorrect textarea update
 - Fixed graph readability
@@ -23,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed handling popup on graph
 - Fixed. In the header of the component infinite loading
 - fixed: graph vertex labels overlap each other
+- Constructor schemes: Disabled focusing on elements
 
 ## [1.99.0]
 
