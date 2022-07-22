@@ -2005,7 +2005,7 @@ class ConstructorSchemesClass {
 
   // TODO: Рефакторин
   updateSelectedNode(updatedData, updateStoreCallback) {
-    if (!updatedData.dataType) {
+    if (this.targetDataNode.tag !== null) {
       if (
         this.targetDataNode.tag.dataType === '0'
         || this.targetDataNode.tag.dataType === '1'
