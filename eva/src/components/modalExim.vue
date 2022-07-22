@@ -44,7 +44,7 @@
           </v-btn>
           <p
             class="msgExp"
-            :style="{ color: theme[msgExp.color], opacity: msgExp.opacity }"
+            :style="{ opacity: msgExp.opacity }"
           >
             {{ msgExp.text }}
           </p>
@@ -72,7 +72,7 @@
           </v-btn>
           <p
             class="msgImp"
-            :style="{ color: theme[msgImp.color], opacity: msgImp.opacity }"
+            :style="{ opacity: msgImp.opacity }"
           >
             {{ msgImp.text }}
           </p>
@@ -217,6 +217,15 @@ export default {
     },
     async exportDash() {
       const ids = [];
+      if (this.selected.length === 0) {
+        const itemname = (this.element === 'dash') ? 'дашборды' : 'группы';
+        this.msgExp.text = `Выберите ${itemname} для экспорта`;
+        this.msgExp.opacity = '1';
+        setTimeout(() => {
+          this.msgExp.opacity = '0';
+        }, 2000);
+        return;
+      }
       if (this.element === 'dash') {
         this.dashboards.forEach((item) => {
           if (this.selected.includes(item.name)) {

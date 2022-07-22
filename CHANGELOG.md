@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- When exporting dashboards without selected elements, the resulting page wasn't found
 
 ## [1.100.1]
 
