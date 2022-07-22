@@ -221,6 +221,8 @@ export default {
       'fontSize',
       'underline',
       'onButton',
+      'SubmitByListDS',
+      'ListDS',
     ],
     textarea: [
       'searchBtn',
@@ -389,7 +391,7 @@ export default {
     },
     {
       relation() {
-        return !!this.$store.state[this.idDash].searches;
+        return this.isDashBoard && !!this.$store.state[this.idDash].searches;
       },
       option: 'defaultFromSourceData',
       description: 'Дефолтное значение из источника данных',
@@ -664,6 +666,26 @@ export default {
       option: 'onButton',
       description: 'Перезапускать серчи по кнопке',
       elem: 'switch',
+    },
+    {
+      relation: ['onButton'],
+      label: 'SubmitByListDS',
+      option: 'SubmitByListDS',
+      description: 'Перезапускать серчи из списка ИД',
+      default: false,
+      elem: 'switch',
+    },
+    {
+      relation: ['SubmitByListDS'],
+      label: 'ListDS',
+      option: 'ListDS',
+      description: 'Если токен содержится в ИД',
+      elem: 'checkbox-list',
+      default: [],
+      items() {
+        return new Set(this.$store.state[this.idDash]?.searches
+          .map(({ sid }) => sid) || []);
+      },
     },
 
     // dashSelect
