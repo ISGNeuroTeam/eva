@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.100.1]
+
+### Fixed
+- Fixed missing token name after rename
+
 ## [1.100.0]
 
 ### Added
