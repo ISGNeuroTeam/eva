@@ -85,6 +85,7 @@
         v-model="search.original_otl"
         :options="cmOption"
         class="search-block-codemirror"
+        style="position:relative;"
         :style="`height: ${heightCodemirror}px`"
         @keyup.ctrl.\="addLineBreaks"
         @change="keypressCtrlEnter($event)"
@@ -351,7 +352,10 @@ import 'codemirror/addon/fold/foldgutter.js';
 import 'codemirror/addon/fold/foldcode.js';
 import 'codemirror/addon/fold/indent-fold.js';
 import 'codemirror/addon/merge/merge.js';
-import '../../js/codeHighlight.js';
+
+import '../../js/codeMirror/codeHighlight.js';
+import '../../js/codeMirror/token-hover.js';
+import '../../js/codeMirror/text-hover.js';
 import { isDarkColor } from '@/js/colorutility/isDarkColor';
 
 export default {
@@ -415,6 +419,9 @@ export default {
         showCursorWhenSelecting: true,
         theme: 'eva-dark',
         lineWrapping: false,
+        textHover: {
+          delay: 400,
+        },
       },
       searchSize: [10, 15, 20, 30, 40, 50],
       numberLineModal: false,
@@ -481,11 +488,6 @@ export default {
         }
       }
     },
-    // getThemeTitle(val) {
-    //   // eslint-disable-next-line no-unused-expressions
-    //   val === 'dark' ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
-    //   this.forwardInput();
-    // },
     isDarkTheme(val) {
       // eslint-disable-next-line no-unused-expressions
       val ? this.cmOption.theme = 'eva-dark' : this.cmOption.theme = 'eva';
@@ -851,4 +853,30 @@ export default {
     color: $secondary_text
 .v-input__slot fieldset
   color: $secondary_text !important
+</style>
+
+<style lang="scss">
+.CodeMirror-hover-tooltip {
+  background-color: infobackground;
+  border: 1px solid black;
+  border-radius: 4px 4px 4px 4px;
+  color: infotext;
+  font-family: monospace;
+  font-size: 10pt;
+  overflow: hidden;
+  padding: 2px 5px;
+  position: fixed;
+  z-index: 100;
+  max-width: 600px;
+  opacity: 0.1;
+  transition: opacity .2s;
+  -moz-transition: opacity .2s;
+  -webkit-transition: opacity .2s;
+  -o-transition: opacity .2s;
+  -ms-transition: opacity .2s;
+
+  ul {
+    padding-left: 20px;
+  }
+}
 </style>
