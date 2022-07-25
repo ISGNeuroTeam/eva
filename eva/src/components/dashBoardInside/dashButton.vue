@@ -223,7 +223,11 @@ export default {
       this.optionsData.onButton = options?.onButton;
     },
     updateSearches() {
-      this.$store.commit('updateManualTokens', { idDash: this.idDash });
+      const { idDash, id } = this;
+      this.$store.commit('updateManualTokens', {
+        idDash,
+        id,
+      });
     },
     actionOpen(targetLink, header, widthPersent, heightPersent) {
       // размер нового окна
@@ -281,39 +285,41 @@ export default {
       let tocken = {};
       let value = false;
 
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (
-          tockens[i].elem === this.id
-          && tockens[i].action === 'click'
-          && tockens[i].capture === 'inverse'
-        ) {
-          switch (tockens[i].value) {
-            case '':
-              value = true;
-              break;
-            case true:
-              value = false;
-              break;
-            case false:
-              value = true;
-              break;
-            default:
-              break;
-          }
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          tocken = {
+            name: tockens[i].name,
+            action: tockens[i].action,
+            capture: tockens[i].capture,
+          };
+          if (
+            tockens[i].elem === this.id
+            && tockens[i].action === 'click'
+            && tockens[i].capture === 'inverse'
+          ) {
+            switch (tockens[i].value) {
+              case '':
+                value = true;
+                break;
+              case true:
+                value = false;
+                break;
+              case false:
+                value = true;
+                break;
+              default:
+                break;
+            }
 
-          this.$store.commit('setTocken', {
-            token: tocken,
-            idDash: this.idDash,
-            value,
-            store: this.$store,
-          });
-        }
-      });
+            this.$store.commit('setTocken', {
+              token: tocken,
+              idDash: this.idDash,
+              value,
+              store: this.$store,
+            });
+          }
+        });
+      }
 
       const events = this.getEvents({
         event: 'onclick',

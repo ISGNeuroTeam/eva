@@ -216,11 +216,15 @@ export default new Vuex.Store({
         token.name = value;
       }
     },
-    updateManualTokens(state, { idDash }) {
+    updateManualTokens(state, { idDash, id }) {
       if (state[idDash]?.tockens?.length > 0) {
+        const { options } = state[idDash][id];
         state[idDash].tockens.forEach((token) => {
           if (token.onButton) {
             state[idDash].searches.forEach((search) => {
+              if (options.SubmitByListDS && !options.ListDS.includes(search.sid)) {
+                return;
+              }
               if (search.original_otl.includes(`$${token.name}$`)) {
                 this.commit('updateSearchStatus', {
                   idDash,
