@@ -532,7 +532,8 @@ class GraphClass {
 
   applyGraphBuilder() {
     new Promise((resolve) => {
-      this.graphComponent.graphModelManager.graph.clear();
+      this.graphComponent.graph.clear();
+      this.enableWebGL2();
 
       const graphBuilder = new GraphBuilder(this.graphComponent.graph);
 
