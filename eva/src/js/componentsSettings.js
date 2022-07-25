@@ -664,14 +664,14 @@ export default {
     {
       label: 'Submit',
       option: 'onButton',
-      description: 'Перезапускать серчи по кнопке',
+      description: 'Обновлять источники данных по клику',
       elem: 'switch',
     },
     {
       relation: ['onButton'],
       label: 'SubmitByListDS',
       option: 'SubmitByListDS',
-      description: 'Перезапускать серчи из списка ИД',
+      description: 'Обновлять только источники из списка',
       default: false,
       elem: 'switch',
     },
