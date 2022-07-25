@@ -1,3 +1,36 @@
+# [1.100.1]
+
+### Fixed
+- Missing token name after renaming
+
+# [1.100.0]
+
+### Added
+- The ability to set the time format of numbers in the filter
+- Constructor schemes: ability to edit edges
+- Constructor schemes: The order of the elements display
+- Added an error message about out-of-order elements in the "_order" field
+
+### Changed
+- Changed the method of requesting the status of the job from GET to POST ¹
+
+### Fixed
+- No additional tokens are passed in the Header component
+- Settings do not open of SingleValue component
+- Bug when the label can be moved outside node in schemes constructor
+- The component is displayed incorrectly when editing the data source 
+- Bug when changing the data source when the tune slider thumb is in the wrong position
+- Fixed dashed border in a corner of text block in schemes constructor
+- Fixed incorrect token updating of the textarea component
+- Fixed readability and alignment of the Graph component
+- The ability to select an edge when hovering the cursor in the Graph component
+- In the header of the component infinite loading
+- Bug when the labels of the graph vertices overlap each other
+- Constructor schemes: Disabled focusing on elements
+
+#### ¹⁾ Changed the method of requesting the status of the job from GET to POST
+- Minimum required OT simple REST version: 1.13.0
+
 # [1.99.0]
 
 ### Added

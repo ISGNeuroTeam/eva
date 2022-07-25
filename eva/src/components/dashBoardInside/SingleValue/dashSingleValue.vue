@@ -18,7 +18,7 @@
         </div>
 
         <v-icon
-          v-show="dataModeFrom"
+          v-show="dataModeFrom && !error"
           size="22"
           class="settings-icon"
           @click.stop="openSettings"
@@ -159,7 +159,19 @@ export default {
     },
 
     metricsForRender() {
-      return this.metricList.slice(0, this.metricCount);
+      const elementsToShow = this.metricList.slice(0, this.metricCount);
+      if (elementsToShow.length !== elementsToShow.filter(Boolean).length) {
+        this.setError('Допущен пропуск номеров в последовательности значений поля "_order"');
+        this.$store.commit('setState', [{
+          object: this.getOptions.settings,
+          prop: 'metricOptions',
+          value: [],
+        }]);
+        return [];
+      }
+      this.setError('');
+
+      return elementsToShow;
     },
 
     tockens() {
@@ -246,7 +258,7 @@ export default {
     dataRestFrom: {
       handler(val, oldVal) {
         if (val.length > 0) {
-          const isNew = val.length !== oldVal.langth;
+          const isNew = val.length !== oldVal.length;
           const options = structuredClone(this.getOptions);
           this.setVisual(
             this.currentSettings.metricOptions?.length > 0
@@ -273,6 +285,9 @@ export default {
     this.init(null, true);
   },
   methods: {
+    setError(err) {
+      this.error = err;
+    },
     getColor(metric) {
       if (!metric.metadata) {
         return undefined;
@@ -365,12 +380,22 @@ export default {
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
-          if (!sortOrder || this.error) {
+          if (metricOptionsCurrent.length !== metricOptionsCurrent.filter(Boolean).length) {
+            this.error = 'Допущен пропуск номеров в последовательности значений поля "_order"';
+            this.$store.commit('setState', [{
+              object: this.getOptions.settings,
+              prop: 'metricOptions',
+              value: [],
+            }]);
+          }
+          if (!sortOrder) {
             this.error = 'В запросе отсутствует обязательное поле "_order"';
             metricList.length = 0;
             metricOptions.length = 0;
             return;
           }
+          if (this.error) return;
+
           let range;
 
           if (!metadata || typeof metadata !== 'string') {
@@ -379,9 +404,11 @@ export default {
             range = metadata;
           }
           const startId = `${metric}_${id}`;
+
           const metricCurrent = metricOptionsCurrent?.find(
             (m) => m.startId === startId,
           );
+
           const defaultMetricOption = {
             title: metric || data.phase,
             ...metricCurrent,
