@@ -517,7 +517,6 @@ export default {
         }
       }
       const elemDeepValue = this.elemDeep[String(this.multiple)];
-
       this.$store.commit('setSelected', {
         element: 'elemDeep',
         value: this.elemDeep[String(this.multiple)],
@@ -525,69 +524,66 @@ export default {
         id: this.id,
       });
       const { tockens } = this.$store.state[this.idDash];
-      const tockensToUpdate = [];
 
       let curTocken = {};
       const data = this.dataReady;
       if (tockens) {
-        Object.keys(tockens).forEach((i) => {
-          if (tockens[i].elem === this.id && tockens[i].action === 'change') {
-            curTocken = tockens[i];
-            tockensToUpdate.push({ name: tockens[i].name, capture: tockens[i].capture });
+        Object.keys(tockens).forEach((key) => {
+          if (tockens[key].elem === this.id && tockens[key].action === 'change') {
+            curTocken = tockens[key];
+
+            let value = [];
+
+            if (String(this.multiple) === 'true') {
+              elemDeepValue.forEach((elem) => {
+                const addValues = data.filter((x) => elem === x[this.elem])
+                  .map((x) => x[this.elemlink])
+                  .reduce((a, b) => (a.includes(b) ? a : [...a, b]), []);
+                value.push(...addValues);
+              });
+            } else {
+              if (elemDeepValue !== null) {
+                if (Array.isArray(elemDeepValue)) {
+                  value = [...[], ...String(elemDeepValue)];
+                } else {
+                  value = [String(elemDeepValue)];
+                }
+              }
+              for (let i = 0; i < data.length; i += 1) {
+                if (data[i][this.elem] === elemDeepValue) {
+                  value = [data[i][curTocken.capture]];
+                  break;
+                }
+              }
+            }
+
+            if (curTocken.prefix && curTocken.prefix !== '') {
+              value = value.map((item) => `${curTocken.prefix}${item}`);
+            }
+            if (curTocken.sufix && curTocken.sufix !== '') {
+              value = value.map((item) => `${item}${curTocken.sufix}`);
+            }
+            if (curTocken.delimetr && curTocken.delimetr !== '') {
+              value = value.join(curTocken.delimetr);
+            } else if (value) {
+              value = value.join(',');
+            }
+
+            const token = {
+              name: tockens[key].name,
+              action: 'change',
+              capture: tockens[key].capture,
+            };
+            if (token.name !== '') {
+              this.$store.commit('setTocken', {
+                token,
+                idDash: this.idDash,
+                value,
+              });
+            }
           }
         });
       }
-      let value = [];
-
-      if (String(this.multiple) === 'true') {
-        elemDeepValue.forEach((elem) => {
-          const addValues = data.filter((x) => elem === x[this.elem])
-            .map((x) => x[this.elemlink])
-            .reduce((a, b) => (a.includes(b) ? a : [...a, b]), []);
-          value.push(...addValues);
-        });
-      } else {
-        if (elemDeepValue !== null) {
-          if (Array.isArray(elemDeepValue)) {
-            value = [...[], ...String(elemDeepValue)];
-          } else {
-            value = [String(elemDeepValue)];
-          }
-        }
-        for (let i = 0; i < data.length; i += 1) {
-          if (data[i][this.elem] === elemDeepValue) {
-            value = [data[i][this.elemlink]];
-            break;
-          }
-        }
-      }
-
-      if (curTocken.prefix && curTocken.prefix !== '') {
-        value = value.map((item) => `${curTocken.prefix}${item}`);
-      }
-      if (curTocken.sufix && curTocken.sufix !== '') {
-        value = value.map((item) => `${item}${curTocken.sufix}`);
-      }
-      if (curTocken.delimetr && curTocken.delimetr !== '') {
-        value = value.join(curTocken.delimetr);
-      } else if (value) {
-        value = value.join(',');
-      }
-
-      tockensToUpdate.forEach((item) => {
-        const token = {
-          name: item.name,
-          action: 'change',
-          capture: item.capture,
-        };
-        if (item.name !== '') {
-          this.$store.commit('setTocken', {
-            token,
-            idDash: this.idDash,
-            value,
-          });
-        }
-      });
     },
   },
 };

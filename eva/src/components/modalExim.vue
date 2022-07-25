@@ -44,7 +44,7 @@
           </v-btn>
           <p
             class="msgExp"
-            :style="{ color: theme[msgExp.color], opacity: msgExp.opacity }"
+            :style="{ opacity: msgExp.opacity }"
           >
             {{ msgExp.text }}
           </p>
@@ -72,7 +72,7 @@
           </v-btn>
           <p
             class="msgImp"
-            :style="{ color: theme[msgImp.color], opacity: msgImp.opacity }"
+            :style="{ opacity: msgImp.opacity }"
           >
             {{ msgImp.text }}
           </p>
@@ -217,6 +217,15 @@ export default {
     },
     async exportDash() {
       const ids = [];
+      if (this.selected.length === 0) {
+        const itemName = (this.element === 'dash') ? 'дашборды' : 'группы';
+        this.msgExp.text = `Выберите ${itemName} для экспорта`;
+        this.msgExp.opacity = '1';
+        setTimeout(() => {
+          this.msgExp.opacity = '0';
+        }, 2000);
+        return;
+      }
       if (this.element === 'dash') {
         this.dashboards.forEach((item) => {
           if (this.selected.includes(item.name)) {
@@ -240,6 +249,7 @@ export default {
         this.msgExp.color = 'controlsActive';
         this.msgExp.opacity = '1';
       } else {
+        this.isChanged = false;
         this.msgExp.text = 'Экспорт прошел успешно';
         this.msgExp.color = 'controls';
         this.msgExp.opacity = '1';
@@ -288,6 +298,7 @@ export default {
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';
+            this.isChanged = false;
           } catch {
             this.msgImp.text = 'Импортировать не удалось';
             this.msgImp.color = 'controlsActive';
