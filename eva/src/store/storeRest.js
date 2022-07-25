@@ -172,7 +172,6 @@ export default {
 
                     const dataProm = resultProm
                       .map((prom, i) => new Promise((resultPromResolve) => {
-
                         prom.text().then((dataitself) => {
                           if (shema === i) {
                             shema = dataitself;
