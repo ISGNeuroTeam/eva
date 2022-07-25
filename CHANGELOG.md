@@ -8,11 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added visualization of a scatter chart
+- The button component now has the option to choose which tokens to update on click
+- Ability to paint the area between the line and 0 on a multiline chart
+- Ability to change the metric for the x axis on a multiline chart 
 
 ### Changed
 
 ### Fixed
 - Fixed problem with association tokens with Select visualisation
+- When exporting dashboards without selected elements, the resulting page wasn't found
 
 ## [1.100.1]
 
@@ -26,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor schemes: Edge editing
 - Constructor schemes: Step change element z-order
 - Added error message about out-of-order elements in field "_order"
+- Added ability to remove ports
+- Added inability to add a label to the "port" component
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
