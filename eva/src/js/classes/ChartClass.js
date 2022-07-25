@@ -14,6 +14,8 @@ export default class ChartClass {
       barplotType: 'divided', // overlay, divided, accumulation
       barplotBarWidthEnabled: false,
       barplotBarWidth: 80, // percent
+      verticalLines: true,
+      xSelection: true,
       // nice: false,
     },
   }
@@ -113,6 +115,7 @@ export default class ChartClass {
       nice,
       ticksEnabled,
       ticks,
+      label,
     } = this.options.xAxis;
     const { options, maxYLeftAxisWidth } = this;
     const barWidth = this.bandX?.bandwidth() || 30;
@@ -169,6 +172,17 @@ export default class ChartClass {
       .attr('transform', `translate(${options.xAxis.textTranslate}) ${rotate}`) //
       .style('text-anchor', options.xAxis.textAnchor);
 
+    if (label) {
+      // Add X axis label:
+      this.xAxis.append('text')
+        .attr('x', (this.box.width / 2) - this.maxYLeftAxisWidth)
+        .attr('y', 30)
+        .attr('font-size', '12')
+        .attr('fill', 'var(--main_text)')
+        .attr('text-anchor', 'middle')
+        .text(label);
+    }
+
     // recalculate x axis height
     const xAxisBBox = this.xAxis.node().getBBox();
     this.xAxisHeight = xAxisBBox.height;
@@ -199,7 +213,10 @@ export default class ChartClass {
   }
 
   createGroupYAxes(width, height, y, num) {
-    const { groupsTopOffset } = this.options;
+    const {
+      groupsTopOffset,
+      yGroupLabel,
+    } = this.options;
     const { barplotType } = this.options.xAxis;
     const groupHeight = height - groupsTopOffset;
     const metrics = this.metrics
@@ -274,7 +291,7 @@ export default class ChartClass {
     xOffset[axisPosition] += yGroupItem.node().getBBox().width;
 
     /// create Y axes
-    const linearMetrics = metrics.filter((metric) => metric.type === 'line');
+    const linearMetrics = metrics.filter((metric) => (['line', 'scatter'].includes(metric.type)));
     linearMetrics.forEach((metric) => {
       const axisSide = metric.yAxisSide === 'right' ? 'Right' : 'Left';
 
@@ -322,9 +339,23 @@ export default class ChartClass {
             .ticks(metric.ticks || Math.ceil(groupHeight / 30)),
         );
 
-      yGroup.selectAll('text').attr('fill', metric.color);
+      if (metric.coloredYAxis) {
+        yGroup.selectAll('text').attr('fill', metric.color);
+      }
       xOffset[axisSide] += yGroup.node().getBBox().width + 8;
     });
+
+    if (yGroupLabel) {
+      // Add Y axis label:
+      yGroups.Left.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', groupHeight / -2)
+        .attr('y', -20)
+        .attr('font-size', '12')
+        .attr('fill', 'var(--main_text)')
+        .attr('text-anchor', 'middle')
+        .text(yGroupLabel);
+    }
 
     // recalculate y axis width
     const yLeftAxisBBox = yGroups.Left.node().getBBox();
@@ -339,7 +370,13 @@ export default class ChartClass {
 
   createGroupCharts(width, height, y, num) {
     const { groupsTopOffset } = this.options;
-    const { barplotType, barplotBarWidthEnabled, barplotBarWidth } = this.options.xAxis;
+    const {
+      barplotType,
+      barplotBarWidthEnabled,
+      barplotBarWidth,
+      verticalLines,
+      xSelection,
+    } = this.options.xAxis;
     const groupHeight = height - groupsTopOffset;
     const groupMetrics = this.metrics
       // hide metric that use x axis
@@ -360,8 +397,14 @@ export default class ChartClass {
       .attr('height', height - groupsTopOffset)
       .attr('width', this.box.width - this.maxYLeftAxisWidth - this.maxYRightAxisWidth);
 
-    this.addXTickLines(chartGroup, groupHeight);
-    this.addBrush(chartGroup, groupHeight);
+    if (verticalLines) {
+      this.addXTickLines(chartGroup, groupHeight);
+    }
+    if (xSelection) {
+      this.addBrush(chartGroup, groupHeight);
+    } else {
+      this.addCrossSelection(chartGroup, groupHeight);
+    }
 
     // add barplots
     const groupBarplotMetrics = groupMetrics.filter((metric) => metric.type === 'barplot');
@@ -405,6 +448,17 @@ export default class ChartClass {
       .forEach((metric) => {
         this.addZeroLine(chartGroup, metric);
         this.addPath(chartGroup, metric, height, num);
+      });
+
+    // resizes x axis
+    this.createXAxis();
+
+    // add lines charts
+    groupMetrics
+      .filter((metric) => metric.type === 'scatter')
+      .reverse()
+      .forEach((metric) => {
+        this.addScatterDots(chartGroup, metric, height, num);
       });
 
     this.addCrossSelection(chartGroup, groupHeight);
@@ -457,7 +511,7 @@ export default class ChartClass {
    *        yAxisSide: 'right',
    *        color: 'red',
    *        ticks: 10',
-   *        type: 'line', // 'barplot'
+   *        type: 'line', // barplot, scatter
    *        lastDot: 0, // 0 - last, 1 - every, 'odd', 'even', 3, ...
    *        zerosAfterDot: 2, // 1, 2, 3, ...
    *        strokeDasharray: '0', // '5,5', '1,3', '1, 3, 6, 3'
@@ -519,6 +573,7 @@ export default class ChartClass {
     const metrics = ChartClass.metricsToMetricsByGroup(metricsByGroup);
     this.hasBarplot = metrics.findIndex((m) => m.type === 'barplot') !== -1;
     this.metrics = metrics.map((item, n) => ({
+      coloredYAxis: true,
       ...item,
       n,
       type: item.type || 'line',
@@ -631,7 +686,7 @@ export default class ChartClass {
     }
   }
 
-  updateTooltip(d, metric, left, top) {
+  updateTooltip(d, metric, left, top, curMetricBold = true) {
     this.tooltip
       .html(
         [
@@ -643,7 +698,7 @@ export default class ChartClass {
             if (cur.name === this.xMetric) {
               value = this.xTickFormat(value);
             }
-            const fontWeight = (metric.name === cur.name) ? 'bold' : 'regular';
+            const fontWeight = (curMetricBold && metric.name === cur.name) ? 'bold' : 'regular';
             const title = cur.title || cur.name;
             return `${prev}<div style="font-weight: ${fontWeight}">${title}: <span>${value}</span></div>`;
           }, ''),
@@ -696,6 +751,9 @@ export default class ChartClass {
       .call(brush);
     this.brushes.push(brush);
     chartGroup.select('.selection').attr('stroke', null);
+
+    // vertical selector line-dot
+    this.addCrossSelection(chartGroup, groupHeight);
   }
 
   addCrossSelection(chartGroup, groupHeight) {
@@ -770,10 +828,7 @@ export default class ChartClass {
       if (metric.lastDot === '0' && line.length === i + 1) {
         return true;
       }
-      if (ChartClass.lastDotParamForPoint(metric.lastDot, i, line)) {
-        return true;
-      }
-      return false;
+      return ChartClass.lastDotParamForPoint(metric.lastDot, i, line);
     });
 
     chartGroup
@@ -891,6 +946,35 @@ export default class ChartClass {
         if (metric.showText) {
           this.renderPeakTexts(chartGroup, metric, line);
         }
+      });
+  }
+
+  addScatterDots(chartGroup, metric, height, num) {
+    const color = d3.scaleOrdinal().range(d3.schemeSet2);
+    chartGroup.append('g')
+      .selectAll('dot')
+      .data(this.data)
+      .enter()
+      .append('circle')
+      .attr('class', 'dot')
+      .attr('cx', (d) => this.x(d[this.xMetric]))
+      .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
+      .attr('r', metric.dotSize || 3)
+      .style('fill', (d) => color(d[metric.metricGroup]))
+      .on('mouseover', (d) => {
+        const lineXPos = this.x(d[this.xMetric]);
+        const lineYPos = this.y[metric.yAxisLink || metric.name](d[metric.name]);
+        this.setLineDotPosition(lineXPos, lineYPos, num);
+        const tooltipLeftPos = lineXPos + this.maxYLeftAxisWidth;
+        const tooltipTopPos = lineYPos + (height * num) + 14;
+        this.updateTooltip(d, metric, tooltipLeftPos, tooltipTopPos, false);
+      })
+      .on('mouseout', () => {
+        this.hideLineDot();
+        this.hideTooltip();
+      })
+      .on('click', (d) => {
+        this.clickChart(d);
       });
   }
 
