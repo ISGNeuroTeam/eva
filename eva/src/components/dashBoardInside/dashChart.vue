@@ -23,7 +23,8 @@
       >
         <template v-for="(group, nGroup) in metricsByGroup">
           <div
-            v-for="(metric, nMetric) in group.filter(({hideLegend}) => !hideLegend)"
+            v-for="(metric, nMetric) in group
+              .filter(({name, hideLegend}) => !hideLegend && name !== xMetric)"
             :key="metric.name"
             @mouseenter="chart.highlightMetric(metric)"
             @click="openSettingsForMetric(metric, nGroup, nMetric)"
@@ -44,6 +45,12 @@
         class="svg-container"
         @dblclick="$emit('resetRange')"
       />
+      <div
+        v-show="dataRestFrom.length"
+        class="x-metric-text"
+      >
+        {{ xMetric }}
+      </div>
     </div>
     <DashChartSettings
       ref="chartSettings"
@@ -219,8 +226,13 @@ export default {
     },
 
     xMetric() {
-      const [xMetric] = this.firstDataRowMetricList;
-      return xMetric;
+      const { xAxis = {} } = this.options;
+      const { xMetric = null } = xAxis;
+      if (xMetric) {
+        return xMetric;
+      }
+      const [firstMetric] = this.firstDataRowMetricList;
+      return firstMetric;
     },
 
     box() {
@@ -228,7 +240,7 @@ export default {
       const { width, height } = sizeFrom;
       return {
         width: Math.round(width - 42),
-        height: Math.round(height - 55) - 30,
+        height: Math.round(height - 55) - 45,
       };
     },
 
@@ -483,6 +495,9 @@ export default {
 .svg-container
   position: relative
   min-height: 100px
+
+.x-metric-text
+  font-size: 11px
 
 .legend
   text-align: left
