@@ -1,6 +1,8 @@
 import * as d3 from 'd3';
 
 export default class ChartClass {
+  static objId = 0;
+
   options = {
     groupsTopOffset: 14,
     xAxis: {
@@ -56,6 +58,7 @@ export default class ChartClass {
   xMinMax = [];
 
   constructor(svgContainer, width, height, options) {
+    this.id = ChartClass.objId += 1;
     this.options = ChartClass.mergeDeep(this.options, options);
     this.svgContainer = svgContainer;
     this.box = { width, height };
@@ -216,7 +219,9 @@ export default class ChartClass {
     } = this.options;
     const { barplotType } = this.options.xAxis;
     const groupHeight = height - groupsTopOffset;
-    const metrics = this.metrics.filter((item) => item.group === num);
+    const metrics = this.metrics
+      .filter((metric) => metric.name !== this.xMetric)
+      .filter((item) => item.group === num);
 
     const group = this.svgGroups
       .append('g')
@@ -373,7 +378,10 @@ export default class ChartClass {
       xSelection,
     } = this.options.xAxis;
     const groupHeight = height - groupsTopOffset;
-    const groupMetrics = this.metrics.filter((metric) => metric.group === num);
+    const groupMetrics = this.metrics
+      // hide metric that use x axis
+      .filter((metric) => metric.name !== this.xMetric)
+      .filter((metric) => metric.group === num);
 
     /// create chart container
     const chartGroup = this.svgGroups
@@ -382,13 +390,20 @@ export default class ChartClass {
       .attr('transform', `translate(${this.maxYLeftAxisWidth},0)`)
       .attr('class', `group-${num}-chart group-chart`);
 
+    // add clipPath
+    chartGroup.append('clipPath')
+      .attr('id', `group-rect-${num}-${this.id}`)
+      .append('rect')
+      .attr('height', height - groupsTopOffset)
+      .attr('width', this.box.width - this.maxYLeftAxisWidth - this.maxYRightAxisWidth);
+
     if (verticalLines) {
       this.addXTickLines(chartGroup, groupHeight);
     }
     if (xSelection) {
       this.addBrush(chartGroup, groupHeight);
     } else {
-      this.addHoverLines(chartGroup, groupHeight);
+      this.addCrossSelection(chartGroup, groupHeight);
     }
 
     // add barplots
@@ -445,6 +460,8 @@ export default class ChartClass {
       .forEach((metric) => {
         this.addScatterDots(chartGroup, metric, height, num);
       });
+
+    this.addCrossSelection(chartGroup, groupHeight);
   }
 
   /**
@@ -736,14 +753,12 @@ export default class ChartClass {
     chartGroup.select('.selection').attr('stroke', null);
 
     // vertical selector line-dot
-    this.addHoverLines(chartGroup, groupHeight);
+    this.addCrossSelection(chartGroup, groupHeight);
   }
 
-  addHoverLines(chartGroup, groupHeight) {
+  addCrossSelection(chartGroup, groupHeight) {
     const { width } = this.box;
     const { groupsTopOffset } = this.options;
-
-    // vertical selector line-dot
     chartGroup
       .append('line')
       .attr('class', 'line-dot')
@@ -875,10 +890,16 @@ export default class ChartClass {
 
   addPath(chartGroup, metric, height, num) {
     // разбиваем линию на отрезки по пустым ячейкам
+    const {
+      showArea,
+      color,
+      yAxisLink,
+      name,
+    } = metric;
     let line = [];
     this.data
       .reduce((prev, cur, currentIndex, arr) => {
-        if (cur[metric.name] === null) {
+        if (cur[name] === null) {
           prev.push(line);
           line = [];
         } else {
@@ -894,17 +915,29 @@ export default class ChartClass {
         if (line.length === 0) {
           return;
         }
-        chartGroup
+        const path = chartGroup
           .append('path')
+          .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
           .attr('class', `metric metric-${metric.n}`)
           .datum(line)
           .attr('fill', 'none')
-          .attr('stroke', metric.color)
+          .attr('stroke', color)
           .attr('stroke-width', metric.strokeWidth)
-          .style('stroke-dasharray', metric.strokeDasharray)
-          .attr('d', d3.line()
-            .x((d) => this.x(d[this.xMetric]))
-            .y((d) => this.y[metric.yAxisLink || metric.name](d[metric.name])));
+          .style('stroke-dasharray', metric.strokeDasharray);
+
+        if (showArea) {
+          path
+            .attr('fill', d3.hsl(color).brighter(0.1))
+            .attr('d', d3.area()
+              .x((d) => this.x(d[this.xMetric]))
+              .y0((d) => this.y[yAxisLink || name](d[name]))
+              .y1(() => this.y[yAxisLink || name](0)));
+        } else {
+          path
+            .attr('d', d3.line()
+              .x((d) => this.x(d[this.xMetric]))
+              .y((d) => this.y[yAxisLink || name](d[name])));
+        }
 
         // add dots
         this.renderPeakDots(chartGroup, metric, height, num, line);
@@ -986,6 +1019,7 @@ export default class ChartClass {
         .map((d) => ({ ...d, metric: groupBarplotMetrics[nG] })))
       .enter()
       .append('rect')
+      .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
       .attr('x', (d) => this.x(d.data[this.xMetric]) - barWidth / 2)
       .attr('y', (d) => {
         const { metric } = d;
@@ -1077,6 +1111,7 @@ export default class ChartClass {
       })))
       .enter()
       .append('rect')
+      .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
       .attr('class', (d) => `barplot barplot-divided metric metric-${d.n}`)
       .attr('x', (d) => xSubgroup(d.key))
       .attr('y', (d) => {
