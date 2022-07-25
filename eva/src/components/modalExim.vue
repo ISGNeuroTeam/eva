@@ -218,8 +218,8 @@ export default {
     async exportDash() {
       const ids = [];
       if (this.selected.length === 0) {
-        const itemname = (this.element === 'dash') ? 'дашборды' : 'группы';
-        this.msgExp.text = `Выберите ${itemname} для экспорта`;
+        const itemName = (this.element === 'dash') ? 'дашборды' : 'группы';
+        this.msgExp.text = `Выберите ${itemName} для экспорта`;
         this.msgExp.opacity = '1';
         setTimeout(() => {
           this.msgExp.opacity = '0';
