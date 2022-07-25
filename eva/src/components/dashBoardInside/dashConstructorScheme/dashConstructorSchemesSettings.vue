@@ -21,7 +21,7 @@
               'z-index': 100,
             }"
             class="col-10"
-            @change="$emit('changeDataSelectedNode', dataObject)"
+            @change="updateModelValue(dataObject)"
           />
           <v-icon
             class="control-button edit-icon theme--dark col-2"
@@ -49,7 +49,7 @@
           :menu-props="{
             'z-index': 100,
           }"
-          @change="$emit('changeDataSelectedNode', dataObject)"
+          @change="updateModelValue(dataObject)"
         />
       </template>
       <template v-if=" dataType === '4'">
@@ -152,7 +152,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -301,7 +301,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -442,7 +442,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -532,7 +532,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -590,7 +590,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -661,7 +661,7 @@ export default {
     },
     deleteLine(index) {
       this.dataObject.items.splice(index, 1);
-      this.$emit('changeDataSelectedNode', this.dataObject);
+      this.updateModelValue(this.dataObject);
     },
     addLine() {
       this.dataObject.items.push({
@@ -669,7 +669,11 @@ export default {
         textLeft: 'Label',
         textRight: 'Value',
       });
+      this.updateModelValue(this.dataObject);
+    },
+    updateModelValue() {
       this.$emit('changeDataSelectedNode', this.dataObject);
+      this.$emit('update:modelValue', this.dataObject);
     },
   },
 };
