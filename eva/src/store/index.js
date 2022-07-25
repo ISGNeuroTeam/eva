@@ -740,7 +740,6 @@ export default new Vuex.Store({
       }
     },
     updateOptions(state, { idDash, idElement, options }) {
-      // state[idDash][idElement].options = options;
       Vue.set(state[idDash][idElement], 'options', options);
     },
     // метод который обновляет какое-либо свойство у элемнета
