@@ -24,8 +24,7 @@
         <template v-for="(group, nGroup) in metricsByGroup">
           <div
             v-for="(metric, nMetric) in group
-              .filter(({hideLegend}) => !hideLegend)
-              .filter(({name}) => name !== xMetric)"
+              .filter(({name, hideLegend}) => !hideLegend && name !== xMetric)"
             :key="metric.name"
             @mouseenter="chart.highlightMetric(metric)"
             @click="openSettingsForMetric(metric, nGroup, nMetric)"
