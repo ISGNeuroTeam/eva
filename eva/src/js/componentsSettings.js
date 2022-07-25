@@ -17,6 +17,7 @@ import {
   mdiGrid,
   mdiTuneVertical,
   mdiImageFilterTiltShift,
+  mdiScatterPlotOutline,
 } from '@mdi/js';
 
 export default {
@@ -47,6 +48,7 @@ export default {
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
+    { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
   ],
   size: {
     picker: {
@@ -133,6 +135,10 @@ export default {
       width: 400,
       height: 400,
     },
+    scatterPlot: {
+      width: 500,
+      height: 400,
+    },
     constructorSchemes: {
       width: 930,
       height: 850,
@@ -161,6 +167,7 @@ export default {
     accumulators: 'eva-chart_bar_chart_horizontal',
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
+    scatterPlot: mdiScatterPlotOutline,
   },
   commonOptions: [
     'panelSettings',
@@ -221,6 +228,8 @@ export default {
       'fontSize',
       'underline',
       'onButton',
+      'SubmitByListDS',
+      'ListDS',
     ],
     textarea: [
       'searchBtn',
@@ -276,6 +285,12 @@ export default {
       'fillColor',
     ],
     dial: [],
+    scatterPlot: [
+      'scatterPlotGroup',
+      'xMetric',
+      'yMetric',
+      'metricGroup',
+    ],
     constructorSchemes: ['visible', 'level', 'pinned'],
   },
   optionFields: [
@@ -389,7 +404,7 @@ export default {
     },
     {
       relation() {
-        return !!this.$store.state[this.idDash].searches;
+        return this.isDashBoard && !!this.$store.state[this.idDash].searches;
       },
       option: 'defaultFromSourceData',
       description: 'Дефолтное значение из источника данных',
@@ -662,8 +677,28 @@ export default {
     {
       label: 'Submit',
       option: 'onButton',
-      description: 'Перезапускать серчи по кнопке',
+      description: 'Обновлять источники данных по клику',
       elem: 'switch',
+    },
+    {
+      relation: ['onButton'],
+      label: 'SubmitByListDS',
+      option: 'SubmitByListDS',
+      description: 'Обновлять только источники из списка',
+      default: false,
+      elem: 'switch',
+    },
+    {
+      relation: ['SubmitByListDS'],
+      label: 'ListDS',
+      option: 'ListDS',
+      description: 'Если токен содержится в ИД',
+      elem: 'checkbox-list',
+      default: [],
+      items() {
+        return new Set(this.$store.state[this.idDash]?.searches
+          .map(({ sid }) => sid) || []);
+      },
     },
 
     // dashSelect
@@ -688,6 +723,47 @@ export default {
       placeholder: '%Y-%m-%d %H:%M:%S',
     },
 
+    // scatter plot
+    {
+      group: 'Настройки ScatterPlot',
+      option: 'scatterPlotGroup',
+    },
+    {
+      optionGroup: 'scatterPlotGroup',
+      option: 'xMetric',
+      description: 'Метирика для оси X',
+      elem: 'select',
+      items() {
+        return this.$store.state[this.idDash][this.element]?.lastMetrics || [];
+      },
+    },
+    {
+      optionGroup: 'scatterPlotGroup',
+      option: 'yMetric',
+      description: 'Метирика для оси Y',
+      elem: 'select',
+      items() {
+        return this.$store.state[this.idDash][this.element]?.lastMetrics || [];
+      },
+    },
+    {
+      optionGroup: 'scatterPlotGroup',
+      option: 'metricGroup',
+      description: 'Метирика для группировки точек',
+      elem: 'select',
+      default: null,
+      items() {
+        const items = [
+          {
+            text: '-- Нет --',
+            value: null,
+          },
+        ];
+        const metrics = this.$store.state[this.idDash][this.element]?.lastMetrics || [];
+        return [items, ...metrics];
+      },
+    },
+
   ],
   reporstElements: [
     'table',
@@ -702,6 +778,7 @@ export default {
     'heatmap',
     'singleValue',
     'tune',
+    'scatterPlot',
   ],
   reports: {
     table: {
@@ -755,6 +832,10 @@ export default {
     tune: {
       tooltip: 'Ползунок',
       icon: mdiTuneVertical,
+    },
+    scatterPlot: {
+      tooltip: 'Точечный график',
+      icon: mdiScatterPlotOutline,
     },
   },
   excludes: {
