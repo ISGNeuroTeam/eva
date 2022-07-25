@@ -239,7 +239,6 @@ export default {
           }
         });
       }
-      this.isChanged = false;
 
       const response = await this.$store.dispatch('exportDash', {
         element: this.element,
@@ -250,6 +249,7 @@ export default {
         this.msgExp.color = 'controlsActive';
         this.msgExp.opacity = '1';
       } else {
+        this.isChanged = false;
         this.msgExp.text = 'Экспорт прошел успешно';
         this.msgExp.color = 'controls';
         this.msgExp.opacity = '1';
@@ -291,7 +291,6 @@ export default {
             if (this.element === 'group') {
               this.$emit('update:groups');
             }
-            this.isChanged = false;
           });
           try {
             // тут проверяем может ли распарситься ответ от сервера
@@ -299,6 +298,7 @@ export default {
             this.msgImp.text = 'Импорт прошел успешно';
             this.msgImp.color = 'controls';
             this.msgImp.opacity = '1';
+            this.isChanged = false;
           } catch {
             this.msgImp.text = 'Импортировать не удалось';
             this.msgImp.color = 'controlsActive';
