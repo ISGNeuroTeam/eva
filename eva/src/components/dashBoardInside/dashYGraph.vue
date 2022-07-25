@@ -318,7 +318,9 @@ export default {
   watch: {
     dataRestFrom(val) {
       setTimeout(() => {
-        this.graph.reDrawNodesEdges(val, (e) => this.createTockens(e));
+        if (val.length > 0) {
+          this.graph.reDrawNodesEdges(val, (e) => this.createTockens(e));
+        }
       }, 100);
     },
     colorFrom() {
