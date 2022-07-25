@@ -65,7 +65,6 @@ export default {
       type: Array,
       required: true,
     },
-    dataModeFrom: Boolean,
     dataReport: Boolean,
     fullScreenMode: {
       type: Boolean,
@@ -131,12 +130,9 @@ export default {
       if (!this.options.metricGroup) {
         return [];
       }
-      function onlyUnique(value, index, self) {
-        return self.indexOf(value) === index;
-      }
-      return this.dataRestFrom
-        .map((item) => item[this.options.metricGroup])
-        .filter(onlyUnique);
+      const groups = this.dataRestFrom
+        .map((item) => item[this.options.metricGroup]);
+      return [...new Set(groups)];
     },
     legendItems() {
       const color = d3.scaleOrdinal().range(d3.schemeSet2);
@@ -228,7 +224,6 @@ export default {
     this.setLastMetrics(this.metrics);
     const { id, idDash } = this;
     const { actionsWithCapture: actions } = this;
-    console.log({actions})
     this.$store.commit('setActions', { id, idDash, actions });
   },
   methods: {
