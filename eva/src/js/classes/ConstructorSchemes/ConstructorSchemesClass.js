@@ -1312,7 +1312,6 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      deletableItems: GraphItemTypes.NODE | GraphItemTypes.EDGE | GraphItemTypes.LABEL,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1521,12 +1520,24 @@ class ConstructorSchemesClass {
       isValidLabelOwnerPredicate: (labelOwner) => labelOwner instanceof INode
         || labelOwner instanceof IEdge
         || labelOwner instanceof IPort,
-      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => graph.addLabel({
-        owner: dropTarget,
-        location: dropLocation,
-        text: dropData.text,
-        style: dropData.style.clone(),
-      }),
+      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => {
+        if (dropTarget instanceof IPort) {
+          this.graphComponent.graphModelManager.graph.addLabel({
+            owner: dropTarget.owner,
+            style: dropData.style.clone(),
+            text: dropData.text,
+            tag: dropData.tag,
+          });
+        } else {
+          graph.addLabel({
+            owner: dropTarget,
+            location: dropLocation,
+            text: dropData.text,
+            style: dropData.style.clone(),
+          });
+        }
+        return graph;
+      },
     });
   }
 
@@ -1999,43 +2010,45 @@ class ConstructorSchemesClass {
     });
   }
 
-  updateSelectedNode(updatedData, updateStoreCallback) {
-    let items = null;
+  updateSelectedNode(dataFromComponent, updateStoreCallback) {
+    let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
     if (dataType === '0' || dataType === '1') {
-      items = updatedData.items.map((item) => ({
-        ...item,
-        textLeft: this.getDataItemById(item.id)?.Description || '-',
-        textRight: this.getDataItemById(item.id)?.value || '-',
-      }));
+      updatedData = {
+        items: dataFromComponent.items.map((item) => ({
+          ...item,
+          textLeft: this.getDataItemById(item.id)?.Description || '-',
+          textRight: this.getDataItemById(item.id)?.value || '-',
+        })),
+      };
     } else if (dataType === '2' || dataType === '3') {
-      items = {
-        ...updatedData,
-        textFirst: this.getDataItemById(updatedData.id)?.value || '-',
-        textSecond: this.getDataItemById(updatedData.id)?.Description || '-',
+      updatedData = {
+        ...dataFromComponent,
+        textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
+        textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
     } else if (dataType === '4') {
-      items = {
-        ...updatedData,
-        currentValue: Number(this.getDataItemById(updatedData.id)?.value),
+      updatedData = {
+        ...dataFromComponent,
+        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value),
         // TODO: Заменить нан корректное значение!!
-        maxValue: Number(this.getDataItemById(updatedData.id)?.value) + 100,
+        maxValue: Number(this.getDataItemById(dataFromComponent.id)?.value) + 100,
       };
     } else if (dataType === '5') {
-      items = {
-        ...updatedData,
-        firstValue: Number(this.getDataItemById(updatedData.idFirst)?.value),
-        secondValue: Number(this.getDataItemById(updatedData.idSecond)?.value),
+      updatedData = {
+        ...dataFromComponent,
+        firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
+        secondValue: Number(this.getDataItemById(dataFromComponent.idSecond)?.value),
       };
     } else if (dataType === 'label-0' || dataType === 'default-node') {
-      items = updatedData;
-    } else if (updatedData.dataType === 'edge') {
-      this.updateEdgeVisual(updatedData);
-      items = updatedData;
+      updatedData = dataFromComponent;
+    } else if (dataFromComponent.dataType === 'edge') {
+      this.updateEdgeVisual(dataFromComponent);
+      updatedData = dataFromComponent;
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
-      ...items,
+      ...updatedData,
     };
     // Обновляем состояние графа
     this.graphComponent.updateVisual();
