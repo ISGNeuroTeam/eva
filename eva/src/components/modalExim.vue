@@ -239,6 +239,7 @@ export default {
           }
         });
       }
+      this.isChanged = false;
 
       const response = await this.$store.dispatch('exportDash', {
         element: this.element,
@@ -290,6 +291,7 @@ export default {
             if (this.element === 'group') {
               this.$emit('update:groups');
             }
+            this.isChanged = false;
           });
           try {
             // тут проверяем может ли распарситься ответ от сервера
