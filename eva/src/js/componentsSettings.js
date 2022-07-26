@@ -760,7 +760,7 @@ export default {
           },
         ];
         const metrics = this.$store.state[this.idDash][this.element]?.lastMetrics || [];
-        return [items, ...metrics];
+        return [...items, ...metrics];
       },
     },
 
