@@ -262,8 +262,12 @@ export default {
         }
         if (val.fieldType === 'time') {
           this.currentTimeUnit = val?.timeUnits ? val.timeUnits : 0;
+          this.$set(this.temp, 'timeUnits', this.currentTimeUnit);
+        } else {
+          delete this.temp.currentTimeUnit;
         }
       },
+      deep: true,
     },
     currentTimeUnit(val) {
       if (this.temp.fieldType === 'time') {

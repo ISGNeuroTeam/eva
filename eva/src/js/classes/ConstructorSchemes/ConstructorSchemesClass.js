@@ -50,6 +50,7 @@ import {
   SimplePort,
   FreeNodePortLocationModel,
   GraphViewerInputMode,
+  Stroke,
 } from 'yfiles';
 
 import { throttle } from '../../utils/throttle';
@@ -66,6 +67,225 @@ License.value = licenseData; // Проверка лицензии
 const regexpSize = /<svg width="(?<width>.*?)" height="(?<height>.*?)"/;
 
 class ConstructorSchemesClass {
+  static async webGl2CreateNode({
+    graph,
+    createdNode,
+    dropData,
+  }) {
+    await graph.setStyle(
+      createdNode,
+      new ShapeNodeStyle({
+        shape: 'round-rectangle',
+        fill: ConstructorSchemesClass.colorToString(Color.from(dropData.style.fill.color)),
+        stroke: `${ConstructorSchemesClass.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
+      }),
+    );
+    return createdNode;
+  }
+
+  static colorToString(color) {
+    if (color?.a) {
+      return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    }
+    return `rgb(${color.r}, ${color.g}, ${color.b})`;
+  }
+
+  static colorToRgbaObject(color) {
+    const rgbaColor = Color.from(color);
+    return {
+      r: rgbaColor.r,
+      g: rgbaColor.g,
+      b: rgbaColor.b,
+      a: rgbaColor.a,
+    };
+  }
+
+  static generateColor(color) {
+    return {
+      rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
+      rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
+    };
+  }
+
+  static async getSvgLayoutSize(iconUrl) {
+    return fetch(iconUrl)
+      .then((response) => response.body)
+      .then((rb) => {
+        const reader = rb.getReader();
+
+        return new ReadableStream({
+          start(controller) {
+            // The following function handles each data chunk
+            function push() {
+              // "done" is a Boolean and value a "Uint8Array"
+              reader.read()
+                .then(({ done, value }) => {
+                  // If there is no more data to read
+                  if (done) {
+                    controller.close();
+                    return;
+                  }
+                  // Get the data and send it to the browser via the controller
+                  controller.enqueue(value);
+                  push();
+                });
+            }
+
+            push();
+          },
+        });
+      })
+      .then((stream) => new Response(
+        stream,
+        {
+          headers: {
+            'Content-Type': 'text/html',
+          },
+        },
+      ).text())
+      .then((svgText) => svgText.match(regexpSize).groups);
+  }
+
+  static removeClass(e, className) {
+    const classes = e.getAttribute('class');
+    if (classes !== null && classes !== '') {
+      if (classes === className) {
+        e.setAttribute('class', '');
+      } else {
+        const result = classes
+          .split(' ')
+          .filter((s) => s !== className)
+          .join(' ');
+        e.setAttribute('class', result);
+      }
+    }
+    return e;
+  }
+
+  static addClass(e, className) {
+    const classes = e.getAttribute('class');
+    if (classes === null || classes === '') {
+      e.setAttribute('class', className);
+    } else if (!ConstructorSchemesClass.hasClass(e, className)) {
+      e.setAttribute('class', `${classes} ${className}`);
+    }
+    return e;
+  }
+
+  static hasClass(e, className) {
+    const classes = e.getAttribute('class') || '';
+    const r = new RegExp(`\\b${className}\\b`, '');
+    return r.test(classes);
+  }
+
+  static getColorForColorPicker(color) {
+    return {
+      rgba: {
+        r: color.r,
+        g: color.g,
+        b: color.b,
+        a: color.a,
+      },
+      rgbaString: ConstructorSchemesClass.colorToString(color),
+    };
+  }
+
+  static createUrlIcon(ctx, url, imageSize, iconSize) {
+    return new Promise((resolve, reject) => {
+      // create an Image from the url
+      const image = new Image(imageSize.width, imageSize.height);
+      image.onload = () => {
+        // render the image into the canvas
+        ctx.clearRect(0, 0, iconSize.width, iconSize.height);
+        ctx.drawImage(
+          image,
+          0,
+          0,
+          imageSize.width,
+          imageSize.height,
+          0,
+          0,
+          iconSize.width,
+          iconSize.height,
+        );
+        const imageData = ctx.getImageData(0, 0, iconSize.width, iconSize.height);
+        resolve(imageData);
+      };
+      image.onerror = () => {
+        // eslint-disable-next-line prefer-promise-reject-errors
+        reject('Loading the image failed.');
+      };
+      image.src = url;
+      image.preserveAspectRatio = 'xMidYMid meet';
+    });
+  }
+
+  static createCanvasContext(iconSize) {
+    // canvas used to pre-render the icons
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('width', `${iconSize.width}`);
+    canvas.setAttribute('height', `${iconSize.height}`);
+    return canvas.getContext('2d');
+  }
+
+  static createReactiveNode(data, tooltip, type) {
+    const dataNode = new SimpleNode();
+    dataNode.tag = data.dataRest;
+    dataNode.style = new VuejsNodeStyle(data.template);
+    dataNode.layout = new Rect(
+      0,
+      0,
+      data?.width,
+      data?.height
+        ? data.height
+        : data.rowHeight * (data?.dataRest?.items?.length || 1),
+    );
+    return new DragAndDropPanelItem(dataNode, tooltip, type);
+  }
+
+  static getEdgeOptions(edge) {
+    const { color } = edge.style.stroke.fill;
+    return {
+      strokeColor: {
+        rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
+        rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
+      },
+      thickness: `${edge.style.stroke.thickness}px`,
+      smoothingLength: edge.style.smoothingLength,
+    };
+  }
+
+  // Main constructor options
+  options = {
+    defaultNodeSize: [150, 150],
+    defaultNodeStyle: {
+      shape: 0,
+      fill: '#FFFFFF',
+      strokeColor: '#F4F4F4',
+      strokeSize: '1.5px',
+    },
+    defaultEdgeStyle: {
+      strokeColor: '#FFFFFF',
+      strokeSize: '1.5px',
+      targetArrowColor: '#F4F4F4',
+      targetArrowType: 'none',
+      smoothingLength: 0,
+    },
+    defaultLabelStyle: {
+      font: '12px Tahoma', // Size, family
+      textFill: '#000000', // Color
+    },
+    selectedShapeNodeStyle: '',
+    isEdit: false,
+  }
+
+  // Additional options
+  localVariables = {
+    isEdgeCreating: false,
+    creatingEdge: null,
+  }
+
+  // Template elements
   dndDataPanelItems = [
     // TemplateType: template-0
     // Frame-1376
@@ -122,6 +342,7 @@ class ConstructorSchemesClass {
             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
             alignment-baseline="middle"
             :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textLeft }}
            </text>
@@ -134,6 +355,7 @@ class ConstructorSchemesClass {
              :transform="'translate(' + (layout.width - 8) / 2 + ')'"
              fill="white"
              :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textRight }}
            </text>
@@ -233,6 +455,7 @@ class ConstructorSchemesClass {
             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
             alignment-baseline="middle"
             :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textLeft }}
            </text>
@@ -245,6 +468,7 @@ class ConstructorSchemesClass {
              :transform="'translate(' + (layout.width - 8) / 2 + ')'"
              fill="white"
              :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textRight }}
            </text>
@@ -322,6 +546,7 @@ class ConstructorSchemesClass {
        fill="#FFFFFF"
        :dy="((layout.height / 2) - (layout.height / 4))"
        alignment-baseline="middle"
+       :font-size="((layout.height / 2) * 0.8) + 'px'"
       >
         {{ tag.textFirst }}
       </text>
@@ -332,6 +557,7 @@ class ConstructorSchemesClass {
        fill="#3C3B45"
        :dy="(layout.height - (layout.height / 4))"
        alignment-baseline="middle"
+       :font-size="((layout.height / 2) * 0.8) + 'px'"
       >
         {{ tag.textSecond }}
       </text>
@@ -392,6 +618,7 @@ class ConstructorSchemesClass {
           fill="#FFFFFF"
           :dy="((layout.height / 2) - (layout.height / 4))"
           alignment-baseline="middle"
+          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textFirst }}
         </text>
@@ -402,6 +629,7 @@ class ConstructorSchemesClass {
           fill="#3C3B45"
           :dy="(layout.height - (layout.height / 4))"
           alignment-baseline="middle"
+          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textSecond }}
         </text>
@@ -461,6 +689,7 @@ class ConstructorSchemesClass {
          alignment-baseline="middle"
          text-anchor="middle"
          :fill="tag.textColor"
+         :font-size="((layout.height / 2) * 0.8) + 'px'"
        >
            {{ tag.currentValue }}
        </text>
@@ -523,6 +752,7 @@ class ConstructorSchemesClass {
         alignment-baseline="middle"
         text-anchor="middle"
         :fill="tag.firstTextColor"
+        :font-size="((layout.height / 3) * 0.8) + 'px'"
       >
           {{ tag.firstValue }}
       </text>
@@ -533,6 +763,7 @@ class ConstructorSchemesClass {
         alignment-baseline="middle"
         text-anchor="middle"
         :fill="tag.secondTextColor"
+        :font-size="((layout.height / 3) * 0.8) + 'px'"
       >
           {{ tag.secondValue }}
       </text>
@@ -724,34 +955,6 @@ class ConstructorSchemesClass {
     return this.dndDataPanelItems;
   }
 
-  options = {
-    defaultNodeSize: [150, 150],
-    defaultNodeStyle: {
-      shape: 0,
-      fill: '#FFFFFF',
-      strokeColor: '#F4F4F4',
-      strokeSize: '1.5px',
-    },
-    defaultEdgeStyle: {
-      strokeColor: '#FFFFFF',
-      strokeSize: '1.5px',
-      targetArrowColor: '#F4F4F4',
-      targetArrowType: 'none',
-      smoothingLength: 0,
-    },
-    defaultLabelStyle: {
-      font: '12px Tahoma', // Size, family
-      textFill: '#000000', // Color
-    },
-    selectedShapeNodeStyle: '',
-    isEdit: false,
-  }
-
-  localVariables = {
-    isEdgeCreating: false,
-    creatingEdge: null,
-  }
-
   get isEdit() {
     return this.options.isEdit;
   }
@@ -844,44 +1047,69 @@ class ConstructorSchemesClass {
     };
   }
 
-  static async webGl2CreateNode({
-    graph,
-    createdNode,
-    dropData,
+  constructor({
+    dndPanelElem,
+    elem,
+    dataRest,
+    iconsList,
+    elementDefaultStyles,
+    // Сохранение через GraphML
+    savedGraph,
+    // Callbacks
+    updateStoreCallback,
+    openDataPanelCallback,
+    closeDataPanelCallback,
+    isEdit,
   }) {
-    await graph.setStyle(
-      createdNode,
-      new ShapeNodeStyle({
-        shape: 'round-rectangle',
-        fill: ConstructorSchemesClass.colorToString(Color.from(dropData.style.fill.color)),
-        stroke: `${ConstructorSchemesClass.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
-      }),
-    );
-    return createdNode;
-  }
-
-  static colorToString(color) {
-    if (color?.a) {
-      return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
+    this.dragAndDropPanel = null;
+    this.mapper = null;
+    this.elem = elem;
+    this.isEdit = isEdit;
+    this.dataRest = dataRest;
+    this.iconsList = iconsList;
+    // Сохранение через GraphML
+    this.savedGraph = savedGraph;
+    this.updateStoreCallback = updateStoreCallback;
+    this.openDataPanelCallback = openDataPanelCallback;
+    this.closeDataPanelCallback = closeDataPanelCallback;
+    // Вторая реализация сохранения данных
+    this.targetDataNode = {};
+    this.graphComponent = new GraphComponent(elem);
+    this.setDefaultLabelParameters();
+    // Configures default styles for newly created graph elements
+    this.applyStylesElements(elementDefaultStyles);
+    if (this.isEdit) {
+      this.configureInputModes(
+        this.updateStoreCallback,
+        this.openDataPanelCallback,
+        this.closeDataPanelCallback,
+      );
     }
-    return `rgb(${color.r}, ${color.g}, ${color.b})`;
-  }
+    // Сохранение через GraphML
+    this.initializeIO();
+    if (this.savedGraph) {
+      this.loadGraph().then(() => {
+        // Выравнивание графа, инициализация dnd панели
+        this.updateViewport().then(() => {
+          this.dndPanelElem = dndPanelElem;
+          this.initializeDnDPanel();
+        });
+      });
+    } else {
+      // Выравнивание графа, инициализация dnd панели
+      this.updateViewport().then(() => {
+        this.dndPanelElem = dndPanelElem;
+        this.initializeDnDPanel();
+      });
+    }
+    const { nodeDecorator } = this.graphComponent.graph.decorator;
 
-  static colorToRgbaObject(color) {
-    const rgbaColor = Color.from(color);
-    return {
-      r: rgbaColor.r,
-      g: rgbaColor.g,
-      b: rgbaColor.b,
-      a: rgbaColor.a,
-    };
-  }
+    // Отключаем изменение размеров у ненвидимых узлов
+    nodeDecorator.reshapeHandleProviderDecorator
+      .hideImplementation((node) => node.tag === 'invisible');
 
-  static generateColor(color) {
-    return {
-      rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
-      rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
-    };
+    this.registerReshapeHandleProvider();
+    this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
   }
 
   generateIconNodes(iconsList) {
@@ -919,45 +1147,6 @@ class ConstructorSchemesClass {
     return increaseSizeFn(width, height);
   }
 
-  static async getSvgLayoutSize(iconUrl) {
-    return fetch(iconUrl)
-      .then((response) => response.body)
-      .then((rb) => {
-        const reader = rb.getReader();
-
-        return new ReadableStream({
-          start(controller) {
-            // The following function handles each data chunk
-            function push() {
-              // "done" is a Boolean and value a "Uint8Array"
-              reader.read()
-                .then(({ done, value }) => {
-                  // If there is no more data to read
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  // Get the data and send it to the browser via the controller
-                  controller.enqueue(value);
-                  push();
-                });
-            }
-
-            push();
-          },
-        });
-      })
-      .then((stream) => new Response(
-        stream,
-        {
-          headers: {
-            'Content-Type': 'text/html',
-          },
-        },
-      ).text())
-      .then((svgText) => svgText.match(regexpSize).groups);
-  }
-
   createDnDPanelDefaultNode() {
     const defaultNode = new SimpleNode();
     defaultNode.layout = new Rect(
@@ -977,132 +1166,38 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
-  static removeClass(e, className) {
-    const classes = e.getAttribute('class');
-    if (classes !== null && classes !== '') {
-      if (classes === className) {
-        e.setAttribute('class', '');
-      } else {
-        const result = classes
-          .split(' ')
-          .filter((s) => s !== className)
-          .join(' ');
-        e.setAttribute('class', result);
-      }
-    }
-    return e;
-  }
-
-  static addClass(e, className) {
-    const classes = e.getAttribute('class');
-    if (classes === null || classes === '') {
-      e.setAttribute('class', className);
-    } else if (!ConstructorSchemesClass.hasClass(e, className)) {
-      e.setAttribute('class', `${classes} ${className}`);
-    }
-    return e;
-  }
-
-  static hasClass(e, className) {
-    const classes = e.getAttribute('class') || '';
-    const r = new RegExp(`\\b${className}\\b`, '');
-    return r.test(classes);
-  }
-
-  constructor({
-    dndPanelElem,
-    elem,
-    dataRest,
-    iconsList,
-    edgeCustomStyles,
-    nodeCustomStyles,
-    labelCustomStyles,
-    // Сохранение через GraphML
-    savedGraph,
-    // Callbacks
-    updateStoreCallback,
-    openDataPanelCallback,
-    closeDataPanelCallback,
-    isEdit,
-  }) {
-    this.dragAndDropPanel = null;
-    this.mapper = null;
-    this.elem = elem;
-    this.isEdit = isEdit;
-    this.dataRest = dataRest;
-    this.iconsList = iconsList;
-    // Сохранение через GraphML
-    this.savedGraph = savedGraph;
-    this.updateStoreCallback = updateStoreCallback;
-    this.openDataPanelCallback = openDataPanelCallback;
-    this.closeDataPanelCallback = closeDataPanelCallback;
-    // Вторая реализация сохранения данных
-    this.targetDataNode = {};
-    this.graphComponent = new GraphComponent(elem);
-    this.setDefaultLabelParameters();
-    // Configures default styles for newly created graph elements
-    this.applyStylesElements({
-      nodeCustomStyles,
-      edgeCustomStyles,
-      labelCustomStyles,
+  // Save
+  save(updateStoreCallback) {
+    this.saveGraphToLocalStorage().then(() => {
+      this.updateGraphFromLocalStorage(updateStoreCallback);
     });
-    if (this.isEdit) {
-      this.configureInputModes(
-        this.updateStoreCallback,
-        this.openDataPanelCallback,
-        this.closeDataPanelCallback,
-      );
-    }
-    // Сохранение через GraphML
-    this.initializeIO();
-    if (this.savedGraph) {
-      this.loadGraph().then(() => {
-        // Выравнивание графа, инициализация dnd панели
-        this.updateViewport().then(() => {
-          this.dndPanelElem = dndPanelElem;
-          this.initializeDnDPanel();
-        });
-      });
-    } else {
-      // Выравнивание графа, инициализация dnd панели
-      this.updateViewport().then(() => {
-        this.dndPanelElem = dndPanelElem;
-        this.initializeDnDPanel();
-      });
-    }
-    const { nodeDecorator } = this.graphComponent.graph.decorator;
-
-    // Отключаем изменение размеров у ненвидимых узлов
-    nodeDecorator.reshapeHandleProviderDecorator
-      .hideImplementation((node) => node.tag === 'invisible');
-
-    this.registerReshapeHandleProvider();
-    this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
   }
 
-  registerReshapeHandleProvider() {
-    const { nodeDecorator } = this.graphComponent.graph.decorator;
-
-    // return customized reshape handle provider for the orange, blue and green node
-    nodeDecorator.reshapeHandleProviderDecorator.setFactory(
-      (node) => node?.tag?.isAspectRatio,
-      (node) => {
-        // Create a default reshape handle provider for nodes
-        const reshapeHandler = node.lookup(IReshapeHandler.$class);
-        const provider = new NodeReshapeHandleProvider(
-          node,
-          reshapeHandler,
-          HandlePositions.BORDER,
-        );
-        // Show only handles at the corners and always use aspect ratio resizing
-        provider.handlePositions = HandlePositions.CORNERS;
-        provider.ratioReshapeRecognizer = EventRecognizers.ALWAYS;
-        return provider;
-      },
-    );
+  async saveGraphToLocalStorage() {
+    return new Promise((resolve) => {
+      ICommand.SAVE.execute(null, this.graphComponent);
+      resolve();
+    });
   }
 
-  // Сохранение через GraphML
+  // Load
+  async loadGraph() {
+    return new Promise((resolve) => {
+      ICommand.OPEN.execute(null, this.graphComponent);
+      resolve();
+    });
+  }
+
+  // Load from LocalStorage to Store
+  updateGraphFromLocalStorage(updateStoreCallback) {
+    this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
+    window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
+    if (updateStoreCallback && this.savedGraph) {
+      updateStoreCallback(this.savedGraph);
+    }
+  }
+
+  // Settings GraphML
   initializeIO() {
     const graphmlHandler = new GraphMLIOHandler();
     // enable serialization of the VueJS node style -
@@ -1148,50 +1243,47 @@ class ConstructorSchemesClass {
     });
   }
 
-  // Сохранение
-  save(updateStoreCallback) {
-    this.saveGraphToLocalStorage().then(() => {
-      this.updateGraphFromLocalStorage(updateStoreCallback);
-    });
+  registerReshapeHandleProvider() {
+    const { nodeDecorator } = this.graphComponent.graph.decorator;
+
+    // return customized reshape handle provider for the orange, blue and green node
+    nodeDecorator.reshapeHandleProviderDecorator.setFactory(
+      (node) => node?.tag?.isAspectRatio,
+      (node) => {
+        // Create a default reshape handle provider for nodes
+        const reshapeHandler = node.lookup(IReshapeHandler.$class);
+        const provider = new NodeReshapeHandleProvider(
+          node,
+          reshapeHandler,
+          HandlePositions.BORDER,
+        );
+        // Show only handles at the corners and always use aspect ratio resizing
+        provider.handlePositions = HandlePositions.CORNERS;
+        provider.ratioReshapeRecognizer = EventRecognizers.ALWAYS;
+        return provider;
+      },
+    );
   }
 
-  async saveGraphToLocalStorage() {
-    return new Promise((resolve) => {
-      ICommand.SAVE.execute(null, this.graphComponent);
-      resolve();
-    });
-  }
-
-  // Загрузка
-  async loadGraph() {
-    return new Promise((resolve) => {
-      ICommand.OPEN.execute(null, this.graphComponent);
-      resolve();
-    });
-  }
-
-  // Выгразука из LocalStorage в Store через callback
-  updateGraphFromLocalStorage(updateStoreCallback) {
-    this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
-    window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
-    if (updateStoreCallback && this.savedGraph) {
-      updateStoreCallback(this.savedGraph);
-    }
-  }
-
-  applyStylesElements({
-    nodeCustomStyles,
-    edgeCustomStyles,
-    labelCustomStyles,
-  }) {
-    if (nodeCustomStyles) {
-      this.defaultNodeStyle = nodeCustomStyles;
-    }
-    if (edgeCustomStyles) {
-      this.defaultEdgeStyle = edgeCustomStyles;
-    }
-    if (labelCustomStyles) {
-      this.defaultLabelStyle = labelCustomStyles;
+  applyStylesElements(styles) {
+    if (styles) {
+      this.defaultNodeStyle = {
+        shape: styles.nodeShape || 0,
+        fill: styles.nodeFill.rgbaString,
+        strokeColor: styles.nodeStrokeColor.rgbaString,
+        strokeSize: styles.nodeStrokeSize,
+      };
+      this.defaultEdgeStyle = {
+        strokeColor: styles.edgeStrokeColor.rgbaString,
+        strokeSize: styles.edgeStrokeSize,
+        smoothingLength: styles.edgeSmoothingLength,
+        targetArrowColor: styles.edgeStrokeColor.rgbaString,
+        targetArrowType: 'none',
+      };
+      this.defaultLabelStyle = {
+        font: styles.labelFont,
+        textFill: styles.labelTextFill.rgbaString,
+      };
     }
     this.setDefaultStyles();
     if (this.dndPanelElem) {
@@ -1223,16 +1315,17 @@ class ConstructorSchemesClass {
     return this.isEdit;
   }
 
-  // Настройка взаимодействия с графом
+  // Setting up interaction with the graph
   configureInputModes(updateStoreCallback, openDataPanelCallback, closeDataPanelCallback) {
     const mode = new GraphEditorInputMode({
       allowCreateNode: false,
       allowAddLabel: false,
+      focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      deletableItems: GraphItemTypes.NODE | GraphItemTypes.EDGE | GraphItemTypes.LABEL,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
+        snapPortAdjacentSegments: true,
         nodeToNodeDistance: 10,
         nodeToEdgeDistance: 0,
         snapOrthogonalMovement: false,
@@ -1309,12 +1402,18 @@ class ConstructorSchemesClass {
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
       // Проверяем на наличие данных в узле
-      if (evt.item instanceof INode) {
+      if (evt.item instanceof INode || evt.item instanceof IEdge) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
         // Открываем панель для редактирования данных элемента
         if (evt.item.tag?.templateType || evt.item.tag?.textTemplateType) {
           openDataPanelCallback(evt.item.tag);
+        } else if (evt.item instanceof IEdge) {
+          openDataPanelCallback({
+            ...ConstructorSchemesClass.getEdgeOptions(evt.item),
+            dataType: 'edge',
+            nodeId: evt.item.hashCode(),
+          });
         } else {
           openDataPanelCallback({
             ...evt.item.tag,
@@ -1333,6 +1432,9 @@ class ConstructorSchemesClass {
       }
       if (evt?.sourcePortOwner?.tag === 'invisible') {
         this.graphComponent.graph.remove(evt?.sourcePortOwner);
+      }
+      if (evt.item === this.targetDataNode) {
+        closeDataPanelCallback();
       }
       this.graphComponent.updateVisual();
       // Сохранение в store
@@ -1353,18 +1455,6 @@ class ConstructorSchemesClass {
 
     // Сохранение inputMode
     this.graphComponent.inputMode = mode;
-  }
-
-  static getColorForColorPicker(color) {
-    return {
-      rgba: {
-        r: color.r,
-        g: color.g,
-        b: color.b,
-        a: color.a,
-      },
-      rgbaString: ConstructorSchemesClass.colorToString(color),
-    };
   }
 
   settingsNodeDropInputMode() {
@@ -1430,44 +1520,6 @@ class ConstructorSchemesClass {
     });
   }
 
-  static createUrlIcon(ctx, url, imageSize, iconSize) {
-    return new Promise((resolve, reject) => {
-      // create an Image from the url
-      const image = new Image(imageSize.width, imageSize.height);
-      image.onload = () => {
-        // render the image into the canvas
-        ctx.clearRect(0, 0, iconSize.width, iconSize.height);
-        ctx.drawImage(
-          image,
-          0,
-          0,
-          imageSize.width,
-          imageSize.height,
-          0,
-          0,
-          iconSize.width,
-          iconSize.height,
-        );
-        const imageData = ctx.getImageData(0, 0, iconSize.width, iconSize.height);
-        resolve(imageData);
-      };
-      image.onerror = () => {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        reject('Loading the image failed.');
-      };
-      image.src = url;
-      image.preserveAspectRatio = 'xMidYMid meet';
-    });
-  }
-
-  static createCanvasContext(iconSize) {
-    // canvas used to pre-render the icons
-    const canvas = document.createElement('canvas');
-    canvas.setAttribute('width', `${iconSize.width}`);
-    canvas.setAttribute('height', `${iconSize.height}`);
-    return canvas.getContext('2d');
-  }
-
   // eslint-disable-next-line class-methods-use-this
   settingsLabelDropInputMode() {
     return new LabelDropInputMode({
@@ -1479,12 +1531,24 @@ class ConstructorSchemesClass {
       isValidLabelOwnerPredicate: (labelOwner) => labelOwner instanceof INode
         || labelOwner instanceof IEdge
         || labelOwner instanceof IPort,
-      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => graph.addLabel({
-        owner: dropTarget,
-        location: dropLocation,
-        text: dropData.text,
-        style: dropData.style.clone(),
-      }),
+      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => {
+        if (dropTarget instanceof IPort) {
+          this.graphComponent.graphModelManager.graph.addLabel({
+            owner: dropTarget.owner,
+            style: dropData.style.clone(),
+            text: dropData.text,
+            tag: dropData.tag,
+          });
+        } else {
+          graph.addLabel({
+            owner: dropTarget,
+            location: dropLocation,
+            text: dropData.text,
+            style: dropData.style.clone(),
+          });
+        }
+        return graph;
+      },
     });
   }
 
@@ -1497,6 +1561,23 @@ class ConstructorSchemesClass {
       useBestMatchingParameter: true,
       // allow only for nodes to be the new port owner
       isValidPortOwnerPredicate: (portOwner) => portOwner instanceof INode,
+      itemCreator: (
+        context,
+        graph,
+        dropData,
+        dropTarget,
+        dropLocation,
+      ) => graph.addPortAt({
+        owner: dropTarget,
+        location: dropLocation,
+        style: new NodeStylePortStyleAdapter(
+          new ShapeNodeStyle({
+            fill: 'transparent',
+            stroke: 'transparent',
+            shape: 'ellipse',
+          }),
+        ),
+      }),
     });
   }
 
@@ -1600,6 +1681,7 @@ class ConstructorSchemesClass {
           mode, updateStoreCallback, location: sourcePortLocation,
         });
       }
+      this.closeDataPanelCallback();
     });
   }
 
@@ -1819,21 +1901,6 @@ class ConstructorSchemesClass {
     });
   }
 
-  static createReactiveNode(data, tooltip, type) {
-    const dataNode = new SimpleNode();
-    dataNode.tag = data.dataRest;
-    dataNode.style = new VuejsNodeStyle(data.template);
-    dataNode.layout = new Rect(
-      0,
-      0,
-      data?.width,
-      data?.height
-        ? data.height
-        : data.rowHeight * (data?.dataRest?.items?.length || 1),
-    );
-    return new DragAndDropPanelItem(dataNode, tooltip, type);
-  }
-
   async createDnDPanelItems({
     iconsList,
     defaultEdgeStyle,
@@ -1921,22 +1988,11 @@ class ConstructorSchemesClass {
     return this.dataRest.find((dataItem) => dataItem.TagName === dataId);
   }
 
-  getShapeById(shapeId) {
-    const targetShape = this.shapeNodeStyleList.find((item) => item.numberValue === shapeId);
-    if (targetShape) {
-      return targetShape.value;
-    }
-    return '';
-  }
-
-  // TODO: Рефакторин
   updateDataInNode(updatedData) {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
-        if (
-          node.tag.dataType === '0'
-          || node.tag.dataType === '1'
-        ) {
+        const { dataType } = node.tag;
+        if (dataType === '0' || dataType === '1') {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
             const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
@@ -1952,42 +2008,27 @@ class ConstructorSchemesClass {
             ...node.tag,
             items: updatedItems,
           };
-        } else if (
-          node.tag.dataType === '2'
-          || node.tag.dataType === '3'
-        ) {
+        } else if (dataType === '2' || dataType === '3') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          const updateTag = {
+          node.tag = {
             ...node.tag,
             textFirst: targetData?.value || '-',
             textSecond: targetData.Description || '-',
           };
-          node.tag = {
-            ...node.tag,
-            ...updateTag,
-          };
-        } else if (node.tag.dataType === '4') {
+        } else if (dataType === '4') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
-          const updateTag = {
+          node.tag = {
             ...node.tag,
             currentValue: +targetData.value,
             maxValue: +targetData.value + 100,
           };
-          node.tag = {
-            ...node.tag,
-            ...updateTag,
-          };
-        } else if (node.tag.dataType === '5') {
+        } else if (dataType === '5') {
           const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
           const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
-          const updateTag = {
+          node.tag = {
             ...node.tag,
             firstValue: +targetDataFirst.value,
             secondValue: +targetDataSecond.value,
-          };
-          node.tag = {
-            ...node.tag,
-            ...updateTag,
           };
         }
       });
@@ -1997,106 +2038,89 @@ class ConstructorSchemesClass {
     });
   }
 
-  // TODO: Рефакторин
-  updateSelectedNode(updatedData, updateStoreCallback) {
-    if (
-      this.targetDataNode.tag.dataType === '0'
-      || this.targetDataNode.tag.dataType === '1'
-    ) {
-      const items = updatedData.items.map((item) => ({
-        ...item,
-        textLeft: this.getDataItemById(item.id)?.Description || '-',
-        textRight: this.getDataItemById(item.id)?.value || '-',
-      }));
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        items,
+  updateSelectedNode(dataFromComponent, updateStoreCallback) {
+    let updatedData = null;
+    const dataType = this.targetDataNode.tag?.dataType;
+    if (dataType === '0' || dataType === '1') {
+      updatedData = {
+        items: dataFromComponent.items.map((item) => ({
+          ...item,
+          textLeft: this.getDataItemById(item.id)?.Description || '-',
+          textRight: this.getDataItemById(item.id)?.value || '-',
+        })),
       };
-    } else if (
-      this.targetDataNode.tag.dataType === '2'
-      || this.targetDataNode.tag.dataType === '3'
-    ) {
-      const items = {
-        ...updatedData,
-        textFirst: this.getDataItemById(updatedData.id)?.value || '-',
-        textSecond: this.getDataItemById(updatedData.id)?.Description || '-',
+    } else if (dataType === '2' || dataType === '3') {
+      updatedData = {
+        ...dataFromComponent,
+        textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
+        textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...items,
+    } else if (dataType === '4') {
+      updatedData = {
+        ...dataFromComponent,
+        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value),
+        // TODO: Заменить нан корректное значение!!
+        maxValue: Number(this.getDataItemById(dataFromComponent.id)?.value) + 100,
       };
-    } else if (this.targetDataNode.tag.dataType === '4') {
-      const items = {
-        ...updatedData,
-        currentValue: Number(this.getDataItemById(updatedData.id)?.value),
-        maxValue: Number(this.getDataItemById(updatedData.id)?.value) + 100,
+    } else if (dataType === '5') {
+      updatedData = {
+        ...dataFromComponent,
+        firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
+        secondValue: Number(this.getDataItemById(dataFromComponent.idSecond)?.value),
       };
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...items,
-      };
-    } else if (this.targetDataNode.tag.dataType === '5') {
-      const items = {
-        ...updatedData,
-        firstValue: Number(this.getDataItemById(updatedData.idFirst)?.value),
-        secondValue: Number(this.getDataItemById(updatedData.idSecond)?.value),
-      };
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...items,
-      };
-    } else if (this.targetDataNode.tag.dataType === 'label-0') {
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...updatedData,
-      };
-    } else if (this.targetDataNode.tag.dataType === 'default-node') {
-      this.targetDataNode.tag = {
-        ...this.targetDataNode.tag,
-        ...updatedData,
-      };
+    } else if (dataType === 'label-0' || dataType === 'default-node') {
+      updatedData = dataFromComponent;
+    } else if (dataFromComponent.dataType === 'edge') {
+      this.updateEdgeVisual(dataFromComponent);
+      updatedData = dataFromComponent;
     }
+    this.targetDataNode.tag = {
+      ...this.targetDataNode.tag,
+      ...updatedData,
+    };
     // Обновляем состояние графа
     this.graphComponent.updateVisual();
     // Сохраняем изменения
     this.save(updateStoreCallback);
   }
 
+  updateEdgeVisual(updatedData) {
+    this.graphComponent.graphModelManager.graph.setStyle(
+      this.targetDataNode,
+      new PolylineEdgeStyle({
+        stroke: `${updatedData.thickness} solid ${updatedData.strokeColor.rgbaString}`,
+        targetArrow: 'none',
+        sourceArrow: 'none',
+        smoothingLength: updatedData.smoothingLength || 0,
+      }),
+    );
+  }
+
   // Order commands
-  // TODO: Завязать на выделение элементов
-  orderToFront() {
-    if (this.graphComponent.selection.selectedNodes.toArray()?.length > 0) {
-      this.graphComponent.graphModelManager
-        .toFront(this.graphComponent.selection.selectedNodes);
-      this.graphComponent.selection.selectedNodes.toArray().forEach((node) => {
-        this.graphComponent.graphModelManager.update(node);
-      });
-    }
-    if (this.graphComponent.selection.selectedEdges.toArray()?.length > 0) {
-      this.graphComponent.graphModelManager
-        .toFront(this.graphComponent.selection.selectedEdges);
-      this.graphComponent.selection.selectedEdges.toArray().forEach((edge) => {
-        ICommand.TO_FRONT.execute(edge, this.graphComponent);
-        this.graphComponent.graphModelManager.update(edge);
+  changeOrderSelectedElements(method, command) {
+    const nodes = this.graphComponent.selection.selectedNodes;
+    const edges = this.graphComponent.selection.selectedEdges;
+    const elements = [...nodes.toArray(), ...edges.toArray()];
+
+    if (elements?.length > 0) {
+      this.graphComponent.graphModelManager[method](elements);
+      elements.forEach((element) => {
+        if (element instanceof IEdge) {
+          ICommand[command].execute(element, this.graphComponent);
+        }
+        this.graphComponent.graphModelManager.update(element);
       });
     }
   }
 
-  orderToBack() {
-    if (this.graphComponent.selection.selectedNodes.toArray()?.length > 0) {
-      this.graphComponent.graphModelManager
-        .toBack(this.graphComponent.selection.selectedNodes);
-      this.graphComponent.selection.selectedNodes.toArray().forEach((node) => {
-        this.graphComponent.graphModelManager.update(node);
-      });
-    }
-    if (this.graphComponent.selection.selectedEdges.toArray()?.length > 0) {
-      this.graphComponent.graphModelManager
-        .toBack(this.graphComponent.selection.selectedEdges);
-      this.graphComponent.selection.selectedEdges.toArray().forEach((edge) => {
-        this.graphComponent.graphModelManager.update(edge);
-      });
-    }
+  orderTo(key) {
+    const orderCommands = {
+      toFront: 'TO_FRONT',
+      toBack: 'TO_BACK',
+      raise: 'RAISE',
+      lower: 'LOWER',
+    };
+    this.changeOrderSelectedElements(key, orderCommands[key]);
   }
 }
 

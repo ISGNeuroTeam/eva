@@ -6,46 +6,85 @@
       'height': `${innerSize.height}px`,
     }"
   >
-    <template v-if="isEdit">
-      <button
-        class="pa-2"
-        @click="toggleDnDPanel"
+    <div class="d-flex align-center ml-5">
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
       >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <v-switch
+              v-model="isEdit"
+              inset
+              label=""
+              @change="toggleInputMode"
+            />
+          </div>
+        </template>
+        <span>Toggle edit</span>
+      </v-tooltip>
+      <template v-if="isEdit">
+        <button
+          class="pa-2"
+          @click="toggleDnDPanel"
         >
-          {{ gear }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderToFront"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ gear }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('toFront')"
         >
-          {{ arrowUp }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderToBack"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowUp }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('toBack')"
         >
-          {{ arrowDown }}
-        </v-icon>
-      </button>
-    </template>
-    <button @click="toggleInputMode">
-      Toggle edit ({{ isEdit }})
-    </button>
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowDown }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('raise')"
+        >
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowUp }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('lower')"
+        >
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowDown }}
+          </v-icon>
+        </button>
+      </template>
+    </div>
     <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
@@ -90,6 +129,7 @@
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
                       <div class="dash-constructor-schemes__options">
+                        <!--TODO: Возможно стоит вынести в отдельный компонент-->
                         <div class="row">
                           <div class="col-12">
                             Настройки линии
@@ -102,12 +142,14 @@
                             <v-menu
                               top
                               offset-x
+                              z-index="100"
                               :close-on-content-click="false"
                             >
                               <template v-slot:activator="{ on, attrs }">
                                 <v-btn
                                   :style="{
-                                    'background-color': edgeCustomStyles.strokeColor,
+                                    // eslint-disable-next-line max-len
+                                    'background-color': elementDefaultStyles.edgeStrokeColor.rgbaString,
                                   }"
                                   dark
                                   v-bind="attrs"
@@ -116,10 +158,10 @@
                               </template>
 
                               <v-color-picker
-                                v-model="edgeCustomStyles.strokeColor"
+                                :value="elementDefaultStyles.edgeStrokeColor.rgbaObject"
                                 dot-size="12"
                                 mode="rgba"
-                                @input="closeEdgeColorPicker"
+                                @update:color="updateDefaultElementColor($event, 'edgeStrokeColor')"
                               />
                             </v-menu>
                           </div>
@@ -129,7 +171,7 @@
                           </div>
                           <div class="col-4">
                             <v-text-field
-                              v-model="edgeCustomStyles.strokeSize"
+                              v-model="elementDefaultStyles.edgeStrokeSize"
                               dense
                             />
                           </div>
@@ -139,7 +181,7 @@
                           </div>
                           <div class="col-4">
                             <v-text-field
-                              v-model.number="edgeCustomStyles.smoothingLength"
+                              v-model.number="elementDefaultStyles.edgeSmoothingLength"
                               dense
                               placeholder="Скругление"
                             />
@@ -150,7 +192,7 @@
                           <!--Фигура-->
                           <div class="col-12">
                             <v-select
-                              v-model="shapeNodeStyle"
+                              v-model="elementDefaultStyles.nodeShape"
                               :items="shapeNodeStyleList"
                               item-value="id"
                               item-text="label"
@@ -168,12 +210,13 @@
                             <v-menu
                               top
                               offset-x
+                              z-index="100"
                               :close-on-content-click="false"
                             >
                               <template v-slot:activator="{ on, attrs }">
                                 <v-btn
                                   :style="{
-                                    'background-color': nodeCustomStyles.fill.rgbaString,
+                                    'background-color': elementDefaultStyles.nodeFill.rgbaString,
                                   }"
                                   dark
                                   v-bind="attrs"
@@ -182,10 +225,10 @@
                               </template>
 
                               <v-color-picker
-                                v-model="nodeCustomStyles.fill.rgbaObject"
+                                :value="elementDefaultStyles.nodeFill.rgbaObject"
                                 dot-size="12"
                                 mode="rgba"
-                                @input="closeEdgeColorPicker"
+                                @update:color="updateDefaultElementColor($event, 'nodeFill')"
                               />
                             </v-menu>
                           </div>
@@ -197,12 +240,14 @@
                             <v-menu
                               top
                               offset-x
+                              z-index="100"
                               :close-on-content-click="false"
                             >
                               <template v-slot:activator="{ on, attrs }">
                                 <v-btn
                                   :style="{
-                                    'background-color': nodeCustomStyles.strokeColor,
+                                    // eslint-disable-next-line max-len
+                                    'background-color': elementDefaultStyles.nodeStrokeColor.rgbaString,
                                   }"
                                   dark
                                   v-bind="attrs"
@@ -211,10 +256,10 @@
                               </template>
 
                               <v-color-picker
-                                v-model="nodeCustomStyles.strokeColor"
+                                :value="elementDefaultStyles.nodeStrokeColor.rgbaObject"
                                 dot-size="12"
                                 mode="rgba"
-                                @input="closeEdgeColorPicker"
+                                @update:color="updateDefaultElementColor($event, 'nodeStrokeColor')"
                               />
                             </v-menu>
                           </div>
@@ -224,7 +269,7 @@
                           </div>
                           <div class="col-4">
                             <v-text-field
-                              v-model="nodeCustomStyles.strokeSize"
+                              v-model="elementDefaultStyles.nodeStrokeSize"
                               dense
                             />
                           </div>
@@ -324,581 +369,13 @@
           </button>
         </div>
       </div>
-      <div
-        v-if="dataSelectedNode"
-        ref="dataPanelItems"
-        class="dash-constructor-schemes__data-panel-wrapper"
-      >
-        <div
-          v-if="
-            dataSelectedNode.dataType === '0'
-              || dataSelectedNode.dataType === '1'
-          "
-          class="dash-constructor-schemes__data-panel-item"
-        >
-          <div
-            v-for="(item, index) in dataSelectedNode.items"
-            :key="`${dataSelectedNode.nodeId}-${index}`"
-            class="row align-center"
-          >
-            <v-select
-              v-model="item.id"
-              :items="mockData"
-              item-value="TagName"
-              item-text="Description"
-              label="Данные для строки"
-              :menu-props="{
-                'z-index': 100,
-              }"
-              class="col-10"
-              @change="changeDataSelectedNode"
-            />
-            <v-icon
-              class="control-button edit-icon theme--dark col-2"
-              :style="{ color: theme.$secondary_text }"
-              @click="deleteLine(index)"
-            >
-              {{ closeIcon }}
-            </v-icon>
-          </div>
-
-          <v-btn
-            small
-            :color="theme.$primary_button"
-            @click="addLine()"
-          >
-            Добавить строку
-          </v-btn>
-        </div>
-        <div
-          v-if="
-            dataSelectedNode.dataType === '2'
-              || dataSelectedNode.dataType === '3'
-          "
-          class="dash-constructor-schemes__data-panel-item"
-        >
-          <v-select
-            v-model="dataSelectedNode.id"
-            :items="mockData"
-            item-value="TagName"
-            item-text="Description"
-            label="Данные для строки"
-            :menu-props="{
-              'z-index': 100,
-            }"
-            @change="changeDataSelectedNode"
-          />
-        </div>
-        <div
-          v-if=" dataSelectedNode.dataType === '4' "
-          class="dash-constructor-schemes__data-panel-item"
-        >
-          <v-select
-            v-model="dataSelectedNode.id"
-            :items="mockData"
-            item-value="TagName"
-            item-text="Description"
-            label="Данные для строки"
-            :menu-props="{
-              'z-index': 100,
-            }"
-          />
-          <div class="row">
-            <div class="col-8">
-              Цвет текущего
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.currentValueColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.currentValueColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-            <div class="col-8">
-              Цвет максимального
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.maxValueColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.maxValueColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-            <div class="col-8">
-              Цвет текста
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.textColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.textColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <v-btn
-            small
-            :color="theme.$primary_button"
-            @click="changeDataSelectedNode"
-          >
-            Применить
-          </v-btn>
-        </div>
-        <div
-          v-if="dataSelectedNode.dataType === '5'"
-          class="dash-constructor-schemes__data-panel-item"
-        >
-          <v-select
-            v-model="dataSelectedNode.idFirst"
-            :items="mockData"
-            item-value="TagName"
-            item-text="Description"
-            label="Первое значение"
-            :menu-props="{
-              'z-index': 100,
-            }"
-          />
-          <div class="row">
-            <div class="col-8">
-              Цвет первого значения
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.firstValueColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.firstValueColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              Цвет текста первого значения
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.firstTextColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.firstTextColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <v-select
-            v-model="dataSelectedNode.idSecond"
-            :items="mockData"
-            item-value="TagName"
-            item-text="Description"
-            label="Второе значение"
-            :menu-props="{
-              'z-index': 100,
-            }"
-          />
-          <div class="row">
-            <div class="col-8">
-              Цвет второго значения
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.secondValueColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.secondValueColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              Цвет текста второго значения
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.secondTextColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.secondTextColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <v-btn
-            small
-            :color="theme.$primary_button"
-            @click="changeDataSelectedNode"
-          >
-            Применить
-          </v-btn>
-        </div>
-        <div
-          v-if="dataSelectedNode.dataType === 'label-0'"
-          class="dash-constructor-schemes__data-panel-item"
-        >
-          <v-text-field
-            v-model="dataSelectedNode.text"
-            label="Текст"
-            :color="theme.$main_text"
-            style="margin-bottom: 10px"
-            outlined
-            hide-details
-          />
-          <div class="row align-center">
-            <div class="col-8">
-              Цвет текста
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.textColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.textColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-            <div class="col-8">
-              Цвет заливки
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.bgColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.bgColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-            <div class="col-8">
-              Вертикальное расположение
-            </div>
-            <div class="col-4">
-              <v-switch
-                v-model="dataSelectedNode.isVertical"
-              />
-            </div>
-            <div class="col-8">
-              Отображение бордера
-            </div>
-            <div class="col-4">
-              <v-switch
-                v-model="dataSelectedNode.bordered"
-              />
-            </div>
-          </div>
-          <div
-            v-if="dataSelectedNode.bordered"
-            class="row align-center"
-          >
-            <div class="col-8">
-              Цвет бордера
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': dataSelectedNode.borderColor,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  v-model="dataSelectedNode.borderColor"
-                  dot-size="12"
-                  mode="rgba"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-            <div class="col-8">
-              Пунктирный бордер
-            </div>
-            <div class="col-4">
-              <v-switch
-                v-model="dataSelectedNode.borderDashed"
-              />
-            </div>
-            <div class="col-12">
-              <v-text-field
-                v-model="dataSelectedNode.borderSize"
-                label="Размер бордера"
-                :color="theme.$main_text"
-                outlined
-                hide-details
-                style="margin-bottom: 10px"
-              />
-            </div>
-          </div>
-          <v-btn
-            small
-            :color="theme.$primary_button"
-            @click="changeDataSelectedNode"
-          >
-            Применить
-          </v-btn>
-        </div>
-        <div v-if="dataSelectedNode.dataType === 'default-node'">
-          <div class="row">
-            <div class="col-8">
-              Цвет блока:
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': `${dataSelectedNode.fill.rgbaString}`,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  :value="dataSelectedNode.fill.rgbaObject"
-                  dot-size="12"
-                  mode="rgba"
-                  @update:color="updateSelectedNodeColor($event, 'fill')"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              Цвет рамки блока:
-            </div>
-            <div class="col-4">
-              <v-menu
-                top
-                offset-x
-                :close-on-content-click="false"
-                z-index="100"
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    :style="{
-                      'background-color': `${dataSelectedNode.strokeColor.rgbaString}`,
-                    }"
-                    dark
-                    v-bind="attrs"
-                    v-on="on"
-                  />
-                </template>
-
-                <v-color-picker
-                  :value="dataSelectedNode.strokeColor.rgbaObject"
-                  dot-size="12"
-                  mode="rgba"
-                  @update:color="updateSelectedNodeColor($event, 'strokeColor')"
-                  @input="closeEdgeColorPicker"
-                />
-              </v-menu>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-8">
-              Размер рамки:
-            </div>
-            <div class="col-4">
-              <v-text-field
-                v-model="dataSelectedNode.thickness"
-                dense
-              />
-            </div>
-          </div>
-          <v-select
-            v-model="dataSelectedNode.shape"
-            :items="shapeNodeStyleList"
-            item-value="id"
-            item-text="label"
-            label="Фигура"
-            :menu-props="{
-              'z-index': 100,
-            }"
-          />
-          <v-btn
-            small
-            :color="theme.$primary_button"
-            @click="changeDataSelectedNode"
-          >
-            Применить
-          </v-btn>
-        </div>
-      </div>
+      <dash-constructor-schemes-settings
+        v-model="dataSelectedNode"
+        :theme="theme"
+        :data-rest-from="mockData"
+        :shape-node-style-list="shapeNodeStyleList"
+        @changeDataSelectedNode="changeDataSelectedNode"
+      />
     </div>
     <!--The GraphComponent-->
     <div
@@ -910,9 +387,9 @@
 
 <script>
 import {
-  mdiSettings, mdiClose, mdiArrowUp, mdiArrowDown,
+  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings,
 } from '@mdi/js';
-import ConstructorSchemesClass from '../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
+import ConstructorSchemesClass from '../../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 import { throttle } from '@/js/utils/throttle';
 
 export default {
@@ -952,25 +429,52 @@ export default {
       arrowDown: mdiArrowDown,
       dndPanel: false,
       dataPanel: false,
-      edgeColorPopup: false,
       nodeBgColorPopup: false,
       nodeBorderColorPopup: false,
       shapeNodeStyle: '',
       shapeNodeStyleList: [],
-      edgeCustomStyles: {
-        strokeSize: '10.5px',
-        smoothingLength: 0,
-        strokeColor: '#FFFFFF',
-        targetArrowColor: '#F4F4F4',
-      },
-      nodeCustomStyles: {
-        fill: '#ee0000',
-        strokeColor: '#EE0000',
-        strokeSize: '1.5px',
-      },
-      labelCustomStyles: {
-        font: '12px Tahoma',
-        textFill: '#000000',
+      elementDefaultStyles: {
+        labelFont: '12px Tahoma',
+        labelTextFill: {
+          rgbaString: 'rgba(255, 255, 255, 255)',
+          rgbaObject: {
+            r: 255,
+            g: 255,
+            b: 255,
+            a: 255,
+          },
+        },
+        nodeFill: {
+          rgbaString: 'rgba(255, 255, 255, 255)',
+          rgbaObject: {
+            r: 255,
+            g: 255,
+            b: 255,
+            a: 255,
+          },
+        },
+        nodeStrokeColor: {
+          rgbaString: 'rgba(255, 255, 255, 255)',
+          rgbaObject: {
+            r: 255,
+            g: 255,
+            b: 255,
+            a: 255,
+          },
+        },
+        nodeStrokeSize: '1.5px',
+        nodeShape: 0,
+        edgeStrokeColor: {
+          rgbaString: 'rgba(255, 255, 255, 255)',
+          rgbaObject: {
+            r: 255,
+            g: 255,
+            b: 255,
+            a: 255,
+          },
+        },
+        edgeStrokeSize: '10px',
+        edgeSmoothingLength: 0,
       },
       // Список иконок для схемы
       iconsList: [
@@ -1265,37 +769,6 @@ export default {
     },
   },
   watch: {
-    // TODO: Написать метод для перерисовки отдельного элемента на DnD панели
-    edgeCustomStyles: {
-      deep: true,
-      handler(/* value */) {
-        if (this.constructorSchemes) {
-          // this.constructorSchemes.applyStylesElements({
-          //   edgeCustomStyles: value,
-          // });
-        }
-      },
-    },
-    nodeCustomStyles: {
-      deep: true,
-      handler(/* value */) {
-        if (this.constructorSchemes) {
-          // this.constructorSchemes.applyStylesElements({
-          //   nodeCustomStyles: value,
-          // });
-        }
-      },
-    },
-    labelCustomStyles: {
-      deep: true,
-      handler(/* value */) {
-        if (this.constructorSchemes) {
-          // this.constructorSchemes.applyStylesElements({
-          //   labelCustomStyles: value,
-          // });
-        }
-      },
-    },
     mockData: {
       deep: true,
       handler(value) {
@@ -1307,32 +780,19 @@ export default {
   },
   mounted() {
     this.createGraph();
-    this.updateSelectedNodeColor = throttle(this.updateSelectedNodeColor, 200);
+    this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
   },
   methods: {
-    updateSelectedNodeColor(evt, field) {
-      const updateValue = structuredClone(this.dataSelectedNode);
+    updateDefaultElementColor(evt, field) {
+      const updateValue = structuredClone(this.elementDefaultStyles);
       updateValue[field] = {
         rgbaObject: evt.rgba,
         rgbaString: `rgba(${evt.rgba.r}, ${evt.rgba.g}, ${evt.rgba.b}, ${evt.rgba.a})`,
       };
-      this.dataSelectedNode = updateValue;
+      this.elementDefaultStyles = updateValue;
     },
     applyOptions() {
-      if (this.shapeNodeStyle) {
-        this.nodeCustomStyles = {
-          ...this.nodeCustomStyles,
-          shape: this.shapeNodeStyle,
-        };
-      }
-      this.constructorSchemes.applyStylesElements({
-        edgeCustomStyles: this.edgeCustomStyles,
-        nodeCustomStyles: this.nodeCustomStyles,
-        labelCustomStyles: this.labelCustomStyles,
-      });
-    },
-    closeEdgeColorPicker() {
-      this.edgeColorPopup = false;
+      this.constructorSchemes.applyStylesElements(this.elementDefaultStyles);
     },
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
@@ -1343,9 +803,7 @@ export default {
         elem: this.$refs.graphComponent,
         dataRest: this.mockData,
         iconsList: this.iconsList,
-        edgeCustomStyles: this.edgeCustomStyles,
-        nodeCustomStyles: this.nodeCustomStyles,
-        labelCustomStyles: this.labelCustomStyles,
+        elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
@@ -1354,13 +812,13 @@ export default {
       });
       if (this.constructorSchemes) {
         this.shapeNodeStyleList = this.constructorSchemes.getShapeNodeStyleList;
-        this.shapeNodeStyle = this.constructorSchemes.defaultNodeStyle.shape;
+        this.nodeShape = this.constructorSchemes.defaultNodeStyle.shape;
       }
     },
 
-    changeDataSelectedNode() {
+    changeDataSelectedNode(updatedData) {
       this.constructorSchemes.updateSelectedNode(
-        this.dataSelectedNode,
+        updatedData,
         this.updateSavedGraph,
       );
     },
@@ -1379,21 +837,24 @@ export default {
       this.dataSelectedNode = null;
     },
     openDataPanel(targetElement) {
-      this.closeDataPanel();
-      this.dataPanel = true;
-      this.selectedNode = structuredClone(targetElement.nodeId);
-      this.dataSelectedNode = structuredClone(targetElement);
-      if (targetElement.dataType) {
-        this.selectedDataType = structuredClone(targetElement.dataType);
-      } else {
-        this.selectedDataType = 'default-node';
-      }
+      new Promise((resolve) => {
+        this.closeDataPanel();
+        this.selectedNode = structuredClone(targetElement.nodeId);
+        this.dataSelectedNode = structuredClone(targetElement);
+        if (targetElement.dataType) {
+          this.selectedDataType = structuredClone(targetElement.dataType);
+        } else {
+          this.selectedDataType = 'default-node';
+        }
+        resolve();
+      }).then(() => {
+        if (targetElement.dataType !== 'image-node') {
+          this.dataPanel = true;
+        }
+      });
     },
-    orderToFront() {
-      this.constructorSchemes.orderToFront();
-    },
-    orderToBack() {
-      this.constructorSchemes.orderToBack();
+    orderTo(key) {
+      this.constructorSchemes.orderTo(key);
     },
     addLine() {
       this.dataSelectedNode.items.push({
@@ -1519,7 +980,6 @@ export default {
 .b-data-node {
   &__text {
     font-weight: 700;
-    font-size: 11px;
     line-height: 1;
   }
   &__wrapper {
@@ -1537,5 +997,8 @@ export default {
       padding: 7.5px 12px;
     }
   }
+}
+.yfiles-snap-line {
+  stroke: #ff0000 !important;
 }
 </style>

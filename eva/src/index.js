@@ -126,7 +126,8 @@ Vue.component('dash-heatmap', () => import('./components/dashBoardInside/dashHea
 // компонент ползунок
 Vue.component('dash-tune', () => import('./components/dashBoardInside/dashTune.vue'));
 // конструктор схем
-Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorSchemes.vue'));
+Vue.component('dash-constructorSchemes', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemes.vue'));
+Vue.component('dash-constructor-schemes-settings', () => import('./components/dashBoardInside/dashConstructorScheme/dashConstructorSchemesSettings.vue'));
 // компонент Single Value
 Vue.component('dash-singleValue', () => import('./components/dashBoardInside/SingleValue/dashSingleValue.vue'));
 // компонент Accumulators
@@ -157,6 +158,9 @@ Vue.component('modal-log', () => import('./components/autorization/modalLog.vue'
 Vue.component('data-profile', () => import('./components/autorization/dataForProfile.vue'));
 //  компонент для загрузки svg
 Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
+// Точечный график
+Vue.component('dash-scatterPlot', () => import('./components/dashBoardInside/dashScatterPlot.vue'));
+
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
