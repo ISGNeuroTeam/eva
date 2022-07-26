@@ -80,7 +80,7 @@ class HTMLPopupSupport {
     this.graphComponent.addUpdatedVisualListener(() => {
       if (this.currentItem && this.dirty) {
         this.dirty = false;
-        this.updateLocation();
+        // this.updateLocation();
       }
     });
   }
@@ -93,7 +93,7 @@ class HTMLPopupSupport {
     setTimeout(() => {
       this.div.style.opacity = '1';
     }, 0);
-    this.updateLocation();
+    // this.updateLocation();
   }
 
   /**
@@ -158,9 +158,12 @@ class HTMLPopupSupport {
    * @param {number} y The target y-coordinate of the pop-up.
    */
   setLocation(x, y) {
+    let indent = 20;
+    const { zoom } = this.graphComponent;
+    indent /= zoom;
     // Calculate the view coordinates since we have
     // to place the div in the regular HTML coordinate space
-    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
+    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x + indent, y));
     this.div.style.setProperty(
       'transform',
       `translate(${viewPoint.x}px, ${viewPoint.y}px)`,

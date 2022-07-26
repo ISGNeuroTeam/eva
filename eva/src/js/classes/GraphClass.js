@@ -431,6 +431,7 @@ class GraphClass {
       if (item instanceof IEdge && !this.nodePopup.currentItem) {
         // update data in edge pop-up
         GraphClass.updateEdgePopupContent(this.edgePopup, item);
+        this.edgePopup.setLocation(sender.$f4.x, sender.$f4.y);
         // open edge pop-up and node edge pop-up
         this.edgePopup.currentItem = item;
       } else {
