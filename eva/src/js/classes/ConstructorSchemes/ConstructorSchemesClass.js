@@ -1402,7 +1402,11 @@ class ConstructorSchemesClass {
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
       // Проверяем на наличие данных в узле
-      if (evt.item instanceof INode || evt.item instanceof IEdge) {
+      if (
+        evt.item instanceof INode
+        || evt.item instanceof IEdge
+        || evt.item instanceof ILabel
+      ) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
         // Открываем панель для редактирования данных элемента
@@ -1413,6 +1417,12 @@ class ConstructorSchemesClass {
             ...ConstructorSchemesClass.getEdgeOptions(evt.item),
             dataType: 'edge',
             nodeId: evt.item.hashCode(),
+          });
+        } else if (evt.item instanceof ILabel) {
+          openDataPanelCallback({
+            dataType: 'label',
+            fontSize: evt.item.style.textSize,
+            color: ConstructorSchemesClass.generateColor(evt.item.style.textFill.color),
           });
         } else {
           openDataPanelCallback({
@@ -2073,6 +2083,8 @@ class ConstructorSchemesClass {
     } else if (dataFromComponent.dataType === 'edge') {
       this.updateEdgeVisual(dataFromComponent);
       updatedData = dataFromComponent;
+    } else if (dataFromComponent.dataType === 'label') {
+      this.updateLabelVisual(dataFromComponent);
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
@@ -2092,6 +2104,19 @@ class ConstructorSchemesClass {
         targetArrow: 'none',
         sourceArrow: 'none',
         smoothingLength: updatedData.smoothingLength || 0,
+      }),
+    );
+  }
+
+  updateLabelVisual(updatedData) {
+    this.graphComponent.graphModelManager.graph.setStyle(
+      this.targetDataNode,
+      new DefaultLabelStyle({
+        backgroundStroke: 'transparent',
+        backgroundFill: 'transparent',
+        insets: [3, 5, 3, 5],
+        textFill: updatedData.color.rgbaString,
+        textSize: +updatedData.fontSize,
       }),
     );
   }
