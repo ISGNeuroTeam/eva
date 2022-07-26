@@ -49,7 +49,7 @@
             :width="circularWidth"
             :value="percentValue"
             :color="loading ? theme.$secondary_border : theme.$primary_button"
-            :class="value === 0 ? 'dash-map__min-value' : ''"
+            :class="sliderValue === 0 ? 'dash-map__min-value' : ''"
           >
             <div v-if="!loading">
               <span class="text-h4">{{ value }}%</span>
@@ -306,19 +306,14 @@ export default {
         this.value = this.values[value];
       }
     },
-    dataRestFrom(newVal, oldVal) {
-      if (newVal.length > 0 && oldVal.length > 0) {
-        // TODO: оставил так как не уверен что данное решение верное
-        // if (!this.dataField) {
-        //   const keys = Object.keys(dataRestFrom[0]).filter(
-        //     (key) => key[0] !== '_',
-        //   );
-        //   if (keys.length === 1) {
-        //     [this.dataField] = keys;
-        //   }
-        // }
-        this.dataField = '';
-      }
+    dataRestFrom: {
+      handler(newVal, oldVal) {
+        this.setDefaultValueIfExists();
+        if (newVal.length > 0 && oldVal.length > 0) {
+          this.dataField = '';
+        }
+      },
+      deep: true,
     },
     dataField(value) {
       this.$nextTick(() => {
@@ -383,7 +378,7 @@ export default {
     },
     changeValue() {
       this.$nextTick(() => {
-        if (this.value === undefined || this.value === 0) {
+        if (this.value === undefined) {
           this.setDefaultValueIfExists();
         }
         this.setToken();
@@ -426,7 +421,12 @@ export default {
       this.detectSliderValue();
     },
     detectSliderValue(values = this.values) {
-      this.sliderValue = values.findIndex((item) => item === this.value);
+      const index = values.findIndex((item) => item === this.value);
+      if (index === -1) {
+        this.sliderValue = 0;
+      } else {
+        this.sliderValue = index;
+      }
       if (this.value === '' && values?.length > 0) {
         this.value = values[this.sliderValue];
       }

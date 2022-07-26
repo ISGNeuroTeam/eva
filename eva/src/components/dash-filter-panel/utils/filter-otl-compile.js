@@ -38,9 +38,6 @@ export function filterCompile(filter) {
                 })`;
                 break;
               case 'time':
-                console.log(item.timeUnits);
-                console.log(timeUnits);
-                console.log(timeUnits[item.timeUnits]);
                 if (timeUnits[item.timeUnits] === 'd') {
                   value = item.value * 3600 * 24;
                 } else if (timeUnits[item.timeUnits] === 'h') {
