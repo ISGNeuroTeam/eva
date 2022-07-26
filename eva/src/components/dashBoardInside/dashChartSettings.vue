@@ -46,7 +46,10 @@
                   :key="metric.n"
                   class="ma-0"
                 >
-                  <v-expansion-panel-header class="draggable-item panel-header">
+                  <v-expansion-panel-header
+                    class="draggable-item panel-header"
+                    :disabled="metric.name === xAxis.xMetric"
+                  >
                     <template v-slot:default="{ open }">
                       <div class="title-metric">
                         <v-icon
@@ -58,7 +61,7 @@
                         {{ metric.title }}
                         <span v-if="metric.title">({{ metric.name }})</span>
                         <span v-else>{{ metric.name }}</span>
-                        <v-icon>
+                        <v-icon v-if="metric.name !== xAxis.xMetric">
                           {{ open ? mdiChevronUp : mdiChevronDown }}
                         </v-icon>
 
@@ -66,6 +69,11 @@
                           v-if="metric.yAxisLink"
                           class="grey--text ml-2"
                         >📎 {{ metric.yAxisLink }}</span>
+
+                        <span
+                          v-if="metric.name === xAxis.xMetric"
+                          class="grey--text ml-3"
+                        >⚠️ Используется как ось X</span>
                       </div>
                     </template>
                     <template v-slot:actions>
@@ -179,6 +187,16 @@
                         </div>
                       </div>
 
+                      <v-checkbox
+                        v-if="metric.type === 'line'"
+                        v-model="metric.showArea"
+                        label="Закрашивать область между линией и нулем"
+                        persistent-placeholder
+                        dense
+                        outlined
+                        hide-details
+                        color="blue"
+                      />
                       <v-checkbox
                         v-model="metric.hideLegend"
                         label="Скрыть легенду"
@@ -317,19 +335,10 @@
                         class="row my-1"
                       >
                         <div class="col">
-<!--                          <v-autocomplete
-                            v-model="metric.yAxisSide"
-                            :items="yAxisSideList"
-                            :disabled="metric.type !== 'line'"
-                            label="Ось Y"
-                            persistent-placeholder
-                            dense
-                            outlined
-                            hide-details
-                          />-->
                           <v-autocomplete
                             v-model="metric.yAxisLink"
                             :items="metricLineList
+                              .filter(m => m.name !== xAxis.xMetric)
                               .filter(m => m.group === groupNumber
                                 && m.type === 'line'
                                 && !m.yAxisLink
@@ -403,7 +412,19 @@
             <v-expansion-panel-content class="panel-content py-3">
               <!-- forms -->
               <div class="row">
-                <div class="col-6">
+                <div class="col-4">
+                  <v-select
+                    v-model="xAxis.xMetric"
+                    label="Метрика для оси X"
+                    persistent-placeholder
+                    dense
+                    outlined
+                    hide-details
+                    :items="[{text: '_time', value: '_time'}, ...metricsList]"
+                    value="value"
+                  />
+                </div>
+                <div class="col-4">
                   <v-select
                     v-model="xAxis.type"
                     label="Тип оси Х"
@@ -415,7 +436,7 @@
                     value="value"
                   />
                 </div>
-                <div class="col-6">
+                <div class="col-4">
                   <v-select
                     v-model="xAxis.barplotType"
                     label="Стиль столбцов"
@@ -647,6 +668,7 @@ export default {
     panelMetric: [],
     metricsByGroup: [],
     xAxis: {
+      xMetric: '_time',
       type: 'time',
       barplotType: 'divided',
       timeFormat: null,
@@ -712,6 +734,10 @@ export default {
         });
       });
       return metrics;
+    },
+
+    metricsList() {
+      return this.metricLineList.map((item) => item.name);
     },
   },
   watch: {

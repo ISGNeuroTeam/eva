@@ -8,15 +8,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added time filter in filters
+- Added visualization of a scatter chart
+- The button component now has the option to choose which tokens to update on click
+- Ability to paint the area between the line and 0 on a multiline chart
+- Ability to change the metric for the x axis on a multiline chart 
 - Added dashSingleValue: number of digits
 - Added dashSingleValue: switch "whether to split the number into digits"
 
 ### Changed
-- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
 
 ### Fixed
+- Fixed constructor-schemes, ports and standard elements
+- Fixed graph. Component breaks after restart
+- Fixed problem with association tokens with Select visualisation
+- When exporting dashboards without selected elements, the resulting page wasn't found
+
+## [1.100.1]
+
+### Fixed
+- Fixed missing token name after rename
+
+## [1.100.0]
+
+### Added
+- Added time filter in filters
+- Constructor schemes: Edge editing
+- Constructor schemes: Step change element z-order
+- Added error message about out-of-order elements in field "_order"
+- Added ability to remove ports
+- Added inability to add a label to the "port" component
+
+### Changed
+- Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
+- Changed "onclick" on heatmap event syntax
+
+### Fixed
+- Fixed if out-of-order elements in field "_order" in DS for singleValue, then after fix but visualisation not work
 - fixed label can be moved outside node in schemes constructor
+- Fixed visual bug if SingleValue set value equal 0 if exist value less then 0
+- Fixed bug if change DS then slider thumb is in the wrong position
 - Fixed dashed border in a corner of text block in schemes constructor
 - Fixed incorrect textarea update
 - Fixed graph readability
@@ -24,6 +54,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed handling popup on graph
 - Fixed. In the header of the component infinite loading
 - fixed: graph vertex labels overlap each other
+- Constructor schemes: Disabled focusing on elements
 
 ## [1.99.0]
 
