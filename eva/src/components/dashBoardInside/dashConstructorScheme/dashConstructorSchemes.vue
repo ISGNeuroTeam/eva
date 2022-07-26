@@ -6,70 +6,85 @@
       'height': `${innerSize.height}px`,
     }"
   >
-    <template v-if="isEdit">
-      <button
-        class="pa-2"
-        @click="toggleDnDPanel"
+    <div class="d-flex align-center ml-5">
+      <v-tooltip
+        bottom
+        :color="theme.$accent_ui_color"
       >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+        <template v-slot:activator="{ on }">
+          <div v-on="on">
+            <v-switch
+              v-model="isEdit"
+              inset
+              label=""
+              @change="toggleInputMode"
+            />
+          </div>
+        </template>
+        <span>Toggle edit</span>
+      </v-tooltip>
+      <template v-if="isEdit">
+        <button
+          class="pa-2"
+          @click="toggleDnDPanel"
         >
-          {{ gear }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderTo('toFront')"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ gear }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('toFront')"
         >
-          {{ arrowUp }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderTo('toBack')"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowUp }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('toBack')"
         >
-          {{ arrowDown }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderTo('raise')"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowDown }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('raise')"
         >
-          {{ arrowUp }}
-        </v-icon>
-      </button>
-      <button
-        v-if="dataSelectedNode"
-        class="pa-2"
-        @click="orderTo('lower')"
-      >
-        <v-icon
-          class="control-button edit-icon theme--dark"
-          :style="{ color: theme.$secondary_text }"
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowUp }}
+          </v-icon>
+        </button>
+        <button
+          v-if="dataSelectedNode"
+          class="pa-2"
+          @click="orderTo('lower')"
         >
-          {{ arrowDown }}
-        </v-icon>
-      </button>
-    </template>
-    <button @click="toggleInputMode">
-      Toggle edit ({{ isEdit }})
-    </button>
+          <v-icon
+            class="control-button edit-icon theme--dark"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ arrowDown }}
+          </v-icon>
+        </button>
+      </template>
+    </div>
     <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
@@ -833,7 +848,9 @@ export default {
         }
         resolve();
       }).then(() => {
-        this.dataPanel = true;
+        if (targetElement.dataType !== 'image-node') {
+          this.dataPanel = true;
+        }
       });
     },
     orderTo(key) {
@@ -963,7 +980,6 @@ export default {
 .b-data-node {
   &__text {
     font-weight: 700;
-    font-size: 11px;
     line-height: 1;
   }
   &__wrapper {
@@ -981,5 +997,8 @@ export default {
       padding: 7.5px 12px;
     }
   }
+}
+.yfiles-snap-line {
+  stroke: #ff0000 !important;
 }
 </style>

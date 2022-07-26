@@ -48,7 +48,7 @@ import { throttle } from '../utils/throttle';
 
 License.value = licenseData; // проверка лицензии
 const labelFont = new Font({
-  fontSize: 50,
+  fontSize: 40,
   fontFamily: 'ProximaNova',
 });
 const labelFontBOLD = new Font({
@@ -533,6 +533,7 @@ class GraphClass {
   applyGraphBuilder() {
     new Promise((resolve) => {
       this.graphComponent.graph.clear();
+      this.enableWebGL2();
 
       const graphBuilder = new GraphBuilder(this.graphComponent.graph);
 
@@ -576,6 +577,15 @@ class GraphClass {
 
       edgesSource.edgeCreator.createLabelBinding((edgeDataItem) => {
         if (edgeDataItem.label !== '-') {
+          if (edgeDataItem.label.length > 10) {
+            const itemLength = edgeDataItem.label.split(' ').length - 1;
+            if (itemLength >= 1 && itemLength < 3) {
+              return edgeDataItem.label.replace(' ', '\n');
+            }
+            const item = edgeDataItem.label.split(' ');
+            item.splice(3, 0, '\n');
+            return item.join(' ');
+          }
           return edgeDataItem.label;
         }
         return '';
