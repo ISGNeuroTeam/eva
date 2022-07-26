@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ability to change the metric for the x axis on a multiline chart 
 - Added dashSingleValue: number of digits
 - Added dashSingleValue: switch "whether to split the number into digits"
+- Constructor-schemes. Added settings for label
 
 ### Changed
 
