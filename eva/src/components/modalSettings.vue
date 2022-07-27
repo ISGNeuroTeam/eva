@@ -1612,6 +1612,7 @@ export default {
                 'underline',
                 'onButton',
                 'pinned',
+                'numberPerDigit',
               ];
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;
