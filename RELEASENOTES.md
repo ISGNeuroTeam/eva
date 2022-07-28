@@ -22,6 +22,8 @@
 - When exporting dashboards without selected elements, the resulting page wasn't found
 - Data source not loading when entering the dashboard
 - The "visible" option does not work on the component
+- Fixed display metric on yGraph edges
+- Fixed incorrect arrows on yGraph edges
 
 # [1.100.1]
 
