@@ -330,6 +330,9 @@ export default {
   },
   mounted() {
     this.currentSid = this.dataSearchFrom?.sid;
+    if (this.active) {
+      this.setData();
+    }
   },
   methods: {
     setData() {
