@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed data source not loading when entering the dashboard
 - Fixed missing scrollbar for event list on dashboard
 - Fixed setting "visible" on component
+- Fixed display metric on yGraph edges
+- Fixed incorrect arrows on yGraph edges
 
 ## [1.100.1]
 
