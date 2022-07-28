@@ -105,7 +105,7 @@ export default {
   },
   computed: {
     isVisible() {
-      if (!this.dashFromStore[this.id].options.visible) {
+      if (!this.dashFromStore[this.id].options?.visible) {
         return this.dataMod;
       }
       return true;
