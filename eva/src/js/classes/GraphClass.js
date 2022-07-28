@@ -578,7 +578,7 @@ class GraphClass {
 
       edgesSource.edgeCreator.createLabelBinding((edgeDataItem) => {
         if (edgeDataItem.label !== '-') {
-          if (edgeDataItem.label.length > 10) {
+          if (edgeDataItem.label?.length > 10) {
             const itemLength = edgeDataItem.label.split(' ').length - 1;
             if (itemLength >= 1 && itemLength < 3) {
               return edgeDataItem.label.replace(' ', '\n');
