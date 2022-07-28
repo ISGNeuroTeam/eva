@@ -80,7 +80,6 @@ class HTMLPopupSupport {
     this.graphComponent.addUpdatedVisualListener(() => {
       if (this.currentItem && this.dirty) {
         this.dirty = false;
-        // this.updateLocation();
       }
     });
   }
@@ -93,7 +92,6 @@ class HTMLPopupSupport {
     setTimeout(() => {
       this.div.style.opacity = '1';
     }, 0);
-    // this.updateLocation();
   }
 
   /**
