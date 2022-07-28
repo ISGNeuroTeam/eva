@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added dashSingleValue: number of digits
 - Added dashSingleValue: switch "whether to split the number into digits"
 - Constructor-schemes. Added settings for label
+- Added restriction on loading svg
 
 ### Changed
 

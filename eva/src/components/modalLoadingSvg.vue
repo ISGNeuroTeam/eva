@@ -16,7 +16,7 @@
           :color="theme.$main_text"
           :style="{ color: theme.$main_text }"
           :rules="[
-            value => !value || value.size < 10000000 || 'Размер должен быть меньше 10 МБ!',
+            value => !value || value.size < 1000000 || 'Размер должен быть меньше 1 МБ!',
             value => !value || value.type === 'image/svg+xml' || 'Не допустимый формат!',
           ]"
           accept="image/svg+xml"
@@ -36,7 +36,7 @@
           small
           :color="theme.$primary_button"
           class="b-loading-svg__button"
-          :disabled="!file || file.type !== 'image/svg+xml'"
+          :disabled="!file || file.type !== 'image/svg+xml' || file.size > 1000000 "
           @click="loadingSvg"
         >
           Отправить
@@ -104,9 +104,8 @@ export default {
         formData,
       });
       const res = JSON.parse(response);
-      if (res.status === 'ok') {
-        this.message = `Загрузка файла ${this.file.name} прошла успешно`;
-        this.color = 'green';
+      if (res.status === 'ok' && res?.notifications) {
+        this.$store.commit('notify/addNotifications', res.notifications);
         setTimeout(() => {
           this.file = null;
           this.$emit('updateModalValue', false);
