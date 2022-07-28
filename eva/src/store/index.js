@@ -934,6 +934,9 @@ export default new Vuex.Store({
         name: tabName,
       });
     },
+    setTabs(state, { idDash, tabs }) {
+      Vue.set(state[idDash], 'tabList', [...tabs]);
+    },
     changeCurrentTab(state, { idDash, tab }) {
       Vue.set(state[idDash], 'currentTab', tab);
     },
