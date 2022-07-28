@@ -1,5 +1,5 @@
 import {
-  SimpleLabel, Size, Point, IEdge,
+  SimpleLabel, Size, Point, IEdge, INode,
 } from 'yfiles';
 
 class HTMLPopupSupport {
@@ -47,7 +47,7 @@ class HTMLPopupSupport {
     // eslint-disable-next-line no-underscore-dangle
     this._currentItem = value;
     if (value) {
-      this.show();
+      this.show(value);
     } else {
       this.hide();
     }
@@ -88,12 +88,14 @@ class HTMLPopupSupport {
   /**
    * Makes this pop-up visible.
    */
-  show() {
+  show(value) {
     this.div.style.display = 'block';
     setTimeout(() => {
       this.div.style.opacity = '1';
     }, 0);
-    this.updateLocation();
+    if (value instanceof INode) {
+      this.updateLocation();
+    }
   }
 
   /**
@@ -158,9 +160,12 @@ class HTMLPopupSupport {
    * @param {number} y The target y-coordinate of the pop-up.
    */
   setLocation(x, y) {
+    let indent = 20;
+    const { zoom } = this.graphComponent;
+    indent /= zoom;
     // Calculate the view coordinates since we have
     // to place the div in the regular HTML coordinate space
-    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x, y));
+    const viewPoint = this.graphComponent.toViewCoordinates(new Point(x + indent, y));
     this.div.style.setProperty(
       'transform',
       `translate(${viewPoint.x}px, ${viewPoint.y}px)`,

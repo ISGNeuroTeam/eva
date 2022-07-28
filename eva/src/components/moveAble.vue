@@ -1,5 +1,6 @@
 <template>
   <vue-draggable-resizable
+    v-if="isVisible"
     ref="dragres"
     :key="reload"
     :w="width === 0 ? movableProps.grid[0] : width"
@@ -103,6 +104,12 @@ export default {
     };
   },
   computed: {
+    isVisible() {
+      if (!this.dashFromStore[this.id].options?.visible) {
+        return this.dataMod;
+      }
+      return true;
+    },
     theme() {
       return this.$store.getters.getTheme;
     },
