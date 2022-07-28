@@ -126,8 +126,11 @@
         </template>
         <span>В начало</span>
       </v-tooltip>
-      <div
+      <draggable
         ref="tab-panel"
+        v-model="tabsOrder"
+        :disabled="!mode"
+        group="tabs"
         class="tab-panel"
       >
         <div
@@ -215,7 +218,7 @@
             </svg>
           </div>
         </div>
-      </div>
+      </draggable>
       <v-tooltip
         top
         :color="theme.$accent_ui_color"
@@ -263,11 +266,15 @@
 </template>
 
 <script>
+import draggable from 'vuedraggable';
 import ModalVisualisation from './modalVisualisation.vue';
 
 export default {
   name: 'MainTitle',
-  components: { ModalVisualisation },
+  components: {
+    ModalVisualisation,
+    draggable,
+  },
   data() {
     return {
       page: 'dash',
@@ -301,6 +308,15 @@ export default {
     };
   },
   computed: {
+    tabsOrder: {
+      get() {
+        return this.tabs;
+      },
+      set(tabs) {
+        const { idDash } = this;
+        this.$store.commit('setTabs', { idDash, tabs });
+      },
+    },
     mode() {
       return !!this.dashFromStore?.editMode;
     },
