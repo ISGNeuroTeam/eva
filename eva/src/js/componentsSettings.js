@@ -699,8 +699,12 @@ export default {
       elem: 'checkbox-list',
       default: [],
       items() {
-        return new Set(this.$store.state[this.idDash]?.searches
-          .map(({ sid }) => sid) || []);
+        const searches = this.$store.state[this.idDash]?.searches;
+        if (searches && searches.map) {
+          return new Set(this.$store.state[this.idDash]?.searches
+            .map(({ sid }) => sid) || []);
+        }
+        return [];
       },
     },
 
