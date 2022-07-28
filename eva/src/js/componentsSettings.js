@@ -268,7 +268,9 @@ export default {
       'metadata',
       'detailValue',
     ],
-    singleValue: [],
+    singleValue: [
+      'numberPerDigit',
+    ],
     tune: [
       'defaultFromSourceData',
       'defaultSourceDataField',
@@ -357,6 +359,7 @@ export default {
       group: 'Дополнительные настройки',
       option: 'otherSettings',
     },
+
     // dashBoard
     {
       option: 'visible',
@@ -696,8 +699,12 @@ export default {
       elem: 'checkbox-list',
       default: [],
       items() {
-        return new Set(this.$store.state[this.idDash]?.searches
-          .map(({ sid }) => sid) || []);
+        const searches = this.$store.state[this.idDash]?.searches;
+        if (searches && searches.map) {
+          return new Set(this.$store.state[this.idDash]?.searches
+            .map(({ sid }) => sid) || []);
+        }
+        return [];
       },
     },
 
@@ -760,8 +767,15 @@ export default {
           },
         ];
         const metrics = this.$store.state[this.idDash][this.element]?.lastMetrics || [];
-        return [items, ...metrics];
+        return [...items, ...metrics];
       },
+    },
+
+    // dashSingleValue
+    {
+      option: 'numberPerDigit',
+      description: 'Разделять число на разряды',
+      elem: 'switch',
     },
 
   ],

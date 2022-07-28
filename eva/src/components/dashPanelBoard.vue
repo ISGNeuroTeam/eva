@@ -750,7 +750,7 @@
           :style="{ color: theme.$main_text }"
           auto-grow
           outlined
-          class="textarea-event"
+          class="textarea-event textarea-scroll"
           label="Начните писать событие"
           hide-details
           clearable

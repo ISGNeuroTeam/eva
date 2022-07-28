@@ -158,7 +158,6 @@ class GraphClass {
     popupCallback,
   }) {
     this.graphComponent = new GraphComponent(elem);
-    // this.enableWebGL2();
     this.colors = colors;
     this.options.colorFrom = colorFrom;
     this.nodePopupContent = nodePopupContent;
@@ -415,6 +414,7 @@ class GraphClass {
       if (item instanceof IEdge && !this.nodePopup.currentItem) {
         // update data in edge pop-up
         GraphClass.updateEdgePopupContent(this.edgePopup, item);
+        this.edgePopup.setLocation(sender.$f4.x, sender.$f4.y);
         // open edge pop-up and node edge pop-up
         this.edgePopup.currentItem = item;
       } else {
@@ -516,7 +516,6 @@ class GraphClass {
   applyGraphBuilder() {
     new Promise((resolve) => {
       this.graphComponent.graph.clear();
-      // this.enableWebGL2();
 
       const graphBuilder = new GraphBuilder(this.graphComponent.graph);
 
@@ -675,7 +674,6 @@ class GraphClass {
           ),
         );
       }
-      // this.graphComponent.graphModelManager.update(node);
     });
   }
 
