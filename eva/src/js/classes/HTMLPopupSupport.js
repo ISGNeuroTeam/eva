@@ -1,5 +1,5 @@
 import {
-  SimpleLabel, Size, Point, IEdge,
+  SimpleLabel, Size, Point, IEdge, INode,
 } from 'yfiles';
 
 class HTMLPopupSupport {
@@ -47,7 +47,7 @@ class HTMLPopupSupport {
     // eslint-disable-next-line no-underscore-dangle
     this._currentItem = value;
     if (value) {
-      this.show();
+      this.show(value);
     } else {
       this.hide();
     }
@@ -80,6 +80,7 @@ class HTMLPopupSupport {
     this.graphComponent.addUpdatedVisualListener(() => {
       if (this.currentItem && this.dirty) {
         this.dirty = false;
+        this.updateLocation();
       }
     });
   }
@@ -87,11 +88,14 @@ class HTMLPopupSupport {
   /**
    * Makes this pop-up visible.
    */
-  show() {
+  show(value) {
     this.div.style.display = 'block';
     setTimeout(() => {
       this.div.style.opacity = '1';
     }, 0);
+    if (value instanceof INode) {
+      this.updateLocation();
+    }
   }
 
   /**
