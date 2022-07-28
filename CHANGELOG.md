@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed graph. Component breaks after restart
 - Fixed problem with association tokens with Select visualisation
 - When exporting dashboards without selected elements, the resulting page wasn't found
+- Fixed Graph. Signature location
 - Fixed data source not loading when entering the dashboard
 - Fixed missing scrollbar for event list on dashboard
 - Fixed setting "visible" on component
