@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The button component now has the option to choose which tokens to update on click
 - Ability to paint the area between the line and 0 on a multiline chart
 - Ability to change the metric for the x axis on a multiline chart 
+- Ability to move tabs on the dashboard
 - Added dashSingleValue: number of digits
 - Added dashSingleValue: switch "whether to split the number into digits"
 - Constructor-schemes. Added settings for label
@@ -24,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed problem with association tokens with Select visualisation
 - When exporting dashboards without selected elements, the resulting page wasn't found
 - Fixed data source not loading when entering the dashboard
+- Fixed missing scrollbar for event list on dashboard
+- Fixed setting "visible" on component
 
 ## [1.100.1]
 
