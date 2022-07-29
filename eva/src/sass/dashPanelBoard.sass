@@ -183,7 +183,22 @@
 
                     .v-select__selection
                         color: inherit
-
+            &.textarea-scroll
+                .v-input__append-inner
+                    position: absolute
+                    right: 10px
+                    top: 0
+                .v-input__slot
+                    position: relative
+                .v-text-field__slot
+                    max-height: 450px
+                    overflow: auto
+                    cursor: pointer
+                    position: initial
+                .v-label
+                    left: 12px!important
+                .v-label--active
+                    top: 21px
 
         .event-btn
             color: white

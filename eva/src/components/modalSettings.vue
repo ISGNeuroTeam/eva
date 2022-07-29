@@ -1381,6 +1381,7 @@ export default {
     },
     checkOptions(option, relation) {
       // проверяет есть ли такая опция уже в массиве с опциями
+      const hasOption = this.optionsItems.includes(option);
       if (relation !== undefined) {
         if (relation.forEach) {
           const res = relation.filter((item) => {
@@ -1399,12 +1400,12 @@ export default {
             return false;
           }
         } else if (typeof relation === 'function') {
-          return relation.bind(this)();
+          return hasOption && relation.bind(this)();
         } else if (!this.options[relation]) {
           return false;
         }
       }
-      return this.optionsItems.includes(option);
+      return hasOption;
     },
     addIntoTooltip(item) {
       this.isChanged = true;
@@ -1568,6 +1569,8 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
+              } else if (item === 'ListDS') {
+                localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];
               } else if (item === 'color') {
@@ -1609,6 +1612,7 @@ export default {
                 'underline',
                 'onButton',
                 'pinned',
+                'numberPerDigit',
               ];
               if (propsToFalse.includes(item)) {
                 localOptions[item] = false;

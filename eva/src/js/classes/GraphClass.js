@@ -8,7 +8,6 @@ import {
   GraphItemTypes,
   IEdge,
   INode,
-  Point,
   Stroke,
   Color,
   ArrowType,
@@ -18,7 +17,6 @@ import {
   StyleDecorationZoomPolicy,
   GraphViewerInputMode,
   BezierEdgeStyle,
-  TimeSpan,
   Key,
   ModifierKeys,
   Size,
@@ -32,23 +30,16 @@ import {
   License,
   GraphMLSupport,
   StorageLocation,
-  WebGL2GraphModelManager,
-  WebGL2SelectionIndicatorManager,
   HierarchicLayoutNodeLayoutDescriptor,
   HierarchicLayoutPortAssignmentMode,
   SimplexNodePlacer,
-  WebGL2PolylineEdgeStyle,
-  WebGL2Stroke,
-  WebGL2ArrowType,
-  VoidEdgeStyle,
 } from 'yfiles';
 import HTMLPopupSupport from './HTMLPopupSupport';
 import licenseData from '../../license/license.json';
-import { throttle } from '../utils/throttle';
 
 License.value = licenseData; // проверка лицензии
 const labelFont = new Font({
-  fontSize: 50,
+  fontSize: 40,
   fontFamily: 'ProximaNova',
 });
 const labelFontBOLD = new Font({
@@ -123,7 +114,7 @@ class GraphClass {
     const target = {
       sourceName: edge.sourcePort.owner.tag,
       targetName: edge.targetPort.owner.tag,
-      metricValue: edge.tag,
+      metricValue: edge.tag.metric,
     };
 
     // get all divs in the pop-up
@@ -167,7 +158,6 @@ class GraphClass {
     popupCallback,
   }) {
     this.graphComponent = new GraphComponent(elem);
-    this.enableWebGL2();
     this.colors = colors;
     this.options.colorFrom = colorFrom;
     this.nodePopupContent = nodePopupContent;
@@ -255,13 +245,6 @@ class GraphClass {
 
   set colorFrom(value) {
     this.options.colorFrom = value;
-  }
-
-  enableWebGL2() {
-    this.graphComponent.graphModelManager = new WebGL2GraphModelManager();
-    this.graphComponent
-      .selectionIndicatorManager = new WebGL2SelectionIndicatorManager(this.graphComponent);
-    this.graphComponent.focusIndicatorManager.enabled = true;
   }
 
   initMode({
@@ -431,6 +414,7 @@ class GraphClass {
       if (item instanceof IEdge && !this.nodePopup.currentItem) {
         // update data in edge pop-up
         GraphClass.updateEdgePopupContent(this.edgePopup, item);
+        this.edgePopup.setLocation(sender.$f4.x, sender.$f4.y);
         // open edge pop-up and node edge pop-up
         this.edgePopup.currentItem = item;
       } else {
@@ -482,22 +466,21 @@ class GraphClass {
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
       if (edge.tag === '-') {
-        this.graphComponent.graphModelManager.graph.setStyle(
+        this.graphComponent.graph.setStyle(
           edge,
           this.edgeStyle(this.startFinishColor),
         );
       } else if (edge.tag === '-1') {
-        this.graphComponent.graphModelManager.graph.setStyle(
+        this.graphComponent.graph.setStyle(
           edge,
           this.edgeStyle(this.errorColor),
         );
       } else {
-        this.graphComponent.graphModelManager.graph.setStyle(
+        this.graphComponent.graph.setStyle(
           edge,
-          this.edgeStyle(this.colors[edge.tag % this.colors.length]),
+          this.edgeStyle(this.colors[edge.tag.color % this.colors.length]),
         );
       }
-      this.graphComponent.graphModelManager.update(edge);
     });
   }
 
@@ -571,11 +554,23 @@ class GraphClass {
         data: this.edgesSource,
         sourceId: 'fromNode',
         targetId: 'toNode',
-        tag: (item) => item.color,
+        tag: (item) => ({
+          color: item.color,
+          metric: item.label,
+        }),
       });
 
       edgesSource.edgeCreator.createLabelBinding((edgeDataItem) => {
         if (edgeDataItem.label !== '-') {
+          if (edgeDataItem.label?.length > 10) {
+            const itemLength = edgeDataItem.label.split(' ').length - 1;
+            if (itemLength >= 1 && itemLength < 3) {
+              return edgeDataItem.label.replace(' ', '\n');
+            }
+            const item = edgeDataItem.label.split(' ');
+            item.splice(3, 0, '\n');
+            return item.join(' ');
+          }
           return edgeDataItem.label;
         }
         return '';
@@ -618,25 +613,23 @@ class GraphClass {
     const { nodes } = this.graphComponent.graph;
     nodes.forEach((node) => {
       // node.labels.elementAt(0) -- label который name
-      this.graphComponent.graphModelManager.graph.setStyle(
+      this.graphComponent.graph.setStyle(
         node.labels.elementAt(0),
         this.labelStyle(true),
       );
       // node.labels.elementAt(1) -- label который label
-      this.graphComponent.graphModelManager.graph.setStyle(
+      this.graphComponent.graph.setStyle(
         node.labels.elementAt(1),
         this.labelStyle(false),
       );
-      this.graphComponent.graphModelManager.update(node);
     });
 
     const { edges } = this.graphComponent.graph;
     edges.forEach((edge) => {
-      this.graphComponent.graphModelManager.graph.setStyle(
+      this.graphComponent.graph.setStyle(
         edge.labels.elementAt(0),
         this.labelStyle(false, this.colorFrom.backElement),
       );
-      this.graphComponent.graphModelManager.update(edge);
     });
   }
 
@@ -663,17 +656,17 @@ class GraphClass {
         && (node.tag.node_color.toLowerCase() === 'start'
           || node.tag.node_color.toLowerCase() === 'finish')
       ) {
-        this.graphComponent.graphModelManager.graph.setStyle(
+        this.graphComponent.graph.setStyle(
           node,
           GraphClass.nodeStyle(this.startFinishColor),
         );
       } else if (node.tag.node_color === '-1') {
-        this.graphComponent.graphModelManager.graph.setStyle(
+        this.graphComponent.graph.setStyle(
           node,
           GraphClass.nodeStyle(this.errorColor),
         );
       } else {
-        this.graphComponent.graphModelManager.graph.setStyle(
+        this.graphComponent.graph.setStyle(
           node,
           GraphClass.nodeStyle(
             this.colors[node.tag.node_color - 1]
@@ -681,7 +674,6 @@ class GraphClass {
           ),
         );
       }
-      this.graphComponent.graphModelManager.update(node);
     });
   }
 
