@@ -16,7 +16,7 @@
 - Changing the position of edge signatures in the Graph component
 
 ### Fixed
--- Changes in ports and standard elements in the Constructor-schemes component
+- Changes in ports and standard elements in the Constructor-schemes component
 - Component graph breaks after restart
 - Problem with association tokens with Select visualisation
 - When exporting dashboards without selected elements, the resulting page wasn't found
