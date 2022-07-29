@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+- Changed border color on table
+- Changed popup-menu position on heatmap
+
+### Fixed
+
+## [1.100.1]
+
+### Added
 - Added visualization of a scatter chart
 - The button component now has the option to choose which tokens to update on click
 - Ability to paint the area between the line and 0 on a multiline chart

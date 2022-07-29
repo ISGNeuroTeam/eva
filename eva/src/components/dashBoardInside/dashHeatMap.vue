@@ -41,6 +41,7 @@
                   open-on-hover
                   top
                   offset-y
+                  offset-x
                 >
                   <template v-slot:activator="{ on, attrs }">
                     <span
