@@ -21,7 +21,7 @@
               'z-index': 100,
             }"
             class="col-10"
-            @change="$emit('changeDataSelectedNode', dataObject)"
+            @change="updateModelValue(dataObject)"
           />
           <v-icon
             class="control-button edit-icon theme--dark col-2"
@@ -49,7 +49,7 @@
           :menu-props="{
             'z-index': 100,
           }"
-          @change="$emit('changeDataSelectedNode', dataObject)"
+          @change="updateModelValue(dataObject)"
         />
       </template>
       <template v-if=" dataType === '4'">
@@ -152,7 +152,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -301,7 +301,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -442,7 +442,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -532,7 +532,7 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -590,7 +590,56 @@
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="$emit('changeDataSelectedNode', dataObject)"
+          @click="updateModelValue(dataObject)"
+        >
+          Применить
+        </v-btn>
+      </template>
+      <template v-if="dataType === 'label'">
+        <v-text-field
+          v-model="dataObject.fontSize"
+          label="Размер текста"
+          :color="theme.$main_text"
+          style="margin-bottom: 10px"
+          outlined
+          type="Number"
+          hide-details
+        />
+        <div class="row align-center">
+          <div class="col-8">
+            Цвет текста
+          </div>
+          <div class="col-4">
+            <v-menu
+              top
+              offset-x
+              :close-on-content-click="false"
+              z-index="100"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  :style="{
+                    'background-color': dataObject.color.rgbaString,
+                  }"
+                  dark
+                  v-bind="attrs"
+                  v-on="on"
+                />
+              </template>
+
+              <v-color-picker
+                v-model="dataObject.color.rgbaObject"
+                dot-size="12"
+                mode="rgba"
+                @update:color="updateSelectedNodeColor($event, 'color')"
+              />
+            </v-menu>
+          </div>
+        </div>
+        <v-btn
+          small
+          :color="theme.$primary_button"
+          @click="updateModelValue(dataObject)"
         >
           Применить
         </v-btn>
@@ -661,7 +710,7 @@ export default {
     },
     deleteLine(index) {
       this.dataObject.items.splice(index, 1);
-      this.$emit('changeDataSelectedNode', this.dataObject);
+      this.updateModelValue(this.dataObject);
     },
     addLine() {
       this.dataObject.items.push({
@@ -669,7 +718,11 @@ export default {
         textLeft: 'Label',
         textRight: 'Value',
       });
+      this.updateModelValue(this.dataObject);
+    },
+    updateModelValue() {
       this.$emit('changeDataSelectedNode', this.dataObject);
+      this.$emit('update:modelValue', this.dataObject);
     },
   },
 };

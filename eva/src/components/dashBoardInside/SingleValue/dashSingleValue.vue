@@ -64,16 +64,19 @@
             font-weight: ${metric.fontWeight || 200};
             display: ${
               metric.value
-              && metric.value.toString(10).split(',').length > 1
+              && metric.value.toString().split(',').length > 1
                 ? 'flex'
                 : 'block'};
             `"
           >
             <span
-              v-for="(value, inx) in metric.value.toString(10).split(',')"
+              v-for="(value, inx) in metric.value.toString().split(',')"
               :key="inx"
-              v-text="value + (inx !== metric.value.toString(10).split(',').length -1 ? ', ' : '') "
-            />
+            >
+              {{ value + (inx !== metric.value.toString().split(',').length -1
+                ? ', '
+                : '') | filterNumber(getOptions) }}
+            </span>
           </span>
         </div>
       </div>
@@ -97,6 +100,24 @@ import metricTitleIcons from './metricTitleIcons';
 export default {
   name: 'SingleValue',
   components: { SingleValueSettings },
+  filters: {
+    filterNumber: (value, options) => {
+      if (!value) return '';
+      if (!options?.numberPerDigit) return value;
+      const numberOfDigits = (num) => Number(num).toLocaleString('ru-RU');
+      if (value.match(/^-?\d+$/)) {
+        // number
+        return numberOfDigits(value);
+      }
+      if (value.match(/^\d+\.\d+$/)) {
+        // float
+        const filteredValue = numberOfDigits(value.split('.')[0]);
+        return `${filteredValue}.${value.split('.')[1]}`;
+      }
+      // not number
+      return value;
+    },
+  },
   props: {
     idFrom: {
       type: String,

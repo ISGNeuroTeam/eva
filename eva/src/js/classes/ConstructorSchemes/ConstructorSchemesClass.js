@@ -342,6 +342,7 @@ class ConstructorSchemesClass {
             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
             alignment-baseline="middle"
             :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textLeft }}
            </text>
@@ -354,6 +355,7 @@ class ConstructorSchemesClass {
              :transform="'translate(' + (layout.width - 8) / 2 + ')'"
              fill="white"
              :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textRight }}
            </text>
@@ -453,6 +455,7 @@ class ConstructorSchemesClass {
             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
             alignment-baseline="middle"
             :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textLeft }}
            </text>
@@ -465,6 +468,7 @@ class ConstructorSchemesClass {
              :transform="'translate(' + (layout.width - 8) / 2 + ')'"
              fill="white"
              :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
            >
              {{ item.textRight }}
            </text>
@@ -542,6 +546,7 @@ class ConstructorSchemesClass {
        fill="#FFFFFF"
        :dy="((layout.height / 2) - (layout.height / 4))"
        alignment-baseline="middle"
+       :font-size="((layout.height / 2) * 0.8) + 'px'"
       >
         {{ tag.textFirst }}
       </text>
@@ -552,6 +557,7 @@ class ConstructorSchemesClass {
        fill="#3C3B45"
        :dy="(layout.height - (layout.height / 4))"
        alignment-baseline="middle"
+       :font-size="((layout.height / 2) * 0.8) + 'px'"
       >
         {{ tag.textSecond }}
       </text>
@@ -612,6 +618,7 @@ class ConstructorSchemesClass {
           fill="#FFFFFF"
           :dy="((layout.height / 2) - (layout.height / 4))"
           alignment-baseline="middle"
+          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textFirst }}
         </text>
@@ -622,6 +629,7 @@ class ConstructorSchemesClass {
           fill="#3C3B45"
           :dy="(layout.height - (layout.height / 4))"
           alignment-baseline="middle"
+          :font-size="((layout.height / 2) * 0.8) + 'px'"
         >
           {{ tag.textSecond }}
         </text>
@@ -681,6 +689,7 @@ class ConstructorSchemesClass {
          alignment-baseline="middle"
          text-anchor="middle"
          :fill="tag.textColor"
+         :font-size="((layout.height / 2) * 0.8) + 'px'"
        >
            {{ tag.currentValue }}
        </text>
@@ -743,6 +752,7 @@ class ConstructorSchemesClass {
         alignment-baseline="middle"
         text-anchor="middle"
         :fill="tag.firstTextColor"
+        :font-size="((layout.height / 3) * 0.8) + 'px'"
       >
           {{ tag.firstValue }}
       </text>
@@ -753,6 +763,7 @@ class ConstructorSchemesClass {
         alignment-baseline="middle"
         text-anchor="middle"
         :fill="tag.secondTextColor"
+        :font-size="((layout.height / 3) * 0.8) + 'px'"
       >
           {{ tag.secondValue }}
       </text>
@@ -1312,7 +1323,6 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      deletableItems: GraphItemTypes.NODE | GraphItemTypes.EDGE | GraphItemTypes.LABEL,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1392,7 +1402,11 @@ class ConstructorSchemesClass {
     // Событие клика по элементу
     mode.addItemClickedListener((sender, evt) => {
       // Проверяем на наличие данных в узле
-      if (evt.item instanceof INode || evt.item instanceof IEdge) {
+      if (
+        evt.item instanceof INode
+        || evt.item instanceof IEdge
+        || evt.item instanceof ILabel
+      ) {
         // Достаем элемент в отдельную переменную для дальнейшей работы с ним
         this.targetDataNode = evt.item;
         // Открываем панель для редактирования данных элемента
@@ -1403,6 +1417,12 @@ class ConstructorSchemesClass {
             ...ConstructorSchemesClass.getEdgeOptions(evt.item),
             dataType: 'edge',
             nodeId: evt.item.hashCode(),
+          });
+        } else if (evt.item instanceof ILabel) {
+          openDataPanelCallback({
+            dataType: 'label',
+            fontSize: evt.item.style.textSize,
+            color: ConstructorSchemesClass.generateColor(evt.item.style.textFill.color),
           });
         } else {
           openDataPanelCallback({
@@ -1521,12 +1541,24 @@ class ConstructorSchemesClass {
       isValidLabelOwnerPredicate: (labelOwner) => labelOwner instanceof INode
         || labelOwner instanceof IEdge
         || labelOwner instanceof IPort,
-      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => graph.addLabel({
-        owner: dropTarget,
-        location: dropLocation,
-        text: dropData.text,
-        style: dropData.style.clone(),
-      }),
+      itemCreator: (context, graph, dropData, dropTarget, dropLocation) => {
+        if (dropTarget instanceof IPort) {
+          this.graphComponent.graphModelManager.graph.addLabel({
+            owner: dropTarget.owner,
+            style: dropData.style.clone(),
+            text: dropData.text,
+            tag: dropData.tag,
+          });
+        } else {
+          graph.addLabel({
+            owner: dropTarget,
+            location: dropLocation,
+            text: dropData.text,
+            style: dropData.style.clone(),
+          });
+        }
+        return graph;
+      },
     });
   }
 
@@ -1539,6 +1571,23 @@ class ConstructorSchemesClass {
       useBestMatchingParameter: true,
       // allow only for nodes to be the new port owner
       isValidPortOwnerPredicate: (portOwner) => portOwner instanceof INode,
+      itemCreator: (
+        context,
+        graph,
+        dropData,
+        dropTarget,
+        dropLocation,
+      ) => graph.addPortAt({
+        owner: dropTarget,
+        location: dropLocation,
+        style: new NodeStylePortStyleAdapter(
+          new ShapeNodeStyle({
+            fill: 'transparent',
+            stroke: 'transparent',
+            shape: 'ellipse',
+          }),
+        ),
+      }),
     });
   }
 
@@ -1999,43 +2048,47 @@ class ConstructorSchemesClass {
     });
   }
 
-  updateSelectedNode(updatedData, updateStoreCallback) {
-    let items = null;
+  updateSelectedNode(dataFromComponent, updateStoreCallback) {
+    let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
     if (dataType === '0' || dataType === '1') {
-      items = updatedData.items.map((item) => ({
-        ...item,
-        textLeft: this.getDataItemById(item.id)?.Description || '-',
-        textRight: this.getDataItemById(item.id)?.value || '-',
-      }));
+      updatedData = {
+        items: dataFromComponent.items.map((item) => ({
+          ...item,
+          textLeft: this.getDataItemById(item.id)?.Description || '-',
+          textRight: this.getDataItemById(item.id)?.value || '-',
+        })),
+      };
     } else if (dataType === '2' || dataType === '3') {
-      items = {
-        ...updatedData,
-        textFirst: this.getDataItemById(updatedData.id)?.value || '-',
-        textSecond: this.getDataItemById(updatedData.id)?.Description || '-',
+      updatedData = {
+        ...dataFromComponent,
+        textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
+        textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
     } else if (dataType === '4') {
-      items = {
-        ...updatedData,
-        currentValue: Number(this.getDataItemById(updatedData.id)?.value),
+      updatedData = {
+        ...dataFromComponent,
+        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value),
         // TODO: Заменить нан корректное значение!!
-        maxValue: Number(this.getDataItemById(updatedData.id)?.value) + 100,
+        maxValue: Number(this.getDataItemById(dataFromComponent.id)?.value) + 100,
       };
     } else if (dataType === '5') {
-      items = {
-        ...updatedData,
-        firstValue: Number(this.getDataItemById(updatedData.idFirst)?.value),
-        secondValue: Number(this.getDataItemById(updatedData.idSecond)?.value),
+      updatedData = {
+        ...dataFromComponent,
+        firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
+        secondValue: Number(this.getDataItemById(dataFromComponent.idSecond)?.value),
       };
     } else if (dataType === 'label-0' || dataType === 'default-node') {
-      items = updatedData;
-    } else if (updatedData.dataType === 'edge') {
-      this.updateEdgeVisual(updatedData);
-      items = updatedData;
+      updatedData = dataFromComponent;
+    } else if (dataFromComponent.dataType === 'edge') {
+      this.updateEdgeVisual(dataFromComponent);
+      updatedData = dataFromComponent;
+    } else if (dataFromComponent.dataType === 'label') {
+      this.updateLabelVisual(dataFromComponent);
     }
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
-      ...items,
+      ...updatedData,
     };
     // Обновляем состояние графа
     this.graphComponent.updateVisual();
@@ -2051,6 +2104,19 @@ class ConstructorSchemesClass {
         targetArrow: 'none',
         sourceArrow: 'none',
         smoothingLength: updatedData.smoothingLength || 0,
+      }),
+    );
+  }
+
+  updateLabelVisual(updatedData) {
+    this.graphComponent.graphModelManager.graph.setStyle(
+      this.targetDataNode,
+      new DefaultLabelStyle({
+        backgroundStroke: 'transparent',
+        backgroundFill: 'transparent',
+        insets: [3, 5, 3, 5],
+        textFill: updatedData.color.rgbaString,
+        textSize: +updatedData.fontSize,
       }),
     );
   }

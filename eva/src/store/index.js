@@ -216,11 +216,15 @@ export default new Vuex.Store({
         token.name = value;
       }
     },
-    updateManualTokens(state, { idDash }) {
+    updateManualTokens(state, { idDash, id }) {
       if (state[idDash]?.tockens?.length > 0) {
+        const { options } = state[idDash][id];
         state[idDash].tockens.forEach((token) => {
           if (token.onButton) {
             state[idDash].searches.forEach((search) => {
+              if (options.SubmitByListDS && !options.ListDS.includes(search.sid)) {
+                return;
+              }
               if (search.original_otl.includes(`$${token.name}$`)) {
                 this.commit('updateSearchStatus', {
                   idDash,
@@ -732,8 +736,14 @@ export default new Vuex.Store({
         Vue.set(state[idDash][id], 'selectedTableTitles', titles);
       }
     },
+    setLastMetrics(state, {
+      idDash, id, metrics,
+    }) {
+      if (metrics && metrics.length) {
+        Vue.set(state[idDash][id], 'lastMetrics', metrics);
+      }
+    },
     updateOptions(state, { idDash, idElement, options }) {
-      // state[idDash][idElement].options = options;
       Vue.set(state[idDash][idElement], 'options', options);
     },
     // метод который обновляет какое-либо свойство у элемнета
@@ -923,6 +933,9 @@ export default new Vuex.Store({
         id: tabID,
         name: tabName,
       });
+    },
+    setTabs(state, { idDash, tabs }) {
+      Vue.set(state[idDash], 'tabList', [...tabs]);
     },
     changeCurrentTab(state, { idDash, tab }) {
       Vue.set(state[idDash], 'currentTab', tab);
