@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed popup-menu position on heatmap
 
 ### Fixed
+- Fixed range-date-picker size
+- Fixed heatmap on DR 2.0: tooltip background-color
 
 ## [1.100.1]
 
