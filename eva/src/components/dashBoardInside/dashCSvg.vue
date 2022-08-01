@@ -426,7 +426,8 @@ export default {
       if (this.svg !== 'Нет данных для отображения' && this.svg !== '') {
         let timeOut = setTimeout(
           function tick() {
-            if (this.$refs.csvg.querySelector('svg') != null) {
+            if (this.$refs.csvg
+                && this.$refs.csvg.querySelector('svg') !== null) {
               clearTimeout(timeOut);
               const svgElem = this.$refs.csvg.querySelector('svg');
               svgElem.setAttribute('width', this.sizeFrom.width - 40);
@@ -575,12 +576,14 @@ export default {
     checkTokenInTooltip(text) {
       const { tockens } = this.$store.state[this.idDash];
       let reg = '';
-      Object.values(tockens).forEach((item) => {
-        if (text.indexOf(item.name) !== -1) {
-          reg = new RegExp(`\\$${item.name}\\$`, 'g');
-          text = text.replace(reg, item.value);
-        }
-      });
+      if (tockens) {
+        Object.values(tockens).forEach((item) => {
+          if (text.indexOf(item.name) !== -1) {
+            reg = new RegExp(`\\$${item.name}\\$`, 'g');
+            text = text.replace(reg, item.value);
+          }
+        });
+      }
       return text;
     },
     async setSvg() {
@@ -635,32 +638,33 @@ export default {
       const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
       const id = this.$refs.tooltip.getAttribute('data-id');
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          tocken = {
+            name: tockens[i].name,
+            action: tockens[i].action,
+            capture: tockens[i].capture,
+          };
 
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-
-        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
-          if (item === 'object') {
-            this.$store.commit('setTocken', {
-              token: tocken,
-              idDash: this.idDash,
-              value: token,
-              store: this.$store,
-            });
-          } else if (tockens[i].capture === token) {
-            this.$store.commit('setTocken', {
-              token: tocken,
-              idDash: this.idDash,
-              value: id,
-              store: this.$store,
-            });
+          if (tockens[i].elem === this.id && tockens[i].action === 'click') {
+            if (item === 'object') {
+              this.$store.commit('setTocken', {
+                token: tocken,
+                idDash: this.idDash,
+                value: token,
+                store: this.$store,
+              });
+            } else if (tockens[i].capture === token) {
+              this.$store.commit('setTocken', {
+                token: tocken,
+                idDash: this.idDash,
+                value: id,
+                store: this.$store,
+              });
+            }
           }
-        }
-      });
+        });
+      }
 
       if (item === 'object') {
         const events = this.getEvents({
@@ -676,8 +680,10 @@ export default {
                 idDash: this.idDash,
               });
             } else if (event.action === 'go') {
-              this.$store.commit('letEventGo', {
+              event.value[0] = token;
+              this.$store.dispatch('letEventGo', {
                 event,
+                id: this.id,
                 idDash: this.idDash,
                 route: this.$router,
                 store: this.$store,
@@ -691,21 +697,23 @@ export default {
       const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
-          this.$store.commit('setTocken', {
-            token: tocken,
-            idDash: this.idDash,
-            value: token,
-            store: this.$store,
-          });
-        }
-      });
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          tocken = {
+            name: tockens[i].name,
+            action: tockens[i].action,
+            capture: tockens[i].capture,
+          };
+          if (tockens[i].elem === this.id && tockens[i].action === 'mouseover') {
+            this.$store.commit('setTocken', {
+              token: tocken,
+              idDash: this.idDash,
+              value: token,
+              store: this.$store,
+            });
+          }
+        });
+      }
     },
     setLink(direction) {
       const context = this.$refs.link.getContext('2d');
@@ -735,13 +743,13 @@ export default {
         default:
           break;
       }
-      console.log(this.color.$secondary_border);
       context.strokeStyle = this.color.$secondary_border;
       context.stroke();
       context.lineWidth = 2;
     },
     positionTooltip(event) {
-      const id = event.target.getAttribute('id');
+      // const id = event.target.getAttribute('id');
+      const id = this.$refs.csvg.children[0].getAttribute('id');
       let token = '';
       const tooltipSize = this.$refs.tooltip.getBoundingClientRect();
       let tooltipLeft = event.offsetX + 40;
@@ -754,7 +762,7 @@ export default {
       let direction = 'normal';
 
       if (id && id.indexOf('overlay') !== -1) {
-        [token] = id.split('overlay_');
+        [, token] = id.split('overlay_');
         this.$refs.tooltip.setAttribute('data-id', token);
 
         if (this.tooltipOptions === false) {
@@ -798,9 +806,10 @@ export default {
         this.setLink(direction);
       }
     },
-    clickSvg(event) {
+    clickSvg() {
       let token = '';
-      const id = event.target.getAttribute('id');
+      // const id = event.target.getAttribute('id');
+      const id = this.$refs.csvg.children[0].getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
         [, token] = id.split('overlay_');
         this.setClick(token, 'object');
