@@ -813,6 +813,13 @@ export default {
       if (id && id.indexOf('overlay') !== -1) {
         [, token] = id.split('overlay_');
         this.setClick(token, 'object');
+      } else {
+        this.noMsg = 2;
+        this.msgText = 'Отсутствует индификатор';
+        setTimeout(() => {
+          this.noMsg = 1;
+          this.msgText = '';
+        }, 1000);
       }
     },
 
