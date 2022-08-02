@@ -1,3 +1,30 @@
+# [1.101.0]
+
+### Added
+- Added visualization of a scatter chart
+- The button component now has the option to choose which tokens to update on click
+- Ability to paint the area between the line and 0 on a multiline chart
+- Ability to change the metric for the x axis on a multiline chart
+- Ability to move tabs on the dashboard
+- Ability to divide a number into digits in the SingleValue component
+- Added settings for label in the Constructor-schemes component
+- Added ability to remove ports in the Constructor-schemes component
+- Added inability to add a label to the "port" in the Constructor-schemes component
+- Added scrollbar for the event list on a dashboard
+
+### Changed
+- Changing the position of edge signatures in the Graph component
+
+### Fixed
+-- Changes in ports and standard elements in the Constructor-schemes component
+- Component graph breaks after restart
+- Problem with association tokens with Select visualisation
+- When exporting dashboards without selected elements, the resulting page wasn't found
+- Data source not loading when entering the dashboard
+- The "visible" option does not work on the component
+- Fixed display metric on yGraph edges
+- Fixed incorrect arrows on yGraph edges
+
 # [1.100.1]
 
 ### Fixed
