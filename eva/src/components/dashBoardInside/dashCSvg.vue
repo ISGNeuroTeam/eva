@@ -680,7 +680,7 @@ export default {
                 idDash: this.idDash,
               });
             } else if (event.action === 'go') {
-              event.value[0] = token;
+              event.value[0] = this.dataFrom.svg_filename;
               this.$store.dispatch('letEventGo', {
                 event,
                 id: this.id,
@@ -808,12 +808,16 @@ export default {
     },
     clickSvg() {
       let token = '';
+      const events = this.getEvents({
+        event: 'onclick',
+        partelement: 'empty',
+      });
       // const id = event.target.getAttribute('id');
       const id = this.$refs.csvg.children[0].getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
         [, token] = id.split('overlay_');
         this.setClick(token, 'object');
-      } else {
+      } else if (events.length && events[0].element === this.idFrom) {
         this.noMsg = 2;
         this.msgText = 'Отсутствует индификатор';
         setTimeout(() => {
