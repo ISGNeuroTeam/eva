@@ -1039,11 +1039,19 @@ export default new Vuex.Store({
       );
     },
     refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
-      Vue.set(
-        state[idDash].filters[filterIndex].parts[filterPartIndex],
-        'values',
-        [],
-      );
+      if (state[idDash].filters[filterIndex].parts[filterPartIndex].values.length > 0) {
+        Vue.set(
+          state[idDash].filters[filterIndex].parts[filterPartIndex],
+          'values',
+          [],
+        );
+      } else {
+        Vue.set(
+          state[idDash].filters[filterIndex].parts[filterPartIndex],
+          'value',
+          null,
+        );
+      }
     },
     restartSearches(state, { idDash, filter }) {
       const { searches } = state[idDash];
