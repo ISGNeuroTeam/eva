@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed Dial. Component header cannot be hidden
 - Fixed range-date-picker size
 - Fixed heatmap on DR 2.0: tooltip background-color
+- Fixed reset manual filter
 
 ## [1.101.0]
 
