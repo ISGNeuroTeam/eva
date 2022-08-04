@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed svg. Onclick event
+- Fixed Dial. Component header cannot be hidden
 
 ## [1.101.0]
 
