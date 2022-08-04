@@ -1,6 +1,6 @@
 {
   "name": "eva",
-  "version": "1.100.1",
+  "version": "1.101.0",
   "description": "Evolution Visualization Application",
   "author": "Fred",
   "license": "ISC",
@@ -97,6 +97,6 @@
     "vuex": "3.6.2",
     "vuex-persistedstate": "2.7.1",
     "xlsx": "0.17.5",
-    "yfiles": "./src/yfiles-upgrade/es-modules/yfiles-24.0.5.tgz"
+    "yfiles": "./src/yfiles/es-modules/yfiles-24.0.5.tgz"
   }
 }
