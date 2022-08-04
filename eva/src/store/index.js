@@ -1039,7 +1039,7 @@ export default new Vuex.Store({
       );
     },
     refreshFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
-      if (state[idDash].filters[filterIndex].parts[filterPartIndex].values.length > 0) {
+      if (state[idDash].filters[filterIndex].parts[filterPartIndex].values?.length > 0) {
         Vue.set(
           state[idDash].filters[filterIndex].parts[filterPartIndex],
           'values',
