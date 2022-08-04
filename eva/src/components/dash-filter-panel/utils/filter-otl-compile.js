@@ -5,7 +5,7 @@ export function filterCompile(filter) {
     let firstPartWithValuesIndex = 0;
 
     filter.parts.forEach((item, index) => {
-      if (item.values?.length > 0 || item.filterPartType === 'manual') {
+      if (item.values?.length > 0 || (item.filterPartType === 'manual' && item.value)) {
         if (index === firstPartWithValuesIndex) {
           filterOtlText += 'search ';
 

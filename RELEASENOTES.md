@@ -1,3 +1,23 @@
+# [1.102.0]
+
+### Added
+- Added a size limit when uploading svg of 1 MB
+- Added font size settings for the text block in the constructor schemes
+
+### Changed
+- The old version of the yFiles library has been removed
+- Changed the color of the table border in the table component
+- Changed popup-menu position on heatmap
+- The position of the pop-up menu on the heat map component has been changed
+
+### Fixed
+- Onclick event does not work in the SVG component
+- It is not possible to hide the header in the dial component
+- On the heat map, when you hover the mouse cursor over a line, a detail window appears, which closes the view
+- in the date picker, some examples do not fit in the frame
+- Background color of the heatmap tooltip in data research
+- Fixed a problem with resetting the manual filter part
+
 # [1.101.0]
 
 ### Added

@@ -1,10 +1,10 @@
 /****************************************************************************
  ** @license
- ** This file is part of yFiles for HTML 2.3.0.3.
+ ** This file is part of yFiles for HTML 2.4.0.5.
  **
  ** yWorks proprietary/confidential. Use is subject to license terms.
  **
- ** Copyright (c) 2020 by yWorks GmbH, Vor dem Kreuzberg 28,
+ ** Copyright (c) 2022 by yWorks GmbH, Vor dem Kreuzberg 28,
  ** 72070 Tuebingen, Germany. All rights reserved.
  **
  ***************************************************************************/
@@ -24,6 +24,7 @@ export * from './layout-seriesparallel.js'
 export * from './layout-tree.js'
 export * from './router-other.js'
 export * from './router-polyline.js'
+export * from './router-bus.js'
 export * from './styles-other.js'
 export * from './styles-template.js'
 export * from './view-component.js'
@@ -32,6 +33,7 @@ export * from './view-folding.js'
 export * from './view-graphml.js'
 export * from './view-layout-bridge.js'
 export * from './view-table.js'
+export * from './view-webgl.js'
 import yfiles from './core.js'
 export var resources = yfiles.resources
 export default yfiles
