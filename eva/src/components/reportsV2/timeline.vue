@@ -287,7 +287,7 @@ export default {
 </script>
 
 <!-- eslint-disable -->
-<style lang="sass">
+<style lang="sass" scoped>
 @import './../../sass/_colors'
 .timeline
   padding: 0 30px
@@ -310,7 +310,7 @@ export default {
       text-transform: capitalize
       color: $main_text !important
       font-weight: normal
-.v-list
+.timeline::v-deep .v-list
   background-color: $main_bg !important
   .v-list-item
     background-color: $main_bg !important
