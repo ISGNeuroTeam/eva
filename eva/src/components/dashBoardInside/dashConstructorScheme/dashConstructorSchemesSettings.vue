@@ -346,6 +346,16 @@
               />
             </v-menu>
           </div>
+          <div class="col-12">
+            <v-text-field
+              v-model="dataObject.fontSize"
+              label="Размер текста"
+              :color="theme.$main_text"
+              outlined
+              hide-details
+              style="margin-bottom: 10px"
+            />
+          </div>
           <div class="col-8">
             Цвет заливки
           </div>
