@@ -748,6 +748,7 @@ export default {
       context.lineWidth = 2;
     },
     positionTooltip(event) {
+      // TODO: пока решил оставить, возможно пригодится
       // const id = event.target.getAttribute('id');
       const id = this.$refs.csvg.children[0].getAttribute('id');
       let token = '';
@@ -812,6 +813,7 @@ export default {
         event: 'onclick',
         partelement: 'empty',
       });
+      // TODO: пока решил оставить, возможно пригодится
       // const id = event.target.getAttribute('id');
       const id = this.$refs.csvg.children[0].getAttribute('id');
       if (id && id.indexOf('overlay') !== -1) {
