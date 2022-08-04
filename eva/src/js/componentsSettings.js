@@ -456,7 +456,7 @@ export default {
       description: 'Валидация данных',
       elem: 'select',
       items: [
-        { value: null, text: 'Нет вализации' },
+        { value: null, text: 'Нет валидации' },
         { value: 'numberRange', text: 'Диапазон чисел' },
       ],
       default: null,
