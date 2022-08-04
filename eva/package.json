@@ -97,6 +97,6 @@
     "vuex": "3.6.2",
     "vuex-persistedstate": "2.7.1",
     "xlsx": "0.17.5",
-    "yfiles": "./src/yfiles-upgrade/es-modules/yfiles-24.0.5.tgz"
+    "yfiles": "./src/yfiles/es-modules/yfiles-24.0.5.tgz"
   }
 }
