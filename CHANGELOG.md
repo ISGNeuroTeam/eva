@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added restriction on loading svg
 - Added font size settings on text-block in constructor schemes 
+- Added editable legend title in GIS component
 
 ### Changed
 - Deleted old version yFiles
