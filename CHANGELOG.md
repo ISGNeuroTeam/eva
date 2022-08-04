@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.102.0]
+
+### Added
 - Added restriction on loading svg
 - Added font size settings on text-block in constructor schemes
 
