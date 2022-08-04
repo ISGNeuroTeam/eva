@@ -8,16 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added restriction on loading svg
+- Added font size settings on text-block in constructor schemes
 
 ### Changed
+- Deleted old version yFiles
 - Changed border color on table
 - Changed popup-menu position on heatmap
 
 ### Fixed
+- Fixed svg. Onclick event
+- Fixed Dial. Component header cannot be hidden
 - Fixed range-date-picker size
 - Fixed heatmap on DR 2.0: tooltip background-color
 
-## [1.100.1]
+## [1.101.0]
 
 ### Added
 - Added visualization of a scatter chart
@@ -28,8 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added dashSingleValue: number of digits
 - Added dashSingleValue: switch "whether to split the number into digits"
 - Constructor-schemes. Added settings for label
-
-### Changed
+- Added ability to remove ports
+- Added inability to add a label to the "port" component
 
 ### Fixed
 - Fixed constructor-schemes, ports and standard elements
@@ -55,8 +60,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Constructor schemes: Edge editing
 - Constructor schemes: Step change element z-order
 - Added error message about out-of-order elements in field "_order"
-- Added ability to remove ports
-- Added inability to add a label to the "port" component
 
 ### Changed
 - Changed the method of requesting the status of the job from GET to POST (Version required OT simple REST 1.13.0)
