@@ -1294,7 +1294,7 @@ export default {
         if (event.action === 'set') {
           this.$store.commit('letEventSet', { idDash, events });
         } else if (event.action === 'go' && actionName !== 'select') {
-          this.$store.commit('letEventGo', {
+          this.$store.dispatch('letEventGo', {
             idDash,
             event,
             store: this.$store,

@@ -838,6 +838,8 @@ class ConstructorSchemesClass {
               textOrientation: 'mixed', 
               transform: tag.isVertical ? 'rotate(180deg)' : 'rotate(0deg)',
               color: tag.textColor,
+              fontSize: tag.fontSize ? tag.fontSize + 'px' : '12px',
+              fontFamily: tag.fontFamily,
              }"
             >
               {{ tag.text }}
@@ -861,6 +863,7 @@ class ConstructorSchemesClass {
         borderColor: '#000000',
         bgColor: '#FFFFFF',
         textColor: '#000000',
+        fontSize: 12,
       },
     },
   ]
@@ -1494,7 +1497,11 @@ class ConstructorSchemesClass {
             location: dropLocation,
             style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
             labels: dropData.labels,
-            tag: { ...dropData.tag, nodeId: dropData.hashCode() },
+            tag: {
+              ...dropData.tag,
+              nodeId: dropData.hashCode(),
+              fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
+            },
           });
         } else if (dropData?.tag?.isAspectRatio) {
           // Узел с картинкой
