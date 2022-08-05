@@ -102,7 +102,6 @@
       class="button-col"
     >
       <v-icon
-        v-if="filterPart.filterPartType === 'token'"
         v-blur="140"
         :color="theme.$main_text"
         size="20"
