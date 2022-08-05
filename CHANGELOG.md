@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Deleted old version yFiles
 
 ### Fixed
+- Fixed map update primitive-libraries
 
 ## [1.101.0]
 
