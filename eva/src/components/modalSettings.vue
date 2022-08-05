@@ -978,11 +978,11 @@ export default {
       pieTypes: [
         {
           value: 'pie',
-          label: 'Круговая диограмма',
+          label: 'Круговая диаграмма',
         },
         {
           value: 'donat',
-          label: 'Кольцвая диограмма',
+          label: 'Кольцвая диаграмма',
         },
       ],
       accumulators: [],
