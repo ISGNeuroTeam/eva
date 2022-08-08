@@ -286,10 +286,11 @@ export default {
                 );
               }
               this.map.wheelPxPerZoomLevel = 200;
-              this.updateToken(
-                mutation.payload.options.zoomLevel,
-                this.map.bounds,
-              );
+              // TODO: Временный коммент
+              // this.updateToken(
+              //   mutation.payload.options.zoomLevel,
+              //   this.map.bounds,
+              // );
             }
           });
 
