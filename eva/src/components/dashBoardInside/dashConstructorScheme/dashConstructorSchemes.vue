@@ -2,11 +2,13 @@
   <div
     class="dash-constructor-schemes"
     :style="{
-      'width': `${innerSize.width}px`,
+      'width': `${innerSize.width - 22}px`,
       'height': `${innerSize.height}px`,
+      background: theme.$secondary_bg,
+      margin: '0 10px',
     }"
   >
-    <div class="d-flex align-center ml-5">
+    <div class="dash-constructor-schemes__options">
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
@@ -16,6 +18,7 @@
             <v-switch
               v-model="isEdit"
               inset
+              dense
               label=""
               @change="toggleInputMode"
             />
@@ -25,7 +28,7 @@
       </v-tooltip>
       <template v-if="isEdit">
         <button
-          class="pa-2"
+          class="pa-2 dash-constructor-schemes__control-element"
           @click="toggleDnDPanel"
         >
           <v-icon
@@ -37,7 +40,7 @@
         </button>
         <button
           v-if="dataSelectedNode"
-          class="pa-2"
+          class="pa-2 dash-constructor-schemes__control-element"
           @click="orderTo('toFront')"
         >
           <v-icon
@@ -49,7 +52,7 @@
         </button>
         <button
           v-if="dataSelectedNode"
-          class="pa-2"
+          class="pa-2 dash-constructor-schemes__control-element"
           @click="orderTo('toBack')"
         >
           <v-icon
@@ -61,7 +64,7 @@
         </button>
         <button
           v-if="dataSelectedNode"
-          class="pa-2"
+          class="pa-2 dash-constructor-schemes__control-element"
           @click="orderTo('raise')"
         >
           <v-icon
@@ -73,7 +76,7 @@
         </button>
         <button
           v-if="dataSelectedNode"
-          class="pa-2"
+          class="pa-2 dash-constructor-schemes__control-element"
           @click="orderTo('lower')"
         >
           <v-icon
@@ -85,6 +88,32 @@
         </button>
       </template>
     </div>
+    <div class="dash-constructor-schemes__keymap-button">
+      <v-tooltip
+        top
+        :nudge-top="5"
+        :color="theme.$accent_ui_color"
+      >
+        <template v-slot:activator="{ on }">
+          <button
+            v-on="on"
+            @click="openKeymapPanel"
+          >
+            <v-icon
+              class="control-button edit-icon theme--dark"
+              :style="{ color: theme.$secondary_text }"
+            >
+              {{ iconHelp }}
+            </v-icon>
+          </button>
+        </template>
+        <span>Справка по горячим клавишам</span>
+      </v-tooltip>
+    </div>
+    <!--Keymap-panel-->
+    <dash-constructor-schemes-keymap
+      v-model="isKeymapOpen"
+    />
     <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
@@ -387,7 +416,7 @@
 
 <script>
 import {
-  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings,
+  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp,
 } from '@mdi/js';
 import ConstructorSchemesClass from '../../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 import { throttle } from '@/js/utils/throttle';
@@ -427,6 +456,7 @@ export default {
       closeIcon: mdiClose,
       arrowUp: mdiArrowUp,
       arrowDown: mdiArrowDown,
+      iconHelp: mdiHelp,
       dndPanel: false,
       dataPanel: false,
       nodeBgColorPopup: false,
@@ -749,6 +779,7 @@ export default {
       selectedNode: '',
       selectedDataType: '',
       dataSelectedNode: null,
+      isKeymapOpen: false,
     };
   },
   computed: {
@@ -815,14 +846,12 @@ export default {
         this.nodeShape = this.constructorSchemes.defaultNodeStyle.shape;
       }
     },
-
     changeDataSelectedNode(updatedData) {
       this.constructorSchemes.updateSelectedNode(
         updatedData,
         this.updateSavedGraph,
       );
     },
-
     updateSavedGraph(data) {
       this.$store.commit('setState', [{
         object: this.dashFromStore,
@@ -877,6 +906,9 @@ export default {
         }
       }
     },
+    openKeymapPanel() {
+      this.isKeymapOpen = true;
+    },
   },
 };
 </script>
@@ -884,6 +916,29 @@ export default {
 <style lang="scss" scoped>
 .dash-constructor-schemes {
   position: relative;
+  overflow: hidden;
+  &__options {
+    position: absolute;
+    left: 20px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+  }
+  &__keymap-button {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1;
+    border-radius: 50%;
+    background-color: var(--main_bg);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .8;
+  }
   &__color-button {
     width: 100%;
     height: 30px;
@@ -912,8 +967,6 @@ export default {
     background-color: var(--main_bg);
     width: 250px;
     padding: 10px;
-    border-top: 2px solid var(--secondary_bg);
-    border-bottom: 2px solid var(--secondary_bg);
     transition: all .2s ease;
     pointer-events: none;
     max-height: inherit;
@@ -922,7 +975,6 @@ export default {
   }
   &__dnd-panel-container {
     left: 0;
-    border-right: 2px solid var(--secondary_bg);
     border-radius: 0 4px 4px 0;
     transform: translateX(-100%);
     &--active {
@@ -934,7 +986,7 @@ export default {
     right: 0;
     width: 300px;
     transform: translateX(100%);
-    border-left: 2px solid var(--secondary_bg);
+    //border-left: 2px solid var(--secondary_bg);
     border-radius: 4px 0 0 4px;
     &--active {
       transform: translateX(0);
@@ -945,8 +997,8 @@ export default {
     }
   }
   &__graph-component {
-    //height: inherit;
-    height: calc(100% - 42px);
+    height: inherit;
+    //height: calc(100% - 42px);
   }
   &__dnd-panel ::v-deep {
     .v-expansion-panel {
