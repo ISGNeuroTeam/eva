@@ -180,6 +180,25 @@ export default {
         ? [this.position.lat, this.position.lng]
         : [this.options?.initialPoint?.x || 0, this.options?.initialPoint?.y || 0];
     },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
+    getServer() {
+      let OSM = this.getOptions.osmserver;
+      if (OSM.indexOf('$$')) {
+        this.getTockens.forEach((token) => {
+          OSM = OSM.replaceAll(`$${token.name}$`, token.value);
+        });
+        const tile = { tile: []};
+        tile.tile.push(OSM);
+        tile.tile.push({
+          subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+          attribution: '<a http="google.ru" target="_blank">Google</a>',
+        });
+        return tile;
+      }
+      return OSM;
+    },
   },
   watch: {
     error(val) {
@@ -256,6 +275,13 @@ export default {
       },
       deep: true,
     },
+    getServer(val, old) {
+      if (JSON.stringify(val) !== JSON.stringify(old)) {
+        this.map.removeLayer(old.tile);
+        this.map.addLayer(val.tile);
+        this.updateOptions({ selectedLayer: val.tile || null });
+      }
+    },
   },
   mounted() {
     if (this.$refs.map) {
@@ -263,6 +289,13 @@ export default {
     }
   },
   methods: {
+    updateOptions(newOptions) {
+      this.$store.commit('updateOptions', {
+        idDash: this.idDashFrom,
+        idElement: this.element,
+        options: { ...this.getOptions, ...newOptions },
+      });
+    },
     updateModalValue() {
       this.modalSettingsValue = !this.modalSettingsValue;
     },
@@ -446,7 +479,7 @@ export default {
       if (options?.selectedLayer?.tile) {
         this.map.osmServer = options.selectedLayer;
       } else if (options?.osmserver) {
-        this.map.osmServer = options.osmserver;
+        this.map.osmServer = this.getServer;
       } else {
         this.error = 'Введите osm server';
       }
