@@ -150,7 +150,7 @@ export default {
   background:  $accent_ui_color !important
 .events
   .collapse-row
-    border-bottom: 1px solid $main-border !important
+    border-bottom: thin solid rgba(0, 0, 0, 0.12) !important
   .v-data-footer
     border-top: none !important
     .v-icon
