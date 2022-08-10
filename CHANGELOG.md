@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added editable legend title in GIS component
 
 ### Changed
+- Changed text btn in searchModal
 
 ### Fixed
 - Fixed map update primitive-libraries
