@@ -1936,7 +1936,6 @@ export default {
         if (events.length !== 0) {
           events.forEach((item) => {
             originItem = item;
-            item = item.replace(/\s/g, '');
             if (item !== '') {
               // reg = new RegExp(/^[\s+]?[\w]+\(/, 'g');
               reg = /^[\s+]?[\w]+\(/g;
