@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added editable legend title in GIS component
+- Schemes constructor: added keymap panel
 
 ### Changed
 - Changed text btn in searchModal
