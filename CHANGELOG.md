@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Fixed map update primitive-libraries
 - Fixed event on data compare
 
 ## [1.102.0]
