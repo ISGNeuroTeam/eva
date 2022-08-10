@@ -36,7 +36,7 @@
           small
           :color="theme.$primary_button"
           class="b-loading-svg__button"
-          :disabled="!file || file.type !== 'image/svg+xml' || file.size > 1000000 "
+          :disabled="!file || file.type !== 'image/svg+xml' || file.size > 1000000 || disabled"
           @click="loadingSvg"
         >
           Отправить
@@ -81,6 +81,7 @@ export default {
       message: '',
       color: '',
       modalValue: false,
+      disabled: false,
     };
   },
   computed: {
@@ -97,6 +98,7 @@ export default {
       }
     },
     async loadingSvg() {
+      this.disabled = true;
       const formData = new FormData();
       formData.append('file', this.file);
       const response = await this.$store.dispatch('setLoadingSvg', {
@@ -111,8 +113,10 @@ export default {
           this.$emit('updateModalValue', false);
           this.color = '';
           this.message = '';
+          this.disabled = false;
         }, 1000);
       } else {
+        this.disabled = false;
         this.color = 'red';
         this.message = `Загрузить файл ${this.file.name} не удалось.`;
       }

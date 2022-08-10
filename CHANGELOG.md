@@ -8,11 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added editable legend title in GIS component
 - Schemes constructor: added keymap panel
 
 ### Changed
 
 ### Fixed
+- Fixed map update primitive-libraries
+- Fixed event on data compare
 
 ## [1.102.0]
 

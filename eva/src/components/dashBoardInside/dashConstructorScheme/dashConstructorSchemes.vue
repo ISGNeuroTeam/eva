@@ -986,7 +986,6 @@ export default {
     right: 0;
     width: 300px;
     transform: translateX(100%);
-    //border-left: 2px solid var(--secondary_bg);
     border-radius: 4px 0 0 4px;
     &--active {
       transform: translateX(0);
@@ -998,7 +997,6 @@ export default {
   }
   &__graph-component {
     height: inherit;
-    //height: calc(100% - 42px);
   }
   &__dnd-panel ::v-deep {
     .v-expansion-panel {
