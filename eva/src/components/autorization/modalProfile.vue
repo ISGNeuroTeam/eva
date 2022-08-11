@@ -411,7 +411,7 @@ export default {
       }
     },
     btnMsg() {
-      return this.create ? 'Создать' : 'Редактировать';
+      return this.create ? 'Создать' : 'Применить';
     },
     theme() {
       return this.$store.getters.getTheme;
