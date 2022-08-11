@@ -1262,8 +1262,9 @@ export default class ChartClass {
       ? captionKey
       : metric.name;
     const val = data[fieldName];
-    return (val % 1 || metric.zerosAfterDot || metric.zerosAfterDot === 0)
-      ? Number.parseFloat(val).toFixed(metric.zerosAfterDot ?? 2)
+    const { zerosAfterDot } = metric;
+    return (val % 1 === 0 && zerosAfterDot >= 0 && zerosAfterDot <= 100)
+      ? Number.parseFloat(val).toFixed(zerosAfterDot ?? 2)
       : val;
   }
 
