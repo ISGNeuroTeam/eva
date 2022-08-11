@@ -1,3 +1,17 @@
+# [1.103.0]
+
+### Added
+- Added the ability to edit the legend name in the GIS component
+- Schemes constructor: added a panel of key maps
+- Added the ability to reset the filter of the internal table
+
+### Changed
+- Changed the text of some "Edit" buttons on "Apply"
+
+### Fixed
+- The settings for map primitives are applied only after the page is reloaded
+- Events: When using parameters with a space, events are not processed
+
 # [1.102.0]
 
 ### Added
