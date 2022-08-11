@@ -528,17 +528,19 @@ class MapClass {
 
         const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
         // div for tooltip
-        const newDiv = document.createElement('div');
-        let html = '<div style="text-align: left; background-color: #191919; color: white">';
-        html += `<p>${pipelineInfo.label}</p>`;
-        if (this.pipelineParameters.length > 0) {
-          this.pipelineParameters.forEach((item) => {
-            html += `<p>${item.type} ${pipelineInfo[item.type]}</p>`;
-          });
+        if (pipelineInfo) {
+          const newDiv = document.createElement('div');
+          let html = '<div style="text-align: left; background-color: #191919; color: white">';
+          html += `<p>${pipelineInfo.label}</p>`;
+          if (this.pipelineParameters.length > 0) {
+            this.pipelineParameters.forEach((item) => {
+              html += `<p>${item.type} ${pipelineInfo[item.type]}</p>`;
+            });
+          }
+          html += '</div>';
+          newDiv.innerHTML = html;
+          line.setTooltipContent(newDiv);
         }
-        html += '</div>';
-        newDiv.innerHTML = html;
-        line.setTooltipContent(newDiv);
       } else {
         line.setTooltipContent(element.label);
       }

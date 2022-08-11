@@ -341,7 +341,7 @@ export default {
         this.$set(this.search.parametrs, 'isStartImmediately', true);
       }
       if (this.createBtnFrom === 'edit') {
-        this.createBtn = 'Редактировать';
+        this.createBtn = 'Применить';
       } else {
         this.createBtn = 'Создать';
       }
@@ -351,7 +351,7 @@ export default {
         this.active = false;
       } else {
         if (this.createBtnFrom === 'edit') {
-          this.createBtn = 'Редактировать';
+          this.createBtn = 'Применить';
         } else {
           this.createBtn = 'Создать';
         }
