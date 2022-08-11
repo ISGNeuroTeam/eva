@@ -149,6 +149,7 @@
         <v-checkbox
           v-model="options.showLegend"
           hide-details
+          class="mb-3"
         >
           <template v-slot:label>
             <span :style="`color: ${theme.$secondary_text} !important`">
@@ -156,6 +157,15 @@
             </span>
           </template>
         </v-checkbox>
+        <v-text-field
+          v-model="options.nameLegend"
+          label="Имя легенды"
+          :color="theme.$accent_ui_color"
+          class="mb-3"
+          outlined
+          hide-details
+          clearable
+        />
 
         <p>ИД для режима мониторинга</p>
         <v-select
@@ -212,6 +222,7 @@ export default {
         showLegend: true,
         mode: [],
         search: '',
+        nameLegend: 'Легенда',
       },
       currentTile: {},
     };

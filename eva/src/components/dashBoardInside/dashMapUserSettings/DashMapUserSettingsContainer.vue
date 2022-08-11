@@ -233,7 +233,7 @@
                     class="ml-2 legend-title"
                     :style="`color: ${theme.$main_text} !important;`"
                   >
-                    Легенда 11333
+                    {{ options.nameLegend }}
                   </span>
                   <v-spacer />
                   <a
@@ -391,6 +391,7 @@ export default {
         showLegend: true,
         mode: [],
         search: '',
+        nameLegend: 'Легенда',
       },
       localLayerList: [],
       toggleSelectLayer: false,
@@ -470,6 +471,13 @@ export default {
           object: this.dashFromStore.options,
           prop: 'pipelineParameters',
           value: this.pipeline,
+        }]);
+      }
+      if (!this.dashFromStore?.options?.nameLegend) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'nameLegend',
+          value: 'Легенда',
         }]);
       }
       return this.dashFromStore.options;
@@ -620,6 +628,9 @@ export default {
   font-size: 18px
   font-weight: 600
   line-height: 22px
+  max-width: 164px
+  max-height: 27px
+  overflow: hidden
 
 .med
   height: 100%
