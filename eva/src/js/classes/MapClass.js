@@ -259,7 +259,7 @@ class MapClass {
     this.map.addLayer(cluster);
   }
 
-  addLine(element, lib, pipelineData) {
+  addLine(element, lib, pipelineData, callback) {
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -293,12 +293,15 @@ class MapClass {
     line
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
-      .on('mouseout', resetHighlight);
+      .on('mouseout', resetHighlight)
+      .on('click', () => {
+        callback(element.ID);
+      });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);
   }
 
-  drawMarkerHTML({ lib, element }) {
+  drawMarkerHTML({ lib, element, callback }) {
     const {
       text_color: textColor = '#FFFFFF',
       background_color: color = '65, 62, 218',
@@ -339,6 +342,9 @@ class MapClass {
         direction: 'top',
         className: 'leaftet-hover',
         interactive: true,
+      })
+      .on('click', () => {
+        callback(element.ID);
       });
     this.layerGroup[element.type].addLayer(marker);
   }
@@ -457,7 +463,7 @@ class MapClass {
     if (type === 'SVG') {
       this.drawMarkerSVG({ lib, element, callback });
     } else {
-      this.drawMarkerHTML({ lib, element });
+      this.drawMarkerHTML({ lib, element, callback });
     }
   }
 
@@ -481,7 +487,7 @@ class MapClass {
             this.addMarker({ element: item, lib, callback });
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
-            this.addLine(item, lib, pipelineDataDictionary[item.ID]);
+            this.addLine(item, lib, pipelineDataDictionary[item.ID], callback);
           }
         }
       }
