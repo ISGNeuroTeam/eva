@@ -193,6 +193,7 @@ import {
   mdiCalendarMonthOutline,
   mdiCheckBold,
 } from '@mdi/js';
+import moment from 'moment';
 
 export default {
   name: 'DashDatePicker',
@@ -322,6 +323,9 @@ export default {
       // возвращаем либо новый созданный либо имеющийся
       return this.dashFromStore.date;
     },
+    getTockens() {
+      return this.$store.state[this.idDash].tockens;
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -364,10 +368,18 @@ export default {
       }
 
       if (data.startCus != null) {
-        current = `${data.startCus} - `;
+        if (data.startCus.indexOf('$$')) {
+          current = `${moment(this.convertingTokens(data.startCus) * 1000).format('DD.MM.YY')} - `;
+        } else {
+          current = `${data.startCus} - `;
+        }
         this.start_custom.value = data.startCus;
         if (data.endCus != null) {
-          current += data.endCus;
+          if (data.endCus.indexOf('$$')) {
+            current += moment(this.convertingTokens(data.endCus) * 1000).format('DD.MM.YY');
+          } else {
+            current += data.endCus;
+          }
           this.end_custom.value = data.endCus;
         } else {
           current += '...';
@@ -397,6 +409,12 @@ export default {
 
       this.show_curent = current !== '';
       return current;
+    },
+    convertingTokens(element) {
+      this.getTockens.forEach((token) => {
+        element = element.replaceAll(`$${token.name}$`, token.value);
+      });
+      return element;
     },
     openHidden() {
       if (!this.show_picker_elem) {
