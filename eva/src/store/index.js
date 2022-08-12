@@ -1022,6 +1022,7 @@ export default new Vuex.Store({
       const foundFilter = state[idDash].filters.find((val) => id === val.id);
       foundFilter.parts.forEach((part) => {
         part.values = [];
+        part.value = null;
       });
     },
     deleteFilterPart(state, { idDash, filterIndex, filterPartIndex }) {
