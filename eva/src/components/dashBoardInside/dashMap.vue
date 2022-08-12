@@ -180,6 +180,9 @@ export default {
         ? [this.position.lat, this.position.lng]
         : [this.options?.initialPoint?.x || 0, this.options?.initialPoint?.y || 0];
     },
+    getLibrary() {
+      return this.dashFromStore.options.primitivesLibrary;
+    },
     getTockens() {
       return this.$store.state[this.idDash].tockens;
     },
@@ -189,7 +192,7 @@ export default {
         this.getTockens.forEach((token) => {
           OSM = OSM.replaceAll(`$${token.name}$`, token.value);
         });
-        const tile = { tile: []};
+        const tile = { tile: [] };
         tile.tile.push(OSM);
         tile.tile.push({
           subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
@@ -204,6 +207,17 @@ export default {
     error(val) {
       if (!val) {
         this.map.resize();
+      }
+    },
+    getLibrary(value) {
+      if (value && this.map) {
+        this.reDrawMap(this.dataRestFrom);
+        this.$nextTick(() => {
+          if (this.library?.objects) {
+            this.$refs.setting.creationLayer();
+            this.$refs.setting.addLayer();
+          }
+        });
       }
     },
     // TODO: Временный коммент
@@ -319,10 +333,11 @@ export default {
                 );
               }
               this.map.wheelPxPerZoomLevel = 200;
-              this.updateToken(
-                mutation.payload.options.zoomLevel,
-                this.map.bounds,
-              );
+              // TODO: Временный коммент
+              // this.updateToken(
+              //   mutation.payload.options.zoomLevel,
+              //   this.map.bounds,
+              // );
             }
           });
 
@@ -412,13 +427,15 @@ export default {
     reDrawMap(dataRest) {
       this.$nextTick(() => {
         if (this.map) {
+          this.map.layerGroup = {};
+          this.layerGroup = {};
           this.map.clearMap();
           this.error = null;
           // получаем osm server
           this.getOSM();
           // получаем библиотеку
           // get all icons that we need on maps
-          this.generateLibrary(dataRest, this.options?.primitivesLibrary);
+          this.generateLibrary(dataRest, this.getLibrary);
           if (this.library?.objects) {
             Object.keys(this.library.objects).forEach((item) => {
               if (!this.map.layerGroup[item]) {
@@ -426,6 +443,7 @@ export default {
               }
             });
           }
+          this.map.library = this.library;
           this.map.generateClusterPositionItems();
           if (!this.error && dataRest.length > 0) {
             // создаем элемент карты
