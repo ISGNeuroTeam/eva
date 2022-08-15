@@ -509,6 +509,8 @@ export default {
     this.$refs.search.$el.addEventListener('keypress', (event) => {
       if (event.ctrlKey && event.keyCode === 10) {
         this.launchSearch();
+      } else if (event.ctrlKey && event.keyCode === 28) {
+        this.addLineBreaks();
       }
     });
     if (this.isDarkTheme) {
