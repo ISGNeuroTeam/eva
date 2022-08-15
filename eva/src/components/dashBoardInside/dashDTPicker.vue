@@ -374,7 +374,6 @@ export default {
           current = `${data.startCus} - `;
         }
         this.start_custom.value = data.startCus;
-        console.log(data.endCus);
         if (data.endCus != null) {
           if (data.endCus.indexOf('$$')) {
             current += moment(this.convertingTokens(data.endCus) * 1000).format('YYYY-MM-DD');
