@@ -2070,8 +2070,10 @@ export default {
                   doing = doing.match(/[^[]+(?=\])/g);
 
                   if (doing.length === 1) {
-                    value = [...value, ...doing[0].split(',').map((token) => `$${token}$`)];
+                    value = [...value, ...doing[0].split(',')
+                      .map((token) => `$${token.replace(' ', '')}$`)];
                     prop = [...prop, ...doing[0].split(',')];
+                    prop = prop.map((token) => token.replace(' ', ''));
                   } else {
                     value = [...value, ...doing[0].split(',')];
                     prop = [...prop, ...doing[1].split(',')];
