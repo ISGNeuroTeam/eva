@@ -236,7 +236,6 @@ class BushClass {
           style: new ImageNodeStyle(`/svg/${imgSource}`),
           labels: [this.nodesSource[index].label],
         });
-        console.log(imgSource);
       }
       this.setNodeSize(localNode, this.nodesSource[index].type);
       // для дальнейшего рисования edges
@@ -351,7 +350,6 @@ class BushClass {
       });
       const newEdge = this.graphComponent.graph.createEdge(fNode, tNode);
       // применяем этот стиль -- this.elementConfig.library.egdes[edge.style]
-      console.log('this.elementConfig.library.egdes', this.elementConfig.library.egdes);
       // стилизуем нарисованный edge
       this.graphComponent.graph.setStyle(
         newEdge,
