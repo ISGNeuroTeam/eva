@@ -530,10 +530,21 @@ export default {
       }
     },
     addLineBreaks() {
-      this.search.original_otl = this.search.original_otl.replaceAll(
-        '|',
-        '\n|',
-      );
+      if (this.search.original_otl.indexOf('    |') || this.search.original_otl.indexOf(' |')) {
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '    |',
+          '\n|',
+        );
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          ' |',
+          '\n|',
+        );
+      } else {
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '|',
+          '\n|',
+        );
+      }
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }
