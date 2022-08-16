@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added token transfer to datepicker
 
 ### Changed
+- Changed popup on graph
 
 ### Fixed
 - Fixed transitions on click on html elements
