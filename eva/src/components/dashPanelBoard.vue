@@ -2076,7 +2076,9 @@ export default {
                     prop = prop.map((token) => token.replace(' ', ''));
                   } else {
                     value = [...value, ...doing[0].split(',')];
+                    value = value.map((val) => val.replace(' ', ''));
                     prop = [...prop, ...doing[1].split(',')];
+                    prop = prop.map((token) => token.replace(' ', ''));
                   }
                 } else {
                   prop = [doing[1]];
