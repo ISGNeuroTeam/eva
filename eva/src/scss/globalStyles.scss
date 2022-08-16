@@ -165,4 +165,7 @@
   .active.draggable .handle {
     background: rgb(0, 148, 218);
   }
+  .v-file-input .v-file-input__text {
+    color: var(--main_text);
+  }
 }

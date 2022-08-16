@@ -245,6 +245,90 @@
             </template>
           </template>
 
+          <template v-if="element.indexOf('csvg') !== -1">
+            <div class="option-item">
+              <v-card-text
+                class="headline"
+              >
+                <div
+                  class="settings-title"
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
+                >
+                  Подложка
+                </div>
+              </v-card-text>
+            </div>
+            <div class="option-item">
+              <div
+                class="name-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                options.backgroundImage
+              </div>
+              <div
+                class="discribe-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                Изображение
+              </div>
+              <div class="status-option item">
+                <div
+                  class="subnumber flex"
+                  style="position: relative"
+                >
+                  <v-file-input
+                    ref="fileInput"
+                    v-model="csvgBg"
+                    accept="image/png, image/jpeg, image/bmp, image/jpg"
+                    :placeholder="cSvgBgName"
+                    prepend-icon=""
+                    :color="theme.$primary_button"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    outlined
+                    :rules="fileInputRules"
+                    @update:error="clearFileInput"
+                    @change="changeCSvgBg($event)"
+                  >
+                    <template #message="{ message }">
+                      <div
+                        :style="{
+                          width: '85%',
+                          margin: '0 auto',
+                          paddingTop: '5px',
+                        }"
+                      >
+                        {{ message }}
+                      </div>
+                    </template>
+                  </v-file-input>
+                  <!--                  <button
+                    v-show="!!csvgBg"
+                    class="modal-settings__clear-file-input-btn"
+                  >
+                    <v-icon
+                      @click="csvgBg = null"
+                    >
+                      {{ mdiClose }}
+                    </v-icon>
+                  </button>-->
+                </div>
+              </div>
+            </div>
+          </template>
+
           <div
             v-if="checkOptions('positionlegend')"
             class="option-item"
@@ -919,7 +1003,9 @@
 </template>
 
 <script>
-import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
+import {
+  mdiMinusBox, mdiPlusBox, mdiEyedropper, mdiClose,
+} from '@mdi/js';
 import settings from '../js/componentsSettings';
 import TitleAtionSelect from './modalSettings/titleAtionSelect.vue';
 import vusualisation from '@/js/visualisationCRUD';
@@ -947,6 +1033,8 @@ export default {
   },
   data() {
     return {
+      mdiClose,
+      csvgBg: null,
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
       conclusion_count: {},
@@ -1014,9 +1102,20 @@ export default {
       colorPicker: '',
       isOsmServerChange: false,
       titleActions: [],
+      csvgBgValue: null,
+      csvgBgErrorMessage: '',
+      fileInputRules: [
+        (value) => (!value || value?.type === 'image/jpeg'
+            || value?.type === 'image/png'
+            || value?.type === 'image/jpg'
+            || value?.type === 'image/bmp') || 'Некорректный тип файла',
+      ],
     };
   },
   computed: {
+    cSvgBgName() {
+      return this.csvgBg?.name || this.csvgBgErrorMessage || 'Выбрать изображение';
+    },
     printedUnitedMetrics() {
       return this.metrics.map((item) => item.name);
     },
@@ -1150,6 +1249,9 @@ export default {
     this.updateTableTitles();
   },
   methods: {
+    clearFileInput() {
+      this.csvgBg = null;
+    },
     changetitleActions(val) {
       this.titleActions = structuredClone(val);
     },
@@ -1236,6 +1338,11 @@ export default {
       }
       if (this.element.indexOf('csvg') !== -1) {
         this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
+        await this.getBase64(this.csvgBg).then((result) => {
+          this.$set(this.options, 'backgroundImage', result);
+          this.$set(this.options, 'backgroundImageName', this.csvgBg?.name || '');
+          this.$set(this.options, 'backgroundImageType', this.csvgBg?.type || '');
+        });
       }
       if (this.element.indexOf('piechart') !== -1) {
         this.options.metricsRelation = JSON.parse(
@@ -1301,6 +1408,28 @@ export default {
       }
       this.cancelModal();
     },
+    getBase64(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        if (file) {
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            resolve(reader.result);
+          };
+        } else {
+          resolve(null);
+        }
+      });
+    },
+    getFileFromBase64(url, name, type) {
+      return fetch(url)
+        .then((res) => res.blob())
+        .then((blob) => new File(
+          [blob],
+          name,
+          { type },
+        ));
+    },
     visualisationHandler() {
       const oldList = this.elementFromStore.options
         .titleActions?.filter((elem) => elem.type === 'modal') || [];
@@ -1353,6 +1482,22 @@ export default {
               : null,
           },
         ]);
+      }
+    },
+    changeCSvgBg(e) {
+      if (e?.type === 'image/jpeg'
+          || e?.type === 'image/png'
+          || e?.type === 'image/jpg'
+          || e?.type === 'image/bmp') {
+        this.csvgBg = e;
+        this.csvgBgErrorMessage = '';
+        this.isChanged = true;
+      } else if (e) {
+        this.csvgBg = null;
+        this.csvgBgErrorMessage = 'Некорректный тип файла';
+      } else {
+        this.csvgBg = null;
+        this.csvgBgErrorMessage = '';
       }
     },
     cancelModal() {
@@ -1528,12 +1673,24 @@ export default {
               // Настройка указана - получаем значение
               if (item === 'tooltip') {
                 this.tooltip = {};
-                this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([...[], ...options[item].texts])));
-                this.$set(this.tooltip, 'links', JSON.parse(JSON.stringify([...[], ...options[item].links])));
+                this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([
+                  ...[],
+                  ...options[item].texts])));
+                this.$set(this.tooltip, 'links', JSON.parse(JSON.stringify([
+                  ...[],
+                  ...options[item].links])));
                 this.$set(this.tooltip, 'buttons', JSON.parse(JSON.stringify([
                   ...[],
                   ...options[item].buttons,
                 ])));
+              } else if (item === 'backgroundImage') {
+                this.getFileFromBase64(
+                  options[item],
+                  options.backgroundImageName,
+                  options.backgroundImageType,
+                ).then((result) => {
+                  this.csvgBg = result;
+                });
               } else if (item === 'metrics') {
                 this.metrics = JSON.parse(JSON.stringify(options[item]));
               } else if (item === 'metricsRelation') {
@@ -1710,5 +1867,13 @@ export default {
   font-size: 20px !important;
   cursor: pointer;
   margin-right: 20px;
+}
+.modal-settings {
+  &__clear-file-input-btn {
+    position: absolute;
+    right: 45px;
+    top: 50%;
+    transform: translateY(-95%);
+  }
 }
 </style>
