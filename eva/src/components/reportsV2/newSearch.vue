@@ -530,13 +530,9 @@ export default {
       }
     },
     addLineBreaks() {
-      if (this.search.original_otl.indexOf('    |') || this.search.original_otl.indexOf(' |')) {
+      if (this.search.original_otl.indexOf(`${/\s*\|/g}`)) {
         this.search.original_otl = this.search.original_otl.replaceAll(
-          '    |',
-          '\n|',
-        );
-        this.search.original_otl = this.search.original_otl.replaceAll(
-          ' |',
+          /\s*\|/g,
           '\n|',
         );
       } else {
