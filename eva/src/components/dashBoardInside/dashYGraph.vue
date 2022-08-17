@@ -10,19 +10,21 @@
       class="ygraph-wrapper"
     >
       <div class="button-block">
-        <v-row align="start">
+        <div class="d-flex justify-content-between align-center">
           <v-tooltip
             bottom
             :color="colorFrom.$accent_ui_color"
           >
-            <template v-slot:activator="{ on }">
+            <template v-slot:activator="{ on, attrs }">
               <v-icon
+                class="pa-1"
                 :color="
                   isEditor
                     ? colorFrom.$primary_button
                     : colorFrom.$accent_ui_color
                 "
                 :disabled="loading"
+                v-bind="attrs"
                 v-on="on"
                 @click="changeInputMode"
               >
@@ -38,6 +40,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
+                class="pa-1"
                 :color="colorFrom.$accent_ui_color"
                 :disabled="loading"
                 v-on="on"
@@ -55,6 +58,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
+                class="pa-1"
                 :color="colorFrom.$accent_ui_color"
                 :disabled="loading"
                 v-on="on"
@@ -72,6 +76,7 @@
           >
             <template v-slot:activator="{ on }">
               <v-icon
+                class="pa-1"
                 :color="colorFrom.$accent_ui_color"
                 :disabled="loading"
                 v-on="on"
@@ -82,7 +87,29 @@
             </template>
             <span>Выровнять</span>
           </v-tooltip>
-        </v-row>
+
+          <v-tooltip
+            bottom
+            :color="colorFrom.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <v-icon
+                class="pa-1"
+                :color="
+                  !isVisiblePopup
+                    ? colorFrom.$primary_button
+                    : colorFrom.$accent_ui_color
+                "
+                :disabled="loading"
+                v-on="on"
+                @click="toggleVisiblePopup"
+              >
+                {{ mdiEyeOffOutline }}
+              </v-icon>
+            </template>
+            <span>Отображать\скрыть подписи</span>
+          </v-tooltip>
+        </div>
       </div>
       <div
         ref="graph"
@@ -90,28 +117,28 @@
         class="ygraph-component-container"
         :style="{ top: `${top}` }"
       >
-        <div
-          class="popupContainer"
-          :class="{
-            'popupContainer--is-active': isPopupShow,
-          }"
-        >
+        <div class="popupContainer">
           <div
+            v-if="isVisiblePopup && popupNodeContent"
             ref="nodePopupContent"
-            class="popupContent"
+            class="node-popup-content"
             :class="{
-              'popupContent--is-active': isPopupShow,
+              'popupContent--is-active': isPopupNodeShow,
             }"
+            :style="popupNodePosition"
             tabindex="0"
           >
-            <div class="popupContentTitle">
-              <div data-id="node" />
+            <div class="node-popup-content__header">
+              <div class="node-popup-content__title">
+                {{ popupNodeContent.node }}
+              </div>
               <div
-                data-id="node_description"
-                style="font-size: 0.9rem"
-              />
+                class="node-popup-content__description"
+              >
+                {{ popupNodeContent.nodeDescription }}
+              </div>
 
-              <div class="popupContent__close-btn">
+              <div class="node-popup-content__close-btn">
                 <v-icon
                   :color="colorFrom.$accent_ui_color"
                   :disabled="loading"
@@ -122,81 +149,94 @@
                 </v-icon>
               </div>
             </div>
-            <div class="popupContentTabsHeader">
-              <div
-                class="d-flex align-center justify-center"
-                :class="{ active: popupNodeCurrentTab === 0 }"
-                @click="popupNodeCurrentTab = 0"
-              >
-                Parents
-              </div>
-              <div
-                class="d-flex align-center justify-center"
-                :class="{ active: popupNodeCurrentTab === 1 }"
-                @click="popupNodeCurrentTab = 1"
-              >
-                Children
-              </div>
-            </div>
-            <div class="popupContentTabs">
-              <div
-                ref="popupContentTabParents"
-                :class="{ active: popupNodeCurrentTab === 0 }"
-              >
+            <div class="node-popup-content-tabs">
+              <div class="node-popup-content-tabs__header">
                 <div
-                  v-for="item in parentNodes"
-                  :key="item"
+                  class="node-popup-content-tabs__button-item"
+                  :class="{
+                    'node-popup-content-tabs__button-item--active': popupNodeCurrentTab === 0,
+                  }"
+                  @click="popupNodeCurrentTab = 0"
                 >
-                  • Node: {{ item }}
+                  Parents
                 </div>
-                <div v-if="parentNodes.length === 0">
-                  Empty
+                <div
+                  class="node-popup-content-tabs__button-item"
+                  :class="{
+                    'node-popup-content-tabs__button-item--active': popupNodeCurrentTab === 1,
+                  }"
+                  @click="popupNodeCurrentTab = 1"
+                >
+                  Children
                 </div>
               </div>
-              <div
-                ref="popupContentTabChildren"
-                :class="{ active: popupNodeCurrentTab === 1 }"
-              >
+              <div class="node-popup-content-tabs__wrapper">
                 <div
-                  v-for="item in childrenNodes"
-                  :key="item"
+                  class="node-popup-content-tabs__content-item"
+                  :class="{
+                    'node-popup-content-tabs__content-item--active': popupNodeCurrentTab === 0,
+                  }"
                 >
-                  • Node: {{ item }}
+                  <template v-if="parentNodes.length > 0">
+                    <div
+                      v-for="item in parentNodes"
+                      :key="item"
+                      class="pa-1"
+                    >
+                      • Node: {{ item }}
+                    </div>
+                  </template>
+                  <template v-else>
+                    Empty
+                  </template>
                 </div>
-                <div v-if="childrenNodes.length === 0">
-                  Empty
+                <div
+                  class="node-popup-content-tabs__content-item"
+                  :class="{
+                    'node-popup-content-tabs__content-item--active': popupNodeCurrentTab === 1,
+                  }"
+                >
+                  <template v-if="childrenNodes.length > 0">
+                    <div
+                      v-for="item in childrenNodes"
+                      :key="item"
+                      class="pa-1"
+                    >
+                      • Node: {{ item }}
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div>
+                      Empty
+                    </div>
+                  </template>
                 </div>
               </div>
             </div>
           </div>
 
           <div
+            v-if="isVisiblePopup && popupEdgeContent"
             ref="edgePopupContent"
-            class="popupContent"
-            style="text-align: center"
+            class="edge-popup-content"
             :class="{
-              'popupContent--is-active': isPopupShow,
+              'popupContent--is-active': isPopupEdgeShow,
             }"
             tabindex="0"
           >
-            <div style="display: inline-block">
-              <div
-                data-id="sourceName"
-                style="font-weight: bold; float: left"
-              />
-              <div style="float: left; margin-left: 5px; margin-right: 5px">
-                ->
+            <div class="edge-popup-content__wrapper">
+              <div class="edge-popup-content__text edge-popup-content__text--bold">
+                {{ popupEdgeContent.sourceName }} >
               </div>
-              <br>
-              <div
-                data-id="targetName"
-                style="font-weight: bold; float: left"
-              />
-              <br>
-              <div
-                data-id="metricValue"
-                style="font-weight: bold; float: left"
-              />
+              <div class="edge-popup-content__text edge-popup-content__text--bold">
+                {{ popupEdgeContent.targetName }}
+              </div>
+              <div class="edge-popup-content__text">
+                metric:
+                <span class="edge-popup-content__text edge-popup-content__text--bold">
+                  {{ `${popupEdgeContent.metricValue}`.replace('metric:', '') }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -213,6 +253,7 @@ import {
   mdiFitToPageOutline,
   mdiMagnifyMinus,
   mdiClose,
+  mdiEyeOffOutline,
 } from '@mdi/js';
 import GraphClass from '../../js/classes/GraphClass';
 
@@ -261,8 +302,8 @@ export default {
       mdiFitToPageOutline,
       mdiMagnifyMinus,
       mdiClose,
+      mdiEyeOffOutline,
       isEditor: false,
-      isPopupShow: false,
       colors: [
         '#aefaff',
         '#0ab3ff',
@@ -276,7 +317,11 @@ export default {
         { name: 'mouseover', capture: [] },
       ],
       popupNodeCurrentTab: 0,
-      currentNode: null,
+      popupEdgeContent: null,
+      isPopupEdgeShow: false,
+      popupNodeContent: null,
+      isPopupNodeShow: false,
+      isVisiblePopup: true,
     };
   },
   computed: {
@@ -291,14 +336,14 @@ export default {
       return this.idDashFrom;
     },
     parentNodes() {
-      if (!this.currentNode || !this.currentNode.id) return [];
+      if (!this.popupNodeContent?.data?.id) return [];
       return this.dataRestFrom
-        .filter((item) => `${item.relation_id}` === `${this.currentNode.id}`)
+        .filter((item) => `${item.relation_id}` === `${this.popupNodeContent.data.id}`)
         .map((item) => item.node);
     },
     childrenNodes() {
-      if (!this.currentNode || !this.currentNode.id) return [];
-      const node = this.currentNode;
+      if (!this.popupNodeContent?.data?.id) return [];
+      const node = this.popupNodeContent.data;
       if (!node || !node.relation_id) return [];
       // eslint-disable-next-line camelcase
       const relation_ids = [];
@@ -313,6 +358,12 @@ export default {
         .filter((item) => relation_ids.includes(`${item.id}`))
         .map((item) => item.node)
         .filter((value, i, self) => self.indexOf(value) === i);
+    },
+    popupNodePosition() {
+      if (this.popupNodeContent) {
+        return `transform: translate(${this.popupNodeContent.position.x}px, ${this.popupNodeContent.position.y}px)`;
+      }
+      return '';
     },
   },
   watch: {
@@ -341,8 +392,11 @@ export default {
         }
       });
     },
-    currentNode(val) {
-      this.isPopupShow = !!val;
+    popupNodeContent(val) {
+      this.isPopupNodeShow = !!val;
+    },
+    popupEdgeContent(val) {
+      this.isPopupEdgeShow = !!val;
     },
   },
   mounted() {
@@ -473,11 +527,7 @@ export default {
           elem: this.$refs.graph,
           colors: this.colors,
           colorFrom: this.colorFrom,
-          nodePopupContent: this.$refs.nodePopupContent,
-          edgePopupContent: this.$refs.edgePopupContent,
-          popupCallback: (currentNode) => {
-            this.currentNode = currentNode;
-          },
+          popupCallback: this.popupCallback,
         });
         this.graph = Object.freeze(graph);
         this.initMode();
@@ -486,6 +536,16 @@ export default {
     closePopup() {
       this.graph.closeNodePopup();
     },
+    popupCallback(popupContent) {
+      if (popupContent.type === 'node') {
+        this.popupNodeContent = popupContent.content;
+      } else {
+        this.popupEdgeContent = popupContent.content;
+      }
+    },
+    async toggleVisiblePopup() {
+      this.isVisiblePopup = !this.isVisiblePopup;
+    },
   },
 };
 </script>
@@ -493,7 +553,14 @@ export default {
 <style lang="css">
 .ygraph-wrapper .button-block {
   position: absolute;
-  top: 50px;
+  top: 30px;
+  left: 10px;
+  z-index: 1;
+  height: 32px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .ygraph-component-container {
   position: absolute;
@@ -509,72 +576,94 @@ export default {
   width: 300%;
   min-width: 600px;
 }
-.popupContent {
+.node-popup-content, .edge-popup-content {
   position: absolute;
-  display: none;
-  border: 2px solid lightgray;
-  border-radius: 3px;
-  padding: 2px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.85);
-  font-size: 12px;
-  line-height: 1;
-  color: black;
-  opacity: 0; /* will be faded in */
-  transition: opacity 0.2s ease-in;
-  text-align: left;
-  max-width: 250px;
+  left: 0;
+  top: 0;
+  background: var(--secondary_bg);
+  border-radius: 4px;
+  transform: translate(20px, 20px);
+}
+.edge-popup-content {
+  padding: 10px 15px;
+  min-width: 126px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  &__wrapper {
+    text-align: left;
+  }
+  &__text {
+    color: var(--main_text);
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 21px;
+    &--bold {
+      font-weight: 700;
+    }
+  }
   &--is-active {
     display: block;
     opacity: 1;
   }
-  &.popupContentClone {
-    transition: opacity 0.2s ease-out;
+}
+.node-popup-content {
+  color: var(--main_text);
+  width: 250px;
+  padding: 4px;
+  &__header {
+    padding-right: 20px;
+    position: relative;
   }
   &__close-btn {
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 2px;
+    top: 2px;
   }
-
-  &Title {
+  &__title {
     font-size: 1.2rem;
     text-align: center;
-    position: relative;
-    padding-right: 25px;
   }
-
-  &Tabs {
-    padding: 4px;
-    &Header {
-      display: flex;
-      width: 100%;
-      margin-bottom: 8px;
-
-      > div {
-        display: flex;
-        flex: 1;
-        padding: 8px;
-        cursor: pointer;
-        border-bottom: 1px solid transparent;
-        opacity: 0.6;
-        &.active {
-          border-bottom-color: black;
-          opacity: 1;
-        }
-      }
-    }
-
-    > div {
-      display: none;
-      min-width: 200px;
-      &.active {
-        display: block;
-      }
-    }
+  &__description {
+    font-size: 0.9rem;
   }
-
 }
+.node-popup-content-tabs {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  &__button-item {
+    padding: 8px;
+    flex: 1;
+    cursor: pointer;
+    border-bottom: 1px solid var(--secondary_bg);
+    transition: all .2s ease-in-out;
+    &:hover {
+      border-bottom-color: var(--main_text);
+      opacity: .8;
+    }
+    &--active {
+      border-bottom-color: var(--main_text);
+      opacity: 1;
+    }
+  }
+  &__wrapper {
+    display: flex;
+  }
+  &__content-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 4px;
+    display: none;
+    text-align: left;
+    &--active {
+      display: flex;
+    }
+  }
+}
+
 .yfiles-tooltip {
   position: fixed !important;
 }
