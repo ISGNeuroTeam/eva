@@ -329,7 +329,7 @@ export default {
         width,
         height,
         margin,
-        textColor: this.colorFrom.text || 'white',
+        textColor: this.colorFrom.$main_text || 'white',
         colors: this.colors,
         paddings,
         timeAxisStyles,

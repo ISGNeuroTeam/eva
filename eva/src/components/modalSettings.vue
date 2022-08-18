@@ -982,7 +982,7 @@ export default {
         },
         {
           value: 'donat',
-          label: 'Кольцвая диаграмма',
+          label: 'Кольцевая диаграмма',
         },
       ],
       accumulators: [],
