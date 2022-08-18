@@ -13,6 +13,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.104.0]
+
+### Added
+- Added changing the map layer through tokens
+- Added token transfer to datepicker
+
+### Changed
+- Changed popup on graph
+
+### Fixed
+- Fixed transitions on click on html elements
+- Fixed subfilter reset via common button
+- Fixed go event when passing tokens using spaces
+- Extra spaces appear when using tokens
+- Tabs scroll disappeared
+- Fixed, grammatical errors and bush component
+
 ## [1.103.0]
 
 ### Added

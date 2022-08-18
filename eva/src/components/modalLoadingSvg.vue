@@ -17,7 +17,7 @@
           :style="{ color: theme.$main_text }"
           :rules="[
             value => !value || value.size < 1000000 || 'Размер должен быть меньше 1 МБ!',
-            value => !value || value.type === 'image/svg+xml' || 'Не допустимый формат!',
+            value => !value || value.type === 'image/svg+xml' || 'Недопустимый формат!',
           ]"
           accept="image/svg+xml"
           label="Выберите Svg"
