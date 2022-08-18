@@ -124,6 +124,7 @@
                         item.columnColor[text] &&
                         `background-color: ${item.columnColor[text]}`)
                   "
+                  :value="item[text]"
                 >
                   {{ item[text] }}
                 </td>
