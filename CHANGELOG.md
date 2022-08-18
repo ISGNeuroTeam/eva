@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed subfilter reset via common button
 - Fixed go event when passing tokens using spaces
 - Tabs scroll disappeared
+- Fixed, grammatical errors and bush component
 
 ## [1.103.0]
 
