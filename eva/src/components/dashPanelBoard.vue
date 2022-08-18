@@ -560,7 +560,7 @@
             :class="{ showView: lookTockens[i].show }"
             :color="theme.$main_text"
           >
-            {{ tocken.value }}
+            <span class="backlight-tkn">{{ tocken.value }}</span>
           </p>
           <v-tooltip
             bottom
@@ -2070,11 +2070,15 @@ export default {
                   doing = doing.match(/[^[]+(?=\])/g);
 
                   if (doing.length === 1) {
-                    value = [...value, ...doing[0].split(',').map((token) => `$${token}$`)];
+                    value = [...value, ...doing[0].split(',')
+                      .map((token) => `$${token.replace(' ', '')}$`)];
                     prop = [...prop, ...doing[0].split(',')];
+                    prop = prop.map((token) => token.replace(' ', ''));
                   } else {
                     value = [...value, ...doing[0].split(',')];
+                    value = value.map((val) => val.replace(' ', ''));
                     prop = [...prop, ...doing[1].split(',')];
+                    prop = prop.map((token) => token.replace(' ', ''));
                   }
                 } else {
                   prop = [doing[1]];
@@ -2240,5 +2244,10 @@ export default {
 
 .v-tooltip__content {
   width: fit-content;
+}
+.backlight-tkn {
+  white-space: break-spaces;
+  font-family: monospace, Consolas;
+  background-color: #9992;
 }
 </style>

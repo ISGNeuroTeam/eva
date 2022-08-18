@@ -123,6 +123,7 @@
                         item.columnColor[text] &&
                         `background-color: ${item.columnColor[text]}`)
                   "
+                  :value="item[text]"
                 >
                   {{ item[text] }}
                 </td>
@@ -675,7 +676,7 @@ export default {
                     && token.action === 'click'
                     && headers[cellRowIndex] === token.capture
               ) {
-                const value = event.target.textContent;
+                const { value } = event.target.attributes.value;
                 this.$store.commit('setTocken', {
                   token,
                   idDash: this.idDash,
