@@ -160,9 +160,11 @@ export default {
   },
   mounted() {
     this.createGraph();
-    if (this.dataRestFrom.length > 0 && this.graph) {
-      this.graph.drawGraph(this.dataRestFrom);
-    }
+    this.$nextTick(() => {
+      if (this.dataRestFrom.length > 0 && this.graph) {
+        this.graph.drawGraph(this.dataRestFrom);
+      }
+    });
   },
   methods: {
     clickViewMode() {
