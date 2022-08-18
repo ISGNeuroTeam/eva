@@ -560,7 +560,7 @@
             :class="{ showView: lookTockens[i].show }"
             :color="theme.$main_text"
           >
-            {{ tocken.value }}
+            <span class="backlight-tkn">{{ tocken.value }}</span>
           </p>
           <v-tooltip
             bottom
@@ -2244,5 +2244,10 @@ export default {
 
 .v-tooltip__content {
   width: fit-content;
+}
+.backlight-tkn {
+  white-space: break-spaces;
+  font-family: monospace, Consolas;
+  background-color: #9992;
 }
 </style>
