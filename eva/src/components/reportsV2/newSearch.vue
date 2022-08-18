@@ -509,6 +509,8 @@ export default {
     this.$refs.search.$el.addEventListener('keypress', (event) => {
       if (event.ctrlKey && event.keyCode === 10) {
         this.launchSearch();
+      } else if (event.ctrlKey && event.keyCode === 28) {
+        this.addLineBreaks();
       }
     });
     if (this.isDarkTheme) {
@@ -528,10 +530,17 @@ export default {
       }
     },
     addLineBreaks() {
-      this.search.original_otl = this.search.original_otl.replaceAll(
-        '|',
-        '\n|',
-      );
+      if (this.search.original_otl.indexOf(`${/\s*\|/g}`)) {
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          /\s*\|/g,
+          '\n|',
+        );
+      } else {
+        this.search.original_otl = this.search.original_otl.replaceAll(
+          '|',
+          '\n|',
+        );
+      }
       if (this.search.original_otl[0] === '\n') {
         this.search.original_otl = this.search.original_otl.substring(1);
       }

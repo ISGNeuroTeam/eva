@@ -1,3 +1,21 @@
+# [1.104.0] - 2022-08-18
+
+### Added
+- Ability to change the map layer using tokens
+- Added token transfer to datepicker
+
+### Fixed
+- The signature of the edges of the graph does not work out after exiting the move mode
+- Fixed transitions when clicking on html elements on the map
+- Fixed resetting under the filter using the common button
+- Fixed the go event when transferring tokens using spaces
+- When using tokens, additional spaces appear
+- Tabs scroll disappeared
+- Fixed grammatical errors
+- Several signatures are not visible in the gant component along the X axis on a light theme
+- The bush diagram is drawn only after restarting the source data
+- The Ctrl+ hotkey in the code editor does not work
+
 # [1.103.0]
 
 ### Added

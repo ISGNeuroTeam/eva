@@ -1350,7 +1350,7 @@ export default {
 </style>
 <style lang="sass">
 .settings-dash
-  .v-icon:focus::after
+  .v-icon:hover::after
     opacity: 0
 .menu-dropdown
   padding-top: 0
