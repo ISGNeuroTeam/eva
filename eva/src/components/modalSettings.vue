@@ -314,16 +314,6 @@
                       </div>
                     </template>
                   </v-file-input>
-                  <!--                  <button
-                    v-show="!!csvgBg"
-                    class="modal-settings__clear-file-input-btn"
-                  >
-                    <v-icon
-                      @click="csvgBg = null"
-                    >
-                      {{ mdiClose }}
-                    </v-icon>
-                  </button>-->
                 </div>
               </div>
             </div>
@@ -1070,7 +1060,7 @@ export default {
         },
         {
           value: 'donat',
-          label: 'Кольцвая диаграмма',
+          label: 'Кольцевая диаграмма',
         },
       ],
       accumulators: [],

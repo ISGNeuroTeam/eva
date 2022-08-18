@@ -168,4 +168,7 @@
   .v-file-input .v-file-input__text {
     color: var(--main_text);
   }
+  .v-icon.v-icon::after {
+    display: none;
+  }
 }
