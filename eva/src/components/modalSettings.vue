@@ -1327,7 +1327,7 @@ export default {
         }
       }
       if (this.element.indexOf('csvg') !== -1) {
-        this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
+        this.$set(this.options, 'tooltip', structuredClone(this.tooltip));
         await this.getBase64(this.csvgBg).then((result) => {
           this.$set(this.options, 'backgroundImage', result);
           this.$set(this.options, 'backgroundImageName', this.csvgBg?.name || '');
@@ -1335,9 +1335,7 @@ export default {
         });
       }
       if (this.element.indexOf('piechart') !== -1) {
-        this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation),
-        );
+        this.options.metricsRelation = structuredClone(this.metricsRelation);
         if (this.colorsPie.nametheme) {
           this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
@@ -1358,7 +1356,7 @@ export default {
             this.$set(this.colorsPie, 'theme', this.colorsPie.nametheme);
           }
           this.$set(this.options, 'themes', this.themes);
-          this.them = JSON.parse(JSON.stringify(this.themes));
+          this.them = structuredClone(this.themes);
         }
         this.$set(this.options, 'pieType', this.pieType);
       }
@@ -1497,7 +1495,7 @@ export default {
     // если нажали на отмену создания
     checkOnCancel() {
       if (this.isDelete) {
-        this.themes = JSON.parse(JSON.stringify(this.them));
+        this.themes = structuredClone(this.them);
         this.$set(this.options, 'themes', this.themes);
         this.$store.commit('setState', [
           {
@@ -1554,7 +1552,7 @@ export default {
     },
     addMetrics() {
       this.isChanged = true;
-      const arr = JSON.parse(JSON.stringify(this.metrics));
+      const arr = structuredClone(this.metrics);
       arr.push({
         name: '',
         type: '',
@@ -1663,16 +1661,18 @@ export default {
               // Настройка указана - получаем значение
               if (item === 'tooltip') {
                 this.tooltip = {};
-                this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([
+                this.$set(this.tooltip, 'texts', structuredClone([
                   ...[],
-                  ...options[item].texts])));
-                this.$set(this.tooltip, 'links', JSON.parse(JSON.stringify([
+                  ...options[item].texts,
+                ]));
+                this.$set(this.tooltip, 'links', structuredClone([
                   ...[],
-                  ...options[item].links])));
-                this.$set(this.tooltip, 'buttons', JSON.parse(JSON.stringify([
+                  ...options[item].links,
+                ]));
+                this.$set(this.tooltip, 'buttons', structuredClone([
                   ...[],
                   ...options[item].buttons,
-                ])));
+                ]));
               } else if (item === 'backgroundImage') {
                 this.getFileFromBase64(
                   options[item],
@@ -1682,7 +1682,7 @@ export default {
                   this.csvgBg = result;
                 });
               } else if (item === 'metrics') {
-                this.metrics = JSON.parse(JSON.stringify(options[item]));
+                this.metrics = structuredClone(options[item]);
               } else if (item === 'metricsRelation') {
                 this.metricsRelation = {};
                 this.$set(this.metricsRelation, 'metrics', [
@@ -1705,7 +1705,7 @@ export default {
               } else if (item === 'themes') {
                 this.themesArr = Object.keys(options[item]);
                 this.themes = options[item];
-                this.them = JSON.parse(JSON.stringify(this.themes));
+                this.them = structuredClone(this.themes);
               } else if (item === 'titles') {
                 let val = options[item];
                 if (!val) {
