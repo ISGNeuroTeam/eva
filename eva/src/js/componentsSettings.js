@@ -770,6 +770,15 @@ export default {
         return [...items, ...metrics];
       },
     },
+    {
+      optionGroup: 'scatterPlotGroup',
+      option: 'legend',
+      description: 'Линия регрессии для группы',
+      elem: 'select-checkbox',
+      items() {
+        return this.$store.state[this.idDash][this.element]?.options?.group || [];
+      },
+    },
 
     // dashSingleValue
     {

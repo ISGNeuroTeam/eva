@@ -459,6 +459,7 @@ export default class ChartClass {
       .reverse()
       .forEach((metric) => {
         this.addScatterDots(chartGroup, metric, height, num);
+        this.addScatterLine(chartGroup, metric);
       });
 
     this.addCrossSelection(chartGroup, groupHeight);
@@ -658,6 +659,26 @@ export default class ChartClass {
       this.svgGroups.selectAll(`.metric-${item.n}, .axis-y-${item.n}`).attr('opacity', 1);
     } else {
       this.svgGroups.selectAll('.metric, .axis-y').attr('opacity', null);
+    }
+  }
+
+  // TODO: Доработать
+  test(metric) {
+    if (metric) {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', 0.3);
+      this.svgGroups.selectAll(`.dot-${metric.name}, .axis-y-${metric.name}`).attr('opacity', 1);
+    } else {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', null);
+    }
+  }
+
+  // TODO: Доработать
+  test2(metric) {
+    if (metric) {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('display', 'none');
+      this.svgGroups.selectAll(`.dot-${metric.name}, .axis-y-${metric.name}`).attr('display', 'block');
+    } else {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', null);
     }
   }
 
@@ -956,7 +977,7 @@ export default class ChartClass {
       .data(this.data)
       .enter()
       .append('circle')
-      .attr('class', 'dot')
+      .attr('class', (d) => `dot dot-${d[metric.metricGroup]}`)
       .attr('cx', (d) => this.x(d[this.xMetric]))
       .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
       .attr('r', metric.dotSize || 3)
@@ -976,6 +997,31 @@ export default class ChartClass {
       .on('click', (d) => {
         this.clickChart(d);
       });
+  }
+
+  // TODO: Доработать
+  addScatterLine(chartGroup, metric) {
+    const color = d3.scaleOrdinal().range(d3.schemeSet2);
+    const coordinates = this.data.reduce((acc, item) => {
+      if (!acc[item.group_numb]) {
+        acc[item.group_numb] = [];
+      }
+      acc[item.group_numb].push(item);
+      return acc;
+    }, {});
+    const test = Object.values(coordinates);
+    chartGroup.append('g')
+      .selectAll('line')
+      .data(test)
+      .enter()
+      .append('line')
+      .attr('class', 'line')
+      .attr('x1', (d) => this.x(d[0][this.xMetric]))
+      .attr('x2', (d) => this.x(d[d.length - 1][this.xMetric]))
+      .attr('y1', (d) => this.y[metric.yAxisLink || metric.name](d[0].y_reg))
+      .attr('y2', (d) => this.y[metric.yAxisLink || metric.name](d[d.length - 1].y_reg))
+      .style('stroke-dasharray', '100')
+      .style('stroke', (d) => color(d[0][metric.metricGroup]));
   }
 
   setLineDotPosition(lineXPos, lineYPos, num) {
