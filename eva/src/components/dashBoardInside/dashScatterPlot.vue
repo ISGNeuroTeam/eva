@@ -10,13 +10,13 @@
       <div
         ref="legend"
         class="legend"
-        @mouseleave="chart.highlightMetric(null)"
+        @mouseleave="chart.test(null)"
       >
         <div
           v-for="(metric, nMetric) in legendItems"
           :key="metric.name"
-          @mouseenter="chart.highlightMetric(metric)"
-          @click="openSettingsForMetric(metric, nGroup, nMetric)"
+          @mouseenter="chart.test(metric)"
+          @click="chart.test2(metric, nGroup, nMetric)"
         >
           <div
             class="circle"
@@ -84,6 +84,7 @@ export default {
       actions: [
         { name: 'click', capture: [] },
       ],
+      chart: null,
     };
   },
   computed: {
@@ -152,6 +153,16 @@ export default {
     dashStore() {
       const { id, idDash } = this;
       return this.$store.state[idDash][id];
+    },
+    getOptions() {
+      if (!this.dashStore?.options?.group) {
+        this.$store.commit('setState', [{
+          object: this.dashStore.options,
+          prop: 'group',
+          value: this.groups,
+        }]);
+      }
+      return this.dashStore.options;
     },
     options() {
       return {
