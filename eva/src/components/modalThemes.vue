@@ -149,7 +149,14 @@
             outlined
             hide-details
             @input="isChanged = true"
+            @focus="clearError"
           />
+          <div
+            v-show="errorTitle"
+            class="error-message"
+          >
+            {{ errorMessages }}
+          </div>
           <div class="helper-title">
             <p @click="mode = 'manual'">
               Руководство по настройке темы
@@ -502,6 +509,8 @@ export default {
       isChanged: false,
       isConfirmModal: false,
       newFields: null,
+      errorTitle: false,
+      errorMessages: '',
     };
   },
   computed: {
@@ -641,6 +650,11 @@ export default {
             method: 'POST',
             body: JSON.stringify(themeObject),
           });
+          if (res.status === 409) {
+            this.errorTitle = true;
+            this.errorMessages = 'Такое имя уже занято!';
+            return;
+          }
           if (res.status !== 200) return;
           const themeData = await res.json();
           const content = JSON.parse(themeData);
@@ -705,6 +719,10 @@ export default {
       this.newTitle = '';
       this.imagePreview = null;
       this.fields = this.defaultFieldsValue;
+    },
+    clearError() {
+      this.errorTitle = false;
+      this.errorMessages = '';
     },
   },
 };
