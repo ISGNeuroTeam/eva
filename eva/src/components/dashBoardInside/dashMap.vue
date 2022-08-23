@@ -113,6 +113,7 @@ export default {
       actions: [
         { name: 'refresh', capture: [] },
         { name: 'button', capture: [] },
+        { name: 'click', capture: [] },
       ],
       showLegend: false,
       osmserver: null,
@@ -183,13 +184,13 @@ export default {
     getLibrary() {
       return this.dashFromStore.options.primitivesLibrary;
     },
-    getTockens() {
+    getTokens() {
       return this.$store.state[this.idDash].tockens;
     },
     getServer() {
       let OSM = this.getOptions.osmserver;
       if (OSM.indexOf('$$')) {
-        this.getTockens.forEach((token) => {
+        this.getTokens.forEach((token) => {
           OSM = OSM.replaceAll(`$${token.name}$`, token.value);
         });
         const tile = { tile: [] };
@@ -236,7 +237,7 @@ export default {
     // },
     'getOptions.selectedLayer': {
       handler(val, old) {
-        if (JSON.stringify(val) !== JSON.stringify(old) && !old) {
+        if (JSON.stringify(val) !== JSON.stringify(old) && !old && this.map) {
           this.map.remove();
           this.init();
         }
@@ -379,6 +380,19 @@ export default {
         });
       }
     },
+    updateTokenOnClickAction(value) {
+      if (this.getTokens?.length) {
+        const filteredTokenKeys = structuredClone(this.getTokens).filter((token) => token.action === 'click');
+        filteredTokenKeys.forEach((token) => {
+          this.$store.commit('setTocken', {
+            token,
+            idDash: this.idDash,
+            value: value[token.capture],
+            store: this.$store,
+          });
+        });
+      }
+    },
     updateToken(value) {
       const tokens = this.$store.state[this.idDash]?.tockens || {};
       Object.keys(tokens).forEach((i) => {
@@ -419,7 +433,7 @@ export default {
       });
     },
     createTokens() {
-      const captures = ['top_left_point', 'bottom_right_point', 'zoom_level'];
+      const captures = ['top_left_point', 'bottom_right_point', 'zoom_level', 'dash_id'];
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], 'capture', captures);
       });
@@ -452,8 +466,9 @@ export default {
             this.map.drawObjects({
               dataRest,
               pipelineDataDictionary: this.pipelineDataDictionary,
-              callback: (id) => {
-                this.setClick(id);
+              callback: (id, element) => {
+                this.updateTokenOnClickAction(element);
+                this.setClick(id, element);
               },
             });
             if (this.map) {
@@ -589,7 +604,7 @@ export default {
       });
     },
 
-    setClick(tokenValue) {
+    setClick(tokenValue, element) {
       const events = this.getEvents({
         event: 'onclick',
         partelement: 'empty',
@@ -598,6 +613,7 @@ export default {
         events.forEach((item) => {
           if (item.action === 'go') {
             item.value[0] = tokenValue;
+            item.dashId = element.dashId;
             this.$store.dispatch('letEventGo', {
               event: item,
               id: this.element,
