@@ -670,9 +670,9 @@ export default {
                 token.elem === this.id
                     && token.action === 'click'
               ) {
-                const value = [...event.target.parentElement.childNodes]
+                const { value } = [...event.target.parentElement.childNodes]
                   .find((element) => element.dataset.type === token.capture)
-                  .textContent;
+                  .attributes.value;
                 this.$store.commit('setTocken', {
                   token,
                   idDash: this.idDash,
