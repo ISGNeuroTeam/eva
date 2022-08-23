@@ -1581,6 +1581,10 @@ export default {
         }, 2000);
         return;
       }
+      // Проверяем на наличие корректного значения по-умолчанию для поля dash_id
+      if (!this.checkDefaultValueToken(index)) {
+        return;
+      }
 
       // создаем объект нашего сохраняемого токена считывая имя элемент
       // и остальные поля из нужно строки
@@ -1651,6 +1655,31 @@ export default {
         };
         this.uploadTokens();
       }
+    },
+    checkDefaultValueToken(index) {
+      const token = {
+        capture: this.tokens[index]?.capture || this.newCapture,
+        element: this.tokens[index]?.element || this.newElem,
+        defaultValue: this.tokens[index]?.defaultValue || this.newTockenDop.defaultValue,
+      };
+      if (
+        token.capture === 'dash_id'
+          && (token.element.indexOf('map') !== -1)
+          && (!token.defaultValue || Number.isNaN(+token.defaultValue))
+      ) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        const height = this.$refs.blockTocken.clientHeight;
+
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Некорректное значение по-умолчанию. Данное поле является обязательным при использовании свойства dash_id.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return false;
+      }
+      return true;
     },
     deleteTocken(name) {
       // удаляем токен
