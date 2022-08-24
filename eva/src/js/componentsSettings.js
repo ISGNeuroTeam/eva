@@ -292,6 +292,7 @@ export default {
       'xMetric',
       'yMetric',
       'metricGroup',
+      'scatterPlotLegend',
     ],
     constructorSchemes: ['visible', 'level', 'pinned'],
   },
@@ -772,7 +773,7 @@ export default {
     },
     {
       optionGroup: 'scatterPlotGroup',
-      option: 'legend',
+      option: 'scatterPlotLegend',
       description: 'Линия регрессии для группы',
       elem: 'select-checkbox',
       items() {
