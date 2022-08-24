@@ -10,13 +10,13 @@
       <div
         ref="legend"
         class="legend"
-        @mouseleave="chart.test(null)"
+        @mouseleave="chart.highlightMetricDot(null, isActive)"
       >
         <div
-          v-for="(metric, nMetric) in legendItems"
+          v-for="metric in legendItems"
           :key="metric.name"
-          @mouseenter="chart.test(metric)"
-          @click="chart.test2(metric, nGroup, nMetric)"
+          @mouseenter="chart.highlightMetricDot(metric, isActive)"
+          @click="chart.highlightMetricDot(metric, isActive = !isActive)"
         >
           <div
             class="circle"
@@ -85,6 +85,7 @@ export default {
         { name: 'click', capture: [] },
       ],
       chart: null,
+      isActive: false,
     };
   },
   computed: {
@@ -154,15 +155,13 @@ export default {
       const { id, idDash } = this;
       return this.$store.state[idDash][id];
     },
-    getOptions() {
-      if (!this.dashStore?.options?.group) {
-        this.$store.commit('setState', [{
-          object: this.dashStore.options,
-          prop: 'group',
-          value: this.groups,
-        }]);
-      }
-      return this.dashStore.options;
+    group() {
+      this.$store.commit('setState', [{
+        object: this.dashStore.options,
+        prop: 'group',
+        value: this.groups,
+      }]);
+      return this.dashStore.options.group;
     },
     options() {
       return {
@@ -184,6 +183,9 @@ export default {
         ...action,
         capture: this.metrics,
       }));
+    },
+    linesRegression() {
+      return this.options.scatterPlotLegend || [];
     },
   },
   watch: {
@@ -249,11 +251,23 @@ export default {
       const { legend, svgContainer } = this.$refs;
       const { width, height } = this.box;
       const topOffset = legend.offsetHeight;
-      this.chart = new ChartClass(svgContainer, width, height - topOffset, this.chartOptions);
+      this.chart = new ChartClass(
+        svgContainer,
+        width,
+        height - topOffset,
+        this.chartOptions,
+        this.linesRegression,
+      );
       this.chart.onClick((d) => this.onClickDot(d));
     },
     updateData() {
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
+      this.chart.update(
+        this.metricsByGroup,
+        this.xAxisSettings,
+        this.dataRestFrom,
+        this.linesRegression,
+        this.xMetric,
+      );
       this.$nextTick(() => {
         this.updateBox();
       });

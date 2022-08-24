@@ -1583,7 +1583,7 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
-              } else if (item === 'ListDS') {
+              } else if (item === 'ListDS' || item === 'scatterPlotLegend') {
                 localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];

@@ -5,6 +5,7 @@ export default class ChartClass {
 
   options = {
     groupsTopOffset: 14,
+    linesRegression: null,
     xAxis: {
       type: 'time', // linear, time, log, point, band
       timeFormat: null, // %Y-%m-%d %H:%M:%S
@@ -57,9 +58,10 @@ export default class ChartClass {
 
   xMinMax = [];
 
-  constructor(svgContainer, width, height, options) {
+  constructor(svgContainer, width, height, options, linesRegression) {
     this.id = ChartClass.objId += 1;
     this.options = ChartClass.mergeDeep(this.options, options);
+    this.options.linesRegression = linesRegression;
     this.svgContainer = svgContainer;
     this.box = { width, height };
     this.updateBox(width, height);
@@ -534,8 +536,15 @@ export default class ChartClass {
    * }
    * @param data
    * @param xMetric
+   * @param linesRegression
    */
-  update(metricsByGroup, xAxisSettings, data, xMetric = '_time') {
+  update(
+    metricsByGroup,
+    xAxisSettings,
+    data,
+    linesRegression,
+    xMetric = '_time',
+  ) {
     this.resetTmpData();
     const color = d3.scaleOrdinal().range(d3.schemeSet2);
     this.xMetric = xMetric;
@@ -543,6 +552,7 @@ export default class ChartClass {
       ...this.options.xAxis,
       ...xAxisSettings,
     };
+    this.options.linesRegression = linesRegression;
 
     // recalc options
     if (this.options.xAxis.textRotate !== undefined) {
@@ -615,6 +625,14 @@ export default class ChartClass {
     return box.width - maxYLeftAxisWidth - maxYRightAxisWidth;
   }
 
+  set linesRegression(val) {
+    this.options.linesRegression = val;
+  }
+
+  get linesRegression() {
+    return this.options.linesRegression;
+  }
+
   updateMaxYRightAxisWidth(width) {
     if (this.maxYRightAxisWidth < width) {
       this.maxYRightAxisWidth = width;
@@ -663,18 +681,12 @@ export default class ChartClass {
   }
 
   // TODO: Доработать
-  test(metric) {
-    if (metric) {
+  highlightMetricDot(metric, isActive) {
+    if (metric && !isActive) {
       this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', 0.3);
+      this.svgGroups.selectAll('.dot, .axis-y').attr('display', 'block');
       this.svgGroups.selectAll(`.dot-${metric.name}, .axis-y-${metric.name}`).attr('opacity', 1);
-    } else {
-      this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', null);
-    }
-  }
-
-  // TODO: Доработать
-  test2(metric) {
-    if (metric) {
+    } else if (metric && isActive) {
       this.svgGroups.selectAll('.dot, .axis-y').attr('display', 'none');
       this.svgGroups.selectAll(`.dot-${metric.name}, .axis-y-${metric.name}`).attr('display', 'block');
     } else {
@@ -1009,10 +1021,10 @@ export default class ChartClass {
       acc[item.group_numb].push(item);
       return acc;
     }, {});
-    const test = Object.values(coordinates);
+    const drawingLinesRegression = this.options.linesRegression.map((item) => coordinates[item]);
     chartGroup.append('g')
       .selectAll('line')
-      .data(test)
+      .data(drawingLinesRegression)
       .enter()
       .append('line')
       .attr('class', 'line')
@@ -1020,7 +1032,6 @@ export default class ChartClass {
       .attr('x2', (d) => this.x(d[d.length - 1][this.xMetric]))
       .attr('y1', (d) => this.y[metric.yAxisLink || metric.name](d[0].y_reg))
       .attr('y2', (d) => this.y[metric.yAxisLink || metric.name](d[d.length - 1].y_reg))
-      .style('stroke-dasharray', '100')
       .style('stroke', (d) => color(d[0][metric.metricGroup]));
   }
 
