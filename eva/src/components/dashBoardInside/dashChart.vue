@@ -166,12 +166,13 @@ export default {
       );
     },
     metrics() {
-      return [...this.firstDataRowMetricList];
+      return [...this.firstDataRowMetricList.filter((item) => item !== this.xMetric)];
     },
     xAxisSettings() {
       if (this.options.xAxis) {
         return {
           ...this.options.xAxis,
+          allMetrics: this.firstDataRowMetricList,
         };
       }
       const {
@@ -187,6 +188,7 @@ export default {
         timeFormat,
         textRotate: +xAxisCaptionRotate || -45,
         barplotType: barplotstyle || 'divided',
+        allMetrics: this.firstDataRowMetricList,
       };
     },
     metricsByGroup() {
@@ -209,7 +211,8 @@ export default {
       }
 
       // add new metrics config
-      const newMetrics = this.metrics.filter((i) => existsMetrics.indexOf(i) < 0);
+      const newMetrics = this.metrics
+        .filter((i) => existsMetrics.indexOf(i) < 0/* && i !== this.xMetric*/);
       if (newMetrics.length) {
         metricsByGroup.push([]);
         newMetrics.forEach((metricName, nN) => {

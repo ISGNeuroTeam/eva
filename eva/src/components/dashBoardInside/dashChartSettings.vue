@@ -420,7 +420,7 @@
                     dense
                     outlined
                     hide-details
-                    :items="[...metricsList]"
+                    :items="xAxis.allMetrics"
                     value="value"
                   />
                 </div>
@@ -680,6 +680,7 @@ export default {
       textAnchor: 'end', // start, end
       ticksEnabled: false,
       ticks: 10,
+      allMetrics: [],
     },
     colorPickerInputMode: false,
     openXAxisPanel: null,
