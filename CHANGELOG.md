@@ -9,16 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added the ability to follow various links from chamomile petals on the geo-dashboard
+- Added the ability to put a bitmap image file under SVG
 
 ### Changed
 
 ### Fixed
+- Fixed select, set token on click
 
 ## [1.104.0]
 
 ### Added
 - Added changing the map layer through tokens
 - Added token transfer to datepicker
+- Added the ability to get the value of the column selected in the settings when clicking on a table row
 
 ### Changed
 - Changed popup on graph
