@@ -252,7 +252,7 @@ export default {
       'columnCount',
       'tileStyle',
     ],
-    csvg: ['tooltip'],
+    csvg: ['tooltip', 'backgroundImage'],
     ygraph: [],
     bush: [],
     map: ['osmserver', 'primitivesLibrary'],
