@@ -67,6 +67,7 @@
             class="select theme--dark"
             label="Значение"
             @change="setTocken"
+            @click="setTocken"
           >
             <template
               v-if="multiple"
