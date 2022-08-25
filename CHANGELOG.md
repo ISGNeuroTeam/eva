@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed select, set token on click
+- Multiline. Rounding stopped working for data signing
 - Multiline. The first metric for the X-axis is not perceived
 
 ## [1.104.0]
