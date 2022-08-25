@@ -344,7 +344,7 @@ class MapClass {
         interactive: true,
       })
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, element);
       });
     this.layerGroup[element.type].addLayer(marker);
   }
@@ -368,7 +368,7 @@ class MapClass {
         className: 'leaftet-hover',
       })
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, lib);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
