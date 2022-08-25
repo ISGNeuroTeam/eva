@@ -189,7 +189,7 @@ export default {
     },
     getServer() {
       let OSM = this.getOptions.osmserver;
-      if (OSM.indexOf('$$')) {
+      if (OSM.indexOf('$$' !== -1)) {
         this.getTokens.forEach((token) => {
           OSM = OSM.replaceAll(`$${token.name}$`, token.value);
         });
