@@ -185,6 +185,20 @@
                     class="subnumber"
                     @change="isChanged = true"
                   />
+                  <v-select
+                    v-else-if="field.elem === 'select-checkbox'"
+                    v-model="options[field.option]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    multiple
+                    class="subnumber"
+                    :attach="true"
+                    @change="isChanged = true"
+                  />
                   <!-- elem: checkbox-list -->
                   <div
                     v-else-if="field.elem === 'checkbox-list'"
@@ -1716,7 +1730,7 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
-              } else if (item === 'ListDS') {
+              } else if (item === 'ListDS' || item === 'scatterPlotLegend') {
                 localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];
