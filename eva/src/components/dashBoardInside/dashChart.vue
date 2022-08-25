@@ -211,8 +211,7 @@ export default {
       }
 
       // add new metrics config
-      const newMetrics = this.metrics
-        .filter((i) => existsMetrics.indexOf(i) < 0/* && i !== this.xMetric*/);
+      const newMetrics = this.metrics.filter((i) => existsMetrics.indexOf(i) < 0);
       if (newMetrics.length) {
         metricsByGroup.push([]);
         newMetrics.forEach((metricName, nN) => {
