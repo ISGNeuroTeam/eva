@@ -127,7 +127,7 @@
         <span>В начало</span>
       </v-tooltip>
       <draggable
-        ref="tab-panel"
+        ref="tabPanel"
         v-model="tabsOrder"
         :disabled="!mode"
         group="tabs"
@@ -228,7 +228,7 @@
             v-show="rightDots"
             class="dots"
             v-on="on"
-            @click="moveScroll($refs['tab-panel'].scrollWidth)"
+            @click="moveScroll($refs.tabPanel.$el.scrollWidth)"
           >
             ...
           </div>
@@ -513,7 +513,7 @@ export default {
     this.calcSizeCell();
     this.addScrollListener();
 
-    this.$refs['tab-panel'].onwheel = this.scroll;
+    this.$refs.tabPanel.$el.onwheel = this.scroll;
     this.checkTabOverflow();
     window.onresize = this.checkTabOverflow;
   },
@@ -592,16 +592,16 @@ export default {
     scroll(event) {
       event.preventDefault();
       // eslint-disable-next-line operator-assignment
-      this.$refs['tab-panel'].scrollLeft = this.$refs['tab-panel'].scrollLeft - event.wheelDeltaY;
+      this.$refs.tabPanel.$el.scrollLeft = this.$refs.tabPanel.$el.scrollLeft - event.wheelDeltaY;
       this.checkTabOverflow();
     },
     moveScroll(value) {
-      this.$refs['tab-panel'].scrollLeft = value;
+      this.$refs.tabPanel.$el.scrollLeft = value;
       this.checkTabOverflow();
     },
     checkTabOverflow() {
       setTimeout(() => {
-        const { clientWidth, scrollWidth, scrollLeft } = this.$refs['tab-panel'];
+        const { clientWidth, scrollWidth, scrollLeft } = this.$refs.tabPanel.$el;
         this.leftDots = scrollLeft > 0;
         if (clientWidth < scrollWidth) {
           this.rightDots = clientWidth + scrollLeft < scrollWidth + 5
