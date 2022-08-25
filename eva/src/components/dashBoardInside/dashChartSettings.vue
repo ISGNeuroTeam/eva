@@ -420,7 +420,7 @@
                     dense
                     outlined
                     hide-details
-                    :items="[{text: '_time', value: '_time'}, ...metricsList]"
+                    :items="[...metricsList]"
                     value="value"
                   />
                 </div>

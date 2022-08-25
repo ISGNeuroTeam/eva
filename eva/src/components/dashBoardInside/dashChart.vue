@@ -166,9 +166,7 @@ export default {
       );
     },
     metrics() {
-      const metrics = [...this.firstDataRowMetricList];
-      metrics.splice(0, 1);
-      return metrics;
+      return [...this.firstDataRowMetricList];
     },
     xAxisSettings() {
       if (this.options.xAxis) {
@@ -182,6 +180,7 @@ export default {
         barplotstyle,
       } = this.options;
       return {
+        xMetric: this.xMetric,
         type: (this.options.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
           ? 'linear' // linear, time, - log, point, band
           : 'time',
