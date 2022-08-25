@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed select, set token on click
+- Multiline. Rounding stopped working for data signing
 
 ## [1.104.0]
 
