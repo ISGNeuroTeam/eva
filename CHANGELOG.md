@@ -8,11 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added the ability to follow various links from chamomile petals on the geo-dashboard
 - Added the ability to put a bitmap image file under SVG
+- Added regression line for scatter plot
+- Added theme save
 
 ### Changed
 
 ### Fixed
+- Fixed select, set token on click
+- Multiline. The first metric for the X-axis is not perceived
 
 ## [1.104.0]
 
