@@ -680,7 +680,6 @@ export default class ChartClass {
     }
   }
 
-  // TODO: Доработать
   highlightMetricDot(metric, isActive) {
     if (metric && !isActive) {
       this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', 0.3);
@@ -1011,7 +1010,6 @@ export default class ChartClass {
       });
   }
 
-  // TODO: Доработать
   addScatterLine(chartGroup, metric) {
     const color = d3.scaleOrdinal().range(d3.schemeSet2);
     const coordinates = this.data.reduce((acc, item) => {
