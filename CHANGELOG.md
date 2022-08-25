@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added the ability to put a bitmap image file under SVG
+- Added select, set token on click
 
 ### Changed
 
