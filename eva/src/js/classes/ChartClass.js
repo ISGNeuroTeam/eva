@@ -722,7 +722,6 @@ export default class ChartClass {
     this.tooltip
       .html(
         [
-          { name: this.xMetric },
           ...this.metrics,
         ]
           .reduce((prev, cur) => {
