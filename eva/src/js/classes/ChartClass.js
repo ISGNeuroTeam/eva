@@ -542,8 +542,8 @@ export default class ChartClass {
     metricsByGroup,
     xAxisSettings,
     data,
-    linesRegression,
     xMetric = '_time',
+    linesRegression = null,
   ) {
     this.resetTmpData();
     const color = d3.scaleOrdinal().range(d3.schemeSet2);
