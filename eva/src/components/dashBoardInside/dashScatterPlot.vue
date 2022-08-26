@@ -265,8 +265,8 @@ export default {
         this.metricsByGroup,
         this.xAxisSettings,
         this.dataRestFrom,
-        this.linesRegression,
         this.xMetric,
+        this.linesRegression,
       );
       this.$nextTick(() => {
         this.updateBox();
