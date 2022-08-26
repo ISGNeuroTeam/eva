@@ -5,12 +5,23 @@
   >
     <div
       ref="svgBlock"
-      :style="customStyle"
+      :style="{
+        ...customStyle,
+        width: svgStyleWidth,
+        height: svgStyleHeight
+      }"
       :class="customClass"
       v-bind="$attrs"
       class="dash-csvg"
       tabindex="0"
     >
+      <img
+        v-if="getOptions.backgroundImage"
+        class="dash-csvg__bg-image"
+        :width="svgStyleWidth"
+        :height="svgStyleHeight"
+        :src="getOptions.backgroundImage"
+      >
       <div
         v-show="noMsg === 1"
         ref="csvg"

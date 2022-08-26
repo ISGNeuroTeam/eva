@@ -10,13 +10,13 @@
       <div
         ref="legend"
         class="legend"
-        @mouseleave="chart.highlightMetric(null)"
+        @mouseleave="chart.highlightMetricDot(null, isActive)"
       >
         <div
-          v-for="(metric, nMetric) in legendItems"
+          v-for="metric in legendItems"
           :key="metric.name"
-          @mouseenter="chart.highlightMetric(metric)"
-          @click="openSettingsForMetric(metric, nGroup, nMetric)"
+          @mouseenter="chart.highlightMetricDot(metric, isActive)"
+          @click="chart.highlightMetricDot(metric, isActive = !isActive)"
         >
           <div
             class="circle"
@@ -84,6 +84,8 @@ export default {
       actions: [
         { name: 'click', capture: [] },
       ],
+      chart: null,
+      isActive: false,
     };
   },
   computed: {
@@ -153,6 +155,14 @@ export default {
       const { id, idDash } = this;
       return this.$store.state[idDash][id];
     },
+    group() {
+      this.$store.commit('setState', [{
+        object: this.dashStore.options,
+        prop: 'group',
+        value: this.groups,
+      }]);
+      return this.dashStore.options.group;
+    },
     options() {
       return {
         ...this.dashStore.options,
@@ -173,6 +183,9 @@ export default {
         ...action,
         capture: this.metrics,
       }));
+    },
+    linesRegression() {
+      return this.options.scatterPlotLegend || [];
     },
   },
   watch: {
@@ -238,11 +251,23 @@ export default {
       const { legend, svgContainer } = this.$refs;
       const { width, height } = this.box;
       const topOffset = legend.offsetHeight;
-      this.chart = new ChartClass(svgContainer, width, height - topOffset, this.chartOptions);
+      this.chart = new ChartClass(
+        svgContainer,
+        width,
+        height - topOffset,
+        this.chartOptions,
+        this.linesRegression,
+      );
       this.chart.onClick((d) => this.onClickDot(d));
     },
     updateData() {
-      this.chart.update(this.metricsByGroup, this.xAxisSettings, this.dataRestFrom, this.xMetric);
+      this.chart.update(
+        this.metricsByGroup,
+        this.xAxisSettings,
+        this.dataRestFrom,
+        this.xMetric,
+        this.linesRegression,
+      );
       this.$nextTick(() => {
         this.updateBox();
       });
