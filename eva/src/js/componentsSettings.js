@@ -252,7 +252,7 @@ export default {
       'columnCount',
       'tileStyle',
     ],
-    csvg: ['tooltip'],
+    csvg: ['tooltip', 'backgroundImage'],
     ygraph: [],
     bush: [],
     map: ['osmserver', 'primitivesLibrary'],
@@ -292,6 +292,7 @@ export default {
       'xMetric',
       'yMetric',
       'metricGroup',
+      'scatterPlotLegend',
     ],
     constructorSchemes: ['visible', 'level', 'pinned'],
   },
@@ -768,6 +769,15 @@ export default {
         ];
         const metrics = this.$store.state[this.idDash][this.element]?.lastMetrics || [];
         return [...items, ...metrics];
+      },
+    },
+    {
+      optionGroup: 'scatterPlotGroup',
+      option: 'scatterPlotLegend',
+      description: 'Линия регрессии для группы',
+      elem: 'select-checkbox',
+      items() {
+        return this.$store.state[this.idDash][this.element]?.options?.group || [];
       },
     },
 
