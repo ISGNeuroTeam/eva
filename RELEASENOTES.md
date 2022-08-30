@@ -1,3 +1,49 @@
+# [1.105.0] - 2022-08-25
+
+### Added
+- Added the ability to get the value of the column selected in the settings when clicking on a table row
+- Added the ability to follow various links from chamomile petals on the geo-dashboard
+- Added the ability to put a bitmap image file under SVG
+- Added regression line for scatter plot
+- Saving/loading a theme as a file
+- The ability to set a token by clicking through the drop-down list
+
+### Fixed
+- Multiline. Rounding stopped working for data signing
+- Multiline. The first metric for the X-axis is not perceived
+
+# [1.104.0] - 2022-08-18
+
+### Added
+- Ability to change the map layer using tokens
+- Added token transfer to datepicker
+
+### Fixed
+- The signature of the edges of the graph does not work out after exiting the move mode
+- Fixed transitions when clicking on html elements on the map
+- Fixed resetting under the filter using the common button
+- Fixed the go event when transferring tokens using spaces
+- When using tokens, additional spaces appear
+- Tabs scroll disappeared
+- Fixed grammatical errors
+- Several signatures are not visible in the gant component along the X axis on a light theme
+- The bush diagram is drawn only after restarting the source data
+- The Ctrl+ hotkey in the code editor does not work
+
+# [1.103.0]
+
+### Added
+- Added the ability to edit the legend name in the GIS component
+- Schemes constructor: added a panel of key maps
+- Added the ability to reset the filter of the internal table
+
+### Changed
+- Changed the text of some "Edit" buttons on "Apply"
+
+### Fixed
+- The settings for map primitives are applied only after the page is reloaded
+- Events: When using parameters with a space, events are not processed
+
 # [1.102.0]
 
 ### Added

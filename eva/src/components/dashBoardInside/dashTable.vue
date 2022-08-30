@@ -55,43 +55,37 @@
                   {{ mdiMagnify }}
                 </v-icon>
               </template>
-              <v-row v-if="value !== 'string' && value !== 'none'">
-                <v-col cols="6">
-                  <v-select
-                    :items="compare"
-                    label="Знак"
-                    @change="setFilterData(title, $event, 'compare')"
-                  />
-                </v-col>
-                <v-col cols="6">
-                  <v-text-field
-                    label="значение"
-                    @change="setFilterData(title, $event)"
-                  />
-                </v-col>
-              </v-row>
-              <v-row v-else-if="value === 'none'">
-                <v-col cols="12">
-                  <v-select
-                    label="Значение"
-                    :items="compareForBoolean"
-                    @change="
-                      onChangeForBoolean(title, $event)
-                    "
-                  />
-                </v-col>
-              </v-row>
-              <v-row v-else>
-                <v-col cols="12">
-                  <v-text-field
-                    label="значение"
-                    @change="
-                      setFilterData(title, '=', 'compare');
-                      setFilterData(title, $event);
-                    "
-                  />
-                </v-col>
-              </v-row>
+              <dash-table-filter
+                v-if="value !== 'string' && value !== 'none'"
+                :compare="compare"
+                :title="title"
+                :cols="5"
+                select-label="Знак"
+                text-label="значение"
+                @changes="setFilterData(
+                  $event.title, $event.event, $event.comp
+                )"
+              />
+              <dash-table-filter
+                v-else-if="value === 'none'"
+                :compare="compareForBoolean"
+                :title="title"
+                :cols="10"
+                select-label="Значение"
+                @changes="onChangeForBoolean(
+                  $event.title, $event.event
+                )"
+              />
+              <dash-table-filter
+                v-else
+                :compare="compareForBoolean"
+                :title="title"
+                :cols="10"
+                text-label="значение"
+                @changes="onChangeForBoolean(
+                  $event.title, $event.event
+                )"
+              />
             </v-menu>
             <v-tooltip
               :key="`${header.value + value}tooltip`"
@@ -110,10 +104,11 @@
               :key="title + item.rowIndex"
               :style="item.rowColor && `background-color: ${item.rowColor}`"
             >
-              <template v-for="({text}, colIndex) in props.titles">
+              <template v-for="({text, value}, colIndex) in props.titles">
                 <td
                   v-if="!excludeColumns.includes(text)"
                   :key="colIndex"
+                  :data-type="value"
                   class="text-start"
                   :class="{
                     'd-none': options
@@ -129,6 +124,7 @@
                         item.columnColor[text] &&
                         `background-color: ${item.columnColor[text]}`)
                   "
+                  :value="item[text]"
                 >
                   {{ item[text] }}
                 </td>
@@ -149,9 +145,13 @@
 
 <script>
 import { mdiMagnify } from '@mdi/js';
+import dashTableFilter from '@/components/dashBoardInside/dashTable/dashTableFilter';
 
 export default {
   name: 'DashTable',
+  components: {
+    dashTableFilter,
+  },
   inheritAttrs: false,
   props: {
     tablePerPage: {
@@ -530,6 +530,10 @@ export default {
     },
     setFilterData(title, event, compare) {
       if (!this.filters[title]) this.filters[title] = {};
+      if (!event && !compare) {
+        this.filters[title].compare = compare;
+        this.filters[title].value = event;
+      }
       if (compare === 'compare') {
         this.filters[title].compare = event;
       } else {
@@ -660,20 +664,15 @@ export default {
                 });
               event.target.parentElement.classList.add('selected');
             }
-            const headers = Array.from(
-              this.$refs.table.$el.querySelector('thead tr').childNodes,
-            ).map((item) => item.textContent);
-            const cellRowIndex = Array.from(
-              event.target.parentElement.childNodes,
-            ).findIndex((item) => item === event.target);
             const tokens = this.$store.state[this.idDash].tockens;
             tokens.forEach((token) => {
               if (
                 token.elem === this.id
                     && token.action === 'click'
-                    && headers[cellRowIndex] === token.capture
               ) {
-                const value = event.target.textContent;
+                const { value } = [...event.target.parentElement.childNodes]
+                  .find((element) => element.dataset.type === token.capture)
+                  .attributes.value;
                 this.$store.commit('setTocken', {
                   token,
                   idDash: this.idDash,
