@@ -493,7 +493,7 @@ export default {
           } else {
             this.nameTitle = 'Редактировать дашборд';
           }
-          this.nameBtn.create = 'Редактировать';
+          this.nameBtn.create = 'Применить';
         }
         this.dataRest = await this.getDataForEssence();
       }
@@ -564,7 +564,7 @@ export default {
             this.nameBtn.cancel = 'Нет';
           } else {
             // Меняем текст кнопок
-            this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+            this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Применить';
             this.nameBtn.cancel = 'Отмена';
             // Скрываем сообщение
             this.showwarning = false;
@@ -630,7 +630,7 @@ export default {
         this.name = '';
       }
       this.showwarning = false;
-      this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Редактировать';
+      this.nameBtn.create = this.actionFrom === 'create' ? 'Создать' : 'Применить';
       this.nameBtn.cancel = 'Отмена';
       this.nameWarn = 'Имя не может быть пустым';
     },

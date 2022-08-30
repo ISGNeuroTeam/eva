@@ -5,6 +5,7 @@ export default class ChartClass {
 
   options = {
     groupsTopOffset: 14,
+    linesRegression: null,
     xAxis: {
       type: 'time', // linear, time, log, point, band
       timeFormat: null, // %Y-%m-%d %H:%M:%S
@@ -57,9 +58,10 @@ export default class ChartClass {
 
   xMinMax = [];
 
-  constructor(svgContainer, width, height, options) {
+  constructor(svgContainer, width, height, options, linesRegression) {
     this.id = ChartClass.objId += 1;
     this.options = ChartClass.mergeDeep(this.options, options);
+    this.options.linesRegression = linesRegression;
     this.svgContainer = svgContainer;
     this.box = { width, height };
     this.updateBox(width, height);
@@ -459,6 +461,7 @@ export default class ChartClass {
       .reverse()
       .forEach((metric) => {
         this.addScatterDots(chartGroup, metric, height, num);
+        this.addScatterLine(chartGroup, metric);
       });
 
     this.addCrossSelection(chartGroup, groupHeight);
@@ -533,8 +536,15 @@ export default class ChartClass {
    * }
    * @param data
    * @param xMetric
+   * @param linesRegression
    */
-  update(metricsByGroup, xAxisSettings, data, xMetric = '_time') {
+  update(
+    metricsByGroup,
+    xAxisSettings,
+    data,
+    xMetric = '_time',
+    linesRegression = null,
+  ) {
     this.resetTmpData();
     const color = d3.scaleOrdinal().range(d3.schemeSet2);
     this.xMetric = xMetric;
@@ -542,6 +552,7 @@ export default class ChartClass {
       ...this.options.xAxis,
       ...xAxisSettings,
     };
+    this.options.linesRegression = linesRegression;
 
     // recalc options
     if (this.options.xAxis.textRotate !== undefined) {
@@ -614,6 +625,14 @@ export default class ChartClass {
     return box.width - maxYLeftAxisWidth - maxYRightAxisWidth;
   }
 
+  set linesRegression(val) {
+    this.options.linesRegression = val;
+  }
+
+  get linesRegression() {
+    return this.options.linesRegression;
+  }
+
   updateMaxYRightAxisWidth(width) {
     if (this.maxYRightAxisWidth < width) {
       this.maxYRightAxisWidth = width;
@@ -661,6 +680,19 @@ export default class ChartClass {
     }
   }
 
+  highlightMetricDot(metric, isActive) {
+    if (metric && !isActive) {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', 0.3);
+      this.svgGroups.selectAll('.dot, .axis-y').attr('display', 'block');
+      this.svgGroups.selectAll(`.dot-${metric.name}, .axis-y-${metric.name}`).attr('opacity', 1);
+    } else if (metric && isActive) {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('display', 'none');
+      this.svgGroups.selectAll(`.dot-${metric.name}, .axis-y-${metric.name}`).attr('display', 'block');
+    } else {
+      this.svgGroups.selectAll('.dot, .axis-y').attr('opacity', null);
+    }
+  }
+
   xTickFormat(d) {
     const { xAxis } = this.options;
     const { timeFormat, stringOX } = xAxis;
@@ -690,7 +722,6 @@ export default class ChartClass {
     this.tooltip
       .html(
         [
-          { name: this.xMetric },
           ...this.metrics,
         ]
           .reduce((prev, cur) => {
@@ -956,7 +987,7 @@ export default class ChartClass {
       .data(this.data)
       .enter()
       .append('circle')
-      .attr('class', 'dot')
+      .attr('class', (d) => `dot dot-${d[metric.metricGroup]}`)
       .attr('cx', (d) => this.x(d[this.xMetric]))
       .attr('cy', (d) => this.y[metric.yAxisLink || metric.name](d[metric.name]))
       .attr('r', metric.dotSize || 3)
@@ -976,6 +1007,29 @@ export default class ChartClass {
       .on('click', (d) => {
         this.clickChart(d);
       });
+  }
+
+  addScatterLine(chartGroup, metric) {
+    const color = d3.scaleOrdinal().range(d3.schemeSet2);
+    const coordinates = this.data.reduce((acc, item) => {
+      if (!acc[item.group_numb]) {
+        acc[item.group_numb] = [];
+      }
+      acc[item.group_numb].push(item);
+      return acc;
+    }, {});
+    const drawingLinesRegression = this.options.linesRegression.map((item) => coordinates[item]);
+    chartGroup.append('g')
+      .selectAll('line')
+      .data(drawingLinesRegression)
+      .enter()
+      .append('line')
+      .attr('class', 'line')
+      .attr('x1', (d) => this.x(d[0][this.xMetric]))
+      .attr('x2', (d) => this.x(d[d.length - 1][this.xMetric]))
+      .attr('y1', (d) => this.y[metric.yAxisLink || metric.name](d[0].y_reg))
+      .attr('y2', (d) => this.y[metric.yAxisLink || metric.name](d[d.length - 1].y_reg))
+      .style('stroke', (d) => color(d[0][metric.metricGroup]));
   }
 
   setLineDotPosition(lineXPos, lineYPos, num) {
@@ -1262,8 +1316,9 @@ export default class ChartClass {
       ? captionKey
       : metric.name;
     const val = data[fieldName];
-    return (val % 1 || metric.zerosAfterDot || metric.zerosAfterDot === 0)
-      ? Number.parseFloat(val).toFixed(metric.zerosAfterDot ?? 2)
+    const { zerosAfterDot } = metric;
+    return (zerosAfterDot % 1 === 0 && zerosAfterDot >= 0 && zerosAfterDot <= 100)
+      ? Number.parseFloat(val).toFixed(zerosAfterDot ?? 2)
       : val;
   }
 

@@ -2,9 +2,7 @@ import {
   ShapeNodeStyle,
   GraphComponent,
   GraphEditorInputMode,
-  EdgePathLabelModel,
   ExteriorLabelModel,
-  ExteriorLabelModelPosition,
   GraphItemTypes,
   IEdge,
   INode,
@@ -32,9 +30,8 @@ import {
   StorageLocation,
   HierarchicLayoutNodeLayoutDescriptor,
   HierarchicLayoutPortAssignmentMode,
-  SimplexNodePlacer,
+  SimplexNodePlacer, Point,
 } from 'yfiles';
-import HTMLPopupSupport from './HTMLPopupSupport';
 import licenseData from '../../license/license.json';
 
 License.value = licenseData; // проверка лицензии
@@ -57,82 +54,6 @@ class GraphClass {
     });
   }
 
-  static createTooltipContent(item) {
-    if (!IEdge.isInstance(item)) {
-      // not IPort, ILabel, INode
-      return null;
-    }
-    // build the tooltip container
-    const tooltip = document.createElement('div');
-
-    let labelFrom = '';
-    let labelTo = '';
-    if (item.sourceNode.labels.size > 0) {
-      labelFrom = item.sourceNode.labels.last().text;
-    }
-    if (item.targetNode.labels.size > 0) {
-      labelTo = item.targetNode.labels.last().text;
-    }
-
-    if (!!labelFrom || !!labelTo) {
-      const title = document.createElement('h4');
-      title.innerHTML = `${labelFrom}-> \n
-       ${labelTo}`;
-      tooltip.appendChild(title);
-    }
-
-    // extract the first label from the item
-    let label = '';
-    if (item.labels.size > 0) {
-      label = item.labels.first().text;
-    }
-    const text = document.createElement('p');
-    text.innerHTML = label;
-    tooltip.appendChild(text);
-
-    return tooltip;
-  }
-
-  static updateNodePopupContent(nodePopup, node) {
-    // get business data from node tag
-    const data = node.tag;
-
-    // get all divs in the pop-up
-    const divs = nodePopup.div.getElementsByTagName('div');
-    for (let i = 0; i < divs.length; i += 1) {
-      const div = divs.item(i);
-      if (div.hasAttribute('data-id')) {
-        // if div has a 'data-id' attribute, get content from the business data
-        const id = div.getAttribute('data-id') || 'label';
-        div.textContent = data[id];
-      }
-    }
-  }
-
-  static updateEdgePopupContent(edgePopup, edge) {
-    // get business data from node tags
-    const target = {
-      sourceName: edge.sourcePort.owner.tag,
-      targetName: edge.targetPort.owner.tag,
-      metricValue: edge.tag.metric,
-    };
-
-    // get all divs in the pop-up
-    const divs = edgePopup.div.getElementsByTagName('div');
-    for (let i = 0; i < divs.length; i += 1) {
-      const div = divs.item(i);
-      if (div.hasAttribute('data-id')) {
-        // if div has a 'data-id' attribute, get content from the business data
-        const id = div.getAttribute('data-id');
-        const data = target[id];
-        if (data) {
-          const label = data.node || data.label || data;
-          div.textContent = data.node || data.label ? `${label}` : `metric: ${label}`;
-        }
-      }
-    }
-  }
-
   options = {
     labelStyleList: {}, // варианты labelStyle
     edgeStyleList: {},
@@ -142,45 +63,21 @@ class GraphClass {
     colorFrom: '',
     nodesSource: [],
     edgesSource: [],
-  }
-
-  localValiables = {
-    nodePopup: null,
-    edgePopup: null,
+    isVisiblePopup: false,
   }
 
   constructor({
     elem,
     colors,
     colorFrom,
-    nodePopupContent,
-    edgePopupContent,
     popupCallback,
   }) {
     this.graphComponent = new GraphComponent(elem);
     this.colors = colors;
     this.options.colorFrom = colorFrom;
-    this.nodePopupContent = nodePopupContent;
-    this.edgePopupContent = edgePopupContent;
     this.popupCallback = popupCallback;
     const support = new GraphMLSupport(this.graphComponent);
     support.storageLocation = StorageLocation.FILE_SYSTEM;
-  }
-
-  get nodePopup() {
-    return this.localValiables.nodePopup;
-  }
-
-  set nodePopup(val) {
-    this.localValiables.nodePopup = val;
-  }
-
-  get edgePopup() {
-    return this.localValiables.edgePopup;
-  }
-
-  set edgePopup(val) {
-    this.localValiables.edgePopup = val;
   }
 
   get labelStyleList() {
@@ -247,12 +144,15 @@ class GraphClass {
     this.options.colorFrom = value;
   }
 
-  initMode({
-    modeOptions,
-    callback,
-  }) {
-    const mode = new GraphEditorInputMode(modeOptions);
-    mode.addItemClickedListener(callback);
+  get isVisiblePopup() {
+    return this.options.isVisiblePopup;
+  }
+
+  set isVisiblePopup(value) {
+    this.options.isVisiblePopup = value;
+  }
+
+  hoverItemListener(mode) {
     mode.itemHoverInputMode.enabled = true;
     mode.itemHoverInputMode.hoverItems = GraphItemTypes.EDGE || GraphItemTypes.NODE;
     mode.itemHoverInputMode.discardInvalidItems = false;
@@ -261,22 +161,51 @@ class GraphClass {
       // first remove previous highlights
       manager.clearHighlights();
 
-      if (e.item) {
-        const newItem = e.item;
-
-        manager.addHighlight(newItem);
-        if (newItem instanceof INode) {
+      const { item } = e;
+      if (item) {
+        manager.addHighlight(item);
+        if (item instanceof INode) {
           // and if it's a node, we highlight all adjacent edges, too
-          this.graphComponent.graph.edgesAt(newItem).forEach((edge) => {
+          this.graphComponent.graph.edgesAt(item).forEach((edge) => {
             manager.addHighlight(edge);
           });
-        } else if (newItem instanceof IEdge) {
+        } else if (item instanceof IEdge) {
           // if it's an edge - we highlight the adjacent nodes
-          manager.addHighlight(newItem.sourceNode);
-          manager.addHighlight(newItem.targetNode);
+          manager.addHighlight(item.sourceNode);
+          manager.addHighlight(item.targetNode);
         }
       }
+      if (item instanceof IEdge) {
+        this.popupCallback({
+          type: 'edge',
+          content: {
+            sourceName: GraphClass.extractNodeName(item.sourcePort.owner.tag),
+            targetName: GraphClass.extractNodeName(item.targetPort.owner.tag),
+            metricValue: item.tag.metric,
+          },
+        });
+      } else {
+        this.popupCallback({
+          type: 'edge',
+          content: null,
+        });
+      }
     });
+  }
+
+  static extractNodeName(nodeTag) {
+    return typeof nodeTag === 'string'
+      ? `metric: ${nodeTag}`
+      : `${nodeTag.node || nodeTag.label}`;
+  }
+
+  initMode({
+    modeOptions,
+    callback,
+  }) {
+    const mode = new GraphEditorInputMode(modeOptions);
+    mode.addItemClickedListener(callback);
+    this.hoverItemListener(mode);
     // On clicks on empty space, set currentItem to <code>null</code> to hide the pop-ups
     mode.addCanvasClickedListener(() => {
       this.graphComponent.currentItem = null;
@@ -359,68 +288,42 @@ class GraphClass {
 
   initializePopups({
     inputMode,
-    nodePopupContent,
-    edgePopupContent,
     callback,
   }) {
-    // Creates a label model parameter that is used to position the node pop-up
-    const nodeLabelModel = new ExteriorLabelModel({ insets: 10 });
-
-    // Creates the pop-up for the node pop-up template
-    this.nodePopup = new HTMLPopupSupport(
-      this.graphComponent,
-      nodePopupContent,
-      nodeLabelModel.createParameter(ExteriorLabelModelPosition.NORTH),
-    );
-
-    // Creates the edge pop-up for the edge pop-up template with a suitable label model parameter
-    // We use the EdgePathLabelModel for the edge pop-up
-    const edgeLabelModel = new EdgePathLabelModel({ autoRotation: false });
-
-    // Creates the pop-up for the edge pop-up template
-    this.edgePopup = new HTMLPopupSupport(
-      this.graphComponent,
-      edgePopupContent,
-      edgeLabelModel.createDefaultParameter(),
-    );
-
     inputMode.addItemClickedListener((sender, evt) => {
       setTimeout(() => {
         const { item } = evt;
         if (item instanceof INode) {
           this.currentNode = item.tag;
-          // update data in node pop-up
-          GraphClass.updateNodePopupContent(this.nodePopup, item);
           // open node pop-up and hide edge pop-up
-          this.nodePopup.currentItem = item;
-          this.edgePopup.currentItem = null;
+          this.popupCallback({
+            type: 'node',
+            content: {
+              data: item.tag,
+              position: this.getElementPosition(item.layout),
+              node: item.tag?.node || item.tag?.label,
+              nodeDescription: item.tag?.node_description || item.tag?.label,
+            },
+          });
         } else {
-          this.nodePopup.currentItem = null;
-          this.edgePopup.currentItem = null;
+          this.popupCallback({
+            type: 'node',
+            content: null,
+          });
         }
-        callback(this.currentNode);
       }, 0);
     });
 
     this.graphComponent.addMouseClickListener(() => {
-      callback(null);
-      this.nodePopup.currentItem = null;
+      this.popupCallback({
+        type: 'node',
+        content: null,
+      });
     });
 
     // The pop-up is shown for the currentItem thus nodes and edges should be focusable
     inputMode.focusableItems = GraphItemTypes.NODE || GraphItemTypes.EDGE;
-    inputMode.itemHoverInputMode.addHoveredItemChangedListener((sender, evt) => {
-      const { item } = evt;
-      if (item instanceof IEdge && !this.nodePopup.currentItem) {
-        // update data in edge pop-up
-        GraphClass.updateEdgePopupContent(this.edgePopup, item);
-        this.edgePopup.setLocation(sender.$f4.x, sender.$f4.y);
-        // open edge pop-up and node edge pop-up
-        this.edgePopup.currentItem = item;
-      } else {
-        this.edgePopup.currentItem = null;
-      }
-    });
+    this.hoverItemListener(inputMode);
 
     // On press of the ESCAPE key, set currentItem to <code>null</code> to hide the pop-ups
     inputMode.keyboardInputMode.addKeyBinding(
@@ -436,10 +339,24 @@ class GraphClass {
     return inputMode;
   }
 
+  getElementPosition({ x, y }, defaultIndent = 20) {
+    let indent = defaultIndent;
+    const { zoom } = this.graphComponent;
+    indent /= zoom;
+    const position = this.graphComponent.toViewCoordinates(
+      new Point(
+        x + indent,
+        y,
+      ),
+    );
+    return {
+      x: position.x,
+      y: position.y,
+    };
+  }
+
   viewerInputMode() {
     this.graphComponent.inputMode = this.initializePopups({
-      nodePopupContent: this.nodePopupContent,
-      edgePopupContent: this.edgePopupContent,
       callback: this.popupCallback,
       inputMode: new GraphViewerInputMode(),
     });
@@ -454,8 +371,10 @@ class GraphClass {
   }
 
   closeNodePopup() {
-    this.nodePopup.currentItem = null;
-    this.popupCallback(null);
+    this.popupCallback({
+      type: 'node',
+      content: null,
+    });
   }
 
   fitContent() {
@@ -680,8 +599,6 @@ class GraphClass {
   initializeDefault() {
     this.initializeDefaultStyles();
     this.initializePopups({
-      nodePopupContent: this.nodePopupContent,
-      edgePopupContent: this.edgePopupContent,
       callback: this.popupCallback,
       inputMode: this.graphComponent.inputMode,
     });

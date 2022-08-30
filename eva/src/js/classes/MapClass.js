@@ -259,7 +259,7 @@ class MapClass {
     this.map.addLayer(cluster);
   }
 
-  addLine(element, lib, pipelineData) {
+  addLine(element, lib, pipelineData, callback) {
     const latlngs = [];
     element.coordinates.split(';').forEach((point) => {
       const p = point.split(':');
@@ -293,12 +293,45 @@ class MapClass {
     line
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
-      .on('mouseout', resetHighlight);
+      .on('mouseout', resetHighlight)
+      .on('click', () => {
+        callback(element.ID);
+      });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);
   }
 
-  drawMarkerHTML({ lib, element }) {
+  addPolygon(element, lib, callback) {
+    const latlngs = [];
+
+    element.coordinates.split(';').forEach((point) => {
+      const p = point.split(':');
+      if (p[1]) {
+        const p2 = p[1].split(',');
+        latlngs.push(p2);
+      }
+    });
+    const line = L.polygon(latlngs, {
+      color: lib.color,
+      weight: lib.width,
+      opacity: lib.opacity,
+    });
+    const tooltip = L.tooltip({
+      permanent: false,
+      direction: 'top',
+      className: 'leaftet-hover',
+      sticky: true,
+    });
+    line
+      .bindTooltip(tooltip)
+      .on('click', () => {
+        callback(element.ID);
+      });
+    line.setTooltipContent(element.label);
+    this.layerGroup[element.type].addLayer(line);
+  }
+
+  drawMarkerHTML({ lib, element, callback }) {
     const {
       text_color: textColor = '#FFFFFF',
       background_color: color = '65, 62, 218',
@@ -339,6 +372,9 @@ class MapClass {
         direction: 'top',
         className: 'leaftet-hover',
         interactive: true,
+      })
+      .on('click', () => {
+        callback(element.ID, element);
       });
     this.layerGroup[element.type].addLayer(marker);
   }
@@ -362,7 +398,7 @@ class MapClass {
         className: 'leaftet-hover',
       })
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, lib);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
@@ -457,7 +493,7 @@ class MapClass {
     if (type === 'SVG') {
       this.drawMarkerSVG({ lib, element, callback });
     } else {
-      this.drawMarkerHTML({ lib, element });
+      this.drawMarkerHTML({ lib, element, callback });
     }
   }
 
@@ -481,7 +517,10 @@ class MapClass {
             this.addMarker({ element: item, lib, callback });
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
-            this.addLine(item, lib, pipelineDataDictionary[item.ID]);
+            this.addLine(item, lib, pipelineDataDictionary[item.ID], callback);
+          }
+          if (item.geometry_type?.toLowerCase() === 'polygon') {
+            this.addPolygon(item, lib, callback);
           }
         }
       }
@@ -528,17 +567,19 @@ class MapClass {
 
         const pipelineInfo = pipelineData.find((el) => el.pos === closestData);
         // div for tooltip
-        const newDiv = document.createElement('div');
-        let html = '<div style="text-align: left; background-color: #191919; color: white">';
-        html += `<p>${pipelineInfo.label}</p>`;
-        if (this.pipelineParameters.length > 0) {
-          this.pipelineParameters.forEach((item) => {
-            html += `<p>${item.type} ${pipelineInfo[item.type]}</p>`;
-          });
+        if (pipelineInfo) {
+          const newDiv = document.createElement('div');
+          let html = '<div style="text-align: left; background-color: #191919; color: white">';
+          html += `<p>${pipelineInfo.label}</p>`;
+          if (this.pipelineParameters.length > 0) {
+            this.pipelineParameters.forEach((item) => {
+              html += `<p>${item.type} ${pipelineInfo[item.type]}</p>`;
+            });
+          }
+          html += '</div>';
+          newDiv.innerHTML = html;
+          line.setTooltipContent(newDiv);
         }
-        html += '</div>';
-        newDiv.innerHTML = html;
-        line.setTooltipContent(newDiv);
       } else {
         line.setTooltipContent(element.label);
       }

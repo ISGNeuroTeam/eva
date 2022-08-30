@@ -16,6 +16,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.105.0]
+
+### Added
+- Added the ability to get the value of the column selected in the settings when clicking on a table row
+- Added the ability to follow various links from chamomile petals on the geo-dashboard
+- Added the ability to put a bitmap image file under SVG
+- Added regression line for scatter plot
+- Added theme save
+
+### Fixed
+- Fixed select, set token on click
+- Multiline. Rounding stopped working for data signing
+- Multiline. The first metric for the X-axis is not perceived
+
+## [1.104.0]
+
+### Added
+- Added changing the map layer through tokens
+- Added token transfer to datepicker
+
+### Changed
+- Changed popup on graph
+
+### Fixed
+- Fixed transitions on click on html elements
+- Fixed subfilter reset via common button
+- Fixed go event when passing tokens using spaces
+- Extra spaces appear when using tokens
+- Tabs scroll disappeared
+- Fixed, grammatical errors and bush component
+
+## [1.103.0]
+
+### Added
+- Added editable legend title in GIS component
+- Schemes constructor: added keymap panel
+- Added internal table filter resets
+
+### Changed
+- Changed text btn in searchModal
+
+### Fixed
+- Fixed map update primitive-libraries
+- Fixed event on data compare
+
 ## [1.102.0]
 
 ### Added
