@@ -1,3 +1,11 @@
+# [1.106.0] - 2022-09-02
+
+### Added
+- Schemes constructor: Added icons and tooltips on "toggle-order" buttons
+- Schemes constructor: Added tooltip on "toggle-editor-mode" button
+- Schemes constructor: Added tooltip on "options-panel" button
+- Added redirect to the 404 page when switching to a non-existent dashboard
+
 # [1.105.0] - 2022-08-25
 
 ### Added
