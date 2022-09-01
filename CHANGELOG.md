@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Schemes constructor: Added icons and tooltips on "toggle-order" buttons
+- Schemes constructor: Added tooltip on "toggle-editor-mode" button
+- Schemes constructor: Added tooltip on "options-panel" button
 - Added redirect to '404' on switch to a non-existent dashboard
 
 ### Changed
