@@ -6,6 +6,12 @@
 - Schemes constructor: Added tooltip on "options-panel" button
 - Added redirect to the 404 page when switching to a non-existent dashboard
 
+### Changed
+- The animation of the transition of the visualization dialog box to full-screen mode has been changed
+
+### Fixed
+- The size of the text changed when it was selected in full-screen visualizations
+
 # [1.105.0] - 2022-08-25
 
 ### Added
