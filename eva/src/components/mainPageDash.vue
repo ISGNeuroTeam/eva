@@ -390,6 +390,13 @@ export default {
     getGroups() {
       this.$store.dispatch('getGroups').then((res) => {
         this.allGroups = res;
+        if (this.$route.query?.home && this.allGroups.length > 0) {
+          const id = this.allGroups.find((group) => group.name === this.$route.query?.home);
+          this.getDash(id);
+          this.$nextTick(() => {
+            this.tab = 'tab-2';
+          });
+        }
       });
     },
     getDashs(id) {
@@ -473,6 +480,9 @@ export default {
     },
     deleteCookie() {
       document.cookie = 'eva-dashPage=\'\'; max-age=0; path=/';
+      if (this.$route.query?.home) {
+        this.$route.query.home = '';
+      }
       this.getGroups();
     },
     checkName(name) {

@@ -1956,6 +1956,12 @@ export default new Vuex.Store({
     setLoadingSvg(context, param) {
       return rest.setLoadingSvg(param, restAuth);
     },
+    getUserSettings(state, id) {
+      return rest.getUserSettings(restAuth, id);
+    },
+    setUserSettings(state, setting) {
+      return rest.setUserSettings(setting, restAuth);
+    },
   },
   getters: {
     // ...store.getters,
