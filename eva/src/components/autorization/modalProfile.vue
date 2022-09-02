@@ -114,6 +114,12 @@
             clearable
             @input="toggleIsChanged"
           />
+          <v-select
+            v-model="homePage"
+            :items="['', ...dataRest.groups]"
+            class="field-profile"
+            :style="{ color: theme.$main_text }"
+          />
           <data-profile
             v-for="item in Object.keys(user.tab)"
             :key="item"
@@ -363,6 +369,7 @@ export default {
       changedData: null,
       colorFrom: {},
       isChanged: false,
+      homePage: '',
     };
   },
   computed: {
@@ -662,6 +669,17 @@ export default {
           this.showErrorMsg(forbiddenError, '#FF6D70');
         }
       });
+      const getSetting = this.$store.dispatch('getUserSettings', this.userFrom.id);
+      this.$store.dispatch(
+        'setUserSettings',
+        JSON.stringify({
+          user_id: this.userFrom.id,
+          setting: {
+            ...getSetting?.setting,
+            homePage: this.homePage,
+          },
+        }),
+      );
     },
     changeDataEvent(event) {
       this.$refs.confirmModal.focusOnModal();
