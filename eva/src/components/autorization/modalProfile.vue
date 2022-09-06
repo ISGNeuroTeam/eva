@@ -118,6 +118,7 @@
             v-model="homePage"
             :items="['', ...dataRest.groups]"
             class="field-profile"
+            label="Значение для группы по умолчанию"
             :style="{ color: theme.$main_text }"
           />
           <data-profile
@@ -474,6 +475,16 @@ export default {
       this.getDataForEssence();
       this.isChanged = false;
     }
+    if (this.userFrom.id) {
+      this.$store.dispatch('getUserSettings', this.userFrom.id).then((res) => {
+        if (res.setting) {
+          const setting = JSON.parse(res.setting.replaceAll("'", '"'));
+          if (setting?.homePage) {
+            this.homePage = setting.homePage;
+          }
+        }
+      });
+    }
   },
   methods: {
     async getDataForEssence() {
@@ -657,8 +668,21 @@ export default {
         essence: this.essence[this.keyFrom - 1],
         method,
       });
-      response.then((res) => {
+      response.then(async (res) => {
         if (res.status === 200) {
+          await res.json().then((responseData) => {
+            const getSetting = this.$store.dispatch('getUserSettings', this.userFrom.id || responseData.id);
+            this.$store.dispatch(
+              'setUserSettings',
+              JSON.stringify({
+                user_id: this.userFrom.id || responseData.id[0],
+                setting: {
+                  ...getSetting?.setting,
+                  homePage: this.homePage,
+                },
+              }),
+            );
+          });
           if (this.userFrom.id === this.curUserId) {
             this.$store.commit('auth/setUserName', this.userData.username);
           }
@@ -669,17 +693,6 @@ export default {
           this.showErrorMsg(forbiddenError, '#FF6D70');
         }
       });
-      const getSetting = this.$store.dispatch('getUserSettings', this.userFrom.id);
-      this.$store.dispatch(
-        'setUserSettings',
-        JSON.stringify({
-          user_id: this.userFrom.id,
-          setting: {
-            ...getSetting?.setting,
-            homePage: this.homePage,
-          },
-        }),
-      );
     },
     changeDataEvent(event) {
       this.$refs.confirmModal.focusOnModal();
