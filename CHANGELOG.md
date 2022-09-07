@@ -8,19 +8,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added the ability to put a bitmap image file under SVG
 
 ### Changed
 
 ### Fixed
+
+## [1.106.0]
+
+### Added
+- Schemes constructor: Added icons and tooltips on "toggle-order" buttons
+- Schemes constructor: Added tooltip on "toggle-editor-mode" button
+- Schemes constructor: Added tooltip on "options-panel" button
+- Added redirect to '404' on switch to a non-existent dashboard
+
+### Changed
+- The animation of the transition of the visualization dialog box to full-screen mode has been changed
+
+### Fixed
+- The size of the text changed when it was selected in full-screen visualizations
+
+## [1.105.0]
+
+### Added
+- Added the ability to get the value of the column selected in the settings when clicking on a table row
+- Added the ability to follow various links from chamomile petals on the geo-dashboard
+- Added the ability to put a bitmap image file under SVG
+- Added regression line for scatter plot
+- Added theme save
+
+### Fixed
 - Fixed select, set token on click
+- Multiline. Rounding stopped working for data signing
+- Multiline. The first metric for the X-axis is not perceived
 
 ## [1.104.0]
 
 ### Added
 - Added changing the map layer through tokens
 - Added token transfer to datepicker
-- Added the ability to get the value of the column selected in the settings when clicking on a table row
 
 ### Changed
 - Changed popup on graph

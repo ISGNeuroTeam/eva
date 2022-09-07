@@ -166,14 +166,13 @@ export default {
       );
     },
     metrics() {
-      const metrics = [...this.firstDataRowMetricList];
-      metrics.splice(0, 1);
-      return metrics;
+      return [...this.firstDataRowMetricList.filter((item) => item !== this.xMetric)];
     },
     xAxisSettings() {
       if (this.options.xAxis) {
         return {
           ...this.options.xAxis,
+          allMetrics: this.firstDataRowMetricList,
         };
       }
       const {
@@ -182,12 +181,14 @@ export default {
         barplotstyle,
       } = this.options;
       return {
+        xMetric: this.xMetric,
         type: (this.options.stringOX || !ChartClass.isTimestamp(this.firstDataRow[this.xMetric]))
           ? 'linear' // linear, time, - log, point, band
           : 'time',
         timeFormat,
         textRotate: +xAxisCaptionRotate || -45,
         barplotType: barplotstyle || 'divided',
+        allMetrics: this.firstDataRowMetricList,
       };
     },
     metricsByGroup() {

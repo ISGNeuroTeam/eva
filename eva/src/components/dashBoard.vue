@@ -193,6 +193,7 @@
               :width="isFullScreen ? '100vw' : '80vw'"
               :fullscreen="isFullScreen"
               style="z-index: 999"
+              transition="fade-transition"
             >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip

@@ -11,7 +11,7 @@ import {
   FreeNodeLabelModel,
   GraphComponent,
   GraphEditorInputMode,
-  GraphItemTypes,
+  LabelLayerPolicy,
   GraphMLIOHandler,
   GraphMLSupport,
   GraphSnapContext,
@@ -1113,6 +1113,8 @@ class ConstructorSchemesClass {
 
     this.registerReshapeHandleProvider();
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
+    // Привязка z-order у label к родителю
+    this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
   }
 
   generateIconNodes(iconsList) {
@@ -2137,7 +2139,7 @@ class ConstructorSchemesClass {
     if (elements?.length > 0) {
       this.graphComponent.graphModelManager[method](elements);
       elements.forEach((element) => {
-        if (element instanceof IEdge) {
+        if ((element instanceof IEdge) || (element instanceof ILabel)) {
           ICommand[command].execute(element, this.graphComponent);
         }
         this.graphComponent.graphModelManager.update(element);

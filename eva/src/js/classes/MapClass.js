@@ -301,6 +301,36 @@ class MapClass {
     this.layerGroup[element.type].addLayer(line);
   }
 
+  addPolygon(element, lib, callback) {
+    const latlngs = [];
+
+    element.coordinates.split(';').forEach((point) => {
+      const p = point.split(':');
+      if (p[1]) {
+        const p2 = p[1].split(',');
+        latlngs.push(p2);
+      }
+    });
+    const line = L.polygon(latlngs, {
+      color: lib.color,
+      weight: lib.width,
+      opacity: lib.opacity,
+    });
+    const tooltip = L.tooltip({
+      permanent: false,
+      direction: 'top',
+      className: 'leaftet-hover',
+      sticky: true,
+    });
+    line
+      .bindTooltip(tooltip)
+      .on('click', () => {
+        callback(element.ID);
+      });
+    line.setTooltipContent(element.label);
+    this.layerGroup[element.type].addLayer(line);
+  }
+
   drawMarkerHTML({ lib, element, callback }) {
     const {
       text_color: textColor = '#FFFFFF',
@@ -344,7 +374,7 @@ class MapClass {
         interactive: true,
       })
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, element);
       });
     this.layerGroup[element.type].addLayer(marker);
   }
@@ -368,7 +398,7 @@ class MapClass {
         className: 'leaftet-hover',
       })
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, lib);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
@@ -488,6 +518,9 @@ class MapClass {
           }
           if (item.geometry_type?.toLowerCase() === 'line') {
             this.addLine(item, lib, pipelineDataDictionary[item.ID], callback);
+          }
+          if (item.geometry_type?.toLowerCase() === 'polygon') {
+            this.addPolygon(item, lib, callback);
           }
         }
       }

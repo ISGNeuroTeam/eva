@@ -24,68 +24,93 @@
             />
           </div>
         </template>
-        <span>Toggle edit</span>
+        <span>Вкл\выкл режим редактирования</span>
       </v-tooltip>
       <template v-if="isEdit">
-        <button
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="toggleDnDPanel"
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
         >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+          <template v-slot:activator="{ on }">
+            <div class="pa-2 d-flex">
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                v-on="on"
+                @click="toggleDnDPanel"
+              >
+                {{ gear }}
+              </v-icon>
+            </div>
+          </template>
+          <span>Панель настроек</span>
+        </v-tooltip>
+        <template v-if="dataSelectedNode">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ gear }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('toFront')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <bring-to-front
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('toFront')"
+                />
+              </div>
+            </template>
+            <span>На передний план</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ arrowUp }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('toBack')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <send-to-back
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('toBack')"
+                />
+              </div>
+            </template>
+            <span>На задний план</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ arrowDown }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('raise')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <bring-forward
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('raise')"
+                />
+              </div>
+            </template>
+            <span>На уровень выше</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ arrowUp }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('lower')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
-          >
-            {{ arrowDown }}
-          </v-icon>
-        </button>
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <send-backward
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('lower')"
+                />
+              </div>
+            </template>
+            <span>На уровень ниже</span>
+          </v-tooltip>
+        </template>
       </template>
     </div>
     <div class="dash-constructor-schemes__keymap-button">
@@ -418,11 +443,22 @@
 import {
   mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp,
 } from '@mdi/js';
+import BringForward from '../../../images/bring_forward.svg';
+import BringToFront from '../../../images/bring_to_front.svg';
+import SendBackward from '../../../images/send_backward.svg';
+import SendToBack from '../../../images/send_to_back.svg';
+
 import ConstructorSchemesClass from '../../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'DashConstructorSchemes',
+  components: {
+    BringForward,
+    BringToFront,
+    SendBackward,
+    SendToBack,
+  },
   props: {
     // id элемента (table-1\2\3, graph-1\2\3)
     idFrom: {
@@ -455,6 +491,7 @@ export default {
       gear: mdiSettings,
       closeIcon: mdiClose,
       arrowUp: mdiArrowUp,
+      iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
       dndPanel: false,
