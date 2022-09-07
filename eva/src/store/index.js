@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import createPersistedState from 'vuex-persistedstate';
 
+import { indexOf } from 'core-js/internals/array-includes';
 import store from './store'; // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import auth from './storeAuth/store';
 import form from './storeForm/store';
@@ -1228,7 +1229,7 @@ export default new Vuex.Store({
       return new Promise((resolve) => {
         const result = rest.getState(id, restAuth);
         result.then((stateFrom) => {
-          if (stateFrom) {
+          if (stateFrom && stateFrom?.name) {
             if (!state[id]) {
               commit('setState', [
                 {
@@ -1773,9 +1774,14 @@ export default new Vuex.Store({
       }
       const { tockens } = state[event.idDash];
       let id = -1;
+      const idFromToken = tockens.find((token) => token.name === item.target);
+      if ((tockens?.length > 0) && idFromToken) {
+        id = idFromToken?.value || +idFromToken.defaultValue;
+      }
       if (Number.isInteger(+item.target)) {
         id = item.target;
       }
+
       if (id) await dispatch('loader', { id });
 
       let tockensTarget = [];
@@ -1877,9 +1883,9 @@ export default new Vuex.Store({
       const { options } = state[event.idDash][event.id];
       const currentTab = event.event.tab || state[id]?.currentTab;
       const isTabMode = state[id]?.tabs;
-      const lastEl = state[id]?.tabList.find(
+      const lastEl = state[id]?.tabList?.find(
         (el) => el.id.toString() === event.event.tab,
-      );
+      ) || 1;
       if (!options?.openNewScreen) {
         if (!isTabMode) {
           event.route.push(`/dashboards/${id}`);

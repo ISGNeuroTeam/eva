@@ -393,16 +393,16 @@ export default {
       return this.$store.getters.getTheme;
     },
     gridShow() {
-      if (this.loadingDash || !this.dashFromStore.grid) {
+      if (this.loadingDash || !this.dashFromStore?.grid) {
         return false;
       }
-      return this.dashFromStore.gridShow === 'true';
+      return this.dashFromStore?.gridShow === 'true';
     },
     getSizeGrid() {
-      if (this.loadingDash || !this.dashFromStore.grid) {
+      if (this.loadingDash || !this.dashFromStore?.grid) {
         return { hor: '18', vert: '32' };
       }
-      return this.dashFromStore.grid;
+      return this.dashFromStore?.grid;
     },
     tabs() {
       if (this.loadingDash || !this.dashFromStore.tabList) {
@@ -429,14 +429,14 @@ export default {
       if (this.loadingDash) {
         return [];
       }
-      if (!this.dashFromStore.searches) {
+      if (this.dashFromStore && !this.dashFromStore?.searches) {
         this.$store.commit('setState', [{
           object: this.dashFromStore,
           prop: 'searches',
           value: [],
         }]);
       }
-      return this.dashFromStore.searches;
+      return this.dashFromStore?.searches || [];
     },
     tokens() {
       if (this.loadingDash || !this.dashFromStore.tockens) {
@@ -465,7 +465,7 @@ export default {
     searches: {
       deep: true,
       handler(searches) {
-        if (this.firstLoad) {
+        if (this.firstLoad && (searches?.length > 0)) {
           searches.forEach((search) => {
             const loading = search.parametrs?.isStartImmediately
               || search.parametrs.isStartImmediately === undefined;
@@ -505,38 +505,41 @@ export default {
 
     await this.checkAlreadyDash();
     this.loadingDash = false;
-    document.title = `EVA | ${this.dashFromStore.name}`;
+    document.title = `EVA | ${this.dashFromStore?.name || '404'}`;
     if (this.$route.params.tabId) {
       this.clickTab(Number(this.$route.params.tabId));
     }
     this.createStartClient();
     this.calcSizeCell();
     this.addScrollListener();
-
-    this.$refs.tabPanel.$el.onwheel = this.scroll;
+    if (this.$refs?.tabPanel) {
+      this.$refs.tabPanel.$el.onwheel = this.scroll;
+    }
     this.checkTabOverflow();
     window.onresize = this.checkTabOverflow;
   },
   methods: {
     startSearches(searches) {
-      searches.forEach((search) => {
-        if (search.status === 'empty') {
-          this.$set(this.dataObject, search.id, { data: [], loading: true });
-          this.$set(this.dataObjectConst, search.id, {
-            data: [],
-            loading: true,
-          });
-          this.$store.commit('updateSearchStatus', {
-            idDash: this.idDash,
-            sid: search.sid,
-            id: search.id,
-            status: 'pending',
-          });
-          this.$nextTick(() => {
-            this.getData(search);
-          });
-        }
-      });
+      if (searches?.length > 0) {
+        searches.forEach((search) => {
+          if (search.status === 'empty') {
+            this.$set(this.dataObject, search.id, { data: [], loading: true });
+            this.$set(this.dataObjectConst, search.id, {
+              data: [],
+              loading: true,
+            });
+            this.$store.commit('updateSearchStatus', {
+              idDash: this.idDash,
+              sid: search.sid,
+              id: search.id,
+              status: 'pending',
+            });
+            this.$nextTick(() => {
+              this.getData(search);
+            });
+          }
+        });
+      }
     },
     getData(search) {
       this.$store.dispatch('getDataApi', { search, idDash: this.idDash })
@@ -561,7 +564,7 @@ export default {
         });
     },
     getElementSourceId(searchId) {
-      return this.searches.find((search) => search.id === searchId)?.id || '';
+      return this.searches.find((search) => search?.id === searchId)?.id || '';
     },
     exportDataCSV(searchName) {
       const searchData = this.dataObject[searchName].data;
@@ -590,26 +593,32 @@ export default {
       link.remove();
     },
     scroll(event) {
-      event.preventDefault();
-      // eslint-disable-next-line operator-assignment
-      this.$refs.tabPanel.$el.scrollLeft = this.$refs.tabPanel.$el.scrollLeft - event.wheelDeltaY;
-      this.checkTabOverflow();
+      if (this.$refs?.tabPanel) {
+        event.preventDefault();
+        // eslint-disable-next-line operator-assignment
+        this.$refs.tabPanel.$el.scrollLeft = this.$refs.tabPanel.$el.scrollLeft - event.wheelDeltaY;
+        this.checkTabOverflow();
+      }
     },
     moveScroll(value) {
-      this.$refs.tabPanel.$el.scrollLeft = value;
-      this.checkTabOverflow();
+      if (this.$refs?.tabPanel) {
+        this.$refs.tabPanel.$el.scrollLeft = value;
+        this.checkTabOverflow();
+      }
     },
     checkTabOverflow() {
-      setTimeout(() => {
-        const { clientWidth, scrollWidth, scrollLeft } = this.$refs.tabPanel.$el;
-        this.leftDots = scrollLeft > 0;
-        if (clientWidth < scrollWidth) {
-          this.rightDots = clientWidth + scrollLeft < scrollWidth + 5
-            && clientWidth + scrollLeft < scrollWidth - 5;
-        } else {
-          this.rightDots = false;
-        }
-      }, 0);
+      if (this.$refs?.tabPanel) {
+        setTimeout(() => {
+          const { clientWidth, scrollWidth, scrollLeft } = this.$refs.tabPanel.$el;
+          this.leftDots = scrollLeft > 0;
+          if (clientWidth < scrollWidth) {
+            this.rightDots = clientWidth + scrollLeft < scrollWidth + 5
+                && clientWidth + scrollLeft < scrollWidth - 5;
+          } else {
+            this.rightDots = false;
+          }
+        }, 0);
+      }
     },
     getSearchName(elem) {
       return this.searches.find((element) => element?.id === elem.search)?.sid || '';
@@ -650,8 +659,8 @@ export default {
       this.deleteTabName = '';
       this.deleteTabId = '';
       this.deleteTabId = tabIndex;
-      if (this.tabs[tabIndex].name !== '' && this.tabs[tabIndex].name !== 'Без названия') {
-        this.deleteTabName = this.tabs[tabIndex].name;
+      if (this.tabs[tabIndex]?.name !== '' && this.tabs[tabIndex]?.name !== 'Без названия') {
+        this.deleteTabName = this.tabs[tabIndex]?.name;
       } else {
         this.deleteTabName = '';
       }
@@ -669,7 +678,7 @@ export default {
       if (!this.tabEditMode && !this.editableTabID) {
         this.tabEditMode = true;
         this.editableTabID = tab.id;
-        this.tempName = tab.name;
+        this.tempName = tab?.name;
       }
       this.checkTabOverflow();
     },
@@ -724,6 +733,8 @@ export default {
         this.$store.commit('changeDashboard', {
           data: response,
         });
+      } else if (response.status === 'failed') {
+        await this.$router.replace('/404');
       }
       this.prepared = true;
     },

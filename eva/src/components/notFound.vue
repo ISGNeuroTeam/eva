@@ -7,7 +7,7 @@
         </h2>
         <div class="mt-4">
           <v-btn
-            to="/"
+            to="/main"
             outlined
             :dark="isDarkTheme"
           >

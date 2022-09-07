@@ -1,3 +1,31 @@
+# [1.106.0] - 2022-09-02
+
+### Added
+- Schemes constructor: Added icons and tooltips on "toggle-order" buttons
+- Schemes constructor: Added tooltip on "toggle-editor-mode" button
+- Schemes constructor: Added tooltip on "options-panel" button
+- Added redirect to the 404 page when switching to a non-existent dashboard
+
+### Changed
+- The animation of the transition of the visualization dialog box to full-screen mode has been changed
+
+### Fixed
+- The size of the text changed when it was selected in full-screen visualizations
+
+# [1.105.0] - 2022-08-25
+
+### Added
+- Added the ability to get the value of the column selected in the settings when clicking on a table row
+- Added the ability to follow various links from chamomile petals on the geo-dashboard
+- Added the ability to put a bitmap image file under SVG
+- Added regression line for scatter plot
+- Saving/loading a theme as a file
+- The ability to set a token by clicking through the drop-down list
+
+### Fixed
+- Multiline. Rounding stopped working for data signing
+- Multiline. The first metric for the X-axis is not perceived
+
 # [1.104.0] - 2022-08-18
 
 ### Added
