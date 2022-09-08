@@ -1,3 +1,8 @@
+# [1.107.0] - 2022-09-08
+
+### Added
+- Added default dashboard assignment for users
+
 # [1.106.0] - 2022-09-02
 
 ### Added
