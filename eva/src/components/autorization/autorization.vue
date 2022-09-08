@@ -115,6 +115,11 @@ export default {
         });
 
         if (response.status === 200) {
+          const result = await this.$store.dispatch('auth/getEssenceList', {
+            role: 1,
+            create: false,
+          });
+          const userId = result.find((item) => item.name === this.user.username);
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
@@ -124,9 +129,20 @@ export default {
             );
             this.$store.commit('clearState');
             this.$store.commit('auth/setUserName', this.$jwt.decode().username);
-            this.$router.push('/main');
             return res;
           });
+          const getSetting = await this.$store.dispatch('getUserSettings', userId.id);
+          let setting = getSetting.setting.replaceAll("'", '"');
+          try {
+            setting = JSON.parse(setting);
+          } catch (e) {
+            setting = '';
+          }
+          if (setting && setting?.homePage) {
+            await this.$router.push({ path: '/dashboards', query: { home: setting.homePage } });
+          } else {
+            await this.$router.push('/main');
+          }
         } else {
           await this.$store.dispatch(
             'auth/putLog',
