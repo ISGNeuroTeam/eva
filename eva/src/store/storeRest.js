@@ -632,4 +632,75 @@ export default {
 
     return data;
   },
+  async getUserSettings(restAuth, id) {
+    let data = [];
+    const response = await fetch(`/api/user/setting?user_id=${id}`).catch((error) => {
+      restAuth.putLog(
+        `Настройки пользователя получить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
+      );
+      return response;
+    });
+    if (response.status === 200) {
+      // если получилось
+      await response
+        .json()
+        .then((res) => {
+          // переводим полученные данные из json в нормальный объект
+          data = res;
+          restAuth.putLog(
+            `Настройки пользователя получены успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
+          );
+        })
+        .catch((error) => {
+          restAuth.putLog(
+            `Настройки пользователя получить не удалось&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
+          );
+        });
+    } else {
+      restAuth.putLog(
+        `Настройки пользователя получить не удалось&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
+      );
+      return response;
+    }
+    return data;
+  },
+  async setUserSettings(settings, restAuth) {
+    let data = [];
+
+    const response = await fetch('/api/user/setting', {
+      // сперва нужно подать post запрос
+      method: 'PUT',
+      body: settings,
+      // mode: 'no-cors'
+    }).catch((error) => {
+      restAuth.putLog(
+        `Настройки пользователя обновить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
+      );
+      return response;
+    });
+    if (response.status === 200) {
+      // если получилось
+      await response
+        .text()
+        .then((res) => {
+          // переводим полученные данные из json в нормальный объект
+          data = res;
+          restAuth.putLog(
+            `Настройки пользователя обновились успешно.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}`,
+          );
+        })
+        .catch((error) => {
+          restAuth.putLog(
+            `Настройки пользователя обновить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;Ошибка: ${error}`,
+          );
+        });
+    } else {
+      restAuth.putLog(
+        `Настройки пользователя обновить не удалось.&nbsp;&nbsp;status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}`,
+      );
+      return response;
+    }
+
+    return data;
+  },
 };

@@ -43,6 +43,9 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+    query: {
+      home: '',
+    },
   },
   {
     name: 'Дашборд',
