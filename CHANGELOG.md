@@ -8,11 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Added default dashboard assignment for users
 
 ### Changed
 
 ### Fixed
+
+## [1.107.0]
+
+### Added
+- Added default dashboard assignment for users
 
 ## [1.106.0]
 
