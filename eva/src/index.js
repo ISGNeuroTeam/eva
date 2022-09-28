@@ -13,7 +13,7 @@ import AsyncComputed from 'vue-async-computed';
 import VueDraggableResizable from 'vue-draggable-resizable';
 // подключаем компонент для выбора даты и времени
 // TODO: что это за модуль, почему ide считает что он не установлен
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.common.js';
 // подключаем файл с настройками хранилища Vuex
 import moment from 'moment';
 import store from './store/index';
