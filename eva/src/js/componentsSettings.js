@@ -23,7 +23,11 @@ import {
 
 export default {
   tools: [
-    { name: 'Таблица', img: mdiTableLarge, type: 'table' },
+    {
+      name: 'Динамические визуализации',
+      img: mdiGroup,
+      type: 'gridGroup',
+    },
     {
       name: 'Мультилинейный график',
       img: mdiChartMultiline,
@@ -85,9 +89,9 @@ export default {
       width: 700,
       height: 400,
     },
-    grid: {
-      width: 700,
-      height: 400,
+    gridGroup: {
+      width: 900,
+      height: 600,
     },
     button: {
       width: 345,
@@ -153,7 +157,7 @@ export default {
   icons: {
     table: mdiTableLarge,
     multiLine: mdiChartMultiline,
-    grid: mdiGroup,
+    gridGroup: mdiGroup,
     piechart: mdiChartPie,
     graph: mdiGraph,
     guntt: mdiChartGantt,
