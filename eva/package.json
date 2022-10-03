@@ -89,6 +89,7 @@
     "vue-draggable-resizable": "2.3.0",
     "vue-html2canvas": "0.0.4",
     "vue-router": "3.5.3",
+    "vue-markdown": "2.2.4",
     "vue-svg-loader": "0.16.0",
     "vue2-teleport": "1.0.1",
     "vuedraggable": "2.24.3",

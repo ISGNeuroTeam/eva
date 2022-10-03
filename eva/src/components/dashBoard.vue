@@ -490,6 +490,10 @@
         v-show="!showElement"
         class="card-text"
       >
+        <vue-markdown
+          v-if="toolSettings.dataSourceDescription"
+          class="source-descr"
+        >{{ toolSettings.dataSourceDescription }}</vue-markdown>
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
@@ -567,11 +571,15 @@ import {
   mdiFullscreen,
   mdiFullscreenExit,
 } from '@mdi/js';
+import VueMarkdown from 'vue-markdown';
 import settings from '../js/componentsSettings';
 import visualisation from '../js/visualisationCRUD';
 
 export default {
   name: 'DashBoard',
+  components: {
+    VueMarkdown,
+  },
   props: {
     width: {
       type: Number,
@@ -855,6 +863,9 @@ export default {
     },
     excludedFromDataSearches() {
       return settings.excludes.fromDataSearches.some((item) => item === this.elementType);
+    },
+    toolSettings() {
+      return settings.tools.find((item) => item.type === this.elementType);
     },
   },
   watch: {
@@ -1348,6 +1359,12 @@ export default {
 
 <style lang="sass">
 @import '../sass/dashBoard.sass'
+</style>
+<style lang="sass" scoped>
+.source-descr
+  margin: 16px
+  color: var(--main_text)
+  text-align: left
 </style>
 <style lang="sass">
 .settings-dash
