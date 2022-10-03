@@ -294,7 +294,7 @@ export default {
       'metricGroup',
       'scatterPlotLegend',
     ],
-    constructorSchemes: ['visible', 'level', 'pinned'],
+    constructorSchemes: ['visible', 'level', 'pinned', 'primitivesLibrary'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -869,6 +869,7 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
+      'constructorSchemes',
     ],
   },
 };
