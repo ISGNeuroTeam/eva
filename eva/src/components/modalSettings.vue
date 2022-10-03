@@ -398,7 +398,11 @@
               >
                 {{ primitivesLibraryAutoGrowLinkText }}
               </v-btn>
-              <v-textarea
+              <code-editor
+                v-if="active"
+                v-model="options.primitivesLibrary"
+              />
+              <!--              <v-textarea
                 v-model="options.primitivesLibrary"
                 name="input-7-1"
                 filled
@@ -412,7 +416,7 @@
                 outlined
                 hide-details
                 @input="isChanged = true"
-              />
+              />-->
               <v-btn
                 v-if="primitivesLibraryAutoGrow"
                 plain
@@ -1114,6 +1118,8 @@ export default {
             || value?.type === 'image/jpg'
             || value?.type === 'image/bmp') || 'Некорректный тип файла',
       ],
+      codeEditorValue: '',
+      showCodeEditor: false,
     };
   },
   computed: {
@@ -1156,6 +1162,9 @@ export default {
         return this.dashFromStore.modalSettings.status;
       },
       set(value) {
+        this.$nextTick(() => {
+          this.showCodeEditor = value;
+        });
         this.$store.commit('setModalSettings', {
           idDash: this.idDash,
           element: this.element,
@@ -1856,6 +1865,9 @@ export default {
           },
         ]);
       }
+    },
+    updateCodeEditorValue(value) {
+      this.options.primitivesLibrary = value;
     },
   },
 };

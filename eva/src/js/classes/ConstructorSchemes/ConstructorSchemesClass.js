@@ -1,4 +1,4 @@
-import {
+import yFiles, {
   Color,
   DefaultLabelStyle,
   DefaultPortCandidate,
@@ -1314,7 +1314,9 @@ class ConstructorSchemesClass {
       );
     } else {
       this.isEdit = false;
-      this.graphComponent.inputMode = new GraphViewerInputMode();
+      this.graphComponent.inputMode = new GraphViewerInputMode({
+        focusableItems: 'none',
+      });
       this.closeDataPanelCallback();
     }
     return this.isEdit;
@@ -1328,6 +1330,9 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
+      // TODO: Починить функционал copy/paste/duplicate
+      allowPaste: false,
+      allowDuplicate: false,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
