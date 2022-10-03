@@ -468,7 +468,7 @@
 
     .block-tool
         position: absolute
-        width: 400px
+        width: 420px
         height: auto
         overflow-y: auto
         top: 55px
@@ -476,14 +476,10 @@
         border: 2px solid rgba(0,0,0,0.2)
         border-radius: 4px
         background: white
-        padding: 20px
+        padding: 8px
         opacity: 0
         visibility: hidden
         transition: all 0.4s ease
-        display: flex
-        flex-flow: column nowrap
-        justify-content: flex-start
-        align-items: flex-start
         transition: all 0.4s ease
         transform: translateY(-100%)
 
@@ -745,23 +741,26 @@
 .tool-one
     display: flex
     flex-flow: row nowrap
+    vertical-align: center
     justify-content: flex-start
-    align-items: center
-    width: 344px
     cursor: pointer
-    margin: 7px 0
+    padding: 8px
 
     .tool-img
-        padding: 5px 15px
+        padding: 5px 5px
         border-radius: 10px 0 0 10px
         cursor: pointer
         border: 2px solid teal
+        display: flex
+        align-items: center
 
         .tool-img-itself
             width: 20px
             height: 20px
 
     .tool-name
+        display: flex
+        align-items: center
         padding: 9px 15px
         font-size: 14px
         color: rgba(0,0,0,0.7)
@@ -770,6 +769,10 @@
         width: 100%
         cursor: pointer
         background: white
+
+.tool-one
+    &.draggable-fly
+        width: 200px
 
 .block-filter
     position: absolute
