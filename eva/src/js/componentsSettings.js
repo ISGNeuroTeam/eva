@@ -18,6 +18,7 @@ import {
   mdiTuneVertical,
   mdiImageFilterTiltShift,
   mdiScatterPlotOutline,
+  mdiGroup,
 } from '@mdi/js';
 
 export default {
@@ -28,9 +29,10 @@ export default {
       img: mdiChartMultiline,
       type: 'multiLine',
     },
-    { name: 'Карта', img: mdiMapMarker, type: 'map' },
     { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     { name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select' },
+    { name: 'Таблица', img: mdiTableLarge, type: 'table' },
+    { name: 'Карта', img: mdiMapMarker, type: 'map' },
     { name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker' },
     { name: 'Граф', img: mdiGraphql, type: 'ygraph' },
     { name: 'Кустовая схема', img: mdiChartScatterPlot, type: 'bush' },
@@ -80,6 +82,10 @@ export default {
       height: 270,
     },
     multiLine: {
+      width: 700,
+      height: 400,
+    },
+    grid: {
       width: 700,
       height: 400,
     },
@@ -147,6 +153,7 @@ export default {
   icons: {
     table: mdiTableLarge,
     multiLine: mdiChartMultiline,
+    grid: mdiGroup,
     piechart: mdiChartPie,
     graph: mdiGraph,
     guntt: mdiChartGantt,

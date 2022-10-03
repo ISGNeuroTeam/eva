@@ -421,12 +421,13 @@
           Создать
         </v-btn>
       </div>
-      <div
+      <v-row
         class="block-tool"
         :class="{ opentool: opentool }"
         :style="blockToolStyle"
       >
-        <div
+        <v-col
+          cols="6"
           v-for="tool in tools"
           :key="tool.name"
           class="tool-one draggable"
@@ -457,8 +458,8 @@
           >
             {{ tool.name }}
           </div>
-        </div>
-      </div>
+        </v-col>
+      </v-row>
       <div
         ref="blockTocken"
         class="block-tocken"
@@ -1811,6 +1812,7 @@ export default {
       document.body.appendChild(avatar);
       // даем ему класс
       avatar.classList.add('avatar');
+      avatar.classList.add('draggable-fly');
       // делаем его выше всех
       avatar.style.zIndex = 99;
       // и относительно позиионируем
