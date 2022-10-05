@@ -158,7 +158,10 @@
         // 'dash-constructor-schemes__dnd-panel-container--is-keymap-open': isKeymapOpen
       }"
     >
-      <div class="row justify-end">
+      <div
+        v-show="!isLoading"
+        class="row justify-end"
+      >
         <div class="col-auto">
           <button
             @click="toggleDnDPanel"
@@ -173,6 +176,7 @@
         </div>
       </div>
       <div
+        v-show="!isLoading"
         ref="dndPanel"
         class="dash-constructor-schemes__dnd-panel"
       >
@@ -415,7 +419,18 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </div>
+      <div
+        v-show="isLoading"
+        class="dash-constructor-schemes__loading-circular"
+      >
+        <v-progress-circular
+          indeterminate
+          size="50"
+          :color="theme.$accent_ui_color"
+        />
+      </div>
     </div>
+    <!--Settings-element-panel-->
     <div
       class="dash-constructor-schemes__data-panel"
       :class="{
@@ -829,6 +844,7 @@ export default {
       dataSelectedNode: null,
       isKeymapOpen: false,
       panelBottomOffset: 10,
+      isLoading: false,
     };
   },
   computed: {
@@ -836,7 +852,7 @@ export default {
       return this.$store.state[this.idDashFrom];
     },
     primitivesFromStore() {
-      if (this.dashFromStore[this.idFrom].options.primitivesLibrary) {
+      if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
         return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary);
       }
       return [];
@@ -855,6 +871,12 @@ export default {
     },
   },
   watch: {
+    primitivesFromStore: {
+      handler() {
+        this.constructorSchemes.refreshDnDPanel(this.primitivesFromStore);
+      },
+      deep: true,
+    },
     mockData: {
       deep: true,
       handler(value) {
@@ -886,6 +908,9 @@ export default {
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
     },
+    toggleLoading(isLoading) {
+      this.isLoading = isLoading;
+    },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
         dndPanelElem: this.$refs.dndPanel,
@@ -897,6 +922,7 @@ export default {
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
         updateStoreCallback: this.updateSavedGraph,
+        toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
       });
       if (this.constructorSchemes) {
@@ -980,6 +1006,12 @@ export default {
 .dash-constructor-schemes {
   position: relative;
   overflow: hidden;
+  &__loading-circular {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   &__options {
     position: absolute;
     left: 20px;

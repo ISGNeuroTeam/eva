@@ -1,13 +1,11 @@
 <template>
   <div>
-    <button @click="formatRange">
-      formatRange
-    </button>
     <codemirror
       ref="myCm"
       v-model="code"
       :options="cmOptions"
       @keyup.native="formatRange"
+      @ready="refresh"
     />
   </div>
 </template>
