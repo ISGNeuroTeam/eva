@@ -255,7 +255,7 @@ export default {
     csvg: ['tooltip', 'backgroundImage'],
     ygraph: [],
     bush: [],
-    map: ['osmserver', 'primitivesLibrary'],
+    map: ['osmserver', 'primitives', 'primitivesLibrary'],
     heatmap: [
       'dataFormat',
       'x',
@@ -294,7 +294,7 @@ export default {
       'metricGroup',
       'scatterPlotLegend',
     ],
-    constructorSchemes: ['visible', 'level', 'pinned', 'primitivesLibrary'],
+    constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -629,7 +629,6 @@ export default {
         return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
-
     {
       option: 'columnCount',
       description: 'Количество столбцов',
@@ -786,6 +785,18 @@ export default {
       option: 'numberPerDigit',
       description: 'Разделять число на разряды',
       elem: 'switch',
+    },
+
+    // fullWidthGroup
+    {
+      group: 'Библиотека примитивов',
+      option: 'primitives',
+    },
+    {
+      optionGroup: 'primitives',
+      option: 'primitivesLibrary',
+      elem: 'code-editor',
+      isFullWidth: true,
     },
 
   ],
