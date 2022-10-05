@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added the ability to assign an icon via metadata
+- Added ability to correct color via metadata
 
 ### Changed
+- Renaming the single value component
 
 ### Fixed
 
