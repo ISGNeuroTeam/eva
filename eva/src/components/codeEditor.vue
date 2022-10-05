@@ -1,10 +1,13 @@
 <template>
   <div>
+    <button @click="formatRange">
+      formatRange
+    </button>
     <codemirror
       ref="myCm"
       v-model="code"
       :options="cmOptions"
-      @ready="formatRange"
+      @keyup.native="formatRange"
     />
   </div>
 </template>
@@ -19,11 +22,6 @@ import '../js/codeMirror/codeHighlight.js';
 // Linter
 import 'codemirror/addon/lint/lint.js';
 import 'codemirror/addon/lint/json-lint.js';
-import 'codemirror/addon/fold/foldgutter.css';
-import 'codemirror/addon/fold/foldgutter.js';
-import 'codemirror/addon/fold/foldcode.js';
-import 'codemirror/addon/fold/indent-fold.js';
-import 'codemirror/addon/merge/merge.js';
 // Theme
 import { isDarkColor } from '@/js/colorutility/isDarkColor';
 
@@ -48,14 +46,12 @@ export default {
       cmOptions: {
         // codemirror options
         tabSize: 4,
-        foldGutter: true,
-        gutters: ['CodeMirror-foldgutter', 'CodeMirror-linenumbers', 'CodeMirror-lint-markers'],
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-lint-markers'],
         lineWrapping: true,
         mode: {
           name: 'javascript',
           json: true,
         },
-        matchBrackets: true,
         theme: 'eva-dark',
         lineNumbers: true,
         line: true,
@@ -76,7 +72,6 @@ export default {
         return this.modelValue;
       },
       set(value) {
-        console.log(this.$refs.myCm.codemirror.state);
         this.$emit('update:model-value', value);
       },
     },
@@ -93,6 +88,10 @@ export default {
     isDarkTheme(val) {
       // eslint-disable-next-line no-unused-expressions
       val ? this.cmOptions.theme = 'eva-dark' : this.cmOptions.theme = 'eva';
+      this.refresh();
+    },
+    code() {
+      console.log('code update');
     },
   },
   mounted() {
@@ -102,19 +101,18 @@ export default {
       this.cmOptions.theme = 'eva';
     }
   },
-  updated() {
-    this.formatRange();
-  },
   methods: {
-    formatRange() {
-      try {
-        this.incorrectJSON = false;
-        if (this.code) {
-          this.code = JSON.stringify(JSON.parse(this.code), null, 4);
+    formatRange(event) {
+      if (event.ctrlKey && event.shiftKey && event.keyCode === 76) {
+        try {
+          this.incorrectJSON = false;
+          if (this.code) {
+            this.code = JSON.stringify(JSON.parse(this.code), null, 4);
+          }
+          this.refresh();
+        } catch (error) {
+          this.incorrectJSON = true;
         }
-        this.refresh();
-      } catch (error) {
-        this.incorrectJSON = true;
       }
     },
     refresh() {

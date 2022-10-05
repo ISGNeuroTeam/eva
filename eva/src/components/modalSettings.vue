@@ -1822,8 +1822,8 @@ export default {
         ]);
       }
     },
-    updateCodeEditorValue(value) {
-      this.options.primitivesLibrary = value;
+    updateCodeEditorErrorState(errorStatus) {
+      this.codeEditorError = errorStatus;
     },
     updateCodeEditorErrorState(errorStatus) {
       this.codeEditorError = errorStatus;
