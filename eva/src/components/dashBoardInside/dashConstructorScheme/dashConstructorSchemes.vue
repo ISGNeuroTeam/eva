@@ -835,6 +835,12 @@ export default {
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
     },
+    primitivesFromStore() {
+      if (this.dashFromStore[this.idFrom].options.primitivesLibrary) {
+        return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary);
+      }
+      return [];
+    },
     savedGraph() {
       return this.dashFromStore.savedGraph || '';
     },
@@ -885,7 +891,7 @@ export default {
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
         dataRest: this.mockData,
-        iconsList: this.iconsList,
+        iconsList: this.primitivesFromStore,
         elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,

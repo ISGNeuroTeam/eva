@@ -1118,13 +1118,20 @@ class ConstructorSchemesClass {
   }
 
   generateIconNodes(iconsList) {
-    return Promise.all(iconsList.map(async (icon) => {
+    const filteredIconList = [];
+    Promise.all(iconsList.map(async (icon) => {
+      const response = await fetch(`/svg/${icon.src}`);
+      if (response.ok) {
+        filteredIconList.push(icon);
+      }
+    }));
+    return Promise.all(filteredIconList.map(async (icon) => {
       const imageStyleNode = new SimpleNode();
-      const layout = await ConstructorSchemesClass.getSvgLayoutSize(icon.src);
+      const layout = await ConstructorSchemesClass.getSvgLayoutSize(`/svg/${icon.src}`);
       try {
         const nodeSize = this.generateImageSize(layout);
         imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-        imageStyleNode.style = new ImageNodeStyle(icon.src);
+        imageStyleNode.style = new ImageNodeStyle(`/svg/${icon.src}`);
         imageStyleNode.tag = {
           dataType: 'image-node',
           isAspectRatio: true,
