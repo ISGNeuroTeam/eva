@@ -50,127 +50,141 @@
               border: `1px solid ${theme.$main_border}`
             }"
           >
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Выбор времени
+            <div v-if="options.canLastTimeEnter && options.canChooseTime">
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
+              >
+                Выбор времени
+              </div>
+              <div class="choose-period">
+                <p :style="{ color: theme.$main_text }">
+                  Последние
+                </p>
+                <v-text-field
+                  v-model="lastEvery"
+                  class="textarea-item"
+                  outlined
+                  :color="theme.$accent_ui_color"
+                  :style="{ color: theme.$main_text }"
+                  hide-details
+                  @input="setLast($event)"
+                />
+              </div>
+              <div class="choose-time">
+                <v-chip
+                  :color="theme[color.hour]"
+                  class="time"
+                  @click="setTime('hour')"
+                >
+                  Часов
+                </v-chip>
+                <v-chip
+                  :color="theme[color.minute]"
+                  class="time"
+                  @click="setTime('minute')"
+                >
+                  Минут
+                </v-chip>
+                <v-chip
+                  :color="theme[color.second]"
+                  class="time"
+                  @click="setTime('second')"
+                >
+                  Секунд
+                </v-chip>
+              </div>
             </div>
-            <div class="choose-period">
-              <p :style="{ color: theme.$main_text }">
-                Последние
-              </p>
-              <v-text-field
-                v-model="lastEvery"
-                class="textarea-item"
-                outlined
-                :color="theme.$accent_ui_color"
-                :style="{ color: theme.$main_text }"
-                hide-details
-                @input="setLast($event)"
+
+            <div v-if="options.canChooseTime">
+              <div
+                  class="name-of-picker"
+                  :style="{ color: theme.$title }"
+              >
+                Выбор <span v-if="options.canChooseTime"> времени и </span> даты
+              </div>
+              <DTPicker
+                  :id="`${id}-start`"
+                  v-model="start"
+                  :label="`Начальная дата ${options.canChooseTime ? ' и время' : ''}`"
+                  :format="dateTimeFormat"
+                  button-now-translation="Сейчас"
+                  :color="theme.$accent_ui_color"
+                  :button-color="theme.$primary_button"
+                  :only-date="!options.canChooseTime"
+                  class="dtpicker"
+                  @input="setTocken('dt')"
+              />
+              <DTPicker
+                  :id="`${id}-end`"
+                  v-model="end"
+                  :label="`Конечная дата ${options.canChooseTime ? ' и время' : ''}`"
+                  :format="dateTimeFormat"
+                  button-now-translation="Сейчас"
+                  :color="theme.$accent_ui_color"
+                  :button-color="theme.$primary_button"
+                  :only-date="!options.canChooseTime"
+                  class="dtpicker"
+                  @input="setTocken('dt')"
               />
             </div>
-            <div class="choose-time">
-              <v-chip
-                :color="theme[color.hour]"
-                class="time"
-                @click="setTime('hour')"
+
+            <div v-else>
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
               >
-                Часов
-              </v-chip>
-              <v-chip
-                :color="theme[color.minute]"
-                class="time"
-                @click="setTime('minute')"
+                Диапазон дат
+              </div>
+              <DTPicker
+                :id="`${id}-between`"
+                v-model="range"
+                range
+                label="Диапазон дат"
+                :format="dateTimeFormat"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                :custom-shortcuts="DTPickerCustomShortcuts"
+                class="dtpicker range-picker"
+                @input="setTocken('range')"
+              />
+            </div>
+
+            <div v-if="options.canManuallyEnter">
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
               >
-                Минут
-              </v-chip>
-              <v-chip
-                :color="theme[color.second]"
-                class="time"
-                @click="setTime('second')"
-              >
-                Секунд
-              </v-chip>
+                Ввод даты и времени вручную
+              </div>
+              <v-text-field
+                v-model="start_custom.value"
+                label="Начальная дата"
+                counter="500"
+                :style="{ color: theme.$main_text }"
+                clearable
+                :color="theme[start_custom.color]"
+                hide-details
+                outlined
+                class="dtpicker custom-picker"
+                @blur="start_custom.color = 'controlsActive'"
+                @input="setTocken('custom')"
+              />
+              <v-text-field
+                v-model="end_custom.value"
+                label="Конечная дата"
+                counter="500"
+                :style="{ color: theme.$main_text }"
+                clearable
+                :color="theme[end_custom.color]"
+                hide-details
+                outlined
+                class="dtpicker custom-picker"
+                @blur="end_custom.color = 'controlsActive'"
+                @input="setTocken('custom')"
+              />
             </div>
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Выбор времени и даты
-            </div>
-            <DTPicker
-              :id="`${idDash}-start`"
-              v-model="start"
-              label="Начальная дата и время"
-              format="YYYY-MM-DD HH:mm"
-              button-now-translation="Сейчас"
-              :color="theme.$accent_ui_color"
-              :button-color="theme.$primary_button"
-              class="dtpicker"
-              @input="setTocken('dt')"
-            />
-            <DTPicker
-              :id="`${idDash}-end`"
-              v-model="end"
-              label="Конечная дата и время"
-              format="YYYY-MM-DD HH:mm"
-              button-now-translation="Сейчас"
-              :color="theme.$accent_ui_color"
-              :button-color="theme.$primary_button"
-              class="dtpicker"
-              @input="setTocken('dt')"
-            />
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Диапазон дат
-            </div>
-            <DTPicker
-              :id="`${idDash}-between`"
-              v-model="range"
-              range
-              label="Диапазон дат"
-              format="YYYY-MM-DD"
-              :color="theme.$accent_ui_color"
-              :button-color="theme.$primary_button"
-              :custom-shortcuts="DTPickerCustomShortcuts"
-              class="dtpicker range-picker"
-              @input="setTocken('range')"
-            />
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Ввод даты и времени вручную
-            </div>
-            <v-text-field
-              v-model="start_custom.value"
-              label="Начальная дата"
-              counter="500"
-              :style="{ color: theme.$main_text }"
-              clearable
-              :color="theme[start_custom.color]"
-              hide-details
-              outlined
-              class="dtpicker custom-picker"
-              @blur="start_custom.color = 'controlsActive'"
-              @input="setTocken('custom')"
-            />
-            <v-text-field
-              v-model="end_custom.value"
-              label="Конечная дата"
-              counter="500"
-              :style="{ color: theme.$main_text }"
-              clearable
-              :color="theme[end_custom.color]"
-              hide-details
-              outlined
-              class="dtpicker custom-picker"
-              @blur="end_custom.color = 'controlsActive'"
-              @input="setTocken('custom')"
-            />
+
             <div class="set-btn-block">
               <v-btn
                 small
@@ -269,9 +283,25 @@ export default {
       curDate: '',
       startForStore: '',
       endForStore: '',
+      defaultOptions: {
+        timeOutputFormat: '',
+        canManuallyEnter: true,
+        canRangeEnter: true,
+        canLastTimeEnter: true,
+        canChooseTime: true,
+      },
     };
   },
   computed: {
+    dateTimeFormat() {
+      const {
+        canChooseTime,
+      } = this.options;
+      if (canChooseTime) {
+        return 'YYYY-MM-DD hh:mm';
+      }
+      return 'YYYY-MM-DD';
+    },
     lastEvery: {
       get() {
         return this.last.every;
@@ -325,6 +355,16 @@ export default {
     },
     getTockens() {
       return this.$store.state[this.idDash].tockens;
+    },
+    dashStore() {
+      const { id, idDash } = this;
+      return this.$store.state[idDash][id];
+    },
+    options() {
+      return {
+        ...this.defaultOptions,
+        ...this.dashStore.options,
+      };
     },
   },
   mounted() {
@@ -463,8 +503,8 @@ export default {
       let period = 0;
       switch (elem) {
         case 'dt':
-          this.startForStore = parseInt(new Date(this.start).getTime() / 1000, 10);
-          this.endForStore = parseInt(new Date(this.end).getTime() / 1000, 10);
+          this.startForStore = this.formatDateToResult(this.start);
+          this.endForStore = this.formatDateToResult(this.end);
           this.range = null;
           this.start_custom.value = null;
           this.end_custom.value = null;
@@ -477,14 +517,8 @@ export default {
 
         case 'range':
           if (this.range) {
-            this.startForStore = parseInt(
-              new Date(this.range.start).getTime() / 1000,
-              10,
-            );
-            this.endForStore = parseInt(
-              new Date(this.range.end).getTime() / 1000,
-              10,
-            );
+            this.startForStore = this.formatDateToResult(this.range.start);
+            this.endForStore = this.formatDateToResult(this.range.end);
           }
           this.start = null;
           this.end = null;
@@ -525,9 +559,8 @@ export default {
             default:
               break;
           }
-
-          this.startForStore = ((Date.now() - period) / 1000).toFixed(0);
-          this.endForStore = (Date.now() / 1000).toFixed(0);
+          this.startForStore = this.formatDateToResult(Date.now() - period);
+          this.endForStore = this.formatDateToResult(Date.now());
           this.start = null;
           this.end = null;
           this.range = null;
@@ -537,6 +570,18 @@ export default {
         default:
           break;
       }
+    },
+    formatDateToResult(date) {
+      const {
+        timeOutputFormat = null,
+      } = this.options;
+      if (timeOutputFormat) {
+        return moment(date).format(timeOutputFormat);
+      }
+      return parseInt(
+        new Date(date).getTime() / 1000,
+        10,
+      );
     },
     setDate() {
       const tockens = this.$store.state[this.idDash].tockens || {};
@@ -588,6 +633,9 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+.DTPicker-elem::v-deep > div .dtpicker {
+  background-color: var(--main_bg) !important;
+}
 .dash-picker {
 
   ::v-deep .datetimepicker, .datepicker {
