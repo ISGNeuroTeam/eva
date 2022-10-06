@@ -265,6 +265,8 @@
                   <component
                     :is="field.elem"
                     v-model="options[field.option]"
+                    :important-export="!!field.importantExport"
+                    :elem-name="changeComponent"
                     @input="isChanged = true"
                     @update:error="updateCodeEditorErrorState"
                   />
@@ -1821,9 +1823,6 @@ export default {
           },
         ]);
       }
-    },
-    updateCodeEditorErrorState(errorStatus) {
-      this.codeEditorError = errorStatus;
     },
     updateCodeEditorErrorState(errorStatus) {
       this.codeEditorError = errorStatus;
