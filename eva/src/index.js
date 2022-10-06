@@ -161,7 +161,8 @@ Vue.component('data-profile', () => import('./components/autorization/dataForPro
 Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
 // Точечный график
 Vue.component('dash-scatterPlot', () => import('./components/dashBoardInside/dashScatterPlot.vue'));
-
+// Компонент редактора кода
+Vue.component('code-editor', () => import('./components/codeEditor.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
