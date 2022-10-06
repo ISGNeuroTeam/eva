@@ -63,6 +63,12 @@
             'z-index': 100,
           }"
         />
+        <v-text-field
+          v-model.number="dataObject.maxValue"
+          :rules="[value => value >= 0 || 'Некорректное значение.']"
+          label="Максимальное значение*"
+        />
+
         <div class="row">
           <div class="col-8">
             Цвет текущего
@@ -151,6 +157,7 @@
         </div>
         <v-btn
           small
+          :disabled="!(dataObject.maxValue >= 0)"
           :color="theme.$primary_button"
           @click="updateModelValue(dataObject)"
         >
