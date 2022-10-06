@@ -284,6 +284,7 @@ class ConstructorSchemesClass {
   localVariables = {
     isEdgeCreating: false,
     creatingEdge: null,
+    dataRest: [],
   }
 
   // Template elements
@@ -727,47 +728,63 @@ class ConstructorSchemesClass {
           />
         </clipPath>
       </defs>
-      <!--Bg-left-->
-      <rect
-        x="0"
-        y="0"
-        :width="layout.width"
-        :height="(layout.height / 100) * ((tag.firstValue * 100) / (tag.firstValue + tag.secondValue))"
-        :fill="tag.firstValueColor"
-        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-      />
-      <!--Bg-right-->
-      <rect
-        x="0"
-        y="0"
-        :width="layout.width"
-        :height="(layout.height / 100) * ((tag.secondValue * 100) / (tag.firstValue + tag.secondValue))"
-        :fill="tag.secondValueColor"
-        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
-      />
-      <text
-        class="b-data-node__text"
-        :dx="layout.width / 2"
-        :dy="(layout.height / 6) * 2"
-        alignment-baseline="middle"
-        text-anchor="middle"
-        :fill="tag.firstTextColor"
-        :font-size="((layout.height / 3) * 0.8) + 'px'"
-      >
-          {{ tag.firstValue }}
-      </text>
-      <text
-        class="b-data-node__text"
-        :dx="layout.width / 2"
-        :dy="(layout.height / 6) * 4"
-        alignment-baseline="middle"
-        text-anchor="middle"
-        :fill="tag.secondTextColor"
-        :font-size="((layout.height / 3) * 0.8) + 'px'"
-      >
-          {{ tag.secondValue }}
-      </text>
+      <template v-if="(tag.firstValue + tag.secondValue) > 0 && typeof (tag.firstValue + tag.secondValue) === 'number'">
+        <!--Bg-left-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height * (tag.firstValue / (tag.firstValue + tag.secondValue))"
+          :fill="tag.firstValueColor"
+          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+        />
+        <!--Bg-right-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height * (tag.secondValue / (tag.firstValue + tag.secondValue))"
+          :fill="tag.secondValueColor"
+          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
+        />
+        <text
+          class="b-data-node__text"
+          :dx="layout.width / 2"
+          :dy="(layout.height / 6) * 2"
+          alignment-baseline="middle"
+          text-anchor="middle"
+          :fill="tag.firstTextColor"
+          :font-size="((layout.height / 3) * 0.8) + 'px'"
+        >
+            {{ tag.firstValue }}
+        </text>
+        <text
+          class="b-data-node__text"
+          :dx="layout.width / 2"
+          :dy="(layout.height / 6) * 4"
+          alignment-baseline="middle"
+          text-anchor="middle"
+          :fill="tag.secondTextColor"
+          :font-size="((layout.height / 3) * 0.8) + 'px'"
+        >
+            {{ tag.secondValue }}
+        </text>
+      </template>
+      <template v-else>
+        <text
+            class="b-data-node__text"
+            :dx="layout.width / 2"
+            :dy="(layout.height / 6) * 2"
+            alignment-baseline="middle"
+            text-anchor="middle"
+            :style="'text-wrap:' + layout.width + 'px; text-extent: 3line'"
+            :fill="tag.firstTextColor"
+            :font-size="((layout.height / 3) * 0.8) + 'px'"
+          >
+              Выбраны некорректные значения
+        </text>
+      </template>
     </g>`,
       width: 150,
       height: 70,
@@ -1057,6 +1074,14 @@ class ConstructorSchemesClass {
       font,
       textFill,
     };
+  }
+
+  get dataRest() {
+    return this.localVariables.dataRest;
+  }
+
+  set dataRest(value) {
+    this.localVariables.dataRest = value;
   }
 
   constructor({
@@ -2052,8 +2077,8 @@ class ConstructorSchemesClass {
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textLeft: targetData.Description,
-                textRight: targetData.value,
+                textLeft: targetData?.Description || '-',
+                textRight: targetData?.value || '-',
               };
             }
             return nodeDataItem;
@@ -2067,22 +2092,21 @@ class ConstructorSchemesClass {
           node.tag = {
             ...node.tag,
             textFirst: targetData?.value || '-',
-            textSecond: targetData.Description || '-',
+            textSecond: targetData?.Description || '-',
           };
         } else if (dataType === '4') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            currentValue: +targetData.value,
-            maxValue: +targetData.value + 100,
+            currentValue: targetData?.value ? +targetData.value : 0,
           };
         } else if (dataType === '5') {
           const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
           const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
           node.tag = {
             ...node.tag,
-            firstValue: +targetDataFirst.value,
-            secondValue: +targetDataSecond.value,
+            firstValue: targetDataFirst?.value ? +targetDataFirst.value : 0,
+            secondValue: targetDataSecond?.value ? +targetDataSecond.value : 0,
           };
         }
       });
@@ -2112,9 +2136,8 @@ class ConstructorSchemesClass {
     } else if (dataType === '4') {
       updatedData = {
         ...dataFromComponent,
-        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value),
-        // TODO: Заменить нан корректное значение!!
-        maxValue: Number(this.getDataItemById(dataFromComponent.id)?.value) + 100,
+        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
+        maxValue: Number(dataFromComponent.maxValue || 0),
       };
     } else if (dataType === '5') {
       updatedData = {
@@ -2130,6 +2153,7 @@ class ConstructorSchemesClass {
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
     }
+    console.log(updatedData);
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
@@ -2190,6 +2214,10 @@ class ConstructorSchemesClass {
       lower: 'LOWER',
     };
     this.changeOrderSelectedElements(key, orderCommands[key]);
+  }
+
+  updateDataRest(updatedData) {
+    this.dataRest = updatedData;
   }
 }
 
