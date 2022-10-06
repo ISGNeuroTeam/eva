@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DataPicker: Added settings for displaying the input date and time
 - DataPicker: Added the ability to format the result
 - Added code editor for primitivesLibrary field
+- ConstructorSchemes: Added loading svg icons from server
 
 ### Changed
 

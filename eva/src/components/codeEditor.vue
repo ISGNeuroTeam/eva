@@ -5,6 +5,7 @@
       v-model="code"
       :options="cmOptions"
       @keyup.native="formatRange"
+      @ready="refresh"
     />
   </div>
 </template>
@@ -40,7 +41,6 @@ export default {
   },
   data() {
     return {
-      test: '',
       cmOptions: {
         // codemirror options
         tabSize: 4,
@@ -86,6 +86,10 @@ export default {
     isDarkTheme(val) {
       // eslint-disable-next-line no-unused-expressions
       val ? this.cmOptions.theme = 'eva-dark' : this.cmOptions.theme = 'eva';
+      this.refresh();
+    },
+    code() {
+      console.log('code update');
     },
   },
   mounted() {
