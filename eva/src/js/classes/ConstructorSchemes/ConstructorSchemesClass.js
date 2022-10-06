@@ -277,6 +277,7 @@ class ConstructorSchemesClass {
     },
     selectedShapeNodeStyle: '',
     isEdit: false,
+    loadingDnDPanelItems: false,
   }
 
   // Additional options
@@ -958,6 +959,14 @@ class ConstructorSchemesClass {
     return this.dndDataPanelItems;
   }
 
+  get loadingDnDPanelItems() {
+    return this.options.loadingDnDPanelItems;
+  }
+
+  set loadingDnDPanelItems(value) {
+    this.options.loadingDnDPanelItems = value;
+  }
+
   get isEdit() {
     return this.options.isEdit;
   }
@@ -1062,6 +1071,7 @@ class ConstructorSchemesClass {
     updateStoreCallback,
     openDataPanelCallback,
     closeDataPanelCallback,
+    toggleLoadingCallback,
     isEdit,
   }) {
     this.dragAndDropPanel = null;
@@ -1075,6 +1085,7 @@ class ConstructorSchemesClass {
     this.updateStoreCallback = updateStoreCallback;
     this.openDataPanelCallback = openDataPanelCallback;
     this.closeDataPanelCallback = closeDataPanelCallback;
+    this.toggleLoadingCallback = toggleLoadingCallback;
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
@@ -1118,14 +1129,7 @@ class ConstructorSchemesClass {
   }
 
   generateIconNodes(iconsList) {
-    const filteredIconList = [];
-    Promise.all(iconsList.map(async (icon) => {
-      const response = await fetch(`/svg/${icon.src}`);
-      if (response.ok) {
-        filteredIconList.push(icon);
-      }
-    }));
-    return Promise.all(filteredIconList.map(async (icon) => {
+    return Promise.all(iconsList.map(async (icon) => {
       const imageStyleNode = new SimpleNode();
       const layout = await ConstructorSchemesClass.getSvgLayoutSize(`/svg/${icon.src}`);
       try {
@@ -1869,7 +1873,11 @@ class ConstructorSchemesClass {
     await this.graphComponent.fitGraphBounds();
   }
 
-  initializeDnDPanel() {
+  initializeDnDPanel(updatedPrimitives) {
+    if (this.dragAndDropPanel) {
+      this.dragAndDropPanel = null;
+    }
+    this.toggleLoadingCallback(true);
     // initialize panel for yFiles drag and drop
     this.dragAndDropPanel = new DragAndDropPanel(this.dndPanelElem);
     // Set the callback that starts the actual drag and drop operation
@@ -1923,13 +1931,19 @@ class ConstructorSchemesClass {
 
     this.dragAndDropPanel.maxItemWidth = 160;
     this.createDnDPanelItems({
-      iconsList: this.iconsList,
+      iconsList: updatedPrimitives || this.iconsList,
       defaultEdgeStyle: this.defaultEdgeStyle,
       defaultNodeStyle: this.defaultNodeStyle,
       defaultLabelStyle: this.defaultLabelStyle,
     }).then((response) => {
       this.dragAndDropPanel.populatePanel(response);
+      this.toggleLoadingCallback(false);
     });
+  }
+
+  refreshDnDPanel(updatedPrimitives) {
+    this.dragAndDropPanel.clearDnDPanel();
+    this.initializeDnDPanel(updatedPrimitives);
   }
 
   async createDnDPanelItems({
@@ -1937,6 +1951,7 @@ class ConstructorSchemesClass {
     defaultEdgeStyle,
     defaultLabelStyle,
   }) {
+    this.loadingDnDPanelItems = true;
     return new Promise((resolve) => {
       const items = [];
       // Стандартный узел
@@ -2005,9 +2020,17 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
-        this.generateIconNodes(iconsList).then((result) => {
-          items.push(...result);
-          resolve(items);
+        const filteredIconList = [];
+        Promise.all(iconsList.map(async (icon) => {
+          const response = await fetch(`/svg/${icon.src}`);
+          if (response.ok) {
+            filteredIconList.push(icon);
+          }
+        })).then(() => {
+          this.generateIconNodes(filteredIconList).then((result) => {
+            items.push(...result);
+            resolve(items);
+          });
         });
       } else {
         resolve(items);
