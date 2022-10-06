@@ -1,10 +1,34 @@
 <template>
   <div>
+    <div class="importantExport d-flex align-center">
+      <v-file-input
+        :color="theme.$accent_ui_color"
+        :style="{ color: theme.$main_text, fill: theme.$main_text }"
+        class="file-itself"
+        hide-details
+        outlined
+        label="Выберите файл"
+        @change="file = $event"
+      />
+      <v-btn
+        class="ml-2"
+        :disabled="!file"
+        @click="importForm"
+      >
+        import
+      </v-btn>
+      <v-btn
+        class="ml-2"
+        @click="exportForm"
+      >
+        export
+      </v-btn>
+    </div>
     <codemirror
       ref="myCm"
       v-model="code"
       :options="cmOptions"
-      @keyup.native="formatRange"
+      @keyup.native.shift.ctrl.76="formatRange"
       @ready="refresh"
     />
   </div>
@@ -38,9 +62,18 @@ export default {
       type: String,
       default: '',
     },
+    elemName: {
+      type: String,
+      required: true,
+    },
+    importantExport: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
+      file: null,
       cmOptions: {
         // codemirror options
         tabSize: 4,
@@ -88,9 +121,6 @@ export default {
       val ? this.cmOptions.theme = 'eva-dark' : this.cmOptions.theme = 'eva';
       this.refresh();
     },
-    code() {
-      console.log('code update');
-    },
   },
   mounted() {
     if (this.isDarkTheme) {
@@ -98,19 +128,47 @@ export default {
     } else {
       this.cmOptions.theme = 'eva';
     }
+    setTimeout(() => {
+      this.formatRange();
+    }, 0);
   },
   methods: {
-    formatRange(event) {
-      if (event.ctrlKey && event.shiftKey && event.keyCode === 76) {
-        try {
-          this.incorrectJSON = false;
-          if (this.code) {
-            this.code = JSON.stringify(JSON.parse(this.code), null, 4);
-          }
-          this.refresh();
-        } catch (error) {
-          this.incorrectJSON = true;
+    readFile(callback) {
+      const rawFile = new XMLHttpRequest();
+      rawFile.overrideMimeType('application/json');
+      rawFile.open('GET', this.file, true);
+      rawFile.onreadystatechange = () => {
+        if (rawFile.readyState === 4 && rawFile.status === '200') {
+          callback(rawFile.responseText);
         }
+      };
+      rawFile.send(null);
+    },
+    importForm() {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.code = event.target.result;
+      };
+      reader.readAsText(this.file);
+    },
+    exportForm() {
+      const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(this.code)}`;
+      const downloadAnchorNode = document.createElement('a');
+      downloadAnchorNode.setAttribute('href', dataStr);
+      downloadAnchorNode.setAttribute('download', `${this.elemName}.json`);
+      document.body.appendChild(downloadAnchorNode); // required for firefox
+      downloadAnchorNode.click();
+      downloadAnchorNode.remove();
+    },
+    formatRange(event) {
+      try {
+        this.incorrectJSON = false;
+        if (this.code) {
+          this.code = JSON.stringify(JSON.parse(this.code), null, 4);
+        }
+        this.refresh();
+      } catch (error) {
+        this.incorrectJSON = true;
       }
     },
     refresh() {
@@ -123,18 +181,24 @@ export default {
 };
 </script>
 
-<style lang="sass">
-@import 'codemirror/lib/codemirror'
-@import 'codemirror/addon/lint/lint'
-@import ./../sass/codeHighlightEva
-@import ./../sass/codeHighlightEvaDark
+<style lang="scss">
+@import 'codemirror/lib/codemirror';
+@import 'codemirror/addon/lint/lint';
+@import './../sass/codeHighlightEva';
+@import './../sass/codeHighlightEvaDark';
 
-.CodeMirror
-  border: 1px solid #eee
-  height: auto
+.importantExport {
+  margin-bottom: 30px;
+}
 
-.textarea
-  max-height: 420px
-  overflow: auto
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+
+.textarea {
+  max-height: 420px;
+  overflow: auto;
+}
 
 </style>
