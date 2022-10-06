@@ -136,73 +136,78 @@
                   </v-icon>
                 </v-btn>
               </v-tab-item>
-              <v-tab-item
-                :value="'tab-2'"
-                class="groups-of-dash"
-              >
-                <v-card
-                  v-for="(dash, i) in allDashs"
-                  :key="dash.id"
-                  class="dash-group"
-                  :ripple="false"
-                  :style="{
-                    background: theme.$main_bg,
-                    color: theme.$main_text,
-                    borderColors: theme.$main_border,
-                  }"
+              <v-tab-item :value="'tab-2'">
+                <draggable
+                  ref="tabPanel"
+                  v-model="tabsOrder"
+                  group="tabs"
+                  class="groups-of-dash"
+                  @change="dragend"
                 >
-                  <v-card-title class="dash-group-title">
-                    <div
-                      class="title-color"
-                      :style="{ borderColor: curColor }"
-                    />
-                    <div
-                      v-if="editDashPermission"
-                      class="controls-group"
-                    >
-                      <v-tooltip
-                        bottom
-                        :color="theme.$accent_ui_color"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-icon
-                            class="edit control-group"
-                            :color="theme.$primary_button"
-                            v-on="on"
-                            @click="editDashboard(curGroup, i)"
-                          >
-                            {{ pencil }}
-                          </v-icon>
-                        </template>
-                        <span>Редактировать</span>
-                      </v-tooltip>
-                      <v-tooltip
-                        bottom
-                        :color="theme.$accent_ui_color"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-icon
-                            class="delete control-group"
-                            :color="theme.$primary_button"
-                            v-on="on"
-                            @click="deleteDashboard(dash.id)"
-                          >
-                            {{ trash }}
-                          </v-icon>
-                        </template>
-                        <span>Удалить</span>
-                      </v-tooltip>
-                    </div>
-                  </v-card-title>
-                  <v-card-text
-                    class="dash-group-text"
-                    @click="goToDash(i)"
+                  <v-card
+                    v-for="(dash, i) in allDashs"
+                    :key="dash.id"
+                    class="dash-group"
+                    :ripple="false"
+                    :style="{
+                      background: theme.$main_bg,
+                      color: theme.$main_text,
+                      borderColors: theme.$main_border,
+                    }"
                   >
-                    <p class="group-text">
-                      {{ checkName(dash.name) }}
-                    </p>
-                  </v-card-text>
-                </v-card>
+                    <v-card-title class="dash-group-title">
+                      <div
+                        class="title-color"
+                        :style="{ borderColor: curColor }"
+                      />
+                      <div
+                        v-if="editDashPermission"
+                        class="controls-group"
+                      >
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="edit control-group"
+                              :color="theme.$primary_button"
+                              v-on="on"
+                              @click="editDashboard(curGroup, i)"
+                            >
+                              {{ pencil }}
+                            </v-icon>
+                          </template>
+                          <span>Редактировать</span>
+                        </v-tooltip>
+                        <v-tooltip
+                          bottom
+                          :color="theme.$accent_ui_color"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="delete control-group"
+                              :color="theme.$primary_button"
+                              v-on="on"
+                              @click="deleteDashboard(dash.id)"
+                            >
+                              {{ trash }}
+                            </v-icon>
+                          </template>
+                          <span>Удалить</span>
+                        </v-tooltip>
+                      </div>
+                    </v-card-title>
+                    <v-card-text
+                      class="dash-group-text"
+                      @click="goToDash(i)"
+                    >
+                      <p class="group-text">
+                        {{ checkName(dash.name) }}
+                      </p>
+                    </v-card-text>
+                  </v-card>
+                </draggable>
                 <v-btn
                   v-if="editDashPermission"
                   :color="theme.$primary_button"
@@ -283,9 +288,13 @@ import {
   mdiPencil,
   mdiSwapVerticalBold,
 } from '@mdi/js';
+import draggable from 'vuedraggable';
 
 export default {
   name: 'MainPageDash',
+  components: {
+    draggable,
+  },
   data() {
     return {
       tab: 'tab-1',
@@ -315,11 +324,23 @@ export default {
       actionBtn: '',
       cookieId: -1,
       cookieName: '',
+      draggedDash: '',
     };
   },
   computed: {
     theme() {
       return this.$store.getters.getTheme;
+    },
+    sortedAllDashs() {
+      return [...this.allDashs].sort((a, b) => this.getOrder(a) - this.getOrder(b));
+    },
+    tabsOrder: {
+      get() {
+        return this.allDashs;
+      },
+      set(value) {
+        this.allDashs = structuredClone(value);
+      },
     },
   },
   watch: {
@@ -340,6 +361,92 @@ export default {
     document.title = 'EVA | Конструирование дашбордов';
   },
   methods: {
+    getOrder(dash) {
+      return dash?.groups.find((groupEl) => groupEl.name === this.curName)?.order;
+    },
+    dragend(e) {
+      console.log(this.allDashs.map((el, index) => {
+        const elGroups = el.groups.filter((groupEl) => groupEl.name === this.curName);
+        return {
+          groups: elGroups.map((groupEl) => ({
+            name: groupEl.name,
+            order: index,
+          })),
+          id: el.id,
+        }
+      }));
+      this.draggedDash = e.moved.element.name;
+      this.createEssence({
+        id: e.moved.element.id,
+        groups: [
+          {
+            name: this.curName,
+            order: e.moved.newIndex,
+          },
+        ],
+      }, 'PUT', 'dash');
+      this.allDashs = this.allDashs.map((el) => {
+        if (el.id === e.moved.element.id) {
+          return {
+            ...el,
+            groups: el.groups.map((groupEl) => {
+              if (groupEl.name === this.curName) {
+                return {
+                  ...groupEl,
+                  order: e.moved.newIndex,
+                };
+              }
+              return groupEl;
+            }),
+          };
+        }
+        return el;
+      });
+    },
+    createEssence(group, method, essence) {
+      const response = this.$store.dispatch('auth/setEssence', {
+        formData: JSON.stringify(group),
+        essence,
+        method,
+      });
+      response.then((res) => {
+        if (res.status === 200) {
+          if (essence === 'dash') {
+            res.json().then((data) => {
+              this.createDash({
+                id: data.id,
+                name: group.name,
+                idgroup: group.idGroup,
+                modified: data.modified,
+              });
+            });
+          }
+          // передаем в родителя чтобы выключили модалку
+          this.active = false;
+        } else if (res.status === 409) {
+          //  показываем предупреждение
+          this.showwarning = true;
+          this.nameWarn = essence === 'group' ? 'Такая группа уже есть.' : 'Такой дашборд уже есть.';
+          setTimeout(() => {
+            this.showwarning = false;
+          }, 2000);
+        }
+      });
+    },
+    createDash(dash) {
+      this.$store.commit('setDash', {
+        data: dash,
+        getters: (payload) => this.$store.dispatch('checkAlreadyDash', payload),
+      });
+      this.$store.dispatch(
+        'auth/putLog',
+        `Создан дашборд ${this.toHichName(this.draggedDash)} с id ${dash.id}`,
+      );
+      this.draggedDash = '';
+    },
+    toHichName(name) {
+      return name[0].toUpperCase() + name.slice(1);
+    },
     updateModalCreateFrom(dashIndex) {
       this.groupFrom = this.allGroups.find((group) => group.id === this.curGroup) || this.curGroup;
       this.dashFrom = this.actionBtn === 'create' ? null : this.allDashs[dashIndex];
@@ -401,7 +508,10 @@ export default {
     },
     getDashs(id) {
       this.$store.dispatch('getDashs', id).then((res) => {
-        this.allDashs = res;
+        this.allDashs = res.map((el, index) => ({
+          order: index,
+          ...el,
+        }));
       });
     },
     getDash(group) {
