@@ -212,7 +212,13 @@ export default {
       'defaultSourceDataField',
       'defaultSourceDataUpdates',
     ],
-    picker: [],
+    picker: [
+      'canChooseTime',
+      'canLastTimeEnter',
+      'canRangeEnter',
+      'canManuallyEnter',
+      'timeOutputFormat',
+    ],
     graph: ['boxShadow'],
     single: [
       'subnumber',
@@ -485,6 +491,39 @@ export default {
       description:
         'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
+    },
+
+    // datepicker
+    {
+      option: 'canChooseTime',
+      description: 'Выбор времени',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'canLastTimeEnter',
+      description: 'Показать ввод: последние часы/мин/сек',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'canRangeEnter',
+      description: 'Показать выбор диапазона дат',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'canManuallyEnter',
+      description: 'Показать ручной ввод дат',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'timeOutputFormat',
+      description: 'Формат даты для результата',
+      elem: 'text-field',
+      default: '',
+      placeholder: 'Пример: YYYY-MM-DD hh:mm',
     },
 
     // dashSingle
