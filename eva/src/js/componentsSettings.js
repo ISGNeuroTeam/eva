@@ -403,9 +403,9 @@ export default {
     },
     {
       option: 'readOnly',
-      description: 'Редактирование текстового поля',
+      description: 'Только чтение',
       elem: 'switch',
-      default: true,
+      default: false,
     },
     {
       option: 'textFontSize',
