@@ -505,6 +505,7 @@ export default {
       description: 'Показать ввод: последние часы/мин/сек',
       elem: 'switch',
       default: true,
+      relation: ['canChooseTime'],
     },
     {
       option: 'canRangeEnter',
