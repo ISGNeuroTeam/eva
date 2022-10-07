@@ -21,6 +21,7 @@
         spellcheck="false"
         hide-details
         class="textarea-itself"
+        :disabled="!getOptions.readOnly"
         :height="height"
         no-resize
         @keypress.enter="setTockenByPress($event)"
