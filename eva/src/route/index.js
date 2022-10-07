@@ -43,6 +43,9 @@ const routes = [
     meta: {
       requiresAuth: true,
     },
+    query: {
+      home: '',
+    },
   },
   {
     name: 'Дашборд',
@@ -107,8 +110,13 @@ const routes = [
     },
   },
   {
-    path: '*', // если любая другая в том числе не существующая то
+    path: '/404', // если любая другая в том числе не существующая то
+    name: 'notFound',
     component: () => import('../components/notFound.vue'),
+  },
+  {
+    path: '*', // если любая другая в том числе не существующая то
+    redirect: '/404',
   },
 ];
 

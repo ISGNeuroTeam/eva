@@ -68,6 +68,7 @@
                 :key="`${field.option}${prop}`"
                 class="option-item"
               >
+                <!--Group name-->
                 <v-card-text
                   v-if="field.group"
                   class="headline"
@@ -82,8 +83,9 @@
                     {{ field.group }}
                   </div>
                 </v-card-text>
+                <!--Fields-with-description-->
                 <div
-                  v-if="!field.group"
+                  v-if="!field.group && !field.isFullWidth"
                   class="name-option item"
                   :style="{
                     color: theme.$main_text,
@@ -95,7 +97,7 @@
                   <span v-if="prop">.{{ prop }}</span>
                 </div>
                 <div
-                  v-if="!field.group"
+                  v-if="!field.group && !field.isFullWidth"
                   class="discribe-option item"
                   :style="{
                     color: theme.$main_text,
@@ -108,7 +110,7 @@
                   />
                 </div>
                 <div
-                  v-if="!field.group"
+                  v-if="!field.group && !field.isFullWidth"
                   class="status-option item"
                 >
                   <!-- elem: switch -->
@@ -185,6 +187,20 @@
                     class="subnumber"
                     @change="isChanged = true"
                   />
+                  <v-select
+                    v-else-if="field.elem === 'select-checkbox'"
+                    v-model="options[field.option]"
+                    :items="field.items"
+                    :placeholder="field.default"
+                    :color="theme.$primary_button"
+                    :style="{ color: theme.$main_text, fill: theme.$main_text }"
+                    hide-details
+                    outlined
+                    multiple
+                    class="subnumber"
+                    :attach="true"
+                    @change="isChanged = true"
+                  />
                   <!-- elem: checkbox-list -->
                   <div
                     v-else-if="field.elem === 'checkbox-list'"
@@ -241,8 +257,94 @@
                   </v-radio-group>
                   <!-- end -->
                 </div>
+                <!--Full-width-fields-->
+                <div
+                  v-else-if="!field.group && field.isFullWidth"
+                  class="full-width-options-item"
+                >
+                  <component
+                    :is="field.elem"
+                    v-model="options[field.option]"
+                    @input="isChanged = true"
+                    @update:error="updateCodeEditorErrorState"
+                  />
+                </div>
               </div>
             </template>
+          </template>
+
+          <template v-if="element.indexOf('csvg') !== -1">
+            <div class="option-item">
+              <v-card-text
+                class="headline"
+              >
+                <div
+                  class="settings-title"
+                  :style="{
+                    color: theme.$main_text,
+                    borderColor: theme.$main_border,
+                  }"
+                >
+                  Подложка
+                </div>
+              </v-card-text>
+            </div>
+            <div class="option-item">
+              <div
+                class="name-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                options.backgroundImage
+              </div>
+              <div
+                class="discribe-option item"
+                :style="{
+                  color: theme.$main_text,
+                  borderColor: theme.$main_border,
+                }"
+              >
+                Изображение
+              </div>
+              <div class="status-option item">
+                <div
+                  class="subnumber flex"
+                  style="position: relative"
+                >
+                  <v-file-input
+                    ref="fileInput"
+                    v-model="csvgBg"
+                    accept="image/png, image/jpeg, image/bmp, image/jpg"
+                    :placeholder="cSvgBgName"
+                    prepend-icon=""
+                    :color="theme.$primary_button"
+                    :style="{
+                      color: theme.$main_text,
+                      background: 'transparent',
+                      borderColor: theme.$main_border,
+                    }"
+                    outlined
+                    :rules="fileInputRules"
+                    @update:error="clearFileInput"
+                    @change="changeCSvgBg($event)"
+                  >
+                    <template #message="{ message }">
+                      <div
+                        :style="{
+                          width: '85%',
+                          margin: '0 auto',
+                          paddingTop: '5px',
+                        }"
+                      >
+                        {{ message }}
+                      </div>
+                    </template>
+                  </v-file-input>
+                </div>
+              </div>
+            </div>
           </template>
 
           <div
@@ -282,61 +384,6 @@
                 @change="isChanged = true"
               />
             </div>
-          </div>
-
-          <div
-            v-if="checkOptions('primitivesLibrary')"
-            class="option-item"
-          >
-            <v-container fluid>
-              <v-card-text class="headline">
-                <div
-                  class="settings-title"
-                  :style="{
-                    color: theme.$main_text,
-                    borderColor: theme.$main_border,
-                  }"
-                >
-                  Библиотека примитивов отображения
-                </div>
-              </v-card-text>
-              <v-btn
-                plain
-                link
-                small
-                class="mb-3 text-lowercase"
-                :color="theme.$main_text"
-                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow"
-              >
-                {{ primitivesLibraryAutoGrowLinkText }}
-              </v-btn>
-              <v-textarea
-                v-model="options.primitivesLibrary"
-                name="input-7-1"
-                filled
-                rows="6"
-                label="JSON c примитивами"
-                :auto-grow="primitivesLibraryAutoGrow"
-                class="textarea-event"
-                spellcheck="false"
-                :color="theme.$main_text"
-                :style="{ color: theme.$main_text }"
-                outlined
-                hide-details
-                @input="isChanged = true"
-              />
-              <v-btn
-                v-if="primitivesLibraryAutoGrow"
-                plain
-                link
-                small
-                class="text-lowercase"
-                :color="theme.$main_text"
-                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow"
-              >
-                {{ primitivesLibraryAutoGrowLinkText }}
-              </v-btn>
-            </v-container>
           </div>
           <v-card-text
             v-if="checkOptions('piechartSettings')"
@@ -919,7 +966,9 @@
 </template>
 
 <script>
-import { mdiMinusBox, mdiPlusBox, mdiEyedropper } from '@mdi/js';
+import {
+  mdiMinusBox, mdiPlusBox, mdiEyedropper, mdiClose,
+} from '@mdi/js';
 import settings from '../js/componentsSettings';
 import TitleAtionSelect from './modalSettings/titleAtionSelect.vue';
 import vusualisation from '@/js/visualisationCRUD';
@@ -947,6 +996,8 @@ export default {
   },
   data() {
     return {
+      mdiClose,
+      csvgBg: null,
       openNewScreen: false,
       primitivesLibraryAutoGrow: false,
       conclusion_count: {},
@@ -1014,9 +1065,22 @@ export default {
       colorPicker: '',
       isOsmServerChange: false,
       titleActions: [],
+      csvgBgValue: null,
+      csvgBgErrorMessage: '',
+      fileInputRules: [
+        (value) => (!value || value?.type === 'image/jpeg'
+            || value?.type === 'image/png'
+            || value?.type === 'image/jpg'
+            || value?.type === 'image/bmp') || 'Некорректный тип файла',
+      ],
+      codeEditorValue: '',
+      showCodeEditor: false,
     };
   },
   computed: {
+    cSvgBgName() {
+      return this.csvgBg?.name || this.csvgBgErrorMessage || 'Выбрать изображение';
+    },
     printedUnitedMetrics() {
       return this.metrics.map((item) => item.name);
     },
@@ -1053,6 +1117,9 @@ export default {
         return this.dashFromStore.modalSettings.status;
       },
       set(value) {
+        this.$nextTick(() => {
+          this.showCodeEditor = value;
+        });
         this.$store.commit('setModalSettings', {
           idDash: this.idDash,
           element: this.element,
@@ -1150,6 +1217,9 @@ export default {
     this.updateTableTitles();
   },
   methods: {
+    clearFileInput() {
+      this.csvgBg = null;
+    },
     changetitleActions(val) {
       this.titleActions = structuredClone(val);
     },
@@ -1176,6 +1246,7 @@ export default {
         const items = typeof field.items === 'function'
           ? field.items.call(this)
           : field.items;
+        // TODO: Возможно пережитки прошлого
         const each = typeof field.each === 'function' ? field.each.call(this) : field.each;
         if (each) {
           const options = {};
@@ -1235,12 +1306,15 @@ export default {
         }
       }
       if (this.element.indexOf('csvg') !== -1) {
-        this.$set(this.options, 'tooltip', JSON.parse(JSON.stringify(this.tooltip)));
+        this.$set(this.options, 'tooltip', structuredClone(this.tooltip));
+        await this.getBase64(this.csvgBg).then((result) => {
+          this.$set(this.options, 'backgroundImage', result);
+          this.$set(this.options, 'backgroundImageName', this.csvgBg?.name || '');
+          this.$set(this.options, 'backgroundImageType', this.csvgBg?.type || '');
+        });
       }
       if (this.element.indexOf('piechart') !== -1) {
-        this.options.metricsRelation = JSON.parse(
-          JSON.stringify(this.metricsRelation),
-        );
+        this.options.metricsRelation = structuredClone(this.metricsRelation);
         if (this.colorsPie.nametheme) {
           this.$set(this.options, 'colorsPie', this.colorsPie);
           if (!this.defaultThemes.includes(this.colorsPie.nametheme)) {
@@ -1261,7 +1335,7 @@ export default {
             this.$set(this.colorsPie, 'theme', this.colorsPie.nametheme);
           }
           this.$set(this.options, 'themes', this.themes);
-          this.them = JSON.parse(JSON.stringify(this.themes));
+          this.them = structuredClone(this.themes);
         }
         this.$set(this.options, 'pieType', this.pieType);
       }
@@ -1300,6 +1374,28 @@ export default {
         this.deleteTheme();
       }
       this.cancelModal();
+    },
+    getBase64(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        if (file) {
+          reader.readAsDataURL(file);
+          reader.onload = () => {
+            resolve(reader.result);
+          };
+        } else {
+          resolve(null);
+        }
+      });
+    },
+    getFileFromBase64(url, name, type) {
+      return fetch(url)
+        .then((res) => res.blob())
+        .then((blob) => new File(
+          [blob],
+          name,
+          { type },
+        ));
     },
     visualisationHandler() {
       const oldList = this.elementFromStore.options
@@ -1355,6 +1451,22 @@ export default {
         ]);
       }
     },
+    changeCSvgBg(e) {
+      if (e?.type === 'image/jpeg'
+          || e?.type === 'image/png'
+          || e?.type === 'image/jpg'
+          || e?.type === 'image/bmp') {
+        this.csvgBg = e;
+        this.csvgBgErrorMessage = '';
+        this.isChanged = true;
+      } else if (e) {
+        this.csvgBg = null;
+        this.csvgBgErrorMessage = 'Некорректный тип файла';
+      } else {
+        this.csvgBg = null;
+        this.csvgBgErrorMessage = '';
+      }
+    },
     cancelModal() {
       this.active = false;
       this.checkOnCancel();
@@ -1362,7 +1474,7 @@ export default {
     // если нажали на отмену создания
     checkOnCancel() {
       if (this.isDelete) {
-        this.themes = JSON.parse(JSON.stringify(this.them));
+        this.themes = structuredClone(this.them);
         this.$set(this.options, 'themes', this.themes);
         this.$store.commit('setState', [
           {
@@ -1419,7 +1531,7 @@ export default {
     },
     addMetrics() {
       this.isChanged = true;
-      const arr = JSON.parse(JSON.stringify(this.metrics));
+      const arr = structuredClone(this.metrics);
       arr.push({
         name: '',
         type: '',
@@ -1528,14 +1640,28 @@ export default {
               // Настройка указана - получаем значение
               if (item === 'tooltip') {
                 this.tooltip = {};
-                this.$set(this.tooltip, 'texts', JSON.parse(JSON.stringify([...[], ...options[item].texts])));
-                this.$set(this.tooltip, 'links', JSON.parse(JSON.stringify([...[], ...options[item].links])));
-                this.$set(this.tooltip, 'buttons', JSON.parse(JSON.stringify([
+                this.$set(this.tooltip, 'texts', structuredClone([
+                  ...[],
+                  ...options[item].texts,
+                ]));
+                this.$set(this.tooltip, 'links', structuredClone([
+                  ...[],
+                  ...options[item].links,
+                ]));
+                this.$set(this.tooltip, 'buttons', structuredClone([
                   ...[],
                   ...options[item].buttons,
-                ])));
+                ]));
+              } else if (item === 'backgroundImage') {
+                this.getFileFromBase64(
+                  options[item],
+                  options.backgroundImageName,
+                  options.backgroundImageType,
+                ).then((result) => {
+                  this.csvgBg = result;
+                });
               } else if (item === 'metrics') {
-                this.metrics = JSON.parse(JSON.stringify(options[item]));
+                this.metrics = structuredClone(options[item]);
               } else if (item === 'metricsRelation') {
                 this.metricsRelation = {};
                 this.$set(this.metricsRelation, 'metrics', [
@@ -1558,7 +1684,7 @@ export default {
               } else if (item === 'themes') {
                 this.themesArr = Object.keys(options[item]);
                 this.themes = options[item];
-                this.them = JSON.parse(JSON.stringify(this.themes));
+                this.them = structuredClone(this.themes);
               } else if (item === 'titles') {
                 let val = options[item];
                 if (!val) {
@@ -1569,7 +1695,7 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
-              } else if (item === 'ListDS') {
+              } else if (item === 'ListDS' || item === 'scatterPlotLegend') {
                 localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];
@@ -1696,6 +1822,12 @@ export default {
         ]);
       }
     },
+    updateCodeEditorErrorState(errorStatus) {
+      this.codeEditorError = errorStatus;
+    },
+    updateCodeEditorErrorState(errorStatus) {
+      this.codeEditorError = errorStatus;
+    },
   },
 };
 </script>
@@ -1710,5 +1842,13 @@ export default {
   font-size: 20px !important;
   cursor: pointer;
   margin-right: 20px;
+}
+.modal-settings {
+  &__clear-file-input-btn {
+    position: absolute;
+    right: 45px;
+    top: 50%;
+    transform: translateY(-95%);
+  }
 }
 </style>

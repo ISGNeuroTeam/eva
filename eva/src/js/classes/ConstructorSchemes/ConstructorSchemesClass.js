@@ -1,4 +1,4 @@
-import {
+import yFiles, {
   Color,
   DefaultLabelStyle,
   DefaultPortCandidate,
@@ -11,7 +11,7 @@ import {
   FreeNodeLabelModel,
   GraphComponent,
   GraphEditorInputMode,
-  GraphItemTypes,
+  LabelLayerPolicy,
   GraphMLIOHandler,
   GraphMLSupport,
   GraphSnapContext,
@@ -277,6 +277,7 @@ class ConstructorSchemesClass {
     },
     selectedShapeNodeStyle: '',
     isEdit: false,
+    loadingDnDPanelItems: false,
   }
 
   // Additional options
@@ -958,6 +959,14 @@ class ConstructorSchemesClass {
     return this.dndDataPanelItems;
   }
 
+  get loadingDnDPanelItems() {
+    return this.options.loadingDnDPanelItems;
+  }
+
+  set loadingDnDPanelItems(value) {
+    this.options.loadingDnDPanelItems = value;
+  }
+
   get isEdit() {
     return this.options.isEdit;
   }
@@ -1062,6 +1071,7 @@ class ConstructorSchemesClass {
     updateStoreCallback,
     openDataPanelCallback,
     closeDataPanelCallback,
+    toggleLoadingCallback,
     isEdit,
   }) {
     this.dragAndDropPanel = null;
@@ -1075,6 +1085,7 @@ class ConstructorSchemesClass {
     this.updateStoreCallback = updateStoreCallback;
     this.openDataPanelCallback = openDataPanelCallback;
     this.closeDataPanelCallback = closeDataPanelCallback;
+    this.toggleLoadingCallback = toggleLoadingCallback;
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
@@ -1113,16 +1124,18 @@ class ConstructorSchemesClass {
 
     this.registerReshapeHandleProvider();
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
+    // Привязка z-order у label к родителю
+    this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
   }
 
   generateIconNodes(iconsList) {
     return Promise.all(iconsList.map(async (icon) => {
       const imageStyleNode = new SimpleNode();
-      const layout = await ConstructorSchemesClass.getSvgLayoutSize(icon.src);
+      const layout = await ConstructorSchemesClass.getSvgLayoutSize(`/svg/${icon.src}`);
       try {
         const nodeSize = this.generateImageSize(layout);
         imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-        imageStyleNode.style = new ImageNodeStyle(icon.src);
+        imageStyleNode.style = new ImageNodeStyle(`/svg/${icon.src}`);
         imageStyleNode.tag = {
           dataType: 'image-node',
           isAspectRatio: true,
@@ -1312,7 +1325,9 @@ class ConstructorSchemesClass {
       );
     } else {
       this.isEdit = false;
-      this.graphComponent.inputMode = new GraphViewerInputMode();
+      this.graphComponent.inputMode = new GraphViewerInputMode({
+        focusableItems: 'none',
+      });
       this.closeDataPanelCallback();
     }
     return this.isEdit;
@@ -1326,6 +1341,9 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
+      // TODO: Починить функционал copy/paste/duplicate
+      allowPaste: false,
+      allowDuplicate: false,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1855,7 +1873,11 @@ class ConstructorSchemesClass {
     await this.graphComponent.fitGraphBounds();
   }
 
-  initializeDnDPanel() {
+  initializeDnDPanel(updatedPrimitives) {
+    if (this.dragAndDropPanel) {
+      this.dragAndDropPanel = null;
+    }
+    this.toggleLoadingCallback(true);
     // initialize panel for yFiles drag and drop
     this.dragAndDropPanel = new DragAndDropPanel(this.dndPanelElem);
     // Set the callback that starts the actual drag and drop operation
@@ -1909,13 +1931,19 @@ class ConstructorSchemesClass {
 
     this.dragAndDropPanel.maxItemWidth = 160;
     this.createDnDPanelItems({
-      iconsList: this.iconsList,
+      iconsList: updatedPrimitives || this.iconsList,
       defaultEdgeStyle: this.defaultEdgeStyle,
       defaultNodeStyle: this.defaultNodeStyle,
       defaultLabelStyle: this.defaultLabelStyle,
     }).then((response) => {
       this.dragAndDropPanel.populatePanel(response);
+      this.toggleLoadingCallback(false);
     });
+  }
+
+  refreshDnDPanel(updatedPrimitives) {
+    this.dragAndDropPanel.clearDnDPanel();
+    this.initializeDnDPanel(updatedPrimitives);
   }
 
   async createDnDPanelItems({
@@ -1923,6 +1951,7 @@ class ConstructorSchemesClass {
     defaultEdgeStyle,
     defaultLabelStyle,
   }) {
+    this.loadingDnDPanelItems = true;
     return new Promise((resolve) => {
       const items = [];
       // Стандартный узел
@@ -1991,9 +2020,17 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
-        this.generateIconNodes(iconsList).then((result) => {
-          items.push(...result);
-          resolve(items);
+        const filteredIconList = [];
+        Promise.all(iconsList.map(async (icon) => {
+          const response = await fetch(`/svg/${icon.src}`);
+          if (response.ok) {
+            filteredIconList.push(icon);
+          }
+        })).then(() => {
+          this.generateIconNodes(filteredIconList).then((result) => {
+            items.push(...result);
+            resolve(items);
+          });
         });
       } else {
         resolve(items);
@@ -2137,7 +2174,7 @@ class ConstructorSchemesClass {
     if (elements?.length > 0) {
       this.graphComponent.graphModelManager[method](elements);
       elements.forEach((element) => {
-        if (element instanceof IEdge) {
+        if ((element instanceof IEdge) || (element instanceof ILabel)) {
           ICommand[command].execute(element, this.graphComponent);
         }
         this.graphComponent.graphModelManager.update(element);

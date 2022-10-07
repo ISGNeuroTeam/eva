@@ -104,10 +104,11 @@
               :key="title + item.rowIndex"
               :style="item.rowColor && `background-color: ${item.rowColor}`"
             >
-              <template v-for="({text}, colIndex) in props.titles">
+              <template v-for="({text, value}, colIndex) in props.titles">
                 <td
                   v-if="!excludeColumns.includes(text)"
                   :key="colIndex"
+                  :data-type="value"
                   class="text-start"
                   :class="{
                     'd-none': options
@@ -663,20 +664,15 @@ export default {
                 });
               event.target.parentElement.classList.add('selected');
             }
-            const headers = Array.from(
-              this.$refs.table.$el.querySelector('thead tr').childNodes,
-            ).map((item) => item.textContent);
-            const cellRowIndex = Array.from(
-              event.target.parentElement.childNodes,
-            ).findIndex((item) => item === event.target);
             const tokens = this.$store.state[this.idDash].tockens;
             tokens.forEach((token) => {
               if (
                 token.elem === this.id
                     && token.action === 'click'
-                    && headers[cellRowIndex] === token.capture
               ) {
-                const { value } = event.target.attributes.value;
+                const { value } = [...event.target.parentElement.childNodes]
+                  .find((element) => element.dataset.type === token.capture)
+                  .attributes.value;
                 this.$store.commit('setTocken', {
                   token,
                   idDash: this.idDash,

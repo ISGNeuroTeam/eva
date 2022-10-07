@@ -102,23 +102,38 @@
               @result="deleteTheme"
             />
           </div>
-          <div
-            v-if="admin"
-            :style="{
-              color: theme.$accent_ui_color,
-              width: '170px',
-              fontWeight: '600',
-            }"
-            class="add-theme-button"
-            @click="mode = 'create'"
-          >
-            <v-icon
-              :color="theme.$accent_ui_color"
-              :style="{ marginRight: '5px' }"
+          <div class="d-flex align-center justify-space-between mt-2">
+            <div
+              v-if="admin"
+              :style="{
+                color: theme.$accent_ui_color,
+                width: '170px',
+                fontWeight: '600',
+              }"
+              class="add-theme-button"
+              @click="mode = 'create'"
             >
-              {{ mdiPlusCircleOutline }}
-            </v-icon>
-            Создать свою тему
+              <v-icon
+                :color="theme.$accent_ui_color"
+                :style="{ marginRight: '5px' }"
+              >
+                {{ mdiPlusCircleOutline }}
+              </v-icon>
+              Создать свою тему
+            </div>
+            <div
+              :style="{
+                color: theme.$accent_ui_color,
+                fontWeight: '600',
+                cursor: 'pointer',
+              }"
+              @click="downloadTheme(
+                select,
+                JSON.stringify(theme).replaceAll('#', '@')
+              )"
+            >
+              Скачать тему
+            </div>
           </div>
         </v-card-text>
         <v-card-text
@@ -134,7 +149,14 @@
             outlined
             hide-details
             @input="isChanged = true"
+            @focus="clearError"
           />
+          <div
+            v-show="errorTitle"
+            class="error-message"
+          >
+            {{ errorMessages }}
+          </div>
           <div class="helper-title">
             <p @click="mode = 'manual'">
               Руководство по настройке темы
@@ -253,6 +275,17 @@
                 />
               </v-col>
             </v-row>
+          </div>
+          <div class="mt-2">
+            Загрузить тему
+            <v-file-input
+              :color="theme.$main_text"
+              :style="{ color: theme.$main_text }"
+              class="modal-themes__input"
+              type="file"
+              @click:clear="clearTheme"
+              @change="loadTheme($event)"
+            />
           </div>
         </v-card-text>
         <v-card-text
@@ -475,6 +508,9 @@ export default {
       error: false,
       isChanged: false,
       isConfirmModal: false,
+      newFields: null,
+      errorTitle: false,
+      errorMessages: '',
     };
   },
   computed: {
@@ -614,6 +650,11 @@ export default {
             method: 'POST',
             body: JSON.stringify(themeObject),
           });
+          if (res.status === 409) {
+            this.errorTitle = true;
+            this.errorMessages = 'Такое имя уже занято!';
+            return;
+          }
           if (res.status !== 200) return;
           const themeData = await res.json();
           const content = JSON.parse(themeData);
@@ -643,6 +684,45 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    downloadTheme(fileName, data = '', postfix = (+(new Date())).toString()) {
+      const lnk = document.createElement('a');
+      lnk.href = `data:text/plain;content-disposition=attachment;filename=${fileName},${data}`;
+      lnk.download = fileName;
+      lnk.target = '_blank';
+      lnk.style.display = 'none';
+      lnk.id = `downloadlnk-${postfix}`;
+      document.body.appendChild(lnk);
+      lnk.click();
+      document.body.removeChild(lnk);
+    },
+    loadTheme(event) {
+      if (event) {
+        const reader = new FileReader();
+        reader.readAsText(event);
+        reader.onload = () => {
+          this.newFields = JSON.parse(reader.result.replaceAll('@', '#'));
+          this.newTitle = event.name.replaceAll('.txt', '');
+          if (this.newFields.$background_image) {
+            this.imagePreview = this.newFields.$background_image.replaceAll(/(url)[(]|(\))/g, '');
+          } else {
+            this.imagePreview = null;
+          }
+          this.fields = this.fields.map((theme) => {
+            theme.value = this.newFields[theme.propName];
+            return theme;
+          });
+        };
+      }
+    },
+    clearTheme() {
+      this.newTitle = '';
+      this.imagePreview = null;
+      this.fields = this.defaultFieldsValue;
+    },
+    clearError() {
+      this.errorTitle = false;
+      this.errorMessages = '';
     },
   },
 };

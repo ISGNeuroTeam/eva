@@ -212,7 +212,13 @@ export default {
       'defaultSourceDataField',
       'defaultSourceDataUpdates',
     ],
-    picker: [],
+    picker: [
+      'canChooseTime',
+      'canLastTimeEnter',
+      'canRangeEnter',
+      'canManuallyEnter',
+      'timeOutputFormat',
+    ],
     graph: ['boxShadow'],
     single: [
       'subnumber',
@@ -252,10 +258,10 @@ export default {
       'columnCount',
       'tileStyle',
     ],
-    csvg: ['tooltip'],
+    csvg: ['tooltip', 'backgroundImage'],
     ygraph: [],
     bush: [],
-    map: ['osmserver', 'primitivesLibrary'],
+    map: ['osmserver', 'primitives', 'primitivesLibrary'],
     heatmap: [
       'dataFormat',
       'x',
@@ -292,8 +298,9 @@ export default {
       'xMetric',
       'yMetric',
       'metricGroup',
+      'scatterPlotLegend',
     ],
-    constructorSchemes: ['visible', 'level', 'pinned'],
+    constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -486,6 +493,39 @@ export default {
       elem: 'text-field',
     },
 
+    // datepicker
+    {
+      option: 'canChooseTime',
+      description: 'Выбор времени',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'canLastTimeEnter',
+      description: 'Показать ввод: последние часы/мин/сек',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'canRangeEnter',
+      description: 'Показать выбор диапазона дат',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'canManuallyEnter',
+      description: 'Показать ручной ввод дат',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'timeOutputFormat',
+      description: 'Формат даты для результата',
+      elem: 'text-field',
+      default: '',
+      placeholder: 'Пример: YYYY-MM-DD hh:mm',
+    },
+
     // dashSingle
     {
       option: 'subnumber',
@@ -628,7 +668,6 @@ export default {
         return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
-
     {
       option: 'columnCount',
       description: 'Количество столбцов',
@@ -770,12 +809,33 @@ export default {
         return [...items, ...metrics];
       },
     },
+    {
+      optionGroup: 'scatterPlotGroup',
+      option: 'scatterPlotLegend',
+      description: 'Линия регрессии для группы',
+      elem: 'select-checkbox',
+      items() {
+        return this.$store.state[this.idDash][this.element]?.options?.group || [];
+      },
+    },
 
     // dashSingleValue
     {
       option: 'numberPerDigit',
       description: 'Разделять число на разряды',
       elem: 'switch',
+    },
+
+    // fullWidthGroup
+    {
+      group: 'Библиотека примитивов',
+      option: 'primitives',
+    },
+    {
+      optionGroup: 'primitives',
+      option: 'primitivesLibrary',
+      elem: 'code-editor',
+      isFullWidth: true,
     },
 
   ],
@@ -859,6 +919,7 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
+      'constructorSchemes',
     ],
   },
 };

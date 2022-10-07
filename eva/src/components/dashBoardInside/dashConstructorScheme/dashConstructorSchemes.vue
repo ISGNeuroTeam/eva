@@ -8,7 +8,12 @@
       margin: '0 10px',
     }"
   >
-    <div class="dash-constructor-schemes__options">
+    <div
+      class="dash-constructor-schemes__options"
+      :class="{
+        'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
+      }"
+    >
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
@@ -24,68 +29,93 @@
             />
           </div>
         </template>
-        <span>Toggle edit</span>
+        <span>Вкл\выкл режим редактирования</span>
       </v-tooltip>
       <template v-if="isEdit">
-        <button
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="toggleDnDPanel"
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
         >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+          <template v-slot:activator="{ on }">
+            <div class="pa-2 d-flex">
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                v-on="on"
+                @click="toggleDnDPanel"
+              >
+                {{ gear }}
+              </v-icon>
+            </div>
+          </template>
+          <span>Панель настроек</span>
+        </v-tooltip>
+        <template v-if="dataSelectedNode">
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ gear }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('toFront')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <bring-to-front
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('toFront')"
+                />
+              </div>
+            </template>
+            <span>На передний план</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ arrowUp }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('toBack')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <send-to-back
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('toBack')"
+                />
+              </div>
+            </template>
+            <span>На задний план</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ arrowDown }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('raise')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <bring-forward
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('raise')"
+                />
+              </div>
+            </template>
+            <span>На уровень выше</span>
+          </v-tooltip>
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            {{ arrowUp }}
-          </v-icon>
-        </button>
-        <button
-          v-if="dataSelectedNode"
-          class="pa-2 dash-constructor-schemes__control-element"
-          @click="orderTo('lower')"
-        >
-          <v-icon
-            class="control-button edit-icon theme--dark"
-            :style="{ color: theme.$secondary_text }"
-          >
-            {{ arrowDown }}
-          </v-icon>
-        </button>
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <send-backward
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="orderTo('lower')"
+                />
+              </div>
+            </template>
+            <span>На уровень ниже</span>
+          </v-tooltip>
+        </template>
       </template>
     </div>
     <div class="dash-constructor-schemes__keymap-button">
@@ -112,17 +142,26 @@
     </div>
     <!--Keymap-panel-->
     <dash-constructor-schemes-keymap
+      ref="keymap"
       v-model="isKeymapOpen"
+      @changeKeymapTab="setPanelBottomOffset"
     />
     <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
       class="dash-constructor-schemes__dnd-panel-container"
+      :style="{
+        'bottom': `${panelBottomOffset}px`,
+      }"
       :class="{
         'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
+        // 'dash-constructor-schemes__dnd-panel-container--is-keymap-open': isKeymapOpen
       }"
     >
-      <div class="row justify-end">
+      <div
+        v-show="!isLoading"
+        class="row justify-end"
+      >
         <div class="col-auto">
           <button
             @click="toggleDnDPanel"
@@ -137,6 +176,7 @@
         </div>
       </div>
       <div
+        v-show="!isLoading"
         ref="dndPanel"
         class="dash-constructor-schemes__dnd-panel"
       >
@@ -157,7 +197,7 @@
                       Настройки:
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <div class="dash-constructor-schemes__options">
+                      <div class="dash-constructor-schemes__inner-options">
                         <!--TODO: Возможно стоит вынести в отдельный компонент-->
                         <div class="row">
                           <div class="col-12">
@@ -379,7 +419,18 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </div>
+      <div
+        v-show="isLoading"
+        class="dash-constructor-schemes__loading-circular"
+      >
+        <v-progress-circular
+          indeterminate
+          size="50"
+          :color="theme.$accent_ui_color"
+        />
+      </div>
     </div>
+    <!--Settings-element-panel-->
     <div
       class="dash-constructor-schemes__data-panel"
       :class="{
@@ -418,11 +469,22 @@
 import {
   mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp,
 } from '@mdi/js';
+import BringForward from '../../../images/bring_forward.svg';
+import BringToFront from '../../../images/bring_to_front.svg';
+import SendBackward from '../../../images/send_backward.svg';
+import SendToBack from '../../../images/send_to_back.svg';
+
 import ConstructorSchemesClass from '../../../js/classes/ConstructorSchemes/ConstructorSchemesClass';
 import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'DashConstructorSchemes',
+  components: {
+    BringForward,
+    BringToFront,
+    SendBackward,
+    SendToBack,
+  },
   props: {
     // id элемента (table-1\2\3, graph-1\2\3)
     idFrom: {
@@ -455,6 +517,7 @@ export default {
       gear: mdiSettings,
       closeIcon: mdiClose,
       arrowUp: mdiArrowUp,
+      iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
       dndPanel: false,
@@ -780,11 +843,19 @@ export default {
       selectedDataType: '',
       dataSelectedNode: null,
       isKeymapOpen: false,
+      panelBottomOffset: 10,
+      isLoading: false,
     };
   },
   computed: {
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
+    },
+    primitivesFromStore() {
+      if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
+        return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary);
+      }
+      return [];
     },
     savedGraph() {
       return this.dashFromStore.savedGraph || '';
@@ -800,6 +871,12 @@ export default {
     },
   },
   watch: {
+    primitivesFromStore: {
+      handler() {
+        this.constructorSchemes.refreshDnDPanel(this.primitivesFromStore);
+      },
+      deep: true,
+    },
     mockData: {
       deep: true,
       handler(value) {
@@ -807,6 +884,9 @@ export default {
           this.constructorSchemes.updateDataInNode(value);
         }
       },
+    },
+    isKeymapOpen() {
+      this.setPanelBottomOffset();
     },
   },
   mounted() {
@@ -828,17 +908,21 @@ export default {
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
     },
+    toggleLoading(isLoading) {
+      this.isLoading = isLoading;
+    },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
         dataRest: this.mockData,
-        iconsList: this.iconsList,
+        iconsList: this.primitivesFromStore,
         elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
         updateStoreCallback: this.updateSavedGraph,
+        toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
       });
       if (this.constructorSchemes) {
@@ -909,6 +993,11 @@ export default {
     openKeymapPanel() {
       this.isKeymapOpen = true;
     },
+    setPanelBottomOffset() {
+      this.$nextTick().then(() => {
+        this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
+      });
+    },
   },
 };
 </script>
@@ -917,13 +1006,23 @@ export default {
 .dash-constructor-schemes {
   position: relative;
   overflow: hidden;
+  &__loading-circular {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   &__options {
     position: absolute;
     left: 20px;
     top: 0;
     display: flex;
     align-items: center;
-    z-index: 1;
+    z-index: 10;
+  }
+  &__inner-options {
+    display: flex;
+    align-items: center;
   }
   &__keymap-button {
     position: absolute;
@@ -960,7 +1059,7 @@ export default {
   }
   &__dnd-panel-container, &__data-panel {
     color: var(--main_text);
-    z-index: 1;
+    z-index: 10;
     position: absolute;
     top: 5px;
     bottom: 15px;
@@ -976,10 +1075,14 @@ export default {
   &__dnd-panel-container {
     left: 0;
     border-radius: 0 4px 4px 0;
+    transition: all .2s ease;
     transform: translateX(-100%);
     &--active {
       transform: translateX(0);
       pointer-events: all;
+    }
+    &--is-keymap-open {
+      bottom: 405px;
     }
   }
   &__data-panel {

@@ -193,6 +193,7 @@
               :width="isFullScreen ? '100vw' : '80vw'"
               :fullscreen="isFullScreen"
               style="z-index: 999"
+              transition="fade-transition"
             >
               <template v-slot:activator="{ on: onFullScreen }">
                 <v-tooltip
@@ -485,7 +486,7 @@
         </div>
       </div>
       <v-card-text
-        v-if="!excludedFromDataSearches && currentElem !== 'dash-constructorSchemes'"
+        v-if="!excludedFromDataSearches"
         v-show="!showElement"
         class="card-text"
       >
@@ -499,7 +500,7 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement || excludedFromDataSearches || currentElem === 'dash-constructorSchemes'"
+        v-if="showElement || excludedFromDataSearches"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
