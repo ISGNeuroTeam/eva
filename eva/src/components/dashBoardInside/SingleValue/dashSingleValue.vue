@@ -101,6 +101,7 @@
 import { mdiSettings } from '@mdi/js';
 import SingleValueSettings from './SingleValueSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
+import iconlist from '@/fonts/eva-iconfont/eva-iconlist.json';
 
 export default {
   name: 'SingleValue',
@@ -320,7 +321,7 @@ export default {
       }
       const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
       if (ranges.icon) {
-        return ranges.icon;
+        return iconlist.find((icon) => ranges.icon === icon);
       }
       return '';
     },
