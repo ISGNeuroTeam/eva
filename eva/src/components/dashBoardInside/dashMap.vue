@@ -394,7 +394,6 @@ export default {
       }
     },
     updateToken(value) {
-      console.log(value);
       const tokens = this.$store.state[this.idDash]?.tockens || {};
       Object.keys(tokens).forEach((i) => {
         if (
