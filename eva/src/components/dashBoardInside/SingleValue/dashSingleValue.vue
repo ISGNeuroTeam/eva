@@ -49,6 +49,11 @@
               class="icon"
               v-html="getIconSvgByID(metric.icon)"
             />
+            <v-icon
+              v-show="metric.icon === 'no_icon'"
+              :style="`color: ${getColor(metric)} !important;`"
+              v-text="getIcon(metric)"
+            />
             <span
               class="title-text"
               v-text="metric.title"
@@ -96,6 +101,7 @@
 import { mdiSettings } from '@mdi/js';
 import SingleValueSettings from './SingleValueSettings.vue';
 import metricTitleIcons from './metricTitleIcons';
+import iconlist from '@/fonts/eva-iconfont/eva-iconlist.json';
 
 export default {
   name: 'SingleValue',
@@ -309,31 +315,60 @@ export default {
     setError(err) {
       this.error = err;
     },
+    getIcon(metric) {
+      if (!metric.metadata) {
+        return undefined;
+      }
+      const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
+      if (ranges.icon) {
+        return iconlist.find((icon) => ranges.icon === icon);
+      }
+      return '';
+    },
     getColor(metric) {
       if (!metric.metadata) {
         return undefined;
       }
       const ranges = JSON.parse(metric.metadata.replaceAll("'", '"'));
-      Object.keys(ranges).forEach((key) => {
-        ranges[key] = `${ranges[key]}`.split(':').map(Number);
-      });
+      if (!ranges.range) {
+        Object.keys(ranges).forEach((key) => {
+          ranges[key] = `${ranges[key]}`.split(':').map(Number);
+        });
 
-      if (metric.color === 'range') {
-        if (!Number.isNaN(metric.value)) {
+        if (metric.color === 'range') {
+          if (!Number.isNaN(metric.value)) {
+            const val = Number(metric.value);
+            if (val >= ranges.red[0] && val <= ranges.red[1]) {
+              return '#FF5147';
+            }
+
+            if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
+              return '#FFE065';
+            }
+            const greenrange = ranges.green[0] < ranges.green[1]
+              ? val >= ranges.green[0] && val <= ranges.green[1]
+              : val >= ranges.green[0];
+            if (greenrange) {
+              return '#5BD97A';
+            }
+          }
+        }
+      } else if (metric.color === 'range' && ranges?.range.length > 0) {
+        ranges.range.forEach((item, index) => {
+          ranges.range[index] = item.split(':').map(Number);
+        });
+        if (ranges.range.length === ranges.colors.length) {
           const val = Number(metric.value);
-          if (val >= ranges.red[0] && val <= ranges.red[1]) {
-            return '#FF5147';
-          }
-
-          if (val >= ranges.yellow[0] && val <= ranges.yellow[1]) {
-            return '#FFE065';
-          }
-          const greenrange = ranges.green[0] < ranges.green[1]
-            ? val >= ranges.green[0] && val <= ranges.green[1]
-            : val >= ranges.green[0];
-          if (greenrange) {
-            return '#5BD97A';
-          }
+          let localColor = null;
+          ranges.colors.forEach((color, index) => {
+            const colorRange = ranges.range[index][0] < ranges.range[index][1]
+              ? val >= ranges.range[index][0] && val <= ranges.range[index][1]
+              : val >= ranges.range[index][0];
+            if (colorRange) {
+              localColor = color;
+            }
+          });
+          return localColor;
         }
       }
 
@@ -401,7 +436,10 @@ export default {
         if (metric === '_title') {
           this.titleToken = String(value);
         } else {
-          if (metricOptionsCurrent.length !== metricOptionsCurrent.filter(Boolean).length) {
+          if (
+            metricOptionsCurrent
+            && metricOptionsCurrent.length !== metricOptionsCurrent.filter(Boolean).length
+          ) {
             this.error = 'Допущен пропуск номеров в последовательности значений поля "_order"';
             this.$store.commit('setState', [{
               object: this.getOptions.settings,
