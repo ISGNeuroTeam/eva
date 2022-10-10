@@ -42,7 +42,7 @@ export default {
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
-    { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
+    { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
@@ -919,7 +919,7 @@ export default {
       icon: mdiGrid,
     },
     singleValue: {
-      tooltip: 'Single Value',
+      tooltip: 'Показатели',
       icon: mdiNumeric,
     },
     tune: {
