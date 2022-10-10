@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- fixed update of tokens on the map
+- fixed position icons\buttons on dash panel
 
 ## [1.107.0]
 
