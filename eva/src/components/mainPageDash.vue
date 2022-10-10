@@ -368,16 +368,6 @@ export default {
       return dash?.groups.find((groupEl) => groupEl.name === this.curName)?.order;
     },
     dragend(e) {
-      console.log(this.allDashs.map((el, index) => {
-        const elGroups = el.groups.filter((groupEl) => groupEl.name === this.curName);
-        return {
-          groups: elGroups.map((groupEl) => ({
-            name: groupEl.name,
-            order: index,
-          })),
-          id: el.id,
-        };
-      }));
       this.draggedDash = e.moved.element.name;
       this.createEssence({
         id: e.moved.element.id,

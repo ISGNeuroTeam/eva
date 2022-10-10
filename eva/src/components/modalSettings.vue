@@ -1825,9 +1825,6 @@ export default {
     updateCodeEditorErrorState(errorStatus) {
       this.codeEditorError = errorStatus;
     },
-    updateCodeEditorErrorState(errorStatus) {
-      this.codeEditorError = errorStatus;
-    },
   },
 };
 </script>
