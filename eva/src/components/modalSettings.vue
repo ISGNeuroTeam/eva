@@ -265,6 +265,8 @@
                   <component
                     :is="field.elem"
                     v-model="options[field.option]"
+                    :important-export="!!field.importantExport"
+                    :elem-name="changeComponent"
                     @input="isChanged = true"
                     @update:error="updateCodeEditorErrorState"
                   />
