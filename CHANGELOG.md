@@ -12,8 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DataPicker: Added the ability to format the result
 - Added code editor for primitivesLibrary field
 - ConstructorSchemes: Added loading svg icons from server
+- Added the ability to assign an icon via metadata
+- Added ability to correct color via metadata
 
 ### Changed
+- Renaming the single value component
 
 ### Fixed
 - fixed update of tokens on the map
