@@ -575,8 +575,14 @@ export default {
           callback: () => {
             this.position = this.map.center;
             [this.leftBottom, this.rightTop] = Object.entries(this.map.bounds);
-            // TODO: Временный коммент
-            // this.updateToken(this.map.zoom);
+            if (this.getOptions.zoomLevel !== this.map.zoom) {
+              this.$store.commit('setState', [{
+                object: this.dashFromStore.options,
+                prop: 'zoomLevel',
+                value: this.map.zoom,
+              }]);
+              this.updateToken(this.map.zoom);
+            }
           },
         },
         {
