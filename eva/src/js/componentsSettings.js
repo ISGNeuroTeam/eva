@@ -49,6 +49,7 @@ export default {
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
+    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
   ],
   size: {
     picker: {
@@ -143,6 +144,10 @@ export default {
       width: 930,
       height: 850,
     },
+    dynamicForm: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -168,6 +173,7 @@ export default {
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
+    dynamicForm: mdiScatterPlotOutline,
   },
   commonOptions: [
     'panelSettings',
@@ -301,6 +307,7 @@ export default {
       'scatterPlotLegend',
     ],
     constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
+    dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -837,6 +844,18 @@ export default {
       elem: 'code-editor',
       isFullWidth: true,
     },
+    // formGenerator
+    {
+      group: 'Исходные данные для формы',
+      option: 'formGenerator',
+    },
+    {
+      optionGroup: 'formGenerator',
+      option: 'formOptions',
+      elem: 'code-editor',
+      isFullWidth: true,
+      importantExport: true,
+    },
 
   ],
   reporstElements: [
@@ -920,6 +939,7 @@ export default {
       'menu',
       'picker',
       'constructorSchemes',
+      'dynamicForm',
     ],
   },
 };
