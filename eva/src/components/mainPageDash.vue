@@ -136,12 +136,15 @@
                   </v-icon>
                 </v-btn>
               </v-tab-item>
-              <v-tab-item :value="'tab-2'">
+              <v-tab-item
+                :value="'tab-2'"
+                class="groups-of-dash__container"
+              >
                 <draggable
                   ref="tabPanel"
                   v-model="tabsOrder"
                   group="tabs"
-                  class="groups-of-dash"
+                  class="groups-of-dash-draggable"
                   @change="dragend"
                 >
                   <v-card
