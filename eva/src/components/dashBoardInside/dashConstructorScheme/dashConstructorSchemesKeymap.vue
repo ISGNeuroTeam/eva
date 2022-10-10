@@ -25,7 +25,7 @@
           :class="{
             'dash-constructor-schemes-keymap__tab-item--active': activeTab === item.value,
           }"
-          @click="activeTab = item.value"
+          @click="setActiveTab(item.value)"
         >
           {{ item.label }}
         </div>
@@ -229,6 +229,10 @@ export default {
     close() {
       this.$emit('update:modelValue', false);
     },
+    setActiveTab(tabNum) {
+      this.$emit('changeKeymapTab');
+      this.activeTab = tabNum;
+    },
   },
 };
 </script>
@@ -242,7 +246,7 @@ export default {
   z-index: 2;
   pointer-events: none;
   opacity: 0;
-  transition: all .2s ease-in-out;
+  transition: all .2s ease;
   background-color: var(--main_bg);
   padding-top: 10px;
   padding-bottom: 39px;
