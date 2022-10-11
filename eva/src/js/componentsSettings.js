@@ -254,6 +254,7 @@ export default {
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
+      'readOnly',
     ],
     guntt: ['timeFormat'],
     tile: [
@@ -406,6 +407,12 @@ export default {
       option: 'searchBtn',
       description: 'Показывать кнопку поиска',
       elem: 'switch',
+    },
+    {
+      option: 'readOnly',
+      description: 'Только чтение',
+      elem: 'switch',
+      default: false,
     },
     {
       option: 'textFontSize',

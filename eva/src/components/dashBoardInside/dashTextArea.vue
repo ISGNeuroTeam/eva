@@ -21,6 +21,7 @@
         spellcheck="false"
         hide-details
         class="textarea-itself"
+        :disabled="readOnly"
         :height="height"
         no-resize
         @keypress.enter="setTockenByPress($event)"
@@ -140,6 +141,10 @@ export default {
     searchBtn() {
       const options = this.getOptions;
       return options.searchBtn;
+    },
+    readOnly() {
+      const options = this.getOptions;
+      return options.readOnly;
     },
     textAreaValue() {
       return this.getTextArea;

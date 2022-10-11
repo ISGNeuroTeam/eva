@@ -15,9 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DynamicFormDash
 - Added the ability to assign an icon via metadata
 - Added ability to correct color via metadata
+- Added setting for editing
 
 ### Changed
 - Renaming the single value component
+- Removed the board for textarea
 
 ### Fixed
 - fixed update of tokens on the map
