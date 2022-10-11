@@ -42,13 +42,14 @@ export default {
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
-    { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
+    { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
+    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
   ],
   size: {
     picker: {
@@ -143,6 +144,10 @@ export default {
       width: 930,
       height: 850,
     },
+    dynamicForm: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -168,6 +173,7 @@ export default {
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
+    dynamicForm: mdiScatterPlotOutline,
   },
   commonOptions: [
     'panelSettings',
@@ -302,6 +308,7 @@ export default {
       'scatterPlotLegend',
     ],
     constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
+    dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -844,6 +851,18 @@ export default {
       elem: 'code-editor',
       isFullWidth: true,
     },
+    // formGenerator
+    {
+      group: 'Исходные данные для формы',
+      option: 'formGenerator',
+    },
+    {
+      optionGroup: 'formGenerator',
+      option: 'formOptions',
+      elem: 'code-editor',
+      isFullWidth: true,
+      importantExport: true,
+    },
 
   ],
   reporstElements: [
@@ -907,7 +926,7 @@ export default {
       icon: mdiGrid,
     },
     singleValue: {
-      tooltip: 'Single Value',
+      tooltip: 'Показатели',
       icon: mdiNumeric,
     },
     tune: {
@@ -927,6 +946,7 @@ export default {
       'menu',
       'picker',
       'constructorSchemes',
+      'dynamicForm',
     ],
   },
 };

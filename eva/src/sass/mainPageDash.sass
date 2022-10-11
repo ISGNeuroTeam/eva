@@ -244,19 +244,19 @@
 .main-card-dash
     margin-top: 50px
 
-    .groups-of-dash
-        display: flex
-        flex-flow: row wrap
-        justify-content: flex-start
-        align-items: center
-        padding: 40px
-
+    .groups-of-dash__container
         .plus-icon
             right: 70px
             top: 0
         .exim-icon
             top: 0
-        
+
+    .groups-of-dash, .groups-of-dash-draggable
+        display: flex
+        flex-flow: row wrap
+        justify-content: flex-start
+        align-items: center
+        padding: 40px
         .dash-group
             width: 200px
             height: 200px
