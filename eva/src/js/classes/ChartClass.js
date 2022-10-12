@@ -161,6 +161,7 @@ export default class ChartClass {
       .append('g')
       .attr('transform', `translate(${maxYLeftAxisWidth},${height - this.xAxisHeight})`)
       .attr('class', 'xAxis')
+      .style('color', '#fff')
       .call(
         d3.axisBottom(this.x)
           .tickFormat(this.xTickFormat.bind(this))
@@ -335,6 +336,7 @@ export default class ChartClass {
         .append('g')
         .attr('class', `y${axisSide}Axis axis-y axis-y-${metric.n} ${addClassName}`)
         .attr('transform', `translate(${offset},0)`)
+        .style('color', '#fff')
         .call(
           d3[`axis${axisSide}`](this.y[metric.name])
             .tickFormat((str) => (metric.unit ? `${str} ${metric.unit}` : str))
