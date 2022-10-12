@@ -50,7 +50,7 @@
               border: `1px solid ${theme.$main_border}`
             }"
           >
-            <div v-if="options.canLastTimeEnter && options.canChooseTime">
+            <div v-if="options.showLastTimeBlock">
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -96,40 +96,40 @@
               </div>
             </div>
 
-            <div v-if="options.canChooseTime">
+            <div v-if="options.showChoseDateAndTimeBlock">
               <div
-                  class="name-of-picker"
-                  :style="{ color: theme.$title }"
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
               >
-                Выбор <span v-if="options.canChooseTime"> времени и </span> даты
+                Выбор времени и даты
               </div>
               <DTPicker
-                  :id="`${id}-start`"
-                  v-model="start"
-                  :label="`Начальная дата ${options.canChooseTime ? ' и время' : ''}`"
-                  :format="dateTimeFormat"
-                  button-now-translation="Сейчас"
-                  :color="theme.$accent_ui_color"
-                  :button-color="theme.$primary_button"
-                  :only-date="!options.canChooseTime"
-                  class="dtpicker"
-                  @input="setTocken('dt')"
+                :id="`${id}-start`"
+                v-model="start"
+                label="Начальная дата и время"
+                :format="dateTimeFormat"
+                button-now-translation="Сейчас"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                :only-date="!options.canChooseTime"
+                class="dtpicker"
+                @input="setTocken('dt')"
               />
               <DTPicker
-                  :id="`${id}-end`"
-                  v-model="end"
-                  :label="`Конечная дата ${options.canChooseTime ? ' и время' : ''}`"
-                  :format="dateTimeFormat"
-                  button-now-translation="Сейчас"
-                  :color="theme.$accent_ui_color"
-                  :button-color="theme.$primary_button"
-                  :only-date="!options.canChooseTime"
-                  class="dtpicker"
-                  @input="setTocken('dt')"
+                :id="`${id}-end`"
+                v-model="end"
+                label="Конечная дата и время"
+                :format="dateTimeFormat"
+                button-now-translation="Сейчас"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                :only-date="!options.canChooseTime"
+                class="dtpicker"
+                @input="setTocken('dt')"
               />
             </div>
 
-            <div v-else>
+            <div v-if="options.showRangeDateBlock">
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -150,7 +150,7 @@
               />
             </div>
 
-            <div v-if="options.canManuallyEnter">
+            <div v-if="options.showCustomInputBlock">
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -284,11 +284,11 @@ export default {
       startForStore: '',
       endForStore: '',
       defaultOptions: {
+        showLastTimeBlock: true,
+        showChoseDateAndTimeBlock: true,
+        showRangeDateBlock: true,
+        showCustomInputBlock: true,
         timeOutputFormat: '',
-        canManuallyEnter: true,
-        canRangeEnter: true,
-        canLastTimeEnter: true,
-        canChooseTime: true,
       },
     };
   },
@@ -298,7 +298,7 @@ export default {
         canChooseTime,
       } = this.options;
       if (canChooseTime) {
-        return 'YYYY-MM-DD hh:mm';
+        return 'YYYY-MM-DD HH:mm';
       }
       return 'YYYY-MM-DD';
     },
