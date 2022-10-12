@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the ability to assign an icon via metadata
 - Added ability to correct color via metadata
 - Added setting for editing
+- Added possibility save multiLine in png
 
 ### Changed
 - Renaming the single value component
