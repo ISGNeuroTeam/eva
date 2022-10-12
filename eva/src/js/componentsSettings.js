@@ -213,10 +213,10 @@ export default {
       'defaultSourceDataUpdates',
     ],
     picker: [
-      'canChooseTime',
-      'canLastTimeEnter',
-      'canRangeEnter',
-      'canManuallyEnter',
+      'showLastTimeBlock',
+      'showChoseDateAndTimeBlock',
+      'showRangeDateBlock',
+      'showCustomInputBlock',
       'timeOutputFormat',
     ],
     graph: ['boxShadow'],
@@ -495,27 +495,26 @@ export default {
 
     // datepicker
     {
-      option: 'canChooseTime',
-      description: 'Выбор времени',
+      option: 'showLastTimeBlock',
+      description: 'Показать блок: Выбор времени',
       elem: 'switch',
       default: true,
     },
     {
-      option: 'canLastTimeEnter',
-      description: 'Показать ввод: последние часы/мин/сек',
-      elem: 'switch',
-      default: true,
-      relation: ['canChooseTime'],
-    },
-    {
-      option: 'canRangeEnter',
-      description: 'Показать выбор диапазона дат',
+      option: 'showChoseDateAndTimeBlock',
+      description: 'Показать блок: Выбор времени и даты',
       elem: 'switch',
       default: true,
     },
     {
-      option: 'canManuallyEnter',
-      description: 'Показать ручной ввод дат',
+      option: 'showRangeDateBlock',
+      description: 'Показать блок: Диапазон дат',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'showCustomInputBlock',
+      description: 'Показать блок: Ввод даты и времени вручную',
       elem: 'switch',
       default: true,
     },
@@ -524,7 +523,7 @@ export default {
       description: 'Формат даты для результата',
       elem: 'text-field',
       default: '',
-      placeholder: 'Пример: YYYY-MM-DD hh:mm',
+      placeholder: 'Пример: YYYY-MM-DD HH:mm',
     },
 
     // dashSingle
