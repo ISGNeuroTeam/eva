@@ -26,7 +26,7 @@
           v-else
           class="cur-date--placeholder"
         >
-          01.01.2001
+          Дата не установлена
         </span>
         <div
           v-click-outside="onClose"
@@ -50,7 +50,7 @@
               border: `1px solid ${theme.$main_border}`
             }"
           >
-            <div v-if="options.canLastTimeEnter && options.canChooseTime">
+            <div v-if="options.showLastTimeBlock">
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -96,40 +96,40 @@
               </div>
             </div>
 
-            <div v-if="options.canChooseTime">
+            <div v-if="options.showChoseDateAndTimeBlock">
               <div
-                  class="name-of-picker"
-                  :style="{ color: theme.$title }"
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
               >
-                Выбор <span v-if="options.canChooseTime"> времени и </span> даты
+                Выбор времени и даты
               </div>
               <DTPicker
-                  :id="`${id}-start`"
-                  v-model="start"
-                  :label="`Начальная дата ${options.canChooseTime ? ' и время' : ''}`"
-                  :format="dateTimeFormat"
-                  button-now-translation="Сейчас"
-                  :color="theme.$accent_ui_color"
-                  :button-color="theme.$primary_button"
-                  :only-date="!options.canChooseTime"
-                  class="dtpicker"
-                  @input="setTocken('dt')"
+                :id="`${id}-start`"
+                v-model="start"
+                label="Начальная дата и время"
+                :format="defaultFormat"
+                :formatted="dateTimeFormat"
+                button-now-translation="Сейчас"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                class="dtpicker"
+                @input="setTocken('dt')"
               />
               <DTPicker
-                  :id="`${id}-end`"
-                  v-model="end"
-                  :label="`Конечная дата ${options.canChooseTime ? ' и время' : ''}`"
-                  :format="dateTimeFormat"
-                  button-now-translation="Сейчас"
-                  :color="theme.$accent_ui_color"
-                  :button-color="theme.$primary_button"
-                  :only-date="!options.canChooseTime"
-                  class="dtpicker"
-                  @input="setTocken('dt')"
+                :id="`${id}-end`"
+                v-model="end"
+                label="Конечная дата и время"
+                :format="defaultFormat"
+                :formatted="dateTimeFormat"
+                button-now-translation="Сейчас"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                class="dtpicker"
+                @input="setTocken('dt')"
               />
             </div>
 
-            <div v-else>
+            <div v-if="options.showRangeDateBlock">
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -141,7 +141,8 @@
                 v-model="range"
                 range
                 label="Диапазон дат"
-                :format="dateTimeFormat"
+                :format="defaultFormat"
+                :formatted="dateTimeFormat"
                 :color="theme.$accent_ui_color"
                 :button-color="theme.$primary_button"
                 :custom-shortcuts="DTPickerCustomShortcuts"
@@ -150,7 +151,7 @@
               />
             </div>
 
-            <div v-if="options.canManuallyEnter">
+            <div v-if="options.showCustomInputBlock">
               <div
                 class="name-of-picker"
                 :style="{ color: theme.$title }"
@@ -284,23 +285,22 @@ export default {
       startForStore: '',
       endForStore: '',
       defaultOptions: {
+        showLastTimeBlock: true,
+        showChoseDateAndTimeBlock: true,
+        showRangeDateBlock: true,
+        showCustomInputBlock: true,
         timeOutputFormat: '',
-        canManuallyEnter: true,
-        canRangeEnter: true,
-        canLastTimeEnter: true,
-        canChooseTime: true,
       },
+      lastControlElement: null,
+      defaultFormat: 'YYYY-MM-DD HH:mm',
     };
   },
   computed: {
     dateTimeFormat() {
       const {
-        canChooseTime,
+        timeOutputFormat,
       } = this.options;
-      if (canChooseTime) {
-        return 'YYYY-MM-DD hh:mm';
-      }
-      return 'YYYY-MM-DD';
+      return timeOutputFormat || this.defaultFormat;
     },
     lastEvery: {
       get() {
@@ -390,36 +390,48 @@ export default {
       let current = '';
 
       if (data.start != null) {
-        current = `${data.start} - `;
+        current = `${moment(data.start).format(this.dateTimeFormat)} - `;
         this.start = data.start;
         if (data.end != null) {
-          current += data.end;
+          current += moment(data.end).format(this.dateTimeFormat);
           this.end = data.end;
         } else {
           current += '...';
         }
       } else if (data.end != null) {
-        current = `... - ${data.end}`;
+        current = `... - ${moment(data.end).format(this.dateTimeFormat)}`;
       }
 
       if (data.range != null) {
-        current = `${data.range.start} - ${data.range.end}`;
+        current = [
+          moment(data.range.start).format(this.dateTimeFormat),
+          moment(data.range.end).format(this.dateTimeFormat),
+        ].join(' - ');
         this.range = data.range;
       }
 
       if (data.startCus != null) {
-        if (data.startCus.indexOf('$$')) {
-          current = `${moment(this.convertingTokens(data.startCus) * 1000).format('YYYY-MM-DD')} - `;
-        } else {
-          current = `${data.startCus} - `;
+        let val = data.startCus;
+
+        if (/\$\w+\$/.test(val)) {
+          val = this.convertingTokens(data.startCus);
         }
+        if (/^\d+$/.test(val)) {
+          val = moment(+val * 1000).format(this.dateTimeFormat);
+        }
+        current = `${val} - `;
         this.start_custom.value = data.startCus;
+
         if (data.endCus != null) {
-          if (data.endCus.indexOf('$$')) {
-            current += moment(this.convertingTokens(data.endCus) * 1000).format('YYYY-MM-DD');
-          } else {
-            current += data.endCus;
+          val = data.endCus;
+          if (/\$\w+\$/.test(val)) {
+            val = this.convertingTokens(data.endCus);
           }
+          if (/^\d+$/.test(val)) {
+            val = moment(+val * 1000).format(this.dateTimeFormat);
+          }
+          current += val;
+
           this.end_custom.value = data.endCus;
         } else {
           current += '...';
@@ -500,6 +512,7 @@ export default {
       this.setTocken('time');
     },
     setTocken(elem) {
+      this.lastControlElement = elem;
       let period = 0;
       switch (elem) {
         case 'dt':
@@ -572,6 +585,7 @@ export default {
       }
     },
     formatDateToResult(date) {
+      if (date === null) return '';
       const {
         timeOutputFormat = null,
       } = this.options;
@@ -584,6 +598,10 @@ export default {
       );
     },
     setDate() {
+      if (this.lastControlElement) {
+        this.setTocken(this.lastControlElement);
+      }
+
       const tockens = this.$store.state[this.idDash].tockens || {};
       let tocken = {};
 
@@ -601,22 +619,11 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (
-          tockens[i].elem === this.id
-          && tockens[i].action === 'select'
-          && tockens[i].capture === 'start'
-        ) {
-          if (this.startForStore != null) {
-            setTocken(this.startForStore);
-          }
-        }
-        if (
-          tockens[i].elem === this.id
-          && tockens[i].action === 'select'
-          && tockens[i].capture === 'end'
-        ) {
-          if (this.endForStore != null) {
-            setTocken(this.endForStore);
+        if (tockens[i].elem === this.id && tockens[i].action === 'select') {
+          if (tockens[i].capture === 'start') {
+            setTocken(this.startForStore || '');
+          } else if (tockens[i].capture === 'end') {
+            setTocken(this.endForStore || '');
           }
         }
       });
