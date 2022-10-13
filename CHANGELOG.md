@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.108.0]
+
+### Added
 - DataPicker: Added settings for displaying the input date and time
 - DataPicker: Added the ability to format the result
 - Added code editor for primitivesLibrary field
@@ -18,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added code editor for primitivesLibrary field
 - ConstructorSchemes: Added loading svg icons from server
 - ConstructorSchemes: Added data source support
+- Text Area: added read only mode
 
 ### Changed
 - Renaming the single value component
