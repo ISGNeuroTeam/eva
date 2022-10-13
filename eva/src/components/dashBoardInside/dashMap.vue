@@ -286,7 +286,9 @@ export default {
     },
     dataSources: {
       handler() {
-        this.loadDataForPipe(this.getOptions.search);
+        if (this.getOptions.search?.id) {
+          this.loadDataForPipe(this.getOptions.search);
+        }
       },
       deep: true,
     },
