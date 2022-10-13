@@ -42,13 +42,14 @@ export default {
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
-    { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
+    { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
+    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
   ],
   size: {
     picker: {
@@ -143,6 +144,10 @@ export default {
       width: 930,
       height: 850,
     },
+    dynamicForm: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -168,6 +173,7 @@ export default {
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
+    dynamicForm: mdiScatterPlotOutline,
   },
   commonOptions: [
     'panelSettings',
@@ -213,10 +219,10 @@ export default {
       'defaultSourceDataUpdates',
     ],
     picker: [
-      'canChooseTime',
-      'canLastTimeEnter',
-      'canRangeEnter',
-      'canManuallyEnter',
+      'showLastTimeBlock',
+      'showChoseDateAndTimeBlock',
+      'showRangeDateBlock',
+      'showCustomInputBlock',
       'timeOutputFormat',
     ],
     graph: ['boxShadow'],
@@ -248,6 +254,7 @@ export default {
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
+      'readOnly',
     ],
     guntt: ['timeFormat'],
     tile: [
@@ -301,6 +308,7 @@ export default {
       'scatterPlotLegend',
     ],
     constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
+    dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -401,6 +409,12 @@ export default {
       elem: 'switch',
     },
     {
+      option: 'readOnly',
+      description: 'Только чтение',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'textFontSize',
       description: 'Выбрать размер шрифта',
       elem: 'select',
@@ -495,26 +509,26 @@ export default {
 
     // datepicker
     {
-      option: 'canChooseTime',
-      description: 'Выбор времени',
+      option: 'showLastTimeBlock',
+      description: 'Показать блок: Выбор времени',
       elem: 'switch',
       default: true,
     },
     {
-      option: 'canLastTimeEnter',
-      description: 'Показать ввод: последние часы/мин/сек',
+      option: 'showChoseDateAndTimeBlock',
+      description: 'Показать блок: Выбор времени и даты',
       elem: 'switch',
       default: true,
     },
     {
-      option: 'canRangeEnter',
-      description: 'Показать выбор диапазона дат',
+      option: 'showRangeDateBlock',
+      description: 'Показать блок: Диапазон дат',
       elem: 'switch',
       default: true,
     },
     {
-      option: 'canManuallyEnter',
-      description: 'Показать ручной ввод дат',
+      option: 'showCustomInputBlock',
+      description: 'Показать блок: Ввод даты и времени вручную',
       elem: 'switch',
       default: true,
     },
@@ -523,7 +537,7 @@ export default {
       description: 'Формат даты для результата',
       elem: 'text-field',
       default: '',
-      placeholder: 'Пример: YYYY-MM-DD hh:mm',
+      placeholder: 'Пример: YYYY-MM-DD HH:mm',
     },
 
     // dashSingle
@@ -837,6 +851,18 @@ export default {
       elem: 'code-editor',
       isFullWidth: true,
     },
+    // formGenerator
+    {
+      group: 'Исходные данные для формы',
+      option: 'formGenerator',
+    },
+    {
+      optionGroup: 'formGenerator',
+      option: 'formOptions',
+      elem: 'code-editor',
+      isFullWidth: true,
+      importantExport: true,
+    },
 
   ],
   reporstElements: [
@@ -900,7 +926,7 @@ export default {
       icon: mdiGrid,
     },
     singleValue: {
-      tooltip: 'Single Value',
+      tooltip: 'Показатели',
       icon: mdiNumeric,
     },
     tune: {
@@ -919,6 +945,8 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
+      'constructorSchemes',
+      'dynamicForm',
     ],
   },
 };
