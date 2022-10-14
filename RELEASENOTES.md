@@ -6,10 +6,11 @@
 - Data Picker: Added the ability to format the result
 - Single Value: Added the ability to assign an icon via metadata
 - Single Value: Added ability to correct color via metadata
-- Added code editor for primitives library field
 - Constructor schemes: Added code editor for primitives library field
 - Constructor schemes: Added loading svg icons from server
 - Constructor schemes: Added data source support
+- Added possibility save multiLine in png
+- Text Area: added read only mode
 
 ### Changed
 - Renaming the Single Value component to 'Показатели'
@@ -17,6 +18,7 @@
 ### Fixed
 - fixed update of tokens on the map
 - fixed position icons\buttons on dash panel
+- fixed flickering map
 
 # [1.107.0] - 2022-09-08
 
