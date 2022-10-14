@@ -452,7 +452,7 @@
       <dash-constructor-schemes-settings
         v-model="dataSelectedNode"
         :theme="theme"
-        :data-rest-from="mockData"
+        :data-rest-from="dataRestFrom"
         :shape-node-style-list="shapeNodeStyleList"
         @changeDataSelectedNode="changeDataSelectedNode"
       />
@@ -877,10 +877,11 @@ export default {
       },
       deep: true,
     },
-    mockData: {
+    dataRestFrom: {
       deep: true,
       handler(value) {
         if (this.constructorSchemes) {
+          this.constructorSchemes.updateDataRest(value);
           this.constructorSchemes.updateDataInNode(value);
         }
       },
@@ -915,7 +916,7 @@ export default {
       this.constructorSchemes = new ConstructorSchemesClass({
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
-        dataRest: this.mockData,
+        dataRest: this.dataRestFrom,
         iconsList: this.primitivesFromStore,
         elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
@@ -931,10 +932,12 @@ export default {
       }
     },
     changeDataSelectedNode(updatedData) {
-      this.constructorSchemes.updateSelectedNode(
-        updatedData,
-        this.updateSavedGraph,
-      );
+      this.$nextTick().then(() => {
+        this.constructorSchemes.updateSelectedNode(
+          updatedData,
+          this.updateSavedGraph,
+        );
+      });
     },
     updateSavedGraph(data) {
       this.$store.commit('setState', [{

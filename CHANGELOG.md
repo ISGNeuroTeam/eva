@@ -11,11 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DataPicker: Added settings for displaying the input date and time
 - DataPicker: Added the ability to format the result
 - Added code editor for primitivesLibrary field
-- ConstructorSchemes: Added loading svg icons from server
 - DynamicFormDash
 - Added the ability to assign an icon via metadata
 - Added ability to correct color via metadata
 - Added setting for editing
+- Added code editor for primitivesLibrary field
+- ConstructorSchemes: Added loading svg icons from server
+- ConstructorSchemes: Added data source support
 - Added possibility save multiLine in png
 
 ### Changed
@@ -25,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - fixed update of tokens on the map
 - fixed position icons\buttons on dash panel
+- fixed flickering map
 
 ## [1.107.0]
 
