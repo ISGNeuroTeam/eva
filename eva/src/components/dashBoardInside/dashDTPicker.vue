@@ -26,7 +26,7 @@
           v-else
           class="cur-date--placeholder"
         >
-          01.01.2001
+          Дата не установлена
         </span>
         <div
           v-click-outside="onClose"
@@ -50,127 +50,142 @@
               border: `1px solid ${theme.$main_border}`
             }"
           >
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Выбор времени
+            <div v-if="options.showLastTimeBlock">
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
+              >
+                Выбор времени
+              </div>
+              <div class="choose-period">
+                <p :style="{ color: theme.$main_text }">
+                  Последние
+                </p>
+                <v-text-field
+                  v-model="lastEvery"
+                  class="textarea-item"
+                  outlined
+                  :color="theme.$accent_ui_color"
+                  :style="{ color: theme.$main_text }"
+                  hide-details
+                  @input="setLast($event)"
+                />
+              </div>
+              <div class="choose-time">
+                <v-chip
+                  :color="theme[color.hour]"
+                  class="time"
+                  @click="setTime('hour')"
+                >
+                  Часов
+                </v-chip>
+                <v-chip
+                  :color="theme[color.minute]"
+                  class="time"
+                  @click="setTime('minute')"
+                >
+                  Минут
+                </v-chip>
+                <v-chip
+                  :color="theme[color.second]"
+                  class="time"
+                  @click="setTime('second')"
+                >
+                  Секунд
+                </v-chip>
+              </div>
             </div>
-            <div class="choose-period">
-              <p :style="{ color: theme.$main_text }">
-                Последние
-              </p>
-              <v-text-field
-                v-model="lastEvery"
-                class="textarea-item"
-                outlined
+
+            <div v-if="options.showChoseDateAndTimeBlock">
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
+              >
+                Выбор времени и даты
+              </div>
+              <DTPicker
+                :id="`${id}-start`"
+                v-model="start"
+                label="Начальная дата и время"
+                :format="defaultFormat"
+                :formatted="dateTimeFormat"
+                button-now-translation="Сейчас"
                 :color="theme.$accent_ui_color"
-                :style="{ color: theme.$main_text }"
-                hide-details
-                @input="setLast($event)"
+                :button-color="theme.$primary_button"
+                class="dtpicker"
+                @input="setTocken('dt')"
+              />
+              <DTPicker
+                :id="`${id}-end`"
+                v-model="end"
+                label="Конечная дата и время"
+                :format="defaultFormat"
+                :formatted="dateTimeFormat"
+                button-now-translation="Сейчас"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                class="dtpicker"
+                @input="setTocken('dt')"
               />
             </div>
-            <div class="choose-time">
-              <v-chip
-                :color="theme[color.hour]"
-                class="time"
-                @click="setTime('hour')"
+
+            <div v-if="options.showRangeDateBlock">
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
               >
-                Часов
-              </v-chip>
-              <v-chip
-                :color="theme[color.minute]"
-                class="time"
-                @click="setTime('minute')"
+                Диапазон дат
+              </div>
+              <DTPicker
+                :id="`${id}-between`"
+                v-model="range"
+                range
+                label="Диапазон дат"
+                :format="defaultFormat"
+                :formatted="dateTimeFormat"
+                :color="theme.$accent_ui_color"
+                :button-color="theme.$primary_button"
+                :custom-shortcuts="DTPickerCustomShortcuts"
+                class="dtpicker range-picker"
+                @input="setTocken('range')"
+              />
+            </div>
+
+            <div v-if="options.showCustomInputBlock">
+              <div
+                class="name-of-picker"
+                :style="{ color: theme.$title }"
               >
-                Минут
-              </v-chip>
-              <v-chip
-                :color="theme[color.second]"
-                class="time"
-                @click="setTime('second')"
-              >
-                Секунд
-              </v-chip>
+                Ввод даты и времени вручную
+              </div>
+              <v-text-field
+                v-model="start_custom.value"
+                label="Начальная дата"
+                counter="500"
+                :style="{ color: theme.$main_text }"
+                clearable
+                :color="theme[start_custom.color]"
+                hide-details
+                outlined
+                class="dtpicker custom-picker"
+                @blur="start_custom.color = 'controlsActive'"
+                @input="setTocken('custom')"
+              />
+              <v-text-field
+                v-model="end_custom.value"
+                label="Конечная дата"
+                counter="500"
+                :style="{ color: theme.$main_text }"
+                clearable
+                :color="theme[end_custom.color]"
+                hide-details
+                outlined
+                class="dtpicker custom-picker"
+                @blur="end_custom.color = 'controlsActive'"
+                @input="setTocken('custom')"
+              />
             </div>
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Выбор времени и даты
-            </div>
-            <DTPicker
-              :id="`${idDash}-start`"
-              v-model="start"
-              label="Начальная дата и время"
-              format="YYYY-MM-DD HH:mm"
-              button-now-translation="Сейчас"
-              :color="theme.$accent_ui_color"
-              :button-color="theme.$primary_button"
-              class="dtpicker"
-              @input="setTocken('dt')"
-            />
-            <DTPicker
-              :id="`${idDash}-end`"
-              v-model="end"
-              label="Конечная дата и время"
-              format="YYYY-MM-DD HH:mm"
-              button-now-translation="Сейчас"
-              :color="theme.$accent_ui_color"
-              :button-color="theme.$primary_button"
-              class="dtpicker"
-              @input="setTocken('dt')"
-            />
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Диапазон дат
-            </div>
-            <DTPicker
-              :id="`${idDash}-between`"
-              v-model="range"
-              range
-              label="Диапазон дат"
-              format="YYYY-MM-DD"
-              :color="theme.$accent_ui_color"
-              :button-color="theme.$primary_button"
-              :custom-shortcuts="DTPickerCustomShortcuts"
-              class="dtpicker range-picker"
-              @input="setTocken('range')"
-            />
-            <div
-              class="name-of-picker"
-              :style="{ color: theme.$title }"
-            >
-              Ввод даты и времени вручную
-            </div>
-            <v-text-field
-              v-model="start_custom.value"
-              label="Начальная дата"
-              counter="500"
-              :style="{ color: theme.$main_text }"
-              clearable
-              :color="theme[start_custom.color]"
-              hide-details
-              outlined
-              class="dtpicker custom-picker"
-              @blur="start_custom.color = 'controlsActive'"
-              @input="setTocken('custom')"
-            />
-            <v-text-field
-              v-model="end_custom.value"
-              label="Конечная дата"
-              counter="500"
-              :style="{ color: theme.$main_text }"
-              clearable
-              :color="theme[end_custom.color]"
-              hide-details
-              outlined
-              class="dtpicker custom-picker"
-              @blur="end_custom.color = 'controlsActive'"
-              @input="setTocken('custom')"
-            />
+
             <div class="set-btn-block">
               <v-btn
                 small
@@ -269,9 +284,24 @@ export default {
       curDate: '',
       startForStore: '',
       endForStore: '',
+      defaultOptions: {
+        showLastTimeBlock: true,
+        showChoseDateAndTimeBlock: true,
+        showRangeDateBlock: true,
+        showCustomInputBlock: true,
+        timeOutputFormat: '',
+      },
+      lastControlElement: null,
+      defaultFormat: 'YYYY-MM-DD HH:mm',
     };
   },
   computed: {
+    dateTimeFormat() {
+      const {
+        timeOutputFormat,
+      } = this.options;
+      return timeOutputFormat || this.defaultFormat;
+    },
     lastEvery: {
       get() {
         return this.last.every;
@@ -326,6 +356,16 @@ export default {
     getTockens() {
       return this.$store.state[this.idDash].tockens;
     },
+    dashStore() {
+      const { id, idDash } = this;
+      return this.$store.state[idDash][id];
+    },
+    options() {
+      return {
+        ...this.defaultOptions,
+        ...this.dashStore.options,
+      };
+    },
   },
   mounted() {
     this.$store.commit('setActions', {
@@ -350,36 +390,48 @@ export default {
       let current = '';
 
       if (data.start != null) {
-        current = `${data.start} - `;
+        current = `${moment(data.start).format(this.dateTimeFormat)} - `;
         this.start = data.start;
         if (data.end != null) {
-          current += data.end;
+          current += moment(data.end).format(this.dateTimeFormat);
           this.end = data.end;
         } else {
           current += '...';
         }
       } else if (data.end != null) {
-        current = `... - ${data.end}`;
+        current = `... - ${moment(data.end).format(this.dateTimeFormat)}`;
       }
 
       if (data.range != null) {
-        current = `${data.range.start} - ${data.range.end}`;
+        current = [
+          moment(data.range.start).format(this.dateTimeFormat),
+          moment(data.range.end).format(this.dateTimeFormat),
+        ].join(' - ');
         this.range = data.range;
       }
 
       if (data.startCus != null) {
-        if (data.startCus.indexOf('$$')) {
-          current = `${moment(this.convertingTokens(data.startCus) * 1000).format('YYYY-MM-DD')} - `;
-        } else {
-          current = `${data.startCus} - `;
+        let val = data.startCus;
+
+        if (/\$\w+\$/.test(val)) {
+          val = this.convertingTokens(data.startCus);
         }
+        if (/^\d+$/.test(val)) {
+          val = moment(+val * 1000).format(this.dateTimeFormat);
+        }
+        current = `${val} - `;
         this.start_custom.value = data.startCus;
+
         if (data.endCus != null) {
-          if (data.endCus.indexOf('$$')) {
-            current += moment(this.convertingTokens(data.endCus) * 1000).format('YYYY-MM-DD');
-          } else {
-            current += data.endCus;
+          val = data.endCus;
+          if (/\$\w+\$/.test(val)) {
+            val = this.convertingTokens(data.endCus);
           }
+          if (/^\d+$/.test(val)) {
+            val = moment(+val * 1000).format(this.dateTimeFormat);
+          }
+          current += val;
+
           this.end_custom.value = data.endCus;
         } else {
           current += '...';
@@ -460,11 +512,12 @@ export default {
       this.setTocken('time');
     },
     setTocken(elem) {
+      this.lastControlElement = elem;
       let period = 0;
       switch (elem) {
         case 'dt':
-          this.startForStore = parseInt(new Date(this.start).getTime() / 1000, 10);
-          this.endForStore = parseInt(new Date(this.end).getTime() / 1000, 10);
+          this.startForStore = this.formatDateToResult(this.start);
+          this.endForStore = this.formatDateToResult(this.end);
           this.range = null;
           this.start_custom.value = null;
           this.end_custom.value = null;
@@ -477,14 +530,8 @@ export default {
 
         case 'range':
           if (this.range) {
-            this.startForStore = parseInt(
-              new Date(this.range.start).getTime() / 1000,
-              10,
-            );
-            this.endForStore = parseInt(
-              new Date(this.range.end).getTime() / 1000,
-              10,
-            );
+            this.startForStore = this.formatDateToResult(this.range.start);
+            this.endForStore = this.formatDateToResult(this.range.end);
           }
           this.start = null;
           this.end = null;
@@ -525,9 +572,8 @@ export default {
             default:
               break;
           }
-
-          this.startForStore = ((Date.now() - period) / 1000).toFixed(0);
-          this.endForStore = (Date.now() / 1000).toFixed(0);
+          this.startForStore = this.formatDateToResult(Date.now() - period);
+          this.endForStore = this.formatDateToResult(Date.now());
           this.start = null;
           this.end = null;
           this.range = null;
@@ -538,7 +584,24 @@ export default {
           break;
       }
     },
+    formatDateToResult(date) {
+      if (date === null) return '';
+      const {
+        timeOutputFormat = null,
+      } = this.options;
+      if (timeOutputFormat) {
+        return moment(date).format(timeOutputFormat);
+      }
+      return parseInt(
+        new Date(date).getTime() / 1000,
+        10,
+      );
+    },
     setDate() {
+      if (this.lastControlElement) {
+        this.setTocken(this.lastControlElement);
+      }
+
       const tockens = this.$store.state[this.idDash].tockens || {};
       let tocken = {};
 
@@ -556,22 +619,11 @@ export default {
           action: tockens[i].action,
           capture: tockens[i].capture,
         };
-        if (
-          tockens[i].elem === this.id
-          && tockens[i].action === 'select'
-          && tockens[i].capture === 'start'
-        ) {
-          if (this.startForStore != null) {
-            setTocken(this.startForStore);
-          }
-        }
-        if (
-          tockens[i].elem === this.id
-          && tockens[i].action === 'select'
-          && tockens[i].capture === 'end'
-        ) {
-          if (this.endForStore != null) {
-            setTocken(this.endForStore);
+        if (tockens[i].elem === this.id && tockens[i].action === 'select') {
+          if (tockens[i].capture === 'start') {
+            setTocken(this.startForStore || '');
+          } else if (tockens[i].capture === 'end') {
+            setTocken(this.endForStore || '');
           }
         }
       });
@@ -588,6 +640,9 @@ export default {
 </style>
 
 <style lang="scss" scoped>
+.DTPicker-elem::v-deep > div .dtpicker {
+  background-color: var(--main_bg) !important;
+}
 .dash-picker {
 
   ::v-deep .datetimepicker, .datepicker {

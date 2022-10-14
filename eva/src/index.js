@@ -13,7 +13,7 @@ import AsyncComputed from 'vue-async-computed';
 import VueDraggableResizable from 'vue-draggable-resizable';
 // подключаем компонент для выбора даты и времени
 // TODO: что это за модуль, почему ide считает что он не установлен
-import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+import VueCtkDateTimePicker from 'vue-ctk-date-time-picker/dist/vue-ctk-date-time-picker.common.js';
 // подключаем файл с настройками хранилища Vuex
 import moment from 'moment';
 import store from './store/index';
@@ -135,6 +135,7 @@ Vue.component('dash-singleValue', () => import('./components/dashBoardInside/Sin
 Vue.component('dash-accumulators', () => import('./components/dashBoardInside/dashAccumulators.vue'));
 // компонент Menu
 Vue.component('dash-menu', () => import('./components/dashBoardInside/dashMenu.vue'));
+Vue.component('dash-dynamicForm', () => import('./components/dashBoardInside/dynamicForm.vue'));
 // элемнет поиска пока не актуален
 // Vue.component('dash-search', () => import('./components/dashBoardInside/dashSearch.vue'))
 // фильтр для таблицы пока не актуален
@@ -161,7 +162,8 @@ Vue.component('data-profile', () => import('./components/autorization/dataForPro
 Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
 // Точечный график
 Vue.component('dash-scatterPlot', () => import('./components/dashBoardInside/dashScatterPlot.vue'));
-
+// Компонент редактора кода
+Vue.component('code-editor', () => import('./components/codeEditor.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"
 Vue.directive('blur', {
   inserted(el, binding) {
