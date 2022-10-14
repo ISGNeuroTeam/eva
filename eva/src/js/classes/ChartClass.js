@@ -58,8 +58,11 @@ export default class ChartClass {
 
   xMinMax = [];
 
-  constructor(svgContainer, width, height, options, linesRegression) {
+  theme = null;
+
+  constructor(svgContainer, width, height, theme, options, linesRegression) {
     this.id = ChartClass.objId += 1;
+    this.theme = theme;
     this.options = ChartClass.mergeDeep(this.options, options);
     this.options.linesRegression = linesRegression;
     this.svgContainer = svgContainer;
@@ -161,6 +164,7 @@ export default class ChartClass {
       .append('g')
       .attr('transform', `translate(${maxYLeftAxisWidth},${height - this.xAxisHeight})`)
       .attr('class', 'xAxis')
+      .style('color', this.theme.$main_text)
       .call(
         d3.axisBottom(this.x)
           .tickFormat(this.xTickFormat.bind(this))
@@ -335,6 +339,7 @@ export default class ChartClass {
         .append('g')
         .attr('class', `y${axisSide}Axis axis-y axis-y-${metric.n} ${addClassName}`)
         .attr('transform', `translate(${offset},0)`)
+        .style('color', this.theme.$main_text)
         .call(
           d3[`axis${axisSide}`](this.y[metric.name])
             .tickFormat((str) => (metric.unit ? `${str} ${metric.unit}` : str))
@@ -633,6 +638,14 @@ export default class ChartClass {
     return this.options.linesRegression;
   }
 
+  get theme() {
+    return this.theme;
+  }
+
+  set theme(val) {
+    this.theme = val;
+  }
+
   updateMaxYRightAxisWidth(width) {
     if (this.maxYRightAxisWidth < width) {
       this.maxYRightAxisWidth = width;
@@ -755,6 +768,7 @@ export default class ChartClass {
     chartGroup
       .append('g')
       .attr('class', 'vertical-tick-lines')
+      .style('color', this.theme.$main_text)
       .attr('transform', `translate(0,${groupHeight})`)
       .call(d3.axisBottom(this.x)
         .tickSize(-groupHeight)
