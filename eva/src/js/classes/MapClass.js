@@ -62,7 +62,6 @@ class MapClass {
       zoom,
       maxZoom,
       center,
-      markerZoomAnimation: false,
     });
   }
 
