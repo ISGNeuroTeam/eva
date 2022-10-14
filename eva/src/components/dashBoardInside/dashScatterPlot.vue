@@ -187,6 +187,9 @@ export default {
     linesRegression() {
       return this.options.scatterPlotLegend || [];
     },
+    theme() {
+      return this.$store.getters.getTheme;
+    },
   },
   watch: {
     dataRestFrom() {
@@ -255,6 +258,7 @@ export default {
         svgContainer,
         width,
         height - topOffset,
+        this.theme,
         this.chartOptions,
         this.linesRegression,
       );
