@@ -29,7 +29,7 @@
               </v-tab>
               <v-tab-item
                 :value="'tab-1'"
-                class="groups-of-dash"
+                class="groups-of-dash groups-of-dash__container"
               >
                 <v-card
                   v-for="(group, i) in allGroups"
