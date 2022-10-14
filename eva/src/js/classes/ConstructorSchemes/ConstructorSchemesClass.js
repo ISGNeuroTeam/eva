@@ -1,4 +1,4 @@
-import {
+import yFiles, {
   Color,
   DefaultLabelStyle,
   DefaultPortCandidate,
@@ -277,12 +277,14 @@ class ConstructorSchemesClass {
     },
     selectedShapeNodeStyle: '',
     isEdit: false,
+    loadingDnDPanelItems: false,
   }
 
   // Additional options
   localVariables = {
     isEdgeCreating: false,
     creatingEdge: null,
+    dataRest: [],
   }
 
   // Template elements
@@ -726,47 +728,63 @@ class ConstructorSchemesClass {
           />
         </clipPath>
       </defs>
-      <!--Bg-left-->
-      <rect
-        x="0"
-        y="0"
-        :width="layout.width"
-        :height="(layout.height / 100) * ((tag.firstValue * 100) / (tag.firstValue + tag.secondValue))"
-        :fill="tag.firstValueColor"
-        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-      />
-      <!--Bg-right-->
-      <rect
-        x="0"
-        y="0"
-        :width="layout.width"
-        :height="(layout.height / 100) * ((tag.secondValue * 100) / (tag.firstValue + tag.secondValue))"
-        :fill="tag.secondValueColor"
-        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
-      />
-      <text
-        class="b-data-node__text"
-        :dx="layout.width / 2"
-        :dy="(layout.height / 6) * 2"
-        alignment-baseline="middle"
-        text-anchor="middle"
-        :fill="tag.firstTextColor"
-        :font-size="((layout.height / 3) * 0.8) + 'px'"
-      >
-          {{ tag.firstValue }}
-      </text>
-      <text
-        class="b-data-node__text"
-        :dx="layout.width / 2"
-        :dy="(layout.height / 6) * 4"
-        alignment-baseline="middle"
-        text-anchor="middle"
-        :fill="tag.secondTextColor"
-        :font-size="((layout.height / 3) * 0.8) + 'px'"
-      >
-          {{ tag.secondValue }}
-      </text>
+      <template v-if="(tag.firstValue + tag.secondValue) > 0 && typeof (tag.firstValue + tag.secondValue) === 'number'">
+        <!--Bg-left-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height * (tag.firstValue / (tag.firstValue + tag.secondValue))"
+          :fill="tag.firstValueColor"
+          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+        />
+        <!--Bg-right-->
+        <rect
+          x="0"
+          y="0"
+          :width="layout.width"
+          :height="layout.height * (tag.secondValue / (tag.firstValue + tag.secondValue))"
+          :fill="tag.secondValueColor"
+          :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          :transform="'translate(' + layout.width + ',' + layout.height + '), rotate(180)'"
+        />
+        <text
+          class="b-data-node__text"
+          :dx="layout.width / 2"
+          :dy="(layout.height / 6) * 2"
+          alignment-baseline="middle"
+          text-anchor="middle"
+          :fill="tag.firstTextColor"
+          :font-size="((layout.height / 3) * 0.8) + 'px'"
+        >
+            {{ tag.firstValue }}
+        </text>
+        <text
+          class="b-data-node__text"
+          :dx="layout.width / 2"
+          :dy="(layout.height / 6) * 4"
+          alignment-baseline="middle"
+          text-anchor="middle"
+          :fill="tag.secondTextColor"
+          :font-size="((layout.height / 3) * 0.8) + 'px'"
+        >
+            {{ tag.secondValue }}
+        </text>
+      </template>
+      <template v-else>
+        <text
+            class="b-data-node__text"
+            :dx="layout.width / 2"
+            :dy="(layout.height / 6) * 2"
+            alignment-baseline="middle"
+            text-anchor="middle"
+            :style="'text-wrap:' + layout.width + 'px; text-extent: 3line'"
+            :fill="tag.firstTextColor"
+            :font-size="((layout.height / 3) * 0.8) + 'px'"
+          >
+              Выбраны некорректные значения
+        </text>
+      </template>
     </g>`,
       width: 150,
       height: 70,
@@ -958,6 +976,14 @@ class ConstructorSchemesClass {
     return this.dndDataPanelItems;
   }
 
+  get loadingDnDPanelItems() {
+    return this.options.loadingDnDPanelItems;
+  }
+
+  set loadingDnDPanelItems(value) {
+    this.options.loadingDnDPanelItems = value;
+  }
+
   get isEdit() {
     return this.options.isEdit;
   }
@@ -1050,6 +1076,14 @@ class ConstructorSchemesClass {
     };
   }
 
+  get dataRest() {
+    return this.localVariables.dataRest;
+  }
+
+  set dataRest(value) {
+    this.localVariables.dataRest = value;
+  }
+
   constructor({
     dndPanelElem,
     elem,
@@ -1062,6 +1096,7 @@ class ConstructorSchemesClass {
     updateStoreCallback,
     openDataPanelCallback,
     closeDataPanelCallback,
+    toggleLoadingCallback,
     isEdit,
   }) {
     this.dragAndDropPanel = null;
@@ -1075,6 +1110,7 @@ class ConstructorSchemesClass {
     this.updateStoreCallback = updateStoreCallback;
     this.openDataPanelCallback = openDataPanelCallback;
     this.closeDataPanelCallback = closeDataPanelCallback;
+    this.toggleLoadingCallback = toggleLoadingCallback;
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
@@ -1120,11 +1156,11 @@ class ConstructorSchemesClass {
   generateIconNodes(iconsList) {
     return Promise.all(iconsList.map(async (icon) => {
       const imageStyleNode = new SimpleNode();
-      const layout = await ConstructorSchemesClass.getSvgLayoutSize(icon.src);
+      const layout = await ConstructorSchemesClass.getSvgLayoutSize(`/svg/${icon.src}`);
       try {
         const nodeSize = this.generateImageSize(layout);
         imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-        imageStyleNode.style = new ImageNodeStyle(icon.src);
+        imageStyleNode.style = new ImageNodeStyle(`/svg/${icon.src}`);
         imageStyleNode.tag = {
           dataType: 'image-node',
           isAspectRatio: true,
@@ -1314,7 +1350,9 @@ class ConstructorSchemesClass {
       );
     } else {
       this.isEdit = false;
-      this.graphComponent.inputMode = new GraphViewerInputMode();
+      this.graphComponent.inputMode = new GraphViewerInputMode({
+        focusableItems: 'none',
+      });
       this.closeDataPanelCallback();
     }
     return this.isEdit;
@@ -1328,6 +1366,9 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
+      // TODO: Починить функционал copy/paste/duplicate
+      allowPaste: false,
+      allowDuplicate: false,
       ignoreVoidStyles: true,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
@@ -1857,7 +1898,11 @@ class ConstructorSchemesClass {
     await this.graphComponent.fitGraphBounds();
   }
 
-  initializeDnDPanel() {
+  initializeDnDPanel(updatedPrimitives) {
+    if (this.dragAndDropPanel) {
+      this.dragAndDropPanel = null;
+    }
+    this.toggleLoadingCallback(true);
     // initialize panel for yFiles drag and drop
     this.dragAndDropPanel = new DragAndDropPanel(this.dndPanelElem);
     // Set the callback that starts the actual drag and drop operation
@@ -1911,13 +1956,19 @@ class ConstructorSchemesClass {
 
     this.dragAndDropPanel.maxItemWidth = 160;
     this.createDnDPanelItems({
-      iconsList: this.iconsList,
+      iconsList: updatedPrimitives || this.iconsList,
       defaultEdgeStyle: this.defaultEdgeStyle,
       defaultNodeStyle: this.defaultNodeStyle,
       defaultLabelStyle: this.defaultLabelStyle,
     }).then((response) => {
       this.dragAndDropPanel.populatePanel(response);
+      this.toggleLoadingCallback(false);
     });
+  }
+
+  refreshDnDPanel(updatedPrimitives) {
+    this.dragAndDropPanel.clearDnDPanel();
+    this.initializeDnDPanel(updatedPrimitives);
   }
 
   async createDnDPanelItems({
@@ -1925,6 +1976,7 @@ class ConstructorSchemesClass {
     defaultEdgeStyle,
     defaultLabelStyle,
   }) {
+    this.loadingDnDPanelItems = true;
     return new Promise((resolve) => {
       const items = [];
       // Стандартный узел
@@ -1993,9 +2045,17 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
-        this.generateIconNodes(iconsList).then((result) => {
-          items.push(...result);
-          resolve(items);
+        const filteredIconList = [];
+        Promise.all(iconsList.map(async (icon) => {
+          const response = await fetch(`/svg/${icon.src}`);
+          if (response.ok) {
+            filteredIconList.push(icon);
+          }
+        })).then(() => {
+          this.generateIconNodes(filteredIconList).then((result) => {
+            items.push(...result);
+            resolve(items);
+          });
         });
       } else {
         resolve(items);
@@ -2017,8 +2077,8 @@ class ConstructorSchemesClass {
             if (targetData) {
               nodeDataItem = {
                 ...nodeDataItem,
-                textLeft: targetData.Description,
-                textRight: targetData.value,
+                textLeft: targetData?.Description || '-',
+                textRight: targetData?.value || '-',
               };
             }
             return nodeDataItem;
@@ -2032,22 +2092,21 @@ class ConstructorSchemesClass {
           node.tag = {
             ...node.tag,
             textFirst: targetData?.value || '-',
-            textSecond: targetData.Description || '-',
+            textSecond: targetData?.Description || '-',
           };
         } else if (dataType === '4') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
-            currentValue: +targetData.value,
-            maxValue: +targetData.value + 100,
+            currentValue: targetData?.value ? +targetData.value : 0,
           };
         } else if (dataType === '5') {
           const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
           const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
           node.tag = {
             ...node.tag,
-            firstValue: +targetDataFirst.value,
-            secondValue: +targetDataSecond.value,
+            firstValue: targetDataFirst?.value ? +targetDataFirst.value : 0,
+            secondValue: targetDataSecond?.value ? +targetDataSecond.value : 0,
           };
         }
       });
@@ -2077,9 +2136,8 @@ class ConstructorSchemesClass {
     } else if (dataType === '4') {
       updatedData = {
         ...dataFromComponent,
-        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value),
-        // TODO: Заменить нан корректное значение!!
-        maxValue: Number(this.getDataItemById(dataFromComponent.id)?.value) + 100,
+        currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
+        maxValue: Number(dataFromComponent.maxValue || 0),
       };
     } else if (dataType === '5') {
       updatedData = {
@@ -2095,6 +2153,7 @@ class ConstructorSchemesClass {
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
     }
+    console.log(updatedData);
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
@@ -2155,6 +2214,10 @@ class ConstructorSchemesClass {
       lower: 'LOWER',
     };
     this.changeOrderSelectedElements(key, orderCommands[key]);
+  }
+
+  updateDataRest(updatedData) {
+    this.dataRest = updatedData;
   }
 }
 

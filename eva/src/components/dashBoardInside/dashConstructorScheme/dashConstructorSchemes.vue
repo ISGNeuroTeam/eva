@@ -8,7 +8,12 @@
       margin: '0 10px',
     }"
   >
-    <div class="dash-constructor-schemes__options">
+    <div
+      class="dash-constructor-schemes__options"
+      :class="{
+        'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
+      }"
+    >
       <v-tooltip
         bottom
         :color="theme.$accent_ui_color"
@@ -137,17 +142,26 @@
     </div>
     <!--Keymap-panel-->
     <dash-constructor-schemes-keymap
+      ref="keymap"
       v-model="isKeymapOpen"
+      @changeKeymapTab="setPanelBottomOffset"
     />
     <!--Drag-and-drop panel-->
     <div
       ref="dndPanelContainer"
       class="dash-constructor-schemes__dnd-panel-container"
+      :style="{
+        'bottom': `${panelBottomOffset}px`,
+      }"
       :class="{
         'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
+        // 'dash-constructor-schemes__dnd-panel-container--is-keymap-open': isKeymapOpen
       }"
     >
-      <div class="row justify-end">
+      <div
+        v-show="!isLoading"
+        class="row justify-end"
+      >
         <div class="col-auto">
           <button
             @click="toggleDnDPanel"
@@ -162,6 +176,7 @@
         </div>
       </div>
       <div
+        v-show="!isLoading"
         ref="dndPanel"
         class="dash-constructor-schemes__dnd-panel"
       >
@@ -182,7 +197,7 @@
                       Настройки:
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <div class="dash-constructor-schemes__options">
+                      <div class="dash-constructor-schemes__inner-options">
                         <!--TODO: Возможно стоит вынести в отдельный компонент-->
                         <div class="row">
                           <div class="col-12">
@@ -404,7 +419,18 @@
           </v-expansion-panel>
         </v-expansion-panels>
       </div>
+      <div
+        v-show="isLoading"
+        class="dash-constructor-schemes__loading-circular"
+      >
+        <v-progress-circular
+          indeterminate
+          size="50"
+          :color="theme.$accent_ui_color"
+        />
+      </div>
     </div>
+    <!--Settings-element-panel-->
     <div
       class="dash-constructor-schemes__data-panel"
       :class="{
@@ -426,7 +452,7 @@
       <dash-constructor-schemes-settings
         v-model="dataSelectedNode"
         :theme="theme"
-        :data-rest-from="mockData"
+        :data-rest-from="dataRestFrom"
         :shape-node-style-list="shapeNodeStyleList"
         @changeDataSelectedNode="changeDataSelectedNode"
       />
@@ -817,11 +843,19 @@ export default {
       selectedDataType: '',
       dataSelectedNode: null,
       isKeymapOpen: false,
+      panelBottomOffset: 10,
+      isLoading: false,
     };
   },
   computed: {
     dashFromStore() {
       return this.$store.state[this.idDashFrom];
+    },
+    primitivesFromStore() {
+      if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
+        return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary);
+      }
+      return [];
     },
     savedGraph() {
       return this.dashFromStore.savedGraph || '';
@@ -837,13 +871,23 @@ export default {
     },
   },
   watch: {
-    mockData: {
+    primitivesFromStore: {
+      handler() {
+        this.constructorSchemes.refreshDnDPanel(this.primitivesFromStore);
+      },
+      deep: true,
+    },
+    dataRestFrom: {
       deep: true,
       handler(value) {
         if (this.constructorSchemes) {
+          this.constructorSchemes.updateDataRest(value);
           this.constructorSchemes.updateDataInNode(value);
         }
       },
+    },
+    isKeymapOpen() {
+      this.setPanelBottomOffset();
     },
   },
   mounted() {
@@ -865,17 +909,21 @@ export default {
     toggleDnDPanel() {
       this.dndPanel = !this.dndPanel;
     },
+    toggleLoading(isLoading) {
+      this.isLoading = isLoading;
+    },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
         dndPanelElem: this.$refs.dndPanel,
         elem: this.$refs.graphComponent,
-        dataRest: this.mockData,
-        iconsList: this.iconsList,
+        dataRest: this.dataRestFrom,
+        iconsList: this.primitivesFromStore,
         elementDefaultStyles: this.elementDefaultStyles,
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
         updateStoreCallback: this.updateSavedGraph,
+        toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
       });
       if (this.constructorSchemes) {
@@ -884,10 +932,12 @@ export default {
       }
     },
     changeDataSelectedNode(updatedData) {
-      this.constructorSchemes.updateSelectedNode(
-        updatedData,
-        this.updateSavedGraph,
-      );
+      this.$nextTick().then(() => {
+        this.constructorSchemes.updateSelectedNode(
+          updatedData,
+          this.updateSavedGraph,
+        );
+      });
     },
     updateSavedGraph(data) {
       this.$store.commit('setState', [{
@@ -946,6 +996,11 @@ export default {
     openKeymapPanel() {
       this.isKeymapOpen = true;
     },
+    setPanelBottomOffset() {
+      this.$nextTick().then(() => {
+        this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
+      });
+    },
   },
 };
 </script>
@@ -954,13 +1009,23 @@ export default {
 .dash-constructor-schemes {
   position: relative;
   overflow: hidden;
+  &__loading-circular {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   &__options {
     position: absolute;
     left: 20px;
     top: 0;
     display: flex;
     align-items: center;
-    z-index: 1;
+    z-index: 10;
+  }
+  &__inner-options {
+    display: flex;
+    align-items: center;
   }
   &__keymap-button {
     position: absolute;
@@ -997,7 +1062,7 @@ export default {
   }
   &__dnd-panel-container, &__data-panel {
     color: var(--main_text);
-    z-index: 1;
+    z-index: 10;
     position: absolute;
     top: 5px;
     bottom: 15px;
@@ -1013,10 +1078,14 @@ export default {
   &__dnd-panel-container {
     left: 0;
     border-radius: 0 4px 4px 0;
+    transition: all .2s ease;
     transform: translateX(-100%);
     &--active {
       transform: translateX(0);
       pointer-events: all;
+    }
+    &--is-keymap-open {
+      bottom: 405px;
     }
   }
   &__data-panel {
