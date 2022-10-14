@@ -41,13 +41,16 @@ export default {
       const newItem = {
         ...payload,
         time,
-        read: false,
       };
       const savedItem = state.notifications.find((item) => item.id === payload.id);
       if (savedItem) {
         Object.assign(savedItem, newItem);
       } else {
-        state.notifications.push(newItem);
+        // @todo: check please
+        state.notifications.push({
+          ...newItem,
+          read: false,
+        });
       }
     },
     dismiss(state, payload) {
