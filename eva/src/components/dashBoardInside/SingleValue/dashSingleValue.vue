@@ -213,7 +213,7 @@ export default {
       return `metric-${this.metricCount} v-${this.template}`;
     },
     dashFromStore() {
-      return this.$store.state[this.idDashFrom][this.idFrom];
+      return this.$store.state[this.idDashFrom][this.idFrom] || {};
     },
     getOptions() {
       if (!this.idFrom) {
@@ -291,7 +291,10 @@ export default {
       },
       deep: true,
     },
-    currentSettings() {
+    currentSettings(val, old) {
+      if (JSON.stringify(val) === JSON.stringify(old)) {
+        return;
+      }
       const currentSettings = {
         metricOptions: [],
         ...this.currentSettings,
@@ -387,9 +390,12 @@ export default {
         this.updateSettings(newSettings);
       }
 
-      this.setVisual();
+      this.setVisual({});
     },
     setVisual(metricOptionsCurrent) {
+      if (metricOptionsCurrent === undefined || metricOptionsCurrent.filter === undefined) {
+        return;
+      }
       const metricList = [];
       const metricOptions = [];
       this.error = '';

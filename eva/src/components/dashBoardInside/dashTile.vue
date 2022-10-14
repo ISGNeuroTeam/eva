@@ -167,7 +167,7 @@ export default {
       return this.$store.state[this.idDashFrom][this.idFrom];
     },
     getOptions() {
-      return this.dashFromStore.options;
+      return this.dashFromStore?.options || {};
     },
     getColumn() {
       if (this.getOptions?.columnCount) {
@@ -176,7 +176,7 @@ export default {
       return 'auto';
     },
     tileStyleIsNotRange() {
-      return typeof this.getOptions.tileStyle === 'string';
+      return typeof this.getOptions?.tileStyle === 'string';
     },
   },
   watch: {

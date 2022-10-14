@@ -976,6 +976,15 @@
         </div>
         <v-card-actions class="actions-settings">
           <v-spacer />
+          <!-- <v-btn
+            small
+            text
+            :color="theme.$primary_button"
+            class="create-btn"
+            @click="copyJson"
+          >
+            Copy JSON
+          </v-btn>-->
           <v-btn
             small
             :color="theme.$primary_button"
@@ -1013,6 +1022,8 @@ import {
 import settings from '../js/componentsSettings';
 import TitleAtionSelect from './modalSettings/titleAtionSelect.vue';
 import vusualisation from '@/js/visualisationCRUD';
+
+const { mdiContentCopy } = require('@mdi/js');
 
 export default {
   name: 'ModalSettings',
@@ -1505,6 +1516,16 @@ export default {
     cancelModal() {
       this.active = false;
       this.checkOnCancel();
+    },
+    copyJson() {
+      const json = JSON.stringify(this.dashFromStore[this.element].options);
+      navigator.clipboard.writeText(json);
+      this.$store.commit('notify/addNotification', {
+        id: 'settings-copy',
+        icon: mdiContentCopy,
+        message: 'Скопировано в буфер',
+        read: false,
+      });
     },
     // если нажали на отмену создания
     checkOnCancel() {

@@ -34,9 +34,14 @@ export default {
         + '- **id** - уникальное значение, строка/число\n'
         + '- **size** - размер в сетке через запятую, пример 4,3 (ширина, высота), строка\n'
         + '- **visualization** - название (код) визуализации для добавления, строка\n'
-        + '- **source** - название источника данных для визуализации, строка\n'
-        + '- **source_separator** - название поля по которому данные делятся\n'
-        + '- **options** - настройки для даша, json',
+        + '- **source** - название источника данных для визуализации, строка\n\n'
+        + '#### Коды визуализаций:\n'
+        + '- **multiline** - Мультилинейный график\n'
+        + '- **ygraph** - Граф\n'
+        + '- **singlevalue** - Число\n'
+        + '- **piechart** - Круговая диаграмма\n'
+        + '- **tile** - Плитка\n'
+        + '- **accumulators** - Накопитель',
     },
     {
       name: 'Мультилинейный график',
@@ -272,6 +277,10 @@ export default {
       'tileSettings',
       'columnCount',
       'tileStyle',
+    ],
+    gridGroup: [
+      'colNum',
+      'rowHeight',
     ],
     csvg: ['tooltip', 'backgroundImage'],
     ygraph: [],
@@ -513,6 +522,20 @@ export default {
       option: 'subnumber',
       description: 'Выводит дополнительную надпись под числом',
       elem: 'text-field',
+    },
+
+    // gridGroup
+    {
+      option: 'colNum',
+      description: 'Количество столбцов в сетке',
+      elem: 'text-field',
+      placeholder: '10',
+    },
+    {
+      option: 'rowHeight',
+      description: 'Высота одной ячейки',
+      elem: 'text-field',
+      placeholder: '60',
     },
 
     // dashTable

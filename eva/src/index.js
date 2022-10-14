@@ -93,7 +93,7 @@ Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashL
 Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashChart.vue'));
 // элемент динамические визуализации
 Vue.component(
-  'dash-grid',
+  'dash-gridGroup',
   () => import('./components/dashBoardInside/dashGridGroup/dashGridGroup.vue'),
 );
 // элемент селект
