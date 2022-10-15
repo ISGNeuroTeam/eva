@@ -18,6 +18,7 @@ import {
   mdiTuneVertical,
   mdiImageFilterTiltShift,
   mdiScatterPlotOutline,
+  mdiDotsHorizontal,
 } from '@mdi/js';
 
 export default {
@@ -50,6 +51,16 @@ export default {
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
+    {
+      name: 'Частотный график',
+      img: mdiDotsHorizontal,
+      type: 'frequencyGraph',
+      dataSourceDescription:
+        'Выберите источник данных.\n'
+        + '#### Обязательные поля:\n'
+        + '- **_time** - время unixtime, число\n'
+        + '- **event** - название события, строка\n',
+    },
   ],
   size: {
     picker: {
@@ -148,6 +159,10 @@ export default {
       width: 400,
       height: 400,
     },
+    frequencyGraph: {
+      width: 700,
+      height: 240,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -174,6 +189,7 @@ export default {
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
     dynamicForm: mdiScatterPlotOutline,
+    frequencyGraph: mdiDotsHorizontal,
   },
   commonOptions: [
     'panelSettings',
@@ -309,6 +325,10 @@ export default {
     ],
     constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
     dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
+    frequencyGraph: [
+      'groupMetric',
+      'tooltipMetrics',
+    ],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -830,6 +850,26 @@ export default {
       elem: 'select-checkbox',
       items() {
         return this.$store.state[this.idDash][this.element]?.options?.group || [];
+      },
+    },
+
+    // frequencyGraph
+    {
+      option: 'groupMetric',
+      description: 'Поле для группировки (название события)',
+      elem: 'text-field',
+      placeholder: 'event',
+    },
+    {
+      option: 'tooltipMetrics',
+      description: 'Метирики в тултипе',
+      elem: 'checkbox-list',
+      default: [],
+      items() {
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.tooltipMetrics || [];
+        const curTitles = storeElement?.lastMetrics || [];
+        return new Set([...savedTitles, ...curTitles]);
       },
     },
 
