@@ -306,7 +306,7 @@
                               class="icon"
                               :color="theme.$main_border"
                               v-on="on"
-                              @click="screenShot($refs.fullScreenCard.$el)"
+                              @click="screenShot($refs.fullScreenCard)"
                             >
                               {{ props.mdiCamera }}
                             </v-icon>
@@ -405,7 +405,7 @@
                   class="icon"
                   :color="theme.$main_border"
                   v-on="on"
-                  @click="screenShot($refs.screenCard.$el)"
+                  @click="screenShot($refs.screenCard)"
                 >
                   {{ props.mdiCamera }}
                 </v-icon>
@@ -547,7 +547,7 @@
         :color-from="theme"
         :custom-style="{
           color: theme.$main_text,
-          background: theme.$main_bg
+          background: 'transparent'
         }"
         :id-from="element"
         :id-dash-from="idDash"
@@ -1386,9 +1386,12 @@ export default {
       this.isFullScreen = false;
     },
     screenShot(screen) {
-      this.$html2canvas(screen, { type: 'dataURL' }).then((canvas) => {
-        this.downloadTheme(canvas);
-      });
+      screen.$el.style.background = this.theme.$main_bg;
+      this.$html2canvas(screen.$el, { type: 'dataURL' })
+        .then((canvas) => {
+          this.downloadTheme(canvas);
+          screen.$el.style.background = 'transparent';
+        });
     },
     downloadTheme(canvas, postfix = (+(new Date())).toString()) {
       const lnk = document.createElement('a');
