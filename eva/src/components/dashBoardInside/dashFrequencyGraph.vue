@@ -160,8 +160,14 @@ export default {
   mounted() {
     this.render();
     this.setLastMetrics(this.tooltipFields);
+    this.$on('resetZoom', this.resetZoom);
   },
   methods: {
+    resetZoom() {
+      // emit double click
+      this.updateChart();
+      this.updateChart();
+    },
     clear() {
       d3.select(this.$refs.svgContainer).selectAll('svg').remove();
     },
