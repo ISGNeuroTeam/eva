@@ -205,7 +205,7 @@ export default {
     createClipArea() {
       const { chartWidth, chartHeight } = this.box;
       this.clip = this.svg.append('defs').append('svg:clipPath')
-        .attr('id', 'clip')
+        // .attr('id', 'clip')
         .append('svg:rect')
         .attr('width', chartWidth)
         .attr('height', chartHeight)
@@ -293,8 +293,8 @@ export default {
         .text((d) => d);
     },
     addDots() {
-      this.scatter = this.svg.append('g')
-        .attr('clip-path', 'url(#clip)');
+      this.scatter = this.svg.append('g');
+      // .attr('clip-path', 'url(#clip)')
 
       this.brushGroup = this.scatter
         .append('g')
