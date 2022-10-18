@@ -985,7 +985,6 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
-      'constructorSchemes',
       'dynamicForm',
     ],
   },
