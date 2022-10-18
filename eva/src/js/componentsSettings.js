@@ -19,37 +19,13 @@ import {
   mdiImageFilterTiltShift,
   mdiScatterPlotOutline,
   mdiGroup,
+  mdiInboxMultipleOutline,
 } from '@mdi/js';
 
 export default {
   tools: [
-    {
-      name: 'Мультилинейный график',
-      img: mdiChartMultiline,
-      type: 'multiLine',
-    },
-    { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
     { name: 'Выпадающий список', img: mdiFormatListBulleted, type: 'select' },
-    { name: 'Таблица', img: mdiTableLarge, type: 'table' },
-    { name: 'Карта', img: mdiMapMarker, type: 'map' },
-    { name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker' },
-    { name: 'Граф', img: mdiGraphql, type: 'ygraph' },
-    { name: 'Кустовая схема', img: mdiChartScatterPlot, type: 'bush' },
-    { name: 'Диаграмма Гантта', img: mdiChartGantt, type: 'guntt' },
-    { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
-    { name: 'Изображение', img: mdiBrush, type: 'csvg' },
-    { name: 'Число', img: mdiNumeric, type: 'single' },
-    { name: 'Кнопка', img: mdiGestureTap, type: 'button' },
-    { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
-    { name: 'Граф_old', img: mdiGraph, type: 'graph' },
-    { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
-    { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
-    { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
-    { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
-    { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
-    { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
-    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
-    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
+    { name: 'Динамическая форма', img: mdiInboxMultipleOutline, type: 'dynamicForm' },
     {
       name: 'Динамические визуализации',
       img: mdiGroup,
@@ -65,12 +41,38 @@ export default {
         + '#### Коды визуализаций:\n'
         + '- **multiline** - Мультилинейный график\n'
         + '- **ygraph** - Граф\n'
-        + '- **singlevalue** - Число\n'
+        + '- **singlevalue** - Показатели\n'
         + '- **piechart** - Круговая диаграмма\n'
         + '- **tile** - Плитка\n'
         + '- **accumulators** - Накопитель',
     },
+    { name: 'Круговая диаграмма', img: mdiChartPie, type: 'piechart' },
+    {
+      name: 'Мультилинейный график',
+      img: mdiChartMultiline,
+      type: 'multiLine',
+    },
+
+    { name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker' },
+    { name: 'Граф', img: mdiGraphql, type: 'ygraph' },
+    // { name: 'Граф_old', img: mdiGraph, type: 'graph' },
+    { name: 'Диаграмма Гантта', img: mdiChartGantt, type: 'guntt' },
+    { name: 'Изображение', img: mdiBrush, type: 'csvg' },
+    { name: 'Карта', img: mdiMapMarker, type: 'map' },
+    { name: 'Кнопка', img: mdiGestureTap, type: 'button' },
+    { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
+    { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
+    { name: 'Кустовая схема', img: mdiChartScatterPlot, type: 'bush' },
+    { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
+    { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
+    { name: 'Плитка', img: mdiViewGrid, type: 'tile' },
+    { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
+    { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
+    { name: 'Таблица', img: mdiTableLarge, type: 'table' },
+    { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
+    { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
+    { name: 'Число', img: mdiNumeric, type: 'single' },
   ],
   size: {
     picker: {
