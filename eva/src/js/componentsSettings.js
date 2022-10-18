@@ -63,13 +63,14 @@ export default {
     { name: 'Текстовый блок', img: mdiCardTextOutline, type: 'textarea' },
     { name: 'Граф_old', img: mdiGraph, type: 'graph' },
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
-    { name: 'Single Value', img: mdiNumeric, type: 'singleValue' },
+    { name: 'Показатели', img: mdiNumeric, type: 'singleValue' },
     { name: 'Ползунок', img: 'eva-basic_slider_01', type: 'tune' },
     { name: 'Конструктор схем', img: mdiTuneVertical, type: 'constructorSchemes' },
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
+    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
   ],
   size: {
     picker: {
@@ -168,6 +169,10 @@ export default {
       width: 930,
       height: 850,
     },
+    dynamicForm: {
+      width: 400,
+      height: 400,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -194,6 +199,7 @@ export default {
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
+    dynamicForm: mdiScatterPlotOutline,
   },
   commonOptions: [
     'panelSettings',
@@ -238,7 +244,13 @@ export default {
       'defaultSourceDataField',
       'defaultSourceDataUpdates',
     ],
-    picker: [],
+    picker: [
+      'showLastTimeBlock',
+      'showChoseDateAndTimeBlock',
+      'showRangeDateBlock',
+      'showCustomInputBlock',
+      'timeOutputFormat',
+    ],
     graph: ['boxShadow'],
     single: [
       'subnumber',
@@ -268,6 +280,7 @@ export default {
       'validationType',
       'validationNumberRangeMin',
       'validationNumberRangeMax',
+      'readOnly',
     ],
     guntt: ['timeFormat'],
     tile: [
@@ -285,7 +298,7 @@ export default {
     csvg: ['tooltip', 'backgroundImage'],
     ygraph: [],
     bush: [],
-    map: ['osmserver', 'primitivesLibrary'],
+    map: ['osmserver', 'primitives', 'primitivesLibrary'],
     heatmap: [
       'dataFormat',
       'x',
@@ -324,7 +337,8 @@ export default {
       'metricGroup',
       'scatterPlotLegend',
     ],
-    constructorSchemes: ['visible', 'level', 'pinned'],
+    constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
+    dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -425,6 +439,12 @@ export default {
       elem: 'switch',
     },
     {
+      option: 'readOnly',
+      description: 'Только чтение',
+      elem: 'switch',
+      default: false,
+    },
+    {
       option: 'textFontSize',
       description: 'Выбрать размер шрифта',
       elem: 'select',
@@ -515,6 +535,39 @@ export default {
       description:
         'Сервер для набора tile Пример:\nhttps://tile.openstreetmap.org/{z}/{x}/{y}.png',
       elem: 'text-field',
+    },
+
+    // datepicker
+    {
+      option: 'showLastTimeBlock',
+      description: 'Показать блок: Выбор времени',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'showChoseDateAndTimeBlock',
+      description: 'Показать блок: Выбор времени и даты',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'showRangeDateBlock',
+      description: 'Показать блок: Диапазон дат',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'showCustomInputBlock',
+      description: 'Показать блок: Ввод даты и времени вручную',
+      elem: 'switch',
+      default: true,
+    },
+    {
+      option: 'timeOutputFormat',
+      description: 'Формат даты для результата',
+      elem: 'text-field',
+      default: '',
+      placeholder: 'Пример: YYYY-MM-DD HH:mm',
     },
 
     // dashSingle
@@ -673,7 +726,6 @@ export default {
         return this.$store.state[this.idDash][this.element]?.availableTableTitles;
       },
     },
-
     {
       option: 'columnCount',
       description: 'Количество столбцов',
@@ -832,6 +884,30 @@ export default {
       elem: 'switch',
     },
 
+    // fullWidthGroup
+    {
+      group: 'Библиотека примитивов',
+      option: 'primitives',
+    },
+    {
+      optionGroup: 'primitives',
+      option: 'primitivesLibrary',
+      elem: 'code-editor',
+      isFullWidth: true,
+    },
+    // formGenerator
+    {
+      group: 'Исходные данные для формы',
+      option: 'formGenerator',
+    },
+    {
+      optionGroup: 'formGenerator',
+      option: 'formOptions',
+      elem: 'code-editor',
+      isFullWidth: true,
+      importantExport: true,
+    },
+
   ],
   reporstElements: [
     'table',
@@ -894,7 +970,7 @@ export default {
       icon: mdiGrid,
     },
     singleValue: {
-      tooltip: 'Single Value',
+      tooltip: 'Показатели',
       icon: mdiNumeric,
     },
     tune: {
@@ -913,6 +989,8 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
+      'constructorSchemes',
+      'dynamicForm',
     ],
   },
 };

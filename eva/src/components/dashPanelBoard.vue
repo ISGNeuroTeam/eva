@@ -2277,7 +2277,6 @@ export default {
   width: fit-content;
 }
 .backlight-tkn {
-  white-space: break-spaces;
   font-family: monospace, Consolas;
   background-color: #9992;
 }
