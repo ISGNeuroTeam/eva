@@ -39,7 +39,7 @@
           >
             <v-card-text
               :is="`dash-${vizCodes[item.row.visualization.toLowerCase()]}`"
-              :id-from="`${item.row.visualization}-${idFrom}-${item.option_key}-v1`"
+              :id-from="item.visualizationId"
               :id-dash-from="idDash"
               :color-from="theme"
               :options="dashItemOptions[item.i] || {}"
@@ -56,7 +56,7 @@
               :width-from="(box.width - 56) * (colNum >= item.w ? colNum / item.w : 1)"
               :search-rep="true"
               :data-report="true"
-              :data-rest-from="dataSourcesBySid.find(obj => obj.sid === item.row.source).data"
+              :data-rest-from="item.dataRest.data"
               :current-settings="settings"
               :update-settings="updateSettings"
               :data-mode-from="dataModeFrom"
@@ -77,6 +77,8 @@
               @hideDS="hideDS($event)"
               @setVissible="setVissible($event)"
               @setLoading="setLoading($event)"
+              @SetRange="setRange($event, item)"
+              @resetRange="$emit('resetRange', item.dataRest.id)"
             />
           </grid-item>
         </grid-layout>
@@ -280,6 +282,8 @@ export default {
               y += maxRowH;
               maxRowH = 0;
             }
+            const dataRest = this.dataSourcesBySid.find((obj) => obj.sid === item.source);
+            const optionKey = item.option_key || item.id;
             const params = {
               row: item,
               i: item.id,
@@ -288,7 +292,9 @@ export default {
               x,
               y,
               text: `${n} (x: ${x}, y: ${y}) [${sizes[0]}x${sizes[1]}]`,
-              option_key: item.option_key || item.id,
+              visualizationId: `${item.visualization}-${this.idFrom}-${optionKey}-v1`,
+              optionKey,
+              dataRest,
             };
             if (+sizes[0] + x <= colNum) {
               x += +sizes[0];
@@ -309,6 +315,17 @@ export default {
     },
   },
   methods: {
+    setRange({ range }, item) {
+      const { xMetric = '_time' } = this.$store.state[this.idDash][item.visualizationId].options.xAxis;
+      this.$emit('SetRange', {
+        range,
+        elem: {
+          elem: item.visualizationId,
+          search: item.dataRest.id,
+        },
+        xMetric,
+      });
+    },
     updateSettings(val) {
       this.settings = JSON.parse(JSON.stringify(val));
     },
