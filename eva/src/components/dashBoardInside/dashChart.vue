@@ -9,13 +9,21 @@
       v-bind="$attrs"
       class="muililine-new"
     >
-      <v-icon
+      <div
         v-show="dataModeFrom"
-        size="22"
-        class="settings-icon"
+        class="d-inline-block settings-icon"
         @click.stop="openSettings"
-        v-text="mdiSettings"
-      />
+      >
+        <svg
+          height="22px"
+          width="22px"
+        >
+          <path
+            :d="mdiSettings"
+            :fill="theme.$main_text"
+          />
+        </svg>
+      </div>
       <div
         ref="legend"
         class="legend"
@@ -282,6 +290,13 @@ export default {
         });
       });
     },
+    theme(val, old) {
+      if (JSON.stringify(val) !== JSON.stringify(old)) {
+        this.chart.theme = this.theme;
+        this.chart.moveInNewContainer(this.$refs.svgContainer);
+        this.updateBox();
+      }
+    },
   },
   mounted() {
     const { id, idDash, actions } = this;
@@ -292,7 +307,7 @@ export default {
   methods: {
     createChart() {
       const { width, height } = this.box;
-      this.chart = new ChartClass(this.$refs.svgContainer, width, height, {
+      this.chart = new ChartClass(this.$refs.svgContainer, width, height, this.theme, {
         xAxis: {
           type: 'time', // linear, time, - log, point, band
           timeFormat: '%d.%m.%y %H:%M',
@@ -495,6 +510,7 @@ export default {
   float: right
   margin: 8px 2px
   color: $secondary-text !important
+  cursor: pointer
 
 .svg-container
   position: relative

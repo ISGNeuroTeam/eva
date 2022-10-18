@@ -68,6 +68,7 @@
                 :key="`${field.option}${prop}`"
                 class="option-item"
               >
+                <!--Group name-->
                 <v-card-text
                   v-if="field.group"
                   class="headline"
@@ -82,8 +83,9 @@
                     {{ field.group }}
                   </div>
                 </v-card-text>
+                <!--Fields-with-description-->
                 <div
-                  v-if="!field.group"
+                  v-if="!field.group && !field.isFullWidth"
                   class="name-option item"
                   :style="{
                     color: theme.$main_text,
@@ -95,7 +97,7 @@
                   <span v-if="prop">.{{ prop }}</span>
                 </div>
                 <div
-                  v-if="!field.group"
+                  v-if="!field.group && !field.isFullWidth"
                   class="discribe-option item"
                   :style="{
                     color: theme.$main_text,
@@ -108,7 +110,7 @@
                   />
                 </div>
                 <div
-                  v-if="!field.group"
+                  v-if="!field.group && !field.isFullWidth"
                   class="status-option item"
                 >
                   <!-- elem: switch -->
@@ -255,6 +257,20 @@
                   </v-radio-group>
                   <!-- end -->
                 </div>
+                <!--Full-width-fields-->
+                <div
+                  v-else-if="!field.group && field.isFullWidth"
+                  class="full-width-options-item"
+                >
+                  <component
+                    :is="field.elem"
+                    v-model="options[field.option]"
+                    :important-export="!!field.importantExport"
+                    :elem-name="changeComponent"
+                    @input="isChanged = true"
+                    @update:error="updateCodeEditorErrorState"
+                  />
+                </div>
               </div>
             </template>
           </template>
@@ -370,61 +386,6 @@
                 @change="isChanged = true"
               />
             </div>
-          </div>
-
-          <div
-            v-if="checkOptions('primitivesLibrary')"
-            class="option-item"
-          >
-            <v-container fluid>
-              <v-card-text class="headline">
-                <div
-                  class="settings-title"
-                  :style="{
-                    color: theme.$main_text,
-                    borderColor: theme.$main_border,
-                  }"
-                >
-                  Библиотека примитивов отображения
-                </div>
-              </v-card-text>
-              <v-btn
-                plain
-                link
-                small
-                class="mb-3 text-lowercase"
-                :color="theme.$main_text"
-                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow"
-              >
-                {{ primitivesLibraryAutoGrowLinkText }}
-              </v-btn>
-              <v-textarea
-                v-model="options.primitivesLibrary"
-                name="input-7-1"
-                filled
-                rows="6"
-                label="JSON c примитивами"
-                :auto-grow="primitivesLibraryAutoGrow"
-                class="textarea-event"
-                spellcheck="false"
-                :color="theme.$main_text"
-                :style="{ color: theme.$main_text }"
-                outlined
-                hide-details
-                @input="isChanged = true"
-              />
-              <v-btn
-                v-if="primitivesLibraryAutoGrow"
-                plain
-                link
-                small
-                class="text-lowercase"
-                :color="theme.$main_text"
-                @click="primitivesLibraryAutoGrow = !primitivesLibraryAutoGrow"
-              >
-                {{ primitivesLibraryAutoGrowLinkText }}
-              </v-btn>
-            </v-container>
           </div>
           <v-card-text
             v-if="checkOptions('piechartSettings')"
@@ -1125,6 +1086,8 @@ export default {
             || value?.type === 'image/jpg'
             || value?.type === 'image/bmp') || 'Некорректный тип файла',
       ],
+      codeEditorValue: '',
+      showCodeEditor: false,
     };
   },
   computed: {
@@ -1167,6 +1130,9 @@ export default {
         return this.dashFromStore.modalSettings.status;
       },
       set(value) {
+        this.$nextTick(() => {
+          this.showCodeEditor = value;
+        });
         this.$store.commit('setModalSettings', {
           idDash: this.idDash,
           element: this.element,
@@ -1293,6 +1259,7 @@ export default {
         const items = typeof field.items === 'function'
           ? field.items.call(this)
           : field.items;
+        // TODO: Возможно пережитки прошлого
         const each = typeof field.each === 'function' ? field.each.call(this) : field.each;
         if (each) {
           const options = {};
@@ -1877,6 +1844,9 @@ export default {
           },
         ]);
       }
+    },
+    updateCodeEditorErrorState(errorStatus) {
+      this.codeEditorError = errorStatus;
     },
   },
 };

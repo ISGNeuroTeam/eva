@@ -62,7 +62,6 @@ class MapClass {
       zoom,
       maxZoom,
       center,
-      markerZoomAnimation: false,
     });
   }
 
@@ -295,7 +294,7 @@ class MapClass {
       .on('mouseover', (e) => highlightFeature(e, line))
       .on('mouseout', resetHighlight)
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, element);
       });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);
@@ -325,7 +324,7 @@ class MapClass {
     line
       .bindTooltip(tooltip)
       .on('click', () => {
-        callback(element.ID);
+        callback(element.ID, element);
       });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);

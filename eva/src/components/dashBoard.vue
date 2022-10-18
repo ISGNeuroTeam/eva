@@ -296,6 +296,24 @@
                     <div class="settings-dash-block">
                       <div class="settings-dash">
                         <v-tooltip
+                          v-if="!excludedFromDataSearches && elementType === 'multiLine'"
+                          bottom
+                          :color="theme.$accent_ui_color"
+                          :open-delay="tooltipOpenDelay"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-icon
+                              class="icon"
+                              :color="theme.$main_border"
+                              v-on="on"
+                              @click="screenShot($refs.fullScreenCard)"
+                            >
+                              {{ props.mdiCamera }}
+                            </v-icon>
+                          </template>
+                          <span>Скачать в PNG</span>
+                        </v-tooltip>
+                        <v-tooltip
                           v-if="isMultiline"
                           bottom
                           :color="theme.$accent_ui_color"
@@ -360,7 +378,11 @@
                   </v-card-title>
 
                   <portal-target
+                    ref="fullScreenCard"
                     style="height: calc(100% - 35px)"
+                    :style="{
+                      background: theme.$main_bg
+                    }"
                     :name="`${element}`"
                   />
                 </v-card>
@@ -372,6 +394,24 @@
             class="settings-dash"
             :class="{ settings_move: props.open_gear }"
           >
+            <v-tooltip
+              v-if="!excludedFromDataSearches && elementType === 'multiLine'"
+              bottom
+              :color="theme.$accent_ui_color"
+              :open-delay="tooltipOpenDelay"
+            >
+              <template v-slot:activator="{ on }">
+                <v-icon
+                  class="icon"
+                  :color="theme.$main_border"
+                  v-on="on"
+                  @click="screenShot($refs.screenCard)"
+                >
+                  {{ props.mdiCamera }}
+                </v-icon>
+              </template>
+              <span>Скачать в PNG</span>
+            </v-tooltip>
             <v-tooltip
               v-if="!excludedFromDataSearches"
               bottom
@@ -486,7 +526,7 @@
         </div>
       </div>
       <v-card-text
-        v-if="!excludedFromDataSearches && currentElem !== 'dash-constructorSchemes'"
+        v-if="!excludedFromDataSearches"
         v-show="!showElement"
         class="card-text"
       >
@@ -504,7 +544,8 @@
       </v-card-text>
       <v-card-text
         :is="currentElem"
-        v-if="showElement || excludedFromDataSearches || currentElem === 'dash-constructorSchemes'"
+        v-if="showElement || excludedFromDataSearches"
+        ref="screenCard"
         :full-screen-mode="bigSizeMode"
         custom-class="card-text element-itself"
         :color-from="theme"
@@ -570,6 +611,7 @@ import {
   mdiTrashCanOutline,
   mdiFullscreen,
   mdiFullscreenExit,
+  mdiCamera,
 } from '@mdi/js';
 import VueMarkdown from 'vue-markdown';
 import settings from '../js/componentsSettings';
@@ -659,6 +701,7 @@ export default {
         mdiArrowCollapse,
         mdiFullscreen,
         mdiFullscreenExit,
+        mdiCamera,
         icons: {},
         edit: true,
         edit_icon: true,
@@ -1352,6 +1395,25 @@ export default {
     toggleBigSize() {
       this.bigSizeMode = !this.bigSizeMode;
       this.isFullScreen = false;
+    },
+    screenShot(screen) {
+      screen.$el.style.background = this.theme.$main_bg;
+      this.$html2canvas(screen.$el, { type: 'dataURL' })
+        .then((canvas) => {
+          this.downloadTheme(canvas);
+          screen.$el.style.background = 'transparent';
+        });
+    },
+    downloadTheme(canvas, postfix = (+(new Date())).toString()) {
+      const lnk = document.createElement('a');
+      lnk.href = canvas;
+      lnk.download = this.element;
+      lnk.target = '_blank';
+      lnk.style.display = 'none';
+      lnk.id = `downloadlnk-${postfix}`;
+      document.body.appendChild(lnk);
+      lnk.click();
+      document.body.removeChild(lnk);
     },
   },
 };
