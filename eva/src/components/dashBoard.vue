@@ -580,7 +580,7 @@
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
-        @SetRange="setRange($event)"
+        @SetRange="$emit('SetRange', $event)"
         @resetRange="resetRange($event)"
         @changeSelectPie="changeSelectedPie"
         @update:table-per-page="onTableItemsPerPageChange"
@@ -1364,11 +1364,8 @@ export default {
         this.searchData = JSON.parse(JSON.stringify(this.props.dataRest));
       }
     },
-    setRange(range) {
-      this.$emit('SetRange', range);
-    },
-    resetRange() {
-      this.$emit('ResetRange', this.dataSourceId);
+    resetRange(search) {
+      this.$emit('ResetRange', search || this.dataSourceId);
     },
     nameAction(actionList) {
       if (!actionList || this.excludedFromTitleAcrions) return;
