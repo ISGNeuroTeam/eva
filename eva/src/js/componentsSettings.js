@@ -24,26 +24,6 @@ import {
 export default {
   tools: [
     {
-      name: 'Динамические визуализации',
-      img: mdiGroup,
-      type: 'gridGroup',
-      dataSourceDescription:
-        'Выберите источник данных в котором указано какие визуализации '
-        + 'необходимо отрисовать.\n'
-        + '#### Обязательные поля:\n'
-        + '- **id** - уникальное значение, строка/число\n'
-        + '- **size** - размер в сетке через запятую, пример 4,3 (ширина, высота), строка\n'
-        + '- **visualization** - название (код) визуализации для добавления, строка\n'
-        + '- **source** - название источника данных для визуализации, строка\n\n'
-        + '#### Коды визуализаций:\n'
-        + '- **multiline** - Мультилинейный график\n'
-        + '- **ygraph** - Граф\n'
-        + '- **singlevalue** - Число\n'
-        + '- **piechart** - Круговая диаграмма\n'
-        + '- **tile** - Плитка\n'
-        + '- **accumulators** - Накопитель',
-    },
-    {
       name: 'Мультилинейный график',
       img: mdiChartMultiline,
       type: 'multiLine',
@@ -69,8 +49,28 @@ export default {
     { name: 'Накопитель', img: 'eva-chart_bar_chart_horizontal', type: 'accumulators' },
     { name: 'Меню', img: 'eva-edit_list_checklist', type: 'menu' },
     { name: 'Круговая шкала', img: mdiImageFilterTiltShift, type: 'dial' },
-    { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
+    {
+      name: 'Динамические визуализации',
+      img: mdiGroup,
+      type: 'gridGroup',
+      dataSourceDescription:
+        'Выберите источник данных в котором указано какие визуализации '
+        + 'необходимо отрисовать.\n'
+        + '#### Обязательные поля:\n'
+        + '- **id** - уникальное значение, строка/число\n'
+        + '- **size** - размер в сетке через запятую, пример 4,3 (ширина, высота), строка\n'
+        + '- **visualization** - название (код) визуализации для добавления, строка\n'
+        + '- **source** - название источника данных для визуализации, строка\n\n'
+        + '#### Коды визуализаций:\n'
+        + '- **multiline** - Мультилинейный график\n'
+        + '- **ygraph** - Граф\n'
+        + '- **singlevalue** - Число\n'
+        + '- **piechart** - Круговая диаграмма\n'
+        + '- **tile** - Плитка\n'
+        + '- **accumulators** - Накопитель',
+    },
+    { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
   ],
   size: {
     picker: {
