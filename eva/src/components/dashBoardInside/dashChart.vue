@@ -10,7 +10,7 @@
       class="muililine-new"
     >
       <div
-        v-show="dataModeFrom"
+        v-if="dataModeFrom"
         class="d-inline-block settings-icon"
         @click.stop="openSettings"
       >
