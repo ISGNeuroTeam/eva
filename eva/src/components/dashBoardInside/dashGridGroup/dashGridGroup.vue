@@ -12,6 +12,9 @@
       <div v-if="dataRestFrom.length === 0">
         <span>Нет данных для отображения</span>
       </div>
+      <div v-else-if="errorMessage">
+        <span>{{ errorMessage }}</span>
+      </div>
       <div
         v-else
         :style="`height: ${box.height}px; overflow: auto;`"
@@ -293,6 +296,40 @@ export default {
     rowHeight() {
       return +this.options.rowHeight || this.defaultOptions.rowHeight;
     },
+    errorMessage() {
+      // when more data
+      const vizLimit = 100;
+      if (this.dataRestFrom.length > vizLimit) {
+        return `Вы попытались вывести больше ${vizLimit} визуализаций`;
+      }
+
+      if (this.dataRestFrom.length > 0) {
+        // when not found required fields
+        const requiredFields = ['id', 'size', 'visualization', 'source'];
+        const notFoundFields = [];
+        const firstRow = Object.keys(this.dataRestFrom[0]);
+        requiredFields.forEach((field) => {
+          if (!firstRow.includes(field)) {
+            notFoundFields.push(field);
+          }
+        });
+        if (notFoundFields.length) {
+          return `Не передан параметр ${notFoundFields.join(', ')}`;
+        }
+
+        // when exists doubles of id
+        const existsIds = [];
+        // eslint-disable-next-line no-restricted-syntax
+        for (const row of this.dataRestFrom) {
+          const id = `${row.id}`;
+          if (existsIds.includes(id)) {
+            return `Найден дубль ID: ${id}`;
+          }
+          existsIds.push(id);
+        }
+      }
+      return null;
+    },
     dashes: {
       get() {
         let x = 0;
@@ -300,7 +337,7 @@ export default {
         let maxRowH = 0;
         const list = new Map();
         this.dataRestFrom
-          .forEach((item, n) => {
+          .forEach((item) => {
             const { colNum } = this;
             const sizes = item.size.split(',');
             if (maxRowH < +sizes[1]) {
