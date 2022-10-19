@@ -37,8 +37,19 @@
             :h="item.h"
             :i="item.i"
           >
+            <div
+              v-if="dashFromStore.editMode && item.hasSettings"
+              class="setting-icon"
+            >
+              <v-icon
+                left
+                class="icon-main"
+                @click.prevent="switchOP(item)"
+                v-text="mdiSettings"
+              />
+            </div>
             <v-card-text
-              :is="`dash-${vizCodes[item.row.visualization.toLowerCase()]}`"
+              :is="item.dash"
               :id-from="item.visualizationId"
               :id-dash-from="idDash"
               :color-from="theme"
@@ -73,7 +84,8 @@
                 color: theme.$main_text,
                 background: 'var(--main_bg)',
               }"
-              custom-class="card-text element-itself grid-elem"
+              custom-class="card-text element-itself"
+              class="grid-elem"
               @hideDS="hideDS($event)"
               @setVissible="setVissible($event)"
               @setLoading="setLoading($event)"
@@ -89,6 +101,7 @@
 
 <script>
 import { GridLayout, GridItem } from 'vue-grid-layout';
+import { mdiSettings } from '@mdi/js';
 
 export default {
   name: 'DashGridGroup',
@@ -150,15 +163,30 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    vizCodes: {
+    vizOptions: {
       type: Object,
       default: () => ({
-        multiline: 'multiLine',
-        ygraph: 'ygraph',
-        singlevalue: 'singleValue',
-        piechart: 'piechart',
-        tile: 'tile',
-        accumulators: 'accumulators',
+        multiline: {
+          dash: 'multiLine',
+        },
+        ygraph: {
+          dash: 'ygraph',
+        },
+        singlevalue: {
+          dash: 'singleValue',
+        },
+        piechart: {
+          dash: 'piechart',
+          mainSettings: true,
+        },
+        tile: {
+          dash: 'tile',
+          mainSettings: true,
+        },
+        accumulators: {
+          dash: 'accumulators',
+          mainSettings: true,
+        },
       }),
     },
   },
@@ -171,6 +199,7 @@ export default {
       bigSizeMode: false,
       stateDash: {},
       dashItemOptions: {},
+      mdiSettings,
       props: {
         id: '',
         name: '',
@@ -284,6 +313,10 @@ export default {
             }
             const dataRest = this.dataSourcesBySid.find((obj) => obj.sid === item.source);
             const optionKey = item.option_key || item.id;
+            const vizOptions = this.vizOptions[item.visualization.toLowerCase()];
+            if (!vizOptions) {
+              return;
+            }
             const params = {
               row: item,
               i: item.id,
@@ -291,10 +324,11 @@ export default {
               h: +sizes[1],
               x,
               y,
-              text: `${n} (x: ${x}, y: ${y}) [${sizes[0]}x${sizes[1]}]`,
+              dash: `dash-${vizOptions.dash}`,
               visualizationId: `${item.visualization}-${this.idFrom}-${optionKey}-v1`,
               optionKey,
               dataRest,
+              hasSettings: !!vizOptions.mainSettings,
             };
             if (+sizes[0] + x <= colNum) {
               x += +sizes[0];
@@ -303,6 +337,9 @@ export default {
           });
         return [...list.values()];
       },
+    },
+    dashFromStore() {
+      return this.$store.state[this.idDash];
     },
     idToSidObj() {
       return this.$store.state[this.idDash].searches.map(({ id, sid }) => ({ id, sid }));
@@ -350,6 +387,12 @@ export default {
       }
       this.props.loading = event;
     },
+    switchOP(item) {
+      this.$store.dispatch('openModalSettings', {
+        path: this.idDash,
+        element: item.visualizationId,
+      });
+    },
   },
 };
 </script>
@@ -364,7 +407,7 @@ export default {
   border: .5px solid var(--main_border)
   background-color: var(--main_bg)
 
-.grid-widget > div
+.grid-elem
   display: flex
   justify-content: space-around
   align-items: stretch
@@ -373,5 +416,18 @@ export default {
   flex-wrap: nowrap
   flex: 1
   height: 100%
+.setting-icon
+  position: absolute
+  top: 0
+  right: 0
+  justify-content: flex-start
+  align-self: flex-start
+  align-content: flex-start
+  align-items: flex-start
+  padding-top: 10px
+.icon-main
+  color: var(--main_text)
+  cursor: pointer
+  margin-bottom: auto
 
 </style>
