@@ -463,7 +463,7 @@ export default {
   align-items: flex-start
   padding-top: 10px
 .icon-main
-  color: var(--main_text)
+  color: var(--main_text) !important
   cursor: pointer
   margin-bottom: auto
 
