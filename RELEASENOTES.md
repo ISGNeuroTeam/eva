@@ -1,3 +1,15 @@
+# [1.109.0] - 2022-10-20
+
+### Added
+- Added the Frequency graph visualization
+- Added the Dash group visualization
+
+### Changed
+- The component menu has become more compact
+
+### Fixed
+- Fixed DS selection button on constructor-schemes
+
 # [1.108.0] - 2022-10-13
 
 ### Added
