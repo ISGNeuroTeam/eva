@@ -1718,7 +1718,7 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
-              } else if (item === 'ListDS' || item === 'scatterPlotLegend') {
+              } else if (item === 'ListDS' || item === 'scatterPlotLegend' || item === 'tooltipMetrics') {
                 localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];
