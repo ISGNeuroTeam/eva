@@ -201,7 +201,7 @@ export default {
     menu: 'eva-edit_list_checklist',
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
-    dynamicForm: mdiScatterPlotOutline,
+    dynamicForm: mdiInboxMultipleOutline,
   },
   commonOptions: [
     'panelSettings',
