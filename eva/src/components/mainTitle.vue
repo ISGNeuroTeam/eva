@@ -780,10 +780,11 @@ export default {
       });
     },
     setRange(range, elem) {
-      if (range.zoomForAll && !this.zoomedSearch.includes(this.getSearchName(elem))) {
-        this.zoomedSearch.push(this.getSearchName(elem));
+      const resultElem = range.elem ? range.elem : elem;
+      if (range.zoomForAll && !this.zoomedSearch.includes(this.getSearchName(resultElem))) {
+        this.zoomedSearch.push(this.getSearchName(resultElem));
       }
-      const elements = range.zoomForAll ? this.elements : [elem];
+      const elements = range.zoomForAll ? this.elements : [resultElem];
       elements.forEach((element) => {
         this.dataObject[element.search].data = this.sliceRange(
           this.dataObject[element.search].data,
