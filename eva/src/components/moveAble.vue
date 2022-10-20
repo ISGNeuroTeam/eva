@@ -8,7 +8,7 @@
     :x="left"
     :y="top"
     :draggable="dragRes"
-    :drag-cancel="'.v-slider'"
+    :drag-cancel="'.v-slider, .no-draggable'"
     :resizable="dragRes"
     :data-grid="true"
     :grid="movableProps.grid"

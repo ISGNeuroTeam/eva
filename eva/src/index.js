@@ -90,12 +90,13 @@ Vue.component('dash-graph', () => import('./components/dashBoardInside/dashGraph
 // элемент графика
 Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashLineChart.vue'));
 // элемент графика с несоклькими линиями
-// Vue.component(
-//   'dash-multiLine',
-//   () => import('./components/dashBoardInside/MultiLine/MultiLine.vue')
-// );
 Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashChart.vue'));
-// элемент графика
+// элемент динамические визуализации
+Vue.component(
+  'dash-gridGroup',
+  () => import('./components/dashBoardInside/dashGridGroup/dashGridGroup.vue'),
+);
+// элемент селект
 Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
 // элемент выбора даты и времени
 Vue.component('dash-picker', () => import('./components/dashBoardInside/dashDTPicker.vue'));
