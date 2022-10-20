@@ -53,6 +53,16 @@ export default {
       img: mdiChartMultiline,
       type: 'multiLine',
     },
+    {
+      name: 'Частотный график',
+      img: mdiDotsHorizontal,
+      type: 'frequencyGraph',
+      dataSourceDescription:
+        'Выберите источник данных.\n'
+        + '#### Обязательные поля:\n'
+        + '- **_time** - время unixtime, число\n'
+        + '- **event** - название события, строка\n',
+    },
 
     { name: 'Выбор времени', img: mdiCalendarMonth, type: 'picker' },
     { name: 'Граф', img: mdiGraphql, type: 'ygraph' },
@@ -74,17 +84,6 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
-    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
-    {
-      name: 'Частотный график',
-      img: mdiDotsHorizontal,
-      type: 'frequencyGraph',
-      dataSourceDescription:
-        'Выберите источник данных.\n'
-        + '#### Обязательные поля:\n'
-        + '- **_time** - время unixtime, число\n'
-        + '- **event** - название события, строка\n',
-    },
   ],
   size: {
     picker: {
