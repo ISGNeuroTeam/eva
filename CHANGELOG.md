@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added visualization Frequency graph
 - Added the Dash group visualization
 
 ### Changed
 - The component menu has become more compact 
 
 ### Fixed
+- Fixed DS selection button on constructor-schemes
 
 ## [1.108.0]
 

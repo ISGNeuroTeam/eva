@@ -18,6 +18,7 @@ import {
   mdiTuneVertical,
   mdiImageFilterTiltShift,
   mdiScatterPlotOutline,
+  mdiDotsHorizontal,
   mdiGroup,
   mdiInboxMultipleOutline,
 } from '@mdi/js';
@@ -73,6 +74,17 @@ export default {
     { name: 'Тепловая карта', img: mdiGrid, type: 'heatmap' },
     { name: 'Точечный график', img: mdiScatterPlotOutline, type: 'scatterPlot' },
     { name: 'Число', img: mdiNumeric, type: 'single' },
+    { name: 'Динамическая форма', img: mdiScatterPlotOutline, type: 'dynamicForm' },
+    {
+      name: 'Частотный график',
+      img: mdiDotsHorizontal,
+      type: 'frequencyGraph',
+      dataSourceDescription:
+        'Выберите источник данных.\n'
+        + '#### Обязательные поля:\n'
+        + '- **_time** - время unixtime, число\n'
+        + '- **event** - название события, строка\n',
+    },
   ],
   size: {
     picker: {
@@ -175,6 +187,10 @@ export default {
       width: 400,
       height: 400,
     },
+    frequencyGraph: {
+      width: 700,
+      height: 240,
+    },
   },
   icons: {
     table: mdiTableLarge,
@@ -202,6 +218,7 @@ export default {
     dial: mdiImageFilterTiltShift,
     scatterPlot: mdiScatterPlotOutline,
     dynamicForm: mdiInboxMultipleOutline,
+    frequencyGraph: mdiDotsHorizontal,
   },
   commonOptions: [
     'panelSettings',
@@ -341,6 +358,10 @@ export default {
     ],
     constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
     dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
+    frequencyGraph: [
+      'groupMetric',
+      'tooltipMetrics',
+    ],
   },
   optionFields: [
     // описание типов полей и их характеристик
@@ -879,6 +900,26 @@ export default {
       },
     },
 
+    // frequencyGraph
+    {
+      option: 'groupMetric',
+      description: 'Поле для группировки (название события)',
+      elem: 'text-field',
+      placeholder: 'event',
+    },
+    {
+      option: 'tooltipMetrics',
+      description: 'Метирики в тултипе',
+      elem: 'checkbox-list',
+      default: [],
+      items() {
+        const storeElement = this.$store.state[this.idDash][this.element];
+        const savedTitles = storeElement?.options?.tooltipMetrics || [];
+        const curTitles = storeElement?.lastMetrics || [];
+        return new Set([...savedTitles, ...curTitles]);
+      },
+    },
+
     // dashSingleValue
     {
       option: 'numberPerDigit',
@@ -991,7 +1032,6 @@ export default {
     fromDataSearches: [
       'menu',
       'picker',
-      'constructorSchemes',
       'dynamicForm',
     ],
   },

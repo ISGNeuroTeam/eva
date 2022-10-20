@@ -131,7 +131,7 @@
         <div class="settings-dash-block">
           <div class="settings-dash">
             <v-tooltip
-              v-if="isMultiline"
+              v-if="isMultiline || isFrequencyGraph"
               bottom
               :color="theme.$accent_ui_color"
               :open-delay="tooltipOpenDelay"
@@ -141,7 +141,7 @@
                   class="icon"
                   :color="theme.$main_border"
                   v-on="on"
-                  @click="resetRange()"
+                  @click="isFrequencyGraph ? $refs.screenCard.$emit('resetZoom') : resetRange()"
                 >
                   {{ props.mdiMagnifyMinusOutline }}
                 </v-icon>
@@ -314,7 +314,7 @@
                           <span>Скачать в PNG</span>
                         </v-tooltip>
                         <v-tooltip
-                          v-if="isMultiline"
+                          v-if="isMultiline || isFrequencyGraph"
                           bottom
                           :color="theme.$accent_ui_color"
                           :open-delay="tooltipOpenDelay"
@@ -324,7 +324,7 @@
                               class="icon"
                               :color="theme.$main_border"
                               v-on="on"
-                              @click="resetRange()"
+                              @click="isFrequencyGraph ? $refs.screenCard.$emit('resetZoom') : resetRange()"
                             >
                               {{ props.mdiMagnifyMinusOutline }}
                             </v-icon>
@@ -754,6 +754,9 @@ export default {
     },
     isMultiline() {
       return !!this.element?.includes('multiLine');
+    },
+    isFrequencyGraph() {
+      return this.element?.includes('frequencyGraph');
     },
     getSelfTockens() {
       return this.getTockens || [];
