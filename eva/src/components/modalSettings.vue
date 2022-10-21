@@ -1035,7 +1035,7 @@ export default {
       colorsPie: {
         theme: 'neitral',
         colors: '',
-        nametheme: '',
+        nametheme: 'neitral',
       },
       defaultThemes: ['neitral', 'indicted'],
       pieType: '',
