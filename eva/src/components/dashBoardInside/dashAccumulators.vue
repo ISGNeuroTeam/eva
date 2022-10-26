@@ -150,7 +150,7 @@ export default {
       if (!this.idDash) {
         return [];
       }
-      if (!this.dashFromStore.options) {
+      if (!this.dashFromStore?.options) {
         this.$store.commit(
           'setDefaultOptions',
           {

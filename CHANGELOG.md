@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.109.0]
+
+### Added
+- Added visualization Frequency graph
+- Added the Dash group visualization
+
+### Changed
+- The component menu has become more compact 
+
+### Fixed
+- Fixed DS selection button on constructor-schemes
+- Fixed a lot of errors when initializing a new map
+
 ## [1.108.0]
 
 ### Added

@@ -5,7 +5,6 @@ import Vuex from 'vuex';
 // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import createPersistedState from 'vuex-persistedstate';
 
-import { indexOf } from 'core-js/internals/array-includes';
 import store from './store'; // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import auth from './storeAuth/store';
 import form from './storeForm/store';
@@ -48,6 +47,9 @@ export default new Vuex.Store({
       });
     },
     setDefaultOptions(state, { idDash, id }) {
+      if (!state[idDash][id]) {
+        Vue.set(state[idDash], id, {});
+      }
       Vue.set(state[idDash][id], 'options', {});
       Object.keys(defaultOptions).forEach((option) => {
         Vue.set(state[idDash][id].options, option, defaultOptions[option]);
@@ -389,6 +391,9 @@ export default new Vuex.Store({
       }
     },
     setActions(state, { idDash, id, actions }) {
+      if (!state[idDash][id]) {
+        state[idDash][id] = {};
+      }
       // устанавливаем список событий для элемента
       state[idDash][id].actions = actions;
     },
@@ -721,6 +726,13 @@ export default new Vuex.Store({
     setOptions(state, {
       idDash, id, options, titles,
     }) {
+      if (!state[idDash]) {
+        Vue.set(state, idDash, {});
+      }
+      if (!state[idDash][id]) {
+        Vue.set(state[idDash], id, {});
+      }
+      Vue.set(state[idDash][id], 'options', {});
       // пробегаемся по всем настройкам, что к нам пришли
       Object.keys(options).forEach((item) => {
         // если это натсройка change
