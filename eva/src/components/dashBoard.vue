@@ -131,7 +131,7 @@
         <div class="settings-dash-block">
           <div class="settings-dash">
             <v-tooltip
-              v-if="isMultiline"
+              v-if="isMultiline || isFrequencyGraph"
               bottom
               :color="theme.$accent_ui_color"
               :open-delay="tooltipOpenDelay"
@@ -141,7 +141,7 @@
                   class="icon"
                   :color="theme.$main_border"
                   v-on="on"
-                  @click="resetRange()"
+                  @click="isFrequencyGraph ? $refs.screenCard.$emit('resetZoom') : resetRange()"
                 >
                   {{ props.mdiMagnifyMinusOutline }}
                 </v-icon>
@@ -314,7 +314,7 @@
                           <span>Скачать в PNG</span>
                         </v-tooltip>
                         <v-tooltip
-                          v-if="isMultiline"
+                          v-if="isMultiline || isFrequencyGraph"
                           bottom
                           :color="theme.$accent_ui_color"
                           :open-delay="tooltipOpenDelay"
@@ -324,7 +324,7 @@
                               class="icon"
                               :color="theme.$main_border"
                               v-on="on"
-                              @click="resetRange()"
+                              @click="isFrequencyGraph ? $refs.screenCard.$emit('resetZoom') : resetRange()"
                             >
                               {{ props.mdiMagnifyMinusOutline }}
                             </v-icon>
@@ -530,6 +530,10 @@
         v-show="!showElement"
         class="card-text"
       >
+        <vue-markdown
+          v-if="toolSettings.dataSourceDescription"
+          class="source-descr"
+        >{{ toolSettings.dataSourceDescription }}</vue-markdown>
         <button
           class="selectDS"
           :style="{ color: '#FFFFFF', background: theme.$primary_button }"
@@ -576,7 +580,7 @@
         @setVissible="setVissible($event)"
         @setLoading="setLoading($event)"
         @hideLoading="props.hideLoad = true"
-        @SetRange="setRange($event)"
+        @SetRange="$emit('SetRange', $event)"
         @resetRange="resetRange($event)"
         @changeSelectPie="changeSelectedPie"
         @update:table-per-page="onTableItemsPerPageChange"
@@ -609,11 +613,15 @@ import {
   mdiFullscreenExit,
   mdiCamera,
 } from '@mdi/js';
+import VueMarkdown from 'vue-markdown';
 import settings from '../js/componentsSettings';
 import visualisation from '../js/visualisationCRUD';
 
 export default {
   name: 'DashBoard',
+  components: {
+    VueMarkdown,
+  },
   props: {
     width: {
       type: Number,
@@ -746,6 +754,9 @@ export default {
     },
     isMultiline() {
       return !!this.element?.includes('multiLine');
+    },
+    isFrequencyGraph() {
+      return this.element?.includes('frequencyGraph');
     },
     getSelfTockens() {
       return this.getTockens || [];
@@ -898,6 +909,9 @@ export default {
     },
     excludedFromDataSearches() {
       return settings.excludes.fromDataSearches.some((item) => item === this.elementType);
+    },
+    toolSettings() {
+      return settings.tools.find((item) => item.type === this.elementType);
     },
   },
   watch: {
@@ -1353,11 +1367,8 @@ export default {
         this.searchData = JSON.parse(JSON.stringify(this.props.dataRest));
       }
     },
-    setRange(range) {
-      this.$emit('SetRange', range);
-    },
-    resetRange() {
-      this.$emit('ResetRange', this.dataSourceId);
+    resetRange(search) {
+      this.$emit('ResetRange', search || this.dataSourceId);
     },
     nameAction(actionList) {
       if (!actionList || this.excludedFromTitleAcrions) return;
@@ -1410,6 +1421,12 @@ export default {
 
 <style lang="sass">
 @import '../sass/dashBoard.sass'
+</style>
+<style lang="sass" scoped>
+.source-descr
+  margin: 16px
+  color: var(--main_text)
+  text-align: left
 </style>
 <style lang="sass">
 .settings-dash

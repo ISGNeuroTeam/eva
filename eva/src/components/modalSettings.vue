@@ -937,6 +937,15 @@
         </div>
         <v-card-actions class="actions-settings">
           <v-spacer />
+          <!-- <v-btn
+            small
+            text
+            :color="theme.$primary_button"
+            class="create-btn"
+            @click="copyJson"
+          >
+            Copy JSON
+          </v-btn>-->
           <v-btn
             small
             :color="theme.$primary_button"
@@ -974,6 +983,8 @@ import {
 import settings from '../js/componentsSettings';
 import TitleAtionSelect from './modalSettings/titleAtionSelect.vue';
 import vusualisation from '@/js/visualisationCRUD';
+
+const { mdiContentCopy } = require('@mdi/js');
 
 export default {
   name: 'ModalSettings',
@@ -1024,7 +1035,7 @@ export default {
       colorsPie: {
         theme: 'neitral',
         colors: '',
-        nametheme: '',
+        nametheme: 'neitral',
       },
       defaultThemes: ['neitral', 'indicted'],
       pieType: '',
@@ -1352,6 +1363,7 @@ export default {
         });
       }
       if (this.element.startsWith('map')) {
+        this.options = { ...this.$store.state[this.idDash][this.element].options, ...this.options };
         this.changeSelectedLayer();
       }
       if (this.titleActions) {
@@ -1472,6 +1484,16 @@ export default {
     cancelModal() {
       this.active = false;
       this.checkOnCancel();
+    },
+    copyJson() {
+      const json = JSON.stringify(this.dashFromStore[this.element].options);
+      navigator.clipboard.writeText(json);
+      this.$store.commit('notify/addNotification', {
+        id: 'settings-copy',
+        icon: mdiContentCopy,
+        message: 'Скопировано в буфер',
+        read: false,
+      });
     },
     // если нажали на отмену создания
     checkOnCancel() {
@@ -1697,7 +1719,7 @@ export default {
                   }
                 }
                 localOptions[item] = val || [];
-              } else if (item === 'ListDS' || item === 'scatterPlotLegend') {
+              } else if (item === 'ListDS' || item === 'scatterPlotLegend' || item === 'tooltipMetrics') {
                 localOptions[item] = options[item] || [];
               } else if (item === 'pieType') {
                 this.pieType = options[item];

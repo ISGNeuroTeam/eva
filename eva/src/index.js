@@ -90,12 +90,13 @@ Vue.component('dash-graph', () => import('./components/dashBoardInside/dashGraph
 // элемент графика
 Vue.component('dash-lineChart', () => import('./components/dashBoardInside/dashLineChart.vue'));
 // элемент графика с несоклькими линиями
-// Vue.component(
-//   'dash-multiLine',
-//   () => import('./components/dashBoardInside/MultiLine/MultiLine.vue')
-// );
 Vue.component('dash-multiLine', () => import('./components/dashBoardInside/dashChart.vue'));
-// элемент графика
+// элемент динамические визуализации
+Vue.component(
+  'dash-gridGroup',
+  () => import('./components/dashBoardInside/dashGridGroup/dashGridGroup.vue'),
+);
+// элемент селект
 Vue.component('dash-select', () => import('./components/dashBoardInside/dashSelect.vue'));
 // элемент выбора даты и времени
 Vue.component('dash-picker', () => import('./components/dashBoardInside/dashDTPicker.vue'));
@@ -162,6 +163,8 @@ Vue.component('data-profile', () => import('./components/autorization/dataForPro
 Vue.component('modal-loading-svg', () => import('./components/modalLoadingSvg.vue'));
 // Точечный график
 Vue.component('dash-scatterPlot', () => import('./components/dashBoardInside/dashScatterPlot.vue'));
+// Частотный график
+Vue.component('dash-frequencyGraph', () => import('./components/dashBoardInside/dashFrequencyGraph.vue'));
 // Компонент редактора кода
 Vue.component('code-editor', () => import('./components/codeEditor.vue'));
 // убирает фокус с элемена сразу либо через переданное ms v-blur="140"

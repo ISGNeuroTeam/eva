@@ -626,7 +626,7 @@ export default {
     checkLoading(elem) {
       if (this.getSearchName(elem) === '') return false;
       if (elem.elem === 'map' && !this.dataObject[elem.search]?.loading) {
-        return this.dataObject[this.dashFromStore[elem.elem].options.search.id]?.loading;
+        return this.dataObject[this.dashFromStore[elem.elem].options.search?.id]?.loading;
       }
       return this.dataObject[elem.search]?.loading;
     },
@@ -780,10 +780,11 @@ export default {
       });
     },
     setRange(range, elem) {
-      if (range.zoomForAll && !this.zoomedSearch.includes(this.getSearchName(elem))) {
-        this.zoomedSearch.push(this.getSearchName(elem));
+      const resultElem = range.elem ? range.elem : elem;
+      if (range.zoomForAll && !this.zoomedSearch.includes(this.getSearchName(resultElem))) {
+        this.zoomedSearch.push(this.getSearchName(resultElem));
       }
-      const elements = range.zoomForAll ? this.elements : [elem];
+      const elements = range.zoomForAll ? this.elements : [resultElem];
       elements.forEach((element) => {
         this.dataObject[element.search].data = this.sliceRange(
           this.dataObject[element.search].data,

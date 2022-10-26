@@ -10,7 +10,7 @@
       class="muililine-new"
     >
       <div
-        v-show="dataModeFrom"
+        v-if="dataModeFrom"
         class="d-inline-block settings-icon"
         @click.stop="openSettings"
       >
@@ -137,6 +137,9 @@ export default {
     },
     dashStore() {
       const { id, idDash } = this;
+      if (!this.$store.state[idDash][id] || !this.$store.state[idDash][id].options) {
+        this.$store.commit('setDefaultOptions', { id, idDash });
+      }
       return this.$store.state[idDash][id];
     },
     tokensStore() {
