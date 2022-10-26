@@ -1,4 +1,4 @@
-# [1.109.0] - 2022-10-20
+# [1.109.0] - 2022-10-26
 
 ### Added
 - Added the Frequency graph visualization
