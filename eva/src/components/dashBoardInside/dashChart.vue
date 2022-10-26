@@ -122,7 +122,9 @@ export default {
       chart: null,
       mdiSettings,
       isSettingsComponentOpen: false,
-      defaultSettings: {},
+      defaultSettings: {
+        useGroups: true,
+      },
     };
   },
   computed: {
@@ -148,6 +150,7 @@ export default {
     },
     options() {
       return {
+        ...this.defaultSettings,
         ...this.dashStore.options,
       };
     },
@@ -212,7 +215,11 @@ export default {
           group.forEach((metric) => {
             if (this.metrics.includes(metric.name)) {
               existsMetrics.push(metric.name);
-              metrics.push(metric);
+              if (!this.options.useGroups) {
+                metricsByGroup.push([metric]);
+              } else {
+                metrics.push(metric);
+              }
             }
           });
           if (metrics.length) {
@@ -227,6 +234,9 @@ export default {
         metricsByGroup.push([]);
         newMetrics.forEach((metricName, nN) => {
           const metric = this.getOldMetricConfig(metricName);
+          if (!this.options.useGroups && metricsByGroup[metricsByGroup.length - 1].length > 0) {
+            metricsByGroup.push([]);
+          }
           metricsByGroup[metricsByGroup.length - 1].push(metric);
           // если тащим настройки со старого мультилайна то добавим группы для не united графиков
           if (this.options.united === false && nN !== newMetrics.length - 1) {
@@ -270,6 +280,7 @@ export default {
       return {
         metricsByGroup: [...this.metricsByGroup],
         xAxis: { ...this.xAxisSettings },
+        useGroups: !!this.options.useGroups,
       };
     },
   },
@@ -308,6 +319,7 @@ export default {
     createChart() {
       const { width, height } = this.box;
       this.chart = new ChartClass(this.$refs.svgContainer, width, height, this.theme, {
+        useGroups: !!this.options.useGroups,
         xAxis: {
           type: 'time', // linear, time, - log, point, band
           timeFormat: '%d.%m.%y %H:%M',
@@ -486,12 +498,13 @@ export default {
     },
 
     saveSettings(settings = {}) {
-      const { metricsByGroup, xAxis } = settings;
+      const { metricsByGroup, xAxis, useGroups } = settings;
       this.$store.commit('setOptions', {
         id: this.idFrom,
         idDash: this.idDashFrom,
         options: {
           ...this.options,
+          useGroups,
           metricsByGroup,
           xAxis,
           version: 3,
@@ -511,6 +524,7 @@ export default {
   margin: 8px 2px
   color: $secondary-text !important
   cursor: pointer
+  margin-bottom: -8px
 
 .svg-container
   position: relative
