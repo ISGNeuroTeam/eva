@@ -13,7 +13,24 @@
   >
     <v-card class="dialog-content">
       <v-card-title class="header">
-        <span class="main-title">Настройка визуализации</span>
+        <v-row>
+          <v-col>
+            <span class="main-title">Настройка визуализации</span>
+          </v-col>
+          <v-col>
+            <v-checkbox
+              v-model="useGroups"
+              label="Группировка"
+              persistent-placeholder
+              dense
+              outlined
+              hide-details
+              color="blue"
+              class="float-end"
+            >
+            </v-checkbox>
+          </v-col>
+        </v-row>
       </v-card-title>
       <v-card-text class="content groups-multiline-settings">
         <!-- Groups -->
@@ -22,11 +39,21 @@
           :key="groupNumber"
           class="mt-0"
         >
-          <div class="section-title text-uppercase">
+          <div
+            v-if="useGroups"
+            class="section-title text-uppercase"
+          >
             Группа {{ groupNumber + 1 }}
           </div>
-          <div class="content-section metric-group-content">
-            <v-divider :color="theme.$main_bg" />
+          <div
+            :class="{
+              'content-section': true,
+              'metric-group-content': useGroups,
+            }"
+          >
+            <v-divider
+              v-if="useGroups"
+              :color="theme.$main_bg"/>
 
             <!-- Metrics -->
             <v-expansion-panels
@@ -349,7 +376,7 @@
                                 value: m.name,
                                 text: `📎 ${m.name}`,
                               }))"
-                            :disabled="metric.type !== 'line'"
+                            :disabled="metric.type !== 'line' || !useGroups"
                             label="Ось Y"
                             persistent-placeholder
                             dense
@@ -684,6 +711,7 @@ export default {
     },
     colorPickerInputMode: false,
     openXAxisPanel: null,
+    useGroups: true,
     lastDotSearch: '',
     defaultLastDotItems: [
       { value: '0', text: 'Последнее' },
@@ -718,9 +746,20 @@ export default {
     },
 
     currentSettings() {
+      const metricsByGroup = [...this.metricsByGroupNoEmpty];
+      if (!this.useGroups) {
+        metricsByGroup.forEach((group) => {
+          group.forEach((metric) => {
+            if (metric.yAxisLink) {
+              delete metric.yAxisLink;
+            }
+          });
+        });
+      }
       return {
-        metricsByGroup: [...this.metricsByGroupNoEmpty],
+        metricsByGroup,
         xAxis: { ...this.xAxis },
+        useGroups: this.useGroups,
       };
     },
 
@@ -804,6 +843,7 @@ export default {
         ...this.xAxis,
         ...this.receivedSettings.xAxis,
       }));
+      this.useGroups = !!this.receivedSettings.useGroups;
       this.metricsByGroup = [...JSON.parse(JSON.stringify(this.receivedSettings.metricsByGroup))];
       this.metricsByGroup.push([]);
     },
