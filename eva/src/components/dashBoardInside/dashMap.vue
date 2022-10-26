@@ -164,6 +164,24 @@ export default {
           value: this.search || '',
         }]);
       }
+      if (!this.dashFromStore?.options.initialPoint) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'initialPoint',
+          value: {
+            x: 59.242065955847735,
+            y: 74.35169122692963,
+          },
+        }]);
+      }
+      // eslint-disable-next-line no-restricted-globals
+      if (!this.dashFromStore?.options.zoomLevel || isNaN(this.dashFromStore?.options.zoomLevel)) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore.options,
+          prop: 'zoomLevel',
+          value: 10,
+        }]);
+      }
 
       return this.dashFromStore.options;
     },
@@ -189,10 +207,12 @@ export default {
     },
     getServer() {
       let OSM = this.getOptions.osmserver;
-      if (OSM.indexOf('$$' !== -1)) {
-        this.getTokens.forEach((token) => {
-          OSM = OSM.replaceAll(`$${token.name}$`, token.value);
-        });
+      if (OSM) {
+        if (OSM.indexOf('$$') !== -1) {
+          this.getTokens.forEach((token) => {
+            OSM = OSM.replaceAll(`$${token.name}$`, token.value);
+          });
+        }
         const tile = { tile: [] };
         tile.tile.push(OSM);
         tile.tile.push({
@@ -206,14 +226,14 @@ export default {
   },
   watch: {
     error(val) {
-      if (!val) {
+      if (!val && this.map) {
         this.map.resize();
       }
     },
     getLibrary(value) {
-      if (value && this.map) {
+      if (value && this.map && this.dataRestFrom) {
         this.reDrawMap(this.dataRestFrom);
-        this.$nextTick(() => {
+        this.$nextTick().then(() => {
           if (this.library?.objects) {
             this.$refs.setting.creationLayer();
             this.$refs.setting.addLayer();
@@ -244,16 +264,16 @@ export default {
       },
       deep: true,
     },
-    mapStyleSize() {
-      if (this.map) {
-        this.map.resize();
-      }
-    },
+    // mapStyleSize() {
+    //  if (this.map) {
+    //    this.map.resize();
+    //  }
+    // },
     dataRestFrom(_dataRest) {
       // при обновлении данных перерисовать
       if (_dataRest && this.map) {
         this.reDrawMap(_dataRest);
-        this.$nextTick(() => {
+        this.$nextTick().then(() => {
           if (this.library?.objects) {
             this.$refs.setting.creationLayer();
             this.$refs.setting.addLayer();
@@ -273,7 +293,7 @@ export default {
       }
     },
     fullScreenMode() {
-      this.$nextTick(() => {
+      this.$nextTick().then(() => {
         this.map.remove();
         this.map = null;
         this.init();
@@ -293,8 +313,10 @@ export default {
       deep: true,
     },
     getServer(val, old) {
-      if (JSON.stringify(val) !== JSON.stringify(old)) {
-        this.map.removeLayer(old.tile);
+      if (val && JSON.stringify(val) !== JSON.stringify(old)) {
+        if (old && old.tile) {
+          this.map.removeLayer(old.tile);
+        }
         this.map.addLayer(val.tile);
         this.updateOptions({ selectedLayer: val.tile || null });
       }
@@ -373,7 +395,7 @@ export default {
       if (this.map) {
         this.reDrawMap(this.dataRestFrom);
         this.$nextTick(() => {
-          this.$nextTick(() => {
+          this.$nextTick().then(() => {
             if (this.map && this.library?.objects) {
               this.$refs.setting.creationLayer();
               this.$refs.setting.addLayer();
@@ -441,7 +463,7 @@ export default {
       });
     },
     reDrawMap(dataRest) {
-      this.$nextTick(() => {
+      this.$nextTick().then(() => {
         if (this.map) {
           this.map.layerGroup = {};
           this.layerGroup = {};
@@ -560,7 +582,7 @@ export default {
     initMap() {
       const map = new MapClass({
         mapRef: this.$refs.map,
-        wheelPxPerZoomLevel: 101 - this.options.zoomStep,
+        wheelPxPerZoomLevel: 101 - (this.options?.zoomStep || 200),
         zoomSnap: 0,
         zoom: this.getOptions.zoomLevel,
         maxZoom: 25,

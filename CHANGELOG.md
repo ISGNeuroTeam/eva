@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed DS selection button on constructor-schemes
+- Fixed a lot of errors when initializing a new map
 
 ## [1.108.0]
 
