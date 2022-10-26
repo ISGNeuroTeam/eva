@@ -533,7 +533,7 @@ export default {
       this.layerList = JSON.parse(JSON.stringify(this.localLayerList));
     },
     creationLayer() {
-      if (this.layerList.length === 0) {
+      if (this.layerList.length === 0 && this.library?.objects) {
         const key = Object.keys(this.library.objects);
         this.localLayerList = Object.values(this.library.objects);
         this.localLayerList.forEach((item, index) => {

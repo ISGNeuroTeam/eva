@@ -1363,6 +1363,7 @@ export default {
         });
       }
       if (this.element.startsWith('map')) {
+        this.options = { ...this.$store.state[this.idDash][this.element].options, ...this.options };
         this.changeSelectedLayer();
       }
       if (this.titleActions) {
