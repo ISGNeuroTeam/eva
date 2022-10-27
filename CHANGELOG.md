@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added visualization Frequency graph
 - Added the Dash group visualization
 - Added the group settings for the multiline
+- Added the ability to draw vertical lines on a multiline chart
 
 ### Changed
 - The component menu has become more compact 

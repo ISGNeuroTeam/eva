@@ -180,7 +180,7 @@ export default {
       );
     },
     metrics() {
-      return [...this.firstDataRowMetricList.filter((item) => item !== this.xMetric)];
+      return [...this.firstDataRowMetricList.filter((item) => !/^_.*_mark$/.test(item) && item !== this.xMetric)];
     },
     xAxisSettings() {
       if (this.options.xAxis) {
