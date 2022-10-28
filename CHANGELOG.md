@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added visualization Frequency graph
 - Added the Dash group visualization
+- Added it is possible to change the color of the guntt visualization
 
 ### Changed
 - The component menu has become more compact 
