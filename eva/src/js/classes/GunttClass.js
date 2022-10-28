@@ -179,14 +179,17 @@ class GunttClass {
       .attr('stroke', 'none')
       .style('cursor', 'pointer')
       .attr('fill', (d) => {
-        let j = 0;
-        phases.forEach((item, i) => {
-          if (item === d.phase) {
-            j = i;
-          }
-        });
+        if (!d.color) {
+          let j = 0;
+          phases.forEach((item, i) => {
+            if (item === d.phase) {
+              j = i;
+            }
+          });
 
-        return colors.filter(Boolean)[j];
+          return colors.filter(Boolean)[j];
+        }
+        return d.color;
       });
 
     this.texts = this.bars
