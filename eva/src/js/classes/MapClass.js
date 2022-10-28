@@ -619,12 +619,12 @@ class MapClass {
   }
 
   removeLayerGroup(i) {
-    this.layerGroup[i].remove();
+    if (this.layerGroup[i]) this.layerGroup[i].remove();
   }
 
   addLayerGroup(i) {
     this.removeLayerGroup(i);
-    this.layerGroup[i].addTo(this.map);
+    if (this.layerGroup[i] && this.map) this.layerGroup[i].addTo(this.map);
   }
 
   addGroup(group) {
@@ -632,12 +632,14 @@ class MapClass {
   }
 
   changeIndexOffset(group, zIndex) {
-    this.layerGroup[group].eachLayer((layer) => {
-      // eslint-disable-next-line no-underscore-dangle
-      if (layer._icon) {
-        layer.setZIndexOffset(zIndex);
-      }
-    });
+    if (this.layerGroup[group]) {
+      this.layerGroup[group].eachLayer((layer) => {
+        // eslint-disable-next-line no-underscore-dangle
+        if (layer._icon) {
+          layer.setZIndexOffset(zIndex);
+        }
+      });
+    }
   }
 
   removeLayer(layer) {
