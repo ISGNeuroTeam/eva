@@ -531,7 +531,7 @@
         class="card-text"
       >
         <vue-markdown
-          v-if="toolSettings.dataSourceDescription"
+          v-if="toolSettings && toolSettings.dataSourceDescription"
           class="source-descr"
         >{{ toolSettings.dataSourceDescription }}</vue-markdown>
         <button
