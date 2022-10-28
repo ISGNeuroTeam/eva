@@ -20,7 +20,9 @@
         >
           <div
             class="circle"
-            :style="{ backgroundColor: colors[index] }"
+            :style="{ backgroundColor: getPhasesColor(item)
+              ? getPhasesColor(item)
+              : colors[index] }"
           />
           <div class="text">
             {{ item }}
@@ -248,6 +250,7 @@ export default {
             if (this.dataReport) {
               if (this.activeElemFrom === this.id) {
                 this.noMsg = false;
+                this.guntt.removeGuntt();
                 this.prepareChart(this.dataRestFrom);
               } else if (this.guntt) {
                 this.guntt.removeGuntt();
@@ -449,6 +452,9 @@ export default {
           });
         }
       });
+    },
+    getPhasesColor(phases) {
+      return this.dataRestFrom.find((item) => item.phase === phases)?.color || null;
     },
   },
 };
