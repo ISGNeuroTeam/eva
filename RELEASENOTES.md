@@ -1,3 +1,15 @@
+# [1.110.0] - 2022-10-28
+
+### Added
+- Added ability to hide the time selector in the datetime picker
+- Added it is possible to change the color of the gantt visualization
+- Added the group settings for the multiline
+- Added the ability to draw vertical lines on a multiline chart
+
+### Fixed
+- Fixed a bug with the presence of a dot in the name of the data column
+- Fixed issue with resetting options when saving settings
+
 # [1.109.0] - 2022-10-26
 
 ### Added
