@@ -980,9 +980,6 @@ export default class ChartClass {
           return;
         }
 
-        // add red lines
-        this.renderRedLines(chartGroup, metric, height, line);
-
         // add the line itself
         const path = chartGroup
           .append('path')
@@ -993,6 +990,9 @@ export default class ChartClass {
           .attr('stroke', color)
           .attr('stroke-width', metric.strokeWidth)
           .style('stroke-dasharray', metric.strokeDasharray);
+
+        // add red lines
+        this.renderRedLines(chartGroup, metric, height, line);
 
         if (showArea) {
           path
