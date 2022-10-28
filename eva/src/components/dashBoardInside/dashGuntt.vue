@@ -250,7 +250,9 @@ export default {
             if (this.dataReport) {
               if (this.activeElemFrom === this.id) {
                 this.noMsg = false;
-                this.guntt.removeGuntt();
+                if (this.guntt) {
+                  this.guntt.removeGuntt();
+                }
                 this.prepareChart(this.dataRestFrom);
               } else if (this.guntt) {
                 this.guntt.removeGuntt();
