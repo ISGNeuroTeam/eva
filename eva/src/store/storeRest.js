@@ -206,9 +206,9 @@ export default {
                       const values = [];
                       shema
                         .replace('``', '＂')
-                        .match(/`([^`]+)`\s(\w+)[^,]/g)
+                        .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
                         .forEach((str) => {
-                          const [, key, value] = str.match(/^`(.*)`\s(\w+)$/);
+                          const [, key, value] = str.match(/^`(.*)`\s(.*)$/);
                           keys.push(key.replace('＂', '`'));
                           values.push(value);
                         });
