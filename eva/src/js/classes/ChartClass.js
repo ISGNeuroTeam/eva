@@ -686,10 +686,12 @@ export default class ChartClass {
       if (!item) {
         return;
       }
-      this.svgGroups.selectAll('.metric, .axis-y').attr('opacity', 0.3);
-      this.svgGroups.selectAll(`.metric-${item.n}, .axis-y-${item.n}`).attr('opacity', 1);
+      this.svgGroups.selectAll('.metric, .axis-y, .metric-red-lines').attr('opacity', 0.3);
+      this.svgGroups
+        .selectAll(`.metric-${item.n}, .axis-y-${item.n}, .metric-${item.n}-red-lines`)
+        .attr('opacity', 1);
     } else {
-      this.svgGroups.selectAll('.metric, .axis-y').attr('opacity', null);
+      this.svgGroups.selectAll('.metric, .axis-y, .metric-red-lines').attr('opacity', null);
     }
   }
 
@@ -868,6 +870,23 @@ export default class ChartClass {
       });
   }
 
+  renderRedLines(chartGroup, metric, groupHeight, line) {
+    const { groupsTopOffset } = this.options;
+    chartGroup
+      .append('g')
+      .attr('class', `metric-red-lines metric-${metric.n}-red-lines`)
+      .selectAll('line')
+      .data(line)
+      .enter()
+      .filter((d) => !!d[`_${[metric.name]}_mark`])
+      .append('line')
+      .attr('x1', (d) => this.x(d[this.xMetric]))
+      .attr('x2', (d) => this.x(d[this.xMetric]))
+      .attr('y1', 0)
+      .attr('y2', groupHeight - groupsTopOffset)
+      .attr('stroke', 'red');
+  }
+
   renderPeakTexts(chartGroup, metric, line) {
     const data = line.filter((d, i) => {
       if (metric.lastDot === '0' && line.length === i + 1) {
@@ -960,6 +979,8 @@ export default class ChartClass {
         if (line.length === 0) {
           return;
         }
+
+        // add the line itself
         const path = chartGroup
           .append('path')
           .attr('clip-path', `url(#group-rect-${num}-${this.id})`)
@@ -969,6 +990,9 @@ export default class ChartClass {
           .attr('stroke', color)
           .attr('stroke-width', metric.strokeWidth)
           .style('stroke-dasharray', metric.strokeDasharray);
+
+        // add red lines
+        this.renderRedLines(chartGroup, metric, height, line);
 
         if (showArea) {
           path
