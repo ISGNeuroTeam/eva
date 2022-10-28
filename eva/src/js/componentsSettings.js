@@ -268,6 +268,7 @@ export default {
       'showRangeDateBlock',
       'showCustomInputBlock',
       'timeOutputFormat',
+      'hideTimeSelect',
     ],
     graph: ['boxShadow'],
     single: [
@@ -590,6 +591,12 @@ export default {
       elem: 'text-field',
       default: '',
       placeholder: 'Пример: YYYY-MM-DD HH:mm',
+    },
+    {
+      option: 'hideTimeSelect',
+      description: 'Скрыть выбор времени в календаре',
+      elem: 'switch',
+      default: false,
     },
 
     // dashSingle

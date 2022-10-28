@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added ability to hide the time selector in the datetime picker
+- Added it is possible to change the color of the guntt visualization
+
+### Changed
+
+### Fixed
+- Fixed a bug with the presence of a dot in the name of the data column
+- Fixed issue with resetting options when saving settings
+- Fixed a lot of errors when initializing a new map
+
+## [1.109.0]
+
+### Added
 - Added visualization Frequency graph
 - Added the Dash group visualization
 - Added the group settings for the multiline
@@ -18,7 +31,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed DS selection button on constructor-schemes
-- Fixed issue with resetting options when saving settings
 
 ## [1.108.0]
 

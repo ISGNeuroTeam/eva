@@ -232,7 +232,13 @@ export default {
       return [
         {
           name: 'Заданная в настройках',
-          tile: this.dashFromStore.options.osmserver || null,
+          tile: [
+            this.dashFromStore.options.osmserver || null,
+            {
+              subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+              attribution: '<a http="google.ru" target="_blank">Google</a>',
+            },
+          ],
         },
         {
           name: 'Google спутник',
@@ -313,7 +319,7 @@ export default {
     'options.zoomStep': {
       deep: true,
       handler(val, oldVal) {
-        if (val !== oldVal) {
+        if (val && val !== oldVal) {
           this.map.options.wheelPxPerZoomLevel = 101 - val;
           this.map.map.options.wheelPxPerZoomLevel = 101 - val;
         }
@@ -395,7 +401,7 @@ export default {
         this.$store.commit('setOptions', {
           idDash: this.idDashFrom,
           id: this.idElement,
-          options: initOptions,
+          options: { ...initOptions, ...options },
         });
       } else {
         this.$set(this, 'options', JSON.parse(JSON.stringify(options)));
