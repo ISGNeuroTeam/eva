@@ -732,7 +732,9 @@ export default new Vuex.Store({
       if (!state[idDash][id]) {
         Vue.set(state[idDash], id, {});
       }
-      Vue.set(state[idDash][id], 'options', {});
+      if (!state[idDash][id].options) {
+        Vue.set(state[idDash][id], 'options', {});
+      }
       // пробегаемся по всем настройкам, что к нам пришли
       Object.keys(options).forEach((item) => {
         // если это натсройка change
