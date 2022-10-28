@@ -202,11 +202,17 @@ export default {
                     });
 
                     if (shema != null && shema !== '') {
-                      const keys = shema.match(/`[^`.]+`/g).map((item) => item.replace(/`/g, ''));
-                      const values = shema
-                        .replace(/`[^`.]+`/g, '')
-                        .replace(/\s*/g, '')
-                        .split(',');
+                      const keys = [];
+                      const values = [];
+                      shema
+                        .replace('``', '＂')
+                        .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
+                        .forEach((str) => {
+                          const [, key, value] = str.match(/^`(.*)`\s(.*)$/);
+                          keys.push(key.replace('＂', '`'));
+                          values.push(value);
+                        });
+
                       shema = {};
                       keys.forEach((item, i) => {
                         shema[item] = values[i];
