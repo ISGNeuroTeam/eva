@@ -107,24 +107,26 @@
                 :id="`${id}-start`"
                 v-model="start"
                 label="Начальная дата и время"
-                :format="defaultFormat"
+                :format="dateTimeFormat"
                 :formatted="dateTimeFormat"
                 button-now-translation="Сейчас"
                 :color="theme.$accent_ui_color"
                 :button-color="theme.$primary_button"
                 class="dtpicker"
+                :only-date="options.hideTimeSelect"
                 @input="setTocken('dt')"
               />
               <DTPicker
                 :id="`${id}-end`"
                 v-model="end"
                 label="Конечная дата и время"
-                :format="defaultFormat"
+                :format="dateTimeFormat"
                 :formatted="dateTimeFormat"
                 button-now-translation="Сейчас"
                 :color="theme.$accent_ui_color"
                 :button-color="theme.$primary_button"
                 class="dtpicker"
+                :only-date="options.hideTimeSelect"
                 @input="setTocken('dt')"
               />
             </div>
@@ -293,14 +295,19 @@ export default {
       },
       lastControlElement: null,
       defaultFormat: 'YYYY-MM-DD HH:mm',
+      defaultFormatWithoutTime: 'YYYY-MM-DD',
     };
   },
   computed: {
     dateTimeFormat() {
       const {
         timeOutputFormat,
+        hideTimeSelect,
       } = this.options;
-      return timeOutputFormat || this.defaultFormat;
+      if (timeOutputFormat) {
+        return timeOutputFormat;
+      }
+      return hideTimeSelect ? this.defaultFormatWithoutTime : this.defaultFormat;
     },
     lastEvery: {
       get() {
