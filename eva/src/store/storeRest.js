@@ -204,11 +204,14 @@ export default {
                     if (shema != null && shema !== '') {
                       const keys = [];
                       const values = [];
-                      shema.split(',').forEach((str) => {
-                        const [, key, value] = str.match(/^`(.*)`\s(\w+)$/);
-                        keys.push(key.replace('``', '`'));
-                        values.push(value);
-                      });
+                      shema
+                        .replace('``', '＂')
+                        .match(/`([^`]+)`\s(\w+)[^,]/g)
+                        .forEach((str) => {
+                          const [, key, value] = str.match(/^`(.*)`\s(\w+)$/);
+                          keys.push(key.replace('＂', '`'));
+                          values.push(value);
+                        });
 
                       shema = {};
                       keys.forEach((item, i) => {
