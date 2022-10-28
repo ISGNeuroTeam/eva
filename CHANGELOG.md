@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- Fixed a bug with the presence of a dot in the name of the data column
 
 ## [1.109.0]
 
