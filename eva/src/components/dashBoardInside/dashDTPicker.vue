@@ -113,7 +113,7 @@
                 :color="theme.$accent_ui_color"
                 :button-color="theme.$primary_button"
                 class="dtpicker"
-                :only-date="options.hideTimeSelect"
+                :only-date="hideTimeSelect"
                 @input="setTocken('dt')"
               />
               <DTPicker
@@ -126,7 +126,7 @@
                 :color="theme.$accent_ui_color"
                 :button-color="theme.$primary_button"
                 class="dtpicker"
-                :only-date="options.hideTimeSelect"
+                :only-date="hideTimeSelect"
                 @input="setTocken('dt')"
               />
             </div>
@@ -308,6 +308,19 @@ export default {
         return timeOutputFormat;
       }
       return hideTimeSelect ? this.defaultFormatWithoutTime : this.defaultFormat;
+    },
+    hideTimeSelect() {
+      const {
+        timeOutputFormat,
+        hideTimeSelect,
+      } = this.options;
+      if (hideTimeSelect) {
+        return hideTimeSelect;
+      }
+      if (timeOutputFormat) {
+        return !timeOutputFormat.includes('HH') && !timeOutputFormat.includes('mm');
+      }
+      return false;
     },
     lastEvery: {
       get() {
