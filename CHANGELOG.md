@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed selection in visualization groups component
+- Disabled logging when taking a screenshot
 
 ## [1.110.0]
 
