@@ -1398,7 +1398,7 @@ export default {
     },
     screenShot(screen) {
       screen.$el.style.background = this.theme.$main_bg;
-      this.$html2canvas(screen.$el, { type: 'dataURL' })
+      this.$html2canvas(screen.$el, { type: 'dataURL', logging: false, })
         .then((canvas) => {
           this.downloadTheme(canvas);
           screen.$el.style.background = 'transparent';
