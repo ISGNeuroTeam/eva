@@ -772,10 +772,10 @@ export default new Vuex.Store({
           });
         }
         // переводи строковое значение в bolean
-        if (item.value === 'true') {
+        if (item.value[0] === 'true') {
           item.value = true;
         }
-        if (item.value === 'false') {
+        if (item.value[0] === 'false') {
           item.value = false;
         }
         Vue.set(
