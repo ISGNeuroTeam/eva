@@ -12,7 +12,7 @@
         :value="!!item"
         dismissible
         dense
-        type="warning"
+        :type="item.type || 'warning'"
         class="mb-3"
         :icon="item.icon || mdiSyncAlert"
         @input="dismissAllert(index)"

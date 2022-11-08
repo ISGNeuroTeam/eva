@@ -1,3 +1,5 @@
+import { mdiNetwork } from '@mdi/js';
+
 export default {
   store: null,
   setStore(store) {
@@ -204,14 +206,27 @@ export default {
                     if (shema != null && shema !== '') {
                       const keys = [];
                       const values = [];
-                      shema
-                        .replace('``', '＂')
-                        .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
-                        .forEach((str) => {
-                          const [, key, value] = str.match(/^`(.*)`\s(.*)$/);
-                          keys.push(key.replace('＂', '`'));
-                          values.push(value);
+                      try {
+                        shema
+                          .replace('``', '＂')
+                          .match(/`([^`]+)`\s(\w+(\([\d,]+)?)[^,]/g)
+                          .forEach((str) => {
+                            const [, key, value] = str.match(/^`(.*)`\s(.*)$/);
+                            keys.push(key.replace('＂', '`'));
+                            values.push(value);
+                          });
+                      } catch (err) {
+                        console.warn(`%cНе удалось прочитать схему данных! _SCHEMA: %c${shema}`, 'font-weight: bold', 'font-weight: normal');
+                        console.error(err);
+                        // eslint-disable-next-line no-alert
+                        this.store.commit('notify/addNotification', {
+                          id: 'schema-error-reading',
+                          icon: mdiNetwork,
+                          message: 'Не удалось прочитать схему данных',
+                          read: false,
+                          type: 'error',
                         });
+                      }
 
                       shema = {};
                       keys.forEach((item, i) => {
