@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- added alert for schema read error
 
 ### Changed
 
 ### Fixed
+- Fixed selection in visualization groups component
+- Disabled logging when taking a screenshot
 - fix labels in dynamicForm for radio and checkbox
 - fix OnTokenCompare set event
 
