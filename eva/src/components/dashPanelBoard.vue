@@ -427,9 +427,9 @@
         :style="blockToolStyle"
       >
         <v-col
-          cols="6"
           v-for="tool in tools"
           :key="tool.name"
+          cols="6"
           class="tool-one draggable"
           :data-type="tool.type"
           @mousedown="dragTool"
