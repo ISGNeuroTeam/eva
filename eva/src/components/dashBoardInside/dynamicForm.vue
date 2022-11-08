@@ -106,13 +106,7 @@
               hide-details
               dark
               class="mb-3"
-            >
-              <template v-slot:label>
-                <span :style="`color: ${theme.$main_text} !important`">
-                  Включить отображение легенды
-                </span>
-              </template>
-            </v-checkbox>
+            />
 
             <v-radio-group
               v-if="field.type === 'radioGroup'"
@@ -122,7 +116,7 @@
                 v-for="option in field.options"
                 :key="field.name + option.label"
                 :color="theme.$primary_button"
-                :label="`Radio ${option.label}`"
+                :label="option.label"
                 :value="option.value"
               />
             </v-radio-group>
