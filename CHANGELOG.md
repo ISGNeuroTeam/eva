@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- added alert for schema read error
 
 ### Changed
+
+### Fixed
+
+## [1.111.0]
+
+### Added
+- Added alert for schema read error
 
 ### Fixed
 - Fixed selection in visualization groups component

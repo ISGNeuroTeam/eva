@@ -1,3 +1,14 @@
+# [1.111.0] - 2022-11-10
+
+### Added
+- Added alert for schema read error
+
+### Fixed
+- Fixed selection in visualization groups component
+- Disabled logging when taking a screenshot
+- fix labels in dynamicForm for radio and checkbox
+- Incorrect parameter switching using the OnTokenCompare event
+
 # [1.110.0] - 2022-10-28
 
 ### Added
