@@ -7,7 +7,7 @@
       :style="customStyle"
       :class="customClass"
       v-bind="$attrs"
-      class="dash-grid-group no-draggable"
+      class="dash-grid-group"
     >
       <div v-if="dataRestFrom.length === 0">
         <span>Нет данных для отображения</span>
