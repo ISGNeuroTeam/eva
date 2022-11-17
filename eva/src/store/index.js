@@ -35,6 +35,8 @@ export default new Vuex.Store({
       name: 'dark',
       settings: themes.dark,
     },
+    openTree: false,
+    lastOpenGroup: null,
   },
   mutations: {
     ...store.mutations,
@@ -1084,10 +1086,12 @@ export default new Vuex.Store({
     updateSearchStatus: (state, {
       idDash, sid, status, id,
     }) => {
-      const search = state[idDash].searches.find(
+      const search = state[idDash]?.searches.find(
         (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
-      Vue.set(search, 'status', status);
+      if (search) {
+        Vue.set(search, 'status', status);
+      }
     },
     setVisualisationModalData(state, { idDash, data }) {
       if (!state[idDash]?.visualisationModalData) {
@@ -1101,6 +1105,19 @@ export default new Vuex.Store({
         Vue.set(state[idDash], 'editMode', newModeState);
       } else {
         state[idDash].editMode = newModeState;
+      }
+    },
+    toggleOpenTree(state) {
+      Vue.set(state, 'openTree', !state.openTree);
+    },
+    setOpenTree(state, val) {
+      if (state.openTree !== val) {
+        state.openTree = !!val;
+      }
+    },
+    setLastOpenGroup(state, val) {
+      if (val) {
+        Vue.set(state, 'lastOpenGroup', val);
       }
     },
   },
@@ -2023,6 +2040,9 @@ export default new Vuex.Store({
     },
     getTheme(state) {
       return state.theme.settings;
+    },
+    isOpenTree(state) {
+      return state.openTree;
     },
   },
   modules: {

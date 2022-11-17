@@ -2,6 +2,7 @@
   <v-app :style="{ background: theme.$secondary_bg }">
     <header-top @permissions="setPermissions" />
     <v-main>
+      <notifications style="z-index: 99" />
       <v-container class="main-container container-dash">
         <v-card
           class="main-card-dash"
@@ -16,21 +17,35 @@
             >
               <v-tabs-slider />
               <v-tab
-                :href="`#tab-1`"
-                @click="deleteCookie"
+                href="#tab-1"
+                @click="openTabGroups"
               >
                 Группы
               </v-tab>
               <v-tab
-                :href="`#tab-2`"
+                href="#tab-2"
                 :disabled="disabledTab"
+                @click="openTabGroup"
               >
                 Дашборды
               </v-tab>
+              <v-tab
+                href="#tab-3"
+                @click="openTabTree"
+              >
+                Дерево
+              </v-tab>
               <v-tab-item
-                :value="'tab-1'"
+                value="tab-1"
                 class="groups-of-dash groups-of-dash__container"
               >
+                <template v-if="loading && allGroups.length === 0">
+                  <v-skeleton-loader
+                    v-for="_ in [1,2,3,4]"
+                    class="dash-group"
+                    type="card"
+                  />
+                </template>
                 <v-card
                   v-for="(group, i) in allGroups"
                   :key="group.id"
@@ -137,7 +152,7 @@
                 </v-btn>
               </v-tab-item>
               <v-tab-item
-                :value="'tab-2'"
+                value="tab-2"
                 class="groups-of-dash__container"
               >
                 <draggable
@@ -147,6 +162,13 @@
                   class="groups-of-dash-draggable"
                   @change="dragend"
                 >
+                  <template v-if="loading">
+                    <v-skeleton-loader
+                      v-for="n in [1,2,3,4]"
+                      class="dash-group"
+                      type="card"
+                    ></v-skeleton-loader>
+                  </template>
                   <v-card
                     v-for="(dash, i) in allDashs"
                     :key="dash.id"
@@ -247,6 +269,12 @@
                   </v-icon>
                 </v-btn>
               </v-tab-item>
+              <v-tab-item
+                value="tab-3"
+                class="groups-of-dash__container"
+              >
+                <navigation-tree-view />
+              </v-tab-item>
             </v-tabs>
           </v-card-text>
         </v-card>
@@ -290,13 +318,18 @@ import {
   mdiPlus,
   mdiPencil,
   mdiSwapVerticalBold,
+  mdiShield,
 } from '@mdi/js';
 import draggable from 'vuedraggable';
+import NavigationTreeView from './navigationTreeView';
+import Notifications from './notifications';
 
 export default {
   name: 'MainPageDash',
   components: {
+    Notifications,
     draggable,
+    NavigationTreeView,
   },
   data() {
     return {
@@ -328,6 +361,8 @@ export default {
       cookieId: -1,
       cookieName: '',
       draggedDash: '',
+      loadingState: false,
+      loadingInt: null,
     };
   },
   computed: {
@@ -345,13 +380,30 @@ export default {
         this.allDashs = structuredClone(value);
       },
     },
+    loading: {
+      get() {
+        return this.loadingState;
+      },
+      set(val) {
+        if (val && !this.loadingState && !this.loadingInt) {
+          this.loadingInt = setTimeout(() => {
+            this.loadingState = true;
+          }, 200);
+        }
+        if (!val) {
+          clearTimeout(this.loadingInt);
+          this.loadingInt = null;
+          this.loadingState = false;
+        }
+      },
+    },
   },
   watch: {
     modalCreate(val) {
       if (!val) {
         this.modalExim = false;
         this.curGroup = -1;
-        if (this.tab === 'tab-1') {
+        if (this.tab === 'tab-1' || this.tab === 'tab-3') {
           this.getGroups();
         } else {
           this.getDashs(this.cookieId);
@@ -360,7 +412,35 @@ export default {
     },
   },
   mounted() {
-    this.checkCookie();
+    const { groupId } = this.$route.params;
+    if (groupId || this.$route.query?.home) {
+      this.tab = 'tab-2';
+    } else if (this.$route.path.includes('/tree')) {
+      this.tab = 'tab-3';
+    }
+
+    this.getGroups().then(() => {
+      if (groupId) {
+        const group = this.allGroups.find((item) => `${item.id}` === groupId);
+        if (group) {
+          this.getDash(group);
+        } else {
+          this.$store.commit('notify/addNotification', {
+            id: 'access-error',
+            icon: mdiShield,
+            message: `Группа с ID ${groupId} не существует либо к ней нет доступа`,
+            read: false,
+            type: 'error',
+            time: 2,
+          });
+          this.$router.push('/dashboards');
+        }
+      } else if (this.$route.query?.home) {
+        const homeGroupId = this.allGroups.find((group) => group.name === this.$route.query?.home);
+        this.getDash(homeGroupId);
+      }
+    });
+
     document.title = 'EVA | Конструирование дашбордов';
   },
   methods: {
@@ -488,23 +568,22 @@ export default {
       this.updateModalCreateFrom(dashIndex);
     },
     getGroups() {
-      this.$store.dispatch('getGroups').then((res) => {
+      this.loading = true;
+      return this.$store.dispatch('getGroups').then((res) => {
+        this.loading = false;
         this.allGroups = res;
-        if (this.$route.query?.home && this.allGroups.length > 0) {
-          const id = this.allGroups.find((group) => group.name === this.$route.query?.home);
-          this.getDash(id);
-          this.$nextTick(() => {
-            this.tab = 'tab-2';
-          });
-        }
+        return res;
       });
     },
     getDashs(id) {
+      this.loading = true;
+      this.allDashs = [];
       this.$store.dispatch('getDashs', id).then((res) => {
         this.allDashs = res.map((el, index) => ({
           order: index,
           ...el,
         }));
+        this.loading = false;
       });
     },
     getDash(group) {
@@ -515,10 +594,9 @@ export default {
       this.curColor = group.color;
       this.disabledTab = false;
       this.tab = 'tab-2';
-      document.cookie = `eva-dashPage=${JSON.stringify(
-        group,
-      )}; max-age=3600; path=/`;
       this.getDashs(this.curGroup);
+      this.openTabGroup();
+      this.$store.commit('setLastOpenGroup', group.id);
     },
     setPermissions(event) {
       this.editDashPermission = false;
@@ -533,7 +611,7 @@ export default {
     closeModal() {
       this.modalCreate = false;
       this.modalExim = false;
-      if (this.tab === 'tab-1') {
+      if (this.tab === 'tab-1' || this.tab === 'tab-3') {
         this.getGroups();
       } else {
         this.getDashs(this.cookieId);
@@ -571,22 +649,21 @@ export default {
         this.$store.commit('deleteDashFromMain', [...data].find((dash) => dash.id === id));
       }
     },
-    checkCookie() {
-      const cookie = document.cookie.split(';').find((item) => item.indexOf('eva-dashPage') !== -1);
-      if (cookie) {
-        this.cookieId = JSON.parse(cookie.split('=')[1]).id;
-        this.cookieName = JSON.parse(cookie.split('=')[1]).name;
-        this.getDash(JSON.parse(cookie.split('=')[1]));
-      } else {
-        this.getGroups();
-      }
+    openTabTree() {
+      window.history.replaceState({}, '', '/eva/dashboards/tree');
+    },
+    openTabGroup() {
+      window.history.replaceState({}, '', `/eva/dashboards/group/${this.curGroup}`);
+    },
+    openTabGroups() {
+      window.history.replaceState({}, '', '/eva/dashboards');
+      this.deleteCookie();
     },
     deleteCookie() {
       document.cookie = 'eva-dashPage=\'\'; max-age=0; path=/';
       if (this.$route.query?.home) {
         this.$route.query.home = '';
       }
-      this.getGroups();
     },
     checkName(name) {
       let newName = name;
@@ -603,4 +680,8 @@ export default {
 // подключаем стили для этого компонента
 
 @import '../sass/mainPageDash.sass';
+.groups-of-dash-draggable {
+  min-height: 560px;
+  align-items: start !important;
+}
 </style>

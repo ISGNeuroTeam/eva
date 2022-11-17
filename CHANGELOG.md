@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Navigation panel on dash page
+- Redirect back after login
+- Url for group page
+- Section "Tree"
 
 ### Changed
 
