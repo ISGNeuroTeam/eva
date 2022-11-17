@@ -56,6 +56,16 @@
           v-else
           class="dash-container"
         >
+          <v-navigation-drawer
+            v-model="openTree"
+            absolute
+            bottom
+            temporary
+            :style="{ color: theme.$main_text, background: theme.$main_bg }"
+            class="nav-panel-drawer"
+          >
+            <navigation-tree-view class="navigation-tree" />
+          </v-navigation-drawer>
           <div
             v-if="gridShow"
             class="overlay-grid"
@@ -268,10 +278,12 @@
 <script>
 import draggable from 'vuedraggable';
 import ModalVisualisation from './modalVisualisation.vue';
+import NavigationTreeView from './navigationTreeView';
 
 export default {
   name: 'MainTitle',
   components: {
+    NavigationTreeView,
     ModalVisualisation,
     draggable,
   },
@@ -449,6 +461,14 @@ export default {
         vert: 32,
         hor: 18,
       };
+    },
+    openTree: {
+      get() {
+        return this.$store.getters.isOpenTree;
+      },
+      set(val) {
+        return this.$store.commit('setOpenTree', val);
+      },
     },
   },
   watch: {
@@ -811,4 +831,17 @@ export default {
 
 <style lang="scss">
 @import '../sass/mainTitle.sass';
+</style>
+
+<style lang="sass" scoped>
+.nav-panel-drawer
+  position: fixed
+  width: 320px !important
+  height: auto !important
+  top: 50px !important
+  bottom: 0 !important
+
+  .navigation-tree
+    margin-top: 16px
+    margin-bottom: 16px
 </style>
