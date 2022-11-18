@@ -150,7 +150,10 @@
             v-if="tab.id !== editableTabID"
             style="height: 40px"
           >
-            <div class="tab-title">
+            <div
+              class="tab-title"
+              :title="tab.name"
+            >
               {{ tab.name }}
             </div>
             <svg
