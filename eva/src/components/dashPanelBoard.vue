@@ -304,6 +304,7 @@
               border: `1px solid ${theme.$accent_ui_color}`,
               width: '65px',
             }"
+            :title="search.sid"
           >
             {{ checkSid(search.sid) }}
           </div>
@@ -2279,5 +2280,8 @@ export default {
 .backlight-tkn {
   font-family: monospace, Consolas;
   background-color: #9992;
+}
+.row-tocken::v-deep .v-menu__content {
+  max-width: initial;
 }
 </style>
