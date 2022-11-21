@@ -691,7 +691,7 @@ export default {
           &:first-letter
             text-transform: uppercase !important
       .v-date-picker-table
-        height: 195px
+        height: 215px
         table
           thead
             th
