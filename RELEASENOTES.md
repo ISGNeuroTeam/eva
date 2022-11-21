@@ -1,3 +1,9 @@
+# [1.112.0] - 2022-11-18
+
+### Fixed
+- Calendar: the sixth row of the table with numbers is covered by another element, as a result of which the last days in some months are not visible
+- The name of the visualization does not fit to display
+
 # [1.111.0] - 2022-11-10
 
 ### Added
