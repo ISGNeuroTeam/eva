@@ -114,7 +114,7 @@ export default {
       return this.$store.getters.getTheme;
     },
     height() {
-      return this.sizeFrom.height - 39;
+      return this.sizeFrom.height - 59;
     },
     dashFromStore() {
       return this.$store.state[this.idDash][this.id];
