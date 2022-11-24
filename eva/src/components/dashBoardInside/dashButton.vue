@@ -4,25 +4,26 @@
     :disabled="!fullScreenMode"
   >
     <div
-      v-if="optionsData.onButton"
+      v-if="optionsData.onButton || getOptions.onButtonToken"
       :style="customStyle"
       :class="customClass"
+      class="dash-button"
       v-bind="$attrs"
     >
-      <div
+      <v-btn
         class="name"
         :class="{ textDecoration: underline }"
         :style="{
           color: optionsData.colorText || theme.$main_text,
           height: `${height}px`,
+          width: '100%',
           fontSize: `${fontSize}px`,
-          lineHeight: `${height - dataMode}px`,
           background: optionsData.background,
         }"
-        @click="updateSearches"
+        @click="update()"
       >
-        Подтвердить
-      </div>
+        {{ optionsData.name ? optionsData.name : 'Подтвердить' }}
+      </v-btn>
     </div>
     <div
       v-else
@@ -32,13 +33,13 @@
       @click="setClick"
     >
       <div
-        class="name"
+        class="name d-flex align-center justify-center"
         :class="{ textDecoration: underline }"
         :style="{
           color: optionsData.colorText || theme.$main_text,
           height: `${height}px`,
+          width: '100%',
           fontSize: `${fontSize}px`,
-          lineHeight: `${height - dataMode}px`,
           background: optionsData.background,
         }"
       >
@@ -113,13 +114,7 @@ export default {
       return this.$store.getters.getTheme;
     },
     height() {
-      return this.sizeFrom.height;
-    },
-    dataMode() {
-      if (this.dataModeFrom) {
-        return 35;
-      }
-      return 0;
+      return this.sizeFrom.height - 59;
     },
     dashFromStore() {
       return this.$store.state[this.idDash][this.id];
@@ -222,11 +217,28 @@ export default {
       this.underline = options.underline;
       this.optionsData.onButton = options?.onButton;
     },
+    update() {
+      if (this.optionsData.onButton) {
+        this.updateSearches();
+      }
+      if (this.getOptions.onButtonToken) {
+        this.updateToken();
+      }
+    },
     updateSearches() {
       const { idDash, id } = this;
       this.$store.commit('updateManualTokens', {
         idDash,
         id,
+      });
+    },
+    updateToken() {
+      const { idDash, id } = this;
+      const tokens = this.getOptions?.ListTokens;
+      this.$store.commit('removeTokens', {
+        idDash,
+        id,
+        tokens,
       });
     },
     actionOpen(targetLink, header, widthPersent, heightPersent) {

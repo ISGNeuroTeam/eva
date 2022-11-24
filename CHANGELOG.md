@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added line wrap on textarea
+- Button. Added the ability to reset tokens on click
 
 ### Changed
+- Visual button change
 
 ### Fixed
 - Fixed events on visualisation "select"
