@@ -1200,7 +1200,7 @@ export default {
       return {
         background: this.theme.$main_bg,
         color: this.theme.$main_text,
-        'max-height': `${this.screenHeight}px`,
+        'max-height': `${this.screenHeight - 50}px`,
       };
     },
     isEditDash() {
