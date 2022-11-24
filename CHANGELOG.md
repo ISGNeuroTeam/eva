@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed events on visualisation "select"
+- Fixed line wrap on textarea after update token
 
 ## [1.112.0]
 
