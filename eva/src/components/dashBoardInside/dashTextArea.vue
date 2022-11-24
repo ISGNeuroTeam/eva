@@ -197,7 +197,7 @@ export default {
       if (val === false && val !== oldVal) {
         const defaultValue = this.getDefaultValue();
         if (defaultValue !== null) {
-          this.textarea = `${defaultValue}`;
+          this.textarea = this.replaceLineWrapForTextarea(`${defaultValue}`);
         }
         this.setTockenBlur();
       }
