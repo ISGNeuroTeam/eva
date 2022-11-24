@@ -287,6 +287,8 @@ export default {
       'onButton',
       'SubmitByListDS',
       'ListDS',
+      'onButtonToken',
+      'ListTokens',
     ],
     textarea: [
       'searchBtn',
@@ -829,6 +831,29 @@ export default {
         if (searches && searches.map) {
           return new Set(this.$store.state[this.idDash]?.searches
             .map(({ sid }) => sid) || []);
+        }
+        return [];
+      },
+    },
+    {
+      label: 'Submit',
+      option: 'onButtonToken',
+      description: 'Обнулять токены из списка',
+      elem: 'switch',
+      default: false,
+    },
+    {
+      relation: ['onButtonToken'],
+      label: 'ListTokens',
+      option: 'ListTokens',
+      description: '-',
+      elem: 'checkbox-list',
+      default: [],
+      items() {
+        const tokens = this.$store.state[this.idDash]?.tockens;
+        if (tokens) {
+          return new Set(this.$store.state[this.idDash]?.tockens
+            .map(({ name }) => name) || []);
         }
         return [];
       },
