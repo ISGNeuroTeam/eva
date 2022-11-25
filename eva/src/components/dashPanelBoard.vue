@@ -320,6 +320,7 @@
               border: `1px solid ${theme.$accent_ui_color}`,
               width: '65px',
             }"
+            :title="search.sid"
           >
             {{ checkSid(search.sid) }}
           </div>
@@ -1217,7 +1218,7 @@ export default {
       return {
         background: this.theme.$main_bg,
         color: this.theme.$main_text,
-        'max-height': `${this.screenHeight}px`,
+        'max-height': `${this.screenHeight - 50}px`,
       };
     },
     isEditDash() {
@@ -2301,5 +2302,8 @@ export default {
 .backlight-tkn {
   font-family: monospace, Consolas;
   background-color: #9992;
+}
+.row-tocken::v-deep .v-menu__content {
+  max-width: initial;
 }
 </style>
