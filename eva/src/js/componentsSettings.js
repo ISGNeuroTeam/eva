@@ -261,6 +261,7 @@ export default {
       'defaultFromSourceData',
       'defaultSourceDataField',
       'defaultSourceDataUpdates',
+      'resetValuesWhichAreNot',
     ],
     picker: [
       'showLastTimeBlock',
@@ -864,6 +865,12 @@ export default {
       option: 'multiple',
       description: 'Возможность выбора нескольких значений',
       elem: 'switch',
+    },
+    {
+      option: 'resetValuesWhichAreNot',
+      description: 'Сбросить значения, если источник данных их не содержит',
+      elem: 'switch',
+      default: false,
     },
 
     // dashMap, dashPieChart
