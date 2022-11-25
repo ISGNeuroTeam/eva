@@ -87,13 +87,13 @@ export default {
   mounted() {
     if (this.$jwt.hasToken()) {
       this.$router.push(this.$route.query.redirect || '/main');
-      return;
+    } else {
+      this.$refs.authForm.$el.addEventListener('keypress', (event) => {
+        if (event.keyCode === 13) {
+          this.sendAut();
+        }
+      });
     }
-    this.$refs.authForm.$el.addEventListener('keypress', (event) => {
-      if (event.keyCode === 13) {
-        this.sendAut();
-      }
-    });
   },
   methods: {
     async sendAut() {
