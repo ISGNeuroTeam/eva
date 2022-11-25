@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added line wrap on textarea
 - Button. Added the ability to reset tokens on click
+- Navigation panel on dash page
+- Redirect back after login
+- Url for group page
+- Section "Tree"
 
 ### Changed
 - Visual button change
