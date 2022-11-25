@@ -5,7 +5,6 @@ import Vuex from 'vuex';
 // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import createPersistedState from 'vuex-persistedstate';
 
-import store from './store'; // это подключаем чтобы после перезагрузки страницы он сохранял состояние
 import auth from './storeAuth/store';
 import form from './storeForm/store';
 import rest from './storeRest';
@@ -30,14 +29,14 @@ const defaultOptions = {
 export default new Vuex.Store({
   strict: process.env.NODE_ENV !== 'production',
   state: {
-    ...store.state,
     theme: {
       name: 'dark',
       settings: themes.dark,
     },
+    openTree: false,
+    lastOpenGroup: null,
   },
   mutations: {
-    ...store.mutations,
     /* метод для добавления реактивных свойств
      * payload - массив объектов {object, prop, value}
      * */
@@ -1093,10 +1092,12 @@ export default new Vuex.Store({
     updateSearchStatus: (state, {
       idDash, sid, status, id,
     }) => {
-      const search = state[idDash].searches.find(
+      const search = state[idDash]?.searches.find(
         (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );
-      Vue.set(search, 'status', status);
+      if (search) {
+        Vue.set(search, 'status', status);
+      }
     },
     setVisualisationModalData(state, { idDash, data }) {
       if (!state[idDash]?.visualisationModalData) {
@@ -1112,9 +1113,21 @@ export default new Vuex.Store({
         state[idDash].editMode = newModeState;
       }
     },
+    toggleOpenTree(state) {
+      Vue.set(state, 'openTree', !state.openTree);
+    },
+    setOpenTree(state, val) {
+      if (state.openTree !== val) {
+        Vue.set(state, 'openTree', !!val);
+      }
+    },
+    setLastOpenGroup(state, val) {
+      if (val) {
+        Vue.set(state, 'lastOpenGroup', val);
+      }
+    },
   },
   actions: {
-    ...store.actions,
     // метод получающий данные из rest
     getDataApi({ state }, searchFrom) {
       // создаем произвольный хэш чтобы наши запросы не повторялись
@@ -1451,7 +1464,7 @@ export default new Vuex.Store({
           // получить хранилище объектов для работы с ним
           const searches = transaction.objectStore('searches'); // (2)
 
-          const query = searches.get(sid); // (3) return store.get('Ire Aderinokun');
+          const query = searches.get(sid);
 
           query.onsuccess = () => {
             // (4)
@@ -1615,7 +1628,7 @@ export default new Vuex.Store({
         const searches = transaction.objectStore('searches'); // (2)
 
         searchName.forEach((item) => {
-          searches.delete(String(item)); // (3) return store.get('Ire Aderinokun');
+          searches.delete(String(item));
         });
       };
     },
@@ -1993,7 +2006,6 @@ export default new Vuex.Store({
     },
   },
   getters: {
-    // ...store.getters,
     getReportSearch: (state) => {
       const key = state.reports?.table?.search || '';
       if (key !== '') {
@@ -2032,6 +2044,9 @@ export default new Vuex.Store({
     },
     getTheme(state) {
       return state.theme.settings;
+    },
+    isOpenTree(state) {
+      return !!state.openTree;
     },
   },
   modules: {

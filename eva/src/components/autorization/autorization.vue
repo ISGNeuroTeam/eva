@@ -85,12 +85,15 @@ export default {
     },
   },
   mounted() {
-    this.getCookie();
-    this.$refs.authForm.$el.addEventListener('keypress', (event) => {
-      if (event.keyCode === 13) {
-        this.sendAut();
-      }
-    });
+    if (this.$jwt.hasToken()) {
+      this.$router.push(this.$route.query.redirect || '/main');
+    } else {
+      this.$refs.authForm.$el.addEventListener('keypress', (event) => {
+        if (event.keyCode === 13) {
+          this.sendAut();
+        }
+      });
+    }
   },
   methods: {
     async sendAut() {
@@ -138,10 +141,11 @@ export default {
           } catch (e) {
             setting = '';
           }
-          if (setting && setting?.homePage) {
+          const { redirect } = this.$route.query;
+          if (setting && setting?.homePage && !redirect) {
             await this.$router.push({ path: '/dashboards', query: { home: setting.homePage } });
           } else {
-            await this.$router.push('/main');
+            await this.$router.push(redirect || '/main');
           }
         } else {
           await this.$store.dispatch(
@@ -161,11 +165,6 @@ export default {
         setTimeout(() => {
           this.msg = false;
         }, 2000);
-      }
-    },
-    getCookie() {
-      if (this.$jwt.hasToken()) {
-        this.$router.push('/main');
       }
     },
   },
