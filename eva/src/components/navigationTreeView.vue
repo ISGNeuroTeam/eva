@@ -132,3 +132,10 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.tree-nav::v-deep
+  .v-treeview-node--disabled
+    .v-treeview-node__label, .v-treeview-node__prepend > span
+      color: var(--primary_button)
+</style>
