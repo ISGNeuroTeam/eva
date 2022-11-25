@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added line wrap on textarea
 - Button. Added the ability to reset tokens on click
+- "Reset values if data source does not contain them" option to select
 
 ### Changed
 - Visual button change
