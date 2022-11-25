@@ -66,9 +66,30 @@
             hide-details
             class="select theme--dark"
             label="Значение"
-            @change="setTocken"
-            @click="setTocken"
+            @change="setTocken('change')"
+            @click="setTocken('click')"
+            @mouseover="setTocken('mouseover')"
           >
+            <template v-slot:item="{ item, attrs, on }">
+              <v-list-item
+                ripple
+                v-on="on"
+                @click="setTocken('click')"
+              >
+                <v-list-item-action v-if="multiple">
+                  <v-icon :color="theme.$main_text">
+                    {{ attrs['aria-selected'] === "true"
+                      ? "eva-basic_checkbox_checked"
+                      : "eva-basic_checkbox" }}
+                  </v-icon>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ item }}
+                  </v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
             <template
               v-if="multiple"
               v-slot:prepend-item
@@ -110,10 +131,6 @@
 </template>
 
 <script>
-import {
-  mdiCropSquare,
-  mdiSquare,
-} from '@mdi/js';
 import ArrowBlock from '../arrowBlock.vue';
 import defaultSourceData from '../../mixins/defaultSourceData';
 
@@ -188,7 +205,7 @@ export default {
       dataFromRest: {},
       legends: {},
       chooseText: 'Выбрать все',
-      chooseIcon: mdiCropSquare,
+      chooseIcon: 'eva-basic_checkbox',
       actions: [
         { name: 'click', capture: [] },
         { name: 'change', capture: [] },
@@ -335,6 +352,12 @@ export default {
       }
       return true;
     },
+    getTokensFromStore() {
+      if (this.$store.state[this.idDash]?.tockens?.length > 0) {
+        return this.$store.state[this.idDash].tockens;
+      }
+      return [];
+    },
   },
   watch: {
     'dashFromStore.options.defaultFromSourceData': {
@@ -409,10 +432,10 @@ export default {
       if ((selected.elemDeep && selected.elemDeep.length !== 0) || selected.elemDeep !== '') {
         this.elemDeep[String(this.multiple)] = selected.elemDeep;
         this.chooseText = 'Очистить Все';
-        this.chooseIcon = mdiSquare;
+        this.chooseIcon = 'eva-basic_checkbox_checked';
       } else {
         this.chooseText = 'Выбрать все';
-        this.chooseIcon = mdiCropSquare;
+        this.chooseIcon = 'eva-basic_checkbox';
       }
     }
   },
@@ -478,11 +501,11 @@ export default {
     selectItems() {
       if (this.chooseText === 'Выбрать все') {
         this.chooseText = 'Очистить Все';
-        this.chooseIcon = mdiSquare;
+        this.chooseIcon = 'eva-basic_checkbox_checked';
         this.elemDeep.true = [...this.topArray, ...Array.from(new Set(this.bottomArray))];
       } else {
         this.chooseText = 'Выбрать все';
-        this.chooseIcon = mdiCropSquare;
+        this.chooseIcon = 'eva-basic_checkbox';
         this.elemDeep.true = [];
       }
       this.setTocken();
@@ -503,7 +526,7 @@ export default {
 
       return data;
     },
-    setTocken() {
+    setTocken(actionType = 'change') {
       if (this.loading !== false) {
         return;
       }
@@ -524,13 +547,13 @@ export default {
         idDash: this.idDash,
         id: this.id,
       });
-      const { tockens } = this.$store.state[this.idDash];
+      const tockens = this.getTokensFromStore;
 
       let curTocken = {};
       const data = this.dataReady;
       if (tockens) {
         Object.keys(tockens).forEach((key) => {
-          if (tockens[key].elem === this.id && tockens[key].action === 'change') {
+          if (tockens[key].elem === this.id && tockens[key].action === actionType) {
             curTocken = tockens[key];
 
             let value = [];
@@ -572,7 +595,7 @@ export default {
 
             const token = {
               name: tockens[key].name,
-              action: 'change',
+              action: actionType,
               capture: tockens[key].capture,
             };
             if (token.name !== '') {

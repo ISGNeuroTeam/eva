@@ -240,6 +240,15 @@ export default new Vuex.Store({
         });
       }
     },
+    removeTokens(state, { idDash, tokens }) {
+      if (state[idDash]?.tockens?.length > 0 && tokens.length > 0) {
+        state[idDash]?.tockens.forEach((token) => {
+          if (tokens.find((item) => item === token.name)) {
+            token.value = token.defaultValue;
+          }
+        });
+      }
+    },
     // TODO refactor
     // сохранение токена в хранилище
     setTocken(state, { token, idDash, value }) {

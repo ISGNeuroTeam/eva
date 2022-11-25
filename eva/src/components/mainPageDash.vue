@@ -110,7 +110,10 @@
                       })
                     "
                   >
-                    <p class="group-text">
+                    <p
+                      class="group-text"
+                      :title="group.name"
+                    >
                       {{ checkName(group.name) }}
                     </p>
                   </v-card-text>
@@ -227,7 +230,10 @@
                       class="dash-group-text"
                       @click="goToDash(i)"
                     >
-                      <p class="group-text">
+                      <p
+                        class="group-text"
+                        :title="dash.name"
+                      >
                         {{ checkName(dash.name) }}
                       </p>
                     </v-card-text>
