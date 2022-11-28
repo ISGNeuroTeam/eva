@@ -1,4 +1,5 @@
 import { mdiNetwork } from '@mdi/js';
+import Vue from 'vue';
 
 export default {
   store: null,
@@ -6,6 +7,8 @@ export default {
     this.store = store;
   },
   async rest(formData, searchFrom, restAuth, idDash) {
+    const jwt = Vue.$jwt.decode();
+    formData.set('username', jwt.username);
     const response = await fetch('/api/makejob', {
       // сперва нужно подать post запрос
       method: 'POST',
