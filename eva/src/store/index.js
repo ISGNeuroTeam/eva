@@ -1810,9 +1810,12 @@ export default new Vuex.Store({
       }
       const { tockens } = state[event.idDash];
       let id = -1;
-      const idFromToken = tockens.find((token) => token.name === item.target);
-      if ((tockens?.length > 0) && idFromToken) {
-        id = idFromToken?.value || +idFromToken.defaultValue;
+
+      if (tockens) {
+        const idFromToken = tockens.find((token) => token.name === item.target);
+        if ((tockens?.length > 0) && idFromToken) {
+          id = idFromToken?.value || +idFromToken.defaultValue;
+        }
       }
       if (Number.isInteger(+item.target)) {
         id = item.target;
@@ -1822,7 +1825,7 @@ export default new Vuex.Store({
 
       let tockensTarget = [];
       Object.keys(state).forEach((key) => {
-        if (state[key].name) {
+        if (state[key]?.name) {
           if (state[key].name.toLowerCase() === item.target.toLowerCase()) {
             id = key;
           }
