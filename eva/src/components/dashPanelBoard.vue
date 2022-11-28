@@ -23,6 +23,22 @@
               class="home"
               :color="theme.$secondary_text"
               v-on="on"
+              @click="openNavPanel"
+            >
+              {{ iconTree }}
+            </v-icon>
+          </template>
+          <span>Дерево</span>
+        </v-tooltip>
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <v-icon
+              class="home"
+              :color="theme.$secondary_text"
+              v-on="on"
               @click="toHome"
             >
               {{ home }}
@@ -927,6 +943,7 @@ import {
   mdiTrashCanOutline,
   mdiUndoVariant,
   mdiVariable,
+  mdiFileTree,
 } from '@mdi/js';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
@@ -1003,6 +1020,7 @@ export default {
       exim: mdiSwapVerticalBold,
       home: mdiHomeVariantOutline,
       logIcon: mdiScriptTextOutline,
+      iconTree: mdiFileTree,
       openhelp: false,
       newDashBoard: {},
       lookTockens: [],
@@ -1200,11 +1218,11 @@ export default {
       return {
         background: this.theme.$main_bg,
         color: this.theme.$main_text,
-        'max-height': `${this.screenHeight}px`,
+        'max-height': `${this.screenHeight - 50}px`,
       };
     },
     isEditDash() {
-      return !!this.allGroups.find(
+      return !!this.allGroups?.find(
         (group) => group.dashs.includes(this.name) && group.users.includes(this.login),
       );
     },
@@ -2241,6 +2259,10 @@ export default {
     },
     toHome() {
       this.$router.push('/main');
+    },
+    openNavPanel() {
+      this.$store.commit('toggleOpenTree');
+      this.gearShow = false;
     },
     getScreenHeight() {
       return 0.9 * window.innerHeight;

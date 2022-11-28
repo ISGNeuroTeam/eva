@@ -21,10 +21,10 @@
         spellcheck="false"
         hide-details
         class="textarea-itself"
-        :disabled="readOnly"
+        :readonly="readOnly"
         :height="height"
         no-resize
-        @keypress.enter="setTockenByPress($event)"
+        @keypress="setTockenByPress($event)"
         @blur="setTockenBlur($event)"
         @change="onInputText"
         @keyup="onKeyUpText"
@@ -175,7 +175,7 @@ export default {
   },
   watch: {
     textAreaValue(val) {
-      this.textarea = val;
+      this.textarea = this.replaceLineWrapForTextarea(val);
     },
     'dashFromStore.options.validationType': {
       immediate: true,
@@ -197,7 +197,7 @@ export default {
       if (val === false && val !== oldVal) {
         const defaultValue = this.getDefaultValue();
         if (defaultValue !== null) {
-          this.textarea = `${defaultValue}`;
+          this.textarea = this.replaceLineWrapForTextarea(`${defaultValue}`);
         }
         this.setTockenBlur();
       }
@@ -205,7 +205,7 @@ export default {
   },
   mounted() {
     this.$emit('hideDS', this.id);
-    this.textarea = this.getTextArea;
+    this.textarea = this.replaceLineWrapForTextarea(`${this.getTextArea}`);
     this.$store.commit('setActions', {
       actions: this.actions,
       idDash: this.idDash,
@@ -213,6 +213,12 @@ export default {
     });
   },
   methods: {
+    replaceLineWrapForToken(text) {
+      return text.replaceAll('\n', '<br/>');
+    },
+    replaceLineWrapForTextarea(text) {
+      return text.replaceAll('<br/>', '\n');
+    },
     setTockenBlur(event = null) {
       if (event) {
         event.preventDefault();
@@ -220,14 +226,15 @@ export default {
       if (this.textarea === '') {
         const defaultValue = this.getDefaultValue();
         if (defaultValue !== null) {
-          this.textarea = `${defaultValue}`;
+          this.textarea = this.replaceLineWrapForTextarea(`${defaultValue}`);
         }
       }
       if (this.dashFromStore.textarea !== this.textarea) {
+        const replacedText = this.replaceLineWrapForToken(`${this.textarea}`);
         this.$store.commit('setTextArea', {
           idDash: this.idDash,
           id: this.id,
-          textarea: this.textarea,
+          textarea: replacedText,
         });
         this.setTocken();
       }
@@ -264,17 +271,20 @@ export default {
     },
     acceptTextArea() {
       if (this.dashFromStore.textarea !== this.textarea) {
+        const replacedText = this.replaceLineWrapForToken(`${this.textarea}`);
         this.$store.commit('setTextArea', {
           idDash: this.idDash,
           id: this.id,
-          textarea: this.textarea,
+          textarea: replacedText,
         });
         this.setTocken();
       }
     },
     setTockenByPress(event) {
-      event.preventDefault();
-      this.acceptTextArea();
+      if (event.ctrlKey && event.code === 'Enter') {
+        event.preventDefault();
+        this.acceptTextArea();
+      }
     },
     setTocken() {
       const { tockens } = this.$store.state[this.idDash];
@@ -287,8 +297,7 @@ export default {
             currentTokenValue = token?.value || '';
           }
         });
-
-        const textarea = this.textarea.replace(/\n/g, ' ');
+        const textarea = this.replaceLineWrapForToken(`${this.textarea}`);
         const token = {
           name,
           action: 'accept',
