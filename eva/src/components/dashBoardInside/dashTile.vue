@@ -249,21 +249,23 @@ export default {
       const { tockens } = this.$store.state[this.idDash];
       let tocken = {};
 
-      Object.keys(tockens).forEach((i) => {
-        tocken = {
-          name: tockens[i].name,
-          action: tockens[i].action,
-          capture: tockens[i].capture,
-        };
-        if (tockens[i].elem === this.id && tockens[i].action === 'click') {
-          this.$store.commit('setTocken', {
-            token: tocken,
-            idDash: this.idDash,
-            value: item[tockens[i].capture],
-            store: this.$store,
-          });
-        }
-      });
+      if (tockens) {
+        Object.keys(tockens).forEach((i) => {
+          tocken = {
+            name: tockens[i].name,
+            action: tockens[i].action,
+            capture: tockens[i].capture,
+          };
+          if (tockens[i].elem === this.id && tockens[i].action === 'click') {
+            this.$store.commit('setTocken', {
+              token: tocken,
+              idDash: this.idDash,
+              value: item[tockens[i].capture],
+              store: this.$store,
+            });
+          }
+        });
+      }
 
       const events = this.getEvents({
         event: 'onclick',
