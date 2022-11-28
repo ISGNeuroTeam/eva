@@ -484,6 +484,7 @@ export default {
     .v-btn:not(.v-btn--round).v-size--default
       height: 26px
       min-width: 47px
+      padding: 0 6px
     .text-h4
       font-size: 1.125rem !important
 </style>
