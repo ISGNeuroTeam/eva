@@ -13,6 +13,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.113.0]
+
+### Added
+- Added line wrap on textarea
+- Button. Added the ability to reset tokens on click
+- Navigation panel on dash page
+- Redirect back after login
+- Url for group page
+- Section "Tree"
+
+### Changed
+- Visual button change
+
+### Fixed
+- Fixed events on visualisation "select"
+- Fixed line wrap on textarea after update token
+- Token refresh confirmation window appears in the wrong place
+
 ## [1.112.0]
 
 ### Fixed

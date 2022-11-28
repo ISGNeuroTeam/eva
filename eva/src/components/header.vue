@@ -18,7 +18,7 @@
         :color="theme.$accent_ui_color"
       >
         <template v-slot:activator="{ on }">
-          <router-link to="main">
+          <router-link to="/main">
             <v-icon
               class="home"
               :color="theme.$secondary_text"

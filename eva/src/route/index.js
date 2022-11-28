@@ -38,18 +38,25 @@ const routes = [
   },
   {
     name: 'Дашборды',
-    path: '/dashboards', // если главная страница
+    path: '/dashboards',
+    alias: ['/dashboards/tree'],
     component: () => import('../components/mainPageDash.vue'),
     meta: {
       requiresAuth: true,
     },
-    query: {
-      home: '',
-    },
+    children: [
+      {
+        name: 'Дашборды',
+        path: '/dashboards/group/:groupId(\\d+)',
+        meta: {
+          requiresAuth: true,
+        },
+      },
+    ],
   },
   {
     name: 'Дашборд',
-    path: '/dashboards/:id', // если страница дашборда
+    path: '/dashboards/:id(\\d+)', // если страница дашборда
     component: () => import('../components/mainTitle.vue'),
     props: true,
     meta: {
@@ -132,7 +139,7 @@ router.beforeEach((to, from, next) => {
       next();
       return;
     }
-    next('/');
+    next({ path: '/', query: { redirect: to.path } });
   } else {
     next();
   }
