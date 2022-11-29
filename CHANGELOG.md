@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Run searches from admin username
+- Fixed spontaneous change in the case of the first letters of words in the title of dashboards
 
 ## [1.113.0]
 
