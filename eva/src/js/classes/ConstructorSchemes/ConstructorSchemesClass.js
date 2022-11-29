@@ -50,10 +50,9 @@ import yFiles, {
   SimplePort,
   FreeNodePortLocationModel,
   GraphViewerInputMode,
-  Stroke,
 } from 'yfiles';
 
-import { throttle } from '../../utils/throttle';
+import { throttle } from '@/js/utils/throttle';
 import licenseData from '../../../license/license.json';
 import { DragAndDropPanel, DragAndDropPanelItem } from './DnDPanelClass';
 import HtmlLabelStyle from './HtmlLabelStyles';
@@ -61,10 +60,9 @@ import VuejsNodeStyle from './VueNodeStyle.js';
 import { EdgePathPortCandidateProvider } from './EdgePathPortCandidateProvider';
 import VuejsNodeStyleMarkupExtension from './VuejsNodeStyleMarkupExtension.js';
 import EdgeDropInputMode from './EdgeDropInputModeClass';
+import GenerateIcons from './GenerateIcons.js';
 
 License.value = licenseData; // Проверка лицензии
-
-const regexpSize = /<svg width="(?<width>.*?)" height="(?<height>.*?)"/;
 
 class ConstructorSchemesClass {
   static async webGl2CreateNode({
@@ -105,45 +103,6 @@ class ConstructorSchemesClass {
       rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
       rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
     };
-  }
-
-  static async getSvgLayoutSize(iconUrl) {
-    return fetch(iconUrl)
-      .then((response) => response.body)
-      .then((rb) => {
-        const reader = rb.getReader();
-
-        return new ReadableStream({
-          start(controller) {
-            // The following function handles each data chunk
-            function push() {
-              // "done" is a Boolean and value a "Uint8Array"
-              reader.read()
-                .then(({ done, value }) => {
-                  // If there is no more data to read
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  // Get the data and send it to the browser via the controller
-                  controller.enqueue(value);
-                  push();
-                });
-            }
-
-            push();
-          },
-        });
-      })
-      .then((stream) => new Response(
-        stream,
-        {
-          headers: {
-            'Content-Type': 'text/html',
-          },
-        },
-      ).text())
-      .then((svgText) => svgText.match(regexpSize).groups);
   }
 
   static removeClass(e, className) {
@@ -293,84 +252,82 @@ class ConstructorSchemesClass {
     // Frame-1376
     {
       template: `<g class="b-data-node">
-        <!--Area-->
-        <defs>
-         <!--Border-radius-bg-->
-         <clipPath :id="'border-radius-' + tag.nodeId">
-           <rect 
-             x="0" 
-             y="0" 
-             :width="layout.width" 
-             :height="layout.height" 
-             fill="transparent" 
-             rx="3" 
-             ry="3" 
-           />
-         </clipPath>
-         <!--Separator-line-->
-         <rect 
-           :id="'separator-line-' + tag.nodeId"
-           :width="layout.width" 
-           height="1" 
-           fill="#E0E0EC" 
-         />
-        </defs>
-        <!--Bg-left-->
+    <!--Area-->
+    <defs>
+        <!--Border-radius-bg-->
+        <clipPath :id="'border-radius-' + tag.nodeId">
+            <rect
+                x="0"
+                y="0"
+                :width="layout.width"
+                :height="layout.height"
+                fill="transparent"
+                rx="3"
+                ry="3"
+            />
+        </clipPath>
+        <!--Separator-line-->
         <rect
-         x="0"
-         y="0"
-         :width="layout.width / 2"
-         :height="layout.height"
-         fill="#FFFFFF"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+            :id="'separator-line-' + tag.nodeId"
+            :width="layout.width"
+            height="1"
+            fill="#E0E0EC"
         />
-        <!--Bg-right-->
-        <rect
-         :x="layout.width / 2"
-         y="0"
-         :width="layout.width / 2"
-         :height="layout.height"
-         fill="#000000"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
-        <template v-if="tag && tag.items && tag.items.length > 0">
-         <template
-          v-for="(item, index) in tag.items"
-         >
-           <text
-            dx="0.5em"
-            class="b-data-node__text b-data-node__text--left"
-            fill="#3C3B45"
-            :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
-            alignment-baseline="middle"
-            :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
-            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
-           >
-             {{ item.textLeft }}
-           </text>
-           <text
-             text-anchor="end"
-             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
-             alignment-baseline="middle"
-             :dx="(layout.width / 2) - 1"
-             class="b-data-node__text b-data-node__text--right"
-             :transform="'translate(' + (layout.width - 8) / 2 + ')'"
-             fill="white"
-             :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
-             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
-           >
-             {{ item.textRight }}
-           </text>
-           <use
-            v-if="index < (tag.items.length - 1)"
-            :href="'#separator-line-' + tag.nodeId"
-            x="0" 
-            :y="(layout.height / tag.items.length) * (index + 1)"
-            :key="'row-' + tag.nodeId + '-' + index + '-separator'"
-           />
-         </template>
+    </defs>
+    <!--Bg-left-->
+    <rect
+        x="0"
+        y="0"
+        :width="layout.width / 2"
+        :height="layout.height"
+        fill="#FFFFFF"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    <!--Bg-right-->
+    <rect
+        :x="layout.width / 2"
+        y="0"
+        :width="layout.width / 2"
+        :height="layout.height"
+        fill="#000000"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    <template v-if="tag && tag.items && tag.items.length > 0">
+        <template v-for="(item, index) in tag.items">
+            <text
+                dx="0.5em"
+                class="b-data-node__text b-data-node__text--left"
+                fill="#3C3B45"
+                :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
+                alignment-baseline="middle"
+                :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+                :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
+            >
+                {{ item.textLeft }}
+            </text>
+            <text
+                text-anchor="end"
+                :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
+                alignment-baseline="middle"
+                :dx="(layout.width / 2) - 1"
+                class="b-data-node__text b-data-node__text--right"
+                :transform="'translate(' + (layout.width - 8) / 2 + ')'"
+                fill="white"
+                :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+                :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
+            >
+                {{ item.textRight }}
+            </text>
+            <use
+                v-if="index < (tag.items.length - 1)"
+                :href="'#separator-line-' + tag.nodeId"
+                x="0"
+                :y="(layout.height / tag.items.length) * (index + 1)"
+                :key="'row-' + tag.nodeId + '-' + index + '-separator'"
+            />
         </template>
-        </g>`,
+    </template>
+</g>`,
       width: 150,
       rowHeight: 16,
       dataRest: {
@@ -1151,41 +1108,6 @@ class ConstructorSchemesClass {
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
-  }
-
-  generateIconNodes(iconsList) {
-    return Promise.all(iconsList.map(async (icon) => {
-      const imageStyleNode = new SimpleNode();
-      const layout = await ConstructorSchemesClass.getSvgLayoutSize(`/svg/${icon.src}`);
-      try {
-        const nodeSize = this.generateImageSize(layout);
-        imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-        imageStyleNode.style = new ImageNodeStyle(`/svg/${icon.src}`);
-        imageStyleNode.tag = {
-          dataType: 'image-node',
-          isAspectRatio: true,
-        };
-      } catch {
-        throw new Error();
-      }
-      return new DragAndDropPanelItem(imageStyleNode, 'Элементы с картинкой', 'image-node');
-    }));
-  }
-
-  generateImageSize({
-    width,
-    height,
-  }) {
-    const increaseSizeFn = (resultWidth, resultHeight) => {
-      if ((this.dragAndDropPanel.getMaxItemWidth * 2) < (resultWidth + resultHeight)) {
-        return increaseSizeFn(+resultWidth / 2, +resultHeight / 2);
-      }
-      return {
-        width: +resultWidth,
-        height: +resultHeight,
-      };
-    };
-    return increaseSizeFn(width, height);
   }
 
   createDnDPanelDefaultNode() {
@@ -2045,14 +1967,19 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
+        const GenerateIconsClass = new GenerateIcons({
+          maxItemSize: this.dragAndDropPanel.getMaxItemWidth,
+          // Временный вариант, заменить на внешнее значение
+          minItemSize: 150,
+        });
         const filteredIconList = [];
         Promise.all(iconsList.map(async (icon) => {
-          const response = await fetch(`/svg/${icon.src}`);
+          const response = await fetch(`/svg/${icon}.svg`);
           if (response.ok) {
             filteredIconList.push(icon);
           }
         })).then(() => {
-          this.generateIconNodes(filteredIconList).then((result) => {
+          GenerateIconsClass.generateIconNodes(filteredIconList).then((result) => {
             items.push(...result);
             resolve(items);
           });
