@@ -300,7 +300,7 @@ export default {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
-        res = this.filterSelect(res, this.elemDeep.true);
+        res = this.filterSelect(res, this.multiple ? this.elemDeep.true : [this.elemDeep.false]);
       }
 
       return res;
@@ -514,6 +514,7 @@ export default {
       this.setTocken();
     },
     filterSelect(res, selected) {
+      console.log('filterSelected %s', this.id, res, selected);
       if (this.getOptions?.resetValuesWhichAreNot) {
         const existsItems = this.dataReady.map((item) => item[this.elem]);
         selected = selected.filter((elem) => !!existsItems.includes(elem));
