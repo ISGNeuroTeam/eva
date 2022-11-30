@@ -41,7 +41,8 @@
               >
                 <template v-if="loading && allGroups.length === 0">
                   <v-skeleton-loader
-                    v-for="_ in [1,2,3,4]"
+                    v-for="n in 4"
+                    :key="n"
                     class="dash-group"
                     type="card"
                   />
@@ -167,7 +168,8 @@
                 >
                   <template v-if="loading">
                     <v-skeleton-loader
-                      v-for="n in [1,2,3,4]"
+                      v-for="n in 4"
+                      :key="n"
                       class="dash-group"
                       type="card"
                     ></v-skeleton-loader>
