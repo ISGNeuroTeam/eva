@@ -5,7 +5,7 @@
   >
     <div
       ref="container"
-      class="dash-map"
+      class="dash-tune"
       :class="getClasses"
       :style="getStyles"
     >
@@ -436,7 +436,7 @@ export default {
 </script>
 
 <style lang="sass">
-.dash-map
+.dash-tune
   color: var(--main_text) !important
   min-width: 360px
   height: calc(100% - 25px)
@@ -474,7 +474,7 @@ export default {
     .text-h4
       font-size: 62px !important
     .v-size--default
-      padding: 25px 48px
+      padding: 25px 48px !important
   &.min-size
     min-width: 210px
     .slider-vertical

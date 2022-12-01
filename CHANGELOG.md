@@ -8,9 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- "Reset values if data source does not contain them" option to select
+
+### Changed
+
+### Fixed
+- Run searches from admin username
+
+## [1.113.0]
+
+### Added
 - Added line wrap on textarea
 - Button. Added the ability to reset tokens on click
-- "Reset values if data source does not contain them" option to select
+- Navigation panel on dash page
+- Redirect back after login
+- Url for group page
+- Section "Tree"
 
 ### Changed
 - Visual button change
