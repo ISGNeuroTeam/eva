@@ -1527,40 +1527,6 @@ export default {
       }
     },
     saveTocken(index) {
-      // функция которая сохраняет токен в хранилище
-
-      if (this.tokens?.length > 0) {
-        const filterTockens = this.tokens.filter((x) => {
-          if (!Number.isNaN(index) && index !== undefined) {
-            return (
-              x.elem === this.tokens[index].elem
-              && x.action === this.tokens[index].action
-              && x.capture === this.tokens[index].capture
-              && x.name !== this.tokens[index].name
-            );
-          }
-          return (
-            x.elem === this.newElem
-            && x.action === this.newAction
-            && x.capture === this.newCapture
-          );
-        });
-
-        if (filterTockens.length > 0) {
-          this.errorSaveToken = true;
-          this.openwarning = true;
-          const height = this.$refs.blockTocken.clientHeight;
-
-          this.otstupBottom = height + 55;
-          this.msgWarn = 'Токен с такими опциями уже существует.';
-
-          setTimeout(() => {
-            this.openwarning = false;
-          }, 2000);
-          return;
-        }
-      }
-
       // проверяем не пустой ли токен
       if (
         (!this.newTockenName && !Number.isInteger(index))
