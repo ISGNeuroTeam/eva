@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Run searches from admin username
+- Multiselect. The selectable property from the list in the token is ignored
 
 ## [1.113.0]
 
