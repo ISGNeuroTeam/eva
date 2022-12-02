@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [1.114.0]
+
+### Added
+- dynamicForm: Added step to slider
+
+### Fixed
+- Run searches from admin username
+- Multiselect. The selectable property from the list in the token is ignored
+
 ## [1.113.0]
 
 ### Added
