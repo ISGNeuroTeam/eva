@@ -1529,8 +1529,8 @@ export default {
     saveTocken(index) {
       // проверяем не пустой ли токен
       if (
-        (this.newTockenName === 'evaTknLogin' && !Number.isInteger(index))
-        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name] === 'evaTknLogin')
+        (this.newTockenName.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
+        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name].toLowerCase() === 'evatknlogin')
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
