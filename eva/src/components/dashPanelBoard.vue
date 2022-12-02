@@ -1529,6 +1529,24 @@ export default {
     saveTocken(index) {
       // проверяем не пустой ли токен
       if (
+        (this.newTockenName === 'evaTknLogin' && !Number.isInteger(index))
+        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name] === 'evaTknLogin')
+      ) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        const height = this.$refs.blockTocken.clientHeight;
+
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Имя токена evaTknLogin системное.';
+
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
+      }
+
+      // проверяем не пустой ли токен
+      if (
         (!this.newTockenName && !Number.isInteger(index))
         || (Number.isInteger(index)
           && !this.tockensName[this.tokens[index].name].length)
