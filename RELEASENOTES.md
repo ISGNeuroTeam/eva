@@ -1,3 +1,12 @@
+# [1.114.0] - 2022-12-02
+
+### Added
+- dynamicForm: Added step to slider
+
+### Fixed
+- Run searches from admin username
+- Multiselect. The selectable property from the list in the token is ignored
+
 # [1.113.0] - 2022-11-25
 
 ### Added
