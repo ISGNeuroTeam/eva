@@ -33,7 +33,7 @@
             outlined
             class="select-parent"
             :loading="dataLoading"
-            label="Столбец данных"
+            label="Данные для отображения"
             @change="getItem('elem')"
           />
           <v-select
@@ -44,7 +44,7 @@
             hide-details
             outlined
             class="select-parent"
-            label="Связанный столбец данных"
+            label="Связанные данные"
             :loading="dataLoading"
             @change="getItem('elemlink')"
           />
@@ -300,7 +300,7 @@ export default {
         const data = this.dataReady;
         res = Object.values(data).map((item) => item[this.elem]);
 
-        res = this.filterSelect(res, this.elemDeep.true);
+        res = this.filterSelect(res, this.multiple ? this.elemDeep.true : [this.elemDeep.false]);
       }
 
       return res;
@@ -389,6 +389,9 @@ export default {
     },
     dataReady(dataReady) {
       this.updateActions(dataReady);
+      if (this.getOptions?.resetValuesWhichAreNot) {
+        this.setTocken();
+      }
     },
     // Загрузился ИД для дефотла
     changedDataDefaultLoading(val, oldVal) {
@@ -511,6 +514,15 @@ export default {
       this.setTocken();
     },
     filterSelect(res, selected) {
+      if (this.getOptions?.resetValuesWhichAreNot) {
+        const existsItems = this.dataReady.map((item) => item[this.elem]);
+        selected = selected.filter((elem) => !!existsItems.includes(elem));
+        if (this.multiple) {
+          this.elemDeep.true = selected;
+        } else if (!existsItems.includes(this.elemDeep.false)) {
+          this.elemDeep.false = '';
+        }
+      }
       let data = [...[], ...res];
       data = data.filter((elem) => !selected.includes(elem));
 
@@ -540,10 +552,16 @@ export default {
           this.elemDeep[String(this.multiple)] = defaultValue;
         }
       }
-      const elemDeepValue = this.elemDeep[String(this.multiple)];
+      let elemDeepValue = this.elemDeep[String(this.multiple)];
+      if (this.getOptions?.resetValuesWhichAreNot) {
+        const existsItems = this.dataReady.map((item) => item[this.elem]);
+        if (elemDeepValue.filter) {
+          elemDeepValue = elemDeepValue.filter((elem) => !!existsItems.includes(elem));
+        }
+      }
       this.$store.commit('setSelected', {
         element: 'elemDeep',
-        value: this.elemDeep[String(this.multiple)],
+        value: elemDeepValue,
         idDash: this.idDash,
         id: this.id,
       });
@@ -569,7 +587,7 @@ export default {
               if (elemDeepValue !== null) {
                 if (Array.isArray(elemDeepValue)) {
                   value = [...[], ...String(elemDeepValue)];
-                } else {
+                } else if (!this.getOptions?.resetValuesWhichAreNot) {
                   value = [String(elemDeepValue)];
                 }
               }
