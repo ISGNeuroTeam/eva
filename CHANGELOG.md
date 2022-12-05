@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- The ability to create an arbitrary number of tokens per element for one event.
 
 ### Changed
 
