@@ -8,12 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- The ability to create an arbitrary number of tokens per element for one event.
 - "Reset values if data source does not contain them" option to select
 
 ### Changed
 
 ### Fixed
+
+## [1.114.0]
+
+### Added
+- dynamicForm: Added step to slider
+
+### Fixed
 - Run searches from admin username
+- Multiselect. The selectable property from the list in the token is ignored
 
 ## [1.113.0]
 

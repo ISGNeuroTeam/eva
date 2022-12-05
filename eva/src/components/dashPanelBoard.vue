@@ -1527,38 +1527,22 @@ export default {
       }
     },
     saveTocken(index) {
-      // функция которая сохраняет токен в хранилище
+      // проверяем не пустой ли токен
+      if (
+        (this.newTockenName.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
+        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name].toLowerCase() === 'evatknlogin')
+      ) {
+        this.errorSaveToken = true;
+        this.openwarning = true;
+        const height = this.$refs.blockTocken.clientHeight;
 
-      if (this.tokens?.length > 0) {
-        const filterTockens = this.tokens.filter((x) => {
-          if (!Number.isNaN(index) && index !== undefined) {
-            return (
-              x.elem === this.tokens[index].elem
-              && x.action === this.tokens[index].action
-              && x.capture === this.tokens[index].capture
-              && x.name !== this.tokens[index].name
-            );
-          }
-          return (
-            x.elem === this.newElem
-            && x.action === this.newAction
-            && x.capture === this.newCapture
-          );
-        });
+        this.otstupBottom = height + 55;
+        this.msgWarn = 'Имя токена evaTknLogin системное.';
 
-        if (filterTockens.length > 0) {
-          this.errorSaveToken = true;
-          this.openwarning = true;
-          const height = this.$refs.blockTocken.clientHeight;
-
-          this.otstupBottom = height + 55;
-          this.msgWarn = 'Токен с такими опциями уже существует.';
-
-          setTimeout(() => {
-            this.openwarning = false;
-          }, 2000);
-          return;
-        }
+        setTimeout(() => {
+          this.openwarning = false;
+        }, 2000);
+        return;
       }
 
       // проверяем не пустой ли токен

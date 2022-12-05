@@ -579,7 +579,7 @@ export default {
             if (String(this.multiple) === 'true') {
               elemDeepValue.forEach((elem) => {
                 const addValues = data.filter((x) => elem === x[this.elem])
-                  .map((x) => x[this.elemlink])
+                  .map((x) => x[curTocken.capture])
                   .reduce((a, b) => (a.includes(b) ? a : [...a, b]), []);
                 value.push(...addValues);
               });
