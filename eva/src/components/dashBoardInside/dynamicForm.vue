@@ -81,6 +81,7 @@
               hide-details
               :max="field.max"
               :min="field.min"
+              :step="field.step ? field.step : 1"
             >
               <template v-slot:append>
                 <v-text-field
@@ -94,6 +95,7 @@
                   style="width: auto"
                   :max="field.max"
                   :min="field.min"
+                  :step="field.step ? field.step : 1"
                   @blur="(event) => validateMinMax(event, field.name, index)"
                 />
               </template>
