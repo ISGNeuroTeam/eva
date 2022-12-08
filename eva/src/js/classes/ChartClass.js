@@ -747,7 +747,7 @@ export default class ChartClass {
             const fontWeight = (curMetricBold && metric.name === cur.name) ? 'bold' : 'regular';
             const title = cur.title || cur.name;
             return `${prev}<div style="font-weight: ${fontWeight}">${title}: <span>${value}</span></div>`;
-          }, ''),
+          }, `${this.xMetric}: ${this.xTickFormat(d[this.xMetric])}`),
       );
 
     let leftPos = left;

@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - The ability to create an arbitrary number of tokens per element for one event.
 - "Reset values if data source does not contain them" option to select
+- Multiline: added the x axis value in tooltip
 
 ### Changed
 
