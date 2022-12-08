@@ -1529,7 +1529,7 @@ export default {
     saveTocken(index) {
       // проверяем не пустой ли токен
       if (
-        (this.newTockenName.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
+        (this.newTockenName?.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
         || (Number.isInteger(index) && this.tockensName[this.tokens[index].name].toLowerCase() === 'evatknlogin')
       ) {
         this.errorSaveToken = true;
