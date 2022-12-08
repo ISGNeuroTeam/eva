@@ -8,10 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.115.0]
+
+### Added
 - The ability to create an arbitrary number of tokens per element for one event.
 - "Reset values if data source does not contain them" option to select
 
 ### Changed
+- Change icons list settings
 
 ### Fixed
 - Fixed spontaneous change in the case of the first letters of words in the title of dashboards
@@ -37,7 +46,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Visual button change
-- Change icons list settings
 
 ### Fixed
 - Fixed events on visualisation "select"
