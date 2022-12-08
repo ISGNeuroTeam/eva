@@ -1,3 +1,15 @@
+# [1.115.0] - 2022-12-08
+
+### Added
+- The ability to create an arbitrary number of tokens per element for one event
+- Added "Reset values if data source does not contain them" option in the select component
+
+### Changed
+- Schemes constructor: Changed icons list settings
+
+### Fixed
+- Fixed spontaneous change in the case of the first letters of words in the title of dashboards
+
 # [1.114.0] - 2022-12-02
 
 ### Added
