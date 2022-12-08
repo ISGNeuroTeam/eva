@@ -839,7 +839,7 @@ export default {
 <style lang="sass" scoped>
 .nav-panel-drawer
   position: fixed
-  z-index: 199
+  z-index: 98
   width: 320px !important
   height: auto !important
   top: 50px !important
