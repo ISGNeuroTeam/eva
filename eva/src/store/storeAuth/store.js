@@ -6,6 +6,7 @@ export default {
   state: {
     userName: '',
     essence: [],
+    permissions: [],
   },
   mutations: {
     setUserName(state, userName) {
@@ -16,6 +17,9 @@ export default {
     },
     dropEssence(state) {
       state.essence = structuredClone({});
+    },
+    permissions(state, data) {
+      state.permissions = data;
     },
   },
   actions: {
@@ -96,11 +100,14 @@ export default {
       document.cookie = "eva_token=''; max-age=0 ; path=/";
       commit({ type: 'clearState' }, { root: true });
       commit('setUserName', '');
+      commit('permissions', []);
       router.push('/');
     },
   },
   getters: {
+    permissions: (state) => state.permissions,
     essence: (state) => state.essence,
     userName: (state) => state.userName,
+    isAdmin: (state) => state.permissions.includes('admin_all'),
   },
 };
