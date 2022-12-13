@@ -7,29 +7,54 @@
     <div class="dash-constructor-schemes__data-panel-item">
       <template v-if="dataType === '0' || dataType === '1'">
         <div
-          v-for="(item, index) in dataObject.items"
+          v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
-          class="row align-center"
+          class="column"
         >
-          <v-select
-            v-model="item.id"
-            :items="dataRestFrom"
-            item-value="TagName"
-            item-text="Description"
-            label="Данные для строки"
-            :menu-props="{
-              'z-index': 100,
-            }"
-            class="col-10"
-            @change="updateModelValue(dataObject)"
-          />
-          <v-icon
-            class="control-button edit-icon theme--dark col-2"
+          <div class="row align-center">
+            <v-select
+              v-model="element.id"
+              :items="dataRestFrom"
+              item-value="TagName"
+              item-text="Description"
+              label="Данные для строки"
+              :menu-props="{
+                'z-index': 100,
+              }"
+              class="col-10"
+              @change="updateModelValue(dataObject)"
+            >
+              <template v-slot:item="{ item, on }">
+                <v-list-item
+                  ripple
+                  class="v-list-item--link"
+                  v-on="on"
+                >
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      {{ item.Description }}
+                    </v-list-item-title>
+                    <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                      {{ item.NameObject }}
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </template>
+            </v-select>
+            <v-icon
+              class="control-button edit-icon theme--dark col-2"
+              :style="{ color: theme.$secondary_text }"
+              @click="deleteLine(index)"
+            >
+              {{ closeIcon }}
+            </v-icon>
+          </div>
+          <div
+            class="mb-9"
             :style="{ color: theme.$secondary_text }"
-            @click="deleteLine(index)"
           >
-            {{ closeIcon }}
-          </v-icon>
+            {{ element.id | getObjectNameById(dataRestFrom) }}
+          </div>
         </div>
         <v-btn
           small
@@ -40,29 +65,79 @@
         </v-btn>
       </template>
       <template v-if="dataType === '2' || dataType === '3'">
-        <v-select
-          v-model="dataObject.id"
-          :items="dataRestFrom"
-          item-value="TagName"
-          item-text="Description"
-          label="Данные для строки"
-          :menu-props="{
-            'z-index': 100,
-          }"
-          @change="updateModelValue(dataObject)"
-        />
+        <div class="column">
+          <v-select
+            v-model="dataObject.id"
+            :items="dataRestFrom"
+            item-value="TagName"
+            item-text="Description"
+            label="Данные для строки"
+            :menu-props="{
+              'z-index': 100,
+            }"
+            @change="updateModelValue(dataObject)"
+          >
+            <template v-slot:item="{ item, on }">
+              <v-list-item
+                ripple
+                class="v-list-item--link"
+                v-on="on"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ item.Description }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                    {{ item.NameObject }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-select>
+          <div
+            class="mb-9"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ dataObject.id | getObjectNameById(dataRestFrom) }}
+          </div>
+        </div>
       </template>
       <template v-if=" dataType === '4'">
-        <v-select
-          v-model="dataObject.id"
-          :items="dataRestFrom"
-          item-value="TagName"
-          item-text="Description"
-          label="Данные для строки"
-          :menu-props="{
-            'z-index': 100,
-          }"
-        />
+        <div class="column">
+          <v-select
+            v-model="dataObject.id"
+            :items="dataRestFrom"
+            item-value="TagName"
+            item-text="Description"
+            label="Данные для строки"
+            :menu-props="{
+              'z-index': 100,
+            }"
+          >
+            <template v-slot:item="{ item, on }">
+              <v-list-item
+                ripple
+                class="v-list-item--link"
+                v-on="on"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>
+                    {{ item.Description }}
+                  </v-list-item-title>
+                  <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                    {{ item.NameObject }}
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </template>
+          </v-select>
+          <div
+            class="mb-9"
+            :style="{ color: theme.$secondary_text }"
+          >
+            {{ dataObject.id | getObjectNameById(dataRestFrom) }}
+          </div>
+        </div>
         <v-text-field
           v-model.number="dataObject.maxValue"
           :rules="[value => value >= 0 || 'Некорректное значение.']"
@@ -167,16 +242,41 @@
       <template v-if="dataType === '5'">
         <div class="row align-center">
           <div class="col-12">
-            <v-select
-              v-model="dataObject.idFirst"
-              :items="dataRestFrom"
-              item-value="TagName"
-              item-text="Description"
-              label="Первое значение"
-              :menu-props="{
-                'z-index': 100,
-              }"
-            />
+            <div class="column">
+              <v-select
+                v-model="dataObject.idFirst"
+                :items="dataRestFrom"
+                item-value="TagName"
+                item-text="Description"
+                label="Первое значение"
+                :menu-props="{
+                  'z-index': 100,
+                }"
+              >
+                <template v-slot:item="{ item, on }">
+                  <v-list-item
+                    ripple
+                    class="v-list-item--link"
+                    v-on="on"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.Description }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                        {{ item.NameObject }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+              <div
+                class="mb-9"
+                :style="{ color: theme.$secondary_text }"
+              >
+                {{ dataObject.idFirst | getObjectNameById(dataRestFrom) }}
+              </div>
+            </div>
           </div>
           <div class="col-8">
             Цвет первого значения
@@ -237,16 +337,41 @@
         </div>
         <div class="row align-center">
           <div class="col-12">
-            <v-select
-              v-model="dataObject.idSecond"
-              :items="dataRestFrom"
-              item-value="TagName"
-              item-text="Description"
-              label="Второе значение"
-              :menu-props="{
-                'z-index': 100,
-              }"
-            />
+            <div class="column">
+              <v-select
+                v-model="dataObject.idSecond"
+                :items="dataRestFrom"
+                item-value="TagName"
+                item-text="Description"
+                label="Второе значение"
+                :menu-props="{
+                  'z-index': 100,
+                }"
+              >
+                <template v-slot:item="{ item, on }">
+                  <v-list-item
+                    ripple
+                    class="v-list-item--link"
+                    v-on="on"
+                  >
+                    <v-list-item-content>
+                      <v-list-item-title>
+                        {{ item.Description }}
+                      </v-list-item-title>
+                      <v-list-item-subtitle :style="{ color: theme.$secondary_text }">
+                        {{ item.NameObject }}
+                      </v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </template>
+              </v-select>
+              <div
+                class="mb-9"
+                :style="{ color: theme.$secondary_text }"
+              >
+                {{ dataObject.idSecond | getObjectNameById(dataRestFrom) }}
+              </div>
+            </div>
           </div>
           <div class="col-8">
             Цвет второго значения
@@ -671,6 +796,11 @@ import { throttle } from '@/js/utils/throttle';
 
 export default {
   name: 'DashConstructorSchemesSettings',
+  filters: {
+    getObjectNameById(id, dataRest) {
+      return dataRest.find((item) => item.TagName === id)?.NameObject || '-';
+    },
+  },
   model: {
     prop: 'modelValue',
     event: 'update:modelValue',
@@ -744,3 +874,13 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.dash-constructor-schemes__data-panel-wrapper {
+  .dash-constructor-schemes__data-panel-item {
+    ::v-deep.v-text-field__details {
+      display: none;
+    }
+  }
+}
+</style>
