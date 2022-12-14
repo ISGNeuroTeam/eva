@@ -22,7 +22,6 @@
                 'z-index': 100,
               }"
               class="col-10"
-              @change="updateModelValue(dataObject)"
             >
               <template v-slot:item="{ item, on }">
                 <v-list-item
@@ -56,12 +55,53 @@
             {{ element.id | getObjectNameById(dataRestFrom) }}
           </div>
         </div>
+        <div class="d-flex mb-9">
+          <v-btn
+            class="mr-4"
+            ripple
+            small
+            :color="theme.$primary_button"
+            @click="addLine()"
+          >
+            <v-icon
+              class="control-button edit-icon theme--dark"
+              :style="{ color: theme.$secondary_text }"
+            >
+              {{ addLineIcon }}
+            </v-icon>
+          </v-btn>
+          <div>
+            Добавить строку
+          </div>
+        </div>
+        <div class="dash-constructor-schemes__slider column align-stretch">
+          <div class="mb-4">
+            Размер подложки таблицы:
+          </div>
+          <div class="dash-constructor-schemes__slider-title">
+            <div>
+              <span>{{ dataObject.widthLeft }}</span>
+              <span>%</span>
+            </div>
+            <div>
+              <span>{{ dataObject.widthLeft | revertValue }}</span>
+              <span>%</span>
+            </div>
+          </div>
+          <v-slider
+            :value="dataObject.widthLeft"
+            max="90"
+            min="10"
+            @input="updateSliderValue"
+          />
+        </div>
         <v-btn
           small
           :color="theme.$primary_button"
-          @click="addLine()"
+          :style="{ color: theme.$main_text }"
+          @click="updateModelValue"
         >
-          Добавить строку
+          Применить
         </v-btn>
       </template>
       <template v-if="dataType === '2' || dataType === '3'">
@@ -791,7 +831,7 @@
 </template>
 
 <script>
-import { mdiClose } from '@mdi/js';
+import { mdiClose, mdiTableRowPlusAfter } from '@mdi/js';
 import { throttle } from '@/js/utils/throttle';
 
 export default {
@@ -799,6 +839,9 @@ export default {
   filters: {
     getObjectNameById(id, dataRest) {
       return dataRest.find((item) => item.TagName === id)?.NameObject || '-';
+    },
+    revertValue(value) {
+      return 100 - value;
     },
   },
   model: {
@@ -828,6 +871,8 @@ export default {
       dataObject: null,
       // Icons
       closeIcon: mdiClose,
+      addLineIcon: mdiTableRowPlusAfter,
+      test12345: 50,
     };
   },
   computed: {
@@ -845,6 +890,7 @@ export default {
   },
   mounted() {
     this.updateSelectedNodeColor = throttle(this.updateSelectedNodeColor, 200);
+    this.updateSliderValue = throttle(this.updateSliderValue, 200);
   },
   methods: {
     updateSelectedNodeColor(evt, field) {
@@ -857,7 +903,6 @@ export default {
     },
     deleteLine(index) {
       this.dataObject.items.splice(index, 1);
-      this.updateModelValue(this.dataObject);
     },
     addLine() {
       this.dataObject.items.push({
@@ -865,11 +910,13 @@ export default {
         textLeft: 'Label',
         textRight: 'Value',
       });
-      this.updateModelValue(this.dataObject);
     },
     updateModelValue() {
       this.$emit('changeDataSelectedNode', this.dataObject);
       this.$emit('update:modelValue', this.dataObject);
+    },
+    updateSliderValue(value) {
+      this.dataObject.widthLeft = value;
     },
   },
 };
@@ -880,6 +927,13 @@ export default {
   .dash-constructor-schemes__data-panel-item {
     ::v-deep.v-text-field__details {
       display: none;
+    }
+  }
+  .dash-constructor-schemes__slider {
+    .dash-constructor-schemes__slider-title {
+      width: inherit;
+      display: flex;
+      justify-content: space-between;
     }
   }
 }
