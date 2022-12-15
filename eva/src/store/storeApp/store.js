@@ -208,10 +208,7 @@ export default {
     },
   },
   getters: {
-    treeCategories(state) {
-      // @todo: add filter by role
-      return state.treeCategories;
-    },
+    treeCategories: (state) => state.treeCategories,
     treeOpenItems: (state) => state.treeOpenItems,
     treeGroups: (state) => state.treeGroups,
     isOpenTree: (state) => !!state.treeOpen,

@@ -475,7 +475,6 @@ export default {
         treeId: item.treeId,
         props,
       });
-      // @todo: проверить - не грузятся дети после смены с даша на группу
     },
     async activeCurrentDash() {
       const dashId = this.$route.params?.id;
