@@ -70,7 +70,6 @@ export default {
       }));
     },
     treeOpenItems(state, val) {
-      console.log('%ccommit treeOpenItems', 'color: green', val);
       state.treeOpenItems = val;
     },
     toggleOpenTree(state) {
