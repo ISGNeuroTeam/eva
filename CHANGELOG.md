@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added fitGraph button on constructorSchemes
 - Added change background size data-node on constructorSchemes
 - Added copy\paste fn for ConstructorSchemes
+- Added token interaction with filter
 
 ### Changed
 - Home group selection now has a filter
