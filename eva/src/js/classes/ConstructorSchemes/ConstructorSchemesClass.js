@@ -187,7 +187,7 @@ class ConstructorSchemesClass {
     return canvas.getContext('2d');
   }
 
-  static createReactiveNode(data, tooltip, type) {
+  static createReactiveNode(data) {
     const dataNode = new SimpleNode();
     dataNode.tag = data.dataRest;
     dataNode.style = new VuejsNodeStyle(data.template);
@@ -199,7 +199,7 @@ class ConstructorSchemesClass {
         ? data.height
         : data.rowHeight * (data?.dataRest?.items?.length || 1),
     );
-    return new DragAndDropPanelItem(dataNode, tooltip, type);
+    return dataNode;
   }
 
   static getEdgeOptions(edge) {
@@ -831,7 +831,7 @@ class ConstructorSchemesClass {
         nodeId: 'label-template-0',
         id: '',
         textTemplateType: 'template-0',
-        text: 'Text',
+        text: 'Text Text Text Text Text Text Text ',
         isVertical: false,
         bordered: true,
         borderType: 'solid',
@@ -1928,12 +1928,24 @@ class ConstructorSchemesClass {
 
       // Узел с данными
       this.dndDataPanelItems.forEach((item) => {
-        items.push(ConstructorSchemesClass.createReactiveNode(item, 'Элменты с данными', 'data-node'));
+        items.push(
+          new DragAndDropPanelItem(
+            ConstructorSchemesClass.createReactiveNode(item),
+            'Элменты с данными',
+            'data-node',
+          ),
+        );
       });
 
       // Узел с текстом
       this.dndLabelPanelItems.forEach((item) => {
-        items.push(ConstructorSchemesClass.createReactiveNode(item, 'Элементы с текстом', 'text-node'));
+        items.push(
+          new DragAndDropPanelItem(
+            ConstructorSchemesClass.createReactiveNode(item),
+            'Элементы с текстом',
+            'text-node',
+          ),
+        );
       });
 
       // Подписи к узлам\ребрам
@@ -2173,10 +2185,15 @@ class ConstructorSchemesClass {
 
   buildGraph(dataSource) {
     this.defaultDataSource = dataSource;
-    this.deleteAllImageNode().then(() => {
-      this.defaultDataSource.forEach(() => {
+    this.deleteAllImageNode()
+      .then(() => this.getIconsListForGraph({
+        iconsList: this.defaultDataSource,
+        maxItemSize: 150,
+        minItemSize: 150,
+      }))
+      .then((dataForGraph) => {
+        console.log(dataForGraph);
       });
-    });
   }
 
   // iconsList:Array<string>, maxItemSize:number, minItemSize:number
@@ -2184,24 +2201,34 @@ class ConstructorSchemesClass {
     return new Promise((resolve) => {
       const GenerateIconsClass = new GenerateIcons({
         maxItemSize,
-        // Временный вариант, заменить на внешнее значение
         minItemSize,
       });
+      const localIconList = [];
       const resultList = [];
-      GenerateIconsClass.generateIconNodes(iconsList).then((result) => {
+      if (iconsList.some((item) => item.description)) {
+        iconsList.forEach((item) => {
+          if (item.description) {
+            const node = ConstructorSchemesClass.createReactiveNode(this.dndLabelPanelItems[0]);
+            localIconList.push({
+              ...item,
+              description: {
+                text: item.description,
+                data: {
+                  node,
+                  tooltip: 'Элементы с текстом',
+                  dataType: 'text-node',
+                },
+              },
+            });
+          }
+        });
+      } else {
+        localIconList.push(...iconsList);
+      }
+      GenerateIconsClass.generateIconNodes(localIconList).then((result) => {
         resultList.push(...result);
         resolve(resultList);
       });
-      // const loadedIconsList = [];
-      // const resultList = [];
-      // Promise.all(iconsList.map(async (item) => {
-      //   const response = await fetch(`/svg/${item.icon}.svg`);
-      //   if (response.ok) {
-      //     loadedIconsList.push(item);
-      //   }
-      // })).then(() => {
-      //
-      // });
     });
   }
 }

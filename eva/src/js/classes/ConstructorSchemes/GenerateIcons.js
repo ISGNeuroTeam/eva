@@ -78,36 +78,31 @@ class GenerateIcons {
   generateIconNodes(iconsList) {
     return GenerateIcons.getIconsListWithSize(iconsList)
       .then((iconsWithSize) => iconsWithSize.map((item) => {
-        const imageStyleNode = new SimpleNode();
-        try {
-          const nodeSize = this.generateImageSize(item.layout);
-          imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-          imageStyleNode.style = new ImageNodeStyle(`/svg/${item.icon}.svg`);
-          imageStyleNode.tag = {
+        const imageStyleNode = this.getIconNode(item);
+        return {
+          description: item.description,
+          icon: {
+            node: imageStyleNode,
+            tooltip: 'Элементы с картинкой',
             dataType: 'image-node',
-            isAspectRatio: true,
-          };
-          if (item.description) {
-            return {
-              description: {
-                node: imageStyleNode,
-                tooltip: 'Элементы с картинкой',
-                dataType: 'image-node',
-              },
-            };
-          }
-          return {
-            icon: {
-              node: imageStyleNode,
-              tooltip: 'Элементы с картинкой',
-              dataType: 'image-node',
-            },
-          };
-        } catch (e) {
-          throw new Error(e);
-        }
+          },
+        };
       }));
   }
+
+  getIconNode(data) {
+    const imageStyleNode = new SimpleNode();
+    const nodeSize = this.generateImageSize(data.layout);
+    imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
+    imageStyleNode.style = new ImageNodeStyle(`/svg/${data.icon}.svg`);
+    imageStyleNode.tag = {
+      dataType: 'image-node',
+      isAspectRatio: true,
+    };
+    return imageStyleNode;
+  }
+
+  getTextNode() {}
 
   generateImageSize({
     width,
