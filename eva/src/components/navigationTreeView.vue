@@ -101,7 +101,7 @@
                 :items="treeGroups"
                 item-text="name"
                 return-object
-                placeholder="Выберите группу дошбордов"
+                placeholder="Выберите группу дашбордов"
                 persistent-placeholder
                 dense
                 outlined
@@ -142,6 +142,7 @@
           v-else
           :title="(isAdmin && item.roles && item.roles.length) ? `Роли: ${ item.roles}` : null"
           @click.middle="onClickMiddleMouse(item)"
+          @mousedown="onMouseDownItem"
         >
           {{ item.name }}
         </div>
@@ -346,6 +347,13 @@ export default {
         this.$store.commit('app/treeOpenItems', [...this.$refs.tree.openCache]);
         await this.$router.push(`/dashboards/${item.id}`);
       }
+    },
+    onMouseDownItem(event) {
+      if (event.button !== 1) {
+        return;
+      }
+      event.stopPropagation();
+      event.preventDefault();
     },
     onClickMiddleMouse(item) {
       if (item.type === 'dash') {
