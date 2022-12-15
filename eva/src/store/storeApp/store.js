@@ -1,6 +1,6 @@
 import Vue from 'vue';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { v4 as uuidv4 } from 'uuid';
+import uuidv4 from 'uuid/dist/v4';
 import rest from '../storeRest';
 import restAuth from '../storeAuth/storeRest';
 
