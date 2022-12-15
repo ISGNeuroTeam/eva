@@ -116,6 +116,27 @@
             <span>На уровень ниже</span>
           </v-tooltip>
         </template>
+        <template v-if="defaultFromSourceData">
+          <v-tooltip
+            :disabled="isLoading"
+            bottom
+            :color="theme.$accent_ui_color"
+          >
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <v-icon
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="openConfirmModal"
+                >
+                  {{ cloudDownloadOutlineIcon }}
+                </v-icon>
+              </div>
+            </template>
+            <span>Загрузить с сервера</span>
+          </v-tooltip>
+        </template>
       </template>
     </div>
     <div class="dash-constructor-schemes__keymap-button">
@@ -462,12 +483,20 @@
       ref="graphComponent"
       class="dash-constructor-schemes__graph-component"
     />
+    <modal-confirm
+      v-model="isConfirmModal"
+      :theme="theme"
+      :modal-text="`Все изображения на визуализации будут удалены. Продолжить ?`"
+      btn-confirm-text="Да"
+      btn-cancel-text="Нет"
+      @result="startSearch"
+    />
   </div>
 </template>
 
 <script>
 import {
-  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp,
+  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp, mdiCloudDownloadOutline,
 } from '@mdi/js';
 import BringForward from '../../../images/bring_forward.svg';
 import BringToFront from '../../../images/bring_to_front.svg';
@@ -510,6 +539,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    dataSources: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   data() {
     return {
@@ -520,6 +553,7 @@ export default {
       iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
+      cloudDownloadOutlineIcon: mdiCloudDownloadOutline,
       dndPanel: false,
       dataPanel: false,
       nodeBgColorPopup: false,
@@ -723,128 +757,13 @@ export default {
         },
       ],
       allItems: [],
-      mockData: [
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_NGS1_PNI',
-          Description: 'НГС-1 Давление',
-          value: '6.793125152587891',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_NGS1_LNI',
-          Description: 'НГС-1 Уровень',
-          value: '0.8172000050544739',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_NGS2_PNI',
-          Description: 'НГС-2 Давление',
-          value: '',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_NGS2_LNI',
-          Description: 'НГС-2 Уровень',
-          value: '',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'TAYL-D1_NGS3_PNI',
-          Description: 'НГС-3 Давление',
-          value: '6.817500114440918',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'TAYL-D1_NGS3_TNI',
-          Description: 'НГС-3 Температура',
-          value: '37.959373474121094',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'TAYL-D1_NGS3_LNI',
-          Description: 'НГС-3 Уровень',
-          value: '0.8356599807739258',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove1_In_PNI',
-          Description: 'П-1 Давление на входе',
-          value: '5.357499599456787',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove1_Out_PNI',
-          Description: 'П-1 Давление на выходе',
-          value: '4.078125',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove1_In_TNI',
-          Description: 'П-1 Температура на входе',
-          value: '45.390625',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove1_Out_TNI',
-          Description: 'П-1 Температура на выходе',
-          value: '58.412498474121094',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove2_In_PNI',
-          Description: 'П-2 Давление на входе',
-          value: '5.059375286102295',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove2_Out_PNI',
-          Description: 'П-2 Давление на выходе',
-          value: '4.093124866485596',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove2_In_TNI',
-          Description: 'П-2 Температура на входе',
-          value: '43.56249237060547',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove2_Out_TNI',
-          Description: 'П-2 Температура на выходе',
-          value: '54.36000061035156',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove3_In_PNI',
-          Description: 'П-3 Давление на входе',
-          value: '4.653749942779541',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove3_Out_PNI',
-          Description: 'П-3 Давление на выходе',
-          value: '4.324999809265137',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove4_In_PNI',
-          Description: 'П-4 Давление на входе',
-          value: '4.473750114440918',
-        },
-        {
-          NameObject: 'Тайлаковское м/р ДНС-1',
-          TagName: 'S1D1_Stove4_Out_PNI',
-          Description: 'П-4 Давление на выходе',
-          value: '4.23562479019165',
-        },
-      ],
       selectedNode: '',
       selectedDataType: '',
       dataSelectedNode: null,
       isKeymapOpen: false,
       panelBottomOffset: 10,
       isLoading: false,
+      isConfirmModal: false,
     };
   },
   computed: {
@@ -853,7 +772,10 @@ export default {
     },
     primitivesFromStore() {
       if (this.dashFromStore[this.idFrom]?.options?.primitivesLibrary) {
-        return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary);
+        return JSON.parse(this.dashFromStore[this.idFrom].options.primitivesLibrary)
+          .map((iconName) => ({
+            icon: iconName,
+          }));
       }
       return [];
     },
@@ -869,6 +791,15 @@ export default {
     theme() {
       return this.$store.getters.getTheme;
     },
+    defaultFromSourceData() {
+      return this.dashFromStore[this.idFrom].options.defaultFromSourceData;
+    },
+    getDefaultDataSource() {
+      if (this.defaultFromSourceData) {
+        return this.dataSources[this.defaultFromSourceData]?.data || [];
+      }
+      return [];
+    },
   },
   watch: {
     primitivesFromStore: {
@@ -881,8 +812,16 @@ export default {
       deep: true,
       handler(value) {
         if (this.constructorSchemes) {
-          this.constructorSchemes.updateDataRest(value);
-          this.constructorSchemes.updateDataInNode(value);
+          this.constructorSchemes.updateDataRest(structuredClone(value));
+          this.constructorSchemes.updateDataInNode(structuredClone(value));
+        }
+      },
+    },
+    getDefaultDataSource: {
+      deep: true,
+      handler(value) {
+        if (this.constructorSchemes && value?.length > 0) {
+          this.constructorSchemes.buildGraph(structuredClone(value));
         }
       },
     },
@@ -1000,6 +939,20 @@ export default {
       this.$nextTick().then(() => {
         this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
       });
+    },
+    openConfirmModal() {
+      this.isConfirmModal = true;
+    },
+    async startSearch(confirm) {
+      if (confirm) {
+        this.$store.commit('updateSearchStatus', {
+          idDash: this.idDashFrom,
+          id: this.defaultFromSourceData,
+          status: 'empty',
+        });
+      } else {
+        this.isConfirmModal = false;
+      }
     },
   },
 };

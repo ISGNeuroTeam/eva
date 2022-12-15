@@ -1092,6 +1092,7 @@ export default new Vuex.Store({
     updateSearchStatus: (state, {
       idDash, sid, status, id,
     }) => {
+      console.log('updateSearchStatus', idDash, sid, status, id);
       const search = state[idDash]?.searches.find(
         (searchItem) => searchItem.sid === sid || searchItem?.id === id,
       );

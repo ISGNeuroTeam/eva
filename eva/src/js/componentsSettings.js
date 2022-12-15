@@ -359,7 +359,7 @@ export default {
       'metricGroup',
       'scatterPlotLegend',
     ],
-    constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'primitivesLibrary'],
+    constructorSchemes: ['visible', 'level', 'pinned', 'primitives', 'defaultFromSourceData', 'primitivesLibrary'],
     dynamicForm: ['visible', 'level', 'pinned', 'formGenerator', 'formOptions'],
     frequencyGraph: [
       'groupMetric',
