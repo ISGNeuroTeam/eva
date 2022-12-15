@@ -26,6 +26,8 @@ import yFiles, {
   INode,
   InteriorLabelModel,
   IPort,
+  IBend,
+  IModelItem,
   IReshapeHandler,
   KeyEventRecognizers,
   LabelDropInputMode,
@@ -925,6 +927,8 @@ class ConstructorSchemesClass {
     },
   ]
 
+  copiedElements = null
+
   get getShapeNodeStyleList() {
     return this.shapeNodeStyleList;
   }
@@ -1129,6 +1133,7 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
+  // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
     this.saveGraphToLocalStorage().then(() => {
@@ -1288,7 +1293,7 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      // TODO: Починить функционал copy/paste/duplicate
+      // Выключены встроеные способы копирования т.к. работают не корректно, написан свой
       allowPaste: false,
       allowDuplicate: false,
       ignoreVoidStyles: true,
@@ -1435,70 +1440,143 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
+  getTemplateElementsForCopy(xOffset = 10, yOffset = 10) {
+    return this.graphComponent.selection.toArray().map((el) => {
+      // TODO: Пока сделано только для узлов
+      if (el instanceof INode) {
+        const node = {
+          location: {
+            x: el.layout.x + xOffset,
+            y: el.layout.y + yOffset,
+          },
+          layout: {
+            width: el.layout.width,
+            height: el.layout.height,
+          },
+          labels: el.labels,
+          id: el.hashCode(),
+          tag: el.tag,
+        };
+        if (el.tag.dataType === 'image-node') {
+          return {
+            ...node,
+            style: el.style.clone(),
+          };
+        }
+        return node;
+      }
+      return null;
+    }).filter((el) => el !== null);
+  }
+
+  copyElement() {
+    // Очищаем ранее скопированные элементы
+    this.copiedElements = null;
+    // Сохраняем новые
+    this.copiedElements = this.getTemplateElementsForCopy();
+  }
+
+  async pasteElement() {
+    if (this.copiedElements?.length > 0) {
+      this.graphComponent.selection.clear();
+      await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
+        graph: this.graphComponent.graph,
+        dropData: element,
+        dropLocation: element?.location,
+        isNewNode: false,
+      }))).then((createdElements) => {
+        createdElements.forEach((el) => {
+          this.graphComponent.inputMode.setSelected(el, true);
+          this.copyElement();
+        });
+        this.graphComponent.updateVisual();
+      });
+    }
+  }
+
+  async nodeCreator({
+    context,
+    graph,
+    dropData,
+    dropTarget,
+    dropLocation,
+    isCopiedElement = false,
+  }) {
+    let createdNode = null;
+    if (dropData?.tag?.templateType) {
+      // Узел с данными
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else if (dropData?.tag?.textTemplateType) {
+      // Узел с текстом
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else if (dropData?.tag?.isAspectRatio) {
+      // Узел с картинкой
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: dropData.style,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else {
+      // Обычный узел
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.dndShapeNode.template),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    }
+    const nodePosition = new Rect(
+      isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
+      isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
+      dropData.layout.width,
+      dropData.layout.height,
+    );
+    createdNode.tag.nodeId = createdNode.hashCode();
+    graph.setNodeLayout(createdNode, nodePosition);
+    return createdNode;
+  }
+
   settingsNodeDropInputMode() {
     return new NodeDropInputMode({
       showPreview: true,
       snappingEnabled: false,
       enabled: true,
-      itemCreator: async (
+      itemCreator: (
         context,
         graph,
         dropData,
         dropTarget,
         dropLocation,
-      ) => {
-        let createdNode = null;
-        if (dropData?.tag?.templateType) {
-          // Узел с данными
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
-            labels: dropData.labels,
-            tag: { ...dropData.tag, nodeId: dropData.hashCode() },
-          });
-        } else if (dropData?.tag?.textTemplateType) {
-          // Узел с текстом
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
-            labels: dropData.labels,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-              fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
-            },
-          });
-        } else if (dropData?.tag?.isAspectRatio) {
-          // Узел с картинкой
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: dropData.style,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-            },
-          });
-        } else {
-          // Обычный узел
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.dndShapeNode.template),
-            labels: dropData.labels,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-            },
-          });
-        }
-        const nodePosition = new Rect(
-          dropLocation.x - (dropData.layout.width / 2),
-          dropLocation.y - (dropData.layout.height / 2),
-          dropData.layout.width,
-          dropData.layout.height,
-        );
-        graph.setNodeLayout(createdNode, nodePosition);
-        return createdNode;
-      },
+      ) => this.nodeCreator({
+        context,
+        graph,
+        dropData,
+        dropTarget,
+        dropLocation,
+      }),
     });
   }
 
@@ -2080,7 +2158,6 @@ class ConstructorSchemesClass {
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
     }
-    console.log(updatedData);
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
