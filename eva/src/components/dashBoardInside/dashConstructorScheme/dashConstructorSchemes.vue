@@ -486,7 +486,8 @@
     <modal-confirm
       v-model="isConfirmModal"
       :theme="theme"
-      :modal-text="`Все изображения на визуализации будут удалены. Продолжить ?`"
+      :modal-text="`Все изображения и связанные с ними линии
+      на визуализации будут удалены. Продолжить ?`"
       btn-confirm-text="Да"
       btn-cancel-text="Нет"
       @result="startSearch"
