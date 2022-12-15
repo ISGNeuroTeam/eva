@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added display of data object id under the object selection select on constructorSchemes.
 - Added fitGraph button on constructorSchemes
 - Added change background size data-node on constructorSchemes
+- Added copy\paste fn for ConstructorSchemes
 
 ### Changed
 

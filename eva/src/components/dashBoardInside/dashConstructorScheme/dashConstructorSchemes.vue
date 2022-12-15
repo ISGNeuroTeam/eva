@@ -476,9 +476,11 @@
       />
     </div>
     <!--The GraphComponent-->
-    <div
+    <component
+      :is="'div'"
       ref="graphComponent"
       class="dash-constructor-schemes__graph-component"
+      @keyup.ctrl="copyPaste"
     />
   </div>
 </template>
@@ -1019,6 +1021,18 @@ export default {
       this.$nextTick().then(() => {
         this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
       });
+    },
+    copyPaste(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      // ctrl + c
+      if (e.keyCode === 67) {
+        this.constructorSchemes.copyElement();
+      }
+      // ctrl + v
+      if (e.keyCode === 86) {
+        this.constructorSchemes.pasteElement();
+      }
     },
     fitGraphContent() {
       this.constructorSchemes.fitGraphContent();
