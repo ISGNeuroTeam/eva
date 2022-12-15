@@ -24,8 +24,7 @@
       ref="tree"
       :items.sync="treeItems"
       :dark="isDarkTheme"
-      :search="`roles-${filterText}`"
-      :filter="filterFunction"
+      :search="filterText"
       :load-children="loadGroupChildren"
       item-key="treeId"
       item-disabled="editable"
@@ -278,6 +277,14 @@ export default {
       return this.$store.state.app.roles.map((item) => item.name);
     },
     treeItems() {
+      const filterByRole = (list) => list
+        .filter(({ roles }) => !roles?.length || roles.some((role) => this.roleList.includes(role)))
+        .map((item) => {
+          if (item.children) {
+            item.children = filterByRole(item.children);
+          }
+          return item;
+        });
       return [
         {
           type: 'categories',
@@ -285,7 +292,9 @@ export default {
           name: 'Категории',
           icon: this.iconFolderCategory,
           editable: false,
-          children: this.treeCategories,
+          children: this.isAdmin
+            ? this.treeCategories
+            : filterByRole(structuredClone(this.treeCategories)),
         },
         // @todo: в следующей серии - Избранные дашборды
         /* {
@@ -329,22 +338,6 @@ export default {
       'pushCategoryItem',
       'removeCategoryItem',
     ]),
-    filterFunction(item, text, fieldName) {
-      const searchByText = () => ['dash', 'group', 'custom-group'].includes(item.type)
-          && item[fieldName].toLowerCase().indexOf(`${this.filterText}`.toLowerCase()) > -1;
-
-      // @todo: проверить функию поиска [test]
-      const accessByRole = () => !!item.roles
-        && item.roles.some((role) => this.roleList.includes(role));
-
-      if (this.filterText) {
-        return searchByText() && (accessByRole() || this.isAdmin || item.type === 'dash');
-      }
-      if (accessByRole() || this.isAdmin) {
-        return true;
-      }
-      return ['favorites', 'groups'].includes(item.type);
-    },
     async onUpdateActive(treeId) {
       const categoryItem = await this.getTreeCategoryItem({ id: treeId[0], idParam: 'treeId' });
       const item = categoryItem || await this.getTreeGroupItem({ id: treeId[0], idParam: 'treeId' });

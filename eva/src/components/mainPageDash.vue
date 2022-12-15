@@ -172,7 +172,7 @@
                       :key="n"
                       class="dash-group"
                       type="card"
-                    ></v-skeleton-loader>
+                    />
                   </template>
                   <v-card
                     v-for="(dash, i) in allDashs"
