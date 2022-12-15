@@ -276,7 +276,28 @@ class ConstructorSchemesClass {
             fill="#E0E0EC"
         />
     </defs>
+    <template v-if="tag.widthLeft > 0">
     <!--Bg-left-->
+    <rect
+        x="0"
+        y="0"
+        :width="layout.width * (tag.widthLeft / 100)"
+        :height="layout.height"
+        fill="#FFFFFF"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    <!--Bg-right-->
+    <rect
+        :x="layout.width * (tag.widthLeft / 100)"
+        y="0"
+        :width="layout.width - (layout.width * (tag.widthLeft / 100))"
+        :height="layout.height"
+        fill="#000000"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    </template>
+    <template v-else>
+     <!--Bg-left-->
     <rect
         x="0"
         y="0"
@@ -294,6 +315,7 @@ class ConstructorSchemesClass {
         fill="#000000"
         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
     />
+    </template>
     <template v-if="tag && tag.items && tag.items.length > 0">
         <template v-for="(item, index) in tag.items">
             <text
@@ -338,26 +360,27 @@ class ConstructorSchemesClass {
         // в дальнейшем должен приходить с сервера
         dataType: '0',
         templateType: 'template-0',
+        widthLeft: 50,
         items: [
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
         ],
       },
@@ -386,24 +409,47 @@ class ConstructorSchemesClass {
            fill="#E0E0EC" 
          />
         </defs>
-        <!--Bg-left-->
-        <rect
-         x="0"
-         y="0"
-         :width="layout.width / 3"
-         :height="layout.height"
-         fill="#FFFFFF"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
-        <!--Bg-right-->
-        <rect
-         :x="layout.width / 3"
-         y="0"
-         :width="((layout.width / 3) * 2)"
-         :height="layout.height"
-         fill="#000000"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
+        <template v-if="tag.widthLeft > 0">
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width * (tag.widthLeft / 100)"
+           :height="layout.height"
+           fill="#FFFFFF"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+          <!--Bg-right-->
+          <rect
+           :x="layout.width * (tag.widthLeft / 100)"
+           y="0"
+           :width="layout.width - (layout.width * (tag.widthLeft / 100))"
+           :height="layout.height"
+           fill="#000000"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+        </template>
+        <template v-else>
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width / 3"
+           :height="layout.height"
+           fill="#FFFFFF"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+          <!--Bg-right-->
+          <rect
+           :x="layout.width / 3"
+           y="0"
+           :width="((layout.width / 3) * 2)"
+           :height="layout.height"
+           fill="#000000"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+        </template>
+        
         <template v-if="tag && tag.items && tag.items.length > 0">
          <template
           v-for="(item, index) in tag.items"
@@ -449,16 +495,17 @@ class ConstructorSchemesClass {
         dataType: '1',
         nodeId: 'template-1',
         templateType: 'template-1',
+        widthLeft: 30,
         items: [
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
         ],
       },
@@ -530,8 +577,8 @@ class ConstructorSchemesClass {
         nodeId: 'template-2',
         templateType: 'template-2',
         id: '',
-        textFirst: 'Value',
-        textSecond: 'Label',
+        textFirst: '-',
+        textSecond: '-',
       },
     },
     // TemplateType: template-3
@@ -602,8 +649,8 @@ class ConstructorSchemesClass {
         nodeId: 'template-3',
         templateType: 'template-3',
         id: '',
-        textFirst: 'Value',
-        textSecond: 'Label',
+        textFirst: '-',
+        textSecond: '-',
       },
     },
     // TemplateType: template-4
@@ -1089,6 +1136,7 @@ class ConstructorSchemesClass {
     this.initializeIO();
     if (this.savedGraph) {
       this.loadGraph().then(() => {
+        this.updateDataNodeTemplate();
         // Выравнивание графа, инициализация dnd панели
         this.updateViewport().then(() => {
           this.dndPanelElem = dndPanelElem;
@@ -1154,6 +1202,33 @@ class ConstructorSchemesClass {
       ICommand.OPEN.execute(null, this.graphComponent);
       resolve();
     });
+  }
+
+  updateDataNodeTemplate() {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node.tag.templateType) {
+        if ((node.tag.dataType === '0' || node.tag.dataType === '1') && !node.tag?.widthLeft) {
+          node.tag = {
+            ...node.tag,
+            widthLeft: this.getDefaultDataNodeParams(node.tag.dataType, 'widthLeft'),
+          };
+        }
+        this.graphComponent.graph.setStyle(
+          node,
+          new VuejsNodeStyle(this.getDataNodeTemplate(node.tag.templateType)),
+        );
+      }
+    });
+  }
+
+  getDefaultDataNodeParams(dataType, fieldName) {
+    try {
+      const defaultOptions = this.dndDataPanelItems
+        .find((item) => item?.dataRest?.dataType === dataType);
+      return defaultOptions.dataRest[fieldName];
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   // Load from LocalStorage to Store
@@ -2126,6 +2201,7 @@ class ConstructorSchemesClass {
     const dataType = this.targetDataNode.tag?.dataType;
     if (dataType === '0' || dataType === '1') {
       updatedData = {
+        widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
           ...item,
           textLeft: this.getDataItemById(item.id)?.Description || '-',
@@ -2222,6 +2298,12 @@ class ConstructorSchemesClass {
 
   updateDataRest(updatedData) {
     this.dataRest = updatedData;
+  }
+
+  fitGraphContent() {
+    this.graphComponent.fitGraphBounds().then(() => {
+      this.graphComponent.updateVisual();
+    });
   }
 }
 
