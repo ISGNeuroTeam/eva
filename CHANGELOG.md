@@ -14,8 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added copy\paste fn for ConstructorSchemes
 
 ### Changed
+- Home group selection now has a filter
 
 ### Fixed
+- Bug when home group does not exist
 
 ## [1.115.0]
 
