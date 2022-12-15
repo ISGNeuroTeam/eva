@@ -214,6 +214,8 @@ class ConstructorSchemesClass {
     };
   }
 
+  defaultDataSource = []
+
   // Main constructor options
   options = {
     defaultNodeSize: [150, 150],
@@ -924,6 +926,14 @@ class ConstructorSchemesClass {
       id: 4,
     },
   ]
+
+  get defaultDataSource() {
+    return this.defaultDataSource;
+  }
+
+  set defaultDataSource(value) {
+    this.defaultDataSource = value;
+  }
 
   get getShapeNodeStyleList() {
     return this.shapeNodeStyleList;
@@ -1967,22 +1977,21 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
-        const GenerateIconsClass = new GenerateIcons({
+        this.getIconsListForGraph({
+          iconsList,
           maxItemSize: this.dragAndDropPanel.getMaxItemWidth,
-          // Временный вариант, заменить на внешнее значение
           minItemSize: 150,
-        });
-        const filteredIconList = [];
-        Promise.all(iconsList.map(async (icon) => {
-          const response = await fetch(`/svg/${icon}.svg`);
-          if (response.ok) {
-            filteredIconList.push(icon);
-          }
-        })).then(() => {
-          GenerateIconsClass.generateIconNodes(filteredIconList).then((result) => {
-            items.push(...result);
-            resolve(items);
+        }).then((result) => {
+          result.forEach((item) => {
+            items.push(
+              new DragAndDropPanelItem(
+                item.icon.node,
+                item.icon.tooltip,
+                item.icon.dataType,
+              ),
+            );
           });
+          resolve(items);
         });
       } else {
         resolve(items);
@@ -2145,6 +2154,55 @@ class ConstructorSchemesClass {
 
   updateDataRest(updatedData) {
     this.dataRest = updatedData;
+  }
+
+  deleteAllImageNode() {
+    return new Promise((resolve, reject) => {
+      try {
+        this.graphComponent.graph.nodes.toArray().forEach((node) => {
+          if (node.tag.dataType === 'image-node') {
+            this.graphComponent.graph.remove(node);
+          }
+        });
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  buildGraph(dataSource) {
+    this.defaultDataSource = dataSource;
+    this.deleteAllImageNode().then(() => {
+      this.defaultDataSource.forEach(() => {
+      });
+    });
+  }
+
+  // iconsList:Array<string>, maxItemSize:number, minItemSize:number
+  getIconsListForGraph({ iconsList, maxItemSize, minItemSize }) {
+    return new Promise((resolve) => {
+      const GenerateIconsClass = new GenerateIcons({
+        maxItemSize,
+        // Временный вариант, заменить на внешнее значение
+        minItemSize,
+      });
+      const resultList = [];
+      GenerateIconsClass.generateIconNodes(iconsList).then((result) => {
+        resultList.push(...result);
+        resolve(resultList);
+      });
+      // const loadedIconsList = [];
+      // const resultList = [];
+      // Promise.all(iconsList.map(async (item) => {
+      //   const response = await fetch(`/svg/${item.icon}.svg`);
+      //   if (response.ok) {
+      //     loadedIconsList.push(item);
+      //   }
+      // })).then(() => {
+      //
+      // });
+    });
   }
 }
 
