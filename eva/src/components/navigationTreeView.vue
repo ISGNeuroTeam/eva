@@ -82,24 +82,12 @@
                 })"
               />
             </v-col>
-            <v-col>
-              <v-text-field
-                v-if="item.type !== 'custom-group'"
-                :value="item.name"
-                placeholder="Название"
-                dense
-                outlined
-                hide-details
-                @change="setCategoryItem({
-                  treeId: item.treeId,
-                  props: { name: $event },
-                })"
-              />
+            <v-col v-if="item.type === 'custom-group'">
               <v-autocomplete
-                v-else
                 :value="item.group"
                 :items="treeGroups"
                 item-text="name"
+                item-value="id"
                 return-object
                 placeholder="Выберите группу дашбордов"
                 persistent-placeholder
@@ -108,7 +96,27 @@
                 hide-details
                 @change="setCategoryItem({
                   treeId: item.treeId,
-                  props: { group: $event },
+                  props: {
+                    group: {
+                      id: $event.id,
+                      name: $event.name,
+                    },
+                    id: $event.id,
+                    name: $event.name,
+                  },
+                })"
+              />
+            </v-col>
+            <v-col>
+              <v-text-field
+                :value="item.name"
+                placeholder="Название"
+                dense
+                outlined
+                hide-details
+                @change="setCategoryItem({
+                  treeId: item.treeId,
+                  props: { name: $event },
                 })"
               />
             </v-col>
@@ -433,13 +441,17 @@ export default {
       if (item.type === 'custom-group') {
         if (item.group) {
           props.id = item.group.id;
-          props.name = item.group.name;
+          if (!item.name) {
+            props.name = item.group.name;
+          }
         }
       } else if (item.type === 'dash') {
         props.id = +item.dash;
         props.children = undefined;
+        if (!item.name) {
+          props.name = `Дашборд ${item.dash}`;
+        }
       }
-      props.group = undefined;
 
       this.setCategoryItem({
         treeId: item.treeId,
