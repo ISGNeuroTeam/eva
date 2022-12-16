@@ -65,7 +65,7 @@
             </v-icon>
           </div>
         </template>
-        <v-list>
+        <v-list class="menu-dropdown">
           <v-list-item
             v-for="item in periodItemsSelect"
             :key="item.value"
@@ -274,7 +274,8 @@ export default {
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
           tooltip.html(`Событий (${d.value})<br>${d.time}`);
-          tooltip.style('display', 'block');
+          tooltip.style('display', 'block')
+            .style('color', this.theme.$main_text);
           return tooltip.style('visibility', 'visible');
         })
         .on('mousemove', () => tooltip
@@ -291,6 +292,8 @@ export default {
 @import './../../sass/_colors'
 .timeline
   padding: 0 30px
+.menu-dropdown
+  background-color: var(--main_bg)
 .select-wrap
   display: flex
   justify-content: space-between
