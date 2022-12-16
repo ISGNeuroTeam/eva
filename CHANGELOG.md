@@ -9,10 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Customizable sections in the navigation menu
+- Added display of data object id under the object selection select on constructorSchemes.
+- Added fitGraph button on constructorSchemes
+- Added change background size data-node on constructorSchemes
+- Added copy\paste fn for ConstructorSchemes
+- Added token interaction with filter
 
 ### Changed
+- Home group selection now has a filter
 
 ### Fixed
+- Bug when home group does not exist
 
 ## [1.115.0]
 
