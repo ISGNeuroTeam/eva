@@ -2,8 +2,8 @@
 
 ### Added
 - Customizable sections in the navigation menu
-- Added display of data object id under the object selection select on constructorSchemes.
-- Added fitGraph button on constructorSchemes
+- Added display of data object id under the object selection select on constructor schemes
+- Added fitGraph button on constructor schemes
 - Added change background size data-node on constructorSchemes
 - Added copy\paste fn for ConstructorSchemes
 - Added token interaction with filter
