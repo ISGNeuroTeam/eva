@@ -445,7 +445,11 @@ export default {
         }
       } else if (this.$route.query?.home) {
         const homeGroupId = this.allGroups.find((group) => group.name === this.$route.query?.home);
-        this.getDash(homeGroupId);
+        if (homeGroupId) {
+          this.getDash(homeGroupId);
+        } else {
+          this.tab = 'tab-1';
+        }
       }
     });
 
