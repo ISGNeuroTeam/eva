@@ -370,6 +370,7 @@ export default {
     removeFromList(id) {
       if (id === this.userId) {
         this.$store.dispatch('auth/logout');
+        this.$store.dispatch('app/resetState');
       } else {
         this.originData = this.originData.filter((item) => item.id !== id);
       }
