@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Bug when home group does not exist
 - Background color for time selection in the searching reporting and tooltip text color in dark theme
+- Disabled "cut" method on constructor-schemes as it did not work correctly
 
 ## [1.115.0]
 
