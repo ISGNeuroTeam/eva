@@ -176,6 +176,7 @@ import {
   mdiScriptTextOutline,
   mdiCloudUpload,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 import EvaLogo from '../images/eva-logo.svg';
 
 export default {
@@ -225,12 +226,15 @@ export default {
           onClick: this.exit,
         },
       ],
-      userPermissions: null,
       loadSvg: false,
       mdiCloudUpload,
     };
   },
   computed: {
+    ...mapGetters('auth', [
+      'isAdmin',
+      'permissions',
+    ]),
     getColorError() {
       if (!this.$store.state.logError) {
         this.$store.commit('setState', [
@@ -248,11 +252,6 @@ export default {
     },
     theme() {
       return this.$store.getters.getTheme;
-    },
-    isAdmin() {
-      return !!(
-        this.userPermissions && this.userPermissions.includes('admin_all')
-      );
     },
     login() {
       return this.$store.getters['auth/userName'];
@@ -286,7 +285,7 @@ export default {
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
             permissions = res.data;
-            this.userPermissions = permissions;
+            this.$store.commit('auth/permissions', permissions);
             this.$emit('permissions', permissions);
             this.$emit('setUsername', this.login);
             this.$emit('checkOver');
@@ -298,6 +297,7 @@ export default {
     },
     exit() {
       this.$store.dispatch('auth/logout');
+      this.$store.dispatch('app/resetState');
       document.title = 'EVA';
     },
     edit() {

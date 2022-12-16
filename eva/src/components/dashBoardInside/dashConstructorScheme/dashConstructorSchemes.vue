@@ -50,6 +50,24 @@
           </template>
           <span>Панель настроек</span>
         </v-tooltip>
+        <v-tooltip
+          bottom
+          :color="theme.$accent_ui_color"
+        >
+          <template v-slot:activator="{ on }">
+            <div class="pa-2 d-flex">
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+                v-on="on"
+                @click="fitGraphContent"
+              >
+                {{ fitToPage }}
+              </v-icon>
+            </div>
+          </template>
+          <span>Выровнять по центру</span>
+        </v-tooltip>
         <template v-if="dataSelectedNode">
           <v-tooltip
             bottom
@@ -458,16 +476,18 @@
       />
     </div>
     <!--The GraphComponent-->
-    <div
+    <component
+      :is="'div'"
       ref="graphComponent"
       class="dash-constructor-schemes__graph-component"
+      @keyup.ctrl="copyPaste"
     />
   </div>
 </template>
 
 <script>
 import {
-  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp,
+  mdiArrowDown, mdiArrowUp, mdiClose, mdiSettings, mdiHelp, mdiFitToPageOutline,
 } from '@mdi/js';
 import BringForward from '../../../images/bring_forward.svg';
 import BringToFront from '../../../images/bring_to_front.svg';
@@ -520,6 +540,7 @@ export default {
       iconArrowUp: '/icons/OrderIcons/bring_to_front.svg',
       arrowDown: mdiArrowDown,
       iconHelp: mdiHelp,
+      fitToPage: mdiFitToPageOutline,
       dndPanel: false,
       dataPanel: false,
       nodeBgColorPopup: false,
@@ -1000,6 +1021,21 @@ export default {
       this.$nextTick().then(() => {
         this.panelBottomOffset = this.isKeymapOpen ? this.$refs.keymap.$el.clientHeight + 5 : 10;
       });
+    },
+    copyPaste(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      // ctrl + c
+      if (e.keyCode === 67) {
+        this.constructorSchemes.copyElement();
+      }
+      // ctrl + v
+      if (e.keyCode === 86) {
+        this.constructorSchemes.pasteElement();
+      }
+    },
+    fitGraphContent() {
+      this.constructorSchemes.fitGraphContent();
     },
   },
 };
