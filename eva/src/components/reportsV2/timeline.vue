@@ -293,7 +293,7 @@ export default {
 .timeline
   padding: 0 30px
 .menu-dropdown
-  background-color: var(--main_bg)
+  background-color: var(--main_bg) !important
 .select-wrap
   display: flex
   justify-content: space-between
