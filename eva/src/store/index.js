@@ -1140,15 +1140,7 @@ export default new Vuex.Store({
       let { tws } = search.parametrs;
       let { twf } = search.parametrs;
       let reg = null;
-      if (state[idDash].filters) {
-        Object.values(state[idDash].filters).forEach((filter) => {
-          reg = new RegExp(`\\$${filter.id}\\$`, 'g');
-          if (otl.indexOf(`$${filter.id}$`) !== -1) {
-            const filterOtlText = filterCompile(filter);
-            otl = otl.replace(reg, filterOtlText);
-          }
-        });
-      }
+
       if (otl.indexOf('$evaTknLogin$') !== -1) {
         if (Vue.$jwt.hasToken()) {
           otl = otl.replaceAll('$evaTknLogin$', Vue.$jwt.decode().username);
@@ -1208,6 +1200,15 @@ export default new Vuex.Store({
                 twf = state[idDash].tockens[item].value;
               }
             }
+          }
+        });
+      }
+      if (state[idDash].filters) {
+        Object.values(state[idDash].filters).forEach((filter) => {
+          reg = new RegExp(`\\$${filter.id}\\$`, 'g');
+          if (otl.indexOf(`$${filter.id}$`) !== -1) {
+            const filterOtlText = filterCompile(filter);
+            otl = otl.replace(reg, filterOtlText);
           }
         });
       }
