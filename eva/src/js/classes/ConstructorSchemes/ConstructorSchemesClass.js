@@ -26,6 +26,8 @@ import yFiles, {
   INode,
   InteriorLabelModel,
   IPort,
+  IBend,
+  IModelItem,
   IReshapeHandler,
   KeyEventRecognizers,
   LabelDropInputMode,
@@ -276,7 +278,28 @@ class ConstructorSchemesClass {
             fill="#E0E0EC"
         />
     </defs>
+    <template v-if="tag.widthLeft > 0">
     <!--Bg-left-->
+    <rect
+        x="0"
+        y="0"
+        :width="layout.width * (tag.widthLeft / 100)"
+        :height="layout.height"
+        fill="#FFFFFF"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    <!--Bg-right-->
+    <rect
+        :x="layout.width * (tag.widthLeft / 100)"
+        y="0"
+        :width="layout.width - (layout.width * (tag.widthLeft / 100))"
+        :height="layout.height"
+        fill="#000000"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    </template>
+    <template v-else>
+     <!--Bg-left-->
     <rect
         x="0"
         y="0"
@@ -294,6 +317,7 @@ class ConstructorSchemesClass {
         fill="#000000"
         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
     />
+    </template>
     <template v-if="tag && tag.items && tag.items.length > 0">
         <template v-for="(item, index) in tag.items">
             <text
@@ -338,26 +362,27 @@ class ConstructorSchemesClass {
         // в дальнейшем должен приходить с сервера
         dataType: '0',
         templateType: 'template-0',
+        widthLeft: 50,
         items: [
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
         ],
       },
@@ -386,24 +411,47 @@ class ConstructorSchemesClass {
            fill="#E0E0EC" 
          />
         </defs>
-        <!--Bg-left-->
-        <rect
-         x="0"
-         y="0"
-         :width="layout.width / 3"
-         :height="layout.height"
-         fill="#FFFFFF"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
-        <!--Bg-right-->
-        <rect
-         :x="layout.width / 3"
-         y="0"
-         :width="((layout.width / 3) * 2)"
-         :height="layout.height"
-         fill="#000000"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
+        <template v-if="tag.widthLeft > 0">
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width * (tag.widthLeft / 100)"
+           :height="layout.height"
+           fill="#FFFFFF"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+          <!--Bg-right-->
+          <rect
+           :x="layout.width * (tag.widthLeft / 100)"
+           y="0"
+           :width="layout.width - (layout.width * (tag.widthLeft / 100))"
+           :height="layout.height"
+           fill="#000000"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+        </template>
+        <template v-else>
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width / 3"
+           :height="layout.height"
+           fill="#FFFFFF"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+          <!--Bg-right-->
+          <rect
+           :x="layout.width / 3"
+           y="0"
+           :width="((layout.width / 3) * 2)"
+           :height="layout.height"
+           fill="#000000"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+        </template>
+        
         <template v-if="tag && tag.items && tag.items.length > 0">
          <template
           v-for="(item, index) in tag.items"
@@ -449,16 +497,17 @@ class ConstructorSchemesClass {
         dataType: '1',
         nodeId: 'template-1',
         templateType: 'template-1',
+        widthLeft: 30,
         items: [
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
         ],
       },
@@ -530,8 +579,8 @@ class ConstructorSchemesClass {
         nodeId: 'template-2',
         templateType: 'template-2',
         id: '',
-        textFirst: 'Value',
-        textSecond: 'Label',
+        textFirst: '-',
+        textSecond: '-',
       },
     },
     // TemplateType: template-3
@@ -602,8 +651,8 @@ class ConstructorSchemesClass {
         nodeId: 'template-3',
         templateType: 'template-3',
         id: '',
-        textFirst: 'Value',
-        textSecond: 'Label',
+        textFirst: '-',
+        textSecond: '-',
       },
     },
     // TemplateType: template-4
@@ -831,7 +880,7 @@ class ConstructorSchemesClass {
         nodeId: 'label-template-0',
         id: '',
         textTemplateType: 'template-0',
-        text: 'Text Text Text Text Text Text Text ',
+        text: 'Text',
         isVertical: false,
         bordered: true,
         borderType: 'solid',
@@ -926,6 +975,8 @@ class ConstructorSchemesClass {
       id: 4,
     },
   ]
+
+  copiedElements = null
 
   get defaultDataSource() {
     return this.defaultDataSource;
@@ -1095,6 +1146,7 @@ class ConstructorSchemesClass {
     this.initializeIO();
     if (this.savedGraph) {
       this.loadGraph().then(() => {
+        this.updateDataNodeTemplate();
         // Выравнивание графа, инициализация dnd панели
         this.updateViewport().then(() => {
           this.dndPanelElem = dndPanelElem;
@@ -1139,6 +1191,7 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
+  // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
     this.saveGraphToLocalStorage().then(() => {
@@ -1159,6 +1212,33 @@ class ConstructorSchemesClass {
       ICommand.OPEN.execute(null, this.graphComponent);
       resolve();
     });
+  }
+
+  updateDataNodeTemplate() {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node.tag.templateType) {
+        if ((node.tag.dataType === '0' || node.tag.dataType === '1') && !node.tag?.widthLeft) {
+          node.tag = {
+            ...node.tag,
+            widthLeft: this.getDefaultDataNodeParams(node.tag.dataType, 'widthLeft'),
+          };
+        }
+        this.graphComponent.graph.setStyle(
+          node,
+          new VuejsNodeStyle(this.getDataNodeTemplate(node.tag.templateType)),
+        );
+      }
+    });
+  }
+
+  getDefaultDataNodeParams(dataType, fieldName) {
+    try {
+      const defaultOptions = this.dndDataPanelItems
+        .find((item) => item?.dataRest?.dataType === dataType);
+      return defaultOptions.dataRest[fieldName];
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   // Load from LocalStorage to Store
@@ -1298,7 +1378,7 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      // TODO: Починить функционал copy/paste/duplicate
+      // Выключены встроеные способы копирования т.к. работают не корректно, написан свой
       allowPaste: false,
       allowDuplicate: false,
       ignoreVoidStyles: true,
@@ -1445,70 +1525,143 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
+  getTemplateElementsForCopy(xOffset = 10, yOffset = 10) {
+    return this.graphComponent.selection.toArray().map((el) => {
+      // TODO: Пока сделано только для узлов
+      if (el instanceof INode) {
+        const node = {
+          location: {
+            x: el.layout.x + xOffset,
+            y: el.layout.y + yOffset,
+          },
+          layout: {
+            width: el.layout.width,
+            height: el.layout.height,
+          },
+          labels: el.labels,
+          id: el.hashCode(),
+          tag: el.tag,
+        };
+        if (el.tag.dataType === 'image-node') {
+          return {
+            ...node,
+            style: el.style.clone(),
+          };
+        }
+        return node;
+      }
+      return null;
+    }).filter((el) => el !== null);
+  }
+
+  copyElement() {
+    // Очищаем ранее скопированные элементы
+    this.copiedElements = null;
+    // Сохраняем новые
+    this.copiedElements = this.getTemplateElementsForCopy();
+  }
+
+  async pasteElement() {
+    if (this.copiedElements?.length > 0) {
+      this.graphComponent.selection.clear();
+      await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
+        graph: this.graphComponent.graph,
+        dropData: element,
+        dropLocation: element?.location,
+        isNewNode: false,
+      }))).then((createdElements) => {
+        createdElements.forEach((el) => {
+          this.graphComponent.inputMode.setSelected(el, true);
+          this.copyElement();
+        });
+        this.graphComponent.updateVisual();
+      });
+    }
+  }
+
+  async nodeCreator({
+    context,
+    graph,
+    dropData,
+    dropTarget,
+    dropLocation,
+    isCopiedElement = false,
+  }) {
+    let createdNode = null;
+    if (dropData?.tag?.templateType) {
+      // Узел с данными
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else if (dropData?.tag?.textTemplateType) {
+      // Узел с текстом
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else if (dropData?.tag?.isAspectRatio) {
+      // Узел с картинкой
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: dropData.style,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else {
+      // Обычный узел
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.dndShapeNode.template),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    }
+    const nodePosition = new Rect(
+      isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
+      isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
+      dropData.layout.width,
+      dropData.layout.height,
+    );
+    createdNode.tag.nodeId = createdNode.hashCode();
+    graph.setNodeLayout(createdNode, nodePosition);
+    return createdNode;
+  }
+
   settingsNodeDropInputMode() {
     return new NodeDropInputMode({
       showPreview: true,
       snappingEnabled: false,
       enabled: true,
-      itemCreator: async (
+      itemCreator: (
         context,
         graph,
         dropData,
         dropTarget,
         dropLocation,
-      ) => {
-        let createdNode = null;
-        if (dropData?.tag?.templateType) {
-          // Узел с данными
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
-            labels: dropData.labels,
-            tag: { ...dropData.tag, nodeId: dropData.hashCode() },
-          });
-        } else if (dropData?.tag?.textTemplateType) {
-          // Узел с текстом
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
-            labels: dropData.labels,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-              fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
-            },
-          });
-        } else if (dropData?.tag?.isAspectRatio) {
-          // Узел с картинкой
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: dropData.style,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-            },
-          });
-        } else {
-          // Обычный узел
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.dndShapeNode.template),
-            labels: dropData.labels,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-            },
-          });
-        }
-        const nodePosition = new Rect(
-          dropLocation.x - (dropData.layout.width / 2),
-          dropLocation.y - (dropData.layout.height / 2),
-          dropData.layout.width,
-          dropData.layout.height,
-        );
-        graph.setNodeLayout(createdNode, nodePosition);
-        return createdNode;
-      },
+      ) => this.nodeCreator({
+        context,
+        graph,
+        dropData,
+        dropTarget,
+        dropLocation,
+      }),
     });
   }
 
@@ -2069,6 +2222,7 @@ class ConstructorSchemesClass {
     const dataType = this.targetDataNode.tag?.dataType;
     if (dataType === '0' || dataType === '1') {
       updatedData = {
+        widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
           ...item,
           textLeft: this.getDataItemById(item.id)?.Description || '-',
@@ -2101,7 +2255,6 @@ class ConstructorSchemesClass {
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
     }
-    console.log(updatedData);
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
@@ -2166,6 +2319,12 @@ class ConstructorSchemesClass {
 
   updateDataRest(updatedData) {
     this.dataRest = updatedData;
+  }
+
+  fitGraphContent() {
+    this.graphComponent.fitGraphBounds().then(() => {
+      this.graphComponent.updateVisual();
+    });
   }
 
   deleteAllImageNode() {

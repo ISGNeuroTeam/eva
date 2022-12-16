@@ -114,12 +114,13 @@
             clearable
             @input="toggleIsChanged"
           />
-          <v-select
+          <v-autocomplete
             v-model="homePage"
-            :items="['', ...dataRest.groups]"
+            :items="[{text:'--Нет--', value: ''}, ...dataRest.groups]"
             class="field-profile"
             label="Значение для группы по умолчанию"
             :style="{ color: theme.$main_text }"
+            outlined
           />
           <data-profile
             v-for="item in Object.keys(user.tab)"
