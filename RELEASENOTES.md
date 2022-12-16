@@ -1,3 +1,20 @@
+# [1.116.0] - 2022-12-16
+
+### Added
+- Customizable sections in the navigation menu
+- Added display of data object id under the object selection select on constructorSchemes.
+- Added fitGraph button on constructorSchemes
+- Added change background size data-node on constructorSchemes
+- Added copy\paste fn for ConstructorSchemes
+- Added token interaction with filter
+
+### Changed
+- Home group selection now has a filter
+
+### Fixed
+- Bug when home group does not exist
+- Background color for time selection in the searching reporting and tooltip text color in dark theme
+
 # [1.115.0] - 2022-12-08
 
 ### Added
