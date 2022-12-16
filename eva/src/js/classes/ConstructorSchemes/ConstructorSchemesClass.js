@@ -1372,6 +1372,7 @@ class ConstructorSchemesClass {
       allowPaste: false,
       allowDuplicate: false,
       ignoreVoidStyles: true,
+      allowClipboardOperations: false,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
         nodeToNodeDistance: 10,
