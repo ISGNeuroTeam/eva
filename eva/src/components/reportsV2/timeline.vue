@@ -259,7 +259,7 @@ export default {
       const rectPadding = 10;
 
       const tooltip = d3
-        .select('body')
+        .select('.v-application')
         .append('div')
         .attr('class', 'block-tooltip')
         .style('position', 'absolute')
@@ -274,12 +274,11 @@ export default {
         .attr('fill', 'rgba(76, 217, 100, 0.7)')
         .on('mouseover', (d) => {
           tooltip.html(`Событий (${d.value})<br>${d.time}`);
-          tooltip.style('display', 'block')
-            .style('color', this.theme.$main_text);
+          tooltip.style('display', 'block');
           return tooltip.style('visibility', 'visible');
         })
         .on('mousemove', () => tooltip
-          .style('top', `${d3.event.pageY - 60}px`)
+          .style('top', `${d3.event.pageY - 70}px`)
           .style('left', `${d3.event.pageX - 10}px`))
         .on('mouseout', () => tooltip.style('visibility', 'hidden'));
     },
@@ -320,11 +319,15 @@ export default {
 
 .container-chart
   margin: auto
+</style>
+<style lang="sass">
 .block-tooltip
   pointer-events: none
   display: none
   padding: 6px
-  background: #FFFFFF
+  background: var(--main_bg) !important
+  color: var(--main_text) !important
+  border: 1px solid var(--main_border)
   box-shadow: 0px 4px 6px rgba(142, 141, 158, 0.25), 0px 1px 2px rgba(142, 141, 158, 0.4)
   border-radius: 6px
 </style>
