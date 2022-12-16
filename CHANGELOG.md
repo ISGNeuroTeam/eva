@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.116.0]
+
+### Added
 - Customizable sections in the navigation menu
 - Added display of data object id under the object selection select on constructorSchemes.
 - Added fitGraph button on constructorSchemes
