@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiline: added setting to show ticks on x-axis by points
 
 ### Changed
+- Changed the filtering logic in the navigation tree
 
 ### Fixed
 
