@@ -26,6 +26,8 @@ import yFiles, {
   INode,
   InteriorLabelModel,
   IPort,
+  IBend,
+  IModelItem,
   IReshapeHandler,
   KeyEventRecognizers,
   LabelDropInputMode,
@@ -50,10 +52,9 @@ import yFiles, {
   SimplePort,
   FreeNodePortLocationModel,
   GraphViewerInputMode,
-  Stroke,
 } from 'yfiles';
 
-import { throttle } from '../../utils/throttle';
+import { throttle } from '@/js/utils/throttle';
 import licenseData from '../../../license/license.json';
 import { DragAndDropPanel, DragAndDropPanelItem } from './DnDPanelClass';
 import HtmlLabelStyle from './HtmlLabelStyles';
@@ -61,10 +62,9 @@ import VuejsNodeStyle from './VueNodeStyle.js';
 import { EdgePathPortCandidateProvider } from './EdgePathPortCandidateProvider';
 import VuejsNodeStyleMarkupExtension from './VuejsNodeStyleMarkupExtension.js';
 import EdgeDropInputMode from './EdgeDropInputModeClass';
+import GenerateIcons from './GenerateIcons.js';
 
 License.value = licenseData; // Проверка лицензии
-
-const regexpSize = /<svg width="(?<width>.*?)" height="(?<height>.*?)"/;
 
 class ConstructorSchemesClass {
   static async webGl2CreateNode({
@@ -105,45 +105,6 @@ class ConstructorSchemesClass {
       rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
       rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
     };
-  }
-
-  static async getSvgLayoutSize(iconUrl) {
-    return fetch(iconUrl)
-      .then((response) => response.body)
-      .then((rb) => {
-        const reader = rb.getReader();
-
-        return new ReadableStream({
-          start(controller) {
-            // The following function handles each data chunk
-            function push() {
-              // "done" is a Boolean and value a "Uint8Array"
-              reader.read()
-                .then(({ done, value }) => {
-                  // If there is no more data to read
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  // Get the data and send it to the browser via the controller
-                  controller.enqueue(value);
-                  push();
-                });
-            }
-
-            push();
-          },
-        });
-      })
-      .then((stream) => new Response(
-        stream,
-        {
-          headers: {
-            'Content-Type': 'text/html',
-          },
-        },
-      ).text())
-      .then((svgText) => svgText.match(regexpSize).groups);
   }
 
   static removeClass(e, className) {
@@ -293,84 +254,104 @@ class ConstructorSchemesClass {
     // Frame-1376
     {
       template: `<g class="b-data-node">
-        <!--Area-->
-        <defs>
-         <!--Border-radius-bg-->
-         <clipPath :id="'border-radius-' + tag.nodeId">
-           <rect 
-             x="0" 
-             y="0" 
-             :width="layout.width" 
-             :height="layout.height" 
-             fill="transparent" 
-             rx="3" 
-             ry="3" 
-           />
-         </clipPath>
-         <!--Separator-line-->
-         <rect 
-           :id="'separator-line-' + tag.nodeId"
-           :width="layout.width" 
-           height="1" 
-           fill="#E0E0EC" 
-         />
-        </defs>
-        <!--Bg-left-->
+    <!--Area-->
+    <defs>
+        <!--Border-radius-bg-->
+        <clipPath :id="'border-radius-' + tag.nodeId">
+            <rect
+                x="0"
+                y="0"
+                :width="layout.width"
+                :height="layout.height"
+                fill="transparent"
+                rx="3"
+                ry="3"
+            />
+        </clipPath>
+        <!--Separator-line-->
         <rect
-         x="0"
-         y="0"
-         :width="layout.width / 2"
-         :height="layout.height"
-         fill="#FFFFFF"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+            :id="'separator-line-' + tag.nodeId"
+            :width="layout.width"
+            height="1"
+            fill="#E0E0EC"
         />
-        <!--Bg-right-->
-        <rect
-         :x="layout.width / 2"
-         y="0"
-         :width="layout.width / 2"
-         :height="layout.height"
-         fill="#000000"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
-        <template v-if="tag && tag.items && tag.items.length > 0">
-         <template
-          v-for="(item, index) in tag.items"
-         >
-           <text
-            dx="0.5em"
-            class="b-data-node__text b-data-node__text--left"
-            fill="#3C3B45"
-            :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
-            alignment-baseline="middle"
-            :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
-            :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
-           >
-             {{ item.textLeft }}
-           </text>
-           <text
-             text-anchor="end"
-             :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
-             alignment-baseline="middle"
-             :dx="(layout.width / 2) - 1"
-             class="b-data-node__text b-data-node__text--right"
-             :transform="'translate(' + (layout.width - 8) / 2 + ')'"
-             fill="white"
-             :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
-             :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
-           >
-             {{ item.textRight }}
-           </text>
-           <use
-            v-if="index < (tag.items.length - 1)"
-            :href="'#separator-line-' + tag.nodeId"
-            x="0" 
-            :y="(layout.height / tag.items.length) * (index + 1)"
-            :key="'row-' + tag.nodeId + '-' + index + '-separator'"
-           />
-         </template>
+    </defs>
+    <template v-if="tag.widthLeft > 0">
+    <!--Bg-left-->
+    <rect
+        x="0"
+        y="0"
+        :width="layout.width * (tag.widthLeft / 100)"
+        :height="layout.height"
+        fill="#FFFFFF"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    <!--Bg-right-->
+    <rect
+        :x="layout.width * (tag.widthLeft / 100)"
+        y="0"
+        :width="layout.width - (layout.width * (tag.widthLeft / 100))"
+        :height="layout.height"
+        fill="#000000"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    </template>
+    <template v-else>
+     <!--Bg-left-->
+    <rect
+        x="0"
+        y="0"
+        :width="layout.width / 2"
+        :height="layout.height"
+        fill="#FFFFFF"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    <!--Bg-right-->
+    <rect
+        :x="layout.width / 2"
+        y="0"
+        :width="layout.width / 2"
+        :height="layout.height"
+        fill="#000000"
+        :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+    />
+    </template>
+    <template v-if="tag && tag.items && tag.items.length > 0">
+        <template v-for="(item, index) in tag.items">
+            <text
+                dx="0.5em"
+                class="b-data-node__text b-data-node__text--left"
+                fill="#3C3B45"
+                :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
+                alignment-baseline="middle"
+                :key="'row-' + tag.nodeId + '-' + index + '-text-left'"
+                :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
+            >
+                {{ item.textLeft }}
+            </text>
+            <text
+                text-anchor="end"
+                :dy="(((layout.height / tag.items.length) * (index + 1)) - ((layout.height / tag.items.length) / 2))"
+                alignment-baseline="middle"
+                :dx="(layout.width / 2) - 1"
+                class="b-data-node__text b-data-node__text--right"
+                :transform="'translate(' + (layout.width - 8) / 2 + ')'"
+                fill="white"
+                :key="'row-' + tag.nodeId + '-' + index + '-text-right'"
+                :font-size="((layout.height / tag.items.length) * 0.8) + 'px'"
+            >
+                {{ item.textRight }}
+            </text>
+            <use
+                v-if="index < (tag.items.length - 1)"
+                :href="'#separator-line-' + tag.nodeId"
+                x="0"
+                :y="(layout.height / tag.items.length) * (index + 1)"
+                :key="'row-' + tag.nodeId + '-' + index + '-separator'"
+            />
         </template>
-        </g>`,
+    </template>
+</g>`,
       width: 150,
       rowHeight: 16,
       dataRest: {
@@ -379,26 +360,27 @@ class ConstructorSchemesClass {
         // в дальнейшем должен приходить с сервера
         dataType: '0',
         templateType: 'template-0',
+        widthLeft: 50,
         items: [
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
         ],
       },
@@ -427,24 +409,47 @@ class ConstructorSchemesClass {
            fill="#E0E0EC" 
          />
         </defs>
-        <!--Bg-left-->
-        <rect
-         x="0"
-         y="0"
-         :width="layout.width / 3"
-         :height="layout.height"
-         fill="#FFFFFF"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
-        <!--Bg-right-->
-        <rect
-         :x="layout.width / 3"
-         y="0"
-         :width="((layout.width / 3) * 2)"
-         :height="layout.height"
-         fill="#000000"
-         :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
-        />
+        <template v-if="tag.widthLeft > 0">
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width * (tag.widthLeft / 100)"
+           :height="layout.height"
+           fill="#FFFFFF"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+          <!--Bg-right-->
+          <rect
+           :x="layout.width * (tag.widthLeft / 100)"
+           y="0"
+           :width="layout.width - (layout.width * (tag.widthLeft / 100))"
+           :height="layout.height"
+           fill="#000000"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+        </template>
+        <template v-else>
+          <!--Bg-left-->
+          <rect
+           x="0"
+           y="0"
+           :width="layout.width / 3"
+           :height="layout.height"
+           fill="#FFFFFF"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+          <!--Bg-right-->
+          <rect
+           :x="layout.width / 3"
+           y="0"
+           :width="((layout.width / 3) * 2)"
+           :height="layout.height"
+           fill="#000000"
+           :clip-path="'url(#border-radius-' + tag.nodeId + ')'"
+          />
+        </template>
+        
         <template v-if="tag && tag.items && tag.items.length > 0">
          <template
           v-for="(item, index) in tag.items"
@@ -490,16 +495,17 @@ class ConstructorSchemesClass {
         dataType: '1',
         nodeId: 'template-1',
         templateType: 'template-1',
+        widthLeft: 30,
         items: [
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
           {
             id: '',
-            textLeft: 'Label',
-            textRight: 'Value',
+            textLeft: '-',
+            textRight: '-',
           },
         ],
       },
@@ -571,8 +577,8 @@ class ConstructorSchemesClass {
         nodeId: 'template-2',
         templateType: 'template-2',
         id: '',
-        textFirst: 'Value',
-        textSecond: 'Label',
+        textFirst: '-',
+        textSecond: '-',
       },
     },
     // TemplateType: template-3
@@ -643,8 +649,8 @@ class ConstructorSchemesClass {
         nodeId: 'template-3',
         templateType: 'template-3',
         id: '',
-        textFirst: 'Value',
-        textSecond: 'Label',
+        textFirst: '-',
+        textSecond: '-',
       },
     },
     // TemplateType: template-4
@@ -968,6 +974,8 @@ class ConstructorSchemesClass {
     },
   ]
 
+  copiedElements = null
+
   get getShapeNodeStyleList() {
     return this.shapeNodeStyleList;
   }
@@ -1128,6 +1136,7 @@ class ConstructorSchemesClass {
     this.initializeIO();
     if (this.savedGraph) {
       this.loadGraph().then(() => {
+        this.updateDataNodeTemplate();
         // Выравнивание графа, инициализация dnd панели
         this.updateViewport().then(() => {
           this.dndPanelElem = dndPanelElem;
@@ -1153,41 +1162,6 @@ class ConstructorSchemesClass {
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
   }
 
-  generateIconNodes(iconsList) {
-    return Promise.all(iconsList.map(async (icon) => {
-      const imageStyleNode = new SimpleNode();
-      const layout = await ConstructorSchemesClass.getSvgLayoutSize(`/svg/${icon.src}`);
-      try {
-        const nodeSize = this.generateImageSize(layout);
-        imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-        imageStyleNode.style = new ImageNodeStyle(`/svg/${icon.src}`);
-        imageStyleNode.tag = {
-          dataType: 'image-node',
-          isAspectRatio: true,
-        };
-      } catch {
-        throw new Error();
-      }
-      return new DragAndDropPanelItem(imageStyleNode, 'Элементы с картинкой', 'image-node');
-    }));
-  }
-
-  generateImageSize({
-    width,
-    height,
-  }) {
-    const increaseSizeFn = (resultWidth, resultHeight) => {
-      if ((this.dragAndDropPanel.getMaxItemWidth * 2) < (resultWidth + resultHeight)) {
-        return increaseSizeFn(+resultWidth / 2, +resultHeight / 2);
-      }
-      return {
-        width: +resultWidth,
-        height: +resultHeight,
-      };
-    };
-    return increaseSizeFn(width, height);
-  }
-
   createDnDPanelDefaultNode() {
     const defaultNode = new SimpleNode();
     defaultNode.layout = new Rect(
@@ -1207,6 +1181,7 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
+  // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
     this.saveGraphToLocalStorage().then(() => {
@@ -1227,6 +1202,33 @@ class ConstructorSchemesClass {
       ICommand.OPEN.execute(null, this.graphComponent);
       resolve();
     });
+  }
+
+  updateDataNodeTemplate() {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node.tag.templateType) {
+        if ((node.tag.dataType === '0' || node.tag.dataType === '1') && !node.tag?.widthLeft) {
+          node.tag = {
+            ...node.tag,
+            widthLeft: this.getDefaultDataNodeParams(node.tag.dataType, 'widthLeft'),
+          };
+        }
+        this.graphComponent.graph.setStyle(
+          node,
+          new VuejsNodeStyle(this.getDataNodeTemplate(node.tag.templateType)),
+        );
+      }
+    });
+  }
+
+  getDefaultDataNodeParams(dataType, fieldName) {
+    try {
+      const defaultOptions = this.dndDataPanelItems
+        .find((item) => item?.dataRest?.dataType === dataType);
+      return defaultOptions.dataRest[fieldName];
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   // Load from LocalStorage to Store
@@ -1366,10 +1368,11 @@ class ConstructorSchemesClass {
       focusableItems: 'none',
       allowEditLabel: true,
       allowGroupingOperations: true,
-      // TODO: Починить функционал copy/paste/duplicate
+      // Выключены встроеные способы копирования т.к. работают не корректно, написан свой
       allowPaste: false,
       allowDuplicate: false,
       ignoreVoidStyles: true,
+      allowClipboardOperations: false,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
         nodeToNodeDistance: 10,
@@ -1513,70 +1516,143 @@ class ConstructorSchemesClass {
     this.graphComponent.inputMode = mode;
   }
 
+  getTemplateElementsForCopy(xOffset = 10, yOffset = 10) {
+    return this.graphComponent.selection.toArray().map((el) => {
+      // TODO: Пока сделано только для узлов
+      if (el instanceof INode) {
+        const node = {
+          location: {
+            x: el.layout.x + xOffset,
+            y: el.layout.y + yOffset,
+          },
+          layout: {
+            width: el.layout.width,
+            height: el.layout.height,
+          },
+          labels: el.labels,
+          id: el.hashCode(),
+          tag: el.tag,
+        };
+        if (el.tag.dataType === 'image-node') {
+          return {
+            ...node,
+            style: el.style.clone(),
+          };
+        }
+        return node;
+      }
+      return null;
+    }).filter((el) => el !== null);
+  }
+
+  copyElement() {
+    // Очищаем ранее скопированные элементы
+    this.copiedElements = null;
+    // Сохраняем новые
+    this.copiedElements = this.getTemplateElementsForCopy();
+  }
+
+  async pasteElement() {
+    if (this.copiedElements?.length > 0) {
+      this.graphComponent.selection.clear();
+      await Promise.all(this.copiedElements.map((element) => this.nodeCreator({
+        graph: this.graphComponent.graph,
+        dropData: element,
+        dropLocation: element?.location,
+        isNewNode: false,
+      }))).then((createdElements) => {
+        createdElements.forEach((el) => {
+          this.graphComponent.inputMode.setSelected(el, true);
+          this.copyElement();
+        });
+        this.graphComponent.updateVisual();
+      });
+    }
+  }
+
+  async nodeCreator({
+    context,
+    graph,
+    dropData,
+    dropTarget,
+    dropLocation,
+    isCopiedElement = false,
+  }) {
+    let createdNode = null;
+    if (dropData?.tag?.templateType) {
+      // Узел с данными
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else if (dropData?.tag?.textTemplateType) {
+      // Узел с текстом
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else if (dropData?.tag?.isAspectRatio) {
+      // Узел с картинкой
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: dropData.style,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    } else {
+      // Обычный узел
+      createdNode = graph.createNodeAt({
+        location: dropLocation,
+        style: new VuejsNodeStyle(this.dndShapeNode.template),
+        labels: dropData.labels,
+        tag: {
+          ...dropData.tag,
+          nodeId: dropData?.id || dropData.hashCode(),
+        },
+      });
+    }
+    const nodePosition = new Rect(
+      isCopiedElement ? dropLocation.x : dropLocation.x - (dropData.layout.width / 2),
+      isCopiedElement ? dropLocation.y : dropLocation.y - (dropData.layout.height / 2),
+      dropData.layout.width,
+      dropData.layout.height,
+    );
+    createdNode.tag.nodeId = createdNode.hashCode();
+    graph.setNodeLayout(createdNode, nodePosition);
+    return createdNode;
+  }
+
   settingsNodeDropInputMode() {
     return new NodeDropInputMode({
       showPreview: true,
       snappingEnabled: false,
       enabled: true,
-      itemCreator: async (
+      itemCreator: (
         context,
         graph,
         dropData,
         dropTarget,
         dropLocation,
-      ) => {
-        let createdNode = null;
-        if (dropData?.tag?.templateType) {
-          // Узел с данными
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
-            labels: dropData.labels,
-            tag: { ...dropData.tag, nodeId: dropData.hashCode() },
-          });
-        } else if (dropData?.tag?.textTemplateType) {
-          // Узел с текстом
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
-            labels: dropData.labels,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-              fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
-            },
-          });
-        } else if (dropData?.tag?.isAspectRatio) {
-          // Узел с картинкой
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: dropData.style,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-            },
-          });
-        } else {
-          // Обычный узел
-          createdNode = graph.createNodeAt({
-            location: dropLocation,
-            style: new VuejsNodeStyle(this.dndShapeNode.template),
-            labels: dropData.labels,
-            tag: {
-              ...dropData.tag,
-              nodeId: dropData.hashCode(),
-            },
-          });
-        }
-        const nodePosition = new Rect(
-          dropLocation.x - (dropData.layout.width / 2),
-          dropLocation.y - (dropData.layout.height / 2),
-          dropData.layout.width,
-          dropData.layout.height,
-        );
-        graph.setNodeLayout(createdNode, nodePosition);
-        return createdNode;
-      },
+      ) => this.nodeCreator({
+        context,
+        graph,
+        dropData,
+        dropTarget,
+        dropLocation,
+      }),
     });
   }
 
@@ -2045,14 +2121,19 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
+        const GenerateIconsClass = new GenerateIcons({
+          maxItemSize: this.dragAndDropPanel.getMaxItemWidth,
+          // Временный вариант, заменить на внешнее значение
+          minItemSize: 150,
+        });
         const filteredIconList = [];
         Promise.all(iconsList.map(async (icon) => {
-          const response = await fetch(`/svg/${icon.src}`);
+          const response = await fetch(`/svg/${icon}.svg`);
           if (response.ok) {
             filteredIconList.push(icon);
           }
         })).then(() => {
-          this.generateIconNodes(filteredIconList).then((result) => {
+          GenerateIconsClass.generateIconNodes(filteredIconList).then((result) => {
             items.push(...result);
             resolve(items);
           });
@@ -2121,6 +2202,7 @@ class ConstructorSchemesClass {
     const dataType = this.targetDataNode.tag?.dataType;
     if (dataType === '0' || dataType === '1') {
       updatedData = {
+        widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
           ...item,
           textLeft: this.getDataItemById(item.id)?.Description || '-',
@@ -2153,7 +2235,6 @@ class ConstructorSchemesClass {
     } else if (dataFromComponent.dataType === 'label') {
       this.updateLabelVisual(dataFromComponent);
     }
-    console.log(updatedData);
     this.targetDataNode.tag = {
       ...this.targetDataNode.tag,
       ...updatedData,
@@ -2218,6 +2299,12 @@ class ConstructorSchemesClass {
 
   updateDataRest(updatedData) {
     this.dataRest = updatedData;
+  }
+
+  fitGraphContent() {
+    this.graphComponent.fitGraphBounds().then(() => {
+      this.graphComponent.updateVisual();
+    });
   }
 }
 

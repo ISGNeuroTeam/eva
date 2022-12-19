@@ -130,8 +130,10 @@ export default {
               'auth/putLog',
               `status: ${response.status}&nbsp;&nbsp;url: ${response.url}&nbsp;&nbsp;statusText: ${response.statusText}&nbsp;&nbsp;login: ${this.user.username}`,
             );
-            this.$store.commit('clearState');
+            this.$store.dispatch('app/resetState');
             this.$store.commit('auth/setUserName', this.$jwt.decode().username);
+            this.$store.dispatch('app/loadSettings');
+            this.$store.dispatch('app/loadRoles');
             return res;
           });
           const getSetting = await this.$store.dispatch('getUserSettings', userId.id);

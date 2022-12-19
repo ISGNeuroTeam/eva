@@ -172,7 +172,7 @@
                       :key="n"
                       class="dash-group"
                       type="card"
-                    ></v-skeleton-loader>
+                    />
                   </template>
                   <v-card
                     v-for="(dash, i) in allDashs"
@@ -281,7 +281,7 @@
                 value="tab-3"
                 class="groups-of-dash__container"
               >
-                <navigation-tree-view />
+                <navigation-tree-view editable />
               </v-tab-item>
             </v-tabs>
           </v-card-text>
@@ -445,7 +445,11 @@ export default {
         }
       } else if (this.$route.query?.home) {
         const homeGroupId = this.allGroups.find((group) => group.name === this.$route.query?.home);
-        this.getDash(homeGroupId);
+        if (homeGroupId) {
+          this.getDash(homeGroupId);
+        } else {
+          this.tab = 'tab-1';
+        }
       }
     });
 
@@ -604,7 +608,6 @@ export default {
       this.tab = 'tab-2';
       this.getDashs(this.curGroup);
       this.openTabGroup();
-      this.$store.commit('setLastOpenGroup', group.id);
     },
     setPermissions(event) {
       this.editDashPermission = false;
