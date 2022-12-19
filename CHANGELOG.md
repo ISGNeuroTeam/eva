@@ -8,13 +8,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- The ability to create an arbitrary number of tokens per element for one event.
-- "Reset values if data source does not contain them" option to select
 - Multiline: added the x axis value in tooltip
 
 ### Changed
 
 ### Fixed
+
+## [1.116.0]
+
+### Added
+- Customizable sections in the navigation menu
+- Added display of data object id under the object selection select on constructorSchemes.
+- Added fitGraph button on constructorSchemes
+- Added change background size data-node on constructorSchemes
+- Added copy\paste fn for ConstructorSchemes
+- Added token interaction with filter
+
+### Changed
+- Home group selection now has a filter
+
+### Fixed
+- Bug when home group does not exist
+- Background color for time selection in the searching reporting and tooltip text color in dark theme
+- Disabled "cut" method on constructor-schemes as it did not work correctly
+
+## [1.115.0]
+
+### Added
+- The ability to create an arbitrary number of tokens per element for one event.
+- "Reset values if data source does not contain them" option to select
+
+### Changed
+- Change icons list settings
+
+### Fixed
+- Fixed spontaneous change in the case of the first letters of words in the title of dashboards
 
 ## [1.114.0]
 

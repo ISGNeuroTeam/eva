@@ -64,7 +64,9 @@
             :style="{ color: theme.$main_text, background: theme.$main_bg }"
             class="nav-panel-drawer"
           >
-            <navigation-tree-view class="navigation-tree" />
+            <navigation-tree-view
+              class="navigation-tree"
+            />
           </v-navigation-drawer>
           <div
             v-if="gridShow"
@@ -467,10 +469,10 @@ export default {
     },
     openTree: {
       get() {
-        return this.$store.getters.isOpenTree;
+        return this.$store.getters['app/isOpenTree'];
       },
       set(val) {
-        return this.$store.commit('setOpenTree', val);
+        return this.$store.commit('app/setOpenTree', val);
       },
     },
   },
@@ -839,7 +841,7 @@ export default {
 <style lang="sass" scoped>
 .nav-panel-drawer
   position: fixed
-  z-index: 199
+  z-index: 98
   width: 320px !important
   height: auto !important
   top: 50px !important
@@ -848,6 +850,5 @@ export default {
   min-width: 320px
 
   .navigation-tree
-    margin-top: 16px
     margin-bottom: 16px
 </style>

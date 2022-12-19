@@ -890,7 +890,7 @@
       <modal-log v-model="modalActive" />
       <dash-settings
         :gear-from="gearShow"
-        :permissions-from="userPermissions"
+        :permissions-from="permissions"
         :id-dash-from="idDashFrom"
       />
       <modal-loading-svg
@@ -904,7 +904,7 @@
       :class="{ openfilter }"
     >
       <dash-filter-panel
-        :permissions-from="userPermissions"
+        :permissions-from="permissions"
         :id-dash-from="idDashFrom"
         :edit-permission="editPermission || isEditDash"
         :edit-mode="editMode"
@@ -945,6 +945,7 @@ import {
   mdiVariable,
   mdiFileTree,
 } from '@mdi/js';
+import { mapGetters } from 'vuex';
 import EvaLogo from '../images/eva-logo.svg';
 import settings from '../js/componentsSettings';
 import DashFilterPanel from './dash-filter-panel/DashFilterPanel.vue';
@@ -1096,7 +1097,6 @@ export default {
       createSearchBtn: '',
       errorSaveToken: false,
       disabledDS: {},
-      userPermissions: [],
       screenHeight: this.getScreenHeight(),
       allGroups: [],
       tokens: [],
@@ -1105,6 +1105,10 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('auth', [
+      'isAdmin',
+      'permissions',
+    ]),
     editMode() {
       return this.dashFromStore?.editMode;
     },
@@ -1125,9 +1129,6 @@ export default {
     },
     headerTop() {
       return document.body.clientWidth <= 1400 ? 40 : 50;
-    },
-    isAdmin() {
-      return this.userPermissions && this.userPermissions.includes('admin_all');
     },
     searches() {
       // массив со всеми ИС на странице
@@ -1152,8 +1153,8 @@ export default {
     },
     editPermission() {
       return (
-        this.userPermissions.includes('admin_all')
-        || this.userPermissions.includes('editdash')
+        this.isAdmin
+        || this.permissions.includes('editdash')
       );
     },
     getEventFull() {
@@ -1269,6 +1270,7 @@ export default {
     this.uploadTokens();
   },
   mounted() {
+    this.$store.commit('app/setOpenTree', false);
     this.getCookie();
     this.getGroups();
     this.tools = settings.tools;
@@ -1318,6 +1320,7 @@ export default {
     },
     exit() {
       this.$store.dispatch('auth/logout');
+      this.$store.dispatch('app/resetState');
       document.title = 'EVA';
     },
     openThemeModal() {
@@ -1362,7 +1365,7 @@ export default {
           // если получилось
           await response.json().then((res) => {
             // переводим полученные данные из json в нормальный объект
-            this.userPermissions = res.data;
+            this.$store.commit('auth/permissions', res.data);
           });
         } else {
           this.exit();
@@ -1529,8 +1532,8 @@ export default {
     saveTocken(index) {
       // проверяем не пустой ли токен
       if (
-        (this.newTockenName.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
-        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name].toLowerCase() === 'evatknlogin')
+        (this.newTockenName?.toLowerCase() === 'evatknlogin' && !Number.isInteger(index))
+        || (Number.isInteger(index) && this.tockensName[this.tokens[index].name]?.toLowerCase() === 'evatknlogin')
       ) {
         this.errorSaveToken = true;
         this.openwarning = true;
@@ -2245,7 +2248,7 @@ export default {
       this.$router.push('/main');
     },
     openNavPanel() {
-      this.$store.commit('toggleOpenTree');
+      this.$store.commit('app/toggleOpenTree');
       this.gearShow = false;
     },
     getScreenHeight() {
