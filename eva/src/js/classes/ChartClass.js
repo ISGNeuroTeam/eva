@@ -168,7 +168,8 @@ export default class ChartClass {
       .call(
         d3.axisBottom(this.x)
           .tickFormat(this.xTickFormat.bind(this))
-          .ticks(ticksEnabled ? ticks : null),
+          .ticks((ticksEnabled && ticks > 0) ? ticks : null)
+          .tickValues((ticksEnabled && ticks === 0) ? this.data.map((item) => `${item[this.xMetric]}`) : null),
       );
 
     const rotate = options.xAxis.textRotate ? ` rotate(${options.xAxis.textRotate})` : '';
@@ -767,6 +768,10 @@ export default class ChartClass {
   }
 
   addXTickLines(chartGroup, groupHeight) {
+    const {
+      ticksEnabled,
+      ticks,
+    } = this.options.xAxis;
     chartGroup
       .append('g')
       .attr('class', 'vertical-tick-lines')
@@ -775,7 +780,8 @@ export default class ChartClass {
       .call(d3.axisBottom(this.x)
         .tickSize(-groupHeight)
         .tickFormat((_) => '')
-        .ticks(10))
+        .ticks((ticksEnabled && ticks > 0) ? ticks : null)
+        .tickValues((ticksEnabled && ticks === 0) ? this.data.map((item) => `${item[this.xMetric]}`) : null))
       .selectAll('.tick line')
       .attr('opacity', 0.2);
     chartGroup
