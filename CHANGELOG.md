@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added load icons list from datasource in constructor-schemes
 
 ### Changed
 
 ### Fixed
+- Fixed incorrect size select-items on settings-panel in constructor-schemes
 
 ## [1.116.0]
 
