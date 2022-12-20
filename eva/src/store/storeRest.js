@@ -727,4 +727,38 @@ export default {
 
     return data;
   },
+  async getSettings() {
+    return fetch('/api/settings')
+      .then((res) => {
+        if (res.status !== 200) {
+          throw new Error(`Bad response from GET /api/settings, status: ${res.status} (${res.statusText})`);
+        }
+        return res.json();
+      })
+      .then((res) => res?.settings.map((item) => ({ ...item, body: JSON.parse(item.body) })));
+  },
+  async saveSettings(settings, restAuth) {
+    return Promise.all(settings.map((item) => {
+      const { id, name, body } = item;
+      return fetch('/api/settings', {
+        method: id ? 'PUT' : 'POST',
+        body: JSON.stringify({ id, name, body: JSON.stringify(body) }),
+      }).then((response) => {
+        if (!response.ok) {
+          return Promise.reject(response);
+        }
+        return {
+          id,
+          name,
+          body,
+          response,
+        };
+      }).catch((err) => {
+        restAuth.putLog(
+          `Общие настройки сохранить не удалось.&nbsp;&nbsp;status: ${err.status}&nbsp;&nbsp;url: ${err.url}&nbsp;&nbsp;statusText: ${err.statusText}`,
+        );
+        return Promise.reject(err);
+      });
+    }));
+  },
 };

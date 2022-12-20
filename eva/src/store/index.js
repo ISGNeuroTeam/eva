@@ -6,6 +6,7 @@ import Vuex from 'vuex';
 import createPersistedState from 'vuex-persistedstate';
 
 import auth from './storeAuth/store';
+import app from './storeApp/store';
 import form from './storeForm/store';
 import rest from './storeRest';
 import restAuth from './storeAuth/storeRest';
@@ -33,8 +34,6 @@ export default new Vuex.Store({
       name: 'dark',
       settings: themes.dark,
     },
-    openTree: false,
-    lastOpenGroup: null,
   },
   mutations: {
     /* метод для добавления реактивных свойств
@@ -871,7 +870,7 @@ export default new Vuex.Store({
     // TODO: избавится от этого метода, он вычищает не только root,
     //  но и все отсальные модули
     clearState(state) {
-      const exclude = ['auth', 'dataResearch', 'form', 'theme', 'notify'];
+      const exclude = ['auth', 'dataResearch', 'form', 'theme', 'notify', 'app'];
       Object.keys(state).forEach((key) => {
         if (!exclude.includes(key)) {
           delete state[key];
@@ -1112,19 +1111,6 @@ export default new Vuex.Store({
         Vue.set(state[idDash], 'editMode', newModeState);
       } else {
         state[idDash].editMode = newModeState;
-      }
-    },
-    toggleOpenTree(state) {
-      Vue.set(state, 'openTree', !state.openTree);
-    },
-    setOpenTree(state, val) {
-      if (state.openTree !== val) {
-        Vue.set(state, 'openTree', !!val);
-      }
-    },
-    setLastOpenGroup(state, val) {
-      if (val) {
-        Vue.set(state, 'lastOpenGroup', val);
       }
     },
   },
@@ -2050,15 +2036,13 @@ export default new Vuex.Store({
     getTheme(state) {
       return state.theme.settings;
     },
-    isOpenTree(state) {
-      return !!state.openTree;
-    },
   },
   modules: {
     auth,
     form,
     dataResearch,
     notify,
+    app,
   },
   plugins: [createPersistedState()],
 });
