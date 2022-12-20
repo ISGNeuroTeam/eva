@@ -850,6 +850,18 @@ export default {
       handler(value) {
         if (this.constructorSchemes && value?.length > 0) {
           this.constructorSchemes.buildGraph(structuredClone(value));
+          const updatedIcons = this.updateIconsList(value);
+          if (updatedIcons?.length > 0) {
+            this.$store.commit('setState', [{
+              object: this.dashFromStore[this.idFrom].options,
+              prop: 'primitivesLibrary',
+              value: JSON.stringify(
+                [...this.primitivesFromStore
+                  .map(({ icon }) => icon),
+                ...updatedIcons],
+              ),
+            }]);
+          }
         }
       },
     },
@@ -997,7 +1009,14 @@ export default {
         this.isConfirmModal = false;
       }
     },
+    updateIconsList(iconsListFrom) {
+      return iconsListFrom
+        .filter((elementFrom) => !this.primitivesFromStore
+          .some((element) => element.icon === elementFrom.icon))
+        .map((element) => element.icon);
+    },
   },
+
 };
 </script>
 
