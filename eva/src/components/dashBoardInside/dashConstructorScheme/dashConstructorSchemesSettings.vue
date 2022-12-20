@@ -14,6 +14,7 @@
           <div class="row align-center">
             <v-select
               v-model="element.id"
+              :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
               item-value="TagName"
               item-text="Description"
@@ -927,6 +928,12 @@ export default {
   .dash-constructor-schemes__data-panel-item {
     ::v-deep.v-text-field__details {
       display: none;
+    }
+    ::v-deep.theme--light.v-input {
+      color: var(--main_text);
+      .v-icon {
+        color: var(--main-text);
+      }
     }
   }
   .dash-constructor-schemes__slider {

@@ -22,6 +22,7 @@ import yFiles, {
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
   ILabel,
+  GraphClipboard,
   ImageNodeStyle,
   INode,
   InteriorLabelModel,
@@ -214,6 +215,12 @@ class ConstructorSchemesClass {
       thickness: `${edge.style.stroke.thickness}px`,
       smoothingLength: edge.style.smoothingLength,
     };
+  }
+
+  static getVerticalPositionWithOffset({
+    position, count, offset,
+  }) {
+    return position + offset;
   }
 
   defaultDataSource = []
@@ -1382,6 +1389,7 @@ class ConstructorSchemesClass {
       allowPaste: false,
       allowDuplicate: false,
       ignoreVoidStyles: true,
+      allowClipboardOperations: false,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
         nodeToNodeDistance: 10,
@@ -1590,26 +1598,17 @@ class ConstructorSchemesClass {
     let createdNode = null;
     if (dropData?.tag?.templateType) {
       // Узел с данными
-      createdNode = graph.createNodeAt({
+      createdNode = this.createDataNode({
+        graph,
         location: dropLocation,
-        style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
-        labels: dropData.labels,
-        tag: {
-          ...dropData.tag,
-          nodeId: dropData?.id || dropData.hashCode(),
-        },
+        data: dropData,
       });
     } else if (dropData?.tag?.textTemplateType) {
       // Узел с текстом
-      createdNode = graph.createNodeAt({
+      createdNode = this.createTextNode({
+        graph,
         location: dropLocation,
-        style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
-        labels: dropData.labels,
-        tag: {
-          ...dropData.tag,
-          fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
-          nodeId: dropData?.id || dropData.hashCode(),
-        },
+        data: dropData,
       });
     } else if (dropData?.tag?.isAspectRatio) {
       // Узел с картинкой
@@ -2342,17 +2341,127 @@ class ConstructorSchemesClass {
     });
   }
 
+  deleteAllTextNodeByImage() {
+    return new Promise((resolve, reject) => {
+      try {
+        this.graphComponent.graph.nodes.toArray().forEach((node) => {
+          if (node.tag.dataType === 'label-0' && node.tag?.byImage) {
+            this.graphComponent.graph.remove(node);
+          }
+        });
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   buildGraph(dataSource) {
     this.defaultDataSource = dataSource;
     this.deleteAllImageNode()
+      .then(() => this.deleteAllTextNodeByImage())
       .then(() => this.getIconsListForGraph({
         iconsList: this.defaultDataSource,
         maxItemSize: 150,
         minItemSize: 150,
       }))
       .then((dataForGraph) => {
-        console.log(dataForGraph);
+        this.createElementFromDefaultData(dataForGraph);
       });
+  }
+
+  createDataNode({ graph, location, data }) {
+    return graph.createNodeAt({
+      location,
+      style: new VuejsNodeStyle(this.getDataNodeTemplate(data.tag.templateType)),
+      tag: {
+        ...data.tag,
+        nodeId: data.id || data.hashCode(),
+      },
+    });
+  }
+
+  createTextNode({ graph, location, data }) {
+    return graph.createNodeAt({
+      location,
+      style: new VuejsNodeStyle(this.getTextNodeTemplate(data.tag.textTemplateType)),
+      tag: {
+        ...data.tag,
+        fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
+        nodeId: data?.id || data.hashCode(),
+      },
+    });
+  }
+
+  createElementFromDefaultData(elements, offsetY = 20, offsetX = 20) {
+    try {
+      let elementYPosition = this.graphComponent.viewPoint.y;
+      const resultElements = elements.map(async (element, index) => new Promise((resolve) => {
+        // icon-node
+        const createdIconNode = this.graphComponent.graph.createNodeAt({
+          location: new Point(
+            this.graphComponent.viewPoint.x,
+            elementYPosition,
+          ),
+          style: element.icon.node.style.clone(),
+          tag: {
+            ...element.icon.node.tag,
+            nodeId: index,
+          },
+        });
+        const data = {
+          tag: {
+            ...element.description.node.tag,
+            dataType: element.description.dataType,
+            text: `${element.description.text}-${createdIconNode.tag.nodeId}`,
+            byImage: true,
+          },
+          id: +`${index + 1}${index}`,
+          byIconId: createdIconNode.tag.nodeId,
+        };
+        const createdTextNode = this.createTextNode({
+          graph: this.graphComponent.graph,
+          location: new Point(
+            this.graphComponent.viewPoint.x + element.icon.node.layout.width,
+            0,
+          ),
+          data,
+        });
+        resolve({
+          createdIconNode,
+          createdTextNode,
+        });
+      }).then(({
+        createdIconNode,
+        createdTextNode,
+      }) => new Promise((resolve) => {
+        const iconNodeHeight = element.icon.node.layout.height;
+        const iconNodePosition = new Rect(
+          createdIconNode.layout.x,
+          elementYPosition,
+          element.icon.node.layout.width,
+          element.icon.node.layout.height,
+        );
+        const textNodeHeight = element.description.node.layout.height;
+        const textNodePosition = new Rect(
+          createdTextNode.layout.x + offsetX,
+          elementYPosition + (((iconNodeHeight + offsetY) - (textNodeHeight + offsetY)) / 2),
+          element.description.node.layout.width,
+          element.description.node.layout.height,
+        );
+        this.graphComponent.graph.setNodeLayout(createdIconNode, iconNodePosition);
+        this.graphComponent.graph.setNodeLayout(createdTextNode, textNodePosition);
+        this.graphComponent.updateVisual();
+        elementYPosition += element.icon.node.layout.height + offsetY;
+        resolve();
+      })));
+      Promise.all(resultElements)
+        .then(() => {
+          this.fitGraphContent();
+        });
+    } catch (e) {
+      throw new Error(e);
+    }
   }
 
   // iconsList:Array<string>, maxItemSize:number, minItemSize:number
@@ -2364,19 +2473,17 @@ class ConstructorSchemesClass {
       });
       const localIconList = [];
       const resultList = [];
-      if (iconsList.some((item) => item.description)) {
+      if (iconsList.some((item) => item.obj_description)) {
         iconsList.forEach((item) => {
-          if (item.description) {
+          if (item.obj_description) {
             const node = ConstructorSchemesClass.createReactiveNode(this.dndLabelPanelItems[0]);
             localIconList.push({
               ...item,
               description: {
-                text: item.description,
-                data: {
-                  node,
-                  tooltip: 'Элементы с текстом',
-                  dataType: 'text-node',
-                },
+                text: item.obj_description,
+                node,
+                tooltip: 'Элементы с текстом',
+                dataType: 'label-0',
               },
             });
           }
