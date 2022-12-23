@@ -64,6 +64,7 @@ import { EdgePathPortCandidateProvider } from './EdgePathPortCandidateProvider';
 import VuejsNodeStyleMarkupExtension from './VuejsNodeStyleMarkupExtension.js';
 import EdgeDropInputMode from './EdgeDropInputModeClass';
 import GenerateIcons from './GenerateIcons.js';
+import SchemeUpdater from './SchemeUpdater.js';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -1198,9 +1199,53 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
+  getElementsForSave() {
+    const resultElements = [];
+    const nodes = this.graphComponent.graph.nodes.toArray();
+    const edges = this.graphComponent.graph.edges.toArray();
+    const ports = this.graphComponent.graph.ports.toArray();
+    const labels = this.graphComponent.graph.labels.toArray();
+    [...nodes, ...edges, ...ports, ...labels].forEach((element) => {
+      if (element instanceof INode) {
+        resultElements.push({
+          type: element.tag.dataType || `${element.tag}-node`,
+          tag: element.tag,
+          element,
+        });
+      }
+      if (element instanceof IEdge) {
+        resultElements.push({
+          type: 'edge',
+          data: element.tag,
+          element,
+        });
+      }
+      if (element instanceof IPort) {
+        resultElements.push({
+          type: 'port',
+          data: element.tag,
+          element,
+        });
+      }
+      if (element instanceof ILabel) {
+        resultElements.push({
+          type: 'label',
+          data: element.tag,
+          element,
+        });
+      }
+    });
+    return resultElements;
+  }
+
   // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
+    // const SchemeUpdaterClass = new SchemeUpdater(
+    //   this.graphComponent.graph,
+    //   this.updateStoreCallback,
+    // );
+    // console.log(SchemeUpdaterClass.save());
     this.saveGraphToLocalStorage().then(() => {
       this.updateGraphFromLocalStorage(updateStoreCallback);
     });
@@ -1218,6 +1263,8 @@ class ConstructorSchemesClass {
     return new Promise((resolve) => {
       ICommand.OPEN.execute(null, this.graphComponent);
       resolve();
+    }).then(() => {
+      this.setDefaultElementsOrder();
     });
   }
 
@@ -2316,6 +2363,27 @@ class ConstructorSchemesClass {
     this.changeOrderSelectedElements(key, orderCommands[key]);
   }
 
+  setDefaultElementsOrder() {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node.tag.templateType) {
+        this.graphComponent.graphModelManager.toFront([node]);
+      } else if (node.tag.dataType === 'image-node') {
+        this.graphComponent.graphModelManager.toFront([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+      } else if (node.tag.textTemplateType) {
+        this.graphComponent.graphModelManager.toFront([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+      } else if (node.tag.dataType === 'default-node') {
+        this.graphComponent.graphModelManager.toFront([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+      }
+      this.graphComponent.graphModelManager.update(node);
+    });
+  }
+
   updateDataRest(updatedData) {
     this.dataRest = updatedData;
   }
@@ -2413,7 +2481,7 @@ class ConstructorSchemesClass {
           tag: {
             ...element.description.node.tag,
             dataType: element.description.dataType,
-            text: `${element.description.text}-${createdIconNode.tag.nodeId}`,
+            text: `${element.description.text}`,
             byImage: true,
           },
           id: +`${index + 1}${index}`,
