@@ -25,6 +25,7 @@
       :items.sync="treeItems"
       :dark="isDarkTheme"
       :search="filterText"
+      :filter="filterFunction"
       :load-children="loadGroupChildren"
       item-key="treeId"
       item-disabled="editable"
@@ -395,6 +396,19 @@ export default {
         }
         this.$refs.tree.updateOpen(treeId, true);
       });
+    },
+    filterFunction(obj, text, nameProp) {
+      // filter by metadata (dashs field)
+      if (obj.children && obj.children.length === 0 && obj.dashs) {
+        if (obj.dashs.join(',').toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+          return true;
+        }
+      }
+      // filter by nameProp
+      if (obj[nameProp].toLowerCase().indexOf(text.toLowerCase()) !== -1) {
+        return true;
+      }
+      return false;
     },
     async loadGroupChildren(item) {
       if (item.type === 'groups') {

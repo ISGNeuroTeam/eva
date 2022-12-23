@@ -1,9 +1,6 @@
 import { ImageNodeStyle, Rect, SimpleNode } from 'yfiles';
-import { DragAndDropPanelItem } from '@/js/classes/ConstructorSchemes/DnDPanelClass';
 
 const regexpSize = /viewBox="0 0 (?<width>.*?) (?<height>.*?)"/;
-
-// const regexpSize2 = /viewBox="0 0 (?<width>.*?) (?<height>.*?)"/;
 
 class GenerateIcons {
   constructor({
@@ -14,34 +11,46 @@ class GenerateIcons {
     this.minItemSize = minItemSize;
   }
 
-  static getSvgLayoutSize(iconUrl) {
-    return fetch(iconUrl)
-      .then((response) => response.body)
-      .then((rb) => {
-        const reader = rb.getReader();
-
-        return new ReadableStream({
-          start(controller) {
-            // The following function handles each data chunk
-            function push() {
-              // "done" is a Boolean and value a "Uint8Array"
-              reader.read()
-                .then(({ done, value }) => {
-                  // If there is no more data to read
-                  if (done) {
-                    controller.close();
-                    return;
-                  }
-                  // Get the data and send it to the browser via the controller
-                  controller.enqueue(value);
-                  push();
-                });
-            }
-
-            push();
-          },
+  // Получаем изображения с сервера, отсеивая некорректные
+  static getImagesFromServer(iconsList) {
+    const resultList = [];
+    return Promise.all(iconsList.map(async (item) => {
+      const response = await fetch(`/svg/${item.icon}.svg`);
+      if (response.ok) {
+        resultList.push({
+          ...item,
+          response,
         });
-      })
+      }
+    })).then(() => resultList);
+  }
+
+  static getSvgLayoutSize(iconFromServer) {
+    return new Promise((resolve) => {
+      const reader = iconFromServer.getReader();
+      resolve(reader);
+    })
+      .then((reader) => new ReadableStream({
+        start(controller) {
+          // The following function handles each data chunk
+          function push() {
+            // "done" is a Boolean and value a "Uint8Array"
+            reader.read()
+              .then(({ done, value }) => {
+                // If there is no more data to read
+                if (done) {
+                  controller.close();
+                  return;
+                }
+                // Get the data and send it to the browser via the controller
+                controller.enqueue(value);
+                push();
+              });
+          }
+
+          push();
+        },
+      }))
       .then((stream) => new Response(
         stream,
         {
@@ -50,30 +59,50 @@ class GenerateIcons {
           },
         },
       ).text())
-      .then((svgText) => svgText.match(regexpSize).groups)
-      .catch((e) => {
-        throw new Error(e);
-      });
+      .then((svgText) => svgText.match(regexpSize).groups);
+  }
+
+  static getIconsListWithSize(iconsList) {
+    return GenerateIcons.getImagesFromServer(iconsList)
+    // Получаем массив загруженых иконок в виде { icon, description, response }
+      .then((responseIconsList) => Promise.all(responseIconsList.map(async (item) => {
+        const layout = await GenerateIcons.getSvgLayoutSize(item.response.body);
+        return {
+          icon: item.icon,
+          description: item.description,
+          layout,
+        };
+      })).then((resultList) => resultList));
   }
 
   generateIconNodes(iconsList) {
-    return Promise.all(iconsList.map(async (icon) => {
-      const imageStyleNode = new SimpleNode();
-      const layout = await GenerateIcons.getSvgLayoutSize(`/svg/${icon}.svg`);
-      try {
-        const nodeSize = this.generateImageSize(layout);
-        imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
-        imageStyleNode.style = new ImageNodeStyle(`/svg/${icon}.svg`);
-        imageStyleNode.tag = {
-          dataType: 'image-node',
-          isAspectRatio: true,
+    return GenerateIcons.getIconsListWithSize(iconsList)
+      .then((iconsWithSize) => iconsWithSize.map((item) => {
+        const imageStyleNode = this.getIconNode(item);
+        return {
+          description: item.description,
+          icon: {
+            node: imageStyleNode,
+            tooltip: 'Элементы с картинкой',
+            dataType: 'image-node',
+          },
         };
-      } catch (e) {
-        throw new Error(e);
-      }
-      return new DragAndDropPanelItem(imageStyleNode, 'Элементы с картинкой', 'image-node');
-    }));
+      }));
   }
+
+  getIconNode(data) {
+    const imageStyleNode = new SimpleNode();
+    const nodeSize = this.generateImageSize(data.layout);
+    imageStyleNode.layout = new Rect(0, 0, +nodeSize.width, +nodeSize.height);
+    imageStyleNode.style = new ImageNodeStyle(`/svg/${data.icon}.svg`);
+    imageStyleNode.tag = {
+      dataType: 'image-node',
+      isAspectRatio: true,
+    };
+    return imageStyleNode;
+  }
+
+  getTextNode() {}
 
   generateImageSize({
     width,

@@ -14,6 +14,7 @@
           <div class="row align-center">
             <v-select
               v-model="element.id"
+              :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
               item-value="TagName"
               item-text="Description"
@@ -26,7 +27,7 @@
               <template v-slot:item="{ item, on }">
                 <v-list-item
                   ripple
-                  class="v-list-item--link"
+                  class="v-list-item--link dash-constructor-schemes__data-panel-select"
                   v-on="on"
                 >
                   <v-list-item-content>
@@ -120,7 +121,7 @@
             <template v-slot:item="{ item, on }">
               <v-list-item
                 ripple
-                class="v-list-item--link"
+                class="v-list-item--link dash-constructor-schemes__data-panel-select"
                 v-on="on"
               >
                 <v-list-item-content>
@@ -157,7 +158,7 @@
             <template v-slot:item="{ item, on }">
               <v-list-item
                 ripple
-                class="v-list-item--link"
+                class="v-list-item--link dash-constructor-schemes__data-panel-select"
                 v-on="on"
               >
                 <v-list-item-content>
@@ -296,7 +297,7 @@
                 <template v-slot:item="{ item, on }">
                   <v-list-item
                     ripple
-                    class="v-list-item--link"
+                    class="v-list-item--link dash-constructor-schemes__data-panel-select"
                     v-on="on"
                   >
                     <v-list-item-content>
@@ -391,7 +392,7 @@
                 <template v-slot:item="{ item, on }">
                   <v-list-item
                     ripple
-                    class="v-list-item--link"
+                    class="v-list-item--link dash-constructor-schemes__data-panel-select"
                     v-on="on"
                   >
                     <v-list-item-content>
@@ -928,6 +929,16 @@ export default {
     ::v-deep.v-text-field__details {
       display: none;
     }
+    ::v-deep.theme--light.v-input {
+      color: var(--main_text);
+      .v-icon {
+        color: var(--main-text);
+      }
+    }
+
+    ::v-deep.v-list-item--link {
+      max-width: 480px;
+    }
   }
   .dash-constructor-schemes__slider {
     .dash-constructor-schemes__slider-title {
@@ -936,5 +947,9 @@ export default {
       justify-content: space-between;
     }
   }
+}
+
+.dash-constructor-schemes__data-panel-select {
+  max-width: 480px;
 }
 </style>
