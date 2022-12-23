@@ -1,142 +1,45 @@
 <template>
-  <div
-    class="dash-constructor-schemes"
-    :style="{
-      'width': `${innerSize.width - 22}px`,
-      'height': `${innerSize.height}px`,
-      background: theme.$secondary_bg,
-      margin: '0 10px',
-    }"
+  <portal
+    :to="idFrom"
+    :disabled="!fullScreenMode"
   >
     <div
-      class="dash-constructor-schemes__options"
-      :class="{
-        'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
+      :style="{
+        ...customStyle,
+        'width': `${innerSize.width - 22}px`,
+        'height': `${innerSize.height}px`,
+        background: theme.$secondary_bg,
+        margin: '0 10px',
       }"
+      :class="customClass"
+      v-bind="$attrs"
+      class="dash-constructor-schemes"
     >
-      <v-tooltip
-        bottom
-        :color="theme.$accent_ui_color"
+      <div
+        class="dash-constructor-schemes__options"
+        :class="{
+          'dash-constructor-schemes__options--is-keymap-open': isKeymapOpen,
+        }"
       >
-        <template v-slot:activator="{ on }">
-          <div v-on="on">
-            <v-switch
-              v-model="isEdit"
-              inset
-              dense
-              label=""
-              @change="toggleInputMode"
-            />
-          </div>
-        </template>
-        <span>Вкл\выкл режим редактирования</span>
-      </v-tooltip>
-      <template v-if="isEdit">
         <v-tooltip
           bottom
           :color="theme.$accent_ui_color"
         >
           <template v-slot:activator="{ on }">
-            <div class="pa-2 d-flex">
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
-                v-on="on"
-                @click="toggleDnDPanel"
-              >
-                {{ gear }}
-              </v-icon>
+            <div v-on="on">
+              <v-switch
+                v-model="isEdit"
+                inset
+                dense
+                label=""
+                @change="toggleInputMode"
+              />
             </div>
           </template>
-          <span>Панель настроек</span>
+          <span>Вкл\выкл режим редактирования</span>
         </v-tooltip>
-        <v-tooltip
-          bottom
-          :color="theme.$accent_ui_color"
-        >
-          <template v-slot:activator="{ on }">
-            <div class="pa-2 d-flex">
-              <v-icon
-                class="control-button edit-icon theme--dark"
-                :style="{ color: theme.$secondary_text }"
-                v-on="on"
-                @click="fitGraphContent"
-              >
-                {{ fitToPage }}
-              </v-icon>
-            </div>
-          </template>
-          <span>Выровнять по центру</span>
-        </v-tooltip>
-        <template v-if="dataSelectedNode">
+        <template v-if="isEdit">
           <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <div class="pa-2 d-flex">
-                <bring-to-front
-                  class="control-button edit-icon theme--dark"
-                  :style="{ color: theme.$secondary_text }"
-                  v-on="on"
-                  @click="orderTo('toFront')"
-                />
-              </div>
-            </template>
-            <span>На передний план</span>
-          </v-tooltip>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <div class="pa-2 d-flex">
-                <send-to-back
-                  class="control-button edit-icon theme--dark"
-                  :style="{ color: theme.$secondary_text }"
-                  v-on="on"
-                  @click="orderTo('toBack')"
-                />
-              </div>
-            </template>
-            <span>На задний план</span>
-          </v-tooltip>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <div class="pa-2 d-flex">
-                <bring-forward
-                  class="control-button edit-icon theme--dark"
-                  :style="{ color: theme.$secondary_text }"
-                  v-on="on"
-                  @click="orderTo('raise')"
-                />
-              </div>
-            </template>
-            <span>На уровень выше</span>
-          </v-tooltip>
-          <v-tooltip
-            bottom
-            :color="theme.$accent_ui_color"
-          >
-            <template v-slot:activator="{ on }">
-              <div class="pa-2 d-flex">
-                <send-backward
-                  class="control-button edit-icon theme--dark"
-                  :style="{ color: theme.$secondary_text }"
-                  v-on="on"
-                  @click="orderTo('lower')"
-                />
-              </div>
-            </template>
-            <span>На уровень ниже</span>
-          </v-tooltip>
-        </template>
-        <template v-if="defaultFromSourceData">
-          <v-tooltip
-            :disabled="isLoading"
             bottom
             :color="theme.$accent_ui_color"
           >
@@ -146,373 +49,478 @@
                   class="control-button edit-icon theme--dark"
                   :style="{ color: theme.$secondary_text }"
                   v-on="on"
-                  @click="openConfirmModal"
+                  @click="toggleDnDPanel"
                 >
-                  {{ cloudDownloadOutlineIcon }}
+                  {{ gear }}
                 </v-icon>
               </div>
             </template>
-            <span>Загрузить с сервера</span>
+            <span>Панель настроек</span>
           </v-tooltip>
-        </template>
-      </template>
-    </div>
-    <div class="dash-constructor-schemes__keymap-button">
-      <v-tooltip
-        top
-        :nudge-top="5"
-        :color="theme.$accent_ui_color"
-      >
-        <template v-slot:activator="{ on }">
-          <button
-            v-on="on"
-            @click="openKeymapPanel"
+          <v-tooltip
+            bottom
+            :color="theme.$accent_ui_color"
           >
-            <v-icon
-              class="control-button edit-icon theme--dark"
-              :style="{ color: theme.$secondary_text }"
+            <template v-slot:activator="{ on }">
+              <div class="pa-2 d-flex">
+                <v-icon
+                  class="control-button edit-icon theme--dark"
+                  :style="{ color: theme.$secondary_text }"
+                  v-on="on"
+                  @click="fitGraphContent"
+                >
+                  {{ fitToPage }}
+                </v-icon>
+              </div>
+            </template>
+            <span>Выровнять по центру</span>
+          </v-tooltip>
+          <template v-if="dataSelectedNode">
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
             >
-              {{ iconHelp }}
-            </v-icon>
-          </button>
+              <template v-slot:activator="{ on }">
+                <div class="pa-2 d-flex">
+                  <bring-to-front
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$secondary_text }"
+                    v-on="on"
+                    @click="orderTo('toFront')"
+                  />
+                </div>
+              </template>
+              <span>На передний план</span>
+            </v-tooltip>
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <div class="pa-2 d-flex">
+                  <send-to-back
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$secondary_text }"
+                    v-on="on"
+                    @click="orderTo('toBack')"
+                  />
+                </div>
+              </template>
+              <span>На задний план</span>
+            </v-tooltip>
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <div class="pa-2 d-flex">
+                  <bring-forward
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$secondary_text }"
+                    v-on="on"
+                    @click="orderTo('raise')"
+                  />
+                </div>
+              </template>
+              <span>На уровень выше</span>
+            </v-tooltip>
+            <v-tooltip
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <div class="pa-2 d-flex">
+                  <send-backward
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$secondary_text }"
+                    v-on="on"
+                    @click="orderTo('lower')"
+                  />
+                </div>
+              </template>
+              <span>На уровень ниже</span>
+            </v-tooltip>
+          </template>
+          <template v-if="defaultFromSourceData">
+            <v-tooltip
+              :disabled="isLoading"
+              bottom
+              :color="theme.$accent_ui_color"
+            >
+              <template v-slot:activator="{ on }">
+                <div class="pa-2 d-flex">
+                  <v-icon
+                    class="control-button edit-icon theme--dark"
+                    :style="{ color: theme.$secondary_text }"
+                    v-on="on"
+                    @click="openConfirmModal"
+                  >
+                    {{ cloudDownloadOutlineIcon }}
+                  </v-icon>
+                </div>
+              </template>
+              <span>Загрузить с сервера</span>
+            </v-tooltip>
+          </template>
         </template>
-        <span>Справка по горячим клавишам</span>
-      </v-tooltip>
-    </div>
-    <!--Keymap-panel-->
-    <dash-constructor-schemes-keymap
-      ref="keymap"
-      v-model="isKeymapOpen"
-      @changeKeymapTab="setPanelBottomOffset"
-    />
-    <!--Drag-and-drop panel-->
-    <div
-      ref="dndPanelContainer"
-      class="dash-constructor-schemes__dnd-panel-container"
-      :style="{
-        'bottom': `${panelBottomOffset}px`,
-      }"
-      :class="{
-        'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
-        // 'dash-constructor-schemes__dnd-panel-container--is-keymap-open': isKeymapOpen
-      }"
-    >
-      <div
-        v-show="!isLoading"
-        class="row justify-end"
-      >
-        <div class="col-auto">
-          <button
-            @click="toggleDnDPanel"
-          >
-            <v-icon
-              class="control-button edit-icon theme--dark"
-              :style="{ color: theme.$secondary_text }"
-            >
-              {{ closeIcon }}
-            </v-icon>
-          </button>
-        </div>
       </div>
-      <div
-        v-show="!isLoading"
-        ref="dndPanel"
-        class="dash-constructor-schemes__dnd-panel"
-      >
-        <v-expansion-panels
-          accordion
+      <div class="dash-constructor-schemes__keymap-button">
+        <v-tooltip
+          top
+          :nudge-top="5"
+          :color="theme.$accent_ui_color"
         >
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              class="dndPanelItem__group-title"
+          <template v-slot:activator="{ on }">
+            <button
+              v-on="on"
+              @click="openKeymapPanel"
             >
-              Стандартные элементы
-            </v-expansion-panel-header>
-            <v-expansion-panel-content eager>
-              <div class="dndPanelItem__group dndPanelItem__group--default-element">
-                <v-expansion-panels>
-                  <v-expansion-panel>
-                    <v-expansion-panel-header>
-                      Настройки:
-                    </v-expansion-panel-header>
-                    <v-expansion-panel-content>
-                      <div class="dash-constructor-schemes__inner-options">
-                        <!--TODO: Возможно стоит вынести в отдельный компонент-->
-                        <div class="row">
-                          <div class="col-12">
-                            Настройки линии
-                          </div>
-                          <!--Цвет линии-->
-                          <div class="col-8">
-                            Цвет:
-                          </div>
-                          <div class="col-4">
-                            <v-menu
-                              top
-                              offset-x
-                              z-index="100"
-                              :close-on-content-click="false"
-                            >
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                  :style="{
-                                    // eslint-disable-next-line max-len
-                                    'background-color': elementDefaultStyles.edgeStrokeColor.rgbaString,
-                                  }"
-                                  dark
-                                  v-bind="attrs"
-                                  v-on="on"
-                                />
-                              </template>
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+              >
+                {{ iconHelp }}
+              </v-icon>
+            </button>
+          </template>
+          <span>Справка по горячим клавишам</span>
+        </v-tooltip>
+      </div>
+      <!--Keymap-panel-->
+      <dash-constructor-schemes-keymap
+        ref="keymap"
+        v-model="isKeymapOpen"
+        @changeKeymapTab="setPanelBottomOffset"
+      />
+      <!--Drag-and-drop panel-->
+      <div
+        ref="dndPanelContainer"
+        class="dash-constructor-schemes__dnd-panel-container"
+        :style="{
+          'bottom': `${panelBottomOffset}px`,
+        }"
+        :class="{
+          'dash-constructor-schemes__dnd-panel-container--active': dndPanel,
+        // 'dash-constructor-schemes__dnd-panel-container--is-keymap-open': isKeymapOpen
+        }"
+      >
+        <div
+          v-show="!isLoading"
+          class="row justify-end"
+        >
+          <div class="col-auto">
+            <button
+              @click="toggleDnDPanel"
+            >
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+              >
+                {{ closeIcon }}
+              </v-icon>
+            </button>
+          </div>
+        </div>
+        <div
+          v-show="!isLoading"
+          ref="dndPanel"
+          class="dash-constructor-schemes__dnd-panel"
+        >
+          <v-expansion-panels
+            accordion
+          >
+            <v-expansion-panel>
+              <v-expansion-panel-header
+                class="dndPanelItem__group-title"
+              >
+                Стандартные элементы
+              </v-expansion-panel-header>
+              <v-expansion-panel-content eager>
+                <div class="dndPanelItem__group dndPanelItem__group--default-element">
+                  <v-expansion-panels>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header>
+                        Настройки:
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content>
+                        <div class="dash-constructor-schemes__inner-options">
+                          <!--TODO: Возможно стоит вынести в отдельный компонент-->
+                          <div class="row">
+                            <div class="col-12">
+                              Настройки линии
+                            </div>
+                            <!--Цвет линии-->
+                            <div class="col-8">
+                              Цвет:
+                            </div>
+                            <div class="col-4">
+                              <v-menu
+                                top
+                                offset-x
+                                z-index="100"
+                                :close-on-content-click="false"
+                              >
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    :style="{
+                                      // eslint-disable-next-line max-len
+                                      'background-color': elementDefaultStyles.edgeStrokeColor.rgbaString,
+                                    }"
+                                    dark
+                                    v-bind="attrs"
+                                    v-on="on"
+                                  />
+                                </template>
 
-                              <v-color-picker
-                                :value="elementDefaultStyles.edgeStrokeColor.rgbaObject"
-                                dot-size="12"
-                                mode="rgba"
-                                @update:color="updateDefaultElementColor($event, 'edgeStrokeColor')"
-                              />
-                            </v-menu>
-                          </div>
-                          <!--Размер линии-->
-                          <div class="col-8">
-                            Размер:
-                          </div>
-                          <div class="col-4">
-                            <v-text-field
-                              v-model="elementDefaultStyles.edgeStrokeSize"
-                              dense
-                            />
-                          </div>
-                          <!--Скругление линии-->
-                          <div class="col-8">
-                            Скругление:
-                          </div>
-                          <div class="col-4">
-                            <v-text-field
-                              v-model.number="elementDefaultStyles.edgeSmoothingLength"
-                              dense
-                              placeholder="Скругление"
-                            />
-                          </div>
-                          <div class="col-12">
-                            Настройки блока
-                          </div>
-                          <!--Фигура-->
-                          <div class="col-12">
-                            <v-select
-                              v-model="elementDefaultStyles.nodeShape"
-                              :items="shapeNodeStyleList"
-                              item-value="id"
-                              item-text="label"
-                              label="Фигура"
-                              :menu-props="{
-                                'z-index': 100,
-                              }"
-                            />
-                          </div>
-                          <!--Цвет блока-->
-                          <div class="col-8">
-                            Цвет фона:
-                          </div>
-                          <div class="col-4">
-                            <v-menu
-                              top
-                              offset-x
-                              z-index="100"
-                              :close-on-content-click="false"
-                            >
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                  :style="{
-                                    'background-color': elementDefaultStyles.nodeFill.rgbaString,
-                                  }"
-                                  dark
-                                  v-bind="attrs"
-                                  v-on="on"
+                                <v-color-picker
+                                  :value="elementDefaultStyles.edgeStrokeColor.rgbaObject"
+                                  dot-size="12"
+                                  mode="rgba"
+                                  @update:color="updateDefaultElementColor($event, 'edgeStrokeColor')"
                                 />
-                              </template>
-
-                              <v-color-picker
-                                :value="elementDefaultStyles.nodeFill.rgbaObject"
-                                dot-size="12"
-                                mode="rgba"
-                                @update:color="updateDefaultElementColor($event, 'nodeFill')"
+                              </v-menu>
+                            </div>
+                            <!--Размер линии-->
+                            <div class="col-8">
+                              Размер:
+                            </div>
+                            <div class="col-4">
+                              <v-text-field
+                                v-model="elementDefaultStyles.edgeStrokeSize"
+                                dense
                               />
-                            </v-menu>
-                          </div>
-                          <!--Цвет рамки блока-->
-                          <div class="col-8">
-                            Цвет рамки:
-                          </div>
-                          <div class="col-4">
-                            <v-menu
-                              top
-                              offset-x
-                              z-index="100"
-                              :close-on-content-click="false"
-                            >
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                  :style="{
-                                    // eslint-disable-next-line max-len
-                                    'background-color': elementDefaultStyles.nodeStrokeColor.rgbaString,
-                                  }"
-                                  dark
-                                  v-bind="attrs"
-                                  v-on="on"
+                            </div>
+                            <!--Скругление линии-->
+                            <div class="col-8">
+                              Скругление:
+                            </div>
+                            <div class="col-4">
+                              <v-text-field
+                                v-model.number="elementDefaultStyles.edgeSmoothingLength"
+                                dense
+                                placeholder="Скругление"
+                              />
+                            </div>
+                            <div class="col-12">
+                              Настройки блока
+                            </div>
+                            <!--Фигура-->
+                            <div class="col-12">
+                              <v-select
+                                v-model="elementDefaultStyles.nodeShape"
+                                :items="shapeNodeStyleList"
+                                item-value="id"
+                                item-text="label"
+                                label="Фигура"
+                                :menu-props="{
+                                  'z-index': 100,
+                                }"
+                              />
+                            </div>
+                            <!--Цвет блока-->
+                            <div class="col-8">
+                              Цвет фона:
+                            </div>
+                            <div class="col-4">
+                              <v-menu
+                                top
+                                offset-x
+                                z-index="100"
+                                :close-on-content-click="false"
+                              >
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    :style="{
+                                      'background-color': elementDefaultStyles.nodeFill.rgbaString,
+                                    }"
+                                    dark
+                                    v-bind="attrs"
+                                    v-on="on"
+                                  />
+                                </template>
+
+                                <v-color-picker
+                                  :value="elementDefaultStyles.nodeFill.rgbaObject"
+                                  dot-size="12"
+                                  mode="rgba"
+                                  @update:color="updateDefaultElementColor($event, 'nodeFill')"
                                 />
-                              </template>
+                              </v-menu>
+                            </div>
+                            <!--Цвет рамки блока-->
+                            <div class="col-8">
+                              Цвет рамки:
+                            </div>
+                            <div class="col-4">
+                              <v-menu
+                                top
+                                offset-x
+                                z-index="100"
+                                :close-on-content-click="false"
+                              >
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                    :style="{
+                                      // eslint-disable-next-line max-len
+                                      'background-color': elementDefaultStyles.nodeStrokeColor.rgbaString,
+                                    }"
+                                    dark
+                                    v-bind="attrs"
+                                    v-on="on"
+                                  />
+                                </template>
 
-                              <v-color-picker
-                                :value="elementDefaultStyles.nodeStrokeColor.rgbaObject"
-                                dot-size="12"
-                                mode="rgba"
-                                @update:color="updateDefaultElementColor($event, 'nodeStrokeColor')"
+                                <v-color-picker
+                                  :value="elementDefaultStyles.nodeStrokeColor.rgbaObject"
+                                  dot-size="12"
+                                  mode="rgba"
+                                  @update:color="updateDefaultElementColor($event, 'nodeStrokeColor')"
+                                />
+                              </v-menu>
+                            </div>
+                            <!--Размер рамки блока-->
+                            <div class="col-8">
+                              Размер рамки:
+                            </div>
+                            <div class="col-4">
+                              <v-text-field
+                                v-model="elementDefaultStyles.nodeStrokeSize"
+                                dense
                               />
-                            </v-menu>
-                          </div>
-                          <!--Размер рамки блока-->
-                          <div class="col-8">
-                            Размер рамки:
-                          </div>
-                          <div class="col-4">
-                            <v-text-field
-                              v-model="elementDefaultStyles.nodeStrokeSize"
-                              dense
-                            />
-                          </div>
-                          <div class="col-12">
-                            <v-btn
-                              small
-                              :color="theme.$primary_button"
-                              class="dash-constructor-schemes__apply-options"
-                              @click="applyOptions"
-                            >
-                              Применить
-                            </v-btn>
+                            </div>
+                            <div class="col-12">
+                              <v-btn
+                                small
+                                :color="theme.$primary_button"
+                                class="dash-constructor-schemes__apply-options"
+                                @click="applyOptions"
+                              >
+                                Применить
+                              </v-btn>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </v-expansion-panel-content>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-                <div class="dndPanelItem__group-items" />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              class="dndPanelItem__group-title"
-            >
-              Блоки с данными
-            </v-expansion-panel-header>
-            <v-expansion-panel-content eager>
-              <div class="dndPanelItem__group dndPanelItem__group--data-node">
-                <div class="dndPanelItem__group-items" />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              class="dndPanelItem__group-title"
-            >
-              Текстовые блоки
-            </v-expansion-panel-header>
-            <v-expansion-panel-content eager>
-              <div class="dndPanelItem__group dndPanelItem__group--text-node">
-                <div class="dndPanelItem__group-items" />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              class="dndPanelItem__group-title"
-            >
-              Изображения\иконки
-            </v-expansion-panel-header>
-            <v-expansion-panel-content eager>
-              <div class="dndPanelItem__group dndPanelItem__group--image-node">
-                <div class="dndPanelItem__group-items" />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header class="dndPanelItem__group-title">
-              Подписи к блокам
-            </v-expansion-panel-header>
-            <v-expansion-panel-content eager>
-              <div class="dndPanelItem__group dndPanelItem__group--label-node">
-                <div class="dndPanelItem__group-items" />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header class="dndPanelItem__group-title">
-              Порты
-            </v-expansion-panel-header>
-            <v-expansion-panel-content eager>
-              <div class="dndPanelItem__group dndPanelItem__group--port-node">
-                <div class="dndPanelItem__group-items" />
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      </div>
-      <div
-        v-show="isLoading"
-        class="dash-constructor-schemes__loading-circular"
-      >
-        <v-progress-circular
-          indeterminate
-          size="50"
-          :color="theme.$accent_ui_color"
-        />
-      </div>
-    </div>
-    <!--Settings-element-panel-->
-    <div
-      class="dash-constructor-schemes__data-panel"
-      :class="{
-        'dash-constructor-schemes__data-panel--active': dataPanel,
-      }"
-    >
-      <div class="row">
-        <div class="col-12">
-          <button @click="closeDataPanel">
-            <v-icon
-              class="control-button edit-icon theme--dark"
-              :style="{ color: theme.$secondary_text }"
-            >
-              {{ closeIcon }}
-            </v-icon>
-          </button>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
+                  <div class="dndPanelItem__group-items" />
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header
+                class="dndPanelItem__group-title"
+              >
+                Блоки с данными
+              </v-expansion-panel-header>
+              <v-expansion-panel-content eager>
+                <div class="dndPanelItem__group dndPanelItem__group--data-node">
+                  <div class="dndPanelItem__group-items" />
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header
+                class="dndPanelItem__group-title"
+              >
+                Текстовые блоки
+              </v-expansion-panel-header>
+              <v-expansion-panel-content eager>
+                <div class="dndPanelItem__group dndPanelItem__group--text-node">
+                  <div class="dndPanelItem__group-items" />
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header
+                class="dndPanelItem__group-title"
+              >
+                Изображения\иконки
+              </v-expansion-panel-header>
+              <v-expansion-panel-content eager>
+                <div class="dndPanelItem__group dndPanelItem__group--image-node">
+                  <div class="dndPanelItem__group-items" />
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header class="dndPanelItem__group-title">
+                Подписи к блокам
+              </v-expansion-panel-header>
+              <v-expansion-panel-content eager>
+                <div class="dndPanelItem__group dndPanelItem__group--label-node">
+                  <div class="dndPanelItem__group-items" />
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+            <v-expansion-panel>
+              <v-expansion-panel-header class="dndPanelItem__group-title">
+                Порты
+              </v-expansion-panel-header>
+              <v-expansion-panel-content eager>
+                <div class="dndPanelItem__group dndPanelItem__group--port-node">
+                  <div class="dndPanelItem__group-items" />
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+        <div
+          v-show="isLoading"
+          class="dash-constructor-schemes__loading-circular"
+        >
+          <v-progress-circular
+            indeterminate
+            size="50"
+            :color="theme.$accent_ui_color"
+          />
         </div>
       </div>
-      <dash-constructor-schemes-settings
-        v-model="dataSelectedNode"
+      <!--Settings-element-panel-->
+      <div
+        class="dash-constructor-schemes__data-panel"
+        :class="{
+          'dash-constructor-schemes__data-panel--active': dataPanel,
+        }"
+      >
+        <div class="row">
+          <div class="col-12">
+            <button @click="closeDataPanel">
+              <v-icon
+                class="control-button edit-icon theme--dark"
+                :style="{ color: theme.$secondary_text }"
+              >
+                {{ closeIcon }}
+              </v-icon>
+            </button>
+          </div>
+        </div>
+        <dash-constructor-schemes-settings
+          v-model="dataSelectedNode"
+          :theme="theme"
+          :data-rest-from="dataRestFrom"
+          :shape-node-style-list="shapeNodeStyleList"
+          @changeDataSelectedNode="changeDataSelectedNode"
+        />
+      </div>
+      <!--The GraphComponent-->
+      <component
+        :is="'div'"
+        ref="graphComponent"
+        class="dash-constructor-schemes__graph-component"
+        @keyup.ctrl="copyPaste"
+      />
+      <modal-confirm
+        v-model="isConfirmModal"
         :theme="theme"
-        :data-rest-from="dataRestFrom"
-        :shape-node-style-list="shapeNodeStyleList"
-        @changeDataSelectedNode="changeDataSelectedNode"
+        :modal-text="`Все изображения и связанные с ними линии
+      на визуализации будут удалены. Продолжить ?`"
+        btn-confirm-text="Да"
+        btn-cancel-text="Нет"
+        @result="startSearch"
       />
     </div>
-    <!--The GraphComponent-->
-    <component
-      :is="'div'"
-      ref="graphComponent"
-      class="dash-constructor-schemes__graph-component"
-      @keyup.ctrl="copyPaste"
-    />
-    <modal-confirm
-      v-model="isConfirmModal"
-      :theme="theme"
-      :modal-text="`Все изображения и связанные с ними линии
-      на визуализации будут удалены. Продолжить ?`"
-      btn-confirm-text="Да"
-      btn-cancel-text="Нет"
-      @result="startSearch"
-    />
-  </div>
+  </portal>
 </template>
 
 <script>
@@ -569,6 +577,14 @@ export default {
     dataSources: {
       type: Object,
       default: () => ({}),
+    },
+    customStyle: {
+      type: Object,
+      default: () => ({}),
+    },
+    customClass: {
+      type: String,
+      default: '',
     },
   },
   data() {
@@ -868,6 +884,14 @@ export default {
     isKeymapOpen() {
       this.setPanelBottomOffset();
     },
+    fullScreenMode() {
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          this.createGraph();
+          this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+        });
+      });
+    },
   },
   mounted() {
     this.createGraph();
@@ -950,6 +974,9 @@ export default {
     },
     orderTo(key) {
       this.constructorSchemes.orderTo(key);
+      this.$nextTick(() => {
+        this.constructorSchemes.save(this.updateSavedGraph);
+      });
     },
     addLine() {
       this.dataSelectedNode.items.push({
