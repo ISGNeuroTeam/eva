@@ -1,3 +1,16 @@
+# [1.117.0] - 2022-12-23
+
+### Added
+- Multiline: added the x axis value in tooltip
+- Multiline: added setting to show ticks on x-axis by points
+- Added load icons list from datasource in constructor-schemes
+
+### Changed
+- Changed the filtering logic in the navigation tree
+
+### Fixed
+- Fixed incorrect size select-items on settings-panel in constructor-schemes
+
 # [1.116.0] - 2022-12-16
 
 ### Added
