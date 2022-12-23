@@ -22,6 +22,7 @@ import yFiles, {
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
   ILabel,
+  GraphClipboard,
   ImageNodeStyle,
   INode,
   InteriorLabelModel,
@@ -63,6 +64,7 @@ import { EdgePathPortCandidateProvider } from './EdgePathPortCandidateProvider';
 import VuejsNodeStyleMarkupExtension from './VuejsNodeStyleMarkupExtension.js';
 import EdgeDropInputMode from './EdgeDropInputModeClass';
 import GenerateIcons from './GenerateIcons.js';
+import SchemeUpdater from './SchemeUpdater.js';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -189,7 +191,7 @@ class ConstructorSchemesClass {
     return canvas.getContext('2d');
   }
 
-  static createReactiveNode(data, tooltip, type) {
+  static createReactiveNode(data) {
     const dataNode = new SimpleNode();
     dataNode.tag = data.dataRest;
     dataNode.style = new VuejsNodeStyle(data.template);
@@ -201,7 +203,7 @@ class ConstructorSchemesClass {
         ? data.height
         : data.rowHeight * (data?.dataRest?.items?.length || 1),
     );
-    return new DragAndDropPanelItem(dataNode, tooltip, type);
+    return dataNode;
   }
 
   static getEdgeOptions(edge) {
@@ -215,6 +217,14 @@ class ConstructorSchemesClass {
       smoothingLength: edge.style.smoothingLength,
     };
   }
+
+  static getVerticalPositionWithOffset({
+    position, count, offset,
+  }) {
+    return position + offset;
+  }
+
+  defaultDataSource = []
 
   // Main constructor options
   options = {
@@ -976,6 +986,14 @@ class ConstructorSchemesClass {
 
   copiedElements = null
 
+  get defaultDataSource() {
+    return this.defaultDataSource;
+  }
+
+  set defaultDataSource(value) {
+    this.defaultDataSource = value;
+  }
+
   get getShapeNodeStyleList() {
     return this.shapeNodeStyleList;
   }
@@ -1181,9 +1199,53 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
+  getElementsForSave() {
+    const resultElements = [];
+    const nodes = this.graphComponent.graph.nodes.toArray();
+    const edges = this.graphComponent.graph.edges.toArray();
+    const ports = this.graphComponent.graph.ports.toArray();
+    const labels = this.graphComponent.graph.labels.toArray();
+    [...nodes, ...edges, ...ports, ...labels].forEach((element) => {
+      if (element instanceof INode) {
+        resultElements.push({
+          type: element.tag.dataType || `${element.tag}-node`,
+          tag: element.tag,
+          element,
+        });
+      }
+      if (element instanceof IEdge) {
+        resultElements.push({
+          type: 'edge',
+          data: element.tag,
+          element,
+        });
+      }
+      if (element instanceof IPort) {
+        resultElements.push({
+          type: 'port',
+          data: element.tag,
+          element,
+        });
+      }
+      if (element instanceof ILabel) {
+        resultElements.push({
+          type: 'label',
+          data: element.tag,
+          element,
+        });
+      }
+    });
+    return resultElements;
+  }
+
   // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
+    // const SchemeUpdaterClass = new SchemeUpdater(
+    //   this.graphComponent.graph,
+    //   this.updateStoreCallback,
+    // );
+    // console.log(SchemeUpdaterClass.save());
     this.saveGraphToLocalStorage().then(() => {
       this.updateGraphFromLocalStorage(updateStoreCallback);
     });
@@ -1201,6 +1263,8 @@ class ConstructorSchemesClass {
     return new Promise((resolve) => {
       ICommand.OPEN.execute(null, this.graphComponent);
       resolve();
+    }).then(() => {
+      this.setDefaultElementsOrder();
     });
   }
 
@@ -1581,26 +1645,17 @@ class ConstructorSchemesClass {
     let createdNode = null;
     if (dropData?.tag?.templateType) {
       // Узел с данными
-      createdNode = graph.createNodeAt({
+      createdNode = this.createDataNode({
+        graph,
         location: dropLocation,
-        style: new VuejsNodeStyle(this.getDataNodeTemplate(dropData.tag.templateType)),
-        labels: dropData.labels,
-        tag: {
-          ...dropData.tag,
-          nodeId: dropData?.id || dropData.hashCode(),
-        },
+        data: dropData,
       });
     } else if (dropData?.tag?.textTemplateType) {
       // Узел с текстом
-      createdNode = graph.createNodeAt({
+      createdNode = this.createTextNode({
+        graph,
         location: dropLocation,
-        style: new VuejsNodeStyle(this.getTextNodeTemplate(dropData.tag.textTemplateType)),
-        labels: dropData.labels,
-        tag: {
-          ...dropData.tag,
-          fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
-          nodeId: dropData?.id || dropData.hashCode(),
-        },
+        data: dropData,
       });
     } else if (dropData?.tag?.isAspectRatio) {
       // Узел с картинкой
@@ -2072,12 +2127,24 @@ class ConstructorSchemesClass {
 
       // Узел с данными
       this.dndDataPanelItems.forEach((item) => {
-        items.push(ConstructorSchemesClass.createReactiveNode(item, 'Элменты с данными', 'data-node'));
+        items.push(
+          new DragAndDropPanelItem(
+            ConstructorSchemesClass.createReactiveNode(item),
+            'Элменты с данными',
+            'data-node',
+          ),
+        );
       });
 
       // Узел с текстом
       this.dndLabelPanelItems.forEach((item) => {
-        items.push(ConstructorSchemesClass.createReactiveNode(item, 'Элементы с текстом', 'text-node'));
+        items.push(
+          new DragAndDropPanelItem(
+            ConstructorSchemesClass.createReactiveNode(item),
+            'Элементы с текстом',
+            'text-node',
+          ),
+        );
       });
 
       // Подписи к узлам\ребрам
@@ -2121,22 +2188,21 @@ class ConstructorSchemesClass {
 
       // Узел с изображением\иконкой
       if (iconsList?.length > 0) {
-        const GenerateIconsClass = new GenerateIcons({
+        this.getIconsListForGraph({
+          iconsList,
           maxItemSize: this.dragAndDropPanel.getMaxItemWidth,
-          // Временный вариант, заменить на внешнее значение
           minItemSize: 150,
-        });
-        const filteredIconList = [];
-        Promise.all(iconsList.map(async (icon) => {
-          const response = await fetch(`/svg/${icon}.svg`);
-          if (response.ok) {
-            filteredIconList.push(icon);
-          }
-        })).then(() => {
-          GenerateIconsClass.generateIconNodes(filteredIconList).then((result) => {
-            items.push(...result);
-            resolve(items);
+        }).then((result) => {
+          result.forEach((item) => {
+            items.push(
+              new DragAndDropPanelItem(
+                item.icon.node,
+                item.icon.tooltip,
+                item.icon.dataType,
+              ),
+            );
           });
+          resolve(items);
         });
       } else {
         resolve(items);
@@ -2297,6 +2363,27 @@ class ConstructorSchemesClass {
     this.changeOrderSelectedElements(key, orderCommands[key]);
   }
 
+  setDefaultElementsOrder() {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node.tag.templateType) {
+        this.graphComponent.graphModelManager.toFront([node]);
+      } else if (node.tag.dataType === 'image-node') {
+        this.graphComponent.graphModelManager.toFront([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+      } else if (node.tag.textTemplateType) {
+        this.graphComponent.graphModelManager.toFront([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+      } else if (node.tag.dataType === 'default-node') {
+        this.graphComponent.graphModelManager.toFront([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+        this.graphComponent.graphModelManager.lower([node]);
+      }
+      this.graphComponent.graphModelManager.update(node);
+    });
+  }
+
   updateDataRest(updatedData) {
     this.dataRest = updatedData;
   }
@@ -2304,6 +2391,178 @@ class ConstructorSchemesClass {
   fitGraphContent() {
     this.graphComponent.fitGraphBounds().then(() => {
       this.graphComponent.updateVisual();
+    });
+  }
+
+  deleteAllImageNode() {
+    return new Promise((resolve, reject) => {
+      try {
+        this.graphComponent.graph.nodes.toArray().forEach((node) => {
+          if (node.tag.dataType === 'image-node') {
+            this.graphComponent.graph.remove(node);
+          }
+        });
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  deleteAllTextNodeByImage() {
+    return new Promise((resolve, reject) => {
+      try {
+        this.graphComponent.graph.nodes.toArray().forEach((node) => {
+          if (node.tag.dataType === 'label-0' && node.tag?.byImage) {
+            this.graphComponent.graph.remove(node);
+          }
+        });
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  buildGraph(dataSource) {
+    this.defaultDataSource = dataSource;
+    this.deleteAllImageNode()
+      .then(() => this.deleteAllTextNodeByImage())
+      .then(() => this.getIconsListForGraph({
+        iconsList: this.defaultDataSource,
+        maxItemSize: 150,
+        minItemSize: 150,
+      }))
+      .then((dataForGraph) => {
+        this.createElementFromDefaultData(dataForGraph);
+      });
+  }
+
+  createDataNode({ graph, location, data }) {
+    return graph.createNodeAt({
+      location,
+      style: new VuejsNodeStyle(this.getDataNodeTemplate(data.tag.templateType)),
+      tag: {
+        ...data.tag,
+        nodeId: data.id || data.hashCode(),
+      },
+    });
+  }
+
+  createTextNode({ graph, location, data }) {
+    return graph.createNodeAt({
+      location,
+      style: new VuejsNodeStyle(this.getTextNodeTemplate(data.tag.textTemplateType)),
+      tag: {
+        ...data.tag,
+        fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
+        nodeId: data?.id || data.hashCode(),
+      },
+    });
+  }
+
+  createElementFromDefaultData(elements, offsetY = 20, offsetX = 20) {
+    try {
+      let elementYPosition = this.graphComponent.viewPoint.y;
+      const resultElements = elements.map(async (element, index) => new Promise((resolve) => {
+        // icon-node
+        const createdIconNode = this.graphComponent.graph.createNodeAt({
+          location: new Point(
+            this.graphComponent.viewPoint.x,
+            elementYPosition,
+          ),
+          style: element.icon.node.style.clone(),
+          tag: {
+            ...element.icon.node.tag,
+            nodeId: index,
+          },
+        });
+        const data = {
+          tag: {
+            ...element.description.node.tag,
+            dataType: element.description.dataType,
+            text: `${element.description.text}`,
+            byImage: true,
+          },
+          id: +`${index + 1}${index}`,
+          byIconId: createdIconNode.tag.nodeId,
+        };
+        const createdTextNode = this.createTextNode({
+          graph: this.graphComponent.graph,
+          location: new Point(
+            this.graphComponent.viewPoint.x + element.icon.node.layout.width,
+            0,
+          ),
+          data,
+        });
+        resolve({
+          createdIconNode,
+          createdTextNode,
+        });
+      }).then(({
+        createdIconNode,
+        createdTextNode,
+      }) => new Promise((resolve) => {
+        const iconNodeHeight = element.icon.node.layout.height;
+        const iconNodePosition = new Rect(
+          createdIconNode.layout.x,
+          elementYPosition,
+          element.icon.node.layout.width,
+          element.icon.node.layout.height,
+        );
+        const textNodeHeight = element.description.node.layout.height;
+        const textNodePosition = new Rect(
+          createdTextNode.layout.x + offsetX,
+          elementYPosition + (((iconNodeHeight + offsetY) - (textNodeHeight + offsetY)) / 2),
+          element.description.node.layout.width,
+          element.description.node.layout.height,
+        );
+        this.graphComponent.graph.setNodeLayout(createdIconNode, iconNodePosition);
+        this.graphComponent.graph.setNodeLayout(createdTextNode, textNodePosition);
+        this.graphComponent.updateVisual();
+        elementYPosition += element.icon.node.layout.height + offsetY;
+        resolve();
+      })));
+      Promise.all(resultElements)
+        .then(() => {
+          this.fitGraphContent();
+        });
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  // iconsList:Array<string>, maxItemSize:number, minItemSize:number
+  getIconsListForGraph({ iconsList, maxItemSize, minItemSize }) {
+    return new Promise((resolve) => {
+      const GenerateIconsClass = new GenerateIcons({
+        maxItemSize,
+        minItemSize,
+      });
+      const localIconList = [];
+      const resultList = [];
+      if (iconsList.some((item) => item.obj_description)) {
+        iconsList.forEach((item) => {
+          if (item.obj_description) {
+            const node = ConstructorSchemesClass.createReactiveNode(this.dndLabelPanelItems[0]);
+            localIconList.push({
+              ...item,
+              description: {
+                text: item.obj_description,
+                node,
+                tooltip: 'Элементы с текстом',
+                dataType: 'label-0',
+              },
+            });
+          }
+        });
+      } else {
+        localIconList.push(...iconsList);
+      }
+      GenerateIconsClass.generateIconNodes(localIconList).then((result) => {
+        resultList.push(...result);
+        resolve(resultList);
+      });
     });
   }
 }
