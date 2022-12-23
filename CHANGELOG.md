@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.117.0]
+
+### Added
 - Multiline: added the x axis value in tooltip
 - Multiline: added setting to show ticks on x-axis by points
 - Added load icons list from datasource in constructor-schemes
