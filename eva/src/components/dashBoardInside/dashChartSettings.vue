@@ -547,7 +547,7 @@
                 <div class="col-8 py-0">
                   <v-checkbox
                     v-model="xAxis.ticksEnabled"
-                    :label="`Частота подписей оси X: ${xAxis.ticks}`"
+                    :label="`Количество тиков оси X: ${xAxis.ticks === 0 ? 'каждая точка' : xAxis.ticks}`"
                     persistent-placeholder
                     dense
                     outlined
@@ -561,8 +561,8 @@
                     v-model="xAxis.ticks"
                     :disabled="!xAxis.ticksEnabled"
                     color="blue"
-                    min="1"
-                    max="100"
+                    min="0"
+                    max="50"
                     class="mt-0 mr-1"
                     hide-details
                   />
@@ -706,7 +706,7 @@ export default {
       textTranslate: [-10, 0],
       textAnchor: 'end', // start, end
       ticksEnabled: false,
-      ticks: 10,
+      ticks: 0,
       allMetrics: [],
     },
     colorPickerInputMode: false,

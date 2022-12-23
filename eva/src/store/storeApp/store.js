@@ -61,11 +61,12 @@ export default {
       Vue.set(state, 'roles', roles);
     },
     setGroups(state, groups) {
-      state.treeGroups = groups.map(({ name, id }) => ({
+      state.treeGroups = groups.map(({ name, id, dashs }) => ({
         type: 'group',
         treeId: `dash-${id}`,
         name,
         id,
+        dashs,
         children: [],
       }));
     },
