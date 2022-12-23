@@ -653,6 +653,10 @@ export default {
       if (elem.elem === 'map' && !this.dataObject[elem.search]?.loading) {
         return this.dataObject[this.dashFromStore[elem.elem].options.search?.id]?.loading;
       }
+      if (elem.elem === 'constructorSchemes' && !this.dataObject[elem.search]?.loading) {
+        return this.dataObject[this.dashFromStore[elem.elem]
+          .options.defaultFromSourceData]?.loading;
+      }
       return this.dataObject[elem.search]?.loading;
     },
     getElementData(elem) {
