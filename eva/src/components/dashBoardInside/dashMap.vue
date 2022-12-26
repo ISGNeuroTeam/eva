@@ -280,6 +280,7 @@ export default {
           }
         });
       }
+      this.createTokens();
     },
     clusterTextCount() {
       if (this.map) {
@@ -458,8 +459,16 @@ export default {
     },
     createTokens() {
       const captures = ['top_left_point', 'bottom_right_point', 'zoom_level', 'dash_id'];
+      if (this.dataRestFrom.length) {
+        captures.push(...Object.keys(this.dataRestFrom[0]));
+      }
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], 'capture', captures);
+      });
+      this.$store.commit('setActions', {
+        actions: JSON.parse(JSON.stringify(this.actions)),
+        idDash: this.idDash,
+        id: this.element,
       });
     },
     reDrawMap(dataRest) {
@@ -636,7 +645,7 @@ export default {
 
     setClick(tokenValue, element) {
       const events = this.getEvents({
-        event: 'onclick',
+        event: 'click',
         partelement: 'empty',
       });
       if (events.length !== 0) {
