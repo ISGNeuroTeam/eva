@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Component settings. Centering the filling of the library of primitives
+- GIS: fixed display of tooltip above areas
+- GIS: fixed click event
 
 ## [1.117.0]
 

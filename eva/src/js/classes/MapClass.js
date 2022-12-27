@@ -397,7 +397,7 @@ class MapClass {
         className: 'leaftet-hover',
       })
       .on('click', () => {
-        callback(element.ID, lib);
+        callback(element.ID, element);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
