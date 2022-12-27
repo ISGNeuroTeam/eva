@@ -293,8 +293,8 @@ class MapClass {
       .bindTooltip(tooltip)
       .on('mouseover', (e) => highlightFeature(e, line))
       .on('mouseout', resetHighlight)
-      .on('click', () => {
-        callback(element.ID, element);
+      .on('click', (evn) => {
+        callback(element.ID, element, evn);
       });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);
@@ -323,8 +323,8 @@ class MapClass {
     });
     line
       .bindTooltip(tooltip)
-      .on('click', () => {
-        callback(element.ID, element);
+      .on('click', (evn) => {
+        callback(element.ID, element, evn);
       });
     line.setTooltipContent(element.label);
     this.layerGroup[element.type].addLayer(line);
@@ -372,8 +372,8 @@ class MapClass {
         className: 'leaftet-hover',
         interactive: true,
       })
-      .on('click', () => {
-        callback(element.ID, element);
+      .on('click', (evn) => {
+        callback(element.ID, element, evn);
       });
     this.layerGroup[element.type].addLayer(marker);
   }
@@ -396,8 +396,8 @@ class MapClass {
         direction: 'top',
         className: 'leaftet-hover',
       })
-      .on('click', () => {
-        callback(element.ID, element);
+      .on('click', (evn) => {
+        callback(element.ID, element, evn);
       });
       // eslint-disable-next-line no-underscore-dangle
     this.layerGroup[element.type].addLayer(marker);
