@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Bush: added the ability to change the label color
+- Added onctrlclick event for Ctrl+Click transition
 
 ### Changed
 

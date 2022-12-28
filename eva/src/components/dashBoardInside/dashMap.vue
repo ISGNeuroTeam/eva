@@ -499,9 +499,9 @@ export default {
             this.map.drawObjects({
               dataRest,
               pipelineDataDictionary: this.pipelineDataDictionary,
-              callback: (id, element) => {
+              callback: (id, element, evn) => {
                 this.updateTokenOnClickAction(element);
-                this.setClick(id, element);
+                this.setClick(id, element, evn?.originalEvent.ctrlKey);
               },
             });
             if (this.map) {
@@ -551,7 +551,7 @@ export default {
       }
     },
     generateLibrary(dataRest, options) {
-      const tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
+      const tmp = `${dataRest[dataRest.length - 1]?.ID}`.replaceAll("'", '"');
       if (tmp) {
         try {
           if (options) {
@@ -643,9 +643,9 @@ export default {
       });
     },
 
-    setClick(tokenValue, element) {
+    setClick(tokenValue, element, ctrlKey) {
       const events = this.getEvents({
-        event: 'click',
+        event: ctrlKey ? 'onctrlclick' : 'onclick',
         partelement: 'empty',
       });
       if (events.length !== 0) {
