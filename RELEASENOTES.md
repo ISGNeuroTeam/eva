@@ -1,3 +1,17 @@
+# [1.118.0] - 2022-12-29
+
+### Added
+- Bush: added the ability to change the label color
+- GIS: Added onctrlclick event for Ctrl+Click transition
+- Constructor-schemes: added undo/redo (ctrl+z/ctrl+y)
+
+### Fixed
+- Component settings: Centering the filling of the library of primitives
+- GIS: fixed display of tooltip above areas
+- GIS: fixed click event
+- Constructor-schemes: GraphViewerInputMode is not active default
+- Constructor-schemes: Incorrect start search from component settings
+
 # [1.117.0] - 2022-12-23
 
 ### Added

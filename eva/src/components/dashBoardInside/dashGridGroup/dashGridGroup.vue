@@ -70,7 +70,7 @@
               :width-from="(box.width - 56) * (colNum >= item.w ? colNum / item.w : 1)"
               :search-rep="true"
               :data-report="true"
-              :data-rest-from="item.dataRest.data"
+              :data-rest-from="(item.dataRest ? item.dataRest.data : [])"
               :current-settings="settings"
               :update-settings="updateSettings"
               :data-mode-from="dataModeFrom"
