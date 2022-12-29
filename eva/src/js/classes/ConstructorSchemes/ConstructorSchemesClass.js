@@ -1143,12 +1143,15 @@ class ConstructorSchemesClass {
     this.setDefaultLabelParameters();
     // Configures default styles for newly created graph elements
     this.applyStylesElements(elementDefaultStyles);
+    this.enableUndo();
     if (this.isEdit) {
       this.configureInputModes(
         this.updateStoreCallback,
         this.openDataPanelCallback,
         this.closeDataPanelCallback,
       );
+    } else {
+      this.enableViewerInputMode();
     }
     // Сохранение через GraphML
     this.initializeIO();
@@ -1416,12 +1419,16 @@ class ConstructorSchemesClass {
       );
     } else {
       this.isEdit = false;
-      this.graphComponent.inputMode = new GraphViewerInputMode({
-        focusableItems: 'none',
-      });
+      this.enableViewerInputMode();
       this.closeDataPanelCallback();
     }
     return this.isEdit;
+  }
+
+  enableViewerInputMode() {
+    this.graphComponent.inputMode = new GraphViewerInputMode({
+      focusableItems: 'none',
+    });
   }
 
   // Setting up interaction with the graph
@@ -2564,6 +2571,25 @@ class ConstructorSchemesClass {
         resolve(resultList);
       });
     });
+  }
+
+  enableUndo() {
+    const { graph } = this.graphComponent;
+    // Enables undo on the graph.
+    // This will make the graph store the edits and will make the undo/redo commands work.
+    graph.undoEngineEnabled = true;
+
+    // Basically this means that from now on the following functionality will be available
+    // and do something useful as soon as edits have been made.
+    if (graph.undoEngineEnabled && graph.undoEngine) {
+      if (graph.undoEngine.canUndo()) {
+        graph.undoEngine.undo();
+      }
+      if (graph.undoEngine.canRedo()) {
+        graph.undoEngine.redo();
+      }
+      graph.undoEngine.clear();
+    }
   }
 }
 
