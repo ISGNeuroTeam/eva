@@ -8,11 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Bush: added the ability to change the label color
-- Added onctrlclick event for Ctrl+Click transition
-- Added undo/redo(ctrl+z/ctrl+y) on constructor-schemes
 
 ### Changed
+
+### Fixed
+
+## [1.118.0]
+
+### Added
+- Bush: added the ability to change the label color
+- GIS: Added onctrlclick event for Ctrl+Click transition
+- Added undo/redo(ctrl+z/ctrl+y) on constructor-schemes
 
 ### Fixed
 - Component settings. Centering the filling of the library of primitives
