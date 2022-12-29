@@ -808,6 +808,7 @@ export default {
       panelBottomOffset: 10,
       isLoading: false,
       isConfirmModal: false,
+      isConfirmUpdateScheme: false,
     };
   },
   computed: {
@@ -864,7 +865,7 @@ export default {
     getDefaultDataSource: {
       deep: true,
       handler(value) {
-        if (this.constructorSchemes && value?.length > 0) {
+        if (this.constructorSchemes && value?.length > 0 && this.isConfirmUpdateScheme) {
           this.constructorSchemes.buildGraph(structuredClone(value));
           const updatedIcons = this.updateIconsList(value);
           if (updatedIcons?.length > 0) {
@@ -878,6 +879,7 @@ export default {
               ),
             }]);
           }
+          this.isConfirmUpdateScheme = false;
         }
       },
     },
@@ -1027,6 +1029,7 @@ export default {
     },
     async startSearch(confirm) {
       if (confirm) {
+        this.isConfirmUpdateScheme = true;
         this.$store.commit('updateSearchStatus', {
           idDash: this.idDashFrom,
           id: this.defaultFromSourceData,
