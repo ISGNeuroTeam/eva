@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added undo/redo(ctrl+z/ctrl+y) on constructor-schemes
 
 ### Changed
+- Update yFiles to v25.0.1
+- Update yFiles license to 2.4
 
 ### Fixed
 - Component settings. Centering the filling of the library of primitives
