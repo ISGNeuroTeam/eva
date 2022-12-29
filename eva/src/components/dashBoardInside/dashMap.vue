@@ -280,6 +280,7 @@ export default {
           }
         });
       }
+      this.createTokens();
     },
     clusterTextCount() {
       if (this.map) {
@@ -458,8 +459,16 @@ export default {
     },
     createTokens() {
       const captures = ['top_left_point', 'bottom_right_point', 'zoom_level', 'dash_id'];
+      if (this.dataRestFrom.length) {
+        captures.push(...Object.keys(this.dataRestFrom[0]));
+      }
       this.actions.forEach((item, i) => {
         this.$set(this.actions[i], 'capture', captures);
+      });
+      this.$store.commit('setActions', {
+        actions: JSON.parse(JSON.stringify(this.actions)),
+        idDash: this.idDash,
+        id: this.element,
       });
     },
     reDrawMap(dataRest) {
@@ -490,9 +499,9 @@ export default {
             this.map.drawObjects({
               dataRest,
               pipelineDataDictionary: this.pipelineDataDictionary,
-              callback: (id, element) => {
+              callback: (id, element, evn) => {
                 this.updateTokenOnClickAction(element);
-                this.setClick(id, element);
+                this.setClick(id, element, evn?.originalEvent.ctrlKey);
               },
             });
             if (this.map) {
@@ -542,7 +551,7 @@ export default {
       }
     },
     generateLibrary(dataRest, options) {
-      const tmp = dataRest[dataRest.length - 1]?.ID.replaceAll("'", '"');
+      const tmp = `${dataRest[dataRest.length - 1]?.ID}`.replaceAll("'", '"');
       if (tmp) {
         try {
           if (options) {
@@ -634,9 +643,9 @@ export default {
       });
     },
 
-    setClick(tokenValue, element) {
+    setClick(tokenValue, element, ctrlKey) {
       const events = this.getEvents({
-        event: 'onclick',
+        event: ctrlKey ? 'onctrlclick' : 'onclick',
         partelement: 'empty',
       });
       if (events.length !== 0) {

@@ -12,7 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+
+## [1.118.0]
+
+### Added
+- Bush: added the ability to change the label color
+- GIS: Added onctrlclick event for Ctrl+Click transition
+- Added undo/redo(ctrl+z/ctrl+y) on constructor-schemes
+
+### Fixed
 - Component settings. Centering the filling of the library of primitives
+- GIS: fixed display of tooltip above areas
+- GIS: fixed click event
+- Constructor-schemes: GraphViewerInputMode is not active default
+- Constructor-schemes: Incorrect start search from component settings
 
 ## [1.117.0]
 

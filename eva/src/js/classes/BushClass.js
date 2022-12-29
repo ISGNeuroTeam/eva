@@ -186,8 +186,11 @@ class BushClass {
   initializeDefaultStyles() {
     // стиль для label
     this.graphComponent.graph.nodeDefaults.labels.style = new DefaultLabelStyle({
-      textFill: '#b8b8b8',
-      backgroundFill: '#0a0a0a',
+      backgroundStroke: '#8F8F9C',
+      backgroundFill: '#232026',
+      textFill: 'white',
+      shape: 'round-rectangle',
+      insets: [1, 4, 1, 4],
     });
     this.graphComponent.graph.edgeDefaults.style = new PolylineEdgeStyle({
       stroke: '3px white',
@@ -213,34 +216,52 @@ class BushClass {
     // для нод на графе, скрытая переменная yfile
     // this.graphNodes = null;
     this.nodesSource.forEach((node, index) => {
+      const source = this.nodesSource[index];
       let localNode;
       let imgSource;
-      if (this.nodesSource[index].anomaly === true) {
+      if (source.anomaly === true) {
         imgSource = this.elementConfig.library
-          .primitives[this.nodesSource[index].type].image_on;
+          .primitives[source.type].image_on;
         localNode = this.graphComponent.graph.createNodeAt({
           location: node.point,
           style: new ImageNodeStyle(`/svg/warning_${imgSource}`),
-          labels: [this.nodesSource[index].label],
         });
       } else {
-        if (this.nodesSource[index].status === true) {
+        if (source.status === true) {
           imgSource = this.elementConfig.library
-            .primitives[this.nodesSource[index].type].image_on;
+            .primitives[source.type].image_on;
         } else {
           imgSource = this.elementConfig.library
-            .primitives[this.nodesSource[index].type].image_off;
+            .primitives[source.type].image_off;
         }
         localNode = this.graphComponent.graph.createNodeAt({
           location: node.point,
           style: new ImageNodeStyle(`/svg/${imgSource}`),
-          labels: [this.nodesSource[index].label],
         });
       }
-      this.setNodeSize(localNode, this.nodesSource[index].type);
+
+      // add label with color
+      let labelStyle = null;
+      if (source.labelColor) {
+        labelStyle = new DefaultLabelStyle({
+          backgroundStroke: source.labelColor,
+          backgroundFill: '#232026',
+          textFill: source.labelColor,
+          shape: 'round-rectangle',
+          insets: [1, 4, 1, 4],
+        });
+      }
+      this.graphComponent.graph.addLabel(
+        localNode,
+        source.label,
+        ExteriorLabelModel.SOUTH,
+        labelStyle,
+      );
+
+      this.setNodeSize(localNode, source.type);
       // для дальнейшего рисования edges
       // через tag передаётся id
-      localNode.tag = this.nodesSource[index].id;
+      localNode.tag = source.id;
       if (this.graphNodes) {
         this.graphNodes.push(localNode);
       } else {
@@ -296,6 +317,7 @@ class BushClass {
         type: dataRest[i].object_type,
         status: dataRest[i].status,
         anomaly: dataRest[i].anomaly,
+        labelColor: dataRest[i].label_color,
       });
     }
     this.nodesSource = allNodes;
