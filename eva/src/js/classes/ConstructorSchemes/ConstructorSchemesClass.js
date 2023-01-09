@@ -54,7 +54,7 @@ import yFiles, {
   FreeNodePortLocationModel,
   GraphViewerInputMode,
 } from 'yfiles';
-
+import Utils from './Utils.js';
 import { throttle } from '@/js/utils/throttle';
 import licenseData from '../../../license/license.json';
 import { DragAndDropPanel, DragAndDropPanelItem } from './DnDPanelClass';
@@ -78,35 +78,11 @@ class ConstructorSchemesClass {
       createdNode,
       new ShapeNodeStyle({
         shape: 'round-rectangle',
-        fill: ConstructorSchemesClass.colorToString(Color.from(dropData.style.fill.color)),
-        stroke: `${ConstructorSchemesClass.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
+        fill: Utils.colorToString(Color.from(dropData.style.fill.color)),
+        stroke: `${Utils.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
       }),
     );
     return createdNode;
-  }
-
-  static colorToString(color) {
-    if (color?.a) {
-      return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    }
-    return `rgb(${color.r}, ${color.g}, ${color.b})`;
-  }
-
-  static colorToRgbaObject(color) {
-    const rgbaColor = Color.from(color);
-    return {
-      r: rgbaColor.r,
-      g: rgbaColor.g,
-      b: rgbaColor.b,
-      a: rgbaColor.a,
-    };
-  }
-
-  static generateColor(color) {
-    return {
-      rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
-      rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
-    };
   }
 
   static removeClass(e, className) {
@@ -149,7 +125,7 @@ class ConstructorSchemesClass {
         b: color.b,
         a: color.a,
       },
-      rgbaString: ConstructorSchemesClass.colorToString(color),
+      rgbaString: Utils.colorToString(color),
     };
   }
 
@@ -210,8 +186,8 @@ class ConstructorSchemesClass {
     const { color } = edge.style.stroke.fill;
     return {
       strokeColor: {
-        rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
-        rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
+        rgbaObject: Utils.colorToRgbaObject(color),
+        rgbaString: Utils.colorToString(Color.from(color)),
       },
       thickness: `${edge.style.stroke.thickness}px`,
       smoothingLength: edge.style.smoothingLength,
@@ -368,7 +344,7 @@ class ConstructorSchemesClass {
         nodeId: 'template-0',
         // Идентификатор для связки данных с элементом,
         // в дальнейшем должен приходить с сервера
-        dataType: '0',
+        dataType: 'data-type-0',
         templateType: 'template-0',
         widthLeft: 50,
         items: [
@@ -502,7 +478,7 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 15,
       dataRest: {
-        dataType: '1',
+        dataType: 'data-type-1',
         nodeId: 'template-1',
         templateType: 'template-1',
         widthLeft: 30,
@@ -583,7 +559,7 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 30,
       dataRest: {
-        dataType: '2',
+        dataType: 'data-type-2',
         nodeId: 'template-2',
         templateType: 'template-2',
         id: '',
@@ -655,7 +631,7 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 30,
       dataRest: {
-        dataType: '3',
+        dataType: 'data-type-3',
         nodeId: 'template-3',
         templateType: 'template-3',
         id: '',
@@ -715,7 +691,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 30,
       dataRest: {
-        dataType: '4',
+        dataType: 'data-type-4',
         nodeId: 'template-4',
         id: '',
         templateType: 'template-4',
@@ -805,7 +781,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 70,
       dataRest: {
-        dataType: '5',
+        dataType: 'data-type-5',
         nodeId: 'template-5',
         idFirst: '',
         templateType: 'template-5',
@@ -884,7 +860,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 30,
       dataRest: {
-        dataType: 'label-0',
+        dataType: 'label-type-0',
         nodeId: 'label-template-0',
         id: '',
         textTemplateType: 'template-0',
@@ -1171,16 +1147,20 @@ class ConstructorSchemesClass {
         this.initializeDnDPanel();
       });
     }
-    const { nodeDecorator } = this.graphComponent.graph.decorator;
-
-    // Отключаем изменение размеров у ненвидимых узлов
-    nodeDecorator.reshapeHandleProviderDecorator
-      .hideImplementation((node) => node.tag === 'invisible');
+    this.disableResizeInvisibleNodes();
 
     this.registerReshapeHandleProvider();
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
     // Привязка z-order у label к родителю
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
+  }
+
+  disableResizeInvisibleNodes() {
+    const { nodeDecorator } = this.graphComponent.graph.decorator;
+
+    // Отключаем изменение размеров у ненвидимых узлов
+    nodeDecorator.reshapeHandleProviderDecorator
+      .hideImplementation((node) => node.tag === 'invisible');
   }
 
   createDnDPanelDefaultNode() {
@@ -1194,8 +1174,8 @@ class ConstructorSchemesClass {
     defaultNode.style = new VuejsNodeStyle(this.dndShapeNode.template);
     defaultNode.tag = {
       dataType: 'default-node',
-      fill: ConstructorSchemesClass.generateColor(this.defaultNodeStyle.fill),
-      strokeColor: ConstructorSchemesClass.generateColor(this.defaultNodeStyle.strokeColor),
+      fill: Utils.generateColor(this.defaultNodeStyle.fill),
+      strokeColor: Utils.generateColor(this.defaultNodeStyle.strokeColor),
       thickness: this.defaultNodeStyle.strokeSize,
       shape: this.defaultNodeStyle.shape,
     };
@@ -1244,11 +1224,11 @@ class ConstructorSchemesClass {
   // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
-    // const SchemeUpdaterClass = new SchemeUpdater(
-    //   this.graphComponent.graph,
-    //   this.updateStoreCallback,
-    // );
-    // console.log(SchemeUpdaterClass.save());
+    const SchemeUpdaterClass = new SchemeUpdater(
+      this.graphComponent.graph,
+      this.updateStoreCallback,
+    );
+    console.log(SchemeUpdaterClass.save());
     this.saveGraphToLocalStorage().then(() => {
       this.updateGraphFromLocalStorage(updateStoreCallback);
     });
@@ -1274,7 +1254,7 @@ class ConstructorSchemesClass {
   updateDataNodeTemplate() {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.templateType) {
-        if ((node.tag.dataType === '0' || node.tag.dataType === '1') && !node.tag?.widthLeft) {
+        if ((node.tag.dataType === 'data-type-0' || node.tag.dataType === 'data-type-1') && !node.tag?.widthLeft) {
           node.tag = {
             ...node.tag,
             widthLeft: this.getDefaultDataNodeParams(node.tag.dataType, 'widthLeft'),
@@ -1542,7 +1522,7 @@ class ConstructorSchemesClass {
           openDataPanelCallback({
             dataType: 'label',
             fontSize: evt.item.style.textSize,
-            color: ConstructorSchemesClass.generateColor(evt.item.style.textFill.color),
+            color: Utils.generateColor(evt.item.style.textFill.color),
           });
         } else {
           openDataPanelCallback({
@@ -2225,7 +2205,7 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === '0' || dataType === '1') {
+        if (dataType === 'data-type-0' || dataType === 'data-type-1') {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
             const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
@@ -2241,20 +2221,20 @@ class ConstructorSchemesClass {
             ...node.tag,
             items: updatedItems,
           };
-        } else if (dataType === '2' || dataType === '3') {
+        } else if (dataType === 'data-type-2' || dataType === 'data-type-3') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             textFirst: targetData?.value || '-',
             textSecond: targetData?.Description || '-',
           };
-        } else if (dataType === '4') {
+        } else if (dataType === 'data-type-4') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             currentValue: targetData?.value ? +targetData.value : 0,
           };
-        } else if (dataType === '5') {
+        } else if (dataType === 'data-type-5') {
           const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
           const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
           node.tag = {
@@ -2273,7 +2253,7 @@ class ConstructorSchemesClass {
   updateSelectedNode(dataFromComponent, updateStoreCallback) {
     let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
-    if (dataType === '0' || dataType === '1') {
+    if (dataType === 'data-type-0' || dataType === 'data-type-1') {
       updatedData = {
         widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
@@ -2282,13 +2262,13 @@ class ConstructorSchemesClass {
           textRight: this.getDataItemById(item.id)?.value || '-',
         })),
       };
-    } else if (dataType === '2' || dataType === '3') {
+    } else if (dataType === 'data-type-2' || dataType === 'data-type-3') {
       updatedData = {
         ...dataFromComponent,
         textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
         textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
-    } else if (dataType === '4') {
+    } else if (dataType === 'data-type-4') {
       updatedData = {
         ...dataFromComponent,
         currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
@@ -2558,7 +2538,7 @@ class ConstructorSchemesClass {
                 text: item.obj_description,
                 node,
                 tooltip: 'Элементы с текстом',
-                dataType: 'label-0',
+                dataType: 'label-type-0',
               },
             });
           }
