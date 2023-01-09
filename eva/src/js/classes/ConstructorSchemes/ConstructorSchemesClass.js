@@ -1093,24 +1093,16 @@ class ConstructorSchemesClass {
     } else {
       this.enableViewerInputMode();
     }
-    // Сохранение через GraphML
-    this.initializeIO();
+    this.schemeUpdater = null;
     if (this.savedGraph) {
-      this.loadGraph().then(() => {
-        this.updateDataNodeTemplate();
-        // Выравнивание графа, инициализация dnd панели
-        this.updateViewport().then(() => {
-          this.dndPanelElem = dndPanelElem;
-          this.initializeDnDPanel();
-        });
-      });
-    } else {
-      // Выравнивание графа, инициализация dnd панели
-      this.updateViewport().then(() => {
-        this.dndPanelElem = dndPanelElem;
-        this.initializeDnDPanel();
-      });
+      this.load();
     }
+    // Выравнивание графа, инициализация dnd панели
+    this.updateViewport().then(() => {
+      this.dndPanelElem = dndPanelElem;
+      this.initializeDnDPanel();
+    });
+    // }
     this.disableResizeInvisibleNodes();
 
     this.registerReshapeHandleProvider();
@@ -1146,118 +1138,25 @@ class ConstructorSchemesClass {
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
   }
 
-  // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
+  initSchemeUpdater() {
+    return new SchemeUpdater({
+      graph: this.graphComponent.graph,
+      elementsFromStore: this.savedGraph,
+      updateStoreCallback: this.updateStoreCallback,
+    });
+  }
+
   // Save
-  save(updateStoreCallback) {
-    const SchemeUpdaterClass = new SchemeUpdater(
-      this.graphComponent.graph,
-      this.updateStoreCallback,
-    );
-    SchemeUpdaterClass.save().then((result) => {
+  save() {
+    const schemeUpdater = this.initSchemeUpdater();
+    schemeUpdater.save().then((result) => {
       console.log(result);
     });
-    this.saveGraphToLocalStorage().then(() => {
-      this.updateGraphFromLocalStorage(updateStoreCallback);
-    });
   }
 
-  async saveGraphToLocalStorage() {
-    return new Promise((resolve) => {
-      ICommand.SAVE.execute(null, this.graphComponent);
-      resolve();
-    });
-  }
-
-  // Load
-  async loadGraph() {
-    return new Promise((resolve) => {
-      ICommand.OPEN.execute(null, this.graphComponent);
-      resolve();
-    }).then(() => {
-      this.setDefaultElementsOrder();
-    });
-  }
-
-  updateDataNodeTemplate() {
-    this.graphComponent.graph.nodes.forEach((node) => {
-      if (node.tag.templateType) {
-        if ((node.tag.dataType === 'data-type-0' || node.tag.dataType === 'data-type-1') && !node.tag?.widthLeft) {
-          node.tag = {
-            ...node.tag,
-            widthLeft: this.getDefaultDataNodeParams(node.tag.dataType, 'widthLeft'),
-          };
-        }
-        this.graphComponent.graph.setStyle(
-          node,
-          new VuejsNodeStyle(this.getDataNodeTemplate(node.tag.templateType)),
-        );
-      }
-    });
-  }
-
-  getDefaultDataNodeParams(dataType, fieldName) {
-    try {
-      const defaultOptions = this.dndDataPanelItems
-        .find((item) => item?.dataRest?.dataType === dataType);
-      return defaultOptions.dataRest[fieldName];
-    } catch (e) {
-      throw new Error(e);
-    }
-  }
-
-  // Load from LocalStorage to Store
-  updateGraphFromLocalStorage(updateStoreCallback) {
-    this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
-    window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
-    if (updateStoreCallback && this.savedGraph) {
-      updateStoreCallback(this.savedGraph);
-    }
-  }
-
-  // Settings GraphML
-  initializeIO() {
-    const graphmlHandler = new GraphMLIOHandler();
-    // enable serialization of the VueJS node style -
-    // without a namespace mapping, serialization will fail
-    graphmlHandler.addXamlNamespaceMapping(
-      'http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0',
-      { VuejsNodeStyle: VuejsNodeStyleMarkupExtension },
-    );
-    graphmlHandler.addNamespace(
-      'http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0',
-      'VuejsNodeStyle',
-    );
-    graphmlHandler.addHandleSerializationListener((sender, args) => {
-      const { item } = args;
-      const { context } = args;
-      if (item instanceof VuejsNodeStyle) {
-        const vuejsNodeStyleMarkupExtension = new VuejsNodeStyleMarkupExtension();
-        vuejsNodeStyleMarkupExtension.template = item.template;
-        context.serializeReplacement(
-          VuejsNodeStyleMarkupExtension.$class,
-          item,
-          vuejsNodeStyleMarkupExtension,
-        );
-        args.handled = true;
-      }
-    });
-    // this.zOrderSupport.configureZOrderGraphMLIOHandler(graphmlHandler);
-
-    if (this.savedGraph) {
-      graphmlHandler.readFromGraphMLText(this.graphComponent.graph, this.savedGraph).then(() => {
-        this.initGraphMlSupport(graphmlHandler);
-      });
-    } else {
-      this.initGraphMlSupport(graphmlHandler);
-    }
-  }
-
-  initGraphMlSupport(graphmlHandler) {
-    return new GraphMLSupport({
-      graphComponent: this.graphComponent,
-      graphMLIOHandler: graphmlHandler,
-      storageLocation: StorageLocation.LOCAL_STORAGE,
-    });
+  load() {
+    const schemeUpdater = this.initSchemeUpdater();
+    schemeUpdater.load();
   }
 
   registerReshapeHandleProvider() {
@@ -2448,10 +2347,7 @@ class ConstructorSchemesClass {
   // iconsList:Array<string>, maxItemSize:number, minItemSize:number
   getIconsListForGraph({ iconsList, maxItemSize, minItemSize }) {
     return new Promise((resolve) => {
-      const GenerateIconsClass = new GenerateIcons({
-        maxItemSize,
-        minItemSize,
-      });
+      const GenerateIconsClass = new GenerateIcons();
       const localIconList = [];
       const resultList = [];
       if (iconsList.some((item) => item.obj_description)) {
@@ -2472,7 +2368,11 @@ class ConstructorSchemesClass {
       } else {
         localIconList.push(...iconsList);
       }
-      GenerateIconsClass.generateIconNodes(localIconList).then((result) => {
+      GenerateIconsClass.generateIconNodes(
+        localIconList,
+        maxItemSize,
+        minItemSize,
+      ).then((result) => {
         resultList.push(...result);
         resolve(resultList);
       });
