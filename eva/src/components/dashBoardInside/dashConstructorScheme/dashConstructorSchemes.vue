@@ -944,12 +944,23 @@ export default {
         );
       });
     },
-    updateSavedGraph(data) {
-      this.$store.commit('setState', [{
-        object: this.dashFromStore,
-        prop: 'savedGraph',
-        value: data,
-      }]);
+    updateSavedGraph(data, isMultipleSave) {
+      if (!isMultipleSave) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'savedGraph',
+          value: data,
+        }]);
+      } else {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'savedGraph',
+          value: {
+            ...this.dashFromStore.savedGraph,
+            data,
+          },
+        }]);
+      }
     },
     closeDataPanel() {
       this.dataPanel = false;
