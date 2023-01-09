@@ -22,19 +22,14 @@ import yFiles, {
   IEdge,
   IEdgeReconnectionPortCandidateProvider,
   ILabel,
-  GraphClipboard,
-  ImageNodeStyle,
   INode,
   InteriorLabelModel,
   IPort,
-  IBend,
-  IModelItem,
   IReshapeHandler,
   KeyEventRecognizers,
   LabelDropInputMode,
   License,
   ListEnumerable,
-  MatrixOrder,
   MouseEventRecognizers,
   NodeDropInputMode,
   NodeReshapeHandleProvider,
@@ -54,7 +49,7 @@ import yFiles, {
   FreeNodePortLocationModel,
   GraphViewerInputMode,
 } from 'yfiles';
-
+import Utils from './Utils.js';
 import { throttle } from '@/js/utils/throttle';
 import licenseData from '../../../license/license.json';
 import { DragAndDropPanel, DragAndDropPanelItem } from './DnDPanelClass';
@@ -65,6 +60,7 @@ import VuejsNodeStyleMarkupExtension from './VuejsNodeStyleMarkupExtension.js';
 import EdgeDropInputMode from './EdgeDropInputModeClass';
 import GenerateIcons from './GenerateIcons.js';
 import SchemeUpdater from './SchemeUpdater.js';
+import elementTemplates from './elementTemplates.js';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -78,67 +74,11 @@ class ConstructorSchemesClass {
       createdNode,
       new ShapeNodeStyle({
         shape: 'round-rectangle',
-        fill: ConstructorSchemesClass.colorToString(Color.from(dropData.style.fill.color)),
-        stroke: `${ConstructorSchemesClass.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
+        fill: Utils.colorToString(Color.from(dropData.style.fill.color)),
+        stroke: `${Utils.colorToString(Color.from(dropData.style.stroke.fill.color))} ${dropData.style.stroke.thickness}px`,
       }),
     );
     return createdNode;
-  }
-
-  static colorToString(color) {
-    if (color?.a) {
-      return `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
-    }
-    return `rgb(${color.r}, ${color.g}, ${color.b})`;
-  }
-
-  static colorToRgbaObject(color) {
-    const rgbaColor = Color.from(color);
-    return {
-      r: rgbaColor.r,
-      g: rgbaColor.g,
-      b: rgbaColor.b,
-      a: rgbaColor.a,
-    };
-  }
-
-  static generateColor(color) {
-    return {
-      rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
-      rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
-    };
-  }
-
-  static removeClass(e, className) {
-    const classes = e.getAttribute('class');
-    if (classes !== null && classes !== '') {
-      if (classes === className) {
-        e.setAttribute('class', '');
-      } else {
-        const result = classes
-          .split(' ')
-          .filter((s) => s !== className)
-          .join(' ');
-        e.setAttribute('class', result);
-      }
-    }
-    return e;
-  }
-
-  static addClass(e, className) {
-    const classes = e.getAttribute('class');
-    if (classes === null || classes === '') {
-      e.setAttribute('class', className);
-    } else if (!ConstructorSchemesClass.hasClass(e, className)) {
-      e.setAttribute('class', `${classes} ${className}`);
-    }
-    return e;
-  }
-
-  static hasClass(e, className) {
-    const classes = e.getAttribute('class') || '';
-    const r = new RegExp(`\\b${className}\\b`, '');
-    return r.test(classes);
   }
 
   static getColorForColorPicker(color) {
@@ -149,7 +89,7 @@ class ConstructorSchemesClass {
         b: color.b,
         a: color.a,
       },
-      rgbaString: ConstructorSchemesClass.colorToString(color),
+      rgbaString: Utils.colorToString(color),
     };
   }
 
@@ -210,8 +150,8 @@ class ConstructorSchemesClass {
     const { color } = edge.style.stroke.fill;
     return {
       strokeColor: {
-        rgbaObject: ConstructorSchemesClass.colorToRgbaObject(color),
-        rgbaString: ConstructorSchemesClass.colorToString(Color.from(color)),
+        rgbaObject: Utils.colorToRgbaObject(color),
+        rgbaString: Utils.colorToString(Color.from(color)),
       },
       thickness: `${edge.style.stroke.thickness}px`,
       smoothingLength: edge.style.smoothingLength,
@@ -368,7 +308,7 @@ class ConstructorSchemesClass {
         nodeId: 'template-0',
         // Идентификатор для связки данных с элементом,
         // в дальнейшем должен приходить с сервера
-        dataType: '0',
+        dataType: 'data-type-0',
         templateType: 'template-0',
         widthLeft: 50,
         items: [
@@ -502,7 +442,7 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 15,
       dataRest: {
-        dataType: '1',
+        dataType: 'data-type-1',
         nodeId: 'template-1',
         templateType: 'template-1',
         widthLeft: 30,
@@ -583,7 +523,7 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 30,
       dataRest: {
-        dataType: '2',
+        dataType: 'data-type-2',
         nodeId: 'template-2',
         templateType: 'template-2',
         id: '',
@@ -655,7 +595,7 @@ class ConstructorSchemesClass {
       width: 150,
       rowHeight: 30,
       dataRest: {
-        dataType: '3',
+        dataType: 'data-type-3',
         nodeId: 'template-3',
         templateType: 'template-3',
         id: '',
@@ -715,7 +655,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 30,
       dataRest: {
-        dataType: '4',
+        dataType: 'data-type-4',
         nodeId: 'template-4',
         id: '',
         templateType: 'template-4',
@@ -805,7 +745,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 70,
       dataRest: {
-        dataType: '5',
+        dataType: 'data-type-5',
         nodeId: 'template-5',
         idFirst: '',
         templateType: 'template-5',
@@ -884,7 +824,7 @@ class ConstructorSchemesClass {
       width: 150,
       height: 30,
       dataRest: {
-        dataType: 'label-0',
+        dataType: 'label-type-0',
         nodeId: 'label-template-0',
         id: '',
         textTemplateType: 'template-0',
@@ -1171,11 +1111,7 @@ class ConstructorSchemesClass {
         this.initializeDnDPanel();
       });
     }
-    const { nodeDecorator } = this.graphComponent.graph.decorator;
-
-    // Отключаем изменение размеров у ненвидимых узлов
-    nodeDecorator.reshapeHandleProviderDecorator
-      .hideImplementation((node) => node.tag === 'invisible');
+    this.disableResizeInvisibleNodes();
 
     this.registerReshapeHandleProvider();
     this.graphComponent.graphModelManager.hierarchicNestingPolicy = HierarchicNestingPolicy.NODES;
@@ -1183,7 +1119,15 @@ class ConstructorSchemesClass {
     this.graphComponent.graphModelManager.labelLayerPolicy = LabelLayerPolicy.AT_OWNER;
   }
 
-  createDnDPanelDefaultNode() {
+  disableResizeInvisibleNodes() {
+    const { nodeDecorator } = this.graphComponent.graph.decorator;
+
+    // Отключаем изменение размеров у ненвидимых узлов
+    nodeDecorator.reshapeHandleProviderDecorator
+      .hideImplementation((node) => node.tag === 'invisible');
+  }
+
+  createDnDPanelDefaultNode(data) {
     const defaultNode = new SimpleNode();
     defaultNode.layout = new Rect(
       0,
@@ -1191,64 +1135,27 @@ class ConstructorSchemesClass {
       this.defaultNodeSize[0],
       this.defaultNodeSize[1],
     );
-    defaultNode.style = new VuejsNodeStyle(this.dndShapeNode.template);
+    defaultNode.style = new VuejsNodeStyle(data.template);
     defaultNode.tag = {
-      dataType: 'default-node',
-      fill: ConstructorSchemesClass.generateColor(this.defaultNodeStyle.fill),
-      strokeColor: ConstructorSchemesClass.generateColor(this.defaultNodeStyle.strokeColor),
-      thickness: this.defaultNodeStyle.strokeSize,
-      shape: this.defaultNodeStyle.shape,
+      dataType: data.dataRest.dataType,
+      fill: Utils.generateColor(data.dataRest.fill),
+      strokeColor: Utils.generateColor(data.dataRest.strokeColor),
+      thickness: data.dataRest.strokeSize,
+      shape: data.dataRest.shape,
     };
     return new DragAndDropPanelItem(defaultNode, 'Стандартные элементы', 'default-element');
-  }
-
-  getElementsForSave() {
-    const resultElements = [];
-    const nodes = this.graphComponent.graph.nodes.toArray();
-    const edges = this.graphComponent.graph.edges.toArray();
-    const ports = this.graphComponent.graph.ports.toArray();
-    const labels = this.graphComponent.graph.labels.toArray();
-    [...nodes, ...edges, ...ports, ...labels].forEach((element) => {
-      if (element instanceof INode) {
-        resultElements.push({
-          type: element.tag.dataType || `${element.tag}-node`,
-          tag: element.tag,
-          element,
-        });
-      }
-      if (element instanceof IEdge) {
-        resultElements.push({
-          type: 'edge',
-          data: element.tag,
-          element,
-        });
-      }
-      if (element instanceof IPort) {
-        resultElements.push({
-          type: 'port',
-          data: element.tag,
-          element,
-        });
-      }
-      if (element instanceof ILabel) {
-        resultElements.push({
-          type: 'label',
-          data: element.tag,
-          element,
-        });
-      }
-    });
-    return resultElements;
   }
 
   // TODO: Попробовать переписать на graphBuilder + вынести обработку в отдельный класс
   // Save
   save(updateStoreCallback) {
-    // const SchemeUpdaterClass = new SchemeUpdater(
-    //   this.graphComponent.graph,
-    //   this.updateStoreCallback,
-    // );
-    // console.log(SchemeUpdaterClass.save());
+    const SchemeUpdaterClass = new SchemeUpdater(
+      this.graphComponent.graph,
+      this.updateStoreCallback,
+    );
+    SchemeUpdaterClass.save().then((result) => {
+      console.log(result);
+    });
     this.saveGraphToLocalStorage().then(() => {
       this.updateGraphFromLocalStorage(updateStoreCallback);
     });
@@ -1274,7 +1181,7 @@ class ConstructorSchemesClass {
   updateDataNodeTemplate() {
     this.graphComponent.graph.nodes.forEach((node) => {
       if (node.tag.templateType) {
-        if ((node.tag.dataType === '0' || node.tag.dataType === '1') && !node.tag?.widthLeft) {
+        if ((node.tag.dataType === 'data-type-0' || node.tag.dataType === 'data-type-1') && !node.tag?.widthLeft) {
           node.tag = {
             ...node.tag,
             widthLeft: this.getDefaultDataNodeParams(node.tag.dataType, 'widthLeft'),
@@ -1542,7 +1449,7 @@ class ConstructorSchemesClass {
           openDataPanelCallback({
             dataType: 'label',
             fontSize: evt.item.style.textSize,
-            color: ConstructorSchemesClass.generateColor(evt.item.style.textFill.color),
+            color: Utils.generateColor(evt.item.style.textFill.color),
           });
         } else {
           openDataPanelCallback({
@@ -1933,7 +1840,7 @@ class ConstructorSchemesClass {
     if (
       !createdItem.style.image
         && createdItem.tag.dataType
-        !== 'default-node'
+        !== 'shape-type-0'
     ) {
       this.graphComponent.graph.addRelativePort(
         createdItem,
@@ -2084,9 +1991,9 @@ class ConstructorSchemesClass {
       if (dragSource) {
         dragSource.addQueryContinueDragListener((src, args) => {
           if (args.dropTarget === null) {
-            ConstructorSchemesClass.removeClass(dragPreview, 'hidden');
+            Utils.removeClass(dragPreview, 'hidden');
           } else {
-            ConstructorSchemesClass.addClass(dragPreview, 'hidden');
+            Utils.addClass(dragPreview, 'hidden');
           }
         });
       }
@@ -2117,10 +2024,6 @@ class ConstructorSchemesClass {
     this.loadingDnDPanelItems = true;
     return new Promise((resolve) => {
       const items = [];
-      // Стандартный узел
-      const defaultItem = this.createDnDPanelDefaultNode();
-      items.push(defaultItem);
-
       // Ребра
       const edge1 = new SimpleEdge({
         style: new PolylineEdgeStyle({
@@ -2131,28 +2034,31 @@ class ConstructorSchemesClass {
         }),
       });
       items.push(new DragAndDropPanelItem(edge1, 'Стандартные элементы', 'default-element'));
-
-      // Узел с данными
-      this.dndDataPanelItems.forEach((item) => {
-        items.push(
-          new DragAndDropPanelItem(
-            ConstructorSchemesClass.createReactiveNode(item),
-            'Элменты с данными',
-            'data-node',
-          ),
-        );
-      });
-
-      // Узел с текстом
-      this.dndLabelPanelItems.forEach((item) => {
-        items.push(
-          new DragAndDropPanelItem(
-            ConstructorSchemesClass.createReactiveNode(item),
-            'Элементы с текстом',
-            'text-node',
-          ),
-        );
-      });
+      if (elementTemplates) {
+        Object.entries(elementTemplates).forEach(([key, value]) => {
+          if (key.includes('shape-type')) {
+            items.push(this.createDnDPanelDefaultNode(value));
+          }
+          if (key.includes('data-type')) {
+            items.push(
+              new DragAndDropPanelItem(
+                ConstructorSchemesClass.createReactiveNode(value),
+                'Элменты с данными',
+                'data-node',
+              ),
+            );
+          }
+          if (key.includes('label-type')) {
+            items.push(
+              new DragAndDropPanelItem(
+                ConstructorSchemesClass.createReactiveNode(value),
+                'Элементы с текстом',
+                'text-node',
+              ),
+            );
+          }
+        });
+      }
 
       // Подписи к узлам\ребрам
       const labelNode = new SimpleNode();
@@ -2225,7 +2131,7 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === '0' || dataType === '1') {
+        if (dataType === 'data-type-0' || dataType === 'data-type-1') {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
             const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
@@ -2241,20 +2147,20 @@ class ConstructorSchemesClass {
             ...node.tag,
             items: updatedItems,
           };
-        } else if (dataType === '2' || dataType === '3') {
+        } else if (dataType === 'data-type-2' || dataType === 'data-type-3') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             textFirst: targetData?.value || '-',
             textSecond: targetData?.Description || '-',
           };
-        } else if (dataType === '4') {
+        } else if (dataType === 'data-type-4') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             currentValue: targetData?.value ? +targetData.value : 0,
           };
-        } else if (dataType === '5') {
+        } else if (dataType === 'data-type-5') {
           const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
           const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
           node.tag = {
@@ -2273,7 +2179,7 @@ class ConstructorSchemesClass {
   updateSelectedNode(dataFromComponent, updateStoreCallback) {
     let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
-    if (dataType === '0' || dataType === '1') {
+    if (dataType === 'data-type-0' || dataType === 'data-type-1') {
       updatedData = {
         widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
@@ -2282,13 +2188,13 @@ class ConstructorSchemesClass {
           textRight: this.getDataItemById(item.id)?.value || '-',
         })),
       };
-    } else if (dataType === '2' || dataType === '3') {
+    } else if (dataType === 'data-type-2' || dataType === 'data-type-3') {
       updatedData = {
         ...dataFromComponent,
         textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
         textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
-    } else if (dataType === '4') {
+    } else if (dataType === 'data-type-4') {
       updatedData = {
         ...dataFromComponent,
         currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
@@ -2300,7 +2206,7 @@ class ConstructorSchemesClass {
         firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
         secondValue: Number(this.getDataItemById(dataFromComponent.idSecond)?.value),
       };
-    } else if (dataType === 'label-0' || dataType === 'default-node') {
+    } else if (dataType === 'label-type-0' || dataType === 'shape-type-0') {
       updatedData = dataFromComponent;
     } else if (dataFromComponent.dataType === 'edge') {
       this.updateEdgeVisual(dataFromComponent);
@@ -2558,7 +2464,7 @@ class ConstructorSchemesClass {
                 text: item.obj_description,
                 node,
                 tooltip: 'Элементы с текстом',
-                dataType: 'label-0',
+                dataType: 'label-type-0',
               },
             });
           }
