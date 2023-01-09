@@ -5,7 +5,7 @@
     class="dash-constructor-schemes__data-panel-wrapper"
   >
     <div class="dash-constructor-schemes__data-panel-item">
-      <template v-if="dataType === '0' || dataType === '1'">
+      <template v-if="dataType === 'data-type-0' || dataType === 'data-type-1'">
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
@@ -105,7 +105,7 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === '2' || dataType === '3'">
+      <template v-if="dataType === 'data-type-2' || dataType === 'data-type-3'">
         <div class="column">
           <v-select
             v-model="dataObject.id"
@@ -143,7 +143,7 @@
           </div>
         </div>
       </template>
-      <template v-if=" dataType === '4'">
+      <template v-if=" dataType === 'data-type-4'">
         <div class="column">
           <v-select
             v-model="dataObject.id"
@@ -280,7 +280,7 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === '5'">
+      <template v-if="dataType === 'data-type-5'">
         <div class="row align-center">
           <div class="col-12">
             <div class="column">
@@ -479,7 +479,7 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === 'label-0'">
+      <template v-if="dataType === 'label-type-0'">
         <div class="row align-center">
           <div class="col-12">
             <v-text-field
@@ -630,7 +630,7 @@
           Применить
         </v-btn>
       </template>
-      <template v-if="dataType === 'default-node'">
+      <template v-if="dataType === 'shape-type-0'">
         <div class="row align-center">
           <div class="col-8">
             Цвет блока:
