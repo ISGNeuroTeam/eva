@@ -26,9 +26,7 @@ class SchemeUpdater {
     return new Promise((resolve, reject) => {
       try {
         const result = [];
-        console.log(this.allElementsOnGraph);
         this.allElementsOnGraph.forEach((element) => {
-          console.log('element', element);
           if (element instanceof INode) {
             result.push({
               type: 'node',
@@ -90,7 +88,7 @@ class SchemeUpdater {
 
   static getPortData(port) {
     return {
-      owner: port.owner.tag.nodeId,
+      owner: port?.owner?.tag?.nodeId,
       tag: port?.tag?.portType,
       position: {
         x: port.dynamicLocation.x,
@@ -132,7 +130,7 @@ class SchemeUpdater {
       labels: SchemeUpdater.getEdgeLabels(edge),
       style: SchemeUpdater.getEdgeStyle(style),
       source: {
-        node: sourceNode.tag.nodeId,
+        node: sourceNode?.tag?.nodeId,
         port: {
           location: {
             x: sourcePort.dynamicLocation.x,
@@ -142,7 +140,7 @@ class SchemeUpdater {
         },
       },
       target: {
-        node: targetNode.tag.nodeId,
+        node: targetNode?.tag?.nodeId,
         port: {
           location: {
             x: targetPort.dynamicLocation.x,

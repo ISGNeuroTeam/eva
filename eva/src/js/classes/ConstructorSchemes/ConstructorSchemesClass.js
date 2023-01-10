@@ -1058,8 +1058,10 @@ class ConstructorSchemesClass {
     elementDefaultStyles,
     // Сохранение через GraphML
     savedGraph,
+    savedGraphObject,
     // Callbacks
     updateStoreCallback,
+    updateStoreCallbackV2,
     openDataPanelCallback,
     closeDataPanelCallback,
     toggleLoadingCallback,
@@ -1073,7 +1075,9 @@ class ConstructorSchemesClass {
     this.iconsList = iconsList;
     // Сохранение через GraphML
     this.savedGraph = savedGraph;
+    this.savedGraphObject = savedGraphObject;
     this.updateStoreCallback = updateStoreCallback;
+    this.updateStoreCallbackV2 = updateStoreCallbackV2;
     this.openDataPanelCallback = openDataPanelCallback;
     this.closeDataPanelCallback = closeDataPanelCallback;
     this.toggleLoadingCallback = toggleLoadingCallback;
@@ -1094,8 +1098,8 @@ class ConstructorSchemesClass {
       this.enableViewerInputMode();
     }
     this.schemeUpdater = null;
-    if (this.savedGraph) {
-      this.load();
+    if (this.savedGraphObject) {
+      // this.load();
     }
     // Выравнивание графа, инициализация dnd панели
     this.updateViewport().then(() => {
@@ -1141,8 +1145,8 @@ class ConstructorSchemesClass {
   initSchemeUpdater() {
     return new SchemeUpdater({
       graph: this.graphComponent.graph,
-      elementsFromStore: this.savedGraph,
-      updateStoreCallback: this.updateStoreCallback,
+      elementsFromStore: this.savedGraphObject,
+      updateStoreCallback: this.updateStoreCallbackV2,
     });
   }
 
@@ -1150,7 +1154,14 @@ class ConstructorSchemesClass {
   save() {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.save().then((result) => {
-      console.log(result);
+      // console.log(result);
+    });
+  }
+
+  saveAnObject() {
+    const schemeUpdater = this.initSchemeUpdater();
+    schemeUpdater.save().then((result) => {
+      // console.log(result);
     });
   }
 
@@ -1293,12 +1304,14 @@ class ConstructorSchemesClass {
     // Событие добавления подписи
     mode.addLabelAddedListener(() => {
       this.save(updateStoreCallback);
+      this.saveAnObject();
     });
 
     // Событие добавления ребра
     mode.createEdgeInputMode.addEdgeCreatedListener(() => {
       // Сохранение в store
       this.save(updateStoreCallback);
+      this.saveAnObject();
     });
 
     // Событие добавления узла
@@ -1323,6 +1336,7 @@ class ConstructorSchemesClass {
 
       // Сохранение в store
       this.save(updateStoreCallback);
+      this.saveAnObject();
     });
 
     // Событие клика по элементу
@@ -1375,18 +1389,21 @@ class ConstructorSchemesClass {
       this.graphComponent.updateVisual();
       // Сохранение в store
       this.save(updateStoreCallback);
+      this.saveAnObject();
     });
 
     // Событие редактирования положения\размеров узла
     this.graphComponent.graph.addNodeLayoutChangedListener(throttle(() => {
       // Сохранение в store
       this.save(updateStoreCallback);
+      this.saveAnObject();
     }, 500));
 
     // Событие добавления\редактирования углов на ребрах
     this.graphComponent.graph.addBendLocationChangedListener(throttle(() => {
       // Сохранение в store
       this.save(updateStoreCallback);
+      this.saveAnObject();
     }, 500));
 
     // Сохранение inputMode
@@ -1720,6 +1737,7 @@ class ConstructorSchemesClass {
       this.graphComponent.graph.addBends(createdEdge, this.creatingEdge.bends);
       mode.createEdgeInputMode.cancel();
       this.save(updateStoreCallback);
+      this.saveAnObject();
     }
   }
 
@@ -2030,7 +2048,7 @@ class ConstructorSchemesClass {
     new Promise((resolve) => {
       this.graphComponent.graph.nodes.forEach((node) => {
         const { dataType } = node.tag;
-        if (dataType === 'data-type-0' || dataType === 'data-type-1') {
+        if (dataType === 'data-type-0') {
           const updatedItems = node.tag.items.map((nodeDataItem) => {
             const targetData = updatedData.find((item) => item.TagName === nodeDataItem.id);
             if (targetData) {
@@ -2046,20 +2064,20 @@ class ConstructorSchemesClass {
             ...node.tag,
             items: updatedItems,
           };
-        } else if (dataType === 'data-type-2' || dataType === 'data-type-3') {
+        } else if (dataType === 'data-type-1') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             textFirst: targetData?.value || '-',
             textSecond: targetData?.Description || '-',
           };
-        } else if (dataType === 'data-type-4') {
+        } else if (dataType === 'data-type-2') {
           const targetData = updatedData.find((item) => item.TagName === node.tag.id);
           node.tag = {
             ...node.tag,
             currentValue: targetData?.value ? +targetData.value : 0,
           };
-        } else if (dataType === 'data-type-5') {
+        } else if (dataType === 'data-type-3') {
           const targetDataFirst = updatedData.find((item) => item.TagName === node.tag.idFirst);
           const targetDataSecond = updatedData.find((item) => item.TagName === node.tag.idSecond);
           node.tag = {
@@ -2078,7 +2096,7 @@ class ConstructorSchemesClass {
   updateSelectedNode(dataFromComponent, updateStoreCallback) {
     let updatedData = null;
     const dataType = this.targetDataNode.tag?.dataType;
-    if (dataType === 'data-type-0' || dataType === 'data-type-1') {
+    if (dataType === 'data-type-0') {
       updatedData = {
         widthLeft: dataFromComponent?.widthLeft,
         items: dataFromComponent.items.map((item) => ({
@@ -2087,19 +2105,19 @@ class ConstructorSchemesClass {
           textRight: this.getDataItemById(item.id)?.value || '-',
         })),
       };
-    } else if (dataType === 'data-type-2' || dataType === 'data-type-3') {
+    } else if (dataType === 'data-type-1') {
       updatedData = {
         ...dataFromComponent,
         textFirst: this.getDataItemById(dataFromComponent.id)?.value || '-',
         textSecond: this.getDataItemById(dataFromComponent.id)?.Description || '-',
       };
-    } else if (dataType === 'data-type-4') {
+    } else if (dataType === 'data-type-2') {
       updatedData = {
         ...dataFromComponent,
         currentValue: Number(this.getDataItemById(dataFromComponent.id)?.value || 0),
         maxValue: Number(dataFromComponent.maxValue || 0),
       };
-    } else if (dataType === '5') {
+    } else if (dataType === 'data-type-3') {
       updatedData = {
         ...dataFromComponent,
         firstValue: Number(this.getDataItemById(dataFromComponent.idFirst)?.value),
@@ -2121,6 +2139,7 @@ class ConstructorSchemesClass {
     this.graphComponent.updateVisual();
     // Сохраняем изменения
     this.save(updateStoreCallback);
+    this.saveAnObject();
   }
 
   updateEdgeVisual(updatedData) {

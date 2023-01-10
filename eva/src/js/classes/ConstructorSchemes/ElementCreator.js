@@ -1,4 +1,4 @@
-import { PolylineEdgeStyle, Rect } from 'yfiles';
+import { PolylineEdgeStyle, Rect, ShapeNodeStyle } from 'yfiles';
 import elementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
@@ -95,6 +95,16 @@ class ElementCreator {
         location: imageNode.layout,
         style: imageNode.style.clone(),
         tag: imageNode.tag,
+      });
+    } else if (element.tag === 'invisible') {
+      createdNode = this.graph.createNode({
+        layout: new Rect(0, 0, 2, 2),
+        style: new ShapeNodeStyle({
+          shape: 'ellipse',
+          fill: 'transparent',
+          stroke: '1px transparent',
+        }),
+        tag: 'invisible',
       });
     } else {
       const { template } = this.elementTemplates[element.tag.dataType];

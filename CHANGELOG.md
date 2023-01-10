@@ -8,14 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Bush: added the ability to change the label color
-- Added onctrlclick event for Ctrl+Click transition
-- Added undo/redo(ctrl+z/ctrl+y) on constructor-schemes
 - Added saving of all elements in the "designer schema" as an array of objects with parameters for creating an element
 
 ### Changed
 - Update yFiles to v25.0.1
 - Update yFiles license to 2.4
+
+### Fixed
+
+## [1.118.0]
+
+### Added
+- Bush: added the ability to change the label color
+- GIS: Added onctrlclick event for Ctrl+Click transition
+- Added undo/redo(ctrl+z/ctrl+y) on constructor-schemes
 
 ### Fixed
 - Component settings. Centering the filling of the library of primitives

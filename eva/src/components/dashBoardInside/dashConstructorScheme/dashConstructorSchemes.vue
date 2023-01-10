@@ -898,6 +898,7 @@ export default {
   mounted() {
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+    this.updateSavedGraph = throttle(this.updateSavedGraph, 200);
   },
   methods: {
     updateDefaultElementColor(evt, field) {
@@ -927,7 +928,9 @@ export default {
         openDataPanelCallback: this.openDataPanel,
         closeDataPanelCallback: this.closeDataPanel,
         savedGraph: this.savedGraph,
+        savedGraphObject: this.savedGraphObject,
         updateStoreCallback: this.updateSavedGraph,
+        updateStoreCallbackV2: this.updateSavedGraphObject,
         toggleLoadingCallback: this.toggleLoading,
         isEdit: this.isEdit,
       });
@@ -955,6 +958,24 @@ export default {
         this.$store.commit('setState', [{
           object: this.dashFromStore,
           prop: 'savedGraph',
+          value: {
+            ...this.dashFromStore.savedGraph,
+            data,
+          },
+        }]);
+      }
+    },
+    updateSavedGraphObject(data, isMultipleSave) {
+      if (!isMultipleSave) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'savedGraphObject',
+          value: data,
+        }]);
+      } else {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'savedGraphObject',
           value: {
             ...this.dashFromStore.savedGraph,
             data,
