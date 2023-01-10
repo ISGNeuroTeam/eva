@@ -6,13 +6,14 @@
   >
     <div class="dash-constructor-schemes__data-panel-item">
       <template v-if="dataType === 'data-type-0'">
+        <!--data-type-0-->
         <div
           v-for="(element, index) in dataObject.items"
           :key="`${dataObject.nodeId}-${index}`"
           class="column"
         >
           <div class="row align-center">
-            <v-select
+            <v-autocomplete
               v-model="element.id"
               :style="{ color: theme.$main_text }"
               :items="dataRestFrom"
@@ -40,7 +41,7 @@
                   </v-list-item-content>
                 </v-list-item>
               </template>
-            </v-select>
+            </v-autocomplete>
             <v-icon
               class="control-button edit-icon theme--dark col-2"
               :style="{ color: theme.$secondary_text }"
@@ -106,8 +107,9 @@
         </v-btn>
       </template>
       <template v-if="dataType === 'data-type-1'">
+        <!--data-type-1-->
         <div class="column">
-          <v-select
+          <v-autocomplete
             v-model="dataObject.id"
             :items="dataRestFrom"
             item-value="TagName"
@@ -134,7 +136,7 @@
                 </v-list-item-content>
               </v-list-item>
             </template>
-          </v-select>
+          </v-autocomplete>
           <div
             class="mb-9"
             :style="{ color: theme.$secondary_text }"
@@ -144,8 +146,9 @@
         </div>
       </template>
       <template v-if=" dataType === 'data-type-2'">
+        <!--data-type-2-->
         <div class="column">
-          <v-select
+          <v-autocomplete
             v-model="dataObject.id"
             :items="dataRestFrom"
             item-value="TagName"
@@ -171,7 +174,7 @@
                 </v-list-item-content>
               </v-list-item>
             </template>
-          </v-select>
+          </v-autocomplete>
           <div
             class="mb-9"
             :style="{ color: theme.$secondary_text }"
@@ -184,7 +187,6 @@
           :rules="[value => value >= 0 || 'Некорректное значение.']"
           label="Максимальное значение*"
         />
-
         <div class="row">
           <div class="col-8">
             Цвет текущего
@@ -281,10 +283,11 @@
         </v-btn>
       </template>
       <template v-if="dataType === 'data-type-3'">
+        <!--data-type-3-->
         <div class="row align-center">
           <div class="col-12">
             <div class="column">
-              <v-select
+              <v-autocomplete
                 v-model="dataObject.idFirst"
                 :items="dataRestFrom"
                 item-value="TagName"
@@ -310,7 +313,7 @@
                     </v-list-item-content>
                   </v-list-item>
                 </template>
-              </v-select>
+              </v-autocomplete>
               <div
                 class="mb-9"
                 :style="{ color: theme.$secondary_text }"
@@ -379,7 +382,7 @@
         <div class="row align-center">
           <div class="col-12">
             <div class="column">
-              <v-select
+              <v-autocomplete
                 v-model="dataObject.idSecond"
                 :items="dataRestFrom"
                 item-value="TagName"
@@ -405,7 +408,7 @@
                     </v-list-item-content>
                   </v-list-item>
                 </template>
-              </v-select>
+              </v-autocomplete>
               <div
                 class="mb-9"
                 :style="{ color: theme.$secondary_text }"
@@ -480,6 +483,7 @@
         </v-btn>
       </template>
       <template v-if="dataType === 'label-type-0'">
+        <!--label-type-0-->
         <div class="row align-center">
           <div class="col-12">
             <v-text-field
@@ -700,7 +704,7 @@
             />
           </div>
           <div class="col-12">
-            <v-select
+            <v-autocomplete
               v-model="dataObject.shape"
               :items="shapeNodeStyleList"
               item-value="id"
@@ -950,6 +954,7 @@ export default {
 }
 
 .dash-constructor-schemes__data-panel-select {
-  max-width: 480px;
+  min-width: 420px;
+  max-width: 420px;
 }
 </style>

@@ -2,6 +2,8 @@ import {
   INode,
   IEdge,
   IPort,
+  ILabel,
+  ILabelModelParameter,
 } from 'yfiles';
 import Utils from './Utils.js';
 // import elementTemplates from './elementTemplates.js';
@@ -22,12 +24,12 @@ class SchemeUpdater {
     return [...this.nodes, ...this.edges, ...this.ports, ...this.labels];
   }
 
-  save(isMultipleSave) {
+  save() {
     return new Promise((resolve, reject) => {
       try {
         const result = [];
         this.allElementsOnGraph.forEach((element) => {
-          if (element instanceof INode) {
+          if (element instanceof INode && element.tag.dataType !== 'invisible') {
             result.push({
               type: 'node',
               data: SchemeUpdater.getNode(element),
@@ -45,23 +47,29 @@ class SchemeUpdater {
               data: SchemeUpdater.getPortData(element),
             });
           }
+          if (element instanceof ILabel) {
+            console.log(SchemeUpdater.getLabelData(element));
+            result.push({
+              type: 'label',
+              data: SchemeUpdater.getLabelData(element),
+            });
+          }
         });
-        this.updateStoreCallback({
-          graph: result,
-        }, isMultipleSave);
-        resolve(result);
+        this.updateStoreCallback(structuredClone(result));
+        console.log(structuredClone(result));
+        resolve(structuredClone(result));
       } catch (e) {
         reject(e);
       }
     });
   }
 
-  load(id = 'graph') {
+  load() {
     return new Promise((resolve, reject) => {
       try {
         const elementCreator = new ElementCreator({
           graph: this.graph,
-          elements: structuredClone(this.elementsFromStore[id]),
+          elements: structuredClone(this.elementsFromStore),
         });
         elementCreator.buildGraph().then(() => {
           resolve();
@@ -75,26 +83,61 @@ class SchemeUpdater {
   static getNode(element) {
     if (element.tag.dataType === 'image-node') {
       return {
-        tag: element.tag,
+        tag: {
+          ...element.tag,
+          nodeId: element.hashCode(),
+        },
         icon: element.style.image.match(/\/svg\/([\s\S]+?)\.svg/)[1],
         layout: SchemeUpdater.getLayout(element.layout),
       };
     }
     return {
-      tag: element?.tag,
+      tag: {
+        ...element.tag,
+        nodeId: element.hashCode(),
+      },
       layout: SchemeUpdater.getLayout(element.layout),
+    };
+  }
+
+  static getLabelData(label) {
+    return {
+      tag: {
+        id: label.hashCode(),
+        font: label.style.font.fontFamily.replace('\'', ''),
+        fontSize: label.style.textSize,
+        textColor: Utils.generateColor(label.style.textFill.color),
+      },
+      text: label?.text || '',
+      position: {
+        x: label.layout.orientedRectangleCenter.x,
+        y: label.layout.orientedRectangleCenter.y,
+      },
     };
   }
 
   static getPortData(port) {
     return {
-      owner: port?.owner?.tag?.nodeId,
-      tag: port?.tag?.portType,
-      position: {
-        x: port.dynamicLocation.x,
-        y: port.dynamicLocation.y,
+      owner: {
+        type: SchemeUpdater.getPortOwnerType(port.owner),
+        id: port?.owner?.hashCode(),
       },
+      tag: {
+        type: port?.tag?.portType || 'edge-to-edge',
+        portId: port?.hashCode(),
+      },
+      position: SchemeUpdater.getPortLocation(port),
     };
+  }
+
+  static getPortOwnerType(owner) {
+    if (owner instanceof INode) {
+      return 'node';
+    }
+    if (owner instanceof IEdge) {
+      return 'edge';
+    }
+    return '';
   }
 
   static getEdgeStyle({
@@ -125,30 +168,34 @@ class SchemeUpdater {
       style,
     } = edge;
     return {
-      tag,
+      tag: {
+        ...tag,
+        edgeId: edge.hashCode(),
+      },
       bends: SchemeUpdater.getBends(edge),
       labels: SchemeUpdater.getEdgeLabels(edge),
       style: SchemeUpdater.getEdgeStyle(style),
       source: {
         node: sourceNode?.tag?.nodeId,
         port: {
-          location: {
-            x: sourcePort.dynamicLocation.x,
-            y: sourcePort.dynamicLocation.y,
-          },
-          type: sourcePort?.tag?.portType || '',
+          id: sourcePort?.hashCode(),
+          location: SchemeUpdater.getPortLocation(sourcePort),
         },
       },
       target: {
         node: targetNode?.tag?.nodeId,
         port: {
-          location: {
-            x: targetPort.dynamicLocation.x,
-            y: targetPort.dynamicLocation.y,
-          },
-          type: targetPort?.tag?.portType || '',
+          id: targetPort?.hashCode(),
+          location: SchemeUpdater.getPortLocation(targetPort),
         },
       },
+    };
+  }
+
+  static getPortLocation(port) {
+    return {
+      x: port.dynamicLocation.x,
+      y: port.dynamicLocation.y,
     };
   }
 

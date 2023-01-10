@@ -1,4 +1,7 @@
-import { PolylineEdgeStyle, Rect, ShapeNodeStyle } from 'yfiles';
+import {
+  Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle,
+} from 'yfiles';
+import HtmlLabelStyle from './HtmlLabelStyles.js';
 import elementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
@@ -18,24 +21,35 @@ class ElementCreator {
       try {
         this.graph.clear();
         this.createNodes()
+          .then(() => this.createPorts())
           .then(() => this.createEdges())
+          .then(() => this.createLabels())
           .then(() => {
             resolve();
           });
-        // this.elements.forEach((element) => {
-        //   if (element.type === 'node') {
-        //     this.createNode(element.data);
-        //   }
-        //   if (element.type === 'edge') {
-        //     this.createEdge(element.data);
-        //   }
-        //   if (element.type === 'port') {
-        //     this.createPort(element.data);
-        //   }
-        // });
       } catch (e) {
         reject(e);
       }
+    });
+  }
+
+  createPorts() {
+    return new Promise((resolve) => {
+      const ports = this.getElementsByType('port');
+      const portsFromGraph = this.graph.ports.toArray();
+      const filteredPorts = [];
+      ports.forEach((port) => {
+        if (!portsFromGraph.some((el) => port.data.tag.portId === el.tag.portId)) {
+          filteredPorts.push(port.data);
+        } else {
+          console.log('create-port', portsFromGraph.find((el) => port.data.tag.portId === el.tag.portId));
+        }
+      });
+      filteredPorts.forEach((el) => {
+        const createdNode = this.createInvisibleNode(el.position, el.tag.portId);
+        this.createRelativePort(createdNode, el.tag.portId);
+      });
+      resolve();
     });
   }
 
@@ -43,13 +57,27 @@ class ElementCreator {
     return this.elements.filter((el) => el.type === type);
   }
 
+  getTargetPort(targetPortId) {
+    if (this.graph.ports.toArray()?.length > 0) {
+      return this.graph.ports.toArray().find(({ tag }) => tag.portId === targetPortId);
+    }
+    return null;
+  }
+
+  getSourcePort(sourcePortId) {
+    if (this.graph.ports.toArray()?.length > 0) {
+      return this.graph.ports.toArray().find(({ tag }) => tag.portId === sourcePortId);
+    }
+    return null;
+  }
+
   createEdges() {
     return new Promise((resolve, reject) => {
       try {
         const edgesList = this.getElementsByType('edge');
         if (edgesList?.length > 0) {
-          edgesList.forEach((edge) => {
-            this.createEdge(edge.data);
+          edgesList.forEach(({ data }) => {
+            this.createEdge(data);
           });
         }
         resolve();
@@ -64,7 +92,9 @@ class ElementCreator {
       try {
         const nodeList = this.getElementsByType('node');
         nodeList.forEach((element) => {
-          this.createNode(element.data);
+          this.createNode(element.data).then((createdNode) => {
+            this.createPortsById(createdNode);
+          });
         });
         resolve();
       } catch (e) {
@@ -73,96 +103,153 @@ class ElementCreator {
     });
   }
 
+  createPortsById(element) {
+    const portList = this.getElementsByType('port');
+    const nodeId = element?.tag?.nodeId;
+    const edgeId = element?.tag?.edgeId;
+    if (portList?.length > 0) {
+      const filteredPortsList = portList
+        .filter((el) => el?.data?.owner?.id === nodeId || el?.data?.owner?.id === edgeId);
+      if (filteredPortsList?.length > 0) {
+        filteredPortsList.forEach((port) => {
+          if (nodeId) {
+            this.createPort(this.getNodeById(nodeId), port.data.position, port.data.tag);
+          }
+        });
+      }
+    }
+  }
+
   getNodeById(id) {
     return this.graph.nodes.toArray().find((node) => node.tag.nodeId === id);
   }
 
-  getPortsForNodes(nodesList) {
-    const nodesIdList = nodesList.map((el) => el.data.tag.nodeId);
-    return this.elements
-      .filter((el) => el.type === 'port' && nodesIdList
-        .some((id) => id === el.data.owner));
+  createNode(element) {
+    return new Promise((resolve) => {
+      let createdNode = null;
+      if (element.tag.dataType === 'image-node') {
+        const imageNode = GenerateIcons.getIconNode({
+          data: element,
+          size: element.layout,
+        });
+        createdNode = this.graph.createNodeAt({
+          location: imageNode.layout,
+          style: imageNode.style.clone(),
+          tag: imageNode.tag,
+        });
+      } else if (element.tag?.dataType !== 'invisible') {
+        // createdNode = this.graph.createNode({
+        //   layout: new Rect(0, 0, 2, 2),
+        //   style: new ShapeNodeStyle({
+        //     shape: 'ellipse',
+        //     fill: 'transparent',
+        //     stroke: '1px transparent',
+        //   }),
+        //   tag: {
+        //     dataType: 'invisible',
+        //     nodeId: element?.tag?.nodeId,
+        //   },
+        // });
+        const { template } = this.elementTemplates[element.tag.dataType];
+        createdNode = this.graph.createNodeAt({
+          location: new Rect(
+            0,
+            0,
+            element.layout.width,
+            element.layout.height,
+          ),
+          style: new VuejsNodeStyle(template),
+          tag: {
+            ...element.tag,
+            nodeId: element.tag.nodeId || element.hashCode(),
+          },
+        });
+      }
+      const nodePosition = new Rect(
+        element.layout.x,
+        element.layout.y,
+        element.layout.width,
+        element.layout.height,
+      );
+      this.graph.setNodeLayout(createdNode, nodePosition);
+      const portsForCurrentNode = this.elements.filter((el) => el.type === 'port' && el?.data?.owner === element.tag.nodeId);
+      if (portsForCurrentNode?.length > 0) {
+        portsForCurrentNode.forEach(({ data }) => {
+          try {
+            this.createPort(createdNode, data.position, data.tag);
+          } catch (e) {
+            throw new Error(e);
+          }
+        });
+      }
+      resolve(createdNode);
+    });
   }
 
-  createNode(element) {
-    let createdNode = null;
-    if (element.tag.dataType === 'image-node') {
-      const imageNode = GenerateIcons.getIconNode({
-        data: element,
-        size: element.layout,
-      });
-      createdNode = this.graph.createNodeAt({
-        location: imageNode.layout,
-        style: imageNode.style.clone(),
-        tag: imageNode.tag,
-      });
-    } else if (element.tag === 'invisible') {
-      createdNode = this.graph.createNode({
-        layout: new Rect(0, 0, 2, 2),
-        style: new ShapeNodeStyle({
-          shape: 'ellipse',
-          fill: 'transparent',
-          stroke: '1px transparent',
-        }),
-        tag: 'invisible',
-      });
-    } else {
-      const { template } = this.elementTemplates[element.tag.dataType];
-      createdNode = this.graph.createNodeAt({
-        location: new Rect(
-          0,
-          0,
-          element.layout.width,
-          element.layout.height,
-        ),
-        style: new VuejsNodeStyle(template),
-        tag: {
-          ...element.tag,
-          nodeId: element.tag.nodeId || element.hashCode(),
-        },
-      });
-    }
-    const nodePosition = new Rect(
-      element.layout.x,
-      element.layout.y,
-      element.layout.width,
-      element.layout.height,
+  createInvisibleNode(location, id) {
+    const createdNode = this.graph.createNode({
+      layout: new Rect(location.x, location.y, 2, 2),
+      style: new ShapeNodeStyle({
+        shape: 'ellipse',
+        fill: 'transparent',
+        stroke: '1px transparent',
+      }),
+      tag: {
+        dataType: 'invisible',
+      },
+    });
+    createdNode.tag = {
+      ...createdNode.tag,
+      nodeId: id,
+    };
+    return createdNode;
+  }
+
+  createRelativePort(node, portId) {
+    const createdNode = this.graph.addRelativePort(
+      node,
+      new Point(0, 0),
     );
-    this.graph.setNodeLayout(createdNode, nodePosition);
-    const portsForCurrentNode = this.elements.filter((el) => el.type === 'port' && el?.data?.owner === element.tag.nodeId);
-    if (portsForCurrentNode?.length > 0) {
-      portsForCurrentNode.forEach(({ data }) => {
-        try {
-          this.createPort(createdNode, data.position, data.tag);
-        } catch (e) {
-          throw new Error(e);
-        }
-      });
-    }
+    createdNode.tag = {
+      portType: 'edge-to-edge',
+      portId,
+    };
+    return createdNode;
   }
 
   createEdge(edge) {
-    const createdEdge = this.graph.createEdge({
-      sourcePort: this.getPortByLocation(edge.source.port.location),
-      targetPort: this.getPortByLocation(edge.target.port.location),
-      style: new PolylineEdgeStyle({
-        smoothingLength: edge.style.smoothingLength,
-        stroke: `${edge.style.strokeSize}px solid ${edge.style.strokeColor}`,
-        targetArrow: 'none',
-        sourceArrow: 'none',
-      }),
-      tag: edge.tag,
-    });
-    if (edge.bends?.length > 0) {
-      edge.bends.forEach((bend) => {
-        this.createBend(createdEdge, bend);
+    new Promise((resolve) => {
+      const targetPort = this.getTargetPort(edge.target.port.id);
+      const sourcePort = this.getSourcePort(edge.source.port.id);
+      const targetNode = targetPort.owner;
+      const sourceNode = sourcePort.owner;
+      resolve({
+        sourceNode,
+        targetNode,
+        sourcePort,
+        targetPort,
       });
-    }
-  }
-
-  getPortByLocation(location) {
-    return this.graph.ports.toArray()
-      .find((el) => el.dynamicLocation.x === location.x && el.dynamicLocation.y === location.y);
+    }).then((response) => new Promise((resolve) => {
+      const createdEdge = this.graph.createEdge({
+        sourcePort: response.sourcePort,
+        targetPort: response.targetPort,
+        style: new PolylineEdgeStyle({
+          smoothingLength: edge.style.smoothingLength,
+          stroke: `${edge.style.strokeSize}px solid ${edge.style.strokeColor}`,
+          targetArrow: 'none',
+          sourceArrow: 'none',
+        }),
+        tag: edge.tag,
+      });
+      resolve(createdEdge);
+    })).then((createdEdge) => new Promise((resolve) => {
+      if (edge.bends?.length > 0) {
+        edge.bends.forEach((bend) => {
+          this.createBend(createdEdge, bend);
+        });
+      }
+      resolve(createdEdge);
+    }));
   }
 
   createPort(owner, location, tag) {
@@ -173,10 +260,27 @@ class ElementCreator {
     });
   }
 
-  createLabel() {}
-
   createBend(edge, position) {
     this.graph.addBend(edge, position);
+  }
+
+  createLabels() {
+    const labels = this.getElementsByType('label');
+    labels.forEach((el) => {
+      const createdNode = this.createInvisibleNode(el.data.position, el.data.tag.id);
+      this.graph.addLabel({
+        owner: createdNode,
+        style: new DefaultLabelStyle({
+          font: el.data.tag.font,
+          textFill: el.data.tag.textColor.rgbaString,
+          textSize: el.data.tag.fontSize,
+          backgroundFill: 'transparent',
+          backgroundStroke: 'transparent',
+        }),
+        text: el.data.text,
+        tag: el.data.tag,
+      });
+    });
   }
 }
 

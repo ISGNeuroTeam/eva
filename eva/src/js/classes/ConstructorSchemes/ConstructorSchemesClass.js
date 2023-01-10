@@ -14,6 +14,7 @@ import yFiles, {
   LabelLayerPolicy,
   GraphMLIOHandler,
   GraphMLSupport,
+  MoveLabelInputMode,
   GraphSnapContext,
   GridSnapTypes,
   HandlePositions,
@@ -48,6 +49,8 @@ import yFiles, {
   SimplePort,
   FreeNodePortLocationModel,
   GraphViewerInputMode,
+  PortRelocationHandleProvider,
+  Visualization,
 } from 'yfiles';
 import Utils from './Utils.js';
 import { throttle } from '@/js/utils/throttle';
@@ -61,6 +64,7 @@ import EdgeDropInputMode from './EdgeDropInputModeClass';
 import GenerateIcons from './GenerateIcons.js';
 import SchemeUpdater from './SchemeUpdater.js';
 import elementTemplates from './elementTemplates.js';
+import testSave from './testSave.js';
 
 License.value = licenseData; // Проверка лицензии
 
@@ -1074,7 +1078,7 @@ class ConstructorSchemesClass {
     this.dataRest = dataRest;
     this.iconsList = iconsList;
     // Сохранение через GraphML
-    this.savedGraph = savedGraph;
+    this.savedGraph = testSave.graph;
     this.savedGraphObject = savedGraphObject;
     this.updateStoreCallback = updateStoreCallback;
     this.updateStoreCallbackV2 = updateStoreCallbackV2;
@@ -1084,6 +1088,7 @@ class ConstructorSchemesClass {
     // Вторая реализация сохранения данных
     this.targetDataNode = {};
     this.graphComponent = new GraphComponent(elem);
+    this.additionalEdgeToEdgeSettings();
     this.setDefaultLabelParameters();
     // Configures default styles for newly created graph elements
     this.applyStylesElements(elementDefaultStyles);
@@ -1097,9 +1102,29 @@ class ConstructorSchemesClass {
     } else {
       this.enableViewerInputMode();
     }
+    // old
+    // Сохранение через GraphML
+    this.initializeIO();
+    // if (this.savedGraph) {
+    //   this.loadGraph().then(() => {
+    //     this.updateDataNodeTemplate();
+    //     // Выравнивание графа, инициализация dnd панели
+    //     this.updateViewport().then(() => {
+    //       this.dndPanelElem = dndPanelElem;
+    //       this.initializeDnDPanel();
+    //     });
+    //   });
+    // } else {
+    // // Выравнивание графа, инициализация dnd панели
+    //   this.updateViewport().then(() => {
+    //     this.dndPanelElem = dndPanelElem;
+    //     this.initializeDnDPanel();
+    //   });
+    // }
+
     this.schemeUpdater = null;
     if (this.savedGraphObject) {
-      // this.load();
+      this.load();
     }
     // Выравнивание графа, инициализация dnd панели
     this.updateViewport().then(() => {
@@ -1120,7 +1145,7 @@ class ConstructorSchemesClass {
 
     // Отключаем изменение размеров у ненвидимых узлов
     nodeDecorator.reshapeHandleProviderDecorator
-      .hideImplementation((node) => node.tag === 'invisible');
+      .hideImplementation((node) => node?.tag?.dataType === 'invisible');
   }
 
   createDnDPanelDefaultNode(data) {
@@ -1131,7 +1156,7 @@ class ConstructorSchemesClass {
       this.defaultNodeSize[0],
       this.defaultNodeSize[1],
     );
-    defaultNode.style = new VuejsNodeStyle(data.template);
+    defaultNode.style = new VuejsNodeStyle(elementTemplates[data.dataRest.dataType].template);
     defaultNode.tag = {
       dataType: data.dataRest.dataType,
       fill: Utils.generateColor(data.dataRest.fill),
@@ -1150,18 +1175,166 @@ class ConstructorSchemesClass {
     });
   }
 
+  // old
   // Save
-  save() {
-    const schemeUpdater = this.initSchemeUpdater();
-    schemeUpdater.save().then((result) => {
-      // console.log(result);
+  save(updateStoreCallback) {
+    this.saveGraphToLocalStorage().then(() => {
+      this.updateGraphFromLocalStorage(updateStoreCallback);
+    });
+  }
+
+  async saveGraphToLocalStorage() {
+    return new Promise((resolve) => {
+      ICommand.SAVE.execute(null, this.graphComponent);
+      resolve();
+    });
+  }
+
+  // Load
+  async loadGraph() {
+    return new Promise((resolve) => {
+      ICommand.OPEN.execute(null, this.graphComponent);
+      resolve();
+    }).then(() => {
+      this.setDefaultElementsOrder();
+    });
+  }
+
+  updateDataNodeTemplate() {
+    this.graphComponent.graph.nodes.forEach((node) => {
+      if (node.tag.dataType) {
+        node.tag = ConstructorSchemesClass.upgradeNodeTag(node);
+        if (node.tag.dataType !== 'image-node' && node?.tag?.dataType !== 'invisible') {
+          this.graphComponent.graph.setStyle(
+            node,
+            new VuejsNodeStyle(elementTemplates[node.tag.dataType].template),
+          );
+        }
+      }
+    });
+  }
+
+  // TODO: Временный метод, для обновления
+  static upgradeNodeTag(node) {
+    if (node?.tag?.dataType === '0' || node?.tag?.dataType === '1') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-0',
+      };
+    }
+    if (node?.tag?.dataType === '2' || node?.tag?.dataType === '3') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-1',
+      };
+    }
+    if (node?.tag?.dataType === '4') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-2',
+      };
+    }
+    if (node?.tag?.dataType === '5') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-3',
+      };
+    }
+    if (node?.tag?.dataType === '5') {
+      return {
+        ...node.tag,
+        dataType: 'data-type-3',
+      };
+    }
+    if (node?.tag?.dataType === 'label-0') {
+      return {
+        ...node.tag,
+        dataType: 'label-type-0',
+      };
+    }
+    if (node?.tag?.dataType === 'default-node') {
+      return {
+        ...node.tag,
+        dataType: 'shape-type-0',
+      };
+    }
+    if (node?.tag === 'invisible') {
+      return {
+        dataType: 'invisible',
+      };
+    }
+    return node.tag;
+  }
+
+  getDefaultDataNodeParams(dataType, fieldName) {
+    try {
+      const defaultOptions = this.dndDataPanelItems
+        .find((item) => item?.dataRest?.dataType === dataType);
+      return defaultOptions.dataRest[fieldName];
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  // Load from LocalStorage to Store
+  updateGraphFromLocalStorage(updateStoreCallback) {
+    this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
+    window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
+    if (updateStoreCallback && this.savedGraph) {
+      updateStoreCallback(this.savedGraph);
+    }
+  }
+
+  // Settings GraphML
+  initializeIO() {
+    const graphmlHandler = new GraphMLIOHandler();
+    // enable serialization of the VueJS node style -
+    // without a namespace mapping, serialization will fail
+    graphmlHandler.addXamlNamespaceMapping(
+      'http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0',
+      { VuejsNodeStyle: VuejsNodeStyleMarkupExtension },
+    );
+    graphmlHandler.addNamespace(
+      'http://www.yworks.com/demos/yfiles-vuejs-node-style/1.0',
+      'VuejsNodeStyle',
+    );
+    graphmlHandler.addHandleSerializationListener((sender, args) => {
+      const { item } = args;
+      const { context } = args;
+      if (item instanceof VuejsNodeStyle) {
+        const vuejsNodeStyleMarkupExtension = new VuejsNodeStyleMarkupExtension();
+        vuejsNodeStyleMarkupExtension.template = item.template;
+        context.serializeReplacement(
+          VuejsNodeStyleMarkupExtension.$class,
+          item,
+          vuejsNodeStyleMarkupExtension,
+        );
+        args.handled = true;
+      }
+    });
+    // this.zOrderSupport.configureZOrderGraphMLIOHandler(graphmlHandler);
+
+    if (this.savedGraph) {
+      graphmlHandler.readFromGraphMLText(this.graphComponent.graph, this.savedGraph).then(() => {
+        this.initGraphMlSupport(graphmlHandler);
+      });
+    } else {
+      this.initGraphMlSupport(graphmlHandler);
+    }
+  }
+
+  initGraphMlSupport(graphmlHandler) {
+    return new GraphMLSupport({
+      graphComponent: this.graphComponent,
+      graphMLIOHandler: graphmlHandler,
+      storageLocation: StorageLocation.LOCAL_STORAGE,
     });
   }
 
   saveAnObject() {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.save().then((result) => {
-      // console.log(result);
+      console.log(result);
     });
   }
 
@@ -1250,6 +1423,12 @@ class ConstructorSchemesClass {
 
   // Setting up interaction with the graph
   configureInputModes(updateStoreCallback, openDataPanelCallback, closeDataPanelCallback) {
+    const labelMode = new MoveLabelInputMode({
+      enabled: true,
+    });
+    labelMode.addDragFinishedListener(() => {
+      this.saveAnObject();
+    });
     const mode = new GraphEditorInputMode({
       allowCreateNode: false,
       allowAddLabel: false,
@@ -1261,6 +1440,7 @@ class ConstructorSchemesClass {
       allowDuplicate: false,
       ignoreVoidStyles: true,
       allowClipboardOperations: false,
+      moveLabelInputMode: labelMode,
       snapContext: new GraphSnapContext({
         snapPortAdjacentSegments: true,
         nodeToNodeDistance: 10,
@@ -1293,7 +1473,7 @@ class ConstructorSchemesClass {
       KeyEventRecognizers.SHIFT_IS_DOWN,
     );
 
-    this.additionalEdgeToEdgeSettings();
+    // this.additionalEdgeToEdgeSettings();
 
     // Edge
     this.configureEdgeDropInputMode(mode);
@@ -1303,14 +1483,14 @@ class ConstructorSchemesClass {
 
     // Событие добавления подписи
     mode.addLabelAddedListener(() => {
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     });
 
     // Событие добавления ребра
     mode.createEdgeInputMode.addEdgeCreatedListener(() => {
       // Сохранение в store
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     });
 
@@ -1335,7 +1515,7 @@ class ConstructorSchemesClass {
       }
 
       // Сохранение в store
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     });
 
@@ -1377,10 +1557,10 @@ class ConstructorSchemesClass {
 
     // Событие удаления элемента
     mode.addDeletedItemListener((sender, evt) => {
-      if (evt?.targetPortOwner?.tag === 'invisible') {
+      if (evt?.targetPortOwner?.tag?.dataType === 'invisible') {
         this.graphComponent.graph.remove(evt?.targetPortOwner);
       }
-      if (evt?.sourcePortOwner?.tag === 'invisible') {
+      if (evt?.sourcePortOwner?.tag?.dataType === 'invisible') {
         this.graphComponent.graph.remove(evt?.sourcePortOwner);
       }
       if (evt.item === this.targetDataNode) {
@@ -1388,21 +1568,21 @@ class ConstructorSchemesClass {
       }
       this.graphComponent.updateVisual();
       // Сохранение в store
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     });
 
     // Событие редактирования положения\размеров узла
     this.graphComponent.graph.addNodeLayoutChangedListener(throttle(() => {
       // Сохранение в store
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     }, 500));
 
     // Событие добавления\редактирования углов на ребрах
     this.graphComponent.graph.addBendLocationChangedListener(throttle(() => {
       // Сохранение в store
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     }, 500));
 
@@ -1598,6 +1778,9 @@ class ConstructorSchemesClass {
             shape: 'ellipse',
           }),
         ),
+        tag: {
+          portId: dropTarget.tag?.nodeId || dropTarget.tag?.edgeId,
+        },
       }),
     });
   }
@@ -1668,6 +1851,12 @@ class ConstructorSchemesClass {
       .edgeReconnectionPortCandidateProviderDecorator.setImplementation(
         IEdgeReconnectionPortCandidateProvider.ALL_NODE_AND_EDGE_CANDIDATES,
       );
+
+    this.graphComponent.graph.decorator.edgeDecorator.handleProviderDecorator.setFactory((edge) => {
+      const portRelocationHandleProvider = new PortRelocationHandleProvider(null, edge);
+      portRelocationHandleProvider.visualization = Visualization.LIVE;
+      return portRelocationHandleProvider;
+    });
   }
 
   // Edge-to-invisible-node
@@ -1713,10 +1902,18 @@ class ConstructorSchemesClass {
   }) {
     // Создаем невидимые узлы
     const targetNode = this.createInvisibleNode(location);
+    targetNode.tag = {
+      ...targetNode.tag,
+      nodeId: targetNode?.hashCode(),
+    };
     const targetPort = this.graphComponent.graph.addRelativePort(
       targetNode,
       new Point(0, 0),
     );
+    targetPort.tag = {
+      portType: '',
+      portId: targetNode?.nodeId || targetNode?.hashCode(),
+    };
 
     let { sourcePort } = this.creatingEdge;
     const sourcePortOwner = sourcePort.owner;
@@ -1726,6 +1923,10 @@ class ConstructorSchemesClass {
           sourcePortOwner,
           new Point(0, 0),
         );
+        sourcePort.tag = {
+          portType: '',
+          portId: sourcePortOwner?.nodeId || sourcePortOwner?.hashCode(),
+        };
       }
       // Создаем ребро
       const createdEdge = this.graphComponent.graph.createEdge(
@@ -1736,21 +1937,28 @@ class ConstructorSchemesClass {
       // Добавляем на него углы
       this.graphComponent.graph.addBends(createdEdge, this.creatingEdge.bends);
       mode.createEdgeInputMode.cancel();
-      this.save(updateStoreCallback);
+      // this.save(updateStoreCallback);
       this.saveAnObject();
     }
   }
 
   createInvisibleNode(location) {
-    return this.graphComponent.graph.createNode({
+    const createdNode = this.graphComponent.graph.createNode({
       layout: new Rect(location.x, location.y, 2, 2),
       style: new ShapeNodeStyle({
         shape: 'ellipse',
         fill: 'transparent',
         stroke: '1px transparent',
       }),
-      tag: 'invisible',
+      tag: {
+        dataType: 'invisible',
+      },
     });
+    createdNode.tag = {
+      ...createdNode.tag,
+      nodeId: createdNode.hashCode(),
+    };
+    return createdNode;
   }
 
   createAdditionalPorts(createdItem) {
@@ -1764,24 +1972,28 @@ class ConstructorSchemesClass {
         new Point((createdItem.layout.width / 6) * 2, 0),
       ).tag = {
         portType: 'right',
+        portId: createdItem?.nodeId || createdItem?.edgeId || createdItem.hashCode(),
       };
       this.graphComponent.graph.addRelativePort(
         createdItem,
         new Point(-(createdItem.layout.width / 6) * 2, 0),
       ).tag = {
         portType: 'left',
+        portId: createdItem?.nodeId || createdItem?.edgeId || createdItem.hashCode(),
       };
       this.graphComponent.graph.addRelativePort(
         createdItem,
         new Point(0, (createdItem.layout.height / 6) * 2),
       ).tag = {
         portType: 'top',
+        portId: createdItem?.nodeId || createdItem?.edgeId || createdItem.hashCode(),
       };
       this.graphComponent.graph.addRelativePort(
         createdItem,
         new Point(0, -(createdItem.layout.height / 6) * 2),
       ).tag = {
         portType: 'bottom',
+        portId: createdItem?.nodeId || createdItem?.edgeId || createdItem.hashCode(),
       };
     }
     // Center
@@ -1790,6 +2002,7 @@ class ConstructorSchemesClass {
       new Point(0, 0),
     ).tag = {
       portType: 'center',
+      portId: createdItem?.nodeId || createdItem?.edgeId || createdItem.hashCode(),
     };
   }
 
@@ -2138,7 +2351,7 @@ class ConstructorSchemesClass {
     // Обновляем состояние графа
     this.graphComponent.updateVisual();
     // Сохраняем изменения
-    this.save(updateStoreCallback);
+    // this.save(updateStoreCallback);
     this.saveAnObject();
   }
 
@@ -2272,7 +2485,7 @@ class ConstructorSchemesClass {
   createDataNode({ graph, location, data }) {
     return graph.createNodeAt({
       location,
-      style: new VuejsNodeStyle(this.getDataNodeTemplate(data.tag.templateType)),
+      style: new VuejsNodeStyle(elementTemplates[data.tag.dataType].template),
       tag: {
         ...data.tag,
         nodeId: data.id || data.hashCode(),
@@ -2283,7 +2496,7 @@ class ConstructorSchemesClass {
   createTextNode({ graph, location, data }) {
     return graph.createNodeAt({
       location,
-      style: new VuejsNodeStyle(this.getTextNodeTemplate(data.tag.textTemplateType)),
+      style: new VuejsNodeStyle(elementTemplates[data.tag.dataType].template),
       tag: {
         ...data.tag,
         fontFamily: this.defaultLabelStyle.font.split(' ')[1] || '',
