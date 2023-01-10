@@ -64,7 +64,7 @@ export class EdgePathPortCandidateProvider extends PortCandidateProviderBase {
       candidates.push(
         new DefaultPortCandidate(
           edge,
-          EdgePathPortLocationModel.INSTANCE.createRatioParameter(0.025 * i),
+          EdgePathPortLocationModel.INSTANCE.createRatioParameter(0.5 * i),
         ),
       );
     }
