@@ -1028,6 +1028,46 @@ const docs = {
         </ul>
       `,
     table: '<h3>Отображает только указанные поля. Синоним команды <b>fields</b>.</h3>',
+    gen_distr: `
+        <i>Синтаксис команды (для всех распределений):</i>
+        <h4>V2 | gen_distr &lt;distribution_type&gt; &lt;param1&gt;=&lt;expression1&gt; &lt;param2&gt;=&lt;expression2&gt; &lt;param3&gt;=&lt;expression3&gt;...&lt;paramN&gt;=&lt;expressionN&gt;</h4>
+        <div>Команда <b>V2 | gen_distr</b> позволяет генерировать распределения по заданным параметрам. Поддерживаемые типы: <b>PERT</b>
+        </div><br>
+        <div>Обязательные параметры (для всех распределений):</div>
+        <ul>
+        <li>
+          <b>distribution_type</b> – тип распределения. Может принимать значения: “pert”
+        </li>
+        <li>
+          <b>param1... paramN</b> – Обязательные для построения распределения параметры. Количество зависит от типа распределения
+        </li>
+        <li>
+          <b>expression1... expressionN</b> – значения соответствующих параметров
+        </li>
+        </ul><br>
+        <i>Синтаксис команды для PERT:</i>
+        <h4>V2 | gen_distr “pert” &lt;size&gt;=&lt;expression1&gt; &lt;a&gt;=&lt;expression2&gt; &lt;b&gt;=&lt;expression3&gt; &lt;c&gt;=&lt;expression4&gt;</h4>
+        <br><div>Обязательные параметры для PERT:</div>
+        <ul>
+        <li>
+          <b>size</b> – количество сгенерированных значений
+        </li>
+        <li>
+          <b>a</b> – минимальное значение
+        </li>
+        <li>
+          <b>b</b> – наиболее частное значение (“мода”)
+        </li>
+        <li>
+          <b>c</b> – максимальное значение
+        </li>
+        <li>
+          <b>expression1... expressionN</b> – значения соответствующих параметров
+        </li>
+        </ul><br>
+        <i>Пример использования PERT</i>
+        <div><pre>V2 | gen_distr "pert" size=100 a=100 b=200 c=300</pre></div>
+      `,
   },
 };
 
