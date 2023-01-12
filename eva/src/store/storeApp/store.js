@@ -152,7 +152,8 @@ export default {
         return Promise.resolve();
       }
       return rest.getSettings()
-        .then((settings) => commit('setSettings', settings));
+        .then((settings) => commit('setSettings', settings))
+        .catch(() => Promise.resolve());
     },
     loadRoles: ({ commit }) => restAuth.getEssenceList('roles')
       .then((roles) => commit('setRoles', roles)),
