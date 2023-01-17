@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added gen_distr command description
 - Added saving of all elements in the "designer schema" as an array of objects with parameters for creating an element
 
 ### Changed
