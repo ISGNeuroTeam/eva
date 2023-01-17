@@ -195,7 +195,7 @@
       />
       <!--Drag-and-drop panel-->
       <div
-        ref="dndPanelContainer"
+        :ref="`dndPanelContainer-${idFrom}`"
         class="dash-constructor-schemes__dnd-panel-container"
         :style="{
           'bottom': `${panelBottomOffset}px`,
@@ -224,7 +224,7 @@
         </div>
         <div
           v-show="!isLoading"
-          ref="dndPanel"
+          :ref="`dndPanel-${idFrom}`"
           class="dash-constructor-schemes__dnd-panel"
         >
           <v-expansion-panels
@@ -511,7 +511,7 @@
       <!--The GraphComponent-->
       <component
         :is="'div'"
-        ref="graphComponent"
+        :ref="`graphComponent-${idFrom}`"
         class="dash-constructor-schemes__graph-component"
         @keyup.ctrl="copyPaste"
       />
@@ -682,10 +682,13 @@ export default {
       return [];
     },
     savedGraph() {
-      return this.dashFromStore[this.idFrom]?.savedGraph || this.dashFromStore?.savedGraph || '';
+      return this.dashFromStore?.savedGraph || this.dashFromStore[this.idFrom]?.savedGraph || '';
     },
     savedGraphObject() {
-      return this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme] || [];
+      if (this.dashFromStore[this.idFrom]?.savedGraphObject) {
+        return this.dashFromStore[this.idFrom]?.savedGraphObject[this.activeScheme] || [];
+      }
+      return [];
     },
     innerSize() {
       return {
@@ -751,6 +754,7 @@ export default {
         this.$nextTick(() => {
           this.createGraph();
           this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
+          this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
         });
       });
     },
@@ -761,19 +765,9 @@ export default {
     },
   },
   mounted() {
-    this.createSavedGraphObjectField();
-    // TODO: Временно, удалить после проверки на всех схемах
-    if (this.dashFromStore.savedGraph) {
-      this.updateSavedGraph(this.dashFromStore.savedGraph);
-      this.$store.commit('setState', [{
-        object: this.dashFromStore,
-        prop: 'savedGraph',
-        value: '',
-      }]);
-    }
     this.createGraph();
     this.updateDefaultElementColor = throttle(this.updateDefaultElementColor, 200);
-    this.updateSavedGraph = throttle(this.updateSavedGraph, 200);
+    this.updateSavedGraph = throttle(this.updateSavedGraph, 1000);
   },
   methods: {
     updateDefaultElementColor(evt, field) {
@@ -795,8 +789,9 @@ export default {
     },
     createGraph() {
       this.constructorSchemes = new ConstructorSchemesClass({
-        dndPanelElem: this.$refs.dndPanel,
-        elem: this.$refs.graphComponent,
+        dndPanelElem: this.$refs[`dndPanel-${this.idFrom}`],
+        schemeId: this.idFrom,
+        elem: this.$refs[`graphComponent-${this.idFrom}`],
         dataRest: this.dataRestFrom,
         iconsList: this.primitivesFromStore,
         elementDefaultStyles: this.elementDefaultStyles,
@@ -823,6 +818,13 @@ export default {
       });
     },
     updateSavedGraph(data) {
+      if (this.dashFromStore?.savedGraph) {
+        this.$store.commit('setState', [{
+          object: this.dashFromStore,
+          prop: 'savedGraph',
+          value: data,
+        }]);
+      }
       this.$store.commit('setState', [{
         object: this.dashFromStore[this.idFrom],
         prop: 'savedGraph',
@@ -830,7 +832,7 @@ export default {
       }]);
     },
     createSavedGraphObjectField() {
-      if (!this.dashFromStore[this.idFrom].savedGraphObject) {
+      if (!this.dashFromStore[this.idFrom]?.savedGraphObject) {
         this.$store.commit('setState', [{
           object: this.dashFromStore[this.idFrom],
           prop: 'savedGraphObject',
@@ -850,6 +852,7 @@ export default {
         prop: this.activeScheme,
         value: data,
       }]);
+      this.updateSavedGraph('');
     },
     closeDataPanel() {
       this.dataPanel = false;

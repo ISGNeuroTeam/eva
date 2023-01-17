@@ -111,6 +111,10 @@ export class DragAndDropPanel {
       originalNode.style,
       originalNode.tag,
     );
+    node.tag = {
+      ...node.tag,
+      nodeId: node.hashCode(),
+    };
     if (originalNode.tag.isTriangle) {
       // graph.setStyle(node, );
     }
