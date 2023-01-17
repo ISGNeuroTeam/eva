@@ -6,7 +6,6 @@ import {
   ILabelModelParameter,
 } from 'yfiles';
 import Utils from './Utils.js';
-// import elementTemplates from './elementTemplates.js';
 import ElementCreator from './ElementCreator.js';
 
 class SchemeUpdater {
@@ -48,7 +47,6 @@ class SchemeUpdater {
             });
           }
           if (element instanceof ILabel) {
-            console.log(SchemeUpdater.getLabelData(element));
             result.push({
               type: 'label',
               data: SchemeUpdater.getLabelData(element),
@@ -56,7 +54,6 @@ class SchemeUpdater {
           }
         });
         this.updateStoreCallback(structuredClone(result));
-        console.log(structuredClone(result));
         resolve(structuredClone(result));
       } catch (e) {
         reject(e);
@@ -88,6 +85,15 @@ class SchemeUpdater {
           nodeId: element.hashCode(),
         },
         icon: element.style.image.match(/\/svg\/([\s\S]+?)\.svg/)[1],
+        layout: SchemeUpdater.getLayout(element.layout),
+      };
+    }
+    if (element.tag[0] === 'i') {
+      return {
+        tag: {
+          dataType: 'invisible',
+          nodeId: element.hashCode(),
+        },
         layout: SchemeUpdater.getLayout(element.layout),
       };
     }

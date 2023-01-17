@@ -1,7 +1,6 @@
 import {
   Point, PolylineEdgeStyle, Rect, ShapeNodeStyle, DefaultLabelStyle,
 } from 'yfiles';
-import HtmlLabelStyle from './HtmlLabelStyles.js';
 import elementTemplates from './elementTemplates.js';
 import VuejsNodeStyle from '@/js/classes/ConstructorSchemes/VueNodeStyle';
 import GenerateIcons from '@/js/classes/ConstructorSchemes/GenerateIcons';
@@ -41,8 +40,6 @@ class ElementCreator {
       ports.forEach((port) => {
         if (!portsFromGraph.some((el) => port.data.tag.portId === el.tag.portId)) {
           filteredPorts.push(port.data);
-        } else {
-          console.log('create-port', portsFromGraph.find((el) => port.data.tag.portId === el.tag.portId));
         }
       });
       filteredPorts.forEach((el) => {
@@ -137,19 +134,13 @@ class ElementCreator {
           style: imageNode.style.clone(),
           tag: imageNode.tag,
         });
-      } else if (element.tag?.dataType !== 'invisible') {
-        // createdNode = this.graph.createNode({
-        //   layout: new Rect(0, 0, 2, 2),
-        //   style: new ShapeNodeStyle({
-        //     shape: 'ellipse',
-        //     fill: 'transparent',
-        //     stroke: '1px transparent',
-        //   }),
-        //   tag: {
-        //     dataType: 'invisible',
-        //     nodeId: element?.tag?.nodeId,
-        //   },
-        // });
+      } else if (element.tag?.dataType === 'invisible') {
+        createdNode = this.createInvisibleNode(
+          element.layout.x,
+          element.layout.y,
+          element.tag.nodeId,
+        );
+      } else {
         const { template } = this.elementTemplates[element.tag.dataType];
         createdNode = this.graph.createNodeAt({
           location: new Rect(
@@ -188,7 +179,7 @@ class ElementCreator {
 
   createInvisibleNode(location, id) {
     const createdNode = this.graph.createNode({
-      layout: new Rect(location.x, location.y, 2, 2),
+      layout: new Rect(location.x - 1.5, location.y - 1.5, 3, 3),
       style: new ShapeNodeStyle({
         shape: 'ellipse',
         fill: 'transparent',
@@ -231,6 +222,8 @@ class ElementCreator {
       });
     }).then((response) => new Promise((resolve) => {
       const createdEdge = this.graph.createEdge({
+        sourceNode: response.sourceNode,
+        targetNode: response.targetNode,
         sourcePort: response.sourcePort,
         targetPort: response.targetPort,
         style: new PolylineEdgeStyle({
