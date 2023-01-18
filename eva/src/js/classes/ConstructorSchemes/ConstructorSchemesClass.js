@@ -96,12 +96,19 @@ class ConstructorSchemesClass {
     };
   }
 
-  static createReactiveNode(data) {
+  static createReactiveNode(data, isRgbaColor) {
     const dataNode = new SimpleNode();
     dataNode.tag = {
       ...data.dataRest,
       nodeId: dataNode.hashCode(),
     };
+    if (isRgbaColor) {
+      dataNode.tag = {
+        ...dataNode.tag,
+        borderColor: Utils.generateColor(Color.from(data.dataRest.borderColor)),
+        bgColor: Utils.generateColor(Color.from(data.dataRest.bgColor)),
+      };
+    }
     dataNode.style = new VuejsNodeStyle(data.template);
     dataNode.layout = new Rect(
       0,
@@ -494,9 +501,15 @@ class ConstructorSchemesClass {
         dataType: 'data-type-3',
       };
     }
-    if (node?.tag?.dataType === 'label-0') {
+    if (node?.tag?.dataType === 'label-0' || node?.tag?.dataType === 'label-type-0') {
       return {
         ...node.tag,
+        borderColor: typeof node.tag.borderColor === 'string'
+          ? Utils.generateColor(Color.from(node.tag.borderColor))
+          : node.tag.borderColor,
+        bgColor: typeof node.tag.bgColor === 'string'
+          ? Utils.generateColor(Color.from(node.tag.bgColor))
+          : node.tag.bgColor,
         dataType: 'label-type-0',
       };
     }
@@ -520,6 +533,7 @@ class ConstructorSchemesClass {
     this.savedGraph = window.localStorage.getItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml') || '';
     window.localStorage.removeItem('www.yworks.com/yFilesHTML/GraphML//unnamed.graphml');
     if (updateStoreCallback && this.savedGraph) {
+      console.log(this.savedGraph);
       updateStoreCallback(this.savedGraph);
     }
   }
@@ -572,12 +586,15 @@ class ConstructorSchemesClass {
 
   saveAnObject() {
     const schemeUpdater = this.initSchemeUpdater();
-    schemeUpdater.save().then((/* result */) => {});
+    schemeUpdater.save().then((/* result */) => {
+      this.save(this.updateStoreCallback);
+    });
   }
 
   load(dndPanelElem) {
     const schemeUpdater = this.initSchemeUpdater();
     schemeUpdater.load().then(() => {
+      this.updateDataNodeTemplate();
       this.setDefaultElementsOrder();
       // Выравнивание графа, инициализация dnd панели
       this.updateViewport().then(() => {
@@ -878,6 +895,7 @@ class ConstructorSchemesClass {
     }
   }
 
+  // TODO: Заменить на ElementCreator.createNode
   async nodeCreator({
     graph,
     dropData,
@@ -1416,7 +1434,7 @@ class ConstructorSchemesClass {
           if (key.includes('label-type')) {
             items.push(
               new DragAndDropPanelItem(
-                ConstructorSchemesClass.createReactiveNode(value),
+                ConstructorSchemesClass.createReactiveNode(value, true),
                 'Элементы с текстом',
                 'text-node',
               ),

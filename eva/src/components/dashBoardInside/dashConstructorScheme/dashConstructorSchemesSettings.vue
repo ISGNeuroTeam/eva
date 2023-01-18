@@ -546,7 +546,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn
                   :style="{
-                    'background-color': dataObject.bgColor,
+                    'background-color': dataObject.bgColor.rgbaString,
                   }"
                   dark
                   v-bind="attrs"
@@ -555,9 +555,10 @@
               </template>
 
               <v-color-picker
-                v-model="dataObject.bgColor"
+                :value="dataObject.bgColor.rgbaObject"
                 dot-size="12"
                 mode="rgba"
+                @update:color="updateSelectedNodeColor($event, 'bgColor')"
               />
             </v-menu>
           </div>
@@ -591,7 +592,7 @@
                 <template v-slot:activator="{ on, attrs }">
                   <v-btn
                     :style="{
-                      'background-color': dataObject.borderColor,
+                      'background-color': dataObject.borderColor.rgbaString,
                     }"
                     dark
                     v-bind="attrs"
@@ -600,9 +601,10 @@
                 </template>
 
                 <v-color-picker
-                  v-model="dataObject.borderColor"
+                  :value="dataObject.borderColor.rgbaObject"
                   dot-size="12"
                   mode="rgba"
+                  @update:color="updateSelectedNodeColor($event, 'borderColor')"
                 />
               </v-menu>
             </div>
